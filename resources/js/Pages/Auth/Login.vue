@@ -1,0 +1,77 @@
+<script setup>
+import InputError from "@/Components/InputError.vue";
+import InputLabel from "@/Components/InputLabel.vue";
+import { Head, Link, useForm } from "@inertiajs/vue3";
+
+const form = useForm({
+  nick_usuario: "",
+  password: "",
+});
+
+const submit = () => {
+  form.post(route("login"), {
+    onFinish: () => form.reset("password"),
+  });
+};
+</script>
+
+<template>
+
+  <Head title="Log in" />
+
+  <div class="flex min-h-screen">
+    <!-- Container -->
+    <div class="flex flex-row w-full">
+      <!-- Sidebar -->
+      <div class="hidden lg:flex flex-col justify-between bg-[#001b47] lg:p-8 xl:p-12 lg:max-w-sm xl:max-w-lg">
+        <div class="flex justify-center">
+          <img style="width: 200px" src="../../../img/isri-logo2.png" alt="GOBIERNO DE EL SALVADOR" />
+        </div>
+
+        <div class="flex justify-center">
+          <h1 class="text-center lg:text-3xl xl:text-5xl xl:leading-snug font-extrabold text-white">
+            Sistema Informático de Gestión Institucional
+          </h1>
+        </div>
+        <p class="font-medium text-gray-400 flex justify-center">
+          © 2023 ISRI - Gobierno de El Salvador
+        </p>
+      </div>
+
+      <!-- Login -->
+      <div class="flex flex-1 flex-col items-center justify-center px-10 relative">
+        <form @submit.prevent="submit">
+          <div class="flex flex-1 flex-col justify-center space-y-7 max-w-md">
+            <div class="flex flex-col space-y-2 text-center">
+              <h2 class="text-3xl md:text-4xl font-bold">Ingrese sus datos</h2>
+              <p class="text-md md:text-xl">
+                Lorem ipsum dolor sit, facere cumque repudiandae molestiae!!
+              </p>
+            </div>
+            <div class="flex flex-col max-w-md space-y-5">
+              <input placeholder="Usuario" id="nick_usuario" type="text" v-model="form.nick_usuario" autofocus
+                autocomplete="username"
+                class="flex px-3 py-2 md:px-4 md:py-3 border-2 border-black rounded-lg font-medium placeholder:font-normal" />
+              <InputError class="mt-2" :message="form.errors.nick_usuario" />
+
+              <input type="password" placeholder="Contraseña" id="password" v-model="form.password"
+                autocomplete="current-password"
+                class="flex px-3 py-2 md:px-4 md:py-3 border-2 border-black rounded-lg font-medium placeholder:font-normal" />
+              <InputError class="mt-2" :message="form.errors.password" />
+
+              <button
+                class="flex items-center justify-center flex-none px-3 py-2 md:px-4 md:py-3 border-2 rounded-lg font-medium border-black bg-black text-white">
+                ENTRAR
+              </button>
+              <div class="flex justify-center items-center">
+                <span class="w-full border border-black"></span>
+                <span class="px-4">ISRI</span>
+                <span class="w-full border border-black"></span>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</template>
