@@ -24,9 +24,3 @@ Sustituir por la siguiente linea:
 ``
 return $this->password_usuario;
 ``
-
-**Importante: Debe reemplazar la carpeta Auth que esta dentro de vendor
-por la que esta en la raiz del proyecto.
-Si es para produccion, borrar la carpeta Auth de la raiz del proyecto 
-una vez copiada en el vendor, si es para desarrollo, conservar la carpeta 
-y mantenerla en el repositorio.**
