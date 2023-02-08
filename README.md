@@ -14,9 +14,16 @@ composer install
 ```
 php artisan key:generate
 ```
-- Copiar la carpeta "Auth" que esta en la raiz dentro de:
+- Reemplazar linea de codigo
 
-*/vendor/laravel/framework/src/Illuminate*
+Ir a la ruta
+*/vendor/laravel/framework/src/Illuminate/Auth*
+
+Modificar la linea 51 del archivo Authenticatable.php
+Sustituir por la siguiente linea:
+``
+return $this->password_usuario;
+``
 
 **Importante: Debe reemplazar la carpeta Auth que esta dentro de vendor
 por la que esta en la raiz del proyecto.
