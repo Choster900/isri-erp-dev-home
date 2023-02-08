@@ -22,8 +22,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
-    //IndexController
-    Route::get('user/list', [UserController::class, 'viewList'])->name('usuarios');
+    //This route obtains users based on the parameters sent from the page.
+    Route::get('users', [UserController::class, 'getUsers'])->name('getusers');
 
     Route::get('dashboard/{id}', [IndexController::class, 'getMenus'])->name('mainpage');
     Route::get('password/create', [IndexController::class, 'createCambiarContraseña'])->name('crear.contraseña');
