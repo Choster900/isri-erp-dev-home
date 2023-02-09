@@ -9,7 +9,7 @@
            Prev
         </a>
 
-        <a v-if="pagination.nextPageUrl" class="button is-small pagination-next" @click="$emit('next');">
+        <a v-if="pagination.nextPageUrl" class="button is-small pagination-next cursor-pointer" @click="$emit('next');">
             Next
         </a>
         <a class="button is-small pagination-next" v-else :disabled="true">
