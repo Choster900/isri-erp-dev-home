@@ -15,9 +15,9 @@ import Select2 from 'vue3-select2-component';
 import jQuery from 'jquery'
 window.jQuery = window.$ = jQuery
 
-
 import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
+
 
 
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || '';

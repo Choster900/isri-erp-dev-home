@@ -7,7 +7,6 @@ import { Head } from "@inertiajs/vue3";
 
 <template>
 
-    <Head title="ISRI" />
     <div class="flex h-screen overflow-hidden">
         <Sidebar :propToChangeStateSidebar="changeState" />
         <div class="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
