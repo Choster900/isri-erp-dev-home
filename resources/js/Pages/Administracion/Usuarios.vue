@@ -3,7 +3,6 @@ import Modal from "@/Components/Modal.vue";
 import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
-import Pagination from "@/Components-ISRI/Pagination.vue";
 </script>
 
 <template>
@@ -46,43 +45,36 @@ import Pagination from "@/Components-ISRI/Pagination.vue";
             <td>{{ user.nick_usuario }}</td>
             <td>{{ user.estado_usuario }}</td>
             <td>
-              <!-- <div class="btn-group"> -->
-                <!-- <div class="col-md-6"> -->
-                  <button
-                    type="button"
-                    class="btn btn-blue"
-                    @click="btnEdit(user.id_usuario)"
-                  >
-                    Edit
-                  </button>
-                <!-- </div> -->
-                <!-- <div class="col-md-6"> -->
-                  <button
-                    type="button"
-                    class="btn btn-red"
-                    @click="btnDelete(user.id_usuario)"
-                  >
-                    Delete
-                  </button>
-                <!-- </div> -->
-              <!-- </div> -->
+              <button
+                type="button"
+                class="btn btn-blue"
+                @click="btnEdit(user.id_usuario)"
+              >
+                Edit
+              </button>
+
+              <button
+                type="button"
+                class="btn btn-red"
+                @click="btnDelete(user.id_usuario)"
+              >
+                Delete
+              </button>
             </td>
           </tr>
         </tbody>
+        <div v-for="link in links" :key="link.label">
+          <a @click="getUsers(link.url)">{{ link.label }}</a>
+        </div>
+        <p>Registros: {{ pagination.total }}</p>
       </datatable>
-      <pagination
-        :pagination="pagination"
-        @prev="getUsers(pagination.prevPageUrl)"
-        @next="getUsers(pagination.nextPageUrl)"
-      >
-      </pagination>
     </div>
   </AppLayoutVue>
 </template>
 
 <script>
 export default {
-  components: { datatable: Datatable, pagination: Pagination },
+  components: { datatable: Datatable },
   created() {
     this.getUsers();
   },
@@ -92,13 +84,14 @@ export default {
       { width: "25%", label: "ID", name: "id_usuario" },
       { width: "25%", label: "User Name", name: "nick_usuario" },
       { width: "25%", label: "Estado", name: "estado_usuario" },
-      { width: "25%", label: "Acciones", name:"Acciones"},
+      { width: "25%", label: "Acciones", name: "Acciones" },
     ];
     columns.forEach((column) => {
       sortOrders[column.name] = -1;
     });
     return {
       users: [],
+      links: [],
       columns: columns,
       sortKey: "id_usuario",
       sortOrders: sortOrders,
@@ -137,6 +130,9 @@ export default {
         .then((response) => {
           let data = response.data;
           if (this.tableData.draw == data.draw) {
+            this.links = data.data.links;
+            this.links[0].label = "Anterior";
+            this.links[this.links.length - 1].label = "Siguiente";
             this.users = data.data.data;
             this.configPagination(data.data);
           }
@@ -156,12 +152,12 @@ export default {
       this.pagination.to = data.to;
     },
     sortBy(key) {
-      if(key!='Acciones'){
+      if (key != "Acciones") {
         this.sortKey = key;
-      this.sortOrders[key] = this.sortOrders[key] * -1;
-      this.tableData.column = this.getIndex(this.columns, "name", key);
-      this.tableData.dir = this.sortOrders[key] === 1 ? "asc" : "desc";
-      this.getUsers();
+        this.sortOrders[key] = this.sortOrders[key] * -1;
+        this.tableData.column = this.getIndex(this.columns, "name", key);
+        this.tableData.dir = this.sortOrders[key] === 1 ? "asc" : "desc";
+        this.getUsers();
       }
     },
     getIndex(array, key, value) {
@@ -173,20 +169,20 @@ export default {
 
 <style>
 .btn {
-    @apply font-bold py-2 px-4 rounded;
-  }
-  .btn-blue {
-    @apply bg-blue-500 text-white;
-  }
-  .btn-blue:hover {
-    @apply bg-blue-700;
-  }
-  .btn-red {
-    @apply bg-red-500 text-white;
-  }
-  .btn-red:hover {
-    @apply bg-red-700;
-  }
+  @apply font-bold py-2 px-4 rounded;
+}
+.btn-blue {
+  @apply bg-blue-500 text-white;
+}
+.btn-blue:hover {
+  @apply bg-blue-700;
+}
+.btn-red {
+  @apply bg-red-500 text-white;
+}
+.btn-red:hover {
+  @apply bg-red-700;
+}
 
 div.columTable {
   max-width: 100px;
