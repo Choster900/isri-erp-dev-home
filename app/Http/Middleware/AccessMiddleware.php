@@ -21,12 +21,13 @@ class AccessMiddleware
         $url2= "/".$url;
         $id_usuario = $request->user()->id_usuario;
         $user = User::find($id_usuario);
+        $user_menu = session()->get('menu');
 
         $allowed_url = false;
         $r_object = (object) $request->user()->roles()->get();
         foreach ($r_object as $rol) {
             foreach ($rol->menus as $menu) {
-                if ($user->hasRole($id_usuario,$rol->id_rol) && $menu->pivot->estado_acceso_menu == 1 && $menu->url_menu == $url2) {
+                if ($user->hasRole($id_usuario,$rol->id_rol) && $menu->pivot->estado_acceso_menu == 1 && $menu->url_menu == $url2 && $user_menu) {
                     $allowed_url = true;
                 }
             }

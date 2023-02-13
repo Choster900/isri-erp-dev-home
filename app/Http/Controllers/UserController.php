@@ -7,11 +7,6 @@ use App\Models\User;
 
 class UserController extends Controller
 {
-    // public function viewList(){
-    //     $users = User::select('id_usuario','nick_usuario','estado_usuario');
-    //     //dd($users);
-    //     return datatables($users)->make(true);
-    // }
     public function getUsers(Request $request)
     {
 
@@ -31,7 +26,7 @@ class UserController extends Controller
             });
         }
 
-        $Users = $query->paginate($length);
-        return ['data' => $Users, 'draw' => $request->input('draw')];
+        $users = $query->paginate($length)->onEachSide(1);
+        return ['data' => $users, 'draw' => $request->input('draw')];
     }
 }
