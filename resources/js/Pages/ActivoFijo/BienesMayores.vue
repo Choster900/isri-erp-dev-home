@@ -43,38 +43,38 @@ import RadioButton from '@/Components-ISRI/ComponentsToForms/RadioButton.vue';
 
     <div id="formulario">
 
-      <div class="mb-4 md:flex flex-row  justify-items-start">
-        <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+      <div class="mb-4 md:flex flex-row justify-items-start">
+        <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
           <TextInput id="personal-information" type="text" placeholder="Informacion Personal">
             <LabelToInput icon="personalInformation" forLabel="personal-information" />
           </TextInput>
 
         </div>
-           <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+        <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
           <TextInput id="general-information" type="text" placeholder="Información General">
             <LabelToInput icon="generalInformation" forLabel="general-information" />
           </TextInput>
         </div>
 
-        <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+        <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
           <TextInput id="money" type="text" placeholder="Money">
             <LabelToInput icon="money" forLabel="money" />
           </TextInput>
         </div>
       </div>
-      <div class="mb-4 md:flex justify-items-start ">
-        <div class="mb-4 md:mr-2 md:mb-0 ">
+      <div class="mb-4 md:flex flex-row justify-items-start ">
+        <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
           <TextInput id="correo-electronico" type="email" placeholder="Correo Electronico">
             <LabelToInput icon="email" forLabel="correo-electronico" />
 
           </TextInput>
         </div>
         <div class="mb-4 md:mr-2 md:mb-0 ">
-          <!-- <label class="block mb-2 text-sm font-bold text-gray-700" for="select">
+          <!--  <label class="block mb-2 text-sm font-bold text-gray-700" for="select">
             Seleccionable
           </label> -->
-          <div class="relative flex h-8 w-full flex-row-reverse  div-select2">
-            <Select2 id="select" name="domain" class="text-sm " v-model="myValue" :options="myOptions" />
+          <div class="relative flex h-8 w-full flex-row-reverse div-select2">
+            <Select2 id="select" name="domain" class="text-xs" v-model="myValue" :options="myOptions" />
             <LabelToInput icon="list" for-label="select" />
           </div>
         </div>
@@ -85,27 +85,25 @@ import RadioButton from '@/Components-ISRI/ComponentsToForms/RadioButton.vue';
           </label> -->
           <div class="relative flex h-8 w-full flex-row-reverse">
             <Datepicker v-model="picked" id="domain"
-              class="peer w-full text-sm font-bold rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none" />
+              class="peer w-full text-sm rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none" />
             <LabelToInput icon="date" />
           </div>
         </div>
       </div>
-      <div class="mb-4 md:flex justify-items-start ">
-        <div class="mb-4 md:mr-2 md:mb-0 ">
+      <div class="mb-4 md:flex flex-row justify-items-start ">
+        <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
           <TextInput id="password" type="password" placeholder="Contraseña">
             <LabelToInput icon="password" for-label="password" />
 
           </TextInput>
         </div>
-        <div class="mb-4 md:mr-2 md:mb-0 ">
-          <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
-            <TextInput id="distance" type="text" placeholder="Distancia">
-              <LabelToInput icon="distance" for-label="distance" />
-            </TextInput>
-          </div>
+        <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
+          <TextInput id="distance" type="text" placeholder="Distancia">
+            <LabelToInput icon="distance" for-label="distance" />
+          </TextInput>
         </div>
-        <div class="mb-4 md:mr-2 md:mb-0 ">
-          <!--  <label class="block mb-2 text-sm font-bold text-gray-700" for="message">
+        <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
+          <!--      <label class="block mb-2 text-sm font-bold text-gray-700" for="message">
             Mensaje
           </label> -->
           <textarea id="message" rows="4"
@@ -145,6 +143,13 @@ import RadioButton from '@/Components-ISRI/ComponentsToForms/RadioButton.vue';
       <div class="mb-4 md:mr-2 md:mb-0 basis-1/">
         <GeneralButton />
       </div>
+      <div class="mb-4 md:mr-2 md:mb-0 basis-1/">
+        <a href="https://kamona-wd.github.io/kwd-dashboard/" target="_blank"
+          class="inline-flex items-center justify-center px-4 py-1 space-x-1 bg-red-500 text-white rounded-md shadow animate-bounce hover:bg-red-600">
+          <span>See Dark & Light version</span>
+        </a>
+      </div>
+
     </div>
 
     <!-- //BUTTONS -->
@@ -214,34 +219,13 @@ export default {
 };
 </script>
 
-<style >
+<style>
 .div-select2 span {
   height: 32px !important;
-  width: 192px !important;
-}
-
-.div-select2 .select2-container--default .select2-selection--single {
-  background-color: #fff;
-  border: 1px solid #aaa;
-  border-radius: 0px 7px 7px 0px;
+  width: 215px !important;
 }
 
 .div-select2 .select2-container--default .select2-selection--single .select2-selection__arrow b {
-  border-color: #888 transparent transparent transparent;
-  border-style: solid;
-  border-width: 6px 4px 0 4px;
-  height: 0;
-  left: 50%;
-  margin-left: 82px;
-  margin-top: -2px;
-  position: absolute;
-  top: 50%;
-  width: 0;
-}
-
-.div-select2 .select2-container--default .select2-selection--single .select2-selection__rendered {
-  color: #444;
-  line-height: 30px;
-  font-weight: bold;
+  margin-left: 91px;
 }
 </style>

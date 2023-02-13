@@ -45,7 +45,7 @@ const iconSelected = computed(() => {
         //input file
         file: 'M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13',
         //input password
-        password:'M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z',
+        password: 'M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z',
 
         'defaultBruh': 'M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9',
     }[props.icon];
@@ -64,17 +64,20 @@ defineExpose({ focus: () => input.value.focus() });
 </script>
 
 <template>
-   <!--  <label class="block mb-2 text-sm font-bold text-gray-700" :for="id">
+    <!-- <label class="block mb-2 text-sm font-bold text-gray-700" :for="id">
         {{ placeholder }}
     </label> -->
     <div class="relative flex h-8 w-full flex-row-reverse overflow-clip "
         style="border: none; background-color: transparent;">
-        <input :id="id" :placeholder="placeholder" :type="type" 
-            class="peer w-full text-sm   rounded-r-md border border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
+        <input :id="id" :placeholder="placeholder" :type="type"
+            class="peer w-full text-xs   rounded-r-md border border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
             :value="modelValue" @input="$emit('update:modelValue', $event.target.value)" ref="input" />
 
-            <slot />
-       <!--  <label
+        <!-- <input :id="id" :placeholder="placeholder" :type="type"
+            class="peer w-full text-xs border-r-0 border-t-0  bg-transparent border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
+            :value="modelValue" @input="$emit('update:modelValue', $event.target.value)" ref="input" /> -->
+        <slot />
+        <!--  <label
             class="flex items-center rounded-l-md border border-slate-400 bg-slate-50 px-2 text-sm text-slate-400 transition-colors duration-300 peer-focus:border-[#001b47] peer-focus:bg-[#001b47] peer-focus:text-white"
             :for="id">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -84,7 +87,7 @@ defineExpose({ focus: () => input.value.focus() });
 
         </label> -->
 
-       <!--  <label
+        <!--  <label
             class="flex items-center rounded-l-md border  px-2 text-sm  border-[#001b47] bg-[#152c50] text-white"
             :for="id">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
