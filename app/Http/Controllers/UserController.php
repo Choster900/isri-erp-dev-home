@@ -20,9 +20,9 @@ class UserController extends Controller
         $query = User::select('id_usuario', 'nick_usuario', 'estado_usuario')->orderBy($columns[$column], $dir);
 
         if ($searchValue) {
-            $query->where(function($query) use ($searchValue) {
+            $query->where(function ($query) use ($searchValue) {
                 $query->where('nick_usuario', 'like', '%' . $searchValue . '%')
-                ->orWhere('id_usuario', 'like', '%' . $searchValue . '%');
+                    ->orWhere('id_usuario', 'like', '%' . $searchValue . '%');
             });
         }
 

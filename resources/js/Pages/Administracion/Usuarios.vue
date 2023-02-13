@@ -3,72 +3,153 @@ import Modal from "@/Components/Modal.vue";
 import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
+import GeneralButton from '@/Components-ISRI/ComponentsToForms/GeneralButton.vue';
+import TextInput from '@/Components-ISRI/ComponentsToForms/TextInput.vue';
+import LabelToInput from '@/Components-ISRI/ComponentsToForms/LabelToInput.vue';
 </script>
 
 <template>
+
   <Head title="Administracion" />
-
   <AppLayoutVue>
-    <div>
-      <div>
-        <input
-          class="input"
-          type="text"
-          v-model="tableData.search"
-          placeholder="Search Table"
-          @input="getUsers()"
-        />
-
-        <div class="control">
-          <div class="select">
-            <select v-model="tableData.length" @change="getUsers()">
-              <option
-                v-for="(records, index) in perPage"
-                :key="index"
-                :value="records"
-              >
-                {{ records }}
-              </option>
-            </select>
+    <div class="sm:flex sm:justify-end sm:items-center mb-2">
+      <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
+        <GeneralButton color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add" />
+      </div>
+    </div>
+    <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
+      <header class="px-5 py-4 flex">
+        <div class="mb-4 md:mr-2 md:mb-0 basis-1/6">
+          <div class="relative flex h-8 w-full flex-row-reverse div-select2">
+            <Select2 id="select" name="domain" class="text-xs" v-model="tableData.length" @select="getUsers()"
+              :options="perPage" />
+            <LabelToInput icon="list" for-label="select" />
           </div>
         </div>
-      </div>
-      <datatable
-        :columns="columns"
-        :sortKey="sortKey"
-        :sortOrders="sortOrders"
-        @sort="sortBy"
-      >
-        <tbody>
-          <tr v-for="user in users" :key="user.id_usuario">
-            <td>{{ user.id_usuario }}</td>
-            <td>{{ user.nick_usuario }}</td>
-            <td>{{ user.estado_usuario }}</td>
-            <td>
-              <button
-                type="button"
-                class="btn btn-blue"
-                @click="btnEdit(user.id_usuario)"
-              >
-                Edit
-              </button>
-
-              <button
-                type="button"
-                class="btn btn-red"
-                @click="btnDelete(user.id_usuario)"
-              >
-                Delete
-              </button>
-            </td>
-          </tr>
-        </tbody>
-        <div v-for="link in links" :key="link.label">
-          <a @click="getUsers(link.url)">{{ link.label }}</a>
+        <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
+          <TextInput id="search-user" type="text" v-model="tableData.search" placeholder="Search Table"
+            @input="getUsers()">
+            <LabelToInput icon="search" forLabel="search-user" />
+          </TextInput>
         </div>
-        <p>Registros: {{ pagination.total }}</p>
-      </datatable>
+        <h2 class="font-semibold text-slate-800 pt-1">All Users <span class="text-slate-400 font-medium">{{
+          pagination.total
+        }}</span></h2>
+      </header>
+      <div>
+        <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy">
+          <tbody class="text-sm divide-y divide-slate-200">
+            <tr v-for="user in users" :key="user.id_usuario">
+              <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+                <div class="font-medium text-slate-800">{{ user.id_usuario }}</div>
+              </td>
+              <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+                <div class="font-medium text-slate-800">{{ user.nick_usuario }}</div>
+
+              </td>
+              <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+
+                <div class="font-medium text-slate-800">
+                  <div v-if="(user.estado_usuario == 1)"
+                    class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
+                    Activo
+                  </div>
+                  <div v-else
+                    class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-rose-100 text-rose-600">
+                    Inactivo
+                  </div>
+
+                </div>
+              </td>
+              <!--   <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+                <button type="button" class="btn btn-blue" @click="btnEdit(user.id_usuario)">
+                  Edit
+                </button>
+
+                <button type="button" class="btn btn-red" @click="btnDelete(user.id_usuario)">
+                  Delete
+                </button>
+              </td> -->
+              <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+                <div class="space-x-1">
+                  <button class="text-slate-400 hover:text-slate-500 rounded-full">
+                    <span class="sr-only">Edit</span>
+                    <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
+                      <path
+                        d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z">
+                      </path>
+                    </svg>
+                  </button>
+                  <button class="text-slate-400 hover:text-slate-500 rounded-full">
+                    <span class="sr-only">Download</span><svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
+                      <path
+                        d="M16 20c.3 0 .5-.1.7-.3l5.7-5.7-1.4-1.4-4 4V8h-2v8.6l-4-4L9.6 14l5.7 5.7c.2.2.4.3.7.3zM9 22h14v2H9z">
+                      </path>
+                    </svg>
+                  </button>
+                  <button class="text-rose-500 hover:text-rose-600 rounded-full">
+                    <span class="sr-only">Delete</span><svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
+                      <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
+                      </path>
+                      <path
+                        d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z">
+                      </path>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+
+              <!-- <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px"><button
+                  class="text-slate-400 hover:text-slate-500 rounded-full"><span class="sr-only">Menu</span><svg
+                    class="w-8 h-8 fill-current" viewBox="0 0 32 32">
+                    <circle cx="16" cy="16" r="2"></circle>
+                    <circle cx="10" cy="16" r="2"></circle>
+                    <circle cx="22" cy="16" r="2"></circle>
+                  </svg></button></td> -->
+            </tr>
+          </tbody>
+        </datatable>
+      </div>
     </div>
+
+    <div class="px-6 py-8 bg-white shadow-lg
+     rounded-sm border-slate-200 relative">
+      <div>
+        <nav class="flex justify-between" role="navigation" aria-label="Navigation">
+
+          <div class="grow text-center">
+            <ul class="inline-flex text-sm font-medium -space-x-px">
+              <li v-for="link in links" :key="link.label">
+                <span v-if="(link.label == 'Anterior')"
+                  :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
+
+                  <div class="flex-1 text-right ml-2">
+                    <a @click="getUsers(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                      text-indigo-500">
+                      &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
+                    </a>
+                  </div>
+                </span>
+                <span v-else-if="(link.label == 'Siguiente')"
+                  :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
+                  <div class="flex-1 text-right ml-2">
+                    <a @click="getUsers(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                      text-indigo-500">
+                      <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
+                    </a>
+                  </div>
+                </span>
+                <span class="cursor-pointer" v-else
+                  :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
+                    class=" w-5" @click="getUsers(link.url)">{{ link.label }}</span>
+                </span>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+    </div>
+
   </AppLayoutVue>
 </template>
 
@@ -98,7 +179,7 @@ export default {
       perPage: ["10", "20", "30"],
       tableData: {
         draw: 0,
-        length: 10,
+        length: 5,
         search: "",
         column: 0,
         dir: "desc",
@@ -131,8 +212,10 @@ export default {
           let data = response.data;
           if (this.tableData.draw == data.draw) {
             this.links = data.data.links;
+
             this.links[0].label = "Anterior";
             this.links[this.links.length - 1].label = "Siguiente";
+
             this.users = data.data.data;
             this.configPagination(data.data);
           }
@@ -167,112 +250,3 @@ export default {
 };
 </script>
 
-<style>
-.btn {
-  @apply font-bold py-2 px-4 rounded;
-}
-.btn-blue {
-  @apply bg-blue-500 text-white;
-}
-.btn-blue:hover {
-  @apply bg-blue-700;
-}
-.btn-red {
-  @apply bg-red-500 text-white;
-}
-.btn-red:hover {
-  @apply bg-red-700;
-}
-
-div.columTable {
-  max-width: 100px;
-  width: 100px;
-  white-space: break-word;
-}
-
-table td {
-  /*     text-align: center;
- */
-  font-size: 10pt;
-  /*     border: 1px solid black;
- */
-}
-
-#DataTables_Table_0_filter,
-#DataTables_Table_0_length {
-  padding: 1em;
-}
-
-.dataTables_wrapper .dataTables_length select {
-  padding-left: 20px;
-  padding-right: 20px;
-}
-
-/* div.dataTables_wrapper {
-  width: 900px;
-  margin: 0 auto;
-} */
-
-#tabla-central::-webkit-scrollbar {
-  width: 12px;
-  height: 10px;
-  /* width of the entire scrollbar */
-}
-
-#tabla-central::-webkit-scrollbar-track {
-  background: yellow;
-  /* color of the tracking area */
-}
-
-#tabla-central::-webkit-scrollbar-thumb {
-  background-color: red;
-  /* color of the scroll thumb */
-  border-radius: 20px;
-  /* roundness of the scroll thumb */
-  border: 3px solid transparent;
-  /* creates padding around scroll thumb */
-}
-
-.dt-button {
-  padding: 0;
-  border: none;
-}
-
-table.tablas_sistema thead:nth-child(1) th {
-  background-color: #1f3558;
-  color: white;
-  text-align: center;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-table.tablas_sistema thead:nth-child(2) th {
-  text-align: center;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-input.tabla[type="text"] {
-  width: 100px;
-  height: 28px;
-  line-height: 28px;
-  border-radius: 30px;
-  padding: 0 8px;
-  border: none;
-  background-color: #1f355833;
-  text-align: center;
-}
-
-input.tabla[type="date"] {
-  width: 125px;
-  height: 28px;
-  line-height: 28px;
-  border-radius: 30px;
-  padding: 0 8px;
-  border: none;
-  background-color: #1f355833;
-  text-align: center;
-}
-</style>
