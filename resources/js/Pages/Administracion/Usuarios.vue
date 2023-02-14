@@ -6,6 +6,8 @@ import Datatable from "@/Components-ISRI/Datatable.vue";
 import GeneralButton from '@/Components-ISRI/ComponentsToForms/GeneralButton.vue';
 import TextInput from '@/Components-ISRI/ComponentsToForms/TextInput.vue';
 import LabelToInput from '@/Components-ISRI/ComponentsToForms/LabelToInput.vue';
+import axios from 'axios';
+
 </script>
 
 <template>
@@ -32,7 +34,7 @@ import LabelToInput from '@/Components-ISRI/ComponentsToForms/LabelToInput.vue';
             <LabelToInput icon="search" forLabel="search-user" />
           </TextInput>
         </div>
-        <h2 class="font-semibold text-slate-800 pt-1">All Users <span class="text-slate-400 font-medium">{{
+        <h2 class="font-semibold text-slate-800 pt-1">All Users<span class="text-slate-400 font-medium">{{
           pagination.total
         }}</span></h2>
       </header>
@@ -45,10 +47,8 @@ import LabelToInput from '@/Components-ISRI/ComponentsToForms/LabelToInput.vue';
               </td>
               <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800">{{ user.nick_usuario }}</div>
-
               </td>
               <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
-
                 <div class="font-medium text-slate-800">
                   <div v-if="(user.estado_usuario == 1)"
                     class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
@@ -58,18 +58,8 @@ import LabelToInput from '@/Components-ISRI/ComponentsToForms/LabelToInput.vue';
                     class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-rose-100 text-rose-600">
                     Inactivo
                   </div>
-
                 </div>
               </td>
-              <!--   <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
-                <button type="button" class="btn btn-blue" @click="btnEdit(user.id_usuario)">
-                  Edit
-                </button>
-
-                <button type="button" class="btn btn-red" @click="btnDelete(user.id_usuario)">
-                  Delete
-                </button>
-              </td> -->
               <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                 <div class="space-x-1">
                   <button class="text-slate-400 hover:text-slate-500 rounded-full">
@@ -98,17 +88,10 @@ import LabelToInput from '@/Components-ISRI/ComponentsToForms/LabelToInput.vue';
                   </button>
                 </div>
               </td>
-
-              <!-- <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px"><button
-                  class="text-slate-400 hover:text-slate-500 rounded-full"><span class="sr-only">Menu</span><svg
-                    class="w-8 h-8 fill-current" viewBox="0 0 32 32">
-                    <circle cx="16" cy="16" r="2"></circle>
-                    <circle cx="10" cy="16" r="2"></circle>
-                    <circle cx="22" cy="16" r="2"></circle>
-                  </svg></button></td> -->
             </tr>
           </tbody>
         </datatable>
+
       </div>
     </div>
 
@@ -155,11 +138,10 @@ import LabelToInput from '@/Components-ISRI/ComponentsToForms/LabelToInput.vue';
 
 <script>
 export default {
-  components: { datatable: Datatable },
   created() {
     this.getUsers();
   },
-  data() {
+  data: function (data) {
     let sortOrders = {};
     let columns = [
       { width: "25%", label: "ID", name: "id_usuario" },
@@ -203,26 +185,20 @@ export default {
     btnDelete(id) {
       alert(`Delete user #: ${id}`);
     },
-
-    getUsers(url = "/users") {
+    async getUsers(url = "/users") {
       this.tableData.draw++;
-      axios
-        .get(url, { params: this.tableData })
-        .then((response) => {
-          let data = response.data;
-          if (this.tableData.draw == data.draw) {
-            this.links = data.data.links;
-
-            this.links[0].label = "Anterior";
-            this.links[this.links.length - 1].label = "Siguiente";
-
-            this.users = data.data.data;
-            this.configPagination(data.data);
-          }
-        })
-        .catch((errors) => {
-          console.log(errors);
-        });
+      await axios.get(url, { params: this.tableData }).then((response) => {
+        let data = response.data;
+        if (this.tableData.draw == data.draw) {
+          this.links = data.data.links;
+          this.links[0].label = "Anterior";
+          this.links[this.links.length - 1].label = "Siguiente";
+          this.users = data.data.data;
+          this.configPagination(data.data);
+        }
+      }).catch((errors) => {
+        console.log(errors);
+      });
     },
     configPagination(data) {
       this.pagination.lastPage = data.last_page;

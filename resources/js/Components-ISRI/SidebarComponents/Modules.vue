@@ -1,7 +1,7 @@
 <template>
 
     <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 cursor-pointer"
-        :class="matchPath ? 'bg-[#02143c]' : ''">
+        :class="matchPath ? 'bg-[#010f2c]' : ''">
         <a @click="StateFromModal ? stateToMenu = !stateToMenu : this.$emit('emitToShowSidebarFromModules')"
             class="block text-slate-200 hover:text-white truncate transition duration-150">
             <div class="flex items-center justify-between">

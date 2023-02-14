@@ -6,6 +6,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    title: {
+        type: String,
+        default: "Tittle",
+    },
     maxWidth: {
         type: String,
         default: '2xl',
@@ -76,11 +80,29 @@ const maxWidthClass = computed(() => {
                     enter-to-class="opacity-100 translate-y-0 sm:scale-100" leave-active-class="ease-in duration-200"
                     leave-from-class="opacity-100 translate-y-0 sm:scale-100"
                     leave-to-class="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+
                     <div v-show="show"
-                        class="mb-6 bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-xl transform transition-all sm:w-full sm:mx-auto"
-                        :class="maxWidthClass">
-                        <slot v-if="show" />
+                        class="fixed inset-0 z-50 overflow-hidden flex items-center  my-4 justify-center px-4 sm:px-6">
+                        <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full sm:max-w-xl">
+                            <!-- Modal header -->
+                            <div class="px-5 py-3 border-b border-slate-200">
+                                <div class="flex justify-between items-center">
+                                    <div class="font-semibold text-slate-800">{{ title }}</div>
+                                    <button class="text-slate-400 hover:text-slate-500"  @click.stop="$emit('close-modal')">
+                                        <div class="sr-only">Close</div>
+                                        <svg class="w-4 h-4 fill-current">
+                                            <path
+                                                d="
+                                                M7.95 6.536l4.242-4.243a1 1 0 111.415 1.414L9.364 7.95l4.243 4.242a1 1 0 11-1.415 1.415L7.95 9.364l-4.243 4.243a1 1 0 01-1.414-1.415L6.536 7.95 2.293 3.707a1 1 0 011.414-1.414L7.95 6.536z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <slot />
+                        </div>
                     </div>
+
+
                 </transition>
             </div>
         </transition>
