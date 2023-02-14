@@ -1,20 +1,21 @@
 
 <script setup>
-import Modal from "@/Components/Modal.vue";
 import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from '@/Layouts/AppLayout.vue';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 
+import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
+/* import ModalVue from "@/Components/Modal.vue"; */
 import TextInput from "@/Components-ISRI/ComponentsToForms/TextInput.vue";
 import LabelToInput from "@/Components-ISRI/ComponentsToForms/LabelToInput.vue";
 import GeneralButton from "@/Components-ISRI/ComponentsToForms/GeneralButton.vue";
 import Checkbox from '@/Components-ISRI/ComponentsToForms/Checkbox.vue';
 
 import Datepicker from 'vue3-datepicker'
-import Multiselect from 'vue-multiselect';
 import RadioButton from '@/Components-ISRI/ComponentsToForms/RadioButton.vue';
-
+/* import DatepickerTest from "@/Components-ISRI/ComponentsToForms/datepickerTest.vue";
+ */
 </script>
 
 <template>
@@ -24,6 +25,15 @@ import RadioButton from '@/Components-ISRI/ComponentsToForms/RadioButton.vue';
   <AppLayoutVue>
 
     <h3 class="pt-4 text-2xl text-center pb-10">Create an Account!</h3>
+
+
+
+    <!--    <div>
+      <h2 class="text-2xl text-slate-800 font-bold mb-6">Datepicker (built with <a class="underline hover:no-underline"
+          href="https://github.com/flatpickr/flatpickr" target="_blank" rel="noreferrer">flatpickr</a>)</h2>
+      <DatepickerTest />
+    </div> -->
+
 
     <div class="mb-4 md:flex flex-row ">
       <div class="mb-4 md:mr-2 md:mb-0  basis-1/2">
@@ -129,7 +139,8 @@ import RadioButton from '@/Components-ISRI/ComponentsToForms/RadioButton.vue';
     <!-- BUTTONS -->
     <div class="mb-4 md:flex flex-row ">
       <div class="mb-2 md:mr-2 md:mb-0 basis-1/">
-        <GeneralButton color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add" />
+        <GeneralButton color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add"
+          @click="changeStateFromModal" />
       </div>
       <div class="mb-4 md:mr-2 md:mb-0 basis-1/">
         <GeneralButton color="bg-red-700  hover:bg-red-800" text="Eliminar" icon="delete" @click="deletAlert" />
@@ -154,6 +165,201 @@ import RadioButton from '@/Components-ISRI/ComponentsToForms/RadioButton.vue';
 
     <!-- //BUTTONS -->
 
+    <ModalVue :show="showModal" @close="changeStateFromModal" title="Basic Modal" @close-modal="changeStateFromModal">
+      <div class="px-5 pt-4 pb-1">
+        <div class="text-sm">
+          <div class="mb-4">Selecciona un rol y un sistema:</div>
+          <div class="mb-4 md:flex flex-row justify-items-start">
+            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+              <div class="relative flex h-8 w-full flex-row-reverse div-select2">
+                <Select2 class="text-xs" v-model="myValue" :options="myOptions" placeholder="Sistema" />
+                <LabelToInput icon="list" for-label="select" />
+              </div>
+            </div>
+            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+              <div class="relative flex h-8 w-full flex-row-reverse div-select2">
+                <Select2 class="text-xs" v-model="myValue" :options="myOptions" placeholder="Rol" />
+                <LabelToInput icon="list" for-label="select" />
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-4 md:flex flex-row justify-center">
+
+            <div class="mb-4 md:mr-2 md:mb-0 px-1">
+              <GeneralButton color="bg-orange-700  hover:bg-orange-800" text="Agregar" icon="add"
+                @click="deletAlert()" />
+
+            </div>
+            <div class="mb-4 md:mr-2 md:mb-0 px-1">
+              <GeneralButton text="Cancelar" icon="add" @click="changeStateFromModal" />
+
+            </div>
+
+
+          </div>
+
+          <div class="tabla-modal">
+            <table class="w-full" id="tabla_modal_validacion_arranque">
+              <thead class="bg-[#1F3558] text-white">
+                <tr class="">
+                  <th class="rounded-tl-lg">#</th>
+                  <th>SISTEM</th>
+                  <th>ROL</th>
+                  <th class="rounded-tr-lg">ACCIONES</th>
+                </tr>
+              </thead>
+              <tbody class="text-sm divide-y divide-slate-200">
+                <tr class="hover:bg-[#141414]/10">
+                  <td class="text-center">1</td>
+                  <td class="text-center">Sistema 1</td>
+                  <td class="text-center">Rol 1</td>
+                  <td class="text-center">
+                    <div class="space-x-1">
+                      <button class="text-slate-400 hover:text-slate-500 rounded-full">
+                        <span class="sr-only">Edit</span>
+                        <svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
+                          <path
+                            d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z">
+                          </path>
+                        </svg>
+                      </button>
+                      <button class="text-rose-500 hover:text-rose-600 rounded-full">
+                        <span class="sr-only">Delete</span><svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
+                          <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
+                          </path>
+                          <path
+                            d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z">
+                          </path>
+                        </svg>
+                      </button>
+                    </div>
+
+                  </td>
+                </tr>
+                <tr class="hover:bg-[#141414]/10">
+                  <td class="text-center">1</td>
+                  <td class="text-center">Sistema 1</td>
+                  <td class="text-center">Rol 1</td>
+                  <td class="text-center">
+                    <div class="space-x-1">
+                      <button class="text-slate-400 hover:text-slate-500 rounded-full">
+                        <span class="sr-only">Edit</span>
+                        <svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
+                          <path
+                            d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z">
+                          </path>
+                        </svg>
+                      </button>
+                      <button class="text-rose-500 hover:text-rose-600 rounded-full">
+                        <span class="sr-only">Delete</span><svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
+                          <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
+                          </path>
+                          <path
+                            d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z">
+                          </path>
+                        </svg>
+                      </button>
+                    </div>
+
+                  </td>
+                </tr>
+                <tr class="hover:bg-[#141414]/10">
+                  <td class="text-center">1</td>
+                  <td class="text-center">Sistema 1</td>
+                  <td class="text-center">Rol 1</td>
+                  <td class="text-center">
+                    <div class="space-x-1">
+                      <button class="text-slate-400 hover:text-slate-500 rounded-full">
+                        <span class="sr-only">Edit</span>
+                        <svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
+                          <path
+                            d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z">
+                          </path>
+                        </svg>
+                      </button>
+                      <button class="text-rose-500 hover:text-rose-600 rounded-full">
+                        <span class="sr-only">Delete</span><svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
+                          <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
+                          </path>
+                          <path
+                            d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z">
+                          </path>
+                        </svg>
+                      </button>
+                    </div>
+
+                  </td>
+                </tr>
+                <tr class="hover:bg-[#141414]/10">
+                  <td class="text-center">1</td>
+                  <td class="text-center">Sistema 1</td>
+                  <td class="text-center">Rol 1</td>
+                  <td class="text-center">
+                    <div class="space-x-1">
+                      <button class="text-slate-400 hover:text-slate-500 rounded-full">
+                        <span class="sr-only">Edit</span>
+                        <svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
+                          <path
+                            d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z">
+                          </path>
+                        </svg>
+                      </button>
+                      <button class="text-rose-500 hover:text-rose-600 rounded-full">
+                        <span class="sr-only">Delete</span><svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
+                          <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
+                          </path>
+                          <path
+                            d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z">
+                          </path>
+                        </svg>
+                      </button>
+                    </div>
+
+                  </td>
+                </tr>
+                <tr class="hover:bg-[#141414]/10">
+                  <td class="text-center">1</td>
+                  <td class="text-center">Sistema 1</td>
+                  <td class="text-center">Rol 1</td>
+                  <td class="text-center">
+                    <div class="space-x-1">
+                      <button class="text-slate-400 hover:text-slate-500 rounded-full">
+                        <span class="sr-only">Edit</span>
+                        <svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
+                          <path
+                            d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z">
+                          </path>
+                        </svg>
+                      </button>
+                      <button class="text-rose-500 hover:text-rose-600 rounded-full">
+                        <span class="sr-only">Delete</span><svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
+                          <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
+                          </path>
+                          <path
+                            d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z">
+                          </path>
+                        </svg>
+                      </button>
+                    </div>
+
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="text-xs text-slate-500">Your workspace’s Mosaic Light Plan is set to $39 per month and will renew
+            on August 9, 2021.</div>
+        </div>
+      </div>
+
+      <div class="px-5 py-4">
+        <div class="flex flex-wrap justify-end space-x-2">
+          <!-- <GeneralButton color="bg-orange-700  hover:bg-orange-800" text="Agregar" icon="add" @click="deletAlert()" />
+          <GeneralButton text="Cancelar" icon="add" @click="changeStateFromModal" /> -->
+        </div>
+      </div>
+    </ModalVue>
 
   </AppLayoutVue>
 
@@ -168,7 +374,7 @@ export default {
   data: function () {
     return {
       changeState: false,
-      showModal: false,
+      showModal: false,//COPIAR ESTO PARA FUNCIONAMIENTO DE MODAL
       myOptions: ['Registro', 'Usuario de prueba', 'Opcion de prueba 3'],
       primerNombre: '',
       picked: '',
@@ -177,9 +383,8 @@ export default {
 
     };
   },
-  components: { Modal },
   methods: {
-    changeStateFromModal() {
+    changeStateFromModal() {//COPIAR ESTE PARA FUNCIONAMIENTO DE MODAL
       this.showModal = !this.showModal;
     },
     notify() {
@@ -227,5 +432,11 @@ export default {
 
 .div-select2 .select2-container--default .select2-selection--single .select2-selection__arrow b {
   margin-left: 91px;
+}
+
+
+
+div.tabla-modal table thead {
+  font-size: 12px;
 }
 </style>
