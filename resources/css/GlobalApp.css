@@ -3,14 +3,11 @@
     width: 200px !important;
     display: block;
 }
-
-
 .div-select2 .select2-container--default .select2-selection--single {
     background-color: #fff;
     border: 1px solid #aaa;
     border-radius: 0px 7px 7px 0px;
 }
-
 .div-select2
     .select2-container--default
     .select2-selection--single
@@ -27,11 +24,20 @@
     top: 50%;
     width: 0;
 }
-
 .div-select2
     .select2-container--default
     .select2-selection--single
     .select2-selection__rendered {
     color: #444;
     line-height: 30px;
+}
+:root {
+    --toastify-toast-min-height: 50px !important;
+}
+.Toastify__toast-theme--light {
+    background: var(--toastify-color-light);
+    color: var(--toastify-text-color-light);
+    font-size: 10pt !important;
+    font-weight: bold;
+    
 }

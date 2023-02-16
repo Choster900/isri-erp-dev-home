@@ -1,5 +1,5 @@
 <template>
-    <table class="table-auto w-full">
+    <table class="table-auto w-full editor_listing_table ">
         <thead class="text-xs font-semibold uppercase text-slate-500 bg-slate-50 border-t border-b border-slate-200">
             <tr>
                 <th v-for="column in columns" :key="column.name" @click="$emit('sort', column.name)"
@@ -10,7 +10,7 @@
                 </th>
             </tr>
         </thead>
-        <slot></slot>
+        <slot class=""></slot>
     </table>
 </template>
 
@@ -19,3 +19,6 @@ export default {
     props: ['columns', 'sortKey', 'sortOrders']
 }
 </script>
+<style>
+
+</style>
