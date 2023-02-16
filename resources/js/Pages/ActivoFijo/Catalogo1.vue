@@ -12,7 +12,7 @@ import AppLayoutVue from '@/Layouts/AppLayout.vue';
   <Head title="Activo Fijo" />
 
   <AppLayoutVue>
-    Soy el index de catalogo 1
+    
   </AppLayoutVue>
 
 
@@ -26,7 +26,6 @@ export default {
       showModal: false,
     };
   },
-  components: { Modal },
   methods: {
     changeStateFromModal() {
       this.showModal = !this.showModal;

@@ -25,6 +25,13 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     //This route obtains users based on the parameters sent from the page.
     Route::get('users', [UserController::class, 'getUsers'])->name('getusers');
 
+    Route::get('sistemas', [UserController::class, 'getSistemas'])->name('getsistemas');
+    Route::get('rolesxsistemas', [UserController::class, 'getRoles'])->name('getroles');
+    Route::post('save/rol', [UserController::class, 'saveRol'])->name('saverol');
+    Route::post('desactive/rol', [UserController::class, 'desactiveRol'])->name('desactiverol');
+    Route::post('edit/rol', [UserController::class, 'editRol'])->name('editrol');
+    Route::get('rolesxsistema', [UserController::class, 'getRolesxSistema'])->name('getrolesxsistema');
+
     Route::get('dashboard/{id}', [IndexController::class, 'getMenus'])->name('mainpage');
     Route::get('password/create', [IndexController::class, 'createCambiarContraseña'])->name('crear.contraseña');
     Route::put('password/reset', [IndexController::class, 'cambiarContraseña'])->name('cambiar.contraseña');

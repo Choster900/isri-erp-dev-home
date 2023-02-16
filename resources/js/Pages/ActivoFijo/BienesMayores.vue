@@ -1,42 +1,61 @@
-
 <script setup>
 import { Head } from "@inertiajs/vue3";
-import AppLayoutVue from '@/Layouts/AppLayout.vue';
-import { toast } from 'vue3-toastify';
-import 'vue3-toastify/dist/index.css';
+import AppLayoutVue from "@/Layouts/AppLayout.vue";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 
 import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
 /* import ModalVue from "@/Components/Modal.vue"; */
 import TextInput from "@/Components-ISRI/ComponentsToForms/TextInput.vue";
 import LabelToInput from "@/Components-ISRI/ComponentsToForms/LabelToInput.vue";
 import GeneralButton from "@/Components-ISRI/ComponentsToForms/GeneralButton.vue";
-import Checkbox from '@/Components-ISRI/ComponentsToForms/Checkbox.vue';
+import Checkbox from "@/Components-ISRI/ComponentsToForms/Checkbox.vue";
 
-import Datepicker from 'vue3-datepicker'
-import RadioButton from '@/Components-ISRI/ComponentsToForms/RadioButton.vue';
-/* import DatepickerTest from "@/Components-ISRI/ComponentsToForms/datepickerTest.vue";
- */
+import Datepicker from "vue3-datepicker";
+import RadioButton from "@/Components-ISRI/ComponentsToForms/RadioButton.vue";
+import DatepickerTest from "@/Components-ISRI/ComponentsToForms/FlatPickr.vue";
+
+import Multiselect from "@vueform/multiselect";
 </script>
 
 <template>
-
   <Head title="Activo fijo" />
 
   <AppLayoutVue>
 
+    <Multiselect v-model="valor" :options="opcionesSelect2" :searchable="true" />
+    <br>
     <h3 class="pt-4 text-2xl text-center pb-10">Create an Account!</h3>
 
+    <!-- <Multiselect v-model="valor" mode="tags" :close-on-select="false" :searchable="true" :create-option="false"
+                  :options="[
+                    { value: '1', label: 'Batman' },
+                    { value: '2', label: 'Robin' },
+                    { value: '3', label: 'Joker' },
+                  ]" class="" /> -->
+
+    <div class="mb-4 md:flex flex-row justify-items-start">
+      <div class="mb-4 md:mr-2 md:mb-0">
+        <div class="relative flex h-8 w-full flex-row-reverse basis-1">
+          <DatepickerTest v-model="picked" id="domain">
+          </DatepickerTest>
+          <LabelToInput icon="date" />
+        </div>
+      </div>
+      {{ valor }}
 
 
-    <!--    <div>
-      <h2 class="text-2xl text-slate-800 font-bold mb-6">Datepicker (built with <a class="underline hover:no-underline"
-          href="https://github.com/flatpickr/flatpickr" target="_blank" rel="noreferrer">flatpickr</a>)</h2>
-      <DatepickerTest />
-    </div> -->
+      <div class="mb-4 md:mr-2 md:mb-0">
+        <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
+          <Multiselect placeholder="Seleccione" v-model="valor" mode="tags" :close-on-select="false" :searchable="true"
+            :create-option="false" :options="opcionesSelect2" class="cursor-pointer text-xs" />
+          <LabelToInput icon="date" />
+        </div>
+      </div>
+    </div>
 
-
-    <div class="mb-4 md:flex flex-row ">
-      <div class="mb-4 md:mr-2 md:mb-0  basis-1/2">
+    <div class="mb-4 md:flex flex-row">
+      <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
         <RadioButton modelValue="1" v-model="prueba" />
         <RadioButton modelValue="2" v-model="prueba" />
         <RadioButton modelValue="3" v-model="prueba" />
@@ -46,19 +65,14 @@ import RadioButton from '@/Components-ISRI/ComponentsToForms/RadioButton.vue';
       </div>
 
       {{ prueba }}
-
     </div>
 
-
-
     <div id="formulario">
-
       <div class="mb-4 md:flex flex-row justify-items-start">
         <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
           <TextInput id="personal-information" type="text" placeholder="Informacion Personal">
             <LabelToInput icon="personalInformation" forLabel="personal-information" />
           </TextInput>
-
         </div>
         <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
           <TextInput id="general-information" type="text" placeholder="Información General">
@@ -72,27 +86,27 @@ import RadioButton from '@/Components-ISRI/ComponentsToForms/RadioButton.vue';
           </TextInput>
         </div>
       </div>
-      <div class="mb-4 md:flex flex-row justify-items-start ">
+      <div class="mb-4 md:flex flex-row justify-items-start">
         <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
           <TextInput id="correo-electronico" type="email" placeholder="Correo Electronico">
             <LabelToInput icon="email" forLabel="correo-electronico" />
-
           </TextInput>
         </div>
-        <div class="mb-4 md:mr-2 md:mb-0 ">
+        <div class="mb-4 md:mr-2 md:mb-0">
           <!--  <label class="block mb-2 text-sm font-bold text-gray-700" for="select">
-            Seleccionable
-          </label> -->
+                        Seleccionable
+                      </label> -->
           <div class="relative flex h-8 w-full flex-row-reverse div-select2">
-            <Select2 id="select" name="domain" class="text-xs" v-model="myValue" :options="myOptions" />
+            <Select2 id="select" name="domain" class="text-xs" v-model="prueba" :options="opcionesSelect2" />
             <LabelToInput icon="list" for-label="select" />
+            {{ prueba }}
           </div>
         </div>
 
-        <div class="mb-4 md:mr-2 md:mb-0 ">
+        <div class="mb-4 md:mr-2 md:mb-0">
           <!-- <label class="block mb-2 text-sm font-bold text-gray-700" for="select">
-            DatePicker
-          </label> -->
+                        DatePicker
+                      </label> -->
           <div class="relative flex h-8 w-full flex-row-reverse">
             <Datepicker v-model="picked" id="domain"
               class="peer w-full text-sm rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none" />
@@ -100,11 +114,10 @@ import RadioButton from '@/Components-ISRI/ComponentsToForms/RadioButton.vue';
           </div>
         </div>
       </div>
-      <div class="mb-4 md:flex flex-row justify-items-start ">
+      <div class="mb-4 md:flex flex-row justify-items-start">
         <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
           <TextInput id="password" type="password" placeholder="Contraseña">
             <LabelToInput icon="password" for-label="password" />
-
           </TextInput>
         </div>
         <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
@@ -114,8 +127,8 @@ import RadioButton from '@/Components-ISRI/ComponentsToForms/RadioButton.vue';
         </div>
         <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
           <!--      <label class="block mb-2 text-sm font-bold text-gray-700" for="message">
-            Mensaje
-          </label> -->
+                        Mensaje
+                      </label> -->
           <textarea id="message" rows="4"
             class="peer w-full rounded-md text-sm border h-10 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
             placeholder="Your message..."></textarea>
@@ -123,21 +136,23 @@ import RadioButton from '@/Components-ISRI/ComponentsToForms/RadioButton.vue';
       </div>
     </div>
 
-    <div class="mb-4 md:flex flex-row ">
-      <div class="mb-4 md:mr-2 md:mb-0 ">
-        <label for="checbox1" class="text-sm font-bold text-gray-700">Remember me </label>
+    <div class="mb-4 md:flex flex-row">
+      <div class="mb-4 md:mr-2 md:mb-0">
+        <label for="checbox1" class="text-sm font-bold text-gray-700">Remember me
+        </label>
         <checkbox class="mr-3" id="checbox1" />
-        <label for="checbox2" class="text-sm font-bold text-gray-700">Remember my password to </label>
+        <label for="checbox2" class="text-sm font-bold text-gray-700">Remember my password to
+        </label>
         <checkbox class="mr-3" id="checbox2" />
       </div>
     </div>
 
     <!-- <Multiselect id="mechanic_id" placeholder="Search mechanic" :options="mechanics" label="name" track-by="id"
-      @search-change="onSearchMechanisChange" @input="onSelectdMechanic">
+                  @search-change="onSearchMechanisChange" @input="onSelectdMechanic">
 
-    </Multiselect> -->
+                </Multiselect> -->
     <!-- BUTTONS -->
-    <div class="mb-4 md:flex flex-row ">
+    <div class="mb-4 md:flex flex-row">
       <div class="mb-2 md:mr-2 md:mb-0 basis-1/">
         <GeneralButton color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add"
           @click="changeStateFromModal" />
@@ -160,7 +175,6 @@ import RadioButton from '@/Components-ISRI/ComponentsToForms/RadioButton.vue';
           <span>See Dark & Light version</span>
         </a>
       </div>
-
     </div>
 
     <!-- //BUTTONS -->
@@ -185,18 +199,12 @@ import RadioButton from '@/Components-ISRI/ComponentsToForms/RadioButton.vue';
           </div>
 
           <div class="mb-4 md:flex flex-row justify-center">
-
             <div class="mb-4 md:mr-2 md:mb-0 px-1">
-              <GeneralButton color="bg-orange-700  hover:bg-orange-800" text="Agregar" icon="add"
-                @click="deletAlert()" />
-
+              <GeneralButton color="bg-orange-700  hover:bg-orange-800" text="Agregar" icon="add" @click="deletAlert()" />
             </div>
             <div class="mb-4 md:mr-2 md:mb-0 px-1">
               <GeneralButton text="Cancelar" icon="add" @click="changeStateFromModal" />
-
             </div>
-
-
           </div>
 
           <div class="tabla-modal">
@@ -226,15 +234,13 @@ import RadioButton from '@/Components-ISRI/ComponentsToForms/RadioButton.vue';
                       </button>
                       <button class="text-rose-500 hover:text-rose-600 rounded-full">
                         <span class="sr-only">Delete</span><svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
-                          <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
-                          </path>
+                          <path d="M13 15h2v6h-2zM17 15h2v6h-2z"></path>
                           <path
                             d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z">
                           </path>
                         </svg>
                       </button>
                     </div>
-
                   </td>
                 </tr>
                 <tr class="hover:bg-[#141414]/10">
@@ -253,15 +259,13 @@ import RadioButton from '@/Components-ISRI/ComponentsToForms/RadioButton.vue';
                       </button>
                       <button class="text-rose-500 hover:text-rose-600 rounded-full">
                         <span class="sr-only">Delete</span><svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
-                          <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
-                          </path>
+                          <path d="M13 15h2v6h-2zM17 15h2v6h-2z"></path>
                           <path
                             d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z">
                           </path>
                         </svg>
                       </button>
                     </div>
-
                   </td>
                 </tr>
                 <tr class="hover:bg-[#141414]/10">
@@ -280,15 +284,13 @@ import RadioButton from '@/Components-ISRI/ComponentsToForms/RadioButton.vue';
                       </button>
                       <button class="text-rose-500 hover:text-rose-600 rounded-full">
                         <span class="sr-only">Delete</span><svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
-                          <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
-                          </path>
+                          <path d="M13 15h2v6h-2zM17 15h2v6h-2z"></path>
                           <path
                             d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z">
                           </path>
                         </svg>
                       </button>
                     </div>
-
                   </td>
                 </tr>
                 <tr class="hover:bg-[#141414]/10">
@@ -307,15 +309,13 @@ import RadioButton from '@/Components-ISRI/ComponentsToForms/RadioButton.vue';
                       </button>
                       <button class="text-rose-500 hover:text-rose-600 rounded-full">
                         <span class="sr-only">Delete</span><svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
-                          <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
-                          </path>
+                          <path d="M13 15h2v6h-2zM17 15h2v6h-2z"></path>
                           <path
                             d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z">
                           </path>
                         </svg>
                       </button>
                     </div>
-
                   </td>
                 </tr>
                 <tr class="hover:bg-[#141414]/10">
@@ -334,109 +334,126 @@ import RadioButton from '@/Components-ISRI/ComponentsToForms/RadioButton.vue';
                       </button>
                       <button class="text-rose-500 hover:text-rose-600 rounded-full">
                         <span class="sr-only">Delete</span><svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
-                          <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
-                          </path>
+                          <path d="M13 15h2v6h-2zM17 15h2v6h-2z"></path>
                           <path
                             d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z">
                           </path>
                         </svg>
                       </button>
                     </div>
-
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <div class="text-xs text-slate-500">Your workspace’s Mosaic Light Plan is set to $39 per month and will renew
-            on August 9, 2021.</div>
+          <div class="text-xs text-slate-500">
+            Your workspace’s Mosaic Light Plan is set to $39 per
+            month and will renew on August 9, 2021.
+          </div>
         </div>
       </div>
 
       <div class="px-5 py-4">
         <div class="flex flex-wrap justify-end space-x-2">
           <!-- <GeneralButton color="bg-orange-700  hover:bg-orange-800" text="Agregar" icon="add" @click="deletAlert()" />
-          <GeneralButton text="Cancelar" icon="add" @click="changeStateFromModal" /> -->
+                      <GeneralButton text="Cancelar" icon="add" @click="changeStateFromModal" /> -->
         </div>
       </div>
     </ModalVue>
-
-  </AppLayoutVue>
-
-
-
+</AppLayoutVue>
 </template>
 
 <script>
-
 export default {
-
   data: function () {
     return {
       changeState: false,
-      showModal: false,//COPIAR ESTO PARA FUNCIONAMIENTO DE MODAL
-      myOptions: ['Registro', 'Usuario de prueba', 'Opcion de prueba 3'],
-      primerNombre: '',
-      picked: '',
+      showModal: false, //COPIAR ESTO PARA FUNCIONAMIENTO DE MODAL
+      opcionesSelect2: [
+        { value: 'batman', label: 'Batman' },
+        { value: 'robin', label: 'Robin', disabled: true },
+        { value: 'joker', label: 'Joker' },
+      ],
+      primerNombre: "",
+      picked: "",
       mechanics: [],
-      prueba: ''
-
+      prueba: "",
+      valor: ["batman"],
+      textDate: "",
     };
   },
   methods: {
-    changeStateFromModal() {//COPIAR ESTE PARA FUNCIONAMIENTO DE MODAL
+    changeStateFromModal() {
+      //COPIAR ESTE PARA FUNCIONAMIENTO DE MODAL
       this.showModal = !this.showModal;
     },
     notify() {
       toast.info("Te informamos que", {
-        autoClose: 1000,
+        autoClose: 5000,
         position: "top-right",
-        transition: "zoom",
+        transition: "bounce",
         toastBackgroundColor: "white",
+        icon: "🚀",
       });
     },
     deletAlert() {
-      this.$swal.fire({
-        title: 'Esta seguro de eliminar este registro',
-        icon: 'question',
-        iconHtml: '❓',
-        confirmButtonText: 'Si, Eliminarlo',
-        confirmButtonColor: '#f8312f',
-        cancelButtonText: 'Cancelar',
-        showCancelButton: true,
-        showCloseButton: true
-      }).then((result) => {
-        if (result.isConfirmed) {
-          toast.success("Alerta de success", {
-            autoClose: 1000,
-            position: "top-right",
-            transition: "zoom",
-            toastBackgroundColor: "white",
-          });
-        }
-      })
-    }
-
+      this.$swal
+        .fire({
+          title: "Esta seguro de eliminar este registro",
+          icon: "question",
+          iconHtml: "❓",
+          confirmButtonText: "Si, Eliminarlo",
+          confirmButtonColor: "#f8312f",
+          cancelButtonText: "Cancelar",
+          showCancelButton: true,
+          showCloseButton: true,
+        })
+        .then((result) => {
+          if (result.isConfirmed) {
+            toast.success("Alerta de success", {
+              autoClose: 5000,
+              position: "top-right",
+              transition: "zoom",
+              toastBackgroundColor: "white",
+            });
+          }
+        });
+    },
   },
-  created() {
-
-  },
+  created() { },
 };
 </script>
 
 <style>
+/* ESTILOS SELECT2 */
+/* altura del select 2 y ancho */
 .div-select2 span {
   height: 32px !important;
   width: 215px !important;
 }
 
+/* Distancia el icono del select 2 de display */
 .div-select2 .select2-container--default .select2-selection--single .select2-selection__arrow b {
   margin-left: 91px;
 }
 
-
+/* //ESTILOS SELECT2 */
 
 div.tabla-modal table thead {
   font-size: 12px;
 }
+
+/* ESTILOS MULTISELECT */
+.multiselect {
+  min-width: 200px;
+  min-height: 10px;
+}
+
+.multiselect-tag {
+  background: #243041;
+  color: var(--ms-tag-color, #fff);
+  font-size: 8pt;
+}
+
+/* //ESTILOS MULTISELECT */
 </style>
