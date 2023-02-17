@@ -83,11 +83,11 @@ const maxWidthClass = computed(() => {
 
                     <div v-show="show"
                         class="fixed inset-0 z-50 overflow-hidden flex items-center  my-4 justify-center px-4 sm:px-6">
-                        <div class="bg-white rounded shadow-lg overflow-auto max-w-lg w-full max-h-full sm:max-w-xl">
+                        <div class="bg-white rounded-md shadow-lg overflow-auto max-w-lg w-full max-h-full sm:max-w-xl">
                             <!-- Modal header -->
-                            <div class="px-5 py-3 border-b border-slate-200">
-                                <div class="flex justify-between items-center">
-                                    <div class="font-semibold text-slate-800">{{ title }}</div>
+                            <div class="px-5 py-3 border-b border-slate-200 bg-[#1F3558]">
+                                <div class="flex justify-between items-center ">
+                                    <div class="font-semibold text-slate-50">{{ title }}</div>
                                     <button class="text-slate-400 hover:text-slate-500"  @click.stop="$emit('close-modal')">
                                         <div class="sr-only">Close</div>
                                         <svg class="w-4 h-4 fill-current">
