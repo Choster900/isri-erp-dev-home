@@ -6,6 +6,7 @@ import Datatable from "@/Components-ISRI/Datatable.vue";
 import GeneralButton from '@/Components-ISRI/ComponentsToForms/GeneralButton.vue';
 import TextInput from '@/Components-ISRI/ComponentsToForms/TextInput.vue';
 import LabelToInput from '@/Components-ISRI/ComponentsToForms/LabelToInput.vue';
+import ModalAdministracionVue from '@/Components-ISRI/Administracion/ModalAdministracion.vue';
 </script>
 <template>
   <Head title="Administracion" />
@@ -119,7 +120,7 @@ import LabelToInput from '@/Components-ISRI/ComponentsToForms/LabelToInput.vue';
         </nav>
       </div>
     </div>
-    <ModalAdministracion :showModal="showModal" :modalData="modalData" @cerrar-modal="showModal = !showModal" />
+    <ModalAdministracionVue :showModal="showModal" :modalData="modalData" @cerrar-modal="showModal = !showModal" />
   </AppLayoutVue>
 </template>
 <script>
