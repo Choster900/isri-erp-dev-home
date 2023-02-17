@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\IndexController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\Administracion\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
