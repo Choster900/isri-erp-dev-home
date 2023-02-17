@@ -1,8 +1,5 @@
 <script setup>
 import Modal from "@/Components/Modal.vue";
-import GeneralButton from '@/Components-ISRI/ComponentsToForms/GeneralButton.vue';
-import TextInput from '@/Components-ISRI/ComponentsToForms/TextInput.vue';
-import LabelToInput from '@/Components-ISRI/ComponentsToForms/LabelToInput.vue';
 import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
@@ -10,23 +7,25 @@ import axios from 'axios';
 </script>
 <template>
     <ModalVue :show="showModal" @close="$emit('cerrar-modal')"
-        v-bind:title="'Gestion de roles usuario: ' + modalData.id_usuario" @close-modal="$emit('cerrar-modal')">
+        v-bind:title="'⚙️ Gestion de roles usuario: ' + modalData.nombre_usuario + '.'"
+        @close-modal="$emit('cerrar-modal')">
         <div class="px-5 pt-4 pb-1">
             <div class="text-sm">
                 <div class="mb-4">Selecciona un rol y un sistema:</div>
-                <div class="mb-4 md:flex flex-row justify-items-start">
-                    <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                        <div class="relative flex h-8 w-full flex-row-reverse div-select2">
-                            <Select2 class="text-xs" v-model="modalData.id_sistema" @select="getRolesxSistema()"
-                                :options="modalData.sistemas" placeholder="Sistema" />
-                            <LabelToInput icon="list" for-label="select" />
+                <div class="mb-4 md:flex flex-row justify-between">
+                    <div class="mb-4 md:mr-2 md:mb-0">
+                        <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
+                            <Multiselect v-model="modalData.id_sistema" @select="getRolesxSistema()"
+                                :options="modalData.sistemas" placeholder="Sistema" :searchable="true" />
+                            <LabelToInput icon="date" />
                         </div>
                     </div>
-                    <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                        <div class="relative flex h-8 w-full flex-row-reverse div-select2">
-                            <Select2 class="text-xs" v-model="modalData.id_rol" :options="modalData.roles"
-                                placeholder="Rol" />
-                            <LabelToInput icon="list" for-label="select" />
+
+                    <div class="mb-4 md:mr-2 md:mb-0">
+                        <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
+                            <Multiselect v-model="modalData.id_rol" :options="modalData.roles" placeholder="Rol"
+                                :searchable="true" />
+                            <LabelToInput icon="date" />
                         </div>
                     </div>
                 </div>

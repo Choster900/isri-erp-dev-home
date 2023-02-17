@@ -1,38 +1,22 @@
 <script setup>
 import { Head } from "@inertiajs/vue3";
-import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
-
 import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
-/* import ModalVue from "@/Components/Modal.vue"; */
-import TextInput from "@/Components-ISRI/ComponentsToForms/TextInput.vue";
-import LabelToInput from "@/Components-ISRI/ComponentsToForms/LabelToInput.vue";
-import GeneralButton from "@/Components-ISRI/ComponentsToForms/GeneralButton.vue";
-import Checkbox from "@/Components-ISRI/ComponentsToForms/Checkbox.vue";
-
-import Datepicker from "vue3-datepicker";
-import RadioButton from "@/Components-ISRI/ComponentsToForms/RadioButton.vue";
-import DatepickerTest from "@/Components-ISRI/ComponentsToForms/FlatPickr.vue";
-
-import Multiselect from "@vueform/multiselect";
 </script>
 
 <template>
   <Head title="Activo fijo" />
 
   <AppLayoutVue>
-
-    <Multiselect v-model="valor" :options="opcionesSelect2" :searchable="true" />
-    <br>
     <h3 class="pt-4 text-2xl text-center pb-10">Create an Account!</h3>
 
     <!-- <Multiselect v-model="valor" mode="tags" :close-on-select="false" :searchable="true" :create-option="false"
-                  :options="[
-                    { value: '1', label: 'Batman' },
-                    { value: '2', label: 'Robin' },
-                    { value: '3', label: 'Joker' },
-                  ]" class="" /> -->
+                    :options="[
+                      { value: '1', label: 'Batman' },
+                      { value: '2', label: 'Robin' },
+                      { value: '3', label: 'Joker' },
+                    ]" class="" /> -->
 
     <div class="mb-4 md:flex flex-row justify-items-start">
       <div class="mb-4 md:mr-2 md:mb-0">
@@ -42,11 +26,18 @@ import Multiselect from "@vueform/multiselect";
           <LabelToInput icon="date" />
         </div>
       </div>
-      {{ valor }}
-
+      <!--       {{ valor }}
+   -->
 
       <div class="mb-4 md:mr-2 md:mb-0">
         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
+          <Multiselect class="" v-model="valor" :options="opcionesSelect2" :searchable="true" />
+          <LabelToInput icon="date" />
+        </div>
+      </div>
+
+      <div class="mb-4 md:mr-2 md:mb-0">
+        <div class="relative flex h-8 w-full flex-row-reverse">
           <Multiselect placeholder="Seleccione" v-model="valor" mode="tags" :close-on-select="false" :searchable="true"
             :create-option="false" :options="opcionesSelect2" class="cursor-pointer text-xs" />
           <LabelToInput icon="date" />
@@ -94,8 +85,8 @@ import Multiselect from "@vueform/multiselect";
         </div>
         <div class="mb-4 md:mr-2 md:mb-0">
           <!--  <label class="block mb-2 text-sm font-bold text-gray-700" for="select">
-                        Seleccionable
-                      </label> -->
+                          Seleccionable
+                        </label> -->
           <div class="relative flex h-8 w-full flex-row-reverse div-select2">
             <Select2 id="select" name="domain" class="text-xs" v-model="prueba" :options="opcionesSelect2" />
             <LabelToInput icon="list" for-label="select" />
@@ -105,8 +96,8 @@ import Multiselect from "@vueform/multiselect";
 
         <div class="mb-4 md:mr-2 md:mb-0">
           <!-- <label class="block mb-2 text-sm font-bold text-gray-700" for="select">
-                        DatePicker
-                      </label> -->
+                          DatePicker
+                        </label> -->
           <div class="relative flex h-8 w-full flex-row-reverse">
             <Datepicker v-model="picked" id="domain"
               class="peer w-full text-sm rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none" />
@@ -127,8 +118,8 @@ import Multiselect from "@vueform/multiselect";
         </div>
         <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
           <!--      <label class="block mb-2 text-sm font-bold text-gray-700" for="message">
-                        Mensaje
-                      </label> -->
+                          Mensaje
+                        </label> -->
           <textarea id="message" rows="4"
             class="peer w-full rounded-md text-sm border h-10 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
             placeholder="Your message..."></textarea>
@@ -148,9 +139,9 @@ import Multiselect from "@vueform/multiselect";
     </div>
 
     <!-- <Multiselect id="mechanic_id" placeholder="Search mechanic" :options="mechanics" label="name" track-by="id"
-                  @search-change="onSearchMechanisChange" @input="onSelectdMechanic">
+                    @search-change="onSearchMechanisChange" @input="onSelectdMechanic">
 
-                </Multiselect> -->
+                  </Multiselect> -->
     <!-- BUTTONS -->
     <div class="mb-4 md:flex flex-row">
       <div class="mb-2 md:mr-2 md:mb-0 basis-1/">
@@ -356,11 +347,11 @@ import Multiselect from "@vueform/multiselect";
       <div class="px-5 py-4">
         <div class="flex flex-wrap justify-end space-x-2">
           <!-- <GeneralButton color="bg-orange-700  hover:bg-orange-800" text="Agregar" icon="add" @click="deletAlert()" />
-                      <GeneralButton text="Cancelar" icon="add" @click="changeStateFromModal" /> -->
+                        <GeneralButton text="Cancelar" icon="add" @click="changeStateFromModal" /> -->
         </div>
       </div>
     </ModalVue>
-</AppLayoutVue>
+  </AppLayoutVue>
 </template>
 
 <script>
@@ -449,11 +440,7 @@ div.tabla-modal table thead {
   min-height: 10px;
 }
 
-.multiselect-tag {
-  background: #243041;
-  color: var(--ms-tag-color, #fff);
-  font-size: 8pt;
-}
+
 
 /* //ESTILOS MULTISELECT */
 </style>

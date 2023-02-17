@@ -1,11 +1,7 @@
 <script setup>
 import Modal from "@/Components/Modal.vue";
 import { Head } from "@inertiajs/vue3";
-import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
-import GeneralButton from '@/Components-ISRI/ComponentsToForms/GeneralButton.vue';
-import TextInput from '@/Components-ISRI/ComponentsToForms/TextInput.vue';
-import LabelToInput from '@/Components-ISRI/ComponentsToForms/LabelToInput.vue';
 import ModalAdministracionVue from '@/Components-ISRI/Administracion/ModalAdministracion.vue';
 </script>
 <template>
@@ -18,18 +14,20 @@ import ModalAdministracionVue from '@/Components-ISRI/Administracion/ModalAdmini
     </div>
     <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
       <header class="px-5 py-4 flex">
-        <div class="mb-4 md:mr-2 md:mb-0 basis-1/6">
-          <div class="relative flex h-8 w-full flex-row-reverse div-select2">
-            <Select2 id="select" name="domain" class="text-xs" v-model="tableData.length" @select="getUsers()"
-              :options="perPage" />
-            <LabelToInput icon="list" for-label="select" />
+        <div class="mb-4 md:flex flex-row justify-items-start">
+          <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+            <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
+              <Multiselect v-model="tableData.length" @select="getUsers()" :options="perPage" :searchable="true" />
+              <LabelToInput icon="date" />
+            </div>
           </div>
-        </div>
-        <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
-          <TextInput id="search-user" type="text" v-model="tableData.search" placeholder="Search Table"
-            @input="getUsers()">
-            <LabelToInput icon="search" forLabel="search-user" />
-          </TextInput>
+
+          <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+            <TextInput id="search-user" type="text" v-model="tableData.search" placeholder="Search Table"
+              @input="getUsers()">
+              <LabelToInput icon="search" forLabel="search-user" />
+            </TextInput>
+          </div>
         </div>
         <h2 class="font-semibold text-slate-800 pt-1">All Users<span class="text-slate-400 font-medium">{{
           pagination.total
@@ -96,7 +94,7 @@ import ModalAdministracionVue from '@/Components-ISRI/Administracion/ModalAdmini
 
                   <div class="flex-1 text-right ml-2">
                     <a @click="getUsers(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                  text-indigo-500">
+                                    text-indigo-500">
                       &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                     </a>
                   </div>
@@ -105,7 +103,7 @@ import ModalAdministracionVue from '@/Components-ISRI/Administracion/ModalAdmini
                   :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                   <div class="flex-1 text-right ml-2">
                     <a @click="getUsers(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                  text-indigo-500">
+                                    text-indigo-500">
                       <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                     </a>
                   </div>

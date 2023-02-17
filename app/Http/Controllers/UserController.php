@@ -46,8 +46,8 @@ class UserController extends Controller
         if(isset($rolesxuser)){
             foreach($sistemas as $sistema){
                 if(!(in_array($sistema->id_sistema,$rolesxuser))){
-                    $arraySistemas['id']=$sistema->id_sistema;
-                    $arraySistemas['text']=$sistema->nombre_sistema;
+                    $arraySistemas['value']=$sistema->id_sistema;
+                    $arraySistemas['label']=$sistema->nombre_sistema;
                     $arraySis[]=$arraySistemas;
                 }
             }
@@ -56,8 +56,8 @@ class UserController extends Controller
             }
         }else{
             foreach($sistemas as $sistema){
-                $arraySistemas['id']=$sistema->id_sistema;
-                $arraySistemas['text']=$sistema->nombre_sistema;
+                $arraySistemas['value']=$sistema->id_sistema;
+                $arraySistemas['label']=$sistema->nombre_sistema;
                 $arraySis[]=$arraySistemas;
             }
         }
@@ -67,8 +67,8 @@ class UserController extends Controller
         $id_sistema = $request->input('id_sistema');
         $sistema = Sistema::find($id_sistema);
         foreach($sistema->roles as $rol){
-            $arrayRol['id']=$rol->id_rol;
-            $arrayRol['text']=$rol->nombre_rol;
+            $arrayRol['value']=$rol->id_rol;
+            $arrayRol['label']=$rol->nombre_rol;
             $arrayRoles[]=$arrayRol;
         }
         return ['roles' => $arrayRoles];
@@ -107,8 +107,8 @@ class UserController extends Controller
         $permisox=PermisoUsuario::where('id_usuario','=',$id_usuario)->where('id_rol','=',$id_rol)->first();
         $sistema=Sistema::find($id_sistema);
         foreach($sistema->roles as $rol){
-            $arraySistemas['id']=$rol->id_rol;
-            $arraySistemas['text']=$rol->nombre_rol;
+            $arraySistemas['value']=$rol->id_rol;
+            $arraySistemas['label']=$rol->nombre_rol;
             $arraySis[]=$arraySistemas;
         }
         return ['roles' => $arraySis,'permiso_usuario'=>$permisox->id_permiso_usuario];
