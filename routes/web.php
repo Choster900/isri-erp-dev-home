@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\Administracion\UserController;
+use App\Http\Controllers\Administracion\RolController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -24,6 +25,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
     //This route obtains users based on the parameters sent from the page.
     Route::get('users', [UserController::class, 'getUsers'])->name('getusers');
+
+    Route::get('roles', [RolController::class, 'getRoles'])->name('getroles');
 
     Route::get('sistemas', [UserController::class, 'getSistemas'])->name('getsistemas');
     Route::get('rolesxsistemas', [UserController::class, 'getRoles'])->name('getroles');
