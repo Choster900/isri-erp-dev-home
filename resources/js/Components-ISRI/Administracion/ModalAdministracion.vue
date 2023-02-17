@@ -81,6 +81,10 @@ import axios from 'axios';
                                     </td>
                                 </tr>
                             </template>
+                            <tr v-if="modalData.userRoles == '' ">
+                                <td v-if="modalData.userRoles.length > 0" colspan="4" class="text-center">Cargando...</td>
+                                <td v-else colspan="4" class="text-center">Sin resultados</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -95,10 +99,10 @@ import axios from 'axios';
                 <div class="mb-4">Sistema : {{ modalData.sistema_edit }}</div>
                 <div class="mb-4 md:flex flex-row justify-items-start">
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                        <div class="relative flex h-8 w-full flex-row-reverse div-select2">
-                            <Select2 class="text-xs" v-model="modalData.id_rol_edit" :options="modalData.roles_edit"
-                                placeholder="Rol" />
-                            <LabelToInput icon="list" for-label="select" />
+                        <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
+                            <Multiselect v-model="modalData.id_rol_edit" :options="modalData.roles_edit" placeholder="Rol"
+                                :searchable="true" />
+                            <LabelToInput icon="date" />
                         </div>
                     </div>
                 </div>
@@ -258,7 +262,10 @@ export default {
     },
     watch: {
         showModal: function (newParam, oldParam) {
-            newParam ? this.getSistemas() : ""
+            let tBody = document.getElementById("tabla_modal_validacion_arranque")
+            //newParam ? this.getSistemas() : tBody.innerHTML = ""
+            newParam ? this.getSistemas() : this.modalData.userRoles = []
+
         },
     },
 }
