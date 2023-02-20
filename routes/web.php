@@ -24,16 +24,21 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     })->name('dashboard');
 
     //This route obtains users based on the parameters sent from the page.
-    Route::get('users', [UserController::class, 'getUsers'])->name('getusers');
+    Route::get('users', [UserController::class, 'getUsers'])->name('get.users');
+    //Manage roles for a specific user
+    Route::get('sistemas', [UserController::class, 'getSistemas'])->name('get.sistemas');
+    Route::get('rolesxsistemas', [UserController::class, 'getRoles'])->name('get.roles');
+    Route::post('save/rol', [UserController::class, 'saveRol'])->name('save.rol');
+    Route::post('desactive/rol', [UserController::class, 'desactiveRol'])->name('desactive.rol');
+    Route::post('edit/rol', [UserController::class, 'editRol'])->name('edit.rol');
+    Route::get('rolesxsistema', [UserController::class, 'getRolesxSistema'])->name('get.rolesxsistema');
 
-    Route::get('roles', [RolController::class, 'getRoles'])->name('getroles');
+    //This route obtains roles based on the parameters sent from the page.
+    Route::get('roles', [RolController::class, 'getRoles'])->name('get.roles');
+    //This route allows to desactive a specific rol for all users
+    Route::post('change/rol/all', [RolController::class, 'changeRolAll'])->name('change.rol.all');
+    //Manage menus for a specific rol
 
-    Route::get('sistemas', [UserController::class, 'getSistemas'])->name('getsistemas');
-    Route::get('rolesxsistemas', [UserController::class, 'getRoles'])->name('getroles');
-    Route::post('save/rol', [UserController::class, 'saveRol'])->name('saverol');
-    Route::post('desactive/rol', [UserController::class, 'desactiveRol'])->name('desactiverol');
-    Route::post('edit/rol', [UserController::class, 'editRol'])->name('editrol');
-    Route::get('rolesxsistema', [UserController::class, 'getRolesxSistema'])->name('getrolesxsistema');
 
     Route::get('dashboard/{id}', [IndexController::class, 'getMenus'])->name('mainpage');
     Route::get('password/create', [IndexController::class, 'createCambiarContraseña'])->name('crear.contraseña');

@@ -34,6 +34,21 @@ class RolController extends Controller
         }
 
         $roles = $query->paginate($length)->onEachSide(1);
-        return ['data' => $roles, 'draw' => $request->input('draw')];
+        $current_page=$request->input('currentPage');
+        // if($current_page!=""){
+        //     $roles->current=$current_page;
+        // }
+        return ['data' => $roles, 'draw' => $request->input('draw'),'current'=>$current_page];
+    }
+
+    public function changeRolAll(Request $request){
+        $id_rol = $request->input('id_rol');
+        $estado_anterior = $request->input('estado_rol');
+        $msg="";
+        $rol = Rol::find($id_rol);
+        $estado_anterior==1 ? $rol->estado_rol=0 : $rol->estado_rol=1;
+        $estado_anterior==1 ? $msg="Desactivado" : $msg="Activado";
+        $rol->update();
+        return ['mensaje' => $msg.' rol '.$rol->nombre_rol.' con exito'];
     }
 }

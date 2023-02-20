@@ -88,7 +88,7 @@ import axios from 'axios';
                       </path>
                     </svg>
                   </button>
-                  <button class="text-rose-500 hover:text-rose-600 rounded-full">
+                  <button @click="desactiveRol(rol.id_rol,rol.nombre_rol,rol.estado_rol)" class="text-rose-500 hover:text-rose-600 rounded-full">
                     <span class="sr-only">Delete</span><svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
                       <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
                       </path>
@@ -152,6 +152,17 @@ export default {
   created() {
     this.getRoles();
   },
+  watch:{
+    links(newValue){
+      Array.from(newValue).forEach(element => 
+        function(){
+          if(element.active==true){
+            this.tableData.currentPage=element.label
+          }
+        }
+      );
+    }
+  },
   data: function (data) {
     let sortOrders = {};
     let columns = [
@@ -176,6 +187,7 @@ export default {
       sortOrders: sortOrders,
       perPage: ["10", "20", "30"],
       tableData: {
+        currentPage:'',
         draw: 0,
         length: 5,
         search: "",
@@ -195,6 +207,37 @@ export default {
     };
   },
   methods: {
+    desactiveRol(id_rol,nombre_rol,estado_rol){
+      let msg
+      estado_rol==1 ? msg="Desactivar":msg="Activar"
+      this.$swal.fire({
+        title: msg+' Rol '+nombre_rol+' para todos los usuarios',
+        text: "Estas seguro?",
+        icon: 'warning',
+        showCancelButton: true,
+        cancelButtonText:'Cancelar',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Si, '+msg
+      }).then((result) => {
+        if (result.isConfirmed) {
+          axios.post("/change/rol/all",{
+                id_rol: id_rol,
+                estado_rol:estado_rol
+              })
+            .then((response) => {
+              this.$swal.fire({
+                text:response.data.mensaje,
+                icon: 'success',
+                timer:2000
+              })
+              this.getRoles('http://127.0.0.1:8000/roles?page='+this.tableData.currentPage);
+            })
+            .catch((errors) => console.log(errors))
+        }
+      })
+    },
+
     async getRoles(url = "/roles") {
       this.tableData.draw++;
       await axios.get(url, { params: this.tableData }).then((response) => {
@@ -202,6 +245,7 @@ export default {
         if (this.tableData.draw == data.draw) {
           this.links = data.data.links;
           this.pagination.total=data.data.total;
+          this.tableData.currentPage=data.data.current_page;
           console.log(data.data);
           this.links[0].label = "Anterior";
           this.links[this.links.length - 1].label = "Siguiente";
