@@ -39,7 +39,7 @@ import axios from 'axios';
             <LabelToInput icon="search" forLabel="search-user" />
           </TextInput>
         </div>
-        <h2 class="font-semibold text-slate-800 pt-1">All Users<span class="text-slate-400 font-medium">{{
+        <h2 class="font-semibold text-slate-800 pt-1">All Users <span class="text-slate-400 font-medium">{{
           pagination.total
         }}</span></h2>
       </header>
@@ -471,6 +471,7 @@ export default {
         let data = response.data;
         if (this.tableData.draw == data.draw) {
           this.links = data.data.links;
+          this.pagination.total=data.data.total
           this.links[0].label = "Anterior";
           this.links[this.links.length - 1].label = "Siguiente";
           this.users = data.data.data;

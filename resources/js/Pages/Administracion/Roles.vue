@@ -39,7 +39,7 @@ import axios from 'axios';
             <LabelToInput icon="search" forLabel="search-rol" />
           </TextInput>
         </div>
-        <h2 class="font-semibold text-slate-800 pt-1">Total Roles<span class="text-slate-400 font-medium">{{
+        <h2 class="font-semibold text-slate-800 pt-1">Total Roles <span class="text-slate-400 font-medium">{{
           pagination.total
         }}</span></h2>
       </header>
@@ -51,7 +51,7 @@ import axios from 'axios';
                 <div class="font-medium text-slate-800">{{ rol.id_rol }}</div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
-                <div class="font-medium text-slate-800">{{ rol.sistema.nombre_sistema }}</div>
+                <div class="font-medium text-slate-800">{{ rol.nombre_sistema }}</div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800">{{ rol.nombre_rol }}</div>
@@ -155,11 +155,11 @@ export default {
   data: function (data) {
     let sortOrders = {};
     let columns = [
-      { width: "15%", label: "ID", name: "id_rol" },
-      { width: "15%", label: "Nombre Sistema", name: "nombre_sistema" },
-      { width: "15%", label: "Nombre Rol", name: "nombre_rol" },
+      { width: "10%", label: "ID", name: "id_rol" },
+      { width: "20%", label: "Nombre Sistema", name: "nombre_sistema" },
+      { width: "20%", label: "Nombre Rol", name: "nombre_rol" },
+      { width: "20%", label: "Fecha Registro", name: "fecha_reg_rol" },
       { width: "15%", label: "Estado", name: "estado_rol" },
-      { width: "25%", label: "Fecha Registro", name: "fecha_reg_rol" },
       { width: "15%", label: "Acciones", name: "Acciones" },
     ];
     columns.forEach((column) => {
@@ -201,6 +201,8 @@ export default {
         let data = response.data;
         if (this.tableData.draw == data.draw) {
           this.links = data.data.links;
+          this.pagination.total=data.data.total;
+          console.log(data.data);
           this.links[0].label = "Anterior";
           this.links[this.links.length - 1].label = "Siguiente";
           this.roles = data.data.data;
