@@ -27,7 +27,6 @@ import 'sweetalert2/dist/sweetalert2.min.css';
 
 import 'flatpickr/dist/flatpickr.css';
 import '../css/FlatPickr_theme.css'
-import moment from 'moment';
 
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || '';
 

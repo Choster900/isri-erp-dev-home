@@ -12,11 +12,11 @@ import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
     <h3 class="pt-4 text-2xl text-center pb-10">Create an Account!</h3>
 
     <!-- <Multiselect v-model="valor" mode="tags" :close-on-select="false" :searchable="true" :create-option="false"
-                    :options="[
-                      { value: '1', label: 'Batman' },
-                      { value: '2', label: 'Robin' },
-                      { value: '3', label: 'Joker' },
-                    ]" class="" /> -->
+                      :options="[
+                        { value: '1', label: 'Batman' },
+                        { value: '2', label: 'Robin' },
+                        { value: '3', label: 'Joker' },
+                      ]" class="" /> -->
 
     <div class="mb-4 md:flex flex-row justify-items-start">
       <div class="mb-4 md:mr-2 md:mb-0">
@@ -27,7 +27,7 @@ import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
         </div>
       </div>
       <!--       {{ valor }}
-   -->
+     -->
 
       <div class="mb-4 md:mr-2 md:mb-0">
         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
@@ -85,8 +85,8 @@ import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
         </div>
         <div class="mb-4 md:mr-2 md:mb-0">
           <!--  <label class="block mb-2 text-sm font-bold text-gray-700" for="select">
-                          Seleccionable
-                        </label> -->
+                            Seleccionable
+                          </label> -->
           <div class="relative flex h-8 w-full flex-row-reverse div-select2">
             <Select2 id="select" name="domain" class="text-xs" v-model="prueba" :options="opcionesSelect2" />
             <LabelToInput icon="list" for-label="select" />
@@ -96,8 +96,8 @@ import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
 
         <div class="mb-4 md:mr-2 md:mb-0">
           <!-- <label class="block mb-2 text-sm font-bold text-gray-700" for="select">
-                          DatePicker
-                        </label> -->
+                            DatePicker
+                          </label> -->
           <div class="relative flex h-8 w-full flex-row-reverse">
             <Datepicker v-model="picked" id="domain"
               class="peer w-full text-sm rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none" />
@@ -118,8 +118,8 @@ import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
         </div>
         <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
           <!--      <label class="block mb-2 text-sm font-bold text-gray-700" for="message">
-                          Mensaje
-                        </label> -->
+                            Mensaje
+                          </label> -->
           <textarea id="message" rows="4"
             class="peer w-full rounded-md text-sm border h-10 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
             placeholder="Your message..."></textarea>
@@ -139,9 +139,9 @@ import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
     </div>
 
     <!-- <Multiselect id="mechanic_id" placeholder="Search mechanic" :options="mechanics" label="name" track-by="id"
-                    @search-change="onSearchMechanisChange" @input="onSelectdMechanic">
+                      @search-change="onSearchMechanisChange" @input="onSelectdMechanic">
 
-                  </Multiselect> -->
+                    </Multiselect> -->
     <!-- BUTTONS -->
     <div class="mb-4 md:flex flex-row">
       <div class="mb-2 md:mr-2 md:mb-0 basis-1/">
@@ -347,7 +347,7 @@ import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
       <div class="px-5 py-4">
         <div class="flex flex-wrap justify-end space-x-2">
           <!-- <GeneralButton color="bg-orange-700  hover:bg-orange-800" text="Agregar" icon="add" @click="deletAlert()" />
-                        <GeneralButton text="Cancelar" icon="add" @click="changeStateFromModal" /> -->
+                          <GeneralButton text="Cancelar" icon="add" @click="changeStateFromModal" /> -->
         </div>
       </div>
     </ModalVue>
@@ -414,33 +414,3 @@ export default {
   created() { },
 };
 </script>
-
-<style>
-/* ESTILOS SELECT2 */
-/* altura del select 2 y ancho */
-.div-select2 span {
-  height: 32px !important;
-  width: 215px !important;
-}
-
-/* Distancia el icono del select 2 de display */
-.div-select2 .select2-container--default .select2-selection--single .select2-selection__arrow b {
-  margin-left: 91px;
-}
-
-/* //ESTILOS SELECT2 */
-
-div.tabla-modal table thead {
-  font-size: 12px;
-}
-
-/* ESTILOS MULTISELECT */
-.multiselect {
-  min-width: 200px;
-  min-height: 10px;
-}
-
-
-
-/* //ESTILOS MULTISELECT */
-</style>

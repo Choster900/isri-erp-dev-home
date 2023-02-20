@@ -49,6 +49,7 @@ import axios from 'axios';
                             </tr>
                         </thead>
                         <tbody class="text-sm divide-y divide-slate-200">
+
                             <template v-for="rol in modalData.userRoles" :key="rol.id_rol">
                                 <tr v-if="rol.pivot.estado_permiso_usuario == 1" class="hover:bg-[#141414]/10">
                                     <td class="text-center">{{ rol.id_rol }}</td>
@@ -82,8 +83,7 @@ import axios from 'axios';
                                 </tr>
                             </template>
                             <tr v-if="modalData.userRoles == '' ">
-                                <td v-if="modalData.userRoles.length > 0" colspan="4" class="text-center">Cargando...</td>
-                                <td v-else colspan="4" class="text-center">Sin resultados</td>
+                                <td colspan="4" class="text-center p-2 font-light">Sin resultados en la busqueda</td>
                             </tr>
                         </tbody>
                     </table>
@@ -263,6 +263,7 @@ export default {
     watch: {
         showModal: function (newParam, oldParam) {
             let tBody = document.getElementById("tabla_modal_validacion_arranque")
+            
             //newParam ? this.getSistemas() : tBody.innerHTML = ""
             newParam ? this.getSistemas() : this.modalData.userRoles = []
 

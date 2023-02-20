@@ -99,3 +99,17 @@ div.tabla-modal table thead {
   min-width: 200px;
   min-height: 10px;
 }
+
+.multiselect-option.is-selected {
+    background: var(--ms-option-bg-selected,#001b47);
+    color: var(--ms-option-color-selected,#fff);
+}
+
+.multiselect-option.is-selected.is-pointed {
+    background: var(--ms-option-bg-selected-pointed,#001b47);
+    color: var(--ms-option-color-selected-pointed,#fff);
+}
+
+.multiselect-option {
+    font-size: 9pt;
+}
