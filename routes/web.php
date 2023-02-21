@@ -38,6 +38,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     //This route allows to desactive a specific rol for all users
     Route::post('change/rol/all', [RolController::class, 'changeRolAll'])->name('change.rol.all');
     //Manage menus for a specific rol
+    Route::get('menus', [RolController::class, 'getMenusRol'])->name('get.menus.rol');
 
 
     Route::get('dashboard/{id}', [IndexController::class, 'getMenus'])->name('mainpage');

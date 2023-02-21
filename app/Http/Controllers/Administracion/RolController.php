@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Administracion;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Rol;
+use App\Models\Menu;
+use App\Models\PermisoUsuario;
 use Illuminate\Support\Facades\DB;
 
 class RolController extends Controller
@@ -35,9 +37,6 @@ class RolController extends Controller
 
         $roles = $query->paginate($length)->onEachSide(1);
         $current_page=$request->input('currentPage');
-        // if($current_page!=""){
-        //     $roles->current=$current_page;
-        // }
         return ['data' => $roles, 'draw' => $request->input('draw'),'current'=>$current_page];
     }
 
@@ -47,8 +46,22 @@ class RolController extends Controller
         $msg="";
         $rol = Rol::find($id_rol);
         $estado_anterior==1 ? $rol->estado_rol=0 : $rol->estado_rol=1;
+        $permisox=PermisoUsuario::where('id_rol','=',$id_rol)->get();
+        foreach($permisox as $permiso){
+            $permiso->estado_permiso_usuario=0;
+            $permiso->update();
+        }
         $estado_anterior==1 ? $msg="Desactivado" : $msg="Activado";
         $rol->update();
         return ['mensaje' => $msg.' rol '.$rol->nombre_rol.' con exito'];
     }
+    public function getMenusRol(Request $request){
+        $id = $request->input('id_rol');
+        $rol = Rol::find($id);
+        $menux = Menu::find(8);
+        $menuP = $menux->parentMenu->nombre_menu;
+
+        return ['rolMenus' => $rol->menus->load('parentMenu'),'menu_padre' => $menuP];
+    }
+    
 }
