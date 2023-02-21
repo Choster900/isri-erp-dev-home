@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Administracion;
 
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Rol;
 use App\Models\Sistema;
 use App\Models\PermisoUsuario;
+use App\Http\Controllers\Controller;
 
 
 class UserController extends Controller

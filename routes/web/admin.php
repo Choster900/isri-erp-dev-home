@@ -9,4 +9,9 @@ Route::group(['middleware' => ['auth','access']], function () {
             'menu' => session()->get('menu')
         ]);
     })->name('adm.usuarios');
+    Route::get('adm/roles', function () {
+        return Inertia::render('Administracion/Roles', [
+            'menu' => session()->get('menu')
+        ]);
+    })->name('adm.roles');
 });
