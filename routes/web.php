@@ -24,6 +24,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
     //This route obtains users based on the parameters sent from the page.
     Route::get('users', [UserController::class, 'getUsers'])->name('getusers');
+    Route::get('roles', [RolController::class, 'getRoles'])->name('adm.roles');
 
     Route::get('sistemas', [UserController::class, 'getSistemas'])->name('getsistemas');
     Route::get('rolesxsistemas', [UserController::class, 'getRoles'])->name('getroles');
