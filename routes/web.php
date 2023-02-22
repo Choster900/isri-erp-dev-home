@@ -41,6 +41,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::get('menus', [RolController::class, 'getMenusRol'])->name('get.menus.rol');
     Route::get('menus/childrenMenus', [RolController::class, 'getChildrenMenus'])->name('get.children.menus');
     Route::post('save/menu', [RolController::class, 'saveMenu'])->name('save.menu');
+    Route::post('desactive/menu', [RolController::class, 'desactiveMenu'])->name('desactive.menu');
 
 
     Route::get('dashboard/{id}', [IndexController::class, 'getMenus'])->name('mainpage');

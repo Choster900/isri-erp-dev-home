@@ -166,4 +166,14 @@ class RolController extends Controller
         $menu=Menu::find($id_childrenMenu);
         return ['mensaje' => 'Guardado menu '.$menu->nombre_menu.' con exito'];
     }
+    public function desactiveMenu(Request $request){
+        $id_rol = $request->input('id_rol');
+        $id_childrenMenu = $request->input('id_menu');
+        //$rol = Rol::find($id_rol);
+        $acceso_menu=AccesoMenu::where('id_menu','=',$id_childrenMenu)->where('id_rol','=',$id_rol)->first();
+        $acceso_menu->estado_acceso_menu=0;
+        $acceso_menu->update();
+        $menu=Menu::find($id_childrenMenu);
+        return ['mensaje' => 'Desactivado menu '.$menu->nombre_menu.' con exito'];
+    }
 }

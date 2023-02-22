@@ -199,7 +199,7 @@ import axios from 'axios';
                           </path>
                         </svg>
                       </button>
-                      <button class="text-rose-500 hover:text-rose-600 rounded-full">
+                      <button @click="desactiveMenu(menu.id_menu, menu.nombre_menu)" class="text-rose-500 hover:text-rose-600 rounded-full">
                         <span class="sr-only">Delete</span><svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
                           <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
                           </path>
@@ -281,6 +281,34 @@ export default {
     };
   },
   methods: {
+    desactiveMenu(id_menu,nombre_menu){
+      this.$swal.fire({
+        title: 'Desactivar Menu ' + nombre_menu,
+        text: "Estas seguro?",
+        icon: 'warning',
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Si, desactivar!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          axios.post("/desactive/menu", {
+            id_menu: id_menu,
+            id_rol: this.modalData.id_rol
+          }).then((response) => {
+            toast.success(response.data.mensaje, {
+              autoClose: 3000,
+              position: "top-right",
+              transition: "zoom",
+              toastBackgroundColor: "white",
+            });
+            this.cleanModalInputs()
+            this.getMenus()
+            }).catch((errors) => console.log(errors))
+          }
+        })
+    },
     cleanModalInputs(){
       this.modalData.id_childrenMenu=""
       this.modalData.childrenMenus=""
@@ -304,12 +332,12 @@ export default {
                 id_childrenMenu: this.modalData.id_childrenMenu,
                 id_rol: this.modalData.id_rol
               }).then((response) => {
-                this.$swal.fire({
-                  title: 'Guardado!',
-                  text: response.data.mensaje,
-                  icon: 'success',
-                  timer:3000
-                })
+                toast.success(response.data.mensaje, {
+                  autoClose: 3000,
+                  position: "top-right",
+                  transition: "zoom",
+                  toastBackgroundColor: "white",
+                });
                 this.cleanModalInputs()
                 this.getMenus()
                 }).catch((errors) => console.log(errors))
