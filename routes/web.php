@@ -39,6 +39,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::post('change/rol/all', [RolController::class, 'changeRolAll'])->name('change.rol.all');
     //Manage menus for a specific rol
     Route::get('menus', [RolController::class, 'getMenusRol'])->name('get.menus.rol');
+    Route::get('menus/childrenMenus', [RolController::class, 'getChildrenMenus'])->name('get.children.menus');
+    Route::post('save/menu', [RolController::class, 'saveMenu'])->name('save.menu');
 
 
     Route::get('dashboard/{id}', [IndexController::class, 'getMenus'])->name('mainpage');

@@ -8,6 +8,9 @@ import TextInput from '@/Components-ISRI/ComponentsToForms/TextInput.vue';
 import LabelToInput from '@/Components-ISRI/ComponentsToForms/LabelToInput.vue';
 import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
 
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
+
 //import { toast } from 'vue3-toastify';
 //import 'vue3-toastify/dist/index.css';
 
@@ -28,7 +31,7 @@ import axios from 'axios';
       <header class="px-5 py-4 flex">
         <div class="mb-4 md:mr-2 md:mb-0 basis-1/6">
           <div class="relative flex h-8 w-full flex-row-reverse div-select2">
-            <Select2 id="select" name="domain" class="text-xs" v-model="tableData.length" @select="getRoles()"
+            <Select2 id="select" name="domain" class="text-xs" v-model="tableData.length" @change="getRoles()"
               :options="perPage" />
             <LabelToInput icon="list" for-label="select" />
           </div>
@@ -145,27 +148,27 @@ import axios from 'axios';
     </div>
 
     <!-- Modal Menus-->
-    <ModalVue :show="showModal" @close="changeStateFromModal" v-bind:title="'Gestion de menus usuario: '+modalData.nombre_rol" @close-modal="changeStateFromModal">
+    <ModalVue :show="showModal" @close="changeStateFromModal" v-bind:title="'Gestion de menus : '+modalData.nombre_rol" @close-modal="changeStateFromModal">
       <div class="px-5 pt-4 pb-1">
         <div class="text-sm">
           <div class="mb-4">Selecciona un menu y un submenu:</div>
           <div class="mb-4 md:flex flex-row justify-items-start">
             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
               <div class="relative flex h-8 w-full flex-row-reverse div-select2">
-                <Select2 class="text-xs"   placeholder="Menu" />
+                <Select2 class="text-xs" v-model="modalData.id_menu" :options="modalData.menus" @select="getChildrenMenus()" placeholder="Menu" />
                 <LabelToInput icon="list" for-label="select" />
               </div>
             </div>
             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
               <div class="relative flex h-8 w-full flex-row-reverse div-select2">
-                <Select2 class="text-xs"  placeholder="Sub Menu" />
+                <Select2 class="text-xs" v-model="modalData.id_childrenMenu" :options="modalData.childrenMenus"  placeholder="Sub Menu" />
                 <LabelToInput icon="list" for-label="select" />
               </div>
             </div>
           </div>
           <div class="mb-4 md:flex flex-row justify-center">
             <div class="mb-4 md:mr-2 md:mb-0 px-1">
-              <GeneralButton  color="bg-orange-700  hover:bg-orange-800" text="Agregar" icon="add" />
+              <GeneralButton @click="saveMenu()" color="bg-orange-700  hover:bg-orange-800" text="Agregar" icon="add" />
             </div>
             <div class="mb-4 md:mr-2 md:mb-0 px-1">
               <GeneralButton text="Cancelar" icon="add" @click="changeStateFromModal" />
@@ -182,7 +185,7 @@ import axios from 'axios';
                 </tr>
               </thead>
               <tbody v-for="menu in modalData.rolMenus" :key="menu.id_menu" class="text-sm divide-y divide-slate-200">
-                <tr v-if="menu.pivot.estado_acceso_menu==1 && menu.id_menu_padre!=null && menu.estado_menu==1" class="hover:bg-[#141414]/10">
+                <tr class="hover:bg-[#141414]/10">
                   <td class="text-center">{{ menu.id_menu }}</td>
                   <td class="text-center">{{ menu.parent_menu.nombre_menu }}</td>
                   <td class="text-center">{{ menu.nombre_menu }}</td>
@@ -246,10 +249,10 @@ export default {
         rolMenus:[],
         id_rol:"",
         nombre_rol:"",
-        parentMenu:"",
-        
-        roles:"",
-        id_sistema:"",
+        id_menus_rol:[],
+        childrenMenus:[],
+        id_childrenMenu:"",
+        menus:"",
         id_menu:"",
 
         // sistema_edit:"",
@@ -278,19 +281,73 @@ export default {
     };
   },
   methods: {
+    cleanModalInputs(){
+      this.modalData.id_childrenMenu=""
+      this.modalData.childrenMenus=""
+      this.modalData.id_menu=""
+    },
+    saveMenu() {
+      if (this.modalData.id_menu != "" && this.modalData.id_childrenMenu != "") {
+          this.$swal.fire({
+            title: 'Esta seguro de guardar el menu',
+            icon: 'question',
+            iconHtml: '✅',
+            confirmButtonText: 'Si, Guardar',
+            confirmButtonColor: '#15803D',
+            cancelButtonText: 'Cancelar',
+            showCancelButton: true,
+            showCloseButton: true
+          }).then((result) => {
+            if (result.isConfirmed) {
+              axios.post("/save/menu", {
+                id_menu: this.modalData.id_menu,
+                id_childrenMenu: this.modalData.id_childrenMenu,
+                id_rol: this.modalData.id_rol
+              }).then((response) => {
+                this.$swal.fire({
+                  title: 'Guardado!',
+                  text: response.data.mensaje,
+                  icon: 'success',
+                  timer:3000
+                })
+                this.cleanModalInputs()
+                this.getMenus()
+                }).catch((errors) => console.log(errors))
+              }
+            })
+      } else {
+        this.$swal.fire({
+          title: 'Información incompleta',
+          text: "Debes seleccionar Menu y Submenu",
+          icon: 'warning',
+          timer:5000
+          })
+      }
+    },
     getSelectsRolMenu(identificador){
       this.modalData.id_rol=identificador
       this.getMenus()
+    },
+    getChildrenMenus(){
+      this.modalData.id_childrenMenu=""
+      axios.get('/menus/childrenMenus',{params: this.modalData})
+        .then((response) => {
+          this.modalData.childrenMenus=response.data.childrenMenus
+          //console.log(response.data.childrenMenus);
+        })
+        .catch((errors) => console.log(errors))
     },
     async getMenus(){
       await axios.get("/menus",{params: this.modalData})
         .then((response) => {
           this.modalData.rolMenus=response.data.rolMenus
-          //this.modalData.parentMenu=response.data.parentMenu
-          //this.modalData.nombre_rol=response.data.nombre_rol
-          console.log(response.data.menu_padre);
+          this.modalData.menus=response.data.menus
+          this.modalData.id_menus_rol=response.data.id_menus_asignados
+          this.modalData.nombre_rol=response.data.nombre_rol
+          console.log(response.data.menus); 
           if(this.showModal==false){
             this.changeStateFromModal()
+            this.cleanModalInputs()
           }
         })
         .catch((errors) => console.log(errors))
