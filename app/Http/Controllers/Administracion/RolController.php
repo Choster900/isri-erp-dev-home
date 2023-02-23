@@ -167,10 +167,23 @@ class RolController extends Controller
     public function desactiveMenu(Request $request){
         $id_rol = $request->input('id_rol');
         $id_childrenMenu = $request->input('id_menu');
-        //$rol = Rol::find($id_rol);
         $acceso_menu=AccesoMenu::where('id_menu','=',$id_childrenMenu)->where('id_rol','=',$id_rol)->first();
         $acceso_menu->estado_acceso_menu=0;
         $acceso_menu->update();
+        $childrenMenu=Menu::find($id_childrenMenu);
+        $parentMenu=$childrenMenu->parentMenu;
+        $isStillParent=false;
+        foreach($parentMenu->childrenMenus as $child){
+            $access_child = AccesoMenu::where('id_menu','=',$child->id_menu)->where('id_rol','=',$id_rol)->first();
+            if($access_child && $access_child->estado_acceso_menu==1){
+                $isStillParent=true;
+            }
+        }
+        if(!$isStillParent){
+            $access_parent = AccesoMenu::where('id_menu','=',$parentMenu->id_menu)->where('id_rol','=',$id_rol)->first();
+            $access_parent->estado_acceso_menu=0;
+            $access_parent->update();
+        }
         $menu=Menu::find($id_childrenMenu);
         return ['mensaje' => 'Desactivado menu '.$menu->nombre_menu.' con exito'];
     }
