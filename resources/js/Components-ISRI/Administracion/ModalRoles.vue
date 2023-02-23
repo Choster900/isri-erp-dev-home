@@ -122,7 +122,7 @@ export default {
               transition: "zoom",
               toastBackgroundColor: "white",
             });
-            //this.cleanModalInputs()
+            response.data.update ? this.$emit('update-table'):''
             this.getMenus()
             this.modalData.id_menu=""
             this.modalData.id_childrenMenu=""
@@ -155,7 +155,7 @@ export default {
                   transition: "zoom",
                   toastBackgroundColor: "white",
                 });
-                //this.cleanModalInputs()
+                response.data.update ? this.$emit('update-table'):''
                 this.getMenus()
                 this.modalData.id_childrenMenu=""
                 this.modalData.id_menu=""

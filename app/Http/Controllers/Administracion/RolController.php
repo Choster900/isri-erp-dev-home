@@ -132,7 +132,6 @@ class RolController extends Controller
         $id_parentMenu = $request->input('id_menu');
         $id_childrenMenu = $request->input('id_childrenMenu');
         $id_rol = $request->input('id_rol');
-        $rol = Rol::find($id_rol);
         $acceso_menu_padre=AccesoMenu::where('id_rol','=',$id_rol)->where('id_menu','=',$id_parentMenu)->first();
         $acceso_menu_hijo=AccesoMenu::where('id_rol','=',$id_rol)->where('id_menu','=',$id_childrenMenu)->first();
         if($acceso_menu_padre){
@@ -161,8 +160,17 @@ class RolController extends Controller
             $menuChildren->fecha_reg_acceso_menu=Carbon::now();
             $menuChildren->save();
         }
+        //Activate rol if it's necessary
+        $rol = Rol::find($id_rol);
+        if($rol->estado_rol==0){
+            $rol->estado_rol=1;
+            $updateTable=true;
+        }else{
+            $updateTable=false;
+        }
+        $rol->update();
         $menu=Menu::find($id_childrenMenu);
-        return ['mensaje' => 'Guardado menu '.$menu->nombre_menu.' con exito'];
+        return ['mensaje' => 'Guardado menu '.$menu->nombre_menu.' con exito','update' => $updateTable];
     }
     public function desactiveMenu(Request $request){
         $id_rol = $request->input('id_rol');
@@ -184,7 +192,22 @@ class RolController extends Controller
             $access_parent->estado_acceso_menu=0;
             $access_parent->update();
         }
+
+        $rol=Rol::find($id_rol);
+        $menus_disponibles=false;
+        $updateTable=false;
+        foreach($rol->menus as $menu){
+            if($menu->pivot->estado_acceso_menu==1){
+                $menus_disponibles=true;
+            }
+        }
+        if(!$menus_disponibles){
+            $rol->estado_rol=0;
+            $rol->update();
+            //Desactivate rol if it's necessary
+            $updateTable=true;
+        }
         $menu=Menu::find($id_childrenMenu);
-        return ['mensaje' => 'Desactivado menu '.$menu->nombre_menu.' con exito'];
+        return ['mensaje' => 'Desactivado menu '.$menu->nombre_menu.' con exito','update' => $updateTable];
     }
 }

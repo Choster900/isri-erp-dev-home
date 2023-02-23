@@ -150,7 +150,8 @@ import axios from 'axios';
 
     <ModalRolesVue 
     :modalVar="modalVar" :showModal="showModal" :modalData="modalData" 
-    @cerrar-modal="closeVars" @abrir-modal="showModal = true"/>
+    @cerrar-modal="closeVars" @abrir-modal="showModal = true"
+    @update-table="getUpdateTable()"/>
 
   </AppLayoutVue>
 </template>
@@ -214,6 +215,10 @@ export default {
     };
   },
   methods: {
+    getUpdateTable(){
+      console.log('holaaaa');
+      this.getRoles('http://127.0.0.1:8000/roles?page='+this.tableData.currentPage);
+    },
     closeVars(){
       this.showModal=false
       this.modalVar=false
