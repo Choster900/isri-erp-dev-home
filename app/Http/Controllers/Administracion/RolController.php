@@ -49,7 +49,7 @@ class RolController extends Controller
         $estado_anterior==1 ? $rol->estado_rol=0 : $rol->estado_rol=1;
         $permisox=PermisoUsuario::where('id_rol','=',$id_rol)->get();
         foreach($permisox as $permiso){
-            $permiso->estado_permiso_usuario=0;
+            $estado_anterior==1 ? $permiso->estado_permiso_usuario=0 : $permiso->estado_permiso_usuario=1;
             $permiso->update();
         }
         $estado_anterior==1 ? $msg="Desactivado" : $msg="Activado";
@@ -68,15 +68,9 @@ class RolController extends Controller
             ->where('pivot.estado_acceso_menu','=',1);
 
         if($menus_asignados!=null){
-            //Arreglo de ids de menus asignados
+            //Arreglo de ids de menus hijos asignados
             foreach($menus_asignados as $menu){
                 $id_menus_asignados[]=$menu->id_menu;
-            }
-            //Menus padre
-            foreach($rol->menus as $menu){
-                if($menu->pivot->estado_acceso_menu==1 && $menu->id_menu_padre==null){
-                    $menusxrol[]=$menu->id_menu;
-                }
             }
             //Llenando select de menus padre
             foreach($sistema->menus->load('childrenMenus') as $menu){
@@ -165,6 +159,10 @@ class RolController extends Controller
         if($rol->estado_rol==0){
             $rol->estado_rol=1;
             $updateTable=true;
+            foreach($rol->usuarios as $user){
+                $user->pivot->estado_permiso_usuario=1;
+                $user->pivot->update();
+            }
         }else{
             $updateTable=false;
         }

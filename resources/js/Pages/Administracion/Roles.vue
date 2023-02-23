@@ -12,9 +12,6 @@ import ModalRolesVue from '@/Components-ISRI/Administracion/ModalRoles.vue';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 
-//import { toast } from 'vue3-toastify';
-//import 'vue3-toastify/dist/index.css';
-
 import axios from 'axios';
 
 </script>
@@ -187,16 +184,9 @@ export default {
         id_childrenMenu:"",
         menus:"",
         id_menu:"",
-
-        // sistema_edit:"",
-        // id_rol_edit:"",
-        // roles_edit:"",
-        // id_sistema_edit:"",
-        // permiso_usuario:""
       },
       showModal: false,
       modalVar:false,
-      //showModal2: false,
       roles: [],
       links: [],
       columns: columns,
@@ -216,7 +206,6 @@ export default {
   },
   methods: {
     getUpdateTable(){
-      console.log('holaaaa');
       this.getRoles('http://127.0.0.1:8000/roles?page='+this.tableData.currentPage);
     },
     closeVars(){
@@ -271,7 +260,6 @@ export default {
           this.links = data.data.links;
           this.tableData.total=data.data.total;
           this.tableData.currentPage=data.data.current_page;
-          console.log(data.data);
           this.links[0].label = "Anterior";
           this.links[this.links.length - 1].label = "Siguiente";
           this.roles = data.data.data;
