@@ -148,7 +148,9 @@ import axios from 'axios';
       </div>
     </div>
 
-    <ModalRolesVue :modalVar="modalVar" :showModal="showModal" :modalData="modalData" @cerrar-modal="closeVars" @abrir-modal="showModal = true" />
+    <ModalRolesVue 
+    :modalVar="modalVar" :showModal="showModal" :modalData="modalData" 
+    @cerrar-modal="closeVars" @abrir-modal="showModal = true"/>
 
   </AppLayoutVue>
 </template>
@@ -213,9 +215,14 @@ export default {
   },
   methods: {
     closeVars(){
-      this.modalVar=false
       this.showModal=false
-      this.modalData.rolMenus=[]
+      this.modalVar=false
+      this.cleanModalInputs()
+    },
+    cleanModalInputs(){
+      this.modalData.id_childrenMenu=""
+      this.modalData.childrenMenus=""
+      this.modalData.id_menu=""
     },
     desactiveRol(id_rol,nombre_rol,estado_rol){
       let msg

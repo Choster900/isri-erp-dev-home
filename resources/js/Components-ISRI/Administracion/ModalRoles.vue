@@ -28,7 +28,7 @@
           </div>
           <div class="mb-4 md:flex flex-row justify-center">
             <div class="mb-4 md:mr-2 md:mb-0 px-1">
-              <GeneralButton @click="saveMenu()" color="bg-orange-700  hover:bg-orange-800" text="Agregar" icon="add" />
+              <GeneralButton @click="saveMenu()" color="bg-green-700  hover:bg-green-800" text="Agregar" icon="add" />
             </div>
             <div class="mb-4 md:mr-2 md:mb-0 px-1">
               <GeneralButton text="Cancelar" icon="add" @click="$emit('cerrar-modal')" />
@@ -88,8 +88,6 @@ export default {
             if(newParam){
                 await this.getMenus()
                 this.$emit('abrir-modal')
-            }else{
-                this.$emit('cerrar-modal')
             }
         }
     },
@@ -129,11 +127,6 @@ export default {
             }).catch((errors) => console.log(errors))
           }
         })
-    },
-    cleanModalInputs(){
-      this.modalData.id_childrenMenu=""
-      this.modalData.childrenMenus=""
-      this.modalData.id_menu=""
     },
     saveMenu() {
       if (this.modalData.id_menu != "" && this.modalData.id_childrenMenu != "") {
