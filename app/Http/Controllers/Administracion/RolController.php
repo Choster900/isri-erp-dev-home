@@ -62,11 +62,9 @@ class RolController extends Controller
         $sistema = Sistema::find($rol->id_sistema);
         
         $id_menus_asignados=[];
-
         $menus_asignados = $rol->menus->load('parentMenu')
             ->where('estado_menu','=',1)
             ->where('id_menu_padre','<>',null)
-            //->where('parent_menu.pivot.estado_acceso_menu','=',1)
             ->where('pivot.estado_acceso_menu','=',1);
 
         if($menus_asignados!=null){
@@ -82,20 +80,22 @@ class RolController extends Controller
             }
             //Llenando select de menus padre
             foreach($sistema->menus->load('childrenMenus') as $menu){
+                $var=false;
                 foreach($menu->childrenMenus as $hijo){
                     if(!(in_array($hijo->id_menu,$id_menus_asignados)) && $menu->estado_menu==1 && $hijo->estado_menu==1){
-                        $arrayRoles['id']=$menu->id_menu;
-                        $arrayRoles['text']=$menu->nombre_menu;
-                        $arrayRol[]=$arrayRoles;
+                        $var=true;
                     }
+                }
+                if($var==true){
+                    $arrayRoles['id']=$menu->id_menu;
+                    $arrayRoles['text']=$menu->nombre_menu;
+                    $arrayRol[]=$arrayRoles;
                 }
             }
             if(!(isset($arrayRol))){
                 $arrayRol=[];
             }
-
         }else{
-            
             foreach($sistema->menus as $menu){
                 if($menu->id_menu_padre==null){
                     $arrayRoles['id']=$menu->id_menu;
@@ -104,7 +104,6 @@ class RolController extends Controller
                 }
             }
         }
-
         return ['rolMenus' => $menus_asignados, 'menus' => $arrayRol, 'id_menus_asignados' => $id_menus_asignados, 'nombre_rol' =>$rol->nombre_rol];
     }
     public function getChildrenMenus(Request $request){
@@ -126,7 +125,6 @@ class RolController extends Controller
                     $arrayRol[]=$arrayRoles;
             }
         }
-        
         return ['childrenMenus' => $arrayRol];
     }
     
