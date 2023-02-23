@@ -122,8 +122,11 @@ export default {
               transition: "zoom",
               toastBackgroundColor: "white",
             });
-            this.cleanModalInputs()
+            //this.cleanModalInputs()
             this.getMenus()
+            this.modalData.id_menu=""
+            this.modalData.id_childrenMenu=""
+            this.modalData.childrenMenus=""
             }).catch((errors) => console.log(errors))
           }
         })
@@ -152,8 +155,11 @@ export default {
                   transition: "zoom",
                   toastBackgroundColor: "white",
                 });
-                this.cleanModalInputs()
+                //this.cleanModalInputs()
                 this.getMenus()
+                this.modalData.id_childrenMenu=""
+                this.modalData.id_menu=""
+                this.modalData.childrenMenus=""
                 }).catch((errors) => console.log(errors))
               }
             })
