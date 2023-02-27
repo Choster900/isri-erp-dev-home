@@ -34,6 +34,19 @@
 :root {
     --toastify-toast-min-height: 50px !important;
 }
+
+* {
+    scroll-behavior: smooth;
+   /*Comenta la línea (o dale el valor 'auto' a scroll behavior )
+   para probar la diferencia con y sin scroll suavizado*/
+}
+table tbody tr:hover {
+    background-color: rgba(31, 53, 88, 0.1);
+}
+
+table tbody td :disabled {
+    background-color: rgba(31, 53, 88, 0.2);
+}
 .Toastify__toast-theme--light {
     background: var(--toastify-color-light);
     color: var(--toastify-text-color-light);
@@ -96,8 +109,7 @@ div.tabla-modal table thead {
 
 /* ESTILOS MULTISELECT */
 .multiselect {
-  min-width: 200px;
-  min-height: 10px;
+    min-height: 10px;
 }
 
 .multiselect-option.is-selected {

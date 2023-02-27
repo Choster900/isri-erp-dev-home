@@ -13,7 +13,7 @@ import axios from 'axios';
             <div class="text-sm">
                 <div class="mb-4">Selecciona un rol y un sistema:</div>
                 <div class="mb-4 md:flex flex-row justify-between">
-                    <div class="mb-4 md:mr-2 md:mb-0">
+                    <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
                             <Multiselect v-model="modalData.id_sistema" @select="getRolesxSistema()"
                                 :options="modalData.sistemas" placeholder="Sistema" :searchable="true" />
@@ -21,7 +21,7 @@ import axios from 'axios';
                         </div>
                     </div>
 
-                    <div class="mb-4 md:mr-2 md:mb-0">
+                    <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
                             <Multiselect v-model="modalData.id_rol" :options="modalData.roles" placeholder="Rol"
                                 :searchable="true" />

@@ -14,4 +14,10 @@ Route::group(['middleware' => ['auth','access']], function () {
             'menu' => session()->get('menu')
         ]);
     })->name('adm.roles');
+    Route::get('adm/personas', function () {
+        return Inertia::render('Administracion/Personas', [
+            'menu' => session()->get('menu')
+        ]);
+    })->name('adm.personas');
+    
 });

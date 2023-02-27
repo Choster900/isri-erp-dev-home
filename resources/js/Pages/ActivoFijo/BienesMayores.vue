@@ -8,35 +8,46 @@ import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
 <template>
   <Head title="Activo fijo" />
 
-  <AppLayoutVue>
-    <h3 class="pt-4 text-2xl text-center pb-10">Create an Account!</h3>
+<AppLayoutVue>
+  <h3 class="pt-4 text-2xl text-center pb-10">Create an Account!</h3>
 
     <!-- <Multiselect v-model="valor" mode="tags" :close-on-select="false" :searchable="true" :create-option="false"
-                      :options="[
-                        { value: '1', label: 'Batman' },
-                        { value: '2', label: 'Robin' },
-                        { value: '3', label: 'Joker' },
-                      ]" class="" /> -->
+                            :options="[
+                              { value: '1', label: 'Batman' },
+                              { value: '2', label: 'Robin' },
+                              { value: '3', label: 'Joker' },
+                            ]" class="" /> -->
 
     <div class="mb-4 md:flex flex-row justify-items-start">
       <div class="mb-4 md:mr-2 md:mb-0">
         <div class="relative flex h-8 w-full flex-row-reverse basis-1">
-          <DatepickerTest v-model="picked" id="domain">
-          </DatepickerTest>
-          <LabelToInput icon="date" />
+            <DatepickerTest v-model="picked" id="domain">
+            </DatepickerTest>
+            <LabelToInput icon="date" />
         </div>
       </div>
       <!--       {{ valor }}
-     -->
+           -->
 
       <div class="mb-4 md:mr-2 md:mb-0">
+
+      </div>
+
+      <div class="mb-4 md:mr-2 md:mb-0">
+
+      </div>
+    </div>
+
+
+    <div class="mb-7 md:flex flex-row justify-items-start">
+      <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
           <Multiselect class="" v-model="valor" :options="opcionesSelect2" :searchable="true" />
           <LabelToInput icon="date" />
         </div>
       </div>
 
-      <div class="mb-4 md:mr-2 md:mb-0">
+      <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
         <div class="relative flex h-8 w-full flex-row-reverse">
           <Multiselect placeholder="Seleccione" v-model="valor" mode="tags" :close-on-select="false" :searchable="true"
             :create-option="false" :options="opcionesSelect2" class="cursor-pointer text-xs" />
@@ -78,26 +89,26 @@ import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
         </div>
       </div>
       <div class="mb-4 md:flex flex-row justify-items-start">
-        <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
-          <TextInput id="correo-electronico" type="email" placeholder="Correo Electronico">
+      <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
+        <TextInput id="correo-electronico" type="email" placeholder="Correo Electronico">
             <LabelToInput icon="email" forLabel="correo-electronico" />
           </TextInput>
         </div>
         <div class="mb-4 md:mr-2 md:mb-0">
           <!--  <label class="block mb-2 text-sm font-bold text-gray-700" for="select">
-                            Seleccionable
-                          </label> -->
+                                  Seleccionable
+                                </label> -->
           <div class="relative flex h-8 w-full flex-row-reverse div-select2">
             <Select2 id="select" name="domain" class="text-xs" v-model="prueba" :options="opcionesSelect2" />
-            <LabelToInput icon="list" for-label="select" />
-            {{ prueba }}
+          <LabelToInput icon="list" for-label="select" />
+          {{ prueba }}
           </div>
         </div>
 
         <div class="mb-4 md:mr-2 md:mb-0">
           <!-- <label class="block mb-2 text-sm font-bold text-gray-700" for="select">
-                            DatePicker
-                          </label> -->
+                                  DatePicker
+                                </label> -->
           <div class="relative flex h-8 w-full flex-row-reverse">
             <Datepicker v-model="picked" id="domain"
               class="peer w-full text-sm rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none" />
@@ -111,15 +122,15 @@ import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
             <LabelToInput icon="password" for-label="password" />
           </TextInput>
         </div>
-        <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
-          <TextInput id="distance" type="text" placeholder="Distancia">
+      <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
+        <TextInput id="distance" type="text" placeholder="Distancia">
             <LabelToInput icon="distance" for-label="distance" />
           </TextInput>
         </div>
         <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
           <!--      <label class="block mb-2 text-sm font-bold text-gray-700" for="message">
-                            Mensaje
-                          </label> -->
+                                  Mensaje
+                                </label> -->
           <textarea id="message" rows="4"
             class="peer w-full rounded-md text-sm border h-10 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
             placeholder="Your message..."></textarea>
@@ -132,16 +143,16 @@ import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
         <label for="checbox1" class="text-sm font-bold text-gray-700">Remember me
         </label>
         <checkbox class="mr-3" id="checbox1" />
-        <label for="checbox2" class="text-sm font-bold text-gray-700">Remember my password to
-        </label>
-        <checkbox class="mr-3" id="checbox2" />
+      <label for="checbox2" class="text-sm font-bold text-gray-700">Remember my password to
+      </label>
+      <checkbox class="mr-3" id="checbox2" />
       </div>
     </div>
 
     <!-- <Multiselect id="mechanic_id" placeholder="Search mechanic" :options="mechanics" label="name" track-by="id"
-                      @search-change="onSearchMechanisChange" @input="onSelectdMechanic">
+                            @search-change="onSearchMechanisChange" @input="onSelectdMechanic">
 
-                    </Multiselect> -->
+                          </Multiselect> -->
     <!-- BUTTONS -->
     <div class="mb-4 md:flex flex-row">
       <div class="mb-2 md:mr-2 md:mb-0 basis-1/">
@@ -340,14 +351,14 @@ import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
           <div class="text-xs text-slate-500">
             Your workspace’s Mosaic Light Plan is set to $39 per
             month and will renew on August 9, 2021.
-          </div>
+        </div>
         </div>
       </div>
 
       <div class="px-5 py-4">
         <div class="flex flex-wrap justify-end space-x-2">
           <!-- <GeneralButton color="bg-orange-700  hover:bg-orange-800" text="Agregar" icon="add" @click="deletAlert()" />
-                          <GeneralButton text="Cancelar" icon="add" @click="changeStateFromModal" /> -->
+                                <GeneralButton text="Cancelar" icon="add" @click="changeStateFromModal" /> -->
         </div>
       </div>
     </ModalVue>

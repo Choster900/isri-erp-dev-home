@@ -21,7 +21,7 @@ export default {
         return {
             date: null, // refer to https://github.com/ankurk91/vue-flatpickr-component
             config: {
-                mode: 'range',
+                altInput: true,
                 static: true,
                 monthSelectorType: 'static',
                 /*dateFormat: 'M j, Y',*/
