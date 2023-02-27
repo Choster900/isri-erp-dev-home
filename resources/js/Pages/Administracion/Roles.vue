@@ -8,6 +8,7 @@ import TextInput from '@/Components-ISRI/ComponentsToForms/TextInput.vue';
 import LabelToInput from '@/Components-ISRI/ComponentsToForms/LabelToInput.vue';
 import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
 import ModalRolesVue from '@/Components-ISRI/Administracion/ModalRoles.vue';
+import ModalCreateRoleVue from '@/Components-ISRI/Administracion/ModalCreateRole.vue';
 
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
@@ -145,90 +146,15 @@ import axios from 'axios';
       </div>
     </div>
 
-    <ModalVue :show="showModalCreate" @close-modal="cleanModalCreateInputs()" v-bind:title="'Creacion de Rol '" @close="cleanModalCreateInputs()">
-      <div class="px-5 pt-4 pb-1">
-        <div class="text-sm">
-          <div class="mb-4">Selecciona un Sistema y escriba nombre del rol</div>
-          <div class="mb-4 md:flex flex-row justify-items-start">
-            <div class="mb-4 md:mr-2 md:mb-0 w-64">
-              <div class="relative flex h-8 w-full flex-row-reverse div-select2">
-                <Select2 v-bind:disabled="modalDataCreate.select_sistema" class="text-xs" v-model="modalDataCreate.id_sistema" :options="modalDataCreate.sistemas" @select="getParentMenu()" placeholder="Seleccione Sistema" />
-                <LabelToInput icon="list" for-label="select" />
-              </div>
-            </div>
-            <div class="mb-4 md:ml-1 md:mb-0 w-64">
-              <TextInput v-model="modalDataCreate.nombre_rol" id="personal-information" type="text" placeholder="Nombre Rol">
-                <LabelToInput icon="standard" forLabel="personal-information" />
-              </TextInput>
-            </div>
-          </div>
-          <div class="mb-4">Selecciona un Menu y un Submenu:</div>
-          <div class="mb-4 md:flex flex-row justify-items-start">
-            <div class="mb-4 md:mr-2 md:mb-0 w-64">
-              <div class="relative flex h-8 w-full flex-row-reverse div-select2">
-                <Select2 class="text-xs" v-model="modalDataCreate.id_menu" :options="modalDataCreate.parentsMenu" @select="getChildrenMenus($event)" placeholder="Seleccione Menu" />
-                <LabelToInput icon="list" for-label="select" />
-              </div>
-            </div>
-            <div class="mb-4 md:mr-2 md:mb-0 w-64">
-              <div class="relative flex h-8 w-full flex-row-reverse div-select2">
-                <Select2 class="text-xs" v-model="modalDataCreate.id_childrenMenu" :options="modalDataCreate.childrenMenus" @select="getChildren($event)"  placeholder="Seleccione Sub Menu" />
-                <LabelToInput icon="list" for-label="select" />
-              </div>
-            </div>
-          </div>
-          <div class="mb-4 md:flex flex-row justify-center">
-            <div class="mb-4 md:mr-2 md:mb-0 px-1">
-              <GeneralButton @click="saveRol()" color="bg-green-700  hover:bg-green-800" text="Guardar" icon="add" />
-            </div>
-            <div class="mb-4 md:mr-2 md:mb-0 px-1">
-              <GeneralButton text="Cancelar" icon="add" @click="showModalCreate=false" />
-            </div>
-          </div>
-
-          <!-- Begin Table -->
-          <div class="tabla-modal">
-            <table class="w-full" id="tabla_modal_validacion_arranque">
-              <thead class="bg-[#1F3558] text-white">
-                <tr class="">
-                  <th class="rounded-tl-lg">#</th>
-                  <th>Menu</th>
-                  <th>Submenu</th>
-                  <th class="rounded-tr-lg">ACCIONES</th>
-                </tr>
-              </thead>
-              <tbody v-for="menu in modalDataCreate.menus" :key="menu.id" class="text-sm divide-y divide-slate-200">
-                <tr class="hover:bg-[#141414]/10">
-                  <td class="text-center">{{ menu.id }}</td>
-                  <td class="text-center">{{ menu.menu_padre }}</td>
-                  <td class="text-center">{{ menu.menu }}</td>
-                  <td class="text-center">
-                    <div class="space-x-1">
-                      <button @click="deleteMenu(menu.id,menu.id_menu_padre,menu.menu_padre)" class="text-rose-500 hover:text-rose-600 rounded-full">
-                        <span class="sr-only">Delete</span><svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
-                          <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
-                          </path>
-                          <path
-                            d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z">
-                          </path>
-                        </svg>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          
-          <div class="text-xs text-slate-500">ISRI2023</div>
-        </div>
-      </div>
-    </ModalVue>
-
     <ModalRolesVue 
     :modalVar="modalVar" :showModal="showModal" :modalData="modalData" 
     @cerrar-modal="closeVars" @abrir-modal="showModal = true"
     @update-table="getUpdateTable()"/>
+
+    <ModalCreateRoleVue
+    :showModalCreate="showModalCreate" :modalDataCreate="modalDataCreate"
+    @cerrar-modal="closeModalCreate()" @abrir-modal="showModalCreate=true"
+    />
 
   </AppLayoutVue>
 </template>
@@ -266,6 +192,8 @@ export default {
         id_menu:"",
       },
       modalDataCreate:{
+        //The name of the new role.
+        nombre_rol:'',
         //List of all registered systems
         sistemas:[],
         //Selected system Id
@@ -307,8 +235,19 @@ export default {
   },
   methods: {
     //Methods for creating a new role
-    cleanModalCreateInputs(){
+    async createRol(){
+      await axios.get("/sistemas/all")
+        .then((response)=> {
+          this.modalDataCreate.sistemas=response.data.sistemas
+          this.showModalCreate=true
+        })
+        .catch((errors)=> console.log(errors))
+    },
+    closeModalCreate(){
       this.showModalCreate=false
+      this.cleanModalInputsCreate()
+    },
+    cleanModalInputsCreate(){
       this.modalDataCreate.sistemas=[]
       this.modalDataCreate.id_sistema=''
       this.modalDataCreate.parentsMenu=[]
@@ -319,135 +258,6 @@ export default {
       this.modalDataCreate.menus=[]
       this.modalDataCreate.select_sistema=false
     },
-    async createRol(){
-      await axios.get("/sistemas/all")
-        .then((response)=> {
-          this.modalDataCreate.sistemas=response.data.sistemas
-          console.log(response.data.sistemas);
-          this.showModalCreate=true
-        })
-        .catch((errors)=> console.log(errors))
-    },
-    getParentMenu(){
-      this.modalDataCreate.select_sistema=true
-      axios.get('/parentsMenu/all',{params: this.modalDataCreate})
-        .then((response) => {
-          this.modalDataCreate.parentsMenu=response.data.parentsMenu
-        })
-        .catch((errors) => console.log(errors))
-    },
-    getChildrenMenus({id,text}){
-      this.modalDataCreate.id_childrenMenu=""
-      this.modalDataCreate.nombre_parent_menu=text
-      axios.get('/menus/childrenMenus',{params: this.modalDataCreate})
-        .then((response) => {
-          this.modalDataCreate.childrenMenus=response.data.childrenMenus
-          if(this.modalDataCreate.menus!=""){
-            this.modalDataCreate.menus.forEach((value1, index1) => {
-              this.modalDataCreate.childrenMenus.forEach((value2,index2)=>{
-                if(value2.id==value1.id){
-                  this.modalDataCreate.childrenMenus.splice(index2,1)
-                }
-              })
-          });
-          }
-        })
-        .catch((errors) => console.log(errors))
-    },
-    getChildren({id,text}){
-      //Insertando nuevo array en tabla de menus
-      var array = {id:this.modalDataCreate.id_childrenMenu,id_menu_padre:this.modalDataCreate.id_menu, menu_padre:this.modalDataCreate.nombre_parent_menu,menu:text}
-      this.modalDataCreate.menus.push(array)
-      this.modalDataCreate.id_childrenMenu=""
-      this.modalDataCreate.childrenMenus.forEach((value, index) => {
-        if(value.id==array.id){
-          this.modalDataCreate.childrenMenus.splice(index,1)
-        }
-      })
-      //Verificando si el select de menus hijos esta vacio para borrar el respectivo menu padre
-      if(this.modalDataCreate.childrenMenus==''){
-        this.modalDataCreate.parentsMenu.forEach((value, index) => {
-          if(value.id==this.modalDataCreate.id_menu){
-            this.modalDataCreate.parentsMenu.splice(index,1)
-            this.modalDataCreate.id_menu=""
-          }
-        })
-        this.modalDataCreate.id_menu=''
-      }
-      
-    },
-    deleteMenu(id_menu,id_padre,nombre_padre){
-      let arraySelectParents = {id:id_padre,text:nombre_padre}
-      this.modalDataCreate.menus.forEach((value, index) => {
-        if(value.id==id_menu){
-        this.modalDataCreate.menus.splice(index,1)
-        }
-      })
-      if(this.modalDataCreate.parentsMenu==''){
-        this.modalDataCreate.parentsMenu.push(arraySelectParents)
-      }else{
-        let isInArray=false
-        this.modalDataCreate.parentsMenu.forEach((value2, index2) => {
-          if(value2.id==id_padre){
-            isInArray=true
-          }
-        })
-        if(!isInArray){
-          this.modalDataCreate.parentsMenu.push(arraySelectParents)
-        }
-      }
-      this.modalDataCreate.childrenMenus=''
-      this.modalDataCreate.id_childrenMenu=''
-      this.modalDataCreate.id_menu=''
-      
-    },
-    saveRol(){
-      if(this.modalDataCreate.nombre_rol!="" && this.modalDataCreate.menus!=""){
-        this.$swal.fire({
-            title: 'Esta seguro de guardar el rol',
-            icon: 'question',
-            iconHtml: '✅',
-            confirmButtonText: 'Si, Guardar',
-            confirmButtonColor: '#15803D',
-            cancelButtonText: 'Cancelar',
-            showCancelButton: true,
-            showCloseButton: true
-          }).then((result) => {
-            if (result.isConfirmed) {
-              axios.post("/create/rol", {
-                id_sistema : this.modalDataCreate.id_sistema,
-                nombre_rol : this.modalDataCreate.nombre_rol,
-                menus : this.modalDataCreate.menus
-              }).then((response) => {
-                this.$swal.fire({
-                text:response.data.mensaje,
-                icon: 'success',
-                timer:2000
-                })
-                this.cleanModalCreateInputs()
-                this.getRoles();
-                }).catch((errors) => console.log(errors))
-              }
-            })
-      }else{
-        let msg="Debes "
-        if(this.modalDataCreate.nombre_rol==""){
-            msg=msg+"escribir el nombre para el rol "
-          if(this.modalDataCreate.menus==""){
-            msg=msg+"y seleccionar menus"
-          }
-        }else{
-          msg=msg+"seleccionar menus"
-        }
-        this.$swal.fire({
-          title: 'Información incompleta',
-          text: msg,
-          icon: 'warning',
-          timer:5000
-          })
-      }
-    },
-
 
     //Methods for ModalRoles
     getUpdateTable(){
