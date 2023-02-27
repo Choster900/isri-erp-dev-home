@@ -42,6 +42,10 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::get('menus/childrenMenus', [RolController::class, 'getChildrenMenus'])->name('get.children.menus');
     Route::post('save/menu', [RolController::class, 'saveMenu'])->name('save.menu');
     Route::post('desactive/menu', [RolController::class, 'desactiveMenu'])->name('desactive.menu');
+    //Urls to create a new role
+    Route::get('sistemas/all', [RolController::class, 'getSistemasAll'])->name('get.sistemas.all');
+    Route::get('parentsMenu/all', [RolController::class, 'getParentsMenuAll'])->name('get.parentsMenu.all');
+    Route::post('create/rol', [RolController::class, 'createRol'])->name('create.rol');
 
 
     Route::get('dashboard/{id}', [IndexController::class, 'getMenus'])->name('mainpage');

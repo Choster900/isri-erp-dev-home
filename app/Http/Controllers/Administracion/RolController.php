@@ -100,6 +100,7 @@ class RolController extends Controller
         }
         return ['rolMenus' => $menus_asignados, 'menus' => $arrayRol, 'id_menus_asignados' => $id_menus_asignados, 'nombre_rol' =>$rol->nombre_rol];
     }
+    //Mismo metodo para Crear Rol y Editar Rol, el array id_menus_rol es utilizado en el modal ModalRoles
     public function getChildrenMenus(Request $request){
         $id_menu = $request->input('id_menu');
         $menus_asignados = $request->input('id_menus_rol');
@@ -207,5 +208,64 @@ class RolController extends Controller
         }
         $menu=Menu::find($id_childrenMenu);
         return ['mensaje' => 'Desactivado menu '.$menu->nombre_menu.' con exito','update' => $updateTable];
+    }
+
+    //Methods for create Role
+    public function getSistemasAll(){
+        $sistemas = Sistema::get();
+        $arraySistemas=[];
+        foreach($sistemas as $sistema){
+            $arraySis['id']=$sistema->id_sistema;
+            $arraySis['text']=$sistema->nombre_sistema;
+            $arraySistemas[]=$arraySis;
+        }
+        return ['sistemas'=>$arraySistemas];
+    }
+    public function getParentsMenuAll(Request $request){
+        $id_sistema = $request->input('id_sistema');
+        $sistema=Sistema::find($id_sistema);
+        foreach($sistema->menus as $menu){
+            if($menu->id_menu_padre==null && $menu->estado_menu==1){
+                $arrayParent['id']=$menu->id_menu;
+                $arrayParent['text']=$menu->nombre_menu;
+                $arrayParents[]=$arrayParent;
+            }
+        }
+        return['parentsMenu'=>$arrayParents];
+    }
+    public function createRol(Request $request){
+        $nombre_rol = $request->input('nombre_rol');
+        $id_sistema = $request->input('id_sistema');
+        $menus = $request->input('menus');
+        $rol = new Rol();
+        $rol->id_sistema=$id_sistema;
+        $rol->nombre_rol=$nombre_rol;
+        $rol->estado_rol=1;
+        $rol->fecha_reg_rol=Carbon::now();
+        $rol->save();
+        
+        foreach($menus as $menu){
+            $acceso_menu = new AccesoMenu();
+            $acceso_menu->id_rol=$rol->id_rol;
+            $acceso_menu->id_menu=$menu['id'];
+            $acceso_menu->estado_acceso_menu=1;
+            $acceso_menu->insertar_acceso_menu=1;
+            $acceso_menu->actualizar_acceso_menu=1;
+            $acceso_menu->eliminar_acceso_menu=1;
+            $acceso_menu->ejecutar_acceso_menu=1;
+            $acceso_menu->fecha_reg_acceso_menu=Carbon::now();
+            $acceso_menu->save();
+
+            $acceso_menu_padre = AccesoMenu::where('id_rol','=',$rol->id_rol)->where('id_menu','=',$menu['id_menu_padre'])->first();
+            if(!$acceso_menu_padre){
+                $acceso_padre = new AccesoMenu();
+                $acceso_padre->id_rol=$rol->id_rol;
+                $acceso_padre->id_menu=$menu['id_menu_padre'];
+                $acceso_padre->estado_acceso_menu=1;
+                $acceso_padre->fecha_reg_acceso_menu=Carbon::now();
+                $acceso_padre->save();
+            }
+        }
+        return['mensaje' => 'Guardado rol '.$nombre_rol.' con exito'];
     }
 }
