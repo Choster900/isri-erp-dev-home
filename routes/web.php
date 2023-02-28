@@ -40,13 +40,20 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::post('change/rol/all', [RolController::class, 'changeRolAll'])->name('change.rol.all');
     //Manage menus for a specific rol
     Route::get('menus', [RolController::class, 'getMenusRol'])->name('get.menus.rol');
+    Route::get('menus/childrenMenus', [RolController::class, 'getChildrenMenus'])->name('get.children.menus');
+    Route::post('save/menu', [RolController::class, 'saveMenu'])->name('save.menu');
+    Route::post('desactive/menu', [RolController::class, 'desactiveMenu'])->name('desactive.menu');
+    //Urls to create a new role
+    Route::get('sistemas/all', [RolController::class, 'getSistemasAll'])->name('get.sistemas.all');
+    Route::get('parentsMenu/all', [RolController::class, 'getParentsMenuAll'])->name('get.parentsMenu.all');
+    Route::post('create/rol', [RolController::class, 'createRol'])->name('create.rol');
+
     //This route obtains roles based on the parameters sent from the page.
     Route::get('personas', [PersonasController::class, 'getPersona'])->name('get.personas');
     Route::get('/list-option-select', [PersonasController::class, 'getInformationToSelect'])->name('list-option-select');
     Route::get('get-persona', [PersonasController::class, 'getInformationPersona'])->name('get.persona');
     Route::post('post-persona', [PersonasController::class, 'AgregarPersona'])->name('post-persona');
     Route::post('update-persona', [PersonasController::class, 'EditarPersona'])->name('update-persona');
-
 
     Route::get('dashboard/{id}', [IndexController::class, 'getMenus'])->name('mainpage');
     Route::get('password/create', [IndexController::class, 'createCambiarContraseña'])->name('crear.contraseña');
