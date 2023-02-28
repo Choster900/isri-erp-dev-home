@@ -82,7 +82,7 @@ import axios from 'axios';
                                     </td>
                                 </tr>
                             </template>
-                            <tr v-if="modalData.userRoles == '' ">
+                            <tr v-if="modalData.userRoles == ''">
                                 <td colspan="4" class="text-center p-2 font-light">Sin resultados en la busqueda</td>
                             </tr>
                         </tbody>
@@ -263,7 +263,7 @@ export default {
     watch: {
         showModal: function (newParam, oldParam) {
             let tBody = document.getElementById("tabla_modal_validacion_arranque")
-            
+
             //newParam ? this.getSistemas() : tBody.innerHTML = ""
             newParam ? this.getSistemas() : this.modalData.userRoles = []
 

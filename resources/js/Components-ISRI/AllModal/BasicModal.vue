@@ -66,10 +66,10 @@ const maxWidthClass = computed(() => {
 <template>
     <teleport to="body">
         <transition leave-active-class="duration-200">
-            <div v-show="show" class="fixed inset-0 overflow-y-auto px-4 py-6 sm:px-0 z-50" scroll-region>
+            <div v-show="show" class="fixed inset-0 overflow-y-auto px-4 py-6 sm:px-0 z-50 " scroll-region>
                 <transition enter-active-class="ease-out duration-300" enter-from-class="opacity-0"
-                    enter-to-class="opacity-100" leave-active-class="ease-in duration-200"
-                    leave-from-class="opacity-100" leave-to-class="opacity-0">
+                    enter-to-class="opacity-100" leave-active-class="ease-in duration-200" leave-from-class="opacity-100"
+                    leave-to-class="opacity-0">
                     <div v-show="show" class="fixed inset-0 transform transition-all" @click="close">
                         <div class="absolute inset-0 bg-gray-500 dark:bg-gray-900 opacity-75" />
                     </div>
@@ -83,17 +83,18 @@ const maxWidthClass = computed(() => {
 
                     <div v-show="show"
                         class="fixed inset-0 z-50 overflow-hidden flex items-center  my-4 justify-center px-4 sm:px-6">
-                        <div class="bg-white rounded-md shadow-lg overflow-auto max-w-lg w-full max-h-full sm:max-w-xl">
+                        <div
+                            class="sin-scroll bg-white rounded-md shadow-lg overflow-auto max-w-lg w-full max-h-full sm:max-w-xl">
                             <!-- Modal header -->
-                            <div class="px-5 py-3 border-b border-slate-200 bg-[#1F3558]">
+                            <div class="px-5 py-3 border-b border-slate-200 bg-[#1F3558] ">
                                 <div class="flex justify-between items-center ">
                                     <div class="font-semibold text-slate-50">{{ title }}</div>
-                                    <button class="text-slate-400 hover:text-slate-500"  @click.stop="$emit('close-modal')">
+                                    <button class="text-slate-400 hover:text-slate-500" @click.stop="$emit('close-modal')">
                                         <div class="sr-only">Close</div>
                                         <svg class="w-4 h-4 fill-current">
                                             <path
                                                 d="
-                                                M7.95 6.536l4.242-4.243a1 1 0 111.415 1.414L9.364 7.95l4.243 4.242a1 1 0 11-1.415 1.415L7.95 9.364l-4.243 4.243a1 1 0 01-1.414-1.415L6.536 7.95 2.293 3.707a1 1 0 011.414-1.414L7.95 6.536z" />
+                                                        M7.95 6.536l4.242-4.243a1 1 0 111.415 1.414L9.364 7.95l4.243 4.242a1 1 0 11-1.415 1.415L7.95 9.364l-4.243 4.243a1 1 0 01-1.414-1.415L6.536 7.95 2.293 3.707a1 1 0 011.414-1.414L7.95 6.536z" />
                                         </svg>
                                     </button>
                                 </div>
@@ -108,3 +109,13 @@ const maxWidthClass = computed(() => {
         </transition>
     </teleport>
 </template>
+<style>
+.sin-scroll {
+    overflow: auto;
+    scrollbar-width: none;
+}
+
+.sin-scroll::-webkit-scrollbar {
+    width: 0;
+}
+</style>

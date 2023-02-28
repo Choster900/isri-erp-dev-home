@@ -81,8 +81,8 @@ class RolController extends Controller
                     }
                 }
                 if($var==true){
-                    $arrayRoles['id']=$menu->id_menu;
-                    $arrayRoles['text']=$menu->nombre_menu;
+                    $arrayRoles['value']=$menu->id_menu;
+                    $arrayRoles['label']=$menu->nombre_menu;
                     $arrayRol[]=$arrayRoles;
                 }
             }
@@ -92,8 +92,8 @@ class RolController extends Controller
         }else{
             foreach($sistema->menus as $menu){
                 if($menu->id_menu_padre==null){
-                    $arrayRoles['id']=$menu->id_menu;
-                    $arrayRoles['text']=$menu->nombre_menu;
+                    $arrayRoles['value']=$menu->id_menu;
+                    $arrayRoles['label']=$menu->nombre_menu;
                     $arrayRol[]=$arrayRoles;
                 }
             }
@@ -108,15 +108,15 @@ class RolController extends Controller
         if(isset($menus_asignados)){
             foreach($menu_padre->childrenMenus as $menu){
                 if(!in_array($menu->id_menu,$menus_asignados)){
-                    $arrayRoles['id']=$menu->id_menu;
-                    $arrayRoles['text']=$menu->nombre_menu;
+                    $arrayRoles['value']=$menu->id_menu;
+                    $arrayRoles['label']=$menu->nombre_menu;
                     $arrayRol[]=$arrayRoles;
                 }
             }
         }else{
             foreach($menu_padre->childrenMenus as $menu){
-                    $arrayRoles['id']=$menu->id_menu;
-                    $arrayRoles['text']=$menu->nombre_menu;
+                    $arrayRoles['value']=$menu->id_menu;
+                    $arrayRoles['label']=$menu->nombre_menu;
                     $arrayRol[]=$arrayRoles;
             }
         }
@@ -215,8 +215,8 @@ class RolController extends Controller
         $sistemas = Sistema::get();
         $arraySistemas=[];
         foreach($sistemas as $sistema){
-            $arraySis['id']=$sistema->id_sistema;
-            $arraySis['text']=$sistema->nombre_sistema;
+            $arraySis['value']=$sistema->id_sistema;
+            $arraySis['label']=$sistema->nombre_sistema;
             $arraySistemas[]=$arraySis;
         }
         return ['sistemas'=>$arraySistemas];
@@ -226,8 +226,8 @@ class RolController extends Controller
         $sistema=Sistema::find($id_sistema);
         foreach($sistema->menus as $menu){
             if($menu->id_menu_padre==null && $menu->estado_menu==1){
-                $arrayParent['id']=$menu->id_menu;
-                $arrayParent['text']=$menu->nombre_menu;
+                $arrayParent['value']=$menu->id_menu;
+                $arrayParent['label']=$menu->nombre_menu;
                 $arrayParents[]=$arrayParent;
             }
         }

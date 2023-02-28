@@ -23,27 +23,11 @@ import ModalAdministracionVue from '@/Components-ISRI/Administracion/ModalAdmini
           </div>
           <div class="mb-4 md:mr-2 md:mb-0 basis-1/4"><!-- TODO:ARREGARL SEARCH -->
             <TextInput :label-input="false" id="search-user" type="text" v-model="tableData.search"
-              placeholder="Search Table" @input="getUsers()">
+              placeholder="Search Table"  @update:modelValue="getUsers()">
             <LabelToInput icon="search" forLabel="search-user" />
           </TextInput>
         </div>
       </div>
-
-      <!-- <div class="mb-4 md:flex flex-row justify-items-start">
-          <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-            <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-              <Multiselect v-model="tableData.length" @select="getUsers()" :options="perPage" :searchable="true" />
-              <LabelToInput icon="date" />
-            </div>
-          </div>
-
-          <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-              <TextInput id="search-user" type="text" v-model="tableData.search" placeholder="Search Table"
-                @input="getUsers()">
-                <LabelToInput icon="search" forLabel="search-user" />
-              </TextInput>
-            </div>
-          </div> -->
         <h2 class="font-semibold text-slate-800 pt-1">All Users <span class="text-slate-400 font-medium">{{
           pagination.total
         }}</span></h2>

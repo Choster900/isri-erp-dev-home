@@ -374,19 +374,19 @@ export default {
             }
         },
         async addPerson() {
-        /*     let isValid = this.typeDUI(this.persona.dui_persona)
-            if (isValid) { */
-                await axios.post('/post-persona', this.persona).then((response) => {
-                    console.log(response.data);
-                })
-          /*   } else {
-                toast.error("El DUI proporcinado es invalido", {
-                    autoClose: 5000,
-                    position: "top-right",
-                    transition: "zoom",
-                    toastBackgroundColor: "white",
-                });
-            } */
+            /*     let isValid = this.typeDUI(this.persona.dui_persona)
+                if (isValid) { */
+            await axios.post('/post-persona', this.persona).then((response) => {
+                console.log(response.data);
+            })
+            /*   } else {
+                  toast.error("El DUI proporcinado es invalido", {
+                      autoClose: 5000,
+                      position: "top-right",
+                      transition: "zoom",
+                      toastBackgroundColor: "white",
+                  });
+              } */
         },
         async updatePerson() {
             let isValid = this.typeDUI(this.persona.dui_persona)
