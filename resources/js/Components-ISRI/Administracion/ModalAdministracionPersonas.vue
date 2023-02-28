@@ -213,7 +213,7 @@ import 'vue3-toastify/dist/index.css';
                         </div>
                     </div>
 
-                    <div id="nivel-academico">
+                    <div id="abajo">
                         <div class="pb-4 mb-4 md:flex flex-row justify-between">
                             <span class="font-semibold text-slate-800 mb-2 text-lg underline underline-offset-2">
                                 Nivel académico
@@ -246,17 +246,17 @@ import 'vue3-toastify/dist/index.css';
                 </div>
             </div>
 
-            <div class="sticky bottom-0 px-5 py-4 bg-white border-t border-slate-200" id="abajo">
+            <div class="sticky bottom-0 px-5 py-4 bg-white border-t border-slate-200">
                 <div class="flex flex-wrap justify-end space-x-3">
 
                     <button
                         class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600 underline underline-offset-1"
                         @click.stop="this.$emit('close-definitive')">Cerrar</button>
 
-                    <GeneralButton v-if="infoPersona != ''" @click="updatePerson()" color="bg-orange-700  hover:bg-orange-800"
-                        text="Editar persona" icon="add" />
-                    <GeneralButton v-else @click="addPerson()" color="bg-green-700  hover:bg-green-800" text="Agregar persona"
-                        icon="add" />
+                    <GeneralButton v-if="infoPersona != ''" @click="updatePerson()"
+                        color="bg-orange-700  hover:bg-orange-800" text="Editar persona" icon="add" />
+                    <GeneralButton v-else @click="addPerson()" color="bg-green-700  hover:bg-green-800"
+                        text="Agregar persona" icon="add" />
                 </div>
             </div>
 
@@ -370,23 +370,23 @@ export default {
                 }
                 return dig_ve === (10 - (sum % 10)) % 10;
             } else {
-                return false;
+                return "false";
             }
         },
         async addPerson() {
-            let isValid = this.typeDUI(this.persona.dui_persona)
-            if (isValid) {
+        /*     let isValid = this.typeDUI(this.persona.dui_persona)
+            if (isValid) { */
                 await axios.post('/post-persona', this.persona).then((response) => {
                     console.log(response.data);
                 })
-            } else {
+          /*   } else {
                 toast.error("El DUI proporcinado es invalido", {
                     autoClose: 5000,
                     position: "top-right",
                     transition: "zoom",
                     toastBackgroundColor: "white",
                 });
-            }
+            } */
         },
         async updatePerson() {
             let isValid = this.typeDUI(this.persona.dui_persona)

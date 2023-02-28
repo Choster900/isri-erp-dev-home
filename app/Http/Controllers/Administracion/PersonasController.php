@@ -108,29 +108,43 @@ class PersonasController extends Controller
     public function AgregarPersona(PersonasRequest $request)
     {
         try {
-            DB::beginTransaction();
+            /*  DB::beginTransaction();
             $persona = Personas::create([
-                'pnombre_persona'        => $request->input("pnombre_persona"),
-                'snombre_persona'        => $request->input("snombre_persona"),
-                'tnombre_persona'        => $request->input("tnombre_persona"),
-                'papellido_persona'      => $request->input("papellido_persona"),
-                'sapellido_persona'      => $request->input("sapellido_persona"),
-                'tapellido_persona'      => $request->input("tapellido_persona"),
-                'telefono_persona'       => $request->input("telefono_persona"),
-                'dui_persona'            => $request->input("dui_persona"),
-                'email_persona'          => $request->input("email_persona"),
-                'id_genero'              => $request->input("id_genero"),
-                'id_estado_civil'        => $request->input("id_estado_civil"),
-                'nombre_conyuge_persona' => $request->input("nombre_conyuge_persona"),
-                'nombre_madre_persona'   => $request->input("nombre_madre_persona"),
-                'nombre_padre_persona'   => $request->input("nombre_padre_persona"),
-                'fecha_nac_persona'      => $request->input("fecha_nac_persona"),
-                'id_municipio'           => $request->input("id_municipio"),
-                'id_profesion'           => $request->input("id_profesion"),
-                'id_nivel_educativo'     => $request->input("id_nivel_educativo"),
+            'pnombre_persona'        => $request->input("pnombre_persona"),
+            'snombre_persona'        => $request->input("snombre_persona"),
+            'tnombre_persona'        => $request->input("tnombre_persona"),
+            'papellido_persona'      => $request->input("papellido_persona"),
+            'sapellido_persona'      => $request->input("sapellido_persona"),
+            'tapellido_persona'      => $request->input("tapellido_persona"),
+            'telefono_persona'       => $request->input("telefono_persona"),
+            'dui_persona'            => $request->input("dui_persona"),
+            'email_persona'          => $request->input("email_persona"),
+            'id_genero'              => $request->input("id_genero"),
+            'id_estado_civil'        => $request->input("id_estado_civil"),
+            'nombre_conyuge_persona' => $request->input("nombre_conyuge_persona"),
+            'nombre_madre_persona'   => $request->input("nombre_madre_persona"),
+            'nombre_padre_persona'   => $request->input("nombre_padre_persona"),
+            'fecha_nac_persona'      => $request->input("fecha_nac_persona"),
+            'id_municipio'           => $request->input("id_municipio"),
+            'id_profesion'           => $request->input("id_profesion"),
+            'id_nivel_educativo'     => $request->input("id_nivel_educativo"),
             ]);
             DB::commit();
-            return $persona;
+            return $persona; */
+
+            if ((bool) preg_match('/(^\d{8})-(\d$)/', $request->input("dui_persona")) === true) {
+                [$digits, $digit_veri] = explode('-', $request->input("dui_persona"));
+                $sum = 0;
+
+                for ($i = 0, $l = strlen($digits); $i < $l; $i++) {
+                    $sum += (9 - $i) * (int) $digits[$i];
+                }
+
+                return (int) $digit_veri === ((10 - ($sum % 10)) % 10);
+            }
+
+            return false;
+
         } catch (\Throwable $th) {
             //throw $th;
             DB::rollback();
