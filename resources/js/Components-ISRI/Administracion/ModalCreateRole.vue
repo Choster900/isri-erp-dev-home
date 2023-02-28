@@ -4,6 +4,7 @@ import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import axios from 'axios';
+import Targets from '@/Components-ISRI/Targets.vue';
 </script>
 
 <template>
@@ -12,18 +13,18 @@ import axios from 'axios';
   <div class="px-5 pt-4 pb-1">
     <div class="text-sm">
       <div class="mb-4">Selecciona un Sistema y escriba nombre del rol</div>
-      <div class="mb-4 md:flex flex-row justify-items-start">
+        <div class="mb-4 md:flex flex-row justify-items-start">
           <!--           <div class="mb-4 md:mr-2 md:mb-0 w-64">
-                <div class="relative flex h-8 w-full flex-row-reverse div-select2">
-                  <Select2 v-bind:disabled="modalDataCreate.select_sistema" class="text-xs"
-                    v-model="modalDataCreate.id_sistema" :options="modalDataCreate.sistemas" @select="getParentMenu()"
-                    placeholder="Seleccione Sistema" />
-                  <LabelToInput icon="list" for-label="select" />
-                </div>
-              </div> -->
+                                                                    <div class="relative flex h-8 w-full flex-row-reverse div-select2">
+                                                                      <Select2 v-bind:disabled="modalDataCreate.select_sistema" class="text-xs"
+                                                                        v-model="modalDataCreate.id_sistema" :options="modalDataCreate.sistemas" @select="getParentMenu()"
+                                                                        placeholder="Seleccione Sistema" />
+                                                                      <LabelToInput icon="list" for-label="select" />
+                                                                    </div>
+                                                                  </div> -->
           <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
             <label class="block mb-2 text-xs font-light text-gray-600">
-              Estado civil <span class="text-red-600 font-extrabold">*</span>
+              Sistema <span class="text-red-600 font-extrabold">*</span>
             </label>
             <div class="relative font-semibold  flex h-8 w-full flex-row-reverse ">
               <Multiselect v-bind:disabled="modalDataCreate.select_sistema" class="text-xs"
@@ -34,7 +35,7 @@ import axios from 'axios';
           </div>
 
           <div class="mb-4 md:ml-1 md:mb-0 w-64">
-            <TextInput v-model="modalDataCreate.nombre_rol" id="personal-information" type="text"
+          <TextInput v-model="modalDataCreate.nombre_rol" id="personal-information" type="text"
             placeholder="Nombre Rol">
             <LabelToInput icon="standard" forLabel="personal-information" />
           </TextInput>
@@ -48,33 +49,39 @@ import axios from 'axios';
                 @select="getChildrenMenus($event)" placeholder="Seleccione Menu" />
               <LabelToInput icon="list" for-label="select" />
             </div>
-          </div>
-              <div class="mb-4 md:mr-2 md:mb-0 w-64">
-                <div class="relative flex h-8 w-full flex-row-reverse div-select2">
-                  <Select2 class="text-xs" v-model="modalDataCreate.id_childrenMenu" :options="modalDataCreate.childrenMenus"
-                    @select="getChildren($event)" placeholder="Seleccione Sub Menu" />
-                  <LabelToInput icon="list" for-label="select" />
-                </div>
-              </div>
-     -->
+                                              </div>
+                                                                  <div class="mb-4 md:mr-2 md:mb-0 w-64">
+                                                                    <div class="relative flex h-8 w-full flex-row-reverse div-select2">
+                                                                      <Select2 class="text-xs" v-model="modalDataCreate.id_childrenMenu" :options="modalDataCreate.childrenMenus"
+                                                                        @select="getChildren($event)" placeholder="Seleccione Sub Menu" />
+                                                                      <LabelToInput icon="list" for-label="select" />
+                                                                    </div>
+                                                                  </div>
+                                                         -->
           <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
             <label class="block mb-2 text-xs font-light text-gray-600">
-              Estado civil <span class="text-red-600 font-extrabold">*</span>
+              Menu <span class="text-red-600 font-extrabold">*</span>
             </label>
             <div class="relative font-semibold  flex h-8 w-full flex-row-reverse ">
+
               <Multiselect v-model="modalDataCreate.id_menu" :options="modalDataCreate.parentsMenu"
-                @select="getChildrenMenus($event)" placeholder="Seleccione Menu" :searchable="true" />
+                @select="getChildrenMenus(modalDataCreate.parentsMenu, $event)" placeholder="Seleccione Menu"
+                :searchable="true" />
+
               <LabelToInput icon="list" />
             </div>
           </div>
 
           <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
             <label class="block mb-2 text-xs font-light text-gray-600">
-              Estado civil <span class="text-red-600 font-extrabold">*</span>
+              Sub menu <span class="text-red-600 font-extrabold">*</span>
             </label>
             <div class="relative font-semibold  flex h-8 w-full flex-row-reverse ">
+
               <Multiselect v-model="modalDataCreate.id_childrenMenu" :options="modalDataCreate.childrenMenus"
-                @select="getChildren($event)" placeholder="Seleccione Sub Menu" :searchable="true" />
+                @select="getChildren(modalDataCreate.childrenMenus, $event)" placeholder="Seleccione Sub Menu"
+                :searchable="true" />
+
               <LabelToInput icon="list" />
             </div>
           </div>
@@ -133,7 +140,9 @@ import axios from 'axios';
 export default {
   props: ["showModalCreate", "modalDataCreate"],
   data: function (data) {
+    return {
 
+    }
   },
   methods: {
     //Methods for creating a new role
@@ -157,16 +166,23 @@ export default {
         })
         .catch((errors) => console.log(errors))
     },
-    getChildrenMenus({ id, text }) {
-      this.modalDataCreate.id_childrenMenu = ""
-      this.modalDataCreate.nombre_parent_menu = text
+    getChildrenMenus: function (data, event) {
+
+      let finalLabel
+      data.forEach((value, index) => {
+        if (value.value == event) {
+          finalLabel = value.label
+        }
+      })
+      this.modalDataCreate.id_childrenMenu = null
+      this.modalDataCreate.nombre_parent_menu = finalLabel
       axios.get('/menus/childrenMenus', { params: this.modalDataCreate })
         .then((response) => {
           this.modalDataCreate.childrenMenus = response.data.childrenMenus
           if (this.modalDataCreate.menus != "") {
             this.modalDataCreate.menus.forEach((value1, index1) => {
               this.modalDataCreate.childrenMenus.forEach((value2, index2) => {
-                if (value2.id == value1.id) {
+                if (value2.value == value1.id) {
                   this.modalDataCreate.childrenMenus.splice(index2, 1)
                 }
               })
@@ -175,22 +191,34 @@ export default {
         })
         .catch((errors) => console.log(errors))
     },
-    getChildren({ id, text }) {
+    getChildren(data, event) {
+
+      let finalLabel
+      data.forEach((value, index) => {
+        if (value.value == event) {
+          finalLabel = value.label
+        }
+      })
       //Insertando nuevo array en tabla de menus
-      var array = { id: this.modalDataCreate.id_childrenMenu, id_menu_padre: this.modalDataCreate.id_menu, menu_padre: this.modalDataCreate.nombre_parent_menu, menu: text }
+      var array = {
+        id: this.modalDataCreate.id_childrenMenu,
+        id_menu_padre: this.modalDataCreate.id_menu,
+        menu_padre: this.modalDataCreate.nombre_parent_menu, menu: finalLabel
+      }
       this.modalDataCreate.menus.push(array)
       this.modalDataCreate.id_childrenMenu = ""
       this.modalDataCreate.childrenMenus.forEach((value, index) => {
-        if (value.id == array.id) {
+        if (value.value == array.id) {
           this.modalDataCreate.childrenMenus.splice(index, 1)
         }
       })
       //Verificando si el select de menus hijos esta vacio para borrar el respectivo menu padre
       if (this.modalDataCreate.childrenMenus == '') {
         this.modalDataCreate.parentsMenu.forEach((value, index) => {
-          if (value.id == this.modalDataCreate.id_menu) {
+          if (value.value == this.modalDataCreate.id_menu) {
             this.modalDataCreate.parentsMenu.splice(index, 1)
             this.modalDataCreate.id_menu = ""
+            this.modalDataCreate.id_childrenMenu = ""
           }
         })
         this.modalDataCreate.id_menu = ''
@@ -198,7 +226,8 @@ export default {
 
     },
     deleteMenu(id_menu, id_padre, nombre_padre) {
-      let arraySelectParents = { id: id_padre, text: nombre_padre }
+      console.log(id_menu, id_padre, nombre_padre);
+      let arraySelectParents = { value: id_padre, label: nombre_padre }
       this.modalDataCreate.menus.forEach((value, index) => {
         if (value.id == id_menu) {
           this.modalDataCreate.menus.splice(index, 1)
@@ -209,7 +238,7 @@ export default {
       } else {
         let isInArray = false
         this.modalDataCreate.parentsMenu.forEach((value2, index2) => {
-          if (value2.id == id_padre) {
+          if (value2.value == id_padre) {
             isInArray = true
           }
         })
@@ -246,7 +275,7 @@ export default {
                 timer: 3000
               })
               this.cleanModalCreateInputs()
-              this.getRoles();
+              this.$emit("update-table")
             }).catch((errors) => console.log(errors))
           }
         })
