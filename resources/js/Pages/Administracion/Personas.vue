@@ -3,7 +3,7 @@ import { Head } from "@inertiajs/vue3";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import axios from "axios";
 import moment from 'moment';
-import ModalAdministracionPersonasVue from '@/Components-ISRI/Administracion/ModalAdministracionPersonas.vue';
+import ModalAdministracionPersonasVue from '@/Components-ISRI/Administracion/ModalAdminPersona.vue';
 </script>
 <template>
     <Head title="Administracion" />
@@ -19,14 +19,14 @@ import ModalAdministracionPersonasVue from '@/Components-ISRI/Administracion/Mod
                 <div class="mb-4 md:flex flex-row justify-items-start">
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-                            <Multiselect v-model="tableData.length" @select="getUsers()" :options="perPage"
+                            <Multiselect v-model="tableData.length" @select="getPersonas()" :options="perPage"
                                 :searchable="true" />
                             <LabelToInput icon="date" />
                         </div>
                     </div>
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4"><!-- TODO:ARREGARL SEARCH -->
                         <TextInput :label-input="false" id="search-user" type="text" v-model="tableData.search"
-                            placeholder="Search Table" @input="getUsers()">
+                            placeholder="Search Table" @update:modelValue="getPersonas()">
                             <LabelToInput icon="search" forLabel="search-user" />
                         </TextInput>
                     </div>
@@ -57,9 +57,20 @@ import ModalAdministracionPersonasVue from '@/Components-ISRI/Administracion/Mod
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800">
+                                    <div v-if="(persona.estado_persona == 1)"
+                                        class="inline-flex font-medium rounded-full text-xs text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
+                                        A
+                                    </div>
+                                    <div v-else
+                                        class="inline-flex font-medium rounded-full text-xs text-center px-2.5 py-0.5 bg-rose-100 text-rose-600">
+                                        I
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800">
                                     {{ moment(persona.fecha_nac_persona).format('dddd Do MMMM YYYY') }}
                                 </div>
-
                             </td>
 
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
@@ -73,7 +84,9 @@ import ModalAdministracionPersonasVue from '@/Components-ISRI/Administracion/Mod
                                             </path>
                                         </svg>
                                     </button>
-                                    <button class="text-rose-500 hover:text-rose-600 rounded-full">
+                                    <!-- CAMBIAR ICONO DE BOTON POR QUE VA A SER ACTIVAR Y DESCATIVAR -->
+                                    <button @click="enableInformationPersona(persona.id_persona)"
+                                        class="text-rose-500 hover:text-rose-600 rounded-full">
                                         <span class="sr-only">Delete</span><svg class="w-8 h-8 fill-current"
                                             viewBox="0 0 32 32">
                                             <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
@@ -101,9 +114,9 @@ import ModalAdministracionPersonasVue from '@/Components-ISRI/Administracion/Mod
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
 
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getUsers(link.url)"
+                                        <a @click="getPersonas(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                              text-indigo-500">
+                                                                                                                                                                                  text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
                                     </div>
@@ -111,16 +124,16 @@ import ModalAdministracionPersonasVue from '@/Components-ISRI/Administracion/Mod
                                 <span v-else-if="(link.label == 'Siguiente')"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getUsers(link.url)"
+                                        <a @click="getPersonas(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                              text-indigo-500">
+                                                                                                                                                                                  text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
                                     </div>
                                 </span>
                                 <span class="cursor-pointer" v-else
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
-                                        class=" w-5" @click="getUsers(link.url)">{{ link.label }}</span>
+                                        class=" w-5" @click="getPersonas(link.url)">{{ link.label }}</span>
                                 </span>
                             </li>
                         </ul>
@@ -137,7 +150,7 @@ import ModalAdministracionPersonasVue from '@/Components-ISRI/Administracion/Mod
 <script>
 export default {
     created() {
-        this.getUsers();
+        this.getPersonas();
     },
     data: function (data) {
         let sortOrders = {};
@@ -145,6 +158,7 @@ export default {
             { width: "10%", label: "Id", name: "id_persona" },
             { width: "20%", label: "Dui", name: "dui_persona" },
             { width: "40%", label: "Nombre", name: "snombre_persona" },
+            { width: "10%", label: "Estado", name: "estado_persona" },
             { width: "25%", label: "Fecha Nacimiento", name: "fecha_nac_persona" },
             { width: "25%", label: "Acciones", name: "Acciones" },
         ];
@@ -158,6 +172,7 @@ export default {
             scrollbarModalOpen: false,
             personas: [],
             links: [],
+            lastUrl:'',
             columns: columns,
             sortKey: "id_persona",
             sortOrders: sortOrders,
@@ -183,7 +198,8 @@ export default {
         };
     },
     methods: {
-        async getUsers(url = "/personas") {
+        async getPersonas(url = "/personas") {
+            this.lastUrl = url;
             this.tableData.draw++;
             await axios.get(url, { params: this.tableData }).then((response) => {
                 let data = response.data;
@@ -204,14 +220,13 @@ export default {
                 this.sortOrders[key] = this.sortOrders[key] * -1;
                 this.tableData.column = this.getIndex(this.columns, "name", key);
                 this.tableData.dir = this.sortOrders[key] === 1 ? "asc" : "desc";
-                this.getUsers();
+                this.getPersonas();
             }
         },
         getIndex(array, key, value) {
             return array.findIndex((i) => i[key] == value);
         },
         async getInformationPersona(id_persona) {
-            this.scrollbarModalOpen = !this.scrollbarModalOpen
             await axios.get("/get-persona", { params: { id_persona: id_persona } })
                 .then(res => {
                     this.infoPerson = res.data
@@ -219,6 +234,18 @@ export default {
                 .catch(err => {
                     console.error(err);
                 })
+            this.scrollbarModalOpen = !this.scrollbarModalOpen
+        },
+        async enableInformationPersona(id_persona) {
+
+            await axios.post("/update-state-person", { id_persona: id_persona })
+                .then(res => {
+                    console.log(res)
+                })
+                .catch(err => {
+                    console.error(err);
+                })
+            this.getPersonas(this.lastUrl)//llamamos de nuevo el metodo para que actualize la tabla
         },
         AddInformationPersona() {
             this.scrollbarModalOpen = !this.scrollbarModalOpen

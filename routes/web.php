@@ -4,7 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\Administracion\UserController;
 use App\Http\Controllers\Administracion\RolController;
-use App\Http\Controllers\Administracion\PersonasController;
+use App\Http\Controllers\Administracion\PersonaController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -49,11 +49,12 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::post('create/rol', [RolController::class, 'createRol'])->name('create.rol');
 
     //This route obtains roles based on the parameters sent from the page.
-    Route::get('personas', [PersonasController::class, 'getPersona'])->name('get.personas');
-    Route::get('/list-option-select', [PersonasController::class, 'getInformationToSelect'])->name('list-option-select');
-    Route::get('get-persona', [PersonasController::class, 'getInformationPersona'])->name('get.persona');
-    Route::post('post-persona', [PersonasController::class, 'AgregarPersona'])->name('post-persona');
-    Route::post('update-persona', [PersonasController::class, 'EditarPersona'])->name('update-persona');
+    Route::get('personas', [PersonaController::class, 'getPersona'])->name('get.personas');
+    Route::get('/list-option-select', [PersonaController::class, 'getInformationToSelect'])->name('list-option-select');
+    Route::get('get-persona', [PersonaController::class, 'getInformationPersona'])->name('get.persona');
+    Route::post('post-persona', [PersonaController::class, 'AgregarPersona'])->name('post-persona');
+    Route::post('update-persona', [PersonaController::class, 'EditarPersona'])->name('update-persona');
+    Route::post('update-state-person', [PersonaController::class, 'changeStatePerson'])->name('update-estate-person');
 
     Route::get('dashboard/{id}', [IndexController::class, 'getMenus'])->name('mainpage');
     Route::get('password/create', [IndexController::class, 'createCambiarContraseña'])->name('crear.contraseña');

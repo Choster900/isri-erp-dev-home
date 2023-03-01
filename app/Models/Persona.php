@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Personas extends Model
+class Persona extends Model
 {
     use HasFactory;
     protected $table = 'persona';
@@ -31,6 +31,7 @@ class Personas extends Model
         'id_nivel_educativo',
         'id_municipio',
         'id_profesion',
+        'estado_persona',
     ];
 
 

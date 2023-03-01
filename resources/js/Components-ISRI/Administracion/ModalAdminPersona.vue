@@ -2,7 +2,7 @@
 import ModalBasicVue from '@/Components-ISRI/AllModal/ModalBasic.vue';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
-
+import InputError from "@/Components/InputError.vue";
 </script>
 <template>
     <div class="m-1.5">
@@ -38,13 +38,16 @@ import 'vue3-toastify/dist/index.css';
                                     :value="persona.pnombre_persona" type="text" placeholder="Primer nombre">
                                     <LabelToInput icon="personalInformation" forLabel="primer-nombre" />
                                 </TextInput>
-                            </div>
+                                <InputError class="mt-2" :message="errosModel.pnombre_persona" />
 
+                            </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="segundo-nombre" v-model="persona.snombre_persona"
                                     :value="persona.snombre_persona" type="text" placeholder="Segundo nombre">
                                     <LabelToInput icon="personalInformation" forLabel="segundo-nombre" />
                                 </TextInput>
+                                <InputError class="mt-2" :message="errosModel.snombre_persona" />
+
                             </div>
 
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
@@ -52,6 +55,7 @@ import 'vue3-toastify/dist/index.css';
                                     :value="persona.tnombre_persona" type="text" placeholder="Tercer nombre (opcional)">
                                     <LabelToInput icon="personalInformation" forLabel="tercer-nombre" />
                                 </TextInput>
+
                             </div>
                         </div>
 
@@ -61,6 +65,8 @@ import 'vue3-toastify/dist/index.css';
                                     :value="persona.papellido_persona" type="text" placeholder="Primer apellido">
                                     <LabelToInput icon="personalInformation" forLabel="primer-apellido" />
                                 </TextInput>
+                                <InputError class="mt-2" :message="errosModel.papellido_persona" />
+
                             </div>
 
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
@@ -68,6 +74,8 @@ import 'vue3-toastify/dist/index.css';
                                     :value="persona.sapellido_persona" type="text" placeholder="Segundo apellido">
                                     <LabelToInput icon="personalInformation" forLabel="segundo-apellido" />
                                 </TextInput>
+                                <InputError class="mt-2" :message="errosModel.sapellido_persona" />
+
                             </div>
 
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
@@ -75,6 +83,7 @@ import 'vue3-toastify/dist/index.css';
                                     :value="persona.tapellido_persona" type="text" placeholder="Tercer apellido (opcional)">
                                     <LabelToInput icon="personalInformation" forLabel="tercer-apellido" />
                                 </TextInput>
+
                             </div>
                         </div>
 
@@ -85,21 +94,24 @@ import 'vue3-toastify/dist/index.css';
                                     @update:modelValue="typePhoneNumber()">
                                     <LabelToInput icon="personalInformation" forLabel="telefono" />
                                 </TextInput>
-
+                                <InputError class="mt-2" :message="errosModel.telefono_persona" />
                             </div>
 
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="DUI" v-model="persona.dui_persona" :value="persona.dui_persona" type="text"
-                                    placeholder="DUI">
+                                    placeholder="DUI" @update:modelValue="typeDUI()">
                                     <LabelToInput icon="personalInformation" forLabel="DUI" />
-
                                 </TextInput>
+                                <InputError class="mt-2" :message="errosModel.dui_persona" />
+
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="Correo" v-model="persona.email_persona" :value="persona.email_persona"
                                     type="email" placeholder="Correo electronico">
                                     <LabelToInput icon="email" forLabel="Correo" />
                                 </TextInput>
+                                <InputError class="mt-2" :message="errosModel.email_persona" />
+
                             </div>
                         </div>
 
@@ -113,6 +125,8 @@ import 'vue3-toastify/dist/index.css';
                                         :options="allSelectOptios.gender" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
+                                <InputError class="mt-2" :message="errosModel.id_genero" />
+
                             </div>
                         </div>
                     </div>
@@ -133,7 +147,10 @@ import 'vue3-toastify/dist/index.css';
                                         id="estado-civil" :options="allSelectOptios.civilStatus" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
+                                <InputError class="mt-2" :message="errosModel.id_estado_civil" />
+
                             </div>
+
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="nombre-conyuge" v-model="persona.nombre_conyuge_persona"
                                     :value="persona.sapellido_persona" type="text" placeholder="Nombre cónyuge">
@@ -176,16 +193,18 @@ import 'vue3-toastify/dist/index.css';
                                         :options="allSelectOptios.country" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
+
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Departamento <span class="text-red-600 font-extrabold">*</span>
                                 </label>
                                 <div class="relative flex h-8 w-full flex-row-reverse ">
-                                    <Multiselect placeholder="Departamento" v-model="valor"
+                                    <Multiselect placeholder="Departamento" v-model="persona.departament"
                                         :options="allSelectOptios.departament" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
+
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
@@ -196,6 +215,8 @@ import 'vue3-toastify/dist/index.css';
                                         :options="allSelectOptios.municipio" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
+                                <InputError class="mt-2" :message="errosModel.id_municipio" />
+
                             </div>
                         </div>
                         <div class="mb-7 md:flex flex-row justify-items-start">
@@ -209,6 +230,8 @@ import 'vue3-toastify/dist/index.css';
                                         :config="config" v-model="persona.fecha_nac_persona" />
                                     <LabelToInput icon="date" />
                                 </div>
+                                <InputError class="mt-2" :message="errosModel.fecha_nac_persona" />
+
                             </div>
                         </div>
                     </div>
@@ -229,6 +252,8 @@ import 'vue3-toastify/dist/index.css';
                                         :options="allSelectOptios.levelEducation" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
+                                <InputError class="mt-2" :message="errosModel.id_nivel_educativo" />
+
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
@@ -239,6 +264,8 @@ import 'vue3-toastify/dist/index.css';
                                         :options="allSelectOptios.levelProfession" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
+                                <InputError class="mt-2" :message="errosModel.id_profesion" />
+
                             </div>
                         </div>
                     </div>
@@ -332,6 +359,7 @@ export default {
                     },
                 },
             },
+            errosModel: {}
         }
     },
     methods: {
@@ -350,67 +378,94 @@ export default {
             var x = this.persona.telefono_persona.replace(/\D/g, '').match(/(\d{0,4})(\d{0,4})/);
             this.persona.telefono_persona = !x[2] ? x[1] : '' + x[1] + '-' + x[2] + (x[4] ? '-' + x[4] : '');
         },
-
-        typeDUI(str = "string") {
-            /* var x = this.persona.dui_persona.replace(/\D/g, '').match(/(\d{0,8})(\d{0,1}$/);
-            console.log(x[2]);
-            this.persona.dui_persona = !x[2] ? x[1] : '' + x[1] + '-' + x[2]; */
-
-            var regex = /(^\d{8})-(\d$)/, parts = str.match(regex);
-            // verficar formato y extraer digitos junto al digito verificador
-            if (parts !== null) {
-                var digits = parts[1],
-                    dig_ve = parseInt(parts[2], 10),
-                    sum = 0;
-                // sumar producto de posiciones y digitos
-                console.log(digits.length);
-                for (var i = 0, l = digits.length; i < l; i++) {
-                    var d = parseInt(digits[i], 10);
-                    sum += (9 - i) * d;
-                }
-                return dig_ve === (10 - (sum % 10)) % 10;
-            } else {
-                return "false";
-            }
+        typeDUI() {
+            var x = this.persona.dui_persona.replace(/\D/g, '').match(/(\d{0,8})(\d{0,1})/);
+            this.persona.dui_persona = !x[2] ? x[1] : '' + x[1] + '-' + x[2] + (x[4] ? '-' + x[4] : '');
         },
-        async addPerson() {
-            /*     let isValid = this.typeDUI(this.persona.dui_persona)
-                if (isValid) { */
-            await axios.post('/post-persona', this.persona).then((response) => {
-                console.log(response.data);
-            })
-            /*   } else {
-                  toast.error("El DUI proporcinado es invalido", {
-                      autoClose: 5000,
-                      position: "top-right",
-                      transition: "zoom",
-                      toastBackgroundColor: "white",
-                  });
-              } */
-        },
-        async updatePerson() {
-            let isValid = this.typeDUI(this.persona.dui_persona)
-            if (isValid) {
-                await axios.post('/update-persona', this.persona).then((response) => {
-                    console.log(response.data);
-                    toast.success("El registro se ha modificado correctamente", {
-                        autoClose: 5000,
-                        position: "top-right",
-                        transition: "zoom",
-                        toastBackgroundColor: "white",
+        addPerson() {
+            this.$swal.fire({
+                title: '¿Esta seguro de guardar los datos?',
+                icon: 'question',
+                iconHtml: '❓',
+                confirmButtonText: 'Si, Guardar',
+                confirmButtonColor: '#001b47',
+                cancelButtonText: 'Cancelar',
+                showCancelButton: true,
+                showCloseButton: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.post('/post-persona', this.persona).then((response) => {
+                        console.log(response.data);
+                        toast.success("El registro se ha agregado correctamente", {
+                            autoClose: 5000,
+                            position: "top-right",
+                            transition: "zoom",
+                            toastBackgroundColor: "white",
+                        });
+                    }).catch((Error) => {
+                        if (Error.response.status === 422) {
+                            toast.warning("Tienes algunos errores por favor verifica tus datos", {
+                                autoClose: 5000,
+                                position: "top-right",
+                                transition: "zoom",
+                                toastBackgroundColor: "white",
+                            });
+                            let data = Error.response.data.errors
+                            var myData = new Object();
+                            for (const errorBack in data) {
+                                myData[errorBack] = data[errorBack][0]
+                            }
+                            this.errosModel = myData;
+                            setTimeout(() => {
+                                this.errosModel = {}
+                            }, 9000);
+                        }
                     });
-                })
-            }
-            else {
-                toast.error("El DUI proporcinado es invalido", {
-                    autoClose: 5000,
-                    position: "top-right",
-                    transition: "zoom",
-                    toastBackgroundColor: "white",
-                });
-            }
-
-        }
+                }
+            })
+        },
+        updatePerson() {
+            this.$swal.fire({
+                title: '¿Esta seguro de editar los datos?',
+                icon: 'question',
+                iconHtml: '❓',
+                confirmButtonText: 'Si, Editar',
+                confirmButtonColor: '#D2691E',
+                cancelButtonText: 'Cancelar',
+                showCancelButton: true,
+                showCloseButton: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.post('/update-persona', this.persona).then((response) => {
+                        console.log(response.data);
+                        toast.success("El registro se edito con exito", {
+                            autoClose: 5000,
+                            position: "top-right",
+                            transition: "zoom",
+                            toastBackgroundColor: "white",
+                        });
+                    }).catch((Error) => {
+                        if (Error.response.status === 422) {
+                            toast.warning("Tienes algunos errores por favor verifica tus datos", {
+                                autoClose: 5000,
+                                position: "top-right",
+                                transition: "zoom",
+                                toastBackgroundColor: "white",
+                            });
+                            let data = Error.response.data.errors
+                            var myData = new Object();
+                            for (const errorBack in data) {
+                                myData[errorBack] = data[errorBack][0]
+                            }
+                            this.errosModel = myData;
+                            setTimeout(() => {
+                                this.errosModel = {}
+                            }, 9000);
+                        }
+                    });
+                }
+            })
+        },
     },
     created() {
         this.listOptionsSelect()

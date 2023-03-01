@@ -43,9 +43,6 @@ onUnmounted(() => {
     document.removeEventListener('click', clickHandler)
     document.removeEventListener('keydown', keyHandler)
 })
-
-
-
 const maxWidthClass = computed(() => {
     return {
         sm: 'sm:max-w-sm',
