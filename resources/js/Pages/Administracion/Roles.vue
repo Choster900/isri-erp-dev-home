@@ -151,7 +151,7 @@ import axios from 'axios';
     <ModalRolesVue :modalVar="modalVar" :showModal="showModal" :modalData="modalData" @cerrar-modal="closeVars"
       @abrir-modal="showModal = true" @update-table="getUpdateTable()" />
 
-    <ModalCreateRoleVue :showModalCreate="showModalCreate" :modalDataCreate="modalDataCreate"
+    <ModalCreateRoleVue :showModalCreate="showModalCreate" :modalDataCreate="modalDataCreate" @update-table="getUpdateTable()"
       @cerrar-modal="closeModalCreate()" @abrir-modal="showModalCreate = true" />
 
   </AppLayoutVue>
