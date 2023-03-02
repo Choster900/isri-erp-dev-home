@@ -30,7 +30,7 @@
                 </div>
                 <ul ref="dropdown" @focusin="dropdownOpen = true" @focusout="dropdownOpen = false">
                     <li>
-                        <DropdownLink :href="route('crear.contraseña')" method="get" as="a"
+                        <DropdownLink :href="route('index.createCambiarContraseña')" method="get" as="a"
                             class="font-bold text-sm text-indigo-500 flex items-center py-1 px-3">
                             Cambiar Contraseña
                         </DropdownLink>

@@ -134,7 +134,7 @@ export default {
             this.modalData.id_sistema = ""
         },
         async getSistemas() {
-            await axios.get("/sistemas", { params: this.modalData })
+            await axios.get("/systems", { params: this.modalData })
                 .then((response) => {
                     this.modalData.userRoles = response.data.userRoles
                     this.modalData.sistemas = response.data.sistemas
@@ -144,7 +144,7 @@ export default {
                 .catch((errors) => console.log(errors))
         },
         async getRolesxSistema() {
-            await axios.get("/rolesxsistemas", { params: this.modalData })
+            await axios.get("/roles-per-system", { params: this.modalData })
                 .then((response) => {
                     this.modalData.roles = response.data.roles
                 })
@@ -166,7 +166,7 @@ export default {
                     showCloseButton: true
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        axios.post("/save/rol", {
+                        axios.post("/save-rol", {
                             id_rol: this.modalData.id_rol,
                             id_usuario: this.modalData.id_usuario
                         }).then((response) => {
@@ -202,7 +202,7 @@ export default {
                 confirmButtonText: 'Si, desactivar!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    axios.post("/desactive/rol", {
+                    axios.post("/desactive-rol", {
                         id_rol: id_rol,
                         id_usuario: this.modalData.id_usuario
                     }).then((response) => {
@@ -222,7 +222,7 @@ export default {
             this.modalData.sistema_edit = sistema
             this.modalData.id_sistema_edit = id_sistema
             this.modalData.id_rol_edit = id_rol
-            axios.get("/rolesxsistema", { params: this.modalData })
+            axios.get("/roles-per-system-edit", { params: this.modalData })
                 .then((response) => {
                     this.modalData.roles_edit = response.data.roles
                     this.modalData.permiso_usuario = response.data.permiso_usuario
@@ -241,7 +241,7 @@ export default {
                 showCloseButton: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    axios.post("/edit/rol", {
+                    axios.post("/update-rol", {
                         id_rol: this.modalData.id_rol_edit,
                         permiso_usuario: this.modalData.permiso_usuario
                     }).then((response) => {

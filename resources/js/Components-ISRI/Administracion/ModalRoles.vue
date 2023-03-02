@@ -114,7 +114,7 @@ export default {
         confirmButtonText: 'Si, desactivar!'
       }).then((result) => {
         if (result.isConfirmed) {
-          axios.post("/desactive/menu", {
+          axios.post("/desactive-menu", {
             id_menu: id_menu,
             id_rol: this.modalData.id_rol
           }).then((response) => {
@@ -146,7 +146,7 @@ export default {
           showCloseButton: true
         }).then((result) => {
           if (result.isConfirmed) {
-            axios.post("/save/menu", {
+            axios.post("/save-menu", {
               id_menu: this.modalData.id_menu,
               id_childrenMenu: this.modalData.id_childrenMenu,
               id_rol: this.modalData.id_rol
@@ -176,14 +176,14 @@ export default {
     },
     getChildrenMenus() {
       this.modalData.id_childrenMenu = ""
-      axios.get('/menus/childrenMenus', { params: this.modalData })
+      axios.get('/children-menus', { params: this.modalData })
         .then((response) => {
           this.modalData.childrenMenus = response.data.childrenMenus
         })
         .catch((errors) => console.log(errors))
     },
     async getMenus() {
-      await axios.get("/menus", { params: this.modalData })
+      await axios.get("/menus-edit-rol", { params: this.modalData })
         .then((response) => {
           this.modalData.rolMenus = response.data.rolMenus
           this.modalData.menus = response.data.menus

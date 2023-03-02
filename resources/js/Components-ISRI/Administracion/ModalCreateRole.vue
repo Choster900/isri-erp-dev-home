@@ -160,7 +160,7 @@ export default {
     },
     getParentMenu() {
       this.modalDataCreate.select_sistema = true
-      axios.get('/parentsMenu/all', { params: this.modalDataCreate })
+      axios.get('/parents-menu-all', { params: this.modalDataCreate })
         .then((response) => {
           this.modalDataCreate.parentsMenu = response.data.parentsMenu
         })
@@ -176,7 +176,7 @@ export default {
       })
       this.modalDataCreate.id_childrenMenu = null
       this.modalDataCreate.nombre_parent_menu = finalLabel
-      axios.get('/menus/childrenMenus', { params: this.modalDataCreate })
+      axios.get('/children-menus', { params: this.modalDataCreate })
         .then((response) => {
           this.modalDataCreate.childrenMenus = response.data.childrenMenus
           if (this.modalDataCreate.menus != "") {
@@ -264,7 +264,7 @@ export default {
           showCloseButton: true
         }).then((result) => {
           if (result.isConfirmed) {
-            axios.post("/create/rol", {
+            axios.post("/create-rol", {
               id_sistema: this.modalDataCreate.id_sistema,
               nombre_rol: this.modalDataCreate.nombre_rol,
               menus: this.modalDataCreate.menus

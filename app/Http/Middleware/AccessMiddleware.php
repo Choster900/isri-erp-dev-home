@@ -33,9 +33,11 @@ class AccessMiddleware
             }
         }
 
-        if ($allowed_url)
+        if ($allowed_url || $request->ajax()){
             return $next($request);
-
-        return redirect('dashboard');
+        }else{
+            return redirect('dashboard');
+        }
+        
     }
 }

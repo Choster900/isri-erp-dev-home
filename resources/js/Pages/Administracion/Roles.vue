@@ -84,13 +84,6 @@ import axios from 'axios';
                       </path>
                     </svg>
                   </button>
-                  <button class="text-slate-400 hover:text-slate-500 rounded-full">
-                    <span class="sr-only">Download</span><svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
-                      <path
-                        d="M16 20c.3 0 .5-.1.7-.3l5.7-5.7-1.4-1.4-4 4V8h-2v8.6l-4-4L9.6 14l5.7 5.7c.2.2.4.3.7.3zM9 22h14v2H9z">
-                      </path>
-                    </svg>
-                  </button>
                   <button @click="desactiveRol(rol.id_rol, rol.nombre_rol, rol.estado_rol)"
                     class="text-rose-500 hover:text-rose-600 rounded-full">
                     <span class="sr-only">Delete</span><svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
@@ -234,7 +227,7 @@ export default {
   methods: {
     //Methods for creating a new role
     async createRol() {
-      await axios.get("/sistemas/all")
+      await axios.get("/systems-all")
         .then((response) => {
           this.modalDataCreate.sistemas = response.data.sistemas
           this.showModalCreate = true
@@ -287,7 +280,7 @@ export default {
         confirmButtonText: 'Si, ' + msg
       }).then((result) => {
         if (result.isConfirmed) {
-          axios.post("/change/rol/all", {
+          axios.post("/change-state-role-all", {
             id_rol: id_rol,
             estado_rol: estado_rol
           })

@@ -27,10 +27,10 @@ import ModalAdministracionVue from '@/Components-ISRI/Administracion/ModalAdmini
             <LabelToInput icon="search" forLabel="search-user" />
           </TextInput>
         </div>
-      </div>
-        <h2 class="font-semibold text-slate-800 pt-1">All Users <span class="text-slate-400 font-medium">{{
-          pagination.total
+        <h2 class="font-semibold text-slate-800 pt-1">Total Usuarios <span class="text-slate-400 font-medium">{{
+          tableData.total
         }}</span></h2>
+      </div>
       </header>
       <div class="overflow-x-auto">
         <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy">
@@ -65,7 +65,7 @@ import ModalAdministracionVue from '@/Components-ISRI/Administracion/ModalAdmini
                       </path>
                     </svg>
                   </button>
-                  <button class="text-rose-500 hover:text-rose-600 rounded-full">
+                  <button @click="changeStateUser(user.id_usuario, user.nick_usuario, user.estado_usuario)" class="text-rose-500 hover:text-rose-600 rounded-full">
                     <span class="sr-only">Delete</span><svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
                       <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
                       </path>
@@ -167,20 +167,42 @@ export default {
         search: "",
         column: 0,
         dir: "asc",
-      },
-      pagination: {
-        lastPage: "",
-        currentPage: "",
         total: "",
-        lastPageUrl: "",
-        nextPageUrl: "",
-        prevPageUrl: "",
-        from: "",
-        to: "",
-      },
+        currentPage: '',
+      }
     };
   },
   methods: {
+    changeStateUser(id_usuario,nick_usuario,estado_usuario){
+      let msg
+      estado_usuario == 1 ? msg = "Desactivar" : msg = "Activar"
+      this.$swal.fire({
+        title: msg + ' usuario ' + nick_usuario,
+        text: "Estas seguro?",
+        icon: 'warning',
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Si, ' + msg
+      }).then((result) => {
+        if (result.isConfirmed) {
+          axios.post("/change-state-user", {
+            id_usuario: id_usuario,
+            estado_usuario: estado_usuario
+          })
+            .then((response) => {
+              this.$swal.fire({
+                text: response.data.message,
+                icon: 'success',
+                timer: 2000
+              })
+              this.getUsers('http://127.0.0.1:8000/users?page=' + this.tableData.currentPage);
+            })
+            .catch((errors) => console.log(errors))
+        }
+      })
+    },
     changeStateFromModal(identificador = "") {
       this.showModal = !this.showModal;
       this.modalData.id_usuario = identificador;
@@ -191,7 +213,8 @@ export default {
         let data = response.data;
         if (this.tableData.draw == data.draw) {
           this.links = data.data.links;
-          this.pagination.total = data.data.total
+          this.tableData.total = data.data.total
+          this.tableData.currentPage = data.data.current_page;
           this.links[0].label = "Anterior";
           this.links[this.links.length - 1].label = "Siguiente";
           this.users = data.data.data;
