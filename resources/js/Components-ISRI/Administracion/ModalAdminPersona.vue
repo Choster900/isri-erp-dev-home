@@ -25,12 +25,15 @@ import InputError from "@/Components/InputError.vue";
                                     <title>Ir al final</title>
                                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                     <line x1="12" y1="5" x2="12" y2="19" />
-                                    <line x1="16" y1="15" x2="12" y2="19" />
-                                    <line x1="8" y1="15" x2="12" y2="19" />
-                                </svg>
+                                <line x1="16" y1="15" x2="12" y2="19" />
+                                <line x1="8" y1="15" x2="12" y2="19" />
+                            </svg>
                             </a>
                         </div>
+                        <!--    <pre>
 
+                                    {{ allSelectOptios.locationPersona }}
+                                </pre> -->
                         <div class="mb-7 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
 
@@ -184,43 +187,20 @@ import InputError from "@/Components/InputError.vue";
                             </span>
                         </div>
                         <div class="mb-7 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <label class="block mb-2 text-xs font-light text-gray-600">
-                                    Pais <span class="text-red-600 font-extrabold">*</span>
-                                </label>
-                                <div class="relative flex h-8 w-full flex-row-reverse ">
-                                    <Multiselect placeholder="Pais" v-model="persona.id_nivel_educativo"
-                                        :options="allSelectOptios.country" :searchable="true" />
-                                    <LabelToInput icon="list" />
-                                </div>
 
-                            </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <label class="block mb-2 text-xs font-light text-gray-600">
-                                    Departamento <span class="text-red-600 font-extrabold">*</span>
-                                </label>
-                                <div class="relative flex h-8 w-full flex-row-reverse ">
-                                    <Multiselect placeholder="Departamento" v-model="persona.departament"
-                                        :options="allSelectOptios.departament" :searchable="true" />
-                                    <LabelToInput icon="list" />
-                                </div>
-
-                            </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Municipio <span class="text-red-600 font-extrabold">*</span>
                                 </label>
                                 <div class="relative flex h-8 w-full flex-row-reverse ">
                                     <Multiselect placeholder="Municipio" v-model="persona.id_municipio"
-                                        :options="allSelectOptios.municipio" :searchable="true" />
+                                        :options="allSelectOptios.locationPersona" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
                                 <InputError class="mt-2" :message="errosModel.id_municipio" />
 
                             </div>
-                        </div>
-                        <div class="mb-7 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600" for="fecha_nacimiento">
                                     Fecha de nacimiento <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -317,6 +297,7 @@ export default {
                 municipio: [],
                 levelEducation: [],
                 levelProfession: [],
+                locationPersona: [],
             },
             persona: {
                 pnombre_persona: '',
@@ -367,11 +348,9 @@ export default {
             await axios.get("/list-option-select").then((response) => {
                 this.allSelectOptios.gender = response.data.gender
                 this.allSelectOptios.civilStatus = response.data.civilStatus
-                this.allSelectOptios.country = response.data.country
-                this.allSelectOptios.departament = response.data.departament
-                this.allSelectOptios.municipio = response.data.municipio
                 this.allSelectOptios.levelEducation = response.data.levelEducation
                 this.allSelectOptios.levelProfession = response.data.levelProfession
+                this.allSelectOptios.locationPersona = response.data.location
             });
         },
         typePhoneNumber() {
@@ -466,6 +445,8 @@ export default {
                 }
             })
         },
+
+
     },
     created() {
         this.listOptionsSelect()
@@ -491,6 +472,9 @@ export default {
             this.persona.id_municipio = this.infoPersona.id_municipio;
             this.persona.id_profesion = this.infoPersona.id_profesion;
             this.persona.id_persona = this.infoPersona.id_persona;
+
+
+
         }
     }
 }

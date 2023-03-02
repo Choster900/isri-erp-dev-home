@@ -20,9 +20,12 @@ use Inertia\Inertia;
 */
 
 Route::group(['middleware' => ['auth', 'verified']], function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+    Route::get(
+        'dashboard',
+        function () {
+            return Inertia::render('Dashboard');
+        }
+    )->name('dashboard');
 
     //This route obtains users based on the parameters sent from the page.
     Route::get('users', [UserController::class, 'getUsers'])->name('get.users');
@@ -55,6 +58,9 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::post('post-persona', [PersonaController::class, 'AgregarPersona'])->name('post-persona');
     Route::post('update-persona', [PersonaController::class, 'EditarPersona'])->name('update-persona');
     Route::post('update-state-person', [PersonaController::class, 'changeStatePerson'])->name('update-estate-person');
+    Route::get('list-departament/{id_country}', [PersonaController::class, 'getDepartamentByCountry'])->name('list-departament');
+    Route::get('list-municipio/{id_departament}', [PersonaController::class, 'getMunicipioByDepartament'])->name('list-municipio');
+    Route::get('list-departament-by-municipio/{id_municpio}', [PersonaController::class, 'getDepartamentByMunicipio'])->name('list-departament-by-municipio');
 
     Route::get('dashboard/{id}', [IndexController::class, 'getMenus'])->name('mainpage');
     Route::get('password/create', [IndexController::class, 'createCambiarContraseña'])->name('crear.contraseña');
@@ -62,15 +68,15 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 });
 
 
-Route::middleware('auth')->group(function () {  
+Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/web/auth.php';
-require __DIR__.'/web/public.php';
-require __DIR__.'/web/admin.php';
-require __DIR__.'/web/rrhh.php';
-require __DIR__.'/web/af.php';
-require __DIR__.'/web/pr.php';
+require __DIR__ . '/web/auth.php';
+require __DIR__ . '/web/public.php';
+require __DIR__ . '/web/admin.php';
+require __DIR__ . '/web/rrhh.php';
+require __DIR__ . '/web/af.php';
+require __DIR__ . '/web/pr.php';

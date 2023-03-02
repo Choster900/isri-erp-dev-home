@@ -3,6 +3,8 @@ import { Head } from "@inertiajs/vue3";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import axios from "axios";
 import moment from 'moment';
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
 import ModalAdministracionPersonasVue from '@/Components-ISRI/Administracion/ModalAdminPersona.vue';
 </script>
 <template>
@@ -85,7 +87,7 @@ import ModalAdministracionPersonasVue from '@/Components-ISRI/Administracion/Mod
                                         </svg>
                                     </button>
                                     <!-- CAMBIAR ICONO DE BOTON POR QUE VA A SER ACTIVAR Y DESCATIVAR -->
-                                    <button @click="enableInformationPersona(persona.id_persona)"
+                                    <button @click="enableStateForPersona(persona.id_persona, persona.estado_persona)"
                                         class="text-rose-500 hover:text-rose-600 rounded-full">
                                         <span class="sr-only">Delete</span><svg class="w-8 h-8 fill-current"
                                             viewBox="0 0 32 32">
@@ -116,7 +118,7 @@ import ModalAdministracionPersonasVue from '@/Components-ISRI/Administracion/Mod
                                     <div class="flex-1 text-right ml-2">
                                         <a @click="getPersonas(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                  text-indigo-500">
+                                                                                                                                                                                                                                                      text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
                                     </div>
@@ -126,7 +128,7 @@ import ModalAdministracionPersonasVue from '@/Components-ISRI/Administracion/Mod
                                     <div class="flex-1 text-right ml-2">
                                         <a @click="getPersonas(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                  text-indigo-500">
+                                                                                                                                                                                                                                                      text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
                                     </div>
@@ -172,7 +174,7 @@ export default {
             scrollbarModalOpen: false,
             personas: [],
             links: [],
-            lastUrl:'',
+            lastUrl: '/personas',
             columns: columns,
             sortKey: "id_persona",
             sortOrders: sortOrders,
@@ -236,8 +238,7 @@ export default {
                 })
             this.scrollbarModalOpen = !this.scrollbarModalOpen
         },
-        async enableInformationPersona(id_persona) {
-
+        async enable(id_persona, estado) {
             await axios.post("/update-state-person", { id_persona: id_persona })
                 .then(res => {
                     console.log(res)
@@ -245,7 +246,32 @@ export default {
                 .catch(err => {
                     console.error(err);
                 })
-            this.getPersonas(this.lastUrl)//llamamos de nuevo el metodo para que actualize la tabla
+            this.getPersonas(this.lastUrl)//llamamos de nuevo el metodo para que actualize la tabla 
+        },
+        enableStateForPersona(id_persona, estado) {
+            let state = estado == 0 ? 'habilitar' : 'deshabilitar'
+            this.$swal.fire({
+                title: '¿Esta seguro de ' + state + ' el registro ?',
+                icon: 'question',
+                iconHtml: '❓',
+                confirmButtonText: 'Si, ' + state + '',
+                confirmButtonColor: '#001b47',
+                cancelButtonText: 'Cancelar',
+                showCancelButton: true,
+                showCloseButton: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.enable(id_persona, estado)//peticion async hace la modificacion 
+                    //no la llamamos en el mismo metodo por que dejaria de ser asyn y hay problema al momento de actulizar la tabla
+                    toast.info("Hecho", {
+                        autoClose: 5000,
+                        position: "top-right",
+                        transition: "bounce",
+                        toastBackgroundColor: "white",
+                        icon: "✔️",
+                    });
+                }
+            })
         },
         AddInformationPersona() {
             this.scrollbarModalOpen = !this.scrollbarModalOpen
