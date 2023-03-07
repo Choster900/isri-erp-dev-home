@@ -188,4 +188,11 @@ class UserController extends Controller
         $new_permiso_user->save();
         return ['mensaje' => 'Guardado usuario '. $new_user->nick_usuario.' con exito'];
     }
+
+    public function changePasswordUser(Request $request){
+        $user = User::find($request->id_usuario);
+        $user->password_usuario = Hash::make($request->password);
+        $user->update();
+        return ['mensaje' => 'Contraseña actualizada con exito'];
+    }
 }

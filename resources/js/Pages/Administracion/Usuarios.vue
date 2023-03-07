@@ -4,6 +4,7 @@ import { Head } from "@inertiajs/vue3";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import ModalAdministracionVue from '@/Components-ISRI/Administracion/ModalAdministracion.vue';
 import ModalCreateUserVue from '@/Components-ISRI/Administracion/ModalCreateUser.vue';
+import ModalChangePasswordVue from '@/Components-ISRI/Administracion/ModalChangePassword.vue';
 </script>
 <template>
   <Head title="Administracion" />
@@ -88,6 +89,11 @@ import ModalCreateUserVue from '@/Components-ISRI/Administracion/ModalCreateUser
                       </path>
                     </svg>
                   </button>
+                  <button @click="changePasswordUser(user.id_usuario, user.nick_usuario)" class="text-yellow-500 hover:text-yellow-600 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
+                    </svg>
+                  </button>
                 </div>
               </td>
             </tr>
@@ -134,7 +140,11 @@ import ModalCreateUserVue from '@/Components-ISRI/Administracion/ModalCreateUser
     <ModalCreateUserVue :modalDataCreate="modalDataCreate" :showModalCreate="showModalCreate" 
     @update-table="getUpdateTable()" @cerrar-modal="showModalCreate = !showModalCreate"/>
 
-    <ModalAdministracionVue :showModal="showModal" :modalData="modalData" @cerrar-modal="showModal = !showModal" />
+    <ModalAdministracionVue :modalVar="modalVar" :showModal="showModal" :modalData="modalData" 
+    @cerrar-modal="closeVars()" @update-table="getUpdateTable()" @abrir-modal="showModal = true" />
+
+    <ModalChangePasswordVue :showModalChangePassword="showModalChangePassword" :modalDataChangePassword="modalDataChangePassword"
+    @cerrar-modal="showModalChangePassword = !showModalChangePassword" @abrir-modal="showModalChangePassword = true"/>
   </AppLayoutVue>
 </template>
 <script>
@@ -146,10 +156,10 @@ export default {
     let sortOrders = {};
     let columns = [
       { width: "5%", label: "ID", name: "id_usuario" },
-      { width: "35%", label: "Nombre Persona", name: "nombre_persona" },
+      { width: "40%", label: "Nombre Persona", name: "nombre_persona" },
       { width: "15%", label: "Dui", name: "dui_persona" },
       { width: "20%", label: "User Name", name: "nick_usuario" },
-      { width: "15%", label: "Estado", name: "estado_usuario" },
+      { width: "10%", label: "Estado", name: "estado_usuario" },
       { width: "10%", label: "Acciones", name: "Acciones" },
     ];
     columns.forEach((column) => {
@@ -186,8 +196,15 @@ export default {
         id_rol:'',
         roles:[]
       },
+      modalDataChangePassword:{
+        password:'',
+        nick_usuario:'',
+        id_usuario:''
+      },
       showModalCreate:false,
+      modalVar: false,
       showModal: false,
+      showModalChangePassword : false,
       users: [],
       links: [],
       columns: columns,
@@ -206,6 +223,21 @@ export default {
     };
   },
   methods: {
+    changePasswordUser(id_usuario,nick_usuario){
+      this.modalDataChangePassword.nick_usuario=nick_usuario
+      this.modalDataChangePassword.id_usuario=id_usuario
+      this.showModalChangePassword=true
+    },
+    cleanModalInputs() {
+      this.modalData.id_rol = ""
+      this.modalData.id_sistema = ""
+      this.modalData.roles = ""
+    },
+    closeVars() {
+      this.showModal = false
+      this.modalVar = false
+      this.cleanModalInputs()
+    },
     async createUser(){
       await axios.get("/systems-all")
         .then((response) => {
@@ -248,7 +280,7 @@ export default {
       })
     },
     changeStateFromModal(identificador = "") {
-      this.showModal = !this.showModal;
+      this.modalVar = true;
       this.modalData.id_usuario = identificador;
     },
     async getUsers(url = "/users") {

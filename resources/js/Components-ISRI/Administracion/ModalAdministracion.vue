@@ -31,7 +31,7 @@ import axios from 'axios';
                 </div>
                 <div class="mb-4 md:flex flex-row justify-center">
                     <div class="mb-4 md:mr-2 md:mb-0 px-1">
-                        <GeneralButton @click="saveRol()" color="bg-orange-700  hover:bg-orange-800" text="Agregar"
+                        <GeneralButton @click="saveRol()" color="bg-green-700  hover:bg-green-800" text="Agregar"
                             icon="add" />
                     </div>
                     <div class="mb-4 md:mr-2 md:mb-0 px-1">
@@ -122,7 +122,15 @@ import axios from 'axios';
 </template>
 <script>
 export default {
-    props: ["showModal", "modalData"],
+    props: ["showModal", "modalData", "modalVar"],
+    watch: {
+    modalVar: async function (newParam) {
+      if (newParam) {
+        await this.getSistemas()
+        this.$emit('abrir-modal')
+      }
+    }
+  },
     data: function (data) {
         return {
             showModal2: false,
@@ -132,6 +140,7 @@ export default {
         cleanModalInputs() {
             this.modalData.id_rol = ""
             this.modalData.id_sistema = ""
+            this.modalData.roles = ""
         },
         async getSistemas() {
             await axios.get("/systems", { params: this.modalData })
@@ -139,7 +148,6 @@ export default {
                     this.modalData.userRoles = response.data.userRoles
                     this.modalData.sistemas = response.data.sistemas
                     this.modalData.nombre_usuario = response.data.nombre_usuario
-
                 })
                 .catch((errors) => console.log(errors))
         },
@@ -258,15 +266,6 @@ export default {
                         .catch((errors) => console.log(errors))
                 }
             })
-        },
-    },
-    watch: {
-        showModal: function (newParam, oldParam) {
-            let tBody = document.getElementById("tabla_modal_validacion_arranque")
-
-            //newParam ? this.getSistemas() : tBody.innerHTML = ""
-            newParam ? this.getSistemas() : this.modalData.userRoles = []
-
         },
     },
 }

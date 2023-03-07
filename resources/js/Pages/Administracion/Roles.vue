@@ -162,9 +162,9 @@ export default {
       { width: "5%", label: "ID", name: "id_rol" },
       { width: "20%", label: "Nombre Sistema", name: "nombre_sistema" },
       { width: "25%", label: "Nombre Rol", name: "nombre_rol" },
-      { width: "25%", label: "Fecha Registro", name: "fecha_reg_rol" },
+      { width: "30%", label: "Fecha Registro", name: "fecha_reg_rol" },
       { width: "10%", label: "Estado", name: "estado_rol" },
-      { width: "15%", label: "Acciones", name: "Acciones" },
+      { width: "10%", label: "Acciones", name: "Acciones" },
     ];
     columns.forEach((column) => {
       if (column.name === 'id_rol')
