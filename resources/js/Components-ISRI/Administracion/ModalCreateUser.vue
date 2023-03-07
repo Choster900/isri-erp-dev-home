@@ -11,9 +11,11 @@ import moment from 'moment';
 
 <ModalVue :show="showModalCreate" @close-modal="closeModal()" title="Creacion de Usuario "
   @close="closeModal()">
-  <div class="px-5 pt-4 pb-1">
+  <div class="px-3 pt-1 pb-1">
     <div class="text-sm">
-      <span class="font-semibold text-slate-800 mb-2 text-lg underline underline-offset-2">Ingresa número de DUI</span>
+      <div class="md:flex flex-row justify-center">
+        <span class="font-semibold text-slate-800 mb-2 text-lg">Ingresa número de DUI</span>
+      </div>
       <!-- <div class="mb-2 justify-center">Ingresa número de DUI</div> -->
       <div class="mb-2 md:flex flex-row justify-center">
         <div class="md:mr-2 md:mb-0 basis-1/2">       
@@ -27,11 +29,11 @@ import moment from 'moment';
           <div class="md:mr-2 md:mb-0 px-1">
             <GeneralButton v-bind:disabled="!modalDataCreate.disable_submit" @click="searchDui()" color="bg-blue-700  hover:bg-blue-800" text="Buscar" icon="add" />
           </div>
-          <div class="mb-4 md:mr-2 md:mb-0 px-1">
+          <div class="md:mr-2 md:mb-0 px-1">
             <GeneralButton v-bind:disabled="modalDataCreate.disable_submit" text="Limpiar" icon="add" @click="cleanModalCreateInputs()" />
           </div>
       </div>
-      <span class="font-semibold text-slate-800 mb-2 text-lg underline underline-offset-2">Informacion de la persona:</span>
+      <span class="font-semibold text-slate-800 mb-4 text-lg">Informacion de la persona:</span>
       <!-- <div class="mb-2">Informacion de la persona:</div> -->
       <div class="mb-4 md:flex flex-row justify-items-start">
           <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
@@ -47,23 +49,10 @@ import moment from 'moment';
             </TextInput>
           </div>
         </div>
-        <span class="font-semibold text-slate-800 mb-2 text-lg underline underline-offset-2">Ingresa nombre de usuario y contraseña</span>
-        <!-- <div class="mb-2 justify-center">Ingresa nombre de usuario y contraseña</div> -->
-        <div class="mb-4 md:flex flex-row justify-items-start">
-          <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-            <TextInput v-bind:readOnly="modalDataCreate.disable_submit" v-model="modalDataCreate.nick_usuario" id="personal-information" type="text"
-            placeholder="Nombre Usuario">
-            <LabelToInput icon="personalInformation" forLabel="personal-information" />
-            </TextInput>
-          </div>
-          <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-            <TextInput v-bind:readOnly="modalDataCreate.disable_submit" v-model="modalDataCreate.password" id="personal-information" type="password"
-            placeholder="Contraseña">
-            <LabelToInput icon="password" forLabel="personal-information" />
-            </TextInput>
-          </div>
+
+        <div>
+          <span class="font-semibold text-slate-800 mb-4 text-lg">Selecciona un sistema y un rol:</span>
         </div>
-        <span class="font-semibold text-slate-800 mb-2 text-lg underline underline-offset-2">Selecciona un sistema y un rol:</span>
         <!-- <div class="mb-2">Selecciona un sistema y un rol:</div> -->
         <div class="mb-4 md:flex flex-row justify-items-start">
           <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
@@ -85,6 +74,25 @@ import moment from 'moment';
                 :searchable="true" />
               <LabelToInput icon="list" />
             </div>
+          </div>
+        </div>
+
+        <div>
+          <span class="font-semibold text-slate-800 mb-4 text-lg">Ingresa nombre de usuario y contraseña</span>
+        </div>
+        <!-- <div class="mb-2 justify-center">Ingresa nombre de usuario y contraseña</div> -->
+        <div class="mb-4 md:flex flex-row justify-items-start">
+          <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+            <TextInput v-bind:readOnly="modalDataCreate.disable_submit" v-model="modalDataCreate.nick_usuario" id="personal-information" type="text"
+            placeholder="Nombre Usuario">
+            <LabelToInput icon="personalInformation" forLabel="personal-information" />
+            </TextInput>
+          </div>
+          <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+            <TextInput v-bind:readOnly="modalDataCreate.disable_submit" v-model="modalDataCreate.password" id="personal-information" type="password"
+            placeholder="Contraseña">
+            <LabelToInput icon="password" forLabel="personal-information" />
+            </TextInput>
           </div>
         </div>
         
