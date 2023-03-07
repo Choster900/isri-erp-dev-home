@@ -9,6 +9,7 @@ import LabelToInput from '@/Components-ISRI/ComponentsToForms/LabelToInput.vue';
 import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
 import ModalRolesVue from '@/Components-ISRI/Administracion/ModalRoles.vue';
 import ModalCreateRoleVue from '@/Components-ISRI/Administracion/ModalCreateRole.vue';
+import moment from 'moment';
 
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
@@ -36,14 +37,14 @@ import axios from 'axios';
           </div>
           <div class="mb-4 md:mr-2 md:mb-0 basis-1/4"><!-- TODO:ARREGARL SEARCH -->
             <TextInput :label-input="false" id="search-user" type="text" v-model="tableData.search"
-              placeholder="Search Table" @update:modelValue="getRoles()">
+              placeholder="Buscar Rol" @update:modelValue="getRoles()">
               <LabelToInput icon="search" forLabel="search-user" />
             </TextInput>
           </div>
-        </div>
-        <h2 class="font-semibold text-slate-800 pt-1">Total Roles <span class="text-slate-400 font-medium">{{
+          <h2 class="font-semibold text-slate-800 pt-1">Total Roles <span class="text-slate-400 font-medium">{{
           tableData.total
         }}</span></h2>
+        </div>
       </header>
 
       <div class="overflow-x-auto">
@@ -60,7 +61,7 @@ import axios from 'axios';
                 <div class="font-medium text-slate-800">{{ rol.nombre_rol }}</div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
-                <div class="font-medium text-slate-800">{{ rol.fecha_reg_rol }}</div>
+                <div class="font-medium text-slate-800">{{ moment(rol.fecha_reg_rol).format('dddd Do MMMM YYYY - HH:mm:ss') }}</div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800">
@@ -158,12 +159,12 @@ export default {
   data: function (data) {
     let sortOrders = {};
     let columns = [
-      { width: "10%", label: "ID", name: "id_rol" },
+      { width: "5%", label: "ID", name: "id_rol" },
       { width: "20%", label: "Nombre Sistema", name: "nombre_sistema" },
-      { width: "20%", label: "Nombre Rol", name: "nombre_rol" },
-      { width: "20%", label: "Fecha Registro", name: "fecha_reg_rol" },
-      { width: "15%", label: "Estado", name: "estado_rol" },
-      { width: "15%", label: "Acciones", name: "Acciones" },
+      { width: "25%", label: "Nombre Rol", name: "nombre_rol" },
+      { width: "30%", label: "Fecha Registro", name: "fecha_reg_rol" },
+      { width: "10%", label: "Estado", name: "estado_rol" },
+      { width: "10%", label: "Acciones", name: "Acciones" },
     ];
     columns.forEach((column) => {
       if (column.name === 'id_rol')

@@ -7,26 +7,43 @@ use App\Models\User;
 use App\Models\Rol;
 use App\Models\Sistema;
 use App\Models\PermisoUsuario;
+use App\Models\Persona;
 use App\Http\Controllers\Controller;
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 
 class UserController extends Controller
 {
     public function getUsers(Request $request)
     {
-            $columns = ['id_usuario', 'nick_usuario', 'estado_usuario'];
+            $columns = ['id_usuario', 'nombre_persona','pnombre_persona','snombre_persona',
+                        'tnombre_persona','papellido_persona','sapellido_persona','tapellido_persona',
+                        'dui_persona','nick_usuario', 'estado_usuario'
+                        ];
 
             $length = $request->input('length');
             $column = $request->input('column'); //Index
             $dir = $request->input('dir');
             $search_value = $request->input('search');
 
-            $query = User::select('id_usuario', 'nick_usuario', 'estado_usuario')->orderBy($columns[$column], $dir);
+            $query = User::select('usuario.id_usuario AS id_usuario', 'persona.pnombre_persona AS pnombre_persona','persona.snombre_persona AS snombre_persona','persona.tnombre_persona AS tnombre_persona','persona.papellido_persona AS papellido_persona','persona.sapellido_persona AS sapellido_persona','persona.tapellido_persona AS tapellido_persona', 'persona.dui_persona AS dui_persona' , 'usuario.nick_usuario AS nick_usuario' , 'usuario.estado_usuario AS estado_usuario')
+                           ->join('persona', function ($join) {
+                                    $join->on('usuario.id_persona', '=', 'persona.id_persona');
+                                })
+                           ->orderBy($columns[$column], $dir);
 
             if ($search_value) {
                 $query->where(function ($query) use ($search_value) {
-                    $query->where('nick_usuario', 'like', '%' . $search_value . '%')
-                        ->orWhere('id_usuario', 'like', '%' . $search_value . '%');
+                    $query->where('usuario.id_usuario', 'like', '%' . $search_value . '%')
+                        ->orWhere('nick_usuario', 'like'. '%' . $search_value . '%')
+                        ->orWhere('dui_persona', 'like', '%' . $search_value . '%')
+                        ->orwhere('pnombre_persona', 'like','%' . $search_value . '%')
+                        ->orwhere('snombre_persona', 'like','%' . $search_value . '%')
+                        ->orwhere('tnombre_persona', 'like','%' . $search_value . '%')
+                        ->orwhere('papellido_persona', 'like','%' . $search_value . '%')
+                        ->orwhere('sapellido_persona', 'like','%' . $search_value . '%')
+                        ->orwhere('tapellido_persona', 'like','%' . $search_value . '%');
                 });
             }
 
@@ -136,5 +153,46 @@ class UserController extends Controller
             $permiso_user->id_rol=$id_rol;
             $permiso_user->update();
             return ['mensaje' => 'Nuevo rol asignado '.$rol->nombre_rol.' con exito'];
+    }
+
+    //Methods to create a new user
+    public function getDui(Request $request){
+        $person = Persona::select(DB::raw('CONCAT(pnombre_persona," ",IFNULL(snombre_persona,"")," ",IFNULL(tnombre_persona,"")," ",papellido_persona," ",IFNULL(sapellido_persona,"")," ",IFNULL(tapellido_persona,"")) AS nombre_persona'),'id_persona','fecha_nac_persona')
+            ->where('dui_persona','=',$request->input('dui'))
+            ->first();
+        if($person){
+            $user = User::where('id_persona','=',$person->id_persona)->first();
+            if(!$user){
+                $user='';
+            }
+        }else{
+            $user='';
+        }
+        return ['persona' => $person ? $person : '','usuario' => $user];
+    }
+    public function saveUser(Request $request){
+        $person = Persona::find($request->id_persona);
+        $new_user = new User();
+        $new_user->nick_usuario = $request->nick_usuario;
+        $new_user->password_usuario = Hash::make($request->password);
+        $new_user->id_persona = $request->id_persona;
+        $new_user->estado_usuario=1;
+        $new_user->fecha_reg_usuario=Carbon::now();
+        $new_user->save();
+        $person->id_usuario=$new_user->id_usuario;
+        $person->update();
+        $new_permiso_user = new PermisoUsuario();
+        $new_permiso_user->id_rol=$request->id_role;
+        $new_permiso_user->id_usuario=$new_user->id_usuario;
+        $new_permiso_user->estado_permiso_usuario=1;
+        $new_permiso_user->save();
+        return ['mensaje' => 'Guardado usuario '. $new_user->nick_usuario.' con exito'];
+    }
+
+    public function changePasswordUser(Request $request){
+        $user = User::find($request->id_usuario);
+        $user->password_usuario = Hash::make($request->password);
+        $user->update();
+        return ['mensaje' => 'Contraseña actualizada con exito'];
     }
 }

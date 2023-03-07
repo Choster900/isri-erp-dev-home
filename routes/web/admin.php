@@ -28,6 +28,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
 
     //Async Routes
     Route::post('change-state-user', [UserController::class, 'changeStateUser'])->name('user.changeStateUser');
+    Route::post('change-password-user', [UserController::class, 'changePasswordUser'])->name('user.changePasswordUser');
     //This route obtains users based on the parameters sent from the page.
     Route::get('users', [UserController::class, 'getUsers'])->name('user.getUsers');
     //Manage roles for a specific user
@@ -37,6 +38,9 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('desactive-rol', [UserController::class, 'desactiveRol'])->name('user.desactiveRol');
     Route::post('update-rol', [UserController::class, 'updateRol'])->name('user.updateRol');
     Route::get('roles-per-system-edit', [UserController::class, 'getRolesPerSystemEdit'])->name('user.getRolesPerSystemEdit');
+    //Urls to create a new User
+    Route::get('get-dui', [UserController::class, 'getDui'])->name('user.getDui');
+    Route::post('save-user', [UserController::class, 'saveUser'])->name('user.saveUser');
 
     //Manage Roles
     //This route obtains roles based on the parameters sent from the page.

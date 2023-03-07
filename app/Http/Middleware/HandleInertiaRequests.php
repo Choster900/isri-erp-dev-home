@@ -39,15 +39,21 @@ class HandleInertiaRequests extends Middleware
             $user = User::find($id_usuario);
             $roles = [];
             foreach ($r_object as $rol) {
-                    if ($user->hasRole($id_usuario,$rol->id_rol)) {
-                        $rolxsistema = [];
+                $rol_active_and_menus=false;
+                foreach($rol->menus as $menu){
+                    if ($user->hasRole($id_usuario,$rol->id_rol) && $rol->hasMenu($rol->id_rol,$menu->id_menu)) {
+                        $rol_active_and_menus=true;
+                    }
+                }
+                if($rol_active_and_menus){
+                    $rolxsistema = [];
                         $rolxsistema['id_rol'] = $rol->id_rol;
                         $rolxsistema['rol'] = $rol->nombre_rol;
                         $rolxsistema['sistema'] = $rol->sistema->nombre_sistema;
                         $rolxsistema['icon'] = $rol->sistema->icon;
 
                         array_push($roles, $rolxsistema);
-                    }
+                }
             }
         }
 
