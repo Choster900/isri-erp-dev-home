@@ -3,13 +3,14 @@ import Modal from "@/Components/Modal.vue";
 import { Head } from "@inertiajs/vue3";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import ModalAdministracionVue from '@/Components-ISRI/Administracion/ModalAdministracion.vue';
+import ModalCreateUserVue from '@/Components-ISRI/Administracion/ModalCreateUser.vue';
 </script>
 <template>
   <Head title="Administracion" />
   <AppLayoutVue>
     <div class="sm:flex sm:justify-end sm:items-center mb-2">
       <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-        <GeneralButton color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add" />
+        <GeneralButton @click="createUser()" color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add" />
       </div>
     </div>
     <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
@@ -23,7 +24,7 @@ import ModalAdministracionVue from '@/Components-ISRI/Administracion/ModalAdmini
           </div>
           <div class="mb-4 md:mr-2 md:mb-0 basis-1/4"><!-- TODO:ARREGARL SEARCH -->
             <TextInput :label-input="false" id="search-user" type="text" v-model="tableData.search"
-              placeholder="Search Table"  @update:modelValue="getUsers()">
+              placeholder="Buscar Usuario"  @update:modelValue="getUsers()">
             <LabelToInput icon="search" forLabel="search-user" />
           </TextInput>
         </div>
@@ -38,6 +39,19 @@ import ModalAdministracionVue from '@/Components-ISRI/Administracion/ModalAdmini
             <tr v-for="user in users" :key="user.id_usuario">
               <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800">{{ user.id_usuario }}</div>
+              </td>
+              <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+                <div class="font-medium text-slate-800">
+                  {{ user.pnombre_persona }}
+                  {{ user.snombre_persona }}
+                  {{ user.tnombre_persona }}
+                  {{ user.papellido_persona }}
+                  {{ user.sapellido_persona }}
+                  {{ user.tapellido_persona }}
+                </div>
+              </td>
+              <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+                <div class="font-medium text-slate-800">{{ user.dui_persona }}</div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800">{{ user.nick_usuario }}</div>
@@ -117,6 +131,9 @@ import ModalAdministracionVue from '@/Components-ISRI/Administracion/ModalAdmini
         </nav>
       </div>
     </div>
+    <ModalCreateUserVue :modalDataCreate="modalDataCreate" :showModalCreate="showModalCreate" 
+    @update-table="getUpdateTable()" @cerrar-modal="showModalCreate = !showModalCreate"/>
+
     <ModalAdministracionVue :showModal="showModal" :modalData="modalData" @cerrar-modal="showModal = !showModal" />
   </AppLayoutVue>
 </template>
@@ -128,10 +145,12 @@ export default {
   data: function (data) {
     let sortOrders = {};
     let columns = [
-      { width: "25%", label: "ID", name: "id_usuario" },
-      { width: "25%", label: "User Name", name: "nick_usuario" },
-      { width: "25%", label: "Estado", name: "estado_usuario" },
-      { width: "25%", label: "Acciones", name: "Acciones" },
+      { width: "5%", label: "ID", name: "id_usuario" },
+      { width: "35%", label: "Nombre Persona", name: "nombre_persona" },
+      { width: "15%", label: "Dui", name: "dui_persona" },
+      { width: "20%", label: "User Name", name: "nick_usuario" },
+      { width: "15%", label: "Estado", name: "estado_usuario" },
+      { width: "10%", label: "Acciones", name: "Acciones" },
     ];
     columns.forEach((column) => {
       if (column.name === 'id_usuario')
@@ -154,6 +173,20 @@ export default {
         id_sistema_edit: "",
         permiso_usuario: ""
       },
+      modalDataCreate:{
+        dui:'',
+        nombre_persona:'',
+        fecha_nacimiento:'',
+        id_persona:'',
+        nick_usuario:'',
+        password:'',
+        disable_submit:true,
+        id_sistema:'',
+        systems:[],
+        id_rol:'',
+        roles:[]
+      },
+      showModalCreate:false,
       showModal: false,
       users: [],
       links: [],
@@ -173,6 +206,17 @@ export default {
     };
   },
   methods: {
+    async createUser(){
+      await axios.get("/systems-all")
+        .then((response) => {
+          this.modalDataCreate.systems = response.data.sistemas
+          this.showModalCreate = true
+        })
+        .catch((errors) => console.log(errors))
+    },
+    getUpdateTable() {
+      this.getUsers('http://127.0.0.1:8000/users?page=' + this.tableData.currentPage);
+    },
     changeStateUser(id_usuario,nick_usuario,estado_usuario){
       let msg
       estado_usuario == 1 ? msg = "Desactivar" : msg = "Activar"
@@ -212,6 +256,7 @@ export default {
       await axios.get(url, { params: this.tableData }).then((response) => {
         let data = response.data;
         if (this.tableData.draw == data.draw) {
+          console.log(data.data.data);
           this.links = data.data.links;
           this.tableData.total = data.data.total
           this.tableData.currentPage = data.data.current_page;

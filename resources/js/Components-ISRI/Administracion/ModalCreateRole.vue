@@ -14,14 +14,6 @@ import Targets from '@/Components-ISRI/Targets.vue';
     <div class="text-sm">
       <div class="mb-4">Selecciona un Sistema y escriba nombre del rol</div>
         <div class="mb-4 md:flex flex-row justify-items-start">
-          <!--           <div class="mb-4 md:mr-2 md:mb-0 w-64">
-                                                                    <div class="relative flex h-8 w-full flex-row-reverse div-select2">
-                                                                      <Select2 v-bind:disabled="modalDataCreate.select_sistema" class="text-xs"
-                                                                        v-model="modalDataCreate.id_sistema" :options="modalDataCreate.sistemas" @select="getParentMenu()"
-                                                                        placeholder="Seleccione Sistema" />
-                                                                      <LabelToInput icon="list" for-label="select" />
-                                                                    </div>
-                                                                  </div> -->
           <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
             <label class="block mb-2 text-xs font-light text-gray-600">
               Sistema <span class="text-red-600 font-extrabold">*</span>
@@ -34,7 +26,7 @@ import Targets from '@/Components-ISRI/Targets.vue';
             </div>
           </div>
 
-          <div class="mb-4 md:ml-1 md:mb-0 w-64">
+          <div class="mb-4 md:ml-0 md:mb-0 w-64">
           <TextInput v-model="modalDataCreate.nombre_rol" id="personal-information" type="text"
             placeholder="Nombre Rol">
             <LabelToInput icon="standard" forLabel="personal-information" />
@@ -43,27 +35,11 @@ import Targets from '@/Components-ISRI/Targets.vue';
       </div>
       <div class="mb-4">Selecciona un Menu y un Submenu:</div>
       <div class="mb-4 md:flex flex-row justify-items-start">
-        <!--  <div class="mb-4 md:mr-2 md:mb-0 w-64">
-            <div class="relative flex h-8 w-full flex-row-reverse div-select2">
-              <Select2 class="text-xs" v-model="modalDataCreate.id_menu" :options="modalDataCreate.parentsMenu"
-                @select="getChildrenMenus($event)" placeholder="Seleccione Menu" />
-              <LabelToInput icon="list" for-label="select" />
-            </div>
-                                              </div>
-                                                                  <div class="mb-4 md:mr-2 md:mb-0 w-64">
-                                                                    <div class="relative flex h-8 w-full flex-row-reverse div-select2">
-                                                                      <Select2 class="text-xs" v-model="modalDataCreate.id_childrenMenu" :options="modalDataCreate.childrenMenus"
-                                                                        @select="getChildren($event)" placeholder="Seleccione Sub Menu" />
-                                                                      <LabelToInput icon="list" for-label="select" />
-                                                                    </div>
-                                                                  </div>
-                                                         -->
           <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
             <label class="block mb-2 text-xs font-light text-gray-600">
               Menu <span class="text-red-600 font-extrabold">*</span>
             </label>
             <div class="relative font-semibold  flex h-8 w-full flex-row-reverse ">
-
               <Multiselect v-model="modalDataCreate.id_menu" :options="modalDataCreate.parentsMenu"
                 @select="getChildrenMenus(modalDataCreate.parentsMenu, $event)" placeholder="Seleccione Menu"
                 :searchable="true" />

@@ -37,6 +37,9 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('desactive-rol', [UserController::class, 'desactiveRol'])->name('user.desactiveRol');
     Route::post('update-rol', [UserController::class, 'updateRol'])->name('user.updateRol');
     Route::get('roles-per-system-edit', [UserController::class, 'getRolesPerSystemEdit'])->name('user.getRolesPerSystemEdit');
+    //Urls to create a new User
+    Route::get('get-dui', [UserController::class, 'getDui'])->name('user.getDui');
+    Route::post('save-user', [UserController::class, 'saveUser'])->name('user.saveUser');
 
     //Manage Roles
     //This route obtains roles based on the parameters sent from the page.

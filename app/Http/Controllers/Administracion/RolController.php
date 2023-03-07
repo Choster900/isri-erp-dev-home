@@ -23,9 +23,8 @@ class RolController extends Controller
             $dir = $request->input('dir');
             $search_value = $request->input('search');
             
-            $query = DB::table('rol')
+            $query = Rol::select('rol.id_rol as id_rol', 'sistema.nombre_sistema as nombre_sistema', 'rol.nombre_rol as nombre_rol', 'rol.fecha_reg_rol as fecha_reg_rol', 'rol.estado_rol as estado_rol')
                     ->join('sistema', 'rol.id_sistema', '=', 'sistema.id_sistema')
-                    ->select('rol.id_rol as id_rol', 'sistema.nombre_sistema as nombre_sistema', 'rol.nombre_rol as nombre_rol', 'rol.fecha_reg_rol as fecha_reg_rol', 'rol.estado_rol as estado_rol')
                     ->orderBy($columns[$column], $dir);
 
             if ($search_value) {

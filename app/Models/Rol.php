@@ -52,7 +52,7 @@ class Rol extends Model
         $contador = 0;
         if ($menu) {
             foreach ($menu->roles as $rol) {
-                if ($rol->pivot->id_rol==$id_rol && $rol->pivot->estado_acceso_menu==1) {
+                if ($rol->pivot->id_rol==$id_rol && $rol->pivot->estado_acceso_menu==1 && $menu->id_menu_padre!=null) {
                     $contador++;
                 }
             }
