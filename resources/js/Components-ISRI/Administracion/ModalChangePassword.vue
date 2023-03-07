@@ -8,8 +8,8 @@ import Targets from '@/Components-ISRI/Targets.vue';
 </script>
 
 <template>
-    <ModalVue :show="showModalChangePassword" @close-modal="$emit('cerrar-modal')" 
-    v-bind:title="'Cambio de contraseña para : ' + modalDataChangePassword.nick_usuario" @close="$emit('cerrar-modal')"> 
+    <ModalVue :show="showModalChangePassword" @close-modal="closeModal()" 
+    v-bind:title="'Cambio de contraseña para : ' + modalDataChangePassword.nick_usuario" @close="closeModal()"> 
         <div class="px-5 pt-4 pb-1">
 
     <div class="mb-2 justify-center">Ingresa nueva contraseña</div>
@@ -28,7 +28,7 @@ import Targets from '@/Components-ISRI/Targets.vue';
             <GeneralButton @click="saveNewPassword()" color="bg-green-700  hover:bg-green-800" text="Guardar" icon="add" />
           </div>
           <div class="mb-4 md:mr-2 md:mb-0 px-1">
-            <GeneralButton text="Cancelar" icon="add" @click="$emit('cerrar-modal')" />
+            <GeneralButton text="Cancelar" icon="add" @click="closeModal()" />
           </div>
         </div>
         <div class="text-xs text-slate-500">ISRI2023</div>
@@ -42,10 +42,13 @@ export default {
   props: ["showModalChangePassword",'modalDataChangePassword'],
   data: function (data) {
     return {
-
     }
   },
   methods: {
+    closeModal(){
+      this.modalDataChangePassword.password=''
+      this.$emit('cerrar-modal')
+    },
     saveNewPassword(){
         if(this.modalDataChangePassword.password==""){
           this.$swal.fire({
