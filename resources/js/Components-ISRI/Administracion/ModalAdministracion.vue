@@ -149,14 +149,30 @@ export default {
                     this.modalData.sistemas = response.data.sistemas
                     this.modalData.nombre_usuario = response.data.nombre_usuario
                 })
-                .catch((errors) => console.log(errors))
+                .catch((errors) => {
+                    let msg = this.manageError(errors)
+                    this.$swal.fire({
+                      title: 'Operación cancelada',
+                      text: msg,
+                      icon: 'warning',
+                      timer:5000
+                    })
+                })
         },
         async getRolesxSistema() {
             await axios.get("/roles-per-system", { params: this.modalData })
                 .then((response) => {
                     this.modalData.roles = response.data.roles
                 })
-                .catch((errors) => console.log(errors))
+                .catch((errors) => {
+                    let msg = this.manageError(errors)
+                    this.$swal.fire({
+                      title: 'Operación cancelada',
+                      text: msg,
+                      icon: 'warning',
+                      timer:5000
+                    })
+                })
         },
         changeStateFromModal2() {
             this.showModal2 = !this.showModal2;
@@ -186,7 +202,15 @@ export default {
                             });
                             this.cleanModalInputs()
                             this.getSistemas()
-                        }).catch((errors) => console.log(errors))
+                        }).catch((errors) => {
+                            let msg = this.manageError(errors)
+                            this.$swal.fire({
+                              title: 'Operación cancelada',
+                              text: msg,
+                              icon: 'warning',
+                              timer:5000
+                            })
+                        })
                     }
                 })
             } else {
@@ -222,7 +246,16 @@ export default {
                         });
                         this.cleanModalInputs()
                         this.getSistemas()
-                    }).catch((errors) => console.log(errors))
+                    })
+                    .catch((errors) => {
+                    let msg = this.manageError(errors)
+                    this.$swal.fire({
+                      title: 'Operación cancelada',
+                      text: msg,
+                      icon: 'warning',
+                      timer:5000
+                    })
+                })
                 }
             })
         },
@@ -236,7 +269,15 @@ export default {
                     this.modalData.permiso_usuario = response.data.permiso_usuario
                     this.changeStateFromModal2()
                 })
-                .catch((errors) => console.log(errors))
+                .catch((errors) => {
+                    let msg = this.manageError(errors)
+                    this.$swal.fire({
+                      title: 'Operación cancelada',
+                      text: msg,
+                      icon: 'warning',
+                      timer:5000
+                    })
+                })
         },
         updateRol() {
             this.$swal.fire({
@@ -263,7 +304,15 @@ export default {
                         this.modalData.permiso_usuario = ""
                         this.getSistemas()
                     })
-                        .catch((errors) => console.log(errors))
+                    .catch((errors) => {
+                    let msg = this.manageError(errors)
+                    this.$swal.fire({
+                      title: 'Operación cancelada',
+                      text: msg,
+                      icon: 'warning',
+                      timer:5000
+                    })
+                })
                 }
             })
         },

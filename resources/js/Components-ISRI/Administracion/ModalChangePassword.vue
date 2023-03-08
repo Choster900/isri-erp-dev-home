@@ -12,8 +12,9 @@ import Targets from '@/Components-ISRI/Targets.vue';
     v-bind:title="'Cambio de contraseña para : ' + modalDataChangePassword.nick_usuario" @close="closeModal()"> 
         <div class="px-5 pt-4 pb-1">
 
-    <div class="mb-2 justify-center">Ingresa nueva contraseña</div>
-    <div class="mb-2 md:flex flex-row justify-center">
+    <div class="text-sm">
+      <div class="mb-4 md:flex flex-row justify-center">Ingresa nueva contraseña</div>
+      <div class="mb-4 md:flex flex-row justify-center">
         <div class="md:mr-2 md:mb-0 basis-1/2">       
           <TextInput v-model="modalDataChangePassword.password" :label-input="false" id="personal-information" type="password"
             placeholder="Nueva contraseña">
@@ -21,16 +22,14 @@ import Targets from '@/Components-ISRI/Targets.vue';
           </TextInput>
         </div>
       </div>
-
-    <div class="text-sm">
-        <div class="mb-4 md:flex flex-row justify-center">
-          <div class="mb-4 md:mr-2 md:mb-0 px-1">
-            <GeneralButton @click="saveNewPassword()" color="bg-green-700  hover:bg-green-800" text="Guardar" icon="add" />
-          </div>
-          <div class="mb-4 md:mr-2 md:mb-0 px-1">
-            <GeneralButton text="Cancelar" icon="add" @click="closeModal()" />
-          </div>
+      <div class="mb-4 md:flex flex-row justify-center">
+        <div class="mb-4 md:mr-2 md:mb-0 px-1">
+          <GeneralButton @click="saveNewPassword()" color="bg-green-700  hover:bg-green-800" text="Guardar" icon="add" />
         </div>
+        <div class="mb-4 md:mr-2 md:mb-0 px-1">
+          <GeneralButton text="Cancelar" icon="add" @click="closeModal()" />
+        </div>
+      </div>
         <div class="text-xs text-slate-500">ISRI2023</div>
       </div>
     </div>
@@ -45,6 +44,23 @@ export default {
     }
   },
   methods: {
+    almanageError(errors){
+      let code_error = errors.response.status
+      let msg
+      if(code_error==500){
+        console.log(errors.response.data.message);
+        msg = "Error al conectarse con el servidor."
+      }else if(code_error==404){
+        console.log(errors.response.data.message);
+        msg = "Funcionalidad no disponible, consulte con el administrador."
+      }
+      this.$swal.fire({
+        title: 'Operación cancelada',
+        text: msg,
+        icon: 'warning',
+      })
+      this.closeModal()
+    },
     closeModal(){
       this.modalDataChangePassword.password=''
       this.$emit('cerrar-modal')
@@ -81,7 +97,17 @@ export default {
               });
               this.$emit('cerrar-modal')
               this.modalDataChangePassword.password = ""
-            }).catch((errors) => console.log(errors))
+            }).catch((errors) => {
+              let msg = this.manageError(errors)
+              this.$swal.fire({
+                title: 'Operación cancelada',
+                text: msg,
+                icon: 'warning',
+                timer:5000
+              })
+              this.$emit('cerrar-modal')
+              this.modalDataChangePassword.password=''
+            })
           }
         })
         }

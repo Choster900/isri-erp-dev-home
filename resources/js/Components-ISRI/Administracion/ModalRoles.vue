@@ -129,7 +129,15 @@ export default {
             this.modalData.id_menu = ""
             this.modalData.id_childrenMenu = ""
             this.modalData.childrenMenus = ""
-          }).catch((errors) => console.log(errors))
+          }).catch((errors) => {
+            let msg = this.manageError(errors)
+            this.$swal.fire({
+              title: 'Operación cancelada',
+              text: msg,
+              icon: 'warning',
+              timer:5000
+            })
+        })
         }
       })
     },
@@ -162,7 +170,15 @@ export default {
               this.modalData.id_childrenMenu = ""
               this.modalData.id_menu = ""
               this.modalData.childrenMenus = ""
-            }).catch((errors) => console.log(errors))
+            }).catch((errors) => {
+            let msg = this.manageError(errors)
+            this.$swal.fire({
+              title: 'Operación cancelada',
+              text: msg,
+              icon: 'warning',
+              timer:5000
+            })
+        })
           }
         })
       } else {
@@ -180,7 +196,15 @@ export default {
         .then((response) => {
           this.modalData.childrenMenus = response.data.childrenMenus
         })
-        .catch((errors) => console.log(errors))
+        .catch((errors) => {
+            let msg = this.manageError(errors)
+            this.$swal.fire({
+              title: 'Operación cancelada',
+              text: msg,
+              icon: 'warning',
+              timer:5000
+            })
+        })
     },
     async getMenus() {
       await axios.get("/menus-edit-rol", { params: this.modalData })
@@ -190,7 +214,15 @@ export default {
           this.modalData.id_menus_rol = response.data.id_menus_asignados
           this.modalData.nombre_rol = response.data.nombre_rol
         })
-        .catch((errors) => console.log(errors))
+        .catch((errors) => {
+            let msg = this.manageError(errors)
+            this.$swal.fire({
+              title: 'Operación cancelada',
+              text: msg,
+              icon: 'warning',
+              timer:5000
+            })
+        })
     },
   }
 }

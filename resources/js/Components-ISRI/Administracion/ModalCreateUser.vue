@@ -184,7 +184,15 @@ export default {
                 this.$emit("update-table")
                 this.$emit("cerrar-modal")
                 this.modalDataCreate.dui=''
-              }).catch((errors) => console.log(errors))
+              }).catch((errors) => {
+                  let msg = this.manageError(errors)
+                  this.$swal.fire({
+                    title: 'Operación cancelada',
+                    text: msg,
+                    icon: 'warning',
+                    timer:5000
+                  })
+                })
             }
           })
         }
@@ -194,7 +202,15 @@ export default {
         .then((response) => {
           this.modalDataCreate.roles = response.data.roles
           })
-        .catch((errors) => console.log(errors))
+        .catch((errors) => {
+          let msg = this.manageError(errors)
+          this.$swal.fire({
+            title: 'Operación cancelada',
+            text: msg,
+            icon: 'warning',
+            timer:5000
+          })
+        })
       },
       searchDui(){
         if(this.modalDataCreate.dui==""){
@@ -234,7 +250,15 @@ export default {
                   }
                 }
             })
-            .catch((errors) => console.log(errors))
+            .catch((errors) => {
+              let msg = this.manageError(errors)
+              this.$swal.fire({
+                title: 'Operación cancelada',
+                text: msg,
+                icon: 'warning',
+                timer:5000
+              })
+            })
         }
       },
       typeDUI() {

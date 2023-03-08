@@ -244,7 +244,15 @@ export default {
           this.modalDataCreate.systems = response.data.sistemas
           this.showModalCreate = true
         })
-        .catch((errors) => console.log(errors))
+        .catch((errors) => {
+            let msg = this.manageError(errors)
+            this.$swal.fire({
+              title: 'Operación cancelada',
+              text: msg,
+              icon: 'warning',
+              timer:5000
+            })
+        })
     },
     getUpdateTable() {
       this.getUsers('http://127.0.0.1:8000/users?page=' + this.tableData.currentPage);
@@ -275,7 +283,15 @@ export default {
               })
               this.getUsers('http://127.0.0.1:8000/users?page=' + this.tableData.currentPage);
             })
-            .catch((errors) => console.log(errors))
+            .catch((errors) => {
+              let msg = this.manageError(errors)
+              this.$swal.fire({
+                title: 'Operación cancelada',
+                text: msg,
+                icon: 'warning',
+                timer:5000
+              })
+            })
         }
       })
     },
@@ -288,7 +304,6 @@ export default {
       await axios.get(url, { params: this.tableData }).then((response) => {
         let data = response.data;
         if (this.tableData.draw == data.draw) {
-          console.log(data.data.data);
           this.links = data.data.links;
           this.tableData.total = data.data.total
           this.tableData.currentPage = data.data.current_page;
@@ -297,8 +312,15 @@ export default {
           this.users = data.data.data;
         }
       }).catch((errors) => {
-        console.log(errors);
-      });
+            let msg = this.manageError(errors)
+            //window.location.href = 'http://127.0.0.1:8000/dashboard'
+            this.$swal.fire({
+              title: 'Operación cancelada',
+              text: msg,
+              icon: 'warning',
+              timer:5000
+            })
+        })
     },
     sortBy(key) {
       if (key != "Acciones") {

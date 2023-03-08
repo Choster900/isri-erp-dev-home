@@ -140,7 +140,15 @@ export default {
         .then((response) => {
           this.modalDataCreate.parentsMenu = response.data.parentsMenu
         })
-        .catch((errors) => console.log(errors))
+        .catch((errors) => {
+            let msg = this.manageError(errors)
+            this.$swal.fire({
+              title: 'Operación cancelada',
+              text: msg,
+              icon: 'warning',
+              timer:5000
+            })
+        })
     },
     getChildrenMenus: function (data, event) {
 
@@ -165,7 +173,15 @@ export default {
             });
           }
         })
-        .catch((errors) => console.log(errors))
+        .catch((errors) => {
+            let msg = this.manageError(errors)
+            this.$swal.fire({
+              title: 'Operación cancelada',
+              text: msg,
+              icon: 'warning',
+              timer:5000
+            })
+        })
     },
     getChildren(data, event) {
 
@@ -252,7 +268,15 @@ export default {
               })
               this.cleanModalCreateInputs()
               this.$emit("update-table")
-            }).catch((errors) => console.log(errors))
+            }).catch((errors) => {
+            let msg = this.manageError(errors)
+            this.$swal.fire({
+              title: 'Operación cancelada',
+              text: msg,
+              icon: 'warning',
+              timer:5000
+            })
+        })
           }
         })
       } else {

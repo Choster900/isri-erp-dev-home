@@ -38,6 +38,23 @@ import "../css/FlatPickr_theme.css";
 const appName =
     window.document.getElementsByTagName("title")[0]?.innerText || "";
 
+const manageError = (errors) => {
+    let code_error = errors.response.status
+    let msg
+    if(code_error>=500){
+        console.log(errors.response.data.message);
+        msg = "Error al conectarse con el servidor."
+    }else if(code_error>=400 && code_error<500){
+        console.log(errors.response.data.message);
+        msg = "Funcionalidad no disponible, consulte con el administrador."
+    }
+    else{
+        console.log(errors.response.data.message);
+        msg = "Lo sentimos, hubo un error al procesar la petición."
+    }
+    return msg
+}
+
 createInertiaApp({
     title: (title) => `${title}  ${appName}`,
     resolve: (name) =>
@@ -59,6 +76,7 @@ createInertiaApp({
             .component("Datepicker", Datepicker)
             .component("RadioButton", RadioButton)
             .component("DatepickerTest", DatepickerTest)
+            .mixin({methods: { manageError } })
             .use(ZiggyVue, Ziggy)
             .mount(el);
     },
