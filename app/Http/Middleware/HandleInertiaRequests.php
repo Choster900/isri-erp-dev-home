@@ -50,7 +50,7 @@ class HandleInertiaRequests extends Middleware
                         $rolxsistema['id_rol'] = $rol->id_rol;
                         $rolxsistema['rol'] = $rol->nombre_rol;
                         $rolxsistema['sistema'] = $rol->sistema->nombre_sistema;
-                        $rolxsistema['icon'] = $rol->sistema->icon;
+                        $rolxsistema['icono_sistema'] = $rol->sistema->icono_sistema;
 
                         array_push($roles, $rolxsistema);
                 }

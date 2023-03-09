@@ -24,7 +24,7 @@ class IndexController extends Controller
             $rolxsistema['id_rol'] = $rol->id_rol;
             $rolxsistema['rol'] = $rol->nombre_rol;
             $rolxsistema['sistema'] = $rol->sistema->nombre_sistema;
-            $rolxsistema['icon'] = $rol->sistema->icon;
+            $rolxsistema['icono_sistema'] = $rol->sistema->icono_sistema;
             $menu_padre = [];
 
             foreach ($rol->menus as $menu) {

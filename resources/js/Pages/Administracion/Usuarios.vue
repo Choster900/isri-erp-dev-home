@@ -23,7 +23,7 @@ import ModalChangePasswordVue from '@/Components-ISRI/Administracion/ModalChange
               <LabelToInput icon="date" />
             </div>
           </div>
-          <div class="mb-4 md:mr-2 md:mb-0 basis-1/4"><!-- TODO:ARREGARL SEARCH -->
+          <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
             <TextInput :label-input="false" id="search-user" type="text" v-model="tableData.search"
               placeholder="Buscar Usuario"  @update:modelValue="getUsers()">
             <LabelToInput icon="search" forLabel="search-user" />
@@ -80,7 +80,8 @@ import ModalChangePasswordVue from '@/Components-ISRI/Administracion/ModalChange
                       </path>
                     </svg>
                   </button>
-                  <button @click="changeStateUser(user.id_usuario, user.nick_usuario, user.estado_usuario)" class="text-rose-500 hover:text-rose-600 rounded-full">
+                  <button @click="changeStateUser(user.id_usuario, user.nick_usuario, user.estado_usuario)"
+                    class="text-rose-500 hover:text-rose-600 rounded-full">
                     <span class="sr-only">Delete</span><svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
                       <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
                       </path>
@@ -113,7 +114,7 @@ import ModalChangePasswordVue from '@/Components-ISRI/Administracion/ModalChange
 
                   <div class="flex-1 text-right ml-2">
                     <a @click="getUsers(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                        text-indigo-500">
+                                          text-indigo-500">
                       &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                     </a>
                   </div>
@@ -122,7 +123,7 @@ import ModalChangePasswordVue from '@/Components-ISRI/Administracion/ModalChange
                   :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                   <div class="flex-1 text-right ml-2">
                     <a @click="getUsers(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                        text-indigo-500">
+                                          text-indigo-500">
                       <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                     </a>
                   </div>

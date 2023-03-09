@@ -44,6 +44,6 @@ class DuiValidationRule implements Rule
      */
     public function message()
     {
-        return 'El DUI que desea registrar el FALSO';
+        return 'El Dui correspondiente no tiene el formato correcto';
     }
 }
