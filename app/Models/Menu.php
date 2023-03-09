@@ -35,12 +35,16 @@ class Menu extends Model
             ->withPivot([
                 'id_acceso_menu',
                 'estado_acceso_menu',
+                'insertar_acceso_menu',
+                'actualizar_acceso_menu',
+                'eliminar_acceso_menu',
+                'ejecutar_acceso_menu',
             ]);
     }
 
     public function childrenMenus()
     {
-        return $this->hasMany('App\Models\Menu', 'id_menu_padre', 'id_menu');
+        return $this->hasMany('App\Models\Menu', 'id_menu_padre', 'id_menu')->with('roles');
     }
 
     public function allChildrenMenus()
@@ -52,4 +56,5 @@ class Menu extends Model
     {
         return $this->hasOne('App\Models\Menu', 'id_menu', 'id_menu_padre');
     }
+
 }
