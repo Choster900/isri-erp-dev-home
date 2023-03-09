@@ -1,10 +1,4 @@
 <script setup>
-
-
-
-
-
-
 import DropdownLink from "@/Components/DropdownLink.vue";
 import { computed, onMounted, onUnmounted, watch } from "vue";
 const props = defineProps({
@@ -37,7 +31,7 @@ const props = defineProps({
                 </div>
             </div>
         </div>
-</DropdownLink>
+    </DropdownLink>
 </template>
 <script>
 
@@ -45,7 +39,7 @@ const props = defineProps({
 
 export default {
     mounted() {
-        this.$refs.container.innerHTML = this.modulo.icon
+        this.$refs.container.innerHTML = this.modulo.icono_sistema
     }
 };
 </script>

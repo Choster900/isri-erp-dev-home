@@ -4,7 +4,6 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Rules\DuiValidationRule;
-use App\Rules\EmailValidatorRule;
 
 class PersonaRequest extends FormRequest
 {
@@ -31,8 +30,8 @@ class PersonaRequest extends FormRequest
             'papellido_persona'  => 'required',
             'sapellido_persona'  => 'required',
             'telefono_persona'   => 'required',
-            'dui_persona'        => ['required', new DuiValidationRule],
-            'email_persona'      => ['required','email'],
+            'dui_persona'        => ['required', new DuiValidationRule, 'unique:persona'],
+            'email_persona'      => ['required', 'email'],
             'id_genero'          => 'required',
             'id_estado_civil'    => 'required',
             'fecha_nac_persona'  => 'required',
@@ -51,7 +50,8 @@ class PersonaRequest extends FormRequest
             'telefono_persona.required'   => 'El campos telefono es requerido ',
             'dui_persona.required'        => 'El campos dui es requerido ',
             'email_persona.required'      => 'El campos email es requerido ',
-            'email_persona.email'      => 'El correo tiene que ser valido ',
+            'email_persona.email'         => 'El correo tiene que ser valido ',
+            'dui_persona.unique'          => 'El Dui correspondiente tiene el formato correcto pero esta repetido ',
             'id_genero.required'          => 'El campos genero es requerido ',
             'id_estado_civil.required'    => 'El campos estado civil es requerido ',
             'fecha_nac_persona.required'  => 'El campos fecha nacimiento es requerido ',

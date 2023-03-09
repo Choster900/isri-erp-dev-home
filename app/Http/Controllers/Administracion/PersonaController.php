@@ -87,7 +87,7 @@ class PersonaController extends Controller
 
     public function getInformationPersona(Request $request)
     {
-        return Persona::find($request->input("id_persona"));
+        return Persona::find($request->input("id_proveedor"));
     }
     public function AgregarPersona(PersonaRequest $request)
     {

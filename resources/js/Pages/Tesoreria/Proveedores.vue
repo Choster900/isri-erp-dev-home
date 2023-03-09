@@ -1,84 +1,66 @@
 <script setup>
 import { Head } from "@inertiajs/vue3";
 import Datatable from "@/Components-ISRI/Datatable.vue";
-import axios from "axios";
-import moment from 'moment';
-import { toast } from 'vue3-toastify';
-import 'vue3-toastify/dist/index.css';
-import ModalAdministracionPersonasVue from '@/Components-ISRI/Administracion/ModalAdminPersona.vue';
+import ModalSuppliersVue from '@/Components-ISRI/Tesoreria/ModalSuppliers.vue';
 </script>
 <template>
     <Head title="Administracion" />
     <AppLayoutVue>
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="AddInformationPerson()" color="bg-green-700  hover:bg-green-800"
-                    text="Agregar Elemento" icon="add" />
+                <GeneralButton @click="addDataSupplier()" color="bg-green-700  hover:bg-green-800" text="Agregar Elemento"
+                    icon="add" />
             </div>
         </div>
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
+            <!-- TODO: Improve view table - this is temporal and doesn't mean is permanent -->
             <header class="px-5 py-4">
                 <div class="mb-4 md:flex flex-row justify-items-start">
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-                            <Multiselect v-model="tableData.length" @select="getPersonas()" :options="perPage"
+                            <Multiselect v-model="tableData.length" @select="getSuppilers()" :options="perPage"
                                 :searchable="true" />
                             <LabelToInput icon="date" />
                         </div>
                     </div>
-                    <div class="mb-4 md:mr-2 md:mb-0 basis-1/4"><!-- TODO:ARREGARL SEARCH -->
+                    <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <TextInput :label-input="false" id="search-user" type="text" v-model="tableData.search"
-                            placeholder="Search Table" @update:modelValue="getPersonas()">
+                            placeholder="Search Table" @update:modelValue="getSuppilers()">
                             <LabelToInput icon="search" forLabel="search-user" />
                         </TextInput>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Todas las personas <span class="text-slate-400 font-medium">{{
-                    pagination.total
-                }}</span></h2>
+                    <h2 class="font-semibold text-slate-800 pt-1">Todos los proveedores
+                        <span class="text-slate-400 font-medium">{{ pagination.total }}</span>
+                    </h2>
                 </div>
-             
+
             </header>
             <div class="overflow-x-auto">
                 <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy">
                     <tbody class="text-sm divide-y divide-slate-200">
-                        <tr v-for="persona in personas" :key="persona.id_persona">
+                        <tr v-for="proveedor in proveedores" :key="proveedor.id_proveedor">
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800">{{ persona.id_persona }}</div>
+                                <div class="font-medium text-slate-800">{{ proveedor.id_proveedor }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800">{{ persona.dui_persona }}</div>
-                            </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 wrap">
-                                    {{ persona.pnombre_persona }}
-                                    {{ persona.snombre_persona }}
-                                    {{ persona.tnombre_persona }}
-                                    {{ persona.papellido_persona }}
-                                    {{ persona.sapellido_persona }}
-                                    {{ persona.tapellido_persona }}
+                                <div v-if="proveedor.dui_proveedor" class="font-medium text-slate-800">
+                                    {{ proveedor.dui_proveedor }}<br>
                                 </div>
-                            </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800">
-                                    <div v-if="(persona.estado_persona == 1)"
-                                        class="inline-flex font-medium rounded-full text-xs text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
-                                        A
-                                    </div>
-                                    <div v-else
-                                        class="inline-flex font-medium rounded-full text-xs text-center px-2.5 py-0.5 bg-rose-100 text-rose-600">
-                                        I
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800">
-                                    {{ moment(persona.fecha_nac_persona).format('dddd Do MMMM YYYY') }}
+                                <div v-else class="font-medium text-slate-800">
+                                    {{ proveedor.nit_proveedor }}<br>
                                 </div>
                             </td>
 
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800">{{ proveedor.razon_social_proveedor }}</div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800">{{ proveedor.nombre_comercial_proveedor }}</div>
+                            </td>
+
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="space-x-1">
-                                    <button @click.stop="getInformationPersons(persona.id_persona)"
+                                    <button @click.stop="getSuppiler(proveedor.id_proveedor)"
                                         class="text-slate-400 hover:text-slate-500 rounded-full">
                                         <span class="sr-only">Edit</span>
                                         <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
@@ -88,8 +70,7 @@ import ModalAdministracionPersonasVue from '@/Components-ISRI/Administracion/Mod
                                         </svg>
                                     </button>
                                     <!-- CAMBIAR ICONO DE BOTON POR QUE VA A SER ACTIVAR Y DESCATIVAR -->
-                                    <button @click="enableStateForPerson(persona.id_persona, persona.estado_persona)"
-                                        class="text-rose-500 hover:text-rose-600 rounded-full">
+                                    <button class="text-rose-500 hover:text-rose-600 rounded-full">
                                         <span class="sr-only">Delete</span><svg class="w-8 h-8 fill-current"
                                             viewBox="0 0 32 32">
                                             <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
@@ -117,9 +98,9 @@ import ModalAdministracionPersonasVue from '@/Components-ISRI/Administracion/Mod
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
 
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getPersonas(link.url)"
+                                        <a @click="getSuppilers(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                      text-indigo-500">
+                                                                                                                                                                                                                                                                                                                                      text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
                                     </div>
@@ -127,16 +108,16 @@ import ModalAdministracionPersonasVue from '@/Components-ISRI/Administracion/Mod
                                 <span v-else-if="(link.label == 'Siguiente')"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getPersonas(link.url)"
+                                        <a @click="getSuppilers(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                      text-indigo-500">
+                                                                                                                                                                                                                                                                                                                                      text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
                                     </div>
                                 </span>
                                 <span class="cursor-pointer" v-else
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
-                                        class=" w-5" @click="getPersonas(link.url)">{{ link.label }}</span>
+                                        class=" w-5" @click="getSuppilers(link.url)">{{ link.label }}</span>
                                 </span>
                             </li>
                         </ul>
@@ -145,24 +126,24 @@ import ModalAdministracionPersonasVue from '@/Components-ISRI/Administracion/Mod
             </div>
         </div>
 
-        <ModalAdministracionPersonasVue :scrollbarModalOpen="scrollbarModalOpen"
-            @close-definitive="scrollbarModalOpen = false" :infoPersona="infoPerson" />
+        <ModalSuppliersVue :scrollbarModalOpen="scrollbarModalOpen" @close-definitive="scrollbarModalOpen = false"
+            :infoSupplier="infoSupplier" @showTableAgain="getSuppilers(lastUrl)" />
+
 
     </AppLayoutVue>
 </template>
 <script>
 export default {
     created() {
-        this.getPersonas();
+        this.getSuppilers();
     },
     data: function (data) {
         let sortOrders = {};
         let columns = [
-            { width: "10%", label: "Id", name: "id_persona" },
-            { width: "20%", label: "Dui", name: "dui_persona" },
-            { width: "40%", label: "Nombre", name: "snombre_persona" },
-            { width: "10%", label: "Estado", name: "estado_persona" },
-            { width: "25%", label: "Fecha Nacimiento", name: "fecha_nac_persona" },
+            { width: "10%", label: "Id", name: "id_proveedor" },
+            { width: "20%", label: "Documentos", name: "dui_proveedor" },
+            { width: "30%", label: "Razon social", name: "razon_social_proveedor" },
+            { width: "30%", label: "Nombre comercial", name: "nombre_comercial_proveedor" },
             { width: "25%", label: "Acciones", name: "Acciones" },
         ];
         columns.forEach((column) => {
@@ -173,11 +154,11 @@ export default {
         });
         return {
             scrollbarModalOpen: false,
-            personas: [],
+            proveedores: [],
             links: [],
-            lastUrl: '/personas',
+            lastUrl: '/proveedores',
             columns: columns,
-            sortKey: "id_persona",
+            sortKey: "id_proveedor",
             sortOrders: sortOrders,
             perPage: ["10", "20", "30"],
             tableData: {
@@ -197,11 +178,11 @@ export default {
                 from: "",
                 to: "",
             },
-            infoPerson: [],
+            infoSupplier: [],
         };
     },
     methods: {
-        async getPersonas(url = "/personas") {
+        async getSuppilers(url = "/proveedores") {
             this.lastUrl = url;
             this.tableData.draw++;
             await axios.get(url, { params: this.tableData }).then((response) => {
@@ -211,7 +192,7 @@ export default {
                     this.pagination.total = data.data.total
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
-                    this.personas = data.data.data;
+                    this.proveedores = data.data.data;
                 }
             }).catch((errors) => {
                 console.log(errors);
@@ -223,61 +204,27 @@ export default {
                 this.sortOrders[key] = this.sortOrders[key] * -1;
                 this.tableData.column = this.getIndex(this.columns, "name", key);
                 this.tableData.dir = this.sortOrders[key] === 1 ? "asc" : "desc";
-                this.getPersonas();
+                this.getSuppilers();
             }
         },
         getIndex(array, key, value) {
             return array.findIndex((i) => i[key] == value);
         },
-        async getInformationPersons(id_persona) {
-            await axios.get("/get-persona", { params: { id_persona: id_persona } })
-                .then(res => {
-                    this.infoPerson = res.data
-                })
-                .catch(err => {
-                    console.error(err);
-                })
-            this.scrollbarModalOpen = !this.scrollbarModalOpen
-        },
-        async enable(id_persona, estado) {
-            await axios.post("/update-state-person", { id_persona: id_persona })
-                .then(res => {
-                    console.log(res)
-                })
-                .catch(err => {
-                    console.error(err);
-                })
-            this.getPersonas(this.lastUrl)//llamamos de nuevo el metodo para que actualize la tabla 
-        },
-        enableStateForPerson(id_persona, estado) {
-            let state = estado == 0 ? 'habilitar' : 'deshabilitar'
-            this.$swal.fire({
-                title: '¿Esta seguro de ' + state + ' el registro ?',
-                icon: 'question',
-                iconHtml: '❓',
-                confirmButtonText: 'Si, ' + state + '',
-                confirmButtonColor: '#001b47',
-                cancelButtonText: 'Cancelar',
-                showCancelButton: true,
-                showCloseButton: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    this.enable(id_persona, estado)//peticion async hace la modificacion 
-                    //no la llamamos en el mismo metodo por que dejaria de ser asyn y hay problema al momento de actulizar la tabla
-                    toast.info("Hecho", {
-                        autoClose: 5000,
-                        position: "top-right",
-                        transition: "bounce",
-                        toastBackgroundColor: "white",
-                        icon: "✔️",
-                    });
-                }
+        async getSuppiler(supplier_id) {
+            await axios.get("/get-supplier", { params: { id_proveedor: supplier_id } }).then(res => {
+                console.log(res.data);
+                this.infoSupplier = res.data
+            }).catch(err => {
+                console.error(err);
             })
-        },
-        AddInformationPerson() {
             this.scrollbarModalOpen = !this.scrollbarModalOpen
-            this.infoPerson = []
+        },
+        addDataSupplier() {
+            this.infoSupplier = []
+            this.scrollbarModalOpen = !this.scrollbarModalOpen
+
         }
+
     },
 };
 </script>
