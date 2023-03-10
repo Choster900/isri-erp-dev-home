@@ -23,12 +23,6 @@ import ModalSuppliersVue from '@/Components-ISRI/Tesoreria/ModalSuppliers.vue';
                             <LabelToInput icon="date" />
                         </div>
                     </div>
-                    <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
-                        <TextInput :label-input="false" id="search-user" type="text" v-model="tableData.search"
-                            placeholder="Search Table" @update:modelValue="getSuppilers()">
-                            <LabelToInput icon="search" forLabel="search-user" />
-                        </TextInput>
-                    </div>
                     <h2 class="font-semibold text-slate-800 pt-1">Todos los proveedores
                         <span class="text-slate-400 font-medium">{{ pagination.total }}</span>
                     </h2>
@@ -36,26 +30,27 @@ import ModalSuppliersVue from '@/Components-ISRI/Tesoreria/ModalSuppliers.vue';
 
             </header>
             <div class="overflow-x-auto">
-                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy">
+                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy"
+                    @datos-enviados="handleData($event)">
                     <tbody class="text-sm divide-y divide-slate-200">
                         <tr v-for="proveedor in proveedores" :key="proveedor.id_proveedor">
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800">{{ proveedor.id_proveedor }}</div>
+                                <div class="font-medium text-slate-800 text-center">{{ proveedor.id_proveedor }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div v-if="proveedor.dui_proveedor" class="font-medium text-slate-800">
+                                <div v-if="proveedor.dui_proveedor" class="font-medium text-slate-800 text-center">
                                     {{ proveedor.dui_proveedor }}<br>
                                 </div>
-                                <div v-else class="font-medium text-slate-800">
+                                <div v-else class="font-medium text-slate-800 text-center">
                                     {{ proveedor.nit_proveedor }}<br>
                                 </div>
                             </td>
 
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800">{{ proveedor.razon_social_proveedor }}</div>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px wrap">
+                                <div class="font-medium text-slate-800 text-center">{{ proveedor.razon_social_proveedor }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800">{{ proveedor.nombre_comercial_proveedor }}</div>
+                                <div class="font-medium text-slate-800 text-center">{{ proveedor.nombre_comercial_proveedor }}</div>
                             </td>
 
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
@@ -100,7 +95,7 @@ import ModalSuppliersVue from '@/Components-ISRI/Tesoreria/ModalSuppliers.vue';
                                     <div class="flex-1 text-right ml-2">
                                         <a @click="getSuppilers(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                                                                                                      text-indigo-500">
+                                                                                                                                                                                                                                                                                                                                                                          text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
                                     </div>
@@ -110,7 +105,7 @@ import ModalSuppliersVue from '@/Components-ISRI/Tesoreria/ModalSuppliers.vue';
                                     <div class="flex-1 text-right ml-2">
                                         <a @click="getSuppilers(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                                                                                                      text-indigo-500">
+                                                                                                                                                                                                                                                                                                                                                                          text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
                                     </div>
@@ -164,10 +159,11 @@ export default {
             tableData: {
                 draw: 0,
                 length: 5,
-                search: "",
                 column: 0,
                 dir: "desc",
+                search: {},
             },
+
             pagination: {
                 lastPage: "",
                 currentPage: "",
@@ -185,15 +181,16 @@ export default {
         async getSuppilers(url = "/proveedores") {
             this.lastUrl = url;
             this.tableData.draw++;
-            await axios.get(url, { params: this.tableData }).then((response) => {
-                let data = response.data;
-                if (this.tableData.draw == data.draw) {
-                    this.links = data.data.links;
-                    this.pagination.total = data.data.total
-                    this.links[0].label = "Anterior";
-                    this.links[this.links.length - 1].label = "Siguiente";
-                    this.proveedores = data.data.data;
-                }
+            await axios.get(url, { params: this.tableData}).then((response) => {
+                 let data = response.data;
+                 if (this.tableData.draw == data.draw) {
+                     this.links = data.data.links;
+                     this.pagination.total = data.data.total
+                     this.links[0].label = "Anterior";
+                     this.links[this.links.length - 1].label = "Siguiente";
+                     this.proveedores = data.data.data;
+                 }
+                console.log(response.data);
             }).catch((errors) => {
                 console.log(errors);
             });
@@ -223,9 +220,15 @@ export default {
             this.infoSupplier = []
             this.scrollbarModalOpen = !this.scrollbarModalOpen
 
+        },
+        handleData(myEventData) {
+            console.log(myEventData);
+            this.tableData.search = myEventData;
+            this.getSuppilers()
         }
 
     },
+
 };
 </script>
   

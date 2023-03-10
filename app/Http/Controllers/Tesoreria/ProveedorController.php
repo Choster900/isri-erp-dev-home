@@ -29,29 +29,25 @@ class ProveedorController extends Controller
         $v_length = $request->input('length');
         $v_column = $request->input('column'); //Index
         $v_dir = $request->input('dir');
-        $v_search_value = $request->input('search');
-
+        $data = $request->input('search');
         $v_query = DB::table('proveedor')
             ->join('tipo_contribuyente', 'proveedor.id_tipo_contribuyente', '=', 'tipo_contribuyente.id_tipo_contribuyente')
             ->join('sujeto_retencion', 'proveedor.id_sujeto_retencion', '=', 'sujeto_retencion.id_sujeto_retencion')
             ->select('*')
             ->orderBy($v_columns[$v_column], $v_dir);
 
-        if ($v_search_value) {
-            $v_query->where(function ($query) use ($v_search_value) {
-                $query->where('id_proveedor', 'like', '%' . $v_search_value . '%')
-                    ->orWhere('dui_proveedor', 'like', '%' . $v_search_value . '%')
-                    ->orWhere('nrc_proveedor', 'like', '%' . $v_search_value . '%')
-                    ->orWhere('nit_proveedor', 'like', '%' . $v_search_value . '%')
-                    ->orWhere('nit_proveedor', 'like', '%' . $v_search_value . '%')
-                    ->orWhere('nit_proveedor', 'like', '%' . $v_search_value . '%')
-                    ->orWhere('nit_proveedor', 'like', '%' . $v_search_value . '%')
-                    ->orWhere('nit_proveedor', 'like', '%' . $v_search_value . '%');
-            });
+        if ($data) {
+            $v_query->where('id_proveedor', 'like', '%' . $data["id_proveedor"] . '%')
+                ->where('dui_proveedor', 'like', '%' . $data["dui_proveedor"] . '%')
+                ->where('razon_social_proveedor', 'like', '%' . $data["razon_social_proveedor"] . '%')
+                ->where('nombre_comercial_proveedor', 'like', '%' . $data["nombre_comercial_proveedor"] . '%');
         }
 
         $v_roles = $v_query->paginate($v_length)->onEachSide(1);
-        return ['data' => $v_roles, 'draw' => $request->input('draw')];
+        return [
+            'data' => $v_roles,
+            'draw' => $request->input('draw'),
+        ];
     }
 
     public function getInformationToSelect(Request $request)

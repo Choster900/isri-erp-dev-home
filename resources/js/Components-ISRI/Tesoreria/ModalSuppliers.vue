@@ -247,7 +247,6 @@ export default {
     methods: {
         async listOptionsSelect() {//metodo que trae toda la info de todos los select
             await axios.get("/list-option-select-suppliers").then((response) => {
-                console.log(response.data);
                 this.allSelectOptios.location = response.data.location
                 this.allSelectOptios.typeContribuyent = response.data.typeContribuyent
                 this.allSelectOptios.retention = response.data.retention
