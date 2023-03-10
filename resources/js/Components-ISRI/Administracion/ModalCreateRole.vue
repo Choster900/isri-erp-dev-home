@@ -33,15 +33,15 @@ import Targets from '@/Components-ISRI/Targets.vue';
           </TextInput>
         </div>
       </div>
-      <div class="mb-4">Selecciona un Menu y un Submenu:</div>
+      <div class="mb-4">Selecciona un Menú y un Submenú:</div>
       <div class="mb-4 md:flex flex-row justify-items-start">
           <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
             <label class="block mb-2 text-xs font-light text-gray-600">
-              Menu <span class="text-red-600 font-extrabold">*</span>
+              Menú <span class="text-red-600 font-extrabold">*</span>
             </label>
             <div class="relative font-semibold  flex h-8 w-full flex-row-reverse ">
               <Multiselect v-model="modalDataCreate.id_menu" :options="modalDataCreate.parentsMenu"
-                @select="getChildrenMenus(modalDataCreate.parentsMenu, $event)" placeholder="Seleccione Menu"
+                @select="getChildrenMenus(modalDataCreate.parentsMenu, $event)" placeholder="Seleccione Menú"
                 :searchable="true" />
 
               <LabelToInput icon="list" />
@@ -50,17 +50,34 @@ import Targets from '@/Components-ISRI/Targets.vue';
 
           <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
             <label class="block mb-2 text-xs font-light text-gray-600">
-              Sub menu <span class="text-red-600 font-extrabold">*</span>
+              Submenú <span class="text-red-600 font-extrabold">*</span>
             </label>
             <div class="relative font-semibold  flex h-8 w-full flex-row-reverse ">
 
               <Multiselect v-model="modalDataCreate.id_childrenMenu" :options="modalDataCreate.childrenMenus"
-                @select="getChildren(modalDataCreate.childrenMenus, $event)" placeholder="Seleccione Sub Menu"
+                @select="getChildren(modalDataCreate.childrenMenus, $event)" placeholder="Seleccione Submenú"
                 :searchable="true" />
 
               <LabelToInput icon="list" />
             </div>
           </div>
+        </div>
+        <div class="mb-4">Permisos para el Submenú seleccionado:</div>
+        <div class="mb-4 md:flex flex-row">
+          <div class="mb-4 md:mr-2 md:mb-0">
+            <label for="checbox1" class="text-sm font-bold text-gray-700">Insertar
+            </label>
+            <checkbox class="mr-3" id="checbox1" />
+            <label for="checbox2" class="text-sm font-bold text-gray-700">Actualizar
+            </label>
+            <checkbox class="mr-3" id="checbox2" />
+            <label for="checbox3" class="text-sm font-bold text-gray-700">Eliminar
+            </label>
+            <checkbox class="mr-3" id="checbox3" />
+            <label for="checbox4" class="text-sm font-bold text-gray-700">Ejecutar
+            </label>
+            <checkbox class="mr-3" id="checbox4" />
+        </div>
         </div>
         <div class="mb-4 md:flex flex-row justify-center">
           <div class="mb-4 md:mr-2 md:mb-0 px-1">
@@ -77,8 +94,8 @@ import Targets from '@/Components-ISRI/Targets.vue';
             <thead class="bg-[#1F3558] text-white">
               <tr class="">
                 <th class="rounded-tl-lg">#</th>
-                <th>Menu</th>
-                <th>Submenu</th>
+                <th>MENU</th>
+                <th>SUBMENU</th>
                 <th class="rounded-tr-lg">ACCIONES</th>
               </tr>
             </thead>

@@ -12,28 +12,45 @@ import axios from 'axios';
     v-bind:title="'Gestion de menus : ' + modalData.nombre_rol" @close="$emit('cerrar-modal')">
     <div class="px-5 pt-4 pb-1">
       <div class="text-sm">
-        <div class="mb-4">Selecciona un menu y un submenu:</div>
+        <div class="mb-4">Selecciona un Menú y un Submenú:</div>
         <div class="mb-4 md:flex flex-row justify-items-start">
           <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
             <label class="block mb-2 text-xs font-light text-gray-600">
-              Menu <span class="text-red-600 font-extrabold">*</span>
+              Menú <span class="text-red-600 font-extrabold">*</span>
             </label>
             <div class="relative font-semibold  flex h-8 w-full flex-row-reverse ">
               <Multiselect v-model="modalData.id_menu" :options="modalData.menus" @select="getChildrenMenus()"
-                placeholder="Menu" :searchable="true" />
+                placeholder="Seleccione Menú" :searchable="true" />
               <LabelToInput icon="list" />
             </div>
           </div>
           <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
             <label class="block mb-2 text-xs font-light text-gray-600">
-              Sub Menu <span class="text-red-600 font-extrabold">*</span>
+              Submenú <span class="text-red-600 font-extrabold">*</span>
             </label>
             <div class="relative font-semibold  flex h-8 w-full flex-row-reverse ">
-              <Multiselect v-model="modalData.id_childrenMenu" :options="modalData.childrenMenus" placeholder="Sub Menu"
+              <Multiselect v-model="modalData.id_childrenMenu" :options="modalData.childrenMenus" placeholder="Seleccione Submenú"
                 :searchable="true" />
               <LabelToInput icon="list" />
             </div>
           </div>
+        </div>
+        <div class="mb-4">Permisos para el Submenú seleccionado:</div>
+        <div class="mb-4 md:flex flex-row">
+          <div class="mb-4 md:mr-2 md:mb-0">
+            <label for="checbox1" class="text-sm font-bold text-gray-700">Insertar
+            </label>
+            <checkbox class="mr-3" id="checbox1" />
+            <label for="checbox2" class="text-sm font-bold text-gray-700">Actualizar
+            </label>
+            <checkbox class="mr-3" id="checbox2" />
+            <label for="checbox3" class="text-sm font-bold text-gray-700">Eliminar
+            </label>
+            <checkbox class="mr-3" id="checbox3" />
+            <label for="checbox4" class="text-sm font-bold text-gray-700">Ejecutar
+            </label>
+            <checkbox class="mr-3" id="checbox4" />
+        </div>
         </div>
         <div class="mb-4 md:flex flex-row justify-center">
           <div class="mb-4 md:mr-2 md:mb-0 px-1">
@@ -48,8 +65,8 @@ import axios from 'axios';
             <thead class="bg-[#1F3558] text-white">
               <tr class="">
                 <th class="rounded-tl-lg">#</th>
-                <th>Menu</th>
-                <th>Submenu</th>
+                <th>MENU</th>
+                <th>SUBMENU</th>
                 <th class="rounded-tr-lg">ACCIONES</th>
               </tr>
             </thead>
