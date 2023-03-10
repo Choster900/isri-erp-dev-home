@@ -124,13 +124,13 @@ import axios from 'axios';
 export default {
     props: ["showModal", "modalData", "modalVar"],
     watch: {
-    modalVar: async function (newParam) {
-      if (newParam) {
-        await this.getSistemas()
-        this.$emit('abrir-modal')
-      }
-    }
-  },
+        modalVar: async function (newParam) {
+            if (newParam) {
+                await this.getSistemas()
+                this.$emit('abrir-modal')
+            }
+        }
+    },
     data: function (data) {
         return {
             showModal2: false,
@@ -152,10 +152,10 @@ export default {
                 .catch((errors) => {
                     let msg = this.manageError(errors)
                     this.$swal.fire({
-                      title: 'Operación cancelada',
-                      text: msg,
-                      icon: 'warning',
-                      timer:5000
+                        title: 'Operación cancelada',
+                        text: msg,
+                        icon: 'warning',
+                        timer: 5000
                     })
                 })
         },
@@ -167,10 +167,10 @@ export default {
                 .catch((errors) => {
                     let msg = this.manageError(errors)
                     this.$swal.fire({
-                      title: 'Operación cancelada',
-                      text: msg,
-                      icon: 'warning',
-                      timer:5000
+                        title: 'Operación cancelada',
+                        text: msg,
+                        icon: 'warning',
+                        timer: 5000
                     })
                 })
         },
@@ -205,10 +205,10 @@ export default {
                         }).catch((errors) => {
                             let msg = this.manageError(errors)
                             this.$swal.fire({
-                              title: 'Operación cancelada',
-                              text: msg,
-                              icon: 'warning',
-                              timer:5000
+                                title: 'Operación cancelada',
+                                text: msg,
+                                icon: 'warning',
+                                timer: 5000
                             })
                         })
                     }
@@ -246,16 +246,15 @@ export default {
                         });
                         this.cleanModalInputs()
                         this.getSistemas()
-                    })
-                    .catch((errors) => {
-                    let msg = this.manageError(errors)
-                    this.$swal.fire({
-                      title: 'Operación cancelada',
-                      text: msg,
-                      icon: 'warning',
-                      timer:5000
-                    })
-                })
+                    }).catch((errors) => {
+                            let msg = this.manageError(errors)
+                            this.$swal.fire({
+                                title: 'Operación cancelada',
+                                text: msg,
+                                icon: 'warning',
+                                timer: 5000
+                            })
+                        })
                 }
             })
         },
@@ -268,14 +267,13 @@ export default {
                     this.modalData.roles_edit = response.data.roles
                     this.modalData.permiso_usuario = response.data.permiso_usuario
                     this.changeStateFromModal2()
-                })
-                .catch((errors) => {
+                }).catch((errors) => {
                     let msg = this.manageError(errors)
                     this.$swal.fire({
-                      title: 'Operación cancelada',
-                      text: msg,
-                      icon: 'warning',
-                      timer:5000
+                        title: 'Operación cancelada',
+                        text: msg,
+                        icon: 'warning',
+                        timer: 5000
                     })
                 })
         },
@@ -303,16 +301,15 @@ export default {
                         this.changeStateFromModal2()
                         this.modalData.permiso_usuario = ""
                         this.getSistemas()
+                    }).catch((errors) => {
+                        let msg = this.manageError(errors)
+                        this.$swal.fire({
+                            title: 'Operación cancelada',
+                            text: msg,
+                            icon: 'warning',
+                            timer: 5000
+                        })
                     })
-                    .catch((errors) => {
-                    let msg = this.manageError(errors)
-                    this.$swal.fire({
-                      title: 'Operación cancelada',
-                      text: msg,
-                      icon: 'warning',
-                      timer:5000
-                    })
-                })
                 }
             })
         },
@@ -320,4 +317,6 @@ export default {
 }
 </script>
 
-<style></style>
+<style>
+
+</style>
