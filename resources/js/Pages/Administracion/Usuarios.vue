@@ -11,7 +11,7 @@ import ModalChangePasswordVue from '@/Components-ISRI/Administracion/ModalChange
   <AppLayoutVue>
     <div class="sm:flex sm:justify-end sm:items-center mb-2">
       <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-        <GeneralButton @click="createUser()" color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add" />
+        <GeneralButton v-if="permits.insertar==1" @click="createUser()" color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add" />
       </div>
     </div>
     <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
@@ -71,7 +71,7 @@ import ModalChangePasswordVue from '@/Components-ISRI/Administracion/ModalChange
               </td>
               <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                 <div class="space-x-1">
-                  <button @click="changeStateFromModal(user.id_usuario)"
+                  <button v-if="permits.actualizar==1" @click="changeStateFromModal(user.id_usuario)"
                     class="text-slate-400 hover:text-slate-500 rounded-full">
                     <span class="sr-only">Edit</span>
                     <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
@@ -80,7 +80,7 @@ import ModalChangePasswordVue from '@/Components-ISRI/Administracion/ModalChange
                       </path>
                     </svg>
                   </button>
-                  <button @click="changeStateUser(user.id_usuario, user.nick_usuario, user.estado_usuario)"
+                  <button v-if="permits.eliminar==1" @click="changeStateUser(user.id_usuario, user.nick_usuario, user.estado_usuario)"
                     class="text-rose-500 hover:text-rose-600 rounded-full">
                     <span class="sr-only">Delete</span><svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
                       <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
@@ -90,7 +90,7 @@ import ModalChangePasswordVue from '@/Components-ISRI/Administracion/ModalChange
                       </path>
                     </svg>
                   </button>
-                  <button @click="changePasswordUser(user.id_usuario, user.nick_usuario)" class="text-yellow-500 hover:text-yellow-600 rounded-full">
+                  <button v-if="permits.actualizar==1" @click="changePasswordUser(user.id_usuario, user.nick_usuario)" class="text-yellow-500 hover:text-yellow-600 rounded-full">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
                     </svg>
@@ -151,7 +151,8 @@ import ModalChangePasswordVue from '@/Components-ISRI/Administracion/ModalChange
 <script>
 export default {
   created() {
-    this.getUsers();
+    this.getUsers()
+    this.getPermits()
   },
   data: function (data) {
     let sortOrders = {};
@@ -170,6 +171,7 @@ export default {
         sortOrders[column.name] = -1;
     });
     return {
+      permits : [],
       modalData: {
         userRoles: [],
         id_usuario: "",
@@ -224,6 +226,19 @@ export default {
     };
   },
   methods: {
+    getPermits(){
+      var URLactual = window.location.pathname
+      let data = this.$page.props.menu;
+      let menu = JSON.parse(JSON.stringify(data['urls']))
+      menu.forEach((value, index) => {
+        value.submenu.forEach((value2, index2) => {
+          if(value2.url===URLactual){
+            var array = {'insertar':value2.insertar,'actualizar':value2.actualizar,'eliminar':value2.eliminar,'ejecutar':value2.ejecutar}
+            this.permits = array
+          }
+        })
+      })
+    },
     changePasswordUser(id_usuario,nick_usuario){
       this.modalDataChangePassword.nick_usuario=nick_usuario
       this.modalDataChangePassword.id_usuario=id_usuario

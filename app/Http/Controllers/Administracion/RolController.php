@@ -49,9 +49,13 @@ class RolController extends Controller
             $permisox=PermisoUsuario::where('id_rol','=',$id_rol)->get();
             foreach($permisox as $permiso){
                 $estado_anterior==1 ? $permiso->estado_permiso_usuario=0 : $permiso->estado_permiso_usuario=1;
+                $permiso->ip_permiso_usuario=$request->ip();
+                $permiso->fecha_mod_permiso_usuario=Carbon::now();
                 $permiso->update();
             }
             $estado_anterior==1 ? $msg="Desactivado" : $msg="Activado";
+            $rol->ip_rol=$request->ip();
+            $rol->fecha_mod_rol=Carbon::now();
             $rol->update();
             return ['mensaje' => $msg.' rol '.$rol->nombre_rol.' con exito'];
     }
@@ -131,6 +135,8 @@ class RolController extends Controller
             if($acceso_menu_padre){
                 if($acceso_menu_padre->estado_acceso_menu==0){
                     $acceso_menu_padre->estado_acceso_menu=1;
+                    $acceso_menu_padre->fecha_mod_acceso_menu=Carbon::now();
+                    $acceso_menu_padre->ip_acceso_menu=$request->ip();
                     $acceso_menu_padre->update();
                 }
             }else{
@@ -138,12 +144,15 @@ class RolController extends Controller
                 $new_menu_parent->id_rol=$id_rol;
                 $new_menu_parent->id_menu=$id_parent_menu;
                 $new_menu_parent->estado_acceso_menu=1;
+                $new_menu_parent->ip_acceso_menu=$request->ip();
                 $new_menu_parent->fecha_reg_acceso_menu=Carbon::now();
                 $new_menu_parent->save();
             }
             if($acceso_menu_hijo){
                 if($acceso_menu_hijo->estado_acceso_menu==0){
                     $acceso_menu_hijo->estado_acceso_menu=1;
+                    $acceso_menu_hijo->fecha_mod_acceso_menu=Carbon::now();
+                    $acceso_menu_hijo->ip_acceso_menu=$request->ip();
                     $acceso_menu_hijo->update();
                 }
             }else{
@@ -151,6 +160,11 @@ class RolController extends Controller
                 $new_menu_children->id_rol=$id_rol;
                 $new_menu_children->id_menu=$id_children_menu;
                 $new_menu_children->estado_acceso_menu=1;
+                $new_menu_children->insertar_acceso_menu=1;
+                $new_menu_children->actualizar_acceso_menu=1;
+                $new_menu_children->eliminar_acceso_menu=1;
+                $new_menu_children->ejecutar_acceso_menu=1;
+                $acceso_menu_hijo->ip_acceso_menu=$request->ip();
                 $new_menu_children->fecha_reg_acceso_menu=Carbon::now();
                 $new_menu_children->save();
             }
@@ -160,12 +174,16 @@ class RolController extends Controller
                 $rol->estado_rol=1;
                 $update_table=true;
                 foreach($rol->usuarios as $user){
+                    $user->pivot->ip_permiso_usuario=$request->ip();
+                    $user->pivot->fecha_mod_permiso_usuario=Carbon::now();
                     $user->pivot->estado_permiso_usuario=1;
                     $user->pivot->update();
                 }
             }else{
                 $update_table=false;
             }
+            $rol->fecha_mod_rol=Carbon::now();
+            $rol->ip_rol=$request->ip();
             $rol->update();
             $menu=Menu::find($id_children_menu);
             return ['mensaje' => 'Guardado menu '.$menu->nombre_menu.' con exito','update' => $update_table];
@@ -175,6 +193,8 @@ class RolController extends Controller
             $id_children_menu = $request->input('id_menu');
             $acceso_menu=AccesoMenu::where('id_menu','=',$id_children_menu)->where('id_rol','=',$id_rol)->first();
             $acceso_menu->estado_acceso_menu=0;
+            $acceso_menu->fecha_mod_acceso_menu=Carbon::now();
+            $acceso_menu->ip_acceso_menu=$request->ip();
             $acceso_menu->update();
             $children_menu=Menu::find($id_children_menu);
             $parent_menu=$children_menu->parentMenu;
@@ -187,6 +207,8 @@ class RolController extends Controller
             }
             if(!$is_still_parent){
                 $access_parent = AccesoMenu::where('id_menu','=',$parent_menu->id_menu)->where('id_rol','=',$id_rol)->first();
+                $access_parent->fecha_mod_acceso_menu=Carbon::now();
+                $access_parent->ip_acceso_menu=$request->ip();
                 $access_parent->estado_acceso_menu=0;
                 $access_parent->update();
             }
@@ -201,6 +223,8 @@ class RolController extends Controller
             }
             if(!$menus_disponibles){
                 $rol->estado_rol=0;
+                $rol->ip_rol=$request->ip();
+                $rol->fecha_mod_rol=Carbon::now();
                 $rol->update();
                 //Desactivate rol if it's necessary
                 $update_table=true;
@@ -241,6 +265,7 @@ class RolController extends Controller
             $new_rol->nombre_rol=$nombre_rol;
             $new_rol->estado_rol=1;
             $new_rol->fecha_reg_rol=Carbon::now();
+            $new_rol->ip_rol=$request->ip();
             $new_rol->save();
             
             foreach($menus as $menu){
@@ -252,6 +277,7 @@ class RolController extends Controller
                 $new_acceso_menu->actualizar_acceso_menu=1;
                 $new_acceso_menu->eliminar_acceso_menu=1;
                 $new_acceso_menu->ejecutar_acceso_menu=1;
+                $new_acceso_menu->ip_acceso_menu=$request->ip();
                 $new_acceso_menu->fecha_reg_acceso_menu=Carbon::now();
                 $new_acceso_menu->save();
 
@@ -261,6 +287,7 @@ class RolController extends Controller
                     $new_acceso_padre->id_rol=$new_rol->id_rol;
                     $new_acceso_padre->id_menu=$menu['id_menu_padre'];
                     $new_acceso_padre->estado_acceso_menu=1;
+                    $new_acceso_padre->ip_acceso_menu=$request->ip();
                     $new_acceso_padre->fecha_reg_acceso_menu=Carbon::now();
                     $new_acceso_padre->save();
                 }

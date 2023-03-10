@@ -41,7 +41,11 @@ class Rol extends Model
             ->using('App\Models\AccesoMenu')
             ->withPivot([
                 'id_acceso_menu',
-                'estado_acceso_menu'
+                'estado_acceso_menu',
+                'insertar_acceso_menu',
+                'actualizar_acceso_menu',
+                'eliminar_acceso_menu',
+                'ejecutar_acceso_menu',
             ]);
     }
 

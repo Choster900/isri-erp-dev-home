@@ -58,6 +58,8 @@ class UserController extends Controller
         $user = User::find($id_user);
         $previous_state==1 ? $user->estado_usuario=0 : $user->estado_usuario=1;
         $previous_state==1 ? $msg="Desactivado" : $msg="Activado";
+        $user->ip_usuario=$request->ip();
+        $user->fecha_mod_usuario=Carbon::now();
         $user->update();
         return ['message' => $msg.' usuario '.$user->nick_usuario.' con exito'];
     }
@@ -111,12 +113,16 @@ class UserController extends Controller
             $permiso_user=PermisoUsuario::where('id_usuario','=',$id_usuario)->where('id_rol','=',$id_rol)->first();
             if($permiso_user){
                 $permiso_user->estado_permiso_usuario=1;
+                $permiso_user->ip_permiso_usuario=$request->ip();
+                $permiso_user->fecha_mod_permiso_usuario=Carbon::now();
                 $permiso_user->update();
             }else{
                 $new_permiso_user = new PermisoUsuario();
                 $new_permiso_user->id_rol=$id_rol;
                 $new_permiso_user->id_usuario=$id_usuario;
                 $new_permiso_user->estado_permiso_usuario=1;
+                $new_permiso_user->ip_permiso_usuario=$request->ip();
+                $new_permiso_user->fecha_reg_permiso_usuario=Carbon::now();
                 $new_permiso_user->save();
             }
             return ['mensaje' => 'Guardado rol '.$rol->nombre_rol.' con exito'];
@@ -127,6 +133,8 @@ class UserController extends Controller
             $rol = Rol::find($id_rol);
             $permiso_user=PermisoUsuario::where('id_usuario','=',$id_usuario)->where('id_rol','=',$id_rol)->first();
             $permiso_user->estado_permiso_usuario=0;
+            $permiso_user->ip_permiso_usuario=$request->ip();
+            $permiso_user->fecha_mod_permiso_usuario=Carbon::now();
             $permiso_user->update();
             return ['mensaje' => 'Desactivado rol '.$rol->nombre_rol.' con exito'];
     }
@@ -151,6 +159,8 @@ class UserController extends Controller
             $rol = Rol::find($id_rol);
             $permiso_user=PermisoUsuario::find($id_permiso_usuario);
             $permiso_user->id_rol=$id_rol;
+            $permiso_user->ip_permiso_usuario=$request->ip();
+            $permiso_user->fecha_mod_permiso_usuario=Carbon::now();
             $permiso_user->update();
             return ['mensaje' => 'Nuevo rol asignado '.$rol->nombre_rol.' con exito'];
     }
@@ -172,19 +182,25 @@ class UserController extends Controller
     }
     public function saveUser(Request $request){
         $person = Persona::find($request->id_persona);
+        $ip=$request->ip();
         $new_user = new User();
         $new_user->nick_usuario = $request->nick_usuario;
         $new_user->password_usuario = Hash::make($request->password);
         $new_user->id_persona = $request->id_persona;
         $new_user->estado_usuario=1;
         $new_user->fecha_reg_usuario=Carbon::now();
+        $new_user->ip_usuario=$ip;
         $new_user->save();
         $person->id_usuario=$new_user->id_usuario;
+        $person->fecha_mod_persona=Carbon::now();
+        $person->ip_persona=$ip;
         $person->update();
         $new_permiso_user = new PermisoUsuario();
         $new_permiso_user->id_rol=$request->id_role;
         $new_permiso_user->id_usuario=$new_user->id_usuario;
         $new_permiso_user->estado_permiso_usuario=1;
+        $new_permiso_user->ip_permiso_usuario=$ip;
+        $new_permiso_user->fecha_reg_permiso_usuario=Carbon::now();
         $new_permiso_user->save();
         return ['mensaje' => 'Guardado usuario '. $new_user->nick_usuario.' con exito'];
     }
@@ -192,6 +208,8 @@ class UserController extends Controller
     public function changePasswordUser(Request $request){
         $user = User::find($request->id_usuario);
         $user->password_usuario = Hash::make($request->password);
+        $user->ip_usuario=$request->ip();
+        $user->fecha_mod_usuario=Carbon::now();
         $user->update();
         return ['mensaje' => 'Contraseña actualizada con exito'];
     }

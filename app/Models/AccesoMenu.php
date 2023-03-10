@@ -18,7 +18,11 @@ class AccesoMenu extends Pivot
         'id_rol',
         'id_menu',
         'estado_acceso_menu',
-        'fecha_reg_acceso_menu'
+        'fecha_reg_acceso_menu',
+        'insertar_acceso_menu',
+        'actualizar_acceso_menu',
+        'eliminar_acceso_menu',
+        'ejecutar_acceso_menu',
     ];
 
     // public function menu()
