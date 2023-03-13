@@ -23,7 +23,8 @@ import axios from 'axios';
   <AppLayoutVue>
     <div class="sm:flex sm:justify-end sm:items-center mb-2">
       <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-        <GeneralButton v-if="permits.insertar==1" @click="createRol()" color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add" />
+        <GeneralButton v-if="permits.insertar == 1" @click="createRol()" color="bg-green-700  hover:bg-green-800"
+          text="Agregar Elemento" icon="add" />
       </div>
     </div>
     <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
@@ -42,13 +43,14 @@ import axios from 'axios';
             </TextInput>
           </div>
           <h2 class="font-semibold text-slate-800 pt-1">Total Roles <span class="text-slate-400 font-medium">{{
-          tableData.total
-        }}</span></h2>
+            tableData.total
+          }}</span></h2>
         </div>
       </header>
 
       <div class="overflow-x-auto">
-        <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy">
+        <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy"
+          @datos-enviados="handleData($event)">
           <tbody class="text-sm divide-y divide-slate-200">
             <tr v-for="rol in roles" :key="rol.id_rol">
               <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
@@ -61,7 +63,9 @@ import axios from 'axios';
                 <div class="font-medium text-slate-800">{{ rol.nombre_rol }}</div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
-                <div class="font-medium text-slate-800">{{ moment(rol.fecha_reg_rol).format('dddd Do MMMM YYYY - HH:mm:ss') }}</div>
+                <div class="font-medium text-slate-800">
+                  {{ moment(rol.fecha_reg_rol).format('dddd Do MMMM YYYY -HH: mm: ss') }}
+                </div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800">
@@ -77,7 +81,8 @@ import axios from 'axios';
               </td>
               <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                 <div class="space-x-1">
-                  <button v-if="permits.actualizar==1" @click="getSelectsRolMenu(rol.id_rol)" class="text-slate-400 hover:text-slate-500 rounded-full">
+                  <button v-if="permits.actualizar == 1" @click="getSelectsRolMenu(rol.id_rol)"
+                    class="text-slate-400 hover:text-slate-500 rounded-full">
                     <span class="sr-only">Edit</span>
                     <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
                       <path
@@ -85,7 +90,7 @@ import axios from 'axios';
                       </path>
                     </svg>
                   </button>
-                  <button v-if="permits.eliminar==1" @click="desactiveRol(rol.id_rol, rol.nombre_rol, rol.estado_rol)"
+                  <button v-if="permits.eliminar == 1" @click="desactiveRol(rol.id_rol, rol.nombre_rol, rol.estado_rol)"
                     class="text-rose-500 hover:text-rose-600 rounded-full">
                     <span class="sr-only">Delete</span><svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
                       <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
@@ -105,7 +110,7 @@ import axios from 'axios';
     </div>
 
     <div class="px-6 py-8 bg-white shadow-lg
-                 rounded-sm border-slate-200 relative">
+                         rounded-sm border-slate-200 relative">
       <div>
         <nav class="flex justify-between" role="navigation" aria-label="Navigation">
 
@@ -117,7 +122,7 @@ import axios from 'axios';
 
                   <div class="flex-1 text-right ml-2">
                     <a @click="getRoles(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                  text-indigo-500">
+                                          text-indigo-500">
                       &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                     </a>
                   </div>
@@ -126,7 +131,7 @@ import axios from 'axios';
                   :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                   <div class="flex-1 text-right ml-2">
                     <a @click="getRoles(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                  text-indigo-500">
+                                          text-indigo-500">
                       <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                     </a>
                   </div>
@@ -145,8 +150,8 @@ import axios from 'axios';
     <ModalRolesVue :modalVar="modalVar" :showModal="showModal" :modalData="modalData" @cerrar-modal="closeVars"
       @abrir-modal="showModal = true" @update-table="getUpdateTable()" />
 
-    <ModalCreateRoleVue :showModalCreate="showModalCreate" :modalDataCreate="modalDataCreate" @update-table="getUpdateTable()"
-      @cerrar-modal="closeModalCreate()" @abrir-modal="showModalCreate = true" />
+    <ModalCreateRoleVue :showModalCreate="showModalCreate" :modalDataCreate="modalDataCreate"
+      @update-table="getUpdateTable()" @cerrar-modal="closeModalCreate()" @abrir-modal="showModalCreate = true" />
 
   </AppLayoutVue>
 </template>
@@ -160,11 +165,17 @@ export default {
   data: function (data) {
     let sortOrders = {};
     let columns = [
-      { width: "5%", label: "ID", name: "id_rol" },
-      { width: "20%", label: "Nombre Sistema", name: "nombre_sistema" },
-      { width: "25%", label: "Nombre Rol", name: "nombre_rol" },
-      { width: "30%", label: "Fecha Registro", name: "fecha_reg_rol" },
-      { width: "10%", label: "Estado", name: "estado_rol" },
+      { width: "5%", label: "ID", name: "id_rol", type: "text" },
+      { width: "20%", label: "Nombre Sistema", name: "nombre_sistema", type: "text" },
+      { width: "25%", label: "Nombre Rol", name: "nombre_rol", type: "text" },
+      { width: "30%", label: "Fecha Registro", name: "fecha_reg_rol", type: "date" },
+      {
+        width: "10%", label: "Estado", name: "estado_rol", type: "select",
+        options: [
+          {value: "1", label: "Activo"},
+          {value: "0", label: "Inactivo"}
+        ]
+      },
       { width: "10%", label: "Acciones", name: "Acciones" },
     ];
     columns.forEach((column) => {
@@ -174,7 +185,7 @@ export default {
         sortOrders[column.name] = -1;
     });
     return {
-      permits : [],
+      permits: [],
       modalData: {
         rolMenus: [],
         id_rol: "",
@@ -220,7 +231,7 @@ export default {
         currentPage: '',
         draw: 0,
         length: 5,
-        search: "",
+        search: {},
         column: 0,
         dir: "asc",
         total: ""
@@ -228,14 +239,14 @@ export default {
     };
   },
   methods: {
-    getPermits(){
+    getPermits() {
       var URLactual = window.location.pathname
       let data = this.$page.props.menu;
       let menu = JSON.parse(JSON.stringify(data['urls']))
       menu.forEach((value, index) => {
         value.submenu.forEach((value2, index2) => {
-          if(value2.url===URLactual){
-            var array = {'insertar':value2.insertar,'actualizar':value2.actualizar,'eliminar':value2.eliminar,'ejecutar':value2.ejecutar}
+          if (value2.url === URLactual) {
+            var array = { 'insertar': value2.insertar, 'actualizar': value2.actualizar, 'eliminar': value2.eliminar, 'ejecutar': value2.ejecutar }
             this.permits = array
           }
         })
@@ -344,6 +355,11 @@ export default {
     getIndex(array, key, value) {
       return array.findIndex((i) => i[key] == value);
     },
+    handleData(myEventData) {
+      console.log(myEventData);
+      this.tableData.search = myEventData;
+      this.getRoles()
+    }
   },
 };
 </script>
