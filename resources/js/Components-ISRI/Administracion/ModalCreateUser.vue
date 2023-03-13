@@ -185,13 +185,22 @@ export default {
                 this.$emit("cerrar-modal")
                 this.modalDataCreate.dui=''
               }).catch((errors) => {
-                  let msg = this.manageError(errors)
-                  this.$swal.fire({
-                    title: 'Operación cancelada',
-                    text: msg,
+                  if(errors.response.status===422){
+                    console.log(errors);
+                    this.$swal.fire({
+                    title: 'Error en la petición',
+                    html: errors.response.data,
                     icon: 'warning',
-                    timer:5000
                   })
+                  }else{
+                    let msg = this.manageError(errors)
+                    this.$swal.fire({
+                      title: 'Operación cancelada',
+                      text: msg,
+                      icon: 'warning',
+                      timer:5000
+                    })
+                  }
                 })
             }
           })
