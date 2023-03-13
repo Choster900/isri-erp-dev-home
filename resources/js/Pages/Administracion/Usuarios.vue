@@ -23,25 +23,26 @@ import ModalChangePasswordVue from '@/Components-ISRI/Administracion/ModalChange
               <LabelToInput icon="date" />
             </div>
           </div>
-          <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
+          <!-- <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
             <TextInput :label-input="false" id="search-user" type="text" v-model="tableData.search"
               placeholder="Buscar Usuario"  @update:modelValue="getUsers()">
             <LabelToInput icon="search" forLabel="search-user" />
           </TextInput>
-        </div>
+        </div> -->
         <h2 class="font-semibold text-slate-800 pt-1">Total Usuarios <span class="text-slate-400 font-medium">{{
           tableData.total
         }}</span></h2>
       </div>
       </header>
       <div class="overflow-x-auto">
-        <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy">
+        <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" 
+        @sort="sortBy" @datos-enviados="handleData($event)">
           <tbody class="text-sm divide-y divide-slate-200">
             <tr v-for="user in users" :key="user.id_usuario">
-              <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+              <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800">{{ user.id_usuario }}</div>
               </td>
-              <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+              <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800">
                   {{ user.pnombre_persona }}
                   {{ user.snombre_persona }}
@@ -51,13 +52,13 @@ import ModalChangePasswordVue from '@/Components-ISRI/Administracion/ModalChange
                   {{ user.tapellido_persona }}
                 </div>
               </td>
-              <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+              <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800">{{ user.dui_persona }}</div>
               </td>
-              <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+              <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800">{{ user.nick_usuario }}</div>
               </td>
-              <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+              <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800">
                   <div v-if="(user.estado_usuario == 1)"
                     class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
@@ -69,7 +70,7 @@ import ModalChangePasswordVue from '@/Components-ISRI/Administracion/ModalChange
                   </div>
                 </div>
               </td>
-              <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+              <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="space-x-1">
                   <button v-if="permits.actualizar==1" @click="changeStateFromModal(user.id_usuario)"
                     class="text-slate-400 hover:text-slate-500 rounded-full">
@@ -157,8 +158,8 @@ export default {
   data: function (data) {
     let sortOrders = {};
     let columns = [
-      { width: "5%", label: "ID", name: "id_usuario" },
-      { width: "40%", label: "Nombre Persona", name: "nombre_persona" },
+      { width: "10%", label: "ID", name: "id_usuario" },
+      { width: "35%", label: "Nombre Persona", name: "nombre_persona" },
       { width: "15%", label: "Dui", name: "dui_persona" },
       { width: "20%", label: "User Name", name: "nick_usuario" },
       { width: "10%", label: "Estado", name: "estado_usuario" },
@@ -350,6 +351,11 @@ export default {
     getIndex(array, key, value) {
       return array.findIndex((i) => i[key] == value);
     },
+    handleData(myEventData) {
+      console.log(myEventData);
+      this.tableData.search = myEventData;
+      this.getUsers()
+    }
   },
 };
 </script>

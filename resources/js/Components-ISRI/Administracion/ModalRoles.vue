@@ -126,13 +126,13 @@ import axios from "axios";
             <label for="checbox1" class="text-sm font-bold text-gray-700">Insertar(I)
             </label>
             <checkbox v-model="modalData.insertar" v-bind:checked="modalData.insertar" class="mr-3" id="checbox1" />
-            <label for="checbox2" class="text-sm font-bold text-gray-700">Actualizar(A)
+            <label for="checbox2" class="text-sm font-bold text-gray-700">Actualizar(U)
             </label>
             <checkbox v-model="modalData.actualizar" v-bind:checked="modalData.actualizar" class="mr-3" id="checbox2" />
-            <label for="checbox3" class="text-sm font-bold text-gray-700">Eliminar(El)
+            <label for="checbox3" class="text-sm font-bold text-gray-700">Eliminar(D)
             </label>
             <checkbox v-model="modalData.eliminar" v-bind:checked="modalData.eliminar" class="mr-3" id="checbox3" />
-            <label for="checbox4" class="text-sm font-bold text-gray-700">Ejecutar(Ej)
+            <label for="checbox4" class="text-sm font-bold text-gray-700">Ejecutar(E)
             </label>
             <checkbox v-model="modalData.ejecutar" v-bind:checked="modalData.ejecutar" class="mr-3" id="checbox4" />
           </div>

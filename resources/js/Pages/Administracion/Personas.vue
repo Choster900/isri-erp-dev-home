@@ -12,7 +12,7 @@ import ModalAdministracionPersonasVue from '@/Components-ISRI/Administracion/Mod
     <AppLayoutVue>
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="AddInformationPerson()" color="bg-green-700  hover:bg-green-800"
+                <GeneralButton v-if="permits.insertar==1" @click="AddInformationPerson()" color="bg-green-700  hover:bg-green-800"
                     text="Agregar Elemento" icon="add" />
             </div>
         </div>
@@ -78,7 +78,7 @@ import ModalAdministracionPersonasVue from '@/Components-ISRI/Administracion/Mod
 
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="space-x-1">
-                                    <button @click.stop="getInformationPersons(persona.id_persona)"
+                                    <button v-if="permits.actualizar==1" @click.stop="getInformationPersons(persona.id_persona)"
                                         class="text-slate-400 hover:text-slate-500 rounded-full">
                                         <span class="sr-only">Edit</span>
                                         <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
@@ -88,7 +88,7 @@ import ModalAdministracionPersonasVue from '@/Components-ISRI/Administracion/Mod
                                         </svg>
                                     </button>
                                     <!-- CAMBIAR ICONO DE BOTON POR QUE VA A SER ACTIVAR Y DESCATIVAR -->
-                                    <button @click="enableStateForPerson(persona.id_persona, persona.estado_persona)"
+                                    <button v-if="permits.eliminar==1" @click="enableStateForPerson(persona.id_persona, persona.estado_persona)"
                                         class="text-rose-500 hover:text-rose-600 rounded-full">
                                         <span class="sr-only">Delete</span><svg class="w-8 h-8 fill-current"
                                             viewBox="0 0 32 32">

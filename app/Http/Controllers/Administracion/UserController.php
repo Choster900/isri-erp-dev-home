@@ -17,7 +17,7 @@ class UserController extends Controller
 {
     public function getUsers(Request $request)
     {
-            $columns = ['id_usuario', 'nombre_persona','pnombre_persona','snombre_persona',
+            $columns = ['usuario.id_usuario', 'nombre_persona','pnombre_persona','snombre_persona',
                         'tnombre_persona','papellido_persona','sapellido_persona','tapellido_persona',
                         'dui_persona','nick_usuario', 'estado_usuario'
                         ];
@@ -27,24 +27,27 @@ class UserController extends Controller
             $dir = $request->input('dir');
             $search_value = $request->input('search');
 
-            $query = User::select('usuario.id_usuario AS id_usuario', 'persona.pnombre_persona AS pnombre_persona','persona.snombre_persona AS snombre_persona','persona.tnombre_persona AS tnombre_persona','persona.papellido_persona AS papellido_persona','persona.sapellido_persona AS sapellido_persona','persona.tapellido_persona AS tapellido_persona', 'persona.dui_persona AS dui_persona' , 'usuario.nick_usuario AS nick_usuario' , 'usuario.estado_usuario AS estado_usuario')
+            $query = User::select('*')
                            ->join('persona', function ($join) {
                                     $join->on('usuario.id_persona', '=', 'persona.id_persona');
                                 })
                            ->orderBy($columns[$column], $dir);
 
             if ($search_value) {
-                $query->where(function ($query) use ($search_value) {
-                    $query->where('usuario.id_usuario', 'like', '%' . $search_value . '%')
-                        ->orWhere('nick_usuario', 'like'. '%' . $search_value . '%')
-                        ->orWhere('dui_persona', 'like', '%' . $search_value . '%')
-                        ->orwhere('pnombre_persona', 'like','%' . $search_value . '%')
-                        ->orwhere('snombre_persona', 'like','%' . $search_value . '%')
-                        ->orwhere('tnombre_persona', 'like','%' . $search_value . '%')
-                        ->orwhere('papellido_persona', 'like','%' . $search_value . '%')
-                        ->orwhere('sapellido_persona', 'like','%' . $search_value . '%')
-                        ->orwhere('tapellido_persona', 'like','%' . $search_value . '%');
-                });
+                    $query->where([
+                        ['usuario.id_usuario','like','%'.$search_value['id_usuario'].'%'],
+                        ['dui_persona','like','%'.$search_value['dui_persona'].'%'],
+                        ['nick_usuario','like','%'.$search_value['nick_usuario'].'%'],
+                        ['estado_usuario','like','%'.$search_value['estado_usuario'].'%'],
+                        [function ($query) use ($search_value){
+                            $query->where('pnombre_persona', 'like','%' . $search_value['nombre_persona'] . '%')
+                                ->orWhere('snombre_persona', 'like','%' . $search_value['nombre_persona'] . '%')
+                                ->orWhere('tnombre_persona', 'like','%' . $search_value['nombre_persona'] . '%')
+                                ->orWhere('papellido_persona', 'like','%' . $search_value['nombre_persona'] . '%')
+                                ->orWhere('sapellido_persona', 'like','%' . $search_value['nombre_persona'] . '%')
+                                ->orWhere('tapellido_persona', 'like','%' . $search_value['nombre_persona'] . '%');
+                        }],
+                    ]);
             }
 
             $users = $query->paginate($length)->onEachSide(1);
