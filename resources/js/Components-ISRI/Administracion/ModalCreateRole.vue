@@ -178,7 +178,7 @@ export default {
           formValid=false
         }else{
           if(this.modalDataCreate.insertar==false && this.modalDataCreate.actualizar==false && this.modalDataCreate.eliminar==false &&this.modalDataCreate.ejecutar==false){
-            msg='Debe seleccionar por lo menos un permiso.'
+            msg='Debe seleccionar al menos un permiso.'
             formValid=false
           }
         }
@@ -351,14 +351,14 @@ export default {
           }
         })
       } else {
-        let msg = "Debes "
+        let msg = "Debe "
         if (this.modalDataCreate.nombre_rol == "") {
-          msg = msg + "escribir el nombre para el rol "
+          msg = msg + "escribir el nombre para el nuevo rol "
           if (this.modalDataCreate.menus == "") {
-            msg = msg + "y seleccionar menus"
+            msg = msg + "y agregar al menos un menu."
           }
         } else {
-          msg = msg + "seleccionar menus"
+          msg = msg + "agregar al menos un menu."
         }
         this.$swal.fire({
           title: 'Información incompleta',
