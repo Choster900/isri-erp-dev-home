@@ -28,12 +28,10 @@ class RolController extends Controller
                     ->orderBy($columns[$column], $dir);
 
             if ($search_value) {
-                $query->where(function ($query) use ($search_value) {
-                    $query->where('nombre_rol', 'like', '%' . $search_value . '%')
-                        ->orWhere('id_rol', 'like', '%' . $search_value . '%')
-                        ->orWhere('fecha_reg_rol', 'like', '%' . $search_value . '%')
-                        ->orWhere('nombre_sistema', 'like', '%' . $search_value . '%');
-                });
+                    $query->where('nombre_rol', 'like', '%' . $search_value['nombre_rol'] . '%')
+                        ->where('id_rol', 'like', '%' . $search_value['id_rol'] . '%')
+                        ->where('fecha_reg_rol', 'like', '%' . $search_value['fecha_reg_rol'] . '%')
+                        ->where('nombre_sistema', 'like', '%' . $search_value['nombre_sistema'] . '%');      
             }
 
             $roles = $query->paginate($length)->onEachSide(1);
@@ -51,11 +49,13 @@ class RolController extends Controller
                 $estado_anterior==1 ? $permiso->estado_permiso_usuario=0 : $permiso->estado_permiso_usuario=1;
                 $permiso->ip_permiso_usuario=$request->ip();
                 $permiso->fecha_mod_permiso_usuario=Carbon::now();
+                $permiso->usuario_permiso_usuario=$request->user()->nick_usuario;
                 $permiso->update();
             }
             $estado_anterior==1 ? $msg="Desactivado" : $msg="Activado";
             $rol->ip_rol=$request->ip();
             $rol->fecha_mod_rol=Carbon::now();
+            $rol->usuario_rol=$request->user()->nick_usuario;
             $rol->update();
             return ['mensaje' => $msg.' rol '.$rol->nombre_rol.' con exito'];
     }
@@ -127,9 +127,9 @@ class RolController extends Controller
     }
     
     public function saveMenu(Request $request){
-            $id_parent_menu = $request->input('id_menu');
-            $id_children_menu = $request->input('id_childrenMenu');
-            $id_rol = $request->input('id_rol');
+            $id_parent_menu = $request->input('modalData.id_menu');
+            $id_children_menu = $request->input('modalData.id_childrenMenu');
+            $id_rol = $request->input('modalData.id_rol');
             $acceso_menu_padre=AccesoMenu::where('id_rol','=',$id_rol)->where('id_menu','=',$id_parent_menu)->first();
             $acceso_menu_hijo=AccesoMenu::where('id_rol','=',$id_rol)->where('id_menu','=',$id_children_menu)->first();
             if($acceso_menu_padre){
@@ -137,6 +137,7 @@ class RolController extends Controller
                     $acceso_menu_padre->estado_acceso_menu=1;
                     $acceso_menu_padre->fecha_mod_acceso_menu=Carbon::now();
                     $acceso_menu_padre->ip_acceso_menu=$request->ip();
+                    $acceso_menu_padre->usuario_acceso_menu=$request->user()->nick_usuario;
                     $acceso_menu_padre->update();
                 }
             }else{
@@ -146,13 +147,19 @@ class RolController extends Controller
                 $new_menu_parent->estado_acceso_menu=1;
                 $new_menu_parent->ip_acceso_menu=$request->ip();
                 $new_menu_parent->fecha_reg_acceso_menu=Carbon::now();
+                $new_menu_parent->usuario_acceso_menu=$request->user()->nick_usuario;
                 $new_menu_parent->save();
             }
             if($acceso_menu_hijo){
                 if($acceso_menu_hijo->estado_acceso_menu==0){
                     $acceso_menu_hijo->estado_acceso_menu=1;
+                    $acceso_menu_hijo->insertar_acceso_menu=$request->input('modalData.insertar');
+                    $acceso_menu_hijo->actualizar_acceso_menu=$request->input('modalData.actualizar');
+                    $acceso_menu_hijo->eliminar_acceso_menu=$request->input('modalData.eliminar');
+                    $acceso_menu_hijo->ejecutar_acceso_menu=$request->input('modalData.ejecutar');
                     $acceso_menu_hijo->fecha_mod_acceso_menu=Carbon::now();
                     $acceso_menu_hijo->ip_acceso_menu=$request->ip();
+                    $acceso_menu_hijo->usuario_acceso_menu=$request->user()->nick_usuario;
                     $acceso_menu_hijo->update();
                 }
             }else{
@@ -160,11 +167,12 @@ class RolController extends Controller
                 $new_menu_children->id_rol=$id_rol;
                 $new_menu_children->id_menu=$id_children_menu;
                 $new_menu_children->estado_acceso_menu=1;
-                $new_menu_children->insertar_acceso_menu=1;
-                $new_menu_children->actualizar_acceso_menu=1;
-                $new_menu_children->eliminar_acceso_menu=1;
-                $new_menu_children->ejecutar_acceso_menu=1;
-                $acceso_menu_hijo->ip_acceso_menu=$request->ip();
+                $new_menu_children->insertar_acceso_menu=$request->input('modalData.insertar');
+                $new_menu_children->actualizar_acceso_menu=$request->input('modalData.actualizar');
+                $new_menu_children->eliminar_acceso_menu=$request->input('modalData.eliminar');
+                $new_menu_children->ejecutar_acceso_menu=$request->input('modalData.ejecutar');
+                $new_menu_children->ip_acceso_menu=$request->ip();
+                $new_menu_children->usuario_acceso_menu=$request->user()->nick_usuario;
                 $new_menu_children->fecha_reg_acceso_menu=Carbon::now();
                 $new_menu_children->save();
             }
@@ -177,6 +185,7 @@ class RolController extends Controller
                     $user->pivot->ip_permiso_usuario=$request->ip();
                     $user->pivot->fecha_mod_permiso_usuario=Carbon::now();
                     $user->pivot->estado_permiso_usuario=1;
+                    $user->pivot->usuario_permiso_usuario=$request->user()->nick_usuario;
                     $user->pivot->update();
                 }
             }else{
@@ -184,6 +193,7 @@ class RolController extends Controller
             }
             $rol->fecha_mod_rol=Carbon::now();
             $rol->ip_rol=$request->ip();
+            $rol->usuario_rol=$request->user()->nick_usuario;
             $rol->update();
             $menu=Menu::find($id_children_menu);
             return ['mensaje' => 'Guardado menu '.$menu->nombre_menu.' con exito','update' => $update_table];
@@ -195,6 +205,7 @@ class RolController extends Controller
             $acceso_menu->estado_acceso_menu=0;
             $acceso_menu->fecha_mod_acceso_menu=Carbon::now();
             $acceso_menu->ip_acceso_menu=$request->ip();
+            $acceso_menu->usuario_acceso_menu=$request->user()->nick_usuario;
             $acceso_menu->update();
             $children_menu=Menu::find($id_children_menu);
             $parent_menu=$children_menu->parentMenu;
@@ -209,6 +220,7 @@ class RolController extends Controller
                 $access_parent = AccesoMenu::where('id_menu','=',$parent_menu->id_menu)->where('id_rol','=',$id_rol)->first();
                 $access_parent->fecha_mod_acceso_menu=Carbon::now();
                 $access_parent->ip_acceso_menu=$request->ip();
+                $access_parent->usuario_acceso_menu=$request->user()->nick_usuario;
                 $access_parent->estado_acceso_menu=0;
                 $access_parent->update();
             }
@@ -225,6 +237,7 @@ class RolController extends Controller
                 $rol->estado_rol=0;
                 $rol->ip_rol=$request->ip();
                 $rol->fecha_mod_rol=Carbon::now();
+                $rol->usuario_rol=$request->user()->nick_usuario;
                 $rol->update();
                 //Desactivate rol if it's necessary
                 $update_table=true;
@@ -266,6 +279,7 @@ class RolController extends Controller
             $new_rol->estado_rol=1;
             $new_rol->fecha_reg_rol=Carbon::now();
             $new_rol->ip_rol=$request->ip();
+            $new_rol->usuario_rol=$request->user()->nick_usuario;
             $new_rol->save();
             
             foreach($menus as $menu){
@@ -273,12 +287,13 @@ class RolController extends Controller
                 $new_acceso_menu->id_rol=$new_rol->id_rol;
                 $new_acceso_menu->id_menu=$menu['id'];
                 $new_acceso_menu->estado_acceso_menu=1;
-                $new_acceso_menu->insertar_acceso_menu=1;
-                $new_acceso_menu->actualizar_acceso_menu=1;
-                $new_acceso_menu->eliminar_acceso_menu=1;
-                $new_acceso_menu->ejecutar_acceso_menu=1;
+                $new_acceso_menu->insertar_acceso_menu=$menu['insertar'];
+                $new_acceso_menu->actualizar_acceso_menu=$menu['actualizar'];
+                $new_acceso_menu->eliminar_acceso_menu=$menu['eliminar'];
+                $new_acceso_menu->ejecutar_acceso_menu=$menu['ejecutar'];
                 $new_acceso_menu->ip_acceso_menu=$request->ip();
                 $new_acceso_menu->fecha_reg_acceso_menu=Carbon::now();
+                $new_acceso_menu->usuario_acceso_menu=$request->user()->nick_usuario;
                 $new_acceso_menu->save();
 
                 $acceso_menu_padre = AccesoMenu::where('id_rol','=',$new_rol->id_rol)->where('id_menu','=',$menu['id_menu_padre'])->first();
@@ -289,9 +304,23 @@ class RolController extends Controller
                     $new_acceso_padre->estado_acceso_menu=1;
                     $new_acceso_padre->ip_acceso_menu=$request->ip();
                     $new_acceso_padre->fecha_reg_acceso_menu=Carbon::now();
+                    $new_acceso_padre->usuario_acceso_menu=$request->user()->nick_usuario;
                     $new_acceso_padre->save();
                 }
             }
             return['mensaje' => 'Guardado rol '.$nombre_rol.' con exito'];
+    }
+
+    public function updatePermits(Request $request){
+        $acceso_menu = AccesoMenu::find($request->id_acceso_menu);
+        $acceso_menu->insertar_acceso_menu=$request->insertar;
+        $acceso_menu->actualizar_acceso_menu=$request->actualizar;
+        $acceso_menu->eliminar_acceso_menu=$request->eliminar;
+        $acceso_menu->ejecutar_acceso_menu=$request->ejecutar;
+        $acceso_menu->fecha_mod_acceso_menu=Carbon::now();
+        $acceso_menu->ip_acceso_menu=$request->ip();
+        $acceso_menu->usuario_acceso_menu=$request->user()->nick_usuario;
+        $acceso_menu->update();
+        return['mensaje' => 'Permisos actualizados con exito.'];
     }
 }

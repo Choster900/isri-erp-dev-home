@@ -35,12 +35,12 @@ import axios from 'axios';
               <LabelToInput icon="date" />
             </div>
           </div>
-          <div class="mb-4 md:mr-2 md:mb-0 basis-1/4"><!-- TODO:ARREGARL SEARCH -->
+          <!-- <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
             <TextInput :label-input="false" id="search-user" type="text" v-model="tableData.search"
               placeholder="Buscar Rol" @update:modelValue="getRoles()">
               <LabelToInput icon="search" forLabel="search-user" />
             </TextInput>
-          </div>
+          </div> -->
           <h2 class="font-semibold text-slate-800 pt-1">Total Roles <span class="text-slate-400 font-medium">{{
           tableData.total
         }}</span></h2>
@@ -48,22 +48,23 @@ import axios from 'axios';
       </header>
 
       <div class="overflow-x-auto">
-        <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy">
+        <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" 
+        @sort="sortBy" @datos-enviados="handleData($event)">
           <tbody class="text-sm divide-y divide-slate-200">
             <tr v-for="rol in roles" :key="rol.id_rol">
-              <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+              <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800">{{ rol.id_rol }}</div>
               </td>
-              <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+              <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800">{{ rol.nombre_sistema }}</div>
               </td>
-              <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+              <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800">{{ rol.nombre_rol }}</div>
               </td>
-              <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+              <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800">{{ moment(rol.fecha_reg_rol).format('dddd Do MMMM YYYY - HH:mm:ss') }}</div>
               </td>
-              <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+              <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800">
                   <div v-if="(rol.estado_rol == 1)"
                     class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
@@ -75,7 +76,7 @@ import axios from 'axios';
                   </div>
                 </div>
               </td>
-              <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+              <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="space-x-1">
                   <button v-if="permits.actualizar==1" @click="getSelectsRolMenu(rol.id_rol)" class="text-slate-400 hover:text-slate-500 rounded-full">
                     <span class="sr-only">Edit</span>
@@ -176,6 +177,10 @@ export default {
     return {
       permits : [],
       modalData: {
+        insertar:false,
+        actualizar:false,
+        eliminar:false,
+        ejecutar:false,
         rolMenus: [],
         id_rol: "",
         nombre_rol: "",
@@ -186,22 +191,27 @@ export default {
         id_menu: "",
       },
       modalDataCreate: {
+        insertar:false,
+        actualizar:false,
+        eliminar:false,
+        ejecutar:false,
         //The name of the new role.
         nombre_rol: '',
         //List of all registered systems
         sistemas: [],
         //Selected system Id
-        id_sistema: "",
+        id_sistema: '',
         //Select parents menus
         parentsMenu: [],
         //This is the identifier of the parent menu
-        id_menu: "",
+        id_menu: '',
         //This is the name of the selected parent menu.
         nombre_parent_menu: '',
         //Array of children's menu
         childrenMenus: [],
         //Id of the selected child menu
-        id_childrenMenu: "",
+        id_childrenMenu: '',
+        name_childrenMenu:'',
         //List of selected child menus.
         menus: [],
         //Property to disable system select.
@@ -248,7 +258,15 @@ export default {
           this.modalDataCreate.sistemas = response.data.sistemas
           this.showModalCreate = true
         })
-        .catch((errors) => console.log(errors))
+        .catch((errors) => {
+          let msg = this.manageError(errors)
+            this.$swal.fire({
+              title: 'Operación cancelada',
+              text: msg,
+              icon: 'warning',
+              timer:5000
+            })
+        })
     },
     closeModalCreate() {
       this.showModalCreate = false
@@ -264,6 +282,10 @@ export default {
       this.modalDataCreate.nombre_rol = ''
       this.modalDataCreate.menus = []
       this.modalDataCreate.select_sistema = false
+      this.modalDataCreate.insertar=false
+      this.modalDataCreate.actualizar=false
+      this.modalDataCreate.eliminar=false
+      this.modalDataCreate.ejecutar=false
     },
 
     //Methods for ModalRoles
@@ -279,6 +301,10 @@ export default {
       this.modalData.id_childrenMenu = ""
       this.modalData.childrenMenus = ""
       this.modalData.id_menu = ""
+      this.modalData.insertar=0
+      this.modalData.actualizar=0
+      this.modalData.eliminar=0
+      this.modalData.ejecutar=0
     },
 
     //Methods for datatable
@@ -308,7 +334,15 @@ export default {
               })
               this.getRoles('http://127.0.0.1:8000/roles?page=' + this.tableData.currentPage);
             })
-            .catch((errors) => console.log(errors))
+            .catch((errors) => {
+            let msg = this.manageError(errors)
+            this.$swal.fire({
+              title: 'Operación cancelada',
+              text: msg,
+              icon: 'warning',
+              timer:5000
+            })
+            })
         }
       })
     },
@@ -329,8 +363,15 @@ export default {
           this.roles = data.data.data;
         }
       }).catch((errors) => {
-        console.log(errors.response.data);
-      });
+          let msg = this.manageError(errors)
+          this.$swal.fire({
+            title: 'Operación cancelada',
+            text: msg,
+            icon: 'warning',
+            timer:5000
+          })
+          //console.log(errors);
+        })
     },
     sortBy(key) {
       if (key != "Acciones") {
@@ -344,6 +385,11 @@ export default {
     getIndex(array, key, value) {
       return array.findIndex((i) => i[key] == value);
     },
+    handleData(myEventData) {
+      console.log(myEventData);
+      this.tableData.search = myEventData;
+      this.getRoles()
+    }
   },
 };
 </script>

@@ -62,26 +62,31 @@ import Targets from '@/Components-ISRI/Targets.vue';
             </div>
           </div>
         </div>
-        <div class="mb-4">Permisos para el Submenú seleccionado:</div>
+        <div class="mb-2">Permisos para el Submenú seleccionado:</div>
         <div class="mb-4 md:flex flex-row">
           <div class="mb-4 md:mr-2 md:mb-0">
-            <label for="checbox1" class="text-sm font-bold text-gray-700">Insertar
+            <label for="checbox1" class="text-sm font-bold text-gray-700">Insertar(I)
             </label>
-            <checkbox class="mr-3" id="checbox1" />
-            <label for="checbox2" class="text-sm font-bold text-gray-700">Actualizar
+            <checkbox v-model="modalDataCreate.insertar" v-bind:checked="modalDataCreate.insertar" class="mr-3" id="checbox1" />
+            <label for="checbox2" class="text-sm font-bold text-gray-700">Actualizar(U)
             </label>
-            <checkbox class="mr-3" id="checbox2" />
-            <label for="checbox3" class="text-sm font-bold text-gray-700">Eliminar
+            <checkbox v-model="modalDataCreate.actualizar" v-bind:checked="modalDataCreate.actualizar" class="mr-3" id="checbox2" />
+            <label for="checbox3" class="text-sm font-bold text-gray-700">Eliminar(D)
             </label>
-            <checkbox class="mr-3" id="checbox3" />
-            <label for="checbox4" class="text-sm font-bold text-gray-700">Ejecutar
+            <checkbox v-model="modalDataCreate.eliminar" v-bind:checked="modalDataCreate.eliminar" class="mr-3" id="checbox3" />
+            <label for="checbox4" class="text-sm font-bold text-gray-700">Ejecutar(E)
             </label>
-            <checkbox class="mr-3" id="checbox4" />
+            <checkbox v-model="modalDataCreate.ejecutar" v-bind:checked="modalDataCreate.ejecutar" class="mr-3" id="checbox4" />
         </div>
         </div>
         <div class="mb-4 md:flex flex-row justify-center">
           <div class="mb-4 md:mr-2 md:mb-0 px-1">
-            <GeneralButton @click="saveRol()" color="bg-green-700  hover:bg-green-800" text="Guardar" icon="add" />
+            <GeneralButton @click="addMenu()" color="bg-blue-700  hover:bg-blue-800" text="Agregar Menu" icon="add" />
+          </div>
+        </div>
+        <div class="mb-4 md:flex flex-row justify-center">
+          <div class="mb-4 md:mr-2 md:mb-0 px-1">
+            <GeneralButton @click="saveRol()" color="bg-green-700  hover:bg-green-800" text="Guardar Rol" icon="add" />
           </div>
           <div class="mb-4 md:mr-2 md:mb-0 px-1">
             <GeneralButton text="Cancelar" icon="add" @click="$emit('cerrar-modal')" />
@@ -96,6 +101,7 @@ import Targets from '@/Components-ISRI/Targets.vue';
                 <th class="rounded-tl-lg">#</th>
                 <th>MENU</th>
                 <th>SUBMENU</th>
+                <th>PERMISOS</th>
                 <th class="rounded-tr-lg">ACCIONES</th>
               </tr>
             </thead>
@@ -104,6 +110,12 @@ import Targets from '@/Components-ISRI/Targets.vue';
                 <td class="text-center">{{ menu.id }}</td>
                 <td class="text-center">{{ menu.menu_padre }}</td>
                 <td class="text-center">{{ menu.menu }}</td>
+                <td class="text-center">
+                  {{ menu.insertar == 1 ? "/I" : '' }}
+                  {{ menu.actualizar == 1 ? "/U" : '' }}
+                  {{ menu.eliminar == 1 ? "/D" : '' }}
+                  {{ menu.ejecutar == 1 ? "/E" : '' }}
+                </td>
                 <td class="text-center">
                   <div class="space-x-1">
                     <button @click="deleteMenu(menu.id, menu.id_menu_padre, menu.menu_padre)"
@@ -140,7 +152,6 @@ export default {
   methods: {
     //Methods for creating a new role
     cleanModalCreateInputs() {
-      this.$emit('cerrar-modal')
       this.modalDataCreate.sistemas = []
       this.modalDataCreate.id_sistema = ''
       this.modalDataCreate.parentsMenu = []
@@ -150,6 +161,71 @@ export default {
       this.modalDataCreate.nombre_rol = ''
       this.modalDataCreate.menus = []
       this.modalDataCreate.select_sistema = false
+      this.modalDataCreate.insertar=false
+      this.modalDataCreate.actualizar=false
+      this.modalDataCreate.eliminar=false
+      this.modalDataCreate.ejecutar=false
+    },
+    addMenu(){
+      let formValid=true
+      let msg
+      if(this.modalDataCreate.id_menu==''){
+        msg='Debe seleccionar Menú.'
+        formValid=false
+      }else{
+        if(this.modalDataCreate.id_childrenMenu==''){
+          msg='Debe seleccionar Submenú.'
+          formValid=false
+        }else{
+          if(this.modalDataCreate.insertar==false && this.modalDataCreate.actualizar==false && this.modalDataCreate.eliminar==false &&this.modalDataCreate.ejecutar==false){
+            msg='Debe seleccionar por lo menos un permiso.'
+            formValid=false
+          }
+        }
+      }
+      if(!formValid){
+        this.$swal.fire({
+          title: 'Información incompleta',
+          text: msg,
+          icon: 'warning',
+          timer: 5000
+        })
+      }else{
+        //Insertando nuevo array en tabla de menus
+        var array = {
+          id: this.modalDataCreate.id_childrenMenu,
+          id_menu_padre: this.modalDataCreate.id_menu,
+          menu_padre: this.modalDataCreate.nombre_parent_menu, 
+          menu: this.modalDataCreate.name_childrenMenu,
+          insertar:this.modalDataCreate.insertar,
+          actualizar:this.modalDataCreate.actualizar,
+          eliminar:this.modalDataCreate.eliminar,
+          ejecutar:this.modalDataCreate.ejecutar
+        }
+        this.modalDataCreate.menus.push(array)
+        this.modalDataCreate.id_childrenMenu = ''
+        this.modalDataCreate.name_childrenMenu= ''
+        this.modalDataCreate.insertar=false
+        this.modalDataCreate.actualizar=false
+        this.modalDataCreate.eliminar=false
+        this.modalDataCreate.ejecutar=false
+        this.modalDataCreate.childrenMenus.forEach((value, index) => {
+          if (value.value == array.id) {
+            this.modalDataCreate.childrenMenus.splice(index, 1)
+          }
+        })
+        //Verificando si el select de menus hijos esta vacio para borrar el respectivo menu padre
+        if (this.modalDataCreate.childrenMenus == '') {
+          this.modalDataCreate.parentsMenu.forEach((value, index) => {
+            if (value.value == this.modalDataCreate.id_menu) {
+              this.modalDataCreate.parentsMenu.splice(index, 1)
+              this.modalDataCreate.id_menu = ""
+              this.modalDataCreate.id_childrenMenu = ""
+            }
+          })
+          this.modalDataCreate.id_menu = ''
+      }
+      }
     },
     getParentMenu() {
       this.modalDataCreate.select_sistema = true
@@ -175,7 +251,6 @@ export default {
           finalLabel = value.label
         }
       })
-      this.modalDataCreate.id_childrenMenu = null
       this.modalDataCreate.nombre_parent_menu = finalLabel
       axios.get('/children-menus', { params: this.modalDataCreate })
         .then((response) => {
@@ -201,37 +276,15 @@ export default {
         })
     },
     getChildren(data, event) {
-
       let finalLabel
       data.forEach((value, index) => {
         if (value.value == event) {
           finalLabel = value.label
         }
       })
-      //Insertando nuevo array en tabla de menus
-      var array = {
-        id: this.modalDataCreate.id_childrenMenu,
-        id_menu_padre: this.modalDataCreate.id_menu,
-        menu_padre: this.modalDataCreate.nombre_parent_menu, menu: finalLabel
-      }
-      this.modalDataCreate.menus.push(array)
-      this.modalDataCreate.id_childrenMenu = ""
-      this.modalDataCreate.childrenMenus.forEach((value, index) => {
-        if (value.value == array.id) {
-          this.modalDataCreate.childrenMenus.splice(index, 1)
-        }
-      })
-      //Verificando si el select de menus hijos esta vacio para borrar el respectivo menu padre
-      if (this.modalDataCreate.childrenMenus == '') {
-        this.modalDataCreate.parentsMenu.forEach((value, index) => {
-          if (value.value == this.modalDataCreate.id_menu) {
-            this.modalDataCreate.parentsMenu.splice(index, 1)
-            this.modalDataCreate.id_menu = ""
-            this.modalDataCreate.id_childrenMenu = ""
-          }
-        })
-        this.modalDataCreate.id_menu = ''
-      }
+      this.modalDataCreate.name_childrenMenu=finalLabel
+      
+      
 
     },
     deleteMenu(id_menu, id_padre, nombre_padre) {
@@ -276,15 +329,16 @@ export default {
             axios.post("/create-rol", {
               id_sistema: this.modalDataCreate.id_sistema,
               nombre_rol: this.modalDataCreate.nombre_rol,
-              menus: this.modalDataCreate.menus
+              menus: this.modalDataCreate.menus,
             }).then((response) => {
               this.$swal.fire({
                 text: response.data.mensaje,
                 icon: 'success',
                 timer: 3000
               })
-              this.cleanModalCreateInputs()
+              //this.cleanModalCreateInputs()
               this.$emit("update-table")
+              this.$emit('cerrar-modal')
             }).catch((errors) => {
             let msg = this.manageError(errors)
             this.$swal.fire({
