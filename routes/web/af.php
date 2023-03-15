@@ -1,8 +1,15 @@
 <?php
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\ActivoFijo\MarcaController;
 
 Route::group(['middleware' => ['auth','access']], function () {
+    Route::get('af/marcas', function () {
+        return Inertia::render('ActivoFijo/Marcas', [
+            'menu' => session()->get('menu')
+        ]);
+    })->name('af.marcas');
+    
     Route::get('af/mayores', function () {
         return Inertia::render('ActivoFijo/BienesMayores', [
             'menu' => session()->get('menu')
@@ -32,4 +39,11 @@ Route::group(['middleware' => ['auth','access']], function () {
             'menu' => session()->get('menu')
         ]);
     })->name('hijo1af');
+
+    //Manage Marcas
+    //This route obtains marcas based on the parameters sent from the page.
+    Route::get('marcas', [MarcaController::class, 'getMarcas'])->name('marca.getMarcas');
+    Route::post('change-state-brand', [MarcaController::class, 'changeStateBrand'])->name('marca.changeStateBrand');
+    Route::post('save-brand', [MarcaController::class, 'saveBrand'])->name('user.saveBrand');
+    Route::post('update-brand', [MarcaController::class, 'updateBrand'])->name('marca.updateBrand');
 });

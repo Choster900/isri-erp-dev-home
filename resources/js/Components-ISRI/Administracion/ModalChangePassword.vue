@@ -44,23 +44,6 @@ export default {
     }
   },
   methods: {
-    almanageError(errors){
-      let code_error = errors.response.status
-      let msg
-      if(code_error==500){
-        console.log(errors.response.data.message);
-        msg = "Error al conectarse con el servidor."
-      }else if(code_error==404){
-        console.log(errors.response.data.message);
-        msg = "Funcionalidad no disponible, consulte con el administrador."
-      }
-      this.$swal.fire({
-        title: 'Operación cancelada',
-        text: msg,
-        icon: 'warning',
-      })
-      this.closeModal()
-    },
     closeModal(){
       this.modalDataChangePassword.password=''
       this.$emit('cerrar-modal')

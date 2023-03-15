@@ -272,7 +272,7 @@ export default {
         })
     },
     getUpdateTable() {
-      this.getUsers('http://127.0.0.1:8000/users?page=' + this.tableData.currentPage);
+      this.getUsers(this.tableData.currentPage);
     },
     changeStateUser(id_usuario,nick_usuario,estado_usuario){
       let msg
@@ -298,7 +298,7 @@ export default {
                 icon: 'success',
                 timer: 2000
               })
-              this.getUsers('http://127.0.0.1:8000/users?page=' + this.tableData.currentPage);
+              this.getUsers(this.tableData.currentPage);
             })
             .catch((errors) => {
               let msg = this.manageError(errors)
@@ -319,11 +319,12 @@ export default {
     async getUsers(url = "/users") {
       this.tableData.draw++;
       await axios.get(url, { params: this.tableData }).then((response) => {
+        this.tableData.currentPage=url
         let data = response.data;
         if (this.tableData.draw == data.draw) {
           this.links = data.data.links;
           this.tableData.total = data.data.total
-          this.tableData.currentPage = data.data.current_page;
+          //this.tableData.currentPage = data.data.current_page;
           this.links[0].label = "Anterior";
           this.links[this.links.length - 1].label = "Siguiente";
           this.users = data.data.data;
