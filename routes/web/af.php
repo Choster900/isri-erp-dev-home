@@ -2,6 +2,7 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\ActivoFijo\MarcaController;
+use App\Http\Controllers\ActivoFijo\ModeloController;
 
 Route::group(['middleware' => ['auth','access']], function () {
     Route::get('af/marcas', function () {
@@ -9,6 +10,11 @@ Route::group(['middleware' => ['auth','access']], function () {
             'menu' => session()->get('menu')
         ]);
     })->name('af.marcas');
+    Route::get('af/modelos', function () {
+        return Inertia::render('ActivoFijo/Modelos', [
+            'menu' => session()->get('menu')
+        ]);
+    })->name('af.modelos');
     
     Route::get('af/mayores', function () {
         return Inertia::render('ActivoFijo/BienesMayores', [
@@ -41,9 +47,12 @@ Route::group(['middleware' => ['auth','access']], function () {
     })->name('hijo1af');
 
     //Manage Marcas
-    //This route obtains marcas based on the parameters sent from the page.
     Route::get('marcas', [MarcaController::class, 'getMarcas'])->name('marca.getMarcas');
     Route::post('change-state-brand', [MarcaController::class, 'changeStateBrand'])->name('marca.changeStateBrand');
     Route::post('save-brand', [MarcaController::class, 'saveBrand'])->name('user.saveBrand');
     Route::post('update-brand', [MarcaController::class, 'updateBrand'])->name('marca.updateBrand');
+
+    //Manage Modelos
+    Route::get('modelos', [ModeloController::class, 'getModelos'])->name('modelo.getModelos');
+    Route::post('change-state-model', [ModeloController::class, 'changeStateModel'])->name('modelo.changeStateModel');
 });
