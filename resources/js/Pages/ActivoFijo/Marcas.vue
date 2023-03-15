@@ -4,7 +4,7 @@ import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
-import ModalAdminMarcaVue from '@/Components-ISRI/Administracion/ModalAdminMarca.vue';
+import ModalAdminMarcaVue from '@/Components-ISRI/ActivoFijo/ModalAdminMarca.vue';
 import moment from 'moment';
 
 import { toast } from 'vue3-toastify';

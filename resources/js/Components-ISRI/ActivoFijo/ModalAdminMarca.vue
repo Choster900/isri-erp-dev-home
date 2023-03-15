@@ -91,14 +91,23 @@ export default {
               this.$emit('get-table')
               this.$emit('cerrar-modal')
             }).catch((errors) => {
-              let msg = this.manageError(errors)
-              this.$swal.fire({
-                title: 'Operación cancelada',
-                text: msg,
-                icon: 'warning',
-                timer:5000
-              })
-              this.$emit('cerrar-modal')
+              if(errors.response.status===422){
+                this.$swal.fire({
+                  title: 'Error en la petición',
+                  html: errors.response.data,
+                  icon: 'warning',
+                  timer:5000
+                })
+              }else{
+                let msg = this.manageError(errors)
+                this.$swal.fire({
+                  title: 'Operación cancelada',
+                  text: msg,
+                  icon: 'warning',
+                  timer:5000
+                })
+                this.$emit('cerrar-modal')
+              }
             })
           }
         })
@@ -137,14 +146,24 @@ export default {
               this.$emit('get-table')
               this.$emit('cerrar-modal')
             }).catch((errors) => {
-              let msg = this.manageError(errors)
-              this.$swal.fire({
-                title: 'Operación cancelada',
-                text: msg,
-                icon: 'warning',
-                timer:5000
-              })
-              this.$emit('cerrar-modal')
+              if(errors.response.status===422){
+                this.$swal.fire({
+                  title: 'Error en la petición',
+                  html: errors.response.data,
+                  icon: 'warning',
+                  timer:5000
+                })
+                this.brand.name_brand=this.modalData.nombre_marca
+              }else{
+                let msg = this.manageError(errors)
+                this.$swal.fire({
+                  title: 'Operación cancelada',
+                  text: msg,
+                  icon: 'warning',
+                  timer:5000
+                })
+                this.$emit('cerrar-modal')
+              }
             })
           }
         })

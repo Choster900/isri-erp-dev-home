@@ -46,23 +46,35 @@ class MarcaController extends Controller
     }
 
     public function saveBrand(Request $request){
-        $marca = new Marca();
-        $marca->nombre_marca=$request->brand;
-        $marca->estado_marca=1;
-        $marca->fecha_reg_marca=Carbon::now();
-        $marca->ip_marca=$request->ip();
-        $marca->usuario_marca=$request->user()->nick_usuario;
-        $marca->save();
-        return ['mensaje' => 'Marca guardada con éxito'];
+        $marca=Marca::where('nombre_marca','=',$request->brand)->first();
+        if($marca){
+            $mensaje= 'El nombre de marca "'.$request->brand.'" ya existe, intente nuevamente';
+            return response()->json($mensaje,422);
+        }else{
+            $new_marca = new Marca();
+            $new_marca->nombre_marca=$request->brand;
+            $new_marca->estado_marca=1;
+            $new_marca->fecha_reg_marca=Carbon::now();
+            $new_marca->ip_marca=$request->ip();
+            $new_marca->usuario_marca=$request->user()->nick_usuario;
+            $new_marca->save();
+            return ['mensaje' => 'Marca guardada con éxito'];
+        }
     }
 
     public function updateBrand(Request $request){
-        $marca = Marca::find($request->id_brand);
-        $marca->nombre_marca=$request->name_brand;
-        $marca->fecha_mod_marca=Carbon::now();
-        $marca->ip_marca=$request->ip();
-        $marca->usuario_marca=$request->user()->nick_usuario;
-        $marca->update();
-        return ['mensaje' => 'Marca actualizada con éxito'];
+        $old_marca=Marca::where('nombre_marca','=',$request->name_brand)->first();
+        if($old_marca){
+            $mensaje= 'El nombre de marca "'.$request->name_brand.'" ya existe, intente nuevamente';
+            return response()->json($mensaje,422);
+        }else{
+            $marca = Marca::find($request->id_brand);
+            $marca->nombre_marca=$request->name_brand;
+            $marca->fecha_mod_marca=Carbon::now();
+            $marca->ip_marca=$request->ip();
+            $marca->usuario_marca=$request->user()->nick_usuario;
+            $marca->update();
+            return ['mensaje' => 'Marca actualizada con éxito'];
+        }
     }
 }
