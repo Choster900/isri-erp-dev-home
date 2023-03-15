@@ -3,12 +3,8 @@ import Modal from "@/Components/Modal.vue";
 import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
-import GeneralButton from '@/Components-ISRI/ComponentsToForms/GeneralButton.vue';
-import TextInput from '@/Components-ISRI/ComponentsToForms/TextInput.vue';
-import LabelToInput from '@/Components-ISRI/ComponentsToForms/LabelToInput.vue';
 import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
-import ModalRolesVue from '@/Components-ISRI/Administracion/ModalRoles.vue';
-import ModalCreateRoleVue from '@/Components-ISRI/Administracion/ModalCreateRole.vue';
+import ModalAdminMarcaVue from '@/Components-ISRI/Administracion/ModalAdminMarca.vue';
 import moment from 'moment';
 
 import { toast } from 'vue3-toastify';
@@ -23,7 +19,7 @@ import axios from 'axios';
   <AppLayoutVue>
     <div class="sm:flex sm:justify-end sm:items-center mb-2">
       <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-        <GeneralButton v-if="permits.insertar==1" @click="createRol()" color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add" />
+        <GeneralButton @click="addBrand()" v-if="permits.insertar==1" color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add" />
       </div>
     </div>
     <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
@@ -31,17 +27,11 @@ import axios from 'axios';
         <div class="mb-4 md:flex flex-row justify-items-start">
           <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
             <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-              <Multiselect v-model="tableData.length" @select="getRoles()" :options="perPage" :searchable="true" />
+              <Multiselect v-model="tableData.length" @select="getBrands()" :options="perPage" :searchable="true" />
               <LabelToInput icon="date" />
             </div>
           </div>
-          <!-- <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
-            <TextInput :label-input="false" id="search-user" type="text" v-model="tableData.search"
-              placeholder="Buscar Rol" @update:modelValue="getRoles()">
-              <LabelToInput icon="search" forLabel="search-user" />
-            </TextInput>
-          </div> -->
-          <h2 class="font-semibold text-slate-800 pt-1">Total Roles <span class="text-slate-400 font-medium">{{
+          <h2 class="font-semibold text-slate-800 pt-1">Total Marcas <span class="text-slate-400 font-medium">{{
           tableData.total
         }}</span></h2>
         </div>
@@ -51,22 +41,19 @@ import axios from 'axios';
         <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" 
         @sort="sortBy" @datos-enviados="handleData($event)">
           <tbody class="text-sm divide-y divide-slate-200">
-            <tr v-for="rol in roles" :key="rol.id_rol">
+            <tr v-for="brand in brands" :key="brand.id_marca">
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                <div class="font-medium text-slate-800">{{ rol.id_rol }}</div>
+                <div class="font-medium text-slate-800">{{ brand.id_marca }}</div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                <div class="font-medium text-slate-800">{{ rol.nombre_sistema }}</div>
+                <div class="font-medium text-slate-800">{{ brand.nombre_marca }}</div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                <div class="font-medium text-slate-800">{{ rol.nombre_rol }}</div>
-              </td>
-              <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                <div class="font-medium text-slate-800">{{ moment(rol.fecha_reg_rol).format('dddd Do MMMM YYYY - HH:mm:ss') }}</div>
+                <div class="font-medium text-slate-800">{{ moment(brand.fecha_reg_marca).format('dddd Do MMMM YYYY - HH:mm:ss') }}</div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800">
-                  <div v-if="(rol.estado_rol == 1)"
+                  <div v-if="(brand.estado_marca == 1)"
                     class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
                     Activo
                   </div>
@@ -78,7 +65,7 @@ import axios from 'axios';
               </td>
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="space-x-1">
-                  <button v-if="permits.actualizar==1" @click="getSelectsRolMenu(rol.id_rol)" class="text-slate-400 hover:text-slate-500 rounded-full">
+                  <button @click="editBrand(brand)" v-if="permits.actualizar==1" class="text-slate-400 hover:text-slate-500 rounded-full">
                     <span class="sr-only">Edit</span>
                     <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
                       <path
@@ -86,7 +73,7 @@ import axios from 'axios';
                       </path>
                     </svg>
                   </button>
-                  <button v-if="permits.eliminar==1" @click="desactiveRol(rol.id_rol, rol.nombre_rol, rol.estado_rol)"
+                  <button @click="changeStateBrand(brand.id_marca,brand.nombre_marca,brand.estado_marca)" v-if="permits.eliminar==1" 
                     class="text-rose-500 hover:text-rose-600 rounded-full">
                     <span class="sr-only">Delete</span><svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
                       <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
@@ -105,11 +92,9 @@ import axios from 'axios';
       </div>
     </div>
 
-    <div class="px-6 py-8 bg-white shadow-lg
-                 rounded-sm border-slate-200 relative">
+    <div class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
       <div>
         <nav class="flex justify-between" role="navigation" aria-label="Navigation">
-
           <div class="grow text-center">
             <ul class="inline-flex text-sm font-medium -space-x-px">
               <li v-for="link in links" :key="link.label">
@@ -117,7 +102,7 @@ import axios from 'axios';
                   :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
 
                   <div class="flex-1 text-right ml-2">
-                    <a @click="getRoles(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                    <a @click="getBrands(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                   text-indigo-500">
                       &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                     </a>
@@ -126,7 +111,7 @@ import axios from 'axios';
                 <span v-else-if="(link.label == 'Siguiente')"
                   :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                   <div class="flex-1 text-right ml-2">
-                    <a @click="getRoles(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                    <a @click="getBrands(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                   text-indigo-500">
                       <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                     </a>
@@ -134,7 +119,7 @@ import axios from 'axios';
                 </span>
                 <span class="cursor-pointer" v-else
                   :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
-                    class=" w-5" @click="getRoles(link.url)">{{ link.label }}</span>
+                    class=" w-5" @click="getBrands(link.url)">{{ link.label }}</span>
                 </span>
               </li>
             </ul>
@@ -143,87 +128,40 @@ import axios from 'axios';
       </div>
     </div>
 
-    <ModalRolesVue :modalVar="modalVar" :showModal="showModal" :modalData="modalData" @cerrar-modal="closeVars"
-      @abrir-modal="showModal = true" @update-table="getUpdateTable()" />
-
-    <ModalCreateRoleVue :showModalCreate="showModalCreate" :modalDataCreate="modalDataCreate" @update-table="getUpdateTable()"
-      @cerrar-modal="closeModalCreate()" @abrir-modal="showModalCreate = true" />
+    <ModalAdminMarcaVue :showModal="showModal" :modalData="modalData"
+            @cerrar-modal="showModal=false" @get-table="this.getBrands(this.tableData.currentPage)"/>
 
   </AppLayoutVue>
+  
 </template>
 
 <script>
 export default {
   created() {
-    this.getRoles()
+    this.getBrands()
     this.getPermits()
   },
-  data: function (data) {
+  data(){
     let sortOrders = {};
     let columns = [
-      { width: "5%", label: "ID", name: "id_rol" },
-      { width: "20%", label: "Nombre Sistema", name: "nombre_sistema" },
-      { width: "25%", label: "Nombre Rol", name: "nombre_rol" },
-      { width: "30%", label: "Fecha Registro", name: "fecha_reg_rol" },
-      { width: "10%", label: "Estado", name: "estado_rol" },
+      { width: "10%", label: "ID", name: "id_marca" },
+      { width: "40%", label: "Nombre Marca", name: "nombre_marca" },
+      { width: "25%", label: "Fecha Registro", name: "fecha_reg_marca" },
+      { width: "15%", label: "Estado", name: "estado_marca" },
       { width: "10%", label: "Acciones", name: "Acciones" },
     ];
     columns.forEach((column) => {
-      if (column.name === 'id_rol')
+      if (column.name === 'id_marca')
         sortOrders[column.name] = 1;
       else
         sortOrders[column.name] = -1;
     });
     return {
       permits : [],
-      modalData: {
-        insertar:false,
-        actualizar:false,
-        eliminar:false,
-        ejecutar:false,
-        rolMenus: [],
-        id_rol: "",
-        nombre_rol: "",
-        id_menus_rol: [],
-        childrenMenus: [],
-        id_childrenMenu: "",
-        menus: "",
-        id_menu: "",
-      },
-      modalDataCreate: {
-        insertar:false,
-        actualizar:false,
-        eliminar:false,
-        ejecutar:false,
-        //The name of the new role.
-        nombre_rol: '',
-        //List of all registered systems
-        sistemas: [],
-        //Selected system Id
-        id_sistema: '',
-        //Select parents menus
-        parentsMenu: [],
-        //This is the identifier of the parent menu
-        id_menu: '',
-        //This is the name of the selected parent menu.
-        nombre_parent_menu: '',
-        //Array of children's menu
-        childrenMenus: [],
-        //Id of the selected child menu
-        id_childrenMenu: '',
-        name_childrenMenu:'',
-        //List of selected child menus.
-        menus: [],
-        //Property to disable system select.
-        select_sistema: false
-      },
-      showModal: false,
-      showModalCreate: false,
-      modalVar: false,
-      roles: [],
+      brands: [],
       links: [],
       columns: columns,
-      sortKey: "id_rol",
+      sortKey: "id_marca",
       sortOrders: sortOrders,
       perPage: ["10", "20", "30"],
       tableData: {
@@ -235,85 +173,26 @@ export default {
         dir: "asc",
         total: ""
       },
-    };
+      showModal:false,
+      modalData : []
+    }
   },
-  methods: {
-    getPermits(){
-      var URLactual = window.location.pathname
-      let data = this.$page.props.menu;
-      let menu = JSON.parse(JSON.stringify(data['urls']))
-      menu.forEach((value, index) => {
-        value.submenu.forEach((value2, index2) => {
-          if(value2.url===URLactual){
-            var array = {'insertar':value2.insertar,'actualizar':value2.actualizar,'eliminar':value2.eliminar,'ejecutar':value2.ejecutar}
-            this.permits = array
-          }
-        })
-      })
+  methods:{
+    editBrand(brand){
+      //var array = {nombre_marca:marca.nombre_marca}
+      this.modalData = brand
+      this.showModal=true
     },
-    //Methods for creating a new role
-    async createRol() {
-      await axios.get("/systems-all")
-        .then((response) => {
-          this.modalDataCreate.sistemas = response.data.sistemas
-          this.showModalCreate = true
-        })
-        .catch((errors) => {
-          let msg = this.manageError(errors)
-            this.$swal.fire({
-              title: 'Operación cancelada',
-              text: msg,
-              icon: 'warning',
-              timer:5000
-            })
-        })
+    addBrand(){
+      this.modalData=[]
+      this.showModal=true
     },
-    closeModalCreate() {
-      this.showModalCreate = false
-      this.cleanModalInputsCreate()
-    },
-    cleanModalInputsCreate() {
-      this.modalDataCreate.sistemas = []
-      this.modalDataCreate.id_sistema = ''
-      this.modalDataCreate.parentsMenu = []
-      this.modalDataCreate.id_menu = ''
-      this.modalDataCreate.nombre_parent_menu = ''
-      this.modalDataCreate.childrenMenus = []
-      this.modalDataCreate.nombre_rol = ''
-      this.modalDataCreate.menus = []
-      this.modalDataCreate.select_sistema = false
-      this.modalDataCreate.insertar=false
-      this.modalDataCreate.actualizar=false
-      this.modalDataCreate.eliminar=false
-      this.modalDataCreate.ejecutar=false
-    },
-
-    //Methods for ModalRoles
-    getUpdateTable() {
-      this.getRoles(this.tableData.currentPage);
-    },
-    closeVars() {
-      this.showModal = false
-      this.modalVar = false
-      this.cleanModalInputs()
-    },
-    cleanModalInputs() {
-      this.modalData.id_childrenMenu = ""
-      this.modalData.childrenMenus = ""
-      this.modalData.id_menu = ""
-      this.modalData.insertar=0
-      this.modalData.actualizar=0
-      this.modalData.eliminar=0
-      this.modalData.ejecutar=0
-    },
-
-    //Methods for datatable
-    desactiveRol(id_rol, nombre_rol, estado_rol) {
+    changeStateBrand(id_brand,name_brand,state_brand){
       let msg
-      estado_rol == 1 ? msg = "Desactivar" : msg = "Activar"
+      state_brand == 1 ? msg = "Desactivar" : msg = "Activar"
       this.$swal.fire({
-        title: msg + ' Rol ' + nombre_rol + ' para todos los usuarios',
-        text: "Estas seguro?",
+        title: msg + ' Marca ' + name_brand + '.',
+        text: "¿Estas seguro?",
         icon: 'warning',
         showCancelButton: true,
         cancelButtonText: 'Cancelar',
@@ -322,9 +201,9 @@ export default {
         confirmButtonText: 'Si, ' + msg
       }).then((result) => {
         if (result.isConfirmed) {
-          axios.post("/change-state-role-all", {
-            id_rol: id_rol,
-            estado_rol: estado_rol
+          axios.post("/change-state-brand", {
+            id_brand: id_brand,
+            state_brand: state_brand
           })
             .then((response) => {
               this.$swal.fire({
@@ -332,7 +211,7 @@ export default {
                 icon: 'success',
                 timer: 2000
               })
-              this.getRoles(this.tableData.currentPage);
+              this.getBrands(this.tableData.currentPage);
             })
             .catch((errors) => {
             let msg = this.manageError(errors)
@@ -346,23 +225,17 @@ export default {
         }
       })
     },
-    getSelectsRolMenu(identificador) {
-      this.modalVar = true;
-      this.modalData.id_rol = identificador;
-    },
-    async getRoles(url = "/roles") {
-      this.tableData.currentPage=url
+    async getBrands(url = "/marcas") {
       this.tableData.draw++;
+      this.tableData.currentPage=url
       await axios.get(url, { params: this.tableData }).then((response) => {
         let data = response.data;
         if (this.tableData.draw == data.draw) {
           this.links = data.data.links;
-          console.log(data);
           this.tableData.total = data.data.total;
-          //this.tableData.currentPage = data.last_page_url;
           this.links[0].label = "Anterior";
           this.links[this.links.length - 1].label = "Siguiente";
-          this.roles = data.data.data;
+          this.brands = data.data.data;
         }
       }).catch((errors) => {
           let msg = this.manageError(errors)
@@ -381,17 +254,30 @@ export default {
         this.sortOrders[key] = this.sortOrders[key] * -1;
         this.tableData.column = this.getIndex(this.columns, "name", key);
         this.tableData.dir = this.sortOrders[key] === 1 ? "asc" : "desc";
-        this.getRoles();
+        this.getBrands();
       }
     },
     getIndex(array, key, value) {
       return array.findIndex((i) => i[key] == value);
     },
+    getPermits(){
+      var URLactual = window.location.pathname
+      let data = this.$page.props.menu;
+      let menu = JSON.parse(JSON.stringify(data['urls']))
+      menu.forEach((value, index) => {
+        value.submenu.forEach((value2, index2) => {
+          if(value2.url===URLactual){
+            var array = {'insertar':value2.insertar,'actualizar':value2.actualizar,'eliminar':value2.eliminar,'ejecutar':value2.ejecutar}
+            this.permits = array
+          }
+        })
+      })
+    },
     handleData(myEventData) {
       console.log(myEventData);
       this.tableData.search = myEventData;
-      this.getRoles()
+      this.getBrands()
     }
-  },
-};
+  }
+}
 </script>

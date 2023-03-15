@@ -4,11 +4,10 @@ import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import axios from 'axios';
-import Targets from '@/Components-ISRI/Targets.vue';
 </script>
 
 <template>
-  <ModalVue :show="showModalCreate" @close-modal="$emit('cerrar-modal')" title="Creacion de Rol "
+  <ModalVue :show="showModal" @close-modal="$emit('cerrar-modal')" title="Creacion de Rol "
   @close="$emit('cerrar-modal')">
   <div class="px-5 pt-4 pb-1">
     <div class="text-sm">
