@@ -7,7 +7,7 @@ import axios from 'axios';
 </script>
 
 <template>
-  <ModalVue :show="showModal" @close-modal="$emit('cerrar-modal')" title="Creacion de Rol "
+  <ModalVue :show="showModalCreate" @close-modal="$emit('cerrar-modal')" title="Creacion de Rol "
   @close="$emit('cerrar-modal')">
   <div class="px-5 pt-4 pb-1">
     <div class="text-sm">

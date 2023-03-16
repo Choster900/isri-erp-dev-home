@@ -21,4 +21,9 @@ class Marca extends Model
         'ip_marca',
         'usuario_marca'
     ];
+
+    public function modelos()
+    {
+        return $this->hasMany('App\Models\Modelo','id_marca','id_marca');
+    }
 }
