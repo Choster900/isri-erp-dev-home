@@ -17,8 +17,7 @@ class UserController extends Controller
 {
     public function getUsers(Request $request)
     {
-            $columns = ['usuario.id_usuario', 'nombre_persona','pnombre_persona','snombre_persona',
-                        'tnombre_persona','papellido_persona','sapellido_persona','tapellido_persona',
+            $columns = ['usuario.id_usuario','pnombre_persona',
                         'dui_persona','nick_usuario', 'estado_usuario'
                         ];
 

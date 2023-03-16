@@ -15,7 +15,7 @@ import axios from 'axios';
                 <div class="mb-4 md:flex flex-row justify-center">
                     <div class="md:mr-2 md:mb-0 basis-1/2">
 
-                        <TextInput id="nombre-marca" v-model="brand.name_brand" :value="brand.name_brand"
+                        <TextInput id="nombre-marca" :label-input="false" v-model="brand.name_brand" :value="brand.name_brand"
                             type="text" placeholder="Nombre Marca">
                             <LabelToInput icon="personalInformation" forLabel="nombre-marca" />
                         </TextInput>

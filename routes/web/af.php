@@ -49,10 +49,13 @@ Route::group(['middleware' => ['auth','access']], function () {
     //Manage Marcas
     Route::get('marcas', [MarcaController::class, 'getMarcas'])->name('marca.getMarcas');
     Route::post('change-state-brand', [MarcaController::class, 'changeStateBrand'])->name('marca.changeStateBrand');
-    Route::post('save-brand', [MarcaController::class, 'saveBrand'])->name('user.saveBrand');
+    Route::post('save-brand', [MarcaController::class, 'saveBrand'])->name('marca.saveBrand');
     Route::post('update-brand', [MarcaController::class, 'updateBrand'])->name('marca.updateBrand');
 
     //Manage Modelos
     Route::get('modelos', [ModeloController::class, 'getModelos'])->name('modelo.getModelos');
     Route::post('change-state-model', [ModeloController::class, 'changeStateModel'])->name('modelo.changeStateModel');
+    Route::post('save-model', [ModeloController::class, 'saveModel'])->name('modelo.saveModel');
+    Route::get('get-brands', [ModeloController::class, 'getBrands'])->name('modelo.getBrands');
+    Route::post('update-model', [ModeloController::class, 'updateModel'])->name('modelo.updateModelo');
 });

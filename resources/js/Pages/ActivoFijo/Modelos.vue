@@ -4,6 +4,7 @@ import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
+import ModalAdminModeloVue from '@/Components-ISRI/ActivoFijo/ModalAdminModelo.vue';
 import moment from 'moment';
 
 import { toast } from 'vue3-toastify';
@@ -18,7 +19,7 @@ import axios from 'axios';
   <AppLayoutVue>
     <div class="sm:flex sm:justify-end sm:items-center mb-2">
       <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-        <GeneralButton @click="addBrand()" v-if="permits.insertar==1" color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add" />
+        <GeneralButton @click="addModel()" v-if="permits.insertar==1" color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add" />
       </div>
     </div>
     <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
@@ -67,7 +68,7 @@ import axios from 'axios';
               </td>
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="space-x-1">
-                  <button @click="editBrand(model)" v-if="permits.actualizar==1" class="text-slate-400 hover:text-slate-500 rounded-full">
+                  <button @click="editModel(model)" v-if="permits.actualizar==1" class="text-slate-400 hover:text-slate-500 rounded-full">
                     <span class="sr-only">Edit</span>
                     <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
                       <path
@@ -75,7 +76,7 @@ import axios from 'axios';
                       </path>
                     </svg>
                   </button>
-                  <button @click="changeStateModel(model.id_modelo,model.nombre_modelo,model.estado_modelo)" v-if="permits.eliminar==1" 
+                  <button @click="changeStateModel(model)" v-if="permits.eliminar==1" 
                     class="text-rose-500 hover:text-rose-600 rounded-full">
                     <span class="sr-only">Delete</span><svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
                       <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
@@ -130,8 +131,8 @@ import axios from 'axios';
       </div>
     </div>
 
-    <!-- <ModalAdminModeloVue :showModal="showModal" :modalData="modalData"
-            @cerrar-modal="showModal=false" @get-table="this.getModels(this.tableData.currentPage)"/> -->
+    <ModalAdminModeloVue :showModal="showModal" :modalData="modalData"
+            @cerrar-modal="showModal=false" @get-table="this.getModels(this.tableData.currentPage)"/>
 
   </AppLayoutVue>
   
@@ -177,56 +178,73 @@ export default {
         total: ""
       },
       showModal:false,
-      modalData : []
+      modalData : [],
     }
   },
   methods:{
-    // editBrand(model){
-    //   //var array = {nombre_marca:marca.nombre_marca}
-    //   this.modalData = model
-    //   this.showModal=true
-    // },
-    // addBrand(){
-    //   this.modalData=[]
-    //   this.showModal=true
-    // },
-    changeStateModel(id_model,name_model,state_model){
-      let msg
-      state_model == 1 ? msg = "Desactivar" : msg = "Activar"
-      this.$swal.fire({
-        title: msg + ' Modelo ' + name_model + '.',
-        text: "¿Estas seguro?",
-        icon: 'warning',
-        showCancelButton: true,
-        cancelButtonText: 'Cancelar',
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Si, ' + msg
-      }).then((result) => {
-        if (result.isConfirmed) {
-          axios.post("/change-state-model", {
-            id_model: id_model,
-            state_model: state_model
-          })
-            .then((response) => {
-              this.$swal.fire({
-                text: response.data.mensaje,
-                icon: 'success',
-                timer: 2000
-              })
-              this.getModels(this.tableData.currentPage);
+    editModel(model){
+      if(model.estado_marca==0){
+        this.$swal.fire({
+          title: 'Operación cancelada',
+          text: 'Debes activar la marca para este modelo.',
+          icon: 'warning',
+          timer:5000
+        })
+      }else{
+        this.modalData = model
+        this.showModal=true
+      }
+    },
+    addModel(){
+      this.modalData=[]
+      this.showModal=true
+    },
+    changeStateModel(model){
+      if(model.estado_marca==0){
+        this.$swal.fire({
+          title: 'Operación cancelada',
+          text: 'Debes activar la marca para este modelo.',
+          icon: 'warning',
+          timer:5000
+        })
+      }else{
+        let msg
+        model.estado_modelo == 1 ? msg = "Desactivar" : msg = "Activar"
+        this.$swal.fire({
+          title: msg + ' Modelo ' + model.nombre_modelo + '.',
+          text: "¿Estas seguro?",
+          icon: 'warning',
+          showCancelButton: true,
+          cancelButtonText: 'Cancelar',
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Si, ' + msg
+        }).then((result) => {
+          if (result.isConfirmed) {
+            axios.post("/change-state-model", {
+              id_model: model.id_modelo,
+              state_model: model.estado_modelo
             })
-            .catch((errors) => {
-                let msg = this.manageError(errors)
+              .then((response) => {
                 this.$swal.fire({
-                title: 'Operación cancelada',
-                text: msg,
-                icon: 'warning',
-                timer:5000
+                  text: response.data.mensaje,
+                  icon: 'success',
+                  timer: 2000
                 })
-            })
-        }
-      })
+                this.getModels(this.tableData.currentPage);
+              })
+              .catch((errors) => {
+                  let msg = this.manageError(errors)
+                  this.$swal.fire({
+                  title: 'Operación cancelada',
+                  text: msg,
+                  icon: 'warning',
+                  timer:5000
+                  })
+              })
+          }
+        })
+      }
     },
     async getModels(url = "/modelos") {
       this.tableData.draw++;

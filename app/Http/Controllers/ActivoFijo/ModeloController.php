@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 use App\Models\Modelo;
+use App\Models\Marca;
+use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\ActivoFijo\ModeloRequest;
 use Carbon\Carbon;
 
 class ModeloController extends Controller
@@ -48,5 +51,36 @@ class ModeloController extends Controller
         $modelo->usuario_modelo=$request->user()->nick_usuario;
         $modelo->update();
         return ['mensaje' => $msg.' modelo '.$modelo->nombre_modelo.' con exito'];
+    }
+
+    public function getBrands(Request $request){
+        $brands = Marca::select('id_marca as value','nombre_marca as label')
+                ->where('estado_marca','=',1)
+                ->orderBy('nombre_marca')
+                ->get();
+        return ['brands' => $brands];
+    }
+
+    public function saveModel(ModeloRequest $request){
+        $new_model = new Modelo();
+        $new_model->id_marca = $request->id_brand;
+        $new_model->nombre_modelo = $request->name_model;
+        $new_model->estado_modelo = 1;
+        $new_model->fecha_reg_modelo = Carbon::now();
+        $new_model->usuario_modelo = $request->user()->nick_usuario;
+        $new_model->ip_modelo = $request->ip();
+        $new_model->save();
+        return ['mensaje' => 'Modelo '.$request->name_model.' guardado con éxito.'];
+    }
+
+    public function updateModel(ModeloRequest $request){
+        $model = Modelo::find($request->id_model);
+        $model->id_marca = $request->id_brand;
+        $model->nombre_modelo = $request->name_model;
+        $model->fecha_mod_modelo = Carbon::now();
+        $model->usuario_modelo = $request->user()->nick_usuario;
+        $model->ip_modelo = $request->ip();
+        $model->update();
+        return ['mensaje' => 'Modelo '.$request->name_model.' actualizado con éxito.'];
     }
 }

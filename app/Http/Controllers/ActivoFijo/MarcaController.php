@@ -42,6 +42,7 @@ class MarcaController extends Controller
         $marca->fecha_mod_marca=Carbon::now();
         $marca->usuario_marca=$request->user()->nick_usuario;
         $marca->update();
+        
         return ['mensaje' => $msg.' marca '.$marca->nombre_marca.' con exito'];
     }
 
