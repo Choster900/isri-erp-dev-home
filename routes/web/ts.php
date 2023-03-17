@@ -22,5 +22,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('update-supplier', [ProveedorController::class, 'updateDataSupplier'])->name('update-supplier');
     Route::post('add-supplier', [ProveedorController::class, 'addDataSupplier'])->name('add-supplier');
     Route::post('change-values-retencion/{id_sujeto_retencion}', [ProveedorController::class, 'changeValueRetencion'])->name('change-values-retencion');
+    Route::post('update-state-supplier', [ProveedorController::class, 'changeStateSupplier'])->name('change-values-retencion');
+    
 
 });

@@ -2,14 +2,16 @@
 import { Head } from "@inertiajs/vue3";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import ModalSuppliersVue from '@/Components-ISRI/Tesoreria/ModalSuppliers.vue';
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';  
 </script>
 <template>
     <Head title="Administracion" />
     <AppLayoutVue>
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton v-if="permits.insertar==1" @click="addDataSupplier()" color="bg-green-700  hover:bg-green-800" text="Agregar Elemento"
-                    icon="add" />
+                <GeneralButton v-if="permits.insertar == 1" @click="addDataSupplier()"
+                    color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add" />
             </div>
         </div>
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
@@ -47,15 +49,28 @@ import ModalSuppliersVue from '@/Components-ISRI/Tesoreria/ModalSuppliers.vue';
                             </td>
 
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px wrap">
-                                <div class="font-medium text-slate-800 text-center">{{ proveedor.razon_social_proveedor }}</div>
+                                <div class="font-medium text-slate-800 text-center">{{ proveedor.razon_social_proveedor }}
+                                </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">{{ proveedor.nombre_comercial_proveedor }}</div>
+                                <div class="font-medium text-slate-800 text-center">{{ proveedor.nombre_comercial_proveedor
+                                }}</div>
                             </td>
-
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800">
+                                    <div v-if="(proveedor.estado_proveedor == 1)"
+                                        class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
+                                        Activo
+                                    </div>
+                                    <div v-else
+                                        class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-rose-100 text-rose-600">
+                                        Inactivo
+                                    </div>
+                                </div>
+                            </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="space-x-1">
-                                    <button v-if="permits.actualizar==1" @click.stop="getSuppiler(proveedor.id_proveedor)"
+                                    <button v-if="permits.actualizar == 1" @click.stop="getSuppiler(proveedor.id_proveedor)"
                                         class="text-slate-400 hover:text-slate-500 rounded-full">
                                         <span class="sr-only">Edit</span>
                                         <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
@@ -65,7 +80,9 @@ import ModalSuppliersVue from '@/Components-ISRI/Tesoreria/ModalSuppliers.vue';
                                         </svg>
                                     </button>
                                     <!-- CAMBIAR ICONO DE BOTON POR QUE VA A SER ACTIVAR Y DESCATIVAR -->
-                                    <button v-if="permits.eliminar==1" class="text-rose-500 hover:text-rose-600 rounded-full">
+                                    <button class="text-rose-500 hover:text-rose-600 rounded-full"
+                                        v-if="permits.eliminar == 1"
+                                        @click="enableStateForSupplier(proveedor.id_proveedor, proveedor.estado_proveedor)">
                                         <span class="sr-only">Delete</span><svg class="w-8 h-8 fill-current"
                                             viewBox="0 0 32 32">
                                             <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
@@ -95,7 +112,7 @@ import ModalSuppliersVue from '@/Components-ISRI/Tesoreria/ModalSuppliers.vue';
                                     <div class="flex-1 text-right ml-2">
                                         <a @click="getSuppilers(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                                                                                                                                          text-indigo-500">
+                                                                                                                                                                                                                                                                                                                                                                                                      text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
                                     </div>
@@ -105,7 +122,7 @@ import ModalSuppliersVue from '@/Components-ISRI/Tesoreria/ModalSuppliers.vue';
                                     <div class="flex-1 text-right ml-2">
                                         <a @click="getSuppilers(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                                                                                                                                          text-indigo-500">
+                                                                                                                                                                                                                                                                                                                                                                                                      text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
                                     </div>
@@ -136,10 +153,17 @@ export default {
     data: function (data) {
         let sortOrders = {};
         let columns = [
-            { width: "10%", label: "Id", name: "id_proveedor" },
-            { width: "20%", label: "Documentos", name: "dui_proveedor" },
-            { width: "30%", label: "Razon social", name: "razon_social_proveedor" },
-            { width: "30%", label: "Nombre comercial", name: "nombre_comercial_proveedor" },
+            { width: "10%", label: "Id", name: "id_proveedor", type: "text" },
+            { width: "20%", label: "Documentos", name: "dui_proveedor", type: "text" },
+            { width: "30%", label: "Razon social", name: "razon_social_proveedor", type: "text" },
+            { width: "30%", label: "Nombre comercial", name: "nombre_comercial_proveedor", type: "text" },
+            {
+                width: "30%", label: "Estado", name: "estado_proveedor", type: "select",
+                options: [
+                    { value: "1", label: "Activo" },
+                    { value: "0", label: "Inactivo" }
+                ]
+            },
             { width: "25%", label: "Acciones", name: "Acciones" },
         ];
         columns.forEach((column) => {
@@ -149,7 +173,7 @@ export default {
                 sortOrders[column.name] = -1;
         });
         return {
-            permits : [],
+            permits: [],
             scrollbarModalOpen: false,
             proveedores: [],
             links: [],
@@ -183,15 +207,15 @@ export default {
         async getSuppilers(url = "/proveedores") {
             this.lastUrl = url;
             this.tableData.draw++;
-            await axios.get(url, { params: this.tableData}).then((response) => {
-                 let data = response.data;
-                 if (this.tableData.draw == data.draw) {
-                     this.links = data.data.links;
-                     this.pagination.total = data.data.total
-                     this.links[0].label = "Anterior";
-                     this.links[this.links.length - 1].label = "Siguiente";
-                     this.proveedores = data.data.data;
-                 }
+            await axios.get(url, { params: this.tableData }).then((response) => {
+                let data = response.data;
+                if (this.tableData.draw == data.draw) {
+                    this.links = data.data.links;
+                    this.pagination.total = data.data.total
+                    this.links[0].label = "Anterior";
+                    this.links[this.links.length - 1].label = "Siguiente";
+                    this.proveedores = data.data.data;
+                }
                 console.log(response.data);
             }).catch((errors) => {
                 console.log(errors);
@@ -223,21 +247,57 @@ export default {
             this.scrollbarModalOpen = !this.scrollbarModalOpen
 
         },
+        async enable(id_persona, estado) {
+            await axios.post("/update-state-supplier", { id_proveedor: id_persona, estado_proveedor: estado })
+                .then(res => {
+                    console.log(res)
+                })
+                .catch(err => {
+                    console.error(err);
+                })
+            this.getSuppilers(this.lastUrl)//llamamos de nuevo el metodo para que actualize la tabla 
+        },
+
+        enableStateForSupplier(id_proveedor, estado) {
+            let state = estado == 0 ? 'habilitar' : 'deshabilitar'
+            this.$swal.fire({
+                title: '¿Esta seguro de ' + state + ' el registro ?',
+                icon: 'question',
+                iconHtml: '❓',
+                confirmButtonText: 'Si, ' + state + '',
+                confirmButtonColor: '#001b47',
+                cancelButtonText: 'Cancelar',
+                showCancelButton: true,
+                showCloseButton: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.enable(id_proveedor, estado)//peticion async hace la modificacion 
+                    //no la llamamos en el mismo metodo por que dejaria de ser asyn y hay problema al momento de actulizar la tabla
+                    toast.info("Hecho", {
+                        autoClose: 5000,
+                        position: "top-right",
+                        transition: "bounce",
+                        toastBackgroundColor: "white",
+                        icon: "✔️",
+                    });
+                }
+            })
+        },
         handleData(myEventData) {
             console.log(myEventData);
             this.tableData.search = myEventData;
             this.getSuppilers()
         },
-        getPermits(){
+        getPermits() {
             var URLactual = window.location.pathname
             let data = this.$page.props.menu;
             let menu = JSON.parse(JSON.stringify(data['urls']))
             menu.forEach((value, index) => {
                 value.submenu.forEach((value2, index2) => {
-                if(value2.url===URLactual){
-                    var array = {'insertar':value2.insertar,'actualizar':value2.actualizar,'eliminar':value2.eliminar,'ejecutar':value2.ejecutar}
-                    this.permits = array
-                }
+                    if (value2.url === URLactual) {
+                        var array = { 'insertar': value2.insertar, 'actualizar': value2.actualizar, 'eliminar': value2.eliminar, 'ejecutar': value2.ejecutar }
+                        this.permits = array
+                    }
                 })
             })
         },

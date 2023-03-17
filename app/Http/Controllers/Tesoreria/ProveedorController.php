@@ -22,7 +22,7 @@ class ProveedorController extends Controller
             'id_tipo_contribuyente',
             'id_sujeto_retencion',
             'razon_social_proveedor',
-            'nombre_comercial_proveedor',
+            'estado_proveedor',
             'nombre_comercial_proveedor',
         ];
 
@@ -40,7 +40,8 @@ class ProveedorController extends Controller
             $v_query->where('id_proveedor', 'like', '%' . $data["id_proveedor"] . '%')
                 ->where('dui_proveedor', 'like', '%' . $data["dui_proveedor"] . '%')
                 ->where('razon_social_proveedor', 'like', '%' . $data["razon_social_proveedor"] . '%')
-                ->where('nombre_comercial_proveedor', 'like', '%' . $data["nombre_comercial_proveedor"] . '%');
+                ->where('nombre_comercial_proveedor', 'like', '%' . $data["nombre_comercial_proveedor"] . '%')
+                ->where('estado_proveedor', 'like', '%' . $data["estado_proveedor"] . '%');
         }
 
         $v_roles = $v_query->paginate($v_length)->onEachSide(1);
@@ -155,10 +156,9 @@ class ProveedorController extends Controller
     public function changeStateSupplier(Request $request)
     {
         $v_dataSupplier = Proveedor::find($request->id_proveedor);
-        Proveedor::where("id_proveedor", $request->input("id_proveedor"))->update([
-            'estado_persona' => $v_dataSupplier["estado_proveedor"] != 1 ? 1 : 0, //si es diferente de 1 ingresamos 1 => Activo de lo contrario 0 =>inactivo
+        return Proveedor::where("id_proveedor", $request->input("id_proveedor"))->update([
+            'estado_proveedor' => $v_dataSupplier["estado_proveedor"] != 1 ? 1 : 0, //si es diferente de 1 ingresamos 1 => Activo de lo contrario 0 =>inactivo
         ]);
-        return $v_dataSupplier["estado_persona"];
 
     }
 }

@@ -16,16 +16,16 @@ class RolController extends Controller
 {
     public function getRoles(Request $request)
     {
-            $columns = ['id_rol', 'nombre_sistema', 'nombre_rol','fecha_reg_rol','estado_rol'];
+        $columns = ['id_rol', 'nombre_sistema', 'nombre_rol', 'fecha_reg_rol', 'estado_rol'];
 
-            $length = $request->input('length');
-            $column = $request->input('column'); //Index
-            $dir = $request->input('dir');
-            $search_value = $request->input('search');
-            
-            $query = Rol::select('rol.id_rol as id_rol', 'sistema.nombre_sistema as nombre_sistema', 'rol.nombre_rol as nombre_rol', 'rol.fecha_reg_rol as fecha_reg_rol', 'rol.estado_rol as estado_rol')
-                    ->join('sistema', 'rol.id_sistema', '=', 'sistema.id_sistema')
-                    ->orderBy($columns[$column], $dir);
+        $length = $request->input('length');
+        $column = $request->input('column'); //Index
+        $dir = $request->input('dir');
+        $search_value = $request->input('search');
+
+        $query = Rol::select('rol.id_rol as id_rol', 'sistema.nombre_sistema as nombre_sistema', 'rol.nombre_rol as nombre_rol', 'rol.fecha_reg_rol as fecha_reg_rol', 'rol.estado_rol as estado_rol')
+            ->join('sistema', 'rol.id_sistema', '=', 'sistema.id_sistema')
+            ->orderBy($columns[$column], $dir);
 
             if ($search_value) {
                     $query->where('nombre_rol', 'like', '%' . $search_value['nombre_rol'] . '%')
@@ -34,8 +34,8 @@ class RolController extends Controller
                         ->where('nombre_sistema', 'like', '%' . $search_value['nombre_sistema'] . '%');      
             }
 
-            $roles = $query->paginate($length)->onEachSide(1);
-            return ['data' => $roles, 'draw' => $request->input('draw')];
+        $roles = $query->paginate($length)->onEachSide(1);
+        return ['data' => $roles, 'draw' => $request->input('draw')];
     }
 
     public function changeStateRolAll(Request $request){
@@ -59,71 +59,73 @@ class RolController extends Controller
             $rol->update();
             return ['mensaje' => $msg.' rol '.$rol->nombre_rol.' con exito'];
     }
-    public function getMenusEditRol(Request $request){
-            $id = $request->input('id_rol');
-            $rol = Rol::find($id);
-            $sistema = Sistema::find($rol->id_sistema);
-            
-            $id_menus_asignados=[];
-            $menus_asignados = $rol->menus->load('parentMenu')
-                ->where('estado_menu','=',1)
-                ->where('id_menu_padre','<>',null)
-                ->where('pivot.estado_acceso_menu','=',1);
+    public function getMenusEditRol(Request $request)
+    {
+        $id = $request->input('id_rol');
+        $rol = Rol::find($id);
+        $sistema = Sistema::find($rol->id_sistema);
 
-            if($menus_asignados!=null){
-                //Arreglo de ids de menus hijos asignados
-                foreach($menus_asignados as $menu){
-                    $id_menus_asignados[]=$menu->id_menu;
-                }
-                //Llenando select de menus padre
-                foreach($sistema->menus->load('childrenMenus') as $menu){
-                    $var=false;
-                    foreach($menu->childrenMenus as $hijo){
-                        if(!(in_array($hijo->id_menu,$id_menus_asignados)) && $menu->estado_menu==1 && $hijo->estado_menu==1){
-                            $var=true;
-                        }
+        $id_menus_asignados = [];
+        $menus_asignados = $rol->menus->load('parentMenu')
+            ->where('estado_menu', '=', 1)
+            ->where('id_menu_padre', '<>', null)
+            ->where('pivot.estado_acceso_menu', '=', 1);
+
+        if ($menus_asignados != null) {
+            //Arreglo de ids de menus hijos asignados
+            foreach ( $menus_asignados as $menu ) {
+                $id_menus_asignados[] = $menu->id_menu;
+            }
+            //Llenando select de menus padre
+            foreach ( $sistema->menus->load('childrenMenus') as $menu ) {
+                $var = false;
+                foreach ( $menu->childrenMenus as $hijo ) {
+                    if (!(in_array($hijo->id_menu, $id_menus_asignados)) && $menu->estado_menu == 1 && $hijo->estado_menu == 1) {
+                        $var = true;
                     }
-                    if($var==true){
-                        $array_roles['value']=$menu->id_menu;
-                        $array_roles['label']=$menu->nombre_menu;
-                        $array_rol[]=$array_roles;
-                    }
                 }
-                if(!(isset($array_rol))){
-                    $array_rol=[];
-                }
-            }else{
-                foreach($sistema->menus as $menu){
-                    if($menu->id_menu_padre==null){
-                        $array_roles['value']=$menu->id_menu;
-                        $array_roles['label']=$menu->nombre_menu;
-                        $array_rol[]=$array_roles;
-                    }
+                if ($var == true) {
+                    $array_roles['value'] = $menu->id_menu;
+                    $array_roles['label'] = $menu->nombre_menu;
+                    $array_rol[] = $array_roles;
                 }
             }
-            return ['rolMenus' => $menus_asignados, 'menus' => $array_rol, 'id_menus_asignados' => $id_menus_asignados, 'nombre_rol' =>$rol->nombre_rol];
+            if (!(isset($array_rol))) {
+                $array_rol = [];
+            }
+        } else {
+            foreach ( $sistema->menus as $menu ) {
+                if ($menu->id_menu_padre == null) {
+                    $array_roles['value'] = $menu->id_menu;
+                    $array_roles['label'] = $menu->nombre_menu;
+                    $array_rol[] = $array_roles;
+                }
+            }
+        }
+        return ['rolMenus' => $menus_asignados, 'menus' => $array_rol, 'id_menus_asignados' => $id_menus_asignados, 'nombre_rol' => $rol->nombre_rol];
     }
     //Mismo metodo para Crear Rol y Editar Rol, el array id_menus_rol es utilizado unicamente en el modal ModalRoles
-    public function getChildrenMenus(Request $request){
-            $id_menu = $request->input('id_menu');
-            $menus_asignados = $request->input('id_menus_rol');
-            $menu_padre = Menu::find($id_menu);
-            if(isset($menus_asignados)){
-                foreach($menu_padre->childrenMenus as $menu){
-                    if(!in_array($menu->id_menu,$menus_asignados)){
-                        $array_roles['value']=$menu->id_menu;
-                        $array_roles['label']=$menu->nombre_menu;
-                        $array_rol[]=$array_roles;
-                    }
-                }
-            }else{
-                foreach($menu_padre->childrenMenus as $menu){
-                        $array_roles['value']=$menu->id_menu;
-                        $array_roles['label']=$menu->nombre_menu;
-                        $array_rol[]=$array_roles;
+    public function getChildrenMenus(Request $request)
+    {
+        $id_menu = $request->input('id_menu');
+        $menus_asignados = $request->input('id_menus_rol');
+        $menu_padre = Menu::find($id_menu);
+        if (isset($menus_asignados)) {
+            foreach ( $menu_padre->childrenMenus as $menu ) {
+                if (!in_array($menu->id_menu, $menus_asignados)) {
+                    $array_roles['value'] = $menu->id_menu;
+                    $array_roles['label'] = $menu->nombre_menu;
+                    $array_rol[] = $array_roles;
                 }
             }
-            return ['childrenMenus' => $array_rol];
+        } else {
+            foreach ( $menu_padre->childrenMenus as $menu ) {
+                $array_roles['value'] = $menu->id_menu;
+                $array_roles['label'] = $menu->nombre_menu;
+                $array_rol[] = $array_roles;
+            }
+        }
+        return ['childrenMenus' => $array_rol];
     }
     
     public function saveMenu(Request $request){
@@ -225,13 +227,12 @@ class RolController extends Controller
                 $access_parent->update();
             }
 
-            $rol=Rol::find($id_rol);
-            $menus_disponibles=false;
-            $update_table=false;
-            foreach($rol->menus as $menu){
-                if($menu->pivot->estado_acceso_menu==1){
-                    $menus_disponibles=true;
-                }
+        $rol = Rol::find($id_rol);
+        $menus_disponibles = false;
+        $update_table = false;
+        foreach ( $rol->menus as $menu ) {
+            if ($menu->pivot->estado_acceso_menu == 1) {
+                $menus_disponibles = true;
             }
             if(!$menus_disponibles){
                 $rol->estado_rol=0;
@@ -247,27 +248,29 @@ class RolController extends Controller
     }
 
     //Methods for create Role
-    public function getSystemsAll(Request $request){
-            $sistemas = Sistema::get();
-            $array_sistemas=[];
-            foreach($sistemas as $sistema){
-                $array_sis['value']=$sistema->id_sistema;
-                $array_sis['label']=$sistema->nombre_sistema;
-                $array_sistemas[]=$array_sis;
-            }
-            return ['sistemas'=>$array_sistemas];
+    public function getSystemsAll(Request $request)
+    {
+        $sistemas = Sistema::get();
+        $array_sistemas = [];
+        foreach ( $sistemas as $sistema ) {
+            $array_sis['value'] = $sistema->id_sistema;
+            $array_sis['label'] = $sistema->nombre_sistema;
+            $array_sistemas[] = $array_sis;
+        }
+        return ['sistemas' => $array_sistemas];
     }
-    public function getParentsMenuAll(Request $request){
-            $id_sistema = $request->input('id_sistema');
-            $sistema=Sistema::find($id_sistema);
-            foreach($sistema->menus as $menu){
-                if($menu->id_menu_padre==null && $menu->estado_menu==1){
-                    $array_parent['value']=$menu->id_menu;
-                    $array_parent['label']=$menu->nombre_menu;
-                    $array_parents[]=$array_parent;
-                }
+    public function getParentsMenuAll(Request $request)
+    {
+        $id_sistema = $request->input('id_sistema');
+        $sistema = Sistema::find($id_sistema);
+        foreach ( $sistema->menus as $menu ) {
+            if ($menu->id_menu_padre == null && $menu->estado_menu == 1) {
+                $array_parent['value'] = $menu->id_menu;
+                $array_parent['label'] = $menu->nombre_menu;
+                $array_parents[] = $array_parent;
             }
-            return['parentsMenu'=>$array_parents];
+        }
+        return ['parentsMenu' => $array_parents];
     }
     public function createRol(Request $request){
             $nombre_rol = $request->input('nombre_rol');
