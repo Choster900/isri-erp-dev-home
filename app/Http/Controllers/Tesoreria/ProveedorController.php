@@ -156,10 +156,9 @@ class ProveedorController extends Controller
     public function changeStateSupplier(Request $request)
     {
         $v_dataSupplier = Proveedor::find($request->id_proveedor);
-        Proveedor::where("id_proveedor", $request->input("id_proveedor"))->update([
-            'estado_persona' => $v_dataSupplier["estado_proveedor"] != 1 ? 1 : 0, //si es diferente de 1 ingresamos 1 => Activo de lo contrario 0 =>inactivo
+        return Proveedor::where("id_proveedor", $request->input("id_proveedor"))->update([
+            'estado_proveedor' => $v_dataSupplier["estado_proveedor"] != 1 ? 1 : 0, //si es diferente de 1 ingresamos 1 => Activo de lo contrario 0 =>inactivo
         ]);
-        return $v_dataSupplier["estado_persona"];
 
     }
 }
