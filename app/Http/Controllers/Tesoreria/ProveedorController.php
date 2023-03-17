@@ -22,7 +22,7 @@ class ProveedorController extends Controller
             'id_tipo_contribuyente',
             'id_sujeto_retencion',
             'razon_social_proveedor',
-            'nombre_comercial_proveedor',
+            'estado_proveedor',
             'nombre_comercial_proveedor',
         ];
 
@@ -40,7 +40,8 @@ class ProveedorController extends Controller
             $v_query->where('id_proveedor', 'like', '%' . $data["id_proveedor"] . '%')
                 ->where('dui_proveedor', 'like', '%' . $data["dui_proveedor"] . '%')
                 ->where('razon_social_proveedor', 'like', '%' . $data["razon_social_proveedor"] . '%')
-                ->where('nombre_comercial_proveedor', 'like', '%' . $data["nombre_comercial_proveedor"] . '%');
+                ->where('nombre_comercial_proveedor', 'like', '%' . $data["nombre_comercial_proveedor"] . '%')
+                ->where('estado_proveedor', 'like', '%' . $data["estado_proveedor"] . '%');
         }
 
         $v_roles = $v_query->paginate($v_length)->onEachSide(1);

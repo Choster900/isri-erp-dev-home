@@ -47,12 +47,25 @@ import ModalSuppliersVue from '@/Components-ISRI/Tesoreria/ModalSuppliers.vue';
                             </td>
 
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px wrap">
-                                <div class="font-medium text-slate-800 text-center">{{ proveedor.razon_social_proveedor }}</div>
+                                <div class="font-medium text-slate-800 text-center">{{ proveedor.razon_social_proveedor }}
+                                </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">{{ proveedor.nombre_comercial_proveedor }}</div>
+                                <div class="font-medium text-slate-800 text-center">{{ proveedor.nombre_comercial_proveedor
+                                }}</div>
                             </td>
-
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800">
+                                    <div v-if="(proveedor.estado_proveedor == 1)"
+                                        class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
+                                        Activo
+                                    </div>
+                                    <div v-else
+                                        class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-rose-100 text-rose-600">
+                                        Inactivo
+                                    </div>
+                                </div>
+                            </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="space-x-1">
                                     <button @click.stop="getSuppiler(proveedor.id_proveedor)"
@@ -95,7 +108,7 @@ import ModalSuppliersVue from '@/Components-ISRI/Tesoreria/ModalSuppliers.vue';
                                     <div class="flex-1 text-right ml-2">
                                         <a @click="getSuppilers(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                                                                                                                                          text-indigo-500">
+                                                                                                                                                                                                                                                                                                                                                                                  text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
                                     </div>
@@ -105,7 +118,7 @@ import ModalSuppliersVue from '@/Components-ISRI/Tesoreria/ModalSuppliers.vue';
                                     <div class="flex-1 text-right ml-2">
                                         <a @click="getSuppilers(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                                                                                                                                          text-indigo-500">
+                                                                                                                                                                                                                                                                                                                                                                                  text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
                                     </div>
@@ -135,10 +148,17 @@ export default {
     data: function (data) {
         let sortOrders = {};
         let columns = [
-            { width: "10%", label: "Id", name: "id_proveedor" },
-            { width: "20%", label: "Documentos", name: "dui_proveedor" },
-            { width: "30%", label: "Razon social", name: "razon_social_proveedor" },
-            { width: "30%", label: "Nombre comercial", name: "nombre_comercial_proveedor" },
+            { width: "10%", label: "Id", name: "id_proveedor", type: "text" },
+            { width: "20%", label: "Documentos", name: "dui_proveedor", type: "text" },
+            { width: "30%", label: "Razon social", name: "razon_social_proveedor", type: "text" },
+            { width: "30%", label: "Nombre comercial", name: "nombre_comercial_proveedor", type: "text" },
+            {
+                width: "30%", label: "Estado", name: "estado_proveedor", type: "select",
+                options: [
+                    { value: "1", label: "Activo" },
+                    { value: "0", label: "Inactivo" }
+                ]
+            },
             { width: "25%", label: "Acciones", name: "Acciones" },
         ];
         columns.forEach((column) => {
@@ -181,15 +201,15 @@ export default {
         async getSuppilers(url = "/proveedores") {
             this.lastUrl = url;
             this.tableData.draw++;
-            await axios.get(url, { params: this.tableData}).then((response) => {
-                 let data = response.data;
-                 if (this.tableData.draw == data.draw) {
-                     this.links = data.data.links;
-                     this.pagination.total = data.data.total
-                     this.links[0].label = "Anterior";
-                     this.links[this.links.length - 1].label = "Siguiente";
-                     this.proveedores = data.data.data;
-                 }
+            await axios.get(url, { params: this.tableData }).then((response) => {
+                let data = response.data;
+                if (this.tableData.draw == data.draw) {
+                    this.links = data.data.links;
+                    this.pagination.total = data.data.total
+                    this.links[0].label = "Anterior";
+                    this.links[this.links.length - 1].label = "Siguiente";
+                    this.proveedores = data.data.data;
+                }
                 console.log(response.data);
             }).catch((errors) => {
                 console.log(errors);
