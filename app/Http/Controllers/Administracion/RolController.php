@@ -27,14 +27,26 @@ class RolController extends Controller
             ->join('sistema', 'rol.id_sistema', '=', 'sistema.id_sistema')
             ->orderBy($columns[$column], $dir);
 
-        if ($search_value) {
-            $query->where(function ($query) use ($search_value) {
-                $query->where('nombre_rol', 'like', '%' . $search_value . '%')
-                    ->orWhere('id_rol', 'like', '%' . $search_value . '%')
-                    ->orWhere('fecha_reg_rol', 'like', '%' . $search_value . '%')
-                    ->orWhere('nombre_sistema', 'like', '%' . $search_value . '%');
-            });
+        /* if ($search_value) {
+        $query->where(function ($query) use ($search_value) {
+        $query->where('nombre_rol', 'like', '%' . $search_value . '%')
+        ->orWhere('id_rol', 'like', '%' . $search_value . '%')
+        ->orWhere('fecha_reg_rol', 'like', '%' . $search_value . '%')
+        ->orWhere('nombre_sistema', 'like', '%' . $search_value . '%');
+        });
         }
+        */
+
+        if ($search_value) {
+
+            $query->where('nombre_rol', 'like', '%' . $search_value["nombre_rol"] . '%')
+                ->where('id_rol', 'like', '%' . $search_value["id_rol"] . '%')
+                ->where('fecha_reg_rol', 'like', '%' . $search_value["fecha_reg_rol"] . '%')
+                ->where('nombre_sistema', 'like', '%' . $search_value["nombre_sistema"] . '%')
+                ->where('estado_rol', 'like', '%' . $search_value["estado_rol"] . '%');
+
+        }
+
 
         $roles = $query->paginate($length)->onEachSide(1);
         return ['data' => $roles, 'draw' => $request->input('draw')];
