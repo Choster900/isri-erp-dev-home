@@ -49,7 +49,7 @@ import axios from 'axios';
                 <div class="font-medium text-slate-800">{{ brand.nombre_marca }}</div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                <div class="font-medium text-slate-800">{{ moment(brand.fecha_reg_marca).format('dddd Do MMMM YYYY - HH:mm:ss') }}</div>
+                <div class="font-medium text-slate-800">{{ moment(brand.fecha_reg_marca).format('dddd Do MMMM YYYY') }}</div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800">
@@ -144,10 +144,16 @@ export default {
   data(){
     let sortOrders = {};
     let columns = [
-      { width: "10%", label: "ID", name: "id_marca" },
-      { width: "40%", label: "Nombre Marca", name: "nombre_marca" },
-      { width: "25%", label: "Fecha Registro", name: "fecha_reg_marca" },
-      { width: "15%", label: "Estado", name: "estado_marca" },
+      { width: "10%", label: "ID", name: "id_marca", type: "text" },
+      { width: "40%", label: "Nombre Marca", name: "nombre_marca", type: "text" },
+      { width: "25%", label: "Fecha Registro", name: "fecha_reg_marca", type: "date" },
+      {
+        width: "10%", label: "Estado", name: "estado_marca", type: "select",
+        options: [
+          {value: "1", label: "Activo"},
+          {value: "0", label: "Inactivo"}
+        ]
+      },
       { width: "10%", label: "Acciones", name: "Acciones" },
     ];
     columns.forEach((column) => {
