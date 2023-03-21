@@ -16,26 +16,26 @@ class RolController extends Controller
 {
     public function getRoles(Request $request)
     {
-        $columns = ['id_rol', 'nombre_sistema', 'nombre_rol','fecha_reg_rol','estado_rol'];
+        $columns = ['id_rol', 'nombre_sistema', 'nombre_rol', 'fecha_reg_rol', 'estado_rol'];
+        $length = $request->input('length');
+        $column = $request->input('column'); //Index
+        $dir = $request->input('dir');
+        $search_value = $request->input('search');
 
-            $length = $request->input('length');
-            $column = $request->input('column'); //Index
-            $dir = $request->input('dir');
-            $search_value = $request->input('search');
-            
-            $query = Rol::select('rol.id_rol as id_rol', 'sistema.nombre_sistema as nombre_sistema', 'rol.nombre_rol as nombre_rol', 'rol.fecha_reg_rol as fecha_reg_rol', 'rol.estado_rol as estado_rol')
-                    ->join('sistema', 'rol.id_sistema', '=', 'sistema.id_sistema')
-                    ->orderBy($columns[$column], $dir);
+        $query = Rol::select('rol.id_rol as id_rol', 'sistema.nombre_sistema as nombre_sistema', 'rol.nombre_rol as nombre_rol', 'rol.fecha_reg_rol as fecha_reg_rol', 'rol.estado_rol as estado_rol')
+            ->join('sistema', 'rol.id_sistema', '=', 'sistema.id_sistema')
+            ->orderBy($columns[$column], $dir);
 
-            if ($search_value) {
-                    $query->where('nombre_rol', 'like', '%' . $search_value['nombre_rol'] . '%')
-                        ->where('id_rol', 'like', '%' . $search_value['id_rol'] . '%')
-                        ->where('fecha_reg_rol', 'like', '%' . $search_value['fecha_reg_rol'] . '%')
-                        ->where('nombre_sistema', 'like', '%' . $search_value['nombre_sistema'] . '%');      
-            }
+        if ($search_value) {
+            $query->where('nombre_rol', 'like', '%' . $search_value["nombre_rol"] . '%')
+                ->where('id_rol', 'like', '%' . $search_value["id_rol"] . '%')
+                ->where('fecha_reg_rol', 'like', '%' . $search_value["fecha_reg_rol"] . '%')
+                ->where('nombre_sistema', 'like', '%' . $search_value["nombre_sistema"] . '%')
+                ->where('estado_rol', 'like', '%' . $search_value["estado_rol"] . '%');
+        }
 
-            $roles = $query->paginate($length)->onEachSide(1);
-            return ['data' => $roles, 'draw' => $request->input('draw')];
+        $roles = $query->paginate($length)->onEachSide(1);
+        return ['data' => $roles, 'draw' => $request->input('draw')];
     }
 
     public function changeStateRolAll(Request $request){
