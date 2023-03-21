@@ -63,7 +63,7 @@ import axios from 'axios';
                 <div class="font-medium text-slate-800">{{ rol.nombre_rol }}</div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                <div class="font-medium text-slate-800">{{ moment(rol.fecha_reg_rol).format('dddd Do MMMM YYYY - HH:mm:ss') }}</div>
+                <div class="font-medium text-slate-800">{{ moment(rol.fecha_reg_rol).format('dddd Do MMMM YYYY') }}</div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800">
@@ -163,10 +163,10 @@ export default {
   data: function (data) {
     let sortOrders = {};
     let columns = [
-      { width: "5%", label: "ID", name: "id_rol", type: "text" },
+      { width: "10%", label: "ID", name: "id_rol", type: "text" },
       { width: "20%", label: "Nombre Sistema", name: "nombre_sistema", type: "text" },
       { width: "25%", label: "Nombre Rol", name: "nombre_rol", type: "text" },
-      { width: "30%", label: "Fecha Registro", name: "fecha_reg_rol", type: "date" },
+      { width: "25%", label: "Fecha Registro", name: "fecha_reg_rol", type: "date" },
       {
         width: "10%", label: "Estado", name: "estado_rol", type: "select",
         options: [
@@ -396,7 +396,6 @@ export default {
       return array.findIndex((i) => i[key] == value);
     },
     handleData(myEventData) {
-      console.log(myEventData);
       this.tableData.search = myEventData;
       this.getRoles()
     }

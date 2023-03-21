@@ -26,12 +26,6 @@ import ModalAdministracionPersonasVue from '@/Components-ISRI/Administracion/Mod
                             <LabelToInput icon="date" />
                         </div>
                     </div>
-                    <div class="mb-4 md:mr-2 md:mb-0 basis-1/4"><!-- TODO:ARREGARL SEARCH -->
-                        <TextInput :label-input="false" id="search-user" type="text" v-model="tableData.search"
-                            placeholder="Search Table" @update:modelValue="getPersonas()">
-                            <LabelToInput icon="search" forLabel="search-user" />
-                        </TextInput>
-                    </div>
                     <h2 class="font-semibold text-slate-800 pt-1">Todas las personas <span class="text-slate-400 font-medium">{{
                     pagination.total
                 }}</span></h2>
@@ -39,7 +33,8 @@ import ModalAdministracionPersonasVue from '@/Components-ISRI/Administracion/Mod
              
             </header>
             <div class="overflow-x-auto">
-                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy">
+                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" 
+                @sort="sortBy" @datos-enviados="handleData($event)">
                     <tbody class="text-sm divide-y divide-slate-200">
                         <tr v-for="persona in personas" :key="persona.id_persona">
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
@@ -60,6 +55,11 @@ import ModalAdministracionPersonasVue from '@/Components-ISRI/Administracion/Mod
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800">
+                                    {{ moment(persona.fecha_nac_persona).format('dddd Do MMMM YYYY') }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800">
                                     <div v-if="(persona.estado_persona == 1)"
                                         class="inline-flex font-medium rounded-full text-xs text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
                                         A
@@ -68,11 +68,6 @@ import ModalAdministracionPersonasVue from '@/Components-ISRI/Administracion/Mod
                                         class="inline-flex font-medium rounded-full text-xs text-center px-2.5 py-0.5 bg-rose-100 text-rose-600">
                                         I
                                     </div>
-                                </div>
-                            </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800">
-                                    {{ moment(persona.fecha_nac_persona).format('dddd Do MMMM YYYY') }}
                                 </div>
                             </td>
 
@@ -159,12 +154,18 @@ export default {
     data: function (data) {
         let sortOrders = {};
         let columns = [
-            { width: "10%", label: "Id", name: "id_persona" },
-            { width: "20%", label: "Dui", name: "dui_persona" },
-            { width: "40%", label: "Nombre", name: "snombre_persona" },
-            { width: "10%", label: "Estado", name: "estado_persona" },
-            { width: "25%", label: "Fecha Nacimiento", name: "fecha_nac_persona" },
-            { width: "25%", label: "Acciones", name: "Acciones" },
+            { width: "10%", label: "Id", name: "id_persona", type: "text" },
+            { width: "15%", label: "Dui", name: "dui_persona", type: "text" },
+            { width: "35%", label: "Nombre", name: "nombre_persona", type: "text" },
+            { width: "20%", label: "Fecha Nacimiento", name: "fecha_nac_persona", type: "date" },
+            {
+                width: "10%", label: "Estado", name: "estado_persona", type: "select",
+                options: [
+                {value: "1", label: "Activo"},
+                {value: "0", label: "Inactivo"}
+                ]
+            },
+            { width: "10%", label: "Acciones", name: "Acciones" },
         ];
         columns.forEach((column) => {
             if (column.name === 'id_persona')
@@ -292,6 +293,10 @@ export default {
         AddInformationPerson() {
             this.scrollbarModalOpen = !this.scrollbarModalOpen
             this.infoPerson = []
+        },
+        handleData(myEventData) {
+            this.tableData.search = myEventData;
+            this.getPersonas()
         }
     },
 };

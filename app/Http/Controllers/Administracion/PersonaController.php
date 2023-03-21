@@ -12,44 +12,34 @@ class PersonaController extends Controller
 {
     public function getPersona(Request $request)
     {
-        $v_columns = [
-            'id_persona',
-            'dui_persona',
-            'pnombre_persona',
-            'snombre_persona',
-            'tnombre_persona',
-            'papellido_persona',
-            'sapellido_persona',
-            'tapellido_persona',
-            'fecha_nac_persona',
-            'estado_persona',
-        ];
-        $v_length = $request->input('length');
-        $v_column = $request->input('column'); //Index
-        $v_dir = $request->input('dir');
-        $v_searchValue = $request->input('search');
+        $columns = ['id_persona','dui_persona','pnombre_persona','fecha_nac_persona','estado_persona',];
+        $length = $request->input('length');
+        $column = $request->input('column'); //Index
+        $dir = $request->input('dir');
+        $search_value = $request->input('search');
+        
+        $query = Persona::select('*')
+            ->orderBy($columns[$column], $dir);
 
-        $v_query = DB::table('persona')
-            #->join('sistema', 'rol.id_sistema', '=', 'sistema.id_sistema')
-            ->select('*')
-            ->orderBy($v_columns[$v_column], $v_dir);
-
-        if ($v_searchValue) {
-            $v_query->where(function ($v_query) use ($v_searchValue) {
-                $v_query->where('id_persona', 'like', '%' . $v_searchValue . '%')
-                    ->orWhere('dui_persona', 'like', '%' . $v_searchValue . '%')
-                    ->orWhere('pnombre_persona', 'like', '%' . $v_searchValue . '%')
-                    ->orWhere('snombre_persona', 'like', '%' . $v_searchValue . '%')
-                    ->orWhere('tnombre_persona', 'like', '%' . $v_searchValue . '%')
-                    ->orWhere('papellido_persona', 'like', '%' . $v_searchValue . '%')
-                    ->orWhere('sapellido_persona', 'like', '%' . $v_searchValue . '%')
-                    ->orWhere('tapellido_persona', 'like', '%' . $v_searchValue . '%')
-                    ->orWhere('estado_persona', 'like', '%' . $v_searchValue . '%');
-            });
+        if ($search_value) {
+            $query->where([
+                ['id_persona','like','%'.$search_value['id_persona'].'%'],
+                ['dui_persona','like','%'.$search_value['dui_persona'].'%'],
+                ['fecha_nac_persona','like','%'.$search_value['fecha_nac_persona'].'%'],
+                ['estado_persona','like','%'.$search_value['estado_persona'].'%'],
+                [function ($query) use ($search_value){
+                    $query->where('pnombre_persona', 'like','%' . $search_value['nombre_persona'] . '%')
+                        ->orWhere('snombre_persona', 'like','%' . $search_value['nombre_persona'] . '%')
+                        ->orWhere('tnombre_persona', 'like','%' . $search_value['nombre_persona'] . '%')
+                        ->orWhere('papellido_persona', 'like','%' . $search_value['nombre_persona'] . '%')
+                        ->orWhere('sapellido_persona', 'like','%' . $search_value['nombre_persona'] . '%')
+                        ->orWhere('tapellido_persona', 'like','%' . $search_value['nombre_persona'] . '%');
+                }],
+            ]);
         }
-        $v_roles = $v_query->paginate($v_length)->onEachSide(1);
-        $v_current_page = $request->input('currentPage');
-        return ['data' => $v_roles, 'draw' => $request->input('draw'), 'current' => $v_current_page];
+        $personas = $query->paginate($length)->onEachSide(1);
+        $current_page = $request->input('currentPage');
+        return ['data' => $personas, 'draw' => $request->input('draw'), 'current' => $current_page];
     }
 
 

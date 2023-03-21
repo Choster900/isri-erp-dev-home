@@ -158,11 +158,17 @@ export default {
   data: function (data) {
     let sortOrders = {};
     let columns = [
-      { width: "10%", label: "ID", name: "id_usuario" },
-      { width: "35%", label: "Nombre Persona", name: "nombre_persona" },
-      { width: "15%", label: "Dui", name: "dui_persona" },
-      { width: "20%", label: "User Name", name: "nick_usuario" },
-      { width: "10%", label: "Estado", name: "estado_usuario" },
+      { width: "10%", label: "ID", name: "id_usuario", type:"text" },
+      { width: "35%", label: "Nombre Persona", name: "nombre_persona", type:"text" },
+      { width: "15%", label: "Dui", name: "dui_persona", type:"text" },
+      { width: "20%", label: "Nombre Usuario", name: "nick_usuario", type:"text" },
+      {
+        width: "10%", label: "Estado", name: "estado_usuario", type: "select",
+        options: [
+          {value: "1", label: "Activo"},
+          {value: "0", label: "Inactivo"}
+        ]
+      },
       { width: "10%", label: "Acciones", name: "Acciones" },
     ];
     columns.forEach((column) => {
@@ -353,7 +359,6 @@ export default {
       return array.findIndex((i) => i[key] == value);
     },
     handleData(myEventData) {
-      console.log(myEventData);
       this.tableData.search = myEventData;
       this.getUsers()
     }
