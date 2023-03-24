@@ -8,7 +8,7 @@ import moment from 'moment';
 </script>
 <template>
     <div class="m-1.5">
-        <ModalBasicVue title="Personas" id="scrollbar-modal" maxWidth="3xl" :modalOpen="scrollbarModalOpen"
+        <ModalBasicVue title="Proveedor" id="scrollbar-modal" maxWidth="3xl" :modalOpen="scrollbarModalOpen"
             @close-modal-persona="this.$emit('close-definitive')">
             <div class="px-5 py-4">
                 <div class="space-y-2">
