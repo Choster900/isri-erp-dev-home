@@ -84,7 +84,7 @@ import axios from 'axios';
                                     <div class="flex-1 text-right ml-2">
                                         <a @click="getSuppilers(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                          text-indigo-500">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
                                     </div>
@@ -94,7 +94,7 @@ import axios from 'axios';
                                     <div class="flex-1 text-right ml-2">
                                         <a @click="getSuppilers(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                          text-indigo-500">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
                                     </div>
@@ -110,8 +110,7 @@ import axios from 'axios';
             </div>
         </div>
 
-        <ModalQuedan :showModal="showModal" @cerrar-modal="closeVars()" :dataQuedan="dataQuedan"
-            :dataForSelect="dataForSelectInRow" @update-table-when-closed="getDataQuedan" />
+        <ModalQuedan :showModal="showModal" @cerrar-modal="closeVars()" />
 
 
     </AppLayoutVue>
@@ -137,8 +136,6 @@ export default {
         return {
             showModal: false,
             //IdQuedan: null,
-            dataQuedan: {},
-            dataForSelectInRow: [],
             permits: [],
             scrollbarModalOpen: false,
             dataQuedanForTable: [],
@@ -203,14 +200,10 @@ export default {
             this.showModal = false
         },
         async createQuedan() {
-            await axios.post('/add-quedan').then((response) => {
-                this.IdQuedan = response.data
 
-            }).catch((error) => {
-                console.log(error);
-            });//create document and before apen modal
+
             this.showModal = true
-            this.getDataQuedan()
+
 
 
         },

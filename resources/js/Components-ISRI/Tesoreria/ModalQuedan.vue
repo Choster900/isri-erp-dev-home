@@ -131,8 +131,84 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                 </thead>
                                 <tbody class="text-sm" id="content">
 
-                                   
-        1                           
+                                    <tr v-for="(row, rowIndex) in tableData" :key="rowIndex" @dblclick="deleteRow(row[0])">
+
+                                        <template v-for="(cell, cellIndex) in row" :key="cellIndex">
+
+
+                                            <template v-if="cellIndex == 1">
+                                                <td @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
+                                                    class="border-2 border-black py-14" contenteditable="true">
+                                                </td>
+                                            </template>
+
+
+                                            <template v-else-if="cellIndex == 2">
+                                                <td class="border-2 border-black" colspan="2">
+                                                    <div class="relative flex h-8 w-full flex-row-reverse ">
+                                                        <Multiselect :options="opcionesSelect2" :searchable="true" />
+                                                    </div>
+                                                </td>
+                                            </template>
+                                            <template v-else-if="cellIndex == 3">
+
+                                                <td class="border-2 border-black">
+                                                    <div class="grid grid-cols-2 gap-2 ml-3">
+                                                        <div class="text-end">Producto</div>
+                                                        <div class="px-0">
+                                                            <RadioButton modelValue="1" :name="cellIndex"
+                                                                ref="id_tipo_prestacion" />
+                                                        </div>
+                                                        <div class="text-end ">Servicio</div>
+                                                        <div>
+                                                            <RadioButton modelValue="2" :name="cellIndex"
+                                                                ref="id_tipo_prestacion" />
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </template>
+
+                                            <template v-else-if="cellIndex == 4">
+
+                                                <td class="border-2 border-black ...">
+
+                                                    <div class="relative flex h-8 w-full flex-row-reverse ">
+                                                        <Multiselect :options="opcionesSelect2" :searchable="true" />
+                                                    </div>
+                                                </td>
+
+                                            </template>
+
+                                            <template v-else-if="cellIndex == 5">
+                                                <td @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
+                                                    class="border-2 border-black px-1 text-[12px]" contenteditable="true">
+                                                    {{ cell }}
+                                                </td>
+
+                                            </template>
+
+                                            <template v-else-if="cellIndex == 6">
+                                                <td @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
+                                                    class="border-2 border-black px-1 text-[12px]" contenteditable="true">
+
+                                                </td>
+
+                                            </template>
+
+                                            <template v-else-if="cellIndex == 7">
+
+                                                <td @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
+                                                    class="border-2 border-black px-1 text-[12px]" contenteditable="true">
+
+                                                </td>
+
+                                            </template>
+
+
+
+                                        </template>
+
+                                    </tr>
 
                                 </tbody>
                                 <tbody>
@@ -168,8 +244,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 </template>
 
 <script>
-import { createApp } from 'vue'
-import RowsTableVue from './RowsTable.vue';
+
 export default {
 
     props: {
@@ -177,155 +252,49 @@ export default {
             type: Boolean,
             default: false,
         },
-        dataQuedan: {
-            type: Array,
-            required: true,
-        },
-        dataForSelect: {
-            type: Array,
-            required: true,
-        },
     },
     data: function () {
         return {
-            dependencias: [],
-            acuerdoCompras: [],
-            optionSelect: {
-                dependencia: '',
-                acuerdoCompra: '',
-            }
+            tableData:
+                [
+                    { 0: 1, 1: 'A', 2: 'A', 3: 'A', 4: 'A', 5: 'A', 6: 'A', 7: 'A' },
+
+                ],
+
+            opcionesSelect2: [
+                { value: 'batman', label: 'Batman' },
+                { value: 'robin', label: 'Robin', disabled: true },
+                { value: 'joker', label: 'Joker' },
+            ],
         }
     },
-    components: {
-        RowsTableVue
-    },
+
     methods: {
-        eliminarFila() {
-            alert("")
-        },
+        onCellEdit(rowIndex, cellIndex, value) {
+            this.tableData[rowIndex][cellIndex] = value;
 
-        async addDetalleQuedan() {
-            try {
-                const response = await axios.post('/add-detalle-quedan', { id_quedan: this.dataQuedan.id_quedan });
-                return response.data.id_det_quedan;
-            } catch (error) {
-                console.error(error);
-                throw error;
+            //console.log(this.tableData[rowIndex][Object.keys(this.tableData[rowIndex])[cellIndex]]);
+            //console.log(this.tableData[rowIndex].factura);
+            //console.log([Object.keys(this.tableData[rowIndex])[cellIndex]]);
+        },
+        addRow() {
+            let flag = this.tableData.length;
+            //var array = this.tableData[flag][0]
+            console.log(this.tableData[flag - 1][0]);
+            //this.tableData.push({ 0: (array + 1), 1: 'A', 2: 'A', 3: 'A', 4: 'A', 5: 'A', 6: 'A', 7: 'A' })
+        },
+        deleteRow(rowIndex) {
+            alert(rowIndex)
+            //this.tableData = this.tableData.filter(obj => obj[0] !== rowIndex);
+            for (let i = 0; i < this.tableData.length; i++) {
+                if (this.tableData[i][0] === rowIndex) {
+                    this.tableData.splice(i, 1);
+                    break;   // Salimos del bucle una vez que eliminamos el objeto
+                }
             }
-        },
-
-        async addRow() {
-
-            const id_det_quedan = await this.addDetalleQuedan()
-            let dataForSelect = JSON.parse(JSON.stringify(this.dataForSelect))
-            const tbody = document.querySelector('#content');
-            const rowComponent = createApp(RowsTableVue, {
-                allDataQuedan: {
-                    "id_det_quedan": id_det_quedan,
-                    "id_quedan": this.dataQuedan.id_quedan,
-                },
-                dataSelect: dataForSelect
-            }).mount(document.createElement('div'));
-            tbody.appendChild(rowComponent.$el);
-        },
-
-        getRows(data) {
-
-
-            let dataQuedan = JSON.parse(JSON.stringify(data))
-            let dataForSelect = JSON.parse(JSON.stringify(this.dataForSelect))
-            const tbody = document.getElementById("content")
-
-            for (let i = 0; i < dataQuedan.detalle_quedan.length; i++) {
-
-                const rowComponent = createApp(RowsTableVue, {
-                    allDataQuedan: dataQuedan.detalle_quedan[i],
-                    dataSelect: dataForSelect
-                }).mount(document.createElement('div'));
-                tbody.appendChild(rowComponent.$el);
-            }
-        },
-
-        async getQuedanById(idQuedan) {
-            await axios.get('/get-quedan', { params: { id_quedan: idQuedan } }).then((response) => {
-                //this.detalleQuedan = response.data.detalle_quedan
-                this.getRows(response.data)
-            }).catch((error) => {
-                console.log(error);
-            });
-        },
-        procesingData(event, campo, fila) {
-            const value = event.target.textContent;
-            const tdName = event.target.getAttribute('field-name');
-
-            const data = {
-                campos: campo,
-                value: value,
-                id_det_quedan: fila,
-                id_quedan: this.IdQuedan,
-            }
-
-            axios.post('/update-detalle-quedan', data).then((response) => {
-                console.log(response);
-            }).catch((error) => {
-                console.log(error);
-            });
-
-        },
-        procesingInput(event, campo, fila) {
-
-            const data = {
-                campos: campo,
-                value: event,
-                id_det_quedan: fila,
-                id_quedan: this.IdQuedan,
-            }
-
-            console.log(data);
-            axios.post('/update-detalle-quedan', data).then((response) => {
-                console.log(response);
-            }).catch((error) => {
-                console.log(error);
-            });
-
-        },
-        procesingSelect(event, nombre, fila) {
-            const data = {
-                campos: nombre,
-                value: event,
-                id_det_quedan: fila,
-                id_quedan: this.IdQuedan,
-            }
-            axios.post('/update-detalle-quedan', data).then((response) => {
-                console.log(response);
-            }).catch((error) => {
-                console.log(error);
-            });
-        },
-        getListForSelect() {
-            axios.get('/get-list-select').then((response) => {
-                this.dependencias = response.data.dependencias;
-                this.acuerdoCompras = response.data.acuerdoCompras;
-            }).catch((error) => {
-                console.log(error);
-            });
         }
     },
-    watch: {
-        showModal: function (value, oldvalue) {
-            if (value) {
-                this.getRows(this.dataQuedan)
-            }
-            else {
-                const tbody = document.getElementById("content")
-                tbody.innerHTML = "";
-                this.$emit("update-table-when-closed")
-            }
-        },
-    },
-    created() {
-        this.getListForSelect()
-    }
+
 
 }
 </script>
