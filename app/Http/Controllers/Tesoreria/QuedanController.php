@@ -47,9 +47,7 @@ class QuedanController extends Controller
         $v_column = $request->input('column'); //Index
         $v_dir = $request->input('dir');
         $data = $request->input('search');
-        $v_query = DB::table('quedan')
-            ->select('*')
-            ->orderBy($v_columns[$v_column], $v_dir);
+        $v_query = Quedan::select('*')->with("detalle_quedan");
 
         if ($data) {
             $v_query->where('id_quedan', 'like', '%' . $data["id_quedan"] . '%');

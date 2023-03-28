@@ -36,14 +36,14 @@ import axios from 'axios';
                 <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy"
                     @datos-enviados="handleData($event)">
                     <tbody class="text-sm divide-y divide-slate-200">
-                        <tr v-for="data in dataQuedan" :key="data.id_quedan">
+                        <tr v-for="data in dataQuedanForTable" :key="data.id_quedan">
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">{{ data.id_quedan }}</div>
                             </td>
 
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="space-x-1">
-                                    <button @click.stop="showQuedan(data.id_quedan)"
+                                    <button @click.stop="showQuedan(data)"
                                         class="text-slate-400 hover:text-slate-500 rounded-full">
                                         <span class="sr-only">Edit</span>
                                         <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
@@ -84,7 +84,7 @@ import axios from 'axios';
                                     <div class="flex-1 text-right ml-2">
                                         <a @click="getSuppilers(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                  text-indigo-500">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                          text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
                                     </div>
@@ -94,7 +94,7 @@ import axios from 'axios';
                                     <div class="flex-1 text-right ml-2">
                                         <a @click="getSuppilers(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                  text-indigo-500">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                          text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
                                     </div>
@@ -110,7 +110,8 @@ import axios from 'axios';
             </div>
         </div>
 
-        <ModalQuedan :showModal="showModal" @cerrar-modal="closeVars()" :IdQuedan="IdQuedan" />
+        <ModalQuedan :showModal="showModal" @cerrar-modal="closeVars()" :dataQuedan="dataQuedan"
+            :dataForSelect="dataForSelectInRow" @update-table-when-closed="getDataQuedan" />
 
 
     </AppLayoutVue>
@@ -119,6 +120,7 @@ import axios from 'axios';
 export default {
     created() {
         this.getDataQuedan()
+        this.getListForSelect()
     },
     data: function (data) {
         let sortOrders = {};
@@ -134,10 +136,12 @@ export default {
         });
         return {
             showModal: false,
-            IdQuedan: null,
+            //IdQuedan: null,
+            dataQuedan: {},
+            dataForSelectInRow: [],
             permits: [],
             scrollbarModalOpen: false,
-            dataQuedan: [],
+            dataQuedanForTable: [],
             links: [],
             lastUrl: '/proveedores',
             columns: columns,
@@ -175,7 +179,8 @@ export default {
                     this.pagination.total = data.data.total
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
-                    this.dataQuedan = data.data.data;
+                    this.dataQuedanForTable = data.data.data;
+                    console.log(response.data);
                 }
             }).catch((errors) => {
                 console.log(errors);
@@ -209,9 +214,16 @@ export default {
 
 
         },
+        async getListForSelect() {
+            await axios.get('/get-list-select').then((response) => {
 
-        async showQuedan(idQuedan) {
-            this.IdQuedan = idQuedan
+                this.dataForSelectInRow = response.data;
+            }).catch((error) => {
+                console.log(error);
+            });
+        },
+        async showQuedan(dataQuedan) {
+            this.dataQuedan = dataQuedan
             this.showModal = true
 
         },

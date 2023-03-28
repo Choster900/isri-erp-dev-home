@@ -107,9 +107,11 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                             Dependencia</th>
                                         <th class="border-2 border-black W-60 text-sm px-5 text-gray-600">Tipo Prestación
                                         </th>
-                                        <th class="border-2 border-black W-60 text-sm px-8 text-gray-600">Tipo de Contratacion
+                                        <th class="border-2 border-black W-60 text-sm px-8 text-gray-600">Tipo de
+                                            Contratacion
                                         </th>
-                                        <th class="border-2 border-black W-60 text-sm px-10 text-gray-600">Número de Contratación
+                                        <th class="border-2 border-black W-60 text-sm px-10 text-gray-600">Número de
+                                            Contratación
                                         </th>
                                         <th class="border-2 border-black W-60 text-sm px-10 text-gray-600">Descripcin
                                             Factura</th>
@@ -123,68 +125,15 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                 <rect x="4" y="4" width="16" height="16" rx="2" />
                                                 <line x1="9" y1="12" x2="15" y2="12" />
                                                 <line x1="12" y1="9" x2="12" y2="15" />
-                                        </svg>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody class="text-sm" id="content">
+                                            </svg>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm" id="content">
 
-                                <!-- <tr @dblclick="deleteRow(id_fila)" v-for="(data, i) in detalleQuedan" :key="i">
-                                        <td class="border-2 border-black py-14" contenteditable="true"
-                                            field-name="numeroFactura" :id="data.id_quedan"
-                                            @input="procesingData($event, 'numero_factura_det_quedan', data.id_det_quedan)">
-                                            {{
-                                                data.numero_factura_det_quedan }}</td>
+                                   
+        1                           
 
-                                        <td class="border-2 border-black" colspan="2">
-                                            <div class="relative  flex h-8 w-full flex-row-reverse ">
-                                                <Multiselect 
-                                                    @select="procesingSelect($event, 'id_dependencia', data.id_det_quedan)"
-                                                    :options="dependencias" :searchable="true" ref="Select" />
-                                            </div>
-                                        </td>
-
-                                        <td class="border-2 border-black">
-                                            <div class="grid grid-cols-2 gap-2 ml-3">
-                                                <div class="text-end">Producto</div>
-                                                <div class="px-0">
-                                                    <RadioButton modelValue="1" :name="id_fila" fieldName="tipoPrestaciones"
-                                                        @update:modelValue="procesingInput(1, 'id_tipo_prestacion', data.id_det_quedan)"
-                                                        ref="id_tipo_prestacion" />
-                                                </div>
-                                                <div>Servicio</div>
-                                                <div>
-                                                    <RadioButton modelValue="2" :name="id_fila" fieldName="tipoPrestaciones"
-                                                        @update:modelValue="procesingInput(2, 'id_tipo_prestacion', data.id_det_quedan)"
-                                                        ref="id_tipo_prestacion" />
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="border-2 border-black ...">
-                                            <div class="relative flex h-8 w-full flex-row-reverse ">
-                                                <Multiselect class="text-center"
-                                                    @select="procesingSelect($event, 'id_acuerdo_compra', data.id_det_quedan)"
-                                                    :options="acuerdoCompras" :searchable="true" ref="Select" />
-                                            </div>
-                                        </td>
-
-                                        <td class="border-2 border-black px-1 text-[12px]" field-name="RespaldoQuedan"
-                                            @input="procesingData($event, 'numero_acuerdo_det_quedan', data.id_det_quedan)"
-                                            contenteditable="true">{{ data.numero_acuerdo_det_quedan }}
-                                        </td>
-
-                                        <td class="border-2 border-black" contenteditable="true"
-                                            field-name="DescripcionFactura"
-                                            @input="procesingData($event, 'descripcion_det_quedan', data.id_det_quedan)">
-                                            {{ data.descripcion_det_quedan }}
-                                        </td>
-
-                                                                                                        <td class="border-2 border-black px-1" field-name="Monto"
-                                                                                                            @input="procesingData($event, 'total_factura_det_quedan', data.id_det_quedan)"
-                                                                                                            contenteditable="true">{{ data.total_factura_det_quedan }}
-                                                                                                        </td>
-                                                                                                    </tr>
-                                                                 -->
                                 </tbody>
                                 <tbody>
                                     <tr id="esconder" class="border-none">
@@ -228,14 +177,17 @@ export default {
             type: Boolean,
             default: false,
         },
-        IdQuedan: {
-            type: Number,
+        dataQuedan: {
+            type: Array,
+            required: true,
+        },
+        dataForSelect: {
+            type: Array,
             required: true,
         },
     },
     data: function () {
         return {
-            detalleQuedan: [],
             dependencias: [],
             acuerdoCompras: [],
             optionSelect: {
@@ -254,7 +206,7 @@ export default {
 
         async addDetalleQuedan() {
             try {
-                const response = await axios.post('/add-detalle-quedan', { id_quedan: this.IdQuedan });
+                const response = await axios.post('/add-detalle-quedan', { id_quedan: this.dataQuedan.id_quedan });
                 return response.data.id_det_quedan;
             } catch (error) {
                 console.error(error);
@@ -265,27 +217,32 @@ export default {
         async addRow() {
 
             const id_det_quedan = await this.addDetalleQuedan()
+            let dataForSelect = JSON.parse(JSON.stringify(this.dataForSelect))
             const tbody = document.querySelector('#content');
             const rowComponent = createApp(RowsTableVue, {
                 allDataQuedan: {
                     "id_det_quedan": id_det_quedan,
-                    "id_quedan": this.IdQuedan,
-                }
+                    "id_quedan": this.dataQuedan.id_quedan,
+                },
+                dataSelect: dataForSelect
             }).mount(document.createElement('div'));
             tbody.appendChild(rowComponent.$el);
         },
 
-        async getRows(data) {
+        getRows(data) {
 
-            console.log(data.detalle_quedan);
 
-            for (let i = 0; i < data.detalle_quedan.length; i++) {
-                const tbody = document.querySelector('#content');
+            let dataQuedan = JSON.parse(JSON.stringify(data))
+            let dataForSelect = JSON.parse(JSON.stringify(this.dataForSelect))
+            const tbody = document.getElementById("content")
+
+            for (let i = 0; i < dataQuedan.detalle_quedan.length; i++) {
+
                 const rowComponent = createApp(RowsTableVue, {
-
-                    allDataQuedan: data.detalle_quedan[i]
+                    allDataQuedan: dataQuedan.detalle_quedan[i],
+                    dataSelect: dataForSelect
                 }).mount(document.createElement('div'));
-                await tbody.appendChild(rowComponent.$el);
+                tbody.appendChild(rowComponent.$el);
             }
         },
 
@@ -357,7 +314,12 @@ export default {
     watch: {
         showModal: function (value, oldvalue) {
             if (value) {
-                this.getQuedanById(this.IdQuedan)
+                this.getRows(this.dataQuedan)
+            }
+            else {
+                const tbody = document.getElementById("content")
+                tbody.innerHTML = "";
+                this.$emit("update-table-when-closed")
             }
         },
     },

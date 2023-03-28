@@ -1,13 +1,13 @@
 <template>
     <tr @dblclick="deleteRow(id_fila)">
         <td class="border-2 border-black py-14" contenteditable="true" field-name="numeroFactura"
-            @input="procesingData($event, 'numero_factura_det_quedan', allDataQuedan.id_det_quedan)">
+            v-on:keyup="procesingData($event, 'numero_factura_det_quedan', allDataQuedan.id_det_quedan)">
             {{ allDataQuedan.numero_factura_det_quedan }}</td>
 
         <td class="border-2 border-black" colspan="2">
             <div class="relative  flex h-8 w-full flex-row-reverse ">
                 <Multiselect v-model="dependencia"
-                    @select="procesingSelect($event, 'id_dependencia', allDataQuedan.id_det_quedan)" :options="dependencias"
+                    @select="procesingSelect($event, 'id_dependencia', allDataQuedan.id_det_quedan)" :options="dataSelect.dependencias"
                     :searchable="true" ref="Select" />
             </div>
         </td>
@@ -34,7 +34,7 @@
             <div class="relative flex h-8 w-full flex-row-reverse ">
                 <Multiselect v-model="acuerdoCompra"
                     @select="procesingSelect($event, 'id_acuerdo_compra', allDataQuedan.id_det_quedan)"
-                    :options="acuerdoCompras" :searchable="true" ref="Select" />
+                    :options="dataSelect.acuerdoCompras" :searchable="true" ref="Select" />
             </div>
         </td>
 
@@ -52,6 +52,7 @@
             @input="procesingData($event, 'total_factura_det_quedan', allDataQuedan.id_det_quedan)" contenteditable="true">
             {{ allDataQuedan.total_factura_det_quedan }}
         </td>
+
     </tr>
 </template>
     
@@ -62,11 +63,17 @@ import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import VueSweetalert2 from "vue-sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
+import jQuery from "jquery";
+window.jQuery = window.$ = jQuery;
 
 
 export default {
     props: {//INTENTEMOS MANDARLE TODO AQUI (ID QUEDAN Y SU DETALLE PARA MANIPULARLO AQUI)
         allDataQuedan: {
+            type: Array,
+            required: false
+        },
+        dataSelect: {
             type: Array,
             required: false
         }
@@ -85,30 +92,40 @@ export default {
             acuerdoCompras: [],//Option select
             dependencia: this.allDataQuedan.id_dependencia,//v-model
             acuerdoCompra: this.allDataQuedan.id_acuerdo_compra,//v-model
-
+            temporizador: null
         }
     },
     methods: {
 
         procesingData(event, campo, fila) {
-            const value = event.target.textContent;
-            const tdName = event.target.getAttribute('field-name');
 
-            const data = {
-                campos: campo,
-                value: value,
-                id_det_quedan: fila,
-                id_quedan: this.allDataQuedan.id_quedan,
-            }
+            clearTimeout(this.temporizador);
+            this.temporizador = setTimeout(() => {
+                const value = event.target.textContent;
+                const tdName = event.target.getAttribute('field-name');
+                const data = {
+                    campos: campo,
+                    value: value,
+                    id_det_quedan: fila,
+                    id_quedan: this.allDataQuedan.id_quedan,
 
-            axios.post('/update-detalle-quedan', data).then((response) => {
-                console.log(response);
-            }).catch((error) => {
-                console.log(error);
-            });
+                }
+
+                axios.post('/update-detalle-quedan', data).then((response) => {
+                    console.log(response);
+                }).catch((error) => {
+                    console.log(error);
+                });
+
+            }, 500);
+
+
+
+
 
         },
         procesingInput(event, campo, fila) {
+
 
             const data = {
                 campos: campo,
@@ -124,8 +141,13 @@ export default {
                 console.log(error);
             });
 
+
+
+
         },
         procesingSelect(event, nombre, fila) {
+
+
             const data = {
                 campos: nombre,
                 value: event,
@@ -137,27 +159,19 @@ export default {
             }).catch((error) => {
                 console.log(error);
             });
+
+
         },
-        deleteRow(id_fila) {
+        /* deleteRow(id_fila) {
             alert("eliminado fila " + id_detalle_quedan)
             this.eliminado = !this.eliminado
-        },
+        }, */
 
-        getListForSelect() {
-            axios.get('/get-list-select').then((response) => {
-                this.dependencias = response.data.dependencias;
-                this.acuerdoCompras = response.data.acuerdoCompras;
-            }).catch((error) => {
-                console.log(error);
-            });
-        }
+        
     },
-    mounted() {
-        this.getListForSelect()
-    },
+
     watch: {
         allDataQuedan: function (value, OldValue) {
-            alert("")
             this.dependencia = allDataQuedan.id_dependencia
             this.acuerdoCompra = allDataQuedan.id_acuerdo_compra
         }
