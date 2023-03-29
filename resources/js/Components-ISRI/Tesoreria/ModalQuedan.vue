@@ -299,11 +299,13 @@ export default {
                 }
             }
 
+            let data = {}
             for (let i = 0; i < this.rowsData.length; i++) {
-                this.rowsData = []
-                this.rowsData.push(this.rowsData)
+                data.push(this.rowsData)
             }
 
+            this.rowsData = []
+            this.rowsData.push(data)
 
         }
     },
