@@ -16,6 +16,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                         <span style="font-size: 9pt; color: black;">Estado</span>
                     </div>
                     <div class="border-2 border-black mx-8 mb-7" id="main-container">
+
                         <div class="mb-7 md:flex flex-row justify-between">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/4 pt-8 px-16">
                             </div>
@@ -99,20 +100,17 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 
 
                         <div class="overflow-x-auto">
-                            <table class="ml-7 mb- " id="main-table">
+                            <table class="ml-20 mb-" id="main-table">
                                 <thead>
                                     <tr>
-                                        <th class="border-2 border-black w- text-sm text-gray-600 ">Factura</th>
-                                        <th class="border-2 border-black w-60 text-sm px-8 text-gray-600" colspan="2">
+                                        <th class="border-2 border-black  text-sm text-gray-600 ">Factura</th>
+                                        <th class="border-2 border-black  text-sm px-5 text-gray-600" colspan="2">
                                             Dependencia</th>
                                         <th class="border-2 border-black W-60 text-sm px-5 text-gray-600">Tipo Prestación
                                         </th>
-                                        <th class="border-2 border-black W-60 text-sm px-8 text-gray-600">Tipo de
-                                            Contratacion
+                                        <th class="border-2 border-black W-60 text-sm px-8 text-gray-600">Numero Acta
                                         </th>
-                                        <th class="border-2 border-black W-60 text-sm px-10 text-gray-600">Número de
-                                            Contratación
-                                        </th>
+
                                         <th class="border-2 border-black W-60 text-sm px-10 text-gray-600">Descripcin
                                             Factura</th>
                                         <th class="border-2 border-black W-60 text-sm px-10 text-gray-600">Monto</th>
@@ -131,7 +129,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                 </thead>
                                 <tbody class="text-sm" id="content">
 
-                                    <tr v-for="(row, rowIndex) in tableData" :key="rowIndex" @dblclick="deleteRow(row[0])">
+                                    <tr v-for="(row, rowIndex) in rowsData" :key="rowIndex" @dblclick="deleteRow(row[0])">
 
                                         <template v-for="(cell, cellIndex) in row" :key="cellIndex">
 
@@ -170,18 +168,15 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 
                                             <template v-else-if="cellIndex == 4">
 
-                                                <td class="border-2 border-black ...">
-
-                                                    <div class="relative flex h-8 w-full flex-row-reverse ">
-                                                        <Multiselect :options="opcionesSelect2" :searchable="true" />
-                                                    </div>
-                                                </td>
+                                                <td class="border-2 border-black"
+                                                    @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
+                                                    contenteditable="true"></td>
 
                                             </template>
 
                                             <template v-else-if="cellIndex == 5">
                                                 <td @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
-                                                    class="border-2 border-black px-1 text-[12px]" contenteditable="true">
+                                                    class="border-2 border-black px-1 " contenteditable="true">
                                                     {{ cell }}
                                                 </td>
 
@@ -189,7 +184,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 
                                             <template v-else-if="cellIndex == 6">
                                                 <td @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
-                                                    class="border-2 border-black px-1 text-[12px]" contenteditable="true">
+                                                    class="border-2 border-black px-1 " contenteditable="true">
 
                                                 </td>
 
@@ -198,7 +193,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                             <template v-else-if="cellIndex == 7">
 
                                                 <td @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
-                                                    class="border-2 border-black px-1 text-[12px]" contenteditable="true">
+                                                    class="border-2 border-black px-1 " contenteditable="true">
 
                                                 </td>
 
@@ -220,7 +215,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                         <td class="border-2 border-black py-4" colspan="2" contenteditable="false">
                                             Descripción
                                         </td>
-                                        <td class="border-2 border-black" colspan="6" contenteditable="true">
+                                        <td class="border-2 border-black" colspan="5" contenteditable="true">
 
                                         </td>
                                     </tr>
@@ -255,10 +250,17 @@ export default {
     },
     data: function () {
         return {
-            tableData:
+            rowsData:
                 [
-                    { 0: 1, 1: 'A', 2: 'A', 3: 'A', 4: 'A', 5: 'A', 6: 'A', 7: 'A' },
-
+                    {
+                        0: 1,//numberRow,
+                        1: '',//factura,
+                        2: '',//dependencia,
+                        3: '',//Tipo prestacion,
+                        4: '',//Numero Acta,
+                        6: '',//DescripcionFactura,
+                        7: '',//Monto,
+                    },
                 ],
 
             opcionesSelect2: [
@@ -271,27 +273,38 @@ export default {
 
     methods: {
         onCellEdit(rowIndex, cellIndex, value) {
-            this.tableData[rowIndex][cellIndex] = value;
-
-            //console.log(this.tableData[rowIndex][Object.keys(this.tableData[rowIndex])[cellIndex]]);
-            //console.log(this.tableData[rowIndex].factura);
-            //console.log([Object.keys(this.tableData[rowIndex])[cellIndex]]);
+            this.rowsData[rowIndex][cellIndex] = value;
+            console.log(this.rowsData[rowIndex]);
         },
         addRow() {
-            let flag = this.tableData.length;
-            //var array = this.tableData[flag][0]
-            console.log(this.tableData[flag - 1][0]);
-            //this.tableData.push({ 0: (array + 1), 1: 'A', 2: 'A', 3: 'A', 4: 'A', 5: 'A', 6: 'A', 7: 'A' })
+            let flag = this.rowsData.length;
+            console.log(this.rowsData[flag - 1][0]);
+            this.rowsData.push({
+                0: (this.rowsData[flag - 1][0] + 1),//numberRow,
+                1: '',//factura,
+                2: '',//dependencia,
+                3: '',//Tipo prestacion,
+                4: '',//Numero Acta,
+                6: '',//DescripcionFactura,
+                7: '',//Monto,
+
+            })
         },
         deleteRow(rowIndex) {
             alert(rowIndex)
-            //this.tableData = this.tableData.filter(obj => obj[0] !== rowIndex);
-            for (let i = 0; i < this.tableData.length; i++) {
-                if (this.tableData[i][0] === rowIndex) {
-                    this.tableData.splice(i, 1);
+            for (let i = 0; i < this.rowsData.length; i++) {
+                if (this.rowsData[i][0] === rowIndex) {
+                    this.rowsData.splice(i, 1);
                     break;   // Salimos del bucle una vez que eliminamos el objeto
                 }
             }
+
+            for (let i = 0; i < this.rowsData.length; i++) {
+                this.rowsData = []
+                this.rowsData.push(this.rowsData)
+            }
+
+
         }
     },
 
