@@ -14,9 +14,8 @@ class DetalleQuedan extends Model
     protected $fillable = [
         'id_dependencia',
         'id_quedan',
-        'id_acuerdo_compra',
         'id_tipo_prestacion',
-        'numero_compra_det_quedan',
+        'numero_acta_det_quedan',
         'numero_factura_det_quedan',
         'fecha_factura_det_quedan',
         'total_factura_det_quedan',
@@ -25,6 +24,7 @@ class DetalleQuedan extends Model
         'fecha_mod_det_quedan',
         'usuario_det_quedan',
         'ip_det_quedan',
+
     ];
 
 
@@ -33,4 +33,13 @@ class DetalleQuedan extends Model
         return $this->belongsTo(Quedan::class, "id_quedan", "id_quedan");
     }
 
+    public function dependencia()
+    {
+        return $this->belongsTo(Dependencia::class, "id_dependencia", "id_dependencia");
+    }
+
+    public function tipo_prestacion()
+    {
+        return $this->belongsTo(TipoPrestacion::class, "id_tipo_prestacion", "id_tipo_prestacion");
+    }
 }

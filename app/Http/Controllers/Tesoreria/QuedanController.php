@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Tesoreria;
 
 use App\Http\Controllers\Controller;
+use App\Models\Proveedor;
 use Illuminate\Http\Request;
 use App\Models\Quedan;
 use App\Models\DetalleQuedan;
@@ -47,10 +48,17 @@ class QuedanController extends Controller
         $v_column = $request->input('column'); //Index
         $v_dir = $request->input('dir');
         $data = $request->input('search');
-        $v_query = Quedan::select('*')->with("detalle_quedan");
+        $v_query = Quedan::select('*')->with(["detalle_quedan", "proveedor.giro", "proveedor.sujeto_retencion"])->orderBy('id_quedan', 'desc');
 
         if ($data) {
             $v_query->where('id_quedan', 'like', '%' . $data["id_quedan"] . '%');
+            $v_query->whereHas('detalle_quedan', function ($query) use ($data) {
+                $query->where('numero_factura_det_quedan', 'like', '%' . $data["numero_factura_det_quedan"] . '%');
+            });
+            $v_query->whereHas('proveedor', function ($query) use ($data) {
+                $query->where('razon_social_proveedor', 'like', '%' . $data["razon_social_proveedor"] . '%');
+            });
+            $v_query->where('monto_liquido_quedan', 'like', '%' . $data["monto_liquido_quedan"] . '%');
 
         }
 
@@ -63,43 +71,100 @@ class QuedanController extends Controller
 
     public function addQuedan(Request $request)
     {
+        $detalle_quedan = $request->detalle_quedan;
+
         $quedan = Quedan::insertGetId([
+            //FALTAN DATOS PARA LLENAR BTW
             //creadon quedan
-            'id_estado_quedan'     => 1,
-            'id_tesorero'          => Tesorero::select("id_tesorero")->where('estado_tesorero', 1)->get()[0]->id_tesorero,
-            'fecha_emision_quedan' => Carbon::now(),
-            'estado_quedan'        => 1,
-            'fecha_reg_quedan'     => Carbon::now(),
+            'id_estado_quedan'              => 1,
+            'id_proy_financiado'            => 1,
+            'id_proveedor'                  => $request->quedan["id_proveedor"],
+            'id_acuerdo_compra'             => $request->quedan["id_acuerdo_compra"],
+            'numero_acuerdo_quedan'         => $request->quedan["numero_acuerdo_quedan"],
+            'numero_compromiso_ppto_quedan' => $request->quedan["numero_compromiso_ppto_quedan"],
+            'descripcion_quedan'            => $request->quedan["descripcion_quedan"],
+            'monto_liquido_quedan'          => 9999,
+            'monto_iva_quedan'              => 9999,
+            'monto_isr_quedan'              => 9999,
+            'id_tesorero'                   => Tesorero::select("id_tesorero")->where('estado_tesorero', 1)->get()[0]->id_tesorero,
+            'fecha_emision_quedan'          => Carbon::now(),
+            'estado_quedan'                 => 1,
+            'fecha_reg_quedan'              => Carbon::now(),
+
         ]);
-        DetalleQuedan::create([
-            //agregando por defecto un detalle al quedan agregado anteriormente
-            'id_quedan'                => $quedan,
-            'fecha_reg_det_quedan'     => Carbon::now(),
-            'fecha_factura_det_quedan' => Carbon::now(),
-        ]);
+        foreach ( $detalle_quedan as $key => $value ) {
+
+            if ($value[8]) {
+                $new_detalle = array(
+                    'id_quedan'                 => $quedan,
+                    'numero_factura_det_quedan' => $value[2],
+                    'id_dependencia'            => $value[3],
+                    'id_tipo_prestacion'        => $value[4],
+                    'numero_acta_det_quedan'    => $value[5],
+                    'descripcion_det_quedan'    => $value[6],
+                    'total_factura_det_quedan'  => $value[7],
+                    'fecha_factura_det_quedan'  => Carbon::now(),
+                    'fecha_reg_det_quedan'      => Carbon::now(),
+                    'usuario_det_quedan'        => $request->user()->nick_usuario,
+                    'ip_det_quedan'             => $request->ip(),
+
+                );
+                DetalleQuedan::create($new_detalle);
+            }
+        }
         return $quedan;
     }
-    public function addDetalleQuedan(Request $request)
-    {
-        return DetalleQuedan::create([
-            //agregando por defecto un detalle al quedan agregado anteriormente
-            'id_quedan'                => $request->input('id_quedan'),
-            'fecha_reg_det_quedan'     => Carbon::now(),
-            'fecha_factura_det_quedan' => Carbon::now(),
-        ]);
-    }
-    public function getQuedan(Request $request)
-    {
-        return Quedan::with("detalle_quedan")->find($request->input("id_quedan"));
-    }
-
     public function updateDetalleQuedan(Request $request)
     {
-        return DetalleQuedan
-            ::where('id_det_quedan', $request->input('id_det_quedan'))
-            ->where('id_quedan', $request->input('id_quedan'))->update([
-                $request->input("campos") => $request->input("value"),
-            ]);
+        $id_quedan = $request->id_quedan;
+        $detalle_quedan = $request->detalle_quedan;
+
+        Quedan::where("id_quedan", $id_quedan)->update([
+            'id_proveedor'                  => $request->quedan["id_proveedor"],
+            'id_acuerdo_compra'             => $request->quedan["id_acuerdo_compra"],
+            'numero_acuerdo_quedan'         => $request->quedan["numero_acuerdo_quedan"],
+            'numero_compromiso_ppto_quedan' => $request->quedan["numero_compromiso_ppto_quedan"],
+            'descripcion_quedan'            => $request->quedan["descripcion_quedan"],
+        ]);
+
+        foreach ( $detalle_quedan as $key => $value ) {
+
+            if ($value[0] == '') { //validar que exista el detalle a modifica
+                $new_detalle = array(
+                    'numero_factura_det_quedan' => $value[2],
+                    'id_dependencia'            => $value[3],
+                    'id_tipo_prestacion'        => $value[4],
+                    'numero_acta_det_quedan'    => $value[5],
+                    'descripcion_det_quedan'    => $value[6],
+                    'total_factura_det_quedan'  => $value[7],
+                    'fecha_mod_det_quedan'      => Carbon::now(),
+                    'usuario_det_quedan'        => $request->user()->nick_usuario,
+                    'ip_det_quedan'             => $request->ip(),
+                );
+                DetalleQuedan::where("id_det_quedan", $value[1])->update($new_detalle);
+            }
+            if ($value[0] == 1) { //al momento de editar puede que agrege filas entonces se valida que la fila sea nueva 
+                $new_detalle = array(
+                    'id_quedan'                 => $id_quedan,
+                    'numero_factura_det_quedan' => $value[2],
+                    'id_dependencia'            => $value[3],
+                    'id_tipo_prestacion'        => $value[4],
+                    'numero_acta_det_quedan'    => $value[5],
+                    'descripcion_det_quedan'    => $value[6],
+                    'total_factura_det_quedan'  => $value[7],
+                    'fecha_factura_det_quedan'  => Carbon::now(),
+                    'fecha_reg_det_quedan'      => Carbon::now(),
+                    'usuario_det_quedan'        => $request->user()->nick_usuario,
+                    'ip_det_quedan'             => $request->ip(),
+                );
+                DetalleQuedan::create($new_detalle);
+            }
+            if ($value[8] == false && $value[0] == '') { //validar que la fila sea eliminada
+                $res = DetalleQuedan::find($value[1]);
+                $res->delete();
+
+            }
+        }
     }
     public function getListForSelect()
     {
@@ -115,10 +180,20 @@ class QuedanController extends Controller
                 'nombre_acuerdo_compra as label'
             )->get();
 
+        $v_Proveedor = DB::table('proveedor')
+            ->select(
+                'id_proveedor as value',
+                'razon_social_proveedor as label'
+            )->get();
         return [
             "dependencias"   => $v_Dependencias,
-            "acuerdoCompras" => $v_AcuerdoCompra
+            "acuerdoCompras" => $v_AcuerdoCompra,
+            "proveedor"      => $v_Proveedor
         ];
+    }
+    public function getSuppliers()//Metodo utilizado al momento de seleccionar proveedor y hacer los calculos 
+    {//se hacen los calculos por que al no existir el quedan no existen registos previos de la base de datos
+        return Proveedor::with(['sujeto_retencion','giro'])->get();
     }
 
 }

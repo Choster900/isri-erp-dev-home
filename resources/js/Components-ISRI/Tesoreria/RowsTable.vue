@@ -119,10 +119,6 @@ export default {
 
             }, 500);
 
-
-
-
-
         },
         procesingInput(event, campo, fila) {
 
@@ -140,9 +136,6 @@ export default {
             }).catch((error) => {
                 console.log(error);
             });
-
-
-
 
         },
         procesingSelect(event, nombre, fila) {

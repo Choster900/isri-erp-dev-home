@@ -41,4 +41,9 @@ class Quedan extends Model
     { //(FOREING KEY, PRIMARY KEY)
         return $this->hasMany(DetalleQuedan::class, "id_quedan", "id_quedan");
     }
+    public function proveedor()
+    { //(FOREING KEY, PRIMARY KEY)
+        return $this->belongsTo(Proveedor::class, "id_proveedor", "id_proveedor");
+    }
+
 }

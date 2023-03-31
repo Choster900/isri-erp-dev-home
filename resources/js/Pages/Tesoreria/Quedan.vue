@@ -21,7 +21,7 @@ import axios from 'axios';
                 <div class="mb-4 md:flex flex-row justify-items-start">
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-                            <Multiselect v-model="tableData.length" @select="getSuppilers()" :options="perPage"
+                            <Multiselect v-model="tableData.length" @select="getDataQuedan()" :options="perPage"
                                 :searchable="true" />
                             <LabelToInput icon="date" />
                         </div>
@@ -41,6 +41,31 @@ import axios from 'axios';
                                 <div class="font-medium text-slate-800 text-center">{{ data.id_quedan }}</div>
                             </td>
 
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800 text-center wrap">
+                                    <p v-for="(detalle, i) in  data.detalle_quedan" :key="i"
+                                        :class="{ 'border-b-2 border-b-gray-500': i < data.detalle_quedan.length - 1 && data.detalle_quedan.length > 1 }">
+                                        N°Fact {{ detalle.numero_factura_det_quedan }} -
+                                        N°Acta{{ detalle.numero_acta_det_quedan }} - {{ detalle.descripcion_det_quedan }} -
+                                        ${{ detalle.total_factura_det_quedan }}
+                                    </p>
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800 text-center wrap">{{
+                                    data.proveedor.razon_social_proveedor
+                                }}</div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800 text-center">{{
+                                    data.monto_liquido_quedan
+                                }}</div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800 text-center">{{
+                                    data.estado_quedan
+                                }}</div>
+                            </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="space-x-1">
                                     <button @click.stop="showQuedan(data)"
@@ -82,9 +107,9 @@ import axios from 'axios';
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
 
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getSuppilers(link.url)"
+                                        <a @click="getDataQuedan(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      text-indigo-500">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
                                     </div>
@@ -92,16 +117,16 @@ import axios from 'axios';
                                 <span v-else-if="(link.label == 'Siguiente')"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getSuppilers(link.url)"
+                                        <a @click="getDataQuedan(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      text-indigo-500">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
                                     </div>
                                 </span>
                                 <span class="cursor-pointer" v-else
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
-                                        class=" w-5" @click="getSuppilers(link.url)">{{ link.label }}</span>
+                                        class=" w-5" @click="getDataQuedan(link.url)">{{ link.label }}</span>
                                 </span>
                             </li>
                         </ul>
@@ -110,7 +135,8 @@ import axios from 'axios';
             </div>
         </div>
 
-        <ModalQuedan :showModal="showModal" @cerrar-modal="closeVars()" />
+        <ModalQuedan :showModal="showModal" @cerrar-modal="closeVars()" :data-quedan="dataQuedan"
+            :dataForSelectInRow="dataForSelectInRow" />
 
 
     </AppLayoutVue>
@@ -125,7 +151,12 @@ export default {
         let sortOrders = {};
         let columns = [
             { width: "10%", label: "Id", name: "id_quedan", type: "text" },
-            { width: "25%", label: "Acciones", name: "Acciones" },
+            { width: "30%", label: "Detalle quedan", name: "numero_factura_det_quedan", type: "text" },
+            { width: "30%", label: "Detalle quedan", name: "razon_social_proveedor", type: "text" },//TODO: hacerlo select
+            { width: "10%", label: "Monto", name: "monto_liquido_quedan", type: "text" },
+            { width: "10%", label: "Estado", name: "estado_quedan", type: "text" },
+
+            { width: "10%", label: "Acciones", name: "Acciones" },
         ];
         columns.forEach((column) => {
             if (column.name === 'id_quedan')
@@ -136,13 +167,16 @@ export default {
         return {
             showModal: false,
             //IdQuedan: null,
+            dataQuedan: [],
             permits: [],
+            options: [],
+            dataForSelectInRow: [],
             scrollbarModalOpen: false,
             dataQuedanForTable: [],
             links: [],
-            lastUrl: '/proveedores',
+            lastUrl: '/quedan',
             columns: columns,
-            sortKey: "id_proveedor",
+            sortKey: "id_quedan",
             sortOrders: sortOrders,
             perPage: ["10", "20", "30"],
             tableData: {
@@ -189,7 +223,7 @@ export default {
                 this.sortOrders[key] = this.sortOrders[key] * -1;
                 this.tableData.column = this.getIndex(this.columns, "name", key);
                 this.tableData.dir = this.sortOrders[key] === 1 ? "asc" : "desc";
-                this.getSuppilers();
+                this.getDataQuedan();
             }
         },
         getIndex(array, key, value) {
@@ -201,10 +235,8 @@ export default {
         },
         async createQuedan() {
 
-
+            this.dataQuedan = []
             this.showModal = true
-
-
 
         },
         async getListForSelect() {
@@ -220,6 +252,12 @@ export default {
             this.showModal = true
 
         },
+
+        handleData(myEventData) {
+            console.log(myEventData);
+            this.tableData.search = myEventData;
+            this.getDataQuedan()
+        },
     },
 
 };
@@ -228,7 +266,7 @@ export default {
 <style>
 .wrap,
 .wrap2 {
-    width: 70%;
+    width: 100%;
     white-space: pre-wrap;
 }
 </style>

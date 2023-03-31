@@ -38,11 +38,9 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     )->name('ts.quedan');
 
     Route::get('quedan', [QuedanController::class, 'getDataQuedan'])->name('get.quedan');
-
     Route::get('get-list-select', [QuedanController::class, 'getListForSelect'])->name('get-list-select');
     Route::post('add-quedan', [QuedanController::class, 'addQuedan'])->name('add-quedan');
-    Route::post('add-detalle-quedan', [QuedanController::class, 'addDetalleQuedan'])->name('add-detalle-quedan');
-    Route::get('get-quedan', [QuedanController::class, 'getQuedan'])->name('get-quedan');
     Route::post('update-detalle-quedan', [QuedanController::class, 'updateDetalleQuedan'])->name('update-detalle-quedan');
+    Route::get('getAllSuppliers', [QuedanController::class, 'getSuppliers'])->name('get-all-suppliers');
 
 });
