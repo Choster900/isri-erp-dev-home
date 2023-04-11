@@ -48,7 +48,7 @@ import 'vue3-toastify/dist/index.css';
                                 </div>
                             </td>
 
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px wrap">
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">{{ proveedor.razon_social_proveedor }}
                                 </div>
                             </td>
@@ -112,7 +112,7 @@ import 'vue3-toastify/dist/index.css';
                                     <div class="flex-1 text-right ml-2">
                                         <a @click="getSuppilers(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                                                                                                                                                                      text-indigo-500">
+                                                                                                                                                                                                                                                                                                                                                                                                                                      text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
                                     </div>
@@ -122,7 +122,7 @@ import 'vue3-toastify/dist/index.css';
                                     <div class="flex-1 text-right ml-2">
                                         <a @click="getSuppilers(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                                                                                                                                                                      text-indigo-500">
+                                                                                                                                                                                                                                                                                                                                                                                                                                      text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
                                     </div>
@@ -154,17 +154,18 @@ export default {
         let sortOrders = {};
         let columns = [
             { width: "10%", label: "Id", name: "id_proveedor", type: "text" },
-            { width: "20%", label: "Documentos", name: "dui_proveedor", type: "text" },
-            { width: "30%", label: "Razon social", name: "razon_social_proveedor", type: "text" },
-            { width: "30%", label: "Nombre comercial", name: "nombre_comercial_proveedor", type: "text" },
+            { width: "15%", label: "Documentos", name: "dui_proveedor", type: "text" },
+            { width: "20%", label: "Razon social", name: "razon_social_proveedor", type: "text" },
+            { width: "20%", label: "Nombre comercial", name: "nombre_comercial_proveedor", type: "text" },
             {
-                width: "30%", label: "Estado", name: "estado_proveedor", type: "select",
+                width: "10%", label: "Estado", name: "estado_proveedor", type: "select",
                 options: [
+                    { value: "", label: "Ninguno" },
                     { value: "1", label: "Activo" },
                     { value: "0", label: "Inactivo" }
                 ]
             },
-            { width: "25%", label: "Acciones", name: "Acciones" },
+            { width: "10%", label: "Acciones", name: "Acciones" },
         ];
         columns.forEach((column) => {
             if (column.name === 'id_persona')
@@ -216,9 +217,7 @@ export default {
                     this.links[this.links.length - 1].label = "Siguiente";
                     this.proveedores = data.data.data;
                 }
-                console.log(response.data);
             }).catch((errors) => {
-                console.log(errors);
             });
         },
         sortBy(key) {
@@ -283,10 +282,23 @@ export default {
                 }
             })
         },
+        validarCamposVacios(objeto) {
+            for (var propiedad in objeto) {
+                if (objeto[propiedad] !== '') {
+                    return false;
+                }
+            }
+            return true;
+        },
         handleData(myEventData) {
-            console.log(myEventData);
-            this.tableData.search = myEventData;
-            this.getSuppilers()
+
+            if (this.validarCamposVacios(myEventData)) {
+                this.tableData.search = {};
+                this.getSuppilers()
+            } else {
+                this.tableData.search = myEventData;
+                this.getSuppilers()
+            }
         },
         getPermits() {
             var URLactual = window.location.pathname

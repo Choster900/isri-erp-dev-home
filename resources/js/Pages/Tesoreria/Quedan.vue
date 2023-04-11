@@ -40,10 +40,19 @@ import axios from 'axios';
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">{{ data.id_quedan }}</div>
                             </td>
+                            <td v-if="dataQuedanForTable == '' ">
+                                NO HAY DATOS
+                            </td>
 
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center wrap">
-                                    <p v-for="(detalle, i) in  data.detalle_quedan" :key="i"
+                                <div class="font-medium text-slate-800 text-center wrap">{{
+                                    data.proveedor.razon_social_proveedor
+                                }}</div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5 whitespace-nowrap w-px">
+                                <div v-for="(detalle, i) in  data.detalle_quedan" :key="i"
+                                    class="font-medium text-slate-800 text-center wrap flex justify-center items-center">
+                                    <p
                                         :class="{ 'border-b-2 border-b-gray-500': i < data.detalle_quedan.length - 1 && data.detalle_quedan.length > 1 }">
                                         N°Fact {{ detalle.numero_factura_det_quedan }} -
                                         N°Acta{{ detalle.numero_acta_det_quedan }} - {{ detalle.descripcion_det_quedan }} -
@@ -51,16 +60,13 @@ import axios from 'axios';
                                     </p>
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center wrap">{{
-                                    data.proveedor.razon_social_proveedor
-                                }}</div>
-                            </td>
+
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">{{
                                     data.monto_liquido_quedan
                                 }}</div>
                             </td>
+
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">{{
                                     data.estado_quedan
@@ -109,7 +115,7 @@ import axios from 'axios';
                                     <div class="flex-1 text-right ml-2">
                                         <a @click="getDataQuedan(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      text-indigo-500">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
                                     </div>
@@ -119,7 +125,7 @@ import axios from 'axios';
                                     <div class="flex-1 text-right ml-2">
                                         <a @click="getDataQuedan(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      text-indigo-500">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
                                     </div>
@@ -136,7 +142,8 @@ import axios from 'axios';
         </div>
 
         <ModalQuedan :showModal="showModal" @cerrar-modal="closeVars()" :data-quedan="dataQuedan"
-            :dataForSelectInRow="dataForSelectInRow" />
+            :dataForSelectInRow="dataForSelectInRow" @actualizar-table-data="getDataQuedan()"
+            :dataSuppliers="dataSuppliers" />
 
 
     </AppLayoutVue>
@@ -144,6 +151,7 @@ import axios from 'axios';
 <script>
 export default {
     created() {
+        this.getAllSuppliers()
         this.getDataQuedan()
         this.getListForSelect()
     },
@@ -151,11 +159,17 @@ export default {
         let sortOrders = {};
         let columns = [
             { width: "10%", label: "Id", name: "id_quedan", type: "text" },
-            { width: "30%", label: "Detalle quedan", name: "numero_factura_det_quedan", type: "text" },
-            { width: "30%", label: "Detalle quedan", name: "razon_social_proveedor", type: "text" },//TODO: hacerlo select
+            { width: "30%", label: "Proveedor", name: "razon_social_proveedor", type: "text" },//TODO: hacerlo select
+            { width: "30%", label: "Detalle quedan", name: "buscar_por_detalle_quedan", type: "text" },
             { width: "10%", label: "Monto", name: "monto_liquido_quedan", type: "text" },
-            { width: "10%", label: "Estado", name: "estado_quedan", type: "text" },
-
+            {
+                width: "10%", label: "Estado", name: "estado_quedan", type: "select",
+                options: [
+                    { value: "", label: "Ninguno" },
+                    { value: "1", label: "Activo" },
+                    { value: "0", label: "Inactivo" }
+                ]
+            },
             { width: "10%", label: "Acciones", name: "Acciones" },
         ];
         columns.forEach((column) => {
@@ -166,10 +180,9 @@ export default {
         });
         return {
             showModal: false,
-            //IdQuedan: null,
             dataQuedan: [],
+            dataSuppliers: null,//attr donde guardar la data de proveedores
             permits: [],
-            options: [],
             dataForSelectInRow: [],
             scrollbarModalOpen: false,
             dataQuedanForTable: [],
@@ -197,6 +210,7 @@ export default {
                 to: "",
             },
 
+
         }
     },
     methods: {
@@ -211,7 +225,6 @@ export default {
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
                     this.dataQuedanForTable = data.data.data;
-                    console.log(response.data);
                 }
             }).catch((errors) => {
                 console.log(errors);
@@ -250,14 +263,33 @@ export default {
         async showQuedan(dataQuedan) {
             this.dataQuedan = dataQuedan
             this.showModal = true
-
         },
-
+        getAllSuppliers() {
+            axios.get("/getAllSuppliers").then(res => {
+                console.log(res.data);
+                this.dataSuppliers = res.data
+            })
+        },
+        validarCamposVacios(objeto) {
+            for (var propiedad in objeto) {
+                if (objeto[propiedad] !== '') {
+                    return false;
+                }
+            }
+            return true;
+        },
         handleData(myEventData) {
-            console.log(myEventData);
-            this.tableData.search = myEventData;
-            this.getDataQuedan()
+
+            if (this.validarCamposVacios(myEventData)) {
+                this.tableData.search = {};
+                this.getDataQuedan()
+            } else {
+                this.tableData.search = myEventData;
+                this.getDataQuedan()
+            }
         },
+
+
     },
 
 };

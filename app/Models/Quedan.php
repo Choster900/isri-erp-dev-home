@@ -45,5 +45,8 @@ class Quedan extends Model
     { //(FOREING KEY, PRIMARY KEY)
         return $this->belongsTo(Proveedor::class, "id_proveedor", "id_proveedor");
     }
-
+    public function tesorero()
+    { //(FOREING KEY, PRIMARY KEY)
+        return $this->belongsTo(Tesorero::class, "id_tesorero", "id_tesorero");
+    }
 }
