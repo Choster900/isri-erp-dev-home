@@ -12,18 +12,21 @@ class DetalleQuedan extends Model
     protected $primaryKey = 'id_det_quedan';
     public $timestamps = false;
     protected $fillable = [
+        'id_det_quedan',
         'id_dependencia',
         'id_quedan',
-        'id_tipo_prestacion',
         'numero_acta_det_quedan',
         'numero_factura_det_quedan',
         'fecha_factura_det_quedan',
+        'producto_factura_det_quedan',
+        'servicio_factura_det_quedan',
         'total_factura_det_quedan',
         'descripcion_det_quedan',
         'fecha_reg_det_quedan',
         'fecha_mod_det_quedan',
         'usuario_det_quedan',
         'ip_det_quedan',
+
 
     ];
 

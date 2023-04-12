@@ -28,8 +28,6 @@ class QuedanRequest extends FormRequest
             'quedan.id_acuerdo_compra'             => 'required',
             'quedan.numero_acuerdo_quedan'         => 'required',
             'quedan.numero_compromiso_ppto_quedan' => 'required|integer',
-            'quedan.numero_compromiso_ppto_quedan' => 'required|integer',
-            'detalle_quedan.0' => 'required',
         ];
     }
 

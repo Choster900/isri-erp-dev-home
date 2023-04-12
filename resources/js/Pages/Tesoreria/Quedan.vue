@@ -40,7 +40,7 @@ import axios from 'axios';
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">{{ data.id_quedan }}</div>
                             </td>
-                            <td v-if="dataQuedanForTable == '' ">
+                            <td v-if="dataQuedanForTable == ''">
                                 NO HAY DATOS
                             </td>
 
@@ -56,7 +56,8 @@ import axios from 'axios';
                                         :class="{ 'border-b-2 border-b-gray-500': i < data.detalle_quedan.length - 1 && data.detalle_quedan.length > 1 }">
                                         N°Fact {{ detalle.numero_factura_det_quedan }} -
                                         N°Acta{{ detalle.numero_acta_det_quedan }} - {{ detalle.descripcion_det_quedan }} -
-                                        ${{ detalle.total_factura_det_quedan }}
+                                        ${{ parseFloat(detalle.servicio_factura_det_quedan) +
+                                            parseFloat(detalle.producto_factura_det_quedan) }}
                                     </p>
                                 </div>
                             </td>
@@ -115,7 +116,7 @@ import axios from 'axios';
                                     <div class="flex-1 text-right ml-2">
                                         <a @click="getDataQuedan(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  text-indigo-500">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
                                     </div>
@@ -125,7 +126,7 @@ import axios from 'axios';
                                     <div class="flex-1 text-right ml-2">
                                         <a @click="getDataQuedan(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  text-indigo-500">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
                                     </div>
@@ -227,7 +228,6 @@ export default {
                     this.dataQuedanForTable = data.data.data;
                 }
             }).catch((errors) => {
-                console.log(errors);
             });
         },
         sortBy(key) {
@@ -257,7 +257,6 @@ export default {
 
                 this.dataForSelectInRow = response.data;
             }).catch((error) => {
-                console.log(error);
             });
         },
         async showQuedan(dataQuedan) {
@@ -266,7 +265,6 @@ export default {
         },
         getAllSuppliers() {
             axios.get("/getAllSuppliers").then(res => {
-                console.log(res.data);
                 this.dataSuppliers = res.data
             })
         },

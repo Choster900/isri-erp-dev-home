@@ -19,17 +19,29 @@ class QuedanController extends Controller
     public function getDataQuedan(Request $request)
     {
         $v_columns = [
-            'id_quedan', 'id_estado_quedan',
-            'id_prioridad_pago', 'id_requerimiento_pago',
-            'id_tesorero', 'id_proy_financiado',
-            'id_serie_retencion_iva', 'id_proveedor',
-            'numero_quedan', 'numero_retencion_iva_quedan',
-            'numero_compromiso_ppto_quedan', 'fecha_emision_quedan',
-            'fecha_retencion_iva_quedan', 'fecha_pago_quedan',
-            'monto_liquido_quedan', 'monto_iva_quedan',
-            'monto_isr_quedan', 'descripcion_quedan',
-            'estado_quedan', 'fecha_reg_quedan',
-            'fecha_mod_quedan', 'usuario_quedan', 'ip_quedan',
+            'id_quedan',
+            'id_estado_quedan',
+            'id_prioridad_pago',
+            'id_requerimiento_pago',
+            'id_tesorero',
+            'id_proy_financiado',
+            'id_serie_retencion_iva',
+            'id_proveedor',
+            'numero_quedan',
+            'numero_retencion_iva_quedan',
+            'numero_compromiso_ppto_quedan',
+            'fecha_emision_quedan',
+            'fecha_retencion_iva_quedan',
+            'fecha_pago_quedan',
+            'monto_liquido_quedan',
+            'monto_iva_quedan',
+            'monto_isr_quedan',
+            'descripcion_quedan',
+            'estado_quedan',
+            'fecha_reg_quedan',
+            'fecha_mod_quedan',
+            'usuario_quedan',
+            'ip_quedan',
         ];
 
         $v_length = $request->input('length');
@@ -72,8 +84,6 @@ class QuedanController extends Controller
         try {
             DB::beginTransaction();
             $quedan = Quedan::insertGetId([
-                //FALTAN DATOS PARA LLENAR BTW
-                //creadon quedan
                 'id_estado_quedan'              => 1,
                 'id_proy_financiado'            => 1,
                 'id_proveedor'                  => $request->quedan["id_proveedor"],
@@ -92,28 +102,28 @@ class QuedanController extends Controller
             ]);
 
 
-            foreach ($detalle_quedan as $key => $value) {
+            foreach ( $detalle_quedan as $key => $value ) {
 
-                if ($value[8]) {
+                if ($value[7]) {
                     $new_detalle = array(
-                        'id_quedan'                 => $quedan,
-                        'numero_factura_det_quedan' => $value[2],
-                        'id_dependencia'            => $value[3],
-                        'id_tipo_prestacion'        => $value[4],
-                        'numero_acta_det_quedan'    => $value[5],
-                        'descripcion_det_quedan'    => $value[6],
-                        'total_factura_det_quedan'  => $value[7],
-                        'fecha_factura_det_quedan'  => Carbon::now(),
-                        'fecha_reg_det_quedan'      => Carbon::now(),
-                        'usuario_det_quedan'        => $request->user()->nick_usuario,
-                        'ip_det_quedan'             => $request->ip(),
+                        'id_quedan'                   => $quedan,
+                        'numero_factura_det_quedan'   => $value[2],
+                        'id_dependencia'              => $value[3],
+                        'numero_acta_det_quedan'      => $value[4],
+                        'descripcion_det_quedan'      => $value[5],
+                        'producto_factura_det_quedan' => $value[6]['producto'],
+                        'servicio_factura_det_quedan' => $value[6]['servicio'],
+                        'fecha_factura_det_quedan'    => Carbon::now(),
+                        'fecha_reg_det_quedan'        => Carbon::now(),
+                        'usuario_det_quedan'          => $request->user()->nick_usuario,
+                        'ip_det_quedan'               => $request->ip(),
 
                     );
                     DetalleQuedan::create($new_detalle);
                 }
             }
 
-            $res =  Quedan::select('*')->with([
+            $res = Quedan::select('*')->with([
                 "detalle_quedan",
                 "proveedor.giro",
                 "proveedor.sujeto_retencion",
@@ -144,16 +154,16 @@ class QuedanController extends Controller
             'monto_isr_quedan'              => $request->quedan["monto_isr_quedan"],
         ]);
 
-        foreach ($detalle_quedan as $key => $value) {
+        foreach ( $detalle_quedan as $key => $value ) {
 
             if ($value[0] == '') { //validar que exista el detalle a modifica
                 $new_detalle = array(
-                    'numero_factura_det_quedan' => $value[2],
-                    'id_dependencia'            => $value[3],
-                    'id_tipo_prestacion'        => $value[4],
-                    'numero_acta_det_quedan'    => $value[5],
-                    'descripcion_det_quedan'    => $value[6],
-                    'total_factura_det_quedan'  => $value[7],
+                    'numero_factura_det_quedan'   => $value[2],
+                    'id_dependencia'              => $value[3],
+                    'numero_acta_det_quedan'      => $value[4],
+                    'descripcion_det_quedan'      => $value[5],
+                    'producto_factura_det_quedan' => $value[6]['producto'],
+                    'servicio_factura_det_quedan' => $value[6]['servicio'],
                     'fecha_mod_det_quedan'      => Carbon::now(),
                     'usuario_det_quedan'        => $request->user()->nick_usuario,
                     'ip_det_quedan'             => $request->ip(),
@@ -163,12 +173,12 @@ class QuedanController extends Controller
             if ($value[0] == 1) { //al momento de editar puede que agrege filas entonces se valida que la fila sea nueva 
                 $new_detalle = array(
                     'id_quedan'                 => $id_quedan,
-                    'numero_factura_det_quedan' => $value[2],
-                    'id_dependencia'            => $value[3],
-                    'id_tipo_prestacion'        => $value[4],
-                    'numero_acta_det_quedan'    => $value[5],
-                    'descripcion_det_quedan'    => $value[6],
-                    'total_factura_det_quedan'  => $value[7],
+                    'numero_factura_det_quedan'   => $value[2],
+                    'id_dependencia'              => $value[3],
+                    'numero_acta_det_quedan'      => $value[4],
+                    'descripcion_det_quedan'      => $value[5],
+                    'producto_factura_det_quedan' => $value[6]['producto'],
+                    'servicio_factura_det_quedan' => $value[6]['servicio'],
                     'fecha_factura_det_quedan'  => Carbon::now(),
                     'fecha_reg_det_quedan'      => Carbon::now(),
                     'usuario_det_quedan'        => $request->user()->nick_usuario,
@@ -176,7 +186,7 @@ class QuedanController extends Controller
                 );
                 DetalleQuedan::create($new_detalle);
             }
-            if ($value[8] == false && $value[0] == '') { //validar que la fila sea eliminada
+            if ($value[7] == false && $value[0] == '') { //validar que la fila sea eliminada
                 $res = DetalleQuedan::find($value[1]);
                 $res->delete();
             }

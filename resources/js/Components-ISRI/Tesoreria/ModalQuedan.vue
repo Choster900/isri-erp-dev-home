@@ -10,15 +10,22 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 
             <div class="">
                 <div class="text-center">
-                    <div class=" justify-content-center pt-2" v-if="dataQuedan == ''">
-                        <GeneralButton color="bg-green-700   hover:bg-green-800" text="AGREGAR" icon="add"
-                            @click="createQuedan()" />
-                    </div>
-                    <div class=" justify-content-center pt-2" v-else>
-                        <GeneralButton color="bg-orange-700   hover:bg-orange-800" text="MODIFICAR" icon="update"
-                            @click="updateQuedan()" />
-                    </div>
+                    <div class=" flex   justify-center pt-2 content-between">
+                        <div class="px-2" v-if="dataQuedan == ''">
+                            <GeneralButton color="bg-green-700   hover:bg-green-800" text="AGREGAR" icon="add"
+                                @click="createQuedan()" />
+                        </div>
 
+                        <div class="px-2" v-else>
+                            <GeneralButton color="bg-orange-700   hover:bg-orange-800" text="MODIFICAR" icon="update"
+                                @click="updateQuedan()" />
+                        </div>
+
+                        <div class="px-2">
+                            <GeneralButton color="bg-red-700   hover:bg-red-800" text="DESCARGAR PDF" icon="pdf"
+                                @click="cominsoon()" />
+                        </div>
+                    </div>
 
                     <button type="button" @click="addRow()"
                         style="float: right;margin-right:-4px;margin-top:399px; font-size: 30px; padding: 0 10px; border: 0; background-color: transparent;">
@@ -85,7 +92,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                     <div class="relative flex  w-full flex-row">
                                         <label for="" class="flex items-center  text-[14px] text-sm">Fecha emision:
                                         </label>
-                                        <input type="date" style="width: 150px;"  v-model="dataInputs.fecha_emision "
+                                        <input type="date" style="width: 150px;" v-model="dataInputs.fecha_emision"
                                             class="placeholder-slate-400 text-sm py-0 text-center font-bold transition-colors duration-300 focus:border-[#001b47 focus:outline-none border-b-0">
                                     </div>
                                 </div>
@@ -142,8 +149,6 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                         <td contenteditable="false" class=""></td>
                                         <td contenteditable="false" class=""></td>
                                         <td contenteditable="false" class=""></td>
-                                        <td contenteditable="false" class=""></td>
-                                        <td contenteditable="false" class=""></td>
                                     </tr>
                                     <tr>
                                         <th class="border-2 border-black  ">
@@ -173,20 +178,20 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                     </tr>
 
                                     <tr>
-                                        <th class="border-2 border-black h-20 text-sm text-gray-600">
+                                        <th class="border-2 border-black h-16 text-sm text-gray-600">
                                             ACUERDO CONTRATACION
                                         </th>
                                         <td class="border-2 border-black"
                                             :class="dataInputs.numero_acuerdo_quedan == '' ? 'bg-[#fdfd96]' : ''"
                                             colspan="3" contenteditable="false">
                                             <input type="text" v-model="dataInputs.numero_acuerdo_quedan"
-                                                class="peer w-full text-sm bg-transparent text-center h-20 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
+                                                class="peer w-full text-sm bg-transparent text-center h-16 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                         </td>
                                         <td class="border-2 border-black"
                                             :class="dataInputs.numero_compromiso_ppto_quedan == '' ? 'bg-[#fdfd96]' : ''"
                                             colspan="8" contenteditable="false">
                                             <input type="text" v-model="dataInputs.numero_compromiso_ppto_quedan"
-                                                class="peer w-full text-sm bg-transparent text-center h-20 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
+                                                class="peer w-full text-sm bg-transparent text-center h-16 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                         </td>
 
                                     </tr>
@@ -208,68 +213,86 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                         <th class="border-2 border-black  text-sm text-gray-600 ">FACTURA</th>
                                         <th class="border-2 border-black  W-64 text-sm px-10 text-gray-600" colspan="2">
                                             DEPENDENCIA</th>
-                                        <th class="border-2 border-black W-60 text-sm px-5 text-gray-600" colspan="2">
-                                            TIPO PRESTACIÓN</th>
-                                        <th class="border-2 border-black w-60 text-sm px-8 text-gray-600">NUMERO ACTA</th>
-                                        <th class="border-2 border-black W-72 text-sm px-10 text-gray-600" colspan="2">
+
+                                        <th class="border-2 border-black w text-sm px-8 text-gray-600">NUMERO ACTA</th>
+                                        <th class="border-2 border-black w-80 text-sm px-10 text-gray-600" colspan="2">
                                             CONCEPTO</th>
-                                        <th class="border-2 border-black W-60 text-sm px-10 text-gray-600">MONTO</th>
+                                        <th class="border-2 border-black w-40 text-sm px-10 text-gray-600">
+                                            MONTO
+                                        </th>
 
                                     </tr>
                                 </thead>
                                 <tbody class="text-sm" id="content">
 
-                                    <tr v-for="(row, rowIndex) in rowsData" :key="rowIndex" @dblclick="deleteRow(rowIndex)">
-                                        <template v-for="(cell, cellIndex) in row" :key="cellIndex">
-                                            <template v-if="row[8]">
-                                                <td v-if="cellIndex == 2"
-                                                    @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
-                                                    class="border-2 border-black py-14 "
-                                                    :class="cell == '' ? 'bg-[#fdfd96]' : ''" contenteditable="true">
-                                                    {{ cell }}
-                                                </td>
-                                                <td v-else-if="cellIndex == 3" class="border-2 border-black" colspan="2"
-                                                    :class="{ 'condition-select': rowsData[rowIndex][3] == '' }">
-                                                    <div class="relative flex h-8 w-full flex-row-reverse ">
-                                                        <Multiselect v-model="rowsData[rowIndex][3]"
-                                                            :options="dataForSelectInRow.dependencias" :searchable="true"
-                                                            @select="onCellEdit(rowIndex, cellIndex, $event)" />
-                                                    </div>
-                                                </td>
-                                                <td v-else-if="cellIndex == 4" class="border-2 border-black" colspan="2"
-                                                    :class="cell == '' ? 'bg-[#fdfd96]' : ''">
-                                                    <div class="grid grid-cols-2 gap-2 ml-3">
-                                                        <div class="text-end">Producto</div>
-                                                        <div class="px-0">
-                                                            <RadioButton modelValue="1" :name="row[1]" :checked="cell === 1"
-                                                                @update:modelValue="onCellEdit(rowIndex, cellIndex, 1)" />
+                                    <template v-for="(row, rowIndex) in rowsData" :key="rowIndex">
+                                        <template v-if="row[7]">
+
+                                            <tr @dblclick="deleteRow(rowIndex)">
+                                                <template v-for="(cell, cellIndex) in row" :key="cellIndex">
+
+                                                    <td v-if="cellIndex == 2"
+                                                        @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
+                                                        class="border-2 border-black"
+                                                        :class="cell == '' ? 'bg-[#fdfd96]' : ''" contenteditable="true">
+                                                        {{ cell }}
+                                                    </td>
+                                                    <td v-else-if="cellIndex == 3" class="border-2 border-black" colspan="2"
+                                                        :class="{ 'condition-select': rowsData[rowIndex][3] == '' }">
+                                                        <div class="relative flex h-10 w-full flex-row-reverse ">
+                                                            <Multiselect v-model="rowsData[rowIndex][3]"
+                                                                :options="dataForSelectInRow.dependencias"
+                                                                :searchable="true"
+                                                                @select="onCellEdit(rowIndex, cellIndex, $event)" />
                                                         </div>
-                                                        <div class="text-end ">Servicio</div>
-                                                        <div>
-                                                            <RadioButton modelValue="2" :name="row[1]" :checked="cell === 2"
-                                                                @update:modelValue="onCellEdit(rowIndex, cellIndex, 2)" />
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td v-else-if="cellIndex == 5" class="border-2 border-black"
-                                                    :class="cell == '' ? 'bg-[#fdfd96]' : ''"
-                                                    @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
-                                                    contenteditable="true">{{ cell }}</td>
-                                                <td v-else-if="cellIndex == 6" colspan="2"
-                                                    @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
-                                                    class="border-2 border-black px-1 " contenteditable="true">
-                                                    {{ cell }}
-                                                </td>
-                                                <td v-else-if="cellIndex == 7"
-                                                    @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
-                                                    class="border-2 border-black px-1 " contenteditable="true"
-                                                    :class="cell == '' ? 'bg-[#fdfd96]' : ''"
-                                                    @keypress="onlyNumberDecimal($event)">
-                                                    {{ cell }}
-                                                </td>
-                                            </template>
+                                                    </td>
+                                                    <td v-else-if="cellIndex == 4" class="border-2 border-black"
+                                                        :class="cell == '' ? 'bg-[#fdfd96]' : ''"
+                                                        @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
+                                                        contenteditable="true">{{ cell }}</td>
+                                                    <td v-else-if="cellIndex == 5" colspan="2"
+                                                        @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
+                                                        class="border-2 border-black px-1 " contenteditable="true">
+                                                        {{ cell }}
+                                                    </td>
+
+                                                    <td v-else-if="cellIndex == 6" class="border-2 border-black"
+                                                        @keypress="onlyNumberDecimal($event)">
+
+                                                        <table>
+                                                            <tr>
+                                                                <th class="border-2 border-r-black border-b-black border-l-transparent border-t-transparent text-sm text-gray-600 py-2"
+                                                                    style="writing-mode: vertical-rl; transform: rotate(180deg);">
+                                                                    PRODUCTO
+                                                                </th>
+                                                                <td contenteditable="true"
+                                                                    :class="cell.producto == '' ? 'bg-[#fdfd96]' : ''"
+                                                                    @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText, 'producto')"
+                                                                    class="w-full border-2 border-b-black border-x-transparent border-t-transparent">
+                                                                    {{ cell.producto }}
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th class="border-2 border-r-black border-t-black border-l-transparent border-b-transparent text-gray-600 py-2"
+                                                                    style="writing-mode: vertical-rl; transform: rotate(180deg);">
+                                                                    SERVICIO
+                                                                </th>
+                                                                <td contenteditable="true"
+                                                                    :class="cell.servicio == '' ? 'bg-[#fdfd96]' : ''"
+                                                                    @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText, 'servicio')">
+                                                                    {{ cell.servicio }}
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+
+                                                    </td>
+
+                                                </template>
+
+                                            </tr>
+
                                         </template>
-                                    </tr>
+                                    </template>
                                 </tbody>
                                 <tbody>
                                     <tr id="esconder" class="border-none">
@@ -362,11 +385,20 @@ export default {
         }
     },
     methods: {
-        onCellEdit(rowIndex, cellIndex, value) {//editando la celda RECIVE ROW, CELL Y EL VALOR A MODIFICAR
-            this.rowsData[rowIndex][cellIndex] = value
-            if (["4", "7"].includes(cellIndex)) {//ejecutando la accion cuando escriba en la celda [monto,tipo_prestacion]
+        onCellEdit(rowIndex, cellIndex, value, type = '') {//editando la celda RECIVE ROW, CELL Y EL VALOR A MODIFICAR
+
+            if (type) {//ejecutando la accion cuando escriba en la celda [monto,tipo_prestacion]
+                if (type == 'producto') {
+                    this.rowsData[rowIndex][cellIndex].producto = value
+                } else {
+                    this.rowsData[rowIndex][cellIndex].servicio = value
+                }
                 this.calculateAmount()
+
+            } else {
+                this.rowsData[rowIndex][cellIndex] = value
             }
+
         },
         getInformationBySupplier(supplier) {
             this.dataSuppliers.forEach((suppliers, index) => {
@@ -387,15 +419,15 @@ export default {
             let totMontoByRow = 0
             let liquido = 0;
             let montoServicios = 0
+
             this.rowsData.forEach((valores, index) => {
-                totMontoByRow = parseFloat(totMontoByRow) + parseFloat(valores[7])
+                totMontoByRow = (!isNaN(parseFloat(totMontoByRow)) ? parseFloat(totMontoByRow) : 0) + (!isNaN(parseFloat(valores[6].producto)) ? parseFloat(valores[6].producto) : 0) + (!isNaN(parseFloat(valores[6].servicio)) ? parseFloat(valores[6].servicio) : 0);
             })
             this.rowsData.forEach((valores, index) => {
-                if (valores[4] == 2) {
-                    montoServicios = parseFloat(montoServicios) + parseFloat(valores[7])
+                if (valores[6].servicio != '') {
+                    montoServicios = parseFloat(montoServicios) + parseFloat(valores[6].servicio)
                 }
             })
-
             liquido = (totMontoByRow / 1.13).toFixed(2);
             let montoIvaQuedan = (liquido * this.dataForCalculate.iva).toFixed(2);
             this.dataInputs.monto_iva_quedan = montoIvaQuedan;
@@ -468,13 +500,12 @@ export default {
             this.rowsData.push({
                 0: 1,//numberRow,
                 1: '',//Id__detalle_quedan,
-                2: '',//factura_detalle_quedan,
-                3: '',//dependencia_detalle_quedan,
-                4: '',//Tipo prestacion_detalle_quedan,
-                5: '',//Numero Acta_detalle_quedan,
-                6: '',//DescripcionFactura_detalle_quedan,
-                7: '',//Monto_detalle_quedan,
-                8: true,//eliminado_logico,
+                2: '',//FACTURA,
+                3: '',//DEPENDENCIA,
+                4: '',//NUMERO ACTA	,
+                5: '',//CONCEPTO	,
+                6: { producto: '', servicio: '' },//Monto en producto y servicio
+                7: true,//eliminado_logico,
             })
         },
 
@@ -546,7 +577,6 @@ export default {
                     id_quedan: this.dataQuedan.id_quedan,
                     detalle_quedan: this.rowsData
                 });
-                console.log(response);
                 return true; // indicate success
             } catch (error) {
                 console.error(error);
@@ -598,7 +628,7 @@ export default {
                 showCloseButton: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    this.rowsData[rowIndex][8] = false;
+                    this.rowsData[rowIndex][7] = false;
                     toast.warning("La fila actual se elimino temporalmente hasta que guarde los cambios", {
                         autoClose: 5000,
                         position: "top-right",
@@ -622,13 +652,12 @@ export default {
                         this.rowsData.push({
                             0: '',//numberRow,
                             1: value.id_det_quedan,//Id__detalle_quedan,
-                            2: value.numero_factura_det_quedan,//factura_detalle_quedan,
-                            3: value.id_dependencia,//dependencia_detalle_quedan,
-                            4: value.id_tipo_prestacion,//Tipo prestacion_detalle_quedan,
-                            5: value.numero_acta_det_quedan,//Numero Acta_detalle_quedan,
-                            6: value.descripcion_det_quedan,//DescripcionFactura_detalle_quedan,
-                            7: value.total_factura_det_quedan,//Monto_detalle_quedan,
-                            8: true,//eliminado_logico
+                            2: value.numero_factura_det_quedan,//FACTURA,
+                            3: value.id_dependencia,//DEPENDENCIA	,
+                            4: value.numero_acta_det_quedan,//NUMERO ACTA	,
+                            5: value.descripcion_det_quedan,//CONCEPTO,
+                            6: { producto: value.producto_factura_det_quedan, servicio: value.servicio_factura_det_quedan },//Monto de producto y servicio,
+                            7: true,//eliminado_logico
                         })
                     })
                     this.calculateAmount()
@@ -704,5 +733,8 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
     animation-name: none !important;
 }
 
-
+td {
+    outline: none;
+    /* Desactiva el marco de enfoque */
+}
 </style>
