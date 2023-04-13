@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Tesoreria;
 
+use Illuminate\Http\Request;
+
 use Illuminate\Foundation\Http\FormRequest;
 
 class QuedanRequest extends FormRequest
@@ -21,24 +23,32 @@ class QuedanRequest extends FormRequest
      *
      * @return array<string, mixed>
      */
-    public function rules()
+    public function rules(Request $request)
     {
-        return [
-            'quedan.id_proveedor'                  => 'required',
-            'quedan.id_acuerdo_compra'             => 'required',
-            'quedan.numero_acuerdo_quedan'         => 'required',
-            'quedan.numero_compromiso_ppto_quedan' => 'required|integer',
-        ];
+
+        $rules = [];
+        foreach ( $this->input('detalle_quedan', []) as $key => $value ) {
+            if ($this->input("detalle_quedan.{$key}.7")) {
+                $rules["detalle_quedan.{$key}.4"] = ['unique:detalle_quedan,numero_acta_det_quedan,' . $this->input("detalle_quedan.{$key}.1") . ',id_det_quedan'];
+            }
+        }
+        return $rules;
+
     }
 
     public function messages()
     {
-        return [
-            'quedan.id_proveedor.required'                  => '1',
-            'quedan.id_acuerdo_compra.required'             => '1',
-            'quedan.numero_acuerdo_quedan.required'         => '1',
-            'quedan.numero_compromiso_ppto_quedan.required' => '1',
-            'quedan.numero_compromiso_ppto_quedan.integer'  => '1',
-        ];
+        $messages = [];
+
+
+        foreach ( $this->input('detalle_quedan', []) as $key => $value ) {
+            if ($this->input("detalle_quedan.{$key}.7")) {
+                $messages["detalle_quedan.{$key}.4.unique"] = '1';
+            }
+
+        }
+
+        return $messages;
+
     }
 }

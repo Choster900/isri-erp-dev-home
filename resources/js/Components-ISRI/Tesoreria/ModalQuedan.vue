@@ -246,8 +246,12 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                                 @select="onCellEdit(rowIndex, cellIndex, $event)" />
                                                         </div>
                                                     </td>
-                                                    <td v-else-if="cellIndex == 4" class="border-2 border-black"
-                                                        :class="cell == '' ? 'bg-[#fdfd96]' : ''"
+                                                    <td v-else-if="cellIndex == 4" class="border-2 border-black" :class="[
+                                                        cell == '' ? 'bg-[#fdfd96]' : '',
+                                                        errosDetalleQuedan[rowIndex] ? 'bg-[#fd9696]' : '',
+                                                        errosrNumeroActa.includes(rowIndex) ? 'bg-[#fd9696]' : ''
+
+                                                    ]"
                                                         @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
                                                         contenteditable="true">{{ cell }}</td>
                                                     <td v-else-if="cellIndex == 5" colspan="2"
@@ -353,7 +357,8 @@ export default {
     data: function () {
         return {
             rowsData: [],//attr donde guardar la information
-            errosQuedan: {},
+            errosDetalleQuedan: [],
+            errosrNumeroActa: [],
             dataInputs: {
                 giro: '',
                 irs: '',
@@ -509,12 +514,46 @@ export default {
             })
         },
 
+        paintPositionRepet() {
+            const duplicatePositions = {};//get position where the acta number was duplicated
+
+            for (let i = 0; i < this.rowsData.length; i++) {
+                const row = this.rowsData[i];
+                const number = row[4]; // get numbers en position 4
+
+                // Verificar si el valor en la fila 7 es false antes de agregar la posición actual a las posiciones duplicadas
+                if (row[7] !== false) {
+                    if (duplicatePositions[number]) {
+                        // Si el número ya ha sido ingresado antes, agregar la posición actual a las posiciones duplicadas
+                        duplicatePositions[number].push(i);
+                    } else {
+                        // Si el número es único, crear un nuevo arreglo con la posición actual
+                        duplicatePositions[number] = [i];
+                    }
+                }
+            }
+            const duplicateNumbers = Object.keys(duplicatePositions).filter(number => duplicatePositions[number].length > 1);
+            duplicateNumbers.forEach(number => {
+                duplicatePositions[number].forEach(position => {
+                    this.errosrNumeroActa.push(position)
+                })
+
+            });
+            setTimeout(() => {
+                this.errosrNumeroActa = [];
+            }, 5000);
+
+            return this.errosrNumeroActa.length;
+
+        },
         async createQuedanAsynchronously() {
+
             try {
                 const response = await axios.post('/add-quedan', {
                     quedan: this.dataInputs,
                     detalle_quedan: this.rowsData
                 })
+
                 return true; // indicate success
             } catch (error) {
 
@@ -525,12 +564,11 @@ export default {
                     let newIndexSplit = split[1]
                     myData[newIndexSplit] = data[errorBack][0]
                 }
-                this.errosQuedan = myData;
-                console.error(this.errosQuedan);
-
+                this.errosDetalleQuedan = myData;
                 setTimeout(() => {
-                    this.errosQuedan = {}
-                }, 2000);
+                    this.errosDetalleQuedan = [];
+
+                }, 5000);
                 return false; // indicate failure
             }
         },
@@ -547,25 +585,36 @@ export default {
                 showCloseButton: true
             });
             if (confirmed.isConfirmed) {
-                const successAdd = await this.createQuedanAsynchronously();
-                if (successAdd) {
-                    toast.success("El quedan fue agregado correctamente", {
-                        autoClose: 5000,
-                        position: "top-right",
-                        transition: "zoom",
-                        toastBackgroundColor: "white",
-                    });
-                    this.$emit("actualizar-table-data")
-                    this.rowsData = []
-                    this.resetValuesToInput()
-                    this.addRow()
+
+                if (this.paintPositionRepet() == 0) {
+                    const successAdd = await this.createQuedanAsynchronously();
+                    if (successAdd) {
+                        toast.success("El quedan fue agregado correctamente", {
+                            autoClose: 5000,
+                            position: "top-right",
+                            transition: "zoom",
+                            toastBackgroundColor: "white",
+                        });
+                        this.$emit("actualizar-table-data")
+                        this.rowsData = []
+                        this.resetValuesToInput()
+                        this.addRow()
+                    } else {
+                        toast.error("Error, Al parecer tiene datos requiredios y/o duplicados", {
+                            autoClose: 5000,
+                            position: "top-right",
+                            transition: "zoom",
+                            toastBackgroundColor: "white",
+                        });
+                    }
                 } else {
-                    toast.error("Error, al parecer tiene datos invalidos", {
+                    toast.error("Al parecer tienes datos repetidos", {
                         autoClose: 5000,
                         position: "top-right",
                         transition: "zoom",
                         toastBackgroundColor: "white",
                     });
+
                 }
             }
         },
@@ -579,7 +628,22 @@ export default {
                 });
                 return true; // indicate success
             } catch (error) {
-                console.error(error);
+                let data = error.response.data.errors
+                var myData = new Object();
+                for (const errorBack in data) {
+                    let split = errorBack.split(".")
+                    let newIndexSplit = split[1]
+                    myData[newIndexSplit] = data[errorBack][0]
+                }
+                this.errosDetalleQuedan = myData;
+
+
+                console.log(this.errosDetalleQuedan);
+
+                setTimeout(() => {
+                    this.errosDetalleQuedan = [];
+
+                }, 5000);
                 return false; // indicate failure
             }
         },
@@ -596,24 +660,37 @@ export default {
             });
 
             if (confirmed.isConfirmed) {
-                const successUpdate = await this.updateQuedanAsynchronously();
-                if (successUpdate) {
-                    toast.success("El quedan fue modificado correctamente", {
-                        autoClose: 5000,
-                        position: "top-right",
-                        transition: "zoom",
-                        toastBackgroundColor: "white",
-                    });
-                    this.$emit("actualizar-table-data")
 
+
+                if (this.paintPositionRepet() == 0) {
+                    const successUpdate = await this.updateQuedanAsynchronously();
+                    if (successUpdate) {
+                        toast.success("El quedan fue modificado correctamente", {
+                            autoClose: 5000,
+                            position: "top-right",
+                            transition: "zoom",
+                            toastBackgroundColor: "white",
+                        });
+                        this.$emit("actualizar-table-data")
+
+                    } else {
+                        toast.error("Error, al parecer tiene datos invalidos", {
+                            autoClose: 5000,
+                            position: "top-right",
+                            transition: "zoom",
+                            toastBackgroundColor: "white",
+                        });
+                    }
                 } else {
-                    toast.error("Error, al parecer tiene datos invalidos", {
+                    toast.error("Al parecer tienes datos repetidos", {
                         autoClose: 5000,
                         position: "top-right",
                         transition: "zoom",
                         toastBackgroundColor: "white",
                     });
+
                 }
+
             }
         },
         deleteRow(rowIndex) {
@@ -726,6 +803,12 @@ table.rounded-lg {
 .condition-select .multiselect-wrapper input {
     /* BACKGROUN COLOR INPUT */
     background-color: #fdfd96;
+}
+
+.condition-acta {
+    /* BACKGROUND SELECT */
+    background: var(--ms-bg, #fd9696);
+
 }
 
 input[type="date"]:focus::-webkit-calendar-picker-indicator {
