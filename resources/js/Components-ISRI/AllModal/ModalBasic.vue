@@ -76,7 +76,7 @@ const maxWidthClass = computed(() => {
                 :class="maxWidthClass">
 
                 <!-- Modal header -->
-                <div class="sticky  block px-5 py-3 border-b border-slate-300 bg-[#1F3558]">
+                <div class="sticky  block px-5 py-3 border-b border-slate-300 bg-[#0c2958]">
                     <div class="flex justify-between items-center ">
                         <div class="font-semibold text-slate-50">{{ title }}</div>
                         <button class="text-slate-400 hover:text-slate-500" @click.stop="$emit('close-modal-persona')">
