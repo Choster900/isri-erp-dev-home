@@ -19,9 +19,14 @@ class SujetoRetencion extends Model
         'isrl_sujeto_retencion',
     ];
 
-    public function proveedores()
+    public function proveedor()
     {
-        return $this->hasMany('App\Models\Proveedor', "id_sujeto_retencion", "p_id_sujeto_retencion");
+        return $this->hasMany(Proveedor::class, "id_sujeto_retencion", "p_id_sujeto_retencion");
+    }
+
+    public function Quedan()
+    {
+        return $this->hasManyThrough(SujetoRetencion::class, Proveedor::class);
     }
 
 

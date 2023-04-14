@@ -1,17 +1,18 @@
 <script setup>
 import { Head } from "@inertiajs/vue3";
 import Datatable from "@/Components-ISRI/Datatable.vue";
-import ModalSuppliersVue from '@/Components-ISRI/Tesoreria/ModalSuppliers.vue';
+import ModalQuedan from "@/Components-ISRI/Tesoreria/ModalQuedan.vue";
 import { toast } from 'vue3-toastify';
-import 'vue3-toastify/dist/index.css';  
+import 'vue3-toastify/dist/index.css';
+import axios from 'axios';
 </script>
 <template>
     <Head title="Administracion" />
     <AppLayoutVue>
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton v-if="permits.insertar == 1" @click="addDataSupplier()"
-                    color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add" />
+                <GeneralButton @click="createQuedan()" color="bg-green-700  hover:bg-green-800" text="Agregar Elemento"
+                    icon="add" />
             </div>
         </div>
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
@@ -20,7 +21,7 @@ import 'vue3-toastify/dist/index.css';
                 <div class="mb-4 md:flex flex-row justify-items-start">
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-                            <Multiselect v-model="tableData.length" @select="getSuppilers()" :options="perPage"
+                            <Multiselect v-model="tableData.length" @select="getDataQuedan()" :options="perPage"
                                 :searchable="true" />
                             <LabelToInput icon="date" />
                         </div>
@@ -35,42 +36,46 @@ import 'vue3-toastify/dist/index.css';
                 <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy"
                     @datos-enviados="handleData($event)">
                     <tbody class="text-sm divide-y divide-slate-200">
-                        <tr v-for="proveedor in proveedores" :key="proveedor.id_proveedor">
+                        <tr v-for="data in dataQuedanForTable" :key="data.id_quedan">
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">{{ proveedor.id_proveedor }}</div>
+                                <div class="font-medium text-slate-800 text-center">{{ data.id_quedan }}</div>
                             </td>
+                            <td v-if="dataQuedanForTable == ''">
+                                NO HAY DATOS
+                            </td>
+
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div v-if="proveedor.dui_proveedor" class="font-medium text-slate-800 text-center">
-                                    {{ proveedor.dui_proveedor }}<br>
-                                </div>
-                                <div v-else class="font-medium text-slate-800 text-center">
-                                    {{ proveedor.nit_proveedor }}<br>
+                                <div class="font-medium text-slate-800 text-center wrap">{{
+                                    data.proveedor.razon_social_proveedor
+                                }}</div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5 whitespace-nowrap w-px">
+                                <div v-for="(detalle, i) in  data.detalle_quedan" :key="i"
+                                    class="font-medium text-slate-800 text-center wrap flex justify-center items-center">
+                                    <p
+                                        :class="{ 'border-b-2 border-b-gray-500': i < data.detalle_quedan.length - 1 && data.detalle_quedan.length > 1 }">
+                                        N°Fact {{ detalle.numero_factura_det_quedan }} -
+                                        N°Acta{{ detalle.numero_acta_det_quedan }} - {{ detalle.descripcion_det_quedan }} -
+                                        ${{ parseFloat(detalle.servicio_factura_det_quedan) +
+                                            parseFloat(detalle.producto_factura_det_quedan) }}
+                                    </p>
                                 </div>
                             </td>
 
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">{{ proveedor.razon_social_proveedor }}
-                                </div>
+                                <div class="font-medium text-slate-800 text-center">{{
+                                    data.monto_liquido_quedan
+                                }}</div>
                             </td>
+
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">{{ proveedor.nombre_comercial_proveedor
+                                <div class="font-medium text-slate-800 text-center">{{
+                                    data.estado_quedan
                                 }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800">
-                                    <div v-if="(proveedor.estado_proveedor == 1)"
-                                        class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
-                                        Activo
-                                    </div>
-                                    <div v-else
-                                        class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-rose-100 text-rose-600">
-                                        Inactivo
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="space-x-1">
-                                    <button v-if="permits.actualizar == 1" @click.stop="getSuppiler(proveedor.id_proveedor)"
+                                    <button @click.stop="showQuedan(data)"
                                         class="text-slate-400 hover:text-slate-500 rounded-full">
                                         <span class="sr-only">Edit</span>
                                         <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
@@ -81,7 +86,6 @@ import 'vue3-toastify/dist/index.css';
                                     </button>
                                     <!-- CAMBIAR ICONO DE BOTON POR QUE VA A SER ACTIVAR Y DESCATIVAR -->
                                     <button class="text-rose-500 hover:text-rose-600 rounded-full"
-                                        v-if="permits.eliminar == 1"
                                         @click="enableStateForSupplier(proveedor.id_proveedor, proveedor.estado_proveedor)">
                                         <span class="sr-only">Delete</span><svg class="w-8 h-8 fill-current"
                                             viewBox="0 0 32 32">
@@ -110,9 +114,9 @@ import 'vue3-toastify/dist/index.css';
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
 
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getSuppilers(link.url)"
+                                        <a @click="getDataQuedan(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                                                                                                                                                                                                      text-indigo-500">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
                                     </div>
@@ -120,16 +124,16 @@ import 'vue3-toastify/dist/index.css';
                                 <span v-else-if="(link.label == 'Siguiente')"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getSuppilers(link.url)"
+                                        <a @click="getDataQuedan(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                                                                                                                                                                                                      text-indigo-500">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
                                     </div>
                                 </span>
                                 <span class="cursor-pointer" v-else
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
-                                        class=" w-5" @click="getSuppilers(link.url)">{{ link.label }}</span>
+                                        class=" w-5" @click="getDataQuedan(link.url)">{{ link.label }}</span>
                                 </span>
                             </li>
                         </ul>
@@ -138,8 +142,9 @@ import 'vue3-toastify/dist/index.css';
             </div>
         </div>
 
-        <ModalSuppliersVue :scrollbarModalOpen="scrollbarModalOpen" @close-definitive="scrollbarModalOpen = false"
-            :infoSupplier="infoSupplier" @showTableAgain="getSuppilers(lastUrl)" />
+        <ModalQuedan :showModal="showModal" @cerrar-modal="closeVars()" :data-quedan="dataQuedan"
+            :dataForSelectInRow="dataForSelectInRow" @actualizar-table-data="getDataQuedan()"
+            :dataSuppliers="dataSuppliers" />
 
 
     </AppLayoutVue>
@@ -147,18 +152,19 @@ import 'vue3-toastify/dist/index.css';
 <script>
 export default {
     created() {
-        this.getSuppilers();
-        this.getPermits()
+        this.getAllSuppliers()
+        this.getDataQuedan()
+        this.getListForSelect()
     },
     data: function (data) {
         let sortOrders = {};
         let columns = [
-            { width: "10%", label: "Id", name: "id_proveedor", type: "text" },
-            { width: "15%", label: "Documentos", name: "dui_proveedor", type: "text" },
-            { width: "20%", label: "Razon social", name: "razon_social_proveedor", type: "text" },
-            { width: "20%", label: "Nombre comercial", name: "nombre_comercial_proveedor", type: "text" },
+            { width: "10%", label: "Id", name: "id_quedan", type: "text" },
+            { width: "30%", label: "Proveedor", name: "razon_social_proveedor", type: "text" },//TODO: hacerlo select
+            { width: "30%", label: "Detalle quedan", name: "buscar_por_detalle_quedan", type: "text" },
+            { width: "10%", label: "Monto", name: "monto_liquido_quedan", type: "text" },
             {
-                width: "10%", label: "Estado", name: "estado_proveedor", type: "select",
+                width: "10%", label: "Estado", name: "estado_quedan", type: "select",
                 options: [
                     { value: "", label: "Ninguno" },
                     { value: "1", label: "Activo" },
@@ -168,19 +174,23 @@ export default {
             { width: "10%", label: "Acciones", name: "Acciones" },
         ];
         columns.forEach((column) => {
-            if (column.name === 'id_persona')
+            if (column.name === 'id_quedan')
                 sortOrders[column.name] = 1;
             else
                 sortOrders[column.name] = -1;
         });
         return {
+            showModal: false,
+            dataQuedan: [],
+            dataSuppliers: null,//attr donde guardar la data de proveedores
             permits: [],
+            dataForSelectInRow: [],
             scrollbarModalOpen: false,
-            proveedores: [],
+            dataQuedanForTable: [],
             links: [],
-            lastUrl: '/proveedores',
+            lastUrl: '/quedan',
             columns: columns,
-            sortKey: "id_proveedor",
+            sortKey: "id_quedan",
             sortOrders: sortOrders,
             perPage: ["10", "20", "30"],
             tableData: {
@@ -190,7 +200,6 @@ export default {
                 dir: "desc",
                 search: {},
             },
-
             pagination: {
                 lastPage: "",
                 currentPage: "",
@@ -201,11 +210,12 @@ export default {
                 from: "",
                 to: "",
             },
-            infoSupplier: [],
-        };
+
+
+        }
     },
     methods: {
-        async getSuppilers(url = "/proveedores") {
+        async getDataQuedan(url = "/quedan") {
             this.lastUrl = url;
             this.tableData.draw++;
             await axios.get(url, { params: this.tableData }).then((response) => {
@@ -215,7 +225,7 @@ export default {
                     this.pagination.total = data.data.total
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
-                    this.proveedores = data.data.data;
+                    this.dataQuedanForTable = data.data.data;
                 }
             }).catch((errors) => {
             });
@@ -226,60 +236,36 @@ export default {
                 this.sortOrders[key] = this.sortOrders[key] * -1;
                 this.tableData.column = this.getIndex(this.columns, "name", key);
                 this.tableData.dir = this.sortOrders[key] === 1 ? "asc" : "desc";
-                this.getSuppilers();
+                this.getDataQuedan();
             }
         },
         getIndex(array, key, value) {
             return array.findIndex((i) => i[key] == value);
         },
-        async getSuppiler(supplier_id) {
-            await axios.get("/get-supplier", { params: { id_proveedor: supplier_id } }).then(res => {
-                console.log(res.data);
-                this.infoSupplier = res.data
-            }).catch(err => {
-                console.error(err);
-            })
-            this.scrollbarModalOpen = !this.scrollbarModalOpen
+
+        closeVars() {
+            this.showModal = false
         },
-        addDataSupplier() {
-            this.infoSupplier = []
-            this.scrollbarModalOpen = !this.scrollbarModalOpen
+        async createQuedan() {
+
+            this.dataQuedan = []
+            this.showModal = true
 
         },
-        async enable(id_persona, estado) {
-            await axios.post("/update-state-supplier", { id_proveedor: id_persona, estado_proveedor: estado })
-                .then(res => {
-                    console.log(res)
-                })
-                .catch(err => {
-                    console.error(err);
-                })
-            this.getSuppilers(this.lastUrl)//llamamos de nuevo el metodo para que actualize la tabla 
-        },
+        async getListForSelect() {
+            await axios.get('/get-list-select').then((response) => {
 
-        enableStateForSupplier(id_proveedor, estado) {
-            let state = estado == 0 ? 'habilitar' : 'deshabilitar'
-            this.$swal.fire({
-                title: '¿Esta seguro de ' + state + ' el registro ?',
-                icon: 'question',
-                iconHtml: '❓',
-                confirmButtonText: 'Si, ' + state + '',
-                confirmButtonColor: '#001b47',
-                cancelButtonText: 'Cancelar',
-                showCancelButton: true,
-                showCloseButton: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    this.enable(id_proveedor, estado)//peticion async hace la modificacion 
-                    //no la llamamos en el mismo metodo por que dejaria de ser asyn y hay problema al momento de actulizar la tabla
-                    toast.info("Hecho", {
-                        autoClose: 5000,
-                        position: "top-right",
-                        transition: "bounce",
-                        toastBackgroundColor: "white",
-                        icon: "✔️",
-                    });
-                }
+                this.dataForSelectInRow = response.data;
+            }).catch((error) => {
+            });
+        },
+        async showQuedan(dataQuedan) {
+            this.dataQuedan = dataQuedan
+            this.showModal = true
+        },
+        getAllSuppliers() {
+            axios.get("/getAllSuppliers").then(res => {
+                this.dataSuppliers = res.data
             })
         },
         validarCamposVacios(objeto) {
@@ -294,25 +280,14 @@ export default {
 
             if (this.validarCamposVacios(myEventData)) {
                 this.tableData.search = {};
-                this.getSuppilers()
+                this.getDataQuedan()
             } else {
                 this.tableData.search = myEventData;
-                this.getSuppilers()
+                this.getDataQuedan()
             }
         },
-        getPermits() {
-            var URLactual = window.location.pathname
-            let data = this.$page.props.menu;
-            let menu = JSON.parse(JSON.stringify(data['urls']))
-            menu.forEach((value, index) => {
-                value.submenu.forEach((value2, index2) => {
-                    if (value2.url === URLactual) {
-                        var array = { 'insertar': value2.insertar, 'actualizar': value2.actualizar, 'eliminar': value2.eliminar, 'ejecutar': value2.ejecutar }
-                        this.permits = array
-                    }
-                })
-            })
-        },
+
+
     },
 
 };
@@ -321,7 +296,7 @@ export default {
 <style>
 .wrap,
 .wrap2 {
-    width: 70%;
+    width: 100%;
     white-space: pre-wrap;
 }
 </style>

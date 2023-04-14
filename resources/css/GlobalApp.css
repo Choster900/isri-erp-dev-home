@@ -40,9 +40,9 @@
    /*Comenta la línea (o dale el valor 'auto' a scroll behavior )
    para probar la diferencia con y sin scroll suavizado*/
 }
-.overflow-x-auto table tbody tr:hover {
+/* .overflow-x-auto table tbody tr:hover {
     background-color: rgba(31, 53, 88, 0.1);
-}
+} */
 
 .overflow-x-auto table tbody td :disabled {
     background-color: rgba(31, 53, 88, 0.2);

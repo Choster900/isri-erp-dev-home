@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use App\Models\Proveedor;
 use Carbon\Carbon;
-use App\Http\Requests\SupplierRequest;
+use App\Http\Requests\Tesoreria\SupplierRequest;
 
 
 class ProveedorController extends Controller
