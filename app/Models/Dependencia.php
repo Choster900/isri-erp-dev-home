@@ -32,4 +32,15 @@ class Dependencia extends Model
     { //(FOREING KEY, PRIMARY KEY)
         return $this->hasMany(DetalleQuedan::class, "id_quedan", "id_quedan");
     }
+
+    public function parentDependency()
+    {
+        return $this->hasOne('App\Models\Dependencia', 'id_dependencia', 'dep_id_dependencia');
+    }
+
+    public function childrenDependencies()
+    {
+        return $this->hasMany('App\Models\Dependencia', 'dep_id_dependencia', 'id_dependencia');
+    }
+
 }
