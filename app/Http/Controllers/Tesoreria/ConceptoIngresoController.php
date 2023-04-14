@@ -11,7 +11,7 @@ use App\Models\ProyectoFinanciado;
 use Carbon\Carbon;
 use App\Http\Requests\IncomeConceptRequest;
 
-class IngresoController extends Controller
+class ConceptoIngresoController extends Controller
 {
     public function getConceptoIngresos(Request $request)
     {
@@ -25,8 +25,8 @@ class IngresoController extends Controller
         $query = ConceptoIngreso::select('*')
                     ->leftJoin('dependencia', function ($join) {
                         $join->on('concepto_ingreso.id_dependencia', '=', 'dependencia.id_dependencia');
-                    });
-
+                    })
+                    ->orderBy($columns[$column], $dir);;
         if ($search_value) {
             $query->where([
                 ['id_concepto_ingreso','like','%'.$search_value['id_concepto_ingreso'].'%'],
@@ -38,13 +38,7 @@ class IngresoController extends Controller
                         ->orWhereRaw('IFNULL(codigo_dependencia, "") like ?','%' . $search_value['nombre_dependencia'] . '%');
                 }],
             ]);
-            // $query->where('id_concepto_ingreso', 'like', '%' . $search_value['id_concepto_ingreso'] . '%')
-            //         ->whereRaw('IFNULL(nombre_dependencia, "") like ?','%' . $search_value['nombre_dependencia'] . '%')
-            //         ->where('nombre_concepto_ingreso', 'like', '%' . $search_value['nombre_concepto_ingreso'] . '%')
-            //         ->where('id_ccta_presupuestal', 'like', '%' . $search_value['id_ccta_presupuestal'] . '%')
-            //         ->where('estado_concepto_ingreso', 'like', '%' . $search_value['estado_concepto_ingreso'] . '%');
         }
-
         $income_concept = $query->paginate($length)->onEachSide(1);
         return ['data' => $income_concept, 'draw' => $request->input('draw')];
     }

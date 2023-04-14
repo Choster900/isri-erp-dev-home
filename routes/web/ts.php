@@ -2,7 +2,7 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Tesoreria\ProveedorController;
-use App\Http\Controllers\Tesoreria\IngresoController;
+use App\Http\Controllers\Tesoreria\ConceptoIngresoController;
 
 Route::group(['middleware' => ['auth', 'access']], function () {
 
@@ -25,19 +25,28 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('change-values-retencion/{id_sujeto_retencion}', [ProveedorController::class, 'changeValueRetencion'])->name('change-values-retencion');
     Route::post('update-state-supplier', [ProveedorController::class, 'changeStateSupplier'])->name('change-values-retencion');
 
-
+    //Routes to manage income concept
     Route::get(
-        '/ts/ingresos',
+        '/ts/concepto-ingresos',
         function () {
             return Inertia::render('Tesoreria/ConceptoIngresos', [
                 'menu' => session()->get('menu')
             ]);
         }
     )->name('ts.conceptoIngresos');
+    Route::get('ingresos', [ConceptoIngresoController::class, 'getConceptoIngresos'])->name('ingreso.getConceptoIngresos');
+    Route::post('change-state-income-concept', [ConceptoIngresoController::class, 'changeStateIncomeConcept'])->name('ingreso.changeStateIncomeConcept');
+    Route::get('get-selects-income-concept', [ConceptoIngresoController::class, 'getSelectsIncomeConcept'])->name('ingreso.getSelectsIncomeConcept');
+    Route::post('save-income-concept', [ConceptoIngresoController::class, 'saveIncomeConcept'])->name('ingreso.saveIncomeConcept');
+    Route::post('update-income-concept', [ConceptoIngresoController::class, 'updateIncomeConcept'])->name('ingreso.updateIncomeConcept');
 
-    Route::get('ingresos', [IngresoController::class, 'getConceptoIngresos'])->name('ingreso.getConceptoIngresos');
-    Route::post('change-state-income-concept', [IngresoController::class, 'changeStateIncomeConcept'])->name('ingreso.changeStateIncomeConcept');
-    Route::get('get-selects-income-concept', [IngresoController::class, 'getSelectsIncomeConcept'])->name('ingreso.getSelectsIncomeConcept');
-    Route::post('save-income-concept', [IngresoController::class, 'saveIncomeConcept'])->name('ingreso.saveIncomeConcept');
-    Route::post('update-income-concept', [IngresoController::class, 'updateIncomeConcept'])->name('ingreso.updateIncomeConcept');
+    //Routes to manage income
+    Route::get(
+        '/ts/ingresos',
+        function () {
+            return Inertia::render('Tesoreria/Ingresos', [
+                'menu' => session()->get('menu')
+            ]);
+        }
+    )->name('ts.ingresos');
 });
