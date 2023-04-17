@@ -9,7 +9,7 @@ use App\Models\CuentaPresupuestal;
 use App\Models\Dependencia;
 use App\Models\ProyectoFinanciado;
 use Carbon\Carbon;
-use App\Http\Requests\IncomeConceptRequest;
+use App\Http\Requests\Tesoreria\IncomeConceptRequest;
 
 class ConceptoIngresoController extends Controller
 {
@@ -26,7 +26,7 @@ class ConceptoIngresoController extends Controller
                     ->leftJoin('dependencia', function ($join) {
                         $join->on('concepto_ingreso.id_dependencia', '=', 'dependencia.id_dependencia');
                     })
-                    ->orderBy($columns[$column], $dir);;
+                    ->orderBy($columns[$column], $dir);
         if ($search_value) {
             $query->where([
                 ['id_concepto_ingreso','like','%'.$search_value['id_concepto_ingreso'].'%'],
