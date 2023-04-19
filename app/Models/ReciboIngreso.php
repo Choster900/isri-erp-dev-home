@@ -16,9 +16,11 @@ class ReciboIngreso extends Model
     protected $fillable = [
         'id_ctrl_ingreso',
         'id_ccta_presupuestal',
+        'id_empleado_tesoreria',
         'fecha_recibo_ingreso',
         'numero_recibo_ingreso',
         'doc_identidad_recibo_ingreso',
+        'direccion_cliente_recibo_ingreso',
         'cliente_recibo_ingreso',
         'monto_recibo_ingreso',
         'descripcion_recibo_ingreso',
@@ -28,4 +30,9 @@ class ReciboIngreso extends Model
         'ip_recibo_ingreso',
         'usuario_recibo_ingreso'
     ];
+
+    public function detalles()
+    {
+        return $this->hasMany('App\Models\DetalleReciboIngreso','id_recibo_ingreso','id_recibo_ingreso');
+    }
 }

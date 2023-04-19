@@ -195,9 +195,9 @@ export default {
                 .fire({
                     title: "¿Está seguro de actualizar el concepto de ingreso?",
                     icon: "question",
-                    iconHtml: "✅",
-                    confirmButtonText: "Si, Guardar",
-                    confirmButtonColor: "#15803D",
+                    iconHtml: "❓",
+                    confirmButtonText: "Si, Actualizar",
+                    confirmButtonColor: "#D2691E",
                     cancelButtonText: "Cancelar",
                     showCancelButton: true,
                     showCloseButton: true,

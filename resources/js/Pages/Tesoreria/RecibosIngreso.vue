@@ -73,7 +73,7 @@ import axios from 'axios';
               </td>
             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
               <div class="space-x-1">
-                <button @click="editIncomeConcept(receipt)" v-if="permits.actualizar == 1"
+                <button @click="editIncomeReceipt(receipt)" v-if="permits.actualizar == 1"
                   class="text-slate-400 hover:text-slate-500 rounded-full">
                   <span class="sr-only">Edit</span>
                     <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
@@ -137,8 +137,8 @@ import axios from 'axios';
       </div>
     </div>
 
-    <ModalIncomeReceiptVue :showModalIncome="showModalIncome" :modalData="modalData" :budget_accounts="budget_accounts" 
-              @cerrar-modal="showModalIncome=false" @get-table="this.getIncomeReceipts(this.tableData.currentPage)"/>
+    <ModalIncomeReceiptVue :show_modal_receipt="show_modal_receipt" :modal_data="modal_data" :budget_accounts="budget_accounts" :income_concepts="income_concepts" :treasury_clerk="treasury_clerk"
+              @cerrar-modal="show_modal_receipt=false" @get-table="this.getIncomeReceipts(this.tableData.currentPage)"/>
 
   </AppLayoutVue>
 </template>
@@ -148,7 +148,7 @@ export default {
   created() {
     this.getIncomeReceipts()
     this.getPermits()
-    this.getTreasuryBudgetAccounts()
+    this.getModalReceiptSelects()
   },
   data() {
     let sortOrders = {};
@@ -177,8 +177,10 @@ export default {
       //Data for datatable
       income_receipts: [],
       //Data for modal
-      showModalIncome: false,
-      modalData: [],
+      income_concepts:[],
+      treasury_clerk : [],
+      show_modal_receipt: false,
+      modal_data: [],
       permits: [],
       budget_accounts: [],
       links: [],
@@ -192,25 +194,27 @@ export default {
         length: 5,
         search: "",
         column: 0,
-        dir: "asc",
+        dir: "desc",
         total: ""
       },
     }
   },
   methods: {
-    editIncomeConcept(income_concept) {
+    editIncomeReceipt(income_concept) {
       //var array = {nombre_marca:marca.nombre_marca}
-      this.modalData = income_concept
-      this.showModalIncome = true
+      this.modal_data = income_concept
+      this.show_modal_receipt = true
     },
     addIncomeConcept() {
-      this.modalData = []
-      this.showModalIncome = true
+      this.modal_data = []
+      this.show_modal_receipt = true
     },
-    getTreasuryBudgetAccounts() {
-      axios.get("/get-treasury-budget-accounts")
+    getModalReceiptSelects() {
+      axios.get("/get-modal-receipt-selects")
         .then((response) => {
           this.budget_accounts = response.data.budget_accounts
+          this.income_concepts = response.data.income_concepts
+          this.treasury_clerk = response.data.treasury_clerk
         })
         .catch((errors) => {
           let msg = this.manageError(errors);

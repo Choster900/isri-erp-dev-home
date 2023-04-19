@@ -9,52 +9,94 @@ import axios from "axios";
 
 <template>
     <div class="m-1.5">
-        <ModalBasicVue :modalOpen="showModalIncome" @close-modal="$emit('cerrar-modal')"
+        <ModalBasicVue :modalOpen="show_modal_receipt" @close-modal="$emit('cerrar-modal')"
             :title="'Administración de recibos de ingreso. '" maxWidth="4xl" @close-modal-persona="$emit('cerrar-modal')">
             <div class="px-5 py-8">
                 <div class="space-y-2">
-                    <div class="mb-4" id="app">
-                        <!-- Form Header -->
-                        <div class="pb-2 mb-4 md:flex flex-row justify-between">
-                            <span class="font-semibold text-slate-800 mb-2 text-lg underline underline-offset-2">
-                                Información general del recibo.
-                            </span>
-                        </div>
-                        <div class="mb-7 md:flex flex-row justify-items-start">
+                    <div class="mb-2" id="app">
+                        <div class="mb-4 md:flex flex-row justify-items-start">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
+                                <TextInput id="name-client" v-model="income_receipt.client" :value="income_receipt.client"
+                                    type="text" placeholder="Nombre o Razón Social">
+                                    <LabelToInput icon="standard" forLabel="name-client" />
+                                </TextInput>
+                                <InputError v-for="(item, index) in errors.client" :key="index" class="mt-2"
+                                    :message="item" />
+                            </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Especifico <span class="text-red-600 font-extrabold">*</span>
                                 </label>
                                 <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                                     <Multiselect v-model="income_receipt.budget_account_id" :options="budget_accounts"
-                                        @select="getIncomeConcept($event)" placeholder="Seleccione Especifico"
-                                        :searchable="true" />
+                                        :disabled="budget_select" @select="getIncomeConcept($event)"
+                                        placeholder="Seleccione Especifico" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
-                            <InputError v-for="(item, index) in errors.budget_account_id" :key="index" class="mt-2"
+                                <InputError v-for="(item, index) in errors.budget_account_id" :key="index" class="mt-2"
                                     :message="item" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                                <!-- <TextInput id="detail-amount" v-model="total" :value="total" :label-input="false"
-                                    type="number">
-                                    
-                                </TextInput> -->
-                                <input type="text" v-model="total" :value="total" class="border-none pointer-events-none bg-gray-100 p-2 rounded-md">
-                                <!-- <InputError v-for="(item, index) in errors.name" :key="index" class="mt-2"
-                                                            :message="item" /> -->
+                                <label class="block mb-2 text-xs font-light text-gray-600">
+                                    Tesorero, Pagador o Colector <span class="text-red-600 font-extrabold">*</span>
+                                </label>
+                                <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
+                                    <Multiselect v-model="income_receipt.treasury_clerk_id" :options="treasury_clerk"
+                                        placeholder="Seleccione Tesorero" :searchable="true" />
+                                    <LabelToInput icon="list" />
+                                </div>
+                                <InputError v-for="(item, index) in errors.treasury_clerk_id" :key="index" class="mt-2"
+                                    :message="item" />
                             </div>
                         </div>
 
-                        <div class="pb-4 mb-2 mt-7 md:flex flex-row justify-between">
-                            <span class="font-semibold text-slate-800 mb-2 text-lg underline underline-offset-2">
-                                Detalle del recibo.
-                            </span>
+                        <div v-if="income_receipt.budget_account_id === 16304"
+                            class="mb-4 md:flex flex-row justify-items-start">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-2/3">
+                                <TextInput id="client-direccion" v-model="income_receipt.direction"
+                                    :value="income_receipt.direction" type="text" placeholder="Direccion">
+                                    <LabelToInput icon="standard" forLabel="client-direccion" />
+                                </TextInput>
+                                <InputError v-for="(item, index) in errors.direction" :key="index" class="mt-2"
+                                    :message="item" />
+                            </div>
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
+                                <TextInput id="document-client" v-model="income_receipt.document"
+                                    :value="income_receipt.document" type="text" placeholder="Documento">
+                                    <LabelToInput icon="standard" forLabel="document-client" />
+                                </TextInput>
+                                <InputError v-for="(item, index) in errors.document" :key="index" class="mt-2"
+                                    :message="item" />
+                            </div>
+                        </div>
+
+                        <div class="mb-4 md:mr-2 md:mb-0 basis-full" style="border: none; background-color: transparent;">
+                            <label class="block mb-2 text-xs font-light text-gray-600" for="descripcion">
+                                Descripcion <span class="text-red-600 font-extrabold">*</span>
+                            </label>
+                            <textarea v-model="income_receipt.description" id="descripcion" name="descripcion"
+                                class="resize-none w-full h-16 overflow-y-auto peer text-xs font-semibold rounded-r-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"></textarea>
+                            <InputError v-for="(item, index) in errors.description" :key="index" class="mt-2"
+                                :message="item" />
+                        </div>
+
+                        <div class="mb-4 mt-4 md:flex flex-row justify-items-start">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                                <span class="font-semibold text-slate-800 mb-2 text-lg underline underline-offset-2">
+                                    Detalle del recibo.
+                                </span>
+                            </div>
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2 text-right">
+                                <span class="font-semibold text-slate-800 mb-2 text-lg">
+                                    Total: ${{ income_receipt.total }}
+                                </span>
+                            </div>
                         </div>
                         <!-- Table -->
-                        <div>
+                        <div class="mt-2 pb-6">
                             <div class="table-header">
-                                <div>Concepto</div>
-                                <div>Monto</div>
+                                <div class="basis-2/3">Concepto</div>
+                                <div class="basis-1/3">Monto</div>
                                 <div>
                                     <button class="text-green-500 hover:text-green-600 rounded-full" @click="addRow()">
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -67,34 +109,36 @@ import axios from "axios";
                                                 fill="currentColor" />
                                         </svg>
                                     </button>
-                                    <!-- <button @click="addRow">Agregar Fila</button> -->
                                 </div>
                             </div>
-                            <div v-for="(row, index) in income_detail" :key="index" class="table-row">
-
+                            <div v-for="(row, index) in active_details" :key="index" class="table-row">
                                 <div class="mb-4 md:mr-2 md:mb-0 basis-2/3">
                                     <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
-                                        <Multiselect v-model="income_detail.income_concept_id" :value="income_detail.income_concept_id"
-                                            :options="income_concept" placeholder="Seleccione Concepto"
+                                        <Multiselect v-model="row.income_concept_id" :value="row.income_concept_id"
+                                            @input="selectConcept($event, row.income_concept_id)"
+                                            :options="income_concept_select" placeholder="Seleccione Concepto"
                                             :searchable="true" />
                                         <LabelToInput icon="list" />
                                     </div>
-                                    <!-- <InputError v-for="(item, index) in errors.dependency_id" :key="index" class="mt-2"
-                                                :message="item" /> -->
+                                    <InputError
+                                        v-for="(item, index2) in errors['income_detail.' + index + '.income_concept_id']"
+                                        :key="index2" class="mt-2" :message="item" />
                                 </div>
 
                                 <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                                    <TextInput id="detail-amount" v-model="income_detail.amount" :value="income_detail.amount"
-                                        :label-input="false" type="number" placeholder="Monto">
+                                    <TextInput id="detail-amount" v-model="row.amount" :value="row.amount"
+                                        :label-input="false" type="text" placeholder="Monto"
+                                        @update:modelValue="typeAmountIncome(index)">
                                         <LabelToInput icon="money" forLabel="detail-amount" />
                                     </TextInput>
-                                    <!-- <InputError v-for="(item, index) in errors.name" :key="index" class="mt-2"
-                                                            :message="item" /> -->
+                                    <InputError v-for="(item, index2) in errors['income_detail.' + index + '.amount']"
+                                        :key="index2" class="mt-2" :message="item" />
                                 </div>
 
-
                                 <div>
-                                    <button @click="deleteRow(index)" class="text-red-500 hover:text-red-600 rounded-full">
+                                    <button :disabled="income_receipt.income_detail.length <= 1"
+                                        @click="deleteRow(index, row.income_concept_id, row.detail_id)"
+                                        class="text-red-500 hover:text-red-600 rounded-full">
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                             xmlns="http://www.w3.org/2000/svg">
                                             <path fill-rule="evenodd" clip-rule="evenodd"
@@ -104,20 +148,18 @@ import axios from "axios";
                                             <path d="M13 9H15V17H13V9Z" fill="currentColor" />
                                         </svg>
                                     </button>
-                                    <!-- <button @click="deleteRow(index)">Eliminar Fila</button> -->
                                 </div>
+
+                            </div>
                         </div>
-                    </div>
-
-
 
                     </div>
 
                     <div class="mt-4 mb-4 md:flex flex-row justify-center">
-                        <!-- <div class="mb-4 md:mr-2 md:mb-0 px-1">
-                                                                <GeneralButton @click="saveNewIncome()" color="bg-green-700  hover:bg-green-800" text="Agregar"
-                                                                icon="add" />
-                                                            </div> -->
+                        <GeneralButton v-if="modal_data != ''" @click="updateIncomeReceipt()"
+                            color="bg-orange-700  hover:bg-orange-800" text="Actualizar" icon="add" />
+                        <GeneralButton v-else @click="saveIncomeReceipt()" color="bg-green-700  hover:bg-green-800"
+                            text="Agregar" icon="add" />
                         <div class="mb-4 md:mr-2 md:mb-0 px-1">
                             <GeneralButton text="Cancelar" icon="add" @click="$emit('cerrar-modal')" />
                         </div>
@@ -131,7 +173,7 @@ import axios from "axios";
 <script>
 export default {
     props: {
-        showModalIncome: {
+        show_modal_receipt: {
             type: Boolean,
             default: false,
         },
@@ -139,183 +181,262 @@ export default {
             type: Array,
             default: [],
         },
+        modal_data: {
+            type: Array,
+            default: [],
+        },
+        income_concepts: {
+            type: Array,
+            default: [],
+        },
+        treasury_clerk: {
+            type: Array,
+            default: []
+        }
     },
     created() { },
     data: function (data) {
         return {
-            rows: [
-                { dependency: '', concept: '', amount: '' }
-            ],
-            income_concept: [],
+            receipt_id: '',
+            income_concept_select: [],
             budget_account_id: '',
             errors: [],
-            environments: [],
-            budget_codes2: [
-                { value: 61101, label: "61101 MOBILIARIO" },
-                { value: 61102, label: "61102 MAQUINARIAS Y EQUIPO" },
-                { value: 61103, label: "61103 EQUIPOS MEDICOS Y DE LABORATORIOS" },
-                { value: 61104, label: "61104 EQUIPOS INFORMATICOS" },
-                { value: 61108, label: "61108 HERRAMIENTAS Y REPUESTOS PRINCIPALES" },
-                { value: 61110, label: "61110 MAQUINARIA Y EQUIPO PARA APOYO INSTITUCIONAL", },
-                { value: 61199, label: "61199 BIENES MUEBLES DIVERSOS" },
-            ],
+            budget_select: false,
             income_receipt: {
-                budget_account_id:'',
-                total:'',
-                client:'',
-                description:''
-            },
-            income_detail: {
-                income_concept_id: "",
-                amount: "",
+                treasury_clerk_id: '',
+                income_receipt_id: '',
+                total: '',
+                budget_account_id: '',
+                direction: '',
+                document: '',
+                client: '',
+                description: '',
+                income_detail: [],
             },
         };
     },
     methods: {
         addRow() {
-            this.rows.push({ dependency: '', concept: '', amount: '' });
+            this.income_receipt.income_detail.push({ detail_id: '', income_concept_id: '', amount: '', deleted: false });
         },
-        deleteRow(index) {
-            this.rows.splice(index, 1);
-        },
-        getIncomeConcept(budget_account_id) {
-            axios.get("/get-income-concept", {
-                budget_account_id: budget_account_id
+        deleteRow(index, concept_id, detail_id) {
+            this.income_concept_select.forEach((value, index) => {
+                if (value.value == concept_id) {
+                    this.income_concept_select[index].disabled = false
+                }
             })
-                .then((response) => {
-                    this.income_concept = response.data.income_concept
-                })
-                .catch((errors) => {
-                    let msg = this.manageError(errors);
-                    this.$swal.fire({
-                        title: "Operación cancelada",
-                        text: msg,
-                        icon: "warning",
-                        timer: 5000,
-                    });
-                    this.$emit("cerrar-modal");
-                });
+            if (detail_id == "") {
+                this.income_receipt.income_detail.splice(index, 1);
+            } else {
+                this.income_receipt.income_detail[index].deleted = true;
+            }
+            this.updateTotal()
         },
-        borrarFila: function (index) {
-            this.dataValidation.filas.splice(index, 1);
-            for (let i = index; i < this.dataValidation.filas.length; i++) {
-                this.dataValidation.filas[i].index = i;
+        typeAmountIncome(index) {
+            let x = this.income_receipt.income_detail[index].amount.replace(/^\./, '').replace(/[^0-9.]/g, '')
+            this.income_receipt.income_detail[index].amount = x
+            const regex = /^(\d+)?([.]?\d{0,2})?$/
+            if (!regex.test(this.income_receipt.income_detail[index].amount)) {
+                this.income_receipt.income_detail[index].amount = this.income_receipt.income_detail[index].amount.match(regex) || x.substring(0, x.length - 1)
+            }
+            this.updateTotal()
+        },
+        updateTotal() {
+            var sum = 0;
+            for (var i = 0; i < this.income_receipt.income_detail.length; i++) {
+                if (this.income_receipt.income_detail[i].deleted == false) {
+                    var amount = parseFloat(this.income_receipt.income_detail[i].amount);
+                    if (!isNaN(amount)) {
+                        sum += amount;
+                    }
+                }
+            }
+            this.income_receipt.total = sum.toFixed(2);
+        },
+        getIncomeConcept(budget_account_id, details) {
+            this.budget_select = true
+            this.income_concept_select = []
+            this.income_concepts.forEach((value, index) => {
+                if (value.id_ccta_presupuestal == budget_account_id) {
+                    var array = { value: value.value, label: value.label, disabled: false }
+                    this.income_concept_select.push(array)
+                }
+            })
+            if (details) {
+                this.income_concept_select.forEach((value, index) => {
+                    details.forEach((value2, index2) => {
+                        if (value.value == value2.id_concepto_ingreso) {
+                            value.disabled = true
+                        }
+                    })
+                })
             }
         },
-        saveNewIncome() {
-            let filas = JSON.parse(JSON.stringify(this.dataValidation.filas))
-            console.log(filas);
-            axios
-                .post("/save-income", this.dataValidation)
-                .then((response) => {
-                    console.log(response);
-                    toast.success(response.data.mensaje, {
-                        autoClose: 3000,
-                        position: "top-right",
-                        transition: "zoom",
-                        toastBackgroundColor: "white",
-                    });
+        selectConcept(newSelection, oldSelection) {
+            if (newSelection == null) {
+                this.income_concept_select.forEach((value, index) => {
+                    if (value.value == oldSelection) {
+                        this.income_concept_select[index].disabled = false
+                    }
                 })
-                .catch((errors) => {
-                    console.log(errors);
-                    if (errors.response.status === 422) {
-                        toast.warning(
-                            "Tienes algunos errores por favor verifica tus datos.",
-                            {
-                                autoClose: 5000,
-                                position: "top-right",
-                                transition: "zoom",
-                                toastBackgroundColor: "white",
-                            }
-                        );
-                        this.errors = errors.response.data.errors;
-                    } else {
-                        let msg = this.manageError(errors);
-                        this.$swal.fire({
-                            title: "Operación cancelada",
-                            text: msg,
-                            icon: "warning",
-                            timer: 5000,
-                        });
-                        this.$emit("cerrar-modal");
+            } else {
+                if (oldSelection == null || oldSelection == '') {
+                    this.income_concept_select.forEach((value, index) => {
+                        if (value.value == newSelection) {
+                            this.income_concept_select[index].disabled = true
+                        }
+                    })
+                } else {
+                    this.income_concept_select.forEach((value, index) => {
+                        if (value.value == oldSelection) {
+                            this.income_concept_select[index].disabled = false
+                        }
+                        if (value.value == newSelection) {
+                            this.income_concept_select[index].disabled = true
+                        }
+                    })
+                }
+            }
+        },
+        saveIncomeReceipt() {
+            this.$swal.fire({
+                title: "¿Está seguro de guardar el nuevo recibo de ingreso?",
+                icon: "question",
+                iconHtml: "✅",
+                confirmButtonText: "Si, Guardar",
+                confirmButtonColor: "#15803D",
+                cancelButtonText: "Cancelar",
+                showCancelButton: true,
+                showCloseButton: true,
+            })
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        axios.post("/save-income-receipt", this.income_receipt)
+                            .then((response) => {
+                                toast.success(response.data.mensaje, {
+                                    autoClose: 3000,
+                                    position: "top-right",
+                                    transition: "zoom",
+                                    toastBackgroundColor: "white",
+                                });
+                                this.$emit("get-table");
+                                this.$emit("cerrar-modal");
+                            })
+                            .catch((errors) => {
+                                if (errors.response.status === 422) {
+                                    toast.warning(
+                                        "Tienes algunos errores por favor verifica tus datos.",
+                                        {
+                                            autoClose: 5000,
+                                            position: "top-right",
+                                            transition: "zoom",
+                                            toastBackgroundColor: "white",
+                                        }
+                                    );
+                                    this.errors = errors.response.data.errors;
+                                } else {
+                                    let msg = this.manageError(errors);
+                                    this.$swal.fire({
+                                        title: "Operación cancelada",
+                                        text: msg,
+                                        icon: "warning",
+                                        timer: 5000,
+                                    });
+                                    this.$emit("cerrar-modal");
+                                }
+                            });
                     }
                 });
         },
-
-        async getEnvironments(dependency_id) {
-            await axios
-                .get("/get-environments", {
-                    params: {
-                        dependency_id: dependency_id,
-                    },
+        updateIncomeReceipt() {    
+            this.$swal
+                .fire({
+                    title: "¿Está seguro de actualizar el recibo de ingreso?",
+                    icon: "question",
+                    iconHtml: '❓',
+                    confirmButtonText: "Si, Actualizar",
+                    confirmButtonColor: "#D2691E",
+                    cancelButtonText: "Cancelar",
+                    showCancelButton: true,
+                    showCloseButton: true,
                 })
-                .then((response) => {
-                    this.environments = response.data.environments;
-                })
-                .catch((errors) => {
-                    let msg = this.manageError(errors);
-                    this.$swal.fire({
-                        title: "Operación cancelada",
-                        text: msg,
-                        icon: "warning",
-                        timer: 5000,
-                    });
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        axios
+                            .post("/update-income-receipt", this.income_receipt)
+                            .then((response) => {
+                                toast.success(response.data.mensaje, {
+                                    autoClose: 3000,
+                                    position: "top-right",
+                                    transition: "zoom",
+                                    toastBackgroundColor: "white",
+                                });
+                                this.$emit("get-table");
+                                this.$emit("cerrar-modal");
+                            })
+                            .catch((errors) => {
+                                if (errors.response.status === 422) {
+                                    toast.warning(
+                                        "Tienes algunos errores por favor verifica tus datos.",
+                                        {
+                                            autoClose: 5000,
+                                            position: "top-right",
+                                            transition: "zoom",
+                                            toastBackgroundColor: "white",
+                                        }
+                                    );
+                                    this.errors = errors.response.data.errors;
+                                } else {
+                                    let msg = this.manageError(errors);
+                                    this.$swal.fire({
+                                        title: "Operación cancelada",
+                                        text: msg,
+                                        icon: "warning",
+                                        timer: 5000,
+                                    });
+                                    this.$emit("cerrar-modal");
+                                }
+                            });
+                    }
                 });
-        },
-        async getModels(brand_id) {
-            await axios
-                .get("/get-models", {
-                    params: {
-                        brand_id: brand_id,
-                    },
-                })
-                .then((response) => {
-                    this.models = response.data.models;
-                })
-                .catch((errors) => {
-                    let msg = this.manageError(errors);
-                    this.$swal.fire({
-                        title: "Operación cancelada",
-                        text: msg,
-                        icon: "warning",
-                        timer: 5000,
-                    });
-                });
-        },
-        typeSeats() {
-            var x = this.asset.vehicle_seats.replace(/\D/g, "").match(/(\d{0,2})/);
-            this.asset.vehicle_seats = !x[2] ? x[1] : "";
-        },
-        typeQuantity() {
-            var x = this.asset.quantity.replace(/\D/g, "").match(/(\d{0,2})/);
-            this.asset.quantity = !x[2] ? x[1] : "";
-        },
-        typeValAdquisicion() {
-            let x = this.asset.acquisition_value
-                .replace(/^\./, "")
-                .replace(/[^0-9.]/g, "");
-            this.asset.acquisition_value = x;
-            const regex = /^(\d+)?([.]?\d{0,2})?$/;
-            if (!regex.test(this.asset.acquisition_value)) {
-                this.asset.acquisition_value =
-                    this.asset.acquisition_value.match(regex) ||
-                    x.substring(0, x.length - 1);
-            }
-            if (!this.asset.acquisition_value == "") {
-                this.asset.acquisition_value = "$" + this.asset.acquisition_value;
-            }
-        },
+        }
     },
     watch: {
-        showModalIncome: function (value, oldValue) {
+        show_modal_receipt: function (value, oldValue) {
             if (value) {
-                this.errors = [];
-                // this.asset.id_dependencia = this.modalData.id_modelo;
-                // this.asset.id_codigo_presupuestario = this.modalData.nombre_modelo;
-                // this.asset.id_fuente_financiamiento = this.modalData.id_marca;
+                this.errors = []
+                this.income_receipt.income_receipt_id = this.modal_data.id_recibo_ingreso;
+                this.income_receipt.total = '';
+                this.income_receipt.budget_account_id = this.modal_data.id_ccta_presupuestal
+                this.income_receipt.treasury_clerk_id = this.modal_data.id_empleado_tesoreria
+                this.income_receipt.direction = this.modal_data.direccion_cliente_recibo_ingreso
+                this.income_receipt.document = this.modal_data.doc_identidad_recibo_ingreso
+                this.income_receipt.client = this.modal_data.cliente_recibo_ingreso
+                this.income_receipt.description = this.modal_data.descripcion_recibo_ingreso
+                this.income_receipt.income_detail = []
+                if (this.modal_data.detalles) {
+                    this.modal_data.detalles.forEach((value, index) => {
+                        var array = { detail_id: value.id_det_recibo_ingreso, income_concept_id: value.id_concepto_ingreso, amount: value.monto_det_recibo_ingreso, deleted: false }
+                        this.income_receipt.income_detail.push(array)
+                    })
+                } else {
+                    var array = { detail_id: '', income_concept_id: '', amount: '', deleted: false }
+                    this.income_receipt.income_detail.push(array)
+                }
+                this.updateTotal()
+                if (this.modal_data.id_recibo_ingreso) {
+                    this.getIncomeConcept(this.modal_data.id_ccta_presupuestal, this.modal_data.detalles)
+                } else {
+                    this.budget_select = false
+                }
             }
         },
     },
+    computed: {
+        active_details() {
+            return this.income_receipt.income_detail.filter((detail) => detail.deleted == false)
+        }
+    }
 };
 </script>
 
