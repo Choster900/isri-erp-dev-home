@@ -8,6 +8,7 @@ use App\Models\RequerimientoPago;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Http\Requests\Tesoreria\RequerimientoRequest;
+use App\Models\Quedan;
 
 class RequerimientoController extends Controller
 {
@@ -75,5 +76,58 @@ class RequerimientoController extends Controller
             DB::rollback();
             return response()->json($th->getMessage(), 500);
         }
+    }
+    public function filterQuedan(Request $request) //TODO:POR TERMINAR 
+    {
+        $query = Quedan::select('*')
+            ->with(["detalle_quedan", "proveedor.giro", "proveedor.sujeto_retencion", "tesorero"])
+            ->orderBy("id_quedan", "desc")
+            ->where("estado_quedan", 1)
+            ->when($request["data"]["suppiler"], function ($query) use ($request) {
+                return $query->where("id_proveedor", $request["data"]["suppiler"]);
+            })
+            ->when($request["data"]["rangeDate"], function ($query) use ($request) {
+                $date = explode("to", $request["data"]["rangeDate"]);
+                return $query->whereDate('fecha_emision_quedan', '>=', $date[0])
+                    ->whereDate('fecha_emision_quedan', '<=', $date[1]);
+            })
+            ->when($request["data"]["iva"], function ($query) use ($request) {
+                return $query->where("monto_iva_quedan", "like", "%" . $request["data"]["iva"] . "%");
+            })
+            ->when($request["data"]["isr"], function ($query) use ($request) {
+                return $query->where("monto_isr_quedan", "like", "%" . $request["data"]["isr"] . "%");
+            })
+            ->when($request["data"]["monto"], function ($query) use ($request) {
+                return $query->where("monto_liquido_quedan", "like", "%" . $request["data"]["monto"] . "%");
+            })
+            ->get();
+
+        return $query;
+
+    }
+
+    public function addANumerRequestToQuedan(Request $request)
+    {
+        // Definir las reglas de validación
+        $rules = [
+            'itemsToAddNumber' => 'required|array',
+            'numberRequest'    => 'required'
+        ];
+        // Validar los campos del request
+        $request->validate($rules);
+
+        // Realizar la actualización de la base de datos
+        foreach ( $request->itemsToAddNumber as $key => $value ) {
+            Quedan::where("id_quedan", $value["id_quedan"])->update(['id_requerimiento_pago' => $request->numberRequest, "estado_quedan" => 2]);
+        }
+        return response()->json(['message' => 'Actualización exitosa'], 200);
+    }
+
+    public function takeOfNumberRequest(Request $request)
+    {
+        # code...
+        Quedan::where("id_quedan", $request->id_quedan)->update(['id_requerimiento_pago' => null, "estado_quedan" => 1]);
+
+        return response()->json(['message' => 'Actualización exitosa'], 200);
     }
 }

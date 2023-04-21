@@ -11,8 +11,8 @@ import axios from 'axios';
     <AppLayoutVue>
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="createQuedan()" color="bg-green-700  hover:bg-green-800" text="Agregar Elemento"
-                    icon="add" />
+                <GeneralButton @click="modalAsignacionRequerimiento()" color="bg-green-700  hover:bg-green-800"
+                    text="Agregar Elemento" icon="add" />
             </div>
         </div>
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
@@ -40,25 +40,43 @@ import axios from 'axios';
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">{{ data.id_quedan }}</div>
                             </td>
-                            <td v-if="dataQuedanForTable == ''">
-                                NO HAY DATOS
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800 text-center wrap">{{
+                                    data.fecha_emision_quedan
+                                }}</div>
                             </td>
-
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center wrap">{{
                                     data.proveedor.razon_social_proveedor
                                 }}</div>
                             </td>
+
                             <td class="px-2 first:pl-5 last:pr-5 whitespace-nowrap w-px">
                                 <div v-for="(detalle, i) in  data.detalle_quedan" :key="i"
                                     class="font-medium text-slate-800 text-center wrap flex justify-center items-center">
                                     <p
                                         :class="{ 'border-b-2 border-b-gray-500': i < data.detalle_quedan.length - 1 && data.detalle_quedan.length > 1 }">
-                                        N°Fact {{ detalle.numero_factura_det_quedan }} -
-                                        N°Acta{{ detalle.numero_acta_det_quedan }} - {{ detalle.descripcion_det_quedan }} -
-                                        ${{ parseFloat(detalle.servicio_factura_det_quedan) +
+                                        FACTURA: {{ detalle.numero_factura_det_quedan }}
+                                        <br>
+                                        PRODUCTO: ${{ detalle.producto_factura_det_quedan }}
+                                        <br>
+                                        SERVICIO: ${{ detalle.servicio_factura_det_quedan }}
+                                        <br>
+                                        TOTAL: ${{ parseFloat(detalle.servicio_factura_det_quedan) +
                                             parseFloat(detalle.producto_factura_det_quedan) }}
                                     </p>
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800 text-center">{{
+                                    data.id_requerimiento_pago
+                                }}-{{ data.requerimiento_pago.anio_requerimiento_pago }}</div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800 text-center">
+                                    COMPROMISO: {{ data.numero_compromiso_ppto_quedan }}
+                                    <hr class="border-b-2 border-b-gray-500">
+                                    ACUERDO: {{ data.numero_acuerdo_quedan }}
                                 </div>
                             </td>
 
@@ -68,33 +86,31 @@ import axios from 'axios';
                                 }}</div>
                             </td>
 
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">{{
-                                    data.estado_quedan
-                                }}</div>
-                            </td>
+
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="space-x-1">
-                                    <button @click.stop="showQuedan(data)"
-                                        class="text-slate-400 hover:text-slate-500 rounded-full">
-                                        <span class="sr-only">Edit</span>
-                                        <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
-                                            <path
-                                                d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z">
-                                            </path>
-                                        </svg>
-                                    </button>
-                                    <!-- CAMBIAR ICONO DE BOTON POR QUE VA A SER ACTIVAR Y DESCATIVAR -->
                                     <button class="text-rose-500 hover:text-rose-600 rounded-full"
-                                        @click="enableStateForSupplier(proveedor.id_proveedor, proveedor.estado_proveedor)">
-                                        <span class="sr-only">Delete</span><svg class="w-8 h-8 fill-current"
-                                            viewBox="0 0 32 32">
-                                            <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
-                                            </path>
-                                            <path
-                                                d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z">
+                                        @click="takeOf(data.id_quedan)">
+                                        <span class="sr-only">Delete</span>
+
+                                        <svg fill="#000000" width="25px" height="25px" viewBox="0 0 24 24"
+                                            id="delete-user-left-5" data-name="Line Color"
+                                            xmlns="http://www.w3.org/2000/svg" class="icon line-color">
+                                            <line id="secondary" x1="3" y1="18" x2="6" y2="15"
+                                                style="fill: none; stroke: rgb(255, 0, 15); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;">
+                                            </line>
+                                            <line id="secondary-2" data-name="secondary" x1="6" y1="18" x2="3" y2="15"
+                                                style="fill: none; stroke: rgb(255, 0, 15 ); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;">
+                                            </line>
+                                            <circle id="primary" cx="13" cy="8" r="5"
+                                                style="fill: none; stroke: rgb(0, 0, 0); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;">
+                                            </circle>
+                                            <path id="primary-2" data-name="primary"
+                                                d="M10,20.81A22,22,0,0,0,13,21c6,0,8-2,8-2V18a5,5,0,0,0-5-5H10"
+                                                style="fill: none; stroke: rgb(0, 0, 0); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;">
                                             </path>
                                         </svg>
+                                        <p class="text-[9px]">Quitar Req.</p>
                                     </button>
                                 </div>
                             </td>
@@ -116,7 +132,7 @@ import axios from 'axios';
                                     <div class="flex-1 text-right ml-2">
                                         <a @click="getDataQuedan(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  text-indigo-500">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
                                     </div>
@@ -126,7 +142,7 @@ import axios from 'axios';
                                     <div class="flex-1 text-right ml-2">
                                         <a @click="getDataQuedan(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  text-indigo-500">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
                                     </div>
@@ -142,35 +158,27 @@ import axios from 'axios';
             </div>
         </div>
 
-        <ModalQuedan :showModal="showModal" @cerrar-modal="closeVars()" :data-quedan="dataQuedan"
-            :dataForSelectInRow="dataForSelectInRow" @actualizar-table-data="getDataQuedan()"
-            :dataSuppliers="dataSuppliers" />
 
+        <ModalQuedan :scrollbarModalOpen="showModal" @close-definitive="showModal = false" :dataForSelect="dataForSelect"
+            @reload-table="getDataQuedan()" />
 
     </AppLayoutVue>
 </template>
 <script>
+
 export default {
-    created() {
-        this.getAllSuppliers()
-        this.getDataQuedan()
-        this.getListForSelect()
-    },
+
     data: function (data) {
         let sortOrders = {};
         let columns = [
             { width: "10%", label: "Id", name: "id_quedan", type: "text" },
-            { width: "30%", label: "Proveedor", name: "razon_social_proveedor", type: "text" },//TODO: hacerlo select
+            { width: "10%", label: "Fecha de emision", name: "fecha_emision_quedan", type: "date" },
+            { width: "20%", label: "Proveedor", name: "razon_social_proveedor", type: "text" },
             { width: "30%", label: "Detalle quedan", name: "buscar_por_detalle_quedan", type: "text" },
+            { width: "10%", label: "Numero requerimiento", name: "id_requerimiento_pago", type: "text" },
+            { width: "10%", label: "Numero compromiso numero acuerdo", name: "id_requerimiento_pago", type: "text" },
             { width: "10%", label: "Monto", name: "monto_liquido_quedan", type: "text" },
-            {
-                width: "10%", label: "Estado", name: "estado_quedan", type: "select",
-                options: [
-                    { value: "", label: "Ninguno" },
-                    { value: "1", label: "Activo" },
-                    { value: "0", label: "Inactivo" }
-                ]
-            },
+
             { width: "10%", label: "Acciones", name: "Acciones" },
         ];
         columns.forEach((column) => {
@@ -184,7 +192,7 @@ export default {
             dataQuedan: [],
             dataSuppliers: null,//attr donde guardar la data de proveedores
             permits: [],
-            dataForSelectInRow: [],
+            dataForSelect: [],
             scrollbarModalOpen: false,
             dataQuedanForTable: [],
             links: [],
@@ -199,6 +207,7 @@ export default {
                 column: 0,
                 dir: "desc",
                 search: {},
+                allWithANumberRequest: 1,
             },
             pagination: {
                 lastPage: "",
@@ -243,31 +252,71 @@ export default {
             return array.findIndex((i) => i[key] == value);
         },
 
+        async getListForSelect() {
+            await axios.get('/get-list-select').then((response) => {
+
+                this.dataForSelect = response.data;
+            }).catch((error) => {
+            });
+        },
+
         closeVars() {
             this.showModal = false
         },
-        async createQuedan() {
+        async modalAsignacionRequerimiento() {
 
             this.dataQuedan = []
             this.showModal = true
 
         },
-        async getListForSelect() {
-            await axios.get('/get-list-select').then((response) => {
+        async takeOfNumberRequest(id_quedan) {
 
-                this.dataForSelectInRow = response.data;
-            }).catch((error) => {
+            try {
+                await axios.post('/take-of-number-request', { id_quedan: id_quedan })
+                this.getDataQuedan(this.lastUrl)
+                return true; // indicate success
+            } catch (error) {
+                return false; // indicate failure
+            }
+        },
+
+        async takeOf(id_quedan) {
+            const confirmed = await this.$swal.fire({
+                title: `Esta seguro de remover el numero de requerimiento al quedan N° ${id_quedan} ?`,
+                icon: 'question',
+                iconHtml: '❓',
+                confirmButtonText: 'Si, Remover el numero de requerimiento',
+                confirmButtonColor: '#D2691E',
+                cancelButtonText: 'Cancelar',
+                showCancelButton: true,
+                showCloseButton: true
             });
+            if (confirmed.isConfirmed) {
+                const successTakeOf = await this.takeOfNumberRequest(id_quedan);
+
+                if (successTakeOf) {
+                    toast.warning(`Se removio el numero de requerimiento al quedan ${id_quedan}`, {
+                        autoClose: 5000,
+                        position: "top-right",
+                        transition: "zoom",
+                        toastBackgroundColor: "white",
+                    });
+
+                } else {
+                    toast.error("ERROR", {
+                        autoClose: 5000,
+                        position: "top-right",
+                        transition: "zoom",
+                        toastBackgroundColor: "white",
+                    });
+                }
+            }
+
+
         },
-        async showQuedan(dataQuedan) {
-            this.dataQuedan = dataQuedan
-            this.showModal = true
-        },
-        getAllSuppliers() {
-            axios.get("/getAllSuppliers").then(res => {
-                this.dataSuppliers = res.data
-            })
-        },
+
+
+
         validarCamposVacios(objeto) {
             for (var propiedad in objeto) {
                 if (objeto[propiedad] !== '') {
@@ -288,6 +337,10 @@ export default {
         },
 
 
+    },
+    created() {
+        this.getDataQuedan()
+        this.getListForSelect()
     },
 
 };

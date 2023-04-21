@@ -23,7 +23,11 @@ class RequerimientoPago extends Model
         'fecha_mod_requerimiento_pago',
         'usuario_requerimiento_pago',
         'ip_requerimiento_pago',
-
     ];
 
+
+    public function Quedan()
+    {
+        return $this->hasMany(Quedan::class, "id_requerimiento_pago", "id_requerimiento_pago");
+    }
 }

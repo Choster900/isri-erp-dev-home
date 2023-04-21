@@ -15,7 +15,7 @@ class Quedan extends Model
         'id_estado_quedan',
         'id_prioridad_pago',
         'id_requerimiento_pago',
-        'id_tesorero',
+        'id_empleado_tesoreria',
         'id_proy_financiado',
         'id_serie_retencion_iva',
         'id_proveedor',
@@ -47,6 +47,13 @@ class Quedan extends Model
     }
     public function tesorero()
     { //(FOREING KEY, PRIMARY KEY)
-        return $this->belongsTo(Tesorero::class, "id_tesorero", "id_tesorero");
+        return $this->belongsTo(EmpleadoTesoreria::class, "id_empleado_tesoreria", "id_empleado_tesoreria");
     }
+
+    public function requerimiento_pago()
+    { //(FOREING KEY, PRIMARY KEY)
+        return $this->belongsTo(RequerimientoPago::class, "id_requerimiento_pago", "id_requerimiento_pago");
+    }
+
+    
 }
