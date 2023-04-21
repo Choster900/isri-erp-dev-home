@@ -35,4 +35,14 @@ class ReciboIngreso extends Model
     {
         return $this->hasMany('App\Models\DetalleReciboIngreso','id_recibo_ingreso','id_recibo_ingreso');
     }
+
+    public function cuenta_presupuestal()
+    {
+        return $this->belongsTo('App\Models\CuentaPresupuestal','id_ccta_presupuestal','id_ccta_presupuestal');
+    }
+
+    public function empleado_tesoreria()
+    {
+        return $this->belongsTo('App\Models\EmpleadoTesoreria','id_empleado_tesoreria','id_empleado_tesoreria');
+    }
 }

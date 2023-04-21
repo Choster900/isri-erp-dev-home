@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Tesoreria;
 
-
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tesoreria\IncomeReceiptRequest;
@@ -25,9 +24,12 @@ class ReciboIngresoController extends Controller
         $search_value = $request->input('search');
 
         $query = ReciboIngreso::select('*')
-            ->with(['detalles' => function ($query) {
+            ->whereHas('detalles', function ($query) {
                 $query->where('estado_det_recibo_ingreso', 1);
-            }])
+            })
+            ->with('detalles.concepto_ingreso')
+            ->with('cuenta_presupuestal')
+            ->with('empleado_tesoreria')
             ->orderBy($columns[$column], $dir);
         if ($search_value) {
             $query->where('numero_recibo_ingreso', 'like', '%' . $search_value['numero_recibo_ingreso'] . '%')
@@ -80,11 +82,11 @@ class ReciboIngresoController extends Controller
         $last_receipt = ReciboIngreso::where('numero_recibo_ingreso', 'like', '%' . $current_year . '%')->orderBy('id_recibo_ingreso', 'desc')->first();
         if ($last_receipt) {
             $last_number = $last_receipt->numero_recibo_ingreso;
-            $correlative = intval(substr($last_number, 0, strpos($last_number, '/'))) + 1;
+            $correlative = intval(substr($last_number, 0, strpos($last_number, '-'))) + 1;
         } else {
             $correlative = 1;
         }
-        $receipt_number = $correlative . '/' . $current_year;
+        $receipt_number = $correlative . '-' . $current_year;
 
         $new_income_receipt = new ReciboIngreso([
             'id_ccta_presupuestal' => $request->budget_account_id,

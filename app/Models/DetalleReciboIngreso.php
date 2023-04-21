@@ -28,4 +28,9 @@ class DetalleReciboIngreso extends Model
     {
         return $this->belongsTo('App\Models\ReciboIngreso','id_recibo_ingreso','id_recibo_ingreso');
     }
+
+    public function concepto_ingreso()
+    {
+        return $this->belongsTo('App\Models\ConceptoIngreso','id_concepto_ingreso','id_concepto_ingreso');
+    }
 }

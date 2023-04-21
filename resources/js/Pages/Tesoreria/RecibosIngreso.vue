@@ -5,6 +5,7 @@ import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
 import ModalIncomeReceiptVue from '@/Components-ISRI/Tesoreria/ModalIncomeReceipt.vue';
+import ModalReceiptFormatVue from '@/Components-ISRI/Tesoreria/ModalReceiptFormat.vue';
 import moment from 'moment';
 
 import { toast } from 'vue3-toastify';
@@ -44,54 +45,68 @@ import axios from 'axios';
           @datos-enviados="handleData($event)">
           <tbody class="text-sm divide-y divide-slate-200">
             <tr v-for="receipt in income_receipts" :key="receipt.id_recibo_ingreso">
-            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-              <div class="font-medium text-slate-800">{{ receipt.numero_recibo_ingreso }}</div>
-            </td>
-            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-              <div class="font-medium text-slate-800">{{ receipt.cliente_recibo_ingreso }}</div>
-            </td>
-            <td class="px-2 first:pl-5 last:pr-5  whitespace-normal w-px break-words">
-              <div class="font-medium text-slate-800">{{ receipt.descripcion_recibo_ingreso }}</div>
-            </td>
-            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-              <div class="font-medium text-slate-800">{{ receipt.id_ccta_presupuestal }}</div>
+              <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                <div class="font-medium text-slate-800">{{ receipt.numero_recibo_ingreso }}</div>
+              </td>
+              <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                <div class="font-medium text-slate-800">{{ receipt.cliente_recibo_ingreso }}</div>
+              </td>
+              <td class="px-2 first:pl-5 last:pr-5  whitespace-normal w-px break-words">
+                <div class="font-medium text-slate-800">{{ receipt.descripcion_recibo_ingreso }}</div>
+              </td>
+              <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                <div class="font-medium text-slate-800">{{ receipt.id_ccta_presupuestal }}</div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800">$ {{ receipt.monto_recibo_ingreso }}</div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                  <div class="font-medium text-slate-800">
-                    <div v-if="(receipt.estado_recibo_ingreso == 1)"
-                      class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
-                      Activo
-                    </div>
-                    <div v-else
-                      class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-rose-100 text-rose-600">
+                <div class="font-medium text-slate-800">
+                  <div v-if="(receipt.estado_recibo_ingreso == 1)"
+                    class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
+                    Activo
+                  </div>
+                  <div v-else
+                    class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-rose-100 text-rose-600">
                     Inactivo
                   </div>
                 </div>
               </td>
-            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-              <div class="space-x-1">
-                <button @click="editIncomeReceipt(receipt)" v-if="permits.actualizar == 1"
-                  class="text-slate-400 hover:text-slate-500 rounded-full">
-                  <span class="sr-only">Edit</span>
+              <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                <div class="space-x-1">
+                  <button @click="editIncomeReceipt(receipt)" v-if="permits.actualizar == 1"
+                    class="text-slate-400 hover:text-slate-500 rounded-full">
+                    <span class="sr-only">Edit</span>
                     <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
                       <path
                         d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z">
                       </path>
                     </svg>
                   </button>
-                  <button @click="changeStateIncomeReceipt(receipt.id_recibo_ingreso,receipt.numero_recibo_ingreso,receipt.estado_recibo_ingreso)" v-if="permits.eliminar==1" 
-                      class="text-rose-500 hover:text-rose-600 rounded-full">
-                      <span class="sr-only">Delete</span><svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
-                        <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
-                        </path>
-                        <path
-                          d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z">
-                        </path>
-                      </svg>
-                    </button>
+                  <button
+                    @click="changeStateIncomeReceipt(receipt.id_recibo_ingreso, receipt.numero_recibo_ingreso, receipt.estado_recibo_ingreso)"
+                    v-if="permits.eliminar == 1" class="text-rose-500 hover:text-rose-600 rounded-full">
+                    <span class="sr-only">Delete</span><svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
+                      <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
+                      </path>
+                      <path
+                        d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z">
+                      </path>
+                    </svg>
+                  </button>
+                  <button
+                    @click="viewReceipt(receipt)"
+                    v-if="permits.eliminar == 1" class="text-blue-500 hover:text-blue-600 rounded-full">
+                    <span class="sr-only">View</span>
+                    <svg class="mb-1" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M16 12C16 14.2091 14.2091 16 12 16C9.79086 16 8 14.2091 8 12C8 9.79086 9.79086 8 12 8C14.2091 8 16 9.79086 16 12ZM14 12C14 13.1046 13.1046 14 12 14C10.8954 14 10 13.1046 10 12C10 10.8954 10.8954 10 12 10C13.1046 10 14 10.8954 14 12Z"
+                        fill="currentColor" />
+                      <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M12 3C17.5915 3 22.2898 6.82432 23.6219 12C22.2898 17.1757 17.5915 21 12 21C6.40848 21 1.71018 17.1757 0.378052 12C1.71018 6.82432 6.40848 3 12 3ZM12 19C7.52443 19 3.73132 16.0581 2.45723 12C3.73132 7.94186 7.52443 5 12 5C16.4756 5 20.2687 7.94186 21.5428 12C20.2687 16.0581 16.4756 19 12 19Z"
+                        fill="currentColor" />
+                    </svg>
+                  </button>
                 </div>
               </td>
             </tr>
@@ -112,7 +127,7 @@ import axios from 'axios';
 
                   <div class="flex-1 text-right ml-2">
                     <a @click="getIncomeReceipts(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                    text-indigo-500">
+                                            text-indigo-500">
                       &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                     </a>
                   </div>
@@ -121,9 +136,9 @@ import axios from 'axios';
                   :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                   <div class="flex-1 text-right ml-2">
                     <a @click="getIncomeReceipts(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                    text-indigo-500">
-                    <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
-                  </a>
+                                            text-indigo-500">
+                      <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
+                    </a>
                   </div>
                 </span>
                 <span class="cursor-pointer" v-else
@@ -137,8 +152,12 @@ import axios from 'axios';
       </div>
     </div>
 
-    <ModalIncomeReceiptVue :show_modal_receipt="show_modal_receipt" :modal_data="modal_data" :budget_accounts="budget_accounts" :income_concepts="income_concepts" :treasury_clerk="treasury_clerk"
-              @cerrar-modal="show_modal_receipt=false" @get-table="this.getIncomeReceipts(this.tableData.currentPage)"/>
+    <ModalIncomeReceiptVue :show_modal_receipt="show_modal_receipt" :modal_data="modal_data"
+      :budget_accounts="budget_accounts" :income_concepts="income_concepts" :treasury_clerk="treasury_clerk"
+      @cerrar-modal="show_modal_receipt = false" @get-table="this.getIncomeReceipts(this.tableData.currentPage)" />
+
+    <ModalReceiptFormatVue :view_receipt="view_receipt" :receipt_to_print="receipt_to_print"
+      @cerrar-modal="view_receipt = false"/>
 
   </AppLayoutVue>
 </template>
@@ -174,11 +193,13 @@ export default {
         sortOrders[column.name] = -1;
     });
     return {
+      view_receipt:false,
+      receipt_to_print:[],
       //Data for datatable
       income_receipts: [],
       //Data for modal
-      income_concepts:[],
-      treasury_clerk : [],
+      income_concepts: [],
+      treasury_clerk: [],
       show_modal_receipt: false,
       modal_data: [],
       permits: [],
@@ -200,8 +221,11 @@ export default {
     }
   },
   methods: {
+    viewReceipt(receipt){
+      this.receipt_to_print=receipt
+      this.view_receipt=true
+    },
     editIncomeReceipt(income_concept) {
-      //var array = {nombre_marca:marca.nombre_marca}
       this.modal_data = income_concept
       this.show_modal_receipt = true
     },
