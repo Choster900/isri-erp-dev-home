@@ -29,7 +29,7 @@ import axios from 'axios';
         <div class="mb-4 md:flex flex-row justify-items-start">
           <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
             <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-              <Multiselect v-model="tableData.length" @select="getIncomeConcept()" :options="perPage"
+              <Multiselect v-model="tableData.length" @select="getIncomeReceipts()" :options="perPage"
                 :searchable="true" />
               <LabelToInput icon="date" />
             </div>
@@ -300,6 +300,7 @@ export default {
           this.links[0].label = "Anterior";
           this.links[this.links.length - 1].label = "Siguiente";
           this.income_receipts = data.data.data;
+          console.log(this.income_receipts);
         }
       }).catch((errors) => {
         let msg = this.manageError(errors)

@@ -88,6 +88,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                             <label for="" class="flex items-center text-[14px] w-max-1/3">Total en
                                                 Letras</label>
                                             <input type="text" readonly
+                                                v-model="receipt_to_print.monto_letras"
                                                 class="font-bold text-left border-b border-black-600 border-opacity-50 border-solid border-0 py-0 text-sm"
                                                 style="width:735px;">
                                         </div>

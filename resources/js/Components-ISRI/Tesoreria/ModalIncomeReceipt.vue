@@ -313,6 +313,7 @@ export default {
                     if (result.isConfirmed) {
                         axios.post("/save-income-receipt", this.income_receipt)
                             .then((response) => {
+                                console.log(response.data.letras);
                                 toast.success(response.data.mensaje, {
                                     autoClose: 3000,
                                     position: "top-right",

@@ -10,13 +10,15 @@ use App\Models\CuentaPresupuestal;
 use App\Models\DetalleReciboIngreso;
 use App\Models\ReciboIngreso;
 use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Luecano\NumeroALetras\NumeroALetras;
 
 class ReciboIngresoController extends Controller
 {
     public function getRecibosIngreso(Request $request)
     {
-        $columns = ['numero_recibo_ingreso','cliente_recibo_ingreso', 'descripcion_recibo_ingreso', 'id_ccta_presupuestal', 'monto_recibo_ingreso', 'estado_recibo_ingreso'];
+        $columns = ['numero_recibo_ingreso', 'cliente_recibo_ingreso', 'descripcion_recibo_ingreso', 'id_ccta_presupuestal', 'monto_recibo_ingreso', 'estado_recibo_ingreso'];
 
         $length = $request->input('length');
         $column = $request->input('column'); //Index
@@ -39,8 +41,25 @@ class ReciboIngresoController extends Controller
                 ->where('descripcion_recibo_ingreso', 'like', '%' . $search_value['descripcion_recibo_ingreso'] . '%')
                 ->where('estado_recibo_ingreso', 'like', '%' . $search_value['estado_recibo_ingreso'] . '%');
         }
-        $income_concept = $query->paginate($length)->onEachSide(1);
-        return ['data' => $income_concept, 'draw' => $request->input('draw')];
+        $income_receipt = $query->paginate($length)->onEachSide(1);
+
+        $numeroLetras = new NumeroALetras();
+        $monto_letras = array_map(function($income_receipt) use($numeroLetras) {
+            return ['monto_letras' => $numeroLetras->toInvoice($income_receipt['monto_recibo_ingreso'], 2, 'DÓLARES')];
+        }, $income_receipt->toArray()['data']);
+        $query_con_monto_letras = $income_receipt->map(function ($item, $key) use ($monto_letras) {
+            $item->monto_letras = $monto_letras[$key]['monto_letras'];
+            return $item;
+        });
+        $paginator = new LengthAwarePaginator(
+            $query_con_monto_letras,
+            $income_receipt->total(),
+            $income_receipt->perPage(),
+            $income_receipt->currentPage(),
+            ['path' => url()->current()]
+        );
+
+        return ['data' => $paginator, 'draw' => $request->input('draw')];
     }
 
     public function changeStateIncomeReceipt(Request $request)
@@ -136,7 +155,7 @@ class ReciboIngresoController extends Controller
         ]);
 
         foreach ($request->income_detail as $detail) {
-            if ($detail['detail_id'] != "" && $detail['deleted']==false) {
+            if ($detail['detail_id'] != "" && $detail['deleted'] == false) {
                 //Update detail
                 $income_detail = DetalleReciboIngreso::find($detail['detail_id']);
                 $income_detail->update([
@@ -148,7 +167,7 @@ class ReciboIngresoController extends Controller
                 ]);
             }
 
-            if($detail['detail_id'] != "" && $detail['deleted']==true){
+            if ($detail['detail_id'] != "" && $detail['deleted'] == true) {
                 $income_detail = DetalleReciboIngreso::find($detail['detail_id']);
                 $income_detail->update([
                     'estado_det_recibo_ingreso' => 0,
@@ -158,11 +177,11 @@ class ReciboIngresoController extends Controller
                 ]);
             }
 
-            if($detail['detail_id'] == "" && $detail['deleted']==false){
-                $exist_detail = DetalleReciboIngreso::where('id_recibo_ingreso',$request->income_receipt_id)
-                    ->where('id_concepto_ingreso',$detail['income_concept_id'])
+            if ($detail['detail_id'] == "" && $detail['deleted'] == false) {
+                $exist_detail = DetalleReciboIngreso::where('id_recibo_ingreso', $request->income_receipt_id)
+                    ->where('id_concepto_ingreso', $detail['income_concept_id'])
                     ->first();
-                if($exist_detail){
+                if ($exist_detail) {
                     $exist_detail->update([
                         'monto_det_recibo_ingreso' => $detail['amount'],
                         'fecha_mod_det_recibo_ingreso' => Carbon::now(),
@@ -170,7 +189,7 @@ class ReciboIngresoController extends Controller
                         'ip_det_recibo_ingreso' => $request->ip(),
                         'estado_det_recibo_ingreso' => 1,
                     ]);
-                }else{
+                } else {
                     $new_income_detail = new DetalleReciboIngreso([
                         'id_recibo_ingreso' => $request->income_receipt_id,
                         'id_concepto_ingreso' => $detail['income_concept_id'],
