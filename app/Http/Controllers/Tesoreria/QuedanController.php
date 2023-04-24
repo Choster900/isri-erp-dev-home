@@ -49,7 +49,7 @@ class QuedanController extends Controller
         $v_column = $request->input('column');
         $v_dir = $request->input('dir');
         $data = $request->input('search');
-        $v_query = Quedan::select('*')->with(["detalle_quedan", "proveedor.giro", "proveedor.sujeto_retencion", "tesorero", "requerimiento_pago"])->orderBy($v_columns[$v_column], $v_dir);
+        $v_query = Quedan::select('*')->with(["detalle_quedan", "proveedor.giro", "proveedor.sujeto_retencion", "tesorero", "requerimiento_pago","acuerdo_compra"])->orderBy($v_columns[$v_column], $v_dir);
 
 
         if ($request->input("allWithANumberRequest")) {
