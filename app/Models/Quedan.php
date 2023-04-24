@@ -17,6 +17,7 @@ class Quedan extends Model
         'id_requerimiento_pago',
         'id_empleado_tesoreria',
         'id_proy_financiado',
+        'id_acuerdo_compra',
         'id_serie_retencion_iva',
         'id_proveedor',
         'numero_quedan',
@@ -53,6 +54,10 @@ class Quedan extends Model
     public function requerimiento_pago()
     { //(FOREING KEY, PRIMARY KEY)
         return $this->belongsTo(RequerimientoPago::class, "id_requerimiento_pago", "id_requerimiento_pago");
+    }
+    public function acuerdo_compra()
+    { //(FOREING KEY, PRIMARY KEY)
+        return $this->belongsTo(AcuerdoCompra::class, "id_acuerdo_compra", "id_acuerdo_compra");
     }
 
     

@@ -3,6 +3,8 @@ import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import moment from 'moment';
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
+import { jsPDF } from "jspdf";
+import html2pdf from 'html2pdf.js'
 </script>
 <template>
     <div class="m-1.5">
@@ -21,9 +23,9 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                 @click="updateQuedan()" />
                         </div>
 
-                        <div class="px-2">
+                        <div class="px-2" v-if="dataQuedan != ''">
                             <GeneralButton color="bg-red-700   hover:bg-red-800" text="DESCARGAR PDF" icon="pdf"
-                                @click="cominsoon()" />
+                                @click="printPdf()" />
                         </div>
                     </div>
 
@@ -34,7 +36,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                         </span>
                     </button>
 
-                    <div class="border-2 border-black mx-8 mb-7" id="main-container">
+                    <div class="border-2 border-black mx-8 mb-7" id="main-container" ref="contenedorPdfQuedan">
 
                         <div class="mb-7 md:flex flex-row justify-between">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/4 pt-1 px-8">
@@ -235,11 +237,11 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                         </div>
                                                     </td>
                                                     <td v-else-if="cellIndex == 4" class="border-2 border-black" :class="[
-                                                        cell == '' ? 'bg-[#fdfd96]' : '',
-                                                        errosDetalleQuedan[rowIndex] ? 'bg-[#fd9696]' : '',
-                                                        errosrNumeroActa.includes(rowIndex) ? 'bg-[#fd9696]' : ''
+                                                            cell == '' ? 'bg-[#fdfd96]' : '',
+                                                            errosDetalleQuedan[rowIndex] ? 'bg-[#fd9696]' : '',
+                                                            errosrNumeroActa.includes(rowIndex) ? 'bg-[#fd9696]' : ''
 
-                                                    ]"
+                                                        ]"
                                                         @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
                                                         contenteditable="true">{{ cell }}</td>
                                                     <td v-else-if="cellIndex == 5" colspan="2"
@@ -344,6 +346,10 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 </template>
 
 <script>
+
+import quedanPDFVue from '@/pdf/Tesoreria/quedanPDF.vue';
+import { createApp, h } from 'vue'
+
 export default {
 
     props: {
@@ -402,7 +408,29 @@ export default {
 
         }
     },
+    components: {
+        quedanPDFVue
+    },
     methods: {
+        printPdf() {
+
+            const opt = {
+                margin: 0.1,
+                filename: 'output.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' },
+            };
+
+            const app = createApp(quedanPDFVue, { dataQuedan: this.dataQuedan, totalCheque: this.dataInputs.total });
+            const div = document.createElement('div');
+            const pdfPrint = app.mount(div);
+            const html = div.outerHTML;
+
+            html2pdf().set(opt).from(html).save();
+
+        },
+
         onCellEdit(rowIndex, cellIndex, value, type = '') {//editando la celda RECIVE ROW, CELL Y EL VALOR A MODIFICAR
 
             if (type) {//ejecutando la accion cuando escriba en la celda [monto,tipo_prestacion]
