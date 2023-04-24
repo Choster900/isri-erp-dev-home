@@ -29,6 +29,10 @@ const props = defineProps({
     readOnly:{
         type:Boolean,
         default:false
+    },
+    required:{
+        type:Boolean,
+        default:true
     }
 });
 
@@ -52,7 +56,7 @@ defineExpose({ focus: () => input.value.focus() });
             {{ placeholder }}
         </label> -->
     <label v-if="labelInput" class="block mb-2 text-xs font-light text-gray-600" :for="id">
-        {{ placeholder }} <span class="text-red-600 font-extrabold">*</span>
+        {{ placeholder }} <span class="text-red-600 font-extrabold" v-if="required">*</span>
     </label>
     <div class="relative flex h-8 w-full flex-row-reverse overflow-clip "
         style="border: none; background-color: transparent;">

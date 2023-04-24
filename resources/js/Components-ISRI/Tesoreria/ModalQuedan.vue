@@ -137,21 +137,11 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                             </div>
                         </div>
 
-                        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 overflow-x-auto">
+                        <div class="max-w-7xl mx-auto pb-20 sm:px-6 lg:px-8 overflow-x-auto">
                             <table class="table-auto mx-auto">
                                 <thead>
-
-                                    <tr id="esconder" class="border-none">
-                                        <td contenteditable="false" class=""></td>
-                                        <td contenteditable="false" class=""></td>
-                                        <td contenteditable="false" class=""></td>
-                                        <td contenteditable="false" class=""></td>
-                                        <td contenteditable="false" class=""></td>
-                                        <td contenteditable="false" class=""></td>
-                                        <td contenteditable="false" class=""></td>
-                                    </tr>
                                     <tr>
-                                        <th class="border-2 border-black  ">
+                                        <th class="border-2 border-black h-7 ">
                                             <p class="px-[55px] text-sm text-gray-600">PROVEEDOR</p>
                                         </th>
                                         <th class="border-2 border-black text-sm text-gray-600" colspan="8"
@@ -169,10 +159,10 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                             </div>
                                         </td>
                                         <th class="border-2 border-black text-sm text-gray-600" colspan="3">
-                                            NUMERO CONTRATACION
+                                            NUMERO DE ACUERDO
                                         </th>
                                         <th class="border-2 border-black text-sm text-gray-600" colspan="8">
-                                            NUMERO COMPROMISO
+                                            NUMERO DE COMPROMISO
                                         </th>
 
                                     </tr>
@@ -193,9 +183,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                             <input type="text" v-model="dataInputs.numero_compromiso_ppto_quedan"
                                                 class="peer w-full text-sm bg-transparent text-center h-16 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                         </td>
-
                                     </tr>
-
                                     <tr>
                                         <td class="border-2 border-black" colspan="1" contenteditable="false">
                                             <div class="relative flex h-8 w-full flex-row-reverse"
@@ -210,12 +198,12 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                         </th>
                                     </tr>
                                     <tr>
-                                        <th class="border-2 border-black  text-sm text-gray-600 ">FACTURA</th>
-                                        <th class="border-2 border-black  W-64 text-sm px-10 text-gray-600" colspan="2">
+                                        <th class="border-2 border-black text-sm text-gray-600 ">FACTURA</th>
+                                        <th class="border-2 border-black text-sm px-10 text-gray-600" colspan="2">
                                             DEPENDENCIA</th>
 
-                                        <th class="border-2 border-black w text-sm px-8 text-gray-600">NUMERO ACTA</th>
-                                        <th class="border-2 border-black w-80 text-sm px-10 text-gray-600" colspan="2">
+                                        <th class="border-2 border-black text-sm px-8 text-gray-600">NUMERO ACTA</th>
+                                        <th class="border-2 border-black w-64 text-sm px-10 text-gray-600" colspan="2">
                                             CONCEPTO</th>
                                         <th class="border-2 border-black w-40 text-sm px-10 text-gray-600">
                                             MONTO
@@ -301,26 +289,49 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                 <tbody>
                                     <tr id="esconder" class="border-none">
                                         <td contenteditable="false" class="py-3 border-none"></td>
-                                        <td colspan="8" contenteditable="false"></td>
                                     </tr>
                                     <tr>
-                                        <td class="border-2 border-black py-4" colspan="2" contenteditable="false">
+                                        <td class="border-2 border-black " colspan="1" rowspan="2" contenteditable="false">
                                             Descripción
                                         </td>
-                                        <td class="border-2 border-black" colspan="7" contenteditable="true"
+                                        <td class="border-2 border-black" colspan="4" rowspan="2" contenteditable="true"
                                             @input="onInputDescripcionQuedan">
                                             {{ dataInputs.descripcion_quedan }}
+
+                                        </td>
+                                        <th class="border-2 border-black text-sm text-gray-600">
+                                            PROYECTO FINANCIADO
+                                        </th>
+                                        <th class="border-2 border-black py-2 text-sm text-gray-600">
+                                            PRIORIDAD DE PAGO
+                                        </th>
+                                    </tr>
+                                    <tr>
+
+                                        <td class="border-2 border-black " colspan="1" contenteditable="false">
+                                            <div class="relative flex h-8 w-full flex-row-reverse "
+                                                :class="{ 'condition-select': dataInputs.id_prioridad_pago == '' }">
+                                                <Multiselect v-model="dataInputs.id_prioridad_pago"
+                                                    :options="dataForSelectInRow.prioridadPago" :searchable="true" />
+                                            </div>
+                                        </td>
+                                        <td class="border-2 border-black " colspan="1" contenteditable="false">
+                                            <div class="relative flex h-8 w-full flex-row-reverse "
+                                                :class="{ 'condition-select': dataInputs.id_proy_financiado == '' }">
+                                                <Multiselect v-model="dataInputs.id_proy_financiado"
+                                                    :options="dataForSelectInRow.proyectoFinanciado" :searchable="true" />
+                                            </div>
                                         </td>
                                     </tr>
-
                                 </tbody>
                             </table>
 
-                            <div class="row footer mt-4 mb-5">
+
+                            <div class="row footer mt-4 mb-10">
                                 <div class="text-center">
                                     <input type="text"
                                         class="border-2 border-solid border-gray-400 text-center w-80 text-[15px]"
-                                        :value="dataInputs.nombre_tesorero" disabled>
+                                        :value="dataInputs.nombre_empleado_tesoreria" disabled>
                                 </div>
                             </div>
                         </div>
@@ -372,9 +383,11 @@ export default {
                 monto_iva_quedan: '',
                 monto_isr_quedan: '',
                 total: '',
-                nombre_tesorero: '',
+                nombre_empleado_tesoreria: '',
                 fecha_emision: '',
                 id_quedan: '',
+                id_prioridad_pago: '',
+                id_proy_financiado: '',
             },
             dataForCalculate: {
                 giro: '',
@@ -471,9 +484,13 @@ export default {
             this.dataInputs.monto_liquido_quedan = this.dataQuedan.monto_liquido_quedan
             this.dataInputs.monto_iva_quedan = this.dataQuedan.monto_iva_quedan
             this.dataInputs.monto_isr_quedan = this.dataQuedan.monto_isr_quedan
-            this.dataInputs.nombre_tesorero = this.dataQuedan.tesorero.nombre_tesorero
+            this.dataInputs.nombre_empleado_tesoreria = this.dataQuedan.tesorero.nombre_empleado_tesoreria
             this.dataInputs.fecha_emision = this.dataQuedan.fecha_emision_quedan
             this.dataInputs.id_quedan = this.dataQuedan.id_quedan
+            this.dataInputs.id_prioridad_pago = this.dataQuedan.id_prioridad_pago
+            this.dataInputs.id_proy_financiado = this.dataQuedan.id_proy_financiado
+
+
         },
         resetValuesToInput() {//funcion para limpiar la data que la llamaremos cuando la data no traiga nada
             this.dataInputs.giro = ""
@@ -488,9 +505,11 @@ export default {
             this.dataInputs.monto_iva_quedan = ""
             this.dataInputs.monto_isr_quedan = ""
             this.dataInputs.total = ""
-            this.dataInputs.nombre_tesorero = ""
+            this.dataInputs.nombre_empleado_tesoreria = ""
             this.dataInputs.fecha_emision = ""
             this.dataInputs.id_quedan = ""
+            this.dataInputs.id_prioridad_pago = ""
+            this.dataInputs.id_proy_financiado = ""
 
             this.dataForCalculate.irs = ''
             this.dataForCalculate.iva = ''
@@ -600,7 +619,7 @@ export default {
                         this.resetValuesToInput()
                         this.addRow()
                     } else {
-                        toast.error("Error, Al parecer tiene datos requiredios y/o duplicados", {
+                        toast.error("Error, Al parecer tiene datos requiredidos y/o duplicados", {
                             autoClose: 5000,
                             position: "top-right",
                             transition: "zoom",

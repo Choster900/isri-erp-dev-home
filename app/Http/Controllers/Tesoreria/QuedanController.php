@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Tesoreria;
 
 use App\Http\Controllers\Controller;
+use App\Models\EmpleadoTesoreria;
 use App\Models\Proveedor;
 use Illuminate\Http\Request;
 use App\Models\Quedan;
@@ -48,17 +49,27 @@ class QuedanController extends Controller
         $v_column = $request->input('column');
         $v_dir = $request->input('dir');
         $data = $request->input('search');
-        $v_query = Quedan::select('*')->with(["detalle_quedan", "proveedor.giro", "proveedor.sujeto_retencion", "tesorero"])->orderBy($v_columns[$v_column], $v_dir);
+        $v_query = Quedan::select('*')->with(["detalle_quedan", "proveedor.giro", "proveedor.sujeto_retencion", "tesorero", "requerimiento_pago"])->orderBy($v_columns[$v_column], $v_dir);
+
+
+        if ($request->input("allWithANumberRequest")) {
+            $v_query->where("estado_quedan", 2);
+        }
+
 
         if ($data) {
-            $v_query->where('id_quedan', 'like', '%' . $data["id_quedan"] . '%');
+            if (isset($data['id_quedan'])) {
+                $v_query->where('id_quedan', 'like', '%' . $data["id_quedan"] . '%');
+            }
+            $v_query->where('fecha_emision_quedan', 'like', '%' . $data["fecha_emision_quedan"] . '%');
 
             $searchText = $data["buscar_por_detalle_quedan"];
             $v_query->whereHas('detalle_quedan', function ($query) use ($searchText) {
                 $query->where(function ($query) use ($searchText) {
                     $query->where('numero_factura_det_quedan', 'like', '%' . $searchText . '%')
                         ->orWhere('numero_acta_det_quedan', 'like', '%' . $searchText . '%')
-                        ->orWhere('total_factura_det_quedan', 'like', '%' . $searchText . '%')
+                        ->orWhere('producto_factura_det_quedan', 'like', '%' . $searchText . '%')
+                        ->orWhere('servicio_factura_det_quedan', 'like', '%' . $searchText . '%')
                         ->orWhere('descripcion_det_quedan', 'like', '%' . $searchText . '%');
                 });
             });
@@ -67,7 +78,14 @@ class QuedanController extends Controller
                 $query->where('razon_social_proveedor', 'like', '%' . $data["razon_social_proveedor"] . '%');
             });
             $v_query->where('monto_liquido_quedan', 'like', '%' . $data["monto_liquido_quedan"] . '%');
-            $v_query->where('estado_quedan', 'like', '%' . $data["estado_quedan"] . '%');
+
+            if (isset($data['id_requerimiento_pago'])) {
+                $v_query->where('id_requerimiento_pago', 'like', '%' . $data["id_requerimiento_pago"] . '%');
+            }
+
+            if (isset($data['estado_quedan'])) {
+                $v_query->where('estado_quedan', 'like', '%' . $data["estado_quedan"] . '%');
+            }
         }
 
         $v_roles = $v_query->paginate($v_length)->onEachSide(1);
@@ -85,7 +103,8 @@ class QuedanController extends Controller
             DB::beginTransaction();
             $quedan = Quedan::insertGetId([
                 'id_estado_quedan'              => 1,
-                'id_proy_financiado'            => 1,
+                'id_proy_financiado'            => $request->quedan["id_proy_financiado"],
+                'id_prioridad_pago'             => $request->quedan["id_prioridad_pago"],
                 'id_proveedor'                  => $request->quedan["id_proveedor"],
                 'id_acuerdo_compra'             => $request->quedan["id_acuerdo_compra"],
                 'numero_acuerdo_quedan'         => $request->quedan["numero_acuerdo_quedan"],
@@ -94,7 +113,7 @@ class QuedanController extends Controller
                 'monto_liquido_quedan'          => $request->quedan["monto_liquido_quedan"],
                 'monto_iva_quedan'              => $request->quedan["monto_iva_quedan"],
                 'monto_isr_quedan'              => $request->quedan["monto_isr_quedan"],
-                'id_tesorero'                   => Tesorero::select("id_tesorero")->where('estado_tesorero', 1)->get()[0]->id_tesorero,
+                'id_empleado_tesoreria'         => EmpleadoTesoreria::select("id_empleado_tesoreria")->where('estado_empleado_tesoreria', 1)->where("id_cargo_tesoreria", 1)->get()[0]->id_empleado_tesoreria,
                 'fecha_emision_quedan'          => Carbon::now(),
                 'estado_quedan'                 => 1,
                 'fecha_reg_quedan'              => Carbon::now(),
@@ -156,6 +175,8 @@ class QuedanController extends Controller
                 'monto_liquido_quedan'          => $request->quedan["monto_liquido_quedan"],
                 'monto_iva_quedan'              => $request->quedan["monto_iva_quedan"],
                 'monto_isr_quedan'              => $request->quedan["monto_isr_quedan"],
+                'id_proy_financiado'            => $request->quedan["id_proy_financiado"],
+                'id_prioridad_pago'             => $request->quedan["id_prioridad_pago"],
             ]);
 
             foreach ( $detalle_quedan as $key => $value ) {
@@ -223,10 +244,32 @@ class QuedanController extends Controller
                 'id_proveedor as value',
                 'razon_social_proveedor as label'
             )->where("estado_proveedor", 1)->get();
+        $v_Requerimiento = DB::table('requerimiento_pago')
+            ->select(
+                'id_requerimiento_pago as value',
+                DB::raw("CONCAT(numero_requerimiento_pago,' - ',anio_requerimiento_pago) AS label")
+            )->get();
+
+        $v_Prioridad_pago = DB::table('prioridad_pago')
+            ->select(
+                'id_prioridad_pago as value',
+                DB::raw("CONCAT(nivel_prioridad_pago,' - ',nombre_prioridad_pago) AS label")
+            )->get();
+
+        $v_Proyecto_finanziado = DB::table('proyecto_financiado')
+            ->select(
+                'id_proy_financiado as value',
+                DB::raw("CONCAT(codigo_proy_financiado,' - ',nombre_proy_financiado) AS label")
+            )->get();
+
+
         return [
-            "dependencias"   => $v_Dependencias,
-            "acuerdoCompras" => $v_AcuerdoCompra,
-            "proveedor"      => $v_Proveedor
+            "dependencias"        => $v_Dependencias,
+            "acuerdoCompras"      => $v_AcuerdoCompra,
+            "proveedor"           => $v_Proveedor,
+            "numeroRequerimiento" => $v_Requerimiento,
+            "prioridadPago"       => $v_Prioridad_pago,
+            "proyectoFinanciado"  => $v_Proyecto_finanziado,
         ];
     }
     public function getSuppliers() //Metodo utilizado al momento de seleccionar proveedor y hacer los calculos 

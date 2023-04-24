@@ -62,6 +62,9 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get('requerimientos', [RequerimientoController::class, 'getRequerimientos'])->name('get.requerimientos');
     Route::post('add-requerimiento', [RequerimientoController::class, 'addRequerimientoNumber'])->name('add-requerimiento');
     Route::post('update-requerimiento', [RequerimientoController::class, 'updateRequerimientoNumber'])->name('update-requerimiento');
+    Route::get('filter-quedan', [RequerimientoController::class, 'filterQuedan'])->name('filter-quedan');
+    Route::post('add-numberRequest-quedan', [RequerimientoController::class, 'addANumerRequestToQuedan'])->name('add-numberRequest-quedan');
+    Route::post('take-of-number-request', [RequerimientoController::class, 'takeOfNumberRequest'])->name('take-of-number-request');
 
 
     //Manage Asignacion de requerimiento

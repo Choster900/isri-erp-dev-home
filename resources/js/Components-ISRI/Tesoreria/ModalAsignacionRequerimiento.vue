@@ -1,776 +1,438 @@
 <script setup>
+import ModalBasicVue from '@/Components-ISRI/AllModal/ModalBasic.vue';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import moment from 'moment';
-import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
+import axios from 'axios';
+
 </script>
 <template>
-    <div class="m-1.5">
-        <ProcessModal maxWidth='6xl' :show="showModal" @close="$emit('cerrar-modal')">
+    <ModalBasicVue title="Asignando numero de requerimiento" id="scrollbar-modal" maxWidth="6xl"
+        :modalOpen="scrollbarModalOpen" @close-modal-persona="this.$emit('close-definitive')">
 
-            <div class="">
-                <div class="text-center">
-                    <div class=" flex   justify-center pt-2 content-between">
-
-
-                        <div class="px-2 w-52 pb-2">
-                            <p class="text-[12px]">Asginar numero requerimiento</p>
-                            <div class="relative flex h-8 w-full flex-row-reverse " placeholder="a"
-                                :class="{ 'condition-select': dataInputs.id_proveedor == '' }">
-                                <Multiselect v-model="dataInputs.id_proveedor" :options="dataForSelectInRow.proveedor"
-                                    :searchable="true" @select="getInformationBySupplier($event)" />
-                            </div>
+        <div class="flex flex-col md:flex-row space-y-5 md:space-y-0  ">
+            <div class="flex-1 p-4 bg shadow-md  bg-white  shadow-[#001b47]  border border-gray-500/20">
+                <div class="mb-7 md:flex flex-row justify-items-start">
+                    <div class="mb-4 md:mr-2 md:mb-0 basis-full">
+                        <label class="block mb-2 text-xs font-light text-gray-600">
+                            Proveedor <span class="text-red-600 font-extrabold">*</span>
+                        </label>
+                        <div class="relative font-semibold  flex h-8  flex-row-reverse ">
+                            <Multiselect id="estado-civil" :options="dataForSelect.proveedor" :searchable="true"
+                                v-model="filter.suppiler" />
+                            <LabelToInput icon="list" />
                         </div>
-
-         
                     </div>
-
-                   
-
-                    <div class="border-2 border-black mx-8 mb-7" id="main-container">
-
-                        <div class="mb-7 md:flex flex-row justify-between">
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/4 pt-1 px-8">
-                            </div>
-                            <div class="mb-4 md:mx-10 md:mb-0 basis-1/2 pt-7 ">
-                                <div class="border-2 border-black ">
-                                    <h3 style class="text-[20px] px-7 py-1.5 font-semibold text-gray-600">
-                                        Documento de seguimiento de pagos
-                                    </h3>
-                                </div>
-                            </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/4 pt-1 px-8 ">
-                            </div>
+                </div>
+                <div class="mb-7 md:flex flex-row justify-items-start">
+                    <div class="mb-4 md:mr-2 md:mb-0">
+                        <label class="block mb-2 text-xs font-light text-gray-600" for="fecha_nacimiento">
+                            Filtrado de fecha [Desde - Hasta]<span class="text-red-600 font-extrabold">*</span>
+                        </label>
+                        <div class="relative flex h-8  md:w-auto flex-row-reverse">
+                            <flat-pickr v-model="filter.rangeDate"
+                                class="peer w-92 text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
+                                :config="config" />
+                            <LabelToInput icon="date" />
                         </div>
-
-                        <div class="mx-20 mb-3 encabezado">
-                            <div class="mb-7 md:flex flex-row justify-items-center">
-                                <div class="mb-4 md:mr-2 md:mb-0 w-100">
-                                    <div class="relative flex w-full flex-row">
-                                        <label for="" class="flex items-center text-[14px] text-sm">Giro del
-                                            proveedor:</label>
-                                        <input type="text" style="width: 350px;" readonly v-model="dataInputs.giro"
-                                            class="border-b-2 border-black placeholder-slate-400 text-sm py-0 transition-colors duration-300 focus:border-[#001b47] focus:outline-none">
-                                    </div>
-                                </div>
-                                <div class="mb-4 md:mr-2 md:mb-0 w-25">
-                                    <div class="relative flex w-full flex-row">
-                                        <label for="" class="flex items-center text-[14px]">Porcentaje de IVA:</label>
-                                        <input type="text" style="width: 75px;" v-model="dataInputs.iva" readonly
-                                            class="border-b-2 border-black placeholder-slate-400 text-sm text-center py-0 transition-colors duration-300 focus:border-[#001b47] focus:outline-none">
-                                    </div>
-                                </div>
-                                <div class="mb-4 md:mr-2 md:mb-0 w-25">
-                                    <div class="relative flex w-full flex-row">
-                                        <label for="" class="flex items-center text-[14px] text-sm">Porcentaje de
-                                            ISR:</label>
-                                        <input type="text" style="width: 75px;" v-model="dataInputs.irs" readonly
-                                            class="border-b-2 border-black placeholder-slate-400 text-sm py-0 text-center transition-colors duration-300 focus:border-[#001b47] focus:outline-none">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="pl-16 mb-7 encabezado">
-                            <div class=" mb-7 md:flex flex-row ">
-                                <div class="mb-4 md:mr-2 md:mb-0 w-25 h-5">
-                                    <div class="relative flex  w-full flex-row">
-                                        <label for="" class="flex items-center  text-[14px] text-sm">Quedan:
-                                        </label>
-                                        <input type="text" style="width: 80px;" readonly v-model="dataInputs.id_quedan"
-                                            class="placeholder-slate-400 text-sm py-0 text-center font-bold transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
-                                    </div>
-                                </div>
-                                <div class="mb-4 md:mr-2 md:mb-0 w-25 h-5">
-                                    <div class="relative flex  w-full flex-row">
-                                        <label for="" class="flex items-center  text-[14px] text-sm">Fecha emision:
-                                        </label>
-                                        <input type="date" style="width: 150px;" v-model="dataInputs.fecha_emision"
-                                            class="placeholder-slate-400 text-sm py-0 text-center font-bold transition-colors duration-300 focus:border-[#001b47 focus:outline-none border-b-0">
-                                    </div>
-                                </div>
-
-                                <div class="mb-4 md:mr-2 md:mb-0  w-40 h-5">
-                                    <div class="relative flex  w-full flex-row">
-                                        <label for="" class="flex items-center text-[14px]">Cheque :</label>
-                                        <input type="text" style="width: 80px;" v-model="dataInputs.monto_liquido_quedan"
-                                            readonly
-                                            class="placeholder-slate-400 text-sm text-center py-0 transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
-                                    </div>
-                                </div>
-
-                                <div class="mb-4 md:mr-2 md:mb-0 w-25 h-5">
-                                    <div class="relative flex  w-full flex-row">
-                                        <label for="" class="flex items-center text-[14px] text-sm">Renta:</label>
-                                        <input type="text" style="width: 80px;" v-model="dataInputs.monto_isr_quedan"
-                                            readonly
-                                            class="placeholder-slate-400 text-sm py-0 text-center  transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
-                                    </div>
-                                </div>
-
-                                <div class="mb-4 md:mr-2 md:mb-0 w-25 h-5">
-                                    <div class="relative flex  w-full flex-row">
-                                        <label for="" class="flex items-center text-[14px]">IVA: </label>
-                                        <input type="text" style="width: 80px;" v-model="dataInputs.monto_iva_quedan"
-                                            readonly
-                                            class="placeholder-slate-400 text-sm text-center py-0 transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
-                                    </div>
-                                </div>
-
-                                <div class="mb-4 md:mr-2 md:mb-0 w-25 h-5">
-                                    <div class="relative flex  w-full flex-row">
-                                        <label for="" class="flex items-center  text-[14px] text-sm">Total:
-                                        </label>
-                                        <input type="text" style="width: 80px;" readonly v-model="dataInputs.total"
-                                            class="placeholder-slate-400 text-sm py-0 text-center font-bold transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
-                                    </div>
-                                </div>
-
-
-                            </div>
-                        </div>
-
-                        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 overflow-x-auto">
-                            <table class="table-auto mx-auto">
-                                <thead>
-
-                                    <tr id="esconder" class="border-none">
-                                        <td contenteditable="false" class=""></td>
-                                        <td contenteditable="false" class=""></td>
-                                        <td contenteditable="false" class=""></td>
-                                        <td contenteditable="false" class=""></td>
-                                        <td contenteditable="false" class=""></td>
-                                        <td contenteditable="false" class=""></td>
-                                        <td contenteditable="false" class=""></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="border-2 border-black  ">
-                                            <p class="px-[55px] text-sm text-gray-600">PROVEEDOR</p>
-                                        </th>
-                                        <th class="border-2 border-black text-sm text-gray-600" colspan="8"
-                                            contenteditable="false">
-                                            DATOS DEL QUEDAN
-                                        </th>
-                                    </tr>
-                                    <tr>
-                                        <td class="border-2 border-black" colspan="1" contenteditable="false">
-                                            <div class="relative flex h-8 w-full flex-row-reverse "
-                                                :class="{ 'condition-select': dataInputs.id_proveedor == '' }">
-                                                <Multiselect v-model="dataInputs.id_proveedor"
-                                                    :options="dataForSelectInRow.proveedor" :searchable="true"
-                                                    @select="getInformationBySupplier($event)" />
-                                            </div>
-                                        </td>
-                                        <th class="border-2 border-black text-sm text-gray-600" colspan="3">
-                                            NUMERO CONTRATACION
-                                        </th>
-                                        <th class="border-2 border-black text-sm text-gray-600" colspan="8">
-                                            NUMERO COMPROMISO
-                                        </th>
-
-                                    </tr>
-
-                                    <tr>
-                                        <th class="border-2 border-black h-16 text-sm text-gray-600">
-                                            ACUERDO CONTRATACION
-                                        </th>
-                                        <td class="border-2 border-black bg-[#e6e6e6]" colspan="3">
-                                            <input type="text" v-model="dataInputs.numero_acuerdo_quedan" disabled
-                                                class="peer w-full text-sm bg-transparent text-center h-16 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
-                                        </td>
-                                        <td class="border-2 border-black bg-[#e6e6e6]" colspan="8">
-                                            <input type="text" v-model="dataInputs.numero_compromiso_ppto_quedan" disabled
-                                                class="peer w-full text-sm bg-transparent text-center h-16 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
-                                        </td>
-
-                                    </tr>
-
-                                    <tr>
-                                        <td class="border-2 border-black" colspan="1">
-                                            <div class="relative flex h-8 w-full flex-row-reverse">
-                                                <Multiselect v-model="dataInputs.id_acuerdo_compra" v-bind:disabled="true"
-                                                    :options="dataForSelectInRow.acuerdoCompras" :searchable="true" />
-                                            </div>
-                                        </td>
-                                        <th class="border-2 border-black text-sm text-gray-600" colspan="8"
-                                            contenteditable="false">
-                                            DETALLE QUEDAN
-                                        </th>
-                                    </tr>
-                                    <tr>
-                                        <th class="border-2 border-black  text-sm text-gray-600 ">FACTURA</th>
-                                        <th class="border-2 border-black  W-64 text-sm px-10 text-gray-600" colspan="2">
-                                            DEPENDENCIA</th>
-
-                                        <th class="border-2 border-black w text-sm px-8 text-gray-600">NUMERO ACTA</th>
-                                        <th class="border-2 border-black w-80 text-sm px-10 text-gray-600" colspan="2">
-                                            CONCEPTO</th>
-                                        <th class="border-2 border-black w-40 text-sm px-10 text-gray-600">
-                                            MONTO
-                                        </th>
-
-                                    </tr>
-                                </thead>
-                                <tbody class="text-sm" id="content">
-
-                                    <template v-for="(row, rowIndex) in rowsData" :key="rowIndex">
-                                        <template v-if="row[7]">
-
-                                            <tr>
-                                                <template v-for="(cell, cellIndex) in row" :key="cellIndex">
-
-                                                    <td v-if="cellIndex == 2" class="border-2 border-black bg-[#e6e6e6]">
-                                                        {{ cell }}
-                                                    </td>
-                                                    <td v-else-if="cellIndex == 3" class="border-2 border-black"
-                                                        colspan="2">
-                                                        <div class="relative flex h-10 w-full flex-row-reverse ">
-                                                            <Multiselect v-model="rowsData[rowIndex][3]"
-                                                                v-bind:disabled="true"
-                                                                :options="dataForSelectInRow.dependencias"
-                                                                :searchable="true" />
-                                                        </div>
-                                                    </td>
-                                                    <td v-else-if="cellIndex == 4"
-                                                        class="border-2 border-black  bg-[#e6e6e6]">{{ cell }}</td>
-
-                                                    <td v-else-if="cellIndex == 5" colspan="2"
-                                                        class="border-2 border-black px-1 bg-[#e6e6e6]">
-                                                        {{ cell }}
-                                                    </td>
-
-                                                    <td v-else-if="cellIndex == 6" class="border-2 border-black"
-                                                        @keypress="onlyNumberDecimal($event)">
-
-                                                        <table>
-                                                            <tr>
-                                                                <th class="border-2 border-r-black border-b-black border-l-transparent border-t-transparent text-sm text-gray-600 py-2"
-                                                                    style="writing-mode: vertical-rl; transform: rotate(180deg);">
-                                                                    PRODUCTO
-                                                                </th>
-                                                                <td
-                                                                    class="w-full border-2 border-b-black border-x-transparent border-t-transparent  bg-[#e6e6e6]">
-                                                                    {{ cell.producto }}
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th class="border-2 border-r-black border-t-black border-l-transparent border-b-transparent text-gray-600 py-2"
-                                                                    style="writing-mode: vertical-rl; transform: rotate(180deg);">
-                                                                    SERVICIO
-                                                                </th>
-                                                                <td class=" bg-[#e6e6e6]">
-                                                                    {{ cell.servicio }}
-                                                                </td>
-                                                            </tr>
-                                                        </table>
-
-                                                    </td>
-
-                                                </template>
-
-                                            </tr>
-
-                                        </template>
-                                    </template>
-                                </tbody>
-                                <tbody>
-                                    <tr id="esconder" class="border-none">
-                                        <td contenteditable="false" class="py-3 border-none"></td>
-                                        <td colspan="8" contenteditable="false"></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="border-2 border-black py-4" colspan="2" contenteditable="false">
-                                            Descripción
-                                        </td>
-                                        <td class="border-2 border-black bg-[#e6e6e6]" colspan="7">
-                                            {{ dataInputs.descripcion_quedan }}
-                                        </td>
-                                    </tr>
-
-                                </tbody>
-                            </table>
-
-                            <div class="row footer mt-4 mb-5">
-                                <div class="text-center">
-                                    <input type="text"
-                                        class="border-2 border-solid border-gray-400 text-center w-80 text-[15px]"
-                                        :value="dataInputs.nombre_tesorero" disabled>
-                                </div>
-                            </div>
-                        </div>
-
+                    </div>
+                </div>
+                <div class="mb-7 md:flex flex-row justify-items-start">
+                    <div class="mb-4 md:mr-2 md:mb-0 basis-full">
+                        <TextInput id="primer-nombre" type="text" placeholder="Saldo en IVA" v-model="filter.iva">
+                            <LabelToInput icon="money" forLabel="primer-nombre" />
+                        </TextInput>
+                    </div>
+                </div>
+                <div class="mb-7 md:flex flex-row justify-items-start">
+                    <div class="mb-4 md:mr-2 md:mb-0 basis-full">
+                        <TextInput id="primer-nombre" type="text" placeholder="Saldo en ISR" v-model="filter.isr">
+                            <LabelToInput icon="money" forLabel="primer-nombre" />
+                        </TextInput>
+                    </div>
+                </div>
+                <div class="mb-7 md:flex flex-row justify-items-start">
+                    <div class="mb-4 md:mr-2 md:mb-0 basis-full">
+                        <TextInput id="primer-nombre" type="text" placeholder="Saldo total" v-model="filter.monto">
+                            <LabelToInput icon="money" forLabel="primer-nombre" />
+                        </TextInput>
+                    </div>
+                </div>
+                <div class="sm:flex sm:justify-end sm:items-center">
+                    <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
+                        <GeneralButton color="bg-[#006205]  hover:bg-[#006205]/90" text="Buscar" icon="search"
+                            @click="filterQuedan()" />
+                    </div>
+                    <div class="grid px-2 grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
+                        <GeneralButton color="bg-[#7a0000]  hover:bg-[#7a0000]/90" text="Limpiar Filtro" icon="search"
+                            @click="dataQuedan = []" />
                     </div>
                 </div>
             </div>
-        </ProcessModal>
-    </div>
+            <div class="flex-1  ">
+                <div class=" p-4 rounded-md overflow-x-auto">
+                    <div class="sm:flex sm:justify-between sm:items-center mb-4">
+                        <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-full">
+                                <label class="block text-xs font-light text-gray-600">
+                                    Numero de requerimiento <span class="text-red-600 font-extrabold">*</span>
+                                </label>
+                                <div class="relative flex h-7  flex-row-reverse select-bg">
+                                    <Multiselect :options="dataForSelect.numeroRequerimiento"
+                                        @select="seleccionarRequerimiento($event)" v-model="id_requerimiento_pago"
+                                        :searchable="true" />
+                                </div>
+                            </div>
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-full mt-4 h-5"
+                                :class="(collectItems != '' && id_requerimiento_pago != '' ? 'animate-bounce' : '')">
+                                <button @click="addNumber()"
+                                    class="inline-flex items-center justify-center px-3 py-1 text-white rounded-md shadow"
+                                    :class="(collectItems != '' && id_requerimiento_pago != '' ? ' bg-orange-600' : ' bg-gray-600')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" class="w-5 h-5 stroke-black">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sidebar-style-isri w-full" style="overflow-x:auto; max-height: 450px;">
+                        <table class="table-auto">
+                            <thead
+                                class="text-xs font-semibold uppercase text-white bg-[#001b47] border-t border-b border-slate-200 sticky top-0">
+                                <tr>
+                                    <th class="px-4 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+                                        <div class="flex items-center">
+                                            <Checkbox @click="selectAllItems()"></Checkbox>
+                                        </div>
+                                    </th>
+                                    <th class="px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap">
+                                        <div class="font-semibold text-center text-[12px] w-1">I D</div>
+                                    </th>
+                                    <th class="px-4 py-2 first:pl-5 last:pr-5 whitespace-nowrap">
+                                        <div class="font-semibold text-center w-52 text-[12px] tracking-wider">P R O V E E D
+                                            O R</div>
+                                    </th>
+                                    <th class="px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap">
+                                        <div class="font-semibold text-center w-44 text-[12px]">D E T A L L E</div>
+                                    </th>
+                                    <th class="px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap">
+                                        <div class="font-semibold text-center text-[12px]">F E C H A </div>
+                                    </th>
+                                    <th class="px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap">
+                                        <div class="font-semibold text-center text-[12px]">I S R</div>
+                                    </th>
+                                    <th class="px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap">
+                                        <div class="font-semibold text-right text-[12px]">I V A</div>
+                                    </th>
+                                    <th class="px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap">
+                                        <div class="font-semibold text-right text-[12px]">SALDO</div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <!-- Table body -->
+                            <tbody name="fade" class="text-sm text-gray-700 bg-white divide-y divide-slate-200">
+                                <template v-for="quedan in dataQuedan" :key="quedan.id_quedan">
+
+                                    <transition enter-active-class="slide-out-right-enter-active"
+                                        leave-active-class="slide-out-right-leave-active">
+                                        <tr v-show="quedan.mostrar">
+                                            <td class="px-4 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+                                                <div class="flex items-center">
+                                                    <Checkbox :value="quedan.id_quedan" :checked="selectAll ? true : false"
+                                                        @update:checked="(value) => selectItem(quedan.id_quedan, value)">
+                                                    </Checkbox>
+                                                </div>
+                                            </td>
+                                            <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                                <div class="text-center  text-[12px]">{{ quedan.id_quedan }}</div>
+                                            </td>
+                                            <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                                <div class="text-center text-[12px] wrapTable whitespace-pre-wrap">
+                                                    {{ quedan.proveedor.razon_social_proveedor }}
+                                                </div>
+                                            </td>
+                                            <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                                <div v-for="(detalle, i) in  quedan.detalle_quedan" :key="i"
+                                                    class="font-medium text-slate-800 text-[12px] text-center wrap flex justify-center items-center">
+                                                    <div
+                                                        :class="{ 'border-b-2 border-b-gray-500': i < quedan.detalle_quedan.length - 1 && quedan.detalle_quedan.length > 1 }">
+                                                        FACTURA: {{ detalle.numero_factura_det_quedan }}
+                                                        <br>
+                                                        PRODUCTO: ${{ detalle.producto_factura_det_quedan }}
+                                                        <br>
+                                                        SERVICIO: ${{ detalle.servicio_factura_det_quedan }}
+                                                        <br>
+                                                        <div class="font-semibold">TOTAL: ${{
+                                                            (parseFloat(detalle.servicio_factura_det_quedan)
+                                                                +
+                                                                parseFloat(detalle.producto_factura_det_quedan)).toFixed(2)
+                                                        }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                                <div class="text-center  text-[12px]">{{ quedan.fecha_emision_quedan }}
+                                                </div>
+                                            </td>
+                                            <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                                <div class="text-center text-red-600 text-[12px]">-${{
+                                                    quedan.monto_iva_quedan
+                                                }}
+                                                </div>
+                                            </td>
+                                            <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
+                                                <div class="text-center text-red-600 text-[12px]">-${{
+                                                    quedan.monto_isr_quedan
+                                                }}
+                                                </div>
+                                            </td>
+                                            <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap ">
+                                                <div class="text-center  text-[12px] font-semibold text-green-600">${{
+                                                    quedan.monto_liquido_quedan }}</div>
+                                            </td>
+                                        </tr>
+
+                                    </transition>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ModalBasicVue>
 </template>
+  
 
 <script>
-export default {
 
+export default {
     props: {
-        showModal: {//prop muestra estado del modal para abrir y cerrar
+        scrollbarModalOpen: {
             type: Boolean,
             default: false,
         },
-        dataQuedan: {//prop has total information from "quedan"
+        dataForSelect: {
             type: Object,
             required: true,
         },
-        dataForSelectInRow: {//prop que muestra information en row 
-            type: [],
-            required: true,
-        },
-        dataSuppliers: {//prop muestra array de suppliers para imprimir en select
-            type: [],
-            required: true,
-        },
 
     },
-    data: function () {
-        return {
-            rowsData: [],//attr donde guardar la information
-            errosDetalleQuedan: [],
-            errosrNumeroActa: [],
-            dataInputs: {
-                giro: '',
-                irs: '',
-                iva: '',
-                id_proveedor: '',
-                id_acuerdo_compra: '',
-                numero_acuerdo_quedan: '',
-                numero_compromiso_ppto_quedan: '',
-                descripcion_quedan: '',
-                monto_liquido_quedan: '',
-                monto_iva_quedan: '',
-                monto_isr_quedan: '',
-                total: '',
-                nombre_tesorero: '',
-                fecha_emision: '',
-                id_quedan: '',
-            },
-            dataForCalculate: {
-                giro: '',
-                irs: '',
-                iva: '',
-                id_proveedor: '',
-                monto_liquido_quedan: '',
-                monto_iva_quedan: '',
-                monto_isr_quedan: '',
-                total: ''
-            },
+    created() {
 
-        }
     },
+    data: (props) => ({
+        dataQuedan: [],
+        collectItems: [],
+        id_requerimiento_pago: '',
+        numero_requerimiento: '',
+        filter: {
+            suppiler: '',
+            rangeDate: '',
+            iva: '',
+            isr: '',
+            monto: '',
+        },
+        selectAll: false,
+        config: {
+            mode: 'range',
+            altInput: true,
+            static: true,
+            monthSelectorType: 'static',
+            altFormat: "F-j Y",
+            dateFormat: "Y-m-d",
+            locale: {
+                firstDayOfWeek: 1,
+                weekdays: {
+                    shorthand: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa'],
+                    longhand: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+                },
+                months: {
+                    shorthand: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                    longhand: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+                },
+            },
+        },
+    }),
     methods: {
-        onCellEdit(rowIndex, cellIndex, value, type = '') {//editando la celda RECIVE ROW, CELL Y EL VALOR A MODIFICAR
-
-            if (type) {//ejecutando la accion cuando escriba en la celda [monto,tipo_prestacion]
-                if (type == 'producto') {
-                    this.rowsData[rowIndex][cellIndex].producto = value
-                } else {
-                    this.rowsData[rowIndex][cellIndex].servicio = value
-                }
-                this.calculateAmount()
-
-            } else {
-                this.rowsData[rowIndex][cellIndex] = value
-            }
-
-        },
-        getInformationBySupplier(supplier) {
-            this.dataSuppliers.forEach((suppliers, index) => {
-                if (suppliers["id_proveedor"] == supplier) {
-                    //data que se pinta en inputs
-                    this.dataInputs.giro = suppliers.giro.codigo_giro + " - " + suppliers.giro.nombre_giro
-                    this.dataInputs.irs = (suppliers.sujeto_retencion.isrl_sujeto_retencion * 100) + " %"
-                    this.dataInputs.iva = (suppliers.sujeto_retencion.iva_sujeto_retencion * 100) + " %"
-
-                    //data que se usa para calculos
-                    this.dataForCalculate.irs = suppliers.sujeto_retencion.isrl_sujeto_retencion
-                    this.dataForCalculate.iva = suppliers.sujeto_retencion.iva_sujeto_retencion
-                }
-            })
-            this.calculateAmount()
-        },
-        calculateAmount() {//calculando montos
-            let totMontoByRow = 0
-            let liquido = 0;
-            let montoServicios = 0
-
-            this.rowsData.forEach((valores, index) => {
-                totMontoByRow = (!isNaN(parseFloat(totMontoByRow)) ? parseFloat(totMontoByRow) : 0) + (!isNaN(parseFloat(valores[6].producto)) ? parseFloat(valores[6].producto) : 0) + (!isNaN(parseFloat(valores[6].servicio)) ? parseFloat(valores[6].servicio) : 0);
-            })
-            this.rowsData.forEach((valores, index) => {
-                if (valores[6].servicio != '') {
-                    montoServicios = parseFloat(montoServicios) + parseFloat(valores[6].servicio)
-                }
-            })
-            liquido = (totMontoByRow / 1.13).toFixed(2);
-            let montoIvaQuedan = (liquido * this.dataForCalculate.iva).toFixed(2);
-            this.dataInputs.monto_iva_quedan = montoIvaQuedan;
-            let montoIsrQuedan = (montoServicios * this.dataForCalculate.irs).toFixed(2);
-            this.dataInputs.monto_isr_quedan = montoIsrQuedan;
-            let montoLiquidoQuedan = (totMontoByRow - montoIvaQuedan - montoIsrQuedan).toFixed(2);
-            this.dataInputs.monto_liquido_quedan = montoLiquidoQuedan;
-            this.dataInputs.total = totMontoByRow;
-        },
-        onlyNumberDecimal(event) {
-            const charCode = (event.which) ? event.which : event.keyCode;
-            const value = event.target.textContent;
-            const decimalCount = (value.match(/\./g) || []).length;
-            if (charCode == 46) {
-                if (decimalCount >= 1) {
-                    event.preventDefault();
-                }
-            } else if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-                event.preventDefault();
-            } else if (decimalCount > 0 && value.split('.')[1].length >= 2) {
-                event.preventDefault();
-            }
-        },
-        onInputDescripcionQuedan(event) {
-            this.dataInputs.descripcion_quedan = event.target.innerText;
-        },
-        setValuesToInput() {//funcion para setear la data que trae la prop a attr nuevos
-            this.dataInputs.giro = this.dataQuedan.proveedor.giro.codigo_giro + " - " + this.dataQuedan.proveedor.giro.nombre_giro
-            this.dataInputs.irs = (this.dataQuedan.proveedor.sujeto_retencion.isrl_sujeto_retencion * 100) + " %"
-            this.dataInputs.iva = (this.dataQuedan.proveedor.sujeto_retencion.iva_sujeto_retencion * 100) + " %"
-            this.dataInputs.id_proveedor = this.dataQuedan.proveedor.id_proveedor
-            this.dataInputs.id_acuerdo_compra = this.dataQuedan.id_acuerdo_compra
-            this.dataInputs.numero_acuerdo_quedan = this.dataQuedan.numero_acuerdo_quedan
-            this.dataInputs.numero_compromiso_ppto_quedan = this.dataQuedan.numero_compromiso_ppto_quedan
-            this.dataInputs.descripcion_quedan = this.dataQuedan.descripcion_quedan
-            this.dataInputs.monto_liquido_quedan = this.dataQuedan.monto_liquido_quedan
-            this.dataInputs.monto_iva_quedan = this.dataQuedan.monto_iva_quedan
-            this.dataInputs.monto_isr_quedan = this.dataQuedan.monto_isr_quedan
-            this.dataInputs.nombre_tesorero = this.dataQuedan.tesorero.nombre_tesorero
-            this.dataInputs.fecha_emision = this.dataQuedan.fecha_emision_quedan
-            this.dataInputs.id_quedan = this.dataQuedan.id_quedan
-        },
-        resetValuesToInput() {//funcion para limpiar la data que la llamaremos cuando la data no traiga nada
-            this.dataInputs.giro = ""
-            this.dataInputs.irs = ""
-            this.dataInputs.iva = ""
-            this.dataInputs.id_proveedor = ""
-            this.dataInputs.id_acuerdo_compra = ""
-            this.dataInputs.numero_acuerdo_quedan = ""
-            this.dataInputs.numero_compromiso_ppto_quedan = ""
-            this.dataInputs.descripcion_quedan = ""
-            this.dataInputs.monto_liquido_quedan = ""
-            this.dataInputs.monto_iva_quedan = ""
-            this.dataInputs.monto_isr_quedan = ""
-            this.dataInputs.total = ""
-            this.dataInputs.nombre_tesorero = ""
-            this.dataInputs.fecha_emision = ""
-            this.dataInputs.id_quedan = ""
-
-            this.dataForCalculate.irs = ''
-            this.dataForCalculate.iva = ''
-            this.dataForCalculate.id_proveedor = ''
-            this.dataForCalculate.monto_liquido_quedan = ''
-            this.dataForCalculate.monto_iva_quedan = ''
-            this.dataForCalculate.monto_isr_quedan = ''
-            this.dataForCalculate.total = ''
-
-        },
-        addRow() {//agregando fila
-            this.rowsData.push({
-                0: 1,//numberRow,
-                1: '',//Id__detalle_quedan,
-                2: '',//FACTURA,
-                3: '',//DEPENDENCIA,
-                4: '',//NUMERO ACTA	,
-                5: '',//CONCEPTO	,
-                6: { producto: '', servicio: '' },//Monto en producto y servicio
-                7: true,//eliminado_logico,
-            })
-        },
-
-        paintPositionRepet() {
-            const duplicatePositions = {};//get position where the acta number was duplicated
-
-            for (let i = 0; i < this.rowsData.length; i++) {
-                const row = this.rowsData[i];
-                const number = row[4]; // get numbers en position 4
-
-                // Verificar si el valor en la fila 7 es false antes de agregar la posición actual a las posiciones duplicadas
-                if (row[7] !== false) {
-                    if (duplicatePositions[number]) {
-                        // Si el número ya ha sido ingresado antes, agregar la posición actual a las posiciones duplicadas
-                        duplicatePositions[number].push(i);
-                    } else {
-                        // Si el número es único, crear un nuevo arreglo con la posición actual
-                        duplicatePositions[number] = [i];
-                    }
-                }
-            }
-            const duplicateNumbers = Object.keys(duplicatePositions).filter(number => duplicatePositions[number].length > 1);
-            duplicateNumbers.forEach(number => {
-                duplicatePositions[number].forEach(position => {
-                    this.errosrNumeroActa.push(position)
-                })
-
-            });
-            setTimeout(() => {
-                this.errosrNumeroActa = [];
-            }, 5000);
-
-            return this.errosrNumeroActa.length;
-
-        },
-        async createQuedanAsynchronously() {
-
-            try {
-                const response = await axios.post('/add-quedan', {
-                    quedan: this.dataInputs,
-                    detalle_quedan: this.rowsData
-                })
-
-                return true; // indicate success
-            } catch (error) {
-
-                let data = error.response.data.errors
-                var myData = new Object();
-                for (const errorBack in data) {
-                    let split = errorBack.split(".")
-                    let newIndexSplit = split[1]
-                    myData[newIndexSplit] = data[errorBack][0]
-                }
-                this.errosDetalleQuedan = myData;
-                setTimeout(() => {
-                    this.errosDetalleQuedan = [];
-
-                }, 5000);
-                return false; // indicate failure
-            }
-        },
-
-        async createQuedan() {
-            const confirmed = await this.$swal.fire({
-                title: '¿Esta seguro de crear un nuevo quedan?',
-                icon: 'question',
-                iconHtml: '❓',
-                confirmButtonText: 'Si, Agregar el quedan',
-                confirmButtonColor: '#141368',
-                cancelButtonText: 'Cancelar',
-                showCancelButton: true,
-                showCloseButton: true
-            });
-            if (confirmed.isConfirmed) {
-
-                if (this.paintPositionRepet() == 0) {
-                    const successAdd = await this.createQuedanAsynchronously();
-                    if (successAdd) {
-                        toast.success("El quedan fue agregado correctamente", {
-                            autoClose: 5000,
-                            position: "top-right",
-                            transition: "zoom",
-                            toastBackgroundColor: "white",
-                        });
-                        this.$emit("actualizar-table-data")
-                        this.rowsData = []
-                        this.resetValuesToInput()
-                        this.addRow()
-                    } else {
-                        toast.error("Error, Al parecer tiene datos requiredios y/o duplicados", {
-                            autoClose: 5000,
-                            position: "top-right",
-                            transition: "zoom",
-                            toastBackgroundColor: "white",
-                        });
-                    }
-                } else {
-                    toast.error("Al parecer tienes datos repetidos", {
-                        autoClose: 5000,
-                        position: "top-right",
-                        transition: "zoom",
-                        toastBackgroundColor: "white",
-                    });
-
-                }
-            }
-        },
-
-        async updateQuedanAsynchronously() {
-            try {
-                const response = await axios.post('/update-detalle-quedan', {
-                    quedan: this.dataInputs,
-                    id_quedan: this.dataQuedan.id_quedan,
-                    detalle_quedan: this.rowsData
-                });
-                return true; // indicate success
-            } catch (error) {
-                let data = error.response.data.errors
-                var myData = new Object();
-                for (const errorBack in data) {
-                    let split = errorBack.split(".")
-                    let newIndexSplit = split[1]
-                    myData[newIndexSplit] = data[errorBack][0]
-                }
-                this.errosDetalleQuedan = myData;
-
-
-                console.log(this.errosDetalleQuedan);
-
-                setTimeout(() => {
-                    this.errosDetalleQuedan = [];
-
-                }, 5000);
-                return false; // indicate failure
-            }
-        },
-        async updateQuedan() {
-            const confirmed = await this.$swal.fire({
-                title: '¿Esta seguro de actualizar el quedan?',
-                icon: 'question',
-                iconHtml: '❓',
-                confirmButtonText: 'Si, Actualizar el quedan',
-                confirmButtonColor: '#141368',
-                cancelButtonText: 'Cancelar',
-                showCancelButton: true,
-                showCloseButton: true
-            });
-
-            if (confirmed.isConfirmed) {
-
-
-                if (this.paintPositionRepet() == 0) {
-                    const successUpdate = await this.updateQuedanAsynchronously();
-                    if (successUpdate) {
-                        toast.success("El quedan fue modificado correctamente", {
-                            autoClose: 5000,
-                            position: "top-right",
-                            transition: "zoom",
-                            toastBackgroundColor: "white",
-                        });
-                        this.$emit("actualizar-table-data")
-
-                    } else {
-                        toast.error("Error, al parecer tiene datos invalidos", {
-                            autoClose: 5000,
-                            position: "top-right",
-                            transition: "zoom",
-                            toastBackgroundColor: "white",
-                        });
-                    }
-                } else {
-                    toast.error("Al parecer tienes datos repetidos", {
-                        autoClose: 5000,
-                        position: "top-right",
-                        transition: "zoom",
-                        toastBackgroundColor: "white",
-                    });
-
-                }
-
-            }
-        },
-
-    },
-    watch: {
-        showModal: function () {
-
-            if (this.showModal) {//when modal is open we set information tho the atribut
-                if (this.dataQuedan != "") {//SI dataQuedan VIENE LLENO HACEMOS ESTO
-                    let newDataQuedan = JSON.parse(JSON.stringify(this.dataQuedan))
-                    this.conditionButton = false;//cambiamos estado del boton para que actualise en lugar de agregar
-                    this.setValuesToInput()
-                    this.getInformationBySupplier(newDataQuedan.proveedor.id_proveedor)
-                    newDataQuedan.detalle_quedan.forEach((value, index) => {
-                        this.rowsData.push({
-                            0: '',//numberRow,
-                            1: value.id_det_quedan,//Id__detalle_quedan,
-                            2: value.numero_factura_det_quedan,//FACTURA,
-                            3: value.id_dependencia,//DEPENDENCIA	,
-                            4: value.numero_acta_det_quedan,//NUMERO ACTA	,
-                            5: value.descripcion_det_quedan,//CONCEPTO,
-                            6: { producto: value.producto_factura_det_quedan, servicio: value.servicio_factura_det_quedan },//Monto de producto y servicio,
-                            7: true,//eliminado_logico
-                        })
+        filterQuedan() {
+            this.dataQuedan = []
+            axios.get('/filter-quedan', { params: { data: this.filter } })
+                .then(res => {
+                    let newDataQuedan = JSON.parse(JSON.stringify(res.data))
+                    newDataQuedan = newDataQuedan.map(quedan => {
+                        return {
+                            ...quedan,
+                            mostrar: true
+                        }
                     })
-                    this.calculateAmount()
-                } else {//SI dataQuedan VIENE VACIO HACEMOS ESTO
-                    this.addRow()
-                    this.resetValuesToInput()
-                }
-
+                    this.dataQuedan = newDataQuedan
+                })
+                .catch(err => {
+                    console.error(err);
+                })
+        },
+        setValorInsideChange(desde, hasta) {
+            this.filter.firstDate = desde;
+            this.filter.secondDate = hasta;
+            console.log(this.filter);
+        },
+        selectItem(id_quedan, checked) {
+            checked
+                ? this.collectItems.push({ id_quedan, checked })
+                : this.collectItems.splice(this.collectItems.findIndex(item => item.id_quedan === id_quedan), 1);
+        },
+        selectAllItems() {
+            this.selectAll = !this.selectAll;
+            if (this.selectAll) {
+                const collectIds = this.collectItems.map(item => item.id_quedan);
+                const newItems = this.dataQuedan.filter(item => !collectIds.includes(item.id_quedan));
+                newItems.forEach(item => {
+                    this.collectItems.push({ id_quedan: item.id_quedan, checked: true });
+                });
             } else {
-                this.rowsData = []
-                this.conditionButton = true;//cambiamos estado del boton para que actualise en lugar de agregar
+                this.collectItems = [];
             }
-        }
-    }
+        },
+        takeOfQUedan() {
+            const newDataQuedan = this.dataQuedan.map((quedan) => {
+                if (this.collectItems.some((collect) => quedan.id_quedan === collect.id_quedan)) {
+                    return { ...quedan, mostrar: false };
+                } else {
+                    return quedan;
+                }
+            });
+            this.dataQuedan = newDataQuedan;
+        },
 
+        async addNumberRequestToQuedan() {
+            try {
+                await axios.post('/add-numberRequest-quedan', {
+                    itemsToAddNumber: this.collectItems,
+                    numberRequest: this.id_requerimiento_pago
+                })
+                this.takeOfQUedan()
+                return true; // indicate success
+            } catch (error) {
+                return false; // indicate failure
+            }
+        },
+        async addNumber() {
+            if (this.collectItems != '') {
+                const confirmed = await this.$swal.fire({
+                    title: `<div class="text-[15px]">¿Esta seguro de agregar el numero de requerimiento
+                        <p class="text-[22px] underline">${this.numero_requerimiento[0].label} </p>  a estos quedan?</div>`,
+                    icon: 'question',
+                    iconHtml: '❓',
+                    confirmButtonText: 'Si, Agregar',
+                    confirmButtonColor: '#141368',
+                    cancelButtonText: 'Cancelar',
+                    showCancelButton: true,
+                    showCloseButton: true
+                });
+                if (confirmed.isConfirmed) {
+                    const successAddNumberRequest = await this.addNumberRequestToQuedan();
+                    if (successAddNumberRequest) {
+                        toast.success("El numero de quedan ", {
+                            autoClose: 5000,
+                            position: "top-right",
+                            transition: "zoom",
+                            toastBackgroundColor: "white",
+                        });
+                        this.$emit("reload-table")
 
+                        this.collectItems = []
+                        this.id_requerimiento_pago = ''
+                        this.numero_requerimiento = ''
+                    } else {
+                        toast.error("ERROR", {
+                            autoClose: 5000,
+                            position: "top-right",
+                            transition: "zoom",
+                            toastBackgroundColor: "white",
+                        });
+                    }
+                }
+            } else {
+                toast.error("Al parecer no haz seleccionado ningun quedan", {
+                    autoClose: 5000,
+                    position: "top-right",
+                    transition: "zoom",
+                    toastBackgroundColor: "white",
+                });
+            }
+
+        },
+        seleccionarRequerimiento(event) {
+            const opcionSeleccionada = this.dataForSelect.numeroRequerimiento.filter(item => item.value === event);
+            this.numero_requerimiento = opcionSeleccionada
+        },
+    },
 }
 </script>
-
-<style>
-.encabezado input {
-    border: none;
-    border-bottom: 2px solid black;
+<style scoped>
+.wrapTable,
+.wrapTable2 {
+    width: 100%;
+    white-space: pre-line;
 }
 
-.encabezado input[type="date"] {
-    width: 50%;
+.overflow-x-auto table tbody tr:hover {
+    background-color: rgb(226 232 240 / 0.5)
 }
 
-.encabezado input[type="text"] {
-    width: 60%;
+
+.sidebar-style-isri {
+    overflow: auto;
+    scrollbar-width: none;
 }
 
-.encabezado .row:nth-child(2) .col-6:nth-child(1) {
-    margin-left: 60px;
+.sidebar-style-isri::-webkit-scrollbar {
+    width: 0;
 }
 
-.encabezado .row:nth-child(2) .col-6:nth-child(1) input {
-    width: 80%;
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 2s;
 }
 
-.encabezado .row:nth-child(2) .col-2:nth-child(2) {
-    margin-left: -25px;
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
 }
 
-.encabezado .row:nth-child(2) .col-6:nth-child(2) input {
-    width: 20%;
+.slide-out-right-enter-active {
+    animation: slide-out-right-enter 1s ease-out both;
 }
 
-table.rounded-lg {
-    border: 2px solid red;
+.slide-out-right-leave-active {
+    animation: slide-out-right-leave 1s ease-out both;
 }
 
-/* ESTILOS PARA ERROR SELECT */
-.condition-select .multiselect {
-    /* BACKGROUND SELECT */
-    background: var(--ms-bg, #fdfd96);
+@keyframes slide-out-right-enter {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
 
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
-.condition-select .multiselect-placeholder {
-    /* COLOR SELECT TEXT */
-    color: #000000;
-}
+@keyframes slide-out-right-leave {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
 
-.condition-select .multiselect-wrapper input {
-    /* BACKGROUN COLOR INPUT */
-    background-color: #fdfd96;
-}
-
-.condition-acta {
-    /* BACKGROUND SELECT */
-    background: var(--ms-bg, #fd9696);
-
-}
-
-input[type="date"]:focus::-webkit-calendar-picker-indicator {
-    -webkit-animation-name: none !important;
-    animation-name: none !important;
-}
-
-td {
-    outline: none;
-    /* Desactiva el marco de enfoque */
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
 }
 </style>
+

@@ -4,7 +4,7 @@
             <tr>
                 <th v-for="column in columns" :key="column.name" @click="$emit('sort', column.name)"
                     :class="sortKey === column.name ? (sortOrders[column.name] > 0 ? 'sorting_asc' : 'sorting_desc') : 'sorting'"
-                    class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap"
+                    class="px-2 first:pl-5 last:pr-5 py-3 "
                     :style="'width:' + column.width + ';' + 'cursor:pointer;'">
                     <div class="font-semibold text-center">{{ column.label }}</div>
                 </th>
