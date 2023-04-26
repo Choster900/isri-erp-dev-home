@@ -3,14 +3,16 @@ import Datatable from "@/Components-ISRI/Datatable.vue";
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import ModalBasicVue from '@/Components-ISRI/AllModal/ModalBasic.vue';
+import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
+import InputError from "@/Components/InputError.vue";
 </script>
 <template>
-    <Head title="Administracion" />
+    <Head title="Tesoreria" />
     <AppLayoutVue>
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
                 <GeneralButton color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add"
-                    @click="requerimientoModalOpen = !requerimientoModalOpen" />
+                    @click="openModal()" />
             </div>
         </div>
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
@@ -23,7 +25,7 @@ import ModalBasicVue from '@/Components-ISRI/AllModal/ModalBasic.vue';
                             <LabelToInput icon="date" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Todos los proveedores
+                    <h2 class="font-semibold text-slate-800 pt-1">Total Requerimientos
                         <span class="text-slate-400 font-medium">{{ pagination.total }}</span>
                     </h2>
                 </div>
@@ -34,24 +36,34 @@ import ModalBasicVue from '@/Components-ISRI/AllModal/ModalBasic.vue';
                     @datos-enviados="handleData($event)">
                     <tbody class="text-sm divide-y divide-slate-200">
                         <tr v-for="requerimiento in requerimientos" :key="requerimiento.id_requerimiento_pago">
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">{{ requerimiento.id_requerimiento_pago
-                                }}
+                            <td class="px-2 first:pl-5 last:pr-5 td-data-table">
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{ requerimiento.numero_requerimiento_pago }}
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">{{
-                                    requerimiento.numero_requerimiento_pago }}</div>
+                            <td class="px-2 first:pl-5 last:pr-5 td-data-table">
+                                <div class="font-medium text-slate-800 text-center ellipsis">
+                                    {{ requerimiento.descripcion_requerimiento_pago }}
+                                </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">{{
-                                    requerimiento.mes_requerimiento_pago }}</div>
+                            <td class="px-2 first:pl-5 last:pr-5 td-data-table">
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{ requerimiento.monto_requerimiento_pago ? '$ ' +
+                                        requerimiento.monto_requerimiento_pago
+                                        : '$ 0.00' }}
+                                </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">{{
-                                    requerimiento.anio_requerimiento_pago }}</div>
+                            <td class="px-2 first:pl-5 last:pr-5 td-data-table">
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{ requerimiento.mes_requerimiento_pago }}
+                                </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                            <td class="px-2 first:pl-5 last:pr-5 td-data-table">
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{ requerimiento.anio_requerimiento_pago }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5 td-data-table">
                                 <div class="space-x-1">
                                     <button class="text-slate-400 hover:text-slate-500 rounded-full"
                                         @click="editRequerimiento(requerimiento)">
@@ -62,15 +74,17 @@ import ModalBasicVue from '@/Components-ISRI/AllModal/ModalBasic.vue';
                                             </path>
                                         </svg>
                                     </button>
-                                    <!-- CAMBIAR ICONO DE BOTON POR QUE VA A SER ACTIVAR Y DESCATIVAR -->
-                                    <button class="text-rose-500 hover:text-rose-600 rounded-full">
-                                        <span class="sr-only">Delete</span><svg class="w-8 h-8 fill-current"
-                                            viewBox="0 0 32 32">
-                                            <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
-                                            </path>
-                                            <path
-                                                d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z">
-                                            </path>
+                                    <button class="text-blue-500 hover:text-blue-600 rounded-full"
+                                        @click="viewRequest(requerimiento)">
+                                        <span class="sr-only">View</span>
+                                        <svg class="mb-1" width="21" height="21" viewBox="0 0 24 24" fill="none"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M7 18H17V16H7V18Z" fill="currentColor" />
+                                            <path d="M17 14H7V12H17V14Z" fill="currentColor" />
+                                            <path d="M7 10H11V8H7V10Z" fill="currentColor" />
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M6 2C4.34315 2 3 3.34315 3 5V19C3 20.6569 4.34315 22 6 22H18C19.6569 22 21 20.6569 21 19V9C21 5.13401 17.866 2 14 2H6ZM6 4H13V9H19V19C19 19.5523 18.5523 20 18 20H6C5.44772 20 5 19.5523 5 19V5C5 4.44772 5.44772 4 6 4ZM15 4.10002C16.6113 4.4271 17.9413 5.52906 18.584 7H15V4.10002Z"
+                                                fill="currentColor" />
                                         </svg>
                                     </button>
                                 </div>
@@ -121,46 +135,93 @@ import ModalBasicVue from '@/Components-ISRI/AllModal/ModalBasic.vue';
     </AppLayoutVue>
 
 
-
-    <ModalBasicVue title="Numero de requerimiento " id="scrollbar-modal" maxWidth="1xl" :modalOpen="requerimientoModalOpen"
-        @close-modal-persona="onCloseModalPersona()">
-
+    <ModalBasicVue title="Gestión número de requerimiento. " id="scrollbar-modal" maxWidth="2xl"
+        :modalOpen="requerimientoModalOpen" @close-modal-persona="requerimientoModalOpen = false">
         <div class="py-5">
-
-            <div class="mb-4 md:flex flex-row justify-center">
-                <span class="font-semibold text-slate-800 mb-2 text-x underline underline-offset-2">
-                    INFORMACIÓN REQUERIDA
-                </span>
-            </div>
-
-
-            <div class="flex flex-wrap justify-center items-center mb-7">
-
-                <div class="w-full md:w-auto mb-4 md:mb-0 md:mr-2">
-                    <TextInput id="numero-requerimiento" type="text" v-model="dataRequerimiento.numero_requerimiento_pago"
-                        placeholder="Numero de requerimiento">
-                        <LabelToInput icon="personalInformation" forLabel="numero-requerimiento" />
-                    </TextInput>
+            <div class="flex-row justify-center items-center mb-7 mx-4">
+                <div class="mb-4 md:flex flex-row justify-items-start mx-8">
+                    <div class="md:mr-2 md:mb-0 w-1/2">
+                        <TextInput v-model="dataRequerimiento.numero_requerimiento_pago" :label-input="true"
+                            id="numero-requerimiento" type="text" placeholder="Requerimiento">
+                            <LabelToInput icon="personalInformation" forLabel="numero-requerimiento" />
+                        </TextInput>
+                        <InputError v-for="(item, index) in errors.numero_requerimiento_pago" :key="index" class="mt-2"
+                            :message="item" />
+                    </div>
+                    <div class="md:mr-0 md:mb-0 w-1/2">
+                        <TextInput v-model="dataRequerimiento.monto_requerimiento_pago" :label-input="true"
+                            @update:modelValue="typeAmount()" id="monto-requerimiento" type="text" placeholder="Monto">
+                            <LabelToInput icon="money" forLabel="monto-requerimiento" />
+                        </TextInput>
+                        <InputError v-for="(item, index) in errors.monto_requerimiento_pago" :key="index" class="mt-2"
+                            :message="item" />
+                    </div>
                 </div>
-                <div class="w-full md:w-auto">
-                    <br>
-                    <div class="pt-2"></div>
+                <div class="mb-4 mx-8 basis-full" style="border: none; background-color: transparent;">
+                    <label class="block mb-2 text-xs font-light text-gray-600" for="descripcion">
+                        Descripcion <span class="text-red-600 font-extrabold">*</span>
+                    </label>
+                    <textarea v-model="dataRequerimiento.descripcion_requerimiento_pago" id="descripcion" name="descripcion"
+                        class="resize-none w-full h-16 overflow-y-auto peer text-xs font-semibold rounded-r-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"></textarea>
+                    <InputError v-for="(item, index) in errors.description" :key="index" class="mt-2" :message="item" />
+                </div>
+                <!-- Buttons -->
+                <div class="mt-4 mb-4 md:flex flex-row justify-center">
+                    <GeneralButton v-if="dataRequerimiento.id_requerimiento_pago" @click="updateRequerimiento()"
+                        color="bg-orange-700  hover:bg-orange-800" text="Actualizar" icon="add" />
+                    <GeneralButton v-else @click="addRequerimiento()" color="bg-green-700  hover:bg-green-800"
+                        text="Agregar" icon="add" />
+                    <div class="mb-4 md:mr-2 md:mb-0 px-1">
+                        <GeneralButton text="Cancelar" icon="add" @click="requerimientoModalOpen = false" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ModalBasicVue>
 
-                    <template v-if="!dataRequerimiento.id_requerimiento_pago">
-                        <GeneralButton color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add"
-                            @click="addRequerimiento()" />
-                    </template>
-
-                    <template v-else>
-                        <GeneralButton color="bg-orange-700  hover:bg-orange-800" text="Modificar Elemento" icon="update"
-                            @click="updateRequerimiento()" />
-                    </template>
+    <ProcessModal maxWidth='4xl' :show="view_req_info" :center="true" @close="view_req_info = false"
+        :show_request="show_request">
+        <div class="m-1.5 p-2 bg-white max-w-full max-h-full">
+            <div class="flex justify-center items-center mt-5">
+                <h2 class="font-bold">Requerimiento {{ show_request.numero_requerimiento_pago }}-{{ show_request.anio_requerimiento_pago }}</h2>
+            </div>
+            <div class="tabla-modal mt-4">
+                <table class="w-full" id="tabla_modal_validacion_arranque">
+                    <thead class="bg-[#1F3558] text-white">
+                        <tr class="">
+                            <th class="rounded-tl-lg w-10">N° QUEDAN</th>
+                            <th class="w-60">PROVEEDOR</th>
+                            <th class="w-10">IVA</th>
+                            <th class="w-10">RENTA</th>
+                            <th class="rounded-tr-lg w-10">MONTO</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm divide-y divide-slate-200">
+                        <tr v-for="quedan in show_request.quedan" :key="quedan.id_quedan" class="hover:bg-[#141414]/10">
+                            <td class="text-center whitespace-normal">{{ quedan.id_quedan }}</td>
+                            <td class="text-center whitespace-normal">{{ quedan.proveedor.razon_social_proveedor }}</td>
+                            <td class="text-center whitespace-normal text-red-600">{{ quedan.monto_iva_quedan }}</td>
+                            <td class="text-center whitespace-normal text-red-600">{{ quedan.monto_isr_quedan }}</td>
+                            <td class="text-center whitespace-normal text-green-600">{{ quedan.monto_liquido_quedan }}</td>
+                        </tr>
+                        <tr v-if="show_request.quedan!=''" class="font-bold">
+                            <td class="text-center whitespace-normal"></td>
+                            <td class="text-center whitespace-normal">Total</td>
+                            <td class="text-center whitespace-normal">{{ total_iva_quedan }}</td>
+                            <td class="text-center whitespace-normal">{{ total_isr_quedan }}</td>
+                            <td class="text-center whitespace-normal">{{ total_liquido_quedan }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div v-if="show_request.quedan==''" class="w-full flex justify-between items-center mt-5 rounded-md font-bold">
+                <div class="flex w-full justify-center text-left text-lg">
+                    <p>Sin Quedan Asignados</p>
                 </div>
             </div>
 
         </div>
-
-    </ModalBasicVue>
+    </ProcessModal>
 </template>
 <script>
 import axios from 'axios';
@@ -172,8 +233,9 @@ export default {
     data: function (data) {
         let sortOrders = {};
         let columns = [
-            { width: "10%", label: "Id", name: "id_proveedor", type: "text" },
             { width: "10%", label: "Numero requerimiento", name: "numero_requerimiento_pago", type: "text" },
+            { width: "45%", label: "Descripcion", name: "descripcion_requerimiento_pago", type: "text" },
+            { width: "15%", label: "Monto", name: "monto_requerimiento_pago", type: "text" },
             { width: "10%", label: "Mes", name: "mes_requerimiento_pago", type: "text" },
             { width: "10%", label: "Año", name: "anio_requerimiento_pago", type: "text" },
 
@@ -186,6 +248,7 @@ export default {
                 sortOrders[column.name] = -1;
         });
         return {
+            errors: [],
             scrollbarModalOpen: false,
             requerimientos: [],
             links: [],
@@ -212,16 +275,32 @@ export default {
                 to: "",
             },
             requerimientoModalOpen: false,
+            view_req_info: false,
             dataRequerimiento: {
                 id_requerimiento_pago: '',
                 numero_requerimiento_pago: '',
+                monto_requerimiento_pago: '',
                 mes_requerimiento_pago: '',
                 anio_requerimiento_pago: '',
+                descripcion_requerimiento_pago: ''
             },
             errorNumber: null,
+            show_request: []
         };
     },
     methods: {
+        viewRequest(request) {
+            this.view_req_info = true
+            this.show_request = request
+        },
+        typeAmount() {
+            let x = this.dataRequerimiento.monto_requerimiento_pago.replace(/^\./, '').replace(/[^0-9.]/g, '')
+            this.dataRequerimiento.monto_requerimiento_pago = x
+            const regex = /^(\d+)?([.]?\d{0,2})?$/
+            if (!regex.test(this.dataRequerimiento.monto_requerimiento_pago)) {
+                this.dataRequerimiento.monto_requerimiento_pago = this.dataRequerimiento.monto_requerimiento_pago.match(regex) || x.substring(0, x.length - 1)
+            }
+        },
         async getDataRequerimiento(url = "/requerimientos") {
             this.lastUrl = url;
             this.tableData.draw++;
@@ -247,96 +326,187 @@ export default {
             }
         },
         addRequerimiento() {
-            // Obtener la fecha actual
-            let currentDate = new Date();
-            this.dataRequerimiento.mes_requerimiento_pago = currentDate.getMonth() + 1;
-            this.dataRequerimiento.anio_requerimiento_pago = currentDate.getFullYear();
-
-            axios({
-                method: 'POST',
-                url: '/add-requerimiento',
-                data: this.dataRequerimiento
-            }).then((data) => {
-                toast.success("Requerimiento agregado con extio", {
-                    autoClose: 5000,
-                    position: "top-right",
-                    transition: "zoom",
-                    toastBackgroundColor: "white",
-                });
-                this.getDataRequerimiento()
-
-            }).catch((Error) => {
-                console.log(Error.response.data.errors.numero_requerimiento_pago[0])
-                this.errorNumber = Error.response.data.errors.numero_requerimiento_pago[0]
-                toast.warning(`${this.errorNumber}`, {
-                    autoClose: 5000,
-                    position: "top-right",
-                    transition: "zoom",
-                    toastBackgroundColor: "white",
-                });
-
-                setTimeout(() => {
-                    this.errorNumber = ''
-                }, 9000);
+            this.$swal.fire({
+                title: "¿Está seguro de guardar el nuevo requerimiento?",
+                icon: "question",
+                iconHtml: "✅",
+                confirmButtonText: "Si, Guardar",
+                confirmButtonColor: "#15803D",
+                cancelButtonText: "Cancelar",
+                showCancelButton: true,
+                showCloseButton: true,
             })
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        // Obtener la fecha actual
+                        let currentDate = new Date();
+                        this.dataRequerimiento.mes_requerimiento_pago = currentDate.getMonth() + 1;
+                        this.dataRequerimiento.anio_requerimiento_pago = currentDate.getFullYear();
+
+                        axios({
+                            method: 'POST',
+                            url: '/add-requerimiento',
+                            data: this.dataRequerimiento
+                        }).then((data) => {
+                            toast.success("Requerimiento agregado con extio", {
+                                autoClose: 5000,
+                                position: "top-right",
+                                transition: "zoom",
+                                toastBackgroundColor: "white",
+                            });
+                            this.getDataRequerimiento()
+                            this.requerimientoModalOpen = false
+
+                        }).catch((errors) => {
+                            console.log(errors);
+                            if (errors.response.status === 422) {
+                                toast.warning(
+                                    "Tienes algunos errores por favor verifica tus datos.",
+                                    {
+                                        autoClose: 5000,
+                                        position: "top-right",
+                                        transition: "zoom",
+                                        toastBackgroundColor: "white",
+                                    }
+                                );
+                                this.errors = errors.response.data.errors;
+                            } else {
+                                let msg = this.manageError(errors);
+                                this.$swal.fire({
+                                    title: "Operación cancelada",
+                                    text: msg,
+                                    icon: "warning",
+                                    timer: 5000,
+                                });
+                                this.$emit("cerrar-modal");
+                            }
+                        })
+                    }
+                });
 
         },
 
         updateRequerimiento() {
-            axios({
-                method: 'POST',
-                url: '/update-requerimiento',
-                data: this.dataRequerimiento
-            }).then((data) => {
-                toast.success("Requerimiento actualizado con extio", {
-                    autoClose: 5000,
-                    position: "top-right",
-                    transition: "zoom",
-                    toastBackgroundColor: "white",
+            this.$swal
+                .fire({
+                    title: "¿Está seguro de actualizar el requerimiento?",
+                    icon: "question",
+                    iconHtml: '❓',
+                    confirmButtonText: "Si, Actualizar",
+                    confirmButtonColor: "#D2691E",
+                    cancelButtonText: "Cancelar",
+                    showCancelButton: true,
+                    showCloseButton: true,
+                })
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        axios({
+                            method: 'POST',
+                            url: '/update-requerimiento',
+                            data: this.dataRequerimiento
+                        }).then((data) => {
+                            toast.success("Requerimiento actualizado con extio", {
+                                autoClose: 5000,
+                                position: "top-right",
+                                transition: "zoom",
+                                toastBackgroundColor: "white",
+                            });
+                            this.getDataRequerimiento(this.lastUrl)
+                            this.requerimientoModalOpen = false
+                        }).catch((errors) => {
+                            if (errors.response.status === 422) {
+                                toast.warning(
+                                    "Tienes algunos errores por favor verifica tus datos.",
+                                    {
+                                        autoClose: 5000,
+                                        position: "top-right",
+                                        transition: "zoom",
+                                        toastBackgroundColor: "white",
+                                    }
+                                );
+                                console.log(errors);
+                                this.errors = errors.response.data.errors;
+                            } else {
+                                let msg = this.manageError(errors);
+                                this.$swal.fire({
+                                    title: "Operación cancelada",
+                                    text: msg,
+                                    icon: "warning",
+                                    timer: 5000,
+                                });
+                                this.$emit("cerrar-modal");
+                            }
+                        })
+                    }
                 });
-                this.getDataRequerimiento()
-            }).catch((Error) => {
-                console.log(Error.response.data.errors.numero_requerimiento_pago[0])
-                this.errorNumber = Error.response.data.errors.numero_requerimiento_pago[0]
-
-                toast.warning(`${this.errorNumber}`, {
-                    autoClose: 5000,
-                    position: "top-right",
-                    transition: "zoom",
-                    toastBackgroundColor: "white",
-                });
-
-                setTimeout(() => {
-                    this.errorNumber = ''
-                }, 9000);
-            })
         },
 
         editRequerimiento(request) {
-
+            this.errors = []
             let newDataQuedan = JSON.parse(JSON.stringify(request))
             this.dataRequerimiento.id_requerimiento_pago = newDataQuedan.id_requerimiento_pago
             this.dataRequerimiento.numero_requerimiento_pago = newDataQuedan.numero_requerimiento_pago
-            this.requerimientoModalOpen = !this.requerimientoModalOpen
+            this.dataRequerimiento.monto_requerimiento_pago = newDataQuedan.monto_requerimiento_pago
+            this.dataRequerimiento.descripcion_requerimiento_pago = newDataQuedan.descripcion_requerimiento_pago
+            this.requerimientoModalOpen = true
         },
-
-        onCloseModalPersona() {
-            this.requerimientoModalOpen = !this.requerimientoModalOpen;
-
-
+        openModal() {
+            this.errors = []
             this.dataRequerimiento.id_requerimiento_pago = ''
+            this.dataRequerimiento.monto_requerimiento_pago = ''
             this.dataRequerimiento.numero_requerimiento_pago = ''
-        }
-
+            this.dataRequerimiento.descripcion_requerimiento_pago = ''
+            this.requerimientoModalOpen = true
+        },
     },
+    computed : {
+        total_liquido_quedan(){
+            if(this.show_request==''){
+                return '0.00'
+            }else{
+                let total = 0
+                this.show_request.quedan.forEach((value,index) => {
+                    total += parseFloat(value.monto_liquido_quedan)
+                })
+                return total.toFixed(2)
+            }
+        },
+        total_iva_quedan(){
+            if(this.show_request==''){
+                return '0.00'
+            }else{
+                let total = 0
+                this.show_request.quedan.forEach((value,index) => {
+                    total += parseFloat(value.monto_iva_quedan)
+                })
+                return total.toFixed(2)
+            }
+        },
+        total_isr_quedan(){
+            if(this.show_request==''){
+                return '0.00'
+            }else{
+                let total = 0
+                this.show_request.quedan.forEach((value,index) => {
+                    total += parseFloat(value.monto_isr_quedan)
+                })
+                return total.toFixed(2)
+            }
+        },
+    }
 
 };
 </script>
   
 <style>
-.wrap,
-.wrap2 {
-    width: 70%;
-    white-space: pre-wrap;
+.td-data-table {
+    max-width: 100px;
+    white-space: nowrap;
+    height: 50px;
+}
+
+.ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 </style>

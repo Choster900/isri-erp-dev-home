@@ -136,7 +136,7 @@ import axios from "axios";
                                 </div>
 
                                 <div>
-                                    <button :disabled="income_receipt.income_detail.length <= 1"
+                                    <button :disabled="available_details <= 1"
                                         @click="deleteRow(index, row.income_concept_id, row.detail_id)"
                                         class="text-red-500 hover:text-red-600 rounded-full">
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -220,17 +220,32 @@ export default {
             this.income_receipt.income_detail.push({ detail_id: '', income_concept_id: '', amount: '', deleted: false });
         },
         deleteRow(index, concept_id, detail_id) {
-            this.income_concept_select.forEach((value, index) => {
-                if (value.value == concept_id) {
-                    this.income_concept_select[index].disabled = false
+
+            this.$swal.fire({
+                title: 'Eliminar concepto de ingreso.',
+                text: "¿Estas seguro?",
+                icon: 'warning',
+                showCancelButton: true,
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#DC2626',
+                cancelButtonColor: '#4B5563',
+                confirmButtonText: 'Si, Eliminar.'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.income_concept_select.forEach((value, index) => {
+                        if (value.value == concept_id) {
+                            this.income_concept_select[index].disabled = false
+                        }
+                    })
+                    if (detail_id == "") {
+                        this.income_receipt.income_detail.splice(index, 1);
+                    } else {
+                        this.income_receipt.income_detail[index].deleted = true;
+                    }
+                    this.updateTotal()
                 }
             })
-            if (detail_id == "") {
-                this.income_receipt.income_detail.splice(index, 1);
-            } else {
-                this.income_receipt.income_detail[index].deleted = true;
-            }
-            this.updateTotal()
+
         },
         typeAmountIncome(index) {
             let x = this.income_receipt.income_detail[index].amount.replace(/^\./, '').replace(/[^0-9.]/g, '')
@@ -349,7 +364,7 @@ export default {
                     }
                 });
         },
-        updateIncomeReceipt() {    
+        updateIncomeReceipt() {
             this.$swal
                 .fire({
                     title: "¿Está seguro de actualizar el recibo de ingreso?",
@@ -405,6 +420,7 @@ export default {
     watch: {
         show_modal_receipt: function (value, oldValue) {
             if (value) {
+                this.income_concept_select = []
                 this.errors = []
                 this.income_receipt.income_receipt_id = this.modal_data.id_recibo_ingreso;
                 this.income_receipt.total = '';
@@ -436,6 +452,17 @@ export default {
     computed: {
         active_details() {
             return this.income_receipt.income_detail.filter((detail) => detail.deleted == false)
+        },
+        available_details() {
+            if (this.income_receipt.income_detail) {
+                let count = 0
+                this.income_receipt.income_detail.forEach((value, index) => {
+                    if (value.deleted == false) {
+                        count = count + 1
+                    }
+                })
+                return count
+            }
         }
     }
 };

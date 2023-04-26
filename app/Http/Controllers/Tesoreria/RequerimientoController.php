@@ -29,6 +29,7 @@ class RequerimientoController extends Controller
         $v_dir = $request->input('dir');
         $data = $request->input('search');
         $v_query = RequerimientoPago::select("*")
+            ->with('Quedan.proveedor')
             ->orderBy($v_columns[$v_column], $v_dir);
 
         if ($data) {
@@ -49,7 +50,10 @@ class RequerimientoController extends Controller
                 'numero_requerimiento_pago'    => $request->input("numero_requerimiento_pago"),
                 'mes_requerimiento_pago'       => $request->input("mes_requerimiento_pago"),
                 'anio_requerimiento_pago'      => $request->input("anio_requerimiento_pago"),
+                'descripcion_requerimiento_pago'      => $request->input("descripcion_requerimiento_pago"),
+                'monto_requerimiento_pago'      => $request->input("monto_requerimiento_pago"),
                 'fecha_requerimiento_pago'     => Carbon::now(),
+                'estado_requerimiento_pago'     => 1,
                 'fecha_reg_requerimiento_pago' => Carbon::now(),
                 'usuario_requerimiento_pago '  => $request->user()->nick_usuario,
                 'ip_requerimiento_pago'        => $request->ip(),
@@ -67,6 +71,9 @@ class RequerimientoController extends Controller
             DB::beginTransaction();
             $v_requerimiento = RequerimientoPago::where('id_requerimiento_pago', $request->input("id_requerimiento_pago"))->update([
                 'numero_requerimiento_pago'    => $request->input("numero_requerimiento_pago"),
+                'descripcion_requerimiento_pago'      => $request->input("descripcion_requerimiento_pago"),
+                'monto_requerimiento_pago'      => $request->input("monto_requerimiento_pago"),
+                'estado_requerimiento_pago'     => 1,
                 'fecha_mod_requerimiento_pago' => Carbon::now(),
                 'ip_requerimiento_pago'        => $request->ip(),
             ]);
@@ -103,7 +110,6 @@ class RequerimientoController extends Controller
             ->get();
 
         return $query;
-
     }
 
     public function addANumerRequestToQuedan(Request $request)
@@ -117,7 +123,7 @@ class RequerimientoController extends Controller
         $request->validate($rules);
 
         // Realizar la actualización de la base de datos
-        foreach ( $request->itemsToAddNumber as $key => $value ) {
+        foreach ($request->itemsToAddNumber as $key => $value) {
             Quedan::where("id_quedan", $value["id_quedan"])->update(['id_requerimiento_pago' => $request->numberRequest, "estado_quedan" => 2]);
         }
         return response()->json(['message' => 'Actualización exitosa'], 200);

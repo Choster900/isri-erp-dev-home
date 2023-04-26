@@ -30,9 +30,9 @@ class ProveedorController extends Controller
         $v_column = $request->input('column'); //Index
         $v_dir = $request->input('dir');
         $data = $request->input('search');
-        $v_query = DB::table('proveedor')
+        $v_query = Proveedor::select('*')
             ->join('tipo_contribuyente', 'proveedor.id_tipo_contribuyente', '=', 'tipo_contribuyente.id_tipo_contribuyente')
-            ->join('sujeto_retencion', 'proveedor.id_sujeto_retencion', '=', 'sujeto_retencion.id_sujeto_retencion')
+            ->with('sujeto_retencion')
             ->select('*')
             ->orderBy($v_columns[$v_column], $v_dir);
 
@@ -81,12 +81,6 @@ class ProveedorController extends Controller
             "retention"        => $v_retention,
             "giro"             => $v_giro,
         ];
-    }
-
-    public function getDataSupplier(Request $request)
-    {
-        return Proveedor::with("sujeto_retencion")
-            ->find($request->input("id_proveedor"));
     }
 
     public function changeValueRetencion($id_sujeto_retencion)

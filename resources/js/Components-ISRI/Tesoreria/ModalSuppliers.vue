@@ -59,7 +59,7 @@ import moment from 'moment';
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="nrc-proveedor" v-model="supplier.nrc_proveedor"
                                     @update:modelValue="typeNrcSupplier()" :value="supplier.nrc_proveedor" type="text"
-                                    placeholder="NCR Proveedor">
+                                    placeholder="NRC Proveedor">
                                     <LabelToInput icon="personalInformation" forLabel="nrc-proveedor" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errosModel.nrc_proveedor" />
@@ -186,9 +186,9 @@ import moment from 'moment';
                         class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600 underline underline-offset-1"
                         @click.stop="this.$emit('close-definitive')">Cerrar</button>
                     <GeneralButton v-if="infoSupplier != ''" @click="updateSupplier()"
-                        color="bg-orange-700  hover:bg-orange-800" text="Editar persona" icon="add" />
+                        color="bg-orange-700  hover:bg-orange-800" text="Editar proveedor" icon="add" />
                     <GeneralButton v-else @click="addSupplier()" color="bg-green-700  hover:bg-green-800"
-                        text="Agregar persona" icon="add" />
+                        text="Agregar proveedor" icon="add" />
                 </div>
             </div>
         </ModalBasicVue>

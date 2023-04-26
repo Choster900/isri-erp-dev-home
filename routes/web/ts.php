@@ -23,7 +23,6 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get('proveedores', [ProveedorController::class, 'getProveedores'])->name('get.proveedores');
     Route::get('list-option-select-suppliers', [ProveedorController::class, 'getInformationToSelect'])->name('list-option-select-suppliers');
     Route::get('update-suplier', [ProveedorController::class, 'getProveedores'])->name('get.proveedores');
-    Route::get('get-supplier', [ProveedorController::class, 'getDataSupplier'])->name('get.information-supplier');
     Route::post('update-supplier', [ProveedorController::class, 'updateDataSupplier'])->name('update-supplier');
     Route::post('add-supplier', [ProveedorController::class, 'addDataSupplier'])->name('add-supplier');
     Route::post('change-values-retencion/{id_sujeto_retencion}', [ProveedorController::class, 'changeValueRetencion'])->name('change-values-retencion');
@@ -108,4 +107,13 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get('get-income-concept', [ReciboIngresoController::class, 'getIncomeConcept'])->name('reciboIngreso.getIncomeConcept');
     Route::post('save-income-receipt', [ReciboIngresoController::class, 'saveIncomeReceipt'])->name('reciboIngreso.saveIncomeReceipt');
     Route::post('update-income-receipt', [ReciboIngresoController::class, 'updateIncomeReceipt'])->name('conceptoIngreso.updateIncomeReceipt');
+
+    Route::get(
+        '/ts/cuadro-deuda',
+        function () {
+            return Inertia::render('Tesoreria/CuadroDeuda', [
+                'menu' => session()->get('menu')
+            ]);
+        }
+    )->name('ts.cuadroDeuda');
 });
