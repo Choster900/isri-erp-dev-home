@@ -17,6 +17,7 @@ class RequerimientoPago extends Model
         'id_requerimiento_pago',
         'numero_requerimiento_pago',
         'mes_requerimiento_pago',
+        'monto_requerimiento_pago',
         'anio_requerimiento_pago',
         'fecha_requerimiento_pago',
         'fecha_reg_requerimiento_pago',

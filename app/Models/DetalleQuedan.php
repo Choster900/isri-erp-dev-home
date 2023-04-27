@@ -40,8 +40,5 @@ class DetalleQuedan extends Model
         return $this->belongsTo(Dependencia::class, "id_dependencia", "id_dependencia");
     }
 
-    public function tipo_prestacion()
-    {
-        return $this->belongsTo(TipoPrestacion::class, "id_tipo_prestacion", "id_tipo_prestacion");
-    }
+
 }

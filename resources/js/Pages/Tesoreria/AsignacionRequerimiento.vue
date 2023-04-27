@@ -69,7 +69,7 @@ import axios from 'axios';
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">{{
-                                    data.id_requerimiento_pago
+                                    data.requerimiento_pago.numero_requerimiento_pago
                                 }}-{{ data.requerimiento_pago.anio_requerimiento_pago }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
@@ -175,7 +175,7 @@ export default {
             { width: "10%", label: "Fecha de emision", name: "fecha_emision_quedan", type: "date" },
             { width: "20%", label: "Proveedor", name: "razon_social_proveedor", type: "text" },
             { width: "30%", label: "Detalle quedan", name: "buscar_por_detalle_quedan", type: "text" },
-            { width: "10%", label: "Numero requerimiento", name: "id_requerimiento_pago", type: "text" },
+            { width: "10%", label: "Numero requerimiento", name: "numero_requerimiento_pago", type: "text" },
             { width: "10%", label: "Numero compromiso numero acuerdo", name: "id_requerimiento_pago", type: "text" },
             { width: "10%", label: "Monto", name: "monto_liquido_quedan", type: "text" },
 

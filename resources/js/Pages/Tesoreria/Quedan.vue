@@ -70,7 +70,7 @@ import axios from 'axios';
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center" v-if="data.requerimiento_pago">
                                     {{
-                                        data.id_requerimiento_pago
+                                        data.requerimiento_pago.numero_requerimiento_pago
                                     }}-{{ data.requerimiento_pago.anio_requerimiento_pago }}
                                 </div>
 
@@ -90,12 +90,12 @@ import axios from 'axios';
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
 
-                                    <div v-if="data.estado_quedan === 1"
+                                    <div v-if="data.id_estado_quedan === 1"
                                         class="text-xs inline-flex font-medium bg-emerald-100 text-emerald-600 rounded-full text-center px-2.5 py-1">
                                         Abierto
                                     </div>
 
-                                    <div v-else-if="data.estado_quedan === 2"
+                                    <div v-else-if="data.id_estado_quedan === 2"
                                         class="text-xs inline-flex font-medium bg-blue-100 text-blue-600 rounded-full text-center px-2.5 py-1">
                                         Req. Asignado
                                     </div>
@@ -119,31 +119,6 @@ import axios from 'axios';
                                             </path>
                                         </svg>
                                         <p class="text-[9px]">Ver</p>
-                                    </button>
-
-                                    <button class="text-rose-500 hover:text-rose-600 rounded-full"
-                                        @click="enableStateForSupplier(proveedor.id_proveedor, proveedor.estado_proveedor)">
-                                        <span class="sr-only">Delete</span>
-
-                                        <svg fill="#000000" width="25px" height="25px" viewBox="0 0 24 24"
-                                            id="delete-user-left-5" data-name="Line Color"
-                                            xmlns="http://www.w3.org/2000/svg" class="icon line-color">
-                                            <line id="secondary" x1="3" y1="18" x2="6" y2="15"
-                                                style="fill: none; stroke: rgb(255, 0, 15); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;">
-                                            </line>
-                                            <line id="secondary-2" data-name="secondary" x1="6" y1="18" x2="3" y2="15"
-                                                style="fill: none; stroke: rgb(255, 0, 15 ); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;">
-                                            </line>
-                                            <circle id="primary" cx="13" cy="8" r="5"
-                                                style="fill: none; stroke: rgb(0, 0, 0); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;">
-                                            </circle>
-                                            <path id="primary-2" data-name="primary"
-                                                d="M10,20.81A22,22,0,0,0,13,21c6,0,8-2,8-2V18a5,5,0,0,0-5-5H10"
-                                                style="fill: none; stroke: rgb(0, 0, 0); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;">
-                                            </path>
-                                        </svg>
-                                        <p class="text-[9px]">Borrar</p>
-
                                     </button>
                                 </div>
                             </td>
@@ -209,7 +184,7 @@ export default {
             { width: "10%", label: "Fecha de emision", name: "fecha_emision_quedan", type: "date" },
             { width: "30%", label: "Proveedor", name: "razon_social_proveedor", type: "text" },
             { width: "30%", label: "Detalle quedan", name: "buscar_por_detalle_quedan", type: "text" },
-            { width: "10%", label: "Numero requerimiento", name: "id_requerimiento_pago", type: "text" },
+            { width: "10%", label: "Numero requerimiento", name: "numero_requerimiento_pago", type: "text" },
 
             { width: "10%", label: "Monto", name: "monto_liquido_quedan", type: "text" },
             {

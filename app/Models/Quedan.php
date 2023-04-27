@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Quedan extends Model
 {
@@ -58,6 +60,15 @@ class Quedan extends Model
     public function acuerdo_compra()
     { //(FOREING KEY, PRIMARY KEY)
         return $this->belongsTo(AcuerdoCompra::class, "id_acuerdo_compra", "id_acuerdo_compra");
+    }
+    /**
+     * Get all of the liquidacion_quedan for the Quedan
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function liquidacion_quedan():HasOne
+    {
+        return $this->hasOne(LiquidacionQuedan::class, 'id_quedan', 'id_quedan');
     }
 
     

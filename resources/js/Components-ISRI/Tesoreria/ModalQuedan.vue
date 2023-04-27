@@ -156,6 +156,7 @@ import html2pdf from 'html2pdf.js'
                                             <div class="relative flex h-8 w-full flex-row-reverse "
                                                 :class="{ 'condition-select': dataInputs.id_proveedor == '' }">
                                                 <Multiselect v-model="dataInputs.id_proveedor"
+                                                    :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                     :options="dataForSelectInRow.proveedor" :searchable="true"
                                                     @select="getInformationBySupplier($event)" />
                                             </div>
@@ -177,12 +178,16 @@ import html2pdf from 'html2pdf.js'
                                             :class="dataInputs.numero_acuerdo_quedan == '' ? 'bg-[#fdfd96]' : ''"
                                             colspan="3" contenteditable="false">
                                             <input type="text" v-model="dataInputs.numero_acuerdo_quedan"
+                                                :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
+                                                :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
                                                 class="peer w-full text-sm bg-transparent text-center h-16 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                         </td>
                                         <td class="border-2 border-black"
                                             :class="dataInputs.numero_compromiso_ppto_quedan == '' ? 'bg-[#fdfd96]' : ''"
                                             colspan="8" contenteditable="false">
                                             <input type="text" v-model="dataInputs.numero_compromiso_ppto_quedan"
+                                                :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
+                                                :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
                                                 class="peer w-full text-sm bg-transparent text-center h-16 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                         </td>
                                     </tr>
@@ -191,6 +196,7 @@ import html2pdf from 'html2pdf.js'
                                             <div class="relative flex h-8 w-full flex-row-reverse"
                                                 :class="{ 'condition-select': dataInputs.id_acuerdo_compra == '' }">
                                                 <Multiselect v-model="dataInputs.id_acuerdo_compra"
+                                                    :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                     :options="dataForSelectInRow.acuerdoCompras" :searchable="true" />
                                             </div>
                                         </td>
@@ -215,16 +221,17 @@ import html2pdf from 'html2pdf.js'
                                 </thead>
                                 <tbody class="text-sm" id="content">
 
-                                    <template v-for="(row, rowIndex) in rowsData" :key="rowIndex">
+                                    <template v-for="( row, rowIndex ) in  rowsData " :key="rowIndex">
                                         <template v-if="row[7]">
 
                                             <tr @dblclick="deleteRow(rowIndex)">
-                                                <template v-for="(cell, cellIndex) in row" :key="cellIndex">
+                                                <template v-for="( cell, cellIndex ) in  row " :key="cellIndex">
 
                                                     <td v-if="cellIndex == 2"
                                                         @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
-                                                        class="border-2 border-black"
-                                                        :class="cell == '' ? 'bg-[#fdfd96]' : ''" contenteditable="true">
+                                                        class="border-2 border-black" :class="[cell == '' ? 'bg-[#fdfd96]' : '',
+                                                            dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']"
+                                                        :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true">
                                                         {{ cell }}
                                                     </td>
                                                     <td v-else-if="cellIndex == 3" class="border-2 border-black" colspan="2"
@@ -233,20 +240,24 @@ import html2pdf from 'html2pdf.js'
                                                             <Multiselect v-model="rowsData[rowIndex][3]"
                                                                 :options="dataForSelectInRow.dependencias"
                                                                 :searchable="true"
+                                                                :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                                 @select="onCellEdit(rowIndex, cellIndex, $event)" />
                                                         </div>
                                                     </td>
                                                     <td v-else-if="cellIndex == 4" class="border-2 border-black" :class="[
                                                             cell == '' ? 'bg-[#fdfd96]' : '',
                                                             errosDetalleQuedan[rowIndex] ? 'bg-[#fd9696]' : '',
-                                                            errosrNumeroActa.includes(rowIndex) ? 'bg-[#fd9696]' : ''
-
+                                                            errosrNumeroActa.includes(rowIndex) ? 'bg-[#fd9696]' : '',
+                                                            dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''
                                                         ]"
                                                         @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
-                                                        contenteditable="true">{{ cell }}</td>
+                                                        :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true">{{
+                                                            cell }}</td>
                                                     <td v-else-if="cellIndex == 5" colspan="2"
                                                         @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
-                                                        class="border-2 border-black px-1 " contenteditable="true">
+                                                        class="border-2 border-black px-1 "
+                                                        :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
+                                                        :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true">
                                                         {{ cell }}
                                                     </td>
 
@@ -259,8 +270,8 @@ import html2pdf from 'html2pdf.js'
                                                                     style="writing-mode: vertical-rl; transform: rotate(180deg);">
                                                                     PRODUCTO
                                                                 </th>
-                                                                <td contenteditable="true"
-                                                                    :class="cell.producto == '' ? 'bg-[#fdfd96]' : ''"
+                                                                <td :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true"
+                                                                    :class="[cell.producto == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']"
                                                                     @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText, 'producto')"
                                                                     class="w-full border-2 border-b-black border-x-transparent border-t-transparent">
                                                                     {{ cell.producto }}
@@ -271,8 +282,8 @@ import html2pdf from 'html2pdf.js'
                                                                     style="writing-mode: vertical-rl; transform: rotate(180deg);">
                                                                     SERVICIO
                                                                 </th>
-                                                                <td contenteditable="true"
-                                                                    :class="cell.servicio == '' ? 'bg-[#fdfd96]' : ''"
+                                                                <td :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true"
+                                                                    :class="[cell.servicio == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']"
                                                                     @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText, 'servicio')">
                                                                     {{ cell.servicio }}
                                                                 </td>
@@ -296,8 +307,10 @@ import html2pdf from 'html2pdf.js'
                                         <td class="border-2 border-black " colspan="1" rowspan="2" contenteditable="false">
                                             Descripción
                                         </td>
-                                        <td class="border-2 border-black" colspan="4" rowspan="2" contenteditable="true"
-                                            @input="onInputDescripcionQuedan">
+                                        <td class="border-2 border-black" colspan="4" rowspan="2"
+                                            :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true"
+                                            @input="onInputDescripcionQuedan"
+                                            :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''">
                                             {{ dataInputs.descripcion_quedan }}
 
                                         </td>
@@ -314,6 +327,7 @@ import html2pdf from 'html2pdf.js'
                                             <div class="relative flex h-8 w-full flex-row-reverse "
                                                 :class="{ 'condition-select': dataInputs.id_prioridad_pago == '' }">
                                                 <Multiselect v-model="dataInputs.id_prioridad_pago"
+                                                    :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                     :options="dataForSelectInRow.prioridadPago" :searchable="true" />
                                             </div>
                                         </td>
@@ -321,6 +335,7 @@ import html2pdf from 'html2pdf.js'
                                             <div class="relative flex h-8 w-full flex-row-reverse "
                                                 :class="{ 'condition-select': dataInputs.id_proy_financiado == '' }">
                                                 <Multiselect v-model="dataInputs.id_proy_financiado"
+                                                    :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                     :options="dataForSelectInRow.proyectoFinanciado" :searchable="true" />
                                             </div>
                                         </td>

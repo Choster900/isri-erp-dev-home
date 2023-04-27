@@ -8,7 +8,6 @@ use App\Models\Proveedor;
 use Illuminate\Http\Request;
 use App\Models\Quedan;
 use App\Models\DetalleQuedan;
-use App\Models\Tesorero;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\Tesoreria\QuedanRequest;
@@ -49,11 +48,11 @@ class QuedanController extends Controller
         $v_column = $request->input('column');
         $v_dir = $request->input('dir');
         $data = $request->input('search');
-        $v_query = Quedan::select('*')->with(["detalle_quedan", "proveedor.giro", "proveedor.sujeto_retencion", "tesorero", "requerimiento_pago","acuerdo_compra"])->orderBy($v_columns[$v_column], $v_dir);
+        $v_query = Quedan::select('*')->with(["detalle_quedan", "proveedor.giro", "proveedor.sujeto_retencion", "tesorero", "requerimiento_pago", "acuerdo_compra", "liquidacion_quedan"])->orderBy($v_columns[$v_column], $v_dir);
 
 
         if ($request->input("allWithANumberRequest")) {
-            $v_query->where("estado_quedan", 2);
+            $v_query->where("id_estado_quedan", 2);
         }
 
 
@@ -74,6 +73,12 @@ class QuedanController extends Controller
                 });
             });
 
+
+            $v_query->whereHas('requerimiento_pago', function ($query) use ($data) {
+                $query->where('numero_requerimiento_pago', 'like', '%' . $data["numero_requerimiento_pago"] . '%');
+            });
+
+
             $v_query->whereHas('proveedor', function ($query) use ($data) {
                 $query->where('razon_social_proveedor', 'like', '%' . $data["razon_social_proveedor"] . '%');
             });
@@ -83,8 +88,8 @@ class QuedanController extends Controller
                 $v_query->where('id_requerimiento_pago', 'like', '%' . $data["id_requerimiento_pago"] . '%');
             }
 
-            if (isset($data['estado_quedan'])) {
-                $v_query->where('estado_quedan', 'like', '%' . $data["estado_quedan"] . '%');
+            if (isset($data['id_estado_quedan'])) {
+                $v_query->where('id_estado_quedan', 'like', '%' . $data["estado_quedan"] . '%');
             }
         }
 
@@ -248,7 +253,7 @@ class QuedanController extends Controller
             ->select(
                 'id_requerimiento_pago as value',
                 DB::raw("CONCAT(numero_requerimiento_pago,' - ',anio_requerimiento_pago) AS label")
-            )->get();
+            )->get();//TODO: poner el estado del requerimiento pago donde exista y este abierto y no cerrado
 
         $v_Prioridad_pago = DB::table('prioridad_pago')
             ->select(

@@ -7,6 +7,7 @@ use App\Http\Controllers\Tesoreria\QuedanController;
 use App\Http\Controllers\Tesoreria\RequerimientoController;
 use App\Http\Controllers\Tesoreria\ConceptoIngresoController;
 use App\Http\Controllers\Tesoreria\ReciboIngresoController;
+use App\Http\Controllers\Tesoreria\LiquidacionQuedanController;
 
 Route::group(['middleware' => ['auth', 'access']], function () {
 
@@ -108,4 +109,17 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get('get-income-concept', [ReciboIngresoController::class, 'getIncomeConcept'])->name('reciboIngreso.getIncomeConcept');
     Route::post('save-income-receipt', [ReciboIngresoController::class, 'saveIncomeReceipt'])->name('reciboIngreso.saveIncomeReceipt');
     Route::post('update-income-receipt', [ReciboIngresoController::class, 'updateIncomeReceipt'])->name('conceptoIngreso.updateIncomeReceipt');
+
+
+    Route::get(
+        '/ts/liquidacion',
+        function () {
+            return Inertia::render('Tesoreria/LiquidacionRequerimiento', [
+                'menu' => session()->get('menu')
+            ]);
+        }
+    )->name('ts.liquidacion');
+    Route::post('liquidar-quedan', [LiquidacionQuedanController::class, 'processLiquidacionQuedan'])->name('liquidar-quedan');
+
+
 });

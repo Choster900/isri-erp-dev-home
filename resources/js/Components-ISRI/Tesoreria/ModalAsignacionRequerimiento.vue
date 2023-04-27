@@ -17,7 +17,7 @@ import axios from 'axios';
                         <label class="block mb-2 text-xs font-light text-gray-600">
                             Proveedor <span class="text-red-600 font-extrabold">*</span>
                         </label>
-                        <div class="relative font-semibold  flex h-8  flex-row-reverse ">
+                        <div class="relative font-semibold  flex h-8  flex-row-reverse">
                             <Multiselect id="estado-civil" :options="dataForSelect.proveedor" :searchable="true"
                                 v-model="filter.suppiler" />
                             <LabelToInput icon="list" />
@@ -31,7 +31,7 @@ import axios from 'axios';
                         </label>
                         <div class="relative flex h-8  md:w-auto flex-row-reverse">
                             <flat-pickr v-model="filter.rangeDate"
-                                class="peer w-92 text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
+                                class="peer w-[250px] text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
                                 :config="config" />
                             <LabelToInput icon="date" />
                         </div>
@@ -86,12 +86,9 @@ import axios from 'axios';
                             <div class="mb-4 md:mr-2 md:mb-0 basis-full mt-4 h-5"
                                 :class="(collectItems != '' && id_requerimiento_pago != '' ? 'animate-bounce' : '')">
                                 <button @click="addNumber()"
-                                    class="inline-flex items-center justify-center px-3 py-1 text-white rounded-md shadow"
+                                    class="inline-flex items-center justify-center px-3 h-6 text-sm py-1 text-white rounded-md shadow"
                                     :class="(collectItems != '' && id_requerimiento_pago != '' ? ' bg-orange-600' : ' bg-gray-600')">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                        stroke-width="1.5" stroke="currentColor" class="w-5 h-5 stroke-black">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                                    </svg>
+                                    Agregar requerimiento
                                 </button>
                             </div>
                         </div>
@@ -140,7 +137,7 @@ import axios from 'axios';
                                             <td class="px-4 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
                                                 <div class="flex items-center">
                                                     <Checkbox :value="quedan.id_quedan" :checked="selectAll ? true : false"
-                                                        @update:checked="(value) => selectItem(quedan.id_quedan, value)">
+                                                        @update:checked="(value) => selectItem(quedan.id_quedan, value, quedan.monto_liquido_quedan)">
                                                     </Checkbox>
                                                 </div>
                                             </td>
@@ -220,9 +217,6 @@ export default {
         },
 
     },
-    created() {
-
-    },
     data: (props) => ({
         dataQuedan: [],
         collectItems: [],
@@ -265,6 +259,7 @@ export default {
                     newDataQuedan = newDataQuedan.map(quedan => {
                         return {
                             ...quedan,
+                            //agregando una nueva key a mi arreglo de quedans 
                             mostrar: true
                         }
                     })
@@ -274,14 +269,10 @@ export default {
                     console.error(err);
                 })
         },
-        setValorInsideChange(desde, hasta) {
-            this.filter.firstDate = desde;
-            this.filter.secondDate = hasta;
-            console.log(this.filter);
-        },
-        selectItem(id_quedan, checked) {
+
+        selectItem(id_quedan, checked, monto_liquido_quedan) {
             checked
-                ? this.collectItems.push({ id_quedan, checked })
+                ? this.collectItems.push({ id_quedan: id_quedan, checked: checked, monto_liquido_quedan: monto_liquido_quedan })
                 : this.collectItems.splice(this.collectItems.findIndex(item => item.id_quedan === id_quedan), 1);
         },
         selectAllItems() {
@@ -347,7 +338,7 @@ export default {
                         this.id_requerimiento_pago = ''
                         this.numero_requerimiento = ''
                     } else {
-                        toast.error("ERROR", {
+                        toast.error("Error, Al parecer el requerimiento seleccionado tiene un monto menor a la sumatoria total de quedan", {
                             autoClose: 5000,
                             position: "top-right",
                             transition: "zoom",

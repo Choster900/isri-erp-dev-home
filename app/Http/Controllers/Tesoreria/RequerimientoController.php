@@ -28,11 +28,21 @@ class RequerimientoController extends Controller
         $v_column = $request->input('column'); //Index
         $v_dir = $request->input('dir');
         $data = $request->input('search');
-        $v_query = RequerimientoPago::select("*")
+        $v_query = RequerimientoPago::select("*")->with(["Quedan", "Quedan.liquidacion_quedan"])
             ->orderBy($v_columns[$v_column], $v_dir);
 
-        if ($data) {
-            $v_query->where('id_requerimiento_pago', 'like', '%' . $data["id_requerimiento_pago"] . '%');
+        if ($data) {//FIXME: la consulta no trae requerimientos que tengan la descripcion_requerimiento_pago vacia
+            $v_query->where('id_requerimiento_pago', 'like', '%' . $data["id_requerimiento_pago"] . '%')
+                ->where('numero_requerimiento_pago', 'like', '%' . $data["numero_requerimiento_pago"] . '%')
+                ->where('descripcion_requerimiento_pago', 'like', '%' . $data["descripcion_requerimiento_pago"] . '%')
+                ->where('monto_requerimiento_pago', 'like', '%' . $data["monto_requerimiento_pago"] . '%');    
+            $searchText = $data["allQUedan"];
+            $v_query->whereHas('Quedan', function ($query) use ($searchText) {
+                $query->where(function ($query) use ($searchText) {
+                    $query->where('id_quedan', 'like', '%' . $searchText . '%')
+                        ->orWhere('monto_liquido_quedan', 'like', '%' . $searchText . '%');
+                });
+            });
         }
 
         $v_requerimientos = $v_query->paginate($v_length)->onEachSide(1);
@@ -82,7 +92,7 @@ class RequerimientoController extends Controller
         $query = Quedan::select('*')
             ->with(["detalle_quedan", "proveedor.giro", "proveedor.sujeto_retencion", "tesorero"])
             ->orderBy("id_quedan", "desc")
-            ->where("estado_quedan", 1)
+            ->where("id_estado_quedan", 1)
             ->when($request["data"]["suppiler"], function ($query) use ($request) {
                 return $query->where("id_proveedor", $request["data"]["suppiler"]);
             })
@@ -116,17 +126,40 @@ class RequerimientoController extends Controller
         // Validar los campos del request
         $request->validate($rules);
 
-        // Realizar la actualización de la base de datos
+        //sumando el total del requerimiento_pago
+        $totRequerimiento = 0;
         foreach ( $request->itemsToAddNumber as $key => $value ) {
-            Quedan::where("id_quedan", $value["id_quedan"])->update(['id_requerimiento_pago' => $request->numberRequest, "estado_quedan" => 2]);
+            $totRequerimiento = $totRequerimiento + $value["monto_liquido_quedan"];
         }
-        return response()->json(['message' => 'Actualización exitosa'], 200);
+
+        $monto_requerimiento_pago = RequerimientoPago::select('*')->where('id_requerimiento_pago', $request->numberRequest)->get();
+
+        $quedanExistente = Quedan::select('*')->where('id_requerimiento_pago', $request->numberRequest)->get();
+
+        foreach ( $quedanExistente as $key => $value ) {
+            $totRequerimiento = $totRequerimiento + $value["monto_liquido_quedan"];
+        }
+        // return $totRequerimiento;
+
+        if ($totRequerimiento < $monto_requerimiento_pago[0]->monto_requerimiento_pago) {
+            foreach ( $request->itemsToAddNumber as $key => $value ) {
+                Quedan::where("id_quedan", $value["id_quedan"])->update(['id_requerimiento_pago' => $request->numberRequest, "id_estado_quedan" => 2]);
+            }
+            return response()->json(['message' => 'Actualización exitosa'], 200);
+        } else {
+            DB::rollback();
+            return response()->json(['message' => 'El monto es mayor a lo ingresado en el requerimiento'], 500);
+
+        }
+
+        // Realizar la actualización de la base de datos
+
     }
 
     public function takeOfNumberRequest(Request $request)
     {
         # code...
-        Quedan::where("id_quedan", $request->id_quedan)->update(['id_requerimiento_pago' => null, "estado_quedan" => 1]);
+        Quedan::where("id_quedan", $request->id_quedan)->update(['id_requerimiento_pago' => null, "id_estado_quedan" => 1]);
 
         return response()->json(['message' => 'Actualización exitosa'], 200);
     }
