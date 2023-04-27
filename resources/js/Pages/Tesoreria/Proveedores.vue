@@ -25,7 +25,7 @@ import 'vue3-toastify/dist/index.css';
                             <LabelToInput icon="date" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Todos los proveedores
+                    <h2 class="font-semibold text-slate-800 pt-1">Total Proveedores
                         <span class="text-slate-400 font-medium">{{ pagination.total }}</span>
                     </h2>
                 </div>
@@ -36,27 +36,27 @@ import 'vue3-toastify/dist/index.css';
                     @datos-enviados="handleData($event)">
                     <tbody class="text-sm divide-y divide-slate-200">
                         <tr v-for="proveedor in proveedores" :key="proveedor.id_proveedor">
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                            <td class="px-2 first:pl-5 last:pr-5 td-data-table">
                                 <div class="font-medium text-slate-800 text-center">{{ proveedor.id_proveedor }}</div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                            <td class="px-2 first:pl-5 last:pr-5 td-data-table">
                                 <div v-if="proveedor.dui_proveedor" class="font-medium text-slate-800 text-center">
                                     {{ proveedor.dui_proveedor }}<br>
                                 </div>
-                                <div v-else class="font-medium text-slate-800 text-center">
+                                <div v-else class="font-medium text-slate-800 text-center ellipsis">
                                     {{ proveedor.nit_proveedor }}<br>
                                 </div>
                             </td>
 
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">{{ proveedor.razon_social_proveedor }}
+                            <td class="px-2 first:pl-5 last:pr-5 td-data-table">
+                                <div class="font-medium text-slate-800 text-center ellipsis">{{ proveedor.razon_social_proveedor }}
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">{{ proveedor.nombre_comercial_proveedor
+                            <td class="px-2 first:pl-5 last:pr-5 td-data-table">
+                                <div class="font-medium text-slate-800 text-center ellipsis">{{ proveedor.nombre_comercial_proveedor
                                 }}</div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                            <td class="px-2 first:pl-5 last:pr-5 td-data-table">
                                 <div class="font-medium text-slate-800">
                                     <div v-if="(proveedor.estado_proveedor == 1)"
                                         class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
@@ -68,9 +68,9 @@ import 'vue3-toastify/dist/index.css';
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                            <td class="px-2 first:pl-5 last:pr-5 td-data-table">
                                 <div class="space-x-1">
-                                    <button v-if="permits.actualizar == 1" @click.stop="getSuppiler(proveedor.id_proveedor)"
+                                    <button v-if="permits.actualizar == 1" @click.stop="getSuppiler(proveedor)"
                                         class="text-slate-400 hover:text-slate-500 rounded-full">
                                         <span class="sr-only">Edit</span>
                                         <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
@@ -168,7 +168,7 @@ export default {
             { width: "10%", label: "Acciones", name: "Acciones" },
         ];
         columns.forEach((column) => {
-            if (column.name === 'id_persona')
+            if (column.name === 'id_proveedor')
                 sortOrders[column.name] = 1;
             else
                 sortOrders[column.name] = -1;
@@ -232,13 +232,14 @@ export default {
         getIndex(array, key, value) {
             return array.findIndex((i) => i[key] == value);
         },
-        async getSuppiler(supplier_id) {
-            await axios.get("/get-supplier", { params: { id_proveedor: supplier_id } }).then(res => {
-                console.log(res.data);
-                this.infoSupplier = res.data
-            }).catch(err => {
-                console.error(err);
-            })
+        async getSuppiler(supplier) {
+            // await axios.get("/get-supplier", { params: { id_proveedor: supplier_id } }).then(res => {
+            //     console.log(res.data);
+            //     this.infoSupplier = res.data
+            // }).catch(err => {
+            //     console.error(err);
+            // })
+            this.infoSupplier = supplier
             this.scrollbarModalOpen = !this.scrollbarModalOpen
         },
         addDataSupplier() {
@@ -319,6 +320,16 @@ export default {
 </script>
   
 <style>
+.td-data-table {
+    max-width: 100px;
+    white-space: nowrap;
+    height: 50px;
+}
+
+.ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 .wrap,
 .wrap2 {
     width: 70%;

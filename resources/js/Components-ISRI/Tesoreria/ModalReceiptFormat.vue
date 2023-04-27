@@ -11,7 +11,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
             <div class="flex justify-between items-center mt-10">
                 <!-- Encabezado izquierdo  -->
                 <div class="logo-container">
-                    <img src="https://via.placeholder.com/150" alt="Logo del Ministerio de tierras" class="logo">
+                    <img src="../../../img/escudo-nacional.png" alt="Logo del Ministerio de tierras" class="logo">
                     <div class="text-center text-base font-bold mx-5">REPUBLICA DE EL SALVADOR</div>
                     <div class="text-center text-base font-bold mx-5">MINISTERIO DE SALUD</div>
                 </div>
@@ -21,7 +21,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                 </div>
                 <!-- Encabezado derecho -->
                 <div class="logo-container">
-                    <img src="https://via.placeholder.com/150" alt="Logo del Instituto de Rios" class="logo">
+                    <img src="../../../img/isri-logo2.png" alt="Logo del Instituto de Rios" class="logo">
                     <div class="text-center text-base font-bold mx-5" style="text-align: center;">INSTITUTO SALVADOREÑO DE
                         REHABILITACION INTEGRAL
                     </div>
@@ -51,7 +51,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                 <div class="flex w-1/3 text-left text-lg mr-5">
                     <div class="relative flex w-full flex-row">
                         <label for="" class="flex items-center text-[14px] text-sm">Fecha</label>
-                        <input type="text" readonly v-model="receipt_to_print.fecha_recibo_ingreso"
+                        <input type="text" readonly v-model="fecha_recibo"
                             class="font-bold text-center w-full border-b border-black-600 border-opacity-50 border-solid border-0 py-0 text-sm">
                     </div>
                 </div>
@@ -109,7 +109,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                 <div class="h-52 flex flex-col">
                                     <div class="flex justify-center items-start mb-2 h-3/4">
                                         <div class="flex w-full text-left mx-4 mt-2">
-                                            <div class="flex items-center text-[14px] text-sm">
+                                            <div class="font-bold flex items-center text-[14px] text-sm">
                                                 {{ receipt_to_print.descripcion_recibo_ingreso }}
                                             </div>
                                         </div>
@@ -133,7 +133,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                             <td class="border border-black">
                                 <div class="h-52 flex flex-col">
                                     <div class="flex justify-center items-start mb-2 h-1/4">
-                                        <div class="flex w-full text-left text-[14px] text-sm mx-4 mt-2">
+                                        <div class="font-bold flex w-full text-left text-[14px] text-sm mx-4 mt-2">
                                             {{ receipt_to_print.id_ccta_presupuestal }} {{ nombre_cuenta }}
                                         </div>
                                     </div>
@@ -142,7 +142,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                         <div class="w-full flex flex-col h-auto">
                                             <div v-for="(detail, index) in receipt_to_print.detalles" :key="index"
                                                 class="relative flex w-full flex-row">
-                                                <label for="" class="flex items-center text-[14px] w-2/3 mx-4 mt-1">
+                                                <label for="" class="font-bold flex items-center text-[14px] w-2/3 mx-4 mt-1">
                                                     {{ detail.concepto_ingreso.nombre_concepto_ingreso }}
                                                 </label>
                                                 <div class="w-1/3 relative">
@@ -157,7 +157,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                             </div>
                                             <div class="flex justify-center items-start mb-2 h-1/4 mt-2">
                                                 <div class="relative flex w-full flex-row">
-                                                    <label for="" class="flex items-center text-[14px] w-2/3 mx-4 mt-2">
+                                                    <label for="" class="font-bold flex items-center text-[14px] w-2/3 mx-4 mt-2">
                                                         TOTAL:
                                                     </label>
                                                     <div class="w-1/3 relative">
@@ -214,6 +214,10 @@ export default {
         nombre_cuenta() {
             return this.receipt_to_print.cuenta_presupuestal ? this.receipt_to_print.cuenta_presupuestal.nombre_ccta_presupuestal : ''
         },
+        fecha_recibo() {
+            return this.receipt_to_print.cuenta_presupuestal ? moment(this.receipt_to_print.fecha_recibo_ingreso, 'Y-M-D').format('DD-MM-Y') : ''
+            
+        }
     }
 }
 </script>
@@ -258,7 +262,7 @@ export default {
 .logo {
     width: 100px;
     height: 100px;
-    object-fit: cover;
+    object-fit: contain;
     margin-bottom: 10px;
 }
 

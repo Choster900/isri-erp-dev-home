@@ -318,10 +318,10 @@ import html2pdf from 'html2pdf.js'
 
                                         </td>
                                         <th class="border-2 border-black text-sm text-gray-600">
-                                            PROYECTO FINANCIADO
-                                        </th>
-                                        <th class="border-2 border-black py-2 text-sm text-gray-600">
                                             PRIORIDAD DE PAGO
+                                        </th>
+                                        <th class="border-2 border-black py-0 text-sm text-gray-600">
+                                            PROYECTO FINANCIADO
                                         </th>
                                     </tr>
                                     <tr>
@@ -623,6 +623,7 @@ export default {
             } catch (error) {
 
                 let data = error.response.data.errors
+                console.log(error);
                 var myData = new Object();
                 for (const errorBack in data) {
                     let split = errorBack.split(".")

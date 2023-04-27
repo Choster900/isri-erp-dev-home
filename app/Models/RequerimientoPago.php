@@ -20,6 +20,8 @@ class RequerimientoPago extends Model
         'monto_requerimiento_pago',
         'anio_requerimiento_pago',
         'fecha_requerimiento_pago',
+        'descripcion_requerimiento_pago',
+        'estado_requerimiento_pago',
         'fecha_reg_requerimiento_pago',
         'fecha_mod_requerimiento_pago',
         'usuario_requerimiento_pago',

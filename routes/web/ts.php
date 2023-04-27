@@ -8,6 +8,7 @@ use App\Http\Controllers\Tesoreria\RequerimientoController;
 use App\Http\Controllers\Tesoreria\ConceptoIngresoController;
 use App\Http\Controllers\Tesoreria\ReciboIngresoController;
 use App\Http\Controllers\Tesoreria\LiquidacionQuedanController;
+use App\Http\Controllers\Tesoreria\ReporteTesoreriaController;
 
 Route::group(['middleware' => ['auth', 'access']], function () {
 
@@ -24,7 +25,6 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get('proveedores', [ProveedorController::class, 'getProveedores'])->name('get.proveedores');
     Route::get('list-option-select-suppliers', [ProveedorController::class, 'getInformationToSelect'])->name('list-option-select-suppliers');
     Route::get('update-suplier', [ProveedorController::class, 'getProveedores'])->name('get.proveedores');
-    Route::get('get-supplier', [ProveedorController::class, 'getDataSupplier'])->name('get.information-supplier');
     Route::post('update-supplier', [ProveedorController::class, 'updateDataSupplier'])->name('update-supplier');
     Route::post('add-supplier', [ProveedorController::class, 'addDataSupplier'])->name('add-supplier');
     Route::post('change-values-retencion/{id_sujeto_retencion}', [ProveedorController::class, 'changeValueRetencion'])->name('change-values-retencion');
@@ -120,6 +120,16 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('ts.liquidacion');
     Route::post('liquidar-quedan', [LiquidacionQuedanController::class, 'processLiquidacionQuedan'])->name('liquidar-quedan');
+
+    Route::get(
+        '/ts/cuadro-deuda',
+        function () {
+            return Inertia::render('Tesoreria/CuadroDeuda', [
+                'menu' => session()->get('menu')
+            ]);
+        }
+    )->name('ts.cuadroDeuda');
+    Route::get('test-excel', [ReporteTesoreriaController::class, 'testExcel'])->name('reporteTesoreria.testExcel');
 
 
 });

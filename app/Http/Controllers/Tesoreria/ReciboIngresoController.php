@@ -26,9 +26,7 @@ class ReciboIngresoController extends Controller
         $search_value = $request->input('search');
 
         $query = ReciboIngreso::select('*')
-            ->whereHas('detalles', function ($query) {
-                $query->where('estado_det_recibo_ingreso', 1);
-            })
+            ->with('detalles')
             ->with('detalles.concepto_ingreso')
             ->with('cuenta_presupuestal')
             ->with('empleado_tesoreria')
@@ -160,6 +158,7 @@ class ReciboIngresoController extends Controller
                 $income_detail = DetalleReciboIngreso::find($detail['detail_id']);
                 $income_detail->update([
                     'id_concepto_ingreso' => $detail['income_concept_id'],
+                    'estado_det_recibo_ingreso' => 1,
                     'monto_det_recibo_ingreso' => $detail['amount'],
                     'fecha_mod_det_recibo_ingreso' => Carbon::now(),
                     'usuario_det_recibo_ingreso' => $request->user()->nick_usuario,

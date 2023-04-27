@@ -31,7 +31,7 @@ import axios from 'axios';
               <LabelToInput icon="date" />
             </div>
           </div>
-          <h2 class="font-semibold text-slate-800 pt-1">Total Concepto Ingresos <span class="text-slate-400 font-medium">{{
+          <h2 class="font-semibold text-slate-800 pt-1">Total Conceptos Ingreso <span class="text-slate-400 font-medium">{{
           tableData.total
         }}</span></h2>
         </div>
