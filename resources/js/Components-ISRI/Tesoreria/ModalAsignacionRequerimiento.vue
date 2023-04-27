@@ -10,8 +10,8 @@ import axios from 'axios';
     <ModalBasicVue title="Asignando numero de requerimiento" id="scrollbar-modal" maxWidth="6xl"
         :modalOpen="scrollbarModalOpen" @close-modal-persona="this.$emit('close-definitive')">
 
-        <div class="flex flex-col md:flex-row space-y-5 md:space-y-0  ">
-            <div class="flex-1 p-4 bg shadow-md  bg-white  shadow-[#001b47]  border border-gray-500/20">
+        <div class="flex flex-col md:flex-row  md:space-y-0  ">
+            <div class="flex-1 px-3 pt-3 shadow-sm  bg-white shadow-[#001b47] border-r border-r-gray-500/20">
                 <div class="mb-7 md:flex flex-row justify-items-start">
                     <div class="mb-4 md:mr-2 md:mb-0 basis-full">
                         <label class="block mb-2 text-xs font-light text-gray-600">
@@ -58,7 +58,7 @@ import axios from 'axios';
                         </TextInput>
                     </div>
                 </div>
-                <div class="sm:flex sm:justify-end sm:items-center">
+                <div class="sm:flex sm:justify-end sm:items-center pt-12 pb-2">
                     <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
                         <GeneralButton color="bg-[#006205]  hover:bg-[#006205]/90" text="Buscar" icon="search"
                             @click="filterQuedan()" />
@@ -69,7 +69,7 @@ import axios from 'axios';
                     </div>
                 </div>
             </div>
-            <div class="flex-1  ">
+            <div class="flex-1">
                 <div class=" p-4 rounded-md overflow-x-auto">
                     <div class="sm:flex sm:justify-between sm:items-center mb-4">
                         <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
@@ -93,7 +93,7 @@ import axios from 'axios';
                             </div>
                         </div>
                     </div>
-                    <div class="sidebar-style-isri w-full" style="overflow-x:auto; max-height: 450px;">
+                    <div class="sidebar-style-isri w-full" style="overflow-x:auto; max-height: 440px;">
                         <table class="table-auto">
                             <thead
                                 class="text-xs font-semibold uppercase text-white bg-[#001b47] border-t border-b border-slate-200 sticky top-0">
@@ -107,7 +107,7 @@ import axios from 'axios';
                                         <div class="font-semibold text-center text-[12px] w-1">I D</div>
                                     </th>
                                     <th class="px-4 py-2 first:pl-5 last:pr-5 whitespace-nowrap">
-                                        <div class="font-semibold text-center w-52 text-[12px] tracking-wider">P R O V E E D
+                                        <div class="font-semibold text-center w-44 text-[12px] tracking-wider">P R O V E E D
                                             O R</div>
                                     </th>
                                     <th class="px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap">
@@ -123,7 +123,7 @@ import axios from 'axios';
                                         <div class="font-semibold text-right text-[12px]">I V A</div>
                                     </th>
                                     <th class="px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap">
-                                        <div class="font-semibold text-right text-[12px]">SALDO</div>
+                                        <div class="font-semibold text-right text-[12px]">M O N T O</div>
                                     </th>
                                 </tr>
                             </thead>
@@ -281,13 +281,13 @@ export default {
                 const collectIds = this.collectItems.map(item => item.id_quedan);
                 const newItems = this.dataQuedan.filter(item => !collectIds.includes(item.id_quedan));
                 newItems.forEach(item => {
-                    this.collectItems.push({ id_quedan: item.id_quedan, checked: true });
+                    this.collectItems.push({ id_quedan: item.id_quedan, checked: true, monto_liquido_quedan: item.monto_liquido_quedan });
                 });
             } else {
                 this.collectItems = [];
             }
         },
-        takeOfQUedan() {
+        takeOfQUedan() {//funcion que pone en false la key mostrar para que desaparesca de la tabla
             const newDataQuedan = this.dataQuedan.map((quedan) => {
                 if (this.collectItems.some((collect) => quedan.id_quedan === collect.id_quedan)) {
                     return { ...quedan, mostrar: false };
@@ -296,19 +296,6 @@ export default {
                 }
             });
             this.dataQuedan = newDataQuedan;
-        },
-
-        async addNumberRequestToQuedan() {
-            try {
-                await axios.post('/add-numberRequest-quedan', {
-                    itemsToAddNumber: this.collectItems,
-                    numberRequest: this.id_requerimiento_pago
-                })
-                this.takeOfQUedan()
-                return true; // indicate success
-            } catch (error) {
-                return false; // indicate failure
-            }
         },
         async addNumber() {
             if (this.collectItems != '') {
@@ -324,27 +311,37 @@ export default {
                     showCloseButton: true
                 });
                 if (confirmed.isConfirmed) {
-                    const successAddNumberRequest = await this.addNumberRequestToQuedan();
-                    if (successAddNumberRequest) {
+
+                    axios.post('/add-numberRequest-quedan', {
+                        itemsToAddNumber: this.collectItems,
+                        numberRequest: this.id_requerimiento_pago
+                    }).then((response) => {
                         toast.success("El numero de quedan ", {
                             autoClose: 5000,
                             position: "top-right",
                             transition: "zoom",
                             toastBackgroundColor: "white",
                         });
-                        this.$emit("reload-table")
+                        this.takeOfQUedan()
 
+                        this.$emit("reload-table")
                         this.collectItems = []
                         this.id_requerimiento_pago = ''
                         this.numero_requerimiento = ''
-                    } else {
-                        toast.error("Error, Al parecer el requerimiento seleccionado tiene un monto menor a la sumatoria total de quedan", {
-                            autoClose: 5000,
-                            position: "top-right",
-                            transition: "zoom",
-                            toastBackgroundColor: "white",
-                        });
-                    }
+                    }).catch((Error) => {
+                        if (Error.response.status === 422) {
+                            console.log(Error);
+                            toast.error(Error.response.data, {
+                                autoClose: 5000,
+                                position: "top-right",
+                                transition: "zoom",
+                                toastBackgroundColor: "white",
+                            });
+
+                        }
+                    });
+
+
                 }
             } else {
                 toast.error("Al parecer no haz seleccionado ningun quedan", {

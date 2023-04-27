@@ -52,7 +52,7 @@ class QuedanController extends Controller
 
 
         if ($request->input("allWithANumberRequest")) {
-            $v_query->where("id_estado_quedan", 2);
+            $v_query->where("id_estado_quedan", ">=", 2);
         }
 
 
@@ -89,7 +89,7 @@ class QuedanController extends Controller
             }
 
             if (isset($data['id_estado_quedan'])) {
-                $v_query->where('id_estado_quedan', 'like', '%' . $data["estado_quedan"] . '%');
+                $v_query->where('id_estado_quedan', 'like', '%' . $data["id_estado_quedan"] . '%');
             }
         }
 
@@ -253,7 +253,7 @@ class QuedanController extends Controller
             ->select(
                 'id_requerimiento_pago as value',
                 DB::raw("CONCAT(numero_requerimiento_pago,' - ',anio_requerimiento_pago) AS label")
-            )->get();//TODO: poner el estado del requerimiento pago donde exista y este abierto y no cerrado
+            )->get(); //TODO: poner el estado del requerimiento pago donde exista y este abierto y no cerrado
 
         $v_Prioridad_pago = DB::table('prioridad_pago')
             ->select(

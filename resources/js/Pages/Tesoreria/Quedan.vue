@@ -188,7 +188,7 @@ export default {
 
             { width: "10%", label: "Monto", name: "monto_liquido_quedan", type: "text" },
             {
-                width: "10%", label: "Estado", name: "estado_quedan", type: "select",
+                width: "10%", label: "Estado", name: "id_estado_quedan", type: "select",
                 options: [
                     { value: "", label: "Ninguno" },
                     { value: "1", label: "Abierto" },

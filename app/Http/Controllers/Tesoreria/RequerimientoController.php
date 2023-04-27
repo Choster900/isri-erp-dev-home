@@ -31,11 +31,11 @@ class RequerimientoController extends Controller
         $v_query = RequerimientoPago::select("*")->with(["Quedan", "Quedan.liquidacion_quedan"])
             ->orderBy($v_columns[$v_column], $v_dir);
 
-        if ($data) {//FIXME: la consulta no trae requerimientos que tengan la descripcion_requerimiento_pago vacia
+        if ($data) { //FIXME: la consulta no trae requerimientos que tengan la descripcion_requerimiento_pago vacia
             $v_query->where('id_requerimiento_pago', 'like', '%' . $data["id_requerimiento_pago"] . '%')
                 ->where('numero_requerimiento_pago', 'like', '%' . $data["numero_requerimiento_pago"] . '%')
                 ->where('descripcion_requerimiento_pago', 'like', '%' . $data["descripcion_requerimiento_pago"] . '%')
-                ->where('monto_requerimiento_pago', 'like', '%' . $data["monto_requerimiento_pago"] . '%');    
+                ->where('monto_requerimiento_pago', 'like', '%' . $data["monto_requerimiento_pago"] . '%');
             $searchText = $data["allQUedan"];
             $v_query->whereHas('Quedan', function ($query) use ($searchText) {
                 $query->where(function ($query) use ($searchText) {
@@ -125,22 +125,16 @@ class RequerimientoController extends Controller
         ];
         // Validar los campos del request
         $request->validate($rules);
-
         //sumando el total del requerimiento_pago
         $totRequerimiento = 0;
         foreach ( $request->itemsToAddNumber as $key => $value ) {
             $totRequerimiento = $totRequerimiento + $value["monto_liquido_quedan"];
         }
-
         $monto_requerimiento_pago = RequerimientoPago::select('*')->where('id_requerimiento_pago', $request->numberRequest)->get();
-
         $quedanExistente = Quedan::select('*')->where('id_requerimiento_pago', $request->numberRequest)->get();
-
         foreach ( $quedanExistente as $key => $value ) {
             $totRequerimiento = $totRequerimiento + $value["monto_liquido_quedan"];
         }
-        // return $totRequerimiento;
-
         if ($totRequerimiento < $monto_requerimiento_pago[0]->monto_requerimiento_pago) {
             foreach ( $request->itemsToAddNumber as $key => $value ) {
                 Quedan::where("id_quedan", $value["id_quedan"])->update(['id_requerimiento_pago' => $request->numberRequest, "id_estado_quedan" => 2]);
@@ -148,12 +142,9 @@ class RequerimientoController extends Controller
             return response()->json(['message' => 'Actualización exitosa'], 200);
         } else {
             DB::rollback();
-            return response()->json(['message' => 'El monto es mayor a lo ingresado en el requerimiento'], 500);
-
+            return response()
+                ->json('Error, Al parecer el requerimiento seleccionado tiene un monto de $' . $monto_requerimiento_pago[0]->monto_requerimiento_pago . ' mayor a la sumatoria todal de los quedan de $' . $totRequerimiento, 422);
         }
-
-        // Realizar la actualización de la base de datos
-
     }
 
     public function takeOfNumberRequest(Request $request)

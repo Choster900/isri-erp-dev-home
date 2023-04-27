@@ -19,8 +19,11 @@ import html2pdf from 'html2pdf.js'
                         </div>
 
                         <div class="px-2" v-else>
-                            <GeneralButton color="bg-orange-700   hover:bg-orange-800" text="MODIFICAR" icon="update"
-                                @click="updateQuedan()" />
+                            <template v-if="dataQuedan.id_estado_quedan === 1">
+                                <GeneralButton color="bg-orange-700   hover:bg-orange-800" text="MODIFICAR" icon="update"
+                                    @click="updateQuedan()" />
+                            </template>
+
                         </div>
 
                         <div class="px-2" v-if="dataQuedan != ''">

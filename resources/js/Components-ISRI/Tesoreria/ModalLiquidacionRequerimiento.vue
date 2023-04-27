@@ -18,6 +18,11 @@ import axios from 'axios';
                                 {{ sumTotalDeuda }}
                             </div>
                         </th>
+                        <th class="px-4 py-2 first:pl-5 last:pr-5 whitespace-nowrap border-r-2">
+                            <div class="font-semibold text-center text-[12px] tracking-wider"> MONTO DEL REQ:
+                                {{ dataQuedan.monto_requerimiento_pago }}
+                            </div>
+                        </th>
                         <th class="px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap rounded-tr-2xl">
                             <div class="font-semibold text-center text-[12px] "
                                 :class="restanteIngreso < 0 ? 'text-red-600' : ''">
@@ -50,9 +55,9 @@ import axios from 'axios';
                 </thead>
                 <tbody>
                     <tr v-for="(data, i ) in  amountRowsData " :key="i">
-                        <td class="pb-1 pt-1 
+                        <td class="pb-1 pt-1
                         focus:bg-white text-xs font-semibold h-12 rounded-md px-3 bg-[#1f355833] bg-opacity-20 text-center border-2 border-white"
-                            contenteditable="false">
+                            contenteditable="false" :class="data.restante == 0 ? 'bg-green-400' : 'bg-red-400'">
                             {{ data.id_quedan }}
                         </td>
                         <td class="pb-1 pt-1 text-xs font-semibold w-full rounded-md px-3 bg-[#1f355833] bg-opacity-20 text-center border-2 border-white"

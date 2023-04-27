@@ -89,7 +89,7 @@ import axios from 'axios';
 
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="space-x-1">
-                                    <button class="text-rose-500 hover:text-rose-600 rounded-full"
+                                    <button class="text-rose-500 hover:text-rose-600 rounded-full" v-if="data.id_estado_quedan === 2"
                                         @click="takeOf(data.id_quedan)">
                                         <span class="sr-only">Delete</span>
 
