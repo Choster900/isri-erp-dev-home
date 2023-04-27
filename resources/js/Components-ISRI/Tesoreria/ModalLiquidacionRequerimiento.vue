@@ -11,22 +11,52 @@ import axios from 'axios';
 
         <div class=" px-10 py-5 ">
             <table class="table-auto">
-                <thead class="text-xs font-semibold uppercase text-white bg-[#001b47] ">
+                <thead class="text-xs font-semibold uppercase   ">
                     <tr>
-                        <th class="px-4 py-2 first:pl-5 last:pr-5 whitespace-nowrap rounded-tl-2xl border-r-2">
+                        <th
+                            class="text-white bg-[#001b47] px-4 py-2 first:pl-5 last:pr-5 whitespace-nowrap rounded-tl-2xl border-r-2">
                             <div class="font-semibold text-center text-[12px] tracking-wider"> TOTAL:
                                 {{ sumTotalDeuda }}
                             </div>
                         </th>
-                        <th class="px-4 py-2 first:pl-5 last:pr-5 whitespace-nowrap border-r-2">
+                        <th class="text-white bg-[#001b47] px-4 py-2 first:pl-5 last:pr-5 whitespace-nowrap border-r-2">
                             <div class="font-semibold text-center text-[12px] tracking-wider"> MONTO DEL REQ:
                                 {{ dataQuedan.monto_requerimiento_pago }}
                             </div>
                         </th>
-                        <th class="px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap rounded-tr-2xl">
+                        <th
+                            class="text-white bg-[#001b47] px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap rounded-tr-2xl">
                             <div class="font-semibold text-center text-[12px] "
                                 :class="restanteIngreso < 0 ? 'text-red-600' : ''">
                                 RESTANTE: {{ restanteIngreso }}
+                            </div>
+                        </th>
+                        <th class=" px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap rounded-tr-2xl">
+                            <div class="font-semibold text-center text-[12px] "
+                                :class="restanteIngreso < 0 ? 'text-red-600' : ''">
+                                <label class="flex items-center">
+                                    <div class="checkbox-icon bg-green-400"></div>
+
+                                    <span class="ml-2 text-[10px] text-green-400">Liquidado</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <div class="checkbox-icon bg-yellow-400/50 border border-black/10"></div>
+
+                                    <span class="ml-2 text-[10px] text-yellow-400/50">Parcial</span>
+                                </label>
+                            </div>
+                        </th>
+                        <th class=" px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap rounded-tr-2xl">
+                            <div class="font-semibold text-center text-[12px] "
+                                :class="restanteIngreso < 0 ? 'text-red-600' : ''">
+                                <label class="flex items-center">
+                                    <div class="checkbox-icon bg-[rgb(191,141,15)]"></div>
+                                    <span class="ml-2 text-[10px] text-[rgb(191,141,15)]">Inconsistencias</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <div class="checkbox-icon bg-[rgb(208,35,35)]"></div>
+                                    <span class="ml-2 text-[10px] text-[rgb(208,35,35)]">Inconsistencias</span>
+                                </label>
                             </div>
                         </th>
                     </tr>
@@ -51,34 +81,41 @@ import axios from 'axios';
                         <th class="px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap">
                             <div class="font-semibold text-right text-[12px]">L I Q U I D A C I O N</div>
                         </th>
+
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="(data, i ) in  amountRowsData " :key="i">
                         <td class="pb-1 pt-1
                         focus:bg-white text-xs font-semibold h-12 rounded-md px-3 bg-[#1f355833] bg-opacity-20 text-center border-2 border-white"
-                            contenteditable="false" :class="data.restante == 0 ? 'bg-green-400' : 'bg-red-400'">
+                            contenteditable="false"
+                            :class="data.restante == 0 ? 'bg-green-400' : data.monto_liquidacion_quedan != 0 ? 'bg-yellow-400' : ''">
                             {{ data.id_quedan }}
                         </td>
                         <td class="pb-1 pt-1 text-xs font-semibold w-full rounded-md px-3 bg-[#1f355833] bg-opacity-20 text-center border-2 border-white"
                             contenteditable="true"
+                            :class="data.restante == 0 ? 'bg-green-400' : data.monto_liquidacion_quedan != 0 ? 'bg-yellow-400' : ''"
                             @input="liquidarMonto(data.id_quedan, $event, 'notifica_liquidacion_quedan')">
                             {{ data.notifica_liquidacion_quedan }}
                         </td>
                         <td class="pb-1 pt-1 focusbg-white text-xs font-semibold w-full  rounded-md px-3 bg-[#1f355833] bg-opacity-20 text-center border-2 border-white"
-                            contenteditable="false">
+                            contenteditable="false"
+                            :class="data.restante == 0 ? 'bg-green-400' : data.monto_liquidacion_quedan != 0 ? 'bg-yellow-400' : ''">
                             {{ data.monto_liquido_quedan }}
                         </td>
 
-                        <td :class="data.restante < 0 ? 'error2' : ''"
+                        <td :class="[data.restante < 0 ? 'error2' : '',
+                        data.restante == 0 ? 'bg-green-400' : data.monto_liquidacion_quedan != 0 ? 'bg-yellow-400' : ''
+                        ]"
                             class="pb-1 pt-1 focus:bg-white text-xs font-semibold w-full rounded-md px-3 bg-[#1f355833] bg-opacity-20 text-center border-2 border-white"
                             contenteditable="false">
                             {{ data.restante }}
                         </td>
 
-                        <td :class="data.restante < 0 ? 'error' : ''"
+                        <td :class="[data.restante < 0 ? 'error' : '',
+                        data.restante == 0 ? 'bg-green-400' : data.monto_liquidacion_quedan != 0 ? 'bg-yellow-400' : '']"
                             class="pb-1 pt-1 text-xs font-semibold w-full rounded-md px-3 bg-[#1f355833] bg-opacity-20 text-center border-2 border-white"
-                            contenteditable="true"
+                            :contenteditable="data.id_estado_quedan == 4 ? false : true"
                             @input="liquidarMonto(data.id_quedan, $event, 'monto_liquidacion_quedan')">
                             {{ data.monto_liquidacion_quedan }}
 
@@ -128,6 +165,7 @@ export default {
             this.dataQuedan.quedan.forEach(element => {
                 this.amountRowsData.push({
                     id_quedan: element.id_quedan,
+                    id_estado_quedan: element.id_estado_quedan,
                     notifica_liquidacion_quedan: element.liquidacion_quedan != null ? element.liquidacion_quedan.notifica_liquidacion_quedan : '',
                     monto_liquido_quedan: element.monto_liquido_quedan,
                     restante: element.liquidacion_quedan != null ? (element.monto_liquido_quedan - element.liquidacion_quedan.monto_liquidacion_quedan).toFixed(2) : element.monto_liquido_quedan,
@@ -250,6 +288,22 @@ td {
 
 .error2 {
     background-color: rgb(191, 141, 15) !important;
+}
+
+.checkbox {
+    display: flex;
+    align-items: center;
+}
+
+.checkbox-icon {
+    display: inline-block;
+    width: 0.75rem;
+    height: 0.75rem;
+    margin-right: 0.5rem;
+}
+
+.checkbox-label {
+    font-size: 0.75rem;
 }
 </style>
 
