@@ -47,14 +47,14 @@ import axios from 'axios';
                         Fuente Financiamiento <span class="text-red-600 font-extrabold">*</span>
                     </label>
                     <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
-                        <Multiselect placeholder="Seleccione Financiamiento" :searchable="true" 
-                        :options="financing_sources" v-model="debt_table.financing_source_id"/>
+                        <Multiselect placeholder="Seleccione Financiamiento" :searchable="true" :options="financing_sources"
+                            v-model="debt_table.financing_source_id" />
                         <LabelToInput icon="list" />
                     </div>
                 </div>
             </div>
             <div class="mb-4 md:flex flex justify-center">
-                <GeneralButton color="bg-green-700  hover:bg-green-800" text="Exportar" icon="add" />
+                <GeneralButton @click="exportExcel()" color="bg-green-700 hover:bg-green-800" text="Excel" icon="add" />
             </div>
         </div>
 
@@ -71,12 +71,12 @@ export default {
     data() {
         return {
             debt_table: {
-                start_date:'',
-                end_date:'',
-                financing_source_id:''
+                start_date: '',
+                end_date: '',
+                financing_source_id: ''
             },
             permits: [],
-            financing_sources:[],
+            financing_sources: [],
             config: {
                 altInput: true,
                 static: true,
@@ -98,6 +98,21 @@ export default {
         }
     },
     methods: {
+        exportExcel() {
+            axios.get('/test-excel', )
+                .then(response => {
+                    console.log(response.data.array);
+                    // const url = window.URL.createObjectURL(new Blob([response.data]));
+                    // const link = document.createElement('a');
+                    // link.href = url;
+                    // link.setAttribute('download', 'data.xlsx');
+                    // document.body.appendChild(link);
+                    // link.click();
+                })
+                .catch(errors => {
+                    console.log(errors);
+                });
+        },
         getDataSelect() {
             axios.get("/get-selects-income-concept")
                 .then((response) => {

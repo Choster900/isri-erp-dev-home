@@ -7,6 +7,7 @@ use App\Http\Controllers\Tesoreria\QuedanController;
 use App\Http\Controllers\Tesoreria\RequerimientoController;
 use App\Http\Controllers\Tesoreria\ConceptoIngresoController;
 use App\Http\Controllers\Tesoreria\ReciboIngresoController;
+use App\Http\Controllers\Tesoreria\ReporteTesoreriaController;
 
 Route::group(['middleware' => ['auth', 'access']], function () {
 
@@ -116,4 +117,5 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             ]);
         }
     )->name('ts.cuadroDeuda');
+    Route::get('test-excel', [ReporteTesoreriaController::class, 'testExcel'])->name('reporteTesoreria.testExcel');
 });
