@@ -26,7 +26,7 @@ import axios from 'axios';
                             <LabelToInput icon="date" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Todos los proveedores
+                    <h2 class="font-semibold text-slate-800 pt-1">Todos los requerimientos
                         <span class="text-slate-400 font-medium">{{ pagination.total }}</span>
                     </h2>
                 </div>

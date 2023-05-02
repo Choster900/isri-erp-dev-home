@@ -25,7 +25,7 @@ import axios from 'axios';
                             <LabelToInput icon="date" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Todos los proveedores
+                    <h2 class="font-semibold text-slate-800 pt-1">Todos los seguimientos de pagos
                         <span class="text-slate-400 font-medium">{{ pagination.total }}</span>
                     </h2>
 
@@ -98,6 +98,14 @@ import axios from 'axios';
                                     <div v-else-if="data.id_estado_quedan === 2"
                                         class="text-xs inline-flex font-medium bg-blue-100 text-blue-600 rounded-full text-center px-2.5 py-1">
                                         Req. Asignado
+                                    </div>
+                                    <div v-else-if="data.id_estado_quedan === 3"
+                                        class="text-xs inline-flex font-medium bg-blue-100 text-orange-600 rounded-full text-center px-2.5 py-1">
+                                        Liq. Parcial
+                                    </div>
+                                    <div v-else-if="data.id_estado_quedan === 4"
+                                        class="text-xs inline-flex font-medium bg-blue-100 text-red-600 rounded-full text-center px-2.5 py-1">
+                                        Liquidado
                                     </div>
                                 </div>
                             </td>

@@ -30,6 +30,11 @@ import html2pdf from 'html2pdf.js'
                             <GeneralButton color="bg-red-700   hover:bg-red-800" text="DESCARGAR PDF" icon="pdf"
                                 @click="printPdf()" />
                         </div>
+                        <div class="px-2" v-if="dataQuedan != ''">
+                            <GeneralButton color="bg-[#2F347E]/90  hover:bg-[#2F347E]"
+                                text="GENERAR COMPROBANTE DE RETENCION" icon="pdf"
+                                @click="generarComprobanteRetencionPdf()" />
+                        </div>
                     </div>
 
                     <button type="button" @click="addRow()"
@@ -366,6 +371,7 @@ import html2pdf from 'html2pdf.js'
 <script>
 
 import quedanPDFVue from '@/pdf/Tesoreria/quedanPDF.vue';
+import comprobanteRetencion from '@/pdf/Tesoreria/ComprobatenRetencionPdf.vue';
 import { createApp, h } from 'vue'
 
 export default {
@@ -441,6 +447,24 @@ export default {
             };
 
             const app = createApp(quedanPDFVue, { dataQuedan: this.dataQuedan, totalCheque: this.dataInputs.total });
+            const div = document.createElement('div');
+            const pdfPrint = app.mount(div);
+            const html = div.outerHTML;
+
+            html2pdf().set(opt).from(html).save();
+
+        },
+
+        generarComprobanteRetencionPdf() {
+            const opt = {
+                margin: 0.1,
+                filename: 'Comprobante_retencion.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' },
+            };
+
+            const app = createApp(comprobanteRetencion, { dataQuedan: this.dataQuedan, totalCheque: this.dataInputs.total });
             const div = document.createElement('div');
             const pdfPrint = app.mount(div);
             const html = div.outerHTML;
@@ -580,36 +604,42 @@ export default {
         },
 
         paintPositionRepet() {
-            const duplicatePositions = {};//get position where the acta number was duplicated
+            const duplicatePositions = {}; //get position where the acta number was duplicated
 
             for (let i = 0; i < this.rowsData.length; i++) {
                 const row = this.rowsData[i];
                 const number = row[4]; // get numbers en position 4
+                const dependency = row[3]; // get dependency en position 3
 
-                // Verificar si el valor en la fila 7 es false antes de agregar la posición actual a las posiciones duplicadas
                 if (row[7] !== false) {
-                    if (duplicatePositions[number]) {
-                        // Si el número ya ha sido ingresado antes, agregar la posición actual a las posiciones duplicadas
-                        duplicatePositions[number].push(i);
+                    if (!duplicatePositions[dependency]) {
+                        duplicatePositions[dependency] = {};
+                    }
+                    if (duplicatePositions[dependency][number]) {
+                        duplicatePositions[dependency][number].push(i);
                     } else {
-                        // Si el número es único, crear un nuevo arreglo con la posición actual
-                        duplicatePositions[number] = [i];
+                        duplicatePositions[dependency][number] = [i];
                     }
                 }
             }
-            const duplicateNumbers = Object.keys(duplicatePositions).filter(number => duplicatePositions[number].length > 1);
-            duplicateNumbers.forEach(number => {
-                duplicatePositions[number].forEach(position => {
-                    this.errosrNumeroActa.push(position)
-                })
 
+            const dependencies = Object.keys(duplicatePositions);
+            dependencies.forEach((dependency) => {
+                const numbers = Object.keys(duplicatePositions[dependency]).filter(
+                    (number) => duplicatePositions[dependency][number].length > 1
+                );
+                numbers.forEach((number) => {
+                    duplicatePositions[dependency][number].forEach((position) => {
+                        this.errosrNumeroActa.push(position);
+                    });
+                });
             });
+
             setTimeout(() => {
                 this.errosrNumeroActa = [];
             }, 5000);
 
             return this.errosrNumeroActa.length;
-
         },
         async createQuedanAsynchronously() {
 
