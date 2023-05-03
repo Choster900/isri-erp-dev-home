@@ -196,7 +196,6 @@ class ReporteTesoreriaController extends Controller
 			rp.numero_requerimiento_pago,
             DATE_FORMAT(dq.fecha_factura_det_quedan,"%d/%m/%Y") as fecha_factura_det_quedan,
 			(IFNULL(dq.producto_factura_det_quedan,0)+IFNULL(dq.servicio_factura_det_quedan,0)) AS total_factura,
-			-- (IFNULL(q.monto_liquido_quedan,0)+IFNULL(q.monto_iva_quedan,0)+IFNULL(q.monto_isr_quedan,0)) AS total_quedan,
 			ROUND(IF((IFNULL(q.monto_liquido_quedan,0)+IFNULL(q.monto_iva_quedan,0)+IFNULL(q.monto_isr_quedan,0))>=113,
 			(((IFNULL(dq.producto_factura_det_quedan,0)+IFNULL(dq.servicio_factura_det_quedan,0))/1.13)*sr.iva_sujeto_retencion),0),2) as retencion_iva,
 			ROUND(IFNULL((dq.servicio_factura_det_quedan*sr.isrl_sujeto_retencion),0),2) AS rentencion_isr,
