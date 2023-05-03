@@ -11,7 +11,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
             <div class="flex justify-between items-center mt-10">
                 <!-- Encabezado izquierdo  -->
                 <div class="logo-container">
-                    <img src="../../../img/escudo-nacional.png" alt="Logo del Ministerio de tierras" class="logo">
+                    <img src="../../../img/escudo-nacional.png" alt="Escudo El Salvador" class="logo">
                     <div class="text-center text-base font-bold mx-5">REPUBLICA DE EL SALVADOR</div>
                     <div class="text-center text-base font-bold mx-5">MINISTERIO DE SALUD</div>
                 </div>
@@ -21,18 +21,18 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                 </div>
                 <!-- Encabezado derecho -->
                 <div class="logo-container">
-                    <img src="../../../img/isri-logo2.png" alt="Logo del Instituto de Rios" class="logo">
+                    <img src="../../../img/isri-logo2.png" alt="Logo ISRI" class="logo">
                     <div class="text-center text-base font-bold mx-5" style="text-align: center;">INSTITUTO SALVADOREÑO DE
                         REHABILITACION INTEGRAL
                     </div>
                 </div>
             </div>
             <!-- Contenedor 2 -->
-            <div class="flex justify-between items-center mt-5">
-                <div class="flex w-2/3 text-left text-lg ml-5">
+            <div class="flex justify-center items-center mt-5">
+                <!-- <div class="flex w-2/3 text-left text-lg ml-5">
 
-                </div>
-                <div class="flex w-1/3 text-left text-lg mr-5">
+                </div> -->
+                <div class="flex w-1/4 text-left text-lg mr-5">
                     <div class="relative flex w-full flex-row">
                         <label for="" class="flex items-center text-[14px] text-sm">Numero</label>
                         <input type="text" readonly v-model="receipt_to_print.numero_recibo_ingreso"
