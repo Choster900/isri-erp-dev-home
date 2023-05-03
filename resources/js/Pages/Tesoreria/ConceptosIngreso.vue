@@ -45,13 +45,13 @@ import axios from 'axios';
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800">{{ service.id_concepto_ingreso }}</div>
               </td>
-              <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                <div class="font-medium text-slate-800">
+              <td class="px-2 first:pl-5 last:pr-5 td-data-table">
+                <div class="font-medium text-slate-800 ellipsis">
                   {{ service.codigo_dependencia && service.nombre_dependencia ? service.codigo_dependencia + ' - ' + service.nombre_dependencia : '' }}
                 </div>
               </td>
-              <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                <div class="font-medium text-slate-800">{{ service.nombre_concepto_ingreso }}</div>
+              <td class="px-2 first:pl-5 last:pr-5 td-data-table">
+                <div class="font-medium text-slate-800 ellipsis">{{ service.nombre_concepto_ingreso }}</div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800">{{ service.id_ccta_presupuestal }}</div>
@@ -152,9 +152,9 @@ export default {
     let sortOrders = {};
     let columns = [
       { width: "10%", label: "ID", name: "id_concepto_ingreso", type: "text" },
-      { width: "20%", label: "Dependencia", name: "nombre_dependencia", type: "text" },
-      { width: "35%", label: "Concepto Ingreso", name: "nombre_concepto_ingreso", type: "text" },
-      { width: "15%", label: "Especifico", name: "id_ccta_presupuestal", type: "text" },
+      { width: "30%", label: "Dependencia", name: "nombre_dependencia", type: "text" },
+      { width: "30%", label: "Concepto Ingreso", name: "nombre_concepto_ingreso", type: "text" },
+      { width: "10%", label: "Especifico", name: "id_ccta_presupuestal", type: "text" },
       {
         width: "10%", label: "Estado", name: "estado_concepto_ingreso", type: "select",
         options: [
@@ -318,3 +318,16 @@ export default {
   }
 }
 </script>
+
+<style>
+.td-data-table {
+    max-width: 100px;
+    white-space: nowrap;
+    height: 50px;
+}
+
+.ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+</style>

@@ -122,14 +122,43 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('liquidar-quedan', [LiquidacionQuedanController::class, 'processLiquidacionQuedan'])->name('liquidar-quedan');
 
     Route::get(
-        '/ts/cuadro-deuda',
+        '/ts/reporte-quedan',
         function () {
-            return Inertia::render('Tesoreria/CuadroDeuda', [
+            return Inertia::render('Tesoreria/ReporteQuedan', [
                 'menu' => session()->get('menu')
             ]);
         }
-    )->name('ts.cuadroDeuda');
-    Route::get('test-excel', [ReporteTesoreriaController::class, 'testExcel'])->name('reporteTesoreria.testExcel');
-
-
+    )->name('ts.reporteQuedan');
+    Route::get('create-quedan-report', [ReporteTesoreriaController::class, 'createQuedanReport'])->name('reporteTesoreria.createQuedanReport');
+    Route::get('create-quedan-report-pdf', [ReporteTesoreriaController::class, 'createQuedanReportPDF'])->name('reporteTesoreria.createQuedanReportPDF');
+    Route::get('get-selects-report', [ReporteTesoreriaController::class, 'getSelectsReport'])->name('reporteTesoreria.getSelectsReport');
+    Route::get(
+        '/ts/reporte-facturas',
+        function () {
+            return Inertia::render('Tesoreria/ReporteFactura', [
+                'menu' => session()->get('menu')
+            ]);
+        }
+    )->name('ts.reporteFactura');
+    Route::get('get-selects-invoice-reporting', [ReporteTesoreriaController::class, 'getSelectsInvoiceReporting'])->name('reporteTesoreria.getSelectsInvoiceReporting');
+    Route::get('create-invoice-report', [ReporteTesoreriaController::class, 'createInvoiceReport'])->name('reporteTesoreria.createInvoiceReport');
+    Route::get(
+        '/ts/reporte-retencion-isr',
+        function () {
+            return Inertia::render('Tesoreria/ReporteRetencionISR', [
+                'menu' => session()->get('menu')
+            ]);
+        }
+    )->name('ts.reporteRetencionISR');
+    Route::get('get-selects-withholding-tax-report', [ReporteTesoreriaController::class, 'getSelectsWithholdingTaxReport'])->name('reporteTesoreria.getSelectsWithholdingTaxReport');
+    Route::get('create-income-tax-report', [ReporteTesoreriaController::class, 'createIncomeTaxReport'])->name('reporteTesoreria.createIncomeTaxReport');
+    Route::get(
+        '/ts/reporte-retencion-iva',
+        function () {
+            return Inertia::render('Tesoreria/ReporteRetencionIVA', [
+                'menu' => session()->get('menu')
+            ]);
+        }
+    )->name('ts.reporteRetencionIVA');
+    Route::get('create-withholding-iva-report', [ReporteTesoreriaController::class, 'createWithholdingIVAReport'])->name('reporteTesoreria.createWithholdingIVAReport');
 });

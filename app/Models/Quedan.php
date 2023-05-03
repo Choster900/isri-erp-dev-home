@@ -75,5 +75,10 @@ class Quedan extends Model
         return $this->hasOne(LiquidacionQuedan::class, 'id_quedan', 'id_quedan');
     }
 
+    public function prioridad_pago()
+    {
+        return $this->belongsTo(PrioridadPago::class, 'id_prioridad_pago', 'id_prioridad_pago');
+    }
+
     
 }
