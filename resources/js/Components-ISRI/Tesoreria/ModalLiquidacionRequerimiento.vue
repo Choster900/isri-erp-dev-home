@@ -6,7 +6,7 @@ import moment from 'moment';
 import axios from 'axios';
 </script>
 <template>
-    <ModalBasicVue title="Requerimiento - N° 1" id="scrollbar-modal" maxWidth="3xl" :modalOpen="scrollbarModalOpen"
+    <ModalBasicVue :title="numeroRequerimiento" id="scrollbar-modal" maxWidth="3xl" :modalOpen="scrollbarModalOpen"
         @close-modal-persona="this.$emit('close-definitive')">
 
         <div class=" px-10 py-5 ">
@@ -87,34 +87,34 @@ import axios from 'axios';
                 <tbody>
                     <tr v-for="(data, i ) in  amountRowsData " :key="i">
                         <td class="pb-1 pt-1
-                        focus:bg-white text-xs font-semibold h-12 rounded-md px-3 bg-[#1f355833] bg-opacity-20 text-center border-2 border-white"
+                        focus:bg-white text-xs font-semibold h-12 rounded-md px-3  bg-opacity-20 text-center border-2 border-white"
                             contenteditable="false"
-                            :class="data.restante == 0 ? 'bg-green-400' : data.monto_liquidacion_quedan != 0 ? 'bg-yellow-400' : ''">
+                            :class="data.restante == 0 ? 'bg-green-400' : data.monto_liquidacion_quedan != 0 ? 'bg-yellow-400' : 'bg-[#1f355833]'">
                             {{ data.id_quedan }}
                         </td>
-                        <td class="pb-1 pt-1 text-xs font-semibold w-full rounded-md px-3 bg-[#1f355833] bg-opacity-20 text-center border-2 border-white"
+                        <td class="pb-1 pt-1 text-xs font-semibold w-full rounded-md px-3  bg-opacity-20 text-center border-2 border-white"
                             contenteditable="true"
-                            :class="data.restante == 0 ? 'bg-green-400' : data.monto_liquidacion_quedan != 0 ? 'bg-yellow-400' : ''"
+                            :class="data.restante == 0 ? 'bg-green-400' : data.monto_liquidacion_quedan != 0 ? 'bg-yellow-400' : 'bg-[#1f355833]'"
                             @input="liquidarMonto(data.id_quedan, $event, 'notifica_liquidacion_quedan')">
                             {{ data.notifica_liquidacion_quedan }}
                         </td>
-                        <td class="pb-1 pt-1 focusbg-white text-xs font-semibold w-full  rounded-md px-3 bg-[#1f355833] bg-opacity-20 text-center border-2 border-white"
+                        <td class="pb-1 pt-1 focusbg-white text-xs font-semibold w-full  rounded-md px-3  bg-opacity-20 text-center border-2 border-white"
                             contenteditable="false"
-                            :class="data.restante == 0 ? 'bg-green-400' : data.monto_liquidacion_quedan != 0 ? 'bg-yellow-400' : ''">
+                            :class="data.restante == 0 ? 'bg-green-400' : data.monto_liquidacion_quedan != 0 ? 'bg-yellow-400' : 'bg-[#1f355833]'">
                             {{ data.monto_liquido_quedan }}
                         </td>
 
                         <td :class="[data.restante < 0 ? 'error2' : '',
-                        data.restante == 0 ? 'bg-green-400' : data.monto_liquidacion_quedan != 0 ? 'bg-yellow-400' : ''
+                        data.restante == 0 ? 'bg-green-400' : data.monto_liquidacion_quedan != 0 ? 'bg-yellow-400' : 'bg-[#1f355833]'
                         ]"
-                            class="pb-1 pt-1 focus:bg-white text-xs font-semibold w-full rounded-md px-3 bg-[#1f355833] bg-opacity-20 text-center border-2 border-white"
+                            class="pb-1 pt-1 focus:bg-white text-xs font-semibold w-full rounded-md px-3  bg-opacity-20 text-center border-2 border-white"
                             contenteditable="false">
                             {{ data.restante }}
                         </td>
 
                         <td :class="[data.restante < 0 ? 'error' : '',
-                        data.restante == 0 ? 'bg-green-400' : data.monto_liquidacion_quedan != 0 ? 'bg-yellow-400' : '']"
-                            class="pb-1 pt-1 text-xs font-semibold w-full rounded-md px-3 bg-[#1f355833] bg-opacity-20 text-center border-2 border-white"
+                        data.restante == 0 ? 'bg-green-400' : data.monto_liquidacion_quedan != 0 ? 'bg-yellow-400' : 'bg-[#1f355833]']"
+                            class="pb-1 pt-1 text-xs font-semibold w-full rounded-md px-3  bg-opacity-20 text-center border-2 border-white"
                             :contenteditable="data.id_estado_quedan == 4 ? false : true"
                             @input="liquidarMonto(data.id_quedan, $event, 'monto_liquidacion_quedan')">
                             {{ data.monto_liquidacion_quedan }}
@@ -157,6 +157,8 @@ export default {
         sumTotalDeuda: 0,
         restanteIngreso: 0,
         amountRowsData: [],
+        numeroRequerimiento: '',
+        liquidado: false,
     }),
 
     methods: {
@@ -218,7 +220,9 @@ export default {
             try {//envia la informacion al backend
                 if (this.passOrNot()) {
                     let res = await axios.post('/liquidar-quedan', {
-                        params: this.amountRowsData
+                        params: this.amountRowsData,
+                        liquidado: this.restanteIngreso == 0 ? true : false,
+                        requerimiento: this.dataQuedan.id_requerimiento_pago,
                     })
                     console.log(res);
                     return res; // indicate success
@@ -268,6 +272,7 @@ export default {
             if (this.scrollbarModalOpen) {
                 this.sumTotQuedan()
                 this.sumRestTotal()
+                this.numeroRequerimiento = `Requerimiento - N°${this.dataQuedan.numero_requerimiento_pago}-${this.dataQuedan.anio_requerimiento_pago}`
             } else {
                 this.amountRowsData = []
             }

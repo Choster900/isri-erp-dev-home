@@ -27,7 +27,7 @@ import html2pdf from 'html2pdf.js'
                         </div>
 
                         <div class="px-2" v-if="dataQuedan != ''">
-                            <GeneralButton color="bg-red-700   hover:bg-red-800" text="DESCARGAR PDF" icon="pdf"
+                            <GeneralButton color="bg-red-700   hover:bg-red-800" text="GENERAR QUEDAN" icon="pdf"
                                 @click="printPdf()" />
                         </div>
                         <div class="px-2" v-if="dataQuedan != ''">
@@ -437,24 +437,28 @@ export default {
     },
     methods: {
         printPdf() {
-
             const opt = {
                 margin: 0.1,
                 filename: 'output.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
             };
 
-            const app = createApp(quedanPDFVue, { dataQuedan: this.dataQuedan, totalCheque: this.dataInputs.total });
+            const app = createApp(quedanPDFVue, {
+                dataQuedan: this.dataQuedan,
+                totalCheque: this.dataInputs.total,
+                renta: this.dataInputs.monto_isr_quedan,
+                iva: this.dataInputs.monto_iva_quedan,
+                cheque: this.dataInputs.monto_liquido_quedan,
+            });
+
             const div = document.createElement('div');
             const pdfPrint = app.mount(div);
             const html = div.outerHTML;
 
             html2pdf().set(opt).from(html).save();
-
         },
-
         generarComprobanteRetencionPdf() {
             const opt = {
                 margin: 0.1,
@@ -464,7 +468,13 @@ export default {
                 jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' },
             };
 
-            const app = createApp(comprobanteRetencion, { dataQuedan: this.dataQuedan, totalCheque: this.dataInputs.total });
+            const app = createApp(comprobanteRetencion, {
+                dataQuedan: this.dataQuedan,
+                totalCheque: this.dataInputs.total,
+                renta: this.dataInputs.monto_isr_quedan,
+                iva: this.dataInputs.monto_iva_quedan,
+                cheque: this.dataInputs.monto_liquido_quedan,
+            });
             const div = document.createElement('div');
             const pdfPrint = app.mount(div);
             const html = div.outerHTML;
@@ -513,7 +523,7 @@ export default {
             })
             this.rowsData.forEach((valores, index) => {
                 if (valores[6].servicio != '') {
-                    montoServicios = parseFloat(montoServicios) + parseFloat(valores[6].servicio)
+                    montoServicios = (!isNaN(parseFloat(montoServicios)) ? parseFloat(montoServicios) : 0) + (!isNaN(parseFloat(valores[6].servicio)) ? parseFloat(valores[6].servicio) : 0)
                 }
             })
             liquido = (totMontoByRow / 1.13).toFixed(2);

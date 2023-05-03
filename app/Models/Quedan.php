@@ -61,6 +61,10 @@ class Quedan extends Model
     { //(FOREING KEY, PRIMARY KEY)
         return $this->belongsTo(AcuerdoCompra::class, "id_acuerdo_compra", "id_acuerdo_compra");
     }
+    public function proyecto_financiado()
+    { //(FOREING KEY, PRIMARY KEY)
+        return $this->belongsTo(ProyectoFinanciado::class, "id_proy_financiado", "id_proy_financiado");
+    }
     /**
      * Get all of the liquidacion_quedan for the Quedan
      *

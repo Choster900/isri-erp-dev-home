@@ -1,257 +1,399 @@
 <template>
-  <div class="">
-    <div class="text-center">
-
-      <div class="border-2 border-black mx-8 mb-7" id="main-container" ref="contenedorPdfQuedan">
-        <div class=" md:flex flex-row justify-between">
-          <div class="mb-2 md:mr-2 md:mb-0 basis-1/4 pt-1 px-8"></div>
-          <div class="mb-2 md:mx-10 md:mb-0 basis-1/2 pt-7 ">
-            <div class="border-2 border-black ">
-              <h3 style class="text-[18px] mb-5 font-semibold text-gray-600">
-                Documento de seguimiento de pagos
-              </h3>
-            </div>
-          </div>
-          <div class="mb-2 md:mr-2 md:mb-0 basis-1/4 pt-1 px-8 "></div>
-        </div>
-
-        <div class="mx-20 ">
-          <div class="mb-7 md:flex flex-row justify-items-center">
-            <div class=" md:mr-2 md:mb-0 w-100">
-              <div class="relative flex w-full flex-row">
-                <label for="" class="flex items-center text-[14px]">Giro del proveedor:</label>
-                <div style="width: 385px;" class="border-b-2 border-black placeholder-slate-400 text-[12px] py-2 ">
-                  {{ dataQuedan.proveedor.giro.id_giro }}-{{ dataQuedan.proveedor.giro.nombre_giro }}</div>
-              </div>
-            </div>
-            <div class=" md:mr-2 md:mb-0 w-25">
-              <div class="relative flex w-full flex-row">
-                <label for="" class="flex items-center text-[14px]">Porcentaje de IVA:</label>
-                <div style="width: 40px;" class="border-b-2 border-black placeholder-slate-400 py-2 text-[12px]">
-                  {{ (dataQuedan.proveedor.sujeto_retencion.iva_sujeto_retencion * 100) + " %" }}</div>
-              </div>
-            </div>
-            <div class=" md:mr-2 md:mb-0 w-25">
-              <div class="relative flex w-full flex-row">
-                <label for="" class="flex items-center text-[14px] text-sm">Porcentaje de
-                  ISR:</label>
-                <div style="width: 40px;" class="border-b-2 border-black placeholder-slate-400  py-2 text-[12px]">
-                  {{ (dataQuedan.proveedor.sujeto_retencion.isrl_sujeto_retencion * 100) + " %" }}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="ml-36 mb-3">
-          <div class="mb-7 md:flex flex-row justify-items-center">
-            <div class="mb-4 md:mr-2 md:mb-0 w-100">
-              <div class="relative flex w-full flex-row">
-                <label for="" class="flex items-center text-[14px]">Quedan:</label>
-                <div style="width: 50px;" class="border-b-2 border-black placeholder-slate-400 text-[12px] py-2 ">
-                  {{ dataQuedan.id_quedan }}</div>
-              </div>
-            </div>
-            <div class="mb-4 md:mr-2 md:mb-0 w-25">
-              <div class="relative flex w-full flex-row">
-                <label for="" class="flex items-center text-[14px]">Fecha emision</label>
-                <div style="width: 100px;" class="border-b-2 border-black placeholder-slate-400 py-2 text-[12px]">
-                  {{ dataQuedan.fecha_emision_quedan }}</div>
-              </div>
-            </div>
-            <div class="mb-4 md:mr-2 md:mb-0 w-25">
-              <div class="relative flex w-full flex-row">
-                <label for="" class="flex items-center text-[14px] text-sm">Cheque:</label>
-                <div style="width: 50px;" class="border-b-2 border-black placeholder-slate-400  py-2 text-[12px]">
-                  {{ dataQuedan.monto_liquido_quedan }}</div>
-              </div>
-            </div>
-            <div class="mb-4 md:mr-2 md:mb-0 w-25">
-              <div class="relative flex w-full flex-row">
-                <label for="" class="flex items-center text-[14px] text-sm">Renta:</label>
-                <div style="width: 50px;" class="border-b-2 border-black placeholder-slate-400  py-2 text-[12px]">
-                  {{ dataQuedan.monto_isr_quedan }}</div>
-              </div>
-            </div>
-            <div class="mb-4 md:mr-2 md:mb-0 w-25">
-              <div class="relative flex w-full flex-row">
-                <label for="" class="flex items-center text-[14px] text-sm">IVA:</label>
-                <div style="width: 50px;" class="border-b-2 border-black placeholder-slate-400  py-2 text-[12px]">
-                  {{ dataQuedan.monto_iva_quedan }}</div>
-              </div>
-            </div>
-            <div class="mb-4 md:mr-2 md:mb-0 w-25">
-              <div class="relative flex w-full flex-row">
-                <label for="" class="flex items-center text-[14px] text-sm">Total:</label>
-                <div style="width: 50px;" class="border-b-2 border-black placeholder-slate-400  py-2 text-[12px]">
-                  {{ totalCheque }}</div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-
-        <div class="max-w-7xl mx-auto pb-20 sm:px-6 lg:px-8">
-          <table class="table-auto mx-auto">
-            <thead>
-              <tr>
-                <th class="border-2 border-black text-gray-600 py-2">
-                  <div class="text-sm" style="margin-top: -12px;">PROVEEDOR</div>
-                </th>
-                <th class="border-2 border-black text-gray-600 py-2" colspan="8">
-                  <div class="text-sm" style="margin-top: -12px;">DATOS DEL QUEDAN</div>
-                </th>
-              </tr>
-              <tr>
-                <td class="border-2 border-black">
-                  <div class="text-[12px] mx-auto py-2" style="word-break: break-word; width: 160px; margin-top: -12px;">
-                    {{ dataQuedan.proveedor.razon_social_proveedor }}
-                  </div>
-                </td>
-                <th class="border-2 border-black text-gray-600" colspan="3">
-                  <div class="text-sm" style="margin-top: -12px;"> NUMERO DE ACUERDO</div>
-                </th>
-                <th class="border-2 border-black text-gray-600" colspan="8">
-                  <div class="text-sm" style="margin-top: -12px;"> NUMERO DE COMPROMISO </div>
-                </th>
-              </tr>
-              <tr>
-                <th class="border-2 border-black text-gray-600 py-2">
-                  <div class="text-sm" style="margin-top: -12px;"> ACUERDO CONTRATACION</div>
-                </th>
-                <td class="border-2 border-black" colspan="3">
-                  <div class="text-[12px] mx-auto py-2" style="word-break: break-word; width: 160px; margin-top: -12px;">
-                    {{ dataQuedan.numero_acuerdo_quedan }}
-                  </div>
-                </td>
-                <td class="border-2 border-black" colspan="8">
-                  <div class="text-[12px] mx-auto py-2" style="word-break: break-word; width: 160px; margin-top: -12px;">
-                    {{ dataQuedan.numero_compromiso_ppto_quedan }}
-                  </div>
-                </td>
-              </tr>
-
-              <tr>
-                <td class="border-2 border-black" colspan="1">
-                  <div class="text-[12px] mx-auto py-2" style="word-break: break-word; width: 160px; margin-top: -12px;">
-                    {{ dataQuedan.acuerdo_compra.nombre_acuerdo_compra }}
-                  </div>
-                </td>
-                <th class="border-2 border-black text-gray-600" colspan="8">
-                  <div class="text-sm" style="margin-top: -12px;"> DETALLE QUEDAN</div>
-                </th>
-              </tr>
-              <tr>
-                <th class="border-2 border-black  text-gray-600 ">
-                  <div class="text-sm py-2" style="margin-top: -12px;"> FACTURA</div>
-                </th>
-                <th class="border-2 border-black px-10 text-gray-600" colspan="2">
-                  <div class="text-sm" style="margin-top: -12px;"> DEPENDENCIA</div>
-                </th>
-                <th class="border-2 border-black  px-8 text-gray-600">
-                  <div class="text-sm" style="margin-top: -12px;"> NUMERO ACTA</div>
-                </th>
-                <th class="border-2 border-black w-64  px-10 text-gray-600" colspan="2">
-                  <div class="text-sm" style="margin-top: -12px;"> CONCEPTO</div>
-                </th>
-                <th class="border-2 border-black w-40  px-10 text-gray-600">
-                  <div class="text-sm" style="margin-top: -12px;"> MONTO</div>
-                </th>
-              </tr>
-            </thead>
-            <tbody class="text-sm" id="content">
-
-
-              <tr v-for="(row, rowIndex) in dataQuedan.detalle_quedan" :key="rowIndex">
-
-
-                  <td class="border-2 border-black">
-                    {{ row.numero_factura_det_quedan }}
-                  </td>
-
-                  <td class="border-2 border-black" colspan="2">
-
-                  </td>
-                  <td class="border-2 border-black">{{ cell }}</td>
-
-                  <td colspan="2">
-                    {{ cell }}
-                  </td>
-
-                  <td class="border-2 border-black">
-                    <table>
-                      <tr>
-                        <th
-                          class="border-2 border-r-black border-b-black border-l-transparent border-t-transparent text-sm text-gray-600 py-2"
-                          style="writing-mode: vertical-rl; transform: rotate(180deg);">
-                          PRODUCTO
-                        </th>
-                        <td class="w-full border-2 border-b-black border-x-transparent border-t-transparent">
-                          {{ cell.producto }}
-                        </td>
-                      </tr>
-                      <tr>
-                        <th
-                          class="border-2 border-r-black border-t-black border-l-transparent border-b-transparent text-gray-600 py-2"
-                          style="writing-mode: vertical-rl; transform: rotate(180deg);">
-                          SERVICIO
-                        </th>
-                        <td>
-                          {{ cell.servicio }}
-                        </td>
-                      </tr>
-                    </table>
-
-                  </td>
-
-
-              </tr>
-
-            </tbody>
-            <!--             <tbody>
-              <tr id="esconder" class="border-none">
-                <td class="py-3 border-none"></td>
-              </tr>
-              <tr>
-                <td class="border-2 border-black " colspan="1" rowspan="2">
-                  Descripción
-                </td>
-                <td class="border-2 border-black" colspan="4" rowspan="2">
-                  {{ dataQuedan.descripcion_quedan }}
-
-                </td>
-                <th class="border-2 border-black text-sm text-gray-600">
-                  PROYECTO FINANCIADO
-                </th>
-                <th class="border-2 border-black py-2 text-sm text-gray-600">
-                  PRIORIDAD DE PAGO
-                </th>
-              </tr>
-              <tr>
-
-                <td class="border-2 border-black " colspan="1">
-                  <div class="relative flex h-8 w-full flex-row-reverse ">
-                    {{ dataQuedan.id_prioridad_pago }} </div>
-                </td>
-                <td class="border-2 border-black " colspan="1">
-                  <div class="relative flex h-8 w-full flex-row-reverse ">
-                    {{ dataQuedan.id_proy_financiado }}
-                  </div>
-                </td>
-              </tr>
-            </tbody> -->
-          </table>
-
-
-          <div class="row footer mt-4 mb-10">
-            <div class="text-center border-2 border-solid border-gray-400 w-80 text-[15px] py-1">
-              {{ dataQuedan.nombre_empleado_tesoreria }}
-            </div>
-          </div>
-
-        </div>
-
+  <div class="mb-5 mt-3 md:flex flex-row justify-between">
+    <div class=" basis-1/5 pl-2">
+      <img src="../../../img/isri-logo2.png" width="100px">
+    </div>
+    <div class="md:mx-10 md:mb-0 basis-1/2">
+      <h3 style class="text-[15pt] font-semibold text-center">
+        INSTITUTO SALVADOREÑO DE REHABILITACIÓN INTEGRAL
+      </h3>
+      <br>
+      <div style class="pl-32">
+        <span class="text-[15pt] font-bold">QUEDAN N°</span>
+        <span class="text-[18pt] pl-2" style="font-family: 'Courier New', Courier, monospace;">0002124</span>
       </div>
     </div>
+    <div class="md:mb-0 basis-1/4 pr-2">
+      <div class="justify-end">
+        <table class="mx-auto">
+          <tr>
+            <td class="text-[10pt] text-right" style="font-family: Arial, Helvetica, sans-serif;">Cheque $</td>
+            <td class="border border-b-black border-x-transparent border-t-transparent w-[75px]">
+              <div style="margin-top: -12px;" class="pl-2 pt-2 pb-2 text-[8pt]"> {{ cheque }}</div>
+            </td>
+          </tr>
+        </table>
+        <table class="mx-auto">
+          <tr>
+            <td class="text-[10pt] text-right" style="font-family: Arial, Helvetica, sans-serif;">
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IVA $</td>
+            <td class="border border-b-black border-x-transparent border-t-transparent w-[75px]">
+              <div style="margin-top: -12px;" class="pl-2 pt-2 pb-2 text-[8pt]">{{ iva }}</div>
+            </td>
+          </tr>
+        </table>
+        <table class="mx-auto">
+          <tr>
+            <td class="text-[10pt] text-right" style="font-family: Arial, Helvetica, sans-serif;">
+              &nbsp;&nbsp;&nbsp;&nbsp;Renta $</td>
+            <td class="border border-b-black border-x-transparent border-t-transparent w-[75px]">
+              <div style="margin-top: -12px;" class="pl-2 pt-2 pb-2 text-[8pt]">{{ renta }}</div>
+            </td>
+          </tr>
+        </table>
+        <table class="mx-auto">
+          <tr>
+            <td class="text-[10pt] text-right" style="font-family: Arial, Helvetica, sans-serif;">
+              &nbsp;&nbsp;&nbsp;&nbsp;TOTAL $</td>
+            <td class="border border-b-black border-x-transparent border-t-transparent w-[75px]">
+              <div style="margin-top: -12px;" class="pl-2 pt-2 pb-2 text-[8pt]">
+                {{ totalCheque }}
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="px-5 pb-5 border border-dashed border-b-black border-x-transparent border-t-transparent">
+    <p class="font-medium text-[12pt]">QUEDAN EN NUESTRO PODER PARA TRAMITE DE PAGO LOS SIGUIENTES DOCUMENTOS:</p>
+
+    <table>
+      <tr>
+        <td class="text-[11pt] font-bold">RECIBO(S) No.</td>
+        <td class="border border-b-black border-x-transparent border-t-transparent w-[450px]">
+          <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt]"></div>
+        </td>
+        <td class="text-[11pt] font-bold">US $:</td>
+        <td class="border border-b-black border-x-transparent border-t-transparent w-[120px]">
+          <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt]"></div>
+        </td>
+      </tr>
+    </table>
+    <table>
+      <tr>
+        <td class="text-[11pt] font-bold">FACTURA(S) No.</td>
+        <td class="border border-b-black border-x-transparent border-t-transparent w-[390px]">
+          <div style="margin-top: -12px;" class="pl-2 pt-2 pb-1 text-[9pt]">
+            <span v-for="(detalle, i) in dataQuedan.detalle_quedan" :key="i">
+              <template v-if="i != 0 && i != detalle.length"> , </template> {{ detalle.numero_factura_det_quedan }}
+            </span>
+          </div>
+        </td>
+        <td class="text-[11pt] font-bold">POR: US $</td>
+        <td class="border border-b-black border-x-transparent border-t-transparent w-[128px]">
+          <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt]">
+            {{ totalCheque }}
+          </div>
+        </td>
+      </tr>
+    </table>
+    <table>
+      <tr>
+        <td class="text-[11pt] font-bold">A FAVOR DE:</td>
+        <td class="border border-b-black border-x-transparent border-t-transparent w-[625px]">
+          <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
+            {{ dataQuedan.proveedor.nombre_comercial_proveedor }}
+          </div>
+        </td>
+      </tr>
+    </table>
+    <table>
+      <tr>
+        <td class="text-[11pt] font-bold">QUE AMPARA:</td>
+        <td class="border border-b-black border-x-transparent border-t-transparent w-[610px]">
+          <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
+            {{ dataQuedan.descripcion_quedan }}
+          </div>
+        </td>
+      </tr>
+    </table>
+    <table>
+      <tr>
+        <td class="text-[11pt] font-bold" v-if="dataQuedan.acuerdo_compra.id_acuerdo_compra === 1">{{
+          dataQuedan.acuerdo_compra.nombre_acuerdo_compra }} N°</td>
+        <td class="text-[11pt] font-bold" v-if="dataQuedan.acuerdo_compra.id_acuerdo_compra === 2">{{
+          dataQuedan.acuerdo_compra.nombre_acuerdo_compra }} N°</td>
+        <td class="text-[11pt] font-bold" v-if="dataQuedan.acuerdo_compra.id_acuerdo_compra === 3">{{
+          dataQuedan.acuerdo_compra.nombre_acuerdo_compra }} N°</td>
+        <td class="text-[11pt] font-bold" v-if="dataQuedan.acuerdo_compra.id_acuerdo_compra === 4">{{
+          dataQuedan.acuerdo_compra.nombre_acuerdo_compra }}</td>
+
+        <td class="border border-b-black border-x-transparent border-t-transparent w-[200px]">
+          <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt]">
+            {{ dataQuedan.numero_acuerdo_quedan }}
+          </div>
+        </td>
+      </tr>
+    </table>
+    <table>
+      <tr>
+        <td class="text-[11pt] font-bold">FINANCIAMIENTO</td>
+        <td class="border border-b-black border-x-transparent border-t-transparent w-[170px]">
+          <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt]">
+            {{ dataQuedan.proyecto_financiado.nombre_proy_financiado }}
+
+          </div>
+        </td>
+      </tr>
+    </table>
+    <table>
+      <tr>
+        <td class="text-[11pt] font-bold">N° DE COMPROMISO</td>
+        <td class="border border-b-black border-x-transparent border-t-transparent w-[158px]">
+          <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt]">
+            {{ dataQuedan.numero_compromiso_ppto_quedan }}
+          </div>
+        </td>
+      </tr>
+    </table>
+    <table>
+      <tr>
+        <td class="text-[11pt] font-bold">SAN SALVADOIR</td>
+        <td class="border border-b-black border-x-transparent border-t-transparent w-[100px]">
+          <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt]">
+            {{ (dataQuedan.fecha_emision_quedan).split("-")[2] }}
+          </div>
+        </td>
+        <td class="text-[11pt] font-bold">DE</td>
+        <td class="border border-b-black border-x-transparent border-t-transparent w-[100px]">
+          <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt]">
+            {{ (dataQuedan.fecha_emision_quedan).split("-")[1] }}
+
+          </div>
+        </td>
+        <td class="text-[11pt] font-bold">DE</td>
+        <td class="border border-b-black border-x-transparent border-t-transparent w-[100px]">
+          <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt]">
+            {{ (dataQuedan.fecha_emision_quedan).split("-")[0] }}
+          </div>
+        </td>
+      </tr>
+    </table>
+    <div class="flex justify-center pt-8">
+      <table class="mx-auto">
+        <tr>
+          <td class="text-right text-[11pt] font-bold">F.</td>
+          <td class="border border-b-black border-x-transparent border-t-transparent w-[225px]">
+            <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt]"></div>
+          </td>
+        </tr>
+        <tr>
+          <td class="h-5 text-[11pt] font-bold">NOMBRE:</td>
+          <td class="border border-b-black border-x-transparent border-t-transparent w-[225px]">
+            <div style="margin-top: -12px;" class="pl-2 pt-2 text-[7pt]">
+              <i>{{ dataQuedan.tesorero.nombre_empleado_tesoreria }}</i>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="h-5"></td>
+          <td class=" w-[225px] text-center">
+            <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt] font-semibold">TESORERO INSTITUCIONAL</div>
+          </td>
+        </tr>
+      </table>
+
+    </div>
+
+  </div>
+  <div class="mb-5 mt-3 md:flex flex-row justify-between">
+    <div class=" basis-1/5 pl-2">
+      <img src="../../../img/isri-logo2.png" width="100px">
+    </div>
+    <div class="md:mx-10 md:mb-0 basis-1/2">
+      <h3 style class="text-[15pt] font-semibold text-center">
+        INSTITUTO SALVADOREÑO DE REHABILITACIÓN INTEGRAL
+      </h3>
+      <br>
+      <div style class="pl-32">
+        <span class="text-[15pt] font-bold">QUEDAN N°</span>
+        <span class="text-[18pt] pl-2" style="font-family: 'Courier New', Courier, monospace;">0002124</span>
+      </div>
+    </div>
+    <div class="md:mb-0 basis-1/4 pr-2">
+      <div class="justify-end">
+        <table class="mx-auto">
+          <tr>
+            <td class="text-[10pt] text-right" style="font-family: Arial, Helvetica, sans-serif;">Cheque $</td>
+            <td class="border border-b-black border-x-transparent border-t-transparent w-[75px]">
+              <div style="margin-top: -12px;" class="pl-2 pt-2 pb-2 text-[8pt]"> {{ cheque }}</div>
+            </td>
+          </tr>
+        </table>
+        <table class="mx-auto">
+          <tr>
+            <td class="text-[10pt] text-right" style="font-family: Arial, Helvetica, sans-serif;">
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IVA $</td>
+            <td class="border border-b-black border-x-transparent border-t-transparent w-[75px]">
+              <div style="margin-top: -12px;" class="pl-2 pt-2 pb-2 text-[8pt]">{{ iva }}</div>
+            </td>
+          </tr>
+        </table>
+        <table class="mx-auto">
+          <tr>
+            <td class="text-[10pt] text-right" style="font-family: Arial, Helvetica, sans-serif;">
+              &nbsp;&nbsp;&nbsp;&nbsp;Renta $</td>
+            <td class="border border-b-black border-x-transparent border-t-transparent w-[75px]">
+              <div style="margin-top: -12px;" class="pl-2 pt-2 pb-2 text-[8pt]">{{ renta }}</div>
+            </td>
+          </tr>
+        </table>
+        <table class="mx-auto">
+          <tr>
+            <td class="text-[10pt] text-right" style="font-family: Arial, Helvetica, sans-serif;">
+              &nbsp;&nbsp;&nbsp;&nbsp;TOTAL $</td>
+            <td class="border border-b-black border-x-transparent border-t-transparent w-[75px]">
+              <div style="margin-top: -12px;" class="pl-2 pt-2 pb-2 text-[8pt]">
+                {{ totalCheque }}
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="px-5 ">
+    <p class="font-medium text-[12pt]">QUEDAN EN NUESTRO PODER PARA TRAMITE DE PAGO LOS SIGUIENTES DOCUMENTOS:</p>
+
+    <table>
+      <tr>
+        <td class="text-[11pt] font-bold">RECIBO(S) No.</td>
+        <td class="border border-b-black border-x-transparent border-t-transparent w-[450px]">
+          <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt]"></div>
+        </td>
+        <td class="text-[11pt] font-bold">US $:</td>
+        <td class="border border-b-black border-x-transparent border-t-transparent w-[120px]">
+          <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt]"></div>
+        </td>
+      </tr>
+    </table>
+    <table>
+      <tr>
+        <td class="text-[11pt] font-bold">FACTURA(S) No.</td>
+        <td class="border border-b-black border-x-transparent border-t-transparent w-[390px]">
+          <div style="margin-top: -12px;" class="pl-2 pt-2 pb-1 text-[9pt]">
+            <span v-for="(detalle, i) in dataQuedan.detalle_quedan" :key="i">
+              <template v-if="i != 0 && i != detalle.length"> , </template> {{ detalle.numero_factura_det_quedan }}
+            </span>
+          </div>
+        </td>
+        <td class="text-[11pt] font-bold">POR: US $</td>
+        <td class="border border-b-black border-x-transparent border-t-transparent w-[128px]">
+          <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt]">
+            {{ totalCheque }}
+          </div>
+        </td>
+      </tr>
+    </table>
+    <table>
+      <tr>
+        <td class="text-[11pt] font-bold">A FAVOR DE:</td>
+        <td class="border border-b-black border-x-transparent border-t-transparent w-[625px]">
+          <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
+            {{ dataQuedan.proveedor.nombre_comercial_proveedor }}
+          </div>
+        </td>
+      </tr>
+    </table>
+    <table>
+      <tr>
+        <td class="text-[11pt] font-bold">QUE AMPARA:</td>
+        <td class="border border-b-black border-x-transparent border-t-transparent w-[610px]">
+          <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
+            {{ dataQuedan.descripcion_quedan }}
+          </div>
+        </td>
+      </tr>
+    </table>
+    <table>
+      <tr>
+        <td class="text-[11pt] font-bold" v-if="dataQuedan.acuerdo_compra.id_acuerdo_compra === 1">{{
+          dataQuedan.acuerdo_compra.nombre_acuerdo_compra }} N°</td>
+        <td class="text-[11pt] font-bold" v-if="dataQuedan.acuerdo_compra.id_acuerdo_compra === 2">{{
+          dataQuedan.acuerdo_compra.nombre_acuerdo_compra }} N°</td>
+        <td class="text-[11pt] font-bold" v-if="dataQuedan.acuerdo_compra.id_acuerdo_compra === 3">{{
+          dataQuedan.acuerdo_compra.nombre_acuerdo_compra }} N°</td>
+        <td class="text-[11pt] font-bold" v-if="dataQuedan.acuerdo_compra.id_acuerdo_compra === 4">{{
+          dataQuedan.acuerdo_compra.nombre_acuerdo_compra }}</td>
+
+        <td class="border border-b-black border-x-transparent border-t-transparent w-[200px]">
+          <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt]">
+            {{ dataQuedan.numero_acuerdo_quedan }}
+          </div>
+        </td>
+      </tr>
+    </table>
+    <table>
+      <tr>
+        <td class="text-[11pt] font-bold">FINANCIAMIENTO</td>
+        <td class="border border-b-black border-x-transparent border-t-transparent w-[170px]">
+          <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt]">
+            {{ dataQuedan.proyecto_financiado.nombre_proy_financiado }}
+
+          </div>
+        </td>
+      </tr>
+    </table>
+    <table>
+      <tr>
+        <td class="text-[11pt] font-bold">N° DE COMPROMISO</td>
+        <td class="border border-b-black border-x-transparent border-t-transparent w-[158px]">
+          <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt]">
+            {{ dataQuedan.numero_compromiso_ppto_quedan }}
+          </div>
+        </td>
+      </tr>
+    </table>
+    <table>
+      <tr>
+        <td class="text-[11pt] font-bold">SAN SALVADOIR</td>
+        <td class="border border-b-black border-x-transparent border-t-transparent w-[100px]">
+          <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt]">
+            {{ (dataQuedan.fecha_emision_quedan).split("-")[2] }}
+          </div>
+        </td>
+        <td class="text-[11pt] font-bold">DE</td>
+        <td class="border border-b-black border-x-transparent border-t-transparent w-[100px]">
+          <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt]">
+            {{ (dataQuedan.fecha_emision_quedan).split("-")[1] }}
+
+          </div>
+        </td>
+        <td class="text-[11pt] font-bold">DE</td>
+        <td class="border border-b-black border-x-transparent border-t-transparent w-[100px]">
+          <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt]">
+            {{ (dataQuedan.fecha_emision_quedan).split("-")[0] }}
+          </div>
+        </td>
+      </tr>
+    </table>
+    <div class="flex justify-center pt-8">
+      <table class="mx-auto">
+        <tr>
+          <td class="text-right text-[11pt] font-bold">F.</td>
+          <td class="border border-b-black border-x-transparent border-t-transparent w-[225px]">
+            <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt]"></div>
+          </td>
+        </tr>
+        <tr>
+          <td class="h-5 text-[11pt] font-bold">NOMBRE:</td>
+          <td class="border border-b-black border-x-transparent border-t-transparent w-[225px]">
+            <div style="margin-top: -12px;" class="pl-2 pt-2 text-[7pt]">
+              <i>{{ dataQuedan.tesorero.nombre_empleado_tesoreria }}</i>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="h-5"></td>
+          <td class=" w-[225px] text-center">
+            <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt] font-semibold">TESORERO INSTITUCIONAL</div>
+          </td>
+        </tr>
+      </table>
+
+    </div>
+
   </div>
 </template>
 
@@ -266,10 +408,25 @@ export default {
       type: String,
       required: true,
     },
+    renta: {//prop has total information from "quedan"
+      type: String,
+      required: true,
+    },
+    iva: {//prop has total information from "quedan"
+      type: String,
+      required: true,
+    },
+    cheque: {//prop has total information from "quedan"
+      type: String,
+      required: true,
+    },
   }
 }
 </script>
 
-<style>
+<style scoped>
 /* Estilos del componente */
+* {
+  font-family: Georgia, "Times New Roman", Times, serif;
+}
 </style>

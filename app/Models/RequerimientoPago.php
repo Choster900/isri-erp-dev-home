@@ -14,7 +14,6 @@ class RequerimientoPago extends Model
     protected $primaryKey = 'id_requerimiento_pago';
     public $timestamps = false;
     protected $fillable = [
-        'id_requerimiento_pago',
         'numero_requerimiento_pago',
         'mes_requerimiento_pago',
         'monto_requerimiento_pago',

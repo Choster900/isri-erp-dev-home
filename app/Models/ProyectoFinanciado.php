@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ProyectoFinanciado extends Model
 {
@@ -23,4 +24,14 @@ class ProyectoFinanciado extends Model
         'ip_proy_financiado',
         'usuario_proy_financiado'
     ];
+
+    /**
+     * Get all of the Quedan for the ProyectoFinanciado
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function Quedan(): HasMany
+    {
+        return $this->hasMany(Quedan::class, 'id_proy_financiado', 'id_proy_financiado');
+    }
 }

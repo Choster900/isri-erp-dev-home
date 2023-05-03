@@ -58,12 +58,19 @@ import axios from 'axios';
                                         :class="{ 'border-b-2 border-b-gray-500': i < data.detalle_quedan.length - 1 && data.detalle_quedan.length > 1 }">
                                         FACTURA: {{ detalle.numero_factura_det_quedan }}
                                         <br>
-                                        PRODUCTO: ${{ detalle.producto_factura_det_quedan }}
+                                        PRODUCTO: ${{ (detalle.producto_factura_det_quedan !== '') ?
+                                            detalle.producto_factura_det_quedan : '0.00' }}
                                         <br>
-                                        SERVICIO: ${{ detalle.servicio_factura_det_quedan }}
+                                        SERVICIO: ${{ (detalle.servicio_factura_det_quedan !== '') ?
+                                            detalle.servicio_factura_det_quedan : '0.00' }}
                                         <br>
-                                        TOTAL: ${{ parseFloat(detalle.servicio_factura_det_quedan) +
-                                            parseFloat(detalle.producto_factura_det_quedan) }}
+                                        TOTAL: ${{
+                                            (!isNaN(parseFloat(detalle.servicio_factura_det_quedan))
+                                                ? parseFloat(detalle.servicio_factura_det_quedan) : 0) +
+
+                                            (!isNaN(parseFloat(detalle.producto_factura_det_quedan)) ?
+                                                parseFloat(detalle.producto_factura_det_quedan) : 0)
+                                        }}
                                     </p>
                                 </div>
                             </td>

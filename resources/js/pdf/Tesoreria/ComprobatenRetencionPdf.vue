@@ -52,7 +52,7 @@
                 </td>
                 <td class="border-r border-black border-b text-left" colspan="2">
                   <div style="margin-top: -12px;" class="pl-2 pt-2 pb-3 text-[8pt]">
-                    GIRO: 
+                    GIRO:
                   </div>
                 </td>
               </tr>
@@ -165,15 +165,7 @@
                 </td>
                 <td class="border-r border-black border-b text-left">
                   <div style="margin-top: -12px;" class="pl-0.5 py-[9px] text-[8pt]">
-                    US $ {{
-                      ((this.dataQuedan.detalle_quedan.reduce((total, element) => {
-                        const producto = isNaN(parseFloat(element.producto_factura_det_quedan)) ? 0 :
-                          parseFloat(element.producto_factura_det_quedan);
-                        const servicio = isNaN(parseFloat(element.servicio_factura_det_quedan)) ? 0 :
-                          parseFloat(element.servicio_factura_det_quedan);
-                        return total + producto + servicio;
-                      }, 0) / 1.13) * parseFloat(dataQuedan.proveedor.sujeto_retencion.iva_sujeto_retencion)).toFixed(2)
-                    }}
+                    US $ {{ iva }}
                   </div>
                 </td>
               </tr>
@@ -285,6 +277,10 @@ export default {
       required: true,
     },
     totalCheque: {//prop has total information from "quedan"
+      type: String,
+      required: true,
+    },
+    iva: {//prop has total information from "quedan"
       type: String,
       required: true,
     },
