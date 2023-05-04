@@ -9,7 +9,6 @@ import axios from 'axios';
 <template>
     <Head title="Liquidaciones" />
     <AppLayoutVue>
-
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
             <!-- TODO: Improve view table - this is temporal and doesn't mean is permanent -->
             <header class="px-5 py-4">
@@ -59,35 +58,47 @@ import axios from 'axios';
                                             QUEDAN: {{ quedan.id_quedan }}
                                             <br>
                                             MONTO TOTAL: {{ quedan.monto_liquido_quedan }}
-
                                         </p>
                                     </div>
                                 </td>
-
-
                                 <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                     <div class="space-x-1 pl-3">
-                                        <button class="text-rose-500 hover:text-rose-600 rounded-full"
+                                        <button class="text-rose-500 hover:text-rose-600 rounded-full" title="Liquidar Req."
                                             @click="openModal(data)">
-                                            <span class="sr-only">Delete</span>
+                                            <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+                                                xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                viewBox="-20.48 -20.48 552.96 552.96" xml:space="preserve" width="25px"
+                                                height="25px" fill="#000000" stroke="#000000" stroke-width="4.096"
+                                                transform="matrix(-1, 0, 0, -1, 0, 0)rotate(0)">
+                                                <path style="fill:#1a539e;"
+                                                    d="M467.163,512H44.837c-7.586,0-13.734-6.149-13.734-13.734V13.734C31.102,6.149,37.251,0,44.837,0 h422.326c7.586,0,13.734,6.149,13.734,13.734v252.338c0,7.586-6.149,13.734-13.734,13.734s-13.734-6.149-13.734-13.734V27.469 H58.571v457.062h394.857V349.393c0-7.586,6.149-13.734,13.734-13.734s13.734,6.149,13.734,13.734v148.872 C480.898,505.851,474.749,512,467.163,512z" />
+                                                <rect x="214.793" y="67.265" style="fill:#e8773b;" width="192.283"
+                                                    height="54.481" />
+                                                <path style="fill:#1a539e;"
+                                                    d="M407.079,135.48H214.796c-7.586,0-13.734-6.149-13.734-13.734V67.266 c0-7.586,6.149-13.734,13.734-13.734h192.283c7.586,0,13.734,6.149,13.734,13.734v54.481 C420.813,129.331,414.664,135.48,407.079,135.48z M228.53,108.011h164.814v-27.01H228.53V108.011z" />
+                                                <rect x="214.793" y="174.923" style="fill:#e8773b;" width="192.283"
+                                                    height="54.481" />
+                                                <path style="fill:#1a539e;"
+                                                    d="M407.079,243.143H214.796c-7.586,0-13.734-6.149-13.734-13.734v-54.481 c0-7.586,6.149-13.734,13.734-13.734h192.283c7.586,0,13.734,6.149,13.734,13.734v54.481 C420.813,236.994,414.664,243.143,407.079,243.143z M228.53,215.674h164.814v-27.012H228.53V215.674z" />
+                                                <rect x="214.793" y="282.587" style="fill:#e8773b;" width="192.283"
+                                                    height="54.481" />
+                                                <g>
+                                                    <path style="fill:#1a539e;"
+                                                        d="M407.079,350.806H214.796c-7.586,0-13.734-6.149-13.734-13.734v-54.481 c0-7.586,6.149-13.734,13.734-13.734h192.283c7.586,0,13.734,6.149,13.734,13.734v54.481 C420.813,344.658,414.664,350.806,407.079,350.806z M228.53,323.337h164.814v-27.012H228.53V323.337z" />
+                                                    <path style="fill:#1a539e;"
+                                                        d="M407.079,458.47H214.796c-7.586,0-13.734-6.149-13.734-13.734s6.149-13.734,13.734-13.734h178.548 v-27.012H214.796c-7.586,0-13.734-6.149-13.734-13.734s6.149-13.734,13.734-13.734h192.283c7.586,0,13.734,6.149,13.734,13.734 v54.481C420.813,452.321,414.664,458.47,407.079,458.47z" />
+                                                    <path style="fill:#1a539e;"
+                                                        d="M159.858,135.48H104.92c-7.586,0-13.734-6.149-13.734-13.734V67.266 c0-7.586,6.149-13.734,13.734-13.734h54.938c7.586,0,13.734,6.149,13.734,13.734v54.481 C173.592,129.331,167.443,135.48,159.858,135.48z M118.654,108.011h27.469v-27.01h-27.469V108.011z" />
+                                                    <path style="fill:#1a539e;"
+                                                        d="M159.858,243.143H104.92c-7.586,0-13.734-6.149-13.734-13.734v-54.481 c0-7.586,6.149-13.734,13.734-13.734h54.938c7.586,0,13.734,6.149,13.734,13.734v54.481 C173.592,236.994,167.443,243.143,159.858,243.143z M118.654,215.674h27.469v-27.012h-27.469V215.674z" />
+                                                    <path style="fill:#1a539e;"
+                                                        d="M159.858,350.806H104.92c-7.586,0-13.734-6.149-13.734-13.734v-54.481 c0-7.586,6.149-13.734,13.734-13.734h54.938c7.586,0,13.734,6.149,13.734,13.734v54.481 C173.592,344.658,167.443,350.806,159.858,350.806z M118.654,323.337h27.469v-27.012h-27.469V323.337z" />
+                                                </g>
+                                                <rect x="104.917" y="390.252" style="fill:#e8773b;" width="54.938"
+                                                    height="54.481" />
+                                                <path style="fill:#1a539e;"
+                                                    d="M159.858,458.47H104.92c-7.586,0-13.734-6.149-13.734-13.734v-54.481 c0-7.586,6.149-13.734,13.734-13.734h54.938c7.586,0,13.734,6.149,13.734,13.734v54.481 C173.592,452.321,167.443,458.47,159.858,458.47z M118.654,431.001h27.469v-27.012h-27.469V431.001z" />
 
-                                            <svg fill="#000000" width="24px" height="24px" viewBox="0 0 24 24"
-                                                id="money-alt-1" data-name="Line Color" xmlns="http://www.w3.org/2000/svg"
-                                                class="icon line-color">
-                                                <path id="secondary"
-                                                    d="M14,7H11.5A1.5,1.5,0,0,0,10,8.5h0A1.5,1.5,0,0,0,11.5,10h1A1.5,1.5,0,0,1,14,11.5h0A1.5,1.5,0,0,1,12.5,13H10"
-                                                    style="fill: none; stroke: rgb(46, 158, 1); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;">
-                                                </path>
-                                                <path id="secondary-2" data-name="secondary" d="M12,6V7m0,6v1"
-                                                    style="fill: none; stroke: rgb(46, 158, 1); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;">
-                                                </path>
-                                                <line id="primary" x1="6" y1="21" x2="18" y2="21"
-                                                    style="fill: none; stroke: rgb(0, 0, 0); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;">
-                                                </line>
-                                                <rect id="primary-2" data-name="primary" x="3" y="3" width="18" height="14"
-                                                    rx="1"
-                                                    style="fill: none; stroke: rgb(0, 0, 0); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;">
-                                                </rect>
                                             </svg>
                                         </button>
                                     </div>

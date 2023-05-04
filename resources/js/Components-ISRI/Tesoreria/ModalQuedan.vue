@@ -138,7 +138,7 @@ import html2pdf from 'html2pdf.js'
                                     <div class="relative flex  w-full flex-row">
                                         <label for="" class="flex items-center  text-[14px] text-sm">Total:
                                         </label>
-                                        <input type="text" style="width: 80px;" readonly v-model="dataInputs.total"
+                                        <input type="text" style="width: 80px;" readonly v-model="dataInputs.monto_total_quedan"
                                             class="placeholder-slate-400 text-sm py-0 text-center font-bold transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
                                     </div>
                                 </div>
@@ -412,7 +412,7 @@ export default {
                 monto_liquido_quedan: '',
                 monto_iva_quedan: '',
                 monto_isr_quedan: '',
-                total: '',
+                monto_total_quedan: '',
                 nombre_empleado_tesoreria: '',
                 fecha_emision: '',
                 id_quedan: '',
@@ -427,7 +427,7 @@ export default {
                 monto_liquido_quedan: '',
                 monto_iva_quedan: '',
                 monto_isr_quedan: '',
-                total: ''
+                monto_total_quedan: ''
             },
 
         }
@@ -447,7 +447,7 @@ export default {
 
             const app = createApp(quedanPDFVue, {
                 dataQuedan: this.dataQuedan,
-                totalCheque: this.dataInputs.total,
+                totalCheque: this.dataInputs.monto_total_quedan,
                 renta: this.dataInputs.monto_isr_quedan,
                 iva: this.dataInputs.monto_iva_quedan,
                 cheque: this.dataInputs.monto_liquido_quedan,
@@ -470,7 +470,7 @@ export default {
 
             const app = createApp(comprobanteRetencion, {
                 dataQuedan: this.dataQuedan,
-                totalCheque: this.dataInputs.total,
+                totalCheque: this.dataInputs.monto_total_quedan,
                 renta: this.dataInputs.monto_isr_quedan,
                 iva: this.dataInputs.monto_iva_quedan,
                 cheque: this.dataInputs.monto_liquido_quedan,
@@ -518,11 +518,11 @@ export default {
             let liquido = 0;
             let montoServicios = 0
 
-            this.rowsData.forEach((valores, index) => {
+            this.rowsData.forEach((valores, index) => {//sumando todos los montos de todas las filas
                 totMontoByRow = (!isNaN(parseFloat(totMontoByRow)) ? parseFloat(totMontoByRow) : 0) + (!isNaN(parseFloat(valores[6].producto)) ? parseFloat(valores[6].producto) : 0) + (!isNaN(parseFloat(valores[6].servicio)) ? parseFloat(valores[6].servicio) : 0);
             })
             this.rowsData.forEach((valores, index) => {
-                if (valores[6].servicio != '') {
+                if (valores[6].servicio != '') {//sumando todos solo los montos de servicios de todas las filas
                     montoServicios = (!isNaN(parseFloat(montoServicios)) ? parseFloat(montoServicios) : 0) + (!isNaN(parseFloat(valores[6].servicio)) ? parseFloat(valores[6].servicio) : 0)
                 }
             })
@@ -533,7 +533,7 @@ export default {
             this.dataInputs.monto_isr_quedan = montoIsrQuedan;
             let montoLiquidoQuedan = (totMontoByRow - montoIvaQuedan - montoIsrQuedan).toFixed(2);
             this.dataInputs.monto_liquido_quedan = montoLiquidoQuedan;
-            this.dataInputs.total = totMontoByRow;
+            this.dataInputs.monto_total_quedan = totMontoByRow.toFixed(2);
         },
         onlyNumberDecimal(event) {
             const charCode = (event.which) ? event.which : event.keyCode;
@@ -569,6 +569,7 @@ export default {
             this.dataInputs.id_quedan = this.dataQuedan.id_quedan
             this.dataInputs.id_prioridad_pago = this.dataQuedan.id_prioridad_pago
             this.dataInputs.id_proy_financiado = this.dataQuedan.id_proy_financiado
+            this.dataInputs.monto_total_quedan = this.dataQuedan.monto_total_quedan
 
 
         },
@@ -590,6 +591,7 @@ export default {
             this.dataInputs.id_quedan = ""
             this.dataInputs.id_prioridad_pago = ""
             this.dataInputs.id_proy_financiado = ""
+            this.dataInputs.monto_total_quedan = ""
 
             this.dataForCalculate.irs = ''
             this.dataForCalculate.iva = ''
@@ -597,7 +599,7 @@ export default {
             this.dataForCalculate.monto_liquido_quedan = ''
             this.dataForCalculate.monto_iva_quedan = ''
             this.dataForCalculate.monto_isr_quedan = ''
-            this.dataForCalculate.total = ''
+            this.dataForCalculate.monto_total_quedan = ''
 
         },
         addRow() {//agregando fila

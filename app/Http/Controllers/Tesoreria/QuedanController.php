@@ -11,6 +11,8 @@ use App\Models\DetalleQuedan;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\Tesoreria\QuedanRequest;
+use Luecano\NumeroALetras\NumeroALetras;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 
 class QuedanController extends Controller
@@ -48,7 +50,16 @@ class QuedanController extends Controller
         $v_column = $request->input('column');
         $v_dir = $request->input('dir');
         $data = $request->input('search');
-        $v_query = Quedan::select('*')->with(["detalle_quedan", "proveedor.giro", "proveedor.sujeto_retencion", "tesorero", "requerimiento_pago", "acuerdo_compra", "liquidacion_quedan","proyecto_financiado"])->orderBy($v_columns[$v_column], $v_dir);
+        $v_query = Quedan::select('*')->with([
+            "detalle_quedan",
+            "proveedor.giro",
+            "proveedor.sujeto_retencion",
+            "tesorero",
+            "requerimiento_pago",
+            "acuerdo_compra",
+            "liquidacion_quedan",
+            "proyecto_financiado"
+        ])->orderBy($v_columns[$v_column], $v_dir);
 
 
         if ($request->input("allWithANumberRequest")) {
@@ -72,13 +83,9 @@ class QuedanController extends Controller
                         ->orWhere('descripcion_det_quedan', 'like', '%' . $searchText . '%');
                 });
             });
-
-
             $v_query->whereHas('requerimiento_pago', function ($query) use ($data) {
                 $query->where('numero_requerimiento_pago', 'like', '%' . $data["numero_requerimiento_pago"] . '%');
             });
-
-
             $v_query->whereHas('proveedor', function ($query) use ($data) {
                 $query->where('razon_social_proveedor', 'like', '%' . $data["razon_social_proveedor"] . '%');
             });
@@ -92,10 +99,28 @@ class QuedanController extends Controller
                 $v_query->where('id_estado_quedan', 'like', '%' . $data["id_estado_quedan"] . '%');
             }
         }
+        $v_quedan = $v_query->paginate($v_length)->onEachSide(1);
 
-        $v_roles = $v_query->paginate($v_length)->onEachSide(1);
+        $numbersToLetters = new NumeroALetras();
+        $amountLetter = array_map(function ($v_quedan) use ($numbersToLetters) {
+            return ['monto_iva_quedan_letter' => $numbersToLetters->toInvoice($v_quedan['monto_iva_quedan'], 2, 'DÓLARES')];
+        }, $v_quedan->toArray()['data']);
+
+        $newQuery = $v_quedan->map(function ($item, $key) use ($amountLetter) {
+            $item->monto_iva_quedan_letter = $amountLetter[$key]['monto_iva_quedan_letter'];
+            return $item;
+        });
+
+        $paginator = new LengthAwarePaginator(
+            $newQuery,
+            $v_quedan->total(),
+            $v_quedan->perPage(),
+            $v_quedan->currentPage(),
+            ['path' => url()->current()]
+        );
+
         return [
-            'data' => $v_roles,
+            'data' => $paginator,
             'draw' => $request->input('draw'),
         ];
     }
@@ -118,6 +143,7 @@ class QuedanController extends Controller
                 'monto_liquido_quedan'          => $request->quedan["monto_liquido_quedan"],
                 'monto_iva_quedan'              => $request->quedan["monto_iva_quedan"],
                 'monto_isr_quedan'              => $request->quedan["monto_isr_quedan"],
+                'monto_total_quedan'            => $request->quedan["monto_total_quedan"],
                 'id_empleado_tesoreria'         => EmpleadoTesoreria::select("id_empleado_tesoreria")->where('estado_empleado_tesoreria', 1)->where("id_cargo_tesoreria", 1)->get()[0]->id_empleado_tesoreria,
                 'fecha_emision_quedan'          => Carbon::now(),
                 'estado_quedan'                 => 1,
@@ -180,6 +206,7 @@ class QuedanController extends Controller
                 'monto_liquido_quedan'          => $request->quedan["monto_liquido_quedan"],
                 'monto_iva_quedan'              => $request->quedan["monto_iva_quedan"],
                 'monto_isr_quedan'              => $request->quedan["monto_isr_quedan"],
+                'monto_total_quedan'            => $request->quedan["monto_total_quedan"],
                 'id_proy_financiado'            => $request->quedan["id_proy_financiado"],
                 'id_prioridad_pago'             => $request->quedan["id_prioridad_pago"],
             ]);
@@ -253,7 +280,7 @@ class QuedanController extends Controller
             ->select(
                 'id_requerimiento_pago as value',
                 DB::raw("CONCAT(numero_requerimiento_pago,' - ',anio_requerimiento_pago) AS label")
-            )->get(); //TODO: poner el estado del requerimiento pago donde exista y este abierto y no cerrado
+            )->where("estado_requerimiento_pago", 1)->get();
 
         $v_Prioridad_pago = DB::table('prioridad_pago')
             ->select(
@@ -261,10 +288,10 @@ class QuedanController extends Controller
                 DB::raw("CONCAT(nivel_prioridad_pago,' - ',nombre_prioridad_pago) AS label")
             )->get();
 
-        $v_Proyecto_finanziado = DB::table('proyecto_financiado')
+        $v_Proyecto_finanziado = DB::table('fuente_financiamiento')
             ->select(
-                'id_proy_financiado as value',
-                DB::raw("CONCAT(codigo_proy_financiado,' - ',nombre_proy_financiado) AS label")
+                'id_fuente_fmto as value',
+                DB::raw("CONCAT(codigo_fuente_fmto,' - ',nombre_fuente_fmto) AS label")
             )->get();
 
 

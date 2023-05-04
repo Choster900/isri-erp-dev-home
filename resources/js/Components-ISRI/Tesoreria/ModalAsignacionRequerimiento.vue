@@ -117,10 +117,10 @@ import axios from 'axios';
                                         <div class="font-semibold text-center text-[12px]">F E C H A </div>
                                     </th>
                                     <th class="px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap">
-                                        <div class="font-semibold text-center text-[12px]">I S R</div>
+                                        <div class="font-semibold text-center text-[12px]">I V A</div>
                                     </th>
                                     <th class="px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap">
-                                        <div class="font-semibold text-right text-[12px]">I V A</div>
+                                        <div class="font-semibold text-right text-[12px]">I S R</div>
                                     </th>
                                     <th class="px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap">
                                         <div class="font-semibold text-right text-[12px]">M O N T O</div>

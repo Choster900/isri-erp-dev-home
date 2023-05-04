@@ -89,28 +89,37 @@ import axios from 'axios';
 
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="space-x-1">
-                                    <button class="text-rose-500 hover:text-rose-600 rounded-full" v-if="data.id_estado_quedan === 2"
-                                        @click="takeOf(data.id_quedan)">
-                                        <span class="sr-only">Delete</span>
+                                    <button class="text-rose-500 hover:text-rose-600 rounded-full" title="Eliminar Req."
+                                        v-if="data.id_estado_quedan === 2" @click="takeOf(data.id_quedan)">
+  
 
-                                        <svg fill="#000000" width="25px" height="25px" viewBox="0 0 24 24"
-                                            id="delete-user-left-5" data-name="Line Color"
-                                            xmlns="http://www.w3.org/2000/svg" class="icon line-color">
-                                            <line id="secondary" x1="3" y1="18" x2="6" y2="15"
-                                                style="fill: none; stroke: rgb(255, 0, 15); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;">
-                                            </line>
-                                            <line id="secondary-2" data-name="secondary" x1="6" y1="18" x2="3" y2="15"
-                                                style="fill: none; stroke: rgb(255, 0, 15 ); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;">
-                                            </line>
-                                            <circle id="primary" cx="13" cy="8" r="5"
-                                                style="fill: none; stroke: rgb(0, 0, 0); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;">
-                                            </circle>
-                                            <path id="primary-2" data-name="primary"
-                                                d="M10,20.81A22,22,0,0,0,13,21c6,0,8-2,8-2V18a5,5,0,0,0-5-5H10"
-                                                style="fill: none; stroke: rgb(0, 0, 0); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;">
-                                            </path>
+                                        <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
+                                        <svg fill="#000000" width="35px" height="35px" viewBox="0 0 24 24" id="delete-alt"
+                                            data-name="Flat Color" xmlns="http://www.w3.org/2000/svg"
+                                            class="icon flat-color" stroke="#000000" stroke-width="0.264">
+
+                                            <g id="SVGRepo_bgCarrier" stroke-width="0" />
+
+                                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" />
+
+                                            <g id="SVGRepo_iconCarrier">
+
+                                                <path id="secondary"
+                                                    d="M16,8a1,1,0,0,1-1-1V4H9V7A1,1,0,0,1,7,7V4A2,2,0,0,1,9,2h6a2,2,0,0,1,2,2V7A1,1,0,0,1,16,8Z"
+                                                    style="fill: #ffffff;" />
+
+                                                <path id="primary"
+                                                    d="M20,6H4A1,1,0,0,0,4,8H5V20a2,2,0,0,0,2,2H17a2,2,0,0,0,2-2V8h1a1,1,0,0,0,0-2Z"
+                                                    style="fill: #c10000e0;" />
+
+                                                <path id="secondary-2" data-name="secondary"
+                                                    d="M10,18a1,1,0,0,1-1-1V11a1,1,0,0,1,2,0v6A1,1,0,0,1,10,18Zm5-1V11a1,1,0,0,0-2,0v6a1,1,0,0,0,2,0Z"
+                                                    style="fill: #ffffff;" />
+
+                                            </g>
+
                                         </svg>
-                                        <p class="text-[9px]">Quitar Req.</p>
+
                                     </button>
                                 </div>
                             </td>
@@ -179,7 +188,7 @@ export default {
             { width: "10%", label: "Numero compromiso numero acuerdo", name: "id_requerimiento_pago", type: "text" },
             { width: "10%", label: "Monto", name: "monto_liquido_quedan", type: "text" },
 
-            { width: "10%", label: "Acciones", name: "Acciones" },
+            { width: "10%", label: "", name: "Acciones" },
         ];
         columns.forEach((column) => {
             if (column.name === 'id_quedan')
@@ -346,10 +355,8 @@ export default {
 };
 </script>
   
-<style>
-.wrap,
+<style>.wrap,
 .wrap2 {
     width: 100%;
     white-space: pre-wrap;
-}
-</style>
+}</style>

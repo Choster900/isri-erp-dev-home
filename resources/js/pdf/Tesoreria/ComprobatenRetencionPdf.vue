@@ -35,7 +35,8 @@
               <tr>
                 <td class="  style4 text-left border-t border-b border-l border-r border-black rounded-t-md" colspan="6">
                   <div style="margin-top: -12px;" class="pl-2 pt-2 pb-3 text-[8pt]">
-                    NOMBRE DEL PROVEEDOR DEL BIEN O SERVICIO: {{ dataQuedan.proveedor.nombre_comercial_proveedor }}
+                    NOMBRE DEL PROVEEDOR DEL BIEN O SERVICIO: <span class="font-extrabold">{{
+                      dataQuedan.proveedor.nombre_comercial_proveedor }}</span>
                   </div>
                 </td>
               </tr>
@@ -59,15 +60,14 @@
               <tr>
                 <td class="border-l border-r border-black border-b text-left" colspan="2">
                   <div style="margin-top: -12px;" class="pl-2 pt-2 pb-3 text-[8pt]">
-                    N.I.T: {{ dataQuedan.proveedor.nit_proveedor }}
+                    N.I.T: <span class="font-extrabold">{{ dataQuedan.proveedor.nit_proveedor }}</span>
                   </div>
                 </td>
                 <td class="border-r border-black border-b text-left" colspan="4">
                   <div style="margin-top: -12px;" class="pl-2 pt-2 pb-3 text-[8pt]">
-                    N.R.C.: {{ dataQuedan.proveedor.nrc_proveedor }}
+                    N.R.C.: <span class="font-extrabold">{{ dataQuedan.proveedor.nrc_proveedor }}</span>
                   </div>
                 </td>
-                <td class=" style3 "></td>
               </tr>
               <tr>
                 <td class="border-l border-r border-black border-b text-center">
@@ -95,24 +95,28 @@
                   </div>
                 </td>
                 <td v-else class=" border-l border-r border-black border-b">&nbsp;</td>
-
-                <td v-if="dataQuedan.detalle_quedan[i - 1]" class=" border-r border-black border-b text-left" colspan="4">
+                <td v-if="dataQuedan.detalle_quedan[i - 1]" class=" border-r border-black border-b" colspan="4">
                   <div style="margin-top: -12px;" class="pl-1 py-[9px] text-[8pt]">
                     {{ dataQuedan.detalle_quedan[i - 1].descripcion_factura_det_quedan }}
                   </div>
                 </td>
                 <td v-else class=" border-r border-black border-b" colspan="4">&nbsp;</td>
+                <td v-if="dataQuedan.detalle_quedan[i - 1]" class=" border-r border-black border-b">
+                  <div style="margin-top: -12px;" class="px-1 py-[9px] text-[8pt] flex justify-between">
+                    <span class="text-left">
+                      $
+                    </span>
+                    <span class="text-right">
+                      {{
+                        (
+                          ((!isNaN(parseFloat(dataQuedan.detalle_quedan[i - 1].producto_factura_det_quedan)) ?
+                            parseFloat(dataQuedan.detalle_quedan[i - 1].producto_factura_det_quedan) : 0)
+                            +
+                            (!isNaN(parseFloat(dataQuedan.detalle_quedan[i - 1].servicio_factura_det_quedan)) ?
+                              parseFloat(dataQuedan.detalle_quedan[i - 1].servicio_factura_det_quedan) : 0)) / 1.13
+                        ).toFixed(2) }}
+                    </span>
 
-                <td v-if="dataQuedan.detalle_quedan[i - 1]" class=" border-r border-black border-b text-left ">
-                  <div style="margin-top: -12px;" class="pl-1 py-[9px] text-[8pt]">
-                    $ {{
-                      (
-                        ((!isNaN(parseFloat(dataQuedan.detalle_quedan[i - 1].producto_factura_det_quedan)) ?
-                          parseFloat(dataQuedan.detalle_quedan[i - 1].producto_factura_det_quedan) : 0)
-                          +
-                          (!isNaN(parseFloat(dataQuedan.detalle_quedan[i - 1].servicio_factura_det_quedan)) ?
-                            parseFloat(dataQuedan.detalle_quedan[i - 1].servicio_factura_det_quedan) : 0)) / 1.13
-                      ).toFixed(2) }}
                   </div>
                 </td>
                 <td v-else class=" border-r border-black border-b">
@@ -124,7 +128,7 @@
               <tr>
                 <td class=" border-l border-r border-black border-b text-left" colspan="3">
                   <div style="margin-top: -12px;" class="pl-1 py-[9px] text-[8pt]">
-                    SON:
+                    SON: <span class="font-extrabold">{{ dataQuedan.monto_iva_quedan_letter }}</span>
                   </div>
                 </td>
                 <td class="border-r border-black border-b text-left" colspan="2">
@@ -133,18 +137,22 @@
                   </div>
                 </td>
                 <td class=" border-r border-black border-b text-left">
-                  <div style="margin-top: -12px;" class="pl-0.5 py-[9px] text-[8pt]">
-                    US $ {{
-                      (this.dataQuedan.detalle_quedan.reduce((total, element) => {
-                        const producto = isNaN(parseFloat(element.producto_factura_det_quedan)) ? 0 :
-                          parseFloat(element.producto_factura_det_quedan);
-                        const servicio = isNaN(parseFloat(element.servicio_factura_det_quedan)) ? 0 :
-                          parseFloat(element.servicio_factura_det_quedan);
-                        return total + producto + servicio;
-                      }, 0) / 1.13).toFixed(2)
-                    }}
+                  <div style="margin-top: -12px;" class="px-1 py-[9px] text-[8pt] flex justify-between">
+                    <span class="text-left">
+                      US $
+                    </span>
+                    <span class="text-right">
+                      {{
+                        (this.dataQuedan.detalle_quedan.reduce((total, element) => {
+                          const producto = isNaN(parseFloat(element.producto_factura_det_quedan)) ? 0 :
+                            parseFloat(element.producto_factura_det_quedan);
+                          const servicio = isNaN(parseFloat(element.servicio_factura_det_quedan)) ? 0 :
+                            parseFloat(element.servicio_factura_det_quedan);
+                          return total + producto + servicio;
+                        }, 0) / 1.13).toFixed(2)
+                      }}
+                    </span>
                   </div>
-
                 </td>
               </tr>
               <tr>
@@ -164,26 +172,30 @@
                   </div>
                 </td>
                 <td class="border-r border-black border-b text-left">
-                  <div style="margin-top: -12px;" class="pl-0.5 py-[9px] text-[8pt]">
-                    US $ {{ iva }}
+                  <div style="margin-top: -12px;" class="px-1 py-[9px] text-[8pt] flex justify-between">
+                    <span class="text-left">
+                      US $
+                    </span>
+                    <span class="text-right">
+                      {{ iva }}
+                    </span>
+
                   </div>
                 </td>
               </tr>
-
               <tr>
                 <td class="border-l border-r border-black border-b text-left" colspan="2">
                   <div style="margin-top: -12px;" class="pl-1 py-[9px] text-[8pt]">
-                    NOMBRE
+                    NOMBRE <span class="font-extrabold">{{ dataQuedan.tesorero.nombre_empleado_tesoreria }}</span>
                   </div>
                 </td>
                 <td class="border-r border-black border-b text-left">
                   <div style="margin-top: -12px;" class="pl-1 py-[9px] text-[8pt]">
-                    NOMBRE
+                    NOMBRE:
                   </div>
                 </td>
                 <td class="border-r border-black border-b text-left" colspan="2">
                   <div style="margin-top: -12px;" class="pl-1 py-[9px] text-[8pt] font-extrabold">
-
                   </div>
                 </td>
                 <td class="border-r border-black border-b text-left">
@@ -195,7 +207,7 @@
               <tr>
                 <td class="border-l border-r border-black border-b text-left" colspan="2">
                   <div style="margin-top: -12px;" class="pl-1 py-[9px] text-[8pt]">
-                    D.U.I.
+                    D.U.I. <span class="font-extrabold">{{ dataQuedan.tesorero.dui_empleado_tesoreria }}</span>
                   </div>
                 </td>
                 <td class="border-r border-black border-b text-left">
@@ -244,19 +256,22 @@
           <div class="w-[40%] text-left">
             <div class="bg-white rounded-lg border-2 border-dashed  border-black">
               <div style="margin-top: -12px;" class="py-4 pl-1 font-bold">
-                <p class=" text-[6.5pt]">NOMBRE, DENOMINACION RAZON SOCIAL:</p>
-                <p class=" text-[6.5pt]">CHAVEZ IMPRESORES: Tom Alberto Hernández Chávez</p>
-                <p class="text-[6.5pt]">NIT: 0614-291264-010-8 NRC: 130243-0</p>
-                <p class=" text-[6.5pt]">AUTORIZACION DE IMPRENTA No. 1031 D.G.I.I. FECHA DE AUTORIZACION 03/06/2008</p>
+                <p class=" text-[6.5pt] mb-1">NOMBRE, DENOMINACION RAZON SOCIAL:</p>
+                <p class=" text-[6.5pt] mb-1">CHAVEZ IMPRESORES: Tom Alberto Hernández Chávez</p>
+                <p class="text-[6.5pt] mb-1">NIT: 0614-291264-010-8
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NRC: 130243-0</p>
+                <p class="text-[6.5pt] mb-1">DIRECCION: 31 Calle Oriente # 434 Colonia La Rábida S. S.</p>
+                <p class=" text-[6.5pt] mb-1">AUTORIZACION DE IMPRENTA No. 1031 D.G.I.I. FECHA DE AUTORIZACION 03/06/2008
+                </p>
                 <p class=" text-[6.5pt]">RESOLUCIÓN: 15041-RES-IN-26216-2021</p>
                 <p class=" text-[6.5pt]">FECHA DE AUTORIZACIÓN: 29/04/2021</p>
-                <p class=" text-[6.5pt]">FECHA DE IMPRESION: 07/05/2021</p>
-                <p class=" text-[6.5pt]">TIRAJE del 21DS000E1 al 21DS000E3000</p>
+                <p class=" text-[6.5pt] mb-1">FECHA DE IMPRESION: 07/05/2021</p>
+                <p class=" text-[6.5pt] mb-3">TIRAJE del 21DS000E1 al 21DS000E3000</p>
               </div>
             </div>
           </div>
           <div class="w-[60%] text-left">
-            <div style="margin-top: -12px;" class="py-8 pl-32 font-extrabold">
+            <div style="margin-top: -12px;" class="py-16 pl-32 font-extrabold">
               <p class="text-[8pt]">BLANCO ORIGINAL: Instituto Salvadoreño de Rehabilitación Integral (ISRI) VERDE </p>
               <p class="text-[8pt]">PRIMERA COPIA: Contribuyente</p>
               <p class="text-[8pt]">AMARILLO SEGUNDA COPIA: Tesorería (ISRI)</p>

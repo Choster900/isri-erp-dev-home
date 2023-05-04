@@ -49,11 +49,13 @@ import 'vue3-toastify/dist/index.css';
                             </td>
 
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
-                                <div class="font-medium text-slate-800 text-center ellipsis">{{ proveedor.razon_social_proveedor }}
+                                <div class="font-medium text-slate-800 text-center ellipsis">{{
+                                    proveedor.razon_social_proveedor }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
-                                <div class="font-medium text-slate-800 text-center ellipsis">{{ proveedor.nombre_comercial_proveedor
+                                <div class="font-medium text-slate-800 text-center ellipsis">{{
+                                    proveedor.nombre_comercial_proveedor
                                 }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
@@ -73,23 +75,52 @@ import 'vue3-toastify/dist/index.css';
                                     <button v-if="permits.actualizar == 1" @click.stop="getSuppiler(proveedor)"
                                         class="text-slate-400 hover:text-slate-500 rounded-full">
                                         <span class="sr-only">Edit</span>
-                                        <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
-                                            <path
-                                                d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z">
-                                            </path>
+                                        <svg width="25px" height="25px" viewBox="0 0 24.00 24.00" fill="none"
+                                            xmlns="http://www.w3.org/2000/svg" stroke="#000000" stroke-width="0.384">
+
+                                            <g id="SVGRepo_bgCarrier" stroke-width="0" />
+
+                                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" />
+
+                                            <g id="SVGRepo_iconCarrier">
+                                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                                    d="M11.9995 8.00001C9.79023 8.00001 8 9.79065 8 12.0005C8 14.2096 9.79043 16 11.9995 16C14.2082 16 16 14.21 16 12.0005C16 9.79024 14.2084 8.00001 11.9995 8.00001ZM10 12.0005C10 10.8948 10.8952 10 11.9995 10C13.1043 10 14 10.8952 14 12.0005C14 13.1046 13.1045 14 11.9995 14C10.895 14 10 13.105 10 12.0005Z"
+                                                    fill="#152C70" />
+                                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                                    d="M16.2389 5.00144C13.5704 3.66721 10.4295 3.66721 7.76104 5.00144C6.14869 5.80761 4.79966 7.05685 3.8722 8.60262L2.65499 10.6313C2.14951 11.4738 2.14951 12.5263 2.65499 13.3687L3.8722 15.3974C4.79966 16.9432 6.14869 18.1924 7.76104 18.9986C10.4295 20.3328 13.5704 20.3328 16.2389 18.9986C17.8512 18.1924 19.2003 16.9432 20.1277 15.3974L21.3449 13.3687C21.8504 12.5263 21.8504 11.4738 21.3449 10.6313L20.1277 8.60262C19.2002 7.05685 17.8512 5.80761 16.2389 5.00144ZM8.65546 6.79029C10.7609 5.73759 13.239 5.73759 15.3444 6.79029C16.6166 7.42636 17.681 8.41201 18.4127 9.63161L19.6299 11.6603C19.7554 11.8694 19.7554 12.1306 19.6299 12.3397L18.4127 14.3684C17.681 15.588 16.6166 16.5737 15.3444 17.2097C13.239 18.2624 10.7609 18.2624 8.65546 17.2097C7.38332 16.5737 6.31895 15.588 5.58718 14.3684L4.36998 12.3397C4.24451 12.1306 4.24451 11.8694 4.36997 11.6603L5.58718 9.63161C6.31895 8.41201 7.38333 7.42636 8.65546 6.79029Z"
+                                                    fill="#152C70" />
+                                            </g>
                                         </svg>
                                     </button>
                                     <!-- CAMBIAR ICONO DE BOTON POR QUE VA A SER ACTIVAR Y DESCATIVAR -->
                                     <button class="text-rose-500 hover:text-rose-600 rounded-full"
                                         v-if="permits.eliminar == 1"
                                         @click="enableStateForSupplier(proveedor.id_proveedor, proveedor.estado_proveedor)">
-                                        <span class="sr-only">Delete</span><svg class="w-8 h-8 fill-current"
-                                            viewBox="0 0 32 32">
-                                            <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
-                                            </path>
-                                            <path
-                                                d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z">
-                                            </path>
+
+                                        <svg fill="#000000" width="25px" height="25px" viewBox="0 0 24 24" id="delete-alt"
+                                            data-name="Flat Color" xmlns="http://www.w3.org/2000/svg"
+                                            class="icon flat-color" stroke="#000000" stroke-width="0.264">
+
+                                            <g id="SVGRepo_bgCarrier" stroke-width="0" />
+
+                                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" />
+
+                                            <g id="SVGRepo_iconCarrier">
+
+                                                <path id="secondary"
+                                                    d="M16,8a1,1,0,0,1-1-1V4H9V7A1,1,0,0,1,7,7V4A2,2,0,0,1,9,2h6a2,2,0,0,1,2,2V7A1,1,0,0,1,16,8Z"
+                                                    style="fill: #ffffff;" />
+
+                                                <path id="primary"
+                                                    d="M20,6H4A1,1,0,0,0,4,8H5V20a2,2,0,0,0,2,2H17a2,2,0,0,0,2-2V8h1a1,1,0,0,0,0-2Z"
+                                                    style="fill: #c10000e0;" />
+
+                                                <path id="secondary-2" data-name="secondary"
+                                                    d="M10,18a1,1,0,0,1-1-1V11a1,1,0,0,1,2,0v6A1,1,0,0,1,10,18Zm5-1V11a1,1,0,0,0-2,0v6a1,1,0,0,0,2,0Z"
+                                                    style="fill: #ffffff;" />
+
+                                            </g>
+
                                         </svg>
                                     </button>
                                 </div>
@@ -165,7 +196,7 @@ export default {
                     { value: "0", label: "Inactivo" }
                 ]
             },
-            { width: "10%", label: "Acciones", name: "Acciones" },
+            { width: "5%", label: "", name: "Acciones" },
         ];
         columns.forEach((column) => {
             if (column.name === 'id_proveedor')
@@ -233,12 +264,6 @@ export default {
             return array.findIndex((i) => i[key] == value);
         },
         async getSuppiler(supplier) {
-            // await axios.get("/get-supplier", { params: { id_proveedor: supplier_id } }).then(res => {
-            //     console.log(res.data);
-            //     this.infoSupplier = res.data
-            // }).catch(err => {
-            //     console.error(err);
-            // })
             this.infoSupplier = supplier
             this.scrollbarModalOpen = !this.scrollbarModalOpen
         },
@@ -330,6 +355,7 @@ export default {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
 .wrap,
 .wrap2 {
     width: 70%;
