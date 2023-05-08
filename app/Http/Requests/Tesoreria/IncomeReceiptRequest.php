@@ -32,9 +32,21 @@ class IncomeReceiptRequest extends FormRequest
         $rules["description"] = ['required'];
         $rules["direction"] = ['required_if:budget_account_id,16304'];
         $rules["document"] = ['required_if:budget_account_id,16304'];
-        foreach($this->input('income_detail',[]) as $key => $value){
-            $rules["income_detail.{$key}.income_concept_id"] = ['required'];
-            $rules["income_detail.{$key}.amount"] = ['required'];
+        foreach ($this->input('income_detail', []) as $key => $income_detail) {
+            $rules["income_detail.{$key}.income_concept_id"] = [
+                function ($attribute, $value, $fail) use ($key, $income_detail) {
+                    if (!$income_detail['deleted'] && empty($value)) {
+                        $fail("Debe seleccionar el concepto.");
+                    }
+                }
+            ];
+            $rules["income_detail.{$key}.amount"] = [
+                function ($attribute, $value, $fail) use ($key, $income_detail) {
+                    if (!$income_detail['deleted'] && empty($value)) {
+                        $fail("Debe ingresar el monto.");
+                    }
+                }
+            ];
         }
         return $rules;
     }
@@ -42,10 +54,6 @@ class IncomeReceiptRequest extends FormRequest
     public function messages()
     {
         $messages = [];   
-        foreach($this->input('income_detail',[]) as $key => $value){
-            $messages["income_detail.{$key}.income_concept_id.required"] = 'Debe seleccionar el concepto de ingreso.';
-            $messages["income_detail.{$key}.amount.required"] = 'Debe ingresar el monto de ingreso.';
-        }
         $messages["client.required"] = "Debe ingresar el nombre o razón social.";
         $messages["budget_account_id.required"] = "Debe seleccionar el especifico presupuestario.";
         $messages["description.required"] = "Debe ingresar la descripción del recibo.";

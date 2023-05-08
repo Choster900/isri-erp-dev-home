@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Tesoreria;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tesoreria\ReporteFacturaRequest;
+use App\Http\Requests\Tesoreria\ReporteIngresoRequest;
 use App\Http\Requests\Tesoreria\ReporteQuedanRequest;
 use App\Http\Requests\Tesoreria\RetencionISRRequest;
+use App\Models\CuentaPresupuestal;
+use App\Models\Dependencia;
 use App\Models\EstadoQuedan;
 use App\Models\Proveedor;
 use App\Models\ProyectoFinanciado;
@@ -20,7 +23,8 @@ use Illuminate\Support\Facades\DB;
 
 class ReporteTesoreriaController extends Controller
 {
-    public function getSelectsReport(Request $request){
+    public function getSelectsReport(Request $request)
+    {
         $financing_sources = ProyectoFinanciado::select('id_proy_financiado as value', 'nombre_proy_financiado as label')
             ->where('estado_proy_financiado', '=', 1)
             ->orderBy('nombre_proy_financiado')
@@ -29,34 +33,52 @@ class ReporteTesoreriaController extends Controller
             ->get();
         return ['financing_sources' => $financing_sources, 'states_quedan' => $states_quedan];
     }
-    public function createQuedanReport(ReporteQuedanRequest $request){
-        if ($request->financing_source_id != '' || $request->financing_source_id != null) {
+    public function createQuedanReport(ReporteQuedanRequest $request)
+    {
+        if ($request->filled('financing_source_id')) {
             $query_financing_source = 'AND `id_proy_financiado` = ' . $request->financing_source_id;
         } else {
             $query_financing_source = '';
         }
-        if ($request->state_quedan_id != '' || $request->state_quedan_id != null) {
+        if ($request->filled('state_quedan_id')) {
             $query_quedan_state = ' AND `id_estado_quedan` = ' . $request->state_quedan_id;
         } else {
             $query_quedan_state = '';
         }
+        $consulta1 = DB::select('SELECT id_quedan FROM
+        detalle_quedan 
+        WHERE fecha_factura_det_quedan = "2023-05-08"');
+        $complemento_consulta = 'AND ';
+
         $array = DB::select(
             '
             SELECT 
-            `p`.`razon_social_proveedor`, 
-            `rp`.`numero_requerimiento_pago`, 
-            DATE_FORMAT(`rp`.`fecha_requerimiento_pago`,"%d/%m/%Y") as fecha_requerimiento_pago, 
-            `monto_liquido_quedan`,
-            IFNULL((SELECT SUM(`lq`.`monto_liquidacion_quedan`) FROM `liquidacion_quedan` lq WHERE `lq`.`id_quedan` = `quedan`.`id_quedan` GROUP BY `lq`.`id_quedan` ), 0) AS monto_pagado, 
-            DATE_FORMAT(`fecha_emision_quedan`,"%d/%m/%Y") as fecha_emision_quedan, 
-            `pp`.`nivel_prioridad_pago`,
-            `pp`.`nombre_prioridad_pago` 
+            q.numero_quedan,
+            p.razon_social_proveedor, 
+            rp.numero_requerimiento_pago, 
+            DATE_FORMAT(rp.fecha_requerimiento_pago,"%d/%m/%Y") as fecha_requerimiento_pago, 
+
+            -- ((IFNULL(dq.producto_factura_det_quedan,0)+IFNULL(dq.servicio_factura_det_quedan,0))- ROUND(IF((IFNULL(q.monto_liquido_quedan,0)+IFNULL(q.monto_iva_quedan,0)+IFNULL(q.monto_isr_quedan,0))>=113,
+			-- (((IFNULL(dq.producto_factura_det_quedan,0)+IFNULL(dq.servicio_factura_det_quedan,0))/1.13)*sr.iva_sujeto_retencion),0),2) - ROUND(IFNULL((dq.servicio_factura_det_quedan*sr.isrl_sujeto_retencion),0),2)) as liquido,
+            -- det.fechas,
+            q.monto_liquido_quedan,
+            IFNULL((SELECT SUM(lq.monto_liquidacion_quedan) FROM liquidacion_quedan lq WHERE lq.id_quedan = q.id_quedan GROUP BY lq.id_quedan ), 0) AS monto_pagado, 
+            det.fechas,
+            -- DATE_FORMAT(q.fecha_emision_quedan,"%d/%m/%Y") as fecha_factura_det_quedan, 
+            pp.nivel_prioridad_pago,
+            pp.nombre_prioridad_pago 
             FROM 
-            `quedan` 
-            INNER JOIN `proveedor` AS p on `quedan`.`id_proveedor` = `p`.`id_proveedor` 
-            LEFT OUTER JOIN `requerimiento_pago` AS rp ON `quedan`.`id_requerimiento_pago` = `rp`.`id_requerimiento_pago`
-            INNER JOIN `prioridad_pago` AS pp on `quedan`.`id_prioridad_pago` = `pp`.`id_prioridad_pago`
-            WHERE `fecha_emision_quedan` BETWEEN ? AND ?
+            quedan AS q
+            INNER JOIN (
+                select dq.id_quedan, 
+                GROUP_CONCAT(concat(dq.numero_factura_det_quedan, " (", DATE_FORMAT(dq.fecha_factura_det_quedan,"%d/%m/%Y"), ")") SEPARATOR "; ") as fechas 
+                from detalle_quedan dq GROUP BY dq.id_quedan
+            ) AS det on q.id_quedan = det.id_quedan
+            INNER JOIN proveedor AS p on q.id_proveedor = p.id_proveedor 
+            LEFT OUTER JOIN requerimiento_pago AS rp ON q.id_requerimiento_pago = rp.id_requerimiento_pago
+            INNER JOIN prioridad_pago AS pp on q.id_prioridad_pago = pp.id_prioridad_pago
+
+            WHERE q.fecha_emision_quedan BETWEEN ? AND ?
             ' . $query_financing_source . $query_quedan_state,
             [$request->start_date, $request->end_date]
         );
@@ -67,7 +89,7 @@ class ReporteTesoreriaController extends Controller
 
         $array = json_decode(json_encode($array), true);
 
-        array_unshift($array, array('SUMINISTRANTE', 'N° REQUERIMIENTO', 'FECHA REQUERIMIENTO', 'MONTO LIQUIDO', 'MONTO PAGADO', 'FECHA QUEDAN', 'PRIORIDAD', 'DESCRIPCION'));
+        array_unshift($array, array('NUMERO','SUMINISTRANTE', 'N° REQUERIMIENTO', 'FECHA REQUERIMIENTO', 'MONTO LIQUIDO', 'MONTO PAGADO', 'FECHA FACTURA', 'PRIORIDAD', 'DESCRIPCION'));
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -112,22 +134,22 @@ class ReporteTesoreriaController extends Controller
         $total_pagado = 0;
         $lastRow = $sheet->getHighestDataRow(); // obtiene el número de la última fila con datos
         for ($i = 3; $i <= $lastRow; $i++) { // comienza en la fila 3 (primer dato) y recorre hasta la última fila con datos
-            $value_liquido = $sheet->getCell('D' . $i)->getValue(); // obtiene el valor de la celda D de la fila actual
+            $value_liquido = $sheet->getCell('E' . $i)->getValue(); // obtiene el valor de la celda D de la fila actual
             if (is_numeric($value_liquido)) { // comprueba que el valor sea numérico
                 $total_liquido += $value_liquido; // suma el valor a la variable $total
             }
-            $value_pagado = $sheet->getCell('E' . $i)->getValue(); // obtiene el valor de la celda D de la fila actual
+            $value_pagado = $sheet->getCell('F' . $i)->getValue(); // obtiene el valor de la celda D de la fila actual
             if (is_numeric($value_pagado)) { // comprueba que el valor sea numérico
                 $total_pagado += $value_pagado; // suma el valor a la variable $total
             }
         }
-        $sheet->setCellValue('D' . ($lastRow + 1), $total_liquido);
-        $sheet->setCellValue('E' . ($lastRow + 1), $total_pagado);
-        $sheet->setCellValue('C' . ($lastRow + 1), 'TOTAL');
+        $sheet->setCellValue('E' . ($lastRow + 1), $total_liquido);
+        $sheet->setCellValue('F' . ($lastRow + 1), $total_pagado);
+        $sheet->setCellValue('D' . ($lastRow + 1), 'TOTAL');
         //Definiendo en negrita las celdas para el total y los montos sumados
-        $sheet->getStyle('C' . ($lastRow + 1))->getFont()->setBold(true);
         $sheet->getStyle('D' . ($lastRow + 1))->getFont()->setBold(true);
         $sheet->getStyle('E' . ($lastRow + 1))->getFont()->setBold(true);
+        $sheet->getStyle('F' . ($lastRow + 1))->getFont()->setBold(true);
 
         // Definimos encabezado
         $sheet->setCellValue('A2', 'REPORTE DE QUEDAN DEL ' . $fechaFormateada . ' - ' . $quedan_state . ' - ' . $fuente_financiamiento);
@@ -149,7 +171,8 @@ class ReporteTesoreriaController extends Controller
 
         $writer->save('php://output');
     }
-    public function getSelectsInvoiceReporting(Request $request){
+    public function getSelectsInvoiceReporting(Request $request)
+    {
         $financing_sources = ProyectoFinanciado::select('id_proy_financiado as value', 'nombre_proy_financiado as label')
             ->where('estado_proy_financiado', '=', 1)
             ->orderBy('nombre_proy_financiado')
@@ -166,13 +189,14 @@ class ReporteTesoreriaController extends Controller
         array_unshift($requirements, ['value' => -1, 'label' => 'Sin requerimiento']);
         return ['suppliers' => $suppliers, 'requirements' => $requirements, 'financing_sources' => $financing_sources];
     }
-    public function createInvoiceReport(ReporteFacturaRequest $request){
-        if ($request->supplier_id != "" && $request->supplier_id != null) {
+    public function createInvoiceReport(ReporteFacturaRequest $request)
+    {
+        if ($request->filled('supplier_id')) {
             $query_supplier = 'AND q.id_proveedor = ' . $request->supplier_id;
         } else {
             $query_supplier = '';
         }
-        if ($request->requirement_id != "" && $request->requirement_id != null) {
+        if ($request->filled('requirement_id')) {
             if ($request->requirement_id == -1) {
                 $query_requirement = ' AND q.id_requerimiento_pago IS NULL OR q.id_requerimiento_pago = ""';
             } else {
@@ -181,7 +205,7 @@ class ReporteTesoreriaController extends Controller
         } else {
             $query_requirement = '';
         }
-        if ($request->financing_source_id != "" && $request->financing_source_id != null) {
+        if ($request->filled('financing_source_id')) {
             $query_financing_source = ' AND q.id_proy_financiado = ' . $request->financing_source_id;
         } else {
             $query_financing_source = '';
@@ -274,13 +298,14 @@ class ReporteTesoreriaController extends Controller
         $writer->save('php://output');
     }
 
-    public function createQuedanReportPDF(ReporteQuedanRequest $request){
-        if ($request->financing_source_id != '' || $request->financing_source_id != null) {
+    public function createQuedanReportPDF(ReporteQuedanRequest $request)
+    {
+        if ($request->filled('financing_source_id')) {
             $query_financing_source = 'AND `id_proy_financiado` = ' . $request->financing_source_id;
         } else {
             $query_financing_source = '';
         }
-        if ($request->state_quedan_id != '' || $request->state_quedan_id != null) {
+        if ($request->filled('state_quedan_id')) {
             $query_quedan_state = ' AND `id_estado_quedan` = ' . $request->state_quedan_id;
         } else {
             $query_quedan_state = '';
@@ -311,14 +336,16 @@ class ReporteTesoreriaController extends Controller
         }
         return ['mensaje' => 'Hola desde el back'];
     }
-    public function getSelectsWithholdingTaxReport(Request $request){
+    public function getSelectsWithholdingTaxReport(Request $request)
+    {
         $financing_sources = ProyectoFinanciado::select('id_proy_financiado as value', 'nombre_proy_financiado as label')
             ->where('estado_proy_financiado', '=', 1)
             ->orderBy('nombre_proy_financiado')
             ->get();
         return ['financing_sources' => $financing_sources];
     }
-    public function createIncomeTaxReport(RetencionISRRequest $request){
+    public function createIncomeTaxReport(RetencionISRRequest $request)
+    {
         $array = DB::select(
             '
             SELECT 	sr.codigo_mh_sujeto_retencion, 
@@ -344,7 +371,7 @@ class ReporteTesoreriaController extends Controller
 					
 			FROM quedan q
 			INNER JOIN proyecto_financiado pf ON q.id_proy_financiado = pf.id_proy_financiado
-			INNER JOIN requerimiento_pago rp ON q.id_requerimiento_pago = rp.id_requerimiento_pago
+			LEFT JOIN requerimiento_pago rp ON q.id_requerimiento_pago = rp.id_requerimiento_pago
 			INNER JOIN proveedor pv ON q.id_proveedor = pv.id_proveedor
 			INNER JOIN sujeto_retencion sr ON pv.id_sujeto_retencion = sr.id_sujeto_retencion
 			INNER JOIN municipio m ON pv.id_municipio = m.id_municipio
@@ -386,7 +413,8 @@ class ReporteTesoreriaController extends Controller
 
         $writer->save('php://output');
     }
-    public function createWithholdingIVAReport(RetencionISRRequest $request){
+    public function createWithholdingIVAReport(RetencionISRRequest $request)
+    {
         $array = DB::select(
             '
             SELECT
@@ -430,6 +458,128 @@ class ReporteTesoreriaController extends Controller
 
         $current_date = Carbon::now()->format('d-m-Y');
         $filename = 'RPT_RETENCION_ISR' . $current_date . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
+    }
+    public function getSelectsIncomeReport(Request $request){
+        $financing_sources = ProyectoFinanciado::select('id_proy_financiado as value', 'nombre_proy_financiado as label')
+            ->where('estado_proy_financiado', '=', 1)
+            ->orderBy('nombre_proy_financiado')
+            ->get();
+        $dependencies = Dependencia::selectRaw("id_dependencia as value , concat(codigo_dependencia, ' - ', nombre_dependencia) as label")
+            ->where('id_tipo_dependencia', '=', 1)
+            ->where('estado_dependencia', '=', 1)
+            ->orderBy('nombre_dependencia')
+            ->get();
+        $budget_accounts = CuentaPresupuestal::selectRaw("id_ccta_presupuestal as value , concat(id_ccta_presupuestal, ' - ', nombre_ccta_presupuestal) as label")
+                ->where('tesoreria_ccta_presupuestal','=',1)
+                ->where('estado_ccta_presupuestal','=',1)
+                ->orderBy('nombre_ccta_presupuestal')
+                ->get();
+        return ['financing_sources' => $financing_sources, 'dependencies' => $dependencies, 'budget_accounts' => $budget_accounts];
+    }
+    public function createIncomeReport(ReporteIngresoRequest $request)
+    {
+        if ($request->filled('financing_source_id')) {
+            $query_financing_source = ' AND pf.id_proy_financiado = ' . $request->financing_source_id;
+            $fuente = ProyectoFinanciado::find($request->financing_source_id);
+            if ($fuente) {
+                $fuente_financiamiento = $fuente->nombre_proy_financiado;
+            } else {
+                $fuente_financiamiento = 'NO EXISTE FUENTE DE FINANCIAMIENTO';
+            }
+        } else {
+            $query_financing_source = '';
+            $fuente_financiamiento = 'TODOS LOS FONDOS';
+        }
+        if ($request->filled('dependency_id')) {
+            $query_dependency = ' AND d.id_dependencia = ' . $request->dependency_id;
+            $query_select_concept = 'ci.nombre_concepto_ingreso ';
+            $dependencia = Dependencia::find($request->dependency_id);
+            if($dependencia) {
+                $codigo_dependencia = $dependencia->codigo_dependencia;
+            } else {
+                $codigo_dependencia = 'NO EXISTE DEPENDENCIA';
+            }
+        } else {
+            $query_dependency = '';
+            $query_select_concept = 'COALESCE(CONCAT_WS(" - ",d.codigo_dependencia,ci.nombre_concepto_ingreso)) as nombre_concepto_ingreso ';
+            $codigo_dependencia = 'TODAS LAS DEPENDENCIAS';
+        }
+        if ($request->filled('budget_account_id')) {
+            $query_budget_account = ' AND ci.id_ccta_presupuestal = ' . $request->budget_account_id;
+            $especifico = ' - ESPECIFICO '.$request->budget_account_id;
+        } else {
+            $query_budget_account = '';
+            $especifico = '';
+        }
+        $array = DB::select(
+            '
+            SELECT ri.numero_recibo_ingreso, DATE_FORMAT(ri.fecha_recibo_ingreso,"%d/%m/%Y") as fecha, ri.cliente_recibo_ingreso, ri.doc_identidad_recibo_ingreso, dri.monto_det_recibo_ingreso, 
+			'.$query_select_concept.'
+
+			FROM recibo_ingreso ri 
+			INNER JOIN detalle_recibo_ingreso dri ON ri.id_recibo_ingreso = dri.id_recibo_ingreso
+			INNER JOIN concepto_ingreso ci ON dri.id_concepto_ingreso = ci.id_concepto_ingreso
+			INNER JOIN proyecto_financiado pf ON ci.id_proy_financiado = pf.id_proy_financiado 
+			LEFT JOIN dependencia d ON ci.id_dependencia = d.id_dependencia
+
+            WHERE ri.estado_recibo_ingreso = 1
+            AND ri.fecha_recibo_ingreso BETWEEN ? AND ?
+            '.$query_financing_source.$query_dependency.$query_budget_account
+            .' ORDER BY ri.numero_recibo_ingreso DESC',
+            [$request->start_date, $request->end_date]
+        );
+        if (empty($array)) {
+            return response()->json(['error' => 'No se encontraron registros'], 404);
+        }
+        //return ['array' => $array];
+
+        $array = json_decode(json_encode($array), true);
+        array_unshift($array, array('NUMERO RECIBO', 'FECHA', 'NOMBRE O RAZON SOCIAL', 'N° DOCUMENTO', 'MONTO', 'CONCEPTO INGRESO'));
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $fecha_fin = Carbon::createFromFormat('Y-m-d', $request->end_date);
+        $fecha_inicio = Carbon::createFromFormat('Y-m-d', $request->start_date);
+        Carbon::setLocale('es');
+        $fecha_f_fin = $fecha_fin->isoFormat('D [DE] MMMM [DE] YYYY');
+        $fecha_f_inicio = $fecha_inicio->isoFormat('D [DE] MMMM');
+        $join_date = $fecha_f_inicio . ' AL ' . $fecha_f_fin;
+        $fechaFormateada = strtoupper($join_date);
+
+        // Combina las celdas 
+        $sheet->mergeCells('A2:F2');
+        $sheet->mergeCells('A1:F1');
+        // Definimos encabezado
+        $sheet->setCellValue('A2', 'REPORTE DE INGRESOS DEL ' . $fechaFormateada .  $especifico.' - '.$codigo_dependencia.' - '.$fuente_financiamiento);
+        $sheet->setCellValue('A1', 'INSTITUTO SALVADOREÑO DE REHABILITACION INTEGRAL - ISRI');
+        $sheet->getStyle('A1:A2')->getFont()->setSize(14);
+
+        // Aplica el formato de centrado y negrita al texto
+        $style = $sheet->getStyle('A1:A2');
+        $style->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $style->getFont()->setBold(true);
+
+        $sheet->getStyle('3')->getFont()->setBold(true);
+        $columns = ['A', 'B', 'C', 'D', 'E', 'F'];
+        foreach ($columns as $column) {
+            $sheet->getColumnDimension($column)->setAutoSize(true);
+        }
+
+        $formatDecimal = '0.00';
+        $sheet->getStyle('E')->getNumberFormat()->setFormatCode($formatDecimal);
+
+        $sheet->fromArray($array, NULL, 'A3');
+
+        $writer = new Xlsx($spreadsheet);
+
+        $filename = 'RPT_REPORTE_FACTURAS.xlsx';
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
