@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use App\Models\User;
 
 class LoginRequest extends FormRequest
 {
@@ -27,8 +28,15 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nick_usuario' => ['required', 'string'],
-            'password' => ['required', 'string'],
+            'nick_usuario' => ['required', 'string', function($attribute, $value, $fail){
+                if (is_string($value) && !empty($value)) {
+                    $user = User::where('nick_usuario', '=', $value)->first();
+                }
+                if($user->estado_usuario!=1){
+                    $fail(__('Este usuario se encuentra desactivado.'));
+                }
+            }],
+            'password' => ['required', 'string',],
         ];
     }
 

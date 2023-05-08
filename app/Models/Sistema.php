@@ -15,6 +15,7 @@ class Sistema extends Model
 
     protected $fillable = [
         'nombre_sistema',
+        'icono_sistema',
     ];
 
     public function roles()

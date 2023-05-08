@@ -1,9 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+@import '@vueform/multiselect/themes/default.css';
 
-@import 'datatables.net-dt';
-@import '../../node_modules/vue-multiselect/dist/vue-multiselect.min.css';
-/* @import 'datatables.net-bs5';
- */@tailwind base;
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 *{

@@ -9,10 +9,10 @@ import AppLayoutVue from '@/Layouts/AppLayout.vue';
 
 <template>
 
-  <Head title="Activo Fijo" />
+  <Head title="Inicio" />
 
   <AppLayoutVue>
-    <h1>Index principal, aqui podria ir el logo</h1>
+    <!-- <h1>Index principal, aqui podria ir el logo</h1> -->
   </AppLayoutVue>
 
 

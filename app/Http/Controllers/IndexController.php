@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Database\Eloquent\Builder;
 
 class IndexController extends Controller
 {
@@ -24,6 +25,7 @@ class IndexController extends Controller
             $rolxsistema['id_rol'] = $rol->id_rol;
             $rolxsistema['rol'] = $rol->nombre_rol;
             $rolxsistema['sistema'] = $rol->sistema->nombre_sistema;
+            $rolxsistema['icono_sistema'] = $rol->sistema->icono_sistema;
             $menu_padre = [];
 
             foreach ($rol->menus as $menu) {
@@ -40,6 +42,10 @@ class IndexController extends Controller
                                         $array_hijo['nombre_submenu'] = $hijo->nombre_menu;
                                         $array_hijo['nombre_ruta'] = $hijo->nombre_ruta;
                                         $array_hijo['url'] = $hijo->url_menu;
+                                        $array_hijo['insertar'] = $hijo_rol->pivot->insertar_acceso_menu;
+                                        $array_hijo['actualizar'] = $hijo_rol->pivot->actualizar_acceso_menu;
+                                        $array_hijo['eliminar'] = $hijo_rol->pivot->eliminar_acceso_menu;
+                                        $array_hijo['ejecutar'] = $hijo_rol->pivot->ejecutar_acceso_menu;
                                         array_push($menu_hijos, $array_hijo);
                                         $array_hijo = [];
                                     }//End fourth if
@@ -52,11 +58,10 @@ class IndexController extends Controller
                     }
                 } //End second if
             } //End first foreach
-
-            $rolxsistema['urls'] = $menu_padre;
+          $rolxsistema['urls'] = $menu_padre;
             session(['menu' => $rolxsistema]);
             return Inertia::render('Index', [
-                'menu' => $rolxsistema,
+                'menu' => $rolxsistema
             ]);
         } //End first if
         else {
