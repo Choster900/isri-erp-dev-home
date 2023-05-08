@@ -8,6 +8,7 @@ use App\Http\Requests\Tesoreria\IncomeReceiptRequest;
 use App\Models\ConceptoIngreso;
 use App\Models\CuentaPresupuestal;
 use App\Models\DetalleReciboIngreso;
+use App\Models\ProyectoFinanciado;
 use App\Models\ReciboIngreso;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -27,7 +28,7 @@ class ReciboIngresoController extends Controller
 
         $query = ReciboIngreso::select('*')
             ->with('detalles')
-            ->with('detalles.concepto_ingreso')
+            ->with('detalles.concepto_ingreso.dependencia')
             ->with('cuenta_presupuestal')
             ->with('empleado_tesoreria')
             ->orderBy($columns[$column], $dir);
@@ -90,7 +91,11 @@ class ReciboIngresoController extends Controller
         $treasury_clerk = DB::table('empleado_tesoreria')
             ->select('id_empleado_tesoreria as value', 'nombre_empleado_tesoreria as label')
             ->get();
-        return ['budget_accounts' => $budget_accounts, 'income_concepts' => $income_concepts, 'treasury_clerk' => $treasury_clerk];
+        $financing_sources = ProyectoFinanciado::select('id_proy_financiado as value','nombre_proy_financiado as label')
+            ->where('estado_proy_financiado','=',1)
+            ->orderBy('nombre_proy_financiado')
+            ->get();
+        return ['budget_accounts' => $budget_accounts, 'income_concepts' => $income_concepts, 'treasury_clerk' => $treasury_clerk,'financing_sources' => $financing_sources];
     }
 
     public function saveIncomeReceipt(IncomeReceiptRequest $request)

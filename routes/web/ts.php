@@ -161,4 +161,14 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('ts.reporteRetencionIVA');
     Route::get('create-withholding-iva-report', [ReporteTesoreriaController::class, 'createWithholdingIVAReport'])->name('reporteTesoreria.createWithholdingIVAReport');
+    Route::get(
+        '/ts/reporte-ingresos',
+        function () {
+            return Inertia::render('Tesoreria/ReporteIngresos', [
+                'menu' => session()->get('menu')
+            ]);
+        }
+    )->name('ts.reporteIngresos');
+    Route::get('get-selects-income-report', [ReporteTesoreriaController::class, 'getSelectsIncomeReport'])->name('reporteTesoreria.getSelectsIncomeReport');
+    Route::get('create-income-report', [ReporteTesoreriaController::class, 'createIncomeReport'])->name('reporteTesoreria.createIncomeReport');
 });
