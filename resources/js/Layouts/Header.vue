@@ -1,8 +1,8 @@
 <script setup>
 import Targets from '@/Components-ISRI/Targets.vue';
 import HeaderVue from '@/Layouts/Header.vue';
-import DropdownLink from '@/Components/DropdownLink.vue';
-import { Head } from '@inertiajs/vue3';
+import DropdownLink from "@/Components/DropdownLink.vue";
+import { Head, usePage } from '@inertiajs/vue3';
 import MenuSidebarVue from '@/Components-ISRI/SidebarComponents/MenuSidebar.vue';
 </script>
 <template>
@@ -22,13 +22,18 @@ import MenuSidebarVue from '@/Components-ISRI/SidebarComponents/MenuSidebar.vue'
                             <rect x="4" y="17" width="16" height="2" />
                         </svg>
                     </button>
+
+                    <h1 class="font-semibold text-xl text-slate-800 pt-1">
+                        {{ $page.props.menu ? $page.props.menu.sistema : '' }}
+                    </h1>
                 </div>
 
                 <!-- Header: Right side -->
                 <div class="flex items-center space-x-3">
                     <!-- <button @click="stateLocal = !stateLocal"
                         class="w-8 h-8 flex items-center justify-center bg-slate-100 hover:bg-slate-200 transition duration-150 rounded-full ml-3"
-                        aria-controls="search-modal"><span class="sr-only">Search</span>
+                        aria-controls="search-modal">
+                        <span class="sr-only">Search</span>
                         <svg class="w-4 h-4" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
                             <path class="fill-current text-slate-500"
                                 d="M7 14c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7zM7 2C4.243 2 2 4.243 2 7s2.243 5 5 5 5-2.243 5-5-2.243-5-5-5z">

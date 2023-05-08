@@ -1,4 +1,5 @@
 <script setup>
+
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
@@ -16,7 +17,6 @@ const submit = () => {
 </script>
 
 <template>
-
   <Head title="Log in" />
 
   <div class="flex min-h-screen">
@@ -25,7 +25,7 @@ const submit = () => {
       <!-- Sidebar -->
       <div class="hidden lg:flex flex-col justify-between bg-[#001b47] lg:p-8 xl:p-12 lg:max-w-sm xl:max-w-lg">
         <div class="flex justify-center">
-          <img style="width: 200px" src="../../../img/isri-logo2.png" alt="GOBIERNO DE EL SALVADOR" />
+          <img  style="width: 200px" src="../../../img/isri-logo2.png" alt="GOBIERNO DE EL SALVADOR" />
         </div>
 
         <div class="flex justify-center">
@@ -73,5 +73,5 @@ const submit = () => {
         </form>
       </div>
     </div>
-  </div>
+</div>
 </template>

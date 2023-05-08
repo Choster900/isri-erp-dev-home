@@ -1,10 +1,9 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\IndexController;
-use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\IndexController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,28 +17,30 @@ use Inertia\Inertia;
 */
 
 Route::group(['middleware' => ['auth', 'verified']], function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+    Route::get(
+        'dashboard',
+        function () {
+            return Inertia::render('Dashboard');
+        }
+    )->name('dashboard');
 
-    //This route obtains users based on the parameters sent from the page.
-    Route::get('users', [UserController::class, 'getUsers'])->name('getusers');
-
-    Route::get('dashboard/{id}', [IndexController::class, 'getMenus'])->name('mainpage');
-    Route::get('password/create', [IndexController::class, 'createCambiarContraseña'])->name('crear.contraseña');
-    Route::put('password/reset', [IndexController::class, 'cambiarContraseña'])->name('cambiar.contraseña');
+    //Manage Login Information
+    Route::get('dashboard/{id}', [IndexController::class, 'getMenus'])->name('index.getMenus');
+    Route::get('password/create', [IndexController::class, 'createCambiarContraseña'])->name('index.createCambiarContraseña');
+    Route::put('password/reset', [IndexController::class, 'cambiarContraseña'])->name('index.cambiarContraseña');
 });
 
 
-Route::middleware('auth')->group(function () {  
+Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/web/auth.php';
-require __DIR__.'/web/public.php';
-require __DIR__.'/web/admin.php';
-require __DIR__.'/web/rrhh.php';
-require __DIR__.'/web/af.php';
-require __DIR__.'/web/pr.php';
+require __DIR__ . '/web/auth.php';
+require __DIR__ . '/web/public.php';
+require __DIR__ . '/web/admin.php';
+require __DIR__ . '/web/rrhh.php';
+require __DIR__ . '/web/af.php';
+require __DIR__ . '/web/pr.php';
+require __DIR__ . '/web/ts.php';

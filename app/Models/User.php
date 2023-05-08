@@ -64,7 +64,7 @@ class User extends Authenticatable
         $contador = 0;
         if ($rol) {
             foreach ($rol->usuarios as $user) {
-                if ($user->pivot->id_usuario==$id_usuario && $user->pivot->estado_permiso_usuario==1) {
+                if ($user->pivot->id_usuario==$id_usuario && $user->pivot->estado_permiso_usuario==1 && $rol->estado_rol==1) {
                     $contador++;
                 }
             }

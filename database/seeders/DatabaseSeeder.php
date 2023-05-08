@@ -1,6 +1,7 @@
 <?php
 
 namespace Database\Seeders;
+use Database\Seeders\PersonasSeeder;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
