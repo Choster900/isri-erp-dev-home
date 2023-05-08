@@ -58,11 +58,11 @@ import axios from 'axios';
                                         :class="{ 'border-b-2 border-b-gray-500': i < data.detalle_quedan.length - 1 && data.detalle_quedan.length > 1 }">
                                         FACTURA: {{ detalle.numero_factura_det_quedan }}
                                         <br>
-                                        PRODUCTO: ${{ (detalle.producto_factura_det_quedan !== '') ?
+                                        PRODUCTO: ${{ (detalle.producto_factura_det_quedan != '') ?
                                             detalle.producto_factura_det_quedan : '0.00' }}
                                         <br>
-                                        SERVICIO: ${{ (detalle.servicio_factura_det_quedan !== '') ?
-                                            detalle.servicio_factura_det_quedan : '0.00' }}
+                                        SERVICIO: ${{ (detalle.servicio_factura_det_quedan != '') ?
+                                            detalle.servicio_factura_det_quedan : 'vacio' }}
                                         <br>
                                         TOTAL: ${{
                                             (!isNaN(parseFloat(detalle.servicio_factura_det_quedan))
@@ -118,26 +118,26 @@ import axios from 'axios';
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="space-x-1">
-                                    <button @click.stop="showQuedan(data)" title="Ver Documento"
-                                        class="text-slate-400 hover:text-slate-500 rounded-full">
-                                        <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
-                                        <svg width="30px" height="30px" viewBox="0 0 24.00 24.00" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg" stroke="#000000" stroke-width="0.384">
 
-                                            <g id="SVGRepo_bgCarrier" stroke-width="0" />
+                                    <DropDownOptions>
+                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                            @click.stop="showQuedan(data)">
+                                            <div class="w-8 text-blue-900">
+                                                <span class="text-xs">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                            <div class="font-semibold">Ver</div>
+                                        </div>
+                                    </DropDownOptions>
 
-                                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" />
-
-                                            <g id="SVGRepo_iconCarrier">
-                                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                                    d="M11.9995 8.00001C9.79023 8.00001 8 9.79065 8 12.0005C8 14.2096 9.79043 16 11.9995 16C14.2082 16 16 14.21 16 12.0005C16 9.79024 14.2084 8.00001 11.9995 8.00001ZM10 12.0005C10 10.8948 10.8952 10 11.9995 10C13.1043 10 14 10.8952 14 12.0005C14 13.1046 13.1045 14 11.9995 14C10.895 14 10 13.105 10 12.0005Z"
-                                                    fill="#152C70" />
-                                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                                    d="M16.2389 5.00144C13.5704 3.66721 10.4295 3.66721 7.76104 5.00144C6.14869 5.80761 4.79966 7.05685 3.8722 8.60262L2.65499 10.6313C2.14951 11.4738 2.14951 12.5263 2.65499 13.3687L3.8722 15.3974C4.79966 16.9432 6.14869 18.1924 7.76104 18.9986C10.4295 20.3328 13.5704 20.3328 16.2389 18.9986C17.8512 18.1924 19.2003 16.9432 20.1277 15.3974L21.3449 13.3687C21.8504 12.5263 21.8504 11.4738 21.3449 10.6313L20.1277 8.60262C19.2002 7.05685 17.8512 5.80761 16.2389 5.00144ZM8.65546 6.79029C10.7609 5.73759 13.239 5.73759 15.3444 6.79029C16.6166 7.42636 17.681 8.41201 18.4127 9.63161L19.6299 11.6603C19.7554 11.8694 19.7554 12.1306 19.6299 12.3397L18.4127 14.3684C17.681 15.588 16.6166 16.5737 15.3444 17.2097C13.239 18.2624 10.7609 18.2624 8.65546 17.2097C7.38332 16.5737 6.31895 15.588 5.58718 14.3684L4.36998 12.3397C4.24451 12.1306 4.24451 11.8694 4.36997 11.6603L5.58718 9.63161C6.31895 8.41201 7.38333 7.42636 8.65546 6.79029Z"
-                                                    fill="#152C70" />
-                                            </g>
-                                        </svg>
-                                    </button>
+                                  
                                 </div>
                             </td>
                         </tr>
@@ -344,8 +344,10 @@ export default {
 };
 </script>
   
-<style>.wrap,
+<style>
+.wrap,
 .wrap2 {
     width: 100%;
     white-space: pre-wrap;
-}</style>
+}
+</style>

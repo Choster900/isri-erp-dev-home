@@ -23,7 +23,9 @@ class IncomeReceiptRequest extends FormRequest
      */
     public function rules()
     {
-        $rules = [];
+        $rules = [
+            'budget_account_id' => ['required'],
+        ];
         $rules["client"] = ['required'];
         $rules["treasury_clerk_id"] = ['required'];
         $rules["budget_account_id"] = ['required'];

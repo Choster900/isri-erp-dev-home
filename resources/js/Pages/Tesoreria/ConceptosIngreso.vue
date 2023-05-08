@@ -19,7 +19,8 @@ import axios from 'axios';
   <AppLayoutVue>
     <div class="sm:flex sm:justify-end sm:items-center mb-2">
       <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-        <GeneralButton @click="addIncomeConcept()" v-if="permits.insertar==1" color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add" />
+        <GeneralButton @click="addIncomeConcept()" v-if="permits.insertar == 1" color="bg-green-700  hover:bg-green-800"
+          text="Agregar Elemento" icon="add" />
       </div>
     </div>
     <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
@@ -27,19 +28,21 @@ import axios from 'axios';
         <div class="mb-4 md:flex flex-row justify-items-start">
           <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
             <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-              <Multiselect v-model="tableData.length" @select="getIncomeConcept()" :options="perPage" :searchable="true" />
+              <Multiselect v-model="tableData.length" @select="getIncomeConcept()" :options="perPage"
+                :searchable="true" />
               <LabelToInput icon="date" />
             </div>
           </div>
-          <h2 class="font-semibold text-slate-800 pt-1">Total Conceptos Ingreso <span class="text-slate-400 font-medium">{{
-          tableData.total
-        }}</span></h2>
+          <h2 class="font-semibold text-slate-800 pt-1">Total Conceptos Ingreso <span
+              class="text-slate-400 font-medium">{{
+                tableData.total
+              }}</span></h2>
         </div>
       </header>
 
       <div class="overflow-x-auto">
-        <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" 
-        @sort="sortBy" @datos-enviados="handleData($event)">
+        <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy"
+          @datos-enviados="handleData($event)">
           <tbody class="text-sm divide-y divide-slate-200">
             <tr v-for="service in income_concept" :key="service.id_concepto_ingreso">
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
@@ -47,7 +50,8 @@ import axios from 'axios';
               </td>
               <td class="px-2 first:pl-5 last:pr-5 td-data-table">
                 <div class="font-medium text-slate-800 ellipsis">
-                  {{ service.codigo_dependencia && service.nombre_dependencia ? service.codigo_dependencia + ' - ' + service.nombre_dependencia : '' }}
+                  {{ service.codigo_dependencia && service.nombre_dependencia ? service.codigo_dependencia + ' - ' +
+                    service.nombre_dependencia : '' }}
                 </div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5 td-data-table">
@@ -70,24 +74,34 @@ import axios from 'axios';
               </td>
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="space-x-1">
-                  <button @click="editIncomeConcept(service)" v-if="permits.actualizar==1" class="text-slate-400 hover:text-slate-500 rounded-full">
-                    <span class="sr-only">Edit</span>
-                    <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
-                      <path
-                        d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z">
-                      </path>
-                    </svg>
-                  </button>
-                  <button @click="changeStateIncomeConcept(service.id_concepto_ingreso,service.nombre_concepto_ingreso,service.estado_concepto_ingreso)" v-if="permits.eliminar==1" 
-                    class="text-rose-500 hover:text-rose-600 rounded-full">
-                    <span class="sr-only">Delete</span><svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
-                      <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
-                      </path>
-                      <path
-                        d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z">
-                      </path>
-                    </svg>
-                  </button>
+                  <DropDownOptions>
+                    <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer" v-if="permits.actualizar == 1"
+                      @click="editIncomeConcept(service)">
+                      <div class="w-8 text-green-900">
+                        <span class="text-xs">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 002.25-2.25V6a2.25 2.25 0 00-2.25-2.25H6A2.25 2.25 0 003.75 6v2.25A2.25 2.25 0 006 10.5zm0 9.75h2.25A2.25 2.25 0 0010.5 18v-2.25a2.25 2.25 0 00-2.25-2.25H6a2.25 2.25 0 00-2.25 2.25V18A2.25 2.25 0 006 20.25zm9.75-9.75H18a2.25 2.25 0 002.25-2.25V6A2.25 2.25 0 0018 3.75h-2.25A2.25 2.25 0 0013.5 6v2.25a2.25 2.25 0 002.25 2.25z" />
+                          </svg>
+                        </span>
+                      </div>
+                      <div class="font-semibold">Ver</div>
+                    </div>
+                    <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                      @click="changeStateIncomeConcept(service.id_concepto_ingreso, service.nombre_concepto_ingreso, service.estado_concepto_ingreso)"
+                      v-if="permits.eliminar == 1">
+                      <div class="w-8 text-red-900"><span class="text-xs">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                          </svg>
+
+                        </span></div>
+                      <div class="font-semibold">Eliminar</div>
+                    </div>
+                  </DropDownOptions>
                 </div>
               </td>
             </tr>
@@ -133,12 +147,11 @@ import axios from 'axios';
       </div>
     </div>
 
-    <ModalIncomeConceptVue :showModalIncome="showModalIncome" :modalData="modalData" :financing_sources="financing_sources"
-            :budget_accounts="budget_accounts" :dependencies="dependencies"
-            @cerrar-modal="showModalIncome=false" @get-table="this.getIncomeConcept(this.tableData.currentPage)"/>
+    <ModalIncomeConceptVue :showModalIncome="showModalIncome" :modalData="modalData"
+      :financing_sources="financing_sources" :budget_accounts="budget_accounts" :dependencies="dependencies"
+      @cerrar-modal="showModalIncome = false" @get-table="this.getIncomeConcept(this.tableData.currentPage)" />
 
   </AppLayoutVue>
-  
 </template>
 
 <script>
@@ -148,7 +161,7 @@ export default {
     this.getPermits()
     this.getSelectsIncomeConcept()
   },
-  data(){
+  data() {
     let sortOrders = {};
     let columns = [
       { width: "10%", label: "ID", name: "id_concepto_ingreso", type: "text" },
@@ -158,8 +171,8 @@ export default {
       {
         width: "10%", label: "Estado", name: "estado_concepto_ingreso", type: "select",
         options: [
-          {value: "1", label: "Activo"},
-          {value: "0", label: "Inactivo"}
+          { value: "1", label: "Activo" },
+          { value: "0", label: "Inactivo" }
         ]
       },
       { width: "10%", label: "Acciones", name: "Acciones" },
@@ -172,12 +185,12 @@ export default {
     });
     return {
       //Data for datatable
-      income_concept : [], 
+      income_concept: [],
       //Data for modal
-      showModalIncome:false,
-      modalData : [], 
+      showModalIncome: false,
+      modalData: [],
 
-      permits : [],
+      permits: [],
       budget_accounts: [],
       dependencies: [],
       financing_sources: [],
@@ -197,18 +210,18 @@ export default {
       },
     }
   },
-  methods:{
-    editIncomeConcept(income_concept){
+  methods: {
+    editIncomeConcept(income_concept) {
       //var array = {nombre_marca:marca.nombre_marca}
       this.modalData = income_concept
-      this.showModalIncome=true
+      this.showModalIncome = true
     },
-    addIncomeConcept(){
-      this.modalData=[]
-      this.showModalIncome=true
+    addIncomeConcept() {
+      this.modalData = []
+      this.showModalIncome = true
     },
-    getSelectsIncomeConcept(){
-        axios.get("/get-selects-income-concept")
+    getSelectsIncomeConcept() {
+      axios.get("/get-selects-income-concept")
         .then((response) => {
           this.budget_accounts = response.data.budget_accounts
           this.dependencies = response.data.dependencies
@@ -225,7 +238,7 @@ export default {
           this.$emit("cerrar-modal");
         });
     },
-    changeStateIncomeConcept(id_service,name_service,state_service){
+    changeStateIncomeConcept(id_service, name_service, state_service) {
       let msg
       state_service == 1 ? msg = "Desactivar" : msg = "Activar"
       this.$swal.fire({
@@ -252,20 +265,20 @@ export default {
               this.getIncomeConcept(this.tableData.currentPage);
             })
             .catch((errors) => {
-            let msg = this.manageError(errors)
-            this.$swal.fire({
-              title: 'Operación cancelada',
-              text: msg,
-              icon: 'warning',
-              timer:5000
-            })
+              let msg = this.manageError(errors)
+              this.$swal.fire({
+                title: 'Operación cancelada',
+                text: msg,
+                icon: 'warning',
+                timer: 5000
+              })
             })
         }
       })
     },
     async getIncomeConcept(url = "/ingresos") {
       this.tableData.draw++;
-      this.tableData.currentPage=url
+      this.tableData.currentPage = url
       await axios.get(url, { params: this.tableData }).then((response) => {
         let data = response.data;
         if (this.tableData.draw == data.draw) {
@@ -276,15 +289,15 @@ export default {
           this.income_concept = data.data.data;
         }
       }).catch((errors) => {
-          let msg = this.manageError(errors)
-          this.$swal.fire({
-            title: 'Operación cancelada',
-            text: msg,
-            icon: 'warning',
-            timer:5000
-          })
-          //console.log(errors);
+        let msg = this.manageError(errors)
+        this.$swal.fire({
+          title: 'Operación cancelada',
+          text: msg,
+          icon: 'warning',
+          timer: 5000
         })
+        //console.log(errors);
+      })
     },
     sortBy(key) {
       if (key != "Acciones") {
@@ -298,14 +311,14 @@ export default {
     getIndex(array, key, value) {
       return array.findIndex((i) => i[key] == value);
     },
-    getPermits(){
+    getPermits() {
       var URLactual = window.location.pathname
       let data = this.$page.props.menu;
       let menu = JSON.parse(JSON.stringify(data['urls']))
       menu.forEach((value, index) => {
         value.submenu.forEach((value2, index2) => {
-          if(value2.url===URLactual){
-            var array = {'insertar':value2.insertar,'actualizar':value2.actualizar,'eliminar':value2.eliminar,'ejecutar':value2.ejecutar}
+          if (value2.url === URLactual) {
+            var array = { 'insertar': value2.insertar, 'actualizar': value2.actualizar, 'eliminar': value2.eliminar, 'ejecutar': value2.ejecutar }
             this.permits = array
           }
         })
@@ -321,13 +334,13 @@ export default {
 
 <style>
 .td-data-table {
-    max-width: 100px;
-    white-space: nowrap;
-    height: 50px;
+  max-width: 100px;
+  white-space: nowrap;
+  height: 50px;
 }
 
 .ellipsis {
-    overflow: hidden;
-    text-overflow: ellipsis;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>

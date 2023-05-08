@@ -65,61 +65,37 @@ import InputError from "@/Components/InputError.vue";
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
                                 <div class="space-x-1">
-                                    <button class="text-slate-400 hover:text-slate-500 rounded-full"
-                                        @click="editRequerimiento(requerimiento)">
-                                        <svg width="33px" height="33px" viewBox="0 0 24.00 24.00" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg" stroke="#000000" stroke-width="0.384">
 
-                                            <g id="SVGRepo_bgCarrier" stroke-width="0" />
-
-                                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" />
-
-                                            <g id="SVGRepo_iconCarrier">
-                                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                                    d="M11.9995 8.00001C9.79023 8.00001 8 9.79065 8 12.0005C8 14.2096 9.79043 16 11.9995 16C14.2082 16 16 14.21 16 12.0005C16 9.79024 14.2084 8.00001 11.9995 8.00001ZM10 12.0005C10 10.8948 10.8952 10 11.9995 10C13.1043 10 14 10.8952 14 12.0005C14 13.1046 13.1045 14 11.9995 14C10.895 14 10 13.105 10 12.0005Z"
-                                                    fill="#152C70" />
-                                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                                    d="M16.2389 5.00144C13.5704 3.66721 10.4295 3.66721 7.76104 5.00144C6.14869 5.80761 4.79966 7.05685 3.8722 8.60262L2.65499 10.6313C2.14951 11.4738 2.14951 12.5263 2.65499 13.3687L3.8722 15.3974C4.79966 16.9432 6.14869 18.1924 7.76104 18.9986C10.4295 20.3328 13.5704 20.3328 16.2389 18.9986C17.8512 18.1924 19.2003 16.9432 20.1277 15.3974L21.3449 13.3687C21.8504 12.5263 21.8504 11.4738 21.3449 10.6313L20.1277 8.60262C19.2002 7.05685 17.8512 5.80761 16.2389 5.00144ZM8.65546 6.79029C10.7609 5.73759 13.239 5.73759 15.3444 6.79029C16.6166 7.42636 17.681 8.41201 18.4127 9.63161L19.6299 11.6603C19.7554 11.8694 19.7554 12.1306 19.6299 12.3397L18.4127 14.3684C17.681 15.588 16.6166 16.5737 15.3444 17.2097C13.239 18.2624 10.7609 18.2624 8.65546 17.2097C7.38332 16.5737 6.31895 15.588 5.58718 14.3684L4.36998 12.3397C4.24451 12.1306 4.24451 11.8694 4.36997 11.6603L5.58718 9.63161C6.31895 8.41201 7.38333 7.42636 8.65546 6.79029Z"
-                                                    fill="#152C70" />
-                                            </g>
-                                        </svg>
-                                    </button>
-                                    <button class="text-blue-500 hover:text-blue-600 rounded-full"
-                                        @click="viewRequest(requerimiento)">
-                                        <svg viewBox="-20.48 -20.48 552.96 552.96" width="25px" height="25px" fill="#000000" class=""
-                                            stroke="#000000" stroke-width="4.096"
-                                            transform="matrix(-1, 0, 0, -1, 0, 0)rotate(0)">
-                                            <path style="fill:#1a539e;"
-                                                d="M467.163,512H44.837c-7.586,0-13.734-6.149-13.734-13.734V13.734C31.102,6.149,37.251,0,44.837,0 h422.326c7.586,0,13.734,6.149,13.734,13.734v252.338c0,7.586-6.149,13.734-13.734,13.734s-13.734-6.149-13.734-13.734V27.469 H58.571v457.062h394.857V349.393c0-7.586,6.149-13.734,13.734-13.734s13.734,6.149,13.734,13.734v148.872 C480.898,505.851,474.749,512,467.163,512z" />
-                                            <rect x="214.793" y="67.265" style="fill:#e8773b;" width="192.283"
-                                                height="54.481" />
-                                            <path style="fill:#1a539e;"
-                                                d="M407.079,135.48H214.796c-7.586,0-13.734-6.149-13.734-13.734V67.266 c0-7.586,6.149-13.734,13.734-13.734h192.283c7.586,0,13.734,6.149,13.734,13.734v54.481 C420.813,129.331,414.664,135.48,407.079,135.48z M228.53,108.011h164.814v-27.01H228.53V108.011z" />
-                                            <rect x="214.793" y="174.923" style="fill:#e8773b;" width="192.283"
-                                                height="54.481" />
-                                            <path style="fill:#1a539e;"
-                                                d="M407.079,243.143H214.796c-7.586,0-13.734-6.149-13.734-13.734v-54.481 c0-7.586,6.149-13.734,13.734-13.734h192.283c7.586,0,13.734,6.149,13.734,13.734v54.481 C420.813,236.994,414.664,243.143,407.079,243.143z M228.53,215.674h164.814v-27.012H228.53V215.674z" />
-                                            <rect x="214.793" y="282.587" style="fill:#e8773b;" width="192.283"
-                                                height="54.481" />
-                                            <g>
-                                                <path style="fill:#1a539e;"
-                                                    d="M407.079,350.806H214.796c-7.586,0-13.734-6.149-13.734-13.734v-54.481 c0-7.586,6.149-13.734,13.734-13.734h192.283c7.586,0,13.734,6.149,13.734,13.734v54.481 C420.813,344.658,414.664,350.806,407.079,350.806z M228.53,323.337h164.814v-27.012H228.53V323.337z" />
-                                                <path style="fill:#1a539e;"
-                                                    d="M407.079,458.47H214.796c-7.586,0-13.734-6.149-13.734-13.734s6.149-13.734,13.734-13.734h178.548 v-27.012H214.796c-7.586,0-13.734-6.149-13.734-13.734s6.149-13.734,13.734-13.734h192.283c7.586,0,13.734,6.149,13.734,13.734 v54.481C420.813,452.321,414.664,458.47,407.079,458.47z" />
-                                                <path style="fill:#1a539e;"
-                                                    d="M159.858,135.48H104.92c-7.586,0-13.734-6.149-13.734-13.734V67.266 c0-7.586,6.149-13.734,13.734-13.734h54.938c7.586,0,13.734,6.149,13.734,13.734v54.481 C173.592,129.331,167.443,135.48,159.858,135.48z M118.654,108.011h27.469v-27.01h-27.469V108.011z" />
-                                                <path style="fill:#1a539e;"
-                                                    d="M159.858,243.143H104.92c-7.586,0-13.734-6.149-13.734-13.734v-54.481 c0-7.586,6.149-13.734,13.734-13.734h54.938c7.586,0,13.734,6.149,13.734,13.734v54.481 C173.592,236.994,167.443,243.143,159.858,243.143z M118.654,215.674h27.469v-27.012h-27.469V215.674z" />
-                                                <path style="fill:#1a539e;"
-                                                    d="M159.858,350.806H104.92c-7.586,0-13.734-6.149-13.734-13.734v-54.481 c0-7.586,6.149-13.734,13.734-13.734h54.938c7.586,0,13.734,6.149,13.734,13.734v54.481 C173.592,344.658,167.443,350.806,159.858,350.806z M118.654,323.337h27.469v-27.012h-27.469V323.337z" />
-                                            </g>
-                                            <rect x="104.917" y="390.252" style="fill:#e8773b;" width="54.938"
-                                                height="54.481" />
-                                            <path style="fill:#1a539e;"
-                                                d="M159.858,458.47H104.92c-7.586,0-13.734-6.149-13.734-13.734v-54.481 c0-7.586,6.149-13.734,13.734-13.734h54.938c7.586,0,13.734,6.149,13.734,13.734v54.481 C173.592,452.321,167.443,458.47,159.858,458.47z M118.654,431.001h27.469v-27.012h-27.469V431.001z" />
-
-                                        </svg>
-                                    </button>
+                                    <DropDownOptions>
+                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                            @click="editRequerimiento(requerimiento)">
+                                            <div class="w-8 text-green-900">
+                                                <span class="text-xs">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 002.25-2.25V6a2.25 2.25 0 00-2.25-2.25H6A2.25 2.25 0 003.75 6v2.25A2.25 2.25 0 006 10.5zm0 9.75h2.25A2.25 2.25 0 0010.5 18v-2.25a2.25 2.25 0 00-2.25-2.25H6a2.25 2.25 0 00-2.25 2.25V18A2.25 2.25 0 006 20.25zm9.75-9.75H18a2.25 2.25 0 002.25-2.25V6A2.25 2.25 0 0018 3.75h-2.25A2.25 2.25 0 0013.5 6v2.25a2.25 2.25 0 002.25 2.25z" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                            <div class="font-semibold">Editar</div>
+                                        </div>
+                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                            @click="viewRequest(requerimiento)">
+                                            <div class="w-8 text-blue-900">
+                                                <span class="text-xs">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                            <div class="font-semibold">Ver</div>
+                                        </div>
+                                    </DropDownOptions>
                                 </div>
                             </td>
                         </tr>
@@ -268,9 +244,9 @@ export default {
     data: function (data) {
         let sortOrders = {};
         let columns = [
-            { width: "10%", label: "Numero requerimiento", name: "numero_requerimiento_pago", type: "text" },
-            { width: "45%", label: "Descripcion", name: "descripcion_requerimiento_pago", type: "text" },
-            { width: "15%", label: "Monto", name: "monto_requerimiento_pago", type: "text" },
+            { width: "5%", label: "Numero requerimiento", name: "numero_requerimiento_pago", type: "text" },
+            { width: "20%", label: "Descripcion", name: "descripcion_requerimiento_pago", type: "text" },
+            { width: "10%", label: "Monto", name: "monto_requerimiento_pago", type: "text" },
             { width: "10%", label: "Mes", name: "mes_requerimiento_pago", type: "text" },
             { width: "10%", label: "Año", name: "anio_requerimiento_pago", type: "text" },
 

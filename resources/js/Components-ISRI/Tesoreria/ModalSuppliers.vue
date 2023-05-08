@@ -186,7 +186,7 @@ import moment from 'moment';
                         class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600 underline underline-offset-1"
                         @click.stop="this.$emit('close-definitive')">Cerrar</button>
                     <GeneralButton v-if="infoSupplier != ''" @click="updateSupplier()"
-                        color="bg-orange-700  hover:bg-orange-800" text="Editar proveedor" icon="add" />
+                        color="bg-orange-700  hover:bg-orange-800" text="Editar proveedor" icon="update" />
                     <GeneralButton v-else @click="addSupplier()" color="bg-green-700  hover:bg-green-800"
                         text="Agregar proveedor" icon="add" />
                 </div>

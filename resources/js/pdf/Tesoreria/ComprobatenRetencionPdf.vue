@@ -9,14 +9,14 @@
             <p class="font-bold text-[8pt]">GIRO: PRESENTACION DE SERVICIOS DE REHABILITACION</p>
             <p class="text-[10pt]">DIRECCION: Colonia Costa Rica y Avenida Irazú, #181, San Salvador</p>
             <p class="text-[10pt]">Tel.: 2240-6519, 2240-6421</p>
-            <p class="text-[8pt]">FECHA: {{ dataQuedan.fecha_emision_quedan }}</p>
+            <p class="text-[8pt]">FECHA: {{ dataQuedan.fecha_retencion_iva_quedan }}</p>
           </div>
           <div class="w-[30%] text-center" style="margin-top: -5px;">
             <div class="bg-white rounded-lg border-2 border-black h-[110px]">
               <div style="margin-top: -12px;" class="py-1">
                 <p class="font-extrabold text-[11pt]">COMPROBANTE DE RETENCION</p>
                 <p class="font-bold text-[6.5pt]">SERIE AUTORIZADA DE 21DS000E1 AL 21DS000E30000</p>
-                <p class="text-[19pt]">0000083</p>
+                <p class="text-[19pt]">{{ dataQuedan.numero_retencion_iva_quedan.toString().padStart(7, '0') }}</p>
                 <p class="font-extrabold text-[9pt]">N.I.T.: 0614-170324-001-9</p>
                 <p class="font-extrabold text-[9pt]">RESOLUCION: 15041-RES-IN-26216-2021</p>
               </div>
@@ -53,7 +53,7 @@
                 </td>
                 <td class="border-r border-black border-b text-left" colspan="2">
                   <div style="margin-top: -12px;" class="pl-2 pt-2 pb-3 text-[8pt]">
-                    GIRO:
+                    GIRO: <!-- <span class="font-extrabold text-[8px]">{{ dataQuedan.proveedor.giro.nombre_giro }}</span> -->
                   </div>
                 </td>
               </tr>
@@ -90,7 +90,7 @@
 
               <tr v-for="i in 7" :key="i">
                 <td v-if="dataQuedan.detalle_quedan[i - 1]" class=" border-l border-r border-black border-b text-left ">
-                  <div style="margin-top: -12px;" class="pl-1 py-[9px] text-[8pt]">
+                  <div style="margin-top: -12px;" class="pl-1 py-[9px] text-[8pt] text-center">
                     {{ dataQuedan.detalle_quedan[i - 1].fecha_factura_det_quedan }}
                   </div>
                 </td>

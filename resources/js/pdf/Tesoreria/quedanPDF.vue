@@ -10,7 +10,7 @@
       <br>
       <div style class="pl-32">
         <span class="text-[15pt] font-bold">QUEDAN N°</span>
-        <span class="text-[18pt] pl-2" style="font-family: 'Courier New', Courier, monospace;">0002124</span>
+        <span class="text-[18pt] pl-2" style="font-family: 'Courier New', Courier, monospace;">{{ dataQuedan.id_quedan.toString().padStart(7, '0') }}</span>
       </div>
     </div>
     <div class="md:mb-0 basis-1/4 pr-2">

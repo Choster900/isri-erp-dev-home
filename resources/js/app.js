@@ -13,8 +13,11 @@ import LabelToInput from "@/Components-ISRI/ComponentsToForms/LabelToInput.vue";
 import Checkbox from "@/Components-ISRI/ComponentsToForms/Checkbox.vue"; //TODO: Fix style
 import moment from "moment";
 moment.lang("es", {
-    months: "Enero_Febrero_Marzo_Abril_Mayo_Junio_Julio_Agosto_Septiembre_Octubre_Noviembre_Diciembre".split("_"),
-    monthsShort:"Enero._Feb._Mar_Abr._May_Jun_Jul._Ago_Sept._Oct._Nov._Dec.".split("_"),
+    months: "Enero_Febrero_Marzo_Abril_Mayo_Junio_Julio_Agosto_Septiembre_Octubre_Noviembre_Diciembre".split(
+        "_"
+    ),
+    monthsShort:
+        "Enero._Feb._Mar_Abr._May_Jun_Jul._Ago_Sept._Oct._Nov._Dec.".split("_"),
     weekdays: "Domingo_Lunes_Martes_Miercoles_Jueves_Viernes_Sabado".split("_"),
     weekdaysShort: "Dom._Lun._Mar._Mier._Jue._Vier._Sab.".split("_"),
     weekdaysMin: "Do_Lu_Ma_Mi_Ju_Vi_Sa".split("_"),
@@ -24,7 +27,8 @@ import Datepicker from "vue3-datepicker";
 import RadioButton from "@/Components-ISRI/ComponentsToForms/RadioButton.vue"; //TODO: Fix style
 import DatepickerTest from "@/Components-ISRI/ComponentsToForms/FlatPickr.vue";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
-import flatPickr from 'vue-flatpickr-component';
+import flatPickr from "vue-flatpickr-component";
+import DropDownOptions from "@/Components-ISRI/DropDownOptions.vue";
 
 import jQuery from "jquery";
 window.jQuery = window.$ = jQuery;
@@ -39,21 +43,20 @@ const appName =
     window.document.getElementsByTagName("title")[0]?.innerText || "";
 
 const manageError = (errors) => {
-    let code_error = errors.response.status
-    let msg
-    if(code_error>=500){
+    let code_error = errors.response.status;
+    let msg;
+    if (code_error >= 500) {
         console.log(errors.response.data.message);
-        msg = "Error al conectarse con el servidor."
-    }else if(code_error>=400 && code_error<500){
+        msg = "Error al conectarse con el servidor.";
+    } else if (code_error >= 400 && code_error < 500) {
         console.log(errors.response.data.message);
-        msg = "Funcionalidad no disponible, consulte con el administrador."
+        msg = "Funcionalidad no disponible, consulte con el administrador.";
+    } else {
+        console.log(errors.response.data.message);
+        msg = "Lo sentimos, hubo un error al procesar la petición.";
     }
-    else{
-        console.log(errors.response.data.message);
-        msg = "Lo sentimos, hubo un error al procesar la petición."
-    }
-    return msg
-}
+    return msg;
+};
 
 createInertiaApp({
     title: (title) => `${title}  ${appName}`,
@@ -68,6 +71,7 @@ createInertiaApp({
             .use(VueSweetalert2)
             .component("AppLayoutVue", AppLayoutVue)
             .component("Multiselect", Multiselect)
+            .component("DropDownOptions", DropDownOptions)
             .component("GeneralButton", GeneralButton)
             .component("flatPickr", flatPickr)
             .component("Checkbox", Checkbox)
@@ -76,7 +80,7 @@ createInertiaApp({
             .component("Datepicker", Datepicker)
             .component("RadioButton", RadioButton)
             .component("DatepickerTest", DatepickerTest)
-            .mixin({methods: { manageError } })
+            .mixin({ methods: { manageError } })
             .use(ZiggyVue, Ziggy)
             .mount(el);
     },

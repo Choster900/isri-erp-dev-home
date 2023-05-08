@@ -47,6 +47,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('add-quedan', [QuedanController::class, 'addQuedan'])->name('add-quedan');
     Route::post('update-detalle-quedan', [QuedanController::class, 'updateDetalleQuedan'])->name('update-detalle-quedan');
     Route::get('getAllSuppliers', [QuedanController::class, 'getSuppliers'])->name('get-all-suppliers');
+    Route::post('updateFechaRetencionIva', [QuedanController::class, 'updateFechaRetencionIva'])->name('update-fecha-liquidacion');
 
 
     //Manage requerimiento pago

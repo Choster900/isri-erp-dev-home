@@ -89,38 +89,33 @@ import axios from 'axios';
 
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="space-x-1">
-                                    <button class="text-rose-500 hover:text-rose-600 rounded-full" title="Eliminar Req."
-                                        v-if="data.id_estado_quedan === 2" @click="takeOf(data.id_quedan)">
-  
-
-                                        <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
-                                        <svg fill="#000000" width="35px" height="35px" viewBox="0 0 24 24" id="delete-alt"
-                                            data-name="Flat Color" xmlns="http://www.w3.org/2000/svg"
-                                            class="icon flat-color" stroke="#000000" stroke-width="0.264">
-
-                                            <g id="SVGRepo_bgCarrier" stroke-width="0" />
-
-                                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" />
-
-                                            <g id="SVGRepo_iconCarrier">
-
-                                                <path id="secondary"
-                                                    d="M16,8a1,1,0,0,1-1-1V4H9V7A1,1,0,0,1,7,7V4A2,2,0,0,1,9,2h6a2,2,0,0,1,2,2V7A1,1,0,0,1,16,8Z"
-                                                    style="fill: #ffffff;" />
-
-                                                <path id="primary"
-                                                    d="M20,6H4A1,1,0,0,0,4,8H5V20a2,2,0,0,0,2,2H17a2,2,0,0,0,2-2V8h1a1,1,0,0,0,0-2Z"
-                                                    style="fill: #c10000e0;" />
-
-                                                <path id="secondary-2" data-name="secondary"
-                                                    d="M10,18a1,1,0,0,1-1-1V11a1,1,0,0,1,2,0v6A1,1,0,0,1,10,18Zm5-1V11a1,1,0,0,0-2,0v6a1,1,0,0,0,2,0Z"
-                                                    style="fill: #ffffff;" />
-
-                                            </g>
-
-                                        </svg>
-
-                                    </button>
+                                    <DropDownOptions>
+                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                            v-if="data.id_estado_quedan === 2" @click="takeOf(data.id_quedan)">
+                                            <div class="w-8 text-orange-900">
+                                                <span class="text-xs">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                            <div class="font-semibold">Eliminar</div>
+                                        </div>
+                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-not-allowed" v-else>
+                                            <div class="w-8 text-blue-900">
+                                                <span class="text-xs">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                            <div class="font-semibold">En liquidacion</div>
+                                        </div>
+                                    </DropDownOptions>
                                 </div>
                             </td>
                         </tr>
@@ -355,8 +350,10 @@ export default {
 };
 </script>
   
-<style>.wrap,
+<style>
+.wrap,
 .wrap2 {
     width: 100%;
     white-space: pre-wrap;
-}</style>
+}
+</style>

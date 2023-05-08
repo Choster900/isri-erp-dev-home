@@ -31,13 +31,12 @@ class QuedanRequest extends FormRequest
         collect($this->input('detalle_quedan', [])) // Convertir el arreglo en una colección
             ->each(function ($detalle, $key) use (&$rules) { // Iterar sobre cada detalle
                 if (!empty($detalle[7])) { // Validar si el campo 7 está lleno
+                    $rules["detalle_quedan.{$key}.3"] = ['required'];
+
                     $rules["detalle_quedan.{$key}.4"] = [
-                        Rule::unique('detalle_quedan', 'numero_acta_det_quedan')
-                            ->where(function ($query) use ($detalle) {
-                                return $query->where('id_dependencia', $detalle[3])
-                                    ->where('numero_acta_det_quedan', $detalle[4]);
-                            })
-                            ->ignore($detalle[1], 'id_det_quedan')
+                        Rule::unique('detalle_quedan', 'numero_acta_det_quedan')->where(function ($query) use ($detalle) {
+                                return $query->where('id_dependencia', $detalle[3])->where('numero_acta_det_quedan', $detalle[4]);
+                            })->ignore($detalle[1], 'id_det_quedan')
                     ];
                 }
             });
@@ -47,11 +46,14 @@ class QuedanRequest extends FormRequest
     public function messages()
     {
         $messages = [];
-
-
-        foreach ($this->input('detalle_quedan', []) as $key => $value) {
+        foreach ( $this->input('detalle_quedan', []) as $key => $value ) {
             if ($this->input("detalle_quedan.{$key}.7")) {
                 $messages["detalle_quedan.{$key}.4.unique"] = '1';
+            }
+        }
+        foreach ( $this->input('detalle_quedan', []) as $key => $value ) {
+            if ($this->input("detalle_quedan.{$key}.7")) {
+                $messages["detalle_quedan.{$key}.3.required"] = 'LA DEPENDENCIA ES UN DATO REQUERIDO';
             }
         }
 

@@ -31,8 +31,8 @@ import html2pdf from 'html2pdf.js'
                                 @click="printPdf()" />
                         </div>
                         <div class="px-2" v-if="dataQuedan != ''">
-                            <GeneralButton color="bg-[#2F347E]/90  hover:bg-[#2F347E]"
-                                text="GENERAR COMPROBANTE DE RETENCION" icon="pdf"
+                            <GeneralButton color="bg-[#0A3158]/90  hover:bg-[#0A3158]"
+                                text="GENERAR RETENCION" icon="pdf"
                                 @click="generarComprobanteRetencionPdf()" />
                         </div>
                     </div>
@@ -138,7 +138,8 @@ import html2pdf from 'html2pdf.js'
                                     <div class="relative flex  w-full flex-row">
                                         <label for="" class="flex items-center  text-[14px] text-sm">Total:
                                         </label>
-                                        <input type="text" style="width: 80px;" readonly v-model="dataInputs.monto_total_quedan"
+                                        <input type="text" style="width: 80px;" readonly
+                                            v-model="dataInputs.monto_total_quedan"
                                             class="placeholder-slate-400 text-sm py-0 text-center font-bold transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
                                     </div>
                                 </div>
@@ -151,16 +152,16 @@ import html2pdf from 'html2pdf.js'
                             <table class="table-auto mx-auto">
                                 <thead>
                                     <tr>
-                                        <th class="border-2 border-black h-7 ">
+                                        <th class="border-2 border-black h-7 " colspan="2">
                                             <p class="px-[55px] text-sm text-gray-600">PROVEEDOR</p>
                                         </th>
-                                        <th class="border-2 border-black text-sm text-gray-600" colspan="8"
+                                        <th class="border-2 border-black text-sm text-gray-600" colspan="9"
                                             contenteditable="false">
                                             DATOS DEL QUEDAN
                                         </th>
                                     </tr>
                                     <tr>
-                                        <td class="border-2 border-black" colspan="1" contenteditable="false">
+                                        <td class="border-2 border-black" colspan="2" contenteditable="false">
                                             <div class="relative flex h-8 w-full flex-row-reverse "
                                                 :class="{ 'condition-select': dataInputs.id_proveedor == '' }">
                                                 <Multiselect v-model="dataInputs.id_proveedor"
@@ -172,14 +173,17 @@ import html2pdf from 'html2pdf.js'
                                         <th class="border-2 border-black text-sm text-gray-600" colspan="3">
                                             NUMERO DE ACUERDO
                                         </th>
-                                        <th class="border-2 border-black text-sm text-gray-600" colspan="8">
+                                        <th class="border-2 border-black text-sm text-gray-600" colspan="4">
                                             NUMERO DE COMPROMISO
+                                        </th>
+                                        <th class="border-2 border-black text-sm text-gray-600" colspan="4">
+                                            NUMERO DE RETENCION
                                         </th>
 
                                     </tr>
 
                                     <tr>
-                                        <th class="border-2 border-black h-16 text-sm text-gray-600">
+                                        <th class="border-2 border-black h-16 text-sm text-gray-600" colspan="2">
                                             ACUERDO CONTRATACION
                                         </th>
                                         <td class="border-2 border-black"
@@ -192,15 +196,23 @@ import html2pdf from 'html2pdf.js'
                                         </td>
                                         <td class="border-2 border-black"
                                             :class="dataInputs.numero_compromiso_ppto_quedan == '' ? 'bg-[#fdfd96]' : ''"
-                                            colspan="8" contenteditable="false">
+                                            colspan="4" contenteditable="false">
                                             <input type="text" v-model="dataInputs.numero_compromiso_ppto_quedan"
+                                                :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
+                                                :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
+                                                class="peer w-full text-sm bg-transparent text-center h-16 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
+                                        </td>
+                                        <td class="border-2 border-black"
+                                            :class="dataInputs.numero_retencion_iva_quedan == '' ? 'bg-[#fdfd96]' : ''"
+                                            colspan="4" contenteditable="false">
+                                            <input type="text" v-model="dataInputs.numero_retencion_iva_quedan"
                                                 :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                 :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
                                                 class="peer w-full text-sm bg-transparent text-center h-16 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="border-2 border-black" colspan="1" contenteditable="false">
+                                        <td class="border-2 border-black" colspan="2" contenteditable="false">
                                             <div class="relative flex h-8 w-full flex-row-reverse"
                                                 :class="{ 'condition-select': dataInputs.id_acuerdo_compra == '' }">
                                                 <Multiselect v-model="dataInputs.id_acuerdo_compra"
@@ -208,23 +220,23 @@ import html2pdf from 'html2pdf.js'
                                                     :options="dataForSelectInRow.acuerdoCompras" :searchable="true" />
                                             </div>
                                         </td>
-                                        <th class="border-2 border-black text-sm text-gray-600" colspan="8"
+                                        <th class="border-2 border-black text-sm text-gray-600" colspan="9"
                                             contenteditable="false">
                                             DETALLE QUEDAN
                                         </th>
                                     </tr>
                                     <tr>
-                                        <th class="border-2 border-black text-sm text-gray-600 ">FACTURA</th>
+                                        <th class="border-2 border-black text-sm w-24 text-gray-600">FACTURA</th>
+                                        <th class="border-2 border-black text-sm text-gray-600">FECHA DE EMISION</th>
                                         <th class="border-2 border-black text-sm px-10 text-gray-600" colspan="2">
                                             DEPENDENCIA</th>
-
-                                        <th class="border-2 border-black text-sm px-8 text-gray-600">NUMERO ACTA</th>
-                                        <th class="border-2 border-black w-64 text-sm px-10 text-gray-600" colspan="2">
-                                            CONCEPTO</th>
-                                        <th class="border-2 border-black w-40 text-sm px-10 text-gray-600">
-                                            MONTO
+                                        <th class="border-2 border-black text-sm px-8 text-gray-600" colspan="2">NUMERO ACTA
                                         </th>
-
+                                        <th class="border-2 border-black w-56 max-w-[256px] text-sm px-10 text-gray-600"
+                                            colspan="3">
+                                            CONCEPTO</th>
+                                        <th class="border-2 border-black w-40 text-sm px-10 text-gray-600" colspan="4">MONTO
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody class="text-sm" id="content">
@@ -238,9 +250,19 @@ import html2pdf from 'html2pdf.js'
                                                     <td v-if="cellIndex == 2"
                                                         @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
                                                         class="border-2 border-black" :class="[cell == '' ? 'bg-[#fdfd96]' : '',
-                                                            dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']"
+                                                        dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']"
                                                         :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true">
                                                         {{ cell }}
+                                                    </td>
+                                                    <td v-if="cellIndex == 2" class="border-2 border-black">
+                                                        <div class="mb-4  md:mb-0">
+                                                            <flat-pickr v-model="rowsData[rowIndex][8]"
+                                                                :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
+                                                                :class="[rowsData[rowIndex][8] == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']"
+                                                                class="w-[126px]  text-xs text-center cursor-pointer rounded-md border h-8 border-slate-400 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
+                                                                :config="config" />
+                                                        </div>
+
                                                     </td>
                                                     <td v-else-if="cellIndex == 3" class="border-2 border-black" colspan="2"
                                                         :class="{ 'condition-select': rowsData[rowIndex][3] == '' }">
@@ -252,7 +274,8 @@ import html2pdf from 'html2pdf.js'
                                                                 @select="onCellEdit(rowIndex, cellIndex, $event)" />
                                                         </div>
                                                     </td>
-                                                    <td v-else-if="cellIndex == 4" class="border-2 border-black" :class="[
+                                                    <td v-else-if="cellIndex == 4" class="border-2 border-black" colspan="2"
+                                                        :class="[
                                                             cell == '' ? 'bg-[#fdfd96]' : '',
                                                             errosDetalleQuedan[rowIndex] ? 'bg-[#fd9696]' : '',
                                                             errosrNumeroActa.includes(rowIndex) ? 'bg-[#fd9696]' : '',
@@ -261,7 +284,7 @@ import html2pdf from 'html2pdf.js'
                                                         @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
                                                         :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true">{{
                                                             cell }}</td>
-                                                    <td v-else-if="cellIndex == 5" colspan="2"
+                                                    <td v-else-if="cellIndex == 5" colspan="4"
                                                         @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
                                                         class="border-2 border-black px-1 "
                                                         :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
@@ -312,26 +335,26 @@ import html2pdf from 'html2pdf.js'
                                         <td contenteditable="false" class="py-3 border-none"></td>
                                     </tr>
                                     <tr>
-                                        <td class="border-2 border-black " colspan="1" rowspan="2" contenteditable="false">
+                                        <td class="border-2 border-black " colspan="2" rowspan="2" contenteditable="false">
                                             Descripción
                                         </td>
-                                        <td class="border-2 border-black" colspan="4" rowspan="2"
+                                        <td class="border-2 border-black" colspan="5" rowspan="2"
                                             :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true"
                                             @input="onInputDescripcionQuedan"
                                             :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''">
                                             {{ dataInputs.descripcion_quedan }}
 
                                         </td>
-                                        <th class="border-2 border-black text-sm text-gray-600">
+                                        <th class="border-2 border-black text-sm text-gray-600" colspan="2">
                                             PRIORIDAD DE PAGO
                                         </th>
-                                        <th class="border-2 border-black py-0 text-sm text-gray-600">
+                                        <th class="border-2 border-black py-0 text-sm text-gray-600" colspan="3">
                                             PROYECTO FINANCIADO
                                         </th>
                                     </tr>
                                     <tr>
 
-                                        <td class="border-2 border-black " colspan="1" contenteditable="false">
+                                        <td class="border-2 border-black " colspan="2" contenteditable="false">
                                             <div class="relative flex h-8 w-full flex-row-reverse "
                                                 :class="{ 'condition-select': dataInputs.id_prioridad_pago == '' }">
                                                 <Multiselect v-model="dataInputs.id_prioridad_pago"
@@ -339,7 +362,7 @@ import html2pdf from 'html2pdf.js'
                                                     :options="dataForSelectInRow.prioridadPago" :searchable="true" />
                                             </div>
                                         </td>
-                                        <td class="border-2 border-black " colspan="1" contenteditable="false">
+                                        <td class="border-2 border-black " colspan="3" contenteditable="false">
                                             <div class="relative flex h-8 w-full flex-row-reverse "
                                                 :class="{ 'condition-select': dataInputs.id_proy_financiado == '' }">
                                                 <Multiselect v-model="dataInputs.id_proy_financiado"
@@ -408,6 +431,7 @@ export default {
                 id_acuerdo_compra: '',
                 numero_acuerdo_quedan: '',
                 numero_compromiso_ppto_quedan: '',
+                numero_retencion_iva_quedan: '',
                 descripcion_quedan: '',
                 monto_liquido_quedan: '',
                 monto_iva_quedan: '',
@@ -428,6 +452,24 @@ export default {
                 monto_iva_quedan: '',
                 monto_isr_quedan: '',
                 monto_total_quedan: ''
+            },
+            config: {
+                altInput: true,
+                static: true,
+                monthSelectorType: 'static',
+                altFormat: "F-j Y",
+                dateFormat: "Y-m-d",
+                locale: {
+                    firstDayOfWeek: 1,
+                    weekdays: {
+                        shorthand: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa'],
+                        longhand: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+                    },
+                    months: {
+                        shorthand: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                        longhand: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+                    },
+                },
             },
 
         }
@@ -458,29 +500,44 @@ export default {
             const html = div.outerHTML;
 
             html2pdf().set(opt).from(html).save();
+
         },
         generarComprobanteRetencionPdf() {
-            const opt = {
-                margin: 0.1,
-                filename: 'Comprobante_retencion.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' },
-            };
 
-            const app = createApp(comprobanteRetencion, {
-                dataQuedan: this.dataQuedan,
-                totalCheque: this.dataInputs.monto_total_quedan,
-                renta: this.dataInputs.monto_isr_quedan,
-                iva: this.dataInputs.monto_iva_quedan,
-                cheque: this.dataInputs.monto_liquido_quedan,
-            });
-            const div = document.createElement('div');
-            const pdfPrint = app.mount(div);
-            const html = div.outerHTML;
+            if (this.dataInputs.numero_retencion_iva_quedan === null) {
+                toast.error("El documento necesita un numero de retencion", {
+                    autoClose: 5000,
+                    position: "top-right",
+                    transition: "zoom",
+                    toastBackgroundColor: "red",
+                });
+            } else {
+                const opt = {
+                    margin: 0.1,
+                    filename: 'Comprobante_retencion.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' },
+                };
 
-            html2pdf().set(opt).from(html).save();
+                const app = createApp(comprobanteRetencion, {
+                    dataQuedan: this.dataQuedan,
+                    totalCheque: this.dataInputs.monto_total_quedan,
+                    renta: this.dataInputs.monto_isr_quedan,
+                    iva: this.dataInputs.monto_iva_quedan,
+                    cheque: this.dataInputs.monto_liquido_quedan,
+                });
+                const div = document.createElement('div');
+                const pdfPrint = app.mount(div);
+                const html = div.outerHTML;
 
+                html2pdf().set(opt).from(html).save();
+
+                axios.post('/updateFechaRetencionIva', { id_quedan: this.dataInputs.id_quedan }).then((response) => {
+                    console.log(response);
+
+                })
+            }
         },
 
         onCellEdit(rowIndex, cellIndex, value, type = '') {//editando la celda RECIVE ROW, CELL Y EL VALOR A MODIFICAR
@@ -570,6 +627,7 @@ export default {
             this.dataInputs.id_prioridad_pago = this.dataQuedan.id_prioridad_pago
             this.dataInputs.id_proy_financiado = this.dataQuedan.id_proy_financiado
             this.dataInputs.monto_total_quedan = this.dataQuedan.monto_total_quedan
+            this.dataInputs.numero_retencion_iva_quedan = this.dataQuedan.numero_retencion_iva_quedan
 
 
         },
@@ -592,6 +650,7 @@ export default {
             this.dataInputs.id_prioridad_pago = ""
             this.dataInputs.id_proy_financiado = ""
             this.dataInputs.monto_total_quedan = ""
+            this.dataInputs.numero_retencion_iva_quedan = ""
 
             this.dataForCalculate.irs = ''
             this.dataForCalculate.iva = ''
@@ -612,12 +671,11 @@ export default {
                 5: '',//CONCEPTO	,
                 6: { producto: '', servicio: '' },//Monto en producto y servicio
                 7: true,//eliminado_logico,
+                8: ''//fecha_factura_det_quedan
             })
         },
-
         paintPositionRepet() {
             const duplicatePositions = {}; //get position where the acta number was duplicated
-
             for (let i = 0; i < this.rowsData.length; i++) {
                 const row = this.rowsData[i];
                 const number = row[4]; // get numbers en position 4
@@ -634,7 +692,6 @@ export default {
                     }
                 }
             }
-
             const dependencies = Object.keys(duplicatePositions);
             dependencies.forEach((dependency) => {
                 const numbers = Object.keys(duplicatePositions[dependency]).filter(
@@ -653,34 +710,6 @@ export default {
 
             return this.errosrNumeroActa.length;
         },
-        async createQuedanAsynchronously() {
-
-            try {
-                const response = await axios.post('/add-quedan', {
-                    quedan: this.dataInputs,
-                    detalle_quedan: this.rowsData
-                })
-
-                return true; // indicate success
-            } catch (error) {
-
-                let data = error.response.data.errors
-                console.log(error);
-                var myData = new Object();
-                for (const errorBack in data) {
-                    let split = errorBack.split(".")
-                    let newIndexSplit = split[1]
-                    myData[newIndexSplit] = data[errorBack][0]
-                }
-                this.errosDetalleQuedan = myData;
-                setTimeout(() => {
-                    this.errosDetalleQuedan = [];
-
-                }, 5000);
-                return false; // indicate failure
-            }
-        },
-
         async createQuedan() {
             const confirmed = await this.$swal.fire({
                 title: '¿Esta seguro de crear un nuevo quedan?',
@@ -693,66 +722,59 @@ export default {
                 showCloseButton: true
             });
             if (confirmed.isConfirmed) {
-
                 if (this.paintPositionRepet() == 0) {
-                    const successAdd = await this.createQuedanAsynchronously();
-                    if (successAdd) {
-                        toast.success("El quedan fue agregado correctamente", {
-                            autoClose: 5000,
-                            position: "top-right",
-                            transition: "zoom",
-                            toastBackgroundColor: "white",
-                        });
+                    axios.post('/add-quedan', { quedan: this.dataInputs, detalle_quedan: this.rowsData }).then((response) => {
                         this.$emit("actualizar-table-data")
                         this.rowsData = []
                         this.resetValuesToInput()
                         this.addRow()
-                    } else {
-                        toast.error("Error, Al parecer tiene datos requiredidos y/o duplicados", {
-                            autoClose: 5000,
-                            position: "top-right",
-                            transition: "zoom",
-                            toastBackgroundColor: "white",
-                        });
-                    }
+                    }).catch((Error) => {
+                        console.log(Error);
+                        if (Error.response.status === 422) {
+                            if (Error.response.data.message === "LA DEPENDENCIA ES UN DATO REQUERIDO") {
+                                toast.error("La dependencia es requerida en este caso", {
+                                    autoClose: 5000,
+                                    position: "top-right",
+                                    transition: "zoom",
+                                    toastBackgroundColor: "white",
+                                });
+                            } else {
+                                toast.error("Al parecer el numero de acta ya existe en este contexto", {
+                                    autoClose: 5000,
+                                    position: "top-right",
+                                    transition: "zoom",
+                                    toastBackgroundColor: "white",
+                                });
+                                let data = Error.response.data.errors
+                                var myData = new Object();
+                                for (const errorBack in data) {
+                                    let split = errorBack.split(".")
+                                    let newIndexSplit = split[1]
+                                    myData[newIndexSplit] = data[errorBack][0]
+                                }
+                                this.errosDetalleQuedan = myData;
+                                setTimeout(() => {
+                                    this.errosDetalleQuedan = [];
+
+                                }, 5000);
+                            }
+                        } else {
+                            toast.error("Al parecer te hacen falta datos por ingresar", {
+                                autoClose: 5000,
+                                position: "top-right",
+                                transition: "zoom",
+                                toastBackgroundColor: "white",
+                            });
+                        }
+                    });
                 } else {
-                    toast.error("Al parecer tienes datos repetidos", {
+                    toast.error("Al parecer el numero de acta ya existe en este contexto", {
                         autoClose: 5000,
                         position: "top-right",
                         transition: "zoom",
                         toastBackgroundColor: "white",
                     });
-
                 }
-            }
-        },
-
-        async updateQuedanAsynchronously() {
-            try {
-                const response = await axios.post('/update-detalle-quedan', {
-                    quedan: this.dataInputs,
-                    id_quedan: this.dataQuedan.id_quedan,
-                    detalle_quedan: this.rowsData
-                });
-                return true; // indicate success
-            } catch (error) {
-                let data = error.response.data.errors
-                var myData = new Object();
-                for (const errorBack in data) {
-                    let split = errorBack.split(".")
-                    let newIndexSplit = split[1]
-                    myData[newIndexSplit] = data[errorBack][0]
-                }
-                this.errosDetalleQuedan = myData;
-
-
-                console.log(this.errosDetalleQuedan);
-
-                setTimeout(() => {
-                    this.errosDetalleQuedan = [];
-
-                }, 5000);
-                return false; // indicate failure
             }
         },
         async updateQuedan() {
@@ -766,31 +788,59 @@ export default {
                 showCancelButton: true,
                 showCloseButton: true
             });
-
             if (confirmed.isConfirmed) {
-
-
                 if (this.paintPositionRepet() == 0) {
-                    const successUpdate = await this.updateQuedanAsynchronously();
-                    if (successUpdate) {
-                        toast.success("El quedan fue modificado correctamente", {
-                            autoClose: 5000,
-                            position: "top-right",
-                            transition: "zoom",
-                            toastBackgroundColor: "white",
-                        });
-                        this.$emit("actualizar-table-data")
+                    axios.post('/update-detalle-quedan', { quedan: this.dataInputs, id_quedan: this.dataQuedan.id_quedan, detalle_quedan: this.rowsData })
+                        .then((response) => {
+                            this.$emit("actualizar-table-data")
+                            toast.success("El quedan se ha actualizado con exito", {
+                                autoClose: 5000,
+                                position: "top-right",
+                                transition: "zoom",
+                                toastBackgroundColor: "white",
+                            });
+                        }).catch((Error) => {
+                            console.log(Error);
+                            if (Error.response.status === 422) {
+                                if (Error.response.data.message === "LA DEPENDENCIA ES UN DATO REQUERIDO") {
+                                    toast.error("La dependencia es requerida en este caso", {
+                                        autoClose: 5000,
+                                        position: "top-right",
+                                        transition: "zoom",
+                                        toastBackgroundColor: "white",
+                                    });
+                                } else {
+                                    toast.error("Al parecer el numero de acta ya existe en este contexto", {
+                                        autoClose: 5000,
+                                        position: "top-right",
+                                        transition: "zoom",
+                                        toastBackgroundColor: "white",
+                                    });
+                                    let data = Error.response.data.errors
+                                    var myData = new Object();
+                                    for (const errorBack in data) {
+                                        let split = errorBack.split(".")
+                                        let newIndexSplit = split[1]
+                                        myData[newIndexSplit] = data[errorBack][0]
+                                    }
+                                    this.errosDetalleQuedan = myData;
+                                    setTimeout(() => {
+                                        this.errosDetalleQuedan = [];
 
-                    } else {
-                        toast.error("Error, al parecer tiene datos invalidos", {
-                            autoClose: 5000,
-                            position: "top-right",
-                            transition: "zoom",
-                            toastBackgroundColor: "white",
+                                    }, 5000);
+                                }
+                            } else {
+                                toast.error("Al parecer te hacen falta datos por ingresar", {
+                                    autoClose: 5000,
+                                    position: "top-right",
+                                    transition: "zoom",
+                                    toastBackgroundColor: "white",
+                                });
+                            }
                         });
-                    }
+
                 } else {
-                    toast.error("Al parecer tienes datos repetidos", {
+                    toast.error("Al parecer el numero de acta ya existe en este contexto", {
                         autoClose: 5000,
                         position: "top-right",
                         transition: "zoom",
@@ -843,6 +893,7 @@ export default {
                             5: value.descripcion_det_quedan,//CONCEPTO,
                             6: { producto: value.producto_factura_det_quedan, servicio: value.servicio_factura_det_quedan },//Monto de producto y servicio,
                             7: true,//eliminado_logico
+                            8: value.fecha_factura_det_quedan,//fecha_factura_det_quedan
                         })
                     })
                     this.calculateAmount()

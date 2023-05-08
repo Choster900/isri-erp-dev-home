@@ -3,7 +3,7 @@ import { Head } from "@inertiajs/vue3";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import ModalSuppliersVue from '@/Components-ISRI/Tesoreria/ModalSuppliers.vue';
 import { toast } from 'vue3-toastify';
-import 'vue3-toastify/dist/index.css';  
+import 'vue3-toastify/dist/index.css';
 </script>
 <template>
     <Head title="Administracion" />
@@ -72,57 +72,37 @@ import 'vue3-toastify/dist/index.css';
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
                                 <div class="space-x-1">
-                                    <button v-if="permits.actualizar == 1" @click.stop="getSuppiler(proveedor)"
-                                        class="text-slate-400 hover:text-slate-500 rounded-full">
-                                        <span class="sr-only">Edit</span>
-                                        <svg width="25px" height="25px" viewBox="0 0 24.00 24.00" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg" stroke="#000000" stroke-width="0.384">
+                                    <DropDownOptions>
+                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                            v-if="permits.actualizar == 1" @click.stop="getSuppiler(proveedor)">
+                                            <div class="w-8 text-green-900">
+                                                <span class="text-xs">
 
-                                            <g id="SVGRepo_bgCarrier" stroke-width="0" />
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 002.25-2.25V6a2.25 2.25 0 00-2.25-2.25H6A2.25 2.25 0 003.75 6v2.25A2.25 2.25 0 006 10.5zm0 9.75h2.25A2.25 2.25 0 0010.5 18v-2.25a2.25 2.25 0 00-2.25-2.25H6a2.25 2.25 0 00-2.25 2.25V18A2.25 2.25 0 006 20.25zm9.75-9.75H18a2.25 2.25 0 002.25-2.25V6A2.25 2.25 0 0018 3.75h-2.25A2.25 2.25 0 0013.5 6v2.25a2.25 2.25 0 002.25 2.25z" />
+                                                    </svg>
 
-                                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" />
-
-                                            <g id="SVGRepo_iconCarrier">
-                                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                                    d="M11.9995 8.00001C9.79023 8.00001 8 9.79065 8 12.0005C8 14.2096 9.79043 16 11.9995 16C14.2082 16 16 14.21 16 12.0005C16 9.79024 14.2084 8.00001 11.9995 8.00001ZM10 12.0005C10 10.8948 10.8952 10 11.9995 10C13.1043 10 14 10.8952 14 12.0005C14 13.1046 13.1045 14 11.9995 14C10.895 14 10 13.105 10 12.0005Z"
-                                                    fill="#152C70" />
-                                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                                    d="M16.2389 5.00144C13.5704 3.66721 10.4295 3.66721 7.76104 5.00144C6.14869 5.80761 4.79966 7.05685 3.8722 8.60262L2.65499 10.6313C2.14951 11.4738 2.14951 12.5263 2.65499 13.3687L3.8722 15.3974C4.79966 16.9432 6.14869 18.1924 7.76104 18.9986C10.4295 20.3328 13.5704 20.3328 16.2389 18.9986C17.8512 18.1924 19.2003 16.9432 20.1277 15.3974L21.3449 13.3687C21.8504 12.5263 21.8504 11.4738 21.3449 10.6313L20.1277 8.60262C19.2002 7.05685 17.8512 5.80761 16.2389 5.00144ZM8.65546 6.79029C10.7609 5.73759 13.239 5.73759 15.3444 6.79029C16.6166 7.42636 17.681 8.41201 18.4127 9.63161L19.6299 11.6603C19.7554 11.8694 19.7554 12.1306 19.6299 12.3397L18.4127 14.3684C17.681 15.588 16.6166 16.5737 15.3444 17.2097C13.239 18.2624 10.7609 18.2624 8.65546 17.2097C7.38332 16.5737 6.31895 15.588 5.58718 14.3684L4.36998 12.3397C4.24451 12.1306 4.24451 11.8694 4.36997 11.6603L5.58718 9.63161C6.31895 8.41201 7.38333 7.42636 8.65546 6.79029Z"
-                                                    fill="#152C70" />
-                                            </g>
-                                        </svg>
-                                    </button>
-                                    <!-- CAMBIAR ICONO DE BOTON POR QUE VA A SER ACTIVAR Y DESCATIVAR -->
-                                    <button class="text-rose-500 hover:text-rose-600 rounded-full"
-                                        v-if="permits.eliminar == 1"
-                                        @click="enableStateForSupplier(proveedor.id_proveedor, proveedor.estado_proveedor)">
-
-                                        <svg fill="#000000" width="25px" height="25px" viewBox="0 0 24 24" id="delete-alt"
-                                            data-name="Flat Color" xmlns="http://www.w3.org/2000/svg"
-                                            class="icon flat-color" stroke="#000000" stroke-width="0.264">
-
-                                            <g id="SVGRepo_bgCarrier" stroke-width="0" />
-
-                                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" />
-
-                                            <g id="SVGRepo_iconCarrier">
-
-                                                <path id="secondary"
-                                                    d="M16,8a1,1,0,0,1-1-1V4H9V7A1,1,0,0,1,7,7V4A2,2,0,0,1,9,2h6a2,2,0,0,1,2,2V7A1,1,0,0,1,16,8Z"
-                                                    style="fill: #ffffff;" />
-
-                                                <path id="primary"
-                                                    d="M20,6H4A1,1,0,0,0,4,8H5V20a2,2,0,0,0,2,2H17a2,2,0,0,0,2-2V8h1a1,1,0,0,0,0-2Z"
-                                                    style="fill: #c10000e0;" />
-
-                                                <path id="secondary-2" data-name="secondary"
-                                                    d="M10,18a1,1,0,0,1-1-1V11a1,1,0,0,1,2,0v6A1,1,0,0,1,10,18Zm5-1V11a1,1,0,0,0-2,0v6a1,1,0,0,0,2,0Z"
-                                                    style="fill: #ffffff;" />
-
-                                            </g>
-
-                                        </svg>
-                                    </button>
+                                                </span>
+                                            </div>
+                                            <div class="font-semibold">Editar</div>
+                                        </div>
+                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                            v-if="permits.eliminar == 1"
+                                            @click="enableStateForSupplier(proveedor.id_proveedor, proveedor.estado_proveedor)">
+                                            <div class="w-8 text-red-900">
+                                                <span class="text-xs">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                            <div class="font-semibold">Eliminar</div>
+                                        </div>
+                                    </DropDownOptions>
                                 </div>
                             </td>
                         </tr>
@@ -179,17 +159,20 @@ import 'vue3-toastify/dist/index.css';
 export default {
     created() {
         this.getSuppilers();
-        this.getPermits()
+        this.getPermits();
     },
     data: function (data) {
         let sortOrders = {};
         let columns = [
-            { width: "10%", label: "Id", name: "id_proveedor", type: "text" },
-            { width: "15%", label: "Documentos", name: "dui_proveedor", type: "text" },
-            { width: "20%", label: "Razon social", name: "razon_social_proveedor", type: "text" },
-            { width: "20%", label: "Nombre comercial", name: "nombre_comercial_proveedor", type: "text" },
+            { width: "5%", label: "Id", name: "id_proveedor", type: "text" },
+            { width: "10%", label: "Documentos", name: "dui_proveedor", type: "text" },
+            { width: "10%", label: "Razon social", name: "razon_social_proveedor", type: "text" },
+            { width: "10%", label: "Nombre comercial", name: "nombre_comercial_proveedor", type: "text" },
             {
-                width: "10%", label: "Estado", name: "estado_proveedor", type: "select",
+                width: "1%",
+                label: "Estado",
+                name: "estado_proveedor",
+                type: "select",
                 options: [
                     { value: "", label: "Ninguno" },
                     { value: "1", label: "Activo" },
@@ -199,7 +182,7 @@ export default {
             { width: "5%", label: "", name: "Acciones" },
         ];
         columns.forEach((column) => {
-            if (column.name === 'id_proveedor')
+            if (column.name === "id_proveedor")
                 sortOrders[column.name] = 1;
             else
                 sortOrders[column.name] = -1;
@@ -209,7 +192,7 @@ export default {
             scrollbarModalOpen: false,
             proveedores: [],
             links: [],
-            lastUrl: '/proveedores',
+            lastUrl: "/proveedores",
             columns: columns,
             sortKey: "id_proveedor",
             sortOrders: sortOrders,
@@ -221,7 +204,6 @@ export default {
                 dir: "desc",
                 search: {},
             },
-
             pagination: {
                 lastPage: "",
                 currentPage: "",
@@ -243,7 +225,7 @@ export default {
                 let data = response.data;
                 if (this.tableData.draw == data.draw) {
                     this.links = data.data.links;
-                    this.pagination.total = data.data.total
+                    this.pagination.total = data.data.total;
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
                     this.proveedores = data.data.data;
@@ -264,39 +246,37 @@ export default {
             return array.findIndex((i) => i[key] == value);
         },
         async getSuppiler(supplier) {
-            this.infoSupplier = supplier
-            this.scrollbarModalOpen = !this.scrollbarModalOpen
+            this.infoSupplier = supplier;
+            this.scrollbarModalOpen = !this.scrollbarModalOpen;
         },
         addDataSupplier() {
-            this.infoSupplier = []
-            this.scrollbarModalOpen = !this.scrollbarModalOpen
-
+            this.infoSupplier = [];
+            this.scrollbarModalOpen = !this.scrollbarModalOpen;
         },
         async enable(id_persona, estado) {
             await axios.post("/update-state-supplier", { id_proveedor: id_persona, estado_proveedor: estado })
                 .then(res => {
-                    console.log(res)
+                    console.log(res);
                 })
                 .catch(err => {
                     console.error(err);
-                })
-            this.getSuppilers(this.lastUrl)//llamamos de nuevo el metodo para que actualize la tabla 
+                });
+            this.getSuppilers(this.lastUrl); //llamamos de nuevo el metodo para que actualize la tabla 
         },
-
         enableStateForSupplier(id_proveedor, estado) {
-            let state = estado == 0 ? 'habilitar' : 'deshabilitar'
+            let state = estado == 0 ? "habilitar" : "deshabilitar";
             this.$swal.fire({
-                title: '¿Esta seguro de ' + state + ' el registro ?',
-                icon: 'question',
-                iconHtml: '❓',
-                confirmButtonText: 'Si, ' + state + '',
-                confirmButtonColor: '#001b47',
-                cancelButtonText: 'Cancelar',
+                title: "¿Esta seguro de " + state + " el registro ?",
+                icon: "question",
+                iconHtml: "❓",
+                confirmButtonText: "Si, " + state + "",
+                confirmButtonColor: "#001b47",
+                cancelButtonText: "Cancelar",
                 showCancelButton: true,
                 showCloseButton: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    this.enable(id_proveedor, estado)//peticion async hace la modificacion 
+                    this.enable(id_proveedor, estado); //peticion async hace la modificacion 
                     //no la llamamos en el mismo metodo por que dejaria de ser asyn y hay problema al momento de actulizar la tabla
                     toast.info("Hecho", {
                         autoClose: 5000,
@@ -306,41 +286,40 @@ export default {
                         icon: "✔️",
                     });
                 }
-            })
+            });
         },
         validarCamposVacios(objeto) {
             for (var propiedad in objeto) {
-                if (objeto[propiedad] !== '') {
+                if (objeto[propiedad] !== "") {
                     return false;
                 }
             }
             return true;
         },
         handleData(myEventData) {
-
             if (this.validarCamposVacios(myEventData)) {
                 this.tableData.search = {};
-                this.getSuppilers()
-            } else {
+                this.getSuppilers();
+            }
+            else {
                 this.tableData.search = myEventData;
-                this.getSuppilers()
+                this.getSuppilers();
             }
         },
         getPermits() {
-            var URLactual = window.location.pathname
+            var URLactual = window.location.pathname;
             let data = this.$page.props.menu;
-            let menu = JSON.parse(JSON.stringify(data['urls']))
+            let menu = JSON.parse(JSON.stringify(data["urls"]));
             menu.forEach((value, index) => {
                 value.submenu.forEach((value2, index2) => {
                     if (value2.url === URLactual) {
-                        var array = { 'insertar': value2.insertar, 'actualizar': value2.actualizar, 'eliminar': value2.eliminar, 'ejecutar': value2.ejecutar }
-                        this.permits = array
+                        var array = { "insertar": value2.insertar, "actualizar": value2.actualizar, "eliminar": value2.eliminar, "ejecutar": value2.ejecutar };
+                        this.permits = array;
                     }
-                })
-            })
+                });
+            });
         },
     },
-
 };
 </script>
   
