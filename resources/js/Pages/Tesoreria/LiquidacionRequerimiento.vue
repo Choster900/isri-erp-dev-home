@@ -7,7 +7,7 @@ import 'vue3-toastify/dist/index.css';
 import axios from 'axios';
 </script>
 <template>
-    <Head title="Liquidaciones" />
+    <Head title="Proceso - Liquidacion" />
     <AppLayoutVue>
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
             <!-- TODO: Improve view table - this is temporal and doesn't mean is permanent -->

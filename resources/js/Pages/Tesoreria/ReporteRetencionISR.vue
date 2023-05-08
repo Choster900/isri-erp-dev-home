@@ -12,7 +12,7 @@ import axios from 'axios';
 </script>
 
 <template>
-    <Head title="Tesoreria" />
+    <Head title="Reporte - Retencion ISR" />
     <AppLayoutVue>
         <div class="border border-gray-600 rounded p-4 mb-4">
             <h2 class="text-lg font-bold mb-4 text-center">Reporte Retencion Renta</h2>

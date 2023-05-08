@@ -7,7 +7,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 import InputError from "@/Components/InputError.vue";
 </script>
 <template>
-    <Head title="Tesoreria" />
+    <Head title="Catalogo - Requerimiento" />
     <AppLayoutVue>
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">

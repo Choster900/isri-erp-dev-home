@@ -16,7 +16,7 @@ import axios from 'axios';
 </script>
 
 <template>
-    <Head title="Administracion" />
+    <Head title="Proceso - Ingreso" />
     <AppLayoutVue>
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
