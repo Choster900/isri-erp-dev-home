@@ -5,14 +5,17 @@ namespace App\Http\Controllers\Tesoreria;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tesoreria\ReporteFacturaRequest;
+use App\Http\Requests\Tesoreria\ReporteIngresoDiarioRequest;
 use App\Http\Requests\Tesoreria\ReporteIngresoRequest;
 use App\Http\Requests\Tesoreria\ReporteQuedanRequest;
 use App\Http\Requests\Tesoreria\RetencionISRRequest;
+use App\Models\ConceptoIngreso;
 use App\Models\CuentaPresupuestal;
 use App\Models\Dependencia;
 use App\Models\EstadoQuedan;
 use App\Models\Proveedor;
 use App\Models\ProyectoFinanciado;
+use App\Models\ReciboIngreso;
 use App\Models\RequerimientoPago;
 use Carbon\Carbon;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -89,7 +92,7 @@ class ReporteTesoreriaController extends Controller
 
         $array = json_decode(json_encode($array), true);
 
-        array_unshift($array, array('NUMERO','SUMINISTRANTE', 'N° REQUERIMIENTO', 'FECHA REQUERIMIENTO', 'MONTO LIQUIDO', 'MONTO PAGADO', 'FECHA FACTURA', 'PRIORIDAD', 'DESCRIPCION'));
+        array_unshift($array, array('NUMERO', 'SUMINISTRANTE', 'N° REQUERIMIENTO', 'FECHA REQUERIMIENTO', 'MONTO LIQUIDO', 'MONTO PAGADO', 'FECHA FACTURA', 'PRIORIDAD', 'DESCRIPCION'));
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -465,7 +468,8 @@ class ReporteTesoreriaController extends Controller
 
         $writer->save('php://output');
     }
-    public function getSelectsIncomeReport(Request $request){
+    public function getSelectsIncomeReport(Request $request)
+    {
         $financing_sources = ProyectoFinanciado::select('id_proy_financiado as value', 'nombre_proy_financiado as label')
             ->where('estado_proy_financiado', '=', 1)
             ->orderBy('nombre_proy_financiado')
@@ -476,10 +480,10 @@ class ReporteTesoreriaController extends Controller
             ->orderBy('nombre_dependencia')
             ->get();
         $budget_accounts = CuentaPresupuestal::selectRaw("id_ccta_presupuestal as value , concat(id_ccta_presupuestal, ' - ', nombre_ccta_presupuestal) as label")
-                ->where('tesoreria_ccta_presupuestal','=',1)
-                ->where('estado_ccta_presupuestal','=',1)
-                ->orderBy('nombre_ccta_presupuestal')
-                ->get();
+            ->where('tesoreria_ccta_presupuestal', '=', 1)
+            ->where('estado_ccta_presupuestal', '=', 1)
+            ->orderBy('nombre_ccta_presupuestal')
+            ->get();
         return ['financing_sources' => $financing_sources, 'dependencies' => $dependencies, 'budget_accounts' => $budget_accounts];
     }
     public function createIncomeReport(ReporteIngresoRequest $request)
@@ -500,7 +504,7 @@ class ReporteTesoreriaController extends Controller
             $query_dependency = ' AND d.id_dependencia = ' . $request->dependency_id;
             $query_select_concept = 'ci.nombre_concepto_ingreso ';
             $dependencia = Dependencia::find($request->dependency_id);
-            if($dependencia) {
+            if ($dependencia) {
                 $codigo_dependencia = $dependencia->codigo_dependencia;
             } else {
                 $codigo_dependencia = 'NO EXISTE DEPENDENCIA';
@@ -512,7 +516,7 @@ class ReporteTesoreriaController extends Controller
         }
         if ($request->filled('budget_account_id')) {
             $query_budget_account = ' AND ci.id_ccta_presupuestal = ' . $request->budget_account_id;
-            $especifico = ' - ESPECIFICO '.$request->budget_account_id;
+            $especifico = ' - ESPECIFICO ' . $request->budget_account_id;
         } else {
             $query_budget_account = '';
             $especifico = '';
@@ -520,7 +524,7 @@ class ReporteTesoreriaController extends Controller
         $array = DB::select(
             '
             SELECT ri.numero_recibo_ingreso, DATE_FORMAT(ri.fecha_recibo_ingreso,"%d/%m/%Y") as fecha, ri.cliente_recibo_ingreso, ri.doc_identidad_recibo_ingreso, dri.monto_det_recibo_ingreso, 
-			'.$query_select_concept.'
+			' . $query_select_concept . '
 
 			FROM recibo_ingreso ri 
 			INNER JOIN detalle_recibo_ingreso dri ON ri.id_recibo_ingreso = dri.id_recibo_ingreso
@@ -530,8 +534,8 @@ class ReporteTesoreriaController extends Controller
 
             WHERE ri.estado_recibo_ingreso = 1
             AND ri.fecha_recibo_ingreso BETWEEN ? AND ?
-            '.$query_financing_source.$query_dependency.$query_budget_account
-            .' ORDER BY ri.numero_recibo_ingreso DESC',
+            ' . $query_financing_source . $query_dependency . $query_budget_account
+                . ' ORDER BY ri.numero_recibo_ingreso DESC',
             [$request->start_date, $request->end_date]
         );
         if (empty($array)) {
@@ -557,7 +561,7 @@ class ReporteTesoreriaController extends Controller
         $sheet->mergeCells('A2:F2');
         $sheet->mergeCells('A1:F1');
         // Definimos encabezado
-        $sheet->setCellValue('A2', 'REPORTE DE INGRESOS DEL ' . $fechaFormateada .  $especifico.' - '.$codigo_dependencia.' - '.$fuente_financiamiento);
+        $sheet->setCellValue('A2', 'REPORTE DE INGRESOS DEL ' . $fechaFormateada .  $especifico . ' - ' . $codigo_dependencia . ' - ' . $fuente_financiamiento);
         $sheet->setCellValue('A1', 'INSTITUTO SALVADOREÑO DE REHABILITACION INTEGRAL - ISRI');
         $sheet->getStyle('A1:A2')->getFont()->setSize(14);
 
@@ -586,5 +590,65 @@ class ReporteTesoreriaController extends Controller
         header('Cache-Control: max-age=0');
 
         $writer->save('php://output');
+    }
+    public function getDailyIncomeReport(ReporteIngresoDiarioRequest $request)
+    {
+        $receipt_numbers = ReciboIngreso::selectRaw('DISTINCT numero_recibo_ingreso')
+            ->join('detalle_recibo_ingreso', function ($join) {
+                $join->on('recibo_ingreso.id_recibo_ingreso', '=', 'detalle_recibo_ingreso.id_recibo_ingreso');
+            })
+            ->join('concepto_ingreso', function ($join) {
+                $join->on('detalle_recibo_ingreso.id_concepto_ingreso', '=', 'concepto_ingreso.id_concepto_ingreso');
+            })
+            ->where('concepto_ingreso.id_proy_financiado',$request->financing_source_id)
+            ->where('recibo_ingreso.fecha_recibo_ingreso',$request->start_date)
+            ->get();
+
+        $details = DB::select('
+        SELECT
+        t.id_dependencia,
+        t.codigo_dependencia,
+        GROUP_CONCAT(DISTINCT t.nombre_concepto_ingreso SEPARATOR ", ") as observacion,
+        SUM(IF(t.id_ccta_presupuestal = 14199, t.total, 0)) as "14199",
+        SUM(IF(t.id_ccta_presupuestal = 14202, t.total, 0)) as "14202",
+        SUM(IF(t.id_ccta_presupuestal = 14204, t.total, 0)) as "14204",
+        SUM(IF(t.id_ccta_presupuestal = 14299, t.total, 0)) as "14299",
+        SUM(IF(t.id_ccta_presupuestal = 15799, t.total, 0)) as "15799",
+        SUM(IF(t.id_ccta_presupuestal = 15502, t.total, 0)) as "15502",
+        SUM(IF(t.id_ccta_presupuestal = 16304, t.total, 0)) as "16304",
+        (SUM(IF(t.id_ccta_presupuestal = 14199, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 14202, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 14204, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 14299, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 15799, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 15502, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 16304, t.total, 0))) as total
+        
+        FROM
+        (
+            SELECT 
+            ci.id_dependencia, 
+            ci.id_ccta_presupuestal,
+            d.codigo_dependencia, 
+            ci.nombre_concepto_ingreso, 
+            SUM(dri.monto_det_recibo_ingreso) as total 
+            FROM 
+            recibo_ingreso ri
+            INNER JOIN detalle_recibo_ingreso dri ON ri.id_recibo_ingreso = dri.id_recibo_ingreso
+            INNER JOIN concepto_ingreso ci ON dri.id_concepto_ingreso = ci.id_concepto_ingreso
+            INNER JOIN dependencia d ON ci.id_dependencia = d.id_dependencia
+            WHERE 
+            ri.fecha_recibo_ingreso = ?
+            AND ci.id_proy_financiado = ?
+            AND ci.id_ccta_presupuestal <> 16201 
+            GROUP BY 
+            d.id_dependencia, 
+            ci.id_ccta_presupuestal,
+            ci.nombre_concepto_ingreso) as t
+            GROUP BY  t.id_dependencia
+        ',
+        [$request->start_date, $request->financing_source_id]);
+
+        if (empty($details)) {
+            return response()->json(['error' => 'No se encontraron registros'], 404);
+        }
+
+        return ['daily_income_report' => $details, 
+        'numeros_recibo' => $receipt_numbers ? $receipt_numbers : ''
+        ];
     }
 }
