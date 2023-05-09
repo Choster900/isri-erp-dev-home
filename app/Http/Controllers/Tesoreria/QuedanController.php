@@ -52,13 +52,14 @@ class QuedanController extends Controller
         $data = $request->input('search');
         $v_query = Quedan::select('*')->with([
             "detalle_quedan",
-            "proveedor.giro",
-            "proveedor.sujeto_retencion",
             "tesorero",
             "requerimiento_pago",
             "acuerdo_compra",
             "liquidacion_quedan",
-            "proyecto_financiado"
+            "proyecto_financiado",
+            "serie_retencion_iva",
+            "proveedor.giro",
+            "proveedor.sujeto_retencion",
         ])->orderBy($v_columns[$v_column], $v_dir);
 
 
@@ -83,9 +84,12 @@ class QuedanController extends Controller
                         ->orWhere('descripcion_det_quedan', 'like', '%' . $searchText . '%');
                 });
             });
-            $v_query->whereHas('requerimiento_pago', function ($query) use ($data) {
-                $query->where('numero_requerimiento_pago', 'like', '%' . $data["numero_requerimiento_pago"] . '%');
-            });
+
+            if (isset($data['numero_requerimiento_pago'])) {
+                $v_query->whereHas('requerimiento_pago', function ($query) use ($data) {
+                    $query->where('numero_requerimiento_pago', 'like', '%' . $data["numero_requerimiento_pago"] . '%');
+                });
+            }
             $v_query->whereHas('proveedor', function ($query) use ($data) {
                 $query->where('razon_social_proveedor', 'like', '%' . $data["razon_social_proveedor"] . '%');
             });
@@ -136,6 +140,8 @@ class QuedanController extends Controller
                 'id_proy_financiado'            => $request->quedan["id_proy_financiado"],
                 'id_prioridad_pago'             => $request->quedan["id_prioridad_pago"],
                 'id_proveedor'                  => $request->quedan["id_proveedor"],
+                'id_serie_retencion_iva'        => 1,
+                //VALOR QUEDAMO POR EL MOMENTO
                 'id_acuerdo_compra'             => $request->quedan["id_acuerdo_compra"],
                 'numero_acuerdo_quedan'         => $request->quedan["numero_acuerdo_quedan"],
                 'numero_compromiso_ppto_quedan' => $request->quedan["numero_compromiso_ppto_quedan"],
