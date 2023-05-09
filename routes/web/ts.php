@@ -172,4 +172,12 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     )->name('ts.reporteIngresos');
     Route::get('get-selects-income-report', [ReporteTesoreriaController::class, 'getSelectsIncomeReport'])->name('reporteTesoreria.getSelectsIncomeReport');
     Route::get('create-income-report', [ReporteTesoreriaController::class, 'createIncomeReport'])->name('reporteTesoreria.createIncomeReport');
+    Route::get(
+        '/ts/ingresos-diarios',
+        function () {
+            return Inertia::render('Tesoreria/IngresosDiarios', [
+                'menu' => session()->get('menu')
+            ]);
+        }
+    )->name('ts.ingresosDiarios');
 });
