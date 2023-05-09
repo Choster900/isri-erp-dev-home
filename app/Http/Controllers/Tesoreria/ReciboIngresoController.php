@@ -82,7 +82,7 @@ class ReciboIngresoController extends Controller
             ->where('estado_ccta_presupuestal', '=', 1)
             ->orderBy('nombre_ccta_presupuestal')
             ->get();
-        $income_concepts = ConceptoIngreso::selectRaw("id_concepto_ingreso as value , concat(coalesce(codigo_dependencia, ''), ' - ', nombre_concepto_ingreso) as label, id_ccta_presupuestal")
+        $income_concepts = ConceptoIngreso::selectRaw("id_concepto_ingreso as value , concat(coalesce(codigo_dependencia, ''), ' - ', nombre_concepto_ingreso) as label, id_ccta_presupuestal, id_proy_financiado")
             ->leftJoin('dependencia', function ($join) {
                 $join->on('concepto_ingreso.id_dependencia', '=', 'dependencia.id_dependencia');
             })
