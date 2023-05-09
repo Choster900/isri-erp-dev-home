@@ -9,9 +9,9 @@ import axios from "axios";
 
 <template>
     <div class="m-1.5">
-        <ModalBasicVue :modalOpen="show_modal_receipt" @close-modal="$emit('cerrar-modal')"
-            :title="'Administración de recibos de ingreso. '" maxWidth="4xl" @close-modal-persona="$emit('cerrar-modal')">
-            <div class="px-5 py-2">
+        <ModalBasicVue :modalOpen="show_modal_receipt"
+            :title="'Administración de recibos de ingreso. '" maxWidth="4xl" @close-modal="$emit('cerrar-modal')">
+            <div class="px-5 py-8">
                 <div class="space-y-2">
                     <div class="mb-2" id="app">
                         <div class="mb-2 md:flex flex-row justify-items-start">

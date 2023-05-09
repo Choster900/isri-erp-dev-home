@@ -9,7 +9,7 @@ import moment from 'moment';
 <template>
     <div class="m-1.5">
         <ModalBasicVue title="Proveedor" id="scrollbar-modal" maxWidth="3xl" :modalOpen="scrollbarModalOpen"
-            @close-modal-persona="this.$emit('close-definitive')">
+            @close-modal="$emit('close-definitive')">
             <div class="px-5 py-4">
                 <div class="space-y-2">
                     <div id="personal-information">
@@ -23,16 +23,19 @@ import moment from 'moment';
                                         <tbody>
                                             <tr>
                                                 <td class="border px-3 text-xs">IVA SUJETO DE RETENCION<br />
-                                                    <span class="text-red-500 text-xs">{{ (supplier.sujetoRetencion.iva * 100)}}%</span>
+                                                    <span class="text-red-500 text-xs">{{ (supplier.sujetoRetencion.iva *
+                                                        100) }}%</span>
                                                 </td>
                                                 <td class="border px-3 text-xs">ISRL SUJETO DE RETENCION<br />
-                                                    <span class="text-red-500 text-xs">{{ (supplier.sujetoRetencion.isrl * 100)}}%</span>
+                                                    <span class="text-red-500 text-xs">{{ (supplier.sujetoRetencion.isrl *
+                                                        100) }}%</span>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td class="border text-xs" colspan="2">FECHA DE CREACION: 
-                                                    <span class="text-xs underline">{{  moment( supplier.fecha_registro_proveedor).format('MMMM Do YYYY') }}</span>
-                                                   <!--  <span class="text-xs">{{ supplier.fecha_registro_proveedor }}</span>
+                                                <td class="border text-xs" colspan="2">FECHA DE CREACION:
+                                                    <span class="text-xs underline">{{ moment(
+                                                        supplier.fecha_registro_proveedor).format('MMMM Do YYYY') }}</span>
+                                                    <!--  <span class="text-xs">{{ supplier.fecha_registro_proveedor }}</span>
                                                     {{ moment( supplier.fecha_registro_proveedor).format('dddd Do MMMM YYYY') }} -->
                                                 </td>
                                             </tr>
@@ -44,14 +47,16 @@ import moment from 'moment';
                         <div class="mb-7 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="razon-social" v-model="supplier.razon_social_proveedor"
-                                    :value="supplier.razon_social_proveedor" type="text" placeholder="Razón social">
+                                    :value="supplier.razon_social_proveedor" type="text" placeholder="Razón social"
+                                    @update:modelValue="supplier.razon_social_proveedor = supplier.razon_social_proveedor.toUpperCase()">
                                     <LabelToInput icon="standard" forLabel="razon-social" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errosModel.razon_social_proveedor" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="nombre-comercial" v-model="supplier.nombre_comercial_proveedor"
-                                    :value="supplier.nombre_comercial_proveedor" type="text" placeholder="Nombre comercial">
+                                    :value="supplier.nombre_comercial_proveedor" type="text" placeholder="Nombre comercial"
+                                    @update:modelValue="supplier.razon_social_proveedor = supplier.razon_social_proveedor.toUpperCase()">
                                     <LabelToInput icon="standard" forLabel="nombre-comercial" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errosModel.nombre_comercial_proveedor" />
@@ -184,7 +189,7 @@ import moment from 'moment';
                 <div class="flex flex-wrap justify-end space-x-3">
                     <button
                         class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600 underline underline-offset-1"
-                        @click.stop="this.$emit('close-definitive')">Cerrar</button>
+                        @click.stop="$emit('close-definitive')">Cerrar</button>
                     <GeneralButton v-if="infoSupplier != ''" @click="updateSupplier()"
                         color="bg-orange-700  hover:bg-orange-800" text="Editar proveedor" icon="update" />
                     <GeneralButton v-else @click="addSupplier()" color="bg-green-700  hover:bg-green-800"
@@ -267,15 +272,13 @@ export default {
             this.supplier.dui_proveedor = !dui[2] ? dui[1] : '' + dui[1] + '-' + dui[2];
         },
         typeNitSupplier() {
-            const regex = /^[0-9\-]+$/;
-            if (!regex.test(this.supplier.nit_proveedor)) {
-                this.supplier.nit_proveedor = this.supplier.nit_proveedor.replace(/[^0-9\-]/g, '');
-            }
+            let nit = this.supplier.nit_proveedor.replace(/\D/g, '').match(/(\d{0,4})(\d{0,6})(\d{0,3})(\d{0,1})/);
+            this.supplier.nit_proveedor = nit[1] + "-" + nit[2] + "-" + nit[3] + "-" + nit[4];
         },
         typeNrcSupplier() {
-            const regex = /^[0-9\-]+$/;
+            const regex = /^\d{0,6}$/;
             if (!regex.test(this.supplier.nrc_proveedor)) {
-                this.supplier.nrc_proveedor = this.supplier.nrc_proveedor.replace(/[^0-9\-]/g, '');
+                this.supplier.nrc_proveedor = this.supplier.nrc_proveedor.replace(/[^\d]/g, '').substring(0, 6);
             }
         },
         updateSupplier() {
@@ -439,6 +442,7 @@ export default {
     margin: 0;
     border-collapse: collapse;
 }
+
 #resumen td {
     /* Agregando tamaño a letra a tabla resumen */
     font-size: 10px;

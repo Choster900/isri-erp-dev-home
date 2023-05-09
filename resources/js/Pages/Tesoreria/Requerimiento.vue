@@ -145,7 +145,7 @@ import InputError from "@/Components/InputError.vue";
 
 
     <ModalBasicVue title="Gestión número de requerimiento. " id="scrollbar-modal" maxWidth="2xl"
-        :modalOpen="requerimientoModalOpen" @close-modal-persona="requerimientoModalOpen = false">
+        :modalOpen="requerimientoModalOpen" @close-modal="requerimientoModalOpen = false">
         <div class="py-5">
             <div class="flex-row justify-center items-center mb-7 mx-4">
                 <div class="mb-4 md:flex flex-row justify-items-start mx-8">

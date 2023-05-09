@@ -70,7 +70,7 @@
             <p class="font-bold text-[14px]">TOTAL REMESA: ${{ total_remittance }}</p>
         </div>
         <div class="h-[100px]"></div>
-        <div class="flex justify-between items-end">
+        <div class="flex justify-between items-end mb-4">
             <div class="w-1/2 text-center">
                 <p class="font-bold text-[12px]">Lic Carmen Elena Ayala de Chavez</p>
                 <p class="font-bold text-[12px]">Tesorera Institucional</p>
@@ -83,7 +83,7 @@
 
 
     </div>
-    <div class=""></div>
+    <!-- <div class=""></div>
     <div class="page_break mt-7">
         <div class="flex flex-col mt-7">
             <table class="border-collapse w-full mr-2">
@@ -131,7 +131,7 @@
             </table>
 
         </div>
-    </div>
+    </div> -->
 </template>
 
 <script>

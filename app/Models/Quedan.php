@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Yajra\DataTables\Html\Editor\Fields\BelongsTo;
 
 class Quedan extends Model
 {
@@ -78,6 +79,16 @@ class Quedan extends Model
     public function prioridad_pago()
     {
         return $this->belongsTo(PrioridadPago::class, 'id_prioridad_pago', 'id_prioridad_pago');
+    }
+
+    /**
+     * Get the serie_retencion_iva that owns the Quedan
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\hasOne
+     */
+    public function serie_retencion_iva(): hasOne
+    {
+        return $this->hasOne(SerieRetencionIva::class, 'id_serie_retencion_iva', 'id_serie_retencion_iva');
     }
 
     

@@ -7,7 +7,7 @@ import axios from 'axios';
 </script>
 <template>
     <ModalBasicVue :title="numeroRequerimiento" id="scrollbar-modal" maxWidth="3xl" :modalOpen="scrollbarModalOpen"
-        @close-modal-persona="this.$emit('close-definitive')">
+        @close-modal="$emit('close-definitive')">
 
         <div class=" px-10 py-5 ">
             <table class="table-auto">
@@ -116,6 +116,7 @@ import axios from 'axios';
                         data.restante == 0 ? 'bg-green-400' : data.monto_liquidacion_quedan != 0 ? 'bg-yellow-400' : 'bg-[#1f355833]']"
                             class="pb-1 pt-1 text-xs font-semibold w-full rounded-md px-3  bg-opacity-20 text-center border-2 border-white"
                             :contenteditable="data.id_estado_quedan == 4 ? false : true"
+                            @keypress="onlyNumberDecimal($event)"
                             @input="liquidarMonto(data.id_quedan, $event, 'monto_liquidacion_quedan')">
                             {{ data.monto_liquidacion_quedan }}
 
@@ -125,13 +126,13 @@ import axios from 'axios';
             </table>
             <div class="flex justify-center items-center">
 
-                <div class="px-2 pt-3">
+                <div class="px-2 pt-3" v-if="dataQuedan.id_estado_req_pago != 2">
                     <GeneralButton @click="enviarTodaLaInformacion()" color="bg-orange-700  hover:bg-orange-800"
                         text="Liquidar" icon="add" />
                 </div>
 
                 <div class="px-2 pt-3">
-                    <GeneralButton @click="this.$emit('close-definitive')" text="Cancelar" icon="delete" />
+                    <GeneralButton @click="$emit('close-definitive')" text="Cancelar" icon="delete" />
                 </div>
 
             </div>
@@ -184,6 +185,20 @@ export default {
                     this.restByRow(id_quedan, event);
                     this.sumRestTotal()
                 }
+            }
+        },
+        onlyNumberDecimal(event) {
+            const charCode = (event.which) ? event.which : event.keyCode;
+            const value = event.target.textContent;
+            const decimalCount = (value.match(/\./g) || []).length;
+            if (charCode == 46) {
+                if (decimalCount >= 1) {
+                    event.preventDefault();
+                }
+            } else if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                event.preventDefault();
+            } else if (decimalCount > 0 && value.split('.')[1].length >= 2) {
+                event.preventDefault();
             }
         },
         restByRow(id_quedan, event) {
