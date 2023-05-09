@@ -10,7 +10,7 @@ import axios from "axios";
 <template>
     <div class="m-1.5">
         <ModalBasicVue :modalOpen="showModalIncome" @close-modal="$emit('cerrar-modal')" :title="'Concepto de ingresos. '"
-            maxWidth="3xl" @close-modal-persona="$emit('cerrar-modal')">
+            maxWidth="3xl" >
             <div class="px-5 py-4">
                 <div class="text-sm">
 

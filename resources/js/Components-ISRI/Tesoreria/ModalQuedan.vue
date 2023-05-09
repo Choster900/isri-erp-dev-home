@@ -17,24 +17,26 @@ import html2pdf from 'html2pdf.js'
                             <GeneralButton color="bg-green-700   hover:bg-green-800" text="AGREGAR" icon="add"
                                 @click="createQuedan()" />
                         </div>
-
                         <div class="px-2" v-else>
                             <template v-if="dataQuedan.id_estado_quedan === 1">
                                 <GeneralButton color="bg-orange-700   hover:bg-orange-800" text="MODIFICAR" icon="update"
                                     @click="updateQuedan()" />
                             </template>
-
                         </div>
-
                         <div class="px-2" v-if="dataQuedan != ''">
                             <GeneralButton color="bg-red-700   hover:bg-red-800" text="GENERAR QUEDAN" icon="pdf"
                                 @click="printPdf()" />
                         </div>
                         <div class="px-2" v-if="dataQuedan != ''">
-                            <GeneralButton color="bg-[#0A3158]/90  hover:bg-[#0A3158]"
-                                text="GENERAR RETENCION" icon="pdf"
+                            <GeneralButton color="bg-[#0A3158]/90  hover:bg-[#0A3158]" text="GENERAR RETENCION" icon="pdf"
                                 @click="generarComprobanteRetencionPdf()" />
                         </div>
+                        <svg class="h-7 w-7 absolute top-0 right-0 mt-2 cursor-pointer" viewBox="0 0 25 25"
+                            @click="$emit('cerrar-modal')">
+                            <path fill="currentColor"
+                                d="M7.95 6.536l4.242-4.243a1 1 0 111.415 1.414L9.364 7.95l4.243 4.242a1 1 0 11-1.415 1.415L7.95 9.364l-4.243 4.243a1 1 0 01-1.414-1.415L6.536 7.95 2.293 3.707a1 1 0 011.414-1.414L7.95 6.536z" />
+                        </svg>
+
                     </div>
 
                     <button type="button" @click="addRow()"

@@ -8,7 +8,7 @@ import axios from 'axios';
 </script>
 <template>
     <ModalBasicVue title="Asignando numero de requerimiento" id="scrollbar-modal" maxWidth="6xl"
-        :modalOpen="scrollbarModalOpen" @close-modal-persona="this.$emit('close-definitive')">
+        :modalOpen="scrollbarModalOpen" @close-modal="$emit('close-definitive')">
 
         <div class="flex flex-col md:flex-row  md:space-y-0  ">
             <div class="flex-1 px-3 pt-3 shadow-sm  bg-white shadow-[#001b47] border-r border-r-gray-500/20">
