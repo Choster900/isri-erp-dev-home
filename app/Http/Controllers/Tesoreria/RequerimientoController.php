@@ -28,14 +28,20 @@ class RequerimientoController extends Controller
         $v_column = $request->input('column'); //Index
         $v_dir = $request->input('dir');
         $data = $request->input('search');
-        $v_query = RequerimientoPago::select("*")->with(["Quedan", "Quedan.liquidacion_quedan","Quedan.proveedor"])
+        $v_query = RequerimientoPago::select("*")->with(["Quedan", "Quedan.liquidacion_quedan", "Quedan.proveedor"])
             ->orderBy($v_columns[$v_column], $v_dir);
 
         if ($data) { //FIXME: la consulta no trae requerimientos que tengan la descripcion_requerimiento_pago vacia
             $v_query->where('id_requerimiento_pago', 'like', '%' . $data["id_requerimiento_pago"] . '%')
-                ->where('numero_requerimiento_pago', 'like', '%' . $data["numero_requerimiento_pago"] . '%')
-                ->where('descripcion_requerimiento_pago', 'like', '%' . $data["descripcion_requerimiento_pago"] . '%')
-                ->where('monto_requerimiento_pago', 'like', '%' . $data["monto_requerimiento_pago"] . '%');
+                ->where('numero_requerimiento_pago', 'like', '%' . $data["numero_requerimiento_pago"] . '%');
+
+            if (isset($data['descripcion_requerimiento_pago'])) {
+                $v_query->where('descripcion_requerimiento_pago', 'like', '%' . $data["descripcion_requerimiento_pago"] . '%');
+
+            }
+
+            $v_query->where('monto_requerimiento_pago', 'like', '%' . $data["monto_requerimiento_pago"] . '%');
+
             $searchText = $data["allQUedan"];
             $v_query->whereHas('Quedan', function ($query) use ($searchText) {
                 $query->where(function ($query) use ($searchText) {
@@ -56,16 +62,16 @@ class RequerimientoController extends Controller
         try {
             DB::beginTransaction();
             $v_requerimiento = RequerimientoPago::create([
-                'numero_requerimiento_pago'    => $request->input("numero_requerimiento_pago"),
-                'mes_requerimiento_pago'       => $request->input("mes_requerimiento_pago"),
-                'anio_requerimiento_pago'      => $request->input("anio_requerimiento_pago"),
-                'descripcion_requerimiento_pago'      => $request->input("descripcion_requerimiento_pago"),
-                'monto_requerimiento_pago'      => $request->input("monto_requerimiento_pago"),
-                'fecha_requerimiento_pago'     => Carbon::now(),
-                'estado_requerimiento_pago'     => 1,
-                'fecha_reg_requerimiento_pago' => Carbon::now(),
-                'usuario_requerimiento_pago '  => $request->user()->nick_usuario,
-                'ip_requerimiento_pago'        => $request->ip(),
+                'numero_requerimiento_pago'      => $request->input("numero_requerimiento_pago"),
+                'mes_requerimiento_pago'         => $request->input("mes_requerimiento_pago"),
+                'anio_requerimiento_pago'        => $request->input("anio_requerimiento_pago"),
+                'descripcion_requerimiento_pago' => $request->input("descripcion_requerimiento_pago"),
+                'monto_requerimiento_pago'       => $request->input("monto_requerimiento_pago"),
+                'fecha_requerimiento_pago'       => Carbon::now(),
+                'estado_requerimiento_pago'      => 1,
+                'fecha_reg_requerimiento_pago'   => Carbon::now(),
+                'usuario_requerimiento_pago '    => $request->user()->nick_usuario,
+                'ip_requerimiento_pago'          => $request->ip(),
             ]);
             DB::commit();
             return $v_requerimiento;
@@ -79,12 +85,12 @@ class RequerimientoController extends Controller
         try {
             DB::beginTransaction();
             $v_requerimiento = RequerimientoPago::where('id_requerimiento_pago', $request->input("id_requerimiento_pago"))->update([
-                'numero_requerimiento_pago'    => $request->input("numero_requerimiento_pago"),
-                'descripcion_requerimiento_pago'      => $request->input("descripcion_requerimiento_pago"),
-                'monto_requerimiento_pago'      => $request->input("monto_requerimiento_pago"),
-                'estado_requerimiento_pago'     => 1,
-                'fecha_mod_requerimiento_pago' => Carbon::now(),
-                'ip_requerimiento_pago'        => $request->ip(),
+                'numero_requerimiento_pago'      => $request->input("numero_requerimiento_pago"),
+                'descripcion_requerimiento_pago' => $request->input("descripcion_requerimiento_pago"),
+                'monto_requerimiento_pago'       => $request->input("monto_requerimiento_pago"),
+                'estado_requerimiento_pago'      => 1,
+                'fecha_mod_requerimiento_pago'   => Carbon::now(),
+                'ip_requerimiento_pago'          => $request->ip(),
             ]);
             DB::commit();
             return $v_requerimiento;
