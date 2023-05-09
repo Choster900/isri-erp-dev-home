@@ -7,7 +7,7 @@ import axios from 'axios';
 </script>
 <template>
     <ModalBasicVue :title="numeroRequerimiento" id="scrollbar-modal" maxWidth="3xl" :modalOpen="scrollbarModalOpen"
-        @close-modal-persona="this.$emit('close-definitive')">
+        @close-modal="$emit('close-definitive')">
 
         <div class=" px-10 py-5 ">
             <table class="table-auto">
@@ -132,7 +132,7 @@ import axios from 'axios';
                 </div>
 
                 <div class="px-2 pt-3">
-                    <GeneralButton @click="this.$emit('close-definitive')" text="Cancelar" icon="delete" />
+                    <GeneralButton @click="$emit('close-definitive')" text="Cancelar" icon="delete" />
                 </div>
 
             </div>
