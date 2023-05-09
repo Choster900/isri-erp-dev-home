@@ -11,11 +11,11 @@ import axios from "axios";
     <div class="m-1.5">
         <ModalBasicVue :modalOpen="show_modal_receipt" @close-modal="$emit('cerrar-modal')"
             :title="'Administración de recibos de ingreso. '" maxWidth="4xl" @close-modal-persona="$emit('cerrar-modal')">
-            <div class="px-5 py-8">
+            <div class="px-5 py-2">
                 <div class="space-y-2">
                     <div class="mb-2" id="app">
-                        <div class="mb-4 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
+                        <div class="mb-2 md:flex flex-row justify-items-start">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="name-client" v-model="income_receipt.client" :value="income_receipt.client"
                                     type="text" placeholder="Nombre o Razón Social">
                                     <LabelToInput icon="standard" forLabel="name-client" />
@@ -23,20 +23,35 @@ import axios from "axios";
                                 <InputError v-for="(item, index) in errors.client" :key="index" class="mt-2"
                                     :message="item" />
                             </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Especifico <span class="text-red-600 font-extrabold">*</span>
                                 </label>
                                 <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                                     <Multiselect v-model="income_receipt.budget_account_id" :options="budget_accounts"
-                                        :disabled="budget_select" @select="getIncomeConcept($event)"
+                                        :disabled="budget_select" @select="selectBudgetAccount($event)"
                                         placeholder="Seleccione Especifico" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
                                 <InputError v-for="(item, index) in errors.budget_account_id" :key="index" class="mt-2"
                                     :message="item" />
                             </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
+                        </div>
+                        <div class="mb-2 md:flex flex-row justify-items-start">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                                <label class="block mb-2 text-xs font-light text-gray-600">
+                                    Fuente Financiamiento <span class="text-red-600 font-extrabold">*</span>
+                                </label>
+                                <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
+                                    <Multiselect v-model="income_receipt.financing_source_id" :options="financing_sources"
+                                        :disabled="financing_select" @select="selectFinancingSource($event)"
+                                        placeholder="Seleccione Financiamiento" :searchable="true" />
+                                    <LabelToInput icon="list" />
+                                </div>
+                                <InputError v-for="(item, index) in errors.financing_source_id" :key="index" class="mt-2"
+                                    :message="item" />
+                            </div>
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Tesorero, Pagador o Colector <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -75,12 +90,12 @@ import axios from "axios";
                                 Descripcion <span class="text-red-600 font-extrabold">*</span>
                             </label>
                             <textarea v-model="income_receipt.description" id="descripcion" name="descripcion"
-                                class="resize-none w-full h-16 overflow-y-auto peer text-xs font-semibold rounded-r-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"></textarea>
+                                class="resize-none w-full h-10 overflow-y-auto peer text-xs font-semibold rounded-r-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"></textarea>
                             <InputError v-for="(item, index) in errors.description" :key="index" class="mt-2"
                                 :message="item" />
                         </div>
 
-                        <div class="mb-4 mt-4 md:flex flex-row justify-items-start">
+                        <div class="mb-1 mt-0 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <span class="font-semibold text-slate-800 mb-2 text-lg underline underline-offset-2">
                                     Detalle del recibo.
@@ -93,12 +108,13 @@ import axios from "axios";
                             </div>
                         </div>
                         <!-- Table -->
-                        <div class="mt-2 pb-6">
+                        <div class="mt-0 pb-6">
                             <div class="table-header">
                                 <div class="basis-2/3">Concepto</div>
                                 <div class="basis-1/3">Monto</div>
                                 <div>
-                                    <button class="text-green-500 hover:text-green-600 rounded-full" @click="addRow()">
+                                    <button :disabled="active_details.length > 6"
+                                        class="text-green-500 hover:text-green-600 rounded-full" @click="addRow()">
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                             xmlns="http://www.w3.org/2000/svg">
                                             <path
@@ -112,7 +128,7 @@ import axios from "axios";
                                 </div>
                             </div>
                             <div v-for="(row, index) in active_details" :key="index" class="table-row">
-                                <div class="mb-4 md:mr-2 md:mb-0 basis-2/3">
+                                <div class="mb-2 md:mr-2 md:mb-0 basis-2/3">
                                     <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                                         <Multiselect v-model="row.income_concept_id" :value="row.income_concept_id"
                                             @input="selectConcept($event, row.income_concept_id)"
@@ -125,7 +141,7 @@ import axios from "axios";
                                         :key="index2" class="mt-2" :message="item" />
                                 </div>
 
-                                <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
+                                <div class="mb-2 md:mr-2 md:mb-0 basis-1/3">
                                     <TextInput id="detail-amount" v-model="row.amount" :value="row.amount"
                                         :label-input="false" type="text" placeholder="Monto"
                                         @update:modelValue="typeAmountIncome(index)">
@@ -192,6 +208,10 @@ export default {
         treasury_clerk: {
             type: Array,
             default: []
+        },
+        financing_sources: {
+            type: Array,
+            default: []
         }
     },
     created() { },
@@ -202,7 +222,9 @@ export default {
             budget_account_id: '',
             errors: [],
             budget_select: false,
+            financing_select: true,
             income_receipt: {
+                financing_source_id:'',
                 treasury_clerk_id: '',
                 income_receipt_id: '',
                 total: '',
@@ -218,6 +240,24 @@ export default {
     methods: {
         addRow() {
             this.income_receipt.income_detail.push({ detail_id: '', income_concept_id: '', amount: '', deleted: false });
+        },
+        selectBudgetAccount(budget_account_id){
+            this.budget_select = true
+            this.financing_select = false
+            //this.getIncomeConcept()
+        },
+        selectFinancingSource(financing_source_id){
+            this.financing_select = true
+            this.getNewIncomeConcept()
+        },
+        getNewIncomeConcept(){
+            this.income_concept_select = []
+            this.income_concepts.forEach((value, index) => {
+                if (value.id_ccta_presupuestal == this.income_receipt.budget_account_id && value.id_proy_financiado == this.income_receipt.financing_source_id) {
+                    var array = { value: value.value, label: value.label, disabled: false }
+                    this.income_concept_select.push(array)
+                }
+            })
         },
         deleteRow(index, concept_id, detail_id) {
 
@@ -340,6 +380,7 @@ export default {
                             })
                             .catch((errors) => {
                                 if (errors.response.status === 422) {
+                                    console.log(errors.response.data);
                                     toast.warning(
                                         "Tienes algunos errores por favor verifica tus datos.",
                                         {
@@ -424,6 +465,7 @@ export default {
                 this.errors = []
                 this.income_receipt.income_receipt_id = this.modal_data.id_recibo_ingreso;
                 this.income_receipt.total = '';
+                this.income_receipt.financing_source_id = '';
                 this.income_receipt.budget_account_id = this.modal_data.id_ccta_presupuestal
                 this.income_receipt.treasury_clerk_id = this.modal_data.id_empleado_tesoreria
                 this.income_receipt.direction = this.modal_data.direccion_cliente_recibo_ingreso
@@ -432,6 +474,7 @@ export default {
                 this.income_receipt.description = this.modal_data.descripcion_recibo_ingreso
                 this.income_receipt.income_detail = []
                 if (this.modal_data.detalles) {
+                    this.income_receipt.financing_source_id = this.modal_data.detalles[0].concepto_ingreso.id_proy_financiado
                     this.modal_data.detalles.forEach((value, index) => {
                         var array = { detail_id: value.id_det_recibo_ingreso, income_concept_id: value.id_concepto_ingreso, amount: value.monto_det_recibo_ingreso, deleted: false }
                         this.income_receipt.income_detail.push(array)
@@ -480,6 +523,6 @@ export default {
     display: flex;
     justify-content: space-between;
     margin-top: 0.5rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
 }
 </style>
