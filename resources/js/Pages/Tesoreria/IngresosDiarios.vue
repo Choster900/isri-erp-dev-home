@@ -26,8 +26,7 @@ import axios from 'axios';
                     <div class="relative flex h-8 flex-row-reverse">
                         <flat-pickr
                             class="mr-1 peer w-[460px] text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
-                            :config="config" v-model="report_data.start_date"
-                            :placeholder="'Seleccione Fecha Inicial'" />
+                            :config="config" v-model="report_data.start_date" :placeholder="'Seleccione Fecha Inicial'" />
                         <LabelToInput icon="date" />
                     </div>
                     <InputError v-for="(item, index) in errors.start_date" :key="index" class="mt-2" :message="item" />
@@ -55,6 +54,7 @@ import axios from 'axios';
 <script>
 import DailyIncomeReportPDF from '@/pdf/Tesoreria/DailyIncomeReportPDF.vue';
 import { createApp, h } from 'vue'
+import Datatable from '@/Components-ISRI/Datatable.vue';
 export default {
     created() {
         this.getPermits()
@@ -64,9 +64,10 @@ export default {
         return {
             financing_sources: [],
             errors: [],
+            daily_income_report: [],
+            receipt_numbers: [],
             report_data: {
                 start_date: '',
-                end_date: '',
                 financing_source_id: ''
             },
             permits: [],
@@ -91,24 +92,183 @@ export default {
         }
     },
     methods: {
-        exportPDF() {
-            const opt = {
-                margin: 0.2,
-                filename: 'output.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                //pagebreak: {mode:'css',before:'page_break'},
-                html2canvas: { scale: 3, useCORS: true },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' },
-            };
-            
-            const app = createApp(DailyIncomeReportPDF, {
+        async exportPDF() {
+            let label
+            let total_remittance = 0
+            let all_totals = {
+                code14199: 0,
+                code14202: 0,
+                code14204: 0,
+                code14299: 0,
+                code15799: 0,
+                code15502: 0,
+                code16304: 0,
+            }
+            let array_receipt_numbers=''
+            this.financing_sources.forEach((value, index) => {
+                if (value.value == this.report_data.financing_source_id) {
+                    label = value.label
+                }
+            })
+            let date
+            date = moment(this.report_data.start_date).locale('es').format('dddd D [de] MMMM [de] YYYY').toUpperCase();
+            await axios.get("/get-daily-income-report",{
+                params : this.report_data
+            })
+                .then((response) => {
+                    this.errors = []
+                    this.daily_income_report = response.data.daily_income_report
+                    this.receipt_numbers = response.data.numeros_recibo
+                    console.log(this.receipt_numbers);
 
-            });
-            const div = document.createElement('div');
-            const pdfPrint = app.mount(div);
-            const html = div.outerHTML;
+                    this.daily_income_report.forEach((value, key) => {
+                        total_remittance += parseFloat(value.total)
+                        all_totals.code14199 += parseFloat(value['14199'])
+                        all_totals.code14202 += parseFloat(value['14202'])
+                        all_totals.code14204 += parseFloat(value['14204'])
+                        all_totals.code14299 += parseFloat(value['14299'])
+                        all_totals.code15799 += parseFloat(value['15799'])
+                        all_totals.code15502 += parseFloat(value['15502'])
+                        all_totals.code16304 += parseFloat(value['16304'])
+                    })
+                    total_remittance = total_remittance.toFixed(2);
+                    all_totals.code14199 = all_totals.code14199.toFixed(2);
+                    all_totals.code14202 = all_totals.code14202.toFixed(2);
+                    all_totals.code14204 = all_totals.code14204.toFixed(2);
+                    all_totals.code14299 = all_totals.code14299.toFixed(2);
+                    all_totals.code15799 = all_totals.code15799.toFixed(2);
+                    all_totals.code15502 = all_totals.code15502.toFixed(2);
+                    all_totals.code16304 = all_totals.code16304.toFixed(2);
 
-            html2pdf().set(opt).from(html).save();
+                    this.receipt_numbers.forEach((value,key) => {
+                        if(array_receipt_numbers===''){
+                            array_receipt_numbers = value.numero_recibo_ingreso
+                        }else{
+                            array_receipt_numbers = array_receipt_numbers+', '+value.numero_recibo_ingreso
+                        } 
+                    })
+
+
+                    const app = createApp(DailyIncomeReportPDF, {
+                        daily_income_report: this.daily_income_report,
+                        financing_source: label,
+                        date: date,
+                        total_remittance: total_remittance,
+                        all_totals: all_totals,
+                        array_receipt_numbers: array_receipt_numbers
+                    });
+                    const div = document.createElement('div');
+                    const pdfPrint = app.mount(div);
+                    const html = div.outerHTML;
+
+                    //const currentDateTime = new Date().toLocaleString();
+                    const currentDateTime = moment().format('DD/MM/YYYY, HH:mm:ss');
+
+                    html2pdf()
+                        .set({
+                            margin: 0.2,
+                            filename: 'salida.pdf',
+                            image: {
+                                type: 'jpeg',
+                                quality: 0.98
+                            },
+                            html2canvas: {
+                                scale: 3, // A mayor escala, mejores gráficos, pero más peso
+                                letterRendering: true,
+                                useCORS: true
+                            },
+                            jsPDF: {
+                                unit: "in",
+                                format: "letter",
+                                orientation: 'landscape' // landscape o portrait
+                            },
+                        })
+                        //codigo para paginar 
+                        .from(html).toPdf().get('pdf').then(function (pdf) {
+                            var totalPages = pdf.internal.getNumberOfPages();
+                            for (var i = 1; i <= totalPages; i++) {
+                                pdf.setPage(i);
+                                pdf.setFontSize(10);
+                                //Text for the page number
+                                let text = 'Página ' + i + ' de ' + totalPages;
+                                const centerX = pdf.internal.pageSize.getWidth() / 2;
+                                //Get the text width
+                                const textWidth1 = pdf.getStringUnitWidth(text) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
+                                //Get the middle position including the text width
+                                const textX = centerX - (textWidth1 / 2);
+                                //Write the text in the desired coordinates.
+                                pdf.text(textX, (pdf.internal.pageSize.getHeight() - 0.4), text);
+                                //Text for the date and time.
+                                let date_text = 'Generado: ' + currentDateTime
+                                //Get the text width
+                                const textWidth = pdf.getStringUnitWidth(date_text) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
+                                //Write the text in the desired coordinates.
+                                pdf.text(pdf.internal.pageSize.getWidth() - textWidth - 0.2, pdf.internal.pageSize.getHeight() - 0.4, date_text);
+                            }
+
+                        })
+                        .save()
+                        .catch(err => console.log(err));
+
+                    // const opt = {
+                    //     margin: 0.2,
+                    //     filename: 'output.pdf',
+                    //     image: { type: 'jpeg', quality: 0.98 },
+                    //     //pagebreak: {mode:'css',before:'page_break'},
+                    //     html2canvas: { scale: 3, useCORS: true },
+                    //     jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' },
+                    // };
+
+                    // const app = createApp(DailyIncomeReportPDF, {
+                    //     daily_income_report: this.daily_income_report,
+                    //     financing_source: label,
+                    //     date: date
+                    // });
+                    // const div = document.createElement('div');
+                    // const pdfPrint = app.mount(div);
+                    // const html = div.outerHTML;
+
+                    // html2pdf().set(opt).from(html).save();
+
+                })
+                .catch((errors) => {
+                    console.log(errors);
+                    if (errors.response.status === 422) {
+                        toast.warning(
+                            "Tienes algunos errores por favor verifica tus datos.",
+                            {
+                                autoClose: 5000,
+                                position: "top-right",
+                                transition: "zoom",
+                                toastBackgroundColor: "white",
+                            }
+                        );
+                        this.errors = errors.response.data.errors;
+                    } else {
+                        if (errors.response.status === 404) {
+                            this.errors = []
+                            toast.warning(
+                                "No se encuentran registros para los criterios de busqueda.",
+                                {
+                                    autoClose: 5000,
+                                    position: "top-right",
+                                    transition: "zoom",
+                                    toastBackgroundColor: "white",
+                                }
+                            );
+                        } else {
+                            let msg = this.manageError(errors);
+                            this.$swal.fire({
+                                title: "Operación cancelada",
+                                text: msg,
+                                icon: "warning",
+                                timer: 5000,
+                            });
+                        }
+
+                    }
+                });
+
 
             //html2pdf().set(opt).from(html).output('dataurlnewwindow');
         },

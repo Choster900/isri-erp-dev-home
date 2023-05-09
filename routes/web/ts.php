@@ -180,4 +180,5 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             ]);
         }
     )->name('ts.ingresosDiarios');
+    Route::get('get-daily-income-report', [ReporteTesoreriaController::class, 'getDailyIncomeReport'])->name('reporteTesoreria.getDailyIncomeReport');
 });
