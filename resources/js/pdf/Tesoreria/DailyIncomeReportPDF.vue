@@ -2,7 +2,7 @@
     <div class="h-screen relative mb-10">
         <div class="h-[90%] mt-3 mb-4">
             <div class="text-center">
-                <img src="../../../img/isri-gob.png" alt="Logo del instituto" class="w-[150px] h-[75px] mx-auto">
+                <img src="../../../img/isri-gob.png" alt="Logo del instituto" class="w-[150px]  mx-auto">
                 <h2 class="text-[14px] mt-2">UNIDAD FINANCIERA INSTITUCIONAL</h2>
                 <h2 class="text-[14px] ">INFORME DE INGRESOS RECIBIDOS POR TESORERIA INSTITUCIONAL</h2>
             </div>
@@ -103,7 +103,7 @@
         <div class="h-screen relative mb-10">
             <div class="h-[90%] mt-3 mb-4">
                 <div class="text-center">
-                    <img src="../../../img/isri-gob.png" alt="Logo del instituto" class="w-[150px] h-[75px] mx-auto">
+                    <img src="../../../img/isri-gob.png" alt="Logo del instituto" class="w-[150px] mx-auto">
                     <h2 class="text-[14px] mt-2">UNIDAD FINANCIERA INSTITUCIONAL</h2>
                     <h2 class="text-[14px] ">INFORME DE INGRESOS RECIBIDOS POR TESORERIA INSTITUCIONAL</h2>
                 </div>
