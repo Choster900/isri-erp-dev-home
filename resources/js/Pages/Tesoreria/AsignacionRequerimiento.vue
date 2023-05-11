@@ -241,6 +241,13 @@ export default {
                     this.dataQuedanForTable = data.data.data;
                 }
             }).catch((errors) => {
+                let msg = this.manageError(errors);
+                this.$swal.fire({
+                    title: "Operación cancelada",
+                    text: msg,
+                    icon: "warning",
+                    timer: 5000,
+                });
             });
         },
         sortBy(key) {
@@ -260,7 +267,14 @@ export default {
             await axios.get('/get-list-select').then((response) => {
 
                 this.dataForSelect = response.data;
-            }).catch((error) => {
+            }).catch((errors) => {
+                let msg = this.manageError(errors);
+                this.$swal.fire({
+                    title: "Operación cancelada",
+                    text: msg,
+                    icon: "warning",
+                    timer: 5000,
+                });
             });
         },
 

@@ -86,7 +86,7 @@ import axios from 'axios';
                           </svg>
                         </span>
                       </div>
-                      <div class="font-semibold">Ver</div>
+                      <div class="font-semibold">Editar</div>
                     </div>
                     <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                       @click="changeStateIncomeConcept(service.id_concepto_ingreso, service.nombre_concepto_ingreso, service.estado_concepto_ingreso)"
