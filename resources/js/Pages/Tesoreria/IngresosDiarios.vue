@@ -26,7 +26,7 @@ import axios from 'axios';
                     <div class="relative flex h-8 flex-row-reverse">
                         <flat-pickr
                             class="mr-1 peer w-[460px] text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
-                            :config="config" v-model="report_data.start_date" :placeholder="'Seleccione Fecha Inicial'" />
+                            :config="config" v-model="report_data.start_date" :placeholder="'Seleccione Fecha'" />
                         <LabelToInput icon="date" />
                     </div>
                     <InputError v-for="(item, index) in errors.start_date" :key="index" class="mt-2" :message="item" />

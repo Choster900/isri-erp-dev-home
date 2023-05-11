@@ -101,7 +101,7 @@ import axios from 'axios';
                                                     </svg>
                                                 </span>
                                             </div>
-                                            <div class="font-semibold">Eliminar</div>
+                                            <div class="font-semibold">Desactivar</div>
                                         </div>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-not-allowed" v-else>
                                             <div class="w-8 text-blue-900">

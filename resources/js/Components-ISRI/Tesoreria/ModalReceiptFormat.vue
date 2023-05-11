@@ -279,53 +279,9 @@ export default {
     align-items: center;
 }
 
-/* .container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-} */
-
-.left {
-    flex: 0 0 50%;
-    text-align: left;
-    font-size: 16px;
-    font-weight: bold;
-    margin-left: 20px;
-}
-
-.right {
-    flex: 0 0 50%;
-    text-align: left;
-    font-size: 16px;
-    font-weight: bold;
-    margin-right: 20px;
-}
-
 .title-container {
     flex: 1;
     text-align: center;
     align-self: flex-start;
 }
-
-.logo-container {
-    flex: 0 0 30%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.logo {
-    width: 100px;
-    height: 100px;
-    object-fit: contain;
-    margin-bottom: 10px;
-}
-
-.institution {
-    text-align: center;
-    font-size: 14px;
-    font-weight: bold;
-    margin-left: 20px;
-    margin-right: 20px;
-}</style>
+</style>

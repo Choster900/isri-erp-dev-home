@@ -100,7 +100,7 @@ import 'vue3-toastify/dist/index.css';
                                                     </svg>
                                                 </span>
                                             </div>
-                                            <div class="font-semibold">Eliminar</div>
+                                            <div class="font-semibold">Desactivar</div>
                                         </div>
                                     </DropDownOptions>
                                 </div>

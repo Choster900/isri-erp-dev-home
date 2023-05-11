@@ -99,7 +99,7 @@ import axios from 'axios';
                           </svg>
 
                         </span></div>
-                      <div class="font-semibold">Eliminar</div>
+                      <div class="font-semibold">Desactivar</div>
                     </div>
                   </DropDownOptions>
                 </div>

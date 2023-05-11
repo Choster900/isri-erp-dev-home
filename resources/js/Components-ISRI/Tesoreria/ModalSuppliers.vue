@@ -256,8 +256,16 @@ export default {
                 this.allSelectOptios.typeContribuyent = response.data.typeContribuyent
                 this.allSelectOptios.retention = response.data.retention
                 this.allSelectOptios.giro = response.data.giro
-
-            });
+            })
+                .catch(errors => {
+                    let msg = this.manageError(errors);
+                    this.$swal.fire({
+                        title: "Operación cancelada",
+                        text: msg,
+                        icon: "warning",
+                        timer: 5000,
+                    });
+                });
         },
         telefonoProveedor() {
             var telefono = this.supplier.telefono1_proveedor.replace(/\D/g, '').match(/(\d{0,4})(\d{0,4})/);
@@ -301,9 +309,9 @@ export default {
                             transition: "zoom",
                             toastBackgroundColor: "white",
                         });
-                    }).catch((Error) => {
-                        if (Error.response.status === 422) {
-                            let data = Error.response.data.errors
+                    }).catch((errors) => {
+                        if (errors.response.status === 422) {
+                            let data = errors.response.data.errors
                             var myData = new Object();
                             for (const errorBack in data) {
                                 myData[errorBack] = data[errorBack][0]
@@ -318,6 +326,14 @@ export default {
                             setTimeout(() => {
                                 this.errosModel = {}
                             }, 9000);
+                        } else {
+                            let msg = this.manageError(errors);
+                            this.$swal.fire({
+                                title: "Operación cancelada",
+                                text: msg,
+                                icon: "warning",
+                                timer: 5000,
+                            });
                         }
                     });
                 }
