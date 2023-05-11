@@ -593,7 +593,7 @@ class ReporteTesoreriaController extends Controller
     }
     public function getDailyIncomeReport(ReporteIngresoDiarioRequest $request)
     {
-        $receipt_numbers = ReciboIngreso::selectRaw('DISTINCT numero_recibo_ingreso')
+        $receipt_numbers = ReciboIngreso::selectRaw('GROUP_CONCAT(DISTINCT numero_recibo_ingreso SEPARATOR ", ") AS numero_recibo_ingreso, recibo_ingreso.fecha_recibo_ingreso')
             ->join('detalle_recibo_ingreso', function ($join) {
                 $join->on('recibo_ingreso.id_recibo_ingreso', '=', 'detalle_recibo_ingreso.id_recibo_ingreso');
             })
@@ -602,6 +602,7 @@ class ReporteTesoreriaController extends Controller
             })
             ->where('concepto_ingreso.id_proy_financiado',$request->financing_source_id)
             ->where('recibo_ingreso.fecha_recibo_ingreso',$request->start_date)
+            ->groupBy('recibo_ingreso.fecha_recibo_ingreso')
             ->get();
 
         $details = DB::select('

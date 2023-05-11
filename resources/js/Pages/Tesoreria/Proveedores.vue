@@ -231,6 +231,13 @@ export default {
                     this.proveedores = data.data.data;
                 }
             }).catch((errors) => {
+                let msg = this.manageError(errors);
+                this.$swal.fire({
+                    title: "Operación cancelada",
+                    text: msg,
+                    icon: "warning",
+                    timer: 5000,
+                });
             });
         },
         sortBy(key) {
@@ -258,8 +265,14 @@ export default {
                 .then(res => {
                     console.log(res);
                 })
-                .catch(err => {
-                    console.error(err);
+                .catch(errors => {
+                    let msg = this.manageError(errors);
+                    this.$swal.fire({
+                        title: "Operación cancelada",
+                        text: msg,
+                        icon: "warning",
+                        timer: 5000,
+                    });
                 });
             this.getSuppilers(this.lastUrl); //llamamos de nuevo el metodo para que actualize la tabla 
         },

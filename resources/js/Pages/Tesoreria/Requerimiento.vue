@@ -325,6 +325,13 @@ export default {
                     this.requerimientos = data.data.data;
                 }
             }).catch((errors) => {
+                let msg = this.manageError(errors);
+                this.$swal.fire({
+                    title: "Operación cancelada",
+                    text: msg,
+                    icon: "warning",
+                    timer: 5000,
+                });
             });
         },
         sortBy(key) {
@@ -369,7 +376,6 @@ export default {
                             this.requerimientoModalOpen = false
 
                         }).catch((errors) => {
-                            console.log(errors);
                             if (errors.response.status === 422) {
                                 toast.warning(
                                     "Tienes algunos errores por favor verifica tus datos.",
