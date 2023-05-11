@@ -326,7 +326,7 @@ export default {
         getAllSuppliers() {
             axios.get("/getAllSuppliers").then(res => {
                 this.dataSuppliers = res.data
-            }).error(errors => {
+            }).catch(errors => {
                 {
                     let msg = this.manageError(errors);
                     this.$swal.fire({
