@@ -85,7 +85,7 @@ import axios from "axios";
                     <!-- Buttons -->
                     <div class="mt-4 mb-4 md:flex flex-row justify-center">
                         <GeneralButton v-if="modalData != ''" @click="updateIncomeConcept()"
-                            color="bg-orange-700  hover:bg-orange-800" text="Actualizar" icon="add" />
+                            color="bg-orange-700  hover:bg-orange-800" text="Actualizar" icon="update" />
                         <GeneralButton v-else @click="saveNewIncomeConcept()" color="bg-green-700  hover:bg-green-800"
                             text="Agregar" icon="add" />
                         <div class="mb-4 md:mr-2 md:mb-0 px-1">
