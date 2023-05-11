@@ -148,18 +148,18 @@ import html2pdf from 'html2pdf.js'
                                 </td>
                                 <td class="border border-black">
                                     <div class="h-72 flex flex-col">
-                                        <div class="flex justify-center items-start mb-2 h-[15%]">
-                                            <div class="font-bold flex w-full text-left text-[12px] mx-4 mt-2">
+                                        <div class="flex justify-center items-start mb-2 h-[10%]">
+                                            <div class="font-bold flex w-full text-left text-[10px] mx-4 mt-2">
                                                 {{ receipt_to_print.id_ccta_presupuestal }} {{ nombre_cuenta }}
                                             </div>
                                         </div>
 
-                                        <div class="flex justify-center items-start mb-2 h-[85%]">
-                                            <div class="w-full flex flex-col h-auto">
+                                        <div class="flex justify-center items-start mb-2 h-[90%]">
+                                            <div class="w-full flex flex-col h-1/8">
                                                 <div v-for="(detail, index) in receipt_to_print.detalles" :key="index"
                                                     class="relative flex w-full flex-row center-vertically">
                                                     <label for=""
-                                                        class="font-bold flex items-center text-[12px] w-2/3 mx-4 mt-0">
+                                                        class="font-bold flex items-center text-[10px] w-2/3 mx-4 mt-0">
                                                         {{ detail.concepto_ingreso.dependencia ?
                                                             detail.concepto_ingreso.dependencia.codigo_dependencia + ' - ' : ''
                                                         }}
@@ -168,10 +168,10 @@ import html2pdf from 'html2pdf.js'
                                                     </label>
                                                     <div class="w-1/3 relative">
                                                         <span
-                                                            class="mt-[1px] absolute left-0 top-1/2 transform text-[12px] -translate-y-1/2 font-bold">$</span>
+                                                            class="mt-[1px] absolute left-0 top-1/2 transform text-[10px] -translate-y-1/2 font-bold">$</span>
                                                         <input type="text" readonly
                                                             v-model="detail.monto_det_recibo_ingreso"
-                                                            class="w-full font-bold text-right border-0 text-[12px] pl-8 py-0">
+                                                            class="w-full font-bold text-right border-0 text-[10px] pl-8 py-0">
                                                     </div>
                                                     <!-- <input type="text" readonly v-model="detail.monto_det_recibo_ingreso"
                                                     class="w-1/3 font-bold text-right border-0 py-0 text-sm"> -->
@@ -179,12 +179,12 @@ import html2pdf from 'html2pdf.js'
                                                 <div class="flex justify-center items-start mb-2 h-1/4 mt-1 center-vertically">
                                                     <div class="relative flex w-full flex-row">
                                                         <label for=""
-                                                            class="font-bold flex items-center text-[12px] w-2/3 mx-4 mt-0">
+                                                            class="font-bold flex items-center text-[10px] w-2/3 mx-4 mt-0">
                                                             TOTAL:
                                                         </label>
                                                         <div class="w-1/3 relative">
                                                             <span
-                                                                class="absolute left-0 top-1/2 transform text-[12px] -translate-y-1/2 font-bold">$</span>
+                                                                class="absolute left-0 top-1/2 transform text-[10px] -translate-y-1/2 font-bold">$</span>
                                                             <input type="text" readonly
                                                                 v-model="receipt_to_print.monto_recibo_ingreso"
                                                                 class="w-full font-bold text-right border-0 border-t py-0 text-[12px] pl-8">
