@@ -17,10 +17,10 @@ class ConceptoIngresoController extends Controller
     {
         $columns = ['id_concepto_ingreso', 'nombre_dependencia', 'nombre_concepto_ingreso', 'id_ccta_presupuestal', 'estado_concepto_ingreso'];
 
-        $length = $request->input('length');
-        $column = $request->input('column'); //Index
-        $dir = $request->input('dir');
-        $search_value = $request->input('search');
+        $length = $request->length;
+        $column = $request->column; //Index
+        $dir = $request->dir;
+        $search_value = $request->search;
 
         $query = ConceptoIngreso::select('*')
                     ->leftJoin('dependencia', function ($join) {

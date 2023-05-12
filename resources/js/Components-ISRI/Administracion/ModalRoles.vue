@@ -352,7 +352,7 @@ export default {
     },
     async getMenus() {
       await axios
-        .get("/menus-edit-rol", { params: this.modalData })
+        .post("/menus-edit-rol", { id_rol: this.modalData.id_rol })
         .then((response) => {
           this.modalData.rolMenus = response.data.rolMenus;
           this.modalData.menus = response.data.menus;
