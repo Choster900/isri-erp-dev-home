@@ -10,23 +10,9 @@ import html2pdf from 'html2pdf.js'
     <div class="m-1.5 p-10">
         <ProcessModal maxWidth='4xl' :show="view_receipt" @close="$emit('cerrar-modal')">
             <div class=" flex   justify-center pt-2 content-between">
-                <!-- <div class="px-2">
-                    <GeneralButton color="bg-green-700   hover:bg-green-800" text="AGREGAR" icon="add"
-                        @click="createQuedan()" />
-                </div> -->
-
-                <!-- <div class="px-2">
-                    <GeneralButton color="bg-orange-700   hover:bg-orange-800" text="MODIFICAR" icon="update"
-                        @click="updateQuedan()" />
-                </div> -->
-
                 <div class="px-2">
                     <GeneralButton color="bg-red-700   hover:bg-red-800" text="PDF" icon="pdf" @click="printPdf()" />
                 </div>
-                <!-- <div class="px-2" >
-                    <GeneralButton color="bg-[#2F347E]/90  hover:bg-[#2F347E]" text="GENERAR COMPROBANTE DE RETENCION"
-                        icon="pdf" @click="generarComprobanteRetencionPdf()" />
-                </div> -->
             </div>
             <div id="income-receipt-pdf">
                 <!-- Contenedor 1 -->
@@ -105,7 +91,7 @@ import html2pdf from 'html2pdf.js'
                                                 <label for="" class="flex items-center text-[12px] w-max-1/3">Total en
                                                     Letras</label>
                                                 <input type="text" readonly v-model="receipt_to_print.monto_letras"
-                                                    class="text-[12px] font-bold text-left border-b border-black-600 border-opacity-50 border-solid border-0 py-0"
+                                                    class="text-[11px] font-bold text-left border-b border-black-600 border-opacity-50 border-solid border-0 py-0"
                                                     style="width:750px;">
                                             </div>
                                         </div>
@@ -187,7 +173,7 @@ import html2pdf from 'html2pdf.js'
                                                                 class="absolute left-0 top-1/2 transform text-[10px] -translate-y-1/2 font-bold">$</span>
                                                             <input type="text" readonly
                                                                 v-model="receipt_to_print.monto_recibo_ingreso"
-                                                                class="w-full font-bold text-right border-0 border-t py-0 text-[12px] pl-8">
+                                                                class="w-full font-bold text-right border-0 border-t py-0 text-[10px] pl-8">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -249,9 +235,7 @@ export default {
             const html = div.outerHTML;
 
             html2pdf().set(opt).from(html).save();
-
             //html2pdf().set(opt).from(html).output('dataurlnewwindow');
-
         }
     },
     watch: {
