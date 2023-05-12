@@ -336,7 +336,7 @@ export default {
     getChildrenMenus() {
       this.modalData.id_childrenMenu = "";
       axios
-        .get("/children-menus", { params: this.modalData })
+        .post("/children-menus", { id_menu: this.modalData.id_menu, id_menus_rol: this.modalData.id_menus_rol })
         .then((response) => {
           this.modalData.childrenMenus = response.data.childrenMenus;
         })
