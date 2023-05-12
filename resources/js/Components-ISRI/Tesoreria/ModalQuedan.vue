@@ -537,7 +537,14 @@ export default {
 
                 axios.post('/updateFechaRetencionIva', { id_quedan: this.dataInputs.id_quedan }).then((response) => {
                     console.log(response);
-
+                }).catch(errors => {
+                    let msg = this.manageError(errors);
+                    this.$swal.fire({
+                        title: "Operación cancelada",
+                        text: msg,
+                        icon: "warning",
+                        timer: 5000,
+                    });
                 })
             }
         },
@@ -802,7 +809,6 @@ export default {
                                 toastBackgroundColor: "white",
                             });
                         }).catch((Error) => {
-                            console.log(Error);
                             if (Error.response.status === 422) {
                                 if (Error.response.data.message === "LA DEPENDENCIA ES UN DATO REQUERIDO") {
                                     toast.error("La dependencia es requerida en este caso", {

@@ -152,7 +152,6 @@ export default {
 
                 })
                 .catch(errors => {
-                    console.log(errors);
                     if (errors.response.status === 422) {
                         toast.warning(
                             "Tienes algunos errores por favor verifica tus datos.",
@@ -187,7 +186,7 @@ export default {
                             reader.readAsText(errors.response.data);
                             reader.onload = () => {
                                 const errors = JSON.parse(reader.result);
-                                console.log(errors);
+                                //console.log(errors);
                             };
 
                             let msg = this.manageError(errors);

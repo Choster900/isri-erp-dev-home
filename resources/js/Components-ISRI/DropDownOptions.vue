@@ -23,7 +23,7 @@
             enter-from-class="opacity-0 -translate-y-2" enter-to-class="opacity-100 translate-y-0"
             leave-active-class="transition ease-out duration-200" leave-from-class="opacity-100" leave-to-class="opacity-0">
             <div v-show="dropdownOpen"
-                class="origin-top-right z-10 absolute top-full min-w-44  py-1.5 rounded  mt-1 right-0">
+                class="origin-top-right z-10 absolute top-full min-w-44  py-1.5 rounded  mt-1 right-0 transform-origin-top-right transform -translate-y-full">
                 <div ref="dropdown" @focusin="dropdownOpen = true" @focusout="dropdownOpen = false"
                     class="bg-white w-40 border border-gray-300 rounded-lg flex flex-col text-sm py-2 px-2 text-gray-500">
                     <slot>

@@ -86,7 +86,7 @@ import axios from 'axios';
                           </svg>
                         </span>
                       </div>
-                      <div class="font-semibold">Ver</div>
+                      <div class="font-semibold">Editar</div>
                     </div>
                     <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                       @click="changeStateIncomeConcept(service.id_concepto_ingreso, service.nombre_concepto_ingreso, service.estado_concepto_ingreso)"
@@ -99,7 +99,7 @@ import axios from 'axios';
                           </svg>
 
                         </span></div>
-                      <div class="font-semibold">Eliminar</div>
+                      <div class="font-semibold">Desactivar</div>
                     </div>
                   </DropDownOptions>
                 </div>
@@ -279,7 +279,7 @@ export default {
     async getIncomeConcept(url = "/ingresos") {
       this.tableData.draw++;
       this.tableData.currentPage = url
-      await axios.get(url, { params: this.tableData }).then((response) => {
+      await axios.post(url, this.tableData ).then((response) => {
         let data = response.data;
         if (this.tableData.draw == data.draw) {
           this.links = data.data.links;
