@@ -70,7 +70,7 @@ import axios from 'axios';
                 </div>
             </div>
             <div class="mb-4 md:flex flex justify-center">
-                <GeneralButton @click="exportPDF()" color="bg-red-700 hover:bg-red-800" text="PDF" icon="add" />
+                <!-- <GeneralButton @click="exportPDF()" color="bg-red-700 hover:bg-red-800" text="PDF" icon="add" /> -->
                 <GeneralButton :class="'ml-2'" @click="exportExcel()" color="bg-green-700 hover:bg-green-800" text="Excel"
                     icon="add" />
             </div>
