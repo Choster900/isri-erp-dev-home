@@ -48,14 +48,14 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     //This route allows to desactive a specific rol for all users
     Route::post('change-state-role-all', [RolController::class, 'changeStateRolAll'])->name('rol.changeStateRolAll');
     //Manage menus for a specific rol
-    Route::get('menus-edit-rol', [RolController::class, 'getMenusEditRol'])->name('rol.getMenusEditRol');
-    Route::get('children-menus', [RolController::class, 'getChildrenMenus'])->name('rol.getChildrenMenus');
+    Route::post('menus-edit-rol', [RolController::class, 'getMenusEditRol'])->name('rol.getMenusEditRol');
+    Route::post('children-menus', [RolController::class, 'getChildrenMenus'])->name('rol.getChildrenMenus');
     Route::post('save-menu', [RolController::class, 'saveMenu'])->name('rol.saveMenu');
     Route::post('desactive-menu', [RolController::class, 'desactiveMenu'])->name('rol.desactiveMenu');
     Route::post('update-permits', [RolController::class, 'updatePermits'])->name('rol.updatePermits');
     //Urls to create a new role
     Route::get('systems-all', [RolController::class, 'getSystemsAll'])->name('rol.getSystemsAll');
-    Route::get('parents-menu-all', [RolController::class, 'getParentsMenuAll'])->name('rol.getParetntsMenuAll');
+    Route::post('parents-menu-all', [RolController::class, 'getParentsMenuAll'])->name('rol.getParetntsMenuAll');
     Route::post('create-rol', [RolController::class, 'createRol'])->name('rol.createRol');
 
     //Manage Personas

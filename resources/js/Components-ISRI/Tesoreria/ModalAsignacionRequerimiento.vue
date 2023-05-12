@@ -265,8 +265,14 @@ export default {
                     })
                     this.dataQuedan = newDataQuedan
                 })
-                .catch(err => {
-                    console.error(err);
+                .catch(errors => {
+                    let msg = this.manageError(errors);
+                    this.$swal.fire({
+                        title: "Operación cancelada",
+                        text: msg,
+                        icon: "warning",
+                        timer: 5000,
+                    });
                 })
         },
 
@@ -328,16 +334,23 @@ export default {
                         this.collectItems = []
                         this.id_requerimiento_pago = ''
                         this.numero_requerimiento = ''
-                    }).catch((Error) => {
-                        if (Error.response.status === 422) {
-                            console.log(Error);
-                            toast.error(Error.response.data, {
+                    }).catch((errors) => {
+                        if (errors.response.status === 422) {
+                            toast.error(errors.response.data, {
                                 autoClose: 5000,
                                 position: "top-right",
                                 transition: "zoom",
                                 toastBackgroundColor: "white",
                             });
 
+                        } else {
+                            let msg = this.manageError(errors);
+                            this.$swal.fire({
+                                title: "Operación cancelada",
+                                text: msg,
+                                icon: "warning",
+                                timer: 5000,
+                            });
                         }
                     });
 

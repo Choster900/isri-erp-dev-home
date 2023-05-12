@@ -52,7 +52,7 @@ import axios from "axios";
                     <div class="mb-7 md:flex flex-row justify-items-start">
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                             <TextInput id="name-income" v-model="income_concept.name" :value="income_concept.name"
-                                type="text" placeholder="Concepto de Ingreso">
+                                type="text" placeholder="Concepto de Ingreso" @update:modelValue="onInput()">
                                 <LabelToInput icon="standard" forLabel="name-income" />
                             </TextInput>
                             <InputError v-for="(item, index) in errors.name" :key="index" class="mt-2" :message="item" />
@@ -85,7 +85,7 @@ import axios from "axios";
                     <!-- Buttons -->
                     <div class="mt-4 mb-4 md:flex flex-row justify-center">
                         <GeneralButton v-if="modalData != ''" @click="updateIncomeConcept()"
-                            color="bg-orange-700  hover:bg-orange-800" text="Actualizar" icon="add" />
+                            color="bg-orange-700  hover:bg-orange-800" text="Actualizar" icon="update" />
                         <GeneralButton v-else @click="saveNewIncomeConcept()" color="bg-green-700  hover:bg-green-800"
                             text="Agregar" icon="add" />
                         <div class="mb-4 md:mr-2 md:mb-0 px-1">
@@ -138,6 +138,9 @@ export default {
         };
     },
     methods: {
+        onInput(){
+            this.income_concept.name = this.income_concept.name.toUpperCase();
+        },
         saveNewIncomeConcept() {
             this.$swal
                 .fire({

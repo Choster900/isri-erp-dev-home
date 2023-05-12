@@ -156,7 +156,7 @@ export default {
                             reader.readAsText(errors.response.data);
                             reader.onload = () => {
                                 const errors = JSON.parse(reader.result);
-                                console.log(errors);
+                                //console.log(errors);
                             };
 
                             let msg = this.manageError(errors);
@@ -177,7 +177,6 @@ export default {
                     this.financing_sources = response.data.financing_sources
                 })
                 .catch((errors) => {
-                    console.log(errors);
                     let msg = this.manageError(errors);
                     this.$swal.fire({
                         title: "Operación cancelada",
