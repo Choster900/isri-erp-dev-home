@@ -336,7 +336,7 @@ export default {
     getChildrenMenus() {
       this.modalData.id_childrenMenu = "";
       axios
-        .get("/children-menus", { params: this.modalData })
+        .post("/children-menus", { id_menu: this.modalData.id_menu, id_menus_rol: this.modalData.id_menus_rol })
         .then((response) => {
           this.modalData.childrenMenus = response.data.childrenMenus;
         })
@@ -352,7 +352,7 @@ export default {
     },
     async getMenus() {
       await axios
-        .get("/menus-edit-rol", { params: this.modalData })
+        .post("/menus-edit-rol", { id_rol: this.modalData.id_rol })
         .then((response) => {
           this.modalData.rolMenus = response.data.rolMenus;
           this.modalData.menus = response.data.menus;

@@ -279,7 +279,7 @@ export default {
     async getIncomeConcept(url = "/ingresos") {
       this.tableData.draw++;
       this.tableData.currentPage = url
-      await axios.get(url, { params: this.tableData }).then((response) => {
+      await axios.post(url, this.tableData ).then((response) => {
         let data = response.data;
         if (this.tableData.draw == data.draw) {
           this.links = data.data.links;

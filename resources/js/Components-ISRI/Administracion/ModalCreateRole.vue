@@ -228,7 +228,7 @@ export default {
     },
     getParentMenu() {
       this.modalDataCreate.select_sistema = true
-      axios.get('/parents-menu-all', { params: this.modalDataCreate })
+      axios.post('/parents-menu-all', { id_sistema: this.modalDataCreate.id_sistema })
         .then((response) => {
           this.modalDataCreate.parentsMenu = response.data.parentsMenu
         })
@@ -251,7 +251,7 @@ export default {
         }
       })
       this.modalDataCreate.nombre_parent_menu = finalLabel
-      axios.get('/children-menus', { params: this.modalDataCreate })
+      axios.post('/children-menus', { id_menu: this.modalDataCreate.id_menu, id_menus_rol: this.modalDataCreate.id_menus_rol })
         .then((response) => {
           this.modalDataCreate.childrenMenus = response.data.childrenMenus
           if (this.modalDataCreate.menus != "") {
