@@ -326,4 +326,45 @@ class QuedanController extends Controller
     { //se hacen esta peticion por que al no existir el quedan no existen registos previos de la base de datos y no podemos ver a que provedor pertenece
         return Quedan::where("id_quedan", $request->id_quedan)->update(["fecha_retencion_iva_quedan" => Carbon::now()]);
     }
+    public function getAmountBySupplierPerMonth(Request $request) //Metodo utilizado al momento de 
+    {
+        /* $fecha = explode('-', $request->fecha_emision_quedan);
+        return Quedan::select("id_quedan","monto_total_quedan")->where('id_proveedor', $request->id_proveedor)
+        ->whereMonth('fecha_emision_quedan', $fecha[1])
+        ->where('id_quedan', '<>', $request->id_quedan)
+        ->get(); */
+
+        $mesActual = Carbon::now()->format('m');
+        $resultado = [];
+        $proveedores = Proveedor::with([
+            'quedan' => function ($query) use ($mesActual) {
+                $query->whereMonth('fecha_emision_quedan', $mesActual);
+            }
+        ])
+            ->get()
+            ->filter(function ($proveedor) {
+                return $proveedor->quedan->isNotEmpty();
+            });
+
+        foreach ( $proveedores as $proveedor ) {
+            $quedan_con_detalle = $proveedor->quedan->map(function ($quedan) {
+                return [
+                    'id_quedan'          => $quedan->id_quedan,
+                    'monto_total_quedan' => $quedan->monto_total_quedan,
+                ];
+            });
+            $total_mensual = $proveedor->quedan->sum('monto_total_quedan');
+            $proveedor_arr = [
+                'id_proveedor'  => $proveedor->id_proveedor,
+                'razon_social'  => $proveedor->razon_social_proveedor,
+                'quedan'        => $quedan_con_detalle,
+                'total_mensual' => $total_mensual,
+            ];
+            array_push($resultado, $proveedor_arr);
+        }
+
+        return $resultado;
+
+
+    }
 }
