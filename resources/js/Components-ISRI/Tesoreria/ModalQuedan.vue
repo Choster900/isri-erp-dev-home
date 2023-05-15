@@ -916,7 +916,6 @@ export default {
                 }
             })
         },
-
     },
     watch: {
         showModal: function () {
