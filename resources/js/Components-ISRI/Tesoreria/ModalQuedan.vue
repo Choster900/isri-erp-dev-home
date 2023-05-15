@@ -418,6 +418,11 @@ export default {
             type: [],
             required: true,
         },
+        totalAmountBySupplier: {
+            type: Array,
+            default: [],
+            required: true,
+        }
 
     },
     data: function () {
@@ -425,6 +430,7 @@ export default {
             rowsData: [],//attr donde guardar la information
             errosDetalleQuedan: [],
             errosrNumeroActa: [],
+            montoTotalProveedorMes: [],
             dataInputs: {
                 giro: '',
                 irs: '',
@@ -453,7 +459,8 @@ export default {
                 monto_liquido_quedan: '',
                 monto_iva_quedan: '',
                 monto_isr_quedan: '',
-                monto_total_quedan: ''
+                monto_total_quedan: '',
+                monto_total_quedan_por_proveedor: '',
             },
             config: {
                 altInput: true,
@@ -550,7 +557,6 @@ export default {
         },
 
         onCellEdit(rowIndex, cellIndex, value, type = '') {//editando la celda RECIVE ROW, CELL Y EL VALOR A MODIFICAR
-
             if (type) {//ejecutando la accion cuando escriba en la celda [monto,tipo_prestacion]
                 if (type == 'producto') {
                     this.rowsData[rowIndex][cellIndex].producto = value
@@ -558,11 +564,9 @@ export default {
                     this.rowsData[rowIndex][cellIndex].servicio = value
                 }
                 this.calculateAmount()
-
             } else {
                 this.rowsData[rowIndex][cellIndex] = value
             }
-
         },
         getInformationBySupplier(supplier) {
             this.dataSuppliers.forEach((suppliers, index) => {
@@ -577,6 +581,7 @@ export default {
                     this.dataForCalculate.iva = suppliers.sujeto_retencion.iva_sujeto_retencion
                 }
             })
+            this.getAmountBySupplier(supplier)
             this.calculateAmount()
         },
         calculateAmount() {//calculando montos
@@ -593,13 +598,38 @@ export default {
                 }
             })
             liquido = (totMontoByRow / 1.13).toFixed(2);
-            let montoIvaQuedan = (liquido * this.dataForCalculate.iva).toFixed(2);
-            this.dataInputs.monto_iva_quedan = montoIvaQuedan;
+
+            let montoIvaQuedan = 0
+            if ((parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) + parseFloat(totMontoByRow)) >= 113) {
+                montoIvaQuedan = (liquido * this.dataForCalculate.iva);
+            }
+            console.log(parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) + parseFloat(totMontoByRow));
+            this.dataInputs.monto_iva_quedan = montoIvaQuedan.toFixed(2);
+
             let montoIsrQuedan = (montoServicios * this.dataForCalculate.irs).toFixed(2);
             this.dataInputs.monto_isr_quedan = montoIsrQuedan;
             let montoLiquidoQuedan = (totMontoByRow - montoIvaQuedan - montoIsrQuedan).toFixed(2);
             this.dataInputs.monto_liquido_quedan = montoLiquidoQuedan;
             this.dataInputs.monto_total_quedan = totMontoByRow.toFixed(2);
+        },
+        getAmountBySupplier(id_proveedor) {
+            let newDataSupplier = JSON.parse(JSON.stringify(this.totalAmountBySupplier))
+            let total = 0;
+            newDataSupplier.forEach((element, index) => {
+                if (element.id_proveedor === id_proveedor) {
+                    if (this.dataInputs.id_quedan != "") {
+                        let quedanArray = element.quedan.filter((element) => element.id_quedan <= this.dataInputs.id_quedan);
+                        total = quedanArray.sort((a, b) => b.id_quedan - a.id_quedan) // ordena el array por id_quedan en orden descendente
+                            .reduce((acc, obj) => acc + parseFloat(obj.monto_total_quedan), 0); // suma el monto_total_quedan de cada objeto
+                    } else {
+                        let montoTotal = element.quedan.reduce((total, element) =>
+                            (parseFloat(total) + parseFloat(element.monto_total_quedan)).toFixed(2), 0);
+                        total = montoTotal;
+                    }
+                }
+            });
+            console.log(total);
+            this.dataForCalculate.monto_total_quedan_por_proveedor = ((!isNaN(parseFloat(total)) ? parseFloat(total) : 0) - (this.dataInputs.monto_total_quedan == '' ? 0 : this.dataInputs.monto_total_quedan))
         },
         onlyNumberDecimal(event) {
             const charCode = (event.which) ? event.which : event.keyCode;
@@ -637,7 +667,6 @@ export default {
             this.dataInputs.id_proy_financiado = this.dataQuedan.id_proy_financiado
             this.dataInputs.monto_total_quedan = this.dataQuedan.monto_total_quedan
             this.dataInputs.numero_retencion_iva_quedan = this.dataQuedan.numero_retencion_iva_quedan
-
 
         },
         resetValuesToInput() {//funcion para limpiar la data que la llamaremos cuando la data no traiga nada
@@ -737,6 +766,12 @@ export default {
                         this.rowsData = []
                         this.resetValuesToInput()
                         this.addRow()
+                        toast.success("El quedan fue guardado con exito", {
+                            autoClose: 5000,
+                            position: "top-right",
+                            transition: "zoom",
+                            toastBackgroundColor: "white",
+                        });
                     }).catch((Error) => {
                         console.log(Error);
                         if (Error.response.status === 422) {
@@ -880,7 +915,7 @@ export default {
                     });
                 }
             })
-        }
+        },
     },
     watch: {
         showModal: function () {
@@ -905,6 +940,7 @@ export default {
                         })
                     })
                     this.calculateAmount()
+                    this.getAmountBySupplier(newDataQuedan.proveedor.id_proveedor)
                 } else {//SI dataQuedan VIENE VACIO HACEMOS ESTO
                     this.addRow()
                     this.resetValuesToInput()
