@@ -600,7 +600,7 @@ export default {
             liquido = (totMontoByRow / 1.13).toFixed(2);
 
             let montoIvaQuedan = 0
-            if ((parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) + parseFloat(totMontoByRow)) >= 113) {ñ
+            if ((parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) + parseFloat(totMontoByRow)) >= 113) {
                 montoIvaQuedan = (liquido * this.dataForCalculate.iva);
             }
             console.log(parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) + parseFloat(totMontoByRow));

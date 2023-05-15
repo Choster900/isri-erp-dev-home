@@ -276,13 +276,6 @@ export default {
                     this.getAmountBySupplier()
                 }
             }).catch((errors) => {
-                let msg = this.manageError(errors);
-                this.$swal.fire({
-                    title: "Operación cancelada",
-                    text: msg,
-                    icon: "warning",
-                    timer: 5000,
-                });
             });
         },
         sortBy(key) {
@@ -311,14 +304,7 @@ export default {
             await axios.get('/get-list-select').then((response) => {
 
                 this.dataForSelectInRow = response.data;
-            }).catch((errors) => {
-                let msg = this.manageError(errors);
-                this.$swal.fire({
-                    title: "Operación cancelada",
-                    text: msg,
-                    icon: "warning",
-                    timer: 5000,
-                });
+            }).catch((error) => {
             });
         },
         async getAmountBySupplier(dataQuedan) {
@@ -340,16 +326,6 @@ export default {
         getAllSuppliers() {
             axios.get("/getAllSuppliers").then(res => {
                 this.dataSuppliers = res.data
-            }).catch(errors => {
-                {
-                    let msg = this.manageError(errors);
-                    this.$swal.fire({
-                        title: "Operación cancelada",
-                        text: msg,
-                        icon: "warning",
-                        timer: 5000,
-                    });
-                }
             })
         },
         validarCamposVacios(objeto) {
