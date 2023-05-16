@@ -143,7 +143,7 @@ export default {
             this.modalData.roles = ""
         },
         async getSistemas() {
-            await axios.get("/systems", { params: {id_usuario:this.modalData.id_usuario} })
+            await axios.post("/systems",{id_usuario:this.modalData.id_usuario})
                 .then((response) => {
                     this.modalData.userRoles = response.data.userRoles
                     this.modalData.sistemas = response.data.sistemas
@@ -160,7 +160,7 @@ export default {
                 })
         },
         async getRolesxSistema() {
-            await axios.get("/roles-per-system", { params: {id_sistema: this.modalData.id_sistema} })
+            await axios.post("/roles-per-system", {id_sistema: this.modalData.id_sistema} )
                 .then((response) => {
                     this.modalData.roles = response.data.roles
                 })
