@@ -318,13 +318,13 @@ export default {
         }
       })
     },
-    changeStateFromModal(identificador = "") {
+    changeStateFromModal(identificador) {
       this.modalVar = true;
       this.modalData.id_usuario = identificador;
     },
     async getUsers(url = "/users") {
       this.tableData.draw++;
-      await axios.get(url, { params: this.tableData }).then((response) => {
+      await axios.post(url,this.tableData ).then((response) => {
         this.tableData.currentPage=url
         let data = response.data;
         if (this.tableData.draw == data.draw) {
