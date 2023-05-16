@@ -178,7 +178,7 @@ import axios from 'axios';
 
         <ModalIncomeReceiptVue :show_modal_receipt="show_modal_receipt" :modal_data="modal_data" :financing_sources="financing_sources"
             :budget_accounts="budget_accounts" :income_concepts="income_concepts" :treasury_clerk="treasury_clerk"
-            @cerrar-modal="show_modal_receipt = false" @get-table="this.getIncomeReceipts(this.tableData.currentPage)" />
+            @cerrar-modal="show_modal_receipt = false" @get-table="getIncomeReceipts(tableData.currentPage)" />
 
         <ModalReceiptFormatVue :view_receipt="view_receipt" :receipt_to_print="receipt_to_print"
             @cerrar-modal="view_receipt = false" />
