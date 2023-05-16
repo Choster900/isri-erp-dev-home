@@ -22,7 +22,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             ]);
         }
     )->name('ts.proveedores');
-    Route::get('proveedores', [ProveedorController::class, 'getProveedores'])->name('proveedor.getProveedor');
+    Route::post('proveedores', [ProveedorController::class, 'getProveedores'])->name('proveedor.getProveedor');
     Route::get('list-option-select-suppliers', [ProveedorController::class, 'getInformationToSelect'])->name('proveedor.getInformationToSelect');
     Route::post('update-supplier', [ProveedorController::class, 'updateDataSupplier'])->name('proveedor.updateDataSupplier');
     Route::post('add-supplier', [ProveedorController::class, 'addDataSupplier'])->name('proveedor.addDataSupplier');
