@@ -414,10 +414,6 @@ export default {
             type: [],
             required: true,
         },
-        dataSuppliers: {//prop muestra array de suppliers para imprimir en select
-            type: [],
-            required: true,
-        },
         totalAmountBySupplier: {
             type: Array,
             default: [],
@@ -569,16 +565,16 @@ export default {
             }
         },
         getInformationBySupplier(supplier) {
-            this.dataSuppliers.forEach((suppliers, index) => {
-                if (suppliers["id_proveedor"] == supplier) {
+            this.dataForSelectInRow.proveedor.forEach((suppliers, index) => {
+                if (suppliers["value"] == supplier) {
                     //data que se pinta en inputs
-                    this.dataInputs.giro = suppliers.giro.codigo_giro + " - " + suppliers.giro.nombre_giro
-                    this.dataInputs.irs = (suppliers.sujeto_retencion.isrl_sujeto_retencion * 100) + " %"
-                    this.dataInputs.iva = (suppliers.sujeto_retencion.iva_sujeto_retencion * 100) + " %"
+                    this.dataInputs.giro = suppliers["codigo_giro"] + " - " + suppliers["nombre_giro"] 
+                    this.dataInputs.irs = (suppliers["isrl_sujeto_retencion"] * 100) + " %"
+                    this.dataInputs.iva = (suppliers["iva_sujeto_retencion"] * 100) + " %"
 
                     //data que se usa para calculos
-                    this.dataForCalculate.irs = suppliers.sujeto_retencion.isrl_sujeto_retencion
-                    this.dataForCalculate.iva = suppliers.sujeto_retencion.iva_sujeto_retencion
+                    this.dataForCalculate.irs = suppliers["isrl_sujeto_retencion"]
+                    this.dataForCalculate.iva = suppliers["iva_sujeto_retencion"]
                 }
             })
             this.getAmountBySupplier(supplier)
@@ -649,9 +645,9 @@ export default {
             this.dataInputs.descripcion_quedan = event.target.innerText;
         },
         setValuesToInput() {//funcion para setear la data que trae la prop a attr nuevos
-            this.dataInputs.giro = this.dataQuedan.proveedor.giro.codigo_giro + " - " + this.dataQuedan.proveedor.giro.nombre_giro
-            this.dataInputs.irs = (this.dataQuedan.proveedor.sujeto_retencion.isrl_sujeto_retencion * 100) + " %"
-            this.dataInputs.iva = (this.dataQuedan.proveedor.sujeto_retencion.iva_sujeto_retencion * 100) + " %"
+            this.dataInputs.giro = this.dataForSelectInRow.proveedor["codigo_giro"] + " - " + this.dataForSelectInRow.proveedor["nombre_giro"]
+            this.dataInputs.irs = (this.dataForSelectInRow.proveedor["isrl_sujeto_retencion"] * 100) + " %"
+            this.dataInputs.iva = (this.dataForSelectInRow.proveedor["iva_sujeto_retencion"] * 100) + " %"
             this.dataInputs.id_proveedor = this.dataQuedan.proveedor.id_proveedor
             this.dataInputs.id_acuerdo_compra = this.dataQuedan.id_acuerdo_compra
             this.dataInputs.numero_acuerdo_quedan = this.dataQuedan.numero_acuerdo_quedan

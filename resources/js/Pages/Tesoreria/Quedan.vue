@@ -185,7 +185,7 @@ import axios from 'axios';
         </div>
 
         <ModalQuedan :showModal="showModal" @cerrar-modal="closeVars()" :data-quedan="dataQuedan"
-            :dataForSelectInRow="dataForSelectInRow" @actualizar-table-data="getDataQuedan()" :dataSuppliers="dataSuppliers"
+            :dataForSelectInRow="dataForSelectInRow" @actualizar-table-data="getDataQuedan()" 
             :totalAmountBySupplier="totalAmountBySupplier" />
 
 
@@ -385,7 +385,6 @@ export default {
 
     },
     created() {
-        this.getAllSuppliers()
         this.getDataQuedan()
         this.getAmountBySupplier()
         this.getListForSelect()
