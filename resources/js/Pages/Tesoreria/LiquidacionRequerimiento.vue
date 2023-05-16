@@ -192,7 +192,7 @@ export default {
         async getDataLiquidaciones(url = "/requerimientos") {
             this.lastUrl = url
             this.tableData.draw++
-            await axios.get(url, { params: this.tableData }).then((response) => {
+            await axios.post(url,this.tableData ).then((response) => {
                 let data = response.data;
                 if (this.tableData.draw == data.draw) {
                     this.links = data.data.links
