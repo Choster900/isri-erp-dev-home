@@ -47,6 +47,7 @@ class ReporteTesoreriaController extends Controller
         }
         if ($request->filled('state_quedan_id')) {
             if ($request->state_quedan_id == -1) {
+                $quedan_state = 'PENDIENTES DE PAGO';
                 $query_quedan_state = ' AND `id_estado_quedan` <> 4';
             } else {
                 $query_quedan_state = ' AND `id_estado_quedan` = ' . $request->state_quedan_id;
@@ -136,9 +137,13 @@ class ReporteTesoreriaController extends Controller
         //Definimos el estado del quedan
         $estado = EstadoQuedan::find($request->state_quedan_id);
         if ($estado) {
-            $quedan_state = $estado->nombre_estado_quedan;
+                $quedan_state = $estado->nombre_estado_quedan;
         } else {
-            $quedan_state = 'TODOS LOS ESTADOS';
+            if($request->state_quedan_id == -1){
+                $quedan_state = 'PENDIENTES DE PAGO';
+            }else{
+                $quedan_state = 'TODOS LOS ESTADOS';
+            }
         }
 
         //Calculo de la suma de monto liquido
@@ -675,10 +680,11 @@ class ReporteTesoreriaController extends Controller
             AND ci.id_proy_financiado = ?
             AND ci.id_ccta_presupuestal <> 16201 
             GROUP BY 
-            d.id_dependencia, 
+            ci.id_dependencia, 
+            d.codigo_dependencia, 
             ci.id_ccta_presupuestal,
             ci.nombre_concepto_ingreso) as t
-            GROUP BY  t.id_dependencia
+            GROUP BY  t.id_dependencia, t.codigo_dependencia
         ',
             [$request->start_date, $request->financing_source_id]
         );
