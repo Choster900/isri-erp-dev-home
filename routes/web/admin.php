@@ -32,8 +32,8 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     //This route obtains users based on the parameters sent from the page.
     Route::get('users', [UserController::class, 'getUsers'])->name('user.getUsers');
     //Manage roles for a specific user
-    Route::get('systems', [UserController::class, 'getSystems'])->name('user.getSystems');
-    Route::get('roles-per-system', [UserController::class, 'getRolesPerSystem'])->name('user.getRolesPerSystem');
+    Route::post('systems', [UserController::class, 'getSystems'])->name('user.getSystems');
+    Route::post('roles-per-system', [UserController::class, 'getRolesPerSystem'])->name('user.getRolesPerSystem');
     Route::post('save-rol', [UserController::class, 'saveRol'])->name('user.saveRol');
     Route::post('desactive-rol', [UserController::class, 'desactiveRol'])->name('user.desactiveRol');
     Route::post('update-rol', [UserController::class, 'updateRol'])->name('user.updateRol');
