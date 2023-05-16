@@ -228,13 +228,13 @@ import html2pdf from 'html2pdf.js'
                                         </th>
                                     </tr>
                                     <tr>
-                                        <th class="border-2 border-black text-sm w-24 text-gray-600">FACTURA</th>
+                                        <th class="border-2 border-black text-sm w-32 text-gray-600">FACTURA</th>
                                         <th class="border-2 border-black text-sm text-gray-600">FECHA DE EMISION</th>
                                         <th class="border-2 border-black text-sm px-10 text-gray-600" colspan="2">
                                             DEPENDENCIA</th>
                                         <th class="border-2 border-black text-sm px-8 text-gray-600" colspan="2">NUMERO ACTA
                                         </th>
-                                        <th class="border-2 border-black w-56 max-w-[256px] text-sm px-10 text-gray-600"
+                                        <th class="border-2 border-black w-56 max-w-[200px] text-sm px-10 text-gray-600"
                                             colspan="3">
                                             CONCEPTO</th>
                                         <th class="border-2 border-black w-40 text-sm px-10 text-gray-600" colspan="4">MONTO
@@ -268,7 +268,7 @@ import html2pdf from 'html2pdf.js'
                                                     </td>
                                                     <td v-else-if="cellIndex == 3" class="border-2 border-black" colspan="2"
                                                         :class="{ 'condition-select': rowsData[rowIndex][3] == '' }">
-                                                        <div class="relative flex h-10 w-full flex-row-reverse ">
+                                                        <div class="relative flex h-8 w-full flex-row-reverse ">
                                                             <Multiselect v-model="rowsData[rowIndex][3]"
                                                                 :options="dataForSelectInRow.dependencias"
                                                                 :searchable="true"
@@ -288,7 +288,7 @@ import html2pdf from 'html2pdf.js'
                                                             cell }}</td>
                                                     <td v-else-if="cellIndex == 5" colspan="4"
                                                         @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
-                                                        class="border-2 border-black px-1 "
+                                                        class="border-2 border-black px-1 max-w-[200px]"
                                                         :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
                                                         :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true">
                                                         {{ cell }}
@@ -340,7 +340,7 @@ import html2pdf from 'html2pdf.js'
                                         <td class="border-2 border-black " colspan="2" rowspan="2" contenteditable="false">
                                             Descripción
                                         </td>
-                                        <td class="border-2 border-black" colspan="5" rowspan="2"
+                                        <td class="border-2 border-black max-w-[250px]" colspan="5" rowspan="2"
                                             :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true"
                                             @input="onInputDescripcionQuedan"
                                             :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''">
