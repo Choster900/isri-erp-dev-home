@@ -123,11 +123,7 @@ export default {
     },
     methods: {
         exportPDF() {
-            axios.get('/create-quedan-report-pdf',
-                {
-                    params: this.debt_table
-                }
-            )
+            axios.post('/create-quedan-report-pdf', this.debt_table)
                 .then(response => {
                     this.errors = []
                     const opt = {
@@ -185,12 +181,9 @@ export default {
 
         },
         exportExcel() {
-            axios.get('/create-quedan-report',
-                {
-                    responseType: 'blob',
-                    params: this.debt_table
-                }
-            )
+            axios.post('/create-quedan-report', this.debt_table, {
+                    responseType: 'blob'
+                })
                 .then(response => {
                     this.errors = []
                     let fecha = moment().format('DD-MM-YYYY');
