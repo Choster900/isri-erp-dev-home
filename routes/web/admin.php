@@ -37,7 +37,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('save-rol', [UserController::class, 'saveRol'])->name('user.saveRol');
     Route::post('desactive-rol', [UserController::class, 'desactiveRol'])->name('user.desactiveRol');
     Route::post('update-rol', [UserController::class, 'updateRol'])->name('user.updateRol');
-    Route::get('roles-per-system-edit', [UserController::class, 'getRolesPerSystemEdit'])->name('user.getRolesPerSystemEdit');
+    Route::post('roles-per-system-edit', [UserController::class, 'getRolesPerSystemEdit'])->name('user.getRolesPerSystemEdit');
     //Urls to create a new User
     Route::get('get-dui', [UserController::class, 'getDui'])->name('user.getDui');
     Route::post('save-user', [UserController::class, 'saveUser'])->name('user.saveUser');
