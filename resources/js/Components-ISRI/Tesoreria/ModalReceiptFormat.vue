@@ -214,9 +214,11 @@ export default {
     },
     methods: {
         printPdf() {
+            let fecha = moment().format('DD-MM-YYYY');
+            let name = 'RECIBO N° '+this.receipt_to_print.numero_recibo_ingreso+' - '+ fecha;
             const opt = {
                 margin: 0.2,
-                filename: 'output.pdf',
+                filename: name,
                 pagebreak: {mode:'css',before:'#pagebreak'},
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 3, useCORS: true },

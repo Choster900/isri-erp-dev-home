@@ -69,6 +69,7 @@ class RequerimientoController extends Controller
                 'monto_requerimiento_pago'       => $request->input("monto_requerimiento_pago"),
                 'fecha_requerimiento_pago'       => Carbon::now(),
                 'estado_requerimiento_pago'      => 1,
+                'id_estado_req_pago'             => 1,
                 'fecha_reg_requerimiento_pago'   => Carbon::now(),
                 'usuario_requerimiento_pago '    => $request->user()->nick_usuario,
                 'ip_requerimiento_pago'          => $request->ip(),
@@ -88,7 +89,6 @@ class RequerimientoController extends Controller
                 'numero_requerimiento_pago'      => $request->input("numero_requerimiento_pago"),
                 'descripcion_requerimiento_pago' => $request->input("descripcion_requerimiento_pago"),
                 'monto_requerimiento_pago'       => $request->input("monto_requerimiento_pago"),
-                'estado_requerimiento_pago'      => 1,
                 'fecha_mod_requerimiento_pago'   => Carbon::now(),
                 'ip_requerimiento_pago'          => $request->ip(),
             ]);
