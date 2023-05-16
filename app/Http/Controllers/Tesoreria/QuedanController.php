@@ -287,8 +287,17 @@ class QuedanController extends Controller
         $v_Proveedor = DB::table('proveedor')
             ->select(
                 'id_proveedor as value',
-                'razon_social_proveedor as label'
-            )->where("estado_proveedor", 1)->get();
+                'razon_social_proveedor as label',
+                'giro.codigo_giro',
+                'giro.nombre_giro',
+                'sujeto_retencion.iva_sujeto_retencion',
+                'sujeto_retencion.isrl_sujeto_retencion',
+            )->join('giro', function ($join) {
+                $join->on('giro.id_giro', '=', 'proveedor.id_giro');
+            })->join('sujeto_retencion', function ($join) {
+            $join->on('sujeto_retencion.id_sujeto_retencion', '=', 'proveedor.id_sujeto_retencion');
+        })->where("estado_proveedor", 1)->get();
+
         $v_Requerimiento = DB::table('requerimiento_pago')
             ->select(
                 'id_requerimiento_pago as value',
@@ -317,23 +326,12 @@ class QuedanController extends Controller
             "proyectoFinanciado"  => $v_Proyecto_finanziado,
         ];
     }
-    public function getSuppliers() //Metodo utilizado al momento de seleccionar proveedor y hacer los calculos 
-    { //se hacen esta peticion por que al no existir el quedan no existen registos previos de la base de datos y no podemos ver a que provedor pertenece
-        return Proveedor::with(['sujeto_retencion', 'giro'])->where("estado_proveedor", 1)->get();
-    }
-
     public function updateFechaRetencionIva(Request $request) //Metodo utilizado al momento de seleccionar proveedor y hacer los calculos 
     { //se hacen esta peticion por que al no existir el quedan no existen registos previos de la base de datos y no podemos ver a que provedor pertenece
         return Quedan::where("id_quedan", $request->id_quedan)->update(["fecha_retencion_iva_quedan" => Carbon::now()]);
     }
     public function getAmountBySupplierPerMonth(Request $request) //Metodo utilizado al momento de 
     {
-        /* $fecha = explode('-', $request->fecha_emision_quedan);
-        return Quedan::select("id_quedan","monto_total_quedan")->where('id_proveedor', $request->id_proveedor)
-        ->whereMonth('fecha_emision_quedan', $fecha[1])
-        ->where('id_quedan', '<>', $request->id_quedan)
-        ->get(); */
-
         $mesActual = Carbon::now()->format('m');
         $resultado = [];
         $proveedores = Proveedor::with([

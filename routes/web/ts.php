@@ -14,7 +14,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
 
     //Manage supplier
     //This route obtains supplier based on the parameters sent from the page.
-    Route::post(
+    Route::get(
         '/ts/proveedores',
         function () {
             return Inertia::render('Tesoreria/Proveedores', [

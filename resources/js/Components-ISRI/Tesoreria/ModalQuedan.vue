@@ -228,13 +228,13 @@ import html2pdf from 'html2pdf.js'
                                         </th>
                                     </tr>
                                     <tr>
-                                        <th class="border-2 border-black text-sm w-24 text-gray-600">FACTURA</th>
+                                        <th class="border-2 border-black text-sm w-32 text-gray-600">FACTURA</th>
                                         <th class="border-2 border-black text-sm text-gray-600">FECHA DE EMISION</th>
                                         <th class="border-2 border-black text-sm px-10 text-gray-600" colspan="2">
                                             DEPENDENCIA</th>
                                         <th class="border-2 border-black text-sm px-8 text-gray-600" colspan="2">NUMERO ACTA
                                         </th>
-                                        <th class="border-2 border-black w-56 max-w-[256px] text-sm px-10 text-gray-600"
+                                        <th class="border-2 border-black w-56 max-w-[200px] text-sm px-10 text-gray-600"
                                             colspan="3">
                                             CONCEPTO</th>
                                         <th class="border-2 border-black w-40 text-sm px-10 text-gray-600" colspan="4">MONTO
@@ -268,7 +268,7 @@ import html2pdf from 'html2pdf.js'
                                                     </td>
                                                     <td v-else-if="cellIndex == 3" class="border-2 border-black" colspan="2"
                                                         :class="{ 'condition-select': rowsData[rowIndex][3] == '' }">
-                                                        <div class="relative flex h-10 w-full flex-row-reverse ">
+                                                        <div class="relative flex h-8 w-full flex-row-reverse ">
                                                             <Multiselect v-model="rowsData[rowIndex][3]"
                                                                 :options="dataForSelectInRow.dependencias"
                                                                 :searchable="true"
@@ -288,7 +288,7 @@ import html2pdf from 'html2pdf.js'
                                                             cell }}</td>
                                                     <td v-else-if="cellIndex == 5" colspan="4"
                                                         @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
-                                                        class="border-2 border-black px-1 "
+                                                        class="border-2 border-black px-1 max-w-[200px]"
                                                         :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
                                                         :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true">
                                                         {{ cell }}
@@ -340,7 +340,7 @@ import html2pdf from 'html2pdf.js'
                                         <td class="border-2 border-black " colspan="2" rowspan="2" contenteditable="false">
                                             Descripción
                                         </td>
-                                        <td class="border-2 border-black" colspan="5" rowspan="2"
+                                        <td class="border-2 border-black max-w-[250px]" colspan="5" rowspan="2"
                                             :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true"
                                             @input="onInputDescripcionQuedan"
                                             :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''">
@@ -411,10 +411,6 @@ export default {
             required: true,
         },
         dataForSelectInRow: {//prop que muestra information en row 
-            type: [],
-            required: true,
-        },
-        dataSuppliers: {//prop muestra array de suppliers para imprimir en select
             type: [],
             required: true,
         },
@@ -569,16 +565,16 @@ export default {
             }
         },
         getInformationBySupplier(supplier) {
-            this.dataSuppliers.forEach((suppliers, index) => {
-                if (suppliers["id_proveedor"] == supplier) {
+            this.dataForSelectInRow.proveedor.forEach((suppliers, index) => {
+                if (suppliers["value"] == supplier) {
                     //data que se pinta en inputs
-                    this.dataInputs.giro = suppliers.giro.codigo_giro + " - " + suppliers.giro.nombre_giro
-                    this.dataInputs.irs = (suppliers.sujeto_retencion.isrl_sujeto_retencion * 100) + " %"
-                    this.dataInputs.iva = (suppliers.sujeto_retencion.iva_sujeto_retencion * 100) + " %"
+                    this.dataInputs.giro = suppliers["codigo_giro"] + " - " + suppliers["nombre_giro"] 
+                    this.dataInputs.irs = (suppliers["isrl_sujeto_retencion"] * 100) + " %"
+                    this.dataInputs.iva = (suppliers["iva_sujeto_retencion"] * 100) + " %"
 
                     //data que se usa para calculos
-                    this.dataForCalculate.irs = suppliers.sujeto_retencion.isrl_sujeto_retencion
-                    this.dataForCalculate.iva = suppliers.sujeto_retencion.iva_sujeto_retencion
+                    this.dataForCalculate.irs = suppliers["isrl_sujeto_retencion"]
+                    this.dataForCalculate.iva = suppliers["iva_sujeto_retencion"]
                 }
             })
             this.getAmountBySupplier(supplier)
@@ -649,9 +645,9 @@ export default {
             this.dataInputs.descripcion_quedan = event.target.innerText;
         },
         setValuesToInput() {//funcion para setear la data que trae la prop a attr nuevos
-            this.dataInputs.giro = this.dataQuedan.proveedor.giro.codigo_giro + " - " + this.dataQuedan.proveedor.giro.nombre_giro
-            this.dataInputs.irs = (this.dataQuedan.proveedor.sujeto_retencion.isrl_sujeto_retencion * 100) + " %"
-            this.dataInputs.iva = (this.dataQuedan.proveedor.sujeto_retencion.iva_sujeto_retencion * 100) + " %"
+            this.dataInputs.giro = this.dataForSelectInRow.proveedor["codigo_giro"] + " - " + this.dataForSelectInRow.proveedor["nombre_giro"]
+            this.dataInputs.irs = (this.dataForSelectInRow.proveedor["isrl_sujeto_retencion"] * 100) + " %"
+            this.dataInputs.iva = (this.dataForSelectInRow.proveedor["iva_sujeto_retencion"] * 100) + " %"
             this.dataInputs.id_proveedor = this.dataQuedan.proveedor.id_proveedor
             this.dataInputs.id_acuerdo_compra = this.dataQuedan.id_acuerdo_compra
             this.dataInputs.numero_acuerdo_quedan = this.dataQuedan.numero_acuerdo_quedan

@@ -32,8 +32,10 @@ class ReporteTesoreriaController extends Controller
             ->where('estado_proy_financiado', '=', 1)
             ->orderBy('nombre_proy_financiado')
             ->get();
-        $states_quedan = EstadoQuedan::select('id_estado_quedan as value', 'nombre_estado_quedan as label')
+        $states_quedan_collection = EstadoQuedan::select('id_estado_quedan as value', 'nombre_estado_quedan as label')
             ->get();
+        $states_quedan = $states_quedan_collection->toArray();
+        array_unshift($states_quedan, ['value' => -1, 'label' => 'PENDIENTE DE PAGO']);
         return ['financing_sources' => $financing_sources, 'states_quedan' => $states_quedan];
     }
     public function createQuedanReport(ReporteQuedanRequest $request)
@@ -44,14 +46,15 @@ class ReporteTesoreriaController extends Controller
             $query_financing_source = '';
         }
         if ($request->filled('state_quedan_id')) {
-            $query_quedan_state = ' AND `id_estado_quedan` = ' . $request->state_quedan_id;
+            if ($request->state_quedan_id == -1) {
+                $quedan_state = 'PENDIENTES DE PAGO';
+                $query_quedan_state = ' AND `id_estado_quedan` <> 4';
+            } else {
+                $query_quedan_state = ' AND `id_estado_quedan` = ' . $request->state_quedan_id;
+            }
         } else {
             $query_quedan_state = '';
         }
-        $consulta1 = DB::select('SELECT id_quedan FROM
-        detalle_quedan 
-        WHERE fecha_factura_det_quedan = "2023-05-08"');
-        $complemento_consulta = 'AND ';
 
         $array = DB::select(
             '
@@ -134,9 +137,13 @@ class ReporteTesoreriaController extends Controller
         //Definimos el estado del quedan
         $estado = EstadoQuedan::find($request->state_quedan_id);
         if ($estado) {
-            $quedan_state = $estado->nombre_estado_quedan;
+                $quedan_state = $estado->nombre_estado_quedan;
         } else {
-            $quedan_state = 'TODOS LOS ESTADOS';
+            if($request->state_quedan_id == -1){
+                $quedan_state = 'PENDIENTES DE PAGO';
+            }else{
+                $quedan_state = 'TODOS LOS ESTADOS';
+            }
         }
 
         //Calculo de la suma de monto liquido
@@ -555,7 +562,6 @@ class ReporteTesoreriaController extends Controller
         if (empty($array)) {
             return response()->json(['error' => 'No se encontraron registros'], 404);
         }
-        //return ['array' => $array];
 
         $array = json_decode(json_encode($array), true);
         array_unshift($array, array('NUMERO RECIBO', 'FECHA', 'NOMBRE O RAZON SOCIAL', 'N° DOCUMENTO', 'MONTO', 'CONCEPTO INGRESO'));
@@ -601,6 +607,21 @@ class ReporteTesoreriaController extends Controller
         $sheet->getStyle('E')->getNumberFormat()->setFormatCode($formatDecimal);
 
         $sheet->fromArray($array, NULL, 'A3');
+
+        //Calculo de la suma de ingresos
+        $income_total = 0;
+        $lastRow = $sheet->getHighestDataRow(); // obtiene el número de la última fila con datos
+        for ($i = 3; $i <= $lastRow; $i++) { // comienza en la fila 3 (primer dato) y recorre hasta la última fila con datos
+            $income_value = $sheet->getCell('E' . $i)->getValue(); // obtiene el valor de la celda D de la fila actual
+            if (is_numeric($income_value)) { // comprueba que el valor sea numérico
+                $income_total += $income_value; // suma el valor a la variable $total
+            }
+        }
+        $sheet->setCellValue('E' . ($lastRow + 1), $income_total);
+        $sheet->setCellValue('D' . ($lastRow + 1), 'TOTAL');
+        //Definiendo en negrita las celdas para el total y los montos sumados
+        $sheet->getStyle('D' . ($lastRow + 1))->getFont()->setBold(true);
+        $sheet->getStyle('E' . ($lastRow + 1))->getFont()->setBold(true);
 
         $writer = new Xlsx($spreadsheet);
 
@@ -659,10 +680,11 @@ class ReporteTesoreriaController extends Controller
             AND ci.id_proy_financiado = ?
             AND ci.id_ccta_presupuestal <> 16201 
             GROUP BY 
-            d.id_dependencia, 
+            ci.id_dependencia, 
+            d.codigo_dependencia, 
             ci.id_ccta_presupuestal,
             ci.nombre_concepto_ingreso) as t
-            GROUP BY  t.id_dependencia
+            GROUP BY  t.id_dependencia, t.codigo_dependencia
         ',
             [$request->start_date, $request->financing_source_id]
         );
