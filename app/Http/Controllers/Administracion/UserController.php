@@ -140,7 +140,7 @@ class UserController extends Controller
             $permiso_user->estado_permiso_usuario=0;
             $permiso_user->ip_permiso_usuario=$request->ip();
             $permiso_user->fecha_mod_permiso_usuario=Carbon::now();
-            $permiso_user->usuario_usuario=$request->user()->nick_usuario;
+            $permiso_user->usuario_permiso_usuario=$request->user()->nick_usuario;
             $permiso_user->update();
             return ['mensaje' => 'Desactivado rol '.$rol->nombre_rol.' con exito'];
     }

@@ -74,9 +74,9 @@ import axios from "axios";
                     <!-- Third row -->
                     <div class="mb-7 md:flex flex-row justify-items-start">
                         <div class="mb-4 md:mr-2 md:mb-0 basis-full">
-                            <TextInput id="fecha-adquisicion" v-model="income_concept.detail" :value="income_concept.detail"
+                            <TextInput :required="false" id="detalle-concepto" v-model="income_concept.detail" :value="income_concept.detail"
                                 type="text" placeholder="Detalle concepto ingreso">
-                                <LabelToInput icon="standard" forLabel="fecha-adquisicion" />
+                                <LabelToInput icon="standard" forLabel="detalle-concepto" />
                             </TextInput>
                             <InputError v-for="(item, index) in errors.detail" :key="index" class="mt-2" :message="item" />
                         </div>

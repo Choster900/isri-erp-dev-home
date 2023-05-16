@@ -100,7 +100,9 @@ import 'vue3-toastify/dist/index.css';
                                                     </svg>
                                                 </span>
                                             </div>
-                                            <div class="font-semibold">Desactivar</div>
+                                            <div class="font-semibold">
+                                                {{ proveedor.estado_proveedor ? 'Desactivar' : 'Activar' }}
+                                            </div>
                                         </div>
                                     </DropDownOptions>
                                 </div>
