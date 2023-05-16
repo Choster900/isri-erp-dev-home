@@ -22,12 +22,12 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             ]);
         }
     )->name('ts.proveedores');
-    Route::get('proveedores', [ProveedorController::class, 'getProveedores'])->name('get.proveedores');
-    Route::get('list-option-select-suppliers', [ProveedorController::class, 'getInformationToSelect'])->name('list-option-select-suppliers');
-    Route::post('update-supplier', [ProveedorController::class, 'updateDataSupplier'])->name('update-supplier');
-    Route::post('add-supplier', [ProveedorController::class, 'addDataSupplier'])->name('add-supplier');
-    Route::post('change-values-retencion/{id_sujeto_retencion}', [ProveedorController::class, 'changeValueRetencion'])->name('change-values-retencion');
-    Route::post('update-state-supplier', [ProveedorController::class, 'changeStateSupplier'])->name('change-values-retencion');
+    Route::get('proveedores', [ProveedorController::class, 'getProveedores'])->name('proveedor.getProveedor');
+    Route::get('list-option-select-suppliers', [ProveedorController::class, 'getInformationToSelect'])->name('proveedor.getInformationToSelect');
+    Route::post('update-supplier', [ProveedorController::class, 'updateDataSupplier'])->name('proveedor.updateDataSupplier');
+    Route::post('add-supplier', [ProveedorController::class, 'addDataSupplier'])->name('proveedor.addDataSupplier');
+    Route::post('change-values-retencion/{id_sujeto_retencion}', [ProveedorController::class, 'changeValueRetencion'])->name('proveedor.changeValueRetencion');
+    Route::post('update-state-supplier', [ProveedorController::class, 'changeStateSupplier'])->name('proveedor.changeStateSupplier');
 
 
     //Manage quenda
