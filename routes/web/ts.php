@@ -24,7 +24,6 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     )->name('ts.proveedores');
     Route::get('proveedores', [ProveedorController::class, 'getProveedores'])->name('get.proveedores');
     Route::get('list-option-select-suppliers', [ProveedorController::class, 'getInformationToSelect'])->name('list-option-select-suppliers');
-    Route::get('update-suplier', [ProveedorController::class, 'getProveedores'])->name('get.proveedores');
     Route::post('update-supplier', [ProveedorController::class, 'updateDataSupplier'])->name('update-supplier');
     Route::post('add-supplier', [ProveedorController::class, 'addDataSupplier'])->name('add-supplier');
     Route::post('change-values-retencion/{id_sujeto_retencion}', [ProveedorController::class, 'changeValueRetencion'])->name('change-values-retencion');
