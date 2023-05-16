@@ -8,7 +8,7 @@ import InputError from "@/Components/InputError.vue";
     <div class="m-1.5">
 
         <ModalBasicVue title="Personas" id="scrollbar-modal" maxWidth="3xl" :modalOpen="scrollbarModalOpen"
-            @close-modal-persona="$emit('close-definitive')">
+            @close-modal="$emit('close-definitive')">
 
             <div class="px-5 py-4">
                 <div class="space-y-2">
