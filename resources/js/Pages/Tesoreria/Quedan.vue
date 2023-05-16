@@ -332,6 +332,17 @@ export default {
                 console.log(errors);
             });
         },
+        async getAmountBySupplier(dataQuedan) {
+
+            await axios.post('/getAmountBySupplierPerMonth').then((response) => {
+                // console.log(response.data);
+
+                this.totalAmountBySupplier = response.data
+
+            }).catch((errors) => {
+                console.log(errors);
+            });
+        },
         async showQuedan(dataQuedan) {
             // await this.getAmountBySupplier(dataQuedan)
             this.dataQuedan = dataQuedan
