@@ -132,12 +132,9 @@ export default {
     },
     methods: {
         exportExcel() {
-            axios.get('/create-income-report',
-                {
-                    responseType: 'blob',
-                    params: this.report_data
-                }
-            )
+            axios.post('/create-income-report', this.report_data, {
+                    responseType: 'blob'
+                })
                 .then(response => {
                     //console.log(response);
                     this.errors = []

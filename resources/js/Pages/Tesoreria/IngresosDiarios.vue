@@ -112,9 +112,7 @@ export default {
             })
             let date
             date = moment(this.report_data.start_date).locale('es').format('dddd D [de] MMMM [de] YYYY').toUpperCase();
-            await axios.get("/get-daily-income-report", {
-                params: this.report_data
-            })
+            await axios.post("/get-daily-income-report",this.report_data)
                 .then((response) => {
                     console.log(response.data.numeros_recibo);
                     this.errors = []

@@ -379,6 +379,14 @@ export default {
                             setTimeout(() => {
                                 this.errosModel = {}
                             }, 9000);
+                        } else {
+                            let msg = this.manageError(Error);
+                            this.$swal.fire({
+                                title: "Operación cancelada",
+                                text: msg,
+                                icon: "warning",
+                                timer: 5000,
+                            });
                         }
                     });
                 }
