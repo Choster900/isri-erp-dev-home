@@ -109,13 +109,20 @@ class ReporteTesoreriaController extends Controller
         $sheet->mergeCells('A2:H2');
         $sheet->mergeCells('A1:H1');
 
-        $fecha_fin = Carbon::createFromFormat('Y-m-d', $request->end_date);
-        $fecha_inicio = Carbon::createFromFormat('Y-m-d', $request->start_date);
-        Carbon::setLocale('es');
-        $fecha_f_fin = $fecha_fin->isoFormat('D [DE] MMMM [DE] YYYY');
-        $fecha_f_inicio = $fecha_inicio->isoFormat('D [DE] MMMM');
-        $join_date = $fecha_f_inicio . ' AL ' . $fecha_f_fin;
-        $fechaFormateada = strtoupper($join_date);
+        if ($request->start_date == $request->end_date) {
+            $fecha_fin = Carbon::createFromFormat('Y-m-d', $request->end_date);
+            $fecha_f_fin = $fecha_fin->isoFormat('D [DE] MMMM [DE] YYYY');
+            $join_date = $fecha_f_fin;
+            $fechaFormateada = strtoupper($join_date);
+        } else {
+            $fecha_fin = Carbon::createFromFormat('Y-m-d', $request->end_date);
+            $fecha_inicio = Carbon::createFromFormat('Y-m-d', $request->start_date);
+            Carbon::setLocale('es');
+            $fecha_f_fin = $fecha_fin->isoFormat('D [DE] MMMM [DE] YYYY');
+            $fecha_f_inicio = $fecha_inicio->isoFormat('D [DE] MMMM [DE] YYYY');
+            $join_date = $fecha_f_inicio . ' AL ' . $fecha_f_fin;
+            $fechaFormateada = strtoupper($join_date);
+        }
 
         //Definiendo nombre de fuente de financiamiento para desplegar en el informe
         $fuente = ProyectoFinanciado::find($request->financing_source_id);
@@ -254,13 +261,20 @@ class ReporteTesoreriaController extends Controller
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        $fecha_fin = Carbon::createFromFormat('Y-m-d', $request->end_date);
-        $fecha_inicio = Carbon::createFromFormat('Y-m-d', $request->start_date);
-        Carbon::setLocale('es');
-        $fecha_f_fin = $fecha_fin->isoFormat('D [DE] MMMM [DE] YYYY');
-        $fecha_f_inicio = $fecha_inicio->isoFormat('D [DE] MMMM');
-        $join_date = $fecha_f_inicio . ' AL ' . $fecha_f_fin;
-        $fechaFormateada = strtoupper($join_date);
+        if ($request->start_date == $request->end_date) {
+            $fecha_fin = Carbon::createFromFormat('Y-m-d', $request->end_date);
+            $fecha_f_fin = $fecha_fin->isoFormat('D [DE] MMMM [DE] YYYY');
+            $join_date = $fecha_f_fin;
+            $fechaFormateada = strtoupper($join_date);
+        } else {
+            $fecha_fin = Carbon::createFromFormat('Y-m-d', $request->end_date);
+            $fecha_inicio = Carbon::createFromFormat('Y-m-d', $request->start_date);
+            Carbon::setLocale('es');
+            $fecha_f_fin = $fecha_fin->isoFormat('D [DE] MMMM [DE] YYYY');
+            $fecha_f_inicio = $fecha_inicio->isoFormat('D [DE] MMMM [DE] YYYY');
+            $join_date = $fecha_f_inicio . ' AL ' . $fecha_f_fin;
+            $fechaFormateada = strtoupper($join_date);
+        }
 
         //Definiendo nombre de fuente de financiamiento para desplegar en el informe
         $fuente = ProyectoFinanciado::find($request->financing_source_id);
@@ -549,13 +563,20 @@ class ReporteTesoreriaController extends Controller
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        $fecha_fin = Carbon::createFromFormat('Y-m-d', $request->end_date);
-        $fecha_inicio = Carbon::createFromFormat('Y-m-d', $request->start_date);
-        Carbon::setLocale('es');
-        $fecha_f_fin = $fecha_fin->isoFormat('D [DE] MMMM [DE] YYYY');
-        $fecha_f_inicio = $fecha_inicio->isoFormat('D [DE] MMMM');
-        $join_date = $fecha_f_inicio . ' AL ' . $fecha_f_fin;
-        $fechaFormateada = strtoupper($join_date);
+        if ($request->start_date == $request->end_date) {
+            $fecha_fin = Carbon::createFromFormat('Y-m-d', $request->end_date);
+            $fecha_f_fin = $fecha_fin->isoFormat('D [DE] MMMM [DE] YYYY');
+            $join_date = $fecha_f_fin;
+            $fechaFormateada = strtoupper($join_date);
+        } else {
+            $fecha_fin = Carbon::createFromFormat('Y-m-d', $request->end_date);
+            $fecha_inicio = Carbon::createFromFormat('Y-m-d', $request->start_date);
+            Carbon::setLocale('es');
+            $fecha_f_fin = $fecha_fin->isoFormat('D [DE] MMMM [DE] YYYY');
+            $fecha_f_inicio = $fecha_inicio->isoFormat('D [DE] MMMM [DE] YYYY');
+            $join_date = $fecha_f_inicio . ' AL ' . $fecha_f_fin;
+            $fechaFormateada = strtoupper($join_date);
+        }
 
         // Combina las celdas 
         $sheet->mergeCells('A2:F2');
@@ -600,12 +621,13 @@ class ReporteTesoreriaController extends Controller
             ->join('concepto_ingreso', function ($join) {
                 $join->on('detalle_recibo_ingreso.id_concepto_ingreso', '=', 'concepto_ingreso.id_concepto_ingreso');
             })
-            ->where('concepto_ingreso.id_proy_financiado',$request->financing_source_id)
-            ->where('recibo_ingreso.fecha_recibo_ingreso',$request->start_date)
+            ->where('concepto_ingreso.id_proy_financiado', $request->financing_source_id)
+            ->where('recibo_ingreso.fecha_recibo_ingreso', $request->start_date)
             ->groupBy('recibo_ingreso.fecha_recibo_ingreso')
             ->get();
 
-        $details = DB::select('
+        $details = DB::select(
+            '
         SELECT
         t.id_dependencia,
         t.codigo_dependencia,
@@ -642,14 +664,16 @@ class ReporteTesoreriaController extends Controller
             ci.nombre_concepto_ingreso) as t
             GROUP BY  t.id_dependencia
         ',
-        [$request->start_date, $request->financing_source_id]);
+            [$request->start_date, $request->financing_source_id]
+        );
 
         if (empty($details)) {
             return response()->json(['error' => 'No se encontraron registros'], 404);
         }
 
-        return ['daily_income_report' => $details, 
-        'numeros_recibo' => $receipt_numbers ? $receipt_numbers : ''
+        return [
+            'daily_income_report' => $details,
+            'numeros_recibo' => $receipt_numbers ? $receipt_numbers : ''
         ];
     }
 }

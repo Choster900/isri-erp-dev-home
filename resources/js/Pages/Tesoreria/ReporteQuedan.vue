@@ -47,7 +47,7 @@ import axios from 'axios';
             <div class="mb-7 md:flex flex-row justify-items-start">
                 <div class="mb-4 md:mr-1 md:mb-0 basis-1/2">
                     <label class="block mb-2 text-xs font-light text-gray-600">
-                        Fuente Financiamiento <span class="text-red-600 font-extrabold">*</span>
+                        Fuente Financiamiento
                     </label>
                     <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                         <Multiselect placeholder="Seleccione Financiamiento" :searchable="true" :options="financing_sources"
@@ -59,7 +59,7 @@ import axios from 'axios';
                 </div>
                 <div class="mb-4 md:mr-1 md:mb-0 basis-1/2">
                     <label class="block mb-2 text-xs font-light text-gray-600">
-                        Estado Quedan <span class="text-red-600 font-extrabold">*</span>
+                        Estado Quedan
                     </label>
                     <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                         <Multiselect placeholder="Seleccione Estado" :searchable="true" :options="states_quedan"
@@ -194,7 +194,7 @@ export default {
                 .then(response => {
                     this.errors = []
                     let fecha = moment().format('DD-MM-YYYY');
-                    let filename = 'RPT-REPORTE-QUEDAN-' + fecha + '.xlsx';
+                    let filename = 'RPT-QUEDAN-' + fecha + '.xlsx';
                     const url = window.URL.createObjectURL(new Blob([response.data]));
                     const link = document.createElement('a');
                     link.href = url;

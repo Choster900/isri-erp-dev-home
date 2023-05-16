@@ -99,7 +99,9 @@ import axios from 'axios';
                           </svg>
 
                         </span></div>
-                      <div class="font-semibold">Desactivar</div>
+                      <div class="font-semibold">
+                        {{ service.estado_concepto_ingreso ? 'Desactivar' : 'Activar' }}
+                      </div>
                     </div>
                   </DropDownOptions>
                 </div>

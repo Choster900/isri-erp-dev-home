@@ -154,11 +154,12 @@ export default {
 
                     //const currentDateTime = new Date().toLocaleString();
                     const currentDateTime = moment().format('DD/MM/YYYY, HH:mm:ss');
+                    let fecha = moment().format('DD-MM-YYYY');
 
                     html2pdf()
                         .set({
                             margin: 0.2,
-                            filename: 'salida.pdf',
+                            filename: 'RPT-INGRESO-DIARIO-'+fecha,
                             image: {
                                 type: 'jpeg',
                                 quality: 0.98
