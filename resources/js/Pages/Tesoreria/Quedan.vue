@@ -185,7 +185,7 @@ import axios from 'axios';
         </div>
 
         <ModalQuedan :showModal="showModal" @cerrar-modal="closeVars()" :data-quedan="dataQuedan"
-            :dataForSelectInRow="dataForSelectInRow" @actualizar-table-data="getDataQuedan()" :dataSuppliers="dataSuppliers"
+            :dataForSelectInRow="dataForSelectInRow" @actualizar-table-data="getDataQuedan()" 
             :totalAmountBySupplier="totalAmountBySupplier" />
 
 
@@ -210,7 +210,9 @@ export default {
                 options: [
                     { value: "", label: "Ninguno" },
                     { value: "1", label: "Abierto" },
-                    { value: "2", label: "Req.Asignado" }
+                    { value: "2", label: "Req.Asignado" },
+                    { value: "3", label: "Liq. Parcial" },
+                    { value: "4", label: "Liquidado" },
                 ]
             },
             { width: "5%", label: "", name: "Acciones" },
@@ -385,7 +387,6 @@ export default {
 
     },
     created() {
-        this.getAllSuppliers()
         this.getDataQuedan()
         this.getAmountBySupplier()
         this.getListForSelect()
