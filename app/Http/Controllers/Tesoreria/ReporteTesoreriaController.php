@@ -621,8 +621,8 @@ class ReporteTesoreriaController extends Controller
             ->join('concepto_ingreso', function ($join) {
                 $join->on('detalle_recibo_ingreso.id_concepto_ingreso', '=', 'concepto_ingreso.id_concepto_ingreso');
             })
-            ->where('concepto_ingreso.id_proy_financiado', $request->financing_source_id)
-            ->where('recibo_ingreso.fecha_recibo_ingreso', $request->start_date)
+            ->where('concepto_ingreso.id_proy_financiado',$request->financing_source_id)
+            ->where('recibo_ingreso.fecha_recibo_ingreso',$request->start_date)
             ->groupBy('recibo_ingreso.fecha_recibo_ingreso')
             ->get();
 

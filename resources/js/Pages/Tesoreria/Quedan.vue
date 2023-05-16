@@ -185,8 +185,8 @@ import axios from 'axios';
         </div>
 
         <ModalQuedan :showModal="showModal" @cerrar-modal="closeVars()" :data-quedan="dataQuedan"
-            :dataForSelectInRow="dataForSelectInRow" @actualizar-table-data="getDataQuedan()"
-            :dataSuppliers="dataSuppliers" />
+            :dataForSelectInRow="dataForSelectInRow" @actualizar-table-data="getDataQuedan()" :dataSuppliers="dataSuppliers"
+            :totalAmountBySupplier="totalAmountBySupplier" />
 
 
     </AppLayoutVue>
@@ -228,6 +228,7 @@ export default {
             isOpen: false,
             showModal: false,
             dataQuedan: [],
+            totalAmountBySupplier: [],
             dataSuppliers: null,//attr donde guardar la data de proveedores
             permits: [],
             dataForSelectInRow: [],
@@ -272,15 +273,9 @@ export default {
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
                     this.dataQuedanForTable = data.data.data;
+                    this.getAmountBySupplier()
                 }
             }).catch((errors) => {
-                let msg = this.manageError(errors);
-                this.$swal.fire({
-                    title: "Operación cancelada",
-                    text: msg,
-                    icon: "warning",
-                    timer: 5000,
-                });
             });
         },
         sortBy(key) {
@@ -309,33 +304,28 @@ export default {
             await axios.get('/get-list-select').then((response) => {
 
                 this.dataForSelectInRow = response.data;
+            }).catch((error) => {
+            });
+        },
+        async getAmountBySupplier(dataQuedan) {
+
+            await axios.post('/getAmountBySupplierPerMonth').then((response) => {
+                // console.log(response.data);
+
+                this.totalAmountBySupplier = response.data
+
             }).catch((errors) => {
-                let msg = this.manageError(errors);
-                this.$swal.fire({
-                    title: "Operación cancelada",
-                    text: msg,
-                    icon: "warning",
-                    timer: 5000,
-                });
+                console.log(errors);
             });
         },
         async showQuedan(dataQuedan) {
+            // await this.getAmountBySupplier(dataQuedan)
             this.dataQuedan = dataQuedan
             this.showModal = true
         },
         getAllSuppliers() {
             axios.get("/getAllSuppliers").then(res => {
                 this.dataSuppliers = res.data
-            }).catch(errors => {
-                {
-                    let msg = this.manageError(errors);
-                    this.$swal.fire({
-                        title: "Operación cancelada",
-                        text: msg,
-                        icon: "warning",
-                        timer: 5000,
-                    });
-                }
             })
         },
         validarCamposVacios(objeto) {
@@ -362,6 +352,7 @@ export default {
     created() {
         this.getAllSuppliers()
         this.getDataQuedan()
+        this.getAmountBySupplier()
         this.getListForSelect()
     },
 
