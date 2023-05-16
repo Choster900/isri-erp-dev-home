@@ -318,7 +318,7 @@ export default {
         async getIncomeReceipts(url = "/recibos-ingreso") {
             this.tableData.draw++;
             this.tableData.currentPage = url
-            await axios.get(url, { params: this.tableData }).then((response) => {
+            await axios.post(url, this.tableData ).then((response) => {
                 let data = response.data;
                 if (this.tableData.draw == data.draw) {
                     this.links = data.data.links;
@@ -326,7 +326,6 @@ export default {
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
                     this.income_receipts = data.data.data;
-                    console.log(this.income_receipts);
                 }
             }).catch((errors) => {
                 let msg = this.manageError(errors)

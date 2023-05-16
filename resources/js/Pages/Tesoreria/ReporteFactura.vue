@@ -130,12 +130,9 @@ export default {
     },
     methods: {
         exportExcel() {
-            axios.get('/create-invoice-report',
-                {
-                    responseType: 'blob',
-                    params: this.invoice_report
-                }
-            )
+            axios.post('/create-invoice-report', this.invoice_report, {
+                    responseType: 'blob'
+                })
                 .then(response => {
                     this.errors = []
                     let fecha = moment().format('DD-MM-YYYY');
