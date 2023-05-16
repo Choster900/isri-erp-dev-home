@@ -26,7 +26,7 @@ class UserController extends Controller
             $dir = $request->input('dir');
             $search_value = $request->input('search');
 
-            $query = User::select('*')
+            $query = User::select('usuario.id_usuario','persona.pnombre_persona','persona.snombre_persona','persona.tnombre_persona','persona.papellido_persona','persona.sapellido_persona','persona.tapellido_persona','persona.dui_persona','usuario.nick_usuario','usuario.estado_usuario')
                            ->join('persona', function ($join) {
                                     $join->on('usuario.id_persona', '=', 'persona.id_persona');
                                 })
