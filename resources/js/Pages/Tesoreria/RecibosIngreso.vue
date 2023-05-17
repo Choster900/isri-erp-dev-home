@@ -47,28 +47,30 @@ import axios from 'axios';
                     <tbody class="text-sm divide-y divide-slate-200">
                         <tr v-for="receipt in income_receipts" :key="receipt.id_recibo_ingreso">
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
-                                <div class="font-medium text-slate-800 ">{{ receipt.numero_recibo_ingreso }}</div>
+                                <div class="font-medium text-slate-800 text-center">{{ receipt.numero_recibo_ingreso }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
-                                <div class="font-medium text-slate-800 ellipsis">{{ receipt.cliente_recibo_ingreso }}</div>
+                                <div class="font-medium text-slate-800 ellipsis text-center">
+                                    {{ formatearFecha(receipt.fecha_recibo_ingreso) }}
+                                    </div>
                             </td>
-                            <!-- <td class="px-2 first:pl-5 last:pr-5  whitespace-normal w-px break-words">
-                <div class="font-medium text-slate-800">{{ receipt.descripcion_recibo_ingreso }}</div>
-              </td> -->
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
-                                <div class="font-medium text-slate-800 ellipsis">{{ receipt.descripcion_recibo_ingreso }}
+                                <div class="font-medium text-slate-800 ellipsis text-center">{{ receipt.cliente_recibo_ingreso }}</div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5 td-data-table">
+                                <div class="font-medium text-slate-800 ellipsis text-center">{{ receipt.descripcion_recibo_ingreso }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
-                                <div class="font-medium text-slate-800 ">{{ receipt.id_ccta_presupuestal }}</div>
+                                <div class="font-medium text-slate-800 text-center">{{ receipt.id_ccta_presupuestal }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
-                                <div class="font-medium text-slate-800 ">
-                                    {{ receipt.monto_recibo_ingreso ? '$ ' + receipt.monto_recibo_ingreso : '' }}
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{ receipt.monto_recibo_ingreso ? '$' + receipt.monto_recibo_ingreso : '' }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
-                                <div class="font-medium text-slate-800">
+                                <div class="font-medium text-slate-800 text-center">
                                     <div v-if="(receipt.estado_recibo_ingreso == 1)"
                                         class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
                                         Activo
@@ -176,9 +178,10 @@ import axios from 'axios';
             </div>
         </div>
 
-        <ModalIncomeReceiptVue :show_modal_receipt="show_modal_receipt" :modal_data="modal_data" :financing_sources="financing_sources"
-            :budget_accounts="budget_accounts" :income_concepts="income_concepts" :treasury_clerk="treasury_clerk"
-            @cerrar-modal="show_modal_receipt = false" @get-table="getIncomeReceipts(tableData.currentPage)" />
+        <ModalIncomeReceiptVue :show_modal_receipt="show_modal_receipt" :modal_data="modal_data"
+            :financing_sources="financing_sources" :budget_accounts="budget_accounts" :income_concepts="income_concepts"
+            :treasury_clerk="treasury_clerk" @cerrar-modal="show_modal_receipt = false"
+            @get-table="getIncomeReceipts(tableData.currentPage)" />
 
         <ModalReceiptFormatVue :view_receipt="view_receipt" :receipt_to_print="receipt_to_print"
             @cerrar-modal="view_receipt = false" />
@@ -196,9 +199,10 @@ export default {
     data() {
         let sortOrders = {};
         let columns = [
-            { width: "5%", label: "Numero", name: "numero_recibo_ingreso", type: "text" },
-            { width: "20%", label: "Cliente", name: "cliente_recibo_ingreso", type: "text" },
-            { width: "20%", label: "Descripcion", name: "descripcion_recibo_ingreso", type: "text" },
+            { width: "11%", label: "Numero", name: "numero_recibo_ingreso", type: "text" },
+            { width: "6%", label: "Fecha", name: "fecha_recibo_ingreso", type: "date" },
+            { width: "25%", label: "Cliente", name: "cliente_recibo_ingreso", type: "text" },
+            { width: "25%", label: "Descripcion", name: "descripcion_recibo_ingreso", type: "text" },
             { width: "5%", label: "Especifico", name: "id_ccta_presupuestal", type: "text" },
             { width: "5%", label: "Monto", name: "monto_recibo_ingreso", type: "text" },
             {
@@ -208,7 +212,7 @@ export default {
                     { value: "0", label: "Inactivo" }
                 ]
             },
-            { width: "10%", label: "Acciones", name: "Acciones" },
+            { width: "18%", label: "Acciones", name: "Acciones" },
         ];
         columns.forEach((column) => {
             if (column.name === 'id_recibo_ingreso')
@@ -223,7 +227,7 @@ export default {
             income_receipts: [],
             //Data for modal
             income_concepts: [],
-            financing_sources:[],
+            financing_sources: [],
             treasury_clerk: [],
             show_modal_receipt: false,
             modal_data: [],
@@ -246,6 +250,9 @@ export default {
         }
     },
     methods: {
+        formatearFecha(date) {
+            return moment(date).format('DD/MM/YYYY');
+        },
         viewReceipt(receipt) {
             this.receipt_to_print = receipt
             this.view_receipt = true
@@ -318,7 +325,7 @@ export default {
         async getIncomeReceipts(url = "/recibos-ingreso") {
             this.tableData.draw++;
             this.tableData.currentPage = url
-            await axios.post(url, this.tableData ).then((response) => {
+            await axios.post(url, this.tableData).then((response) => {
                 let data = response.data;
                 if (this.tableData.draw == data.draw) {
                     this.links = data.data.links;

@@ -421,12 +421,12 @@ export default {
         }
 
     },
-    data: function () {
+    data() {
         return {
-            rowsData: [],//attr donde guardar la information
-            errosDetalleQuedan: [],
-            errosrNumeroActa: [],
-            montoTotalProveedorMes: [],
+            rowsData: [], // Atributo donde se guarda la información
+            errosDetalleQuedan: [], // Errores relacionados con detalle_quedan
+            errosrNumeroActa: [], // Errores relacionados con numero_acta
+            montoTotalProveedorMes: [], // Monto total del proveedor por mes
             dataInputs: {
                 giro: '',
                 irs: '',
@@ -462,8 +462,8 @@ export default {
                 altInput: true,
                 static: true,
                 monthSelectorType: 'static',
-                altFormat: "F-j Y",
-                dateFormat: "Y-m-d",
+                altFormat: 'F-j Y',
+                dateFormat: 'Y-m-d',
                 locale: {
                     firstDayOfWeek: 1,
                     weekdays: {
@@ -476,14 +476,15 @@ export default {
                     },
                 },
             },
-
-        }
-    },
+        };
+    }
+    ,
     components: {
         quedanPDFVue
     },
     methods: {
         printPdf() {
+            // Opciones de configuración para generar el PDF
             const opt = {
                 margin: 0.1,
                 filename: 'output.pdf',
@@ -492,6 +493,7 @@ export default {
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
             };
 
+            // Crear una instancia de la aplicación Vue para generar el componente quedanPDFVue
             const app = createApp(quedanPDFVue, {
                 dataQuedan: this.dataQuedan,
                 totalCheque: this.dataInputs.monto_total_quedan,
@@ -500,23 +502,25 @@ export default {
                 cheque: this.dataInputs.monto_liquido_quedan,
             });
 
+            // Crear un elemento div y montar la instancia de la aplicación en él
             const div = document.createElement('div');
             const pdfPrint = app.mount(div);
             const html = div.outerHTML;
 
+            // Generar y guardar el PDF utilizando html2pdf
             html2pdf().set(opt).from(html).save();
-
         },
         generarComprobanteRetencionPdf() {
-
             if (this.dataInputs.numero_retencion_iva_quedan === null) {
-                toast.error("El documento necesita un numero de retencion", {
+                // Validar si se ha ingresado un número de retención
+                toast.error("El documento necesita un número de retención", {
                     autoClose: 5000,
                     position: "top-right",
                     transition: "zoom",
                     toastBackgroundColor: "red",
                 });
             } else {
+                // Opciones de configuración para generar el PDF
                 const opt = {
                     margin: 0.1,
                     filename: 'Comprobante_retencion.pdf',
@@ -525,6 +529,7 @@ export default {
                     jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' },
                 };
 
+                // Crear una instancia de la aplicación Vue para generar el componente comprobanteRetencion
                 const app = createApp(comprobanteRetencion, {
                     dataQuedan: this.dataQuedan,
                     totalCheque: this.dataInputs.monto_total_quedan,
@@ -532,100 +537,134 @@ export default {
                     iva: this.dataInputs.monto_iva_quedan,
                     cheque: this.dataInputs.monto_liquido_quedan,
                 });
+
+                // Crear un elemento div y montar la instancia de la aplicación en él
                 const div = document.createElement('div');
                 const pdfPrint = app.mount(div);
                 const html = div.outerHTML;
 
+                // Generar y guardar el PDF utilizando html2pdf
                 html2pdf().set(opt).from(html).save();
 
-                axios.post('/updateFechaRetencionIva', { id_quedan: this.dataInputs.id_quedan }).then((response) => {
-                    console.log(response);
-                }).catch(errors => {
-                    let msg = this.manageError(errors);
-                    this.$swal.fire({
-                        title: "Operación cancelada",
-                        text: msg,
-                        icon: "warning",
-                        timer: 5000,
+                // Actualizar la fecha de retención de IVA en el servidor
+                axios.post('/updateFechaRetencionIva', { id_quedan: this.dataInputs.id_quedan })
+                    .then((response) => {
+                        console.log(response);
+                    })
+                    .catch(errors => {
+                        let msg = this.manageError(errors);
+                        this.$swal.fire({
+                            title: "Operación cancelada",
+                            text: msg,
+                            icon: "warning",
+                            timer: 5000,
+                        });
                     });
-                })
             }
         },
-
-        onCellEdit(rowIndex, cellIndex, value, type = '') {//editando la celda RECIVE ROW, CELL Y EL VALOR A MODIFICAR
-            if (type) {//ejecutando la accion cuando escriba en la celda [monto,tipo_prestacion]
-                if (type == 'producto') {
-                    this.rowsData[rowIndex][cellIndex].producto = value
+        onCellEdit(rowIndex, cellIndex, value, type = '') {
+            if (type) {
+                // Verificar si se especificó un tipo de edición (producto o servicio)
+                if (type === 'producto') {
+                    // Editar el valor de la celda correspondiente al producto en la fila y columna dadas
+                    this.rowsData[rowIndex][cellIndex].producto = value;
                 } else {
-                    this.rowsData[rowIndex][cellIndex].servicio = value
+                    // Editar el valor de la celda correspondiente al servicio en la fila y columna dadas
+                    this.rowsData[rowIndex][cellIndex].servicio = value;
                 }
-                this.calculateAmount()
+                // Calcular los montos totales
+                this.calculateAmount();
             } else {
-                this.rowsData[rowIndex][cellIndex] = value
+                // Editar el valor de la celda en la fila y columna dadas
+                this.rowsData[rowIndex][cellIndex] = value;
             }
         },
         getInformationBySupplier(supplier) {
-            this.dataForSelectInRow.proveedor.forEach((suppliers, index) => {
-                if (suppliers["value"] == supplier) {
-                    //data que se pinta en inputs
-                    this.dataInputs.giro = suppliers["codigo_giro"] + " - " + suppliers["nombre_giro"] 
-                    this.dataInputs.irs = (suppliers["isrl_sujeto_retencion"] * 100) + " %"
-                    this.dataInputs.iva = (suppliers["iva_sujeto_retencion"] * 100) + " %"
+            // Buscar el proveedor en la lista de proveedores
+            const selectedSupplier = this.dataForSelectInRow.proveedor.find((suppliers) => suppliers.value === supplier);
 
-                    //data que se usa para calculos
-                    this.dataForCalculate.irs = suppliers["isrl_sujeto_retencion"]
-                    this.dataForCalculate.iva = suppliers["iva_sujeto_retencion"]
-                }
-            })
-            this.getAmountBySupplier(supplier)
-            this.calculateAmount()
+            if (selectedSupplier) {
+                // Datos que se pintan en los inputs
+                this.dataInputs.giro = `${selectedSupplier.codigo_giro} - ${selectedSupplier.nombre_giro}`;
+                this.dataInputs.irs = `${selectedSupplier.isrl_sujeto_retencion * 100} %`;
+                this.dataInputs.iva = `${selectedSupplier.iva_sujeto_retencion * 100} %`;
+
+                // Datos que se usan para cálculos
+                this.dataForCalculate.irs = selectedSupplier.isrl_sujeto_retencion;
+                this.dataForCalculate.iva = selectedSupplier.iva_sujeto_retencion;
+            }
+
+            this.getAmountBySupplier(supplier);
+            this.calculateAmount();
         },
-        calculateAmount() {//calculando montos
-            let totMontoByRow = 0
+        calculateAmount() {
+            let totMontoByRow = 0;
             let liquido = 0;
-            let montoServicios = 0
+            let montoServicios = 0;
 
-            this.rowsData.forEach((valores, index) => {//sumando todos los montos de todas las filas
-                totMontoByRow = (!isNaN(parseFloat(totMontoByRow)) ? parseFloat(totMontoByRow) : 0) + (!isNaN(parseFloat(valores[6].producto)) ? parseFloat(valores[6].producto) : 0) + (!isNaN(parseFloat(valores[6].servicio)) ? parseFloat(valores[6].servicio) : 0);
-            })
+            // Sumar todos los montos de todas las filas
             this.rowsData.forEach((valores, index) => {
-                if (valores[6].servicio != '') {//sumando todos solo los montos de servicios de todas las filas
-                    montoServicios = (!isNaN(parseFloat(montoServicios)) ? parseFloat(montoServicios) : 0) + (!isNaN(parseFloat(valores[6].servicio)) ? parseFloat(valores[6].servicio) : 0)
+                totMontoByRow += parseFloat(valores[6].producto) || 0; // Sumar el monto del producto
+                totMontoByRow += parseFloat(valores[6].servicio) || 0; // Sumar el monto del servicio
+            });
+
+            // Sumar solo los montos de servicios de todas las filas
+            this.rowsData.forEach((valores, index) => {
+                if (valores[6].servicio !== '') {
+                    montoServicios += parseFloat(valores[6].servicio) || 0;
                 }
-            })
+            });
+
+            // Calcular el monto líquido (sin IVA)
             liquido = (totMontoByRow / 1.13).toFixed(2);
 
-            let montoIvaQuedan = 0
-            if ((parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) + parseFloat(totMontoByRow)) >= 113) {
-                montoIvaQuedan = (liquido * this.dataForCalculate.iva);
-            }
-            console.log(parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) + parseFloat(totMontoByRow));
-            this.dataInputs.monto_iva_quedan = montoIvaQuedan.toFixed(2);
+            let montoIvaQuedan = 0;
 
+            // Verificar si el monto total excede el umbral para aplicar IVA
+            if (parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) + parseFloat(totMontoByRow) >= 113) {
+                montoIvaQuedan = (liquido * this.dataForCalculate.iva).toFixed(2);
+            }
+
+            this.dataInputs.monto_iva_quedan = montoIvaQuedan;
+
+            // Calcular el monto de ISR (Impuesto Sobre la Renta)
             let montoIsrQuedan = (montoServicios * this.dataForCalculate.irs).toFixed(2);
             this.dataInputs.monto_isr_quedan = montoIsrQuedan;
+
+            // Calcular el monto líquido (total - IVA - ISR)
             let montoLiquidoQuedan = (totMontoByRow - montoIvaQuedan - montoIsrQuedan).toFixed(2);
             this.dataInputs.monto_liquido_quedan = montoLiquidoQuedan;
+
+            // Asignar el monto total
             this.dataInputs.monto_total_quedan = totMontoByRow.toFixed(2);
         },
         getAmountBySupplier(id_proveedor) {
-            let newDataSupplier = JSON.parse(JSON.stringify(this.totalAmountBySupplier))
+            // Crear una copia de la matriz totalAmountBySupplier
+            let newDataSupplier = JSON.parse(JSON.stringify(this.totalAmountBySupplier));
+
             let total = 0;
-            newDataSupplier.forEach((element, index) => {
+            newDataSupplier.forEach((element) => {
                 if (element.id_proveedor === id_proveedor) {
-                    if (this.dataInputs.id_quedan != "") {
+                    if (this.dataInputs.id_quedan !== "") {
+                        // Filtrar los elementos de quedan según el id_quedan ingresado
                         let quedanArray = element.quedan.filter((element) => element.id_quedan <= this.dataInputs.id_quedan);
-                        total = quedanArray.sort((a, b) => b.id_quedan - a.id_quedan) // ordena el array por id_quedan en orden descendente
-                            .reduce((acc, obj) => acc + parseFloat(obj.monto_total_quedan), 0); // suma el monto_total_quedan de cada objeto
+
+                        // Ordenar el array quedanArray por id_quedan en orden descendente
+                        quedanArray.sort((a, b) => b.id_quedan - a.id_quedan);
+
+                        // Sumar el monto_total_quedan de cada objeto en el array quedanArray
+                        total = quedanArray.reduce((acc, obj) => acc + parseFloat(obj.monto_total_quedan), 0);
                     } else {
+                        // Calcular el monto total sumando el monto_total_quedan de cada objeto en la matriz quedan
                         let montoTotal = element.quedan.reduce((total, element) =>
                             (parseFloat(total) + parseFloat(element.monto_total_quedan)).toFixed(2), 0);
                         total = montoTotal;
                     }
                 }
             });
-            console.log(total);
-            this.dataForCalculate.monto_total_quedan_por_proveedor = ((!isNaN(parseFloat(total)) ? parseFloat(total) : 0) - (this.dataInputs.monto_total_quedan == '' ? 0 : this.dataInputs.monto_total_quedan))
+
+            // Calcular el monto_total_quedan_por_proveedor
+            this.dataForCalculate.monto_total_quedan_por_proveedor = ((!isNaN(parseFloat(total)) ? parseFloat(total) : 0) - (this.dataInputs.monto_total_quedan === '' ? 0 : this.dataInputs.monto_total_quedan));
         },
         onlyNumberDecimal(event) {
             const charCode = (event.which) ? event.which : event.keyCode;
@@ -644,28 +683,29 @@ export default {
         onInputDescripcionQuedan(event) {
             this.dataInputs.descripcion_quedan = event.target.innerText;
         },
-        setValuesToInput() {//funcion para setear la data que trae la prop a attr nuevos
-            this.dataInputs.giro = this.dataForSelectInRow.proveedor["codigo_giro"] + " - " + this.dataForSelectInRow.proveedor["nombre_giro"]
-            this.dataInputs.irs = (this.dataForSelectInRow.proveedor["isrl_sujeto_retencion"] * 100) + " %"
-            this.dataInputs.iva = (this.dataForSelectInRow.proveedor["iva_sujeto_retencion"] * 100) + " %"
-            this.dataInputs.id_proveedor = this.dataQuedan.proveedor.id_proveedor
-            this.dataInputs.id_acuerdo_compra = this.dataQuedan.id_acuerdo_compra
-            this.dataInputs.numero_acuerdo_quedan = this.dataQuedan.numero_acuerdo_quedan
-            this.dataInputs.numero_compromiso_ppto_quedan = this.dataQuedan.numero_compromiso_ppto_quedan
-            this.dataInputs.descripcion_quedan = this.dataQuedan.descripcion_quedan
-            this.dataInputs.monto_liquido_quedan = this.dataQuedan.monto_liquido_quedan
-            this.dataInputs.monto_iva_quedan = this.dataQuedan.monto_iva_quedan
-            this.dataInputs.monto_isr_quedan = this.dataQuedan.monto_isr_quedan
-            this.dataInputs.nombre_empleado_tesoreria = this.dataQuedan.tesorero.nombre_empleado_tesoreria
-            this.dataInputs.fecha_emision = this.dataQuedan.fecha_emision_quedan
-            this.dataInputs.id_quedan = this.dataQuedan.id_quedan
-            this.dataInputs.id_prioridad_pago = this.dataQuedan.id_prioridad_pago
-            this.dataInputs.id_proy_financiado = this.dataQuedan.id_proy_financiado
-            this.dataInputs.monto_total_quedan = this.dataQuedan.monto_total_quedan
-            this.dataInputs.numero_retencion_iva_quedan = this.dataQuedan.numero_retencion_iva_quedan
-
+        setValuesToInput() {
+            // Asignar los valores correspondientes a los atributos de dataInputs utilizando los datos de dataForSelectInRow y dataQuedan
+            this.dataInputs.giro = `${this.dataForSelectInRow.proveedor["codigo_giro"]} - ${this.dataForSelectInRow.proveedor["nombre_giro"]}`;
+            this.dataInputs.irs = `${(this.dataForSelectInRow.proveedor["isrl_sujeto_retencion"] * 100)} %`;
+            this.dataInputs.iva = `${(this.dataForSelectInRow.proveedor["iva_sujeto_retencion"] * 100)} %`;
+            this.dataInputs.id_proveedor = this.dataQuedan.proveedor.id_proveedor;
+            this.dataInputs.id_acuerdo_compra = this.dataQuedan.id_acuerdo_compra;
+            this.dataInputs.numero_acuerdo_quedan = this.dataQuedan.numero_acuerdo_quedan;
+            this.dataInputs.numero_compromiso_ppto_quedan = this.dataQuedan.numero_compromiso_ppto_quedan;
+            this.dataInputs.descripcion_quedan = this.dataQuedan.descripcion_quedan;
+            this.dataInputs.monto_liquido_quedan = this.dataQuedan.monto_liquido_quedan;
+            this.dataInputs.monto_iva_quedan = this.dataQuedan.monto_iva_quedan;
+            this.dataInputs.monto_isr_quedan = this.dataQuedan.monto_isr_quedan;
+            this.dataInputs.nombre_empleado_tesoreria = this.dataQuedan.tesorero.nombre_empleado_tesoreria;
+            this.dataInputs.fecha_emision = this.dataQuedan.fecha_emision_quedan;
+            this.dataInputs.id_quedan = this.dataQuedan.id_quedan;
+            this.dataInputs.id_prioridad_pago = this.dataQuedan.id_prioridad_pago;
+            this.dataInputs.id_proy_financiado = this.dataQuedan.id_proy_financiado;
+            this.dataInputs.monto_total_quedan = this.dataQuedan.monto_total_quedan;
+            this.dataInputs.numero_retencion_iva_quedan = this.dataQuedan.numero_retencion_iva_quedan;
         },
-        resetValuesToInput() {//funcion para limpiar la data que la llamaremos cuando la data no traiga nada
+        resetValuesToInput() {
+            //funcion para limpiar la data que la llamaremos cuando la data no traiga nada
             this.dataInputs.giro = ""
             this.dataInputs.irs = ""
             this.dataInputs.iva = ""
@@ -693,32 +733,40 @@ export default {
             this.dataForCalculate.monto_iva_quedan = ''
             this.dataForCalculate.monto_isr_quedan = ''
             this.dataForCalculate.monto_total_quedan = ''
-
         },
-        addRow() {//agregando fila
+        addRow() {
+            // Función para agregar una nueva fila a rowsData
+
+            // Agregar un nuevo objeto al final del array rowsData
             this.rowsData.push({
-                0: 1,//numberRow,
-                1: '',//Id__detalle_quedan,
-                2: '',//FACTURA,
-                3: '',//DEPENDENCIA,
-                4: '',//NUMERO ACTA	,
-                5: '',//CONCEPTO	,
-                6: { producto: '', servicio: '' },//Monto en producto y servicio
-                7: true,//eliminado_logico,
-                8: ''//fecha_factura_det_quedan
-            })
+                0: 1,                  // numberRow
+                1: '',                 // Id__detalle_quedan
+                2: '',                 // FACTURA
+                3: '',                 // DEPENDENCIA
+                4: '',                 // NUMERO ACTA
+                5: '',                 // CONCEPTO
+                6: { producto: '', servicio: '' },  // Monto en producto y servicio
+                7: true,               // eliminado_logico
+                8: ''                  // fecha_factura_det_quedan
+            });
         },
         paintPositionRepet() {
-            const duplicatePositions = {}; //get position where the acta number was duplicated
+            const duplicatePositions = {}; // Objeto para almacenar las posiciones duplicadas de actas
+
+            // Recorrer las filas de rowsData
             for (let i = 0; i < this.rowsData.length; i++) {
                 const row = this.rowsData[i];
-                const number = row[4]; // get numbers en position 4
-                const dependency = row[3]; // get dependency en position 3
+                const number = row[4]; // Obtener el número de acta en la posición 4
+                const dependency = row[3]; // Obtener la dependencia en la posición 3
 
+                // Verificar si la fila no está marcada como eliminada
                 if (row[7] !== false) {
+                    // Verificar si no existe la dependencia en duplicatePositions
                     if (!duplicatePositions[dependency]) {
                         duplicatePositions[dependency] = {};
                     }
+
+                    // Verificar si ya existe el número de acta en la dependencia
                     if (duplicatePositions[dependency][number]) {
                         duplicatePositions[dependency][number].push(i);
                     } else {
@@ -726,27 +774,33 @@ export default {
                     }
                 }
             }
+
             const dependencies = Object.keys(duplicatePositions);
             dependencies.forEach((dependency) => {
+                // Filtrar los números de acta que tienen más de una posición duplicada
                 const numbers = Object.keys(duplicatePositions[dependency]).filter(
                     (number) => duplicatePositions[dependency][number].length > 1
                 );
+
                 numbers.forEach((number) => {
+                    // Agregar las posiciones duplicadas a errosrNumeroActa
                     duplicatePositions[dependency][number].forEach((position) => {
                         this.errosrNumeroActa.push(position);
                     });
                 });
             });
 
+            // Limpiar errosrNumeroActa después de 5 segundos
             setTimeout(() => {
                 this.errosrNumeroActa = [];
             }, 5000);
 
-            return this.errosrNumeroActa.length;
+            return this.errosrNumeroActa.length; // Devolver la cantidad de posiciones duplicadas encontradas
         },
         async createQuedan() {
+            // Mostrar confirmación al usuario
             const confirmed = await this.$swal.fire({
-                title: '¿Esta seguro de crear un nuevo quedan?',
+                title: '¿Está seguro de crear un nuevo quedan?',
                 icon: 'question',
                 iconHtml: '❓',
                 confirmButtonText: 'Si, Agregar el quedan',
@@ -755,59 +809,72 @@ export default {
                 showCancelButton: true,
                 showCloseButton: true
             });
-            if (confirmed.isConfirmed) {
-                if (this.paintPositionRepet() == 0) {
-                    axios.post('/add-quedan', { quedan: this.dataInputs, detalle_quedan: this.rowsData }).then((response) => {
-                        this.$emit("actualizar-table-data")
-                        this.rowsData = []
-                        this.resetValuesToInput()
-                        this.addRow()
-                        toast.success("El quedan fue guardado con exito", {
-                            autoClose: 5000,
-                            position: "top-right",
-                            transition: "zoom",
-                            toastBackgroundColor: "white",
-                        });
-                    }).catch((Error) => {
-                        console.log(Error);
-                        if (Error.response.status === 422) {
-                            if (Error.response.data.message === "LA DEPENDENCIA ES UN DATO REQUERIDO") {
-                                toast.error("La dependencia es requerida en este caso", {
-                                    autoClose: 5000,
-                                    position: "top-right",
-                                    transition: "zoom",
-                                    toastBackgroundColor: "white",
-                                });
-                            } else {
-                                toast.error("Al parecer el numero de acta ya existe en este contexto", {
-                                    autoClose: 5000,
-                                    position: "top-right",
-                                    transition: "zoom",
-                                    toastBackgroundColor: "white",
-                                });
-                                let data = Error.response.data.errors
-                                var myData = new Object();
-                                for (const errorBack in data) {
-                                    let split = errorBack.split(".")
-                                    let newIndexSplit = split[1]
-                                    myData[newIndexSplit] = data[errorBack][0]
-                                }
-                                this.errosDetalleQuedan = myData;
-                                setTimeout(() => {
-                                    this.errosDetalleQuedan = [];
 
-                                }, 5000);
-                            }
-                        } else {
-                            toast.error("Al parecer te hacen falta datos por ingresar", {
+            if (confirmed.isConfirmed) {
+                // Verificar si no hay posiciones duplicadas de números de acta
+                if (this.paintPositionRepet() === 0) {
+                    axios.post('/add-quedan', { quedan: this.dataInputs, detalle_quedan: this.rowsData })
+                        .then((response) => {
+                            // Actualizar la tabla de datos
+                            this.$emit("actualizar-table-data");
+                            // Limpiar rowsData y restablecer valores de entrada
+                            this.rowsData = [];
+                            this.resetValuesToInput();
+                            // Agregar una nueva fila vacía
+                            this.addRow();
+                            // Mostrar mensaje de éxito
+                            toast.success("El quedan fue guardado con éxito", {
                                 autoClose: 5000,
                                 position: "top-right",
                                 transition: "zoom",
                                 toastBackgroundColor: "white",
                             });
-                        }
-                    });
+                        })
+                        .catch((error) => {
+                            console.log(error);
+                            if (error.response.status === 422) {
+                                if (error.response.data.message === "LA DEPENDENCIA ES UN DATO REQUERIDO") {
+                                    // Mostrar mensaje de error si falta la dependencia
+                                    toast.error("La dependencia es requerida en este caso", {
+                                        autoClose: 5000,
+                                        position: "top-right",
+                                        transition: "zoom",
+                                        toastBackgroundColor: "white",
+                                    });
+                                } else {
+                                    // Mostrar mensaje de error si el número de acta ya existe
+                                    toast.error("Al parecer el numero de acta ya existe en este contexto", {
+                                        autoClose: 5000,
+                                        position: "top-right",
+                                        transition: "zoom",
+                                        toastBackgroundColor: "white",
+                                    });
+                                    const data = error.response.data.errors;
+                                    const myData = {};
+                                    for (const errorBack in data) {
+                                        const split = errorBack.split(".");
+                                        const newIndexSplit = split[1];
+                                        myData[newIndexSplit] = data[errorBack][0];
+                                    }
+                                    this.errosDetalleQuedan = myData;
+
+                                    // Limpiar errosDetalleQuedan después de 5 segundos
+                                    setTimeout(() => {
+                                        this.errosDetalleQuedan = [];
+                                    }, 5000);
+                                }
+                            } else {
+                                // Mostrar mensaje de error genérico si faltan datos
+                                toast.error("Al parecer te hacen falta datos por ingresar", {
+                                    autoClose: 5000,
+                                    position: "top-right",
+                                    transition: "zoom",
+                                    toastBackgroundColor: "white",
+                                });
+                            }
+                        });
                 } else {
+                    // Mostrar mensaje de error si hay posiciones duplicadas de números de acta
                     toast.error("Al parecer el numero de acta ya existe en este contexto", {
                         autoClose: 5000,
                         position: "top-right",
@@ -818,8 +885,9 @@ export default {
             }
         },
         async updateQuedan() {
+            // Mostrar confirmación al usuario
             const confirmed = await this.$swal.fire({
-                title: '¿Esta seguro de actualizar el quedan?',
+                title: '¿Está seguro de actualizar el quedan?',
                 icon: 'question',
                 iconHtml: '❓',
                 confirmButtonText: 'Si, Actualizar el quedan',
@@ -828,20 +896,26 @@ export default {
                 showCancelButton: true,
                 showCloseButton: true
             });
+
             if (confirmed.isConfirmed) {
-                if (this.paintPositionRepet() == 0) {
+                // Verificar si no hay posiciones duplicadas de números de acta
+                if (this.paintPositionRepet() === 0) {
                     axios.post('/update-detalle-quedan', { quedan: this.dataInputs, id_quedan: this.dataQuedan.id_quedan, detalle_quedan: this.rowsData })
                         .then((response) => {
-                            this.$emit("actualizar-table-data")
-                            toast.success("El quedan se ha actualizado con exito", {
+                            // Actualizar la tabla de datos
+                            this.$emit("actualizar-table-data");
+                            // Mostrar mensaje de éxito
+                            toast.success("El quedan se ha actualizado con éxito", {
                                 autoClose: 5000,
                                 position: "top-right",
                                 transition: "zoom",
                                 toastBackgroundColor: "white",
                             });
-                        }).catch((Error) => {
-                            if (Error.response.status === 422) {
-                                if (Error.response.data.message === "LA DEPENDENCIA ES UN DATO REQUERIDO") {
+                        })
+                        .catch((error) => {
+                            if (error.response.status === 422) {
+                                if (error.response.data.message === "LA DEPENDENCIA ES UN DATO REQUERIDO") {
+                                    // Mostrar mensaje de error si falta la dependencia
                                     toast.error("La dependencia es requerida en este caso", {
                                         autoClose: 5000,
                                         position: "top-right",
@@ -849,26 +923,29 @@ export default {
                                         toastBackgroundColor: "white",
                                     });
                                 } else {
+                                    // Mostrar mensaje de error si el número de acta ya existe
                                     toast.error("Al parecer el numero de acta ya existe en este contexto", {
                                         autoClose: 5000,
                                         position: "top-right",
                                         transition: "zoom",
                                         toastBackgroundColor: "white",
                                     });
-                                    let data = Error.response.data.errors
-                                    var myData = new Object();
+                                    const data = error.response.data.errors;
+                                    const myData = {};
                                     for (const errorBack in data) {
-                                        let split = errorBack.split(".")
-                                        let newIndexSplit = split[1]
-                                        myData[newIndexSplit] = data[errorBack][0]
+                                        const split = errorBack.split(".");
+                                        const newIndexSplit = split[1];
+                                        myData[newIndexSplit] = data[errorBack][0];
                                     }
                                     this.errosDetalleQuedan = myData;
+
+                                    // Limpiar errosDetalleQuedan después de 5 segundos
                                     setTimeout(() => {
                                         this.errosDetalleQuedan = [];
-
                                     }, 5000);
                                 }
                             } else {
+                                // Mostrar mensaje de error genérico si faltan datos
                                 toast.error("Al parecer te hacen falta datos por ingresar", {
                                     autoClose: 5000,
                                     position: "top-right",
@@ -877,22 +954,21 @@ export default {
                                 });
                             }
                         });
-
                 } else {
+                    // Mostrar mensaje de error si hay posiciones duplicadas de números de acta
                     toast.error("Al parecer el numero de acta ya existe en este contexto", {
                         autoClose: 5000,
                         position: "top-right",
                         transition: "zoom",
                         toastBackgroundColor: "white",
                     });
-
                 }
-
             }
         },
         deleteRow(rowIndex) {
+            // Mostrar confirmación al usuario
             this.$swal.fire({
-                title: '¿Esta seguro de eliminar la fila actual?',
+                title: '¿Está seguro de eliminar la fila actual?',
                 icon: 'question',
                 iconHtml: '❓',
                 confirmButtonText: 'Si, Eliminar',
@@ -902,54 +978,59 @@ export default {
                 showCloseButton: true
             }).then((result) => {
                 if (result.isConfirmed) {
+                    // Modificar el objeto para que la fila desaparezca de la tabla (valor en posición 7 se establece como false)
                     this.rowsData[rowIndex][7] = false;
-                    toast.warning("La fila actual se elimino temporalmente hasta que guarde los cambios", {
+                    // Mostrar mensaje de advertencia
+                    toast.warning("La fila actual se eliminó temporalmente hasta que guarde los cambios", {
                         autoClose: 5000,
                         position: "top-right",
                         transition: "zoom",
                         toastBackgroundColor: "white",
                     });
                 }
-            })
+            });
         },
     },
     watch: {
-        showModal: function () {
+        showModal() {
+            if (this.showModal) {
+                // Si el modal está abierto, configuramos la información correspondiente
+                if (this.dataQuedan != "") {
+                    // Si dataQuedan tiene valor, realizamos las siguientes acciones
+                    let newDataQuedan = JSON.parse(JSON.stringify(this.dataQuedan));
+                    this.conditionButton = false; // Cambiamos el estado del botón para actualizar en lugar de agregar
+                    this.setValuesToInput();
+                    this.getInformationBySupplier(newDataQuedan.proveedor.id_proveedor);
 
-            if (this.showModal) {//when modal is open we set information tho the atribut
-                if (this.dataQuedan != "") {//SI dataQuedan VIENE LLENO HACEMOS ESTO
-                    let newDataQuedan = JSON.parse(JSON.stringify(this.dataQuedan))
-                    this.conditionButton = false;//cambiamos estado del boton para que actualise en lugar de agregar
-                    this.setValuesToInput()
-                    this.getInformationBySupplier(newDataQuedan.proveedor.id_proveedor)
                     newDataQuedan.detalle_quedan.forEach((value, index) => {
+                        // Agregamos cada detalle_quedan a la matriz rowsData
                         this.rowsData.push({
-                            0: '',//numberRow,
-                            1: value.id_det_quedan,//Id__detalle_quedan,
-                            2: value.numero_factura_det_quedan,//FACTURA,
-                            3: value.id_dependencia,//DEPENDENCIA	,
-                            4: value.numero_acta_det_quedan,//NUMERO ACTA	,
-                            5: value.descripcion_det_quedan,//CONCEPTO,
-                            6: { producto: value.producto_factura_det_quedan, servicio: value.servicio_factura_det_quedan },//Monto de producto y servicio,
-                            7: true,//eliminado_logico
-                            8: value.fecha_factura_det_quedan,//fecha_factura_det_quedan
-                        })
-                    })
-                    this.calculateAmount()
-                    this.getAmountBySupplier(newDataQuedan.proveedor.id_proveedor)
-                } else {//SI dataQuedan VIENE VACIO HACEMOS ESTO
-                    this.addRow()
-                    this.resetValuesToInput()
-                }
+                            0: '', // numberRow
+                            1: value.id_det_quedan, // Id__detalle_quedan
+                            2: value.numero_factura_det_quedan, // FACTURA
+                            3: value.id_dependencia, // DEPENDENCIA
+                            4: value.numero_acta_det_quedan, // NUMERO ACTA
+                            5: value.descripcion_det_quedan, // CONCEPTO
+                            6: { producto: value.producto_factura_det_quedan, servicio: value.servicio_factura_det_quedan }, // Monto de producto y servicio
+                            7: true, // eliminado_logico
+                            8: value.fecha_factura_det_quedan // fecha_factura_det_quedan
+                        });
+                    });
 
+                    this.calculateAmount();
+                    this.getAmountBySupplier(newDataQuedan.proveedor.id_proveedor);
+                } else {
+                    // Si dataQuedan está vacío, agregamos una nueva fila y restablecemos los valores de entrada
+                    this.addRow();
+                    this.resetValuesToInput();
+                }
             } else {
-                this.rowsData = []
-                this.conditionButton = true;//cambiamos estado del boton para que actualise en lugar de agregar
+                // Si el modal está cerrado, reiniciamos la matriz rowsData y cambiamos el estado del botón
+                this.rowsData = [];
+                this.conditionButton = true; // Cambiamos el estado del botón para agregar en lugar de actualizar
             }
         }
     }
-
-
 }
 </script>
 
