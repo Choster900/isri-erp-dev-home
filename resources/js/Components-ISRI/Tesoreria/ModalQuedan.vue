@@ -667,12 +667,6 @@ export default {
                     }
                 }
             });
-            console.log("TOTAL PROVEEDORES EN BASE DE DATOS");
-            console.log(parseFloat(total));
-            console.log("TOTAL EN QUEDAN");
-            console.log(parseFloat(this.dataInputs.monto_total_quedan))
-
-
             this.dataForCalculate.monto_total_quedan_por_proveedor = parseFloat(total)
 
         },
