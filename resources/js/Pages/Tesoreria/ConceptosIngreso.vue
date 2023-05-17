@@ -75,7 +75,8 @@ import axios from 'axios';
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="space-x-1">
                   <DropDownOptions>
-                    <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer" v-if="permits.actualizar == 1"
+                    <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer" 
+                    v-if="permits.actualizar == 1 && service.estado_concepto_ingreso == 1"
                       @click="editIncomeConcept(service)">
                       <div class="w-8 text-green-900">
                         <span class="text-xs">
