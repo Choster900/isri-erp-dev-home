@@ -19,7 +19,7 @@ class ReciboIngresoController extends Controller
 {
     public function getRecibosIngreso(Request $request)
     {
-        $columns = ['numero_recibo_ingreso', 'cliente_recibo_ingreso', 'descripcion_recibo_ingreso', 'id_ccta_presupuestal', 'monto_recibo_ingreso', 'estado_recibo_ingreso'];
+        $columns = ['numero_recibo_ingreso', 'fecha_recibo_ingreso', 'cliente_recibo_ingreso', 'descripcion_recibo_ingreso', 'id_ccta_presupuestal', 'monto_recibo_ingreso', 'estado_recibo_ingreso'];
 
         $length = $request->input('length');
         $column = $request->input('column'); //Index
@@ -34,6 +34,7 @@ class ReciboIngresoController extends Controller
             ->orderBy($columns[$column], $dir);
         if ($search_value) {
             $query->where('numero_recibo_ingreso', 'like', '%' . $search_value['numero_recibo_ingreso'] . '%')
+                ->where('fecha_recibo_ingreso', 'like', '%' . $search_value['fecha_recibo_ingreso'] . '%')
                 ->where('id_ccta_presupuestal', 'like', '%' . $search_value['id_ccta_presupuestal'] . '%')
                 ->where('cliente_recibo_ingreso', 'like', '%' . $search_value['cliente_recibo_ingreso'] . '%')
                 ->where('monto_recibo_ingreso', 'like', '%' . $search_value['monto_recibo_ingreso'] . '%')

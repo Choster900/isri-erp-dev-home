@@ -74,7 +74,7 @@ import 'vue3-toastify/dist/index.css';
                                 <div class="space-x-1">
                                     <DropDownOptions>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            v-if="permits.actualizar == 1" @click.stop="getSuppiler(proveedor)">
+                                            v-if="permits.actualizar == 1 && proveedor.estado_proveedor == 1" @click.stop="getSuppiler(proveedor)">
                                             <div class="w-8 text-green-900">
                                                 <span class="text-xs">
 
