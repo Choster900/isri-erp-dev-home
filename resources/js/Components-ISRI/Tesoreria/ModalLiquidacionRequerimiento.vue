@@ -20,7 +20,7 @@ import axios from 'axios';
                             </div>
                         </th>
                         <th class="text-white bg-[#001b47] px-4 py-2 first:pl-5 last:pr-5 whitespace-nowrap border-r-2">
-                            <div class="font-semibold text-center text-[12px] tracking-wider"> MONTO DEL REQ:
+                            <div class="font-semibold text-center text-[10px] tracking-wider"> MONTO DEL REQ:
                                 {{ dataQuedan.monto_requerimiento_pago }}
                             </div>
                         </th>
@@ -126,7 +126,7 @@ import axios from 'axios';
             </table>
             <div class="flex justify-center items-center">
 
-                <div class="px-2 pt-3" v-if="dataQuedan.id_estado_req_pago != 2">
+                <div class="px-2 pt-3" v-if="enableButton">
                     <GeneralButton @click="enviarTodaLaInformacion()" color="bg-orange-700  hover:bg-orange-800"
                         text="Liquidar" icon="add" />
                 </div>
@@ -160,6 +160,7 @@ export default {
         amountRowsData: [],
         numeroRequerimiento: '',
         liquidado: false,
+        enableButton: true,
     }),
 
     methods: {
@@ -236,7 +237,7 @@ export default {
                 if (this.passOrNot()) {
                     let res = await axios.post('/liquidar-quedan', {
                         params: this.amountRowsData,
-                        liquidado: this.restanteIngreso == 0 ? true : false,
+                        liquidado: this.restanteIngreso != 0 ? false : true,
                         requerimiento: this.dataQuedan.id_requerimiento_pago,
                     }).catch(errors => {
                         let msg = this.manageError(errors);
@@ -276,6 +277,9 @@ export default {
                         transition: "zoom",
                         toastBackgroundColor: "white",
                     });
+                    if (this.restanteIngreso == 0) {
+                        this.enableButton = false
+                    }
                     this.$emit("actualizar-table-data")
 
                 } else {
@@ -294,6 +298,7 @@ export default {
             if (this.scrollbarModalOpen) {
                 this.sumTotQuedan()
                 this.sumRestTotal()
+                this.enableButton = this.dataQuedan.id_estado_req_pago != 2 ? this.enableButton = true : false;
                 this.numeroRequerimiento = `Requerimiento - N°${this.dataQuedan.numero_requerimiento_pago}-${this.dataQuedan.anio_requerimiento_pago}`
             } else {
                 this.amountRowsData = []
