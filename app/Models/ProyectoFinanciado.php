@@ -34,4 +34,9 @@ class ProyectoFinanciado extends Model
     {
         return $this->hasMany(Quedan::class, 'id_proy_financiado', 'id_proy_financiado');
     }
+
+    public function conceptos_ingreso()
+    {
+        return $this->hasMany('App\Models\ConceptoIngreso', 'id_proy_financiado', 'id_proy_financiado');
+    }
 }

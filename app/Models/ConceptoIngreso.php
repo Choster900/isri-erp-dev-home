@@ -35,6 +35,11 @@ class ConceptoIngreso extends Model
         return $this->belongsTo('App\Models\CuentaPresupuestal','id_ccta_presupuestal','id_ccta_presupuestal');
     }
 
+    public function proyecto_financiado()
+    {
+        return $this->belongsTo('App\Models\ProyectoFinanciado','id_proy_financiado','id_proy_financiado');
+    }
+
     public function detalles_recibo_ingreso()
     {
         return $this->hasMany('App\Models\DetalleReciboIngreso', 'id_concepto_ingreso', 'id_concepto_ingreso');
