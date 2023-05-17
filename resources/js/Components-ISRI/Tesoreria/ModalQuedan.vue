@@ -582,7 +582,6 @@ export default {
         getInformationBySupplier(supplier) {
             // Buscar el proveedor en la lista de proveedores
             const selectedSupplier = this.dataForSelectInRow.proveedor.find((suppliers) => suppliers.value === supplier);
-
             if (selectedSupplier) {
                 // Datos que se pintan en los inputs
                 this.dataInputs.giro = `${selectedSupplier.codigo_giro} - ${selectedSupplier.nombre_giro}`;
@@ -592,6 +591,8 @@ export default {
                 // Datos que se usan para cálculos
                 this.dataForCalculate.irs = selectedSupplier.isrl_sujeto_retencion;
                 this.dataForCalculate.iva = selectedSupplier.iva_sujeto_retencion;
+
+                this.dataInputs.id_proveedor = selectedSupplier.value;
             }
 
             this.getAmountBySupplier(supplier);
@@ -619,8 +620,9 @@ export default {
             liquido = (totMontoByRow / 1.13).toFixed(2);
 
             let montoIvaQuedan = 0;
-
             // Verificar si el monto total excede el umbral para aplicar IVA
+            console.log("suma TOTAL PROVEEDOR + TOTAL IVA ");
+            console.log(parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) + parseFloat(totMontoByRow));
             if (parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) + parseFloat(totMontoByRow) >= 113) {
                 montoIvaQuedan = (liquido * this.dataForCalculate.iva).toFixed(2);
             }
@@ -637,6 +639,8 @@ export default {
 
             // Asignar el monto total
             this.dataInputs.monto_total_quedan = totMontoByRow.toFixed(2);
+            this.getAmountBySupplier(this.dataInputs.id_proveedor);
+
         },
         getAmountBySupplier(id_proveedor) {
             // Crear una copia de la matriz totalAmountBySupplier
@@ -647,7 +651,7 @@ export default {
                 if (element.id_proveedor === id_proveedor) {
                     if (this.dataInputs.id_quedan !== "") {
                         // Filtrar los elementos de quedan según el id_quedan ingresado
-                        let quedanArray = element.quedan.filter((element) => element.id_quedan <= this.dataInputs.id_quedan);
+                        let quedanArray = element.quedan.filter((element) => element.id_quedan < this.dataInputs.id_quedan);
 
                         // Ordenar el array quedanArray por id_quedan en orden descendente
                         quedanArray.sort((a, b) => b.id_quedan - a.id_quedan);
@@ -658,13 +662,19 @@ export default {
                         // Calcular el monto total sumando el monto_total_quedan de cada objeto en la matriz quedan
                         let montoTotal = element.quedan.reduce((total, element) =>
                             (parseFloat(total) + parseFloat(element.monto_total_quedan)).toFixed(2), 0);
+
                         total = montoTotal;
                     }
                 }
             });
+            console.log("TOTAL PROVEEDORES EN BASE DE DATOS");
+            console.log(parseFloat(total));
+            console.log("TOTAL EN QUEDAN");
+            console.log(parseFloat(this.dataInputs.monto_total_quedan))
 
-            // Calcular el monto_total_quedan_por_proveedor
-            this.dataForCalculate.monto_total_quedan_por_proveedor = ((!isNaN(parseFloat(total)) ? parseFloat(total) : 0) - (this.dataInputs.monto_total_quedan === '' ? 0 : this.dataInputs.monto_total_quedan));
+
+            this.dataForCalculate.monto_total_quedan_por_proveedor = parseFloat(total)
+
         },
         onlyNumberDecimal(event) {
             const charCode = (event.which) ? event.which : event.keyCode;
