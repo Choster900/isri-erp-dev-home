@@ -361,7 +361,6 @@ export default {
     },
     created() {
         this.getDataQuedan()
-        this.getAmountBySupplier()
         this.getListForSelect()
     },
 
