@@ -102,12 +102,9 @@ export default {
     },
     methods: {
         exportExcel() {
-            axios.get('/create-withholding-iva-report',
-                {
-                    responseType: 'blob',
-                    params: this.report_data
-                }
-            )
+            axios.post('/create-withholding-iva-report', this.report_data, {
+                    responseType: 'blob'
+                })
                 .then(response => {
                     this.errors = []
                     console.log(response.data);
@@ -156,7 +153,7 @@ export default {
                             reader.readAsText(errors.response.data);
                             reader.onload = () => {
                                 const errors = JSON.parse(reader.result);
-                                console.log(errors);
+                                //console.log(errors);
                             };
 
                             let msg = this.manageError(errors);

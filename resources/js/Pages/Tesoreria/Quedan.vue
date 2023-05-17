@@ -137,7 +137,7 @@ import axios from 'axios';
                                         </div>
                                     </DropDownOptions>
 
-                                  
+
                                 </div>
                             </td>
                         </tr>
@@ -184,9 +184,9 @@ import axios from 'axios';
             </div>
         </div>
 
-        <ModalQuedan :showModal="showModal" @cerrar-modal="closeVars()" :data-quedan="dataQuedan"
+        <ModalQuedan :showModal="showModal" @cerrar-modal="showModal = false" :data-quedan="dataQuedan"
             :dataForSelectInRow="dataForSelectInRow" @actualizar-table-data="getDataQuedan()"
-            :dataSuppliers="dataSuppliers" />
+            :totalAmountBySupplier="totalAmountBySupplier" />
 
 
     </AppLayoutVue>
@@ -210,7 +210,9 @@ export default {
                 options: [
                     { value: "", label: "Ninguno" },
                     { value: "1", label: "Abierto" },
-                    { value: "2", label: "Req.Asignado" }
+                    { value: "2", label: "Req.Asignado" },
+                    { value: "3", label: "Liq. Parcial" },
+                    { value: "4", label: "Liquidado" },
                 ]
             },
             { width: "5%", label: "", name: "Acciones" },
@@ -227,8 +229,8 @@ export default {
             dropdown: '',
             isOpen: false,
             showModal: false,
-            dataQuedan: [],
-            dataSuppliers: null,//attr donde guardar la data de proveedores
+            dataQuedan: [],//Datos del quedan hasta los detalles de este
+            totalAmountBySupplier: [],//Datos de proveedores
             permits: [],
             dataForSelectInRow: [],
             scrollbarModalOpen: false,
@@ -262,19 +264,36 @@ export default {
     },
     methods: {
         async getDataQuedan(url = "/quedan") {
+            // Guardar la URL actual y actualizar el contador de dibujos (draw)
             this.lastUrl = url;
             this.tableData.draw++;
-            await axios.get(url, { params: this.tableData }).then((response) => {
-                let data = response.data;
-                if (this.tableData.draw == data.draw) {
+
+            try {
+                // Realizar una solicitud POST a la URL especificada
+                const response = await axios.post(url, this.tableData);
+                const data = response.data;
+
+                // Verificar si la respuesta corresponde al dibujo actual
+                if (this.tableData.draw === data.draw) {
+                    // Actualizar los enlaces de paginación y la información de la tabla
                     this.links = data.data.links;
-                    this.pagination.total = data.data.total
+                    this.pagination.total = data.data.total;
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
                     this.dataQuedanForTable = data.data.data;
+
+                    // Obtener el monto por proveedor
+                    this.getAmountBySupplier();
                 }
-            }).catch((errors) => {
-            });
+            } catch (error) {
+                let msg = this.manageError(error);
+                this.$swal.fire({
+                    title: "Operación cancelada",
+                    text: msg,
+                    icon: "warning",
+                    timer: 5000,
+                });
+            }
         },
         sortBy(key) {
             if (key != "Acciones") {
@@ -288,31 +307,36 @@ export default {
         getIndex(array, key, value) {
             return array.findIndex((i) => i[key] == value);
         },
-
-        closeVars() {
-            this.showModal = false
-        },
         async createQuedan() {
-
             this.dataQuedan = []
             this.showModal = true
-
         },
         async getListForSelect() {
+            //Metodo que traer un listado de catalogos para poder usarlos en MultiSelect y otras variantes
             await axios.get('/get-list-select').then((response) => {
-
                 this.dataForSelectInRow = response.data;
-            }).catch((error) => {
+            }).catch((errors) => {
+                let msg = this.manageError(errors);
+                this.$swal.fire({
+                    title: "Operación cancelada",
+                    text: msg,
+                    icon: "warning",
+                    timer: 5000,
+                });
+            });
+        },
+        async getAmountBySupplier(dataQuedan) {
+            //metodo que trae todos los proveedores del mes actual, se mandan los parametros al modal
+            await axios.post('/getAmountBySupplierPerMonth').then((response) => {
+                this.totalAmountBySupplier = response.data
+            }).catch((errors) => {
+                console.log(errors);
             });
         },
         async showQuedan(dataQuedan) {
+            // await this.getAmountBySupplier(dataQuedan)
             this.dataQuedan = dataQuedan
             this.showModal = true
-        },
-        getAllSuppliers() {
-            axios.get("/getAllSuppliers").then(res => {
-                this.dataSuppliers = res.data
-            })
         },
         validarCamposVacios(objeto) {
             for (var propiedad in objeto) {
@@ -336,7 +360,6 @@ export default {
 
     },
     created() {
-        this.getAllSuppliers()
         this.getDataQuedan()
         this.getListForSelect()
     },

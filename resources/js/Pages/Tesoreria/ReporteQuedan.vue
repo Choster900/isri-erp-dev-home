@@ -47,7 +47,7 @@ import axios from 'axios';
             <div class="mb-7 md:flex flex-row justify-items-start">
                 <div class="mb-4 md:mr-1 md:mb-0 basis-1/2">
                     <label class="block mb-2 text-xs font-light text-gray-600">
-                        Fuente Financiamiento <span class="text-red-600 font-extrabold">*</span>
+                        Fuente Financiamiento
                     </label>
                     <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                         <Multiselect placeholder="Seleccione Financiamiento" :searchable="true" :options="financing_sources"
@@ -59,7 +59,7 @@ import axios from 'axios';
                 </div>
                 <div class="mb-4 md:mr-1 md:mb-0 basis-1/2">
                     <label class="block mb-2 text-xs font-light text-gray-600">
-                        Estado Quedan <span class="text-red-600 font-extrabold">*</span>
+                        Estado Quedan
                     </label>
                     <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                         <Multiselect placeholder="Seleccione Estado" :searchable="true" :options="states_quedan"
@@ -70,7 +70,7 @@ import axios from 'axios';
                 </div>
             </div>
             <div class="mb-4 md:flex flex justify-center">
-                <GeneralButton @click="exportPDF()" color="bg-red-700 hover:bg-red-800" text="PDF" icon="add" />
+                <!-- <GeneralButton @click="exportPDF()" color="bg-red-700 hover:bg-red-800" text="PDF" icon="add" /> -->
                 <GeneralButton :class="'ml-2'" @click="exportExcel()" color="bg-green-700 hover:bg-green-800" text="Excel"
                     icon="add" />
             </div>
@@ -123,11 +123,7 @@ export default {
     },
     methods: {
         exportPDF() {
-            axios.get('/create-quedan-report-pdf',
-                {
-                    params: this.debt_table
-                }
-            )
+            axios.post('/create-quedan-report-pdf', this.debt_table)
                 .then(response => {
                     this.errors = []
                     const opt = {
@@ -185,16 +181,13 @@ export default {
 
         },
         exportExcel() {
-            axios.get('/create-quedan-report',
-                {
-                    responseType: 'blob',
-                    params: this.debt_table
-                }
-            )
+            axios.post('/create-quedan-report', this.debt_table, {
+                    responseType: 'blob'
+                })
                 .then(response => {
                     this.errors = []
                     let fecha = moment().format('DD-MM-YYYY');
-                    let filename = 'RPT-REPORTE-QUEDAN-' + fecha + '.xlsx';
+                    let filename = 'RPT-QUEDAN-' + fecha + '.xlsx';
                     const url = window.URL.createObjectURL(new Blob([response.data]));
                     const link = document.createElement('a');
                     link.href = url;

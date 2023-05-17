@@ -8,7 +8,7 @@ import InputError from "@/Components/InputError.vue";
     <div class="m-1.5">
 
         <ModalBasicVue title="Personas" id="scrollbar-modal" maxWidth="3xl" :modalOpen="scrollbarModalOpen"
-            @close-modal-persona="this.$emit('close-definitive')">
+            @close-modal="$emit('close-definitive')">
 
             <div class="px-5 py-4">
                 <div class="space-y-2">
@@ -258,7 +258,7 @@ import InputError from "@/Components/InputError.vue";
 
                     <button
                         class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600 underline underline-offset-1"
-                        @click.stop="this.$emit('close-definitive')">Cerrar</button>
+                        @click.stop="$emit('close-definitive')">Cerrar</button>
 
                     <GeneralButton v-if="infoPersona != ''" @click="updatePerson()"
                         color="bg-orange-700  hover:bg-orange-800" text="Editar persona" icon="add" />

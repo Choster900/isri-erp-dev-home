@@ -150,25 +150,23 @@ import axios from 'axios';
                                                 </div>
                                             </td>
                                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                                <div v-for="(detalle, i) in  quedan.detalle_quedan" :key="i"
+                                                <div v-for="(detalle, i) in quedan.detalle_quedan" :key="i"
                                                     class="font-medium text-slate-800 text-[12px] text-center wrap flex justify-center items-center">
                                                     <div
                                                         :class="{ 'border-b-2 border-b-gray-500': i < quedan.detalle_quedan.length - 1 && quedan.detalle_quedan.length > 1 }">
                                                         FACTURA: {{ detalle.numero_factura_det_quedan }}
                                                         <br>
-                                                        PRODUCTO: ${{ detalle.producto_factura_det_quedan }}
+                                                        PRODUCTO: ${{ detalle.producto_factura_det_quedan || 0 }}
                                                         <br>
-                                                        SERVICIO: ${{ detalle.servicio_factura_det_quedan }}
+                                                        SERVICIO: ${{ detalle.servicio_factura_det_quedan || 0 }}
                                                         <br>
                                                         <div class="font-semibold">TOTAL: ${{
-                                                            (parseFloat(detalle.servicio_factura_det_quedan)
-                                                                +
-                                                                parseFloat(detalle.producto_factura_det_quedan)).toFixed(2)
-                                                        }}
-                                                        </div>
+                                                            (parseFloat(detalle.servicio_factura_det_quedan) || 0) +
+                                                            (parseFloat(detalle.producto_factura_det_quedan) || 0) }}</div>
                                                     </div>
                                                 </div>
                                             </td>
+
                                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                                 <div class="text-center  text-[12px]">{{ quedan.fecha_emision_quedan }}
                                                 </div>
@@ -265,8 +263,14 @@ export default {
                     })
                     this.dataQuedan = newDataQuedan
                 })
-                .catch(err => {
-                    console.error(err);
+                .catch(errors => {
+                    let msg = this.manageError(errors);
+                    this.$swal.fire({
+                        title: "Operación cancelada",
+                        text: msg,
+                        icon: "warning",
+                        timer: 5000,
+                    });
                 })
         },
 
@@ -328,16 +332,23 @@ export default {
                         this.collectItems = []
                         this.id_requerimiento_pago = ''
                         this.numero_requerimiento = ''
-                    }).catch((Error) => {
-                        if (Error.response.status === 422) {
-                            console.log(Error);
-                            toast.error(Error.response.data, {
+                    }).catch((errors) => {
+                        if (errors.response.status === 422) {
+                            toast.error(errors.response.data, {
                                 autoClose: 5000,
                                 position: "top-right",
                                 transition: "zoom",
                                 toastBackgroundColor: "white",
                             });
 
+                        } else {
+                            let msg = this.manageError(errors);
+                            this.$swal.fire({
+                                title: "Operación cancelada",
+                                text: msg,
+                                icon: "warning",
+                                timer: 5000,
+                            });
                         }
                     });
 

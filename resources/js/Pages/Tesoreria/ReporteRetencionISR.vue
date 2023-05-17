@@ -102,12 +102,9 @@ export default {
     },
     methods: {
         exportExcel() {
-            axios.get('/create-income-tax-report',
-                {
-                    responseType: 'blob',
-                    params: this.report_data
-                }
-            )
+            axios.post('/create-income-tax-report', this.report_data, {
+                    responseType: 'blob'
+                })
                 .then(response => {
                     this.errors = []
                     console.log(response.data);
@@ -156,7 +153,7 @@ export default {
                             reader.readAsText(errors.response.data);
                             reader.onload = () => {
                                 const errors = JSON.parse(reader.result);
-                                console.log(errors);
+                                //console.log(errors);
                             };
 
                             let msg = this.manageError(errors);
@@ -177,7 +174,6 @@ export default {
                     this.financing_sources = response.data.financing_sources
                 })
                 .catch((errors) => {
-                    console.log(errors);
                     let msg = this.manageError(errors);
                     this.$swal.fire({
                         title: "Operación cancelada",

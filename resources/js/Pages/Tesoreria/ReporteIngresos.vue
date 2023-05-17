@@ -46,7 +46,7 @@ import axios from 'axios';
             <div class="mb-7 md:flex flex-row justify-items-start">
                 <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                     <label class="block mb-2 text-xs font-light text-gray-600">
-                        Fuente Financiamiento <span class="text-red-600 font-extrabold">*</span>
+                        Fuente Financiamiento
                     </label>
                     <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                         <Multiselect placeholder="Seleccione Financiamiento" :searchable="true" :options="financing_sources"
@@ -58,7 +58,7 @@ import axios from 'axios';
                 </div>
                 <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                     <label class="block mb-2 text-xs font-light text-gray-600">
-                        Dependencia <span class="text-red-600 font-extrabold">*</span>
+                        Dependencia
                     </label>
                     <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                         <Multiselect placeholder="Seleccione Dependencia" :searchable="true" :options="dependencies"
@@ -69,7 +69,7 @@ import axios from 'axios';
                 </div>
                 <div class="mb-4 md:mr-0 md:mb-0 basis-1/3">
                     <label class="block mb-2 text-xs font-light text-gray-600">
-                        Especifico <span class="text-red-600 font-extrabold">*</span>
+                        Especifico
                     </label>
                     <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                         <Multiselect v-model="report_data.budget_account_id" :options="budget_accounts"
@@ -132,17 +132,14 @@ export default {
     },
     methods: {
         exportExcel() {
-            axios.get('/create-income-report',
-                {
-                    responseType: 'blob',
-                    params: this.report_data
-                }
-            )
+            axios.post('/create-income-report', this.report_data, {
+                    responseType: 'blob'
+                })
                 .then(response => {
                     //console.log(response);
                     this.errors = []
                     let fecha = moment().format('DD-MM-YYYY');
-                    let filename = 'RPT-REPORTE-INGRESOS-' + fecha + '.xlsx';
+                    let filename = 'RPT-INGRESOS-' + fecha + '.xlsx';
                     const url = window.URL.createObjectURL(new Blob([response.data]));
                     const link = document.createElement('a');
                     link.href = url;
@@ -152,7 +149,6 @@ export default {
 
                 })
                 .catch(errors => {
-                    console.log(errors);
                     if (errors.response.status === 422) {
                         toast.warning(
                             "Tienes algunos errores por favor verifica tus datos.",
@@ -187,7 +183,7 @@ export default {
                             reader.readAsText(errors.response.data);
                             reader.onload = () => {
                                 const errors = JSON.parse(reader.result);
-                                console.log(errors);
+                                //console.log(errors);
                             };
 
                             let msg = this.manageError(errors);

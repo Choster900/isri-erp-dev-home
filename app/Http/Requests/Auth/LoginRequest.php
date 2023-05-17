@@ -32,8 +32,12 @@ class LoginRequest extends FormRequest
                 if (is_string($value) && !empty($value)) {
                     $user = User::where('nick_usuario', '=', $value)->first();
                 }
-                if($user->estado_usuario!=1){
-                    $fail(__('Este usuario se encuentra desactivado.'));
+                if($user){
+                    if($user->estado_usuario!=1){
+                        $fail(__('Este usuario se encuentra desactivado.'));
+                    }
+                }else{
+                    $fail(__('Este usuario no se encuentra en nuestros registros.'));
                 }
             }],
             'password' => ['required', 'string',],

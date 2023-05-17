@@ -177,7 +177,7 @@ import InputError from "@/Components/InputError.vue";
                 <!-- Buttons -->
                 <div class="mt-4 mb-4 md:flex flex-row justify-center">
                     <GeneralButton v-if="dataRequerimiento.id_requerimiento_pago" @click="updateRequerimiento()"
-                        color="bg-orange-700  hover:bg-orange-800" text="Actualizar" icon="add" />
+                        color="bg-orange-700  hover:bg-orange-800" text="Actualizar" icon="update" />
                     <GeneralButton v-else @click="addRequerimiento()" color="bg-green-700  hover:bg-green-800"
                         text="Agregar" icon="add" />
                     <div class="mb-4 md:mr-2 md:mb-0 px-1">
@@ -315,7 +315,7 @@ export default {
         async getDataRequerimiento(url = "/requerimientos") {
             this.lastUrl = url;
             this.tableData.draw++;
-            await axios.get(url, { params: this.tableData }).then((response) => {
+            await axios.post(url,this.tableData ).then((response) => {
                 let data = response.data;
                 if (this.tableData.draw == data.draw) {
                     this.links = data.data.links;
@@ -325,6 +325,13 @@ export default {
                     this.requerimientos = data.data.data;
                 }
             }).catch((errors) => {
+                let msg = this.manageError(errors);
+                this.$swal.fire({
+                    title: "Operación cancelada",
+                    text: msg,
+                    icon: "warning",
+                    timer: 5000,
+                });
             });
         },
         sortBy(key) {
@@ -369,7 +376,6 @@ export default {
                             this.requerimientoModalOpen = false
 
                         }).catch((errors) => {
-                            console.log(errors);
                             if (errors.response.status === 422) {
                                 toast.warning(
                                     "Tienes algunos errores por favor verifica tus datos.",
@@ -435,7 +441,6 @@ export default {
                                         toastBackgroundColor: "white",
                                     }
                                 );
-                                console.log(errors);
                                 this.errors = errors.response.data.errors;
                             } else {
                                 let msg = this.manageError(errors);

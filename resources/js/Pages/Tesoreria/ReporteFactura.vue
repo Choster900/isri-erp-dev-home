@@ -46,7 +46,7 @@ import axios from 'axios';
             <div class="mb-7 md:flex flex-row justify-items-start">
                 <div class="mb-4 md:mr-1 md:mb-0 basis-1/3">
                     <label class="block mb-2 text-xs font-light text-gray-600">
-                        Fuente Financiamiento <span class="text-red-600 font-extrabold">*</span>
+                        Fuente Financiamiento
                     </label>
                     <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                         <Multiselect placeholder="Seleccione Financiamiento" :searchable="true" :options="financing_sources"
@@ -58,7 +58,7 @@ import axios from 'axios';
                 </div>
                 <div class="mb-4 md:mr-1 md:mb-0 basis-1/3">
                     <label class="block mb-2 text-xs font-light text-gray-600">
-                        Proveedor <span class="text-red-600 font-extrabold">*</span>
+                        Proveedor
                     </label>
                     <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                         <Multiselect placeholder="Seleccione Proveedor" :searchable="true" :options="suppliers"
@@ -69,7 +69,7 @@ import axios from 'axios';
                 </div>
                 <div class="mb-4 md:mr-1 md:mb-0 basis-1/3">
                     <label class="block mb-2 text-xs font-light text-gray-600">
-                        Requerimiento <span class="text-red-600 font-extrabold">*</span>
+                        Requerimiento
                     </label>
                     <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                         <Multiselect placeholder="Seleccione Requerimiento" :searchable="true" :options="requirements"
@@ -130,16 +130,13 @@ export default {
     },
     methods: {
         exportExcel() {
-            axios.get('/create-invoice-report',
-                {
-                    responseType: 'blob',
-                    params: this.invoice_report
-                }
-            )
+            axios.post('/create-invoice-report', this.invoice_report, {
+                    responseType: 'blob'
+                })
                 .then(response => {
                     this.errors = []
                     let fecha = moment().format('DD-MM-YYYY');
-                    let filename = 'RPT-REPORTE-FACTURA-' + fecha + '.xlsx';
+                    let filename = 'RPT-FACTURA-' + fecha + '.xlsx';
                     const url = window.URL.createObjectURL(new Blob([response.data]));
                     const link = document.createElement('a');
                     link.href = url;
@@ -206,7 +203,6 @@ export default {
                     this.financing_sources = response.data.financing_sources
                 })
                 .catch((errors) => {
-                    console.log(errors);
                     let msg = this.manageError(errors);
                     this.$swal.fire({
                         title: "Operación cancelada",

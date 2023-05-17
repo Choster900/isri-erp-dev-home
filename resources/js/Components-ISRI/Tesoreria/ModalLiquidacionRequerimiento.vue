@@ -238,8 +238,15 @@ export default {
                         params: this.amountRowsData,
                         liquidado: this.restanteIngreso == 0 ? true : false,
                         requerimiento: this.dataQuedan.id_requerimiento_pago,
+                    }).catch(errors => {
+                        let msg = this.manageError(errors);
+                        this.$swal.fire({
+                            title: "Operación cancelada",
+                            text: msg,
+                            icon: "warning",
+                            timer: 5000,
+                        });
                     })
-                    console.log(res);
                     return res; // indicate success
                 } else {
                     return false;

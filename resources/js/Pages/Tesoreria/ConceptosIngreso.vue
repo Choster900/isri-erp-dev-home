@@ -75,7 +75,8 @@ import axios from 'axios';
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="space-x-1">
                   <DropDownOptions>
-                    <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer" v-if="permits.actualizar == 1"
+                    <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer" 
+                    v-if="permits.actualizar == 1 && service.estado_concepto_ingreso == 1"
                       @click="editIncomeConcept(service)">
                       <div class="w-8 text-green-900">
                         <span class="text-xs">
@@ -86,7 +87,7 @@ import axios from 'axios';
                           </svg>
                         </span>
                       </div>
-                      <div class="font-semibold">Ver</div>
+                      <div class="font-semibold">Editar</div>
                     </div>
                     <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                       @click="changeStateIncomeConcept(service.id_concepto_ingreso, service.nombre_concepto_ingreso, service.estado_concepto_ingreso)"
@@ -99,7 +100,9 @@ import axios from 'axios';
                           </svg>
 
                         </span></div>
-                      <div class="font-semibold">Eliminar</div>
+                      <div class="font-semibold">
+                        {{ service.estado_concepto_ingreso ? 'Desactivar' : 'Activar' }}
+                      </div>
                     </div>
                   </DropDownOptions>
                 </div>
@@ -279,7 +282,7 @@ export default {
     async getIncomeConcept(url = "/ingresos") {
       this.tableData.draw++;
       this.tableData.currentPage = url
-      await axios.get(url, { params: this.tableData }).then((response) => {
+      await axios.post(url, this.tableData ).then((response) => {
         let data = response.data;
         if (this.tableData.draw == data.draw) {
           this.links = data.data.links;

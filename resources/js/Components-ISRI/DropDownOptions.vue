@@ -1,4 +1,3 @@
-
 <template>
     <div class="relative inline-flex">
         <div class="bg-gray-200 text-sm text-gray-500 leading-none border-2 border-gray-200 rounded-full inline-flex"
@@ -14,26 +13,18 @@
                     <rect x="14" y="14" width="7" height="7"></rect>
                     <rect x="3" y="14" width="7" height="7"></rect>
                 </svg>
-                <span>Opciones</span>
+                <span class="text-xs">Opciones</span>
             </button>
         </div>
-
-
-        <transition enter-active-class="transition ease-out duration-200 transform"
-            enter-from-class="opacity-0 -translate-y-2" enter-to-class="opacity-100 translate-y-0"
-            leave-active-class="transition ease-out duration-200" leave-from-class="opacity-100" leave-to-class="opacity-0">
-            <div v-show="dropdownOpen"
-                class="origin-top-right z-10 absolute top-full min-w-44  py-1.5 rounded  mt-1 right-0">
-                <div ref="dropdown" @focusin="dropdownOpen = true" @focusout="dropdownOpen = false"
-                    class="bg-white w-40 border border-gray-300 rounded-lg flex flex-col text-sm py-2 px-2 text-gray-500">
-                    <slot>
-                        <!-- opciones del componenten a mostrar -->
-                    </slot>
-                </div>
+        <div v-show="dropdownOpen"
+            class="origin-top-right z-10 absolute top-full min-w-44  py-1.5 rounded  mt-1 right-0 transform-origin-top-right transform -translate-y-full">
+            <div ref="dropdown" @focusin="dropdownOpen = true" @focusout="dropdownOpen = false"
+                class="bg-white w-40 border border-gray-300 rounded-lg flex flex-col text-sm py-2 px-2 text-gray-500">
+                <slot>
+                    <!-- opciones del componenten a mostrar -->
+                </slot>
             </div>
-
-        </transition>
-
+        </div>
     </div>
 </template>
 
@@ -44,8 +35,6 @@ import { ref, onMounted, onUnmounted } from 'vue'
 export default {
     components: { DropdownLink },
     setup() {
-        const imgPrfile = ""
-
         const dropdownOpen = ref(false)
         const trigger = ref(null)
 
@@ -75,10 +64,6 @@ export default {
             dropdown,
         }
     },
-    created() {
-        let name = this.$page.props.auth.user.nick_usuario
-        this.imgPrfile = "https://ui-avatars.com/api/?name=" + name + "&background=001b47&color=fff&size=100"
-    }
 
 }
 </script>

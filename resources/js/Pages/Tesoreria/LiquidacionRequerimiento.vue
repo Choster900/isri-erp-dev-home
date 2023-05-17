@@ -192,7 +192,7 @@ export default {
         async getDataLiquidaciones(url = "/requerimientos") {
             this.lastUrl = url
             this.tableData.draw++
-            await axios.get(url, { params: this.tableData }).then((response) => {
+            await axios.post(url,this.tableData ).then((response) => {
                 let data = response.data;
                 if (this.tableData.draw == data.draw) {
                     this.links = data.data.links
@@ -205,6 +205,13 @@ export default {
                     this.dataRequerimientoForTable = data.data.data
                 }
             }).catch((errors) => {
+                let msg = this.manageError(errors);
+                this.$swal.fire({
+                    title: "Operación cancelada",
+                    text: msg,
+                    icon: "warning",
+                    timer: 5000,
+                });
             });
         },
         sortBy(key) {

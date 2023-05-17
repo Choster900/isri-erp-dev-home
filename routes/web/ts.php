@@ -22,13 +22,12 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             ]);
         }
     )->name('ts.proveedores');
-    Route::get('proveedores', [ProveedorController::class, 'getProveedores'])->name('get.proveedores');
-    Route::get('list-option-select-suppliers', [ProveedorController::class, 'getInformationToSelect'])->name('list-option-select-suppliers');
-    Route::get('update-suplier', [ProveedorController::class, 'getProveedores'])->name('get.proveedores');
-    Route::post('update-supplier', [ProveedorController::class, 'updateDataSupplier'])->name('update-supplier');
-    Route::post('add-supplier', [ProveedorController::class, 'addDataSupplier'])->name('add-supplier');
-    Route::post('change-values-retencion/{id_sujeto_retencion}', [ProveedorController::class, 'changeValueRetencion'])->name('change-values-retencion');
-    Route::post('update-state-supplier', [ProveedorController::class, 'changeStateSupplier'])->name('change-values-retencion');
+    Route::post('proveedores', [ProveedorController::class, 'getProveedores'])->name('proveedor.getProveedor');
+    Route::get('list-option-select-suppliers', [ProveedorController::class, 'getInformationToSelect'])->name('proveedor.getInformationToSelect');
+    Route::post('update-supplier', [ProveedorController::class, 'updateDataSupplier'])->name('proveedor.updateDataSupplier');
+    Route::post('add-supplier', [ProveedorController::class, 'addDataSupplier'])->name('proveedor.addDataSupplier');
+    Route::post('change-values-retencion/{id_sujeto_retencion}', [ProveedorController::class, 'changeValueRetencion'])->name('proveedor.changeValueRetencion');
+    Route::post('update-state-supplier', [ProveedorController::class, 'changeStateSupplier'])->name('proveedor.changeStateSupplier');
 
 
     //Manage quenda
@@ -42,12 +41,12 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('ts.quedan');
 
-    Route::get('quedan', [QuedanController::class, 'getDataQuedan'])->name('get.quedan');
+    Route::post('quedan', [QuedanController::class, 'getDataQuedan'])->name('get.quedan');
     Route::get('get-list-select', [QuedanController::class, 'getListForSelect'])->name('get-list-select');
     Route::post('add-quedan', [QuedanController::class, 'addQuedan'])->name('add-quedan');
     Route::post('update-detalle-quedan', [QuedanController::class, 'updateDetalleQuedan'])->name('update-detalle-quedan');
-    Route::get('getAllSuppliers', [QuedanController::class, 'getSuppliers'])->name('get-all-suppliers');
     Route::post('updateFechaRetencionIva', [QuedanController::class, 'updateFechaRetencionIva'])->name('update-fecha-liquidacion');
+    Route::post('getAmountBySupplierPerMonth', [QuedanController::class, 'getAmountBySupplierPerMonth'])->name('get-amount-by-supplier');
 
 
     //Manage requerimiento pago
@@ -61,7 +60,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('ts.requerimientos');
 
-    Route::get('requerimientos', [RequerimientoController::class, 'getRequerimientos'])->name('get.requerimientos');
+    Route::post('requerimientos', [RequerimientoController::class, 'getRequerimientos'])->name('get.requerimientos');
     Route::post('add-requerimiento', [RequerimientoController::class, 'addRequerimientoNumber'])->name('add-requerimiento');
     Route::post('update-requerimiento', [RequerimientoController::class, 'updateRequerimientoNumber'])->name('update-requerimiento');
     Route::get('filter-quedan', [RequerimientoController::class, 'filterQuedan'])->name('filter-quedan');
@@ -89,7 +88,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             ]);
         }
     )->name('ts.conceptosIngreso');
-    Route::get('ingresos', [ConceptoIngresoController::class, 'getConceptoIngresos'])->name('conceptoIngreso.getConceptoIngresos');
+    Route::post('ingresos', [ConceptoIngresoController::class, 'getConceptoIngresos'])->name('conceptoIngreso.getConceptoIngresos');
     Route::post('change-state-income-concept', [ConceptoIngresoController::class, 'changeStateIncomeConcept'])->name('conceptoIngreso.changeStateIncomeConcept');
     Route::get('get-selects-income-concept', [ConceptoIngresoController::class, 'getSelectsIncomeConcept'])->name('conceptoIngreso.getSelectsIncomeConcept');
     Route::post('save-income-concept', [ConceptoIngresoController::class, 'saveIncomeConcept'])->name('conceptoIngreso.saveIncomeConcept');
@@ -104,7 +103,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             ]);
         }
     )->name('ts.recibosIngreso');
-    Route::get('recibos-ingreso', [ReciboIngresoController::class, 'getRecibosIngreso'])->name('reciboIngreso.getRecibosIngreso');
+    Route::post('recibos-ingreso', [ReciboIngresoController::class, 'getRecibosIngreso'])->name('reciboIngreso.getRecibosIngreso');
     Route::post('change-state-income-receipt', [ReciboIngresoController::class, 'changeStateIncomeReceipt'])->name('reciboIngreso.changeStateIncomeReceipt');
     Route::get('get-modal-receipt-selects', [ReciboIngresoController::class, 'getModalReceiptSelects'])->name('reciboIngreso.getModalReceiptSelects');
     Route::get('get-income-concept', [ReciboIngresoController::class, 'getIncomeConcept'])->name('reciboIngreso.getIncomeConcept');
@@ -130,8 +129,8 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             ]);
         }
     )->name('ts.reporteQuedan');
-    Route::get('create-quedan-report', [ReporteTesoreriaController::class, 'createQuedanReport'])->name('reporteTesoreria.createQuedanReport');
-    Route::get('create-quedan-report-pdf', [ReporteTesoreriaController::class, 'createQuedanReportPDF'])->name('reporteTesoreria.createQuedanReportPDF');
+    Route::post('create-quedan-report', [ReporteTesoreriaController::class, 'createQuedanReport'])->name('reporteTesoreria.createQuedanReport');
+    Route::post('create-quedan-report-pdf', [ReporteTesoreriaController::class, 'createQuedanReportPDF'])->name('reporteTesoreria.createQuedanReportPDF');
     Route::get('get-selects-report', [ReporteTesoreriaController::class, 'getSelectsReport'])->name('reporteTesoreria.getSelectsReport');
     Route::get(
         '/ts/reporte-facturas',
@@ -142,7 +141,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('ts.reporteFactura');
     Route::get('get-selects-invoice-reporting', [ReporteTesoreriaController::class, 'getSelectsInvoiceReporting'])->name('reporteTesoreria.getSelectsInvoiceReporting');
-    Route::get('create-invoice-report', [ReporteTesoreriaController::class, 'createInvoiceReport'])->name('reporteTesoreria.createInvoiceReport');
+    Route::post('create-invoice-report', [ReporteTesoreriaController::class, 'createInvoiceReport'])->name('reporteTesoreria.createInvoiceReport');
     Route::get(
         '/ts/reporte-retencion-isr',
         function () {
@@ -152,7 +151,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('ts.reporteRetencionISR');
     Route::get('get-selects-withholding-tax-report', [ReporteTesoreriaController::class, 'getSelectsWithholdingTaxReport'])->name('reporteTesoreria.getSelectsWithholdingTaxReport');
-    Route::get('create-income-tax-report', [ReporteTesoreriaController::class, 'createIncomeTaxReport'])->name('reporteTesoreria.createIncomeTaxReport');
+    Route::post('create-income-tax-report', [ReporteTesoreriaController::class, 'createIncomeTaxReport'])->name('reporteTesoreria.createIncomeTaxReport');
     Route::get(
         '/ts/reporte-retencion-iva',
         function () {
@@ -161,7 +160,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             ]);
         }
     )->name('ts.reporteRetencionIVA');
-    Route::get('create-withholding-iva-report', [ReporteTesoreriaController::class, 'createWithholdingIVAReport'])->name('reporteTesoreria.createWithholdingIVAReport');
+    Route::post('create-withholding-iva-report', [ReporteTesoreriaController::class, 'createWithholdingIVAReport'])->name('reporteTesoreria.createWithholdingIVAReport');
     Route::get(
         '/ts/reporte-ingresos',
         function () {
@@ -171,7 +170,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('ts.reporteIngresos');
     Route::get('get-selects-income-report', [ReporteTesoreriaController::class, 'getSelectsIncomeReport'])->name('reporteTesoreria.getSelectsIncomeReport');
-    Route::get('create-income-report', [ReporteTesoreriaController::class, 'createIncomeReport'])->name('reporteTesoreria.createIncomeReport');
+    Route::post('create-income-report', [ReporteTesoreriaController::class, 'createIncomeReport'])->name('reporteTesoreria.createIncomeReport');
     Route::get(
         '/ts/ingresos-diarios',
         function () {
@@ -180,5 +179,5 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             ]);
         }
     )->name('ts.ingresosDiarios');
-    Route::get('get-daily-income-report', [ReporteTesoreriaController::class, 'getDailyIncomeReport'])->name('reporteTesoreria.getDailyIncomeReport');
+    Route::post('get-daily-income-report', [ReporteTesoreriaController::class, 'getDailyIncomeReport'])->name('reporteTesoreria.getDailyIncomeReport');
 });

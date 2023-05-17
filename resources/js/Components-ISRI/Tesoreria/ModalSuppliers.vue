@@ -62,7 +62,7 @@ import moment from 'moment';
                                 <InputError class="mt-2" :message="errosModel.nombre_comercial_proveedor" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="nrc-proveedor" v-model="supplier.nrc_proveedor"
+                                <TextInput :required="false" id="nrc-proveedor" v-model="supplier.nrc_proveedor"
                                     @update:modelValue="typeNrcSupplier()" :value="supplier.nrc_proveedor" type="text"
                                     placeholder="NRC Proveedor">
                                     <LabelToInput icon="personalInformation" forLabel="nrc-proveedor" />
@@ -80,7 +80,7 @@ import moment from 'moment';
                                 <InputError class="mt-2" :message="errosModel.dui_proveedor" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="nit-proveedor" v-model="supplier.nit_proveedor"
+                                <TextInput :required="false" id="nit-proveedor" v-model="supplier.nit_proveedor"
                                     @update:modelValue="typeNitSupplier()" :value="supplier.nit_proveedor" type="text"
                                     placeholder="NIT">
                                     <LabelToInput icon="personalInformation" forLabel="nit-proveedor" />
@@ -134,7 +134,7 @@ import moment from 'moment';
                         </div>
                         <div class="mb-7 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="telefono" v-model="supplier.telefono1_proveedor"
+                                <TextInput :required="false" id="telefono" v-model="supplier.telefono1_proveedor"
                                     :value="supplier.telefono1_proveedor" type="text" placeholder="Telefono"
                                     @update:modelValue="telefonoProveedor()">
                                     <LabelToInput icon="personalPhoneNumber" forLabel="telefono" />
@@ -142,15 +142,15 @@ import moment from 'moment';
                                 <InputError class="mt-2" :message="errosModel.telefono1_proveedor" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="telefono2-proveedor" v-model="supplier.telefono2_proveedor"
+                                <TextInput :required="false" id="telefono2-proveedor" v-model="supplier.telefono2_proveedor"
                                     @update:modelValue="telefono2Proveedor()" :value="supplier.telefono2_proveedor"
-                                    type="text" placeholder="Telefono  (opcionar)">
+                                    type="text" placeholder="Telefono">
                                     <LabelToInput icon="personalPhoneNumber" forLabel="telefono2-proveedor" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errosModel.telefono2_proveedor" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="Direccion" v-model="supplier.direccion_proveedor"
+                                <TextInput :required="false" id="Direccion" v-model="supplier.direccion_proveedor"
                                     :value="supplier.direccion_proveedor" type="tex" placeholder="Direccion">
                                     <LabelToInput icon="house" forLabel="Direccion" />
                                 </TextInput>
@@ -159,7 +159,7 @@ import moment from 'moment';
                         </div>
                         <div class="mb-7 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                                <TextInput id="contacto-proveedor" v-model="supplier.contacto_proveedor"
+                                <TextInput :required="false" id="contacto-proveedor" v-model="supplier.contacto_proveedor"
                                     :value="supplier.contacto_proveedor" type="text" placeholder="Contacto ">
                                     <LabelToInput icon="personalInformation" forLabel="contacto-proveedor" />
                                 </TextInput>
@@ -176,7 +176,7 @@ import moment from 'moment';
                                 <InputError class="mt-2" :message="errosModel.id_municipio" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                                <TextInput id="email-proveedor" v-model="supplier.email_proveedor"
+                                <TextInput :required="false" id="email-proveedor" v-model="supplier.email_proveedor"
                                     :value="supplier.email_proveedor" type="email" placeholder="Email ">
                                     <LabelToInput icon="email" forLabel="email-proveedor" />
                                 </TextInput>
@@ -256,8 +256,16 @@ export default {
                 this.allSelectOptios.typeContribuyent = response.data.typeContribuyent
                 this.allSelectOptios.retention = response.data.retention
                 this.allSelectOptios.giro = response.data.giro
-
-            });
+            })
+                .catch(errors => {
+                    let msg = this.manageError(errors);
+                    this.$swal.fire({
+                        title: "Operación cancelada",
+                        text: msg,
+                        icon: "warning",
+                        timer: 5000,
+                    });
+                });
         },
         telefonoProveedor() {
             var telefono = this.supplier.telefono1_proveedor.replace(/\D/g, '').match(/(\d{0,4})(\d{0,4})/);
@@ -301,9 +309,9 @@ export default {
                             transition: "zoom",
                             toastBackgroundColor: "white",
                         });
-                    }).catch((Error) => {
-                        if (Error.response.status === 422) {
-                            let data = Error.response.data.errors
+                    }).catch((errors) => {
+                        if (errors.response.status === 422) {
+                            let data = errors.response.data.errors
                             var myData = new Object();
                             for (const errorBack in data) {
                                 myData[errorBack] = data[errorBack][0]
@@ -318,6 +326,14 @@ export default {
                             setTimeout(() => {
                                 this.errosModel = {}
                             }, 9000);
+                        } else {
+                            let msg = this.manageError(errors);
+                            this.$swal.fire({
+                                title: "Operación cancelada",
+                                text: msg,
+                                icon: "warning",
+                                timer: 5000,
+                            });
                         }
                     });
                 }
@@ -363,6 +379,14 @@ export default {
                             setTimeout(() => {
                                 this.errosModel = {}
                             }, 9000);
+                        } else {
+                            let msg = this.manageError(Error);
+                            this.$swal.fire({
+                                title: "Operación cancelada",
+                                text: msg,
+                                icon: "warning",
+                                timer: 5000,
+                            });
                         }
                     });
                 }

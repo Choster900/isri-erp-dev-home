@@ -26,7 +26,7 @@ import axios from 'axios';
                     <div class="relative flex h-8 flex-row-reverse">
                         <flat-pickr
                             class="mr-1 peer w-[460px] text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
-                            :config="config" v-model="report_data.start_date" :placeholder="'Seleccione Fecha Inicial'" />
+                            :config="config" v-model="report_data.start_date" :placeholder="'Seleccione Fecha'" />
                         <LabelToInput icon="date" />
                     </div>
                     <InputError v-for="(item, index) in errors.start_date" :key="index" class="mt-2" :message="item" />
@@ -45,7 +45,7 @@ import axios from 'axios';
                 </div>
             </div>
             <div class="mb-4 md:flex flex justify-center">
-                <GeneralButton @click="exportPDF()" color="bg-red-700 hover:bg-red-800" text="PDF" icon="add" />
+                <GeneralButton @click="exportPDF()" color="bg-red-700 hover:bg-red-800" text="PDF" icon="pdf" />
             </div>
         </div>
     </AppLayoutVue>
@@ -104,7 +104,7 @@ export default {
                 code15502: 0,
                 code16304: 0,
             }
-            let array_receipt_numbers=''
+            let array_receipt_numbers = ''
             this.financing_sources.forEach((value, index) => {
                 if (value.value == this.report_data.financing_source_id) {
                     label = value.label
@@ -112,14 +112,12 @@ export default {
             })
             let date
             date = moment(this.report_data.start_date).locale('es').format('dddd D [de] MMMM [de] YYYY').toUpperCase();
-            await axios.get("/get-daily-income-report",{
-                params : this.report_data
-            })
+            await axios.post("/get-daily-income-report",this.report_data)
                 .then((response) => {
+                    console.log(response.data.numeros_recibo);
                     this.errors = []
                     this.daily_income_report = response.data.daily_income_report
                     this.receipt_numbers = response.data.numeros_recibo
-                    console.log(this.receipt_numbers);
 
                     this.daily_income_report.forEach((value, key) => {
                         total_remittance += parseFloat(value.total)
@@ -140,22 +138,13 @@ export default {
                     all_totals.code15502 = all_totals.code15502.toFixed(2);
                     all_totals.code16304 = all_totals.code16304.toFixed(2);
 
-                    this.receipt_numbers.forEach((value,key) => {
-                        if(array_receipt_numbers===''){
-                            array_receipt_numbers = value.numero_recibo_ingreso
-                        }else{
-                            array_receipt_numbers = array_receipt_numbers+', '+value.numero_recibo_ingreso
-                        } 
-                    })
-
-
                     const app = createApp(DailyIncomeReportPDF, {
                         daily_income_report: this.daily_income_report,
                         financing_source: label,
                         date: date,
                         total_remittance: total_remittance,
                         all_totals: all_totals,
-                        array_receipt_numbers: array_receipt_numbers
+                        array_receipt_numbers: this.receipt_numbers[0].numero_recibo_ingreso
                     });
                     const div = document.createElement('div');
                     const pdfPrint = app.mount(div);
@@ -163,11 +152,12 @@ export default {
 
                     //const currentDateTime = new Date().toLocaleString();
                     const currentDateTime = moment().format('DD/MM/YYYY, HH:mm:ss');
+                    let fecha = moment().format('DD-MM-YYYY');
 
                     html2pdf()
                         .set({
                             margin: 0.2,
-                            filename: 'salida.pdf',
+                            filename: 'RPT-INGRESO-DIARIO-'+fecha,
                             image: {
                                 type: 'jpeg',
                                 quality: 0.98
@@ -209,26 +199,6 @@ export default {
                         })
                         .save()
                         .catch(err => console.log(err));
-
-                    // const opt = {
-                    //     margin: 0.2,
-                    //     filename: 'output.pdf',
-                    //     image: { type: 'jpeg', quality: 0.98 },
-                    //     //pagebreak: {mode:'css',before:'page_break'},
-                    //     html2canvas: { scale: 3, useCORS: true },
-                    //     jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' },
-                    // };
-
-                    // const app = createApp(DailyIncomeReportPDF, {
-                    //     daily_income_report: this.daily_income_report,
-                    //     financing_source: label,
-                    //     date: date
-                    // });
-                    // const div = document.createElement('div');
-                    // const pdfPrint = app.mount(div);
-                    // const html = div.outerHTML;
-
-                    // html2pdf().set(opt).from(html).save();
 
                 })
                 .catch((errors) => {

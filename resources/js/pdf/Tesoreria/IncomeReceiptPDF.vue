@@ -16,8 +16,6 @@
                     <p class=" text-[12px] font-bold mt-[20px]">ORIGINAL - INTERESADO</p>
                     <div class=" relative flex flex-row justify-center mt-[25px]">
                         <label for="" class="flex items-center text-[10px] ">NUMERO</label>
-                        <!-- <input type="text" :value="receipt_to_print.numero_recibo_ingreso"
-                            class="font-bold text-center w-[150px] border-b border-black-600 border-opacity-50 border-solid border-0 py-0 text-[12px] text-red-500 mt-[10px]"> -->
                         <div class="ml-1 w-[150px] border-b border-gray-700 text-[11px]">
                             <p class="mb-[5px] font-bold">{{ receipt_to_print.numero_recibo_ingreso }}</p>
                         </div>
@@ -46,8 +44,6 @@
                         <div class="ml-1 text-center w-full border-b border-gray-700 text-[11px] font-bold">
                             <p class="mb-[5px]">{{ fecha_recibo }}</p>
                         </div>
-                        <!-- <input type="text" readonly :value="fecha_recibo"
-                            class="text-[12px] font-bold text-center w-full border-b border-black-600 border-opacity-50 border-solid border-0 py-0"> -->
                     </div>
                 </div>
             </div>
@@ -124,8 +120,6 @@
                                                 <div class="ml-1 text-center w-full text-[10px] font-bold">
                                                     <p class="ml-1 mb-[5px]">{{ empleado }}</p>
                                                 </div>
-                                                <!-- <input type="text" readonly :value="empleado"
-                                                    class="w-full font-bold text-center border-0 py-0 text-[10px]"> -->
                                             </div>
                                         </div>
                                     </div>
@@ -140,7 +134,7 @@
                                     </div>
 
                                     <div class="flex justify-center items-start mb-1 h-[90%]">
-                                        <div class="w-full flex flex-col h-auto">
+                                        <div class="w-full flex flex-col h-1/8">
                                             <div v-for="(detail, index) in receipt_to_print.detalles" :key="index"
                                                 class="relative flex w-full flex-row center-vertically mt-1">
                                                 <div class="font-bold flex items-center text-[10px] w-2/3 mx-4">
@@ -158,11 +152,7 @@
                                                     <div class="text-right w-full text-[10px] font-bold pl-8 py-0">
                                                         <p class="">{{ detail.monto_det_recibo_ingreso }}</p>
                                                     </div>
-                                                    <!-- <input type="text" readonly v-model="detail.monto_det_recibo_ingreso"
-                                                        class="w-full font-bold text-right border-0 text-[10px] pl-8 py-0"> -->
                                                 </div>
-                                                <!-- <input type="text" readonly v-model="detail.monto_det_recibo_ingreso"
-                                                    class="w-1/3 font-bold text-right border-0 py-0 text-sm"> -->
                                             </div>
                                             <div class="flex justify-center items-start mb-1 h-1/4 mt-2">
                                                 <div class="relative flex w-full flex-row">
@@ -177,9 +167,6 @@
                                                             class="border-t border-gray-700 text-right w-full text-[10px] font-bold pl-8 py-0">
                                                             <p class="">{{ receipt_to_print.monto_recibo_ingreso }}</p>
                                                         </div>
-                                                        <!-- <input type="text" readonly
-                                                            v-model="receipt_to_print.monto_recibo_ingreso"
-                                                            class="w-full font-bold text-right border-0 border-t py-0 text-[10px] pl-8"> -->
                                                     </div>
                                                 </div>
                                             </div>
@@ -192,7 +179,7 @@
                 </table>
             </div>
         </div>
-        <div class="border-t-2 border-dashed border-black font-bold">
+        <div class="border-t-2 border-dashed border-black">
             <!-- Contenido para la sección superior aquí -->
             <div class="flex justify-between items-center mt-2">
                 <!-- Encabezado izquierdo  -->
@@ -208,8 +195,6 @@
                     <p class=" text-[12px] font-bold mt-[20px]">COPIA - CONTABILIDAD</p>
                     <div class=" relative flex flex-row justify-center mt-[25px]">
                         <label for="" class="flex items-center text-[10px] ">NUMERO</label>
-                        <!-- <input type="text" :value="receipt_to_print.numero_recibo_ingreso"
-                            class="font-bold text-center w-[150px] border-b border-black-600 border-opacity-50 border-solid border-0 py-0 text-[12px] text-red-500 mt-[10px]"> -->
                         <div class="ml-1 w-[150px] border-b border-gray-700 text-[11px]">
                             <p class="mb-[5px] font-bold">{{ receipt_to_print.numero_recibo_ingreso }}</p>
                         </div>
@@ -238,8 +223,6 @@
                         <div class="ml-1 text-center w-full border-b border-gray-700 text-[11px] font-bold">
                             <p class="mb-[5px]">{{ fecha_recibo }}</p>
                         </div>
-                        <!-- <input type="text" readonly :value="fecha_recibo"
-                            class="text-[12px] font-bold text-center w-full border-b border-black-600 border-opacity-50 border-solid border-0 py-0"> -->
                     </div>
                 </div>
             </div>
@@ -316,8 +299,6 @@
                                                 <div class="ml-1 text-center w-full text-[10px] font-bold">
                                                     <p class="ml-1 mb-[5px]">{{ empleado }}</p>
                                                 </div>
-                                                <!-- <input type="text" readonly :value="empleado"
-                                                    class="w-full font-bold text-center border-0 py-0 text-[10px]"> -->
                                             </div>
                                         </div>
                                     </div>
@@ -350,11 +331,7 @@
                                                     <div class="text-right w-full text-[10px] font-bold pl-8 py-0">
                                                         <p class="">{{ detail.monto_det_recibo_ingreso }}</p>
                                                     </div>
-                                                    <!-- <input type="text" readonly v-model="detail.monto_det_recibo_ingreso"
-                                                        class="w-full font-bold text-right border-0 text-[10px] pl-8 py-0"> -->
                                                 </div>
-                                                <!-- <input type="text" readonly v-model="detail.monto_det_recibo_ingreso"
-                                                    class="w-1/3 font-bold text-right border-0 py-0 text-sm"> -->
                                             </div>
                                             <div class="flex justify-center items-start mb-1 h-1/4 mt-2">
                                                 <div class="relative flex w-full flex-row">
@@ -369,9 +346,6 @@
                                                             class="border-t border-gray-700 text-right w-full text-[10px] font-bold pl-8 py-0">
                                                             <p class="">{{ receipt_to_print.monto_recibo_ingreso }}</p>
                                                         </div>
-                                                        <!-- <input type="text" readonly
-                                                            v-model="receipt_to_print.monto_recibo_ingreso"
-                                                            class="w-full font-bold text-right border-0 border-t py-0 text-[10px] pl-8"> -->
                                                     </div>
                                                 </div>
                                             </div>
@@ -401,8 +375,6 @@
                         <p class=" text-[12px] font-bold mt-[20px]">COPIA - TESORERIA</p>
                         <div class=" relative flex flex-row justify-center mt-[25px]">
                             <label for="" class="flex items-center text-[10px] ">NUMERO</label>
-                            <!-- <input type="text" :value="receipt_to_print.numero_recibo_ingreso"
-                            class="font-bold text-center w-[150px] border-b border-black-600 border-opacity-50 border-solid border-0 py-0 text-[12px] text-red-500 mt-[10px]"> -->
                             <div class="ml-1 w-[150px] border-b border-gray-700 text-[11px]">
                                 <p class="mb-[5px] font-bold">{{ receipt_to_print.numero_recibo_ingreso }}</p>
                             </div>
@@ -431,8 +403,6 @@
                             <div class="ml-1 text-center w-full border-b border-gray-700 text-[11px] font-bold">
                                 <p class="mb-[5px]">{{ fecha_recibo }}</p>
                             </div>
-                            <!-- <input type="text" readonly :value="fecha_recibo"
-                            class="text-[12px] font-bold text-center w-full border-b border-black-600 border-opacity-50 border-solid border-0 py-0"> -->
                         </div>
                     </div>
                 </div>
@@ -512,8 +482,6 @@
                                                     <div class="ml-1 text-center w-full text-[10px] font-bold">
                                                         <p class="ml-1 mb-[5px]">{{ empleado }}</p>
                                                     </div>
-                                                    <!-- <input type="text" readonly :value="empleado"
-                                                    class="w-full font-bold text-center border-0 py-0 text-[10px]"> -->
                                                 </div>
                                             </div>
                                         </div>
@@ -547,11 +515,7 @@
                                                         <div class="text-right w-full text-[10px] font-bold pl-8 py-0">
                                                             <p class="">{{ detail.monto_det_recibo_ingreso }}</p>
                                                         </div>
-                                                        <!-- <input type="text" readonly v-model="detail.monto_det_recibo_ingreso"
-                                                        class="w-full font-bold text-right border-0 text-[10px] pl-8 py-0"> -->
                                                     </div>
-                                                    <!-- <input type="text" readonly v-model="detail.monto_det_recibo_ingreso"
-                                                    class="w-1/3 font-bold text-right border-0 py-0 text-sm"> -->
                                                 </div>
                                                 <div class="flex justify-center items-start mb-1 h-1/4 mt-2">
                                                     <div class="relative flex w-full flex-row">
@@ -566,9 +530,6 @@
                                                                 class="border-t border-gray-700 text-right w-full text-[10px] font-bold pl-8 py-0">
                                                                 <p class="">{{ receipt_to_print.monto_recibo_ingreso }}</p>
                                                             </div>
-                                                            <!-- <input type="text" readonly
-                                                            v-model="receipt_to_print.monto_recibo_ingreso"
-                                                            class="w-full font-bold text-right border-0 border-t py-0 text-[10px] pl-8"> -->
                                                         </div>
                                                     </div>
                                                 </div>
@@ -581,7 +542,7 @@
                     </table>
                 </div>
             </div>
-            <div class="border-t-2 border-dashed border-black font-bold">
+            <div class="border-t-2 border-dashed border-black">
                 <!-- Contenido para la sección superior aquí -->
                 <div class="flex justify-between items-center mt-2">
                     <!-- Encabezado izquierdo  -->
@@ -597,8 +558,6 @@
                         <p class=" text-[12px] font-bold mt-[20px]">COPIA - CENTRO DE ATENCION</p>
                         <div class=" relative flex flex-row justify-center mt-[25px]">
                             <label for="" class="flex items-center text-[10px] ">NUMERO</label>
-                            <!-- <input type="text" :value="receipt_to_print.numero_recibo_ingreso"
-                            class="font-bold text-center w-[150px] border-b border-black-600 border-opacity-50 border-solid border-0 py-0 text-[12px] text-red-500 mt-[10px]"> -->
                             <div class="ml-1 w-[150px] border-b border-gray-700 text-[11px]">
                                 <p class="mb-[5px] font-bold">{{ receipt_to_print.numero_recibo_ingreso }}</p>
                             </div>
@@ -627,8 +586,6 @@
                             <div class="ml-1 text-center w-full border-b border-gray-700 text-[11px] font-bold">
                                 <p class="mb-[5px]">{{ fecha_recibo }}</p>
                             </div>
-                            <!-- <input type="text" readonly :value="fecha_recibo"
-                            class="text-[12px] font-bold text-center w-full border-b border-black-600 border-opacity-50 border-solid border-0 py-0"> -->
                         </div>
                     </div>
                 </div>
@@ -708,8 +665,6 @@
                                                     <div class="ml-1 text-center w-full text-[10px] font-bold">
                                                         <p class="ml-1 mb-[5px]">{{ empleado }}</p>
                                                     </div>
-                                                    <!-- <input type="text" readonly :value="empleado"
-                                                    class="w-full font-bold text-center border-0 py-0 text-[10px]"> -->
                                                 </div>
                                             </div>
                                         </div>
@@ -743,11 +698,7 @@
                                                         <div class="text-right w-full text-[10px] font-bold pl-8 py-0">
                                                             <p class="">{{ detail.monto_det_recibo_ingreso }}</p>
                                                         </div>
-                                                        <!-- <input type="text" readonly v-model="detail.monto_det_recibo_ingreso"
-                                                        class="w-full font-bold text-right border-0 text-[10px] pl-8 py-0"> -->
                                                     </div>
-                                                    <!-- <input type="text" readonly v-model="detail.monto_det_recibo_ingreso"
-                                                    class="w-1/3 font-bold text-right border-0 py-0 text-sm"> -->
                                                 </div>
                                                 <div class="flex justify-center items-start mb-1 h-1/4 mt-2">
                                                     <div class="relative flex w-full flex-row">
@@ -762,9 +713,6 @@
                                                                 class="border-t border-gray-700 text-right w-full text-[10px] font-bold pl-8 py-0">
                                                                 <p class="">{{ receipt_to_print.monto_recibo_ingreso }}</p>
                                                             </div>
-                                                            <!-- <input type="text" readonly
-                                                            v-model="receipt_to_print.monto_recibo_ingreso"
-                                                            class="w-full font-bold text-right border-0 border-t py-0 text-[10px] pl-8"> -->
                                                         </div>
                                                     </div>
                                                 </div>

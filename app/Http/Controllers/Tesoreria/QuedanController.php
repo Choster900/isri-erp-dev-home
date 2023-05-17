@@ -20,6 +20,7 @@ class QuedanController extends Controller
     //
     public function getDataQuedan(Request $request)
     {
+        // Definir las columnas seleccionadas para la consulta
         $v_columns = [
             'id_quedan',
             'id_estado_quedan',
@@ -45,11 +46,13 @@ class QuedanController extends Controller
             'usuario_quedan',
             'ip_quedan',
         ];
-
+        // Obtener los parámetros de la solicitud
         $v_length = $request->input('length');
         $v_column = $request->input('column');
         $v_dir = $request->input('dir');
         $data = $request->input('search');
+
+        // Construir la consulta base con las relaciones
         $v_query = Quedan::select('*')->with([
             "detalle_quedan",
             "tesorero",
@@ -62,18 +65,19 @@ class QuedanController extends Controller
             "proveedor.sujeto_retencion",
         ])->orderBy($v_columns[$v_column], $v_dir);
 
-
+        // Aplicar filtro para requerimientos de número mayor o igual a 2
         if ($request->input("allWithANumberRequest")) {
             $v_query->where("id_estado_quedan", ">=", 2);
         }
 
-
+        // Aplicar filtros de búsqueda
         if ($data) {
             if (isset($data['id_quedan'])) {
                 $v_query->where('id_quedan', 'like', '%' . $data["id_quedan"] . '%');
             }
             $v_query->where('fecha_emision_quedan', 'like', '%' . $data["fecha_emision_quedan"] . '%');
 
+            // Filtro de búsqueda en detalle_quedan
             $searchText = $data["buscar_por_detalle_quedan"];
             $v_query->whereHas('detalle_quedan', function ($query) use ($searchText) {
                 $query->where(function ($query) use ($searchText) {
@@ -103,13 +107,16 @@ class QuedanController extends Controller
                 $v_query->where('id_estado_quedan', 'like', '%' . $data["id_estado_quedan"] . '%');
             }
         }
+        // Ejecutar la consulta paginada
         $v_quedan = $v_query->paginate($v_length)->onEachSide(1);
 
+        // Convertir el monto en letra usando la clase NumeroALetras
         $numbersToLetters = new NumeroALetras();
         $amountLetter = array_map(function ($v_quedan) use ($numbersToLetters) {
             return ['monto_iva_quedan_letter' => $numbersToLetters->toInvoice($v_quedan['monto_iva_quedan'], 2, 'DÓLARES')];
         }, $v_quedan->toArray()['data']);
 
+        // Mapear los resultados para agregar el monto en letra
         $newQuery = $v_quedan->map(function ($item, $key) use ($amountLetter) {
             $item->monto_iva_quedan_letter = $amountLetter[$key]['monto_iva_quedan_letter'];
             return $item;
@@ -122,7 +129,7 @@ class QuedanController extends Controller
             $v_quedan->currentPage(),
             ['path' => url()->current()]
         );
-
+        //retornado la data en un arreglo
         return [
             'data' => $paginator,
             'draw' => $request->input('draw'),
@@ -135,13 +142,13 @@ class QuedanController extends Controller
 
         try {
             DB::beginTransaction();
+            // Insertar el registro de quedan y obtener el ID generado
             $quedan = Quedan::insertGetId([
                 'id_estado_quedan'              => 1,
                 'id_proy_financiado'            => $request->quedan["id_proy_financiado"],
                 'id_prioridad_pago'             => $request->quedan["id_prioridad_pago"],
                 'id_proveedor'                  => $request->quedan["id_proveedor"],
-                'id_serie_retencion_iva'        => 1,
-                //VALOR QUEDAMO POR EL MOMENTO
+                'id_serie_retencion_iva'        => 1, //VALOR QUEDAMO POR EL MOMENTO
                 'id_acuerdo_compra'             => $request->quedan["id_acuerdo_compra"],
                 'numero_acuerdo_quedan'         => $request->quedan["numero_acuerdo_quedan"],
                 'numero_compromiso_ppto_quedan' => $request->quedan["numero_compromiso_ppto_quedan"],
@@ -160,7 +167,7 @@ class QuedanController extends Controller
 
             ]);
 
-
+            // Insertar los registros de detalle_quedan
             foreach ( $detalle_quedan as $key => $value ) {
 
                 if ($value[7]) {
@@ -181,7 +188,7 @@ class QuedanController extends Controller
                     DetalleQuedan::create($new_detalle);
                 }
             }
-
+            // Obtener los datos del quedan con relaciones
             $res = Quedan::select('*')->with([
                 "detalle_quedan",
                 "proveedor.giro",
@@ -205,7 +212,7 @@ class QuedanController extends Controller
 
         try {
             DB::beginTransaction();
-
+            // Actualizar los campos principales del quedan
             Quedan::where("id_quedan", $id_quedan)->update([
                 'id_proveedor'                  => $request->quedan["id_proveedor"],
                 'id_acuerdo_compra'             => $request->quedan["id_acuerdo_compra"],
@@ -225,7 +232,8 @@ class QuedanController extends Controller
 
             foreach ( $detalle_quedan as $key => $value ) {
 
-                if ($value[0] == '') { //validar que exista el detalle a modifica
+                if ($value[0] == '') {
+                    // Actualizar un detalle de quedan existente
                     $new_detalle = array(
                         'numero_factura_det_quedan'   => $value[2],
                         'id_dependencia'              => $value[3],
@@ -240,7 +248,9 @@ class QuedanController extends Controller
                     );
                     DetalleQuedan::where("id_det_quedan", $value[1])->update($new_detalle);
                 }
-                if ($value[0] == 1 && $value[7] !== false) { //al momento de editar puede que agrege filas entonces se valida que la fila sea nueva 
+                if ($value[0] == 1 && $value[7] !== false) {
+                    //Al momento de editar puede que agrege filas entonces se valida que la fila sea nueva 
+                    // Agregar un nuevo detalle_quedan
                     $new_detalle = array(
                         'id_quedan'                   => $id_quedan,
                         'numero_factura_det_quedan'   => $value[2],
@@ -256,7 +266,9 @@ class QuedanController extends Controller
                     );
                     DetalleQuedan::create($new_detalle);
                 }
-                if ($value[7] === false && $value[0] == '') { //validar que la fila sea eliminada
+                if ($value[7] === false && $value[0] == '') {
+                    //validar que la fila sea eliminada
+                    // Eliminar un detalle_quedan
                     $res = DetalleQuedan::find($value[1]);
                     $res->delete();
                 }
@@ -287,8 +299,17 @@ class QuedanController extends Controller
         $v_Proveedor = DB::table('proveedor')
             ->select(
                 'id_proveedor as value',
-                'razon_social_proveedor as label'
-            )->where("estado_proveedor", 1)->get();
+                'razon_social_proveedor as label',
+                'giro.codigo_giro',
+                'giro.nombre_giro',
+                'sujeto_retencion.iva_sujeto_retencion',
+                'sujeto_retencion.isrl_sujeto_retencion',
+            )->join('giro', function ($join) {
+                $join->on('giro.id_giro', '=', 'proveedor.id_giro');
+            })->join('sujeto_retencion', function ($join) {
+            $join->on('sujeto_retencion.id_sujeto_retencion', '=', 'proveedor.id_sujeto_retencion');
+        })->where("estado_proveedor", 1)->get();
+
         $v_Requerimiento = DB::table('requerimiento_pago')
             ->select(
                 'id_requerimiento_pago as value',
@@ -317,13 +338,46 @@ class QuedanController extends Controller
             "proyectoFinanciado"  => $v_Proyecto_finanziado,
         ];
     }
-    public function getSuppliers() //Metodo utilizado al momento de seleccionar proveedor y hacer los calculos 
-    { //se hacen esta peticion por que al no existir el quedan no existen registos previos de la base de datos y no podemos ver a que provedor pertenece
-        return Proveedor::with(['sujeto_retencion', 'giro'])->where("estado_proveedor", 1)->get();
-    }
-
     public function updateFechaRetencionIva(Request $request) //Metodo utilizado al momento de seleccionar proveedor y hacer los calculos 
     { //se hacen esta peticion por que al no existir el quedan no existen registos previos de la base de datos y no podemos ver a que provedor pertenece
         return Quedan::where("id_quedan", $request->id_quedan)->update(["fecha_retencion_iva_quedan" => Carbon::now()]);
     }
+    public function getAmountBySupplierPerMonth(Request $request)
+    {
+        // Obtener el mes actual
+        $mesActual = Carbon::now()->format('m');
+        $resultado = [];
+
+        // Obtener proveedores con quedans del mes actual
+        $proveedores = Proveedor::with([
+            'quedan' => function ($query) use ($mesActual) {
+                $query->whereMonth('fecha_emision_quedan', $mesActual);
+            }
+        ])->get()->filter(function ($proveedor) {
+            // Filtrar proveedores con quedans no vacíos
+            return $proveedor->quedan->isNotEmpty();
+        });
+        foreach ( $proveedores as $proveedor ) {
+            // Mapear quedans con detalles para el proveedor actual
+            $quedan_con_detalle = $proveedor->quedan->map(function ($quedan) {
+                return [
+                    'id_quedan'          => $quedan->id_quedan,
+                    'monto_total_quedan' => $quedan->monto_total_quedan,
+                ];
+            });
+            // Calcular el total mensual para el proveedor actual
+            $total_mensual = $proveedor->quedan->sum('monto_total_quedan');
+            // Crear un arreglo con los datos del proveedor actual
+            $proveedor_arr = [
+                'id_proveedor'  => $proveedor->id_proveedor,
+                'razon_social'  => $proveedor->razon_social_proveedor,
+                'quedan'        => $quedan_con_detalle,
+                'total_mensual' => $total_mensual,
+            ];
+            // Agregar el arreglo del proveedor al resultado
+            array_push($resultado, $proveedor_arr);
+        }
+        return $resultado;
+    }
+
 }
