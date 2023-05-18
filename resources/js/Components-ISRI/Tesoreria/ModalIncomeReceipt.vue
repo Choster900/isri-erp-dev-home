@@ -9,8 +9,8 @@ import axios from "axios";
 
 <template>
     <div class="m-1.5">
-        <ModalBasicVue :modalOpen="show_modal_receipt"
-            :title="'Administración de recibos de ingreso. '" maxWidth="4xl" @close-modal="$emit('cerrar-modal')">
+        <ModalBasicVue :modalOpen="show_modal_receipt" :title="'Administración de recibos de ingreso. '" maxWidth="4xl"
+            @close-modal="$emit('cerrar-modal')">
             <div class="px-5 py-8">
                 <div class="space-y-2">
                     <div class="mb-2" id="app">
@@ -50,6 +50,7 @@ import axios from "axios";
                                 </div>
                                 <InputError v-for="(item, index) in errors.financing_source_id" :key="index" class="mt-2"
                                     :message="item" />
+                                <InputError class="mt-2" :message="custom_error" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
@@ -217,6 +218,9 @@ export default {
     created() { },
     data: function (data) {
         return {
+            //mensaje de error temporal
+            custom_error: '',
+            
             receipt_id: '',
             income_concept_select: [],
             budget_account_id: '',
@@ -224,7 +228,7 @@ export default {
             budget_select: false,
             financing_select: true,
             income_receipt: {
-                financing_source_id:'',
+                financing_source_id: '',
                 treasury_clerk_id: '',
                 income_receipt_id: '',
                 total: '',
@@ -241,16 +245,16 @@ export default {
         addRow() {
             this.income_receipt.income_detail.push({ detail_id: '', income_concept_id: '', amount: '', deleted: false });
         },
-        selectBudgetAccount(budget_account_id){
+        selectBudgetAccount(budget_account_id) {
             this.budget_select = true
             this.financing_select = false
             //this.getIncomeConcept()
         },
-        selectFinancingSource(financing_source_id){
+        selectFinancingSource(financing_source_id) {
             this.financing_select = true
             this.getNewIncomeConcept()
         },
-        getNewIncomeConcept(){
+        getNewIncomeConcept() {
             this.income_concept_select = []
             this.income_concepts.forEach((value, index) => {
                 if (value.id_ccta_presupuestal == this.income_receipt.budget_account_id && value.id_proy_financiado == this.income_receipt.financing_source_id) {
@@ -258,6 +262,9 @@ export default {
                     this.income_concept_select.push(array)
                 }
             })
+            if (this.income_concept_select == '') {
+                this.custom_error = 'No se encuentran registros, cierre la ventana e intente de nuevo'
+            }
         },
         deleteRow(index, concept_id, detail_id) {
 
@@ -461,6 +468,9 @@ export default {
     watch: {
         show_modal_receipt: function (value, oldValue) {
             if (value) {
+                //mensaje de error temporal
+                this.custom_error = ''
+
                 this.income_concept_select = []
                 this.errors = []
                 this.income_receipt.income_receipt_id = this.modal_data.id_recibo_ingreso;
