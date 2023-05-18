@@ -179,7 +179,7 @@ import axios from 'axios';
         </div>
 
         <ModalIncomeReceiptVue :show_modal_receipt="show_modal_receipt" :modal_data="modal_data"
-            :financing_sources="financing_sources" :budget_accounts="budget_accounts" :income_concepts="income_concepts"
+            :budget_accounts="budget_accounts" :income_concepts="income_concepts"
             :treasury_clerk="treasury_clerk" @cerrar-modal="show_modal_receipt = false"
             @get-table="getIncomeReceipts(tableData.currentPage)" />
 
@@ -271,7 +271,7 @@ export default {
                     this.budget_accounts = response.data.budget_accounts
                     this.income_concepts = response.data.income_concepts
                     this.treasury_clerk = response.data.treasury_clerk
-                    this.financing_sources = response.data.financing_sources
+                    //this.financing_sources = response.data.financing_sources
                 })
                 .catch((errors) => {
                     let msg = this.manageError(errors);

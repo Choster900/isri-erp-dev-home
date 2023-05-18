@@ -9,8 +9,8 @@ import axios from "axios";
 
 <template>
     <div class="m-1.5">
-        <ModalBasicVue :modalOpen="show_modal_receipt"
-            :title="'Administración de recibos de ingreso. '" maxWidth="4xl" @close-modal="$emit('cerrar-modal')">
+        <ModalBasicVue :modalOpen="show_modal_receipt" :title="'Administración de recibos de ingreso. '" maxWidth="4xl"
+            @close-modal="$emit('cerrar-modal')">
             <div class="px-5 py-8">
                 <div class="space-y-2">
                     <div class="mb-2" id="app">
@@ -29,7 +29,8 @@ import axios from "axios";
                                 </label>
                                 <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                                     <Multiselect v-model="income_receipt.budget_account_id" :options="budget_accounts"
-                                        :disabled="budget_select" @select="selectBudgetAccount($event)"
+                                        :disabled="budget_select"
+                                        @input="selectBudgetAccount($event, income_receipt.budget_account_id)"
                                         placeholder="Seleccione Especifico" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
@@ -44,7 +45,7 @@ import axios from "axios";
                                 </label>
                                 <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                                     <Multiselect v-model="income_receipt.financing_source_id" :options="financing_sources"
-                                        :disabled="financing_select" @select="selectFinancingSource($event)"
+                                        :disabled="financing_select" @change="selectFinancingSource($event)"
                                         placeholder="Seleccione Financiamiento" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
@@ -209,22 +210,23 @@ export default {
             type: Array,
             default: []
         },
-        financing_sources: {
-            type: Array,
-            default: []
-        }
+        // financing_sources: {
+        //     type: Array,
+        //     default: []
+        // }
     },
     created() { },
     data: function (data) {
         return {
+            financing_sources: [],
             receipt_id: '',
             income_concept_select: [],
             budget_account_id: '',
             errors: [],
             budget_select: false,
-            financing_select: true,
+            financing_select: false,
             income_receipt: {
-                financing_source_id:'',
+                financing_source_id: '',
                 treasury_clerk_id: '',
                 income_receipt_id: '',
                 total: '',
@@ -241,26 +243,71 @@ export default {
         addRow() {
             this.income_receipt.income_detail.push({ detail_id: '', income_concept_id: '', amount: '', deleted: false });
         },
-        selectBudgetAccount(budget_account_id){
-            this.budget_select = true
-            this.financing_select = false
-            //this.getIncomeConcept()
+        clearDetails() {
+            //console.log('antes de deleted = true',this.income_receipt.income_detail);
+            // this.income_receipt.income_detail.forEach((value,index) => {
+            //     value.deleted=true
+            // })
+            //console.log('despues de deleted = true',this.income_receipt.income_detail);
+            //this.income_receipt.income_detail = []
+            var array = { detail_id: '', income_concept_id: '', amount: '', deleted: false }
+            this.income_receipt.income_detail.push(array)
         },
-        selectFinancingSource(financing_source_id){
-            this.financing_select = true
-            this.getNewIncomeConcept()
+        clearDetailSelectionsAndTotal() {
+            //limpiando valores de detalles
+            this.clearDetails()
+            this.updateTotal()
         },
-        getNewIncomeConcept(){
-            this.income_concept_select = []
-            this.income_concepts.forEach((value, index) => {
-                if (value.id_ccta_presupuestal == this.income_receipt.budget_account_id && value.id_proy_financiado == this.income_receipt.financing_source_id) {
-                    var array = { value: value.value, label: value.label, disabled: false }
-                    this.income_concept_select.push(array)
+        getFinanceSource(new_selection) {
+            axios.get("/get-select-financing-source", { params: { budget_account_id: new_selection } })
+                .then((response) => {
+                    this.financing_sources = response.data.financing_sources
+                })
+                .catch((errors) => {
+                    let msg = this.manageError(errors);
+                    this.$swal.fire({
+                        title: "Operación cancelada",
+                        text: msg,
+                        icon: "warning",
+                        timer: 5000,
+                    });
+                    this.$emit("cerrar-modal");
+                });
+        },
+        selectBudgetAccount(new_selection, old_selection) {
+            //Nueva seleccion
+            console.log(new_selection, old_selection);
+            if (new_selection != null && old_selection == null) {
+                this.clearDetailSelectionsAndTotal()
+                //Limpiando select de concept de ingresos
+                this.income_concept_select = []
+                this.getFinanceSource(new_selection)
+            } else {
+                //Cambio de seleccion
+                if (new_selection != null && old_selection != null) {
+                    this.clearDetailSelectionsAndTotal()
+                    //Limpiando select de concepto de ingresos
+                    this.income_concept_select = []
+                    //Limpiando select de fuente de financiamiento y seleccion
+                    this.financing_sources = []
+                    this.income_receipt.financing_source_id = ''
+                    this.getFinanceSource(new_selection)
+                } else {
+                    this.financing_sources = []
+                    this.income_receipt.financing_source_id = ''
                 }
-            })
+            }
+        },
+        selectFinancingSource(new_selection) {
+            if (this.modal_data == '') {
+                this.clearDetailSelectionsAndTotal()
+                this.getIncomeConcept(new_selection)
+            }else{
+                this.income_concept_select = []
+                this.getIncomeConcept(new_selection)
+            }
         },
         deleteRow(index, concept_id, detail_id) {
-
             this.$swal.fire({
                 title: 'Eliminar concepto de ingreso.',
                 text: "¿Estas seguro?",
@@ -307,25 +354,6 @@ export default {
                 }
             }
             this.income_receipt.total = sum.toFixed(2);
-        },
-        getIncomeConcept(budget_account_id, details) {
-            this.budget_select = true
-            this.income_concept_select = []
-            this.income_concepts.forEach((value, index) => {
-                if (value.id_ccta_presupuestal == budget_account_id) {
-                    var array = { value: value.value, label: value.label, disabled: false }
-                    this.income_concept_select.push(array)
-                }
-            })
-            if (details) {
-                this.income_concept_select.forEach((value, index) => {
-                    details.forEach((value2, index2) => {
-                        if (value.value == value2.id_concepto_ingreso) {
-                            value.disabled = true
-                        }
-                    })
-                })
-            }
         },
         selectConcept(newSelection, oldSelection) {
             if (newSelection == null) {
@@ -456,6 +484,36 @@ export default {
                             });
                     }
                 });
+        },
+        getAndSetDetails(details) {
+            console.log('sfew');
+            if (details) {
+                this.income_concept_select.forEach((value, index) => {
+                    details.forEach((value2, index2) => {
+                        if (value.value == value2.income_concept_id && value2.deleted == true) {
+                            value.disabled = false
+                        }
+                    })
+                })
+            }
+        },
+        getIncomeConcept(new_selection){
+            // console.log('si entra');
+            axios.get("/get-select-income-concept", { params: { financing_source_id: new_selection, budget_account_id: this.income_receipt.budget_account_id } })
+                .then((response) => {
+                    this.income_concept_select = response.data.income_concept_select
+                    this.getAndSetDetails(this.income_receipt.income_detail)
+                })
+                .catch((errors) => {
+                    let msg = this.manageError(errors);
+                    this.$swal.fire({
+                        title: "Operación cancelada",
+                        text: msg,
+                        icon: "warning",
+                        timer: 5000,
+                    });
+                    this.$emit("cerrar-modal");
+                });
         }
     },
     watch: {
@@ -467,32 +525,56 @@ export default {
                 this.income_receipt.total = '';
                 this.income_receipt.financing_source_id = '';
                 this.income_receipt.budget_account_id = this.modal_data.id_ccta_presupuestal
+                this.income_receipt.financing_source_id = this.modal_data.id_proy_financiado
                 this.income_receipt.treasury_clerk_id = this.modal_data.id_empleado_tesoreria
                 this.income_receipt.direction = this.modal_data.direccion_cliente_recibo_ingreso
                 this.income_receipt.document = this.modal_data.doc_identidad_recibo_ingreso
                 this.income_receipt.client = this.modal_data.cliente_recibo_ingreso
                 this.income_receipt.description = this.modal_data.descripcion_recibo_ingreso
                 this.income_receipt.income_detail = []
-                if (this.modal_data.detalles) {
-                    this.income_receipt.financing_source_id = this.modal_data.detalles[0].concepto_ingreso.id_proy_financiado
+
+                if (this.modal_data != '') {
+                    console.log('entra al modal data');
+                    //Define default values for financing source select
+                    this.financing_sources = []
+                    var sources_array = { value: this.modal_data.proyecto_financiado.id_proy_financiado, label: this.modal_data.proyecto_financiado.nombre_proy_financiado, selected: true }
+                    this.financing_sources.push(sources_array)
+                    this.selectFinancingSource(this.modal_data.proyecto_financiado.id_proy_financiado)
+
                     this.modal_data.detalles.forEach((value, index) => {
-                        var array = { detail_id: value.id_det_recibo_ingreso, income_concept_id: value.id_concepto_ingreso, amount: value.monto_det_recibo_ingreso, deleted: false }
-                        this.income_receipt.income_detail.push(array)
+                        if(value.estado_det_recibo_ingreso==1){
+                            var array = { nombre_concepto: value.concepto_ingreso.nombre_concepto_ingreso,detail_id: value.id_det_recibo_ingreso, income_concept_id: value.id_concepto_ingreso, amount: value.monto_det_recibo_ingreso, deleted: false }
+                            this.income_receipt.income_detail.push(array)
+                        }else{
+                            var array = { nombre_concepto: value.concepto_ingreso.nombre_concepto_ingreso,detail_id: value.id_det_recibo_ingreso, income_concept_id: value.id_concepto_ingreso, amount: value.monto_det_recibo_ingreso, deleted: true }
+                            this.income_receipt.income_detail.push(array)
+                        }
                     })
-                } else {
-                    var array = { detail_id: '', income_concept_id: '', amount: '', deleted: false }
-                    this.income_receipt.income_detail.push(array)
+                }else{
+                    this.income_receipt.income_detail = []
+                    console.log(this.income_receipt.income_detail);
+                    this.clearDetails()
                 }
+                // if (this.modal_data.detalles) {
+                //     this.modal_data.detalles.forEach((value, index) => {
+                //         var array = { detail_id: value.id_det_recibo_ingreso, income_concept_id: value.id_concepto_ingreso, amount: value.monto_det_recibo_ingreso, deleted: false }
+                //         this.income_receipt.income_detail.push(array)
+                //     })
+                // } else {
+                //     this.clearDetails()
+                // }
                 this.updateTotal()
-                if (this.modal_data.id_recibo_ingreso) {
-                    this.getIncomeConcept(this.modal_data.id_ccta_presupuestal, this.modal_data.detalles)
-                } else {
-                    this.budget_select = false
-                }
             }
         },
     },
     computed: {
+        atributoWatch() {
+            if (this.income_receipt.budget_account_id === "") {
+                this.financing_sources = []; // Establecer el array de opciones en vacío
+                this.income_receipt.financing_source_id = ""; // Establecer el valor en vacío
+            }
+            return this.income_receipt.financing_source_id;
+        },
         active_details() {
             return this.income_receipt.income_detail.filter((detail) => detail.deleted == false)
         },

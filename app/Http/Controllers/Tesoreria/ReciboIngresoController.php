@@ -30,6 +30,7 @@ class ReciboIngresoController extends Controller
             ->with('detalles')
             ->with('detalles.concepto_ingreso.dependencia')
             ->with('cuenta_presupuestal')
+            ->with('proyecto_financiado')
             ->with('empleado_tesoreria')
             ->orderBy($columns[$column], $dir);
         if ($search_value) {
@@ -44,7 +45,7 @@ class ReciboIngresoController extends Controller
         $income_receipt = $query->paginate($length)->onEachSide(1);
 
         $numeroLetras = new NumeroALetras();
-        $monto_letras = array_map(function($income_receipt) use($numeroLetras) {
+        $monto_letras = array_map(function ($income_receipt) use ($numeroLetras) {
             return ['monto_letras' => $numeroLetras->toInvoice($income_receipt['monto_recibo_ingreso'], 2, 'DÓLARES')];
         }, $income_receipt->toArray()['data']);
         $query_con_monto_letras = $income_receipt->map(function ($item, $key) use ($monto_letras) {
@@ -81,22 +82,40 @@ class ReciboIngresoController extends Controller
         $budget_accounts = CuentaPresupuestal::selectRaw("id_ccta_presupuestal as value , concat(id_ccta_presupuestal, ' - ', nombre_ccta_presupuestal) as label")
             ->where('tesoreria_ccta_presupuestal', '=', 1)
             ->where('estado_ccta_presupuestal', '=', 1)
-            ->orderBy('nombre_ccta_presupuestal')
-            ->get();
-        $income_concepts = ConceptoIngreso::selectRaw("id_concepto_ingreso as value , concat(coalesce(codigo_dependencia, ''), ' - ', nombre_concepto_ingreso) as label, id_ccta_presupuestal, id_proy_financiado")
-            ->leftJoin('dependencia', function ($join) {
-                $join->on('concepto_ingreso.id_dependencia', '=', 'dependencia.id_dependencia');
+            ->whereHas('conceptos_ingreso', function ($query) use ($request) {
+                $query->where('estado_concepto_ingreso', 1);
             })
-            ->where('estado_concepto_ingreso', '=', 1)
+            ->orderBy('nombre_ccta_presupuestal')
             ->get();
         $treasury_clerk = DB::table('empleado_tesoreria')
             ->select('id_empleado_tesoreria as value', 'nombre_empleado_tesoreria as label')
             ->get();
-        $financing_sources = ProyectoFinanciado::select('id_proy_financiado as value','nombre_proy_financiado as label')
-            ->where('estado_proy_financiado','=',1)
-            ->orderBy('nombre_proy_financiado')
+
+        return ['budget_accounts' => $budget_accounts,'treasury_clerk' => $treasury_clerk];
+    }
+
+    public function getSelectFinancingSource(Request $request)
+    {
+        $financing_sources = ProyectoFinanciado::selectRaw('id_proy_financiado as value, nombre_proy_financiado as label')
+            ->whereHas('conceptos_ingreso', function ($query) use ($request) {
+                $query->where('id_ccta_presupuestal', $request->budget_account_id)
+                      ->where('estado_concepto_ingreso', 1);
+            })
             ->get();
-        return ['budget_accounts' => $budget_accounts, 'income_concepts' => $income_concepts, 'treasury_clerk' => $treasury_clerk,'financing_sources' => $financing_sources];
+        return ['financing_sources' => $financing_sources];
+    }
+
+    public function getSelectIncomeConcept(Request $request)
+    {
+        $income_concept_select = ConceptoIngreso::selectRaw("concepto_ingreso.id_concepto_ingreso as value , concat(coalesce(concat(dependencia.codigo_dependencia,' - '), ''), concepto_ingreso.nombre_concepto_ingreso) as label")
+            ->leftJoin('dependencia', function ($join) {
+                $join->on('concepto_ingreso.id_dependencia', '=', 'dependencia.id_dependencia');
+            })
+            ->where('concepto_ingreso.estado_concepto_ingreso', '=', 1)
+            ->where('concepto_ingreso.id_proy_financiado', '=', $request->financing_source_id)
+            ->where('concepto_ingreso.id_ccta_presupuestal', '=', $request->budget_account_id)
+            ->get();
+        return ['income_concept_select' => $income_concept_select];
     }
 
     public function saveIncomeReceipt(IncomeReceiptRequest $request)
@@ -113,6 +132,7 @@ class ReciboIngresoController extends Controller
 
         $new_income_receipt = new ReciboIngreso([
             'id_ccta_presupuestal' => $request->budget_account_id,
+            'id_proy_financiado' => $request->financing_source_id,
             'id_empleado_tesoreria' => $request->treasury_clerk_id,
             'cliente_recibo_ingreso' => $request->client,
             'descripcion_recibo_ingreso' => $request->description,

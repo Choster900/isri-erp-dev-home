@@ -15,6 +15,7 @@ class ReciboIngreso extends Model
 
     protected $fillable = [
         'id_ctrl_ingreso',
+        'id_proy_financiado',
         'id_ccta_presupuestal',
         'id_empleado_tesoreria',
         'fecha_recibo_ingreso',
@@ -33,13 +34,17 @@ class ReciboIngreso extends Model
 
     public function detalles()
     {
-        return $this->hasMany('App\Models\DetalleReciboIngreso','id_recibo_ingreso','id_recibo_ingreso')
-                    ->where('estado_det_recibo_ingreso', 1);
+        return $this->hasMany('App\Models\DetalleReciboIngreso','id_recibo_ingreso','id_recibo_ingreso');
     }
 
     public function cuenta_presupuestal()
     {
         return $this->belongsTo('App\Models\CuentaPresupuestal','id_ccta_presupuestal','id_ccta_presupuestal');
+    }
+
+    public function proyecto_financiado()
+    {
+        return $this->belongsTo('App\Models\ProyectoFinanciado','id_proy_financiado','id_proy_financiado');
     }
 
     public function empleado_tesoreria()
