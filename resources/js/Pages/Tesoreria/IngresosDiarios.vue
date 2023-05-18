@@ -23,7 +23,7 @@ import axios from 'axios';
                     <label class="block mb-2 text-xs font-light text-gray-600">
                         Fecha <span class="text-red-600 font-extrabold">*</span>
                     </label>
-                    <div class="relative flex h-8 flex-row-reverse">
+                    <div class="relative md:w-auto flex h-8 flex-row-reverse">
                         <flat-pickr
                             class="mr-1 peer w-[460px] text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
                             :config="config" v-model="report_data.start_date" :placeholder="'Seleccione Fecha'" />
@@ -75,7 +75,7 @@ export default {
                 altInput: true,
                 static: true,
                 monthSelectorType: 'static',
-                altFormat: "F-j Y",
+                altFormat: "d/m/Y",
                 dateFormat: "Y-m-d",
                 locale: {
                     firstDayOfWeek: 1,

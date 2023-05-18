@@ -287,7 +287,7 @@ class QuedanController extends Controller
         $v_Dependencias = DB::table('dependencia')
             ->select(
                 'id_dependencia as value',
-                'nombre_dependencia as label'
+                DB::raw("CONCAT(' - ',codigo_dependencia) AS label")
             )->whereNull('dep_id_dependencia')->get();
 
         $v_AcuerdoCompra = DB::table('acuerdo_compra')

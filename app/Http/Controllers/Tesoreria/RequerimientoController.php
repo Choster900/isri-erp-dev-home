@@ -31,7 +31,7 @@ class RequerimientoController extends Controller
         $v_query = RequerimientoPago::select("*")->with(["Quedan", "Quedan.liquidacion_quedan", "Quedan.proveedor"])
             ->orderBy($v_columns[$v_column], $v_dir);
 
-        if ($data) { //FIXME: la consulta no trae requerimientos que tengan la descripcion_requerimiento_pago vacia
+        if ($data) {
             $v_query->where('id_requerimiento_pago', 'like', '%' . $data["id_requerimiento_pago"] . '%')
                 ->where('numero_requerimiento_pago', 'like', '%' . $data["numero_requerimiento_pago"] . '%');
 
