@@ -23,8 +23,9 @@ import MenuSidebarVue from '@/Components-ISRI/SidebarComponents/MenuSidebar.vue'
                         </svg>
                     </button>
 
-                    <h1 class="font-semibold text-xl text-slate-800 pt-1">
-                        {{ $page.props.menu ? $page.props.menu.sistema : '' }}
+                    <h1 class="font-semibold text-base text-slate-800 pt-1">
+
+                        <span id="text-submodule">{{ nameSubModule }}</span>
                     </h1>
                 </div>
 
@@ -78,5 +79,11 @@ export default {
         Notifications,
         Help
     },
+    props: {
+        nameSubModule: {//prop muestra estado del modal para abrir y cerrar
+            type: String,
+            required: true,
+        }
+    }
 }
 </script>

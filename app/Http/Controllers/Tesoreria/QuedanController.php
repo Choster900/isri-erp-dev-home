@@ -148,7 +148,8 @@ class QuedanController extends Controller
                 'id_proy_financiado'            => $request->quedan["id_proy_financiado"],
                 'id_prioridad_pago'             => $request->quedan["id_prioridad_pago"],
                 'id_proveedor'                  => $request->quedan["id_proveedor"],
-                'id_serie_retencion_iva'        => 1, //VALOR QUEDAMO POR EL MOMENTO
+                'id_serie_retencion_iva'        => 1,
+                //VALOR QUEDAMO POR EL MOMENTO
                 'id_acuerdo_compra'             => $request->quedan["id_acuerdo_compra"],
                 'numero_acuerdo_quedan'         => $request->quedan["numero_acuerdo_quedan"],
                 'numero_compromiso_ppto_quedan' => $request->quedan["numero_compromiso_ppto_quedan"],
@@ -287,7 +288,7 @@ class QuedanController extends Controller
         $v_Dependencias = DB::table('dependencia')
             ->select(
                 'id_dependencia as value',
-                'nombre_dependencia as label'
+                DB::raw("CONCAT(' - ',codigo_dependencia) AS label")
             )->whereNull('dep_id_dependencia')->get();
 
         $v_AcuerdoCompra = DB::table('acuerdo_compra')

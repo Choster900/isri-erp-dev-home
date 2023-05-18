@@ -35,7 +35,7 @@
                 <LinksSidebar v-for="(m, i) in modulo.submenu" :key="i" :infoModule="m" @coindiciendoRuta="currenPath" />
             </ul>
         </div>
-</li>
+    </li>
 </template>
 
 <script>
@@ -67,6 +67,14 @@ export default {
             this.stateToMenu = false
         }
     },
+    watch: {
+        StateFromModal: function () {
+            if (this.matchPath) {
+                this.StateFromModal ? this.stateToMenu = false : this.stateToMenu = true
+            }
+            
+        }
+    }
 }
 </script>
 
