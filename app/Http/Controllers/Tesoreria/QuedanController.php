@@ -148,8 +148,7 @@ class QuedanController extends Controller
                 'id_proy_financiado'            => $request->quedan["id_proy_financiado"],
                 'id_prioridad_pago'             => $request->quedan["id_prioridad_pago"],
                 'id_proveedor'                  => $request->quedan["id_proveedor"],
-                'id_serie_retencion_iva'        => 1,
-                //VALOR QUEDAMO POR EL MOMENTO
+                'id_serie_retencion_iva'        => 1, //VALOR QUEDAMO POR EL MOMENTO
                 'id_acuerdo_compra'             => $request->quedan["id_acuerdo_compra"],
                 'numero_acuerdo_quedan'         => $request->quedan["numero_acuerdo_quedan"],
                 'numero_compromiso_ppto_quedan' => $request->quedan["numero_compromiso_ppto_quedan"],
