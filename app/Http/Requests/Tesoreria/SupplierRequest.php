@@ -32,17 +32,12 @@ class SupplierRequest extends FormRequest
             'razon_social_proveedor'     => ['required'],
             'nombre_comercial_proveedor' => ['required'],
             'dui_proveedor' => [
+                'required',
                 new DuiValidationRule,
-                'unique:proveedor,dui_proveedor,' . $request->input("id_proveedor") . ',id_proveedor',
-                function ($attribute, $value, $fail) use ($request) {
-                    $nit_proveedor = $request->input('nit_proveedor');
-            
-                    if (empty($value) && empty($nit_proveedor)) {
-                        $fail(__('Debe ingresar DUI o NIT.'));
-                    }
-                },
+                'unique:proveedor,dui_proveedor,' . $request->input("id_proveedor") . ',id_proveedor'
             ],
             'nit_proveedor' => [
+                'nullable',
                 'unique:proveedor,nit_proveedor,' . $request->input("id_proveedor") . ',id_proveedor',
             ],
             'id_tipo_contribuyente'      => ['required'],
@@ -57,6 +52,7 @@ class SupplierRequest extends FormRequest
         return [
             'razon_social_proveedor.required'     => 'El campo Razon social es requerido',
             'nombre_comercial_proveedor.required' => 'El campo Nombre comercial es requerido',
+            'dui_proveedor.required'              => 'El campo DUI es requerido',
             'dui_proveedor.unique'                => 'El formato del correspondiente Dui son correctos pero ya exite',
             'nit_proveedor.unique'                => 'El formato del correspondiente Nit son correctos pero ya exite',
             'id_tipo_contribuyente.required'      => 'El campo tipo de contribuyente es requerido',
