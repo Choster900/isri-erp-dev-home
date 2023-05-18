@@ -8,7 +8,7 @@ import axios from 'axios';
 </script>
 <template>
     <Head title="Proceso - Liquidacion" />
-    <AppLayoutVue>
+    <AppLayoutVue nameSubModule="Tesoreria - Liquidación de Requerimientos">
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
             <!-- TODO: Improve view table - this is temporal and doesn't mean is permanent -->
             <header class="px-5 py-4">

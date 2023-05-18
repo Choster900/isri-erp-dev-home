@@ -16,7 +16,7 @@ import axios from 'axios';
 
 <template>
   <Head title="Catalogo - Conceptos" />
-  <AppLayoutVue>
+  <AppLayoutVue nameSubModule="Tesoreria - Conceptos de Ingreso">
     <div class="sm:flex sm:justify-end sm:items-center mb-2">
       <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
         <GeneralButton @click="addIncomeConcept()" v-if="permits.insertar == 1" color="bg-green-700  hover:bg-green-800"
