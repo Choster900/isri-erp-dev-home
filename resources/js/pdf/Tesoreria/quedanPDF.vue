@@ -7,8 +7,9 @@
             <h3 style class="text-[15pt] font-semibold text-center">
                 INSTITUTO SALVADOREÑO DE REHABILITACIÓN INTEGRAL
             </h3>
-            <br>
+            
             <div style class="text-center">
+                Original - Contabilidad
             </div>
         </div>
         <div class="md:mb-0 basis-1/4 pr-2">
@@ -176,7 +177,7 @@
         </table>
         <table>
             <tr>
-                <td class="text-[11pt] font-bold">SAN SALVADOIR</td>
+                <td class="text-[11pt] font-bold">SAN SALVADOR</td>
                 <td class="border border-b-black border-x-transparent border-t-transparent w-[100px]">
                     <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
                         <span style="font-family:  Arial, Helvetica, sans-serif;">{{
@@ -218,12 +219,11 @@
                 <tr>
                     <td class="h-5"></td>
                     <td class=" w-[225px] text-center">
-                        <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt] font-semibold">TESORERO INSTITUCIONAL
+                        <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt] font-semibold">TESORERO INSTITUCIONAL 
                         </div>
                     </td>
                 </tr>
             </table>
-
         </div>
 
     </div>
@@ -235,8 +235,8 @@
             <h3 style class="text-[15pt] font-semibold text-center">
                 INSTITUTO SALVADOREÑO DE REHABILITACIÓN INTEGRAL
             </h3>
-            <br>
             <div style class="text-center">
+                Copia - Proveedor/Cliente
             </div>
         </div>
         <div class="md:mb-0 basis-1/4 pr-2">
@@ -451,7 +451,6 @@
                     </td>
                 </tr>
             </table>
-
         </div>
 
     </div>
@@ -488,5 +487,30 @@ export default {
 /* Estilos del componente */
 * {
     font-family: Georgia, "Times New Roman", Times, serif;
+}
+
+.error {
+    background-color: rgb(203, 56, 56) !important;
+}
+
+.error2 {
+    background-color: rgb(191, 141, 15) !important;
+}
+
+.checkbox {
+    display: flex;
+    align-items: center;
+}
+
+.checkbox-icon {
+    display: inline-block;
+    width: 0.75rem;
+    height: 0.75rem;
+    margin-right: 0.5rem;
+    border-color: black;
+}
+
+.checkbox-label {
+    font-size: 0.75rem;
 }
 </style>

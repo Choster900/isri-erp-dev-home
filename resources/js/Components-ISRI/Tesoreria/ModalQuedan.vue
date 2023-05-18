@@ -40,8 +40,10 @@ import html2pdf from 'html2pdf.js'
                     </div>
 
                     <button type="button" @click="addRow()"
+                        :class="rowsData.filter((e) => e[7] === true).length === 7 ? 'cursor-not-allowed' : ''"
                         style="float: right;margin-right:-4px;margin-top:399px; font-size: 30px; padding: 0 10px; border: 0; background-color: transparent;">
-                        <span type="button" data-toggle="tooltip" data-placement="right" title="AGREGAR FACTURA">
+                        <span type="button" data-toggle="tooltip" data-placement="right"
+                            :title="rowsData.length === 7 ? 'Llego al limite del factura por quedan' : 'Agregar factura'">
                             +
                         </span>
                     </button>
@@ -68,23 +70,23 @@ import html2pdf from 'html2pdf.js'
                                     <div class="relative flex w-full flex-row">
                                         <label for="" class="flex items-center text-[14px] text-sm">Giro del
                                             proveedor:</label>
-                                        <input type="text" style="width: 350px;" readonly v-model="dataInputs.giro"
-                                            class="border-b-2 border-black placeholder-slate-400 text-sm py-0 transition-colors duration-300 focus:border-[#001b47] focus:outline-none">
+                                        <input type="text" style="width: 350px;" disabled v-model="dataInputs.giro"
+                                            class="border-b-2 border-black bg-gray-200 placeholder-slate-400 text-sm py-0 transition-colors duration-300 focus:border-[#001b47] focus:outline-none">
                                     </div>
                                 </div>
                                 <div class="mb-4 md:mr-2 md:mb-0 w-25">
                                     <div class="relative flex w-full flex-row">
                                         <label for="" class="flex items-center text-[14px]">Porcentaje de IVA:</label>
-                                        <input type="text" style="width: 75px;" v-model="dataInputs.iva" readonly
-                                            class="border-b-2 border-black placeholder-slate-400 text-sm text-center py-0 transition-colors duration-300 focus:border-[#001b47] focus:outline-none">
+                                        <input type="text" style="width: 75px;" v-model="dataInputs.iva" disabled
+                                            class="border-b-2 border-black bg-gray-200 placeholder-slate-400 text-sm text-center py-0 transition-colors duration-300 focus:border-[#001b47] focus:outline-none">
                                     </div>
                                 </div>
                                 <div class="mb-4 md:mr-2 md:mb-0 w-25">
                                     <div class="relative flex w-full flex-row">
                                         <label for="" class="flex items-center text-[14px] text-sm">Porcentaje de
                                             ISR:</label>
-                                        <input type="text" style="width: 75px;" v-model="dataInputs.irs" readonly
-                                            class="border-b-2 border-black placeholder-slate-400 text-sm py-0 text-center transition-colors duration-300 focus:border-[#001b47] focus:outline-none">
+                                        <input type="text" style="width: 75px;" v-model="dataInputs.irs" disabled
+                                            class="border-b-2 border-black bg-gray-200 placeholder-slate-400 text-sm py-0 text-center transition-colors duration-300 focus:border-[#001b47] focus:outline-none">
                                     </div>
                                 </div>
                             </div>
@@ -96,8 +98,8 @@ import html2pdf from 'html2pdf.js'
                                     <div class="relative flex  w-full flex-row">
                                         <label for="" class="flex items-center  text-[14px] text-sm">Quedan:
                                         </label>
-                                        <input type="text" style="width: 80px;" readonly v-model="dataInputs.id_quedan"
-                                            class="placeholder-slate-400 text-sm py-0 text-center font-bold transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
+                                        <input type="text" style="width: 80px;" disabled v-model="dataInputs.id_quedan"
+                                            class="placeholder-slate-400 bg-gray-200 text-sm py-0 text-center font-bold transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
                                     </div>
                                 </div>
                                 <div class="mb-4 md:mr-2 md:mb-0 w-25 h-5">
@@ -105,7 +107,7 @@ import html2pdf from 'html2pdf.js'
                                         <label for="" class="flex items-center  text-[14px] text-sm">Fecha emision:
                                         </label>
                                         <input type="date" style="width: 150px;" v-model="dataInputs.fecha_emision"
-                                            class="placeholder-slate-400 text-sm py-0 text-center font-bold transition-colors duration-300 focus:border-[#001b47 focus:outline-none border-b-0">
+                                            class="placeholder-slate-400 bg-gray-200 text-sm py-0 text-center font-bold transition-colors duration-300 focus:border-[#001b47 focus:outline-none border-b-0">
                                     </div>
                                 </div>
 
@@ -113,8 +115,8 @@ import html2pdf from 'html2pdf.js'
                                     <div class="relative flex  w-full flex-row">
                                         <label for="" class="flex items-center text-[14px]">Cheque :</label>
                                         <input type="text" style="width: 80px;" v-model="dataInputs.monto_liquido_quedan"
-                                            readonly
-                                            class="placeholder-slate-400 text-sm text-center py-0 transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
+                                            disabled
+                                            class="placeholder-slate-400 text-sm bg-gray-200 text-center py-0 transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
                                     </div>
                                 </div>
 
@@ -122,8 +124,8 @@ import html2pdf from 'html2pdf.js'
                                     <div class="relative flex  w-full flex-row">
                                         <label for="" class="flex items-center text-[14px] text-sm">Renta:</label>
                                         <input type="text" style="width: 80px;" v-model="dataInputs.monto_isr_quedan"
-                                            readonly
-                                            class="placeholder-slate-400 text-sm py-0 text-center  transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
+                                            disabled
+                                            class="placeholder-slate-400 bg-gray-200 text-sm py-0 text-center  transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
                                     </div>
                                 </div>
 
@@ -131,8 +133,8 @@ import html2pdf from 'html2pdf.js'
                                     <div class="relative flex  w-full flex-row">
                                         <label for="" class="flex items-center text-[14px]">IVA: </label>
                                         <input type="text" style="width: 80px;" v-model="dataInputs.monto_iva_quedan"
-                                            readonly
-                                            class="placeholder-slate-400 text-sm text-center py-0 transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
+                                            disabled
+                                            class="placeholder-slate-400 bg-gray-200 text-sm text-center py-0 transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
                                     </div>
                                 </div>
 
@@ -140,9 +142,9 @@ import html2pdf from 'html2pdf.js'
                                     <div class="relative flex  w-full flex-row">
                                         <label for="" class="flex items-center  text-[14px] text-sm">Total:
                                         </label>
-                                        <input type="text" style="width: 80px;" readonly
+                                        <input type="text" style="width: 80px;" disabled
                                             v-model="dataInputs.monto_total_quedan"
-                                            class="placeholder-slate-400 text-sm py-0 text-center font-bold transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
+                                            class="placeholder-slate-400 bg-gray-200 text-sm py-0 text-center font-bold transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
                                     </div>
                                 </div>
 
@@ -462,7 +464,7 @@ export default {
                 altInput: true,
                 static: true,
                 monthSelectorType: 'static',
-                altFormat: 'F-j Y',
+                altFormat: "d/m/Y",
                 dateFormat: 'Y-m-d',
                 locale: {
                     firstDayOfWeek: 1,
@@ -582,7 +584,6 @@ export default {
         getInformationBySupplier(supplier) {
             // Buscar el proveedor en la lista de proveedores
             const selectedSupplier = this.dataForSelectInRow.proveedor.find((suppliers) => suppliers.value === supplier);
-
             if (selectedSupplier) {
                 // Datos que se pintan en los inputs
                 this.dataInputs.giro = `${selectedSupplier.codigo_giro} - ${selectedSupplier.nombre_giro}`;
@@ -592,6 +593,8 @@ export default {
                 // Datos que se usan para cálculos
                 this.dataForCalculate.irs = selectedSupplier.isrl_sujeto_retencion;
                 this.dataForCalculate.iva = selectedSupplier.iva_sujeto_retencion;
+
+                this.dataInputs.id_proveedor = selectedSupplier.value;
             }
 
             this.getAmountBySupplier(supplier);
@@ -619,8 +622,9 @@ export default {
             liquido = (totMontoByRow / 1.13).toFixed(2);
 
             let montoIvaQuedan = 0;
-
             // Verificar si el monto total excede el umbral para aplicar IVA
+            console.log("suma TOTAL PROVEEDOR + TOTAL IVA ");
+            console.log(parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) + parseFloat(totMontoByRow));
             if (parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) + parseFloat(totMontoByRow) >= 113) {
                 montoIvaQuedan = (liquido * this.dataForCalculate.iva).toFixed(2);
             }
@@ -637,6 +641,8 @@ export default {
 
             // Asignar el monto total
             this.dataInputs.monto_total_quedan = totMontoByRow.toFixed(2);
+            this.getAmountBySupplier(this.dataInputs.id_proveedor);
+
         },
         getAmountBySupplier(id_proveedor) {
             // Crear una copia de la matriz totalAmountBySupplier
@@ -647,7 +653,7 @@ export default {
                 if (element.id_proveedor === id_proveedor) {
                     if (this.dataInputs.id_quedan !== "") {
                         // Filtrar los elementos de quedan según el id_quedan ingresado
-                        let quedanArray = element.quedan.filter((element) => element.id_quedan <= this.dataInputs.id_quedan);
+                        let quedanArray = element.quedan.filter((element) => element.id_quedan < this.dataInputs.id_quedan);
 
                         // Ordenar el array quedanArray por id_quedan en orden descendente
                         quedanArray.sort((a, b) => b.id_quedan - a.id_quedan);
@@ -658,13 +664,13 @@ export default {
                         // Calcular el monto total sumando el monto_total_quedan de cada objeto en la matriz quedan
                         let montoTotal = element.quedan.reduce((total, element) =>
                             (parseFloat(total) + parseFloat(element.monto_total_quedan)).toFixed(2), 0);
+
                         total = montoTotal;
                     }
                 }
             });
+            this.dataForCalculate.monto_total_quedan_por_proveedor = parseFloat(total)
 
-            // Calcular el monto_total_quedan_por_proveedor
-            this.dataForCalculate.monto_total_quedan_por_proveedor = ((!isNaN(parseFloat(total)) ? parseFloat(total) : 0) - (this.dataInputs.monto_total_quedan === '' ? 0 : this.dataInputs.monto_total_quedan));
         },
         onlyNumberDecimal(event) {
             const charCode = (event.which) ? event.which : event.keyCode;
@@ -737,18 +743,29 @@ export default {
         addRow() {
             // Función para agregar una nueva fila a rowsData
 
+            //Verifica que solo tenga como maximo 7 facturas por quedan tomando las filas existentes
+            if (this.rowsData.filter((e) => e[7] === true).length !== 7) {
+                this.rowsData.push({
+                    0: 1,                  // numberRow
+                    1: '',                 // Id__detalle_quedan
+                    2: '',                 // FACTURA
+                    3: '',                 // DEPENDENCIA
+                    4: '',                 // NUMERO ACTA
+                    5: '',                 // CONCEPTO
+                    6: { producto: '', servicio: '' },  // Monto en producto y servicio
+                    7: true,               // eliminado_logico
+                    8: ''                  // fecha_factura_det_quedan
+                });
+            } else {
+                toast.error("Solo se permiten 7 facturas por quedan :(", {
+                    autoClose: 4000,
+                    position: "top-right",
+                    transition: "zoom",
+                    toastBackgroundColor: "white",
+                });
+            }
             // Agregar un nuevo objeto al final del array rowsData
-            this.rowsData.push({
-                0: 1,                  // numberRow
-                1: '',                 // Id__detalle_quedan
-                2: '',                 // FACTURA
-                3: '',                 // DEPENDENCIA
-                4: '',                 // NUMERO ACTA
-                5: '',                 // CONCEPTO
-                6: { producto: '', servicio: '' },  // Monto en producto y servicio
-                7: true,               // eliminado_logico
-                8: ''                  // fecha_factura_det_quedan
-            });
+
         },
         paintPositionRepet() {
             const duplicatePositions = {}; // Objeto para almacenar las posiciones duplicadas de actas

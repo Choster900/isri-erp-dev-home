@@ -26,6 +26,11 @@ class CuentaPresupuestal extends Model
         return $this->hasMany('App\Models\ReciboIngreso', 'id_ccta_presupuestal', 'id_ccta_presupuestal');
     }
 
+    public function conceptos_ingreso()
+    {
+        return $this->hasMany('App\Models\ConceptoIngreso', 'id_ccta_presupuestal', 'id_ccta_presupuestal');
+    }
+
     public function parentBudgetAccount()
     {
         return $this->hasOne('App\Models\CuentaPresupuestal', 'id_ccta_presupuestal', 'id_padre_ccta_presupuestal');
