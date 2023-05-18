@@ -7,7 +7,7 @@ import 'vue3-toastify/dist/index.css';
 </script>
 <template>
     <Head title="Catalogo - Proveedor" />
-    <AppLayoutVue>
+    <AppLayoutVue nameSubModule="Tesoreria - Proveedores">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
                 <GeneralButton v-if="permits.insertar == 1" @click="addDataSupplier()"

@@ -15,7 +15,7 @@ import axios from 'axios';
 
 <template>
     <Head title="Reporte - Ingreso diario" />
-    <AppLayoutVue>
+    <AppLayoutVue nameSubModule="Tesoreria - Reporte de Ingresos Diarios">
         <div class="border border-gray-600 rounded p-4 mb-4">
             <h2 class="text-lg font-bold mb-4 text-center">Reporte Ingresos Diarios</h2>
             <div class="mb-7 md:flex flex-row justify-items-start">

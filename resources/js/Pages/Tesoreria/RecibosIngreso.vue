@@ -17,7 +17,7 @@ import axios from 'axios';
 
 <template>
     <Head title="Proceso - Ingreso" />
-    <AppLayoutVue>
+    <AppLayoutVue nameSubModule="Tesoreria - Recibos de Ingreso">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
                 <GeneralButton @click="addIncomeConcept()" v-if="permits.insertar == 1"
