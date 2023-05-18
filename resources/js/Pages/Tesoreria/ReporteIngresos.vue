@@ -114,7 +114,7 @@ export default {
                 altInput: true,
                 static: true,
                 monthSelectorType: 'static',
-                altFormat: "F-j Y",
+                altFormat: "d/m/Y",
                 dateFormat: "Y-m-d",
                 locale: {
                     firstDayOfWeek: 1,

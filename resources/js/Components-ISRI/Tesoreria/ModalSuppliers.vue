@@ -323,9 +323,9 @@ export default {
                                 transition: "zoom",
                                 toastBackgroundColor: "white",
                             });
-                            setTimeout(() => {
-                                this.errosModel = {}
-                            }, 9000);
+                            // setTimeout(() => {
+                            //     this.errosModel = {}
+                            // }, 9000);
                         } else {
                             let msg = this.manageError(errors);
                             this.$swal.fire({
@@ -363,6 +363,7 @@ export default {
                         this.limpiarCampos()
                         this.$emit("showTableAgain")
                     }).catch((Error) => {
+                        console.log(Error);
                         if (Error.response.status === 422) {
                             let data = Error.response.data.errors
                             var myData = new Object();
@@ -376,9 +377,9 @@ export default {
                                 transition: "zoom",
                                 toastBackgroundColor: "white",
                             });
-                            setTimeout(() => {
-                                this.errosModel = {}
-                            }, 9000);
+                            // setTimeout(() => {
+                            //     this.errosModel = {}
+                            // }, 9000);
                         } else {
                             let msg = this.manageError(Error);
                             this.$swal.fire({
@@ -452,9 +453,11 @@ export default {
                 this.supplier.sujetoRetencion.isrl = '00.00'
                 this.supplier.sujetoRetencion.iva = '00.00'
             }
-
-
-
+        },
+        scrollbarModalOpen: function(value){
+            if(value){
+                this.errosModel = {}
+            }
         }
     }
 }

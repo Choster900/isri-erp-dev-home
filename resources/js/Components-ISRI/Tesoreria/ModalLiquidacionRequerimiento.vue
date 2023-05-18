@@ -20,7 +20,7 @@ import axios from 'axios';
                             </div>
                         </th>
                         <th class="text-white bg-[#001b47] px-4 py-2 first:pl-5 last:pr-5 whitespace-nowrap border-r-2">
-                            <div class="font-semibold text-center text-[12px] tracking-wider"> MONTO DEL REQ:
+                            <div class="font-semibold text-center text-[10px] tracking-wider"> MONTO DEL REQ:
                                 {{ dataQuedan.monto_requerimiento_pago }}
                             </div>
                         </th>
@@ -31,7 +31,7 @@ import axios from 'axios';
                                 RESTANTE: {{ restanteIngreso }}
                             </div>
                         </th>
-                        <th class=" px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap rounded-tr-2xl">
+                        <th class="pl-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap rounded-tr-2xl">
                             <div class="font-semibold text-center text-[12px] "
                                 :class="restanteIngreso < 0 ? 'text-red-600' : ''">
                                 <label class="flex items-center">
@@ -46,7 +46,7 @@ import axios from 'axios';
                                 </label>
                             </div>
                         </th>
-                        <th class=" px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap rounded-tr-2xl">
+                        <th class=" py-2 first:pl-5 last:pr-5   whitespace-nowrap rounded-tr-2xl">
                             <div class="font-semibold text-center text-[12px] "
                                 :class="restanteIngreso < 0 ? 'text-red-600' : ''">
                                 <label class="flex items-center">
@@ -79,7 +79,7 @@ import axios from 'axios';
                         </th>
 
                         <th class="px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap">
-                            <div class="font-semibold text-right text-[12px]">L I Q U I D A C I O N</div>
+                            <div class="font-semibold max-w-[100px]  text-right text-[12px]">L I Q U I D A C I O N</div>
                         </th>
 
                     </tr>
@@ -92,7 +92,7 @@ import axios from 'axios';
                             :class="data.restante == 0 ? 'bg-green-400' : data.monto_liquidacion_quedan != 0 ? 'bg-yellow-400' : 'bg-[#1f355833]'">
                             {{ data.id_quedan }}
                         </td>
-                        <td class="pb-1 pt-1 text-xs font-semibold w-full rounded-md px-3  bg-opacity-20 text-center border-2 border-white"
+                        <td class="pb-1 pt-1 text-xs font-semibold max-w-[100px] rounded-md px-3  bg-opacity-20 text-center border-2 border-white"
                             contenteditable="true"
                             :class="data.restante == 0 ? 'bg-green-400' : data.monto_liquidacion_quedan != 0 ? 'bg-yellow-400' : 'bg-[#1f355833]'"
                             @input="liquidarMonto(data.id_quedan, $event, 'notifica_liquidacion_quedan')">
@@ -107,14 +107,14 @@ import axios from 'axios';
                         <td :class="[data.restante < 0 ? 'error2' : '',
                         data.restante == 0 ? 'bg-green-400' : data.monto_liquidacion_quedan != 0 ? 'bg-yellow-400' : 'bg-[#1f355833]'
                         ]"
-                            class="pb-1 pt-1 focus:bg-white text-xs font-semibold w-full rounded-md px-3  bg-opacity-20 text-center border-2 border-white"
+                            class="pb-1 pt-1 focus:bg-white text-xs font-semibold max-w-[50px]  rounded-md px-3  bg-opacity-20 text-center border-2 border-white"
                             contenteditable="false">
                             {{ data.restante }}
                         </td>
 
                         <td :class="[data.restante < 0 ? 'error' : '',
                         data.restante == 0 ? 'bg-green-400' : data.monto_liquidacion_quedan != 0 ? 'bg-yellow-400' : 'bg-[#1f355833]']"
-                            class="pb-1 pt-1 text-xs font-semibold w-full rounded-md px-3  bg-opacity-20 text-center border-2 border-white"
+                            class="pb-1 pt-1 text-xs font-semibold max-w-[50px]  rounded-md px-3  bg-opacity-20 text-center border-2 border-white"
                             :contenteditable="data.id_estado_quedan == 4 ? false : true"
                             @keypress="onlyNumberDecimal($event)"
                             @input="liquidarMonto(data.id_quedan, $event, 'monto_liquidacion_quedan')">
@@ -126,7 +126,7 @@ import axios from 'axios';
             </table>
             <div class="flex justify-center items-center">
 
-                <div class="px-2 pt-3" v-if="dataQuedan.id_estado_req_pago != 2">
+                <div class="px-2 pt-3" v-if="enableButton">
                     <GeneralButton @click="enviarTodaLaInformacion()" color="bg-orange-700  hover:bg-orange-800"
                         text="Liquidar" icon="add" />
                 </div>
@@ -160,6 +160,7 @@ export default {
         amountRowsData: [],
         numeroRequerimiento: '',
         liquidado: false,
+        enableButton: true,
     }),
 
     methods: {
@@ -236,7 +237,7 @@ export default {
                 if (this.passOrNot()) {
                     let res = await axios.post('/liquidar-quedan', {
                         params: this.amountRowsData,
-                        liquidado: this.restanteIngreso == 0 ? true : false,
+                        liquidado: this.restanteIngreso != 0 ? false : true,
                         requerimiento: this.dataQuedan.id_requerimiento_pago,
                     }).catch(errors => {
                         let msg = this.manageError(errors);
@@ -276,6 +277,9 @@ export default {
                         transition: "zoom",
                         toastBackgroundColor: "white",
                     });
+                    if (this.restanteIngreso == 0) {
+                        this.enableButton = false
+                    }
                     this.$emit("actualizar-table-data")
 
                 } else {
@@ -294,6 +298,7 @@ export default {
             if (this.scrollbarModalOpen) {
                 this.sumTotQuedan()
                 this.sumRestTotal()
+                this.enableButton = this.dataQuedan.id_estado_req_pago != 2 ? this.enableButton = true : false;
                 this.numeroRequerimiento = `Requerimiento - N°${this.dataQuedan.numero_requerimiento_pago}-${this.dataQuedan.anio_requerimiento_pago}`
             } else {
                 this.amountRowsData = []

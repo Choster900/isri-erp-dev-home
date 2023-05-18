@@ -30,6 +30,7 @@ class ReciboIngresoController extends Controller
             ->with('detalles')
             ->with('detalles.concepto_ingreso.dependencia')
             ->with('cuenta_presupuestal')
+            ->with('proyecto_financiado')
             ->with('empleado_tesoreria')
             ->orderBy($columns[$column], $dir);
         if ($search_value) {
@@ -81,8 +82,16 @@ class ReciboIngresoController extends Controller
         $budget_accounts = CuentaPresupuestal::selectRaw("id_ccta_presupuestal as value , concat(id_ccta_presupuestal, ' - ', nombre_ccta_presupuestal) as label")
             ->where('tesoreria_ccta_presupuestal', '=', 1)
             ->where('estado_ccta_presupuestal', '=', 1)
+            ->whereHas('conceptos_ingreso', function ($query) use ($request) {
+                $query->where('estado_concepto_ingreso', 1);
+            })
             ->orderBy('nombre_ccta_presupuestal')
             ->get();
+        // $budget_accounts = CuentaPresupuestal::selectRaw("id_ccta_presupuestal as value , concat(id_ccta_presupuestal, ' - ', nombre_ccta_presupuestal) as label")
+        //     ->where('tesoreria_ccta_presupuestal', '=', 1)
+        //     ->where('estado_ccta_presupuestal', '=', 1)
+        //     ->orderBy('nombre_ccta_presupuestal')
+        //     ->get();
         $income_concepts = ConceptoIngreso::selectRaw("id_concepto_ingreso as value , concat(coalesce(codigo_dependencia, ''), ' - ', nombre_concepto_ingreso) as label, id_ccta_presupuestal, id_proy_financiado")
             ->leftJoin('dependencia', function ($join) {
                 $join->on('concepto_ingreso.id_dependencia', '=', 'dependencia.id_dependencia');
@@ -92,10 +101,15 @@ class ReciboIngresoController extends Controller
         $treasury_clerk = DB::table('empleado_tesoreria')
             ->select('id_empleado_tesoreria as value', 'nombre_empleado_tesoreria as label')
             ->get();
-        $financing_sources = ProyectoFinanciado::select('id_proy_financiado as value','nombre_proy_financiado as label')
-            ->where('estado_proy_financiado','=',1)
-            ->orderBy('nombre_proy_financiado')
+        $financing_sources = ProyectoFinanciado::selectRaw('id_proy_financiado as value, nombre_proy_financiado as label')
+            ->whereHas('conceptos_ingreso', function ($query) use ($request) {
+                $query->where('estado_concepto_ingreso', 1);
+            })
             ->get();
+        // $financing_sources = ProyectoFinanciado::select('id_proy_financiado as value','nombre_proy_financiado as label')
+        //     ->where('estado_proy_financiado','=',1)
+        //     ->orderBy('nombre_proy_financiado')
+        //     ->get();
         return ['budget_accounts' => $budget_accounts, 'income_concepts' => $income_concepts, 'treasury_clerk' => $treasury_clerk,'financing_sources' => $financing_sources];
     }
 

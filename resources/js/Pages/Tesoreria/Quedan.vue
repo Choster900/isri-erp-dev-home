@@ -8,7 +8,7 @@ import axios from 'axios';
 </script>
 <template>
     <Head title="Proceso - Quedan" />
-    <AppLayoutVue>
+    <AppLayoutVue nameSubModule="Documentos de seguimiento de pagos">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
                 <GeneralButton @click="createQuedan()" color="bg-green-700  hover:bg-green-800" text="Agregar Elemento"
@@ -20,12 +20,12 @@ import axios from 'axios';
                 <div class="mb-4 md:flex flex-row justify-items-start">
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-                            <Multiselect v-model="tableData.length" @select="getDataQuedan()" :options="perPage"
+                            <Multiselect v-model="tableData.length" placeholder="Cantidad a mostrar" @select="getDataQuedan()" :options="perPage"
                                 :searchable="true" />
-                            <LabelToInput icon="date" />
+                            <LabelToInput icon="list2" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Todos los seguimientos de pagos
+                    <h2 class="font-semibold text-slate-800 pt-1">Quedan :
                         <span class="text-slate-400 font-medium">{{ pagination.total }}</span>
                     </h2>
 
@@ -276,6 +276,7 @@ export default {
                 // Verificar si la respuesta corresponde al dibujo actual
                 if (this.tableData.draw === data.draw) {
                     // Actualizar los enlaces de paginación y la información de la tabla
+                    this.showModal = false;
                     this.links = data.data.links;
                     this.pagination.total = data.data.total;
                     this.links[0].label = "Anterior";
