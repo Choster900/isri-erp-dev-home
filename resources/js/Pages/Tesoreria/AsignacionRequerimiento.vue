@@ -22,8 +22,8 @@ import axios from 'axios';
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
                             <Multiselect v-model="tableData.length" @select="getDataQuedan()" :options="perPage"
-                                :searchable="true" />
-                            <LabelToInput icon="date" />
+                                :searchable="true" placeholder="Cantidad a mostrar"/>
+                            <LabelToInput icon="list2" />
                         </div>
                     </div>
                     <h2 class="font-semibold text-slate-800 pt-1">Todos los requerimientos
