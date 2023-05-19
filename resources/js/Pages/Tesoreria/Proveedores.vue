@@ -21,7 +21,7 @@ import 'vue3-toastify/dist/index.css';
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
                             <Multiselect v-model="tableData.length" @select="getSuppilers()" :options="perPage"
-                                :searchable="true" placeholder="Cantidad a mostrar"/>
+                                :searchable="true" placeholder="Cantidad a mostrar" />
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
@@ -74,7 +74,8 @@ import 'vue3-toastify/dist/index.css';
                                 <div class="space-x-1">
                                     <DropDownOptions>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            v-if="permits.actualizar == 1 && proveedor.estado_proveedor == 1" @click.stop="getSuppiler(proveedor)">
+                                            v-if="permits.actualizar == 1 && proveedor.estado_proveedor == 1"
+                                            @click.stop="getSuppiler(proveedor)">
                                             <div class="w-8 text-green-900">
                                                 <span class="text-xs">
 
@@ -92,13 +93,33 @@ import 'vue3-toastify/dist/index.css';
                                             v-if="permits.eliminar == 1"
                                             @click="enableStateForSupplier(proveedor.id_proveedor, proveedor.estado_proveedor)">
                                             <div class="w-8 text-red-900">
-                                                <span class="text-xs">
+                                                <!-- <span class="text-xs">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                         stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
                                                     </svg>
-                                                </span>
+                                                </span> -->
+                                                <svg fill="#7F1D1D" version="1.1" id="Capa_1"
+                                                    xmlns="http://www.w3.org/2000/svg" width="20px" height="20px"
+                                                    xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 97.994 97.994"
+                                                    xml:space="preserve" stroke="#7F1D1D">
+                                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round"
+                                                        stroke-linejoin="round"></g>
+                                                    <g id="SVGRepo_iconCarrier">
+                                                        <g>
+                                                            <g>
+                                                                <path
+                                                                    d="M97.155,9.939c-0.582-0.416-1.341-0.49-1.991-0.193l-10.848,4.935C74.08,5.29,60.815,0.118,46.966,0.118 c-15.632,0-30.602,6.666-41.07,18.289c-0.359,0.399-0.543,0.926-0.51,1.461c0.033,0.536,0.28,1.036,0.686,1.388l11.301,9.801 c0.818,0.711,2.055,0.639,2.787-0.162c6.866-7.512,16.636-11.821,26.806-11.821c6.135,0,12.229,1.584,17.622,4.583l-7.826,3.561 c-0.65,0.296-1.095,0.916-1.163,1.627c-0.069,0.711,0.247,1.405,0.828,1.82l34.329,24.52c0.346,0.246,0.753,0.373,1.163,0.373 c0.281,0,0.563-0.06,0.828-0.181c0.65-0.296,1.095-0.916,1.163-1.627l4.075-41.989C98.053,11.049,97.737,10.355,97.155,9.939z">
+                                                                </path>
+                                                                <path
+                                                                    d="M80.619,66.937c-0.819-0.709-2.055-0.639-2.787,0.162c-6.866,7.514-16.638,11.822-26.806,11.822 c-6.135,0-12.229-1.584-17.622-4.583l7.827-3.561c0.65-0.296,1.094-0.916,1.163-1.628c0.069-0.711-0.247-1.404-0.828-1.819 L7.237,42.811c-0.583-0.416-1.341-0.49-1.991-0.193c-0.65,0.296-1.094,0.916-1.163,1.627L0.009,86.233 c-0.069,0.712,0.247,1.406,0.828,1.822c0.583,0.416,1.341,0.488,1.991,0.192l10.848-4.935 c10.237,9.391,23.502,14.562,37.351,14.562c15.632,0,30.602-6.666,41.07-18.289c0.358-0.398,0.543-0.926,0.51-1.461 c-0.033-0.536-0.28-1.036-0.687-1.388L80.619,66.937z">
+                                                                </path>
+                                                            </g>
+                                                        </g>
+                                                    </g>
+                                                </svg>
                                             </div>
                                             <div class="font-semibold">
                                                 {{ proveedor.estado_proveedor ? 'Desactivar' : 'Activar' }}
@@ -223,7 +244,7 @@ export default {
         async getSuppilers(url = "/proveedores") {
             this.lastUrl = url;
             this.tableData.draw++;
-            await axios.post(url, this.tableData ).then((response) => {
+            await axios.post(url, this.tableData).then((response) => {
                 let data = response.data;
                 if (this.tableData.draw == data.draw) {
                     this.links = data.data.links;
@@ -293,13 +314,11 @@ export default {
                 if (result.isConfirmed) {
                     this.enable(id_proveedor, estado); //peticion async hace la modificacion 
                     //no la llamamos en el mismo metodo por que dejaria de ser asyn y hay problema al momento de actulizar la tabla
-                    toast.info("Hecho", {
-                        autoClose: 5000,
-                        position: "top-right",
-                        transition: "bounce",
-                        toastBackgroundColor: "white",
-                        icon: "✔️",
-                    });
+                    this.$swal.fire({
+                        text: 'Acción realizada!',
+                        icon: 'success',
+                        timer: 2000
+                    })
                 }
             });
         },
