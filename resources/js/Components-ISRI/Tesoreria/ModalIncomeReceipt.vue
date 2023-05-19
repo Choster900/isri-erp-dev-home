@@ -272,7 +272,7 @@ export default {
             });
             this.updateTotal()
             if (this.income_concept_select == '') {
-                this.custom_error = 'No se encuentran registros'
+                this.custom_error = 'No se encuentran registros de conceptos a agregar.'
             } else {
                 this.custom_error = ""
             }
