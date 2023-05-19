@@ -605,14 +605,16 @@ export default {
             let liquido = 0;
             let montoServicios = 0;
 
+            let quedanArray = this.rowsData.filter((element) => element[7] === true);
+
             // Sumar todos los montos de todas las filas
-            this.rowsData.forEach((valores, index) => {
+            quedanArray.forEach((valores, index) => {
                 totMontoByRow += parseFloat(valores[6].producto) || 0; // Sumar el monto del producto
                 totMontoByRow += parseFloat(valores[6].servicio) || 0; // Sumar el monto del servicio
             });
 
             // Sumar solo los montos de servicios de todas las filas
-            this.rowsData.forEach((valores, index) => {
+            quedanArray.forEach((valores, index) => {
                 if (valores[6].servicio !== '') {
                     montoServicios += parseFloat(valores[6].servicio) || 0;
                 }
@@ -997,6 +999,7 @@ export default {
                 if (result.isConfirmed) {
                     // Modificar el objeto para que la fila desaparezca de la tabla (valor en posición 7 se establece como false)
                     this.rowsData[rowIndex][7] = false;
+                    this.calculateAmount()
                     // Mostrar mensaje de advertencia
                     toast.warning("La fila actual se eliminó temporalmente hasta que guarde los cambios", {
                         autoClose: 5000,
