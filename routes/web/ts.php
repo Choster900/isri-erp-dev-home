@@ -73,7 +73,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get(
         '/ts/asignacion',
         function () {
-            return Inertia::render('Tesoreria/AsignacionRequerimiento', [
+            return Inertia::render('Tesoreria/AsignacionLiquidacionRequerimiento', [
                 'menu' => session()->get('menu')
             ]);
         }

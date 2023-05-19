@@ -257,7 +257,7 @@ export default {
             }
         },
         async enviarTodaLaInformacion() {
-            const confirmed = await this.$swal.fire({
+            /* const confirmed = await this.$swal.fire({
                 title: '¿Esta seguro agregar liquidaciones a estos quedan?',
                 icon: 'question',
                 iconHtml: '❓',
@@ -268,8 +268,9 @@ export default {
                 showCloseButton: true
             });
             if (confirmed.isConfirmed) {
-
+ */
                 const successUpdate = await this.setMontosLiquidacion();
+                console.log(successUpdate);
                 if (successUpdate) {
                     toast.success("Las liquidaciones se han agregado correctamente", {
                         autoClose: 5000,
@@ -290,7 +291,7 @@ export default {
                         toastBackgroundColor: "white",
                     });
                 }
-            }
+            /* } */
         },
     },
     watch: {

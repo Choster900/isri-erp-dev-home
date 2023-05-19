@@ -64,7 +64,7 @@ import axios from 'axios';
                             @click="filterQuedan()" />
                     </div>
                     <div class="grid px-2 grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                        <GeneralButton color="bg-[#7a0000]  hover:bg-[#7a0000]/90" text="Limpiar Filtro" icon="search"
+                        <GeneralButton color="bg-[#7a0000]  hover:bg-[#7a0000]/90" text="Limpiar Filtro" icon="delete"
                             @click="dataQuedan = []" />
                     </div>
                 </div>
