@@ -147,7 +147,7 @@ class RequerimientoController extends Controller
         foreach ( $quedanExistente as $key => $value ) {
             $totRequerimiento = $totRequerimiento + $value["monto_liquido_quedan"];
         }
-        if ($totRequerimiento < $monto_requerimiento_pago[0]->monto_requerimiento_pago) {
+        if ($totRequerimiento <= $monto_requerimiento_pago[0]->monto_requerimiento_pago) {
             foreach ( $request->itemsToAddNumber as $key => $value ) {
                 Quedan::where("id_quedan", $value["id_quedan"])->update(['id_requerimiento_pago' => $request->numberRequest, "id_estado_quedan" => 2]);
             }
@@ -155,9 +155,10 @@ class RequerimientoController extends Controller
         } else {
             DB::rollback();
             return response()
-                ->json('Error, Al parecer el requerimiento seleccionado tiene un monto de $' . $monto_requerimiento_pago[0]->monto_requerimiento_pago . ' mayor a la sumatoria todal de los quedan de $' . $totRequerimiento, 422);
+                ->json('Error, el monto total a asignar es de: $'.$totRequerimiento.' el cual excede el techo de $'.$monto_requerimiento_pago[0]->monto_requerimiento_pago.' del requerimiento.', 422);
         }
     }
+    //El monto total a asignar es de: $XXXX el cual excede el techo asignado al requerimiento que es de: $XXXX
 
     public function takeOfNumberRequest(Request $request)
     {
