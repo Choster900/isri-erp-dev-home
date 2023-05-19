@@ -62,8 +62,8 @@ import axios from 'axios';
                                         <br>
                                         SERVICIO: ${{ detalle.servicio_factura_det_quedan }}
                                         <br>
-                                        TOTAL: ${{ parseFloat(detalle.servicio_factura_det_quedan) +
-                                            parseFloat(detalle.producto_factura_det_quedan) }}
+                                        TOTAL: ${{ parseFloat(detalle.servicio_factura_det_quedan) || 0 +
+                                            parseFloat(detalle.producto_factura_det_quedan) || 0 }}
                                     </p>
                                 </div>
                             </td>
