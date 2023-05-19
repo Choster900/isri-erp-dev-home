@@ -90,6 +90,7 @@ class RequerimientoController extends Controller
                 'descripcion_requerimiento_pago' => $request->input("descripcion_requerimiento_pago"),
                 'monto_requerimiento_pago'       => $request->input("monto_requerimiento_pago"),
                 'fecha_mod_requerimiento_pago'   => Carbon::now(),
+                'usuario_requerimiento_pago '    => $request->user()->nick_usuario,
                 'ip_requerimiento_pago'          => $request->ip(),
             ]);
             DB::commit();

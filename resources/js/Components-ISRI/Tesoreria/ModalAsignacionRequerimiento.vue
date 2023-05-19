@@ -78,7 +78,7 @@ import axios from 'axios';
                                     Numero de requerimiento <span class="text-red-600 font-extrabold">*</span>
                                 </label>
                                 <div class="relative flex h-7  flex-row-reverse select-bg">
-                                    <Multiselect :options="dataForSelect.numeroRequerimiento"
+                                    <Multiselect :options="numeroRequerimientoFiltrado"
                                         @select="seleccionarRequerimiento($event)" v-model="id_requerimiento_pago"
                                         :searchable="true" />
                                 </div>
@@ -369,6 +369,11 @@ export default {
             this.numero_requerimiento = opcionSeleccionada
         },
     },
+    computed: {
+        numeroRequerimientoFiltrado() {
+            return this.dataForSelect?.numeroRequerimiento?.filter(item => item.id_estado_req_pago === 1) || [];
+        }
+    }
 }
 </script>
 <style scoped>
