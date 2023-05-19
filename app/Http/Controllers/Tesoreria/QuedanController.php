@@ -313,7 +313,8 @@ class QuedanController extends Controller
         $v_Requerimiento = DB::table('requerimiento_pago')
             ->select(
                 'id_requerimiento_pago as value',
-                DB::raw("CONCAT(numero_requerimiento_pago,' - ',anio_requerimiento_pago) AS label")
+                DB::raw("CONCAT(numero_requerimiento_pago,' - ',anio_requerimiento_pago) AS label"),
+                'id_estado_req_pago'
             )->where("estado_requerimiento_pago", 1)->get();
 
         $v_Prioridad_pago = DB::table('prioridad_pago')
