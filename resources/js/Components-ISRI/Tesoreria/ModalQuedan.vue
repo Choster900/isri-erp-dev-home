@@ -466,6 +466,7 @@ export default {
                 monthSelectorType: 'static',
                 altFormat: "d/m/Y",
                 dateFormat: 'Y-m-d',
+                maxDate: new Date(), // Bloquear fechas futuras
                 locale: {
                     firstDayOfWeek: 1,
                     weekdays: {
@@ -1120,5 +1121,11 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
 td {
     outline: none;
     /* Desactiva el marco de enfoque */
+}
+
+.flatpickr-day.flatpickr-disabled,
+.flatpickr-day.flatpickr-disabled:hover {
+    cursor: not-allowed;
+    color: rgba(72, 72, 72, 0.3);
 }
 </style>
