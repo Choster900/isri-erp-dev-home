@@ -220,7 +220,7 @@ export default {
         return {
             //mensaje de error temporal
             custom_error: '',
-            
+
             receipt_id: '',
             income_concept_select: [],
             budget_account_id: '',
@@ -251,7 +251,7 @@ export default {
             //this.getIncomeConcept()
         },
         selectFinancingSource(financing_source_id) {
-            this.financing_select = true
+            //this.financing_select = true
             this.getNewIncomeConcept()
         },
         getNewIncomeConcept() {
@@ -262,8 +262,19 @@ export default {
                     this.income_concept_select.push(array)
                 }
             })
+            this.income_receipt.income_detail = this.income_receipt.income_detail.filter((value, index) => {
+                if (index === 0 || value.detail_id !== "") {
+                    value.income_concept_id = "";
+                    value.amount = "";
+                    return true; // Mantén el elemento en el array filtrado
+                }
+                return false; // Elimina el elemento del array filtrado
+            });
+            this.updateTotal()
             if (this.income_concept_select == '') {
-                this.custom_error = 'No se encuentran registros, cierre la ventana e intente de nuevo'
+                this.custom_error = 'No se encuentran registros de conceptos a agregar.'
+            } else {
+                this.custom_error = ""
             }
         },
         deleteRow(index, concept_id, detail_id) {
@@ -484,6 +495,7 @@ export default {
                 this.income_receipt.description = this.modal_data.descripcion_recibo_ingreso
                 this.income_receipt.income_detail = []
                 if (this.modal_data.detalles) {
+                    this.financing_select = true
                     this.income_receipt.financing_source_id = this.modal_data.detalles[0].concepto_ingreso.id_proy_financiado
                     this.modal_data.detalles.forEach((value, index) => {
                         var array = { detail_id: value.id_det_recibo_ingreso, income_concept_id: value.id_concepto_ingreso, amount: value.monto_det_recibo_ingreso, deleted: false }

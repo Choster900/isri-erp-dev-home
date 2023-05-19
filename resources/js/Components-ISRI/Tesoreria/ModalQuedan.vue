@@ -466,6 +466,7 @@ export default {
                 monthSelectorType: 'static',
                 altFormat: "d/m/Y",
                 dateFormat: 'Y-m-d',
+                maxDate: new Date(), // Bloquear fechas futuras
                 locale: {
                     firstDayOfWeek: 1,
                     weekdays: {
@@ -487,9 +488,11 @@ export default {
     methods: {
         printPdf() {
             // Opciones de configuración para generar el PDF
+            let fecha = moment().format('DD-MM-YYYY');
+            let name = 'QUEDAN ' + this.dataInputs.id_quedan + ' - ' + fecha;
             const opt = {
                 margin: 0.1,
-                filename: 'output.pdf',
+                filename: name,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, useCORS: true },
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
@@ -523,9 +526,11 @@ export default {
                 });
             } else {
                 // Opciones de configuración para generar el PDF
+                let fecha = moment().format('DD-MM-YYYY');
+                let name = 'COMPROBANTE DE RENTENCION ' + this.dataInputs.numero_retencion_iva_quedan + ' - ' + fecha;
                 const opt = {
                     margin: 0.1,
-                    filename: 'Comprobante_retencion.pdf',
+                    filename: name,
                     image: { type: 'jpeg', quality: 0.98 },
                     html2canvas: { scale: 2 },
                     jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' },
@@ -551,7 +556,6 @@ export default {
                 // Actualizar la fecha de retención de IVA en el servidor
                 axios.post('/updateFechaRetencionIva', { id_quedan: this.dataInputs.id_quedan })
                     .then((response) => {
-                        console.log(response);
                     })
                     .catch(errors => {
                         let msg = this.manageError(errors);
@@ -605,14 +609,16 @@ export default {
             let liquido = 0;
             let montoServicios = 0;
 
+            let quedanArray = this.rowsData.filter((element) => element[7] === true);
+
             // Sumar todos los montos de todas las filas
-            this.rowsData.forEach((valores, index) => {
+            quedanArray.forEach((valores, index) => {
                 totMontoByRow += parseFloat(valores[6].producto) || 0; // Sumar el monto del producto
                 totMontoByRow += parseFloat(valores[6].servicio) || 0; // Sumar el monto del servicio
             });
 
             // Sumar solo los montos de servicios de todas las filas
-            this.rowsData.forEach((valores, index) => {
+            quedanArray.forEach((valores, index) => {
                 if (valores[6].servicio !== '') {
                     montoServicios += parseFloat(valores[6].servicio) || 0;
                 }
@@ -621,10 +627,9 @@ export default {
             // Calcular el monto líquido (sin IVA)
             liquido = (totMontoByRow / 1.13).toFixed(2);
 
-            let montoIvaQuedan = 0;
-            // Verificar si el monto total excede el umbral para aplicar IVA
-            console.log("suma TOTAL PROVEEDOR + TOTAL IVA ");
-            console.log(parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) + parseFloat(totMontoByRow));
+            let montoIvaQuedan = (0).toFixed(2);
+
+            // Verificar si el monto total excede el umbral => ($ 113.00) para aplicar IVA
             if (parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) + parseFloat(totMontoByRow) >= 113) {
                 montoIvaQuedan = (liquido * this.dataForCalculate.iva).toFixed(2);
             }
@@ -848,7 +853,6 @@ export default {
                             });
                         })
                         .catch((error) => {
-                            console.log(error);
                             if (error.response.status === 422) {
                                 if (error.response.data.message === "LA DEPENDENCIA ES UN DATO REQUERIDO") {
                                     // Mostrar mensaje de error si falta la dependencia
@@ -997,6 +1001,7 @@ export default {
                 if (result.isConfirmed) {
                     // Modificar el objeto para que la fila desaparezca de la tabla (valor en posición 7 se establece como false)
                     this.rowsData[rowIndex][7] = false;
+                    this.calculateAmount()
                     // Mostrar mensaje de advertencia
                     toast.warning("La fila actual se eliminó temporalmente hasta que guarde los cambios", {
                         autoClose: 5000,
@@ -1116,5 +1121,11 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
 td {
     outline: none;
     /* Desactiva el marco de enfoque */
+}
+
+.flatpickr-day.flatpickr-disabled,
+.flatpickr-day.flatpickr-disabled:hover {
+    cursor: not-allowed;
+    color: rgba(72, 72, 72, 0.3);
 }
 </style>

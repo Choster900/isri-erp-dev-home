@@ -56,7 +56,7 @@ import moment from 'moment';
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="nombre-comercial" v-model="supplier.nombre_comercial_proveedor"
                                     :value="supplier.nombre_comercial_proveedor" type="text" placeholder="Nombre comercial"
-                                    @update:modelValue="supplier.razon_social_proveedor = supplier.razon_social_proveedor.toUpperCase()">
+                                    @update:modelValue="supplier.nombre_comercial_proveedor = supplier.nombre_comercial_proveedor.toUpperCase()">
                                     <LabelToInput icon="standard" forLabel="nombre-comercial" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errosModel.nombre_comercial_proveedor" />
@@ -428,37 +428,36 @@ export default {
         this.listOptionsSelect()
     },
     watch: {
-        infoSupplier: function (value, oldvalue) {
-            this.supplier.id_proveedor = this.infoSupplier.id_proveedor
-            this.supplier.razon_social_proveedor = this.infoSupplier.razon_social_proveedor
-            this.supplier.nombre_comercial_proveedor = this.infoSupplier.nombre_comercial_proveedor
-            this.supplier.nrc_proveedor = this.infoSupplier.nrc_proveedor
-            this.supplier.dui_proveedor = this.infoSupplier.dui_proveedor
-            this.supplier.nit_proveedor = this.infoSupplier.nit_proveedor
-            this.supplier.id_tipo_contribuyente = this.infoSupplier.id_tipo_contribuyente
-            this.supplier.id_sujeto_retencion = this.infoSupplier.id_sujeto_retencion
-            this.supplier.telefono1_proveedor = this.infoSupplier.telefono1_proveedor
-            this.supplier.telefono2_proveedor = this.infoSupplier.telefono2_proveedor
-            this.supplier.contacto_proveedor = this.infoSupplier.contacto_proveedor
-            this.supplier.id_municipio = this.infoSupplier.id_municipio
-            this.supplier.direccion_proveedor = this.infoSupplier.direccion_proveedor
-            this.supplier.fecha_registro_proveedor = this.infoSupplier.fecha_reg_proveedor
-            this.supplier.id_giro = this.infoSupplier.id_giro
-            this.supplier.email_proveedor = this.infoSupplier.email_proveedor
+        scrollbarModalOpen: function (value) {
+            if (value) {
+                this.errosModel = {}
 
-            if (this.infoSupplier != "") {
-                this.supplier.sujetoRetencion.isrl = this.infoSupplier.sujeto_retencion.isrl_sujeto_retencion
-                this.supplier.sujetoRetencion.iva = this.infoSupplier.sujeto_retencion.iva_sujeto_retencion
-            } else {
-                this.supplier.sujetoRetencion.isrl = '00.00'
-                this.supplier.sujetoRetencion.iva = '00.00'
+                this.supplier.id_proveedor = this.infoSupplier.id_proveedor
+                this.supplier.razon_social_proveedor = this.infoSupplier.razon_social_proveedor
+                this.supplier.nombre_comercial_proveedor = this.infoSupplier.nombre_comercial_proveedor
+                this.supplier.nrc_proveedor = this.infoSupplier.nrc_proveedor
+                this.supplier.dui_proveedor = this.infoSupplier.dui_proveedor
+                this.supplier.nit_proveedor = this.infoSupplier.nit_proveedor
+                this.supplier.id_tipo_contribuyente = this.infoSupplier.id_tipo_contribuyente
+                this.supplier.id_sujeto_retencion = this.infoSupplier.id_sujeto_retencion
+                this.supplier.telefono1_proveedor = this.infoSupplier.telefono1_proveedor
+                this.supplier.telefono2_proveedor = this.infoSupplier.telefono2_proveedor
+                this.supplier.contacto_proveedor = this.infoSupplier.contacto_proveedor
+                this.supplier.id_municipio = this.infoSupplier.id_municipio
+                this.supplier.direccion_proveedor = this.infoSupplier.direccion_proveedor
+                this.supplier.fecha_registro_proveedor = this.infoSupplier.fecha_reg_proveedor
+                this.supplier.id_giro = this.infoSupplier.id_giro
+                this.supplier.email_proveedor = this.infoSupplier.email_proveedor
+
+                if (this.infoSupplier != "") {
+                    this.supplier.sujetoRetencion.isrl = this.infoSupplier.sujeto_retencion.isrl_sujeto_retencion
+                    this.supplier.sujetoRetencion.iva = this.infoSupplier.sujeto_retencion.iva_sujeto_retencion
+                } else {
+                    this.supplier.sujetoRetencion.isrl = '00.00'
+                    this.supplier.sujetoRetencion.iva = '00.00'
+                }
             }
         },
-        scrollbarModalOpen: function(value){
-            if(value){
-                this.errosModel = {}
-            }
-        }
     }
 }
 </script>

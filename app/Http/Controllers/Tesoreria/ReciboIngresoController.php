@@ -127,6 +127,7 @@ class ReciboIngresoController extends Controller
 
         $new_income_receipt = new ReciboIngreso([
             'id_ccta_presupuestal' => $request->budget_account_id,
+            'id_proy_financiado' => $request->financing_source_id,
             'id_empleado_tesoreria' => $request->treasury_clerk_id,
             'cliente_recibo_ingreso' => $request->client,
             'descripcion_recibo_ingreso' => $request->description,
