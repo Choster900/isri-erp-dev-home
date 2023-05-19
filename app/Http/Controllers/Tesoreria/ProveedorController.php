@@ -38,7 +38,7 @@ class ProveedorController extends Controller
 
         if ($data) {
             $v_query->where('id_proveedor', 'like', '%' . $data["id_proveedor"] . '%')
-                ->where('dui_proveedor', 'like', '%' . $data["dui_proveedor"] . '%')
+                ->whereRaw('IFNULL(dui_proveedor, IFNULL(nit_proveedor, "")) like ?','%' . $data["dui_proveedor"] . '%')
                 ->where('razon_social_proveedor', 'like', '%' . $data["razon_social_proveedor"] . '%')
                 ->where('nombre_comercial_proveedor', 'like', '%' . $data["nombre_comercial_proveedor"] . '%')
                 ->where('estado_proveedor', 'like', '%' . $data["estado_proveedor"] . '%');
