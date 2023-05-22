@@ -71,9 +71,9 @@ class Quedan extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function liquidacion_quedan():HasOne
+    public function liquidacion_quedan():HasMany
     {
-        return $this->hasOne(LiquidacionQuedan::class, 'id_quedan', 'id_quedan');
+        return $this->hasMany(LiquidacionQuedan::class, 'id_quedan', 'id_quedan');
     }
 
     public function prioridad_pago()

@@ -5,7 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Yajra\DataTables\Html\Editor\Fields\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 
 class LiquidacionQuedan extends Model
 {
@@ -30,9 +31,9 @@ class LiquidacionQuedan extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function quedan():HasOne
+    public function quedan():BelongsTo
     {
-        return $this->hasOne(Quedan::class, 'id_quedan', 'id_quedan');
+        return $this->belongsTo(Quedan::class, 'id_quedan', 'id_quedan');
     }
 
     

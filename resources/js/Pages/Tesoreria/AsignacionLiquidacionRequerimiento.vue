@@ -39,19 +39,29 @@ import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalL
                     <tbody class="text-sm divide-y divide-slate-200">
                         <template v-for="data in dataRequerimientoForTable" :key="data.id_requerimiento_pago">
                             <tr v-if="data.quedan != ''">
-                                <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                    <div class="font-medium text-slate-800 text-center">{{ data.id_requerimiento_pago }}
-                                    </div>
-                                </td>
+
                                 <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                     <div class="font-medium text-slate-800 text-center">
-                                        {{ data.numero_requerimiento_pago }}-{{ data.anio_requerimiento_pago }}
+                                        {{ data.numero_requerimiento_pago }}
                                     </div>
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 ">
                                     <div class="font-medium text-slate-800 text-center">{{
                                         data.descripcion_requerimiento_pago }}
                                     </div>
+                                </td>
+                                <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px text-center">
+                                    <div v-if="data.id_estado_req_pago === 1"
+                                        class="text-xs inline-flex font-medium bg-emerald-100 text-emerald-600 rounded-full text-center px-2.5 py-1">
+                                        Abierto
+                                    </div>
+
+                                    <div v-else-if="data.id_estado_req_pago === 2"
+                                        class="text-xs inline-flex font-medium bg-red-100 text-red-600 rounded-full text-center px-2.5 py-1">
+                                        Cerrado
+                                    </div>
+
+
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5">
                                     <div class="font-medium text-slate-800 text-center">{{ data.monto_requerimiento_pago }}
@@ -111,7 +121,7 @@ import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalL
                                     <div class="flex-1 text-right ml-2">
                                         <a @click="getDataLiquidaciones(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      text-indigo-500">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
                                     </div>
@@ -121,7 +131,7 @@ import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalL
                                     <div class="flex-1 text-right ml-2">
                                         <a @click="getDataLiquidaciones(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      text-indigo-500">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
                                     </div>
@@ -138,12 +148,15 @@ import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalL
         </div>
 
 
-        <ModalAsignacionRequerimiento :scrollbarModalOpen="showModalAsignacionRequerimiento" @close-definitive="showModalAsignacionRequerimiento = false"
-            :dataForSelect="dataForSelect" @reload-table="getDataLiquidaciones()" />
+        <ModalAsignacionRequerimiento :scrollbarModalOpen="showModalAsignacionRequerimiento"
+            @close-definitive="showModalAsignacionRequerimiento = false" :dataForSelect="dataForSelect"
+            @reload-table="getDataLiquidaciones()" />
 
 
-        <ModalLiquidacionRequerimientoVue :scrollbarModalOpen="showModalLiquidacionRequerimiento" @close-definitive="showModalLiquidacionRequerimiento = false"
-            :dataQuedan="dataQuedan" @actualizar-table-data="getDataLiquidaciones()" />
+        <ModalLiquidacionRequerimientoVue :modalIsOpen="showModalLiquidacionRequerimiento"
+            @close-definitive="showModalLiquidacionRequerimiento = false" @reload-table="getDataLiquidaciones()"
+            @reload-table-and-close="[getDataLiquidaciones(), this.showModalLiquidacionRequerimiento = false]"
+            :dataLiquidaciones="dataLiquidaciones" />
     </AppLayoutVue>
 </template>
 <script>
@@ -153,9 +166,9 @@ export default {
     data: function (data) {
         let sortOrders = {};
         let columns = [
-            { width: "10%", label: "Id", name: "id_requerimiento_pago", type: "text" },
             { width: "10%", label: "Requerimiento", name: "numero_requerimiento_pago", type: "text" },
             { width: "20%", label: "Descripcion", name: "descripcion_requerimiento_pago", type: "text" },
+            { width: "10%", label: "Estado", name: "id_estado_req_pago", type: "text" },
             { width: "10%", label: "Monto requerido", name: "monto_requerimiento_pago", type: "text" },
             { width: "20%", label: "Todos los quedan", name: "allQUedan", type: "text" },
             { width: "5%", label: "", name: "Acciones" },
@@ -169,8 +182,7 @@ export default {
         return {
             showModalAsignacionRequerimiento: false,
             showModalLiquidacionRequerimiento: false,
-            dataQuedan: [],
-            dataSuppliers: null,//attr donde guardar la data de proveedores
+            dataLiquidaciones: [],//data que contiene todos los totales de todos los requerimientos
             permits: [],
             dataForSelect: [],
             scrollbarModalOpen: false,
@@ -226,14 +238,15 @@ export default {
                 });
             });
         },
-        openModalLiquidacionQuedan(dataQuedan) {
+        openModalLiquidacionQuedan(dataLiquidaciones) {
             this.showModalLiquidacionRequerimiento = !this.showModalLiquidacionRequerimiento
-            this.dataQuedan = dataQuedan
+            this.dataLiquidaciones = this.dataRequerimientoForTable.filter((e) => e.id_requerimiento_pago == dataLiquidaciones.id_requerimiento_pago)
         },
         async getListForSelect() {
             await axios.get('/get-list-select').then((response) => {
 
                 this.dataForSelect = response.data;
+                console.log(response.data);
             }).catch((errors) => {
                 let msg = this.manageError(errors);
                 this.$swal.fire({
@@ -281,6 +294,7 @@ export default {
     },
     created() {
         this.getDataLiquidaciones()
+        this.getListForSelect()
     },
 
 };

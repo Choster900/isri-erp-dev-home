@@ -120,6 +120,8 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('ts.liquidacion');
     Route::post('liquidar-quedan', [LiquidacionQuedanController::class, 'processLiquidacionQuedan'])->name('liquidar-quedan');
+    Route::post('total-liquidacion-by-quedan', [LiquidacionQuedanController::class, 'totalLiquidacionesByQuedan'])->name('total-liquidacion-by-quedan');
+    Route::post('delete-quedan-from-request', [LiquidacionQuedanController::class, 'deleteQuedanFromRequest'])->name('delete-quedan-from-request');
 
     Route::get(
         '/ts/reporte-quedan',
