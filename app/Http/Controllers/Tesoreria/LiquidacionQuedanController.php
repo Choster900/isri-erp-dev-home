@@ -15,19 +15,13 @@ class LiquidacionQuedanController extends Controller
 {
 
     public function processLiquidacionQuedan(Request $request)
-    {   
-        //TODO: VER UNA FORMA DE TRAER LA SUMA DE TODOS LOS QUEDAN DE TODOS LOS REQUERIMIENTOS SIN HACER ALGUNA CONSULTA ANTES
-        //POR QUE NO QUIERO QUE TARDE TANTO AL ABRIR EL MODALN Y PUES ESO
+    {
+
         try {
             $quedan = $request->params;
-
-            /* if ($request->liquidado) {
-            RequerimientoPago::where("id_requerimiento_pago", $request->requerimiento)->update(["id_estado_req_pago" => 2]);
-            } */
-            //variable que acumulara el total monto por id_quedan
             $totalQuedan = [];
-            foreach ( $quedan as $key => $value ) { //creando o actualizando la liquidacion del quedan
-                if ($value["monto_liquidacion_quedan"] > 0) {
+            foreach ($quedan as $key => $value) {
+                if ($value["monto_liquidacion_quedan"] > 0 && $value["eliminadoLogicoQuedan"] == true) {
                     LiquidacionQuedan::create(
                         [
                             'id_quedan'                   => $value["id_quedan"],
@@ -36,30 +30,48 @@ class LiquidacionQuedanController extends Controller
                             'fecha_liquidacion_quedan'    => Carbon::now(),
                         ]
                     );
+                    $montoLiquido = LiquidacionQuedan::where('id_quedan', $value["id_quedan"])->sum('monto_liquidacion_quedan');
                     $totalQuedan[$key] = [
                         "id_quedan" => $value["id_quedan"],
-                        "total"     => LiquidacionQuedan::where('id_quedan', $value["id_quedan"])->sum('monto_liquidacion_quedan'),
+                        "total"     => $montoLiquido,
                     ];
+
+                    $monto_liquido_quedan = Quedan::select('*')->where('id_quedan', $value["id_quedan"])->get();
+
+
+                    if ($monto_liquido_quedan[0]->monto_liquido_quedan === $montoLiquido) {
+                        Quedan::where("id_quedan", $value["id_quedan"])->update([
+                            'id_estado_quedan' => 4,
+                        ]);
+                    } else if ($value["monto_liquidacion_quedan"] != 0) {
+                        Quedan::where("id_quedan", $value["id_quedan"])->update([
+                            'id_estado_quedan' => 3,
+                        ]);
+                    }
                 }
             }
-            return $totalQuedan;
-            /* foreach ( $quedan as $key => $value ) {
-            $monto_liquido_quedan = Quedan::select('*')->where('id_quedan', $value["id_quedan"])->get();
-            if ($monto_liquido_quedan[0]->monto_liquido_quedan === $value["monto_liquidacion_quedan"]) {
-            Quedan::where("id_quedan", $value["id_quedan"])->update([
-            'id_estado_quedan' => 4,
-            ]);
-            } else if ($value["monto_liquidacion_quedan"] != 0) {
-            Quedan::where("id_quedan", $value["id_quedan"])->update([
-            'id_estado_quedan' => 3,
-            ]);
+
+            if ($request->liquidado) {
+                RequerimientoPago::where("id_requerimiento_pago", $request->id_requerimiento_pago)->update(["id_estado_req_pago" => 2]);
             }
-            } */
+
+            return $totalQuedan;
 
             //return $request;
         } catch (\Throwable $th) {
             // manejo de excepciones
         }
     }
+    public function totalLiquidacionesByQuedan()
+    {
+        //return LiquidacionQuedan::select("*")->with(["quedan"])->get();
 
+        return RequerimientoPago::with(["quedan", "quedan.liquidacion_quedan"])->get();
+    }
+    public function deleteQuedanFromRequest(Request $request)
+    {
+        Quedan::where("id_quedan", $request->id_quedan)->update(['id_requerimiento_pago' => null, "id_estado_quedan" => 1]);
+
+        return response()->json(['message' => 'Actualización exitosa'], 200);
+    }
 }

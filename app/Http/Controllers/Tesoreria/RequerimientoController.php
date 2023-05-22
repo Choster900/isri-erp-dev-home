@@ -8,6 +8,7 @@ use App\Models\RequerimientoPago;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Http\Requests\Tesoreria\RequerimientoRequest;
+use App\Models\LiquidacionQuedan;
 use App\Models\Quedan;
 
 class RequerimientoController extends Controller
@@ -37,7 +38,6 @@ class RequerimientoController extends Controller
 
             if (isset($data['descripcion_requerimiento_pago'])) {
                 $v_query->where('descripcion_requerimiento_pago', 'like', '%' . $data["descripcion_requerimiento_pago"] . '%');
-
             }
 
             $v_query->where('monto_requerimiento_pago', 'like', '%' . $data["monto_requerimiento_pago"] . '%');
@@ -139,17 +139,19 @@ class RequerimientoController extends Controller
         $request->validate($rules);
         //sumando el total del requerimiento_pago
         $totRequerimiento = 0;
-        foreach ( $request->itemsToAddNumber as $key => $value ) {
+        foreach ($request->itemsToAddNumber as $key => $value) {
             $totRequerimiento = $totRequerimiento + $value["monto_liquido_quedan"];
         }
         $monto_requerimiento_pago = RequerimientoPago::select('*')->where('id_requerimiento_pago', $request->numberRequest)->get();
         $quedanExistente = Quedan::select('*')->where('id_requerimiento_pago', $request->numberRequest)->get();
-        foreach ( $quedanExistente as $key => $value ) {
+        foreach ($quedanExistente as $key => $value) {
             $totRequerimiento = $totRequerimiento + $value["monto_liquido_quedan"];
         }
-        if ($totRequerimiento < $monto_requerimiento_pago[0]->monto_requerimiento_pago) {
-            foreach ( $request->itemsToAddNumber as $key => $value ) {
-                Quedan::where("id_quedan", $value["id_quedan"])->update(['id_requerimiento_pago' => $request->numberRequest, "id_estado_quedan" => 2]);
+        if ($totRequerimiento <= $monto_requerimiento_pago[0]->monto_requerimiento_pago) {
+            foreach ($request->itemsToAddNumber as $key => $value) {
+                $tieneHistorial = LiquidacionQuedan::where("id_quedan", $value["id_quedan"])->get();
+                $estado = $tieneHistorial->isEmpty() ? 2 : 3;
+                Quedan::where("id_quedan", $value["id_quedan"])->update(['id_requerimiento_pago' => $request->numberRequest, "id_estado_quedan" => $estado]);
             }
             return response()->json(['message' => 'Actualización exitosa'], 200);
         } else {
