@@ -58,7 +58,7 @@ import axios from 'axios';
                         </th>
                         <th
                             class="text-white bg-[#001b47] px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap rounded-tr-2xl">
-                            <div class=" text-center  ">RESTANTE: <br>
+                            <div class=" text-center  ">POR PAGAR: <br> 
                                 <span class="text-sm">{{ restRequest }}</span>
 
                             </div>
@@ -145,7 +145,7 @@ import axios from 'axios';
                                     contenteditable="false">
                                     {{ data.id_quedan }}
                                 </td>
-                                <td :class="[data.restanteToShow == 0 ? 'bg-green-600' :
+                                <td :ref="i" :class="[data.restanteToShow == 0 ? 'bg-green-600' :
                                     data.restanteToShow < 0 ? 'bg-red-600' :
                                         data.monto_liquidacion_quedan < 0 ? 'bg-red-600' :
                                             data.id_estado_quedan == 3 ? 'bg-blue-600' : 'bg-[#1f355833]']"
@@ -306,31 +306,34 @@ export default {
             })
         },
         liquidarMonto(id_quedan, event, campo) {
-            let inputValue = event.target.textContent;
-            const regex = /^(\d+)?(\.\d{0,2})?$/;
-            inputValue = inputValue.replace(/^\./, ''); // Eliminar punto al inicio
-            inputValue = inputValue.replace(/[^0-9.]/g, ''); // Eliminar caracteres no permitidos
+            if (campo === 'monto_liquidacion_quedan') {
+                let inputValue = event.target.textContent;
+                const regex = /^(\d+)?(\.\d{0,2})?$/;
+                inputValue = inputValue.replace(/^\./, ''); // Eliminar punto al inicio
+                inputValue = inputValue.replace(/\.(?=.*\.)/g, ''); // Eliminar puntos adicionales
+                inputValue = inputValue.replace(/[^0-9.]/g, ''); // Eliminar caracteres no permitidos
 
-            if (!regex.test(inputValue)) {
-                const previousValue = event.target.textContent;
-                event.target.textContent = previousValue.substring(0, previousValue.length - 1);
-                const selection = window.getSelection();
-                const range = document.createRange();
-                range.selectNodeContents(event.target);
-                range.collapse(false); // Colapsar al final del rango
-                selection.removeAllRanges();
-                selection.addRange(range);
-            } else {
-                if (event.target.textContent != inputValue) {
-                    event.target.textContent = inputValue
+                if (!regex.test(inputValue)) {
+                    const previousValue = event.target.textContent;
+                    event.target.textContent = previousValue.substring(0, previousValue.length - 1);
                     const selection = window.getSelection();
                     const range = document.createRange();
                     range.selectNodeContents(event.target);
                     range.collapse(false); // Colapsar al final del rango
                     selection.removeAllRanges();
                     selection.addRange(range);
-                }else{
-                    event.target.textContent = inputValue;
+                } else {
+                    if (event.target.textContent != inputValue) {
+                        event.target.textContent = inputValue
+                        const selection = window.getSelection();
+                        const range = document.createRange();
+                        range.selectNodeContents(event.target);
+                        range.collapse(false); // Colapsar al final del rango
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    } else {
+                        event.target.textContent = inputValue;
+                    }
                 }
             }
 
