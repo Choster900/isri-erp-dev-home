@@ -164,7 +164,7 @@ import axios from 'axios';
 
     <ModalIncomeConceptVue :showModalIncome="showModalIncome" :modalData="modalData"
       :financing_sources="financing_sources" :budget_accounts="budget_accounts" :dependencies="dependencies"
-      @cerrar-modal="showModalIncome = false" @get-table="this.getIncomeConcept(this.tableData.currentPage)" />
+      @cerrar-modal="showModalIncome = false" @get-table="getIncomeConcept(tableData.currentPage)" />
 
   </AppLayoutVue>
 </template>

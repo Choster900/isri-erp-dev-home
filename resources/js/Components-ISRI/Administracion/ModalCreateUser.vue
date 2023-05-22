@@ -207,7 +207,7 @@ export default {
         }
       },
       getRolesPerSystem(){
-        axios.get('/roles-per-system', { params: this.modalDataCreate })
+        axios.post('/roles-per-system', this.modalDataCreate )
         .then((response) => {
           this.modalDataCreate.roles = response.data.roles
           })
