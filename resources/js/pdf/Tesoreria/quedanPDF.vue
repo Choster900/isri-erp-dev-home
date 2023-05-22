@@ -7,9 +7,9 @@
             <h3 style class="text-[15pt] font-semibold text-center">
                 INSTITUTO SALVADOREÑO DE REHABILITACIÓN INTEGRAL
             </h3>
-            
+
             <div style class="text-center">
-                Original - Contabilidad
+                ORIGINAL - CLIENTE
             </div>
         </div>
         <div class="md:mb-0 basis-1/4 pr-2">
@@ -18,8 +18,8 @@
                     <tr>
                         <td class="text-[10pt] text-right" style="font-family: Arial, Helvetica, sans-serif;">Cheque $</td>
                         <td class="border border-b-black border-x-transparent border-t-transparent w-[75px]">
-                            <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt] text-right">
-                                <span class="font-semibold text-[9pt]" style="font-family: Arial, Helvetica, sans-serif">{{
+                            <div style="margin-top: -12px;" class="pl-2 pt-2 pb-2 text-[8pt] text-right">
+                                <span class="font-semibold text-[10pt]" style="font-family: Arial, Helvetica, sans-serif">{{
                                     cheque
                                 }}</span>
                             </div>
@@ -32,7 +32,7 @@
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IVA $</td>
                         <td class="border border-b-black border-x-transparent border-t-transparent w-[75px]">
                             <div style="margin-top: -12px;" class="pl-2 pt-2 pb-2 text-[8pt] text-right">
-                                <span class="font-semibold text-[9pt]" style="font-family: Arial, Helvetica, sans-serif">{{
+                                <span class="font-semibold text-[10pt]" style="font-family: Arial, Helvetica, sans-serif">{{
                                     iva }}</span>
                             </div>
                         </td>
@@ -44,7 +44,7 @@
                             &nbsp;&nbsp;&nbsp;&nbsp;Renta $</td>
                         <td class="border border-b-black border-x-transparent border-t-transparent w-[75px]">
                             <div style="margin-top: -12px;" class="pl-2 pt-2 pb-2 text-[8pt] text-right"> <span
-                                    class="font-semibold text-[9pt]" style="font-family: Arial, Helvetica, sans-serif">{{
+                                    class="font-semibold text-[10pt]" style="font-family: Arial, Helvetica, sans-serif">{{
                                         renta }}</span>
                             </div>
                         </td>
@@ -56,7 +56,7 @@
                             &nbsp;&nbsp;&nbsp;&nbsp;TOTAL $</td>
                         <td class="border border-b-black border-x-transparent border-t-transparent w-[75px]">
                             <div style="margin-top: -12px;" class="pl-2 pt-2 pb-2 text-[8pt] text-right">
-                                <span class="font-semibold text-[9pt]" style="font-family: Arial, Helvetica, sans-serif">{{
+                                <span class="font-semibold text-[10pt]" style="font-family: Arial, Helvetica, sans-serif">{{
                                     totalCheque
                                 }}</span>
                             </div>
@@ -219,7 +219,7 @@
                 <tr>
                     <td class="h-5"></td>
                     <td class=" w-[225px] text-center">
-                        <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt] font-semibold">TESORERO INSTITUCIONAL 
+                        <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt] font-semibold">TESORERO INSTITUCIONAL
                         </div>
                     </td>
                 </tr>
@@ -236,7 +236,7 @@
                 INSTITUTO SALVADOREÑO DE REHABILITACIÓN INTEGRAL
             </h3>
             <div style class="text-center">
-                Copia - Proveedor/Cliente
+                COPIA - CONTABILIDAD
             </div>
         </div>
         <div class="md:mb-0 basis-1/4 pr-2">
@@ -245,8 +245,8 @@
                     <tr>
                         <td class="text-[10pt] text-right" style="font-family: Arial, Helvetica, sans-serif;">Cheque $</td>
                         <td class="border border-b-black border-x-transparent border-t-transparent w-[75px]">
-                            <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt] text-right">
-                                <span class="font-semibold text-[9pt]" style="font-family: Arial, Helvetica, sans-serif">{{
+                            <div style="margin-top: -12px;" class="pl-2 pt-2 pb-2 text-[8pt] text-right">
+                                <span class="font-semibold text-[10pt]" style="font-family: Arial, Helvetica, sans-serif">{{
                                     cheque
                                 }}</span>
                             </div>
@@ -259,7 +259,7 @@
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IVA $</td>
                         <td class="border border-b-black border-x-transparent border-t-transparent w-[75px]">
                             <div style="margin-top: -12px;" class="pl-2 pt-2 pb-2 text-[8pt] text-right">
-                                <span class="font-semibold text-[9pt]" style="font-family: Arial, Helvetica, sans-serif">{{
+                                <span class="font-semibold text-[10pt]" style="font-family: Arial, Helvetica, sans-serif">{{
                                     iva }}</span>
                             </div>
                         </td>
@@ -271,7 +271,7 @@
                             &nbsp;&nbsp;&nbsp;&nbsp;Renta $</td>
                         <td class="border border-b-black border-x-transparent border-t-transparent w-[75px]">
                             <div style="margin-top: -12px;" class="pl-2 pt-2 pb-2 text-[8pt] text-right"> <span
-                                    class="font-semibold text-[9pt]" style="font-family: Arial, Helvetica, sans-serif">{{
+                                    class="font-semibold text-[10pt]" style="font-family: Arial, Helvetica, sans-serif">{{
                                         renta }}</span>
                             </div>
                         </td>
@@ -283,7 +283,7 @@
                             &nbsp;&nbsp;&nbsp;&nbsp;TOTAL $</td>
                         <td class="border border-b-black border-x-transparent border-t-transparent w-[75px]">
                             <div style="margin-top: -12px;" class="pl-2 pt-2 pb-2 text-[8pt] text-right">
-                                <span class="font-semibold text-[9pt]" style="font-family: Arial, Helvetica, sans-serif">{{
+                                <span class="font-semibold text-[10pt]" style="font-family: Arial, Helvetica, sans-serif">{{
                                     totalCheque
                                 }}</span>
                             </div>

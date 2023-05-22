@@ -329,10 +329,10 @@ class QuedanController extends Controller
                 DB::raw("CONCAT(nivel_prioridad_pago,' - ',nombre_prioridad_pago) AS label")
             )->get();
 
-        $v_Proyecto_finanziado = DB::table('fuente_financiamiento')
+        $v_Proyecto_finanziado = DB::table('proyecto_financiado')
             ->select(
-                'id_fuente_fmto as value',
-                DB::raw("CONCAT(codigo_fuente_fmto,' - ',nombre_fuente_fmto) AS label")
+                'id_proy_financiado as value',
+                'nombre_proy_financiado AS label',
             )->get();
 
 

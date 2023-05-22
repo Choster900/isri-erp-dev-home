@@ -33,7 +33,7 @@ class RequerimientoController extends Controller
             ->orderBy($v_columns[$v_column], $v_dir);
 
         if ($data) {
-            $v_query->where('id_requerimiento_pago', 'like', '%' . $data["id_requerimiento_pago"] . '%')
+            $v_query->where('numero_requerimiento_pago', 'like', '%' . $data["numero_requerimiento_pago"] . '%')
                 ->where('numero_requerimiento_pago', 'like', '%' . $data["numero_requerimiento_pago"] . '%');
 
             if (isset($data['descripcion_requerimiento_pago'])) {
@@ -41,6 +41,10 @@ class RequerimientoController extends Controller
             }
 
             $v_query->where('monto_requerimiento_pago', 'like', '%' . $data["monto_requerimiento_pago"] . '%');
+
+
+            $v_query->where('id_estado_req_pago', 'like', '%' . $data["id_estado_req_pago"] . '%');
+
 
             $searchText = $data["allQUedan"];
             $v_query->whereHas('Quedan', function ($query) use ($searchText) {
