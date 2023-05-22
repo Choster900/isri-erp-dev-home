@@ -244,9 +244,8 @@ export default {
         },
         async getListForSelect() {
             await axios.get('/get-list-select').then((response) => {
-
                 this.dataForSelect = response.data;
-                console.log(response.data);
+                console.log(response.data.numeroRequerimiento);
             }).catch((errors) => {
                 let msg = this.manageError(errors);
                 this.$swal.fire({

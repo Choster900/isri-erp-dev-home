@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Tesoreria;
 use App\Http\Controllers\Controller;
 use App\Models\EmpleadoTesoreria;
 use App\Models\Proveedor;
+use App\Models\RequerimientoPago;
 use Illuminate\Http\Request;
 use App\Models\Quedan;
 use App\Models\DetalleQuedan;
@@ -310,12 +311,15 @@ class QuedanController extends Controller
             $join->on('sujeto_retencion.id_sujeto_retencion', '=', 'proveedor.id_sujeto_retencion');
         })->where("estado_proveedor", 1)->get();
 
-        $v_Requerimiento = DB::table('requerimiento_pago')
-            ->select(
-                'id_requerimiento_pago as value',
-                DB::raw("CONCAT(numero_requerimiento_pago,' - ',anio_requerimiento_pago) AS label"),
-                'id_estado_req_pago'
-            )->where("estado_requerimiento_pago", 1)->get();
+        $v_Requerimiento = RequerimientoPago::select(
+            'requerimiento_pago.id_requerimiento_pago as value',
+            DB::raw("CONCAT(requerimiento_pago.numero_requerimiento_pago,' - ',requerimiento_pago.anio_requerimiento_pago) AS label"),
+            'requerimiento_pago.id_estado_req_pago',
+            'requerimiento_pago.numero_requerimiento_pago',
+            'requerimiento_pago.monto_requerimiento_pago',
+            'requerimiento_pago.descripcion_requerimiento_pago',
+            DB::raw('(requerimiento_pago.monto_requerimiento_pago - COALESCE((SELECT SUM(monto_liquido_quedan) FROM quedan WHERE quedan.id_requerimiento_pago = requerimiento_pago.id_requerimiento_pago), 0)) AS restante_requerimiento_pago'),
+        )->where('requerimiento_pago.estado_requerimiento_pago', 1)->get();
 
         $v_Prioridad_pago = DB::table('prioridad_pago')
             ->select(
