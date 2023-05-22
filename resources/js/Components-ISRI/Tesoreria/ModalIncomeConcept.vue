@@ -10,7 +10,7 @@ import axios from "axios";
 <template>
     <div class="m-1.5">
         <ModalBasicVue :modalOpen="showModalIncome" @close-modal="$emit('cerrar-modal')" :title="'Concepto de ingresos. '"
-            maxWidth="3xl" >
+            maxWidth="3xl">
             <div class="px-5 py-4">
                 <div class="text-sm">
 
@@ -74,8 +74,8 @@ import axios from "axios";
                     <!-- Third row -->
                     <div class="mb-7 md:flex flex-row justify-items-start">
                         <div class="mb-4 md:mr-2 md:mb-0 basis-full">
-                            <TextInput :required="false" id="detalle-concepto" v-model="income_concept.detail" :value="income_concept.detail"
-                                type="text" placeholder="Detalle concepto ingreso">
+                            <TextInput :required="false" id="detalle-concepto" v-model="income_concept.detail"
+                                :value="income_concept.detail" type="text" placeholder="Detalle concepto ingreso">
                                 <LabelToInput icon="standard" forLabel="detalle-concepto" />
                             </TextInput>
                             <InputError v-for="(item, index) in errors.detail" :key="index" class="mt-2" :message="item" />
@@ -138,7 +138,7 @@ export default {
         };
     },
     methods: {
-        onInput(){
+        onInput() {
             this.income_concept.name = this.income_concept.name.toUpperCase();
         },
         saveNewIncomeConcept() {
@@ -221,16 +221,30 @@ export default {
                             })
                             .catch((errors) => {
                                 if (errors.response.status === 422) {
-                                    toast.warning(
-                                        "Tienes algunos errores por favor verifica tus datos.",
-                                        {
-                                            autoClose: 5000,
-                                            position: "top-right",
-                                            transition: "zoom",
-                                            toastBackgroundColor: "white",
-                                        }
-                                    );
-                                    this.errors = errors.response.data.errors;
+                                    if (errors.response.data.logical_error) {
+                                        toast.error(
+                                            errors.response.data.logical_error,
+                                            {
+                                                autoClose: 5000,
+                                                position: "top-right",
+                                                transition: "zoom",
+                                                toastBackgroundColor: "white",
+                                            }
+                                        );
+                                        this.$emit("get-table");
+                                        this.$emit("cerrar-modal");
+                                    } else {
+                                        toast.warning(
+                                            "Tienes algunos errores por favor verifica tus datos.",
+                                            {
+                                                autoClose: 5000,
+                                                position: "top-right",
+                                                transition: "zoom",
+                                                toastBackgroundColor: "white",
+                                            }
+                                        );
+                                        this.errors = errors.response.data.errors;
+                                    }
                                 } else {
                                     let msg = this.manageError(errors);
                                     this.$swal.fire({
