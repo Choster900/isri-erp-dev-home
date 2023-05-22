@@ -77,6 +77,7 @@ export default {
                 monthSelectorType: 'static',
                 altFormat: "d/m/Y",
                 dateFormat: "Y-m-d",
+                maxDate: new Date(),
                 locale: {
                     firstDayOfWeek: 1,
                     weekdays: {

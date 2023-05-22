@@ -328,7 +328,7 @@ export default {
                 const successTakeOf = await this.takeOfNumberRequest(id_quedan);
 
                 if (successTakeOf) {
-                    toast.warning(`Se removio el numero de requerimiento al quedan ${id_quedan}`, {
+                    toast.warning(`Se eliminó el quedan ${id_quedan} del requerimiento.`, {
                         autoClose: 5000,
                         position: "top-right",
                         transition: "zoom",

@@ -64,7 +64,7 @@ import axios from 'axios';
                             @click="filterQuedan()" />
                     </div>
                     <div class="grid px-2 grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                        <GeneralButton color="bg-[#7a0000]  hover:bg-[#7a0000]/90" text="Limpiar Filtro" icon="search"
+                        <GeneralButton color="bg-[#7a0000]  hover:bg-[#7a0000]/90" text="Limpiar Filtro" icon="delete"
                             @click="dataQuedan = []" />
                     </div>
                 </div>
@@ -88,9 +88,36 @@ import axios from 'axios';
                                 <button @click="addNumber()"
                                     class="inline-flex items-center justify-center px-3 h-6 text-sm py-1 text-white rounded-md shadow"
                                     :class="(collectItems != '' && id_requerimiento_pago != '' ? ' bg-orange-600' : ' bg-gray-600')">
-                                    Agregar requerimiento
+                                    Agregar a requerimiento
                                 </button>
                             </div>
+
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-full">
+                                <table id="resumen" class="table table-bordered text-center p-0 mt-2 w-[350px]">
+                                    <tbody>
+                                        <tr>
+                                            <td class="border-2 px-3  text-xs">NUMERO<br />
+                                                <span class="text-red-500 text-xs">1</span>
+                                            </td>
+                                            <td class="border-2 px-3 text-xs">MONTO<br />
+                                                <span class="text-red-500 text-xs">$ 1899.23</span>
+                                            </td>
+                                            <td class="border-2 px-3 text-xs">SOBRANTE<br />
+                                                <span class="text-red-500 text-xs">192.00</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border-2 text-xs max-w-[350px] min-w-w-[350px]" colspan="3">
+                                                DESCRIPCION:
+                                                <span class="text-xs">Breve descripcion de esta wea esto dependera de el
+                                                    tamano</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+
                         </div>
                     </div>
                     <div class="sidebar-style-isri w-full" style="overflow-x:auto; max-height: 440px;">
@@ -233,7 +260,7 @@ export default {
             altInput: true,
             static: true,
             monthSelectorType: 'static',
-            altFormat: "F-j Y",
+            altFormat: "d/m/Y",
             dateFormat: "Y-m-d",
             locale: {
                 firstDayOfWeek: 1,

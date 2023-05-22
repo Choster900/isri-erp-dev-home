@@ -290,7 +290,6 @@ export default {
             }
         },
         updateSupplier() {
-
             this.$swal.fire({
                 title: '¿Esta seguro de editar los datos?',
                 icon: 'question',
@@ -311,21 +310,33 @@ export default {
                         });
                     }).catch((errors) => {
                         if (errors.response.status === 422) {
-                            let data = errors.response.data.errors
-                            var myData = new Object();
-                            for (const errorBack in data) {
-                                myData[errorBack] = data[errorBack][0]
+                            if (errors.response.data.logical_error) {
+                                toast.error(
+                                    errors.response.data.logical_error,
+                                    {
+                                        autoClose: 5000,
+                                        position: "top-right",
+                                        transition: "zoom",
+                                        toastBackgroundColor: "white",
+                                    }
+                                );
+                                this.$emit("showTableAgain")
+                                this.$emit('close-definitive')
+                                this.limpiarCampos()
+                            } else {
+                                let data = errors.response.data.errors
+                                var myData = new Object();
+                                for (const errorBack in data) {
+                                    myData[errorBack] = data[errorBack][0]
+                                }
+                                this.errosModel = myData;
+                                toast.warning("Tienes algunos errores por favor verifica tus datos", {
+                                    autoClose: 5000,
+                                    position: "top-right",
+                                    transition: "zoom",
+                                    toastBackgroundColor: "white",
+                                });
                             }
-                            this.errosModel = myData;
-                            toast.warning("Tienes algunos errores por favor verifica tus datos", {
-                                autoClose: 5000,
-                                position: "top-right",
-                                transition: "zoom",
-                                toastBackgroundColor: "white",
-                            });
-                            // setTimeout(() => {
-                            //     this.errosModel = {}
-                            // }, 9000);
                         } else {
                             let msg = this.manageError(errors);
                             this.$swal.fire({
@@ -338,8 +349,6 @@ export default {
                     });
                 }
             })
-
-
         },
         addSupplier() {
             this.$swal.fire({

@@ -20,6 +20,7 @@ class ConceptoIngreso extends Model
         'nombre_concepto_ingreso',
         'detalle_concepto_ingreso',
         'fecha_reg_concepto_ingreso',
+        'estado_concepto_ingreso',
         'fecha_mod_concepto_ingreso',
         'ip_concepto_ingreso',
         'usuario_concepto_ingreso'

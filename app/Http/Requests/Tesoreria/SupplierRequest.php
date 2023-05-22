@@ -32,13 +32,15 @@ class SupplierRequest extends FormRequest
             'razon_social_proveedor'     => ['required'],
             'nombre_comercial_proveedor' => ['required'],
             'dui_proveedor' => [
-                'required',
+                'nullable',
                 new DuiValidationRule,
-                'unique:proveedor,dui_proveedor,' . $request->input("id_proveedor") . ',id_proveedor'
+                'unique:proveedor,dui_proveedor,' . $request->input("id_proveedor") . ',id_proveedor',
+                'required_without:nit_proveedor'
             ],
             'nit_proveedor' => [
                 'nullable',
                 'unique:proveedor,nit_proveedor,' . $request->input("id_proveedor") . ',id_proveedor',
+                'required_without:dui_proveedor'
             ],
             'id_tipo_contribuyente'      => ['required'],
             'id_sujeto_retencion'        => ['required'],
@@ -59,7 +61,8 @@ class SupplierRequest extends FormRequest
             'id_sujeto_retencion.required'        => 'El campo sujeto de rentencion es requerido',
             'id_municipio.required'               => 'El campo municipio es requerido',
             'id_giro.required'                    => 'El campo giro es requerido',
-
+            'dui_proveedor.required_without'      => 'Debes proporcionar DUI o NIT.',
+            'nit_proveedor.required_without'      => 'Debes proporcionar DUI o NIT.',
         ];
     }
 }

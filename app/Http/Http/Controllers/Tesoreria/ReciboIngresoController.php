@@ -45,7 +45,7 @@ class ReciboIngresoController extends Controller
         $income_receipt = $query->paginate($length)->onEachSide(1);
 
         $numeroLetras = new NumeroALetras();
-        $monto_letras = array_map(function ($income_receipt) use ($numeroLetras) {
+        $monto_letras = array_map(function($income_receipt) use($numeroLetras) {
             return ['monto_letras' => $numeroLetras->toInvoice($income_receipt['monto_recibo_ingreso'], 2, 'DÓLARES')];
         }, $income_receipt->toArray()['data']);
         $query_con_monto_letras = $income_receipt->map(function ($item, $key) use ($monto_letras) {
@@ -65,34 +65,16 @@ class ReciboIngresoController extends Controller
 
     public function changeStateIncomeReceipt(Request $request)
     {
+        $estado_anterior = $request->input('income_receipt_state');
+        $msg = "";
         $recibo_ingreso = ReciboIngreso::find($request->income_receipt_id);
-        if ($recibo_ingreso->estado_recibo_ingreso == 1) {
-            if ($request->income_receipt_state == 1) {
-                $recibo_ingreso->update([
-                    'estado_recibo_ingreso' => 0,
-                    'fecha_mod_recibo_ingreso' => Carbon::now(),
-                    'usuario_recibo_ingreso' => $request->user()->nick_usuario,
-                    'ip_recibo_ingreso' => $request->ip(),
-                ]);
-                return ['mensaje' => 'Recibo de ingreso ' . $recibo_ingreso->numero_recibo_ingreso . ' ha sido desactivado con exito'];
-            } else {
-                return ['mensaje' => 'El recibo de ingreso seleccionado ya ha sido activado por otro usuario'];
-            }
-        } else {
-            if ($recibo_ingreso->estado_concepto_ingreso == 0) {
-                if ($request->income_receipt_state == 0) {
-                    $recibo_ingreso->update([
-                        'estado_recibo_ingreso' => 1,
-                        'fecha_mod_recibo_ingreso' => Carbon::now(),
-                        'usuario_recibo_ingreso' => $request->user()->nick_usuario,
-                        'ip_recibo_ingreso' => $request->ip(),
-                    ]);
-                    return ['mensaje' => 'Recibo de ingreso ' . $recibo_ingreso->numero_recibo_ingreso . ' ha sido activado con exito'];
-                } else {
-                    return ['mensaje' => 'El recibo de ingreso seleccionado ya ha sido desactivado por otro usuario'];
-                }
-            }
-        }
+        $estado_anterior == 1 ? $recibo_ingreso->estado_recibo_ingreso = 0 : $recibo_ingreso->estado_recibo_ingreso = 1;
+        $estado_anterior == 1 ? $msg = "Desactivado" : $msg = "Activado";
+        $recibo_ingreso->ip_recibo_ingreso = $request->ip();
+        $recibo_ingreso->fecha_mod_recibo_ingreso = Carbon::now();
+        $recibo_ingreso->usuario_recibo_ingreso = $request->user()->nick_usuario;
+        $recibo_ingreso->update();
+        return ['mensaje' => $msg . ' recibo numero ' . $recibo_ingreso->numero_recibo_ingreso . ' con exito'];
     }
 
     public function getModalReceiptSelects(Request $request)
@@ -128,7 +110,7 @@ class ReciboIngresoController extends Controller
         //     ->where('estado_proy_financiado','=',1)
         //     ->orderBy('nombre_proy_financiado')
         //     ->get();
-        return ['budget_accounts' => $budget_accounts, 'income_concepts' => $income_concepts, 'treasury_clerk' => $treasury_clerk, 'financing_sources' => $financing_sources];
+        return ['budget_accounts' => $budget_accounts, 'income_concepts' => $income_concepts, 'treasury_clerk' => $treasury_clerk,'financing_sources' => $financing_sources];
     }
 
     public function saveIncomeReceipt(IncomeReceiptRequest $request)
@@ -179,72 +161,68 @@ class ReciboIngresoController extends Controller
     public function updateIncomeReceipt(IncomeReceiptRequest $request)
     {
         $income_receipt = ReciboIngreso::find($request->income_receipt_id);
-        if ($income_receipt->estado_recibo_ingreso == 0) {
-            return response()->json(['logical_error' => 'Error, el recibo de ingreso seleccionado ha sido desactivado por otro usuario.'], 422);
-        } else {
-            $income_receipt->update([
-                'cliente_recibo_ingreso' => $request->client,
-                'id_empleado_tesoreria' => $request->treasury_clerk_id,
-                'descripcion_recibo_ingreso' => $request->description,
-                'doc_identidad_recibo_ingreso' => $request->document,
-                'direccion_cliente_recibo_ingreso' => $request->direction,
-                'monto_recibo_ingreso' => $request->total,
-                'fecha_mod_recibo_ingreso' => Carbon::now(),
-                'usuario_recibo_ingreso' => $request->user()->nick_usuario,
-                'ip_recibo_ingreso' => $request->ip(),
-            ]);
+        $income_receipt->update([
+            'cliente_recibo_ingreso' => $request->client,
+            'id_empleado_tesoreria' => $request->treasury_clerk_id,
+            'descripcion_recibo_ingreso' => $request->description,
+            'doc_identidad_recibo_ingreso' => $request->document,
+            'direccion_cliente_recibo_ingreso' => $request->direction,
+            'monto_recibo_ingreso' => $request->total,
+            'fecha_mod_recibo_ingreso' => Carbon::now(),
+            'usuario_recibo_ingreso' => $request->user()->nick_usuario,
+            'ip_recibo_ingreso' => $request->ip(),
+        ]);
 
-            foreach ($request->income_detail as $detail) {
-                if ($detail['detail_id'] != "" && $detail['deleted'] == false) {
-                    //Update detail
-                    $income_detail = DetalleReciboIngreso::find($detail['detail_id']);
-                    $income_detail->update([
-                        'id_concepto_ingreso' => $detail['income_concept_id'],
-                        'estado_det_recibo_ingreso' => 1,
+        foreach ($request->income_detail as $detail) {
+            if ($detail['detail_id'] != "" && $detail['deleted'] == false) {
+                //Update detail
+                $income_detail = DetalleReciboIngreso::find($detail['detail_id']);
+                $income_detail->update([
+                    'id_concepto_ingreso' => $detail['income_concept_id'],
+                    'estado_det_recibo_ingreso' => 1,
+                    'monto_det_recibo_ingreso' => $detail['amount'],
+                    'fecha_mod_det_recibo_ingreso' => Carbon::now(),
+                    'usuario_det_recibo_ingreso' => $request->user()->nick_usuario,
+                    'ip_det_recibo_ingreso' => $request->ip()
+                ]);
+            }
+
+            if ($detail['detail_id'] != "" && $detail['deleted'] == true) {
+                $income_detail = DetalleReciboIngreso::find($detail['detail_id']);
+                $income_detail->update([
+                    'estado_det_recibo_ingreso' => 0,
+                    'fecha_mod_det_recibo_ingreso' => Carbon::now(),
+                    'usuario_det_recibo_ingreso' => $request->user()->nick_usuario,
+                    'ip_det_recibo_ingreso' => $request->ip()
+                ]);
+            }
+
+            if ($detail['detail_id'] == "" && $detail['deleted'] == false) {
+                $exist_detail = DetalleReciboIngreso::where('id_recibo_ingreso', $request->income_receipt_id)
+                    ->where('id_concepto_ingreso', $detail['income_concept_id'])
+                    ->first();
+                if ($exist_detail) {
+                    $exist_detail->update([
                         'monto_det_recibo_ingreso' => $detail['amount'],
                         'fecha_mod_det_recibo_ingreso' => Carbon::now(),
                         'usuario_det_recibo_ingreso' => $request->user()->nick_usuario,
-                        'ip_det_recibo_ingreso' => $request->ip()
+                        'ip_det_recibo_ingreso' => $request->ip(),
+                        'estado_det_recibo_ingreso' => 1,
                     ]);
-                }
-
-                if ($detail['detail_id'] != "" && $detail['deleted'] == true) {
-                    $income_detail = DetalleReciboIngreso::find($detail['detail_id']);
-                    $income_detail->update([
-                        'estado_det_recibo_ingreso' => 0,
-                        'fecha_mod_det_recibo_ingreso' => Carbon::now(),
+                } else {
+                    $new_income_detail = new DetalleReciboIngreso([
+                        'id_recibo_ingreso' => $request->income_receipt_id,
+                        'id_concepto_ingreso' => $detail['income_concept_id'],
+                        'monto_det_recibo_ingreso' => $detail['amount'],
+                        'estado_det_recibo_ingreso' => 1,
+                        'fecha_reg_det_recibo_ingreso' => Carbon::now(),
                         'usuario_det_recibo_ingreso' => $request->user()->nick_usuario,
                         'ip_det_recibo_ingreso' => $request->ip()
                     ]);
-                }
-
-                if ($detail['detail_id'] == "" && $detail['deleted'] == false) {
-                    $exist_detail = DetalleReciboIngreso::where('id_recibo_ingreso', $request->income_receipt_id)
-                        ->where('id_concepto_ingreso', $detail['income_concept_id'])
-                        ->first();
-                    if ($exist_detail) {
-                        $exist_detail->update([
-                            'monto_det_recibo_ingreso' => $detail['amount'],
-                            'fecha_mod_det_recibo_ingreso' => Carbon::now(),
-                            'usuario_det_recibo_ingreso' => $request->user()->nick_usuario,
-                            'ip_det_recibo_ingreso' => $request->ip(),
-                            'estado_det_recibo_ingreso' => 1,
-                        ]);
-                    } else {
-                        $new_income_detail = new DetalleReciboIngreso([
-                            'id_recibo_ingreso' => $request->income_receipt_id,
-                            'id_concepto_ingreso' => $detail['income_concept_id'],
-                            'monto_det_recibo_ingreso' => $detail['amount'],
-                            'estado_det_recibo_ingreso' => 1,
-                            'fecha_reg_det_recibo_ingreso' => Carbon::now(),
-                            'usuario_det_recibo_ingreso' => $request->user()->nick_usuario,
-                            'ip_det_recibo_ingreso' => $request->ip()
-                        ]);
-                        $new_income_detail->save();
-                    }
+                    $new_income_detail->save();
                 }
             }
-            return ['mensaje' => 'Actualizado recibo numero ' . $income_receipt->numero_recibo_ingreso . ' con éxito.'];
         }
+        return ['mensaje' => 'Actualizado recibo numero ' . $income_receipt->numero_recibo_ingreso . ' con éxito.'];
     }
 }
