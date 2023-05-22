@@ -241,7 +241,7 @@ import axios from 'axios';
             </table>
             <div class="flex justify-center items-center">
 
-                <div class="px-2 pt-3" v-if="this.dataRequest.id_estado_req_pago != 2">
+                <div class="px-2 pt-3" v-if="dataRequest.id_estado_req_pago != 2">
                     <GeneralButton @click="setLiquidaciones()" color="bg-orange-700  hover:bg-orange-800" text="Liquidar"
                         icon="add" />
                 </div>
