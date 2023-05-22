@@ -376,12 +376,6 @@ export default {
                 });
                 return false; //  si todos los campos vacios no se ingresara  la liquidacion
             } else {
-                toast.success("Liquidaciones agregadas exitosamente", {
-                    autoClose: 4000,
-                    position: "top-right",
-                    transition: "zoom",
-                    toastBackgroundColor: "white",
-                });
                 return true; // si por lo menos hay un campo lleno se ingresara a la bas
             }
         },
@@ -481,7 +475,15 @@ export default {
                                 liquidado: this.restRequest == 0 ? true : false,
                                 id_requerimiento_pago: this.dataRequest.quedan[0].id_requerimiento_pago,
                             }).then(result => {//result obtenemos la cantidad total pagada por los quedan enviados
-                                this.$emit("reload-table-and-close")
+                                toast.success("Liquidaciones agregadas exitosamente", {
+                                    autoClose: 4000,
+                                    position: "top-right",
+                                    transition: "zoom",
+                                    toastBackgroundColor: "white",
+                                });
+                                setTimeout(() => {
+                                    this.$emit("reload-table-and-close")
+                                }, 1000);
                             }).catch(errors => {
                                 let msg = this.manageError(errors);
                                 this.$swal.fire({
