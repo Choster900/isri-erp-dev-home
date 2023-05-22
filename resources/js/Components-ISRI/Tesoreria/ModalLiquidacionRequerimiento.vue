@@ -145,7 +145,7 @@ import axios from 'axios';
                                     contenteditable="false">
                                     {{ data.id_quedan }}
                                 </td>
-                                <td :ref="i" :class="[data.restanteToShow == 0 ? 'bg-green-600' :
+                                <td :class="[data.restanteToShow == 0 ? 'bg-green-600' :
                                     data.restanteToShow < 0 ? 'bg-red-600' :
                                         data.monto_liquidacion_quedan < 0 ? 'bg-red-600' :
                                             data.id_estado_quedan == 3 ? 'bg-blue-600' : 'bg-[#1f355833]']"
