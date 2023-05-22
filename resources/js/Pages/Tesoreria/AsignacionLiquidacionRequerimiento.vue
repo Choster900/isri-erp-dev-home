@@ -9,7 +9,7 @@ import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalL
 </script>
 <template>
     <Head title="Proceso - Asignacion" />
-    <AppLayoutVue nameSubModule="Tesoreria - Asignacion de Requerimiento">
+    <AppLayoutVue nameSubModule="Tesoreria - Asignacion y Liquidacion de requerimientos">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
                 <GeneralButton @click="showModalAsignacionRequerimiento = true" color="bg-green-700  hover:bg-green-800"
@@ -17,17 +17,16 @@ import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalL
             </div>
         </div>
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
-            <!-- TODO: Improve view table - this is temporal and doesn't mean is permanent -->
             <header class="px-5 py-4">
                 <div class="mb-4 md:flex flex-row justify-items-start">
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-                            <Multiselect v-model="tableData.length" @select="getDataQuedan()" :options="perPage"
+                            <Multiselect v-model="tableData.length" @input="getDataLiquidaciones()" :options="perPage"
                                 :searchable="true" placeholder="Cantidad a mostrar" />
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Todos los requerimientos
+                    <h2 class="font-semibold text-slate-800 pt-1">Requerimientos:
                         <span class="text-slate-400 font-medium">{{ pagination.total }}</span>
                     </h2>
                 </div>
@@ -50,23 +49,6 @@ import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalL
                                         data.descripcion_requerimiento_pago }}
                                     </div>
                                 </td>
-                                <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px text-center">
-                                    <div v-if="data.id_estado_req_pago === 1"
-                                        class="text-xs inline-flex font-medium bg-emerald-100 text-emerald-600 rounded-full text-center px-2.5 py-1">
-                                        Abierto
-                                    </div>
-
-                                    <div v-else-if="data.id_estado_req_pago === 2"
-                                        class="text-xs inline-flex font-medium bg-red-100 text-red-600 rounded-full text-center px-2.5 py-1">
-                                        Cerrado
-                                    </div>
-
-
-                                </td>
-                                <td class="px-2 first:pl-5 last:pr-5">
-                                    <div class="font-medium text-slate-800 text-center">{{ data.monto_requerimiento_pago }}
-                                    </div>
-                                </td>
                                 <td>
                                     <div v-for="(quedan, i) in  data.quedan" :key="i"
                                         class="font-medium text-slate-800 text-center flex justify-center items-center">
@@ -76,6 +58,21 @@ import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalL
                                             <br>
                                             MONTO TOTAL: {{ quedan.monto_liquido_quedan }}
                                         </p>
+                                    </div>
+                                </td>
+                                <td class="px-2 first:pl-5 last:pr-5">
+                                    <div class="font-medium text-slate-800 text-center">{{ data.monto_requerimiento_pago }}
+                                    </div>
+                                </td>
+                                <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px text-center">
+                                    <div v-if="data.id_estado_req_pago === 1"
+                                        class="text-xs inline-flex font-medium bg-emerald-100 text-emerald-600 rounded-full text-center px-2.5 py-1">
+                                        Abierto
+                                    </div>
+
+                                    <div v-else-if="data.id_estado_req_pago === 2"
+                                        class="text-xs inline-flex font-medium bg-red-100 text-red-600 rounded-full text-center px-2.5 py-1">
+                                        Cerrado
                                     </div>
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
@@ -148,15 +145,15 @@ import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalL
         </div>
 
 
-        <ModalAsignacionRequerimiento :scrollbarModalOpen="showModalAsignacionRequerimiento"
+        <ModalAsignacionRequerimiento :modalIsOpen="showModalAsignacionRequerimiento"
             @close-definitive="showModalAsignacionRequerimiento = false" :dataForSelect="dataForSelect"
-            @reload-table="getDataLiquidaciones()" />
+            @reload-table="[getDataLiquidaciones(), getListForSelect()]" />
 
 
         <ModalLiquidacionRequerimientoVue :modalIsOpen="showModalLiquidacionRequerimiento"
             @close-definitive="showModalLiquidacionRequerimiento = false" @reload-table="getDataLiquidaciones()"
             @reload-table-and-close="[getDataLiquidaciones(), showModalLiquidacionRequerimiento = false]"
-            :dataLiquidaciones="dataLiquidaciones" />
+            :dataLiquidaciones="dataLiquidaciones" @reload-data-for-select="getListForSelect()" />
     </AppLayoutVue>
 </template>
 <script>
@@ -168,9 +165,16 @@ export default {
         let columns = [
             { width: "10%", label: "Requerimiento", name: "numero_requerimiento_pago", type: "text" },
             { width: "20%", label: "Descripcion", name: "descripcion_requerimiento_pago", type: "text" },
-            { width: "10%", label: "Estado", name: "id_estado_req_pago", type: "text" },
             { width: "10%", label: "Monto requerido", name: "monto_requerimiento_pago", type: "text" },
             { width: "20%", label: "Todos los quedan", name: "allQUedan", type: "text" },
+            {
+                width: "10%", label: "Estado", name: "id_estado_req_pago", type: "select", options: [
+                    { value: "", label: "Ninguno" },
+                    { value: "1", label: "Abierto" },
+                    { value: "2", label: "Cerrado" },
+
+                ]
+            },
             { width: "5%", label: "", name: "Acciones" },
         ];
         columns.forEach((column) => {
@@ -185,7 +189,6 @@ export default {
             dataLiquidaciones: [],//data que contiene todos los totales de todos los requerimientos
             permits: [],
             dataForSelect: [],
-            scrollbarModalOpen: false,
             dataRequerimientoForTable: [],
             links: [],
             lastUrl: '/requerimientos',
