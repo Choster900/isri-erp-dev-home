@@ -58,7 +58,7 @@ import axios from 'axios';
                         </th>
                         <th
                             class="text-white bg-[#001b47] px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap rounded-tr-2xl">
-                            <div class=" text-center  ">RESTANTE: <br>
+                            <div class=" text-center  ">POR PAGAR: <br> 
                                 <span class="text-sm">{{ restRequest }}</span>
 
                             </div>
