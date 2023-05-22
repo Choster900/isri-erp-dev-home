@@ -275,7 +275,7 @@ export default {
               this.$swal.fire({
                 text: response.data.mensaje,
                 icon: 'success',
-                timer: 2000
+                timer: 5000
               })
               this.getIncomeConcept(this.tableData.currentPage);
             })

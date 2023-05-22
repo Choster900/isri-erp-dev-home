@@ -29,6 +29,7 @@ class Quedan extends Model
         'fecha_emision_quedan',
         'fecha_retencion_iva_quedan',
         'fecha_pago_quedan',
+        'monto_total_quedan',
         'monto_liquido_quedan',
         'monto_iva_quedan',
         'monto_isr_quedan',
@@ -71,9 +72,9 @@ class Quedan extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function liquidacion_quedan():HasOne
+    public function liquidacion_quedan():HasMany
     {
-        return $this->hasOne(LiquidacionQuedan::class, 'id_quedan', 'id_quedan');
+        return $this->hasMany(LiquidacionQuedan::class, 'id_quedan', 'id_quedan');
     }
 
     public function prioridad_pago()

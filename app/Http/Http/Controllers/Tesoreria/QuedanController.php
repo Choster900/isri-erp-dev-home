@@ -149,7 +149,8 @@ class QuedanController extends Controller
                 'id_proy_financiado'            => $request->quedan["id_proy_financiado"],
                 'id_prioridad_pago'             => $request->quedan["id_prioridad_pago"],
                 'id_proveedor'                  => $request->quedan["id_proveedor"],
-                'id_serie_retencion_iva'        => 1, //VALOR QUEDAMO POR EL MOMENTO
+                'id_serie_retencion_iva'        => 1,
+                //VALOR QUEDAMO POR EL MOMENTO
                 'id_acuerdo_compra'             => $request->quedan["id_acuerdo_compra"],
                 'numero_acuerdo_quedan'         => $request->quedan["numero_acuerdo_quedan"],
                 'numero_compromiso_ppto_quedan' => $request->quedan["numero_compromiso_ppto_quedan"],
@@ -169,7 +170,7 @@ class QuedanController extends Controller
             ]);
 
             // Insertar los registros de detalle_quedan
-            foreach ($detalle_quedan as $key => $value) {
+            foreach ( $detalle_quedan as $key => $value ) {
 
                 if ($value[7]) {
                     $new_detalle = array(
@@ -231,7 +232,7 @@ class QuedanController extends Controller
                 'fecha_mod_quedan'              => Carbon::now(),
             ]);
 
-            foreach ($detalle_quedan as $key => $value) {
+            foreach ( $detalle_quedan as $key => $value ) {
 
                 if ($value[0] == '') {
                     // Actualizar un detalle de quedan existente
@@ -308,8 +309,8 @@ class QuedanController extends Controller
             )->join('giro', function ($join) {
                 $join->on('giro.id_giro', '=', 'proveedor.id_giro');
             })->join('sujeto_retencion', function ($join) {
-                $join->on('sujeto_retencion.id_sujeto_retencion', '=', 'proveedor.id_sujeto_retencion');
-            })->where("estado_proveedor", 1)->get();
+            $join->on('sujeto_retencion.id_sujeto_retencion', '=', 'proveedor.id_sujeto_retencion');
+        })->where("estado_proveedor", 1)->get();
 
         $v_Requerimiento = RequerimientoPago::select(
             'requerimiento_pago.id_requerimiento_pago as value',
@@ -318,8 +319,7 @@ class QuedanController extends Controller
             'requerimiento_pago.numero_requerimiento_pago',
             'requerimiento_pago.monto_requerimiento_pago',
             'requerimiento_pago.descripcion_requerimiento_pago',
-            DB::raw('(SELECT SUM(monto_liquido_quedan) FROM quedan WHERE quedan.id_requerimiento_pago = requerimiento_pago.id_requerimiento_pago) AS suma_campo'),
-            DB::raw('(requerimiento_pago.monto_requerimiento_pago - COALESCE((SELECT SUM(monto_liquido_quedan) FROM quedan WHERE quedan.id_requerimiento_pago = requerimiento_pago.id_requerimiento_pago), 0)) AS restante_requerimiento'),
+            DB::raw('(requerimiento_pago.monto_requerimiento_pago - COALESCE((SELECT SUM(monto_liquido_quedan) FROM quedan WHERE quedan.id_requerimiento_pago = requerimiento_pago.id_requerimiento_pago), 0)) AS sobrante_requerimiento_pago'),
         )->where('requerimiento_pago.estado_requerimiento_pago', 1)->get();
 
 
@@ -334,8 +334,6 @@ class QuedanController extends Controller
                 'id_fuente_fmto as value',
                 DB::raw("CONCAT(codigo_fuente_fmto,' - ',nombre_fuente_fmto) AS label")
             )->get();
-
-
         return [
             "dependencias"        => $v_Dependencias,
             "acuerdoCompras"      => $v_AcuerdoCompra,
@@ -364,7 +362,7 @@ class QuedanController extends Controller
             // Filtrar proveedores con quedans no vacíos
             return $proveedor->quedan->isNotEmpty();
         });
-        foreach ($proveedores as $proveedor) {
+        foreach ( $proveedores as $proveedor ) {
             // Mapear quedans con detalles para el proveedor actual
             $quedan_con_detalle = $proveedor->quedan->map(function ($quedan) {
                 return [

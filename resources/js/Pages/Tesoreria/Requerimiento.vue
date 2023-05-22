@@ -21,7 +21,7 @@ import InputError from "@/Components/InputError.vue";
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
                             <Multiselect v-model="tableData.length" @select="getDataRequerimiento()" :options="perPage"
-                                :searchable="true" placeholder="Cantidad a mostrar"/>
+                                :searchable="true" placeholder="Cantidad a mostrar" />
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
@@ -315,7 +315,7 @@ export default {
         async getDataRequerimiento(url = "/requerimientos") {
             this.lastUrl = url;
             this.tableData.draw++;
-            await axios.post(url,this.tableData ).then((response) => {
+            await axios.post(url, this.tableData).then((response) => {
                 let data = response.data;
                 if (this.tableData.draw == data.draw) {
                     this.links = data.data.links;
@@ -432,16 +432,28 @@ export default {
                             this.requerimientoModalOpen = false
                         }).catch((errors) => {
                             if (errors.response.status === 422) {
-                                toast.warning(
-                                    "Tienes algunos errores por favor verifica tus datos.",
-                                    {
-                                        autoClose: 5000,
-                                        position: "top-right",
-                                        transition: "zoom",
-                                        toastBackgroundColor: "white",
-                                    }
-                                );
-                                this.errors = errors.response.data.errors;
+                                if (errors.response.data.logical_error) {
+                                    toast.error(
+                                        errors.response.data.logical_error,
+                                        {
+                                            autoClose: 5000,
+                                            position: "top-right",
+                                            transition: "zoom",
+                                            toastBackgroundColor: "white",
+                                        }
+                                    );
+                                } else {
+                                    toast.warning(
+                                        "Tienes algunos errores por favor verifica tus datos.",
+                                        {
+                                            autoClose: 5000,
+                                            position: "top-right",
+                                            transition: "zoom",
+                                            toastBackgroundColor: "white",
+                                        }
+                                    );
+                                    this.errors = errors.response.data.errors;
+                                }
                             } else {
                                 let msg = this.manageError(errors);
                                 this.$swal.fire({

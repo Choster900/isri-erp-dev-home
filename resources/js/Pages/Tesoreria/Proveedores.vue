@@ -317,7 +317,7 @@ export default {
                     this.$swal.fire({
                         text: 'Acción realizada!',
                         icon: 'success',
-                        timer: 2000
+                        timer: 5000
                     })
                 }
             });
