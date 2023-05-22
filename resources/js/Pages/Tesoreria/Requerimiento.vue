@@ -67,7 +67,7 @@ import InputError from "@/Components/InputError.vue";
                                 <div class="space-x-1">
 
                                     <DropDownOptions>
-                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                        <div v-if="requerimiento.id_estado_req_pago!=2" class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                                             @click="editRequerimiento(requerimiento)">
                                             <div class="w-8 text-green-900">
                                                 <span class="text-xs">
