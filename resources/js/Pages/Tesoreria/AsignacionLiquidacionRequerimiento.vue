@@ -1,26 +1,32 @@
 <script setup>
 import { Head } from "@inertiajs/vue3";
 import Datatable from "@/Components-ISRI/Datatable.vue";
-import ModalLiquidacion from "@/Components-ISRI/Tesoreria/ModalLiquidacionRequerimiento.vue";
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import axios from 'axios';
+import ModalAsignacionRequerimiento from "@/Components-ISRI/Tesoreria/ModalAsignacionRequerimiento.vue";
+import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalLiquidacionRequerimiento.vue';
 </script>
 <template>
-    <Head title="Proceso - Liquidacion" />
-    <AppLayoutVue nameSubModule="Tesoreria - Liquidación de Requerimientos">
+    <Head title="Proceso - Asignacion" />
+    <AppLayoutVue nameSubModule="Tesoreria - Asignacion y Liquidacion de requerimientos">
+        <div class="sm:flex sm:justify-end sm:items-center mb-2">
+            <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
+                <GeneralButton @click="showModalAsignacionRequerimiento = true" color="bg-green-700  hover:bg-green-800"
+                    text="Agregar Elemento" icon="add" />
+            </div>
+        </div>
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
-            <!-- TODO: Improve view table - this is temporal and doesn't mean is permanent -->
             <header class="px-5 py-4">
                 <div class="mb-4 md:flex flex-row justify-items-start">
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-                            <Multiselect v-model="tableData.length" @select="getDataLiquidaciones()" :options="perPage"
-                                :searchable="true" placeholder="Cantidad a mostrar"/>
+                            <Multiselect v-model="tableData.length" @input="getDataLiquidaciones()" :options="perPage"
+                                :searchable="true" placeholder="Cantidad a mostrar" />
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Requerimiento con quedan asignados
+                    <h2 class="font-semibold text-slate-800 pt-1">Requerimientos:
                         <span class="text-slate-400 font-medium">{{ pagination.total }}</span>
                     </h2>
                 </div>
@@ -32,22 +38,15 @@ import axios from 'axios';
                     <tbody class="text-sm divide-y divide-slate-200">
                         <template v-for="data in dataRequerimientoForTable" :key="data.id_requerimiento_pago">
                             <tr v-if="data.quedan != ''">
-                                <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                    <div class="font-medium text-slate-800 text-center">{{ data.id_requerimiento_pago }}
-                                    </div>
-                                </td>
+
                                 <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                     <div class="font-medium text-slate-800 text-center">
-                                        {{ data.numero_requerimiento_pago }}-{{ data.anio_requerimiento_pago }}
+                                        {{ data.numero_requerimiento_pago }}
                                     </div>
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5 ">
                                     <div class="font-medium text-slate-800 text-center">{{
                                         data.descripcion_requerimiento_pago }}
-                                    </div>
-                                </td>
-                                <td class="px-2 first:pl-5 last:pr-5">
-                                    <div class="font-medium text-slate-800 text-center">{{ data.monto_requerimiento_pago }}
                                     </div>
                                 </td>
                                 <td>
@@ -61,12 +60,27 @@ import axios from 'axios';
                                         </p>
                                     </div>
                                 </td>
+                                <td class="px-2 first:pl-5 last:pr-5">
+                                    <div class="font-medium text-slate-800 text-center">{{ data.monto_requerimiento_pago }}
+                                    </div>
+                                </td>
+                                <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px text-center">
+                                    <div v-if="data.id_estado_req_pago === 1"
+                                        class="text-xs inline-flex font-medium bg-emerald-100 text-emerald-600 rounded-full text-center px-2.5 py-1">
+                                        Abierto
+                                    </div>
+
+                                    <div v-else-if="data.id_estado_req_pago === 2"
+                                        class="text-xs inline-flex font-medium bg-red-100 text-red-600 rounded-full text-center px-2.5 py-1">
+                                        Cerrado
+                                    </div>
+                                </td>
                                 <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                     <div class="space-x-1 pl-3">
 
                                         <DropDownOptions>
                                             <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                                @click="openModal(data)">
+                                                @click="openModalLiquidacionQuedan(data)">
                                                 <div class="w-8 text-blue-900">
                                                     <span class="text-xs">
                                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -104,7 +118,7 @@ import axios from 'axios';
                                     <div class="flex-1 text-right ml-2">
                                         <a @click="getDataLiquidaciones(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      text-indigo-500">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
                                     </div>
@@ -114,7 +128,7 @@ import axios from 'axios';
                                     <div class="flex-1 text-right ml-2">
                                         <a @click="getDataLiquidaciones(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      text-indigo-500">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
                                     </div>
@@ -130,9 +144,16 @@ import axios from 'axios';
             </div>
         </div>
 
-        <ModalLiquidacion :scrollbarModalOpen="showModal" @close-definitive="showModal = false" :dataQuedan="dataQuedan"
-            @actualizar-table-data="getDataLiquidaciones()" />
 
+        <ModalAsignacionRequerimiento :modalIsOpen="showModalAsignacionRequerimiento"
+            @close-definitive="showModalAsignacionRequerimiento = false" :dataForSelect="dataForSelect"
+            @reload-table="[getDataLiquidaciones(), getListForSelect()]" />
+
+
+        <ModalLiquidacionRequerimientoVue :modalIsOpen="showModalLiquidacionRequerimiento"
+            @close-definitive="showModalLiquidacionRequerimiento = false" @reload-table="getDataLiquidaciones()"
+            @reload-table-and-close="[getDataLiquidaciones(), showModalLiquidacionRequerimiento = false]"
+            :dataLiquidaciones="dataLiquidaciones" @reload-data-for-select="getListForSelect()" />
     </AppLayoutVue>
 </template>
 <script>
@@ -142,11 +163,18 @@ export default {
     data: function (data) {
         let sortOrders = {};
         let columns = [
-            { width: "10%", label: "Id", name: "id_requerimiento_pago", type: "text" },
             { width: "10%", label: "Requerimiento", name: "numero_requerimiento_pago", type: "text" },
             { width: "20%", label: "Descripcion", name: "descripcion_requerimiento_pago", type: "text" },
             { width: "10%", label: "Monto requerido", name: "monto_requerimiento_pago", type: "text" },
             { width: "20%", label: "Todos los quedan", name: "allQUedan", type: "text" },
+            {
+                width: "10%", label: "Estado", name: "id_estado_req_pago", type: "select", options: [
+                    { value: "", label: "Ninguno" },
+                    { value: "1", label: "Abierto" },
+                    { value: "2", label: "Cerrado" },
+
+                ]
+            },
             { width: "5%", label: "", name: "Acciones" },
         ];
         columns.forEach((column) => {
@@ -156,12 +184,11 @@ export default {
                 sortOrders[column.name] = -1;
         });
         return {
-            showModal: false,
-            dataQuedan: [],
-            dataSuppliers: null,//attr donde guardar la data de proveedores
+            showModalAsignacionRequerimiento: false,
+            showModalLiquidacionRequerimiento: false,
+            dataLiquidaciones: [],//data que contiene todos los totales de todos los requerimientos
             permits: [],
             dataForSelect: [],
-            scrollbarModalOpen: false,
             dataRequerimientoForTable: [],
             links: [],
             lastUrl: '/requerimientos',
@@ -192,7 +219,7 @@ export default {
         async getDataLiquidaciones(url = "/requerimientos") {
             this.lastUrl = url
             this.tableData.draw++
-            await axios.post(url,this.tableData ).then((response) => {
+            await axios.post(url, this.tableData).then((response) => {
                 let data = response.data;
                 if (this.tableData.draw == data.draw) {
                     this.links = data.data.links
@@ -204,6 +231,24 @@ export default {
                     this.links[this.links.length - 1].label = "Siguiente"
                     this.dataRequerimientoForTable = data.data.data
                 }
+            }).catch((errors) => {
+                let msg = this.manageError(errors);
+                this.$swal.fire({
+                    title: "Operación cancelada",
+                    text: msg,
+                    icon: "warning",
+                    timer: 5000,
+                });
+            });
+        },
+        openModalLiquidacionQuedan(dataLiquidaciones) {
+            this.showModalLiquidacionRequerimiento = !this.showModalLiquidacionRequerimiento
+            this.dataLiquidaciones = this.dataRequerimientoForTable.filter((e) => e.id_requerimiento_pago == dataLiquidaciones.id_requerimiento_pago)
+        },
+        async getListForSelect() {
+            await axios.get('/get-list-select').then((response) => {
+                this.dataForSelect = response.data;
+                console.log(response.data.numeroRequerimiento);
             }).catch((errors) => {
                 let msg = this.manageError(errors);
                 this.$swal.fire({
@@ -251,13 +296,16 @@ export default {
     },
     created() {
         this.getDataLiquidaciones()
+        this.getListForSelect()
     },
 
 };
 </script>
   
 <style>
-.col-6 {
-    width: auto;
+.wrap,
+.wrap2 {
+    width: 100%;
+    white-space: pre-wrap;
 }
 </style>

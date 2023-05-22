@@ -8,7 +8,7 @@ import InputError from "@/Components/InputError.vue";
 </script>
 <template>
     <Head title="Catalogo - Requerimiento" />
-    <AppLayoutVue>
+    <AppLayoutVue nameSubModule="Tesoreria - Requerimientos">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
                 <GeneralButton color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add"
@@ -21,8 +21,8 @@ import InputError from "@/Components/InputError.vue";
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
                             <Multiselect v-model="tableData.length" @select="getDataRequerimiento()" :options="perPage"
-                                :searchable="true" />
-                            <LabelToInput icon="date" />
+                                :searchable="true" placeholder="Cantidad a mostrar" />
+                            <LabelToInput icon="list2" />
                         </div>
                     </div>
                     <h2 class="font-semibold text-slate-800 pt-1">Total Requerimientos
@@ -67,7 +67,7 @@ import InputError from "@/Components/InputError.vue";
                                 <div class="space-x-1">
 
                                     <DropDownOptions>
-                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                        <div v-if="requerimiento.id_estado_req_pago!=2" class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                                             @click="editRequerimiento(requerimiento)">
                                             <div class="w-8 text-green-900">
                                                 <span class="text-xs">
@@ -315,7 +315,7 @@ export default {
         async getDataRequerimiento(url = "/requerimientos") {
             this.lastUrl = url;
             this.tableData.draw++;
-            await axios.post(url,this.tableData ).then((response) => {
+            await axios.post(url, this.tableData).then((response) => {
                 let data = response.data;
                 if (this.tableData.draw == data.draw) {
                     this.links = data.data.links;
@@ -432,16 +432,28 @@ export default {
                             this.requerimientoModalOpen = false
                         }).catch((errors) => {
                             if (errors.response.status === 422) {
-                                toast.warning(
-                                    "Tienes algunos errores por favor verifica tus datos.",
-                                    {
-                                        autoClose: 5000,
-                                        position: "top-right",
-                                        transition: "zoom",
-                                        toastBackgroundColor: "white",
-                                    }
-                                );
-                                this.errors = errors.response.data.errors;
+                                if (errors.response.data.logical_error) {
+                                    toast.error(
+                                        errors.response.data.logical_error,
+                                        {
+                                            autoClose: 5000,
+                                            position: "top-right",
+                                            transition: "zoom",
+                                            toastBackgroundColor: "white",
+                                        }
+                                    );
+                                } else {
+                                    toast.warning(
+                                        "Tienes algunos errores por favor verifica tus datos.",
+                                        {
+                                            autoClose: 5000,
+                                            position: "top-right",
+                                            transition: "zoom",
+                                            toastBackgroundColor: "white",
+                                        }
+                                    );
+                                    this.errors = errors.response.data.errors;
+                                }
                             } else {
                                 let msg = this.manageError(errors);
                                 this.$swal.fire({

@@ -28,8 +28,10 @@ import html2pdf from 'html2pdf.js'
                                 @click="printPdf()" />
                         </div>
                         <div class="px-2" v-if="dataQuedan != ''">
-                            <GeneralButton color="bg-[#0A3158]/90  hover:bg-[#0A3158]" text="GENERAR RETENCION" icon="pdf"
-                                @click="generarComprobanteRetencionPdf()" />
+                            <template v-if="dataInputs.monto_total_quedan >= 113">
+                                <GeneralButton color="bg-[#0A3158]/90  hover:bg-[#0A3158]" text="GENERAR RETENCION"
+                                    icon="pdf" @click="generarComprobanteRetencionPdf()" />
+                            </template>
                         </div>
                         <svg class="h-7 w-7 absolute top-0 right-0 mt-2 cursor-pointer" viewBox="0 0 25 25"
                             @click="$emit('cerrar-modal')">
@@ -193,7 +195,7 @@ import html2pdf from 'html2pdf.js'
                                         <td class="border-2 border-black"
                                             :class="dataInputs.numero_acuerdo_quedan == '' ? 'bg-[#fdfd96]' : ''"
                                             colspan="3" contenteditable="false">
-                                            <input type="text" v-model="dataInputs.numero_acuerdo_quedan"
+                                            <input type="number" v-model="dataInputs.numero_acuerdo_quedan"
                                                 :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                 :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
                                                 class="peer w-full text-sm bg-transparent text-center h-16 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
@@ -201,7 +203,7 @@ import html2pdf from 'html2pdf.js'
                                         <td class="border-2 border-black"
                                             :class="dataInputs.numero_compromiso_ppto_quedan == '' ? 'bg-[#fdfd96]' : ''"
                                             colspan="4" contenteditable="false">
-                                            <input type="text" v-model="dataInputs.numero_compromiso_ppto_quedan"
+                                            <input type="number" v-model="dataInputs.numero_compromiso_ppto_quedan"
                                                 :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                 :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
                                                 class="peer w-full text-sm bg-transparent text-center h-16 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
@@ -209,7 +211,7 @@ import html2pdf from 'html2pdf.js'
                                         <td class="border-2 border-black"
                                             :class="dataInputs.numero_retencion_iva_quedan == '' ? 'bg-[#fdfd96]' : ''"
                                             colspan="4" contenteditable="false">
-                                            <input type="text" v-model="dataInputs.numero_retencion_iva_quedan"
+                                            <input type="number" v-model="dataInputs.numero_retencion_iva_quedan"
                                                 :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                 :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
                                                 class="peer w-full text-sm bg-transparent text-center h-16 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
@@ -296,8 +298,7 @@ import html2pdf from 'html2pdf.js'
                                                         {{ cell }}
                                                     </td>
 
-                                                    <td v-else-if="cellIndex == 6" class="border-2 border-black"
-                                                        @keypress="onlyNumberDecimal($event)">
+                                                    <td v-else-if="cellIndex == 6" class="border-2 border-black">
 
                                                         <table>
                                                             <tr>
@@ -307,7 +308,7 @@ import html2pdf from 'html2pdf.js'
                                                                 </th>
                                                                 <td :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true"
                                                                     :class="[cell.producto == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']"
-                                                                    @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText, 'producto')"
+                                                                    @input="onCellEdit(rowIndex, cellIndex, $event, 'producto')"
                                                                     class="w-full border-2 border-b-black border-x-transparent border-t-transparent">
                                                                     {{ cell.producto }}
                                                                 </td>
@@ -319,7 +320,7 @@ import html2pdf from 'html2pdf.js'
                                                                 </th>
                                                                 <td :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true"
                                                                     :class="[cell.servicio == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']"
-                                                                    @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText, 'servicio')">
+                                                                    @input="onCellEdit(rowIndex, cellIndex, $event, 'servicio')">
                                                                     {{ cell.servicio }}
                                                                 </td>
                                                             </tr>
@@ -466,6 +467,7 @@ export default {
                 monthSelectorType: 'static',
                 altFormat: "d/m/Y",
                 dateFormat: 'Y-m-d',
+                maxDate: new Date(), // Bloquear fechas futuras
                 locale: {
                     firstDayOfWeek: 1,
                     weekdays: {
@@ -487,9 +489,11 @@ export default {
     methods: {
         printPdf() {
             // Opciones de configuración para generar el PDF
+            let fecha = moment().format('DD-MM-YYYY');
+            let name = 'QUEDAN ' + this.dataInputs.id_quedan + ' - ' + fecha;
             const opt = {
                 margin: 0.1,
-                filename: 'output.pdf',
+                filename: name,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, useCORS: true },
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
@@ -523,9 +527,11 @@ export default {
                 });
             } else {
                 // Opciones de configuración para generar el PDF
+                let fecha = moment().format('DD-MM-YYYY');
+                let name = 'COMPROBANTE DE RENTENCION ' + this.dataInputs.numero_retencion_iva_quedan + ' - ' + fecha;
                 const opt = {
                     margin: 0.1,
-                    filename: 'Comprobante_retencion.pdf',
+                    filename: name,
                     image: { type: 'jpeg', quality: 0.98 },
                     html2canvas: { scale: 2 },
                     jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' },
@@ -551,7 +557,6 @@ export default {
                 // Actualizar la fecha de retención de IVA en el servidor
                 axios.post('/updateFechaRetencionIva', { id_quedan: this.dataInputs.id_quedan })
                     .then((response) => {
-                        console.log(response);
                     })
                     .catch(errors => {
                         let msg = this.manageError(errors);
@@ -564,23 +569,57 @@ export default {
                     });
             }
         },
-        onCellEdit(rowIndex, cellIndex, value, type = '') {
+        onCellEdit(rowIndex, cellIndex, event, type = '') {
             if (type) {
                 // Verificar si se especificó un tipo de edición (producto o servicio)
                 if (type === 'producto') {
-                    // Editar el valor de la celda correspondiente al producto en la fila y columna dadas
-                    this.rowsData[rowIndex][cellIndex].producto = value;
+                    //llamamos el metodo que nos valida si es numero o letra
+                    this.onlyNumberDecimal(rowIndex, cellIndex, event, type = 'producto')
                 } else {
-                    // Editar el valor de la celda correspondiente al servicio en la fila y columna dadas
-                    this.rowsData[rowIndex][cellIndex].servicio = value;
+                    //llamamos el metodo que nos valida si es numero o letra
+                    this.onlyNumberDecimal(rowIndex, cellIndex, event, type = 'servicio')
                 }
                 // Calcular los montos totales
                 this.calculateAmount();
             } else {
                 // Editar el valor de la celda en la fila y columna dadas
-                this.rowsData[rowIndex][cellIndex] = value;
+                this.rowsData[rowIndex][cellIndex] = event;
             }
         },
+
+        onlyNumberDecimal(rowIndex, cellIndex, event, type = '') {
+            let inputValue = event.target.textContent;
+            const regex = /^(\d+)?(\.\d{0,2})?$/;
+            inputValue = inputValue.replace(/^\./, ''); // Eliminar punto al inicio
+            inputValue = inputValue.replace(/\.(?=.*\.)/g, ''); // Eliminar puntos adicionales
+            inputValue = inputValue.replace(/[^0-9.]/g, ''); // Eliminar caracteres no permitidos
+
+            if (!regex.test(inputValue)) {
+                const previousValue = event.target.textContent;
+                event.target.textContent = previousValue.substring(0, previousValue.length - 1);
+                const selection = window.getSelection();
+                const range = document.createRange();
+                range.selectNodeContents(event.target);
+                range.collapse(false); // Colapsar al final del rango
+                selection.removeAllRanges();
+                selection.addRange(range);
+            } else {
+                if (event.target.textContent != inputValue) {
+                    event.target.textContent = inputValue
+                    const selection = window.getSelection();
+                    const range = document.createRange();
+                    range.selectNodeContents(event.target);
+                    range.collapse(false); // Colapsar al final del rango
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                } else {
+                    event.target.textContent = inputValue;
+                }
+            }
+            //Seteamos la informacion a objeto con indice x y celda y
+            this.rowsData[rowIndex][cellIndex][type] = event.target.textContent;
+        },
+
         getInformationBySupplier(supplier) {
             // Buscar el proveedor en la lista de proveedores
             const selectedSupplier = this.dataForSelectInRow.proveedor.find((suppliers) => suppliers.value === supplier);
@@ -605,14 +644,16 @@ export default {
             let liquido = 0;
             let montoServicios = 0;
 
+            let quedanArray = this.rowsData.filter((element) => element[7] === true);
+
             // Sumar todos los montos de todas las filas
-            this.rowsData.forEach((valores, index) => {
+            quedanArray.forEach((valores, index) => {
                 totMontoByRow += parseFloat(valores[6].producto) || 0; // Sumar el monto del producto
                 totMontoByRow += parseFloat(valores[6].servicio) || 0; // Sumar el monto del servicio
             });
 
             // Sumar solo los montos de servicios de todas las filas
-            this.rowsData.forEach((valores, index) => {
+            quedanArray.forEach((valores, index) => {
                 if (valores[6].servicio !== '') {
                     montoServicios += parseFloat(valores[6].servicio) || 0;
                 }
@@ -621,10 +662,9 @@ export default {
             // Calcular el monto líquido (sin IVA)
             liquido = (totMontoByRow / 1.13).toFixed(2);
 
-            let montoIvaQuedan = 0;
-            // Verificar si el monto total excede el umbral para aplicar IVA
-            console.log("suma TOTAL PROVEEDOR + TOTAL IVA ");
-            console.log(parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) + parseFloat(totMontoByRow));
+            let montoIvaQuedan = (0).toFixed(2);
+
+            // Verificar si el monto total excede el umbral => ($ 113.00) para aplicar IVA
             if (parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) + parseFloat(totMontoByRow) >= 113) {
                 montoIvaQuedan = (liquido * this.dataForCalculate.iva).toFixed(2);
             }
@@ -672,20 +712,7 @@ export default {
             this.dataForCalculate.monto_total_quedan_por_proveedor = parseFloat(total)
 
         },
-        onlyNumberDecimal(event) {
-            const charCode = (event.which) ? event.which : event.keyCode;
-            const value = event.target.textContent;
-            const decimalCount = (value.match(/\./g) || []).length;
-            if (charCode == 46) {
-                if (decimalCount >= 1) {
-                    event.preventDefault();
-                }
-            } else if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-                event.preventDefault();
-            } else if (decimalCount > 0 && value.split('.')[1].length >= 2) {
-                event.preventDefault();
-            }
-        },
+       
         onInputDescripcionQuedan(event) {
             this.dataInputs.descripcion_quedan = event.target.innerText;
         },
@@ -848,7 +875,6 @@ export default {
                             });
                         })
                         .catch((error) => {
-                            console.log(error);
                             if (error.response.status === 422) {
                                 if (error.response.data.message === "LA DEPENDENCIA ES UN DATO REQUERIDO") {
                                     // Mostrar mensaje de error si falta la dependencia
@@ -997,6 +1023,7 @@ export default {
                 if (result.isConfirmed) {
                     // Modificar el objeto para que la fila desaparezca de la tabla (valor en posición 7 se establece como false)
                     this.rowsData[rowIndex][7] = false;
+                    this.calculateAmount()
                     // Mostrar mensaje de advertencia
                     toast.warning("La fila actual se eliminó temporalmente hasta que guarde los cambios", {
                         autoClose: 5000,
@@ -1116,5 +1143,21 @@ input[type="date"]:focus::-webkit-calendar-picker-indicator {
 td {
     outline: none;
     /* Desactiva el marco de enfoque */
+}
+
+.flatpickr-day.flatpickr-disabled,
+.flatpickr-day.flatpickr-disabled:hover {
+    cursor: not-allowed;
+    color: rgba(72, 72, 72, 0.3);
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number]:focus {
+    border: none;
 }
 </style>

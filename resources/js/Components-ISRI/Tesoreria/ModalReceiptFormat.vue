@@ -215,7 +215,7 @@ export default {
     methods: {
         printPdf() {
             let fecha = moment().format('DD-MM-YYYY');
-            let name = 'RECIBO N° '+this.receipt_to_print.numero_recibo_ingreso+' - '+ fecha;
+            let name = 'RECIBO '+this.receipt_to_print.numero_recibo_ingreso+' - '+ fecha;
             const opt = {
                 margin: 0.2,
                 filename: name,

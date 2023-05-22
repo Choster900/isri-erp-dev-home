@@ -7,8 +7,8 @@ import axios from 'axios';
 
 </script>
 <template>
-    <ModalBasicVue title="Asignando numero de requerimiento" id="scrollbar-modal" maxWidth="6xl"
-        :modalOpen="scrollbarModalOpen" @close-modal="$emit('close-definitive')">
+    <ModalBasicVue title="Asignando numero de requerimiento" id="scrollbar-modal" maxWidth="6xl" :modalOpen="modalIsOpen"
+        @close-modal="$emit('close-definitive')">
 
         <div class="flex flex-col md:flex-row  md:space-y-0  ">
             <div class="flex-1 px-3 pt-3 shadow-sm  bg-white shadow-[#001b47] border-r border-r-gray-500/20">
@@ -64,8 +64,8 @@ import axios from 'axios';
                             @click="filterQuedan()" />
                     </div>
                     <div class="grid px-2 grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                        <GeneralButton color="bg-[#7a0000]  hover:bg-[#7a0000]/90" text="Limpiar Filtro" icon="search"
-                            @click="dataQuedan = []" />
+                        <GeneralButton color="bg-[#7a0000]  hover:bg-[#7a0000]/90" text="Limpiar todo" icon="delete"
+                            @click="resetData()" />
                     </div>
                 </div>
             </div>
@@ -78,8 +78,8 @@ import axios from 'axios';
                                     Numero de requerimiento <span class="text-red-600 font-extrabold">*</span>
                                 </label>
                                 <div class="relative flex h-7  flex-row-reverse select-bg">
-                                    <Multiselect :options="dataForSelect.numeroRequerimiento"
-                                        @select="seleccionarRequerimiento($event)" v-model="id_requerimiento_pago"
+                                    <Multiselect :options="numeroRequerimientoFiltrado"
+                                        @input="seleccionarRequerimiento($event)" v-model="id_requerimiento_pago"
                                         :searchable="true" />
                                 </div>
                             </div>
@@ -88,8 +88,50 @@ import axios from 'axios';
                                 <button @click="addNumber()"
                                     class="inline-flex items-center justify-center px-3 h-6 text-sm py-1 text-white rounded-md shadow"
                                     :class="(collectItems != '' && id_requerimiento_pago != '' ? ' bg-orange-600' : ' bg-gray-600')">
-                                    Agregar requerimiento
+                                    Agregar a requerimiento
                                 </button>
+                            </div>
+
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-full">
+                                <table id="resumen" class="table table-bordered text-center p-0 mt-2 w-[400px]">
+                                    <tbody>
+                                        <tr>
+                                            <td class="border-2 px-3  text-xs">NUMERO<br />
+                                                <span class="text-green-600 text-xs">
+                                                    {{ infoReqForTableInfo.numeroReq != "" ? infoReqForTableInfo.numeroReq :
+                                                        "0" }}
+                                                </span>
+                                            </td>
+                                            <td class="border-2 px-3 text-xs">MONTO<br />
+                                                <span class="text-green-600 text-xs">$
+                                                    {{ infoReqForTableInfo.montoReq != "" ? infoReqForTableInfo.montoReq :
+                                                        "0.00" }}
+                                                </span>
+                                            </td>
+                                            <td class="border-2 px-3 text-xs">SOBRANTE<br />
+                                                <span
+                                                    :class="infoReqForTableInfo.restanteReq < infoReqForTableInfo.cantSelected ? 'text-red-600 text-xs' : 'text-green-600 text-xs'">$
+                                                    {{ infoReqForTableInfo.cantSelected == "" ?
+                                                        infoReqForTableInfo.restanteReq :
+                                                        (parseFloat(infoReqForTableInfo.restanteReq)  -
+                                                            parseFloat(infoReqForTableInfo.cantSelected) || 0).toFixed(2) }}</span>
+                                            </td>
+                                            <td class=" border-2 px-3 text-xs">CANT. SELECT<br />
+                                                <span
+                                                    :class="infoReqForTableInfo.restanteReq < infoReqForTableInfo.cantSelected ? 'text-red-600 text-xs' : 'text-green-600 text-xs'">$
+                                                    {{ infoReqForTableInfo.cantSelected != "" ?
+                                                        infoReqForTableInfo.cantSelected : "0.00" }}</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border-2 text-xs max-w-[350px] min-w-w-[350px]" colspan="4">
+                                                DESCRIPCION:
+                                                <span class="text-xs">{{ infoReqForTableInfo.descripcionReq
+                                                }}</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -190,7 +232,19 @@ import axios from 'axios';
                                         </tr>
 
                                     </transition>
+
                                 </template>
+
+
+
+                                <tr v-if="dataQuedan.length == 0">
+                                    <td colspan="8"
+                                        class="pb-3 text-xs whitespace-nowrap text-center h-20">
+                                        <span v-if="withoutDataInDb">SIN DATOS EN LA BASE DE DATOS...</span>
+                                        <span v-else>Utilize los filtros o simplemente precio buscar.</span>
+                                    </td>
+
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -205,7 +259,7 @@ import axios from 'axios';
 
 export default {
     props: {
-        scrollbarModalOpen: {
+        modalIsOpen: {
             type: Boolean,
             default: false,
         },
@@ -220,6 +274,7 @@ export default {
         collectItems: [],
         id_requerimiento_pago: '',
         numero_requerimiento: '',
+        withoutDataInDb: false,
         filter: {
             suppiler: '',
             rangeDate: '',
@@ -227,13 +282,19 @@ export default {
             isr: '',
             monto: '',
         },
+        infoReqForTableInfo: {
+            numeroReq: '',
+            montoReq: 0,
+            restanteReq: 0,
+            cantSelected: 0,
+        },
         selectAll: false,
         config: {
             mode: 'range',
             altInput: true,
             static: true,
             monthSelectorType: 'static',
-            altFormat: "F-j Y",
+            altFormat: "d/m/Y",
             dateFormat: "Y-m-d",
             locale: {
                 firstDayOfWeek: 1,
@@ -262,6 +323,7 @@ export default {
                         }
                     })
                     this.dataQuedan = newDataQuedan
+                    this.withoutDataInDb = true
                 })
                 .catch(errors => {
                     let msg = this.manageError(errors);
@@ -278,6 +340,9 @@ export default {
             checked
                 ? this.collectItems.push({ id_quedan: id_quedan, checked: checked, monto_liquido_quedan: monto_liquido_quedan })
                 : this.collectItems.splice(this.collectItems.findIndex(item => item.id_quedan === id_quedan), 1);
+
+            let sum = this.collectItems.reduce((monto, element) => monto + parseFloat(element.monto_liquido_quedan), 0);
+            this.infoReqForTableInfo.cantSelected = sum
         },
         selectAllItems() {
             this.selectAll = !this.selectAll;
@@ -290,8 +355,11 @@ export default {
             } else {
                 this.collectItems = [];
             }
+            let sum = this.collectItems.reduce((monto, element) => monto + parseFloat(element.monto_liquido_quedan), 0);
+            this.infoReqForTableInfo.cantSelected = sum
+
         },
-        takeOfQUedan() {//funcion que pone en false la key mostrar para que desaparesca de la tabla
+        hiddenQuedan() {//funcion que pone en false la key mostrar para que desaparesca de la tabla
             const newDataQuedan = this.dataQuedan.map((quedan) => {
                 if (this.collectItems.some((collect) => quedan.id_quedan === collect.id_quedan)) {
                     return { ...quedan, mostrar: false };
@@ -326,8 +394,8 @@ export default {
                             transition: "zoom",
                             toastBackgroundColor: "white",
                         });
-                        this.takeOfQUedan()
-
+                        this.hiddenQuedan()
+                        this.resetData()
                         this.$emit("reload-table")
                         this.collectItems = []
                         this.id_requerimiento_pago = ''
@@ -367,6 +435,44 @@ export default {
         seleccionarRequerimiento(event) {
             const opcionSeleccionada = this.dataForSelect.numeroRequerimiento.filter(item => item.value === event);
             this.numero_requerimiento = opcionSeleccionada
+
+            let data = this.dataForSelect.numeroRequerimiento.filter(item => item.value === event)
+
+            this.infoReqForTableInfo.numeroReq = data[0].numero_requerimiento_pago
+            this.infoReqForTableInfo.montoReq = data[0].monto_requerimiento_pago
+            this.infoReqForTableInfo.restanteReq = data[0].restante_requerimiento
+            this.infoReqForTableInfo.descripcionReq = data[0].descripcion_requerimiento_pago
+        },
+        resetData() {
+            this.dataQuedan = []
+            this.collectItems = []
+            this.id_requerimiento_pago = ''
+            this.numero_requerimiento = ''
+            this.filter.suppiler = ''
+            this.filter.rangeDate = ''
+            this.filter.iva = ''
+            this.filter.iva = ''
+            this.filter.isr = ''
+            this.filter.monto = ''
+            this.selectAll = false//FIXME: cuando se cierra el modal se supone que tiene que quedar en falso (lo hace) pero el checbox igual queda marcado cuando se sabe por que
+            this.infoReqForTableInfo.numeroReq = ''
+            this.infoReqForTableInfo.montoReq = ''
+            this.infoReqForTableInfo.restanteReq = ''
+            this.infoReqForTableInfo.descripcionReq = ''
+            this.infoReqForTableInfo.cantSelected = ''
+            this.withoutDataInDb = false
+        },
+    },
+    computed: {
+        numeroRequerimientoFiltrado: function () {
+            return this.dataForSelect?.numeroRequerimiento?.filter(item => item.id_estado_req_pago === 1) || [];
+        }
+    },
+    watch: {
+        modalIsOpen: function (newValue, oldValue) {
+
+            this.resetData()
+
         },
     },
 }
