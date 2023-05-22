@@ -38,7 +38,7 @@ class ProveedorController extends Controller
 
         if ($data) {
             $v_query->where('id_proveedor', 'like', '%' . $data["id_proveedor"] . '%')
-                ->whereRaw('IFNULL(dui_proveedor, IFNULL(nit_proveedor, "")) like ?','%' . $data["dui_proveedor"] . '%')
+                ->whereRaw('IFNULL(dui_proveedor, IFNULL(nit_proveedor, "")) like ?', '%' . $data["dui_proveedor"] . '%')
                 ->where('razon_social_proveedor', 'like', '%' . $data["razon_social_proveedor"] . '%')
                 ->where('nombre_comercial_proveedor', 'like', '%' . $data["nombre_comercial_proveedor"] . '%')
                 ->where('estado_proveedor', 'like', '%' . $data["estado_proveedor"] . '%');
@@ -90,30 +90,38 @@ class ProveedorController extends Controller
 
     public function updateDataSupplier(SupplierRequest $request)
     {
-        try {
-            DB::beginTransaction();
-            $v_supplie = Proveedor::where("id_proveedor", $request->input("id_proveedor"))->update([
-                'razon_social_proveedor'     => $request->input("razon_social_proveedor"),
-                'nombre_comercial_proveedor' => $request->input("nombre_comercial_proveedor"),
-                'nrc_proveedor'              => $request->input("nrc_proveedor"),
-                'dui_proveedor'              => $request->input("dui_proveedor"),
-                'nit_proveedor'              => $request->input("nit_proveedor"),
-                'id_tipo_contribuyente'      => $request->input("id_tipo_contribuyente"),
-                'id_sujeto_retencion'        => $request->input("id_sujeto_retencion"),
-                'telefono1_proveedor'        => $request->input("telefono1_proveedor"),
-                'telefono2_proveedor'        => $request->input("telefono2_proveedor"),
-                'contacto_proveedor'         => $request->input("contacto_proveedor"),
-                'id_municipio'               => $request->input("id_municipio"),
-                'direccion_proveedor'        => $request->input("direccion_proveedor"),
-                'id_giro'                    => $request->input("id_giro"),
-                'email_proveedor'            => $request->input("email"),
-            ]);
-            DB::commit();
-            return $v_supplie;
-        } catch (\Throwable $th) {
-            //throw $th;
-            DB::rollback();
-            return response()->json($th->getMessage(), 500);
+        $suplier = Proveedor::find($request->id_proveedor);
+        if ($suplier->estado_proveedor == 0) {
+            return response()->json(['logical_error' => 'Error, el proveedor seleccionado ha sido desactivado por otro usuario.'], 422);
+        } else {
+            try {
+                DB::beginTransaction();
+                $supplier = Proveedor::where("id_proveedor", $request->input("id_proveedor"))->update([
+                    'razon_social_proveedor'     => $request->input("razon_social_proveedor"),
+                    'nombre_comercial_proveedor' => $request->input("nombre_comercial_proveedor"),
+                    'nrc_proveedor'              => $request->input("nrc_proveedor"),
+                    'dui_proveedor'              => $request->input("dui_proveedor"),
+                    'nit_proveedor'              => $request->input("nit_proveedor"),
+                    'id_tipo_contribuyente'      => $request->input("id_tipo_contribuyente"),
+                    'id_sujeto_retencion'        => $request->input("id_sujeto_retencion"),
+                    'telefono1_proveedor'        => $request->input("telefono1_proveedor"),
+                    'telefono2_proveedor'        => $request->input("telefono2_proveedor"),
+                    'contacto_proveedor'         => $request->input("contacto_proveedor"),
+                    'id_municipio'               => $request->input("id_municipio"),
+                    'direccion_proveedor'        => $request->input("direccion_proveedor"),
+                    'id_giro'                    => $request->input("id_giro"),
+                    'email_proveedor'            => $request->input("email"),
+                    'fecha_mod_proveedor'        => Carbon::now(),
+                    'usuario_proveedor'          => $request->user()->nick_usuario,
+                    'ip_proveedor'               => $request->ip(),
+                ]);
+                DB::commit();
+                return $supplier;
+            } catch (\Throwable $th) {
+                //throw $th;
+                DB::rollback();
+                return response()->json($th->getMessage(), 500);
+            }
         }
     }
 
@@ -138,6 +146,8 @@ class ProveedorController extends Controller
                 'fecha_reg_proveedor'        => Carbon::now(),
                 'id_giro'                    => $request->input("id_giro"),
                 'email_proveedor'            => $request->input("email"),
+                'usuario_proveedor'          => $request->user()->nick_usuario,
+                'ip_proveedor'               => $request->ip(),
             ]);
             DB::commit();
             return $v_supplie;
@@ -149,10 +159,28 @@ class ProveedorController extends Controller
     }
     public function changeStateSupplier(Request $request)
     {
-        $v_dataSupplier = Proveedor::find($request->id_proveedor);
-        return Proveedor::where("id_proveedor", $request->input("id_proveedor"))->update([
-            'estado_proveedor' => $v_dataSupplier["estado_proveedor"] != 1 ? 1 : 0, //si es diferente de 1 ingresamos 1 => Activo de lo contrario 0 =>inactivo
-        ]);
-
+        $suplier = Proveedor::find($request->id_proveedor);
+        if ($suplier->estado_proveedor == 1) {
+            if ($request->estado_proveedor == 1) {
+                $suplier->update([
+                    'estado_proveedor' => 0,
+                    'fecha_mod_proveedor' => Carbon::now(),
+                    'usuario_proveedor' => $request->user()->nick_usuario,
+                    'ip_proveedor' => $request->ip(),
+                ]);
+            }
+        } else {
+            if ($suplier->estado_proveedor == 0) {
+                if ($request->estado_proveedor == 0) {
+                    $suplier->update([
+                        'estado_proveedor' => 1,
+                        'fecha_mod_proveedor' => Carbon::now(),
+                        'usuario_proveedor' => $request->user()->nick_usuario,
+                        'ip_proveedor' => $request->ip(),
+                    ]);
+                }
+            }
+        }
+        return ['mensaje' => 'Accion realizada'];
     }
 }

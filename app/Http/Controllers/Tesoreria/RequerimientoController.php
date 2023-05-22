@@ -71,7 +71,7 @@ class RequerimientoController extends Controller
                 'estado_requerimiento_pago'      => 1,
                 'id_estado_req_pago'             => 1,
                 'fecha_reg_requerimiento_pago'   => Carbon::now(),
-                'usuario_requerimiento_pago '    => $request->user()->nick_usuario,
+                'usuario_requerimiento_pago'     => $request->user()->nick_usuario,
                 'ip_requerimiento_pago'          => $request->ip(),
             ]);
             DB::commit();
@@ -83,21 +83,27 @@ class RequerimientoController extends Controller
     }
     public function updateRequerimientoNumber(RequerimientoRequest $request)
     {
-        try {
-            DB::beginTransaction();
-            $v_requerimiento = RequerimientoPago::where('id_requerimiento_pago', $request->input("id_requerimiento_pago"))->update([
-                'numero_requerimiento_pago'      => $request->input("numero_requerimiento_pago"),
-                'descripcion_requerimiento_pago' => $request->input("descripcion_requerimiento_pago"),
-                'monto_requerimiento_pago'       => $request->input("monto_requerimiento_pago"),
-                'fecha_mod_requerimiento_pago'   => Carbon::now(),
-                'usuario_requerimiento_pago '    => $request->user()->nick_usuario,
-                'ip_requerimiento_pago'          => $request->ip(),
-            ]);
-            DB::commit();
-            return $v_requerimiento;
-        } catch (\Throwable $th) {
-            DB::rollback();
-            return response()->json($th->getMessage(), 500);
+        $requirement = RequerimientoPago::find($request->id_requerimiento_pago);
+        $assigned_amount_requirement = $requirement->Quedan()->sum('monto_liquido_quedan');
+        if ($assigned_amount_requirement > $request->monto_requerimiento_pago) {
+            return response()->json(['logical_error' => 'Error, no puede reducir el monto del requerimiento a un valor menor a lo ya asignado: $' . $assigned_amount_requirement], 422);
+        } else {
+            try {
+                DB::beginTransaction();
+                $v_requerimiento = RequerimientoPago::where('id_requerimiento_pago', $request->input("id_requerimiento_pago"))->update([
+                    'numero_requerimiento_pago'      => $request->input("numero_requerimiento_pago"),
+                    'descripcion_requerimiento_pago' => $request->input("descripcion_requerimiento_pago"),
+                    'monto_requerimiento_pago'       => $request->input("monto_requerimiento_pago"),
+                    'fecha_mod_requerimiento_pago'   => Carbon::now(),
+                    'usuario_requerimiento_pago'    => $request->user()->nick_usuario,
+                    'ip_requerimiento_pago'          => $request->ip(),
+                ]);
+                DB::commit();
+                return $v_requerimiento;
+            } catch (\Throwable $th) {
+                DB::rollback();
+                return response()->json($th->getMessage(), 500);
+            }
         }
     }
     public function filterQuedan(Request $request) //TODO:POR TERMINAR 
@@ -148,8 +154,14 @@ class RequerimientoController extends Controller
             $totRequerimiento = $totRequerimiento + $value["monto_liquido_quedan"];
         }
         if ($totRequerimiento <= $monto_requerimiento_pago[0]->monto_requerimiento_pago) {
-            foreach ( $request->itemsToAddNumber as $key => $value ) {
-                Quedan::where("id_quedan", $value["id_quedan"])->update(['id_requerimiento_pago' => $request->numberRequest, "id_estado_quedan" => 2]);
+            foreach ($request->itemsToAddNumber as $key => $value) {
+                Quedan::where("id_quedan", $value["id_quedan"])->update([
+                    'id_requerimiento_pago'     => $request->numberRequest, 
+                    "id_estado_quedan"          => 2,
+                    'usuario_quedan'            => $request->user()->nick_usuario,
+                    'fecha_mod_quedan'          => Carbon::now(),
+                    'ip_quedan'                 => $request->ip(),
+                ]);
             }
             return response()->json(['message' => 'Actualización exitosa'], 200);
         } else {
@@ -163,8 +175,13 @@ class RequerimientoController extends Controller
     public function takeOfNumberRequest(Request $request)
     {
         # code...
-        Quedan::where("id_quedan", $request->id_quedan)->update(['id_requerimiento_pago' => null, "id_estado_quedan" => 1]);
-
+        Quedan::where("id_quedan", $request->id_quedan)->update([
+            'id_requerimiento_pago'     => null, 
+            "id_estado_quedan"          => 1,
+            'usuario_quedan'            => $request->user()->nick_usuario,
+            'fecha_mod_quedan'          => Carbon::now(),
+            'ip_quedan'                 => $request->ip(),
+        ]);
         return response()->json(['message' => 'Actualización exitosa'], 200);
     }
 }

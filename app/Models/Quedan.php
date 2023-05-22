@@ -29,6 +29,7 @@ class Quedan extends Model
         'fecha_emision_quedan',
         'fecha_retencion_iva_quedan',
         'fecha_pago_quedan',
+        'monto_total_quedan',
         'monto_liquido_quedan',
         'monto_iva_quedan',
         'monto_isr_quedan',

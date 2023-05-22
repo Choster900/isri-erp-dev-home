@@ -137,11 +137,11 @@ class ReporteTesoreriaController extends Controller
         //Definimos el estado del quedan
         $estado = EstadoQuedan::find($request->state_quedan_id);
         if ($estado) {
-                $quedan_state = $estado->nombre_estado_quedan;
+            $quedan_state = $estado->nombre_estado_quedan;
         } else {
-            if($request->state_quedan_id == -1){
+            if ($request->state_quedan_id == -1) {
                 $quedan_state = 'PENDIENTES DE PAGO';
-            }else{
+            } else {
                 $quedan_state = 'TODOS LOS ESTADOS';
             }
         }
@@ -642,50 +642,51 @@ class ReporteTesoreriaController extends Controller
             ->join('concepto_ingreso', function ($join) {
                 $join->on('detalle_recibo_ingreso.id_concepto_ingreso', '=', 'concepto_ingreso.id_concepto_ingreso');
             })
-            ->where('concepto_ingreso.id_proy_financiado',$request->financing_source_id)
-            ->where('recibo_ingreso.fecha_recibo_ingreso',$request->start_date)
+            ->where('concepto_ingreso.id_proy_financiado', $request->financing_source_id)
+            ->where('recibo_ingreso.fecha_recibo_ingreso', $request->start_date)
             ->groupBy('recibo_ingreso.fecha_recibo_ingreso')
             ->get();
 
         $details = DB::select(
             '
-        SELECT
-        t.id_dependencia,
-        t.codigo_dependencia,
-        GROUP_CONCAT(DISTINCT t.nombre_concepto_ingreso SEPARATOR ", ") as observacion,
-        SUM(IF(t.id_ccta_presupuestal = 14199, t.total, 0)) as "14199",
-        SUM(IF(t.id_ccta_presupuestal = 14202, t.total, 0)) as "14202",
-        SUM(IF(t.id_ccta_presupuestal = 14204, t.total, 0)) as "14204",
-        SUM(IF(t.id_ccta_presupuestal = 14299, t.total, 0)) as "14299",
-        SUM(IF(t.id_ccta_presupuestal = 15799, t.total, 0)) as "15799",
-        SUM(IF(t.id_ccta_presupuestal = 15502, t.total, 0)) as "15502",
-        SUM(IF(t.id_ccta_presupuestal = 16304, t.total, 0)) as "16304",
-        (SUM(IF(t.id_ccta_presupuestal = 14199, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 14202, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 14204, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 14299, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 15799, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 15502, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 16304, t.total, 0))) as total
-        
-        FROM
-        (
-            SELECT 
-            ci.id_dependencia, 
-            ci.id_ccta_presupuestal,
-            d.codigo_dependencia, 
-            ci.nombre_concepto_ingreso, 
-            SUM(dri.monto_det_recibo_ingreso) as total 
-            FROM 
-            recibo_ingreso ri
-            INNER JOIN detalle_recibo_ingreso dri ON ri.id_recibo_ingreso = dri.id_recibo_ingreso
-            INNER JOIN concepto_ingreso ci ON dri.id_concepto_ingreso = ci.id_concepto_ingreso
-            INNER JOIN dependencia d ON ci.id_dependencia = d.id_dependencia
-            WHERE 
-            ri.estado_recibo_ingreso = 1
-            AND ri.fecha_recibo_ingreso = ?
-            AND ci.id_proy_financiado = ?
-            AND ci.id_ccta_presupuestal <> 16201 
-            GROUP BY 
-            ci.id_dependencia, 
-            d.codigo_dependencia, 
-            ci.id_ccta_presupuestal,
-            ci.nombre_concepto_ingreso) as t
-            GROUP BY  t.id_dependencia, t.codigo_dependencia
+            SELECT
+            t.id_dependencia,
+            t.codigo_dependencia,
+            GROUP_CONCAT(DISTINCT t.nombre_concepto_ingreso SEPARATOR ", ") as observacion,
+            SUM(IF(t.id_ccta_presupuestal = 14199, t.total, 0)) as "14199",
+            SUM(IF(t.id_ccta_presupuestal = 14202, t.total, 0)) as "14202",
+            SUM(IF(t.id_ccta_presupuestal = 14204, t.total, 0)) as "14204",
+            SUM(IF(t.id_ccta_presupuestal = 14299, t.total, 0)) as "14299",
+            SUM(IF(t.id_ccta_presupuestal = 15799, t.total, 0)) as "15799",
+            SUM(IF(t.id_ccta_presupuestal = 15502, t.total, 0)) as "15502",
+            SUM(IF(t.id_ccta_presupuestal = 16304, t.total, 0)) as "16304",
+            (SUM(IF(t.id_ccta_presupuestal = 14199, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 14202, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 14204, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 14299, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 15799, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 15502, t.total, 0))+SUM(IF(t.id_ccta_presupuestal = 16304, t.total, 0))) as total
+            
+            FROM
+            (
+                SELECT 
+                ci.id_dependencia, 
+                ci.id_ccta_presupuestal,
+                d.codigo_dependencia, 
+                ci.nombre_concepto_ingreso, 
+                SUM(dri.monto_det_recibo_ingreso) as total 
+                FROM 
+                recibo_ingreso ri
+                INNER JOIN detalle_recibo_ingreso dri ON ri.id_recibo_ingreso = dri.id_recibo_ingreso
+                INNER JOIN concepto_ingreso ci ON dri.id_concepto_ingreso = ci.id_concepto_ingreso
+                INNER JOIN dependencia d ON ci.id_dependencia = d.id_dependencia
+                WHERE 
+                ri.estado_recibo_ingreso = 1
+                AND ri.fecha_recibo_ingreso = ?
+                AND ci.id_proy_financiado = ?
+                AND ci.id_ccta_presupuestal <> 16201 
+                AND dri.estado_det_recibo_ingreso = 1
+                GROUP BY 
+                ci.id_dependencia, 
+                d.codigo_dependencia, 
+                ci.id_ccta_presupuestal,
+                ci.nombre_concepto_ingreso) as t
+                GROUP BY  t.id_dependencia, t.codigo_dependencia
         ',
             [$request->start_date, $request->financing_source_id]
         );
