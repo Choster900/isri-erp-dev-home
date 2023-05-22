@@ -184,7 +184,7 @@ import axios from 'axios';
                                         v-if="data.id_estado_quedan != 4" height="20px" viewBox="0 0 1024 1024"
                                         :fill="data.seguimiento_pagos == 0 ? '#ff0000' : '#646464'"
                                         class="icon cursor-pointer"
-                                        :class="data.seguimiento_pagos == 0 ? 'cursor-pointer' : 'cursor-help'"
+                                        :class="data.seguimiento_pagos == 0 ? 'cursor-pointer' : 'cursor-not-allowed'"
                                         version="1.1" xmlns="http://www.w3.org/2000/svg" stroke="#ff0000">
                                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                                         <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
@@ -383,67 +383,73 @@ export default {
         //Funcion que recibe dos parametros id quedan y un monto que con esto validaremos si se puede eliminar o no
         async deleteFromRequest(id_quedan, weDeleteIf) {
             try {
-                /* if (weDeleteIf == 0) { */
-                this.$swal.fire({
-                    title: '<p class="text-[16px]">¿Esta seguro de eliminar este quedan de este requerimiento? . Recuerda que puedes volver a agregarlo cuando quieras, mientras el requerimiento este en el rango establecido<p>',
-                    icon: 'question',
-                    iconHtml: '❓',
-                    confirmButtonText: '<p class="text-[14px]">Si, eliminar<p>',
-                    confirmButtonColor: '#D2691E',
-                    cancelButtonText: 'Cancelar',
-                    showCancelButton: true,
-                    showCloseButton: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const index = this.dataForRows.findIndex(r => r.id_quedan === id_quedan);
-                        this.dataForRows[index]["eliminadoLogicoQuedan"] = false;//seteamos el eliminado logico a false para no mostrarlo mas
-                        this.dataForRows[index]["mostrarDetalle"] = false;//seteamos el eliminado logico a false para no mostrarlo mas
+                if (weDeleteIf == 0) {
+                    this.$swal.fire({
+                        title: '<p class="text-[16px]">¿Esta seguro de eliminar este quedan de este requerimiento? . Recuerda que puedes volver a agregarlo cuando quieras, mientras el requerimiento este en el rango establecido<p>',
+                        icon: 'question',
+                        iconHtml: '❓',
+                        confirmButtonText: '<p class="text-[14px]">Si, eliminar<p>',
+                        confirmButtonColor: '#D2691E',
+                        cancelButtonText: 'Cancelar',
+                        showCancelButton: true,
+                        showCloseButton: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const index = this.dataForRows.findIndex(r => r.id_quedan === id_quedan);
+                            this.dataForRows[index]["eliminadoLogicoQuedan"] = false;//seteamos el eliminado logico a false para no mostrarlo mas
+                            this.dataForRows[index]["mostrarDetalle"] = false;//seteamos el eliminado logico a false para no mostrarlo mas
 
-                        let total = this.dataForRows[index].liquidacion_quedan.reduce((acc, obj) => acc + parseFloat(obj.monto_liquidacion_quedan), 0);
+                            let total = this.dataForRows[index].liquidacion_quedan.reduce((acc, obj) => acc + parseFloat(obj.monto_liquidacion_quedan), 0);
 
-                        if (total != 0) {
-                            this.restRequest = (parseFloat(this.restRequest) + parseFloat(total))
-                            this.totalPagadoForCalculate = (parseFloat(this.totalPagadoForCalculate) - parseFloat(total))
+                            if (total != 0) {
+                                this.restRequest = (parseFloat(this.restRequest) + parseFloat(total))
+                                this.totalPagadoForCalculate = (parseFloat(this.totalPagadoForCalculate) - parseFloat(total))
+                            }
+                            this.sumAmountPayAndAmountRest()//llamando la funcion para que haga el recalculo de nuevo
+
+                            // this.calculateWhenIsDelete(this.dataForRows[index].liquidacion_quedan)
+
+
+                            let cantidadEliminada = this.dataForRows.filter((item, i) => item.eliminadoLogicoQuedan <= false);
+                            console.log(cantidadEliminada.length);
+                            console.log(this.dataForRows.length);
+
+                            if (cantidadEliminada.length == this.dataForRows.length) {
+                                this.$emit("reload-table-and-close")
+                            }
+                            axios.post('/delete-quedan-from-request', {
+                                id_quedan: id_quedan,
+                            }).then(response => {
+                                this.$emit("reload-table")
+                                this.$emit("reload-data-for-select")
+                                toast.error(`Quedan ${id_quedan} eliminado del requerimiento`, {
+                                    autoClose: 7000,
+                                    position: "top-right",
+                                    transition: "zoom",
+                                    toastBackgroundColor: "white",
+                                }); 3
+                            }).catch(errors => {
+                                let msg = this.manageError(errors);
+                                this.$swal.fire({
+                                    title: "Operación cancelada",
+                                    text: msg,
+                                    icon: "warning",
+                                    timer: 5000,
+                                });
+                            })
+
                         }
-                        this.sumAmountPayAndAmountRest()//llamando la funcion para que haga el recalculo de nuevo
-
-                        // this.calculateWhenIsDelete(this.dataForRows[index].liquidacion_quedan)
-
-
-
-                        axios.post('/delete-quedan-from-request', {
-                            id_quedan: id_quedan,
-                        }).then(response => {
-                            this.$emit("reload-table")
-                            toast.error(`Quedan ${id_quedan} eliminado del requerimiento`, {
-                                autoClose: 7000,
-                                position: "top-right",
-                                transition: "zoom",
-                                toastBackgroundColor: "white",
-                            });
-                        }).catch(errors => {
-                            let msg = this.manageError(errors);
-                            this.$swal.fire({
-                                title: "Operación cancelada",
-                                text: msg,
-                                icon: "warning",
-                                timer: 5000,
-                            });
-                        })
-
-                    }
-                });
-                return res;
-                /* } else {
-                    //TODO: cambiar texto
-                    toast.error("Este quedan ya tiene montos previos pero se puede eliminar de igual forma, no afecta los calculos en esta vista mas si los podra afectar en la reporteria por que los sumaria aunque ya no esten incluido en el requerimiento", {
-                        autoClose: 4000,
+                    });
+                    return res;
+                } else {
+                    toast.error("Este quedan ya tiene un historial de liquidaciones. por lo tanto no se puede eliminar", {
+                        autoClose: 5000,
                         position: "top-right",
                         transition: "zoom",
                         toastBackgroundColor: "white",
                     })
                     return false
-                } */
+                }
             } catch (error) {
                 return false; // indicate failure
             }

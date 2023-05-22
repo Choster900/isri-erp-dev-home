@@ -28,8 +28,10 @@ import html2pdf from 'html2pdf.js'
                                 @click="printPdf()" />
                         </div>
                         <div class="px-2" v-if="dataQuedan != ''">
-                            <GeneralButton color="bg-[#0A3158]/90  hover:bg-[#0A3158]" text="GENERAR RETENCION" icon="pdf"
-                                @click="generarComprobanteRetencionPdf()" />
+                            <template v-if="dataInputs.monto_total_quedan >= 113">
+                                <GeneralButton color="bg-[#0A3158]/90  hover:bg-[#0A3158]" text="GENERAR RETENCION"
+                                    icon="pdf" @click="generarComprobanteRetencionPdf()" />
+                            </template>
                         </div>
                         <svg class="h-7 w-7 absolute top-0 right-0 mt-2 cursor-pointer" viewBox="0 0 25 25"
                             @click="$emit('cerrar-modal')">
@@ -193,7 +195,7 @@ import html2pdf from 'html2pdf.js'
                                         <td class="border-2 border-black"
                                             :class="dataInputs.numero_acuerdo_quedan == '' ? 'bg-[#fdfd96]' : ''"
                                             colspan="3" contenteditable="false">
-                                            <input type="text" v-model="dataInputs.numero_acuerdo_quedan"
+                                            <input type="number" v-model="dataInputs.numero_acuerdo_quedan"
                                                 :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                 :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
                                                 class="peer w-full text-sm bg-transparent text-center h-16 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
@@ -201,7 +203,7 @@ import html2pdf from 'html2pdf.js'
                                         <td class="border-2 border-black"
                                             :class="dataInputs.numero_compromiso_ppto_quedan == '' ? 'bg-[#fdfd96]' : ''"
                                             colspan="4" contenteditable="false">
-                                            <input type="text" v-model="dataInputs.numero_compromiso_ppto_quedan"
+                                            <input type="number" v-model="dataInputs.numero_compromiso_ppto_quedan"
                                                 :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                 :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
                                                 class="peer w-full text-sm bg-transparent text-center h-16 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
@@ -209,7 +211,7 @@ import html2pdf from 'html2pdf.js'
                                         <td class="border-2 border-black"
                                             :class="dataInputs.numero_retencion_iva_quedan == '' ? 'bg-[#fdfd96]' : ''"
                                             colspan="4" contenteditable="false">
-                                            <input type="text" v-model="dataInputs.numero_retencion_iva_quedan"
+                                            <input type="number" v-model="dataInputs.numero_retencion_iva_quedan"
                                                 :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                 :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
                                                 class="peer w-full text-sm bg-transparent text-center h-16 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
@@ -1127,5 +1129,15 @@ td {
 .flatpickr-day.flatpickr-disabled:hover {
     cursor: not-allowed;
     color: rgba(72, 72, 72, 0.3);
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number]:focus {
+    border: none;
 }
 </style>
