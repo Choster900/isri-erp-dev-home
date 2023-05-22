@@ -155,7 +155,7 @@ import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalL
 
         <ModalLiquidacionRequerimientoVue :modalIsOpen="showModalLiquidacionRequerimiento"
             @close-definitive="showModalLiquidacionRequerimiento = false" @reload-table="getDataLiquidaciones()"
-            @reload-table-and-close="[getDataLiquidaciones(), this.showModalLiquidacionRequerimiento = false]"
+            @reload-table-and-close="[getDataLiquidaciones(), showModalLiquidacionRequerimiento = false]"
             :dataLiquidaciones="dataLiquidaciones" />
     </AppLayoutVue>
 </template>
