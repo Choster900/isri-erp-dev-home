@@ -306,6 +306,33 @@ export default {
             })
         },
         liquidarMonto(id_quedan, event, campo) {
+            let inputValue = event.target.textContent;
+            const regex = /^(\d+)?(\.\d{0,2})?$/;
+            inputValue = inputValue.replace(/^\./, ''); // Eliminar punto al inicio
+            inputValue = inputValue.replace(/[^0-9.]/g, ''); // Eliminar caracteres no permitidos
+
+            if (!regex.test(inputValue)) {
+                const previousValue = event.target.textContent;
+                event.target.textContent = previousValue.substring(0, previousValue.length - 1);
+                const selection = window.getSelection();
+                const range = document.createRange();
+                range.selectNodeContents(event.target);
+                range.collapse(false); // Colapsar al final del rango
+                selection.removeAllRanges();
+                selection.addRange(range);
+            } else {
+                if (event.target.textContent != inputValue) {
+                    event.target.textContent = inputValue
+                    const selection = window.getSelection();
+                    const range = document.createRange();
+                    range.selectNodeContents(event.target);
+                    range.collapse(false); // Colapsar al final del rango
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }else{
+                    event.target.textContent = inputValue;
+                }
+            }
 
             //TODO: arreglar que solo puedan ingresar numeros con dos decimales (tambien en el quedan)
             const index = this.dataForRows.findIndex(quedan => quedan.id_quedan === id_quedan);
