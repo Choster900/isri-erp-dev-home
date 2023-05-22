@@ -62,8 +62,8 @@ import axios from 'axios';
                                         <br>
                                         SERVICIO: ${{ detalle.servicio_factura_det_quedan }}
                                         <br>
-                                        TOTAL: ${{ parseFloat(detalle.servicio_factura_det_quedan) +
-                                            parseFloat(detalle.producto_factura_det_quedan) }}
+                                        TOTAL: ${{ parseFloat(detalle.servicio_factura_det_quedan) || 0 +
+                                            parseFloat(detalle.producto_factura_det_quedan) || 0 }}
                                     </p>
                                 </div>
                             </td>
@@ -116,7 +116,7 @@ import axios from 'axios';
                                                     </svg>
                                                 </span>
                                             </div>
-                                            <div class="font-semibold">Desactivar</div>
+                                            <div class="font-semibold">Eliminar</div>
                                         </div>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-not-allowed" v-else>
                                             <div class="w-8 text-blue-900">
