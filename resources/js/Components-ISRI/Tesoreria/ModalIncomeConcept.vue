@@ -144,14 +144,14 @@ export default {
         saveNewIncomeConcept() {
             this.$swal
                 .fire({
-                    title: "¿Está seguro de guardar el nuevo concepto de ingreso?",
-                    icon: "question",
-                    iconHtml: "✅",
-                    confirmButtonText: "Si, Guardar",
-                    confirmButtonColor: "#15803D",
-                    cancelButtonText: "Cancelar",
+                    title: '¿Está seguro de guardar el nuevo concepto de ingreso?',
+                    icon: 'question',
+                    iconHtml: '❓',
+                    confirmButtonText: 'Si, Guardar',
+                    confirmButtonColor: '#141368',
+                    cancelButtonText: 'Cancelar',
                     showCancelButton: true,
-                    showCloseButton: true,
+                    showCloseButton: true
                 })
                 .then((result) => {
                     if (result.isConfirmed) {
@@ -196,14 +196,14 @@ export default {
         updateIncomeConcept() {
             this.$swal
                 .fire({
-                    title: "¿Está seguro de actualizar el concepto de ingreso?",
-                    icon: "question",
-                    iconHtml: "❓",
-                    confirmButtonText: "Si, Actualizar",
-                    confirmButtonColor: "#D2691E",
-                    cancelButtonText: "Cancelar",
+                    title: '¿Está seguro de actualizar el concepto de ingreso?',
+                    icon: 'question',
+                    iconHtml: '❓',
+                    confirmButtonText: 'Si, Actualizar',
+                    confirmButtonColor: '#141368',
+                    cancelButtonText: 'Cancelar',
                     showCancelButton: true,
-                    showCloseButton: true,
+                    showCloseButton: true
                 })
                 .then((result) => {
                     if (result.isConfirmed) {
