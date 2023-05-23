@@ -291,11 +291,11 @@ export default {
         },
         updateSupplier() {
             this.$swal.fire({
-                title: '¿Esta seguro de editar los datos?',
+                title: '¿Está seguro de actualizar el proveedor?',
                 icon: 'question',
                 iconHtml: '❓',
-                confirmButtonText: 'Si, Editar',
-                confirmButtonColor: '#D2691E',
+                confirmButtonText: 'Si, Actualizar',
+                confirmButtonColor: '#141368',
                 cancelButtonText: 'Cancelar',
                 showCancelButton: true,
                 showCloseButton: true

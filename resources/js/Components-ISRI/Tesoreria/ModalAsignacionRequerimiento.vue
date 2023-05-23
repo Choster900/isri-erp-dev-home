@@ -253,7 +253,7 @@ import axios from 'axios';
         </div>
     </ModalBasicVue>
 </template>
-  
+
 
 <script>
 
@@ -318,7 +318,7 @@ export default {
                     newDataQuedan = newDataQuedan.map(quedan => {
                         return {
                             ...quedan,
-                            //agregando una nueva key a mi arreglo de quedans 
+                            //agregando una nueva key a mi arreglo de quedans
                             mostrar: true
                         }
                     })
@@ -375,9 +375,9 @@ export default {
                     title: `<div class="text-[15px]">¿Esta seguro de agregar el numero de requerimiento
                         <p class="text-[22px] underline">${this.numero_requerimiento[0].label} </p>  a estos quedan?</div>`,
                     icon: 'question',
-                    iconHtml: '❓',
+                    iconHtml: "✅",
                     confirmButtonText: 'Si, Agregar',
-                    confirmButtonColor: '#141368',
+                    confirmButtonColor: '#15803D',
                     cancelButtonText: 'Cancelar',
                     showCancelButton: true,
                     showCloseButton: true

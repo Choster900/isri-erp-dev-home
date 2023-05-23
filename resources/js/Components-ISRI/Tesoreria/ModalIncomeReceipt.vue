@@ -426,14 +426,14 @@ export default {
         updateIncomeReceipt() {
             this.$swal
                 .fire({
-                    title: "¿Está seguro de actualizar el recibo de ingreso?",
-                    icon: "question",
+                    title: '¿Está seguro de actualizar el recibo de ingreso?',
+                    icon: 'question',
                     iconHtml: '❓',
-                    confirmButtonText: "Si, Actualizar",
-                    confirmButtonColor: "#D2691E",
-                    cancelButtonText: "Cancelar",
+                    confirmButtonText: 'Si, Actualizar',
+                    confirmButtonColor: '#141368',
+                    cancelButtonText: 'Cancelar',
                     showCancelButton: true,
-                    showCloseButton: true,
+                    showCloseButton: true
                 })
                 .then((result) => {
                     if (result.isConfirmed) {
