@@ -39,4 +39,8 @@ class ProyectoFinanciado extends Model
     {
         return $this->hasMany('App\Models\ConceptoIngreso', 'id_proy_financiado', 'id_proy_financiado');
     }
+    public function recibos_ingreso()
+    {
+        return $this->hasMany('App\Models\ReciboIngreso', 'id_proy_financiado', 'id_proy_financiado');
+    }
 }
