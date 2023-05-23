@@ -30,6 +30,7 @@ class IncomeReceiptRequest extends FormRequest
         $rules["treasury_clerk_id"] = ['required'];
         $rules["budget_account_id"] = ['required'];
         $rules["description"] = ['required'];
+        $rules["financing_source_id"] = ['required'];
         $rules["direction"] = ['required_if:budget_account_id,16304'];
         $rules["document"] = ['required_if:budget_account_id,16304'];
         foreach ($this->input('income_detail', []) as $key => $income_detail) {
@@ -60,6 +61,7 @@ class IncomeReceiptRequest extends FormRequest
         $messages["treasury_clerk_id.required"] = "Debe seleccionar Tesorero.";
         $messages["direction.required_if"] = "Debe ingresar la direccion de la persona.";
         $messages["document.required_if"] = "Debe ingresar el documento de identificación de la persona.";
+        $messages["financing_source_id.required"] = "Debe seleccionar fuente de financiamiento.";
         return $messages;
     }
 }

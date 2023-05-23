@@ -179,7 +179,7 @@ import axios from 'axios';
         </div>
 
         <ModalIncomeReceiptVue :show_modal_receipt="show_modal_receipt" :modal_data="modal_data"
-            :budget_accounts="budget_accounts" :income_concepts="income_concepts"
+            :budget_accounts="budget_accounts"
             :treasury_clerk="treasury_clerk" @cerrar-modal="show_modal_receipt = false"
             @get-table="getIncomeReceipts(tableData.currentPage)" />
 
