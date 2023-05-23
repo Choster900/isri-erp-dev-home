@@ -3,12 +3,10 @@ import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import moment from 'moment';
 import InputError from "@/Components/InputError.vue";
-
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import { jsPDF } from "jspdf";
 import html2pdf from 'html2pdf.js'
-
 import axios from 'axios';
 
 </script>
@@ -174,7 +172,7 @@ export default {
                                 orientation: 'landscape' // landscape o portrait
                             },
                         })
-                        //codigo para paginar 
+                        //codigo para paginar
                         .from(html).toPdf().get('pdf').then(function (pdf) {
                             var totalPages = pdf.internal.getNumberOfPages();
                             for (var i = 1; i <= totalPages; i++) {
