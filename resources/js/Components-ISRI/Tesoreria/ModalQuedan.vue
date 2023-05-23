@@ -413,7 +413,7 @@ export default {
             type: Object,
             required: true,
         },
-        dataForSelectInRow: {//prop que muestra information en row 
+        dataForSelectInRow: {//prop que muestra information en row
             type: [],
             required: true,
         },
@@ -712,7 +712,7 @@ export default {
             this.dataForCalculate.monto_total_quedan_por_proveedor = parseFloat(total)
 
         },
-       
+
         onInputDescripcionQuedan(event) {
             this.dataInputs.descripcion_quedan = event.target.innerText;
         },
@@ -933,7 +933,7 @@ export default {
                 title: '¿Está seguro de actualizar el quedan?',
                 icon: 'question',
                 iconHtml: '❓',
-                confirmButtonText: 'Si, Actualizar el quedan',
+                confirmButtonText: 'Si, Actualizar',
                 confirmButtonColor: '#141368',
                 cancelButtonText: 'Cancelar',
                 showCancelButton: true,
