@@ -1,5 +1,5 @@
 <template>
-    <div class="h-screen relative mb-14">
+    <div class="h-screen relative mb-14" style="height: 650px;">
         <div class="h-[90%]  mt-3 mb-2">
             <div class="text-center">
                 <img src="../../../img/isri-gob.png" alt="Logo del instituto" class="w-[200px] mx-auto">
@@ -100,7 +100,7 @@
     </div>
 
     <div class="page_break">
-        <div class="h-screen relative mb-16">
+        <div class="h-screen relative mb-16" style="height: 650px;">
             <div class="h-[90%] mt-3 mb-2">
                 <div class="text-center">
                     <img src="../../../img/isri-gob.png" alt="Logo del instituto" class="w-[200px] mx-auto">

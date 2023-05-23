@@ -141,9 +141,9 @@ import html2pdf from 'html2pdf.js'
                                         </div>
 
                                         <div class="flex justify-center items-start mb-2 h-[90%]">
-                                            <div class="w-full flex flex-col h-1/8">
+                                            <div class="w-full flex flex-col h-full">
                                                 <div v-for="(detail, index) in receipt_to_print.detalles" :key="index"
-                                                    class="relative flex w-full flex-row center-vertically">
+                                                    class="relative flex w-full flex-row center-vertically h-1/11">
                                                     <label for=""
                                                         class="font-bold flex items-center text-[10px] w-2/3 mx-4 mt-0">
                                                         {{ detail.concepto_ingreso.dependencia ?
@@ -162,7 +162,7 @@ import html2pdf from 'html2pdf.js'
                                                     <!-- <input type="text" readonly v-model="detail.monto_det_recibo_ingreso"
                                                     class="w-1/3 font-bold text-right border-0 py-0 text-sm"> -->
                                                 </div>
-                                                <div class="flex justify-center items-start mb-2 h-1/4 mt-1 center-vertically">
+                                                <div class="flex justify-center items-start mb-2 h-1/11 mt-1 center-vertically">
                                                     <div class="relative flex w-full flex-row">
                                                         <label for=""
                                                             class="font-bold flex items-center text-[10px] w-2/3 mx-4 mt-0">
