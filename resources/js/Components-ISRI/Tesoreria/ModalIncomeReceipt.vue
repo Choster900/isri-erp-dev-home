@@ -128,46 +128,47 @@ import axios from "axios";
                                     </button>
                                 </div>
                             </div>
-                            <div v-for="(row, index) in active_details" :key="index" class="table-row">
-                                <div class="mb-2 md:mr-2 md:mb-0 basis-2/3">
-                                    <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
-                                        <Multiselect v-model="row.income_concept_id" :value="row.income_concept_id"
-                                            @input="selectConcept($event, row.income_concept_id)"
-                                            :options="income_concept_select" placeholder="Seleccione Concepto"
-                                            :searchable="true" />
-                                        <LabelToInput icon="list" />
+                            <template v-for="(row, index) in income_receipt.income_detail" :key="index" >
+                                <div v-if="row.deleted == false" class="table-row">
+                                    <div class="mb-2 md:mr-2 md:mb-0 basis-2/3">
+                                        <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
+                                            <Multiselect v-model="row.income_concept_id" :value="row.income_concept_id"
+                                                @input="selectConcept($event, row.income_concept_id)"
+                                                :options="income_concept_select" placeholder="Seleccione Concepto"
+                                                :searchable="true" />
+                                            <LabelToInput icon="list" />
+                                        </div>
+                                        <InputError
+                                            v-for="(item, index2) in errors['income_detail.' + index + '.income_concept_id']"
+                                            :key="index2" class="mt-2" :message="item" />
                                     </div>
-                                    <InputError
-                                        v-for="(item, index2) in errors['income_detail.' + index + '.income_concept_id']"
-                                        :key="index2" class="mt-2" :message="item" />
-                                </div>
 
-                                <div class="mb-2 md:mr-2 md:mb-0 basis-1/3">
-                                    <TextInput id="detail-amount" v-model="row.amount" :value="row.amount"
-                                        :label-input="false" type="text" placeholder="Monto"
-                                        @update:modelValue="typeAmountIncome(index)">
-                                        <LabelToInput icon="money" forLabel="detail-amount" />
-                                    </TextInput>
-                                    <InputError v-for="(item, index2) in errors['income_detail.' + index + '.amount']"
-                                        :key="index2" class="mt-2" :message="item" />
-                                </div>
+                                    <div class="mb-2 md:mr-2 md:mb-0 basis-1/3">
+                                        <TextInput id="detail-amount" v-model="row.amount" :value="row.amount"
+                                            :label-input="false" type="text" placeholder="Monto"
+                                            @update:modelValue="typeAmountIncome(index)">
+                                            <LabelToInput icon="money" forLabel="detail-amount" />
+                                        </TextInput>
+                                        <InputError v-for="(item, index2) in errors['income_detail.' + index + '.amount']"
+                                            :key="index2" class="mt-2" :message="item" />
+                                    </div>
 
-                                <div>
-                                    <button :disabled="available_details <= 1"
-                                        @click="deleteRow(index, row.income_concept_id, row.detail_id)"
-                                        class="text-red-500 hover:text-red-600 rounded-full">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                                d="M17 5V4C17 2.89543 16.1046 2 15 2H9C7.89543 2 7 2.89543 7 4V5H4C3.44772 5 3 5.44772 3 6C3 6.55228 3.44772 7 4 7H5V18C5 19.6569 6.34315 21 8 21H16C17.6569 21 19 19.6569 19 18V7H20C20.5523 7 21 6.55228 21 6C21 5.44772 20.5523 5 20 5H17ZM15 4H9V5H15V4ZM17 7H7V18C7 18.5523 7.44772 19 8 19H16C16.5523 19 17 18.5523 17 18V7Z"
-                                                fill="currentColor" />
-                                            <path d="M9 9H11V17H9V9Z" fill="currentColor" />
-                                            <path d="M13 9H15V17H13V9Z" fill="currentColor" />
-                                        </svg>
-                                    </button>
+                                    <div>
+                                        <button :disabled="available_details <= 1"
+                                            @click="deleteRow(index, row.income_concept_id, row.detail_id)"
+                                            class="text-red-500 hover:text-red-600 rounded-full">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                                    d="M17 5V4C17 2.89543 16.1046 2 15 2H9C7.89543 2 7 2.89543 7 4V5H4C3.44772 5 3 5.44772 3 6C3 6.55228 3.44772 7 4 7H5V18C5 19.6569 6.34315 21 8 21H16C17.6569 21 19 19.6569 19 18V7H20C20.5523 7 21 6.55228 21 6C21 5.44772 20.5523 5 20 5H17ZM15 4H9V5H15V4ZM17 7H7V18C7 18.5523 7.44772 19 8 19H16C16.5523 19 17 18.5523 17 18V7Z"
+                                                    fill="currentColor" />
+                                                <path d="M9 9H11V17H9V9Z" fill="currentColor" />
+                                                <path d="M13 9H15V17H13V9Z" fill="currentColor" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
-
-                            </div>
+                            </template>
                         </div>
 
                     </div>
@@ -263,17 +264,17 @@ export default {
             }
         },
         clearDetailSelectionsAndTotal(load = true) {
-            //limpiando valores de detalles
-            console.log('clearDetailSelectionsAndTotal');
+            //Limpiamos detalles dependiendo del valor de la variable load
             this.clearDetails(load)
+            //actualizamos el total
             this.updateTotal()
         },
-        getFinanceSource(new_selection,load = true) {
+        getFinanceSource(new_selection, load = true) {
             axios.get("/get-select-financing-source", { params: { budget_account_id: new_selection } })
                 .then((response) => {
                     this.financing_sources = response.data.financing_sources
                     if (this.modal_data != '') {
-                        this.selectFinancingSource(this.modal_data.id_proy_financiado,load)
+                        this.selectFinancingSource(this.modal_data.id_proy_financiado, load)
                     }
                 })
                 .catch((errors) => {
@@ -328,7 +329,7 @@ export default {
             } else {
                 this.clearDetailSelectionsAndTotal(load)
                 this.income_concept_select = []
-                this.getIncomeConcept(new_selection,load)
+                this.getIncomeConcept(new_selection)
             }
         },
         deleteRow(index, concept_id, detail_id) {
@@ -343,15 +344,15 @@ export default {
                 confirmButtonText: 'Si, Eliminar.'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    this.income_concept_select.forEach((value, index) => {
+                    this.income_concept_select.forEach((value, i) => {
                         if (value.value == concept_id) {
-                            this.income_concept_select[index].disabled = false
+                            this.income_concept_select[i].disabled = false
                         }
                     })
-                    if (detail_id == "") {
-                        this.income_receipt.income_detail.splice(index, 1);
+                    if (detail_id === "") {
+                        this.income_receipt.income_detail = this.income_receipt.income_detail.filter((_, i) => i !== index);
                     } else {
-                        this.income_receipt.income_detail[index].deleted = true;
+                        this.income_receipt.income_detail[index].deleted=true
                     }
                     this.updateTotal()
                 }
@@ -380,6 +381,7 @@ export default {
             this.income_receipt.total = sum.toFixed(2);
         },
         selectConcept(newSelection, oldSelection) {
+            console.log(newSelection, oldSelection);
             if (newSelection == null) {
                 this.income_concept_select.forEach((value, index) => {
                     if (value.value == oldSelection) {
@@ -509,29 +511,24 @@ export default {
                     }
                 });
         },
-        getAndSetDetails(details,load=true) {
+        getAndSetDetails(details) {
             //Funcion para habilitar o deshabilitar opciones del select de concepto de ingreso
             //load es una variable de control para saber si es editar y si recien se abre sin haber ejecutado ninguna opcion
             //load = true significa nuevo o editado ya con una accion
             //load = false significa editado sin haber realizado ninguna accion
             if (details) {
-                this.income_concept_select.forEach((value, index) => {
-                    details.forEach((value2, index2) => {
-                        if (value.value == value2.income_concept_id && load) {
-                            value.disabled = true
-                        }else{
-                            value.disabled = false
-                        }
-                    })
-                })
+                this.income_concept_select = this.income_concept_select.map((value) => {
+                    const isDisabled = details.some((value2) => value.value === value2.income_concept_id && value2.deleted === false);
+                    return { ...value, disabled: isDisabled };
+                });
             }
         },
-        getIncomeConcept(new_selection,load=true) {
+        getIncomeConcept(new_selection) {
             console.log('si entra');
             axios.get("/get-select-income-concept", { params: { financing_source_id: new_selection, budget_account_id: this.income_receipt.budget_account_id } })
                 .then((response) => {
                     this.income_concept_select = response.data.income_concept_select
-                    this.getAndSetDetails(this.income_receipt.income_detail,load)
+                    this.getAndSetDetails(this.income_receipt.income_detail)
                 })
                 .catch((errors) => {
                     let msg = this.manageError(errors);

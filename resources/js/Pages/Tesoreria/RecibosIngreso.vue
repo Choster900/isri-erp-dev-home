@@ -47,18 +47,21 @@ import axios from 'axios';
                     <tbody class="text-sm divide-y divide-slate-200">
                         <tr v-for="receipt in income_receipts" :key="receipt.id_recibo_ingreso">
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
-                                <div class="font-medium text-slate-800 text-center">{{ receipt.numero_recibo_ingreso }}</div>
+                                <div class="font-medium text-slate-800 text-center">{{ receipt.numero_recibo_ingreso }}
+                                </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
                                 <div class="font-medium text-slate-800 ellipsis text-center">
                                     {{ formatearFecha(receipt.fecha_recibo_ingreso) }}
-                                    </div>
+                                </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
-                                <div class="font-medium text-slate-800 ellipsis text-center">{{ receipt.cliente_recibo_ingreso }}</div>
+                                <div class="font-medium text-slate-800 ellipsis text-center">{{
+                                    receipt.cliente_recibo_ingreso }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
-                                <div class="font-medium text-slate-800 ellipsis text-center">{{ receipt.descripcion_recibo_ingreso }}
+                                <div class="font-medium text-slate-800 ellipsis text-center">{{
+                                    receipt.descripcion_recibo_ingreso }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
@@ -179,8 +182,7 @@ import axios from 'axios';
         </div>
 
         <ModalIncomeReceiptVue :show_modal_receipt="show_modal_receipt" :modal_data="modal_data"
-            :budget_accounts="budget_accounts"
-            :treasury_clerk="treasury_clerk" @cerrar-modal="show_modal_receipt = false"
+            :budget_accounts="budget_accounts" :treasury_clerk="treasury_clerk" @cerrar-modal="show_modal_receipt = false"
             @get-table="getIncomeReceipts(tableData.currentPage)" />
 
         <ModalReceiptFormatVue :view_receipt="view_receipt" :receipt_to_print="receipt_to_print"
@@ -254,7 +256,11 @@ export default {
             return moment(date).format('DD/MM/YYYY');
         },
         viewReceipt(receipt) {
-            this.receipt_to_print = receipt
+            const filteredReceipt = {
+                ...receipt,
+                detalles: receipt.detalles.filter(detalle => detalle.estado_det_recibo_ingreso === 1)
+            };
+            this.receipt_to_print = filteredReceipt
             this.view_receipt = true
         },
         editIncomeReceipt(income_concept) {
