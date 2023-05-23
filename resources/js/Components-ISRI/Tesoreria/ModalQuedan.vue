@@ -298,8 +298,7 @@ import html2pdf from 'html2pdf.js'
                                                         {{ cell }}
                                                     </td>
 
-                                                    <td v-else-if="cellIndex == 6" class="border-2 border-black"
-                                                        @keypress="onlyNumberDecimal($event)">
+                                                    <td v-else-if="cellIndex == 6" class="border-2 border-black">
 
                                                         <table>
                                                             <tr>
@@ -309,7 +308,7 @@ import html2pdf from 'html2pdf.js'
                                                                 </th>
                                                                 <td :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true"
                                                                     :class="[cell.producto == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']"
-                                                                    @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText, 'producto')"
+                                                                    @input="onCellEdit(rowIndex, cellIndex, $event, 'producto')"
                                                                     class="w-full border-2 border-b-black border-x-transparent border-t-transparent">
                                                                     {{ cell.producto }}
                                                                 </td>
@@ -321,7 +320,7 @@ import html2pdf from 'html2pdf.js'
                                                                 </th>
                                                                 <td :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true"
                                                                     :class="[cell.servicio == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']"
-                                                                    @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText, 'servicio')">
+                                                                    @input="onCellEdit(rowIndex, cellIndex, $event, 'servicio')">
                                                                     {{ cell.servicio }}
                                                                 </td>
                                                             </tr>
@@ -414,7 +413,7 @@ export default {
             type: Object,
             required: true,
         },
-        dataForSelectInRow: {//prop que muestra information en row 
+        dataForSelectInRow: {//prop que muestra information en row
             type: [],
             required: true,
         },
@@ -570,23 +569,57 @@ export default {
                     });
             }
         },
-        onCellEdit(rowIndex, cellIndex, value, type = '') {
+        onCellEdit(rowIndex, cellIndex, event, type = '') {
             if (type) {
                 // Verificar si se especificó un tipo de edición (producto o servicio)
                 if (type === 'producto') {
-                    // Editar el valor de la celda correspondiente al producto en la fila y columna dadas
-                    this.rowsData[rowIndex][cellIndex].producto = value;
+                    //llamamos el metodo que nos valida si es numero o letra
+                    this.onlyNumberDecimal(rowIndex, cellIndex, event, type = 'producto')
                 } else {
-                    // Editar el valor de la celda correspondiente al servicio en la fila y columna dadas
-                    this.rowsData[rowIndex][cellIndex].servicio = value;
+                    //llamamos el metodo que nos valida si es numero o letra
+                    this.onlyNumberDecimal(rowIndex, cellIndex, event, type = 'servicio')
                 }
                 // Calcular los montos totales
                 this.calculateAmount();
             } else {
                 // Editar el valor de la celda en la fila y columna dadas
-                this.rowsData[rowIndex][cellIndex] = value;
+                this.rowsData[rowIndex][cellIndex] = event;
             }
         },
+
+        onlyNumberDecimal(rowIndex, cellIndex, event, type = '') {
+            let inputValue = event.target.textContent;
+            const regex = /^(\d+)?(\.\d{0,2})?$/;
+            inputValue = inputValue.replace(/^\./, ''); // Eliminar punto al inicio
+            inputValue = inputValue.replace(/\.(?=.*\.)/g, ''); // Eliminar puntos adicionales
+            inputValue = inputValue.replace(/[^0-9.]/g, ''); // Eliminar caracteres no permitidos
+
+            if (!regex.test(inputValue)) {
+                const previousValue = event.target.textContent;
+                event.target.textContent = previousValue.substring(0, previousValue.length - 1);
+                const selection = window.getSelection();
+                const range = document.createRange();
+                range.selectNodeContents(event.target);
+                range.collapse(false); // Colapsar al final del rango
+                selection.removeAllRanges();
+                selection.addRange(range);
+            } else {
+                if (event.target.textContent != inputValue) {
+                    event.target.textContent = inputValue
+                    const selection = window.getSelection();
+                    const range = document.createRange();
+                    range.selectNodeContents(event.target);
+                    range.collapse(false); // Colapsar al final del rango
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                } else {
+                    event.target.textContent = inputValue;
+                }
+            }
+            //Seteamos la informacion a objeto con indice x y celda y
+            this.rowsData[rowIndex][cellIndex][type] = event.target.textContent;
+        },
+
         getInformationBySupplier(supplier) {
             // Buscar el proveedor en la lista de proveedores
             const selectedSupplier = this.dataForSelectInRow.proveedor.find((suppliers) => suppliers.value === supplier);
@@ -679,20 +712,7 @@ export default {
             this.dataForCalculate.monto_total_quedan_por_proveedor = parseFloat(total)
 
         },
-        onlyNumberDecimal(event) {
-            const charCode = (event.which) ? event.which : event.keyCode;
-            const value = event.target.textContent;
-            const decimalCount = (value.match(/\./g) || []).length;
-            if (charCode == 46) {
-                if (decimalCount >= 1) {
-                    event.preventDefault();
-                }
-            } else if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-                event.preventDefault();
-            } else if (decimalCount > 0 && value.split('.')[1].length >= 2) {
-                event.preventDefault();
-            }
-        },
+
         onInputDescripcionQuedan(event) {
             this.dataInputs.descripcion_quedan = event.target.innerText;
         },
@@ -913,7 +933,7 @@ export default {
                 title: '¿Está seguro de actualizar el quedan?',
                 icon: 'question',
                 iconHtml: '❓',
-                confirmButtonText: 'Si, Actualizar el quedan',
+                confirmButtonText: 'Si, Actualizar',
                 confirmButtonColor: '#141368',
                 cancelButtonText: 'Cancelar',
                 showCancelButton: true,

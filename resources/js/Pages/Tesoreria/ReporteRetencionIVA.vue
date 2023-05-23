@@ -3,10 +3,8 @@ import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import moment from 'moment';
 import InputError from "@/Components/InputError.vue";
-
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
-
 import axios from 'axios';
 
 </script>
