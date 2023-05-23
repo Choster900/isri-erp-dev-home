@@ -373,14 +373,14 @@ export default {
         },
         saveIncomeReceipt() {
             this.$swal.fire({
-                title: "¿Está seguro de guardar el nuevo recibo de ingreso?",
-                icon: "question",
-                iconHtml: "✅",
-                confirmButtonText: "Si, Guardar",
-                confirmButtonColor: "#15803D",
-                cancelButtonText: "Cancelar",
+                title: '¿Está seguro de guardar el nuevo recibo de ingreso?',
+                icon: 'question',
+                iconHtml: '❓',
+                confirmButtonText: 'Si, Guardar',
+                confirmButtonColor: '#141368',
+                cancelButtonText: 'Cancelar',
                 showCancelButton: true,
-                showCloseButton: true,
+                showCloseButton: true
             })
                 .then((result) => {
                     if (result.isConfirmed) {
