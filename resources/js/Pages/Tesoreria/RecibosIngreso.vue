@@ -308,12 +308,13 @@ export default {
             this.$swal.fire({
                 title: msg + ' recibo de ingreso numero: ' + income_receipt_number + '.',
                 text: "¿Estas seguro?",
-                icon: 'warning',
+                icon: "question",
+                iconHtml: "❓",
+                confirmButtonText: 'Si, ' + msg,
+                confirmButtonColor: "#001b47",
+                cancelButtonText: "Cancelar",
                 showCancelButton: true,
-                cancelButtonText: 'Cancelar',
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Si, ' + msg
+                showCloseButton: true
             }).then((result) => {
                 if (result.isConfirmed) {
                     axios.post("/change-state-income-receipt", {
