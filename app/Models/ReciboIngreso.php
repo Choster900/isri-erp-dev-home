@@ -34,8 +34,7 @@ class ReciboIngreso extends Model
 
     public function detalles()
     {
-        return $this->hasMany('App\Models\DetalleReciboIngreso','id_recibo_ingreso','id_recibo_ingreso')
-                    ->where('estado_det_recibo_ingreso', 1);
+        return $this->hasMany('App\Models\DetalleReciboIngreso','id_recibo_ingreso','id_recibo_ingreso');
     }
 
     public function cuenta_presupuestal()

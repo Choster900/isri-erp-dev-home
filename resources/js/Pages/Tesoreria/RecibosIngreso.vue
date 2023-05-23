@@ -197,8 +197,7 @@ import axios from 'axios';
         </div>
 
         <ModalIncomeReceiptVue :show_modal_receipt="show_modal_receipt" :modal_data="modal_data"
-            :financing_sources="financing_sources" :budget_accounts="budget_accounts" :income_concepts="income_concepts"
-            :treasury_clerk="treasury_clerk" @cerrar-modal="show_modal_receipt = false"
+            :budget_accounts="budget_accounts" :treasury_clerk="treasury_clerk" @cerrar-modal="show_modal_receipt = false"
             @get-table="getIncomeReceipts(tableData.currentPage)" />
 
         <ModalReceiptFormatVue :view_receipt="view_receipt" :receipt_to_print="receipt_to_print"
@@ -272,7 +271,11 @@ export default {
             return moment(date).format('DD/MM/YYYY');
         },
         viewReceipt(receipt) {
-            this.receipt_to_print = receipt
+            const filteredReceipt = {
+                ...receipt,
+                detalles: receipt.detalles.filter(detalle => detalle.estado_det_recibo_ingreso === 1)
+            };
+            this.receipt_to_print = filteredReceipt
             this.view_receipt = true
         },
         editIncomeReceipt(income_concept) {
@@ -289,7 +292,7 @@ export default {
                     this.budget_accounts = response.data.budget_accounts
                     this.income_concepts = response.data.income_concepts
                     this.treasury_clerk = response.data.treasury_clerk
-                    this.financing_sources = response.data.financing_sources
+                    //this.financing_sources = response.data.financing_sources
                 })
                 .catch((errors) => {
                     let msg = this.manageError(errors);

@@ -68,11 +68,14 @@ export default {
         }
     },
     watch: {
-        StateFromModal: function () {
-            if (this.matchPath) {
-                this.StateFromModal ? this.stateToMenu = false : this.stateToMenu = true
+        StateFromModal: function (newData, oldData) {
+            if (!newData) {
+                this.stateToMenu = true
+            } else {
+                if (this.matchPath) {
+                    this.StateFromModal ? this.stateToMenu = false : this.stateToMenu = true
+                }
             }
-            
         }
     }
 }

@@ -29,7 +29,8 @@ import axios from "axios";
                                 </label>
                                 <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                                     <Multiselect v-model="income_receipt.budget_account_id" :options="budget_accounts"
-                                        :disabled="budget_select" @select="selectBudgetAccount($event)"
+                                        :disabled="budget_select"
+                                        @input="selectBudgetAccount($event, income_receipt.budget_account_id)"
                                         placeholder="Seleccione Especifico" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
@@ -128,46 +129,47 @@ import axios from "axios";
                                     </button>
                                 </div>
                             </div>
-                            <div v-for="(row, index) in active_details" :key="index" class="table-row">
-                                <div class="mb-2 md:mr-2 md:mb-0 basis-2/3">
-                                    <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
-                                        <Multiselect v-model="row.income_concept_id" :value="row.income_concept_id"
-                                            @input="selectConcept($event, row.income_concept_id)"
-                                            :options="income_concept_select" placeholder="Seleccione Concepto"
-                                            :searchable="true" />
-                                        <LabelToInput icon="list" />
+                            <template v-for="(row, index) in income_receipt.income_detail" :key="index" >
+                                <div v-if="row.deleted == false" class="table-row">
+                                    <div class="mb-2 md:mr-2 md:mb-0 basis-2/3">
+                                        <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
+                                            <Multiselect v-model="row.income_concept_id" :value="row.income_concept_id"
+                                                @input="selectConcept($event, row.income_concept_id)"
+                                                :options="income_concept_select" placeholder="Seleccione Concepto"
+                                                :searchable="true" />
+                                            <LabelToInput icon="list" />
+                                        </div>
+                                        <InputError
+                                            v-for="(item, index2) in errors['income_detail.' + index + '.income_concept_id']"
+                                            :key="index2" class="mt-2" :message="item" />
                                     </div>
-                                    <InputError
-                                        v-for="(item, index2) in errors['income_detail.' + index + '.income_concept_id']"
-                                        :key="index2" class="mt-2" :message="item" />
-                                </div>
 
-                                <div class="mb-2 md:mr-2 md:mb-0 basis-1/3">
-                                    <TextInput id="detail-amount" v-model="row.amount" :value="row.amount"
-                                        :label-input="false" type="text" placeholder="Monto"
-                                        @update:modelValue="typeAmountIncome(index)">
-                                        <LabelToInput icon="money" forLabel="detail-amount" />
-                                    </TextInput>
-                                    <InputError v-for="(item, index2) in errors['income_detail.' + index + '.amount']"
-                                        :key="index2" class="mt-2" :message="item" />
-                                </div>
+                                    <div class="mb-2 md:mr-2 md:mb-0 basis-1/3">
+                                        <TextInput id="detail-amount" v-model="row.amount" :value="row.amount"
+                                            :label-input="false" type="text" placeholder="Monto"
+                                            @update:modelValue="typeAmountIncome(index)">
+                                            <LabelToInput icon="money" forLabel="detail-amount" />
+                                        </TextInput>
+                                        <InputError v-for="(item, index2) in errors['income_detail.' + index + '.amount']"
+                                            :key="index2" class="mt-2" :message="item" />
+                                    </div>
 
-                                <div>
-                                    <button :disabled="available_details <= 1"
-                                        @click="deleteRow(index, row.income_concept_id, row.detail_id)"
-                                        class="text-red-500 hover:text-red-600 rounded-full">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path fill-rule="evenodd" clip-rule="evenodd"
-                                                d="M17 5V4C17 2.89543 16.1046 2 15 2H9C7.89543 2 7 2.89543 7 4V5H4C3.44772 5 3 5.44772 3 6C3 6.55228 3.44772 7 4 7H5V18C5 19.6569 6.34315 21 8 21H16C17.6569 21 19 19.6569 19 18V7H20C20.5523 7 21 6.55228 21 6C21 5.44772 20.5523 5 20 5H17ZM15 4H9V5H15V4ZM17 7H7V18C7 18.5523 7.44772 19 8 19H16C16.5523 19 17 18.5523 17 18V7Z"
-                                                fill="currentColor" />
-                                            <path d="M9 9H11V17H9V9Z" fill="currentColor" />
-                                            <path d="M13 9H15V17H13V9Z" fill="currentColor" />
-                                        </svg>
-                                    </button>
+                                    <div>
+                                        <button :disabled="available_details <= 1"
+                                            @click="deleteRow(index, row.income_concept_id, row.detail_id)"
+                                            class="text-red-500 hover:text-red-600 rounded-full">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                                    d="M17 5V4C17 2.89543 16.1046 2 15 2H9C7.89543 2 7 2.89543 7 4V5H4C3.44772 5 3 5.44772 3 6C3 6.55228 3.44772 7 4 7H5V18C5 19.6569 6.34315 21 8 21H16C17.6569 21 19 19.6569 19 18V7H20C20.5523 7 21 6.55228 21 6C21 5.44772 20.5523 5 20 5H17ZM15 4H9V5H15V4ZM17 7H7V18C7 18.5523 7.44772 19 8 19H16C16.5523 19 17 18.5523 17 18V7Z"
+                                                    fill="currentColor" />
+                                                <path d="M9 9H11V17H9V9Z" fill="currentColor" />
+                                                <path d="M13 9H15V17H13V9Z" fill="currentColor" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
-
-                            </div>
+                            </template>
                         </div>
 
                     </div>
@@ -202,31 +204,25 @@ export default {
             type: Array,
             default: [],
         },
-        income_concepts: {
-            type: Array,
-            default: [],
-        },
         treasury_clerk: {
             type: Array,
             default: []
         },
-        financing_sources: {
-            type: Array,
-            default: []
-        }
+        // financing_sources: {
+        //     type: Array,
+        //     default: []
+        // }
     },
     created() { },
     data: function (data) {
         return {
-            //mensaje de error temporal
-            custom_error: '',
-
+            financing_sources: [],
             receipt_id: '',
             income_concept_select: [],
             budget_account_id: '',
             errors: [],
             budget_select: false,
-            financing_select: true,
+            financing_select: false,
             income_receipt: {
                 financing_source_id: '',
                 treasury_clerk_id: '',
@@ -243,42 +239,101 @@ export default {
     },
     methods: {
         addRow() {
+            //Agregamos una fila nueva
             this.income_receipt.income_detail.push({ detail_id: '', income_concept_id: '', amount: '', deleted: false });
         },
-        selectBudgetAccount(budget_account_id) {
-            this.budget_select = true
-            this.financing_select = false
-            //this.getIncomeConcept()
-        },
-        selectFinancingSource(financing_source_id) {
-            //this.financing_select = true
-            this.getNewIncomeConcept()
-        },
-        getNewIncomeConcept() {
-            this.income_concept_select = []
-            this.income_concepts.forEach((value, index) => {
-                if (value.id_ccta_presupuestal == this.income_receipt.budget_account_id && value.id_proy_financiado == this.income_receipt.financing_source_id) {
-                    var array = { value: value.value, label: value.label, disabled: false }
-                    this.income_concept_select.push(array)
-                }
-            })
-            this.income_receipt.income_detail = this.income_receipt.income_detail.filter((value, index) => {
-                if (index === 0 || value.detail_id !== "") {
-                    value.income_concept_id = "";
-                    value.amount = "";
-                    return true; // Mantén el elemento en el array filtrado
-                }
-                return false; // Elimina el elemento del array filtrado
-            });
-            this.updateTotal()
-            if (this.income_concept_select == '') {
-                this.custom_error = 'No se encuentran registros de conceptos a agregar.'
+        clearDetails(load = true) {
+            if (this.income_receipt.income_detail.length == 0 && load) {
+                //Si viene vacio, le agregamos una fila, esto ocurre cuando es un ingreso nuevo
+                var array = { detail_id: '', income_concept_id: '', amount: '', deleted: false }
+                this.income_receipt.income_detail.push(array)
             } else {
-                this.custom_error = ""
+                if (load) {
+                    /*Vaciamos el array de detalles, los que tienen id_detail son valores que ya estan almacenados en la base, 
+                    por lo tanto solo se cambia su estado deleted:true, sino se borran del array*/
+                    this.income_receipt.income_detail = this.income_receipt.income_detail.filter((value, index) => {
+                        if (value.detail_id !== "") {
+                            value.deleted = true; // Limpia el atributo id_detail
+                            return true; // Mantén el elemento en el array filtrado
+                        }
+                        return false; // Elimina el elemento del array filtrado
+                    });
+                    //Luego del borrado lógico se inserta una fila vacia
+                    var array = { detail_id: '', income_concept_id: '', amount: '', deleted: false }
+                    this.income_receipt.income_detail.push(array)
+                }
+            }
+        },
+        clearDetailSelectionsAndTotal(load = true) {
+            //Limpiamos detalles dependiendo del valor de la variable load
+            this.clearDetails(load)
+            //actualizamos el total
+            this.updateTotal()
+        },
+        getFinanceSource(new_selection, load = true) {
+            axios.get("/get-select-financing-source", { params: { budget_account_id: new_selection } })
+                .then((response) => {
+                    this.financing_sources = response.data.financing_sources
+                    if (this.modal_data != '') {
+                        this.selectFinancingSource(this.modal_data.id_proy_financiado, load)
+                    }
+                })
+                .catch((errors) => {
+                    let msg = this.manageError(errors);
+                    this.$swal.fire({
+                        title: "Operación cancelada",
+                        text: msg,
+                        icon: "warning",
+                        timer: 5000,
+                    });
+                    this.$emit("cerrar-modal");
+                });
+        },
+        selectBudgetAccount(new_selection, old_selection, load = true) {
+            //Nueva seleccion
+            console.log('selectBudgetAccount');
+            console.log(new_selection, old_selection);
+            if (new_selection != null && old_selection == null) {
+                //console.log('filtra fuentes de financiamiento');
+                if (load) {
+                    this.clearDetailSelectionsAndTotal()
+                    console.log('entra al select de fuente');
+                    //Limpiando select de concept de ingresos
+                    this.income_concept_select = []
+                    this.getFinanceSource(new_selection)
+                } else {
+                    this.income_concept_select = []
+                    this.getFinanceSource(new_selection, load)
+                }
+
+            } else {
+                //Cambio de seleccion
+                if (new_selection != null && old_selection != null) {
+                    this.clearDetailSelectionsAndTotal()
+                    //Limpiando select de concepto de ingresos
+                    this.income_concept_select = []
+                    //Limpiando select de fuente de financiamiento y seleccion
+                    this.financing_sources = []
+                    this.income_receipt.financing_source_id = ''
+                    this.getFinanceSource(new_selection)
+                } else {
+                    this.financing_sources = []
+                    this.income_receipt.financing_source_id = ''
+                }
+            }
+        },
+        selectFinancingSource(new_selection, load = true) {
+            console.log('selectFinancingSource');
+            if (this.modal_data == '') {
+                this.clearDetailSelectionsAndTotal()
+                this.getIncomeConcept(new_selection)
+            } else {
+                this.clearDetailSelectionsAndTotal(load)
+                this.income_concept_select = []
+                this.getIncomeConcept(new_selection)
             }
         },
         deleteRow(index, concept_id, detail_id) {
-
             this.$swal.fire({
                 title: 'Eliminar concepto de ingreso.',
                 text: "¿Estas seguro?",
@@ -290,15 +345,15 @@ export default {
                 confirmButtonText: 'Si, Eliminar.'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    this.income_concept_select.forEach((value, index) => {
+                    this.income_concept_select.forEach((value, i) => {
                         if (value.value == concept_id) {
-                            this.income_concept_select[index].disabled = false
+                            this.income_concept_select[i].disabled = false
                         }
                     })
-                    if (detail_id == "") {
-                        this.income_receipt.income_detail.splice(index, 1);
+                    if (detail_id === "") {
+                        this.income_receipt.income_detail = this.income_receipt.income_detail.filter((_, i) => i !== index);
                     } else {
-                        this.income_receipt.income_detail[index].deleted = true;
+                        this.income_receipt.income_detail[index].deleted=true
                     }
                     this.updateTotal()
                 }
@@ -326,26 +381,8 @@ export default {
             }
             this.income_receipt.total = sum.toFixed(2);
         },
-        getIncomeConcept(budget_account_id, details) {
-            this.budget_select = true
-            this.income_concept_select = []
-            this.income_concepts.forEach((value, index) => {
-                if (value.id_ccta_presupuestal == budget_account_id) {
-                    var array = { value: value.value, label: value.label, disabled: false }
-                    this.income_concept_select.push(array)
-                }
-            })
-            if (details) {
-                this.income_concept_select.forEach((value, index) => {
-                    details.forEach((value2, index2) => {
-                        if (value.value == value2.id_concepto_ingreso) {
-                            value.disabled = true
-                        }
-                    })
-                })
-            }
-        },
         selectConcept(newSelection, oldSelection) {
+            console.log(newSelection, oldSelection);
             if (newSelection == null) {
                 this.income_concept_select.forEach((value, index) => {
                     if (value.value == oldSelection) {
@@ -488,6 +525,36 @@ export default {
                             });
                     }
                 });
+        },
+        getAndSetDetails(details) {
+            //Funcion para habilitar o deshabilitar opciones del select de concepto de ingreso
+            //load es una variable de control para saber si es editar y si recien se abre sin haber ejecutado ninguna opcion
+            //load = true significa nuevo o editado ya con una accion
+            //load = false significa editado sin haber realizado ninguna accion
+            if (details) {
+                this.income_concept_select = this.income_concept_select.map((value) => {
+                    const isDisabled = details.some((value2) => value.value === value2.income_concept_id && value2.deleted === false);
+                    return { ...value, disabled: isDisabled };
+                });
+            }
+        },
+        getIncomeConcept(new_selection) {
+            console.log('si entra');
+            axios.get("/get-select-income-concept", { params: { financing_source_id: new_selection, budget_account_id: this.income_receipt.budget_account_id } })
+                .then((response) => {
+                    this.income_concept_select = response.data.income_concept_select
+                    this.getAndSetDetails(this.income_receipt.income_detail)
+                })
+                .catch((errors) => {
+                    let msg = this.manageError(errors);
+                    this.$swal.fire({
+                        title: "Operación cancelada",
+                        text: msg,
+                        icon: "warning",
+                        timer: 5000,
+                    });
+                    this.$emit("cerrar-modal");
+                });
         }
     },
     watch: {
@@ -502,33 +569,42 @@ export default {
                 this.income_receipt.total = '';
                 this.income_receipt.financing_source_id = '';
                 this.income_receipt.budget_account_id = this.modal_data.id_ccta_presupuestal
+                this.income_receipt.financing_source_id = this.modal_data.id_proy_financiado
                 this.income_receipt.treasury_clerk_id = this.modal_data.id_empleado_tesoreria
                 this.income_receipt.direction = this.modal_data.direccion_cliente_recibo_ingreso
                 this.income_receipt.document = this.modal_data.doc_identidad_recibo_ingreso
                 this.income_receipt.client = this.modal_data.cliente_recibo_ingreso
                 this.income_receipt.description = this.modal_data.descripcion_recibo_ingreso
                 this.income_receipt.income_detail = []
-                if (this.modal_data.detalles) {
-                    this.financing_select = true
-                    this.income_receipt.financing_source_id = this.modal_data.detalles[0].concepto_ingreso.id_proy_financiado
+
+                if (this.modal_data != '') {
+                    this.financing_sources = []
                     this.modal_data.detalles.forEach((value, index) => {
-                        var array = { detail_id: value.id_det_recibo_ingreso, income_concept_id: value.id_concepto_ingreso, amount: value.monto_det_recibo_ingreso, deleted: false }
-                        this.income_receipt.income_detail.push(array)
+                        if (value.estado_det_recibo_ingreso == 1) {
+                            var array = { nombre_concepto: value.concepto_ingreso.nombre_concepto_ingreso, detail_id: value.id_det_recibo_ingreso, income_concept_id: value.id_concepto_ingreso, amount: value.monto_det_recibo_ingreso, deleted: false }
+                            this.income_receipt.income_detail.push(array)
+                            console.log('guarda un activo');
+                        } else {
+                            var array = { nombre_concepto: value.concepto_ingreso.nombre_concepto_ingreso, detail_id: value.id_det_recibo_ingreso, income_concept_id: value.id_concepto_ingreso, amount: value.monto_det_recibo_ingreso, deleted: true }
+                            this.income_receipt.income_detail.push(array)
+                        }
                     })
+                    this.selectBudgetAccount(this.modal_data.id_ccta_presupuestal, null, false)
                 } else {
-                    var array = { detail_id: '', income_concept_id: '', amount: '', deleted: false }
-                    this.income_receipt.income_detail.push(array)
+                    this.clearDetails()
                 }
                 this.updateTotal()
-                if (this.modal_data.id_recibo_ingreso) {
-                    this.getIncomeConcept(this.modal_data.id_ccta_presupuestal, this.modal_data.detalles)
-                } else {
-                    this.budget_select = false
-                }
             }
         },
     },
     computed: {
+        atributoWatch() {
+            if (this.income_receipt.budget_account_id === "") {
+                this.financing_sources = []; // Establecer el array de opciones en vacío
+                this.income_receipt.financing_source_id = ""; // Establecer el valor en vacío
+            }
+            return this.income_receipt.financing_source_id;
+        },
         active_details() {
             return this.income_receipt.income_detail.filter((detail) => detail.deleted == false)
         },
