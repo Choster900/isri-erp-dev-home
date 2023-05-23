@@ -406,14 +406,14 @@ export default {
         updateRequerimiento() {
             this.$swal
                 .fire({
-                    title: "¿Está seguro de actualizar el requerimiento?",
-                    icon: "question",
+                    title: '¿Está seguro de actualizar el requerimiento?',
+                    icon: 'question',
                     iconHtml: '❓',
-                    confirmButtonText: "Si, Actualizar",
-                    confirmButtonColor: "#D2691E",
-                    cancelButtonText: "Cancelar",
+                    confirmButtonText: 'Si, Actualizar',
+                    confirmButtonColor: '#141368',
+                    cancelButtonText: 'Cancelar',
                     showCancelButton: true,
-                    showCloseButton: true,
+                    showCloseButton: true
                 })
                 .then((result) => {
                     if (result.isConfirmed) {
@@ -525,7 +525,7 @@ export default {
 
 };
 </script>
-  
+
 <style>
 .td-data-table {
     max-width: 100px;

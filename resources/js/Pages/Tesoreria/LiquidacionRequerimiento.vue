@@ -255,7 +255,7 @@ export default {
 
 };
 </script>
-  
+
 <style>
 .col-6 {
     width: auto;
