@@ -188,6 +188,8 @@ class ReciboIngresoController extends Controller
             return response()->json(['logical_error' => 'Error, el recibo de ingreso seleccionado ha sido desactivado por otro usuario.'], 422);
         } else {
             $income_receipt->update([
+                'id_ccta_presupuestal' => $request->budget_account_id,
+                'id_proy_financiado' => $request->financing_source_id,
                 'cliente_recibo_ingreso' => $request->client,
                 'id_empleado_tesoreria' => $request->treasury_clerk_id,
                 'descripcion_recibo_ingreso' => $request->description,
