@@ -11,7 +11,7 @@ import AppLayoutVue from '@/Layouts/AppLayout.vue';
 
   <Head title="Inicio" />
 
-  <AppLayoutVue>
+  <AppLayoutVue :nameSubModule="'¡Bienvenido al Módulo de '+$page.props.menu.sistema+'!'">
     <!-- <h1>Index principal, aqui podria ir el logo</h1> -->
   </AppLayoutVue>
 
