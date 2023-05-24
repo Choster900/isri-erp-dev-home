@@ -52,7 +52,8 @@ import axios from "axios";
                     <div class="mb-7 md:flex flex-row justify-items-start">
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                             <TextInput id="name-income" v-model="income_concept.name" :value="income_concept.name"
-                                type="text" placeholder="Concepto de Ingreso" @update:modelValue="onInput()">
+                                type="text" placeholder="Concepto de Ingreso" 
+                                @update:modelValue="validateInput('name', limit=145, upper=true)">
                                 <LabelToInput icon="standard" forLabel="name-income" />
                             </TextInput>
                             <InputError v-for="(item, index) in errors.name" :key="index" class="mt-2" :message="item" />
@@ -75,7 +76,8 @@ import axios from "axios";
                     <div class="mb-7 md:flex flex-row justify-items-start">
                         <div class="mb-4 md:mr-2 md:mb-0 basis-full">
                             <TextInput :required="false" id="detalle-concepto" v-model="income_concept.detail"
-                                :value="income_concept.detail" type="text" placeholder="Detalle concepto ingreso">
+                                :value="income_concept.detail" type="text" placeholder="Detalle concepto ingreso"
+                                @update:modelValue="validateInput('detail', limit=145)">
                                 <LabelToInput icon="standard" forLabel="detalle-concepto" />
                             </TextInput>
                             <InputError v-for="(item, index) in errors.detail" :key="index" class="mt-2" :message="item" />
@@ -138,8 +140,18 @@ export default {
         };
     },
     methods: {
-        onInput() {
-            this.income_concept.name = this.income_concept.name.toUpperCase();
+        //Function to validate data entry
+        validateInput(field, limit, upper_case) {
+            if (this.income_concept[field] && this.income_concept[field].length > limit) {
+                this.income_concept[field] = this.income_concept[field].substring(0, limit);
+            }
+            if(upper_case){
+                this.toUpperCase(field)
+            }
+        },
+        toUpperCase(field){
+            //Converts field to uppercase
+            this.income_concept[field] = this.income_concept[field].toUpperCase()
         },
         saveNewIncomeConcept() {
             this.$swal

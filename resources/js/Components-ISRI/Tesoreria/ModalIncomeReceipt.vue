@@ -17,7 +17,8 @@ import axios from "axios";
                         <div class="mb-2 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="name-client" v-model="income_receipt.client" :value="income_receipt.client"
-                                    type="text" placeholder="Nombre o Razón Social">
+                                    type="text" placeholder="Nombre o Razón Social"
+                                    @update:modelValue="validateInput('client', limit = 145)">
                                     <LabelToInput icon="standard" forLabel="name-client" />
                                 </TextInput>
                                 <InputError v-for="(item, index) in errors.client" :key="index" class="mt-2"
@@ -71,7 +72,8 @@ import axios from "axios";
                             class="mb-4 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-2/3">
                                 <TextInput id="client-direccion" v-model="income_receipt.direction"
-                                    :value="income_receipt.direction" type="text" placeholder="Direccion">
+                                    :value="income_receipt.direction" type="text" placeholder="Direccion"
+                                    @update:modelValue="validateInput('direction', limit = 250)">
                                     <LabelToInput icon="standard" forLabel="client-direccion" />
                                 </TextInput>
                                 <InputError v-for="(item, index) in errors.direction" :key="index" class="mt-2"
@@ -79,7 +81,8 @@ import axios from "axios";
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="document-client" v-model="income_receipt.document"
-                                    :value="income_receipt.document" type="text" placeholder="Documento">
+                                    :value="income_receipt.document" type="text" placeholder="Documento"
+                                    @update:modelValue="validateInput('document', limit = 17, number = true)">
                                     <LabelToInput icon="standard" forLabel="document-client" />
                                 </TextInput>
                                 <InputError v-for="(item, index) in errors.document" :key="index" class="mt-2"
@@ -92,7 +95,9 @@ import axios from "axios";
                                 Descripcion <span class="text-red-600 font-extrabold">*</span>
                             </label>
                             <textarea v-model="income_receipt.description" id="descripcion" name="descripcion"
-                                class="resize-none w-full h-10 overflow-y-auto peer text-xs font-semibold rounded-r-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"></textarea>
+                                class="resize-none w-full h-10 overflow-y-auto peer text-xs font-semibold rounded-r-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
+                                @input="validateInput('description', limit = 255)">
+                            </textarea>
                             <InputError v-for="(item, index) in errors.description" :key="index" class="mt-2"
                                 :message="item" />
                         </div>
@@ -129,7 +134,7 @@ import axios from "axios";
                                     </button>
                                 </div>
                             </div>
-                            <template v-for="(row, index) in income_receipt.income_detail" :key="index" >
+                            <template v-for="(row, index) in income_receipt.income_detail" :key="index">
                                 <div v-if="row.deleted == false" class="table-row">
                                     <div class="mb-2 md:mr-2 md:mb-0 basis-2/3">
                                         <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
@@ -147,7 +152,7 @@ import axios from "axios";
                                     <div class="mb-2 md:mr-2 md:mb-0 basis-1/3">
                                         <TextInput id="detail-amount" v-model="row.amount" :value="row.amount"
                                             :label-input="false" type="text" placeholder="Monto"
-                                            @update:modelValue="typeAmountIncome(index)">
+                                            @update:modelValue="validateInput('amount', limit = 11, false, monto = true, index)">
                                             <LabelToInput icon="money" forLabel="detail-amount" />
                                         </TextInput>
                                         <InputError v-for="(item, index2) in errors['income_detail.' + index + '.amount']"
@@ -208,10 +213,6 @@ export default {
             type: Array,
             default: []
         },
-        // financing_sources: {
-        //     type: Array,
-        //     default: []
-        // }
     },
     created() { },
     data: function (data) {
@@ -238,6 +239,48 @@ export default {
         };
     },
     methods: {
+        //Function to validate data entry
+        validateInput(field, limit, number, amount, index_amount) {
+            if (amount) {
+                //Validacion especial en caso que sea un detalle
+                let amount_validate = this.income_receipt.income_detail[index_amount][field]
+                if (amount_validate && amount_validate.length > limit) {
+                    amount_validate = amount_validate.substring(0, limit);
+                }
+                this.income_receipt.income_detail[index_amount][field] = amount_validate
+                this.typeAmountIncome(index_amount)
+            } else {
+                //Validacion para un campo normal
+                if (this.income_receipt[field] && this.income_receipt[field].length > limit) {
+                    this.income_receipt[field] = this.income_receipt[field].substring(0, limit);
+                }
+            }
+            if (number) {
+                this.income_receipt[field] = this.income_receipt[field].replace(/[^0-9-]/g, '');
+            }
+
+        },
+        typeAmountIncome(index) {
+            let x = this.income_receipt.income_detail[index].amount.replace(/^\./, '').replace(/[^0-9.]/g, '')
+            this.income_receipt.income_detail[index].amount = x
+            const regex = /^(\d+)?([.]?\d{0,2})?$/
+            if (!regex.test(this.income_receipt.income_detail[index].amount)) {
+                this.income_receipt.income_detail[index].amount = this.income_receipt.income_detail[index].amount.match(regex) || x.substring(0, x.length - 1)
+            }
+            this.updateTotal()
+        },
+        updateTotal() {
+            var sum = 0;
+            for (var i = 0; i < this.income_receipt.income_detail.length; i++) {
+                if (this.income_receipt.income_detail[i].deleted == false) {
+                    var amount = parseFloat(this.income_receipt.income_detail[i].amount);
+                    if (!isNaN(amount)) {
+                        sum += amount;
+                    }
+                }
+            }
+            this.income_receipt.total = sum.toFixed(2);
+        },
         addRow() {
             //Agregamos una fila nueva
             this.income_receipt.income_detail.push({ detail_id: '', income_concept_id: '', amount: '', deleted: false });
@@ -353,33 +396,12 @@ export default {
                     if (detail_id === "") {
                         this.income_receipt.income_detail = this.income_receipt.income_detail.filter((_, i) => i !== index);
                     } else {
-                        this.income_receipt.income_detail[index].deleted=true
+                        this.income_receipt.income_detail[index].deleted = true
                     }
                     this.updateTotal()
                 }
             })
 
-        },
-        typeAmountIncome(index) {
-            let x = this.income_receipt.income_detail[index].amount.replace(/^\./, '').replace(/[^0-9.]/g, '')
-            this.income_receipt.income_detail[index].amount = x
-            const regex = /^(\d+)?([.]?\d{0,2})?$/
-            if (!regex.test(this.income_receipt.income_detail[index].amount)) {
-                this.income_receipt.income_detail[index].amount = this.income_receipt.income_detail[index].amount.match(regex) || x.substring(0, x.length - 1)
-            }
-            this.updateTotal()
-        },
-        updateTotal() {
-            var sum = 0;
-            for (var i = 0; i < this.income_receipt.income_detail.length; i++) {
-                if (this.income_receipt.income_detail[i].deleted == false) {
-                    var amount = parseFloat(this.income_receipt.income_detail[i].amount);
-                    if (!isNaN(amount)) {
-                        sum += amount;
-                    }
-                }
-            }
-            this.income_receipt.total = sum.toFixed(2);
         },
         selectConcept(newSelection, oldSelection) {
             console.log(newSelection, oldSelection);
