@@ -165,8 +165,8 @@ export default {
         let columns = [
             { width: "10%", label: "Requerimiento", name: "numero_requerimiento_pago", type: "text" },
             { width: "20%", label: "Descripcion", name: "descripcion_requerimiento_pago", type: "text" },
-            { width: "10%", label: "Monto requerido", name: "monto_requerimiento_pago", type: "text" },
             { width: "20%", label: "Todos los quedan", name: "allQUedan", type: "text" },
+            { width: "10%", label: "Monto requerido", name: "monto_requerimiento_pago", type: "text" },
             {
                 width: "10%", label: "Estado", name: "id_estado_req_pago", type: "select", options: [
                     { value: "", label: "Ninguno" },

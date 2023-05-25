@@ -143,8 +143,8 @@ class QuedanController extends Controller
 
         try {
             DB::beginTransaction();
-            // Insertar el registro de quedan y obtener el ID generado
-            $quedan = Quedan::insertGetId([
+
+            $quedanData = [
                 'id_estado_quedan'              => 1,
                 'id_proy_financiado'            => $request->quedan["id_proy_financiado"],
                 'id_prioridad_pago'             => $request->quedan["id_prioridad_pago"],
@@ -159,20 +159,25 @@ class QuedanController extends Controller
                 'monto_iva_quedan'              => $request->quedan["monto_iva_quedan"],
                 'monto_isr_quedan'              => $request->quedan["monto_isr_quedan"],
                 'monto_total_quedan'            => $request->quedan["monto_total_quedan"],
-                'id_empleado_tesoreria'         => EmpleadoTesoreria::select("id_empleado_tesoreria")->where('estado_empleado_tesoreria', 1)->where("id_cargo_tesoreria", 1)->get()[0]->id_empleado_tesoreria,
+                'id_empleado_tesoreria'         => EmpleadoTesoreria::select("id_empleado_tesoreria")
+                    ->where('estado_empleado_tesoreria', 1)
+                    ->where("id_cargo_tesoreria", 1)
+                    ->value('id_empleado_tesoreria'),
                 'fecha_emision_quedan'          => Carbon::now(),
                 'estado_quedan'                 => 1,
                 'fecha_reg_quedan'              => Carbon::now(),
                 'usuario_quedan'                => $request->user()->nick_usuario,
                 'ip_quedan'                     => $request->ip(),
+            ];
 
-            ]);
+            // Insertar el registro de quedan y obtener el ID generado
+            $quedan = Quedan::insertGetId($quedanData);
 
             // Insertar los registros de detalle_quedan
-            foreach ($detalle_quedan as $key => $value) {
-
+            $detalleData = [];
+            foreach ( $detalle_quedan as $key => $value ) {
                 if ($value[7]) {
-                    $new_detalle = array(
+                    $new_detalle = [
                         'id_quedan'                   => $quedan,
                         'numero_factura_det_quedan'   => $value[2],
                         'id_dependencia'              => $value[3],
@@ -184,27 +189,28 @@ class QuedanController extends Controller
                         'fecha_reg_det_quedan'        => Carbon::now(),
                         'usuario_det_quedan'          => $request->user()->nick_usuario,
                         'ip_det_quedan'               => $request->ip(),
-
-                    );
-                    DetalleQuedan::create($new_detalle);
+                    ];
+                    $detalleData[] = $new_detalle;
                 }
             }
+            DetalleQuedan::insert($detalleData);
+
             // Obtener los datos del quedan con relaciones
-            $res = Quedan::select('*')->with([
+            $res = Quedan::with([
                 "detalle_quedan",
                 "proveedor.giro",
                 "proveedor.sujeto_retencion",
                 "tesorero"
-            ])->where("id_quedan", $quedan)->get();
+            ])->find($quedan);
 
             DB::commit();
             return $res;
         } catch (\Throwable $th) {
-            //throw $th;
             DB::rollback();
             return response()->json($th->getMessage(), 500);
         }
     }
+
     public function updateDetalleQuedan(QuedanRequest $request)
     {
         $id_quedan = $request->id_quedan;
@@ -231,7 +237,7 @@ class QuedanController extends Controller
                 'fecha_mod_quedan'              => Carbon::now(),
             ]);
 
-            foreach ($detalle_quedan as $key => $value) {
+            foreach ( $detalle_quedan as $key => $value ) {
 
                 if ($value[0] == '') {
                     // Actualizar un detalle de quedan existente
@@ -270,8 +276,7 @@ class QuedanController extends Controller
                 if ($value[7] === false && $value[0] == '') {
                     //validar que la fila sea eliminada
                     // Eliminar un detalle_quedan
-                    $res = DetalleQuedan::find($value[1]);
-                    $res->delete();
+                    DetalleQuedan::destroy($value[1]);
                 }
             }
 
@@ -298,18 +303,11 @@ class QuedanController extends Controller
             )->get();
 
         $v_Proveedor = DB::table('proveedor')
-            ->select(
-                'id_proveedor as value',
-                'razon_social_proveedor as label',
-                'giro.codigo_giro',
-                'giro.nombre_giro',
-                'sujeto_retencion.iva_sujeto_retencion',
-                'sujeto_retencion.isrl_sujeto_retencion',
-            )->join('giro', function ($join) {
-                $join->on('giro.id_giro', '=', 'proveedor.id_giro');
-            })->join('sujeto_retencion', function ($join) {
-                $join->on('sujeto_retencion.id_sujeto_retencion', '=', 'proveedor.id_sujeto_retencion');
-            })->where("estado_proveedor", 1)->get();
+            ->select('id_proveedor as value', 'razon_social_proveedor as label', 'giro.codigo_giro', 'giro.nombre_giro', 'sujeto_retencion.iva_sujeto_retencion', 'sujeto_retencion.isrl_sujeto_retencion')
+            ->join('giro', 'giro.id_giro', '=', 'proveedor.id_giro')
+            ->join('sujeto_retencion', 'sujeto_retencion.id_sujeto_retencion', '=', 'proveedor.id_sujeto_retencion')
+            ->where('estado_proveedor', 1)
+            ->get();
 
         $v_Requerimiento = RequerimientoPago::select(
             'requerimiento_pago.id_requerimiento_pago as value',
@@ -364,7 +362,7 @@ class QuedanController extends Controller
             // Filtrar proveedores con quedans no vacíos
             return $proveedor->quedan->isNotEmpty();
         });
-        foreach ($proveedores as $proveedor) {
+        foreach ( $proveedores as $proveedor ) {
             // Mapear quedans con detalles para el proveedor actual
             $quedan_con_detalle = $proveedor->quedan->map(function ($quedan) {
                 return [
