@@ -388,7 +388,7 @@ export default {
                         itemsToAddNumber: this.collectItems,
                         numberRequest: this.id_requerimiento_pago
                     }).then((response) => {
-                        toast.success("El numero de quedan ", {
+                        toast.success("Se han agregado quedan al requerimiento.", {
                             autoClose: 5000,
                             position: "top-right",
                             transition: "zoom",

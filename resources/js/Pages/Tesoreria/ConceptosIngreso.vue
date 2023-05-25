@@ -220,7 +220,7 @@ export default {
         length: 5,
         search: "",
         column: 0,
-        dir: "asc",
+        dir: "desc",
         total: ""
       },
     }
