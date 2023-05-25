@@ -1,10 +1,11 @@
-
 <template>
     <div class="relative inline-flex">
         <button class="inline-flex justify-center items-center group" ref="trigger"
             @click.prevent="dropdownOpen = !dropdownOpen" :aria-expanded="dropdownOpen" aria-haspopup="true">
 
-            <img class="w-8 h-8 rounded-full" :src="imgPrfile" width="32" height="32" alt="User">
+            <div class="w-9 h-9 rounded-full text-lg flex items-center justify-center bg-[#001c48] text-blue-300">
+                <span class="uppercase text-xl text-white">{{ dynamicUsername }}</span>
+            </div>
 
             <div class="flex items-center truncate">
                 <span class="truncate ml-2 text-sm font-medium group-hover:text-slate-800">
@@ -18,30 +19,29 @@
 
         <transition enter-active-class="transition ease-out duration-200 transform"
             enter-from-class="opacity-0 -translate-y-2" enter-to-class="opacity-100 translate-y-0"
-            leave-active-class="transition ease-out duration-200" leave-from-class="opacity-100"
-            leave-to-class="opacity-0">
+            leave-active-class="transition ease-out duration-200" leave-from-class="opacity-100" leave-to-class="opacity-0">
             <div v-show="dropdownOpen"
-                class="origin-top-right z-10 absolute top-full min-w-44 bg-white border border-slate-200 py-1.5 rounded shadow-lg  mt-1 right-0">
-                <div class="pt-0.5 pb-2 px-3 mb-1 border-slate-200">
+                class="origin-top-right z-10 absolute top-full min-w-44 w-52 bg-white border border-slate-200 py-1.5 rounded shadow-lg  mt-1 right-0">
+                <div class="pt-0.5 pb-1 px-3 mb-1 border-slate-200">
                     <div class="font-bold text-slate-800">{{ $page.props.auth.user.name }}</div>
-                    <div class="text-xs text-slate-500 italic">{{
+                    <div class="text-xs text-slate-500">{{
                         $page.props.menu ? $page.props.menu.rol : 'Bienvenido al sistema ISRI'
                     }}</div>
                 </div>
                 <ul ref="dropdown" @focusin="dropdownOpen = true" @focusout="dropdownOpen = false">
                     <li>
                         <DropdownLink :href="route('index.createCambiarContraseña')" method="get" as="a"
-                            class="font-bold text-sm text-indigo-500 flex items-center py-1 px-3">
+                            class="font-bold text-sm text-indigo-500 flex items-center py-0.5 px-3 hover:text-indigo-700">
                             Cambiar Contraseña
                         </DropdownLink>
                     </li>
                     <li>
                         <DropdownLink :href="route('logout')" method="post" as="a"
-                            class="font-bold text-sm text-indigo-500 flex items-center py-1 px-3">
+                            class="font-bold text-sm text-indigo-500 flex items-center py-1 px-3  hover:text-indigo-700">
                             Logout
                         </DropdownLink>
                     </li>
-                    
+
 
                 </ul>
             </div>
@@ -49,19 +49,19 @@
         </transition>
 
     </div>
-
-
 </template>
 
 <script>
 import DropdownLink from '@/Components/DropdownLink.vue';
 import { ref, onMounted, onUnmounted } from 'vue'
-
 export default {
     components: { DropdownLink },
+    data() {
+        return {
+            dynamicUsername: "", // Aquí puedes asignar el valor dinámico que desees
+        };
+    },
     setup() {
-        const imgPrfile = ""
-
         const dropdownOpen = ref(false)
         const trigger = ref(null)
 
@@ -92,13 +92,13 @@ export default {
         }
     },
     created() {
-        let name = this.$page.props.auth.user.nick_usuario
-        this.imgPrfile = "https://ui-avatars.com/api/?name=" + name + "&background=001b47&color=fff&size=100"
-    }
+        let name = (this.$page.props.auth.user.nick_usuario).split(".")
+        const primerasLetras = name.map(nombre => nombre.charAt(0));
+        const letrasUnidas = primerasLetras.join('');
+        this.dynamicUsername = letrasUnidas
+    },
 
 }
 </script>
 
-<style>
-
-</style>
+<style></style>
