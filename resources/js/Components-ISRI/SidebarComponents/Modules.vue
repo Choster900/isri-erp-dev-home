@@ -1,5 +1,5 @@
 <template>
-    <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 cursor-pointer" :class="matchPath ? 'bg-[#010f2c]' : ''">
+    <li class="px-3 py-2 rounded-sm mb-0.5 last:mb-0 cursor-pointer" :class="matchPath ? 'bg-[#010b2c]' : ''">
         <a @click="StateFromModal ? stateToMenu = !stateToMenu : this.$emit('emitToShowSidebarFromModules')"
             class="block text-slate-200 hover:text-white truncate transition duration-150">
             <div class="flex items-center justify-between">
@@ -18,7 +18,7 @@
                     </svg>
 
                     <span
-                        class="text-sm font-medium ml-3 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 no-select">
+                        class="text-sm ml-3 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200 no-select">
                         {{ modulo.menu }}
                     </span>
                 </div>

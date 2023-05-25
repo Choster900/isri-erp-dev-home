@@ -66,7 +66,8 @@ import ModalVerRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalVerRequer
                                 <div class="space-x-1">
 
                                     <DropDownOptions>
-                                        <div v-if="requerimiento.id_estado_req_pago!=2" class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                        <div v-if="requerimiento.id_estado_req_pago != 2"
+                                            class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                                             @click="editRequerimiento(requerimiento)">
                                             <div class="w-8 text-green-900">
                                                 <span class="text-xs">
@@ -142,11 +143,12 @@ import ModalVerRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalVerRequer
         </div>
     </AppLayoutVue>
 
-    <ModalRequerimientoVue :requerimientoModalOpen="requerimientoModalOpen" @close-definitive="requerimientoModalOpen = false"
-            :modal_data="modal_data" @updateTable="getDataRequerimiento(lastUrl)" />
+    <ModalRequerimientoVue :requerimientoModalOpen="requerimientoModalOpen"
+        @close-definitive="requerimientoModalOpen = false" :modal_data="modal_data"
+        @updateTable="getDataRequerimiento(lastUrl)" />
 
     <ModalVerRequerimientoVue :view_req_info="view_req_info" :show_request="show_request" :center="true"
-            @cerrar-modal="view_req_info = false" />
+        @cerrar-modal="view_req_info = false" />
 </template>
 <script>
 import axios from 'axios';
@@ -247,12 +249,30 @@ export default {
             this.requerimientoModalOpen = true
         },
         openModal() {
-            this.modal_data=[]
+            this.modal_data = []
             this.requerimientoModalOpen = true
+        },
+        validarCamposVacios(objeto) {
+            for (var propiedad in objeto) {
+                if (objeto[propiedad] !== "") {
+                    return false;
+                }
+            }
+            return true;
+        },
+        handleData(myEventData) {
+            if (this.validarCamposVacios(myEventData)) {
+                this.tableData.search = {};
+                this.getDataRequerimiento();
+            }
+            else {
+                this.tableData.search = myEventData;
+                this.getDataRequerimiento();
+            }
         },
     },
     computed: {
-        
+
     }
 
 };

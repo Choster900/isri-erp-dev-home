@@ -6,7 +6,7 @@
                     :class="sortKey === column.name ? (sortOrders[column.name] > 0 ? 'sorting_asc' : 'sorting_desc') : 'sorting'"
                     class="px-2 first:pl-5 last:pr-5 py-2"
                     :style="'width:' + column.width + ';' + 'cursor:pointer;'">
-                    <div class="font-semibold text-center">{{ column.label }}</div>
+                    <div class="font-medium text-center">{{ column.label }}</div>
                 </th>
             </tr>
         </thead>
@@ -18,7 +18,7 @@
                     :style="'width:' + column.width + ';' + 'cursor:pointer;'">
 
                     <div v-if="column.type != 'select'">
-                        <input :type="column.type" class="tabla text-xs font-semibold w-full" @input="sendData($event)"
+                        <input :type="column.type" class="tabla text-xs font-normal w-full " @input="sendData($event)"
                             value="" :id="column.name" ref="myInput" v-if="column.name != 'Acciones'">
                     </div>
                     <div v-else>
