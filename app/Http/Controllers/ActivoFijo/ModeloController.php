@@ -23,10 +23,10 @@ class ModeloController extends Controller
         $search_value = $request->input('search');
 
         $query = Modelo::select('*')
-                    ->join('marca', function ($join) {
-                        $join->on('modelo.id_marca', '=', 'marca.id_marca');
-                    })
-                    ->orderBy($columns[$column], $dir);
+            ->join('marca', function ($join) {
+                $join->on('modelo.id_marca', '=', 'marca.id_marca');
+            })
+            ->orderBy($columns[$column], $dir);
 
         if ($search_value) {
             $query->where('id_modelo', 'like', '%' . $search_value['id_modelo'] . '%')
@@ -40,28 +40,31 @@ class ModeloController extends Controller
         return ['data' => $modelos, 'draw' => $request->input('draw')];
     }
 
-    public function changeStateModel(Request $request){
+    public function changeStateModel(Request $request)
+    {
         $estado_anterior = $request->input('state_model');
-        $msg="";
+        $msg = "";
         $modelo = Modelo::find($request->id_model);
-        $estado_anterior==1 ? $modelo->estado_modelo=0 : $modelo->estado_modelo=1;
-        $estado_anterior==1 ? $msg="Desactivado" : $msg="Activado";
-        $modelo->ip_modelo=$request->ip();
-        $modelo->fecha_mod_modelo=Carbon::now();
-        $modelo->usuario_modelo=$request->user()->nick_usuario;
+        $estado_anterior == 1 ? $modelo->estado_modelo = 0 : $modelo->estado_modelo = 1;
+        $estado_anterior == 1 ? $msg = "Desactivado" : $msg = "Activado";
+        $modelo->ip_modelo = $request->ip();
+        $modelo->fecha_mod_modelo = Carbon::now();
+        $modelo->usuario_modelo = $request->user()->nick_usuario;
         $modelo->update();
-        return ['mensaje' => $msg.' modelo '.$modelo->nombre_modelo.' con exito'];
+        return ['mensaje' => $msg . ' modelo ' . $modelo->nombre_modelo . ' con exito'];
     }
 
-    public function getBrands(Request $request){
-        $brands = Marca::select('id_marca as value','nombre_marca as label')
-                ->where('estado_marca','=',1)
-                ->orderBy('nombre_marca')
-                ->get();
+    public function getBrands(Request $request)
+    {
+        $brands = Marca::select('id_marca as value', 'nombre_marca as label')
+            ->where('estado_marca', '=', 1)
+            ->orderBy('nombre_marca')
+            ->get();
         return ['brands' => $brands];
     }
 
-    public function saveModel(ModeloRequest $request){
+    public function saveModel(ModeloRequest $request)
+    {
         $new_model = new Modelo();
         $new_model->id_marca = $request->id_brand;
         $new_model->nombre_modelo = $request->name_model;
@@ -70,17 +73,22 @@ class ModeloController extends Controller
         $new_model->usuario_modelo = $request->user()->nick_usuario;
         $new_model->ip_modelo = $request->ip();
         $new_model->save();
-        return ['mensaje' => 'Modelo '.$request->name_model.' guardado con éxito.'];
+        return ['mensaje' => 'Modelo ' . $request->name_model . ' guardado con éxito.'];
     }
 
-    public function updateModel(ModeloRequest $request){
+    public function updateModel(ModeloRequest $request)
+    {
         $model = Modelo::find($request->id_model);
-        $model->id_marca = $request->id_brand;
-        $model->nombre_modelo = $request->name_model;
-        $model->fecha_mod_modelo = Carbon::now();
-        $model->usuario_modelo = $request->user()->nick_usuario;
-        $model->ip_modelo = $request->ip();
-        $model->update();
-        return ['mensaje' => 'Modelo '.$request->name_model.' actualizado con éxito.'];
+        if ($model->estado_modelo == 0) {
+            return response()->json(['logical_error' => 'Error, el modelo seleccionado ha sido desactivado por otro usuario.'], 422);
+        } else {
+            $model->id_marca = $request->id_brand;
+            $model->nombre_modelo = $request->name_model;
+            $model->fecha_mod_modelo = Carbon::now();
+            $model->usuario_modelo = $request->user()->nick_usuario;
+            $model->ip_modelo = $request->ip();
+            $model->update();
+            return ['mensaje' => 'Modelo ' . $request->name_model . ' actualizado con éxito.'];
+        }
     }
 }

@@ -10,13 +10,13 @@ import axios from "axios";
 <template>
   <ModalVue :show="showModal" @close-modal="$emit('cerrar-modal')" :title="'Administración de modelo '"
     @close="$emit('cerrar-modal')">
-    <div class="px-5 pt-4 pb-1">
+    <div class="px-3 pt-1 pb-1">
       <div class="text-sm">
-        <div class="mb-4 md:flex flex-row justify-start">
+        <div class="mb-4 md:flex flex-row justify-center">
           Seleccione marca y escriba el modelo:
         </div>
-        <div class="mb-4 md:flex flex-row justify-items-start">
-          <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+        <div class="mb-4 md:flex flex-row justify-center">
+          <div class="mb-4 md:mr-0 md:mb-0 w-2/3">
             <label class="block mb-2 text-xs font-light text-gray-600">
               Marca <span class="text-red-600 font-extrabold">*</span>
             </label>
@@ -26,19 +26,22 @@ import axios from "axios";
             </div>
             <InputError v-for="(item, index) in errors.id_brand" :key="index" class="mt-2" :message="item" />
           </div>
-          <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+        </div>
+        <div class="mb-4 md:flex flex-row justify-center">
+          <div class="mb-4 md:mx-0 md:mb-0 w-2/3">
             <label class="block mb-2 text-xs font-light text-gray-600">
               Modelo <span class="text-red-600 font-extrabold">*</span>
             </label>
-            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+            <div class="mb-4 md:mr-0 md:mb-0 basis-1/2">
               <TextInput v-model="model.name_model" :label-input="false" id="personal-information" type="text"
-                placeholder="Nombre Modelo">
+                placeholder="Nombre Modelo" @update:modelValue="validateInput('name_model', limit = 55)">
                 <LabelToInput icon="personalInformation" forLabel="personal-information" />
               </TextInput>
             </div>
             <InputError v-for="(item, index) in errors.name_model" :key="index" class="mt-2" :message="item" />
           </div>
         </div>
+
         <div class="mb-4 md:flex flex-row justify-center">
           <GeneralButton v-if="modalData != ''" @click="updateModel()" color="bg-orange-700  hover:bg-orange-800"
             text="Actualizar" icon="add" />
@@ -81,6 +84,11 @@ export default {
     };
   },
   methods: {
+    validateInput(field, limit) {
+      if (this.model[field] && this.model[field].length > limit) {
+        this.model[field] = this.model[field].substring(0, limit);
+      }
+    },
     async getBrands() {
       await axios
         .get("/get-brands")
@@ -101,14 +109,14 @@ export default {
     saveNewModel() {
       this.$swal
         .fire({
-          title: "Esta seguro de guardar el nuevo modelo",
-          icon: "question",
-          iconHtml: "✅",
-          confirmButtonText: "Si, Guardar",
-          confirmButtonColor: "#15803D",
-          cancelButtonText: "Cancelar",
+          title: '¿Está seguro de guardar el nuevo modelo?',
+          icon: 'question',
+          iconHtml: '❓',
+          confirmButtonText: 'Si, Guardar',
+          confirmButtonColor: '#141368',
+          cancelButtonText: 'Cancelar',
           showCancelButton: true,
-          showCloseButton: true,
+          showCloseButton: true
         })
         .then((result) => {
           if (result.isConfirmed) {
@@ -153,14 +161,14 @@ export default {
     updateModel() {
       this.$swal
         .fire({
-          title: "Esta seguro de actualizar marca",
-          icon: "question",
-          iconHtml: "✅",
-          confirmButtonText: "Si, Guardar",
-          confirmButtonColor: "#15803D",
-          cancelButtonText: "Cancelar",
+          title: '¿Está seguro de actualizar el modelo?',
+          icon: 'question',
+          iconHtml: '❓',
+          confirmButtonText: 'Si, Actualizar',
+          confirmButtonColor: '#141368',
+          cancelButtonText: 'Cancelar',
           showCancelButton: true,
-          showCloseButton: true,
+          showCloseButton: true
         })
         .then((result) => {
           if (result.isConfirmed) {
@@ -178,16 +186,30 @@ export default {
               })
               .catch((errors) => {
                 if (errors.response.status === 422) {
-                  toast.warning(
-                    "Tienes algunos errores por favor verifica tus datos.",
-                    {
-                      autoClose: 5000,
-                      position: "top-right",
-                      transition: "zoom",
-                      toastBackgroundColor: "white",
-                    }
-                  );
-                  this.errors = errors.response.data.errors;
+                  if (errors.response.data.logical_error) {
+                    toast.error(
+                      errors.response.data.logical_error,
+                      {
+                        autoClose: 5000,
+                        position: "top-right",
+                        transition: "zoom",
+                        toastBackgroundColor: "white",
+                      }
+                    );
+                    this.$emit("get-table");
+                    this.$emit("cerrar-modal");
+                  } else {
+                    toast.warning(
+                      "Tienes algunos errores por favor verifica tus datos.",
+                      {
+                        autoClose: 5000,
+                        position: "top-right",
+                        transition: "zoom",
+                        toastBackgroundColor: "white",
+                      }
+                    );
+                    this.errors = errors.response.data.errors;
+                  }
                 } else {
                   let msg = this.manageError(errors);
                   this.$swal.fire({
