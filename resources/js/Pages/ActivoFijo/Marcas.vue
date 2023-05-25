@@ -202,7 +202,7 @@ export default {
         length: 5,
         search: "",
         column: 0,
-        dir: "asc",
+        dir: "desc",
         total: ""
       },
       showModal: false,
@@ -263,7 +263,7 @@ export default {
     async getBrands(url = "/marcas") {
       this.tableData.draw++;
       this.tableData.currentPage = url
-      await axios.get(url, { params: this.tableData }).then((response) => {
+      await axios.post(url,this.tableData).then((response) => {
         let data = response.data;
         if (this.tableData.draw == data.draw) {
           this.links = data.data.links;

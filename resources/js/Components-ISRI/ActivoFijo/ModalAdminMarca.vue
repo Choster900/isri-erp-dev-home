@@ -3,6 +3,7 @@ import Modal from "@/Components/Modal.vue";
 import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
+import InputError from "@/Components/InputError.vue";
 import axios from 'axios';
 </script>
 
@@ -87,7 +88,7 @@ export default {
       }).then((result) => {
         if (result.isConfirmed) {
           axios.post("/save-brand", {
-            brand: this.brand.name_brand,
+            name_brand: this.brand.name_brand,
           }).then((response) => {
             toast.success(response.data.mensaje, {
               autoClose: 3000,
@@ -190,10 +191,12 @@ export default {
     }
   },
   watch: {
-    modalData: function (value, oldvalue) {
-      this.errors = []
-      this.brand.name_brand = this.modalData.nombre_marca
-      this.brand.id_brand = this.modalData.id_marca
+    showModal: function (value, oldvalue) {
+      if (value) {
+        this.errors = []
+        this.brand.name_brand = this.modalData.nombre_marca
+        this.brand.id_brand = this.modalData.id_marca
+      }
     }
   }
 };
