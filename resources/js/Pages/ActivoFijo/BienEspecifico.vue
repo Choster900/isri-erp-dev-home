@@ -4,7 +4,7 @@ import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
-import ModalAdminModeloVue from '@/Components-ISRI/ActivoFijo/ModalAdminModelo.vue';
+import ModalBienEspecificoVue from '@/Components-ISRI/ActivoFijo/ModalBienEspecifico.vue';
 import moment from 'moment';
 
 import { toast } from 'vue3-toastify';
@@ -16,10 +16,10 @@ import axios from 'axios';
 
 <template>
   <Head title="Administracion" />
-  <AppLayoutVue nameSubModule="Activo Fijo - Modelos">
+  <AppLayoutVue nameSubModule="Activo Fijo - Bien Especifico">
     <div class="sm:flex sm:justify-end sm:items-center mb-2">
       <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-        <GeneralButton @click="addModel()" v-if="permits.insertar==1" color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add" />
+        <GeneralButton @click="addSpecificAsset()" v-if="permits.insertar==1" color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add" />
       </div>
     </div>
     <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
@@ -27,11 +27,11 @@ import axios from 'axios';
         <div class="mb-4 md:flex flex-row justify-items-start">
           <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
             <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-              <Multiselect v-model="tableData.length" @select="getModels()" :options="perPage" :searchable="true" />
+              <Multiselect v-model="tableData.length" @select="getSpecificAssets()" :options="perPage" :searchable="true" />
               <LabelToInput icon="date" />
             </div>
           </div>
-          <h2 class="font-semibold text-slate-800 pt-1">Total Modelos <span class="text-slate-400 font-medium">{{
+          <h2 class="font-semibold text-slate-800 pt-1">Total Bienes Especificos <span class="text-slate-400 font-medium">{{
           tableData.total
         }}</span></h2>
         </div>
@@ -41,22 +41,22 @@ import axios from 'axios';
         <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" 
         @sort="sortBy" @datos-enviados="handleData($event)">
           <tbody class="text-sm divide-y divide-slate-200">
-            <tr v-for="model in models" :key="model.id_modelo">
+            <tr v-for="asset in specific_asset" :key="asset.id_bien_especifico">
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                <div class="font-medium text-slate-800 text-center">{{ model.id_modelo }}</div>
+                <div class="font-medium text-slate-800 text-center">{{ asset.id_bien_especifico }}</div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px td-data-table">
-                <div class="font-medium text-slate-800 ellipsis text-center">{{ model.nombre_marca }}</div>
+                <div class="font-medium text-slate-800 ellipsis text-center">{{ asset.nombre_bien_especifico }}</div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px td-data-table">
-                <div class="font-medium text-slate-800 ellipsis text-center">{{ model.nombre_modelo }}</div>
+                <div class="font-medium text-slate-800 ellipsis text-center">{{ asset.descripcion_bien_especifico }}</div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                <div class="font-medium text-slate-800 text-center">{{ formatearFecha(model.fecha_reg_modelo) }}</div>
+                <div class="font-medium text-slate-800 text-center">{{ asset.id_ccta_presupuestal }}</div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800 text-center">
-                  <div v-if="(model.estado_modelo == 1)"
+                  <div v-if="(asset.estado_bien_especifico == 1)"
                     class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
                     Activo
                   </div>
@@ -70,8 +70,8 @@ import axios from 'axios';
                 <div class="space-x-1">
                   <DropDownOptions>
                     <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                      v-if="permits.actualizar == 1 && model.estado_modelo == 1"
-                      @click="editModel(model)">
+                      v-if="permits.actualizar == 1 && asset.estado_bien_especifico == 1"
+                      @click="editSpecificAsset(asset)">
                       <div class="w-8 text-green-900">
                         <span class="text-xs">
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -84,7 +84,7 @@ import axios from 'axios';
                       <div class="font-semibold">Editar</div>
                     </div>
                     <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                      @click="changeStateModel(model)"
+                      @click="changeStateModel(asset)"
                       v-if="permits.eliminar == 1">
                       <div class="w-8 text-red-900"><span class="text-xs">
                           <svg fill="#7F1D1D" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" width="20px"
@@ -107,7 +107,7 @@ import axios from 'axios';
                           </svg>
                         </span></div>
                       <div class="font-semibold">
-                        {{ model.estado_modelo ? 'Desactivar' : 'Activar' }}
+                        {{ asset.estado_bien_especifico ? 'Desactivar' : 'Activar' }}
                       </div>
                     </div>
                   </DropDownOptions>
@@ -130,7 +130,7 @@ import axios from 'axios';
                   :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
 
                   <div class="flex-1 text-right ml-2">
-                    <a @click="getModels(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                    <a @click="getSpecificAssets(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                   text-indigo-500">
                       &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                     </a>
@@ -139,7 +139,7 @@ import axios from 'axios';
                 <span v-else-if="(link.label == 'Siguiente')"
                   :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                   <div class="flex-1 text-right ml-2">
-                    <a @click="getModels(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                    <a @click="getSpecificAssets(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                   text-indigo-500">
                       <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                     </a>
@@ -147,7 +147,7 @@ import axios from 'axios';
                 </span>
                 <span class="cursor-pointer" v-else
                   :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
-                    class=" w-5" @click="getModels(link.url)">{{ link.label }}</span>
+                    class=" w-5" @click="getSpecificAssets(link.url)">{{ link.label }}</span>
                 </span>
               </li>
             </ul>
@@ -156,8 +156,9 @@ import axios from 'axios';
       </div>
     </div>
 
-    <ModalAdminModeloVue :showModal="showModal" :modalData="modalData"
-            @cerrar-modal="showModal=false" @get-table="this.getModels(this.tableData.currentPage)"/>
+    <ModalBienEspecificoVue :show_modal_specific_asset="show_modal_specific_asset" 
+    :modalData="modalData" :budget_accounts="budget_accounts" 
+    @cerrar-modal="show_modal_specific_asset = false" @get-table="getSpecificAssets(tableData.currentPage)" />
 
   </AppLayoutVue>
   
@@ -166,18 +167,19 @@ import axios from 'axios';
 <script>
 export default {
   created() {
-    this.getModels()
+    this.getSpecificAssets()
     this.getPermits()
+    this.getModalSelect()
   },
   data(){
     let sortOrders = {};
     let columns = [
-      { width: "10%", label: "ID", name: "id_modelo", type: "text" },
-      { width: "20%", label: "Nombre Marca", name: "nombre_marca", type: "text" },
-      { width: "25%", label: "Nombre Modelo", name: "nombre_modelo", type: "text" },
-      { width: "25%", label: "Fecha Registro", name: "fecha_reg_modelo", type: "date" },
+      { width: "10%", label: "ID", name: "id_bien_especifico", type: "text" },
+      { width: "30%", label: "Nombre Bien", name: "nombre_bien_especifico", type: "text" },
+      { width: "30%", label: "Descripcion", name: "descripcion_bien_especifico", type: "text" },
+      { width: "10%", label: "Especifico", name: "id_ccta_presupuestal", type: "text" },
       {
-        width: "10%", label: "Estado", name: "estado_modelo", type: "select",
+        width: "10%", label: "Estado", name: "estado_bien_especifico", type: "select",
         options: [
           {value: "1", label: "Activo"},
           {value: "0", label: "Inactivo"}
@@ -186,17 +188,18 @@ export default {
       { width: "10%", label: "Acciones", name: "Acciones" },
     ];
     columns.forEach((column) => {
-      if (column.name === 'id_modelo')
+      if (column.name === 'id_bien_especifico')
         sortOrders[column.name] = 1;
       else
         sortOrders[column.name] = -1;
     });
     return {
       permits : [],
-      models: [],
+      specific_asset: [],
+      budget_accounts:[],
       links: [],
       columns: columns,
-      sortKey: "id_modelo",
+      sortKey: "id_bien_especifico",
       sortOrders: sortOrders,
       perPage: ["10", "20", "30"],
       tableData: {
@@ -208,27 +211,40 @@ export default {
         dir: "desc",
         total: ""
       },
-      showModal:false,
+      show_modal_specific_asset:false,
       modalData : [],
     }
   },
   methods:{
-    formatearFecha(date) {
-      return moment(date).format('DD/MM/YYYY');
+    editSpecificAsset(asset){
+        this.modalData = asset
+        this.show_modal_specific_asset=true
     },
-    editModel(model){
-        this.modalData = model
-        this.showModal=true
-    },
-    addModel(){
+    addSpecificAsset(){
       this.modalData=[]
-      this.showModal=true
+      this.show_modal_specific_asset=true
     },
-    changeStateModel(model){
+    getModalSelect(){
+      axios.get("/get-select-specific-asset")
+        .then((response) => {
+          this.budget_accounts = response.data.budget_accounts
+        })
+        .catch((errors) => {
+          let msg = this.manageError(errors);
+          this.$swal.fire({
+            title: "Operación cancelada",
+            text: msg,
+            icon: "warning",
+            timer: 5000,
+          });
+          this.$emit("cerrar-modal");
+        });
+    },
+    changeStateModel(asset){
         let msg
-        model.estado_modelo == 1 ? msg = "Desactivar" : msg = "Activar"
+        asset.estado_bien_especifico == 1 ? msg = "Desactivar" : msg = "Activar"
         this.$swal.fire({
-          title: msg + ' Modelo ' + model.nombre_modelo + '.',
+          title: msg + ' Bien ' + asset.nombre_bien_especifico + '.',
           text: "¿Estas seguro?",
           icon: 'warning',
           showCancelButton: true,
@@ -238,9 +254,9 @@ export default {
           confirmButtonText: 'Si, ' + msg
         }).then((result) => {
           if (result.isConfirmed) {
-            axios.post("/change-state-model", {
-              id_model: model.id_modelo,
-              state_model: model.estado_modelo
+            axios.post("/change-state-specific-asset", {
+              id_bien_especifico: asset.id_bien_especifico,
+              state_bien_especifico: asset.estado_bien_especifico
             })
               .then((response) => {
                 this.$swal.fire({
@@ -248,7 +264,7 @@ export default {
                   icon: 'success',
                   timer: 5000
                 })
-                this.getModels(this.tableData.currentPage);
+                this.getSpecificAssets(this.tableData.currentPage);
               })
               .catch((errors) => {
                   let msg = this.manageError(errors)
@@ -262,7 +278,7 @@ export default {
           }
         })
     },
-    async getModels(url = "/modelos") {
+    async getSpecificAssets(url = "/bien-especifico") {
       this.tableData.draw++;
       this.tableData.currentPage=url
       await axios.post(url,this.tableData).then((response) => {
@@ -272,7 +288,7 @@ export default {
           this.tableData.total = data.data.total;
           this.links[0].label = "Anterior";
           this.links[this.links.length - 1].label = "Siguiente";
-          this.models = data.data.data;
+          this.specific_asset = data.data.data;
         }
       }).catch((errors) => {
           let msg = this.manageError(errors)
@@ -291,7 +307,7 @@ export default {
         this.sortOrders[key] = this.sortOrders[key] * -1;
         this.tableData.column = this.getIndex(this.columns, "name", key);
         this.tableData.dir = this.sortOrders[key] === 1 ? "asc" : "desc";
-        this.getModels();
+        this.getSpecificAssets();
       }
     },
     getIndex(array, key, value) {
@@ -313,7 +329,7 @@ export default {
     handleData(myEventData) {
       console.log(myEventData);
       this.tableData.search = myEventData;
-      this.getModels()
+      this.getSpecificAssets()
     }
   }
 }

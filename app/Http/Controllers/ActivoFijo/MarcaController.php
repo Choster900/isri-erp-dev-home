@@ -45,7 +45,7 @@ class MarcaController extends Controller
                 ]);
                 return ['mensaje' => 'Marca ' . $marca->nombre_marca . ' ha sido desactivada con exito'];
             } else {
-                return ['mensaje' => 'La marca seleccionada ya ha sido activado por otro usuario'];
+                return ['mensaje' => 'La marca seleccionada ya ha sido activada por otro usuario'];
             }
         } else {
             if ($marca->estado_marca == 0) {
@@ -67,7 +67,7 @@ class MarcaController extends Controller
     public function saveBrand(MarcaRequest $request)
     {
         $new_marca = new Marca();
-        $new_marca->nombre_marca = $request->brand;
+        $new_marca->nombre_marca = $request->name_brand;
         $new_marca->estado_marca = 1;
         $new_marca->fecha_reg_marca = Carbon::now();
         $new_marca->ip_marca = $request->ip();

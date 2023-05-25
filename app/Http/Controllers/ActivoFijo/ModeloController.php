@@ -42,6 +42,34 @@ class ModeloController extends Controller
 
     public function changeStateModel(Request $request)
     {
+        $modelo = Modelo::find($request->id_model);
+        if ($modelo->estado_modelo == 1) {
+            if ($request->state_model == 1) {
+                $modelo->update([
+                    'estado_modelo' => 0,
+                    'fecha_mod_modelo' => Carbon::now(),
+                    'usuario_modelo' => $request->user()->nick_usuario,
+                    'ip_modelo' => $request->ip(),
+                ]);
+                return ['mensaje' => 'Modelo ' . $modelo->nombre_modelo . ' ha sido desactivado con exito'];
+            } else {
+                return ['mensaje' => 'El modelo seleccionado ya ha sido activado por otro usuario'];
+            }
+        } else {
+            if ($modelo->estado_modelo == 0) {
+                if ($request->state_model == 0) {
+                    $modelo->update([
+                        'estado_modelo' => 1,
+                        'fecha_mod_modelo' => Carbon::now(),
+                        'usuario_modelo' => $request->user()->nick_usuario,
+                        'ip_modelo' => $request->ip(),
+                    ]);
+                    return ['mensaje' => 'Modelo ' . $modelo->nombre_modelo . ' ha sido activado con exito'];
+                } else {
+                    return ['mensaje' => 'El modelo seleccionado ya ha sido desactivado por otro usuario'];
+                }
+            }
+        }
         $estado_anterior = $request->input('state_model');
         $msg = "";
         $modelo = Modelo::find($request->id_model);
