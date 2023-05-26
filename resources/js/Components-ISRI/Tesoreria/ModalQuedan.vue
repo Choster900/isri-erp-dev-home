@@ -28,7 +28,7 @@ import html2pdf from 'html2pdf.js'
                                 @click="printPdf()" />
                         </div>
                         <div class="px-2" v-if="dataQuedan != ''">
-                            <template v-if="dataInputs.monto_total_quedan >= 113">
+                            <template v-if="dataQuedan.monto_total_quedan >= 113">
                                 <GeneralButton color="bg-[#0A3158]/90  hover:bg-[#0A3158]" text="GENERAR RETENCION"
                                     icon="pdf" @click="generarComprobanteRetencionPdf()" />
                             </template>
@@ -173,7 +173,7 @@ import html2pdf from 'html2pdf.js'
                                                 <Multiselect v-model="dataInputs.id_proveedor"
                                                     :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                     :options="dataForSelectInRow.proveedor" :searchable="true"
-                                                    @select="getInformationBySupplier($event)" />
+                                                    @input="getInformationBySupplier($event)" />
                                             </div>
                                         </td>
                                         <th class="border-2 border-black text-sm text-gray-600" colspan="3">
@@ -281,8 +281,8 @@ import html2pdf from 'html2pdf.js'
                                                                 @select="onCellEdit(rowIndex, cellIndex, $event)" />
                                                         </div>
                                                     </td>
-                                                    <td v-else-if="cellIndex == 4" class="border-2 border-black max-w-[75px]" colspan="2"
-                                                        :class="[
+                                                    <td v-else-if="cellIndex == 4"
+                                                        class="border-2 border-black max-w-[75px]" colspan="2" :class="[
                                                             cell == '' ? 'bg-[#fdfd96]' : '',
                                                             errosDetalleQuedan[rowIndex] ? 'bg-[#fd9696]' : '',
                                                             errosrNumeroActa.includes(rowIndex) ? 'bg-[#fd9696]' : '',
@@ -312,8 +312,7 @@ import html2pdf from 'html2pdf.js'
                                                                         maxlength="10"
                                                                         @input="onlyNumberDecimal(rowIndex, cellIndex, $event, 'producto')"
                                                                         :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
-                                                                        :class="[cell.producto == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']"
-                                                                        class="peer w-full text-sm bg-transparent text-center  border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
+                                                                        class="peer w-full h-20 text-sm bg-transparent text-center  border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -328,8 +327,7 @@ import html2pdf from 'html2pdf.js'
                                                                         maxlength="10"
                                                                         @input="onlyNumberDecimal(rowIndex, cellIndex, $event, 'servicio')"
                                                                         :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
-                                                                        :class="[cell.servicio == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']"
-                                                                        class="peer w-full text-sm bg-transparent text-center  border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
+                                                                        class="peer w-full h-20 text-sm bg-transparent text-center  border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                                                 </td>
                                                             </tr>
                                                         </table>
@@ -407,7 +405,7 @@ import html2pdf from 'html2pdf.js'
 <script>
 
 import quedanPDFVue from '@/pdf/Tesoreria/quedanPDF.vue';
-import comprobanteRetencion from '@/pdf/Tesoreria/ComprobatenRetencionPdf.vue';
+import comprobanteRetencion from '@/pdf/Tesoreria/ComprobanteRetencionBlanco.vue';
 import { createApp, h } from 'vue'
 
 export default {
@@ -621,23 +619,41 @@ export default {
         },
 
         getInformationBySupplier(supplier) {
-            // Buscar el proveedor en la lista de proveedores
-            const selectedSupplier = this.dataForSelectInRow.proveedor.find((suppliers) => suppliers.value === supplier);
-            if (selectedSupplier) {
-                // Datos que se pintan en los inputs
-                this.dataInputs.giro = `${selectedSupplier.codigo_giro} - ${selectedSupplier.nombre_giro}`;
-                this.dataInputs.irs = `${selectedSupplier.isrl_sujeto_retencion * 100} %`;
-                this.dataInputs.iva = `${selectedSupplier.iva_sujeto_retencion * 100} %`;
+            console.log(supplier);
 
-                // Datos que se usan para cálculos
-                this.dataForCalculate.irs = selectedSupplier.isrl_sujeto_retencion;
-                this.dataForCalculate.iva = selectedSupplier.iva_sujeto_retencion;
+            if (supplier != null) {
+                // Buscar el proveedor en la lista de proveedores
+                const selectedSupplier = this.dataForSelectInRow.proveedor.find((suppliers) => suppliers.value === supplier);
+                if (selectedSupplier) {
+                    // Datos que se pintan en los inputs
+                    this.dataInputs.giro = `${selectedSupplier.codigo_giro} - ${selectedSupplier.nombre_giro}`;
+                    this.dataInputs.irs = `${selectedSupplier.isrl_sujeto_retencion * 100} %`;
+                    this.dataInputs.iva = `${selectedSupplier.iva_sujeto_retencion * 100} %`;
 
-                this.dataInputs.id_proveedor = selectedSupplier.value;
+                    // Datos que se usan para cálculos
+                    this.dataForCalculate.irs = selectedSupplier.isrl_sujeto_retencion;
+                    this.dataForCalculate.iva = selectedSupplier.iva_sujeto_retencion;
+
+                    this.dataInputs.id_proveedor = selectedSupplier.value;
+                }
+
+                this.getAmountBySupplier(supplier);
+                this.calculateAmount();
+            } else {
+                this.dataInputs.giro = ""
+                this.dataInputs.irs = ""
+                this.dataInputs.iva = ""
+                this.dataInputs.id_proveedor = ""
+
+
+                this.dataForCalculate.irs = ''
+                this.dataForCalculate.iva = ''
+                this.dataForCalculate.id_proveedor = ''
+
+                this.calculateAmount();
+
             }
 
-            this.getAmountBySupplier(supplier);
-            this.calculateAmount();
         },
         calculateAmount() {
             let totMontoByRow = 0;
@@ -1160,5 +1176,9 @@ input[type=number]::-webkit-outer-spin-button {
 
 input[type=number]:focus {
     border: none;
+}
+
+.overflow-x-auto table tbody td :disabled {
+    background-color: transparent;
 }
 </style>
