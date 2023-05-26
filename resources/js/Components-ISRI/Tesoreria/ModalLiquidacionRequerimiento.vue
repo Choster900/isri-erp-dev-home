@@ -420,7 +420,7 @@ export default {
                         icon: 'question',
                         iconHtml: '❓',
                         confirmButtonText: '<p class="text-[14px]">Si, eliminar<p>',
-                        confirmButtonColor: '#D2691E',
+                        confirmButtonColor: '#950909',
                         cancelButtonText: 'Cancelar',
                         showCancelButton: true,
                         showCloseButton: true
@@ -501,7 +501,7 @@ export default {
                         icon: 'question',
                         iconHtml: '❓',
                         confirmButtonText: '<p class="text-[14px]">Si, Agregar<p>',
-                        confirmButtonColor: '#196F3D',
+                        confirmButtonColor: '#001b47',
                         cancelButtonText: 'Cancelar',
                         showCancelButton: true,
                         showCloseButton: true
