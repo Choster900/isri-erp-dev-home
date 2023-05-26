@@ -195,6 +195,7 @@ import html2pdf from 'html2pdf.js'
 
 <script>
 import IncomeReceiptPDF from '@/pdf/Tesoreria/IncomeReceiptPDF.vue';
+import ReciboIngresoMatricialVue from '@/pdf/Tesoreria/ReciboIngresoMatricial.vue';
 import { createApp, h } from 'vue'
 export default {
     props: {
@@ -217,15 +218,15 @@ export default {
             let fecha = moment().format('DD-MM-YYYY');
             let name = 'RECIBO '+this.receipt_to_print.numero_recibo_ingreso+' - '+ fecha;
             const opt = {
-                margin: 0.2,
+                margin: 0,
                 filename: name,
-                pagebreak: {mode:'css',before:'#pagebreak'},
+                //pagebreak: {mode:'css',before:'#pagebreak'},
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 3, useCORS: true },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-            };
+                jsPDF: { unit: 'cm', format: [21.5, 13.95], orientation: 'landscape'}
+                };
             
-            const app = createApp(IncomeReceiptPDF, {
+            const app = createApp(ReciboIngresoMatricialVue, {
                 receipt_to_print: this.receipt_to_print,
                 formatedAmount: this.formatedAmount,
                 empleado: this.empleado,

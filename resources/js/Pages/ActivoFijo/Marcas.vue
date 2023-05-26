@@ -156,7 +156,7 @@ import axios from 'axios';
     </div>
 
     <ModalAdminMarcaVue :showModal="showModal" :modalData="modalData" @cerrar-modal="showModal = false"
-      @get-table="this.getBrands(this.tableData.currentPage)" />
+      @get-table="getBrands(tableData.currentPage)" />
 
   </AppLayoutVue>
 </template>
