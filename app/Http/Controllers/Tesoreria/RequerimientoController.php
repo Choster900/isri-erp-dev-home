@@ -99,12 +99,6 @@ class RequerimientoController extends Controller
         if ($assigned_amount_requirement > $request->monto_requerimiento_pago) {
             return response()->json(['logical_error' => 'Error, no puede reducir el monto del requerimiento a un valor menor a lo ya asignado: $' . $assigned_amount_requirement], 422);
         } else {
-            // $estado='';
-            // if($assigned_amount_requirement == $request->monto_requerimiento_pago){
-            //     $estado=2;
-            // }else{
-            //     $estado=1;
-            // }
             try {
                 DB::beginTransaction();
                 $v_requerimiento = RequerimientoPago::where('id_requerimiento_pago', $request->input("id_requerimiento_pago"))->update([
@@ -130,9 +124,6 @@ class RequerimientoController extends Controller
             ->with(["detalle_quedan", "proveedor.giro", "proveedor.sujeto_retencion", "tesorero"])
             ->orderBy("id_quedan", "desc")
             ->where("id_estado_quedan", 1)
-            ->when($request["data"]["suppiler"], function ($query) use ($request) {
-                return $query->where("id_proveedor", $request["data"]["suppiler"]);
-            })
             ->when($request["data"]["rangeDate"], function ($query) use ($request) {
                 $date = explode("to", $request["data"]["rangeDate"]);
                 return $query->whereDate('fecha_emision_quedan', '>=', $date[0])
@@ -146,10 +137,14 @@ class RequerimientoController extends Controller
             })
             ->when($request["data"]["monto"], function ($query) use ($request) {
                 return $query->where("monto_liquido_quedan", "like", "%" . $request["data"]["monto"] . "%");
-            })
-            ->get();
-
-        return $query;
+            });
+        if (isset($request["data"]["suppiler"])) {
+            $query->when($request["data"]["suppiler"], function ($query) use ($request) {
+                return $query->where("id_proveedor", $request["data"]["suppiler"]);
+            });
+        }
+        $results = $query->get();
+        return $results;
     }
 
     public function addANumerRequestToQuedan(Request $request)

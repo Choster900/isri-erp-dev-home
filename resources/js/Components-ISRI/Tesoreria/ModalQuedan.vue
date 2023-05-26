@@ -28,7 +28,7 @@ import html2pdf from 'html2pdf.js'
                                 @click="printPdf()" />
                         </div>
                         <div class="px-2" v-if="dataQuedan != ''">
-                            <template v-if="dataInputs.monto_total_quedan >= 113">
+                            <template v-if="dataQuedan.monto_total_quedan >= 113">
                                 <GeneralButton color="bg-[#0A3158]/90  hover:bg-[#0A3158]" text="GENERAR RETENCION"
                                     icon="pdf" @click="generarComprobanteRetencionPdf()" />
                             </template>
@@ -407,7 +407,7 @@ import html2pdf from 'html2pdf.js'
 <script>
 
 import quedanPDFVue from '@/pdf/Tesoreria/quedanPDF.vue';
-import comprobanteRetencion from '@/pdf/Tesoreria/ComprobatenRetencionPdf.vue';
+import comprobanteRetencion from '@/pdf/Tesoreria/ComprobanteRetencionBlanco.vue';
 import { createApp, h } from 'vue'
 
 export default {
