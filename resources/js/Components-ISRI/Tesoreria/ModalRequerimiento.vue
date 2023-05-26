@@ -106,9 +106,9 @@ export default {
             this.$swal.fire({
                 title: "¿Está seguro de guardar el nuevo requerimiento?",
                 icon: "question",
-                iconHtml: "✅",
+                iconHtml: "❓",
                 confirmButtonText: "Si, Guardar",
-                confirmButtonColor: "#15803D",
+                confirmButtonColor: "#141368",
                 cancelButtonText: "Cancelar",
                 showCancelButton: true,
                 showCloseButton: true,
