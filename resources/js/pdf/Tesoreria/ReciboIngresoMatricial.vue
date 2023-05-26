@@ -47,7 +47,7 @@
                     <div class="relative flex w-full flex-row">
                         <label for="" class="w-[3.5cm] flex items-center text-[10px] invisible">3) LUGAR Y FECHA </label>
                         <div class="w-[4.5cm] ml-1 text-center  text-[11px] font-bold">
-                            <p class="mb-[5px]"> {{ciudad +' '+ fecha_recibo }}</p>
+                            <p class="mb-[5px]"> {{ ciudad + ' ' + fecha_recibo }}</p>
                         </div>
                     </div>
                 </div>
@@ -63,12 +63,13 @@
                                 <div class="flex w-full h-[0.45cm] justify-between items-center">
                                     <div class="h-full flex w-full text-left">
                                         <div class="h-full relative flex w-full flex-row">
-                                            <label for="" class="h-full flex w-[4cm] items-center text-[10px] mb-0.3 mt-[-2px] invisible">4)
+                                            <label for=""
+                                                class="h-full flex w-[4cm] items-center text-[10px] mb-0.3 mt-[-2px] invisible">4)
                                                 Nombre o
                                                 Razón Social</label>
-                                            <div
-                                                class="h-full ml-1 text-left w-[14.5cm]   text-[10px] font-bold">
-                                                <p class="ml-1 mb-0.3 mt-[-2px]">{{ receipt_to_print.cliente_recibo_ingreso }}</p>
+                                            <div class="h-full ml-1 text-left w-[14.5cm]   text-[10px] font-bold">
+                                                <p class="ml-1 mb-0.3 mt-[-2px]">{{ receipt_to_print.cliente_recibo_ingreso
+                                                }}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -78,26 +79,34 @@
                                     <div class="h-full flex w-full text-left">
                                         <div class="flex w-[4.5cm] text-left">
                                             <div class="relative flex w-full flex-row">
-                                                <label for="" class="w-[1.1cm] flex items-center text-[10px] mb-0.3 mt-[-2px] invisible">5)
+                                                <label for=""
+                                                    class="w-[1.1cm] flex items-center text-[10px] mb-0.3 mt-[-2px] invisible">5)
                                                     Por</label>
-                                                <div
-                                                    class="text-center w-[3.4cm]  text-[10px] font-bold">
+                                                <div class="text-center w-[3.4cm]  text-[10px] font-bold">
                                                     <p class="ml-1 mb-0.3 mt-[-2px]">{{ formatedAmount }}</p>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="relative flex w-[14cm] flex-row">
-                                            <label for="" class="w-[2.8cm] flex items-center text-[10px] mb-0.3 mt-[-2px] invisible">6) Total
+                                            <label for=""
+                                                class="w-[2.8cm] flex items-center text-[10px] mb-0.3 mt-[-2px] invisible">6)
+                                                Total
                                                 en
                                                 Letras</label>
-                                            <div
-                                                class="text-left w-[11.2cm]  text-[10px] font-bold">
-                                                <p class="ml-1 mb-0.3 mt-[-2px]">{{ receipt_to_print.monto_letras }}</p>
+                                            <div class="text-left w-[11.2cm] text-[10px] font-bold">
+                                                <p class="ml-1 mb-0.3 mt-[-2px]">{{ letras1 }}</p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="h-[0.45cm] w-full flex justify-between items-center">
+                                    <div class="h-full flex w-full text-left">
+                                        <div class="h-full relative flex w-full flex-row">
+                                            <div class="text-left w-full  text-[10px] font-bold">
+                                                <p class="ml-1 mb-0.3 mt-[-2px]">{{ letras2 ? letras2: '' }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="h-[0.5cm] w-full flex justify-between items-center">
                                 </div>
