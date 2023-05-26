@@ -179,7 +179,7 @@ export default {
                             url: '/update-requerimiento',
                             data: this.dataRequerimiento
                         }).then((data) => {
-                            toast.success("Requerimiento actualizado con extio", {
+                            toast.success("Requerimiento actualizado con exito", {
                                 autoClose: 5000,
                                 position: "top-right",
                                 transition: "zoom",
