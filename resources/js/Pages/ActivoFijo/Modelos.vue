@@ -157,7 +157,7 @@ import axios from 'axios';
     </div>
 
     <ModalAdminModeloVue :showModal="showModal" :modalData="modalData"
-            @cerrar-modal="showModal=false" @get-table="this.getModels(this.tableData.currentPage)"/>
+            @cerrar-modal="showModal=false" @get-table="getModels(tableData.currentPage)"/>
 
   </AppLayoutVue>
   

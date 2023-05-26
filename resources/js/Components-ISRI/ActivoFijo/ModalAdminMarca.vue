@@ -8,8 +8,8 @@ import axios from 'axios';
 </script>
 
 <template>
-  <ModalVue :show="showModal" @close-modal="this.$emit('cerrar-modal')" :title="'Administración de marca '"
-    @close="this.$emit('cerrar-modal')">
+  <ModalVue :show="showModal" @close-modal="$emit('cerrar-modal')" :title="'Administración de marca '"
+    @close="$emit('cerrar-modal')">
     <div class="px-5 pt-4 pb-1">
 
       <div class="text-sm">
@@ -30,7 +30,7 @@ import axios from 'axios';
           <GeneralButton v-else @click="saveNewMarca()" color="bg-green-700  hover:bg-green-800" text="Agregar"
             icon="add" />
           <div class="mb-4 md:mr-2 md:mb-0 px-1">
-            <GeneralButton text="Cancelar" icon="add" @click="this.$emit('cerrar-modal')" />
+            <GeneralButton text="Cancelar" icon="add" @click="$emit('cerrar-modal')" />
           </div>
         </div>
         <div class="text-xs text-slate-500">ISRI2023</div>
