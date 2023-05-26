@@ -130,9 +130,6 @@ class RequerimientoController extends Controller
             ->with(["detalle_quedan", "proveedor.giro", "proveedor.sujeto_retencion", "tesorero"])
             ->orderBy("id_quedan", "desc")
             ->where("id_estado_quedan", 1)
-            ->when($request["data"]["suppiler"], function ($query) use ($request) {
-                return $query->where("id_proveedor", $request["data"]["suppiler"]);
-            })
             ->when($request["data"]["rangeDate"], function ($query) use ($request) {
                 $date = explode("to", $request["data"]["rangeDate"]);
                 return $query->whereDate('fecha_emision_quedan', '>=', $date[0])
@@ -146,10 +143,14 @@ class RequerimientoController extends Controller
             })
             ->when($request["data"]["monto"], function ($query) use ($request) {
                 return $query->where("monto_liquido_quedan", "like", "%" . $request["data"]["monto"] . "%");
-            })
-            ->get();
-
-        return $query;
+            });
+        if (isset($request["data"]["suppiler"])) {
+            $query->when($request["data"]["suppiler"], function ($query) use ($request) {
+                return $query->where("id_proveedor", $request["data"]["suppiler"]);
+            });
+        }
+        $results = $query->get();
+        return $results;
     }
 
     public function addANumerRequestToQuedan(Request $request)
