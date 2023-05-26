@@ -99,10 +99,17 @@ class RequerimientoController extends Controller
         if ($assigned_amount_requirement > $request->monto_requerimiento_pago) {
             return response()->json(['logical_error' => 'Error, no puede reducir el monto del requerimiento a un valor menor a lo ya asignado: $' . $assigned_amount_requirement], 422);
         } else {
+            // $estado='';
+            // if($assigned_amount_requirement == $request->monto_requerimiento_pago){
+            //     $estado=2;
+            // }else{
+            //     $estado=1;
+            // }
             try {
                 DB::beginTransaction();
                 $v_requerimiento = RequerimientoPago::where('id_requerimiento_pago', $request->input("id_requerimiento_pago"))->update([
                     'numero_requerimiento_pago'      => $request->input("numero_requerimiento_pago"),
+                    //'id_estado_req_pago'             => $estado,
                     'descripcion_requerimiento_pago' => $request->input("descripcion_requerimiento_pago"),
                     'monto_requerimiento_pago'       => $request->input("monto_requerimiento_pago"),
                     'fecha_mod_requerimiento_pago'   => Carbon::now(),
