@@ -212,7 +212,7 @@ import axios from 'axios';
 
                                 <tr v-if="data.mostrarDetalle">
                                     <td></td>
-                                    <td colspan="2" class="text-end py-2"
+                                    <td colspan="2" class="text-end text-sm py-2"
                                         :class="{ 'border-b border-b-gray-300': j < data.liquidacion_quedan.length - 1 && data.liquidacion_quedan.length > 1 }">
                                         <span class="font-medium">{{ formatDate(liquidacion.fecha_liquidacion_quedan) }} -
                                         </span>
