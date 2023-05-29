@@ -234,22 +234,13 @@ export default {
             type: String,
             default: '',
         },
-        letras1:{
-            type: String,
-            default: '',
-        },
-        letras2:{
-            type: String,
-            default: '',
-        }
     },
     data: function () {
         return {
-            ciudad: 'S.S',
+            ciudad: 'S.S'
         }
     },
     computed: {
-
     }
 }
 </script>
