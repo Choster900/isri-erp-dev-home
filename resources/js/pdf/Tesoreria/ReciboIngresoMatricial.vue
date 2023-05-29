@@ -46,7 +46,7 @@
                 <div class="flex w-[8cm] text-left">
                     <div class="relative flex w-full flex-row">
                         <label for="" class="w-[3.5cm] flex items-center text-[10px] invisible">3) LUGAR Y FECHA </label>
-                        <div class="w-[4.5cm] ml-1 text-center  text-[11px] font-bold">
+                        <div class="w-[4.5cm] ml-1 text-center  text-[10px] font-bold">
                             <p class="mb-[5px]"> {{ ciudad + ' ' + fecha_recibo }}</p>
                         </div>
                     </div>
@@ -67,7 +67,7 @@
                                                 class="h-full flex w-[4cm] items-center text-[10px] mb-0.3 mt-[-2px] invisible">4)
                                                 Nombre o
                                                 Razón Social</label>
-                                            <div class="h-full ml-1 text-left w-[14.5cm]   text-[10px] font-bold">
+                                            <div class="h-full ml-1 text-left w-[14.5cm] text-[10px] font-bold">
                                                 <p class="ml-1 mb-0.3 mt-[-2px]">{{ receipt_to_print.cliente_recibo_ingreso
                                                 }}</p>
                                             </div>
