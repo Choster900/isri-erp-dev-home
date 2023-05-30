@@ -1,3 +1,11 @@
+<script setup>
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
+import moment from 'moment';
+import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
+import { jsPDF } from "jspdf";
+import html2pdf from 'html2pdf.js'
+</script>
 <template>
     <div class="w-[18.5] h-[12.5cm] ml-[1.7cm] mr-[1.3cm] mt-[0.80cm] mb-[0.6cm]">
         <!-- Contenido para la sección superior aquí -->
@@ -35,24 +43,18 @@
                 </div>
             </div>
         </div>
-        <div class="h-full w-[18.6cm]">
-                    <!-- Contenido para la sección superior aquí -->
-        <div class="h-[0.6cm] w-full "></div>
-        <div class="h-[2.6cm] w-full ">
-        </div>
-        <div class="h-[0.5cm] w-full"></div>
-        <div class="h-[0.5cm] w-full ">
-            <div class="h-[0.5cm] flex w-full justify-between items-center">
-                <div class="h-[0.5cm] flex text-left w-[10.7cm] invisible">
-                    <div class="relative flex w-full flex-row ">
+        <div class="h-[9.8cm] w-full">
+            <div class="h-[0.9cm] flex w-full justify-between items-center">
+                <div class="flex text-left w-[10.5cm] invisible">
+                    <div class="relative flex w-full flex-row">
                         <label for="" class="flex items-center text-[10px]">2) Institucion: INSTITUTO SALVADOREÑO DE
                             REHABILITACION DE INVALIDOS</label>
                     </div>
                 </div>
-                <div class="h-[0.5cm] flex w-[7.9cm] text-left">
+                <div class="flex w-[8cm] text-left">
                     <div class="relative flex w-full flex-row">
                         <label for="" class="w-[3.5cm] flex items-center text-[10px] invisible">3) LUGAR Y FECHA </label>
-                        <div class="w-[4.4cm] ml-1 text-center  text-[10px] font-bold ">
+                        <div class="w-[4.5cm] ml-1 text-center  text-[10px] font-bold">
                             <p class="mb-[5px]"> {{ ciudad + ' ' + fecha_recibo }}</p>
                         </div>
                     </div>
@@ -114,38 +116,28 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="h-[0.45cm] w-full flex justify-between items-center">
-                                <div class="h-full flex w-full text-left">
-                                    <div class="h-full relative flex w-full flex-row">
-                                        <div class="text-left w-full  text-[10px] font-bold ">
-                                            <p class="">{{ letras2 ? letras2 : '' }}</p>
+                                <div class="h-[0.5cm] w-full flex justify-between items-center">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="h-[0.60cm] invisible">
+                            <td class="text-center w-1/2 border border-black border-t-0 border-r-0 ">
+                                <h2 class="text-[10px] mb-0.5 mt-[-5px]">CARGO EN CAJA</h2>
+                            </td>
+                            <td class="text-center w-1/2 border border-black border-t-0">
+                                <h2 class="text-[10px] mb-0.5 mt-[-5px]">CONCEPTO O MANDAMIENTO DE INGRESO</h2>
+                            </td>
+                        </tr>
+                        <tr class="h-[5.2cm]">
+                            <td class="h-full justify-center items-start ">
+                                <div class="h-full flex flex-col">
+                                    <div class="flex justify-center items-start mb-2 h-[4cm]">
+                                        <div class="flex w-full text-left mx-4 mt-0">
+                                            <div class="font-bold flex items-center text-[10px]">
+                                                {{ receipt_to_print.descripcion_recibo_ingreso }}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="h-[0.5cm] w-full flex justify-between items-center">
-                            </div>
-                        </td>
-                    </tr>
-                    <tr class="h-[0.60cm] w-full invisible">
-                        <td class="text-center w-[9.15cm] border border-black border-t-0 border-r-0 ">
-                            <h2 class="text-[10px] ">7) CARGO EN CAJA</h2>
-                        </td>
-                        <td class="text-center w-[9.45cm] border border-black border-t-0">
-                            <h2 class="text-[10px] ">8) CONCEPTO O MANDAMIENTO DE INGRESO</h2>
-                        </td>
-                    </tr>
-                    <tr class="h-[5.2cm] w-full">
-                        <td class="h-full w-[9.15cm] justify-center items-start ">
-                            <div class="h-full w-full flex flex-col">
-                                <div class="h-[4cm] w-full flex justify-center items-start mx-2">
-                                    <div class="flex w-full text-left mt-0">
-                                        <div class="w-full font-bold flex items-center text-[10px]">
-                                            {{ receipt_to_print.descripcion_recibo_ingreso }}
-                                        </div>
-                                    </div>
-                                </div>
 
                                     <div class="flex justify-center items-start mb-2 h-[1.2cm]">
                                         <div class="w-full flex flex-col h-full">
@@ -160,22 +152,16 @@
                                                     Pagador o Colector</p>
                                             </div>
                                         </div>
-                                        <div
-                                            class="h-[0.7cm] flex w-max-full justify-center mx-4 border-t border-black border-solid invisible ">
-                                            <p class="w-max-full flex items-center text-[11px]">Tesorero,
-                                                Pagador o Colector</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="h-full ">
+                                <div class="h-full flex flex-col">
+                                    <div class="flex justify-center items-start h-[0.7cm]">
+                                        <div class="font-bold flex w-full text-left text-[9px] mx-4 mt-0">
+                                            {{ receipt_to_print.id_ccta_presupuestal }} {{ nombre_cuenta }}
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="h-full w-[9.45cm] ">
-                            <div class="h-full w-full flex flex-col">
-                                <div class="h-[0.6cm] w-full flex justify-center items-start ">
-                                    <div class="font-bold flex w-full text-left text-[9px] mx-3 mt-0">
-                                        {{ receipt_to_print.id_ccta_presupuestal }} {{ nombre_cuenta }}
-                                    </div>
-                                </div>
 
                                     <div class="flex justify-center items-start h-[4.5cm]">
                                         <div class="w-full flex flex-col h-full">
@@ -217,30 +203,31 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr class="h-[0.85cm] w-full invisible ">
-                        <td class="h-full w-full border-t-0 border-r-0 border border-black">
-                        </td>
-                        <td class="h-full w-full border-t-0 border border-black">
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="h-[0.7cm] "></div>
-        </div>
-        <div class="h-full w-[1.55cm]">
-            <!-- Contenido del tercer div -->
+                            </td>
+                        </tr>
+                        <tr class="h-[0.8cm] w-full invisible">
+                            <td class="h-full w-full border-t-0 border-r-0 border border-black">
+                            </td>
+                            <td class="h-full w-full border-t-0 border border-black">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
-import moment from 'moment';
+import IncomeReceiptPDF from '@/pdf/Tesoreria/IncomeReceiptPDF.vue';
+import ReciboIngresoMatricialVue from '@/pdf/Tesoreria/ReciboIngresoMatricial.vue';
+import { createApp, h } from 'vue'
 export default {
     props: {
+        view_receipt: {
+            type: Boolean,
+            default: false,
+        },
         receipt_to_print: {
             type: Array,
             default: [],
@@ -265,67 +252,84 @@ export default {
             type: String,
             default: '',
         },
-        letras2: {
+        letras2:{
             type: String,
             default: '',
         }
     },
     data: function () {
         return {
-            ciudad: 'S.S'
         }
     },
+    methods: {
+        printPdf() {
+            let fecha = moment().format('DD-MM-YYYY');
+            let name = 'RECIBO ' + this.receipt_to_print.numero_recibo_ingreso + ' - ' + fecha;
+            const opt = {
+                margin: 0,
+                filename: name,
+                //pagebreak: {mode:'css',before:'#pagebreak'},
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 3, useCORS: true },
+                //jsPDF: { unit: 'cm', format: [13.95,21.5], orientation: 'landscape' }
+                jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' },
+            };
+
+            const limiteCaracteres = 70;
+            if (this.receipt_to_print.monto_letras.length <= limiteCaracteres) {
+                this.letras1 = this.receipt_to_print.monto_letras;
+                this.letras2 = ''
+            } else {
+                let textoTruncado = this.receipt_to_print.monto_letras.slice(0, limiteCaracteres);
+                let ultimoEspacio = textoTruncado.lastIndexOf(' ');
+                this.letras1 = textoTruncado.slice(0, ultimoEspacio);
+                this.letras2 = this.receipt_to_print.monto_letras.slice(ultimoEspacio + 1);
+            }
+
+            const app = createApp(ReciboIngresoMatricialVue, {
+                receipt_to_print: this.receipt_to_print,
+                formatedAmount: this.receipt_to_print.monto_recibo_ingreso,
+                empleado: this.empleado,
+                nombre_cuenta: this.nombre_cuenta,
+                fecha_recibo: this.fecha_recibo,
+                letras1: this.letras1,
+                letras2: this.letras2
+            });
+            const div = document.createElement('div');
+            const pdfPrint = app.mount(div);
+            const html = div.outerHTML;
+
+            html2pdf().set(opt).from(html).save();
+            //html2pdf().set(opt).from(html).output('dataurlnewwindow');
+        }
+    },
+    watch: {
+    },
     computed: {
-    }
+        formatedAmount() {
+            return '$' + this.receipt_to_print.monto_recibo_ingreso
+        },
+        empleado() {
+            return this.receipt_to_print.empleado_tesoreria ? this.receipt_to_print.empleado_tesoreria.nombre_empleado_tesoreria : ''
+        },
+        nombre_cuenta() {
+            return this.receipt_to_print.cuenta_presupuestal ? this.receipt_to_print.cuenta_presupuestal.nombre_ccta_presupuestal : ''
+        },
+        fecha_recibo() {
+            return this.receipt_to_print.cuenta_presupuestal ? moment(this.receipt_to_print.fecha_recibo_ingreso, 'Y-M-D').format('DD/MM/Y') : ''
+        },
+    },
 }
 </script>
+
 <style>
 .center-vertically {
     align-items: center;
-}
-
-.left {
-    flex: 0 0 50%;
-    text-align: left;
-    font-size: 16px;
-    font-weight: bold;
-    margin-left: 20px;
-}
-
-.right {
-    flex: 0 0 50%;
-    text-align: left;
-    font-size: 16px;
-    font-weight: bold;
-    margin-right: 20px;
 }
 
 .title-container {
     flex: 1;
     text-align: center;
     align-self: flex-start;
-}
-
-.logo-container {
-    flex: 0 0 30%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.logo {
-    width: 50px;
-    height: 50px;
-    object-fit: contain;
-    margin-bottom: 10px;
-}
-
-.institution {
-    text-align: center;
-    font-size: 14px;
-    font-weight: bold;
-    margin-left: 20px;
-    margin-right: 20px;
 }
 </style>
