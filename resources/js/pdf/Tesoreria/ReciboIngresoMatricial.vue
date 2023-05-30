@@ -35,18 +35,24 @@
                 </div>
             </div>
         </div>
-        <div class="h-[9.8cm] w-full">
-            <div class="h-[0.9cm] flex w-full justify-between items-center">
-                <div class="flex text-left w-[10.5cm] invisible">
-                    <div class="relative flex w-full flex-row">
+        <div class="h-full w-[18.6cm]">
+                    <!-- Contenido para la sección superior aquí -->
+        <div class="h-[0.6cm] w-full "></div>
+        <div class="h-[2.6cm] w-full ">
+        </div>
+        <div class="h-[0.5cm] w-full"></div>
+        <div class="h-[0.5cm] w-full ">
+            <div class="h-[0.5cm] flex w-full justify-between items-center">
+                <div class="h-[0.5cm] flex text-left w-[10.7cm] invisible">
+                    <div class="relative flex w-full flex-row ">
                         <label for="" class="flex items-center text-[10px]">2) Institucion: INSTITUTO SALVADOREÑO DE
                             REHABILITACION DE INVALIDOS</label>
                     </div>
                 </div>
-                <div class="flex w-[8cm] text-left">
+                <div class="h-[0.5cm] flex w-[7.9cm] text-left">
                     <div class="relative flex w-full flex-row">
                         <label for="" class="w-[3.5cm] flex items-center text-[10px] invisible">3) LUGAR Y FECHA </label>
-                        <div class="w-[4.5cm] ml-1 text-center  text-[10px] font-bold">
+                        <div class="w-[4.4cm] ml-1 text-center  text-[10px] font-bold ">
                             <p class="mb-[5px]"> {{ ciudad + ' ' + fecha_recibo }}</p>
                         </div>
                     </div>
@@ -108,28 +114,38 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="h-[0.5cm] w-full flex justify-between items-center">
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="h-[0.60cm] invisible">
-                            <td class="text-center w-1/2 border border-black border-t-0 border-r-0 ">
-                                <h2 class="text-[10px] mb-0.5 mt-[-5px]">CARGO EN CAJA</h2>
-                            </td>
-                            <td class="text-center w-1/2 border border-black border-t-0">
-                                <h2 class="text-[10px] mb-0.5 mt-[-5px]">CONCEPTO O MANDAMIENTO DE INGRESO</h2>
-                            </td>
-                        </tr>
-                        <tr class="h-[5.2cm]">
-                            <td class="h-full justify-center items-start ">
-                                <div class="h-full flex flex-col">
-                                    <div class="flex justify-center items-start mb-2 h-[4cm]">
-                                        <div class="flex w-full text-left mx-4 mt-0">
-                                            <div class="font-bold flex items-center text-[10px]">
-                                                {{ receipt_to_print.descripcion_recibo_ingreso }}
-                                            </div>
+                            </div>
+                            <div class="h-[0.45cm] w-full flex justify-between items-center">
+                                <div class="h-full flex w-full text-left">
+                                    <div class="h-full relative flex w-full flex-row">
+                                        <div class="text-left w-full  text-[10px] font-bold ">
+                                            <p class="">{{ letras2 ? letras2 : '' }}</p>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="h-[0.5cm] w-full flex justify-between items-center">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="h-[0.60cm] w-full invisible">
+                        <td class="text-center w-[9.15cm] border border-black border-t-0 border-r-0 ">
+                            <h2 class="text-[10px] ">7) CARGO EN CAJA</h2>
+                        </td>
+                        <td class="text-center w-[9.45cm] border border-black border-t-0">
+                            <h2 class="text-[10px] ">8) CONCEPTO O MANDAMIENTO DE INGRESO</h2>
+                        </td>
+                    </tr>
+                    <tr class="h-[5.2cm] w-full">
+                        <td class="h-full w-[9.15cm] justify-center items-start ">
+                            <div class="h-full w-full flex flex-col">
+                                <div class="h-[4cm] w-full flex justify-center items-start mx-2">
+                                    <div class="flex w-full text-left mt-0">
+                                        <div class="w-full font-bold flex items-center text-[10px]">
+                                            {{ receipt_to_print.descripcion_recibo_ingreso }}
+                                        </div>
+                                    </div>
+                                </div>
 
                                     <div class="flex justify-center items-start mb-2 h-[1.2cm]">
                                         <div class="w-full flex flex-col h-full">
@@ -144,16 +160,22 @@
                                                     Pagador o Colector</p>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="h-full ">
-                                <div class="h-full flex flex-col">
-                                    <div class="flex justify-center items-start h-[0.7cm]">
-                                        <div class="font-bold flex w-full text-left text-[9px] mx-4 mt-0">
-                                            {{ receipt_to_print.id_ccta_presupuestal }} {{ nombre_cuenta }}
+                                        <div
+                                            class="h-[0.7cm] flex w-max-full justify-center mx-4 border-t border-black border-solid invisible ">
+                                            <p class="w-max-full flex items-center text-[11px]">Tesorero,
+                                                Pagador o Colector</p>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="h-full w-[9.45cm] ">
+                            <div class="h-full w-full flex flex-col">
+                                <div class="h-[0.6cm] w-full flex justify-center items-start ">
+                                    <div class="font-bold flex w-full text-left text-[9px] mx-3 mt-0">
+                                        {{ receipt_to_print.id_ccta_presupuestal }} {{ nombre_cuenta }}
+                                    </div>
+                                </div>
 
                                     <div class="flex justify-center items-start h-[4.5cm]">
                                         <div class="w-full flex flex-col h-full">
@@ -195,17 +217,22 @@
                                         </div>
                                     </div>
                                 </div>
-                            </td>
-                        </tr>
-                        <tr class="h-[0.8cm] w-full invisible">
-                            <td class="h-full w-full border-t-0 border-r-0 border border-black">
-                            </td>
-                            <td class="h-full w-full border-t-0 border border-black">
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="h-[0.85cm] w-full invisible ">
+                        <td class="h-full w-full border-t-0 border-r-0 border border-black">
+                        </td>
+                        <td class="h-full w-full border-t-0 border border-black">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="h-[0.7cm] "></div>
+        </div>
+        <div class="h-full w-[1.55cm]">
+            <!-- Contenido del tercer div -->
         </div>
     </div>
 </template>
@@ -238,7 +265,7 @@ export default {
             type: String,
             default: '',
         },
-        letras2:{
+        letras2: {
             type: String,
             default: '',
         }
