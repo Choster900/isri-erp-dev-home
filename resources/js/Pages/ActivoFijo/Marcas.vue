@@ -189,7 +189,7 @@ export default {
         sortOrders[column.name] = -1;
     });
     return {
-      permits: [],
+      //permits: [],
       brands: [],
       links: [],
       columns: columns,
