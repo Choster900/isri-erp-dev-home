@@ -19,7 +19,8 @@ import axios from 'axios';
                         </label>
                         <div class="relative font-semibold  flex h-8  flex-row-reverse">
                             <Multiselect id="estado-civil" :options="dataForSelect.proveedor" :searchable="true"
-                                v-model="filter.suppiler" />
+                                v-model="filter.suppiler"
+                                @select="filter.suppiler == null ? filter.suppiler = '' : filter.suppiler = filter.suppiler" />
                             <LabelToInput icon="list" />
                         </div>
                     </div>
@@ -108,19 +109,26 @@ import axios from 'axios';
                                                         "0.00" }}
                                                 </span>
                                             </td>
-                                            <td class="border-2 px-3 text-xs">SOBRANTE<br />
-                                                <span
-                                                    :class="infoReqForTableInfo.restanteReq < infoReqForTableInfo.cantSelected ? 'text-red-600 text-xs' : 'text-green-600 text-xs'">$
-                                                    {{ infoReqForTableInfo.cantSelected == "" ?
+                                            <td class="border-2 px-3 text-xs">DIFERENCIA<br />
+                                                <span class="text-green-600 text-xs"
+                                                    v-if="infoReqForTableInfo.cantSelected === '' && infoReqForTableInfo.restanteReq === ''">
+                                                    $0.00
+                                                </span>
+                                                <span v-else
+                                                    :class="infoReqForTableInfo.restanteReq < infoReqForTableInfo.cantSelected ? 'text-red-600 text-xs' : 'text-green-600 text-xs'">
+                                                    $
+                                                    {{ (infoReqForTableInfo.cantSelected === '' ?
                                                         infoReqForTableInfo.restanteReq :
-                                                        (parseFloat(infoReqForTableInfo.restanteReq)  -
-                                                            parseFloat(infoReqForTableInfo.cantSelected) || 0).toFixed(2) }}</span>
+                                                        (parseFloat(infoReqForTableInfo.restanteReq) -
+                                                            parseFloat(infoReqForTableInfo.cantSelected) || 0).toFixed(2)) }}
+                                                </span>
                                             </td>
+
                                             <td class=" border-2 px-3 text-xs">CANT. SELECT<br />
                                                 <span
                                                     :class="infoReqForTableInfo.restanteReq < infoReqForTableInfo.cantSelected ? 'text-red-600 text-xs' : 'text-green-600 text-xs'">$
-                                                    {{ infoReqForTableInfo.cantSelected != "" ?
-                                                        infoReqForTableInfo.cantSelected : "0.00" }}</span>
+                                                    {{ infoReqForTableInfo.cantSelected != ""
+                                                        ? (infoReqForTableInfo.cantSelected).toFixed(2) : "0.00" }}</span>
                                             </td>
                                         </tr>
                                         <tr>
@@ -135,37 +143,37 @@ import axios from 'axios';
                             </div>
                         </div>
                     </div>
-                    <div class="sidebar-style-isri w-full" style="overflow-x:auto; max-height: 440px;">
+                    <div class="sidebar-style-isri" style="overflow-x:auto; max-height: 440px; max-width: 800px;">
                         <table class="table-auto">
                             <thead
                                 class="text-xs font-semibold uppercase text-white bg-[#001b47] border-t border-b border-slate-200 sticky top-0">
                                 <tr>
-                                    <th class="px-4 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
+                                    <th class="px-4 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
                                         <div class="flex items-center">
-                                            <Checkbox @click="selectAllItems()"></Checkbox>
+                                            <Checkbox @click="selectAllItems()" :checked="selectAll ? true : false">
+                                            </Checkbox>
                                         </div>
                                     </th>
-                                    <th class="px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap">
-                                        <div class="font-semibold text-center text-[12px] w-1">I D</div>
+                                    <th class="px-4 py-2 ">
+                                        <div class="font-medium text-center text-[12px] w-1">ID</div>
                                     </th>
-                                    <th class="px-4 py-2 first:pl-5 last:pr-5 whitespace-nowrap">
-                                        <div class="font-semibold text-center w-44 text-[12px] tracking-wider">P R O V E E D
-                                            O R</div>
+                                    <th class="px-4 py-2  min-w-48 max-w-48 ">
+                                        <div class="font-medium text-center w-40 text-[12px] tracking-wider">PROVEEDOR</div>
                                     </th>
-                                    <th class="px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap">
-                                        <div class="font-semibold text-center w-44 text-[12px]">D E T A L L E</div>
+                                    <th class="px-4 py-2 min-w-48 max-w-48 ">
+                                        <div class="font-medium text-center w-40 text-[12px]">DETALLE</div>
                                     </th>
-                                    <th class="px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap">
-                                        <div class="font-semibold text-center text-[12px]">F E C H A </div>
+                                    <th class="px-4 py-2 min-w-20 max-w-20 ">
+                                        <div class="font-medium text-center w-10 text-[12px]">FECHA</div>
                                     </th>
-                                    <th class="px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap">
-                                        <div class="font-semibold text-center text-[12px]">I V A</div>
+                                    <th class="px-4 py-2  min-w-10 max-w-10 ">
+                                        <div class="font-medium text-center w-10  text-[12px]">IVA</div>
                                     </th>
-                                    <th class="px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap">
-                                        <div class="font-semibold text-right text-[12px]">I S R</div>
+                                    <th class="px-4 py-2  min-w-10 max-w-10 ">
+                                        <div class="font-medium text-center  w-10 text-[12px]">ISR</div>
                                     </th>
-                                    <th class="px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap">
-                                        <div class="font-semibold text-right text-[12px]">M O N T O</div>
+                                    <th class="px-4 py-2 min-w-10 max-w-10 ">
+                                        <div class="font-medium text-center w-20 text-[12px]">MONTO</div>
                                     </th>
                                 </tr>
                             </thead>
@@ -238,8 +246,7 @@ import axios from 'axios';
 
 
                                 <tr v-if="dataQuedan.length == 0">
-                                    <td colspan="8"
-                                        class="pb-3 text-xs whitespace-nowrap text-center h-20">
+                                    <td colspan="8" class="pb-3 text-xs whitespace-nowrap text-center h-20">
                                         <span v-if="withoutDataInDb">SIN DATOS EN LA BASE DE DATOS...</span>
                                         <span v-else>Utilize los filtros o simplemente precio buscar.</span>
                                     </td>
@@ -275,6 +282,7 @@ export default {
         id_requerimiento_pago: '',
         numero_requerimiento: '',
         withoutDataInDb: false,
+        isChecked: false,
         filter: {
             suppiler: '',
             rangeDate: '',
@@ -324,6 +332,19 @@ export default {
                     })
                     this.dataQuedan = newDataQuedan
                     this.withoutDataInDb = true
+
+
+
+                    this.collectItems = []
+                    this.id_requerimiento_pago = ''
+                    this.numero_requerimiento = ''
+                    this.selectAll = false//FIXME: cuando se cierra el modal se supone que tiene que quedar en falso (lo hace) pero el checbox igual queda marcado cuando se sabe por que
+                    this.infoReqForTableInfo.numeroReq = ''
+                    this.infoReqForTableInfo.montoReq = ''
+                    this.infoReqForTableInfo.restanteReq = ''
+                    this.infoReqForTableInfo.descripcionReq = ''
+                    this.infoReqForTableInfo.cantSelected = ''
+
                 })
                 .catch(errors => {
                     let msg = this.manageError(errors);
@@ -372,12 +393,11 @@ export default {
         async addNumber() {
             if (this.collectItems != '') {
                 const confirmed = await this.$swal.fire({
-                    title: `<div class="text-[15px]">¿Esta seguro de agregar el numero de requerimiento
-                        <p class="text-[22px] underline">${this.numero_requerimiento[0].label} </p>  a estos quedan?</div>`,
+                    title: `<p class="text-[16px]">¿Está seguro de agregar estos quedan al requerimiento ${this.numero_requerimiento[0].label}? Recuerda que una vez asignado el quedan, podrás eliminarlo mientras no hayas realizado algún pago.</p>`,
                     icon: 'question',
-                    iconHtml: "✅",
+                    iconHtml: "❓",
                     confirmButtonText: 'Si, Agregar',
-                    confirmButtonColor: '#15803D',
+                    confirmButtonColor: '#001b47',
                     cancelButtonText: 'Cancelar',
                     showCancelButton: true,
                     showCloseButton: true
@@ -388,7 +408,7 @@ export default {
                         itemsToAddNumber: this.collectItems,
                         numberRequest: this.id_requerimiento_pago
                     }).then((response) => {
-                        toast.success("El numero de quedan ", {
+                        toast.success(`Se agregaron los quedan al requerimiento ${this.numero_requerimiento[0].label}`, {
                             autoClose: 5000,
                             position: "top-right",
                             transition: "zoom",
@@ -433,15 +453,24 @@ export default {
 
         },
         seleccionarRequerimiento(event) {
-            const opcionSeleccionada = this.dataForSelect.numeroRequerimiento.filter(item => item.value === event);
-            this.numero_requerimiento = opcionSeleccionada
 
-            let data = this.dataForSelect.numeroRequerimiento.filter(item => item.value === event)
+            console.log(event);
 
-            this.infoReqForTableInfo.numeroReq = data[0].numero_requerimiento_pago
-            this.infoReqForTableInfo.montoReq = data[0].monto_requerimiento_pago
-            this.infoReqForTableInfo.restanteReq = data[0].restante_requerimiento
-            this.infoReqForTableInfo.descripcionReq = data[0].descripcion_requerimiento_pago
+            if (event !== null) {
+                const opcionSeleccionada = this.dataForSelect.numeroRequerimiento.filter(item => item.value === event);
+                this.numero_requerimiento = opcionSeleccionada
+
+                let data = this.dataForSelect.numeroRequerimiento.filter(item => item.value === event)
+
+                this.infoReqForTableInfo.numeroReq = data[0].numero_requerimiento_pago
+                this.infoReqForTableInfo.montoReq = data[0].monto_requerimiento_pago
+                this.infoReqForTableInfo.restanteReq = data[0].restante_requerimiento
+                this.infoReqForTableInfo.descripcionReq = data[0].descripcion_requerimiento_pago
+            } else {
+                this.resetData()
+
+            }
+
         },
         resetData() {
             this.dataQuedan = []
@@ -460,7 +489,6 @@ export default {
             this.infoReqForTableInfo.restanteReq = ''
             this.infoReqForTableInfo.descripcionReq = ''
             this.infoReqForTableInfo.cantSelected = ''
-            this.withoutDataInDb = false
         },
     },
     computed: {

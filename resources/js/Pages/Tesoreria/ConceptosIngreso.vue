@@ -180,7 +180,7 @@ export default {
     let sortOrders = {};
     let columns = [
       { width: "10%", label: "ID", name: "id_concepto_ingreso", type: "text" },
-      { width: "30%", label: "Dependencia", name: "nombre_dependencia", type: "text" },
+      { width: "45%", label: "Dependencia", name: "nombre_dependencia", type: "text" },
       { width: "30%", label: "Concepto Ingreso", name: "nombre_concepto_ingreso", type: "text" },
       { width: "10%", label: "Especifico", name: "id_ccta_presupuestal", type: "text" },
       {
@@ -190,7 +190,7 @@ export default {
           { value: "0", label: "Inactivo" }
         ]
       },
-      { width: "10%", label: "Acciones", name: "Acciones" },
+      { width: "1%", label: "Acciones", name: "Acciones" },
     ];
     columns.forEach((column) => {
       if (column.name === 'id_concepto_ingreso')
@@ -220,7 +220,7 @@ export default {
         length: 5,
         search: "",
         column: 0,
-        dir: "asc",
+        dir: "desc",
         total: ""
       },
     }

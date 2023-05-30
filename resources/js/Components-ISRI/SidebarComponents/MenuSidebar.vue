@@ -5,7 +5,7 @@
                 <span v-if="!stateFromSidebarProp"
                     class="hidden lg:block lg:sidebar-expanded:hidden 2xl:hidden text-centerw-6"
                     aria-hidden="true">•••</span>
-                <span v-else class="lg:sidebar-expanded:block 2xl:block">Pages</span>
+                <span v-else class="lg:sidebar-expanded:block 2xl:block">Modulos</span>
             </h3>
             <ul class="mt-3">
                 <ModulesVue v-for="(datos, j) in $page.props.menu.urls" :key="j" :modulo="datos"

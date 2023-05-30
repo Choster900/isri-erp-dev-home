@@ -162,7 +162,8 @@ import html2pdf from 'html2pdf.js'
                                                     <!-- <input type="text" readonly v-model="detail.monto_det_recibo_ingreso"
                                                     class="w-1/3 font-bold text-right border-0 py-0 text-sm"> -->
                                                 </div>
-                                                <div class="flex justify-center items-start mb-2 h-1/11 mt-1 center-vertically">
+                                                <div
+                                                    class="flex justify-center items-start mb-2 h-1/11 mt-1 center-vertically">
                                                     <div class="relative flex w-full flex-row">
                                                         <label for=""
                                                             class="font-bold flex items-center text-[10px] w-2/3 mx-4 mt-0">
@@ -195,6 +196,7 @@ import html2pdf from 'html2pdf.js'
 
 <script>
 import IncomeReceiptPDF from '@/pdf/Tesoreria/IncomeReceiptPDF.vue';
+import ReciboIngresoMatricialVue from '@/pdf/Tesoreria/ReciboIngresoMatricial.vue';
 import { createApp, h } from 'vue'
 export default {
     props: {
@@ -209,28 +211,41 @@ export default {
     },
     data: function () {
         return {
-
         }
     },
     methods: {
         printPdf() {
             let fecha = moment().format('DD-MM-YYYY');
-            let name = 'RECIBO '+this.receipt_to_print.numero_recibo_ingreso+' - '+ fecha;
+            let name = 'RECIBO ' + this.receipt_to_print.numero_recibo_ingreso + ' - ' + fecha;
             const opt = {
-                margin: 0.2,
+                margin: 0,
                 filename: name,
-                pagebreak: {mode:'css',before:'#pagebreak'},
+                //pagebreak: {mode:'css',before:'#pagebreak'},
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 3, useCORS: true },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+                //jsPDF: { unit: 'cm', format: [13.95,21.5], orientation: 'landscape' }
+                jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' },
             };
-            
-            const app = createApp(IncomeReceiptPDF, {
+
+            const limiteCaracteres = 70;
+            if (this.receipt_to_print.monto_letras.length <= limiteCaracteres) {
+                this.letras1 = this.receipt_to_print.monto_letras;
+                this.letras2 = ''
+            } else {
+                let textoTruncado = this.receipt_to_print.monto_letras.slice(0, limiteCaracteres);
+                let ultimoEspacio = textoTruncado.lastIndexOf(' ');
+                this.letras1 = textoTruncado.slice(0, ultimoEspacio);
+                this.letras2 = this.receipt_to_print.monto_letras.slice(ultimoEspacio + 1);
+            }
+
+            const app = createApp(ReciboIngresoMatricialVue, {
                 receipt_to_print: this.receipt_to_print,
-                formatedAmount: this.formatedAmount,
+                formatedAmount: this.receipt_to_print.monto_recibo_ingreso,
                 empleado: this.empleado,
                 nombre_cuenta: this.nombre_cuenta,
-                fecha_recibo: this.fecha_recibo
+                fecha_recibo: this.fecha_recibo,
+                letras1: this.letras1,
+                letras2: this.letras2
             });
             const div = document.createElement('div');
             const pdfPrint = app.mount(div);
@@ -253,10 +268,9 @@ export default {
             return this.receipt_to_print.cuenta_presupuestal ? this.receipt_to_print.cuenta_presupuestal.nombre_ccta_presupuestal : ''
         },
         fecha_recibo() {
-            return this.receipt_to_print.cuenta_presupuestal ? moment(this.receipt_to_print.fecha_recibo_ingreso, 'Y-M-D').format('DD-MM-Y') : ''
-
-        }
-    }
+            return this.receipt_to_print.cuenta_presupuestal ? moment(this.receipt_to_print.fecha_recibo_ingreso, 'Y-M-D').format('DD/MM/Y') : ''
+        },
+    },
 }
 </script>
 

@@ -1,10 +1,7 @@
 <script setup>
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
-import moment from 'moment';
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
-import { jsPDF } from "jspdf";
-import html2pdf from 'html2pdf.js'
 </script>
 <template>
     <div class="m-1.5">
@@ -19,18 +16,9 @@ import html2pdf from 'html2pdf.js'
                         </div>
                         <div class="px-2" v-else>
                             <template v-if="dataQuedan.id_estado_quedan === 1">
-                                <GeneralButton color="bg-orange-700   hover:bg-orange-800" text="MODIFICAR" icon="update"
-                                    @click="updateQuedan()" />
-                            </template>
-                        </div>
-                        <div class="px-2" v-if="dataQuedan != ''">
-                            <GeneralButton color="bg-red-700   hover:bg-red-800" text="GENERAR QUEDAN" icon="pdf"
-                                @click="printPdf()" />
-                        </div>
-                        <div class="px-2" v-if="dataQuedan != ''">
-                            <template v-if="dataInputs.monto_total_quedan >= 113">
-                                <GeneralButton color="bg-[#0A3158]/90  hover:bg-[#0A3158]" text="GENERAR RETENCION"
-                                    icon="pdf" @click="generarComprobanteRetencionPdf()" />
+                                <GeneralButton
+                                    :color="['bg-orange-700 hover:bg-orange-800', incoherencia ? 'animate-pulse animate-infinite animate-duration-[3000ms]P' : '']"
+                                    text="MODIFICAR" icon="update" @click="updateQuedan()" />
                             </template>
                         </div>
                         <svg class="h-7 w-7 absolute top-0 right-0 mt-2 cursor-pointer" viewBox="0 0 25 25"
@@ -173,7 +161,7 @@ import html2pdf from 'html2pdf.js'
                                                 <Multiselect v-model="dataInputs.id_proveedor"
                                                     :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                     :options="dataForSelectInRow.proveedor" :searchable="true"
-                                                    @select="getInformationBySupplier($event)" />
+                                                    @input="getInformationBySupplier($event)" />
                                             </div>
                                         </td>
                                         <th class="border-2 border-black text-sm text-gray-600" colspan="3">
@@ -196,6 +184,7 @@ import html2pdf from 'html2pdf.js'
                                             :class="dataInputs.numero_acuerdo_quedan == '' ? 'bg-[#fdfd96]' : ''"
                                             colspan="3" contenteditable="false">
                                             <input type="number" v-model="dataInputs.numero_acuerdo_quedan"
+                                                @input="limitarCaracteres('numero_acuerdo_quedan')"
                                                 :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                 :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
                                                 class="peer w-full text-sm bg-transparent text-center h-16 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
@@ -204,6 +193,7 @@ import html2pdf from 'html2pdf.js'
                                             :class="dataInputs.numero_compromiso_ppto_quedan == '' ? 'bg-[#fdfd96]' : ''"
                                             colspan="4" contenteditable="false">
                                             <input type="number" v-model="dataInputs.numero_compromiso_ppto_quedan"
+                                                @input="limitarCaracteres('numero_compromiso_ppto_quedan')"
                                                 :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                 :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
                                                 class="peer w-full text-sm bg-transparent text-center h-16 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
@@ -212,6 +202,7 @@ import html2pdf from 'html2pdf.js'
                                             :class="dataInputs.numero_retencion_iva_quedan == '' ? 'bg-[#fdfd96]' : ''"
                                             colspan="4" contenteditable="false">
                                             <input type="number" v-model="dataInputs.numero_retencion_iva_quedan"
+                                                @input="limitarCaracteres('numero_retencion_iva_quedan')"
                                                 :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                 :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
                                                 class="peer w-full text-sm bg-transparent text-center h-16 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
@@ -249,16 +240,14 @@ import html2pdf from 'html2pdf.js'
 
                                     <template v-for="( row, rowIndex ) in  rowsData " :key="rowIndex">
                                         <template v-if="row[7]">
-
                                             <tr @dblclick="deleteRow(rowIndex)">
                                                 <template v-for="( cell, cellIndex ) in  row " :key="cellIndex">
-
-                                                    <td v-if="cellIndex == 2"
-                                                        @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
-                                                        class="border-2 border-black" :class="[cell == '' ? 'bg-[#fdfd96]' : '',
-                                                        dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']"
-                                                        :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true">
-                                                        {{ cell }}
+                                                    <td v-if="cellIndex == 2" class="border-2 border-black"
+                                                        :class="[cell == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']">
+                                                        <input type="text" v-model="rowsData[rowIndex][2]" maxlength="10"
+                                                            :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
+                                                            :class="[cell == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']"
+                                                            class="peer w-full text-sm bg-transparent text-center h-[180px] border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                                     </td>
                                                     <td v-if="cellIndex == 2" class="border-2 border-black">
                                                         <div class="mb-4  md:mb-0">
@@ -280,8 +269,8 @@ import html2pdf from 'html2pdf.js'
                                                                 @select="onCellEdit(rowIndex, cellIndex, $event)" />
                                                         </div>
                                                     </td>
-                                                    <td v-else-if="cellIndex == 4" class="border-2 border-black" colspan="2"
-                                                        :class="[
+                                                    <td v-else-if="cellIndex == 4"
+                                                        class="border-2 border-black max-w-[75px]" colspan="2" :class="[
                                                             cell == '' ? 'bg-[#fdfd96]' : '',
                                                             errosDetalleQuedan[rowIndex] ? 'bg-[#fd9696]' : '',
                                                             errosrNumeroActa.includes(rowIndex) ? 'bg-[#fd9696]' : '',
@@ -297,20 +286,21 @@ import html2pdf from 'html2pdf.js'
                                                         :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true">
                                                         {{ cell }}
                                                     </td>
-
                                                     <td v-else-if="cellIndex == 6" class="border-2 border-black">
-
                                                         <table>
                                                             <tr>
                                                                 <th class="border-2 border-r-black border-b-black border-l-transparent border-t-transparent text-sm text-gray-600 py-2"
                                                                     style="writing-mode: vertical-rl; transform: rotate(180deg);">
                                                                     PRODUCTO
                                                                 </th>
-                                                                <td :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true"
-                                                                    :class="[cell.producto == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']"
-                                                                    @input="onCellEdit(rowIndex, cellIndex, $event, 'producto')"
+                                                                <td :class="[cell.producto == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']"
                                                                     class="w-full border-2 border-b-black border-x-transparent border-t-transparent">
-                                                                    {{ cell.producto }}
+                                                                    <input type="text"
+                                                                        v-model="rowsData[rowIndex][6].producto"
+                                                                        maxlength="10"
+                                                                        @input="onlyNumberDecimal(rowIndex, cellIndex, $event, 'producto')"
+                                                                        :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
+                                                                        class="peer w-full h-20 text-sm bg-transparent text-center  border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                                                 </td>
                                                             </tr>
                                                             <tr>
@@ -318,10 +308,14 @@ import html2pdf from 'html2pdf.js'
                                                                     style="writing-mode: vertical-rl; transform: rotate(180deg);">
                                                                     SERVICIO
                                                                 </th>
-                                                                <td :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true"
-                                                                    :class="[cell.servicio == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']"
-                                                                    @input="onCellEdit(rowIndex, cellIndex, $event, 'servicio')">
-                                                                    {{ cell.servicio }}
+                                                                <td
+                                                                    :class="[cell.servicio == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']">
+                                                                    <input type="text"
+                                                                        v-model="rowsData[rowIndex][6].servicio"
+                                                                        maxlength="10"
+                                                                        @input="onlyNumberDecimal(rowIndex, cellIndex, $event, 'servicio')"
+                                                                        :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
+                                                                        class="peer w-full h-20 text-sm bg-transparent text-center  border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                                                 </td>
                                                             </tr>
                                                         </table>
@@ -397,13 +391,7 @@ import html2pdf from 'html2pdf.js'
 </template>
 
 <script>
-
-import quedanPDFVue from '@/pdf/Tesoreria/quedanPDF.vue';
-import comprobanteRetencion from '@/pdf/Tesoreria/ComprobatenRetencionPdf.vue';
-import { createApp, h } from 'vue'
-
 export default {
-
     props: {
         showModal: {//prop muestra estado del modal para abrir y cerrar
             type: Boolean,
@@ -480,123 +468,29 @@ export default {
                     },
                 },
             },
+            incoherencia: false,
         };
-    }
-    ,
-    components: {
-        quedanPDFVue
     },
     methods: {
-        printPdf() {
-            // Opciones de configuración para generar el PDF
-            let fecha = moment().format('DD-MM-YYYY');
-            let name = 'QUEDAN ' + this.dataInputs.id_quedan + ' - ' + fecha;
-            const opt = {
-                margin: 0.1,
-                filename: name,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-            };
-
-            // Crear una instancia de la aplicación Vue para generar el componente quedanPDFVue
-            const app = createApp(quedanPDFVue, {
-                dataQuedan: this.dataQuedan,
-                totalCheque: this.dataInputs.monto_total_quedan,
-                renta: this.dataInputs.monto_isr_quedan,
-                iva: this.dataInputs.monto_iva_quedan,
-                cheque: this.dataInputs.monto_liquido_quedan,
-            });
-
-            // Crear un elemento div y montar la instancia de la aplicación en él
-            const div = document.createElement('div');
-            const pdfPrint = app.mount(div);
-            const html = div.outerHTML;
-
-            // Generar y guardar el PDF utilizando html2pdf
-            html2pdf().set(opt).from(html).save();
+        onCellEdit(rowIndex, cellIndex, event) {
+            this.rowsData[rowIndex][cellIndex] = event
         },
-        generarComprobanteRetencionPdf() {
-            if (this.dataInputs.numero_retencion_iva_quedan === null) {
-                // Validar si se ha ingresado un número de retención
-                toast.error("El documento necesita un número de retención", {
-                    autoClose: 5000,
-                    position: "top-right",
-                    transition: "zoom",
-                    toastBackgroundColor: "red",
-                });
-            } else {
-                // Opciones de configuración para generar el PDF
-                let fecha = moment().format('DD-MM-YYYY');
-                let name = 'COMPROBANTE DE RENTENCION ' + this.dataInputs.numero_retencion_iva_quedan + ' - ' + fecha;
-                const opt = {
-                    margin: 0.1,
-                    filename: name,
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2 },
-                    jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' },
-                };
-
-                // Crear una instancia de la aplicación Vue para generar el componente comprobanteRetencion
-                const app = createApp(comprobanteRetencion, {
-                    dataQuedan: this.dataQuedan,
-                    totalCheque: this.dataInputs.monto_total_quedan,
-                    renta: this.dataInputs.monto_isr_quedan,
-                    iva: this.dataInputs.monto_iva_quedan,
-                    cheque: this.dataInputs.monto_liquido_quedan,
-                });
-
-                // Crear un elemento div y montar la instancia de la aplicación en él
-                const div = document.createElement('div');
-                const pdfPrint = app.mount(div);
-                const html = div.outerHTML;
-
-                // Generar y guardar el PDF utilizando html2pdf
-                html2pdf().set(opt).from(html).save();
-
-                // Actualizar la fecha de retención de IVA en el servidor
-                axios.post('/updateFechaRetencionIva', { id_quedan: this.dataInputs.id_quedan })
-                    .then((response) => {
-                    })
-                    .catch(errors => {
-                        let msg = this.manageError(errors);
-                        this.$swal.fire({
-                            title: "Operación cancelada",
-                            text: msg,
-                            icon: "warning",
-                            timer: 5000,
-                        });
-                    });
-            }
-        },
-        onCellEdit(rowIndex, cellIndex, event, type = '') {
-            if (type) {
-                // Verificar si se especificó un tipo de edición (producto o servicio)
-                if (type === 'producto') {
-                    //llamamos el metodo que nos valida si es numero o letra
-                    this.onlyNumberDecimal(rowIndex, cellIndex, event, type = 'producto')
-                } else {
-                    //llamamos el metodo que nos valida si es numero o letra
-                    this.onlyNumberDecimal(rowIndex, cellIndex, event, type = 'servicio')
-                }
-                // Calcular los montos totales
-                this.calculateAmount();
-            } else {
-                // Editar el valor de la celda en la fila y columna dadas
-                this.rowsData[rowIndex][cellIndex] = event;
+        limitarCaracteres(campos) {
+            if (this.dataInputs[campos].toString().length > 10) {
+                this.dataInputs[campos] = parseInt(this.dataInputs[campos].toString().slice(0, 10), 10);
             }
         },
 
-        onlyNumberDecimal(rowIndex, cellIndex, event, type = '') {
-            let inputValue = event.target.textContent;
+        onlyNumberDecimal(rowIndex, cellIndex, event, type) {
+            let inputValue = event.target.value;
             const regex = /^(\d+)?(\.\d{0,2})?$/;
             inputValue = inputValue.replace(/^\./, ''); // Eliminar punto al inicio
             inputValue = inputValue.replace(/\.(?=.*\.)/g, ''); // Eliminar puntos adicionales
             inputValue = inputValue.replace(/[^0-9.]/g, ''); // Eliminar caracteres no permitidos
 
             if (!regex.test(inputValue)) {
-                const previousValue = event.target.textContent;
-                event.target.textContent = previousValue.substring(0, previousValue.length - 1);
+                const previousValue = event.target.value;
+                event.target.value = previousValue.substring(0, previousValue.length - 1);
                 const selection = window.getSelection();
                 const range = document.createRange();
                 range.selectNodeContents(event.target);
@@ -604,8 +498,8 @@ export default {
                 selection.removeAllRanges();
                 selection.addRange(range);
             } else {
-                if (event.target.textContent != inputValue) {
-                    event.target.textContent = inputValue
+                if (event.target.value != inputValue) {
+                    event.target.value = inputValue
                     const selection = window.getSelection();
                     const range = document.createRange();
                     range.selectNodeContents(event.target);
@@ -613,31 +507,48 @@ export default {
                     selection.removeAllRanges();
                     selection.addRange(range);
                 } else {
-                    event.target.textContent = inputValue;
+                    event.target.value = inputValue;
                 }
             }
             //Seteamos la informacion a objeto con indice x y celda y
-            this.rowsData[rowIndex][cellIndex][type] = event.target.textContent;
+            this.rowsData[rowIndex][cellIndex][type] = event.target.value;
+            this.calculateAmount()
         },
 
         getInformationBySupplier(supplier) {
-            // Buscar el proveedor en la lista de proveedores
-            const selectedSupplier = this.dataForSelectInRow.proveedor.find((suppliers) => suppliers.value === supplier);
-            if (selectedSupplier) {
-                // Datos que se pintan en los inputs
-                this.dataInputs.giro = `${selectedSupplier.codigo_giro} - ${selectedSupplier.nombre_giro}`;
-                this.dataInputs.irs = `${selectedSupplier.isrl_sujeto_retencion * 100} %`;
-                this.dataInputs.iva = `${selectedSupplier.iva_sujeto_retencion * 100} %`;
+            if (supplier != null) {
+                // Buscar el proveedor en la lista de proveedores
+                const selectedSupplier = this.dataForSelectInRow.proveedor.find((suppliers) => suppliers.value === supplier);
+                if (selectedSupplier) {
+                    // Datos que se pintan en los inputs
+                    this.dataInputs.giro = `${selectedSupplier.codigo_giro} - ${selectedSupplier.nombre_giro}`;
+                    this.dataInputs.irs = `${selectedSupplier.isrl_sujeto_retencion * 100} %`;
+                    this.dataInputs.iva = `${selectedSupplier.iva_sujeto_retencion * 100} %`;
 
-                // Datos que se usan para cálculos
-                this.dataForCalculate.irs = selectedSupplier.isrl_sujeto_retencion;
-                this.dataForCalculate.iva = selectedSupplier.iva_sujeto_retencion;
+                    // Datos que se usan para cálculos
+                    this.dataForCalculate.irs = selectedSupplier.isrl_sujeto_retencion;
+                    this.dataForCalculate.iva = selectedSupplier.iva_sujeto_retencion;
 
-                this.dataInputs.id_proveedor = selectedSupplier.value;
+                    this.dataInputs.id_proveedor = selectedSupplier.value;
+                }
+
+                this.getAmountBySupplier(supplier);
+                this.calculateAmount();
+            } else {
+                this.dataInputs.giro = ""
+                this.dataInputs.irs = ""
+                this.dataInputs.iva = ""
+                this.dataInputs.id_proveedor = ""
+
+
+                this.dataForCalculate.irs = ''
+                this.dataForCalculate.iva = ''
+                this.dataForCalculate.id_proveedor = ''
+
+                this.calculateAmount();
+
             }
 
-            this.getAmountBySupplier(supplier);
-            this.calculateAmount();
         },
         calculateAmount() {
             let totMontoByRow = 0;
@@ -710,7 +621,6 @@ export default {
                 }
             });
             this.dataForCalculate.monto_total_quedan_por_proveedor = parseFloat(total)
-
         },
 
         onInputDescripcionQuedan(event) {
@@ -841,6 +751,7 @@ export default {
 
             return this.errosrNumeroActa.length; // Devolver la cantidad de posiciones duplicadas encontradas
         },
+
         async createQuedan() {
             // Mostrar confirmación al usuario
             const confirmed = await this.$swal.fire({
@@ -1063,6 +974,22 @@ export default {
 
                     this.calculateAmount();
                     this.getAmountBySupplier(newDataQuedan.proveedor.id_proveedor);
+
+
+                    if (this.dataQuedan.monto_liquido_quedan != this.dataInputs.monto_liquido_quedan) {
+                        setTimeout(() => {
+                            toast.warning("Se han detectado cambios en los datos del proveedor después de haber utilizado el sujeto de retención correspondiente. Esto ha generado una inconsistencia en la información. Por favor, actualice el registro de quedan para restablecer la coherencia de los datos.", {
+                                autoClose: 10000,
+                                position: "top-right",
+                                transition: "zoom",
+                                toastBackgroundColor: "white",
+                            });
+                            this.incoherencia = true
+                        }, 1500);
+                    }else{
+                        this.incoherencia = false
+                    }
+
                 } else {
                     // Si dataQuedan está vacío, agregamos una nueva fila y restablecemos los valores de entrada
                     this.addRow();
@@ -1073,7 +1000,7 @@ export default {
                 this.rowsData = [];
                 this.conditionButton = true; // Cambiamos el estado del botón para agregar en lugar de actualizar
             }
-        }
+        },
     }
 }
 </script>
@@ -1159,5 +1086,9 @@ input[type=number]::-webkit-outer-spin-button {
 
 input[type=number]:focus {
     border: none;
+}
+
+.overflow-x-auto table tbody td :disabled {
+    background-color: transparent;
 }
 </style>

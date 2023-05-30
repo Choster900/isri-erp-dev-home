@@ -2,9 +2,8 @@
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
-import ModalBasicVue from '@/Components-ISRI/AllModal/ModalBasic.vue';
-import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
-import InputError from "@/Components/InputError.vue";
+import ModalRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalRequerimiento.vue';
+import ModalVerRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalVerRequerimiento.vue';
 </script>
 <template>
     <Head title="Catalogo - Requerimiento" />
@@ -67,7 +66,8 @@ import InputError from "@/Components/InputError.vue";
                                 <div class="space-x-1">
 
                                     <DropDownOptions>
-                                        <div v-if="requerimiento.id_estado_req_pago!=2" class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                        <div v-if="requerimiento.id_estado_req_pago != 2"
+                                            class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                                             @click="editRequerimiento(requerimiento)">
                                             <div class="w-8 text-green-900">
                                                 <span class="text-xs">
@@ -143,96 +143,12 @@ import InputError from "@/Components/InputError.vue";
         </div>
     </AppLayoutVue>
 
+    <ModalRequerimientoVue :requerimientoModalOpen="requerimientoModalOpen"
+        @close-definitive="requerimientoModalOpen = false" :modal_data="modal_data"
+        @updateTable="getDataRequerimiento(lastUrl)" />
 
-    <ModalBasicVue title="Gestión número de requerimiento. " id="scrollbar-modal" maxWidth="2xl"
-        :modalOpen="requerimientoModalOpen" @close-modal="requerimientoModalOpen = false">
-        <div class="py-5">
-            <div class="flex-row justify-center items-center mb-7 mx-4">
-                <div class="mb-4 md:flex flex-row justify-items-start mx-8">
-                    <div class="md:mr-2 md:mb-0 w-1/2">
-                        <TextInput v-model="dataRequerimiento.numero_requerimiento_pago" :label-input="true"
-                            id="numero-requerimiento" type="text" placeholder="Requerimiento">
-                            <LabelToInput icon="personalInformation" forLabel="numero-requerimiento" />
-                        </TextInput>
-                        <InputError v-for="(item, index) in errors.numero_requerimiento_pago" :key="index" class="mt-2"
-                            :message="item" />
-                    </div>
-                    <div class="md:mr-0 md:mb-0 w-1/2">
-                        <TextInput v-model="dataRequerimiento.monto_requerimiento_pago" :label-input="true"
-                            @update:modelValue="typeAmount()" id="monto-requerimiento" type="text" placeholder="Monto">
-                            <LabelToInput icon="money" forLabel="monto-requerimiento" />
-                        </TextInput>
-                        <InputError v-for="(item, index) in errors.monto_requerimiento_pago" :key="index" class="mt-2"
-                            :message="item" />
-                    </div>
-                </div>
-                <div class="mb-4 mx-8 basis-full" style="border: none; background-color: transparent;">
-                    <label class="block mb-2 text-xs font-light text-gray-600" for="descripcion">
-                        Descripcion <span class="text-red-600 font-extrabold">*</span>
-                    </label>
-                    <textarea v-model="dataRequerimiento.descripcion_requerimiento_pago" id="descripcion" name="descripcion"
-                        class="resize-none w-full h-16 overflow-y-auto peer text-xs font-semibold rounded-r-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"></textarea>
-                    <InputError v-for="(item, index) in errors.description" :key="index" class="mt-2" :message="item" />
-                </div>
-                <!-- Buttons -->
-                <div class="mt-4 mb-4 md:flex flex-row justify-center">
-                    <GeneralButton v-if="dataRequerimiento.id_requerimiento_pago" @click="updateRequerimiento()"
-                        color="bg-orange-700  hover:bg-orange-800" text="Actualizar" icon="update" />
-                    <GeneralButton v-else @click="addRequerimiento()" color="bg-green-700  hover:bg-green-800"
-                        text="Agregar" icon="add" />
-                    <div class="mb-4 md:mr-2 md:mb-0 px-1">
-                        <GeneralButton text="Cancelar" icon="add" @click="requerimientoModalOpen = false" />
-                    </div>
-                </div>
-            </div>
-        </div>
-    </ModalBasicVue>
-
-    <ProcessModal maxWidth='4xl' :show="view_req_info" :center="true" @close="view_req_info = false"
-        :show_request="show_request">
-        <div class="m-1.5 p-2 bg-white max-w-full max-h-full">
-            <div class="flex justify-center items-center mt-5">
-                <h2 class="font-bold">Requerimiento {{ show_request.numero_requerimiento_pago }}-{{
-                    show_request.anio_requerimiento_pago }}</h2>
-            </div>
-            <div class="tabla-modal mt-4">
-                <table class="w-full" id="tabla_modal_validacion_arranque">
-                    <thead class="bg-[#1F3558] text-white">
-                        <tr class="">
-                            <th class="rounded-tl-lg w-10">N° QUEDAN</th>
-                            <th class="w-60">PROVEEDOR</th>
-                            <th class="w-10">IVA</th>
-                            <th class="w-10">RENTA</th>
-                            <th class="rounded-tr-lg w-10">MONTO</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-sm divide-y divide-slate-200">
-                        <tr v-for="quedan in show_request.quedan" :key="quedan.id_quedan" class="hover:bg-[#141414]/10">
-                            <td class="text-center whitespace-normal">{{ quedan.id_quedan }}</td>
-                            <td class="text-center whitespace-normal">{{ quedan.proveedor.razon_social_proveedor }}</td>
-                            <td class="text-center whitespace-normal text-red-600">{{ quedan.monto_iva_quedan }}</td>
-                            <td class="text-center whitespace-normal text-red-600">{{ quedan.monto_isr_quedan }}</td>
-                            <td class="text-center whitespace-normal text-green-600">{{ quedan.monto_liquido_quedan }}</td>
-                        </tr>
-                        <tr v-if="show_request.quedan != ''" class="font-bold">
-                            <td class="text-center whitespace-normal"></td>
-                            <td class="text-center whitespace-normal">Total</td>
-                            <td class="text-center whitespace-normal">{{ total_iva_quedan }}</td>
-                            <td class="text-center whitespace-normal">{{ total_isr_quedan }}</td>
-                            <td class="text-center whitespace-normal">{{ total_liquido_quedan }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div v-if="show_request.quedan == ''"
-                class="w-full flex justify-between items-center mt-5 rounded-md font-bold">
-                <div class="flex w-full justify-center text-left text-lg">
-                    <p>Sin Quedan Asignados</p>
-                </div>
-            </div>
-
-        </div>
-    </ProcessModal>
+    <ModalVerRequerimientoVue :view_req_info="view_req_info" :show_request="show_request" :center="true"
+        @cerrar-modal="view_req_info = false" />
 </template>
 <script>
 import axios from 'axios';
@@ -245,12 +161,12 @@ export default {
         let sortOrders = {};
         let columns = [
             { width: "5%", label: "Numero requerimiento", name: "numero_requerimiento_pago", type: "text" },
-            { width: "20%", label: "Descripcion", name: "descripcion_requerimiento_pago", type: "text" },
+            { width: "30%", label: "Descripcion", name: "descripcion_requerimiento_pago", type: "text" },
             { width: "10%", label: "Monto", name: "monto_requerimiento_pago", type: "text" },
             { width: "10%", label: "Mes", name: "mes_requerimiento_pago", type: "text" },
             { width: "10%", label: "Año", name: "anio_requerimiento_pago", type: "text" },
 
-            { width: "10%", label: "Acciones", name: "Acciones" },
+            { width: "1%", label: "Acciones", name: "Acciones" },
         ];
         columns.forEach((column) => {
             if (column.name === 'id_persona')
@@ -287,14 +203,7 @@ export default {
             },
             requerimientoModalOpen: false,
             view_req_info: false,
-            dataRequerimiento: {
-                id_requerimiento_pago: '',
-                numero_requerimiento_pago: '',
-                monto_requerimiento_pago: '',
-                mes_requerimiento_pago: '',
-                anio_requerimiento_pago: '',
-                descripcion_requerimiento_pago: ''
-            },
+            modal_data: [],
             errorNumber: null,
             show_request: []
         };
@@ -303,14 +212,6 @@ export default {
         viewRequest(request) {
             this.view_req_info = true
             this.show_request = request
-        },
-        typeAmount() {
-            let x = this.dataRequerimiento.monto_requerimiento_pago.replace(/^\./, '').replace(/[^0-9.]/g, '')
-            this.dataRequerimiento.monto_requerimiento_pago = x
-            const regex = /^(\d+)?([.]?\d{0,2})?$/
-            if (!regex.test(this.dataRequerimiento.monto_requerimiento_pago)) {
-                this.dataRequerimiento.monto_requerimiento_pago = this.dataRequerimiento.monto_requerimiento_pago.match(regex) || x.substring(0, x.length - 1)
-            }
         },
         async getDataRequerimiento(url = "/requerimientos") {
             this.lastUrl = url;
@@ -343,184 +244,35 @@ export default {
                 this.getDataRequerimiento();
             }
         },
-        addRequerimiento() {
-            this.$swal.fire({
-                title: "¿Está seguro de guardar el nuevo requerimiento?",
-                icon: "question",
-                iconHtml: "✅",
-                confirmButtonText: "Si, Guardar",
-                confirmButtonColor: "#15803D",
-                cancelButtonText: "Cancelar",
-                showCancelButton: true,
-                showCloseButton: true,
-            })
-                .then((result) => {
-                    if (result.isConfirmed) {
-                        // Obtener la fecha actual
-                        let currentDate = new Date();
-                        this.dataRequerimiento.mes_requerimiento_pago = currentDate.getMonth() + 1;
-                        this.dataRequerimiento.anio_requerimiento_pago = currentDate.getFullYear();
-
-                        axios({
-                            method: 'POST',
-                            url: '/add-requerimiento',
-                            data: this.dataRequerimiento
-                        }).then((data) => {
-                            toast.success("Requerimiento agregado con extio", {
-                                autoClose: 5000,
-                                position: "top-right",
-                                transition: "zoom",
-                                toastBackgroundColor: "white",
-                            });
-                            this.getDataRequerimiento()
-                            this.requerimientoModalOpen = false
-
-                        }).catch((errors) => {
-                            if (errors.response.status === 422) {
-                                toast.warning(
-                                    "Tienes algunos errores por favor verifica tus datos.",
-                                    {
-                                        autoClose: 5000,
-                                        position: "top-right",
-                                        transition: "zoom",
-                                        toastBackgroundColor: "white",
-                                    }
-                                );
-                                this.errors = errors.response.data.errors;
-                            } else {
-                                let msg = this.manageError(errors);
-                                this.$swal.fire({
-                                    title: "Operación cancelada",
-                                    text: msg,
-                                    icon: "warning",
-                                    timer: 5000,
-                                });
-                                this.$emit("cerrar-modal");
-                            }
-                        })
-                    }
-                });
-
-        },
-
-        updateRequerimiento() {
-            this.$swal
-                .fire({
-                    title: '¿Está seguro de actualizar el requerimiento?',
-                    icon: 'question',
-                    iconHtml: '❓',
-                    confirmButtonText: 'Si, Actualizar',
-                    confirmButtonColor: '#141368',
-                    cancelButtonText: 'Cancelar',
-                    showCancelButton: true,
-                    showCloseButton: true
-                })
-                .then((result) => {
-                    if (result.isConfirmed) {
-                        axios({
-                            method: 'POST',
-                            url: '/update-requerimiento',
-                            data: this.dataRequerimiento
-                        }).then((data) => {
-                            toast.success("Requerimiento actualizado con extio", {
-                                autoClose: 5000,
-                                position: "top-right",
-                                transition: "zoom",
-                                toastBackgroundColor: "white",
-                            });
-                            this.getDataRequerimiento(this.lastUrl)
-                            this.requerimientoModalOpen = false
-                        }).catch((errors) => {
-                            if (errors.response.status === 422) {
-                                if (errors.response.data.logical_error) {
-                                    toast.error(
-                                        errors.response.data.logical_error,
-                                        {
-                                            autoClose: 5000,
-                                            position: "top-right",
-                                            transition: "zoom",
-                                            toastBackgroundColor: "white",
-                                        }
-                                    );
-                                } else {
-                                    toast.warning(
-                                        "Tienes algunos errores por favor verifica tus datos.",
-                                        {
-                                            autoClose: 5000,
-                                            position: "top-right",
-                                            transition: "zoom",
-                                            toastBackgroundColor: "white",
-                                        }
-                                    );
-                                    this.errors = errors.response.data.errors;
-                                }
-                            } else {
-                                let msg = this.manageError(errors);
-                                this.$swal.fire({
-                                    title: "Operación cancelada",
-                                    text: msg,
-                                    icon: "warning",
-                                    timer: 5000,
-                                });
-                                this.$emit("cerrar-modal");
-                            }
-                        })
-                    }
-                });
-        },
-
         editRequerimiento(request) {
-            this.errors = []
-            let newDataQuedan = JSON.parse(JSON.stringify(request))
-            this.dataRequerimiento.id_requerimiento_pago = newDataQuedan.id_requerimiento_pago
-            this.dataRequerimiento.numero_requerimiento_pago = newDataQuedan.numero_requerimiento_pago
-            this.dataRequerimiento.monto_requerimiento_pago = newDataQuedan.monto_requerimiento_pago
-            this.dataRequerimiento.descripcion_requerimiento_pago = newDataQuedan.descripcion_requerimiento_pago
+            this.modal_data = request
             this.requerimientoModalOpen = true
         },
         openModal() {
-            this.errors = []
-            this.dataRequerimiento.id_requerimiento_pago = ''
-            this.dataRequerimiento.monto_requerimiento_pago = ''
-            this.dataRequerimiento.numero_requerimiento_pago = ''
-            this.dataRequerimiento.descripcion_requerimiento_pago = ''
+            this.modal_data = []
             this.requerimientoModalOpen = true
+        },
+        validarCamposVacios(objeto) {
+            for (var propiedad in objeto) {
+                if (objeto[propiedad] !== "") {
+                    return false;
+                }
+            }
+            return true;
+        },
+        handleData(myEventData) {
+            if (this.validarCamposVacios(myEventData)) {
+                this.tableData.search = {};
+                this.getDataRequerimiento();
+            }
+            else {
+                this.tableData.search = myEventData;
+                this.getDataRequerimiento();
+            }
         },
     },
     computed: {
-        total_liquido_quedan() {
-            if (this.show_request == '') {
-                return '0.00'
-            } else {
-                let total = 0
-                this.show_request.quedan.forEach((value, index) => {
-                    total += parseFloat(value.monto_liquido_quedan)
-                })
-                return total.toFixed(2)
-            }
-        },
-        total_iva_quedan() {
-            if (this.show_request == '') {
-                return '0.00'
-            } else {
-                let total = 0
-                this.show_request.quedan.forEach((value, index) => {
-                    total += parseFloat(value.monto_iva_quedan)
-                })
-                return total.toFixed(2)
-            }
-        },
-        total_isr_quedan() {
-            if (this.show_request == '') {
-                return '0.00'
-            } else {
-                let total = 0
-                this.show_request.quedan.forEach((value, index) => {
-                    total += parseFloat(value.monto_isr_quedan)
-                })
-                return total.toFixed(2)
-            }
-        },
+
     }
 
 };

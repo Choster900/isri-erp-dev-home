@@ -23,6 +23,7 @@ class RequerimientoController extends Controller
             'fecha_mod_requerimiento_pago',
             'usuario_requerimiento_pago',
             'ip_requerimiento_pago',
+            'descripcion_requerimiento_pago',
         ];
 
         $v_length = $request->input('length');
@@ -36,23 +37,29 @@ class RequerimientoController extends Controller
             $v_query->where('numero_requerimiento_pago', 'like', '%' . $data["numero_requerimiento_pago"] . '%')
                 ->where('numero_requerimiento_pago', 'like', '%' . $data["numero_requerimiento_pago"] . '%');
 
-            if (isset($data['descripcion_requerimiento_pago'])) {
-                $v_query->where('descripcion_requerimiento_pago', 'like', '%' . $data["descripcion_requerimiento_pago"] . '%');
-            }
+            $v_query->where('descripcion_requerimiento_pago', 'like', '%' . $data["descripcion_requerimiento_pago"] . '%');
 
             $v_query->where('monto_requerimiento_pago', 'like', '%' . $data["monto_requerimiento_pago"] . '%');
-
-
-            $v_query->where('id_estado_req_pago', 'like', '%' . $data["id_estado_req_pago"] . '%');
-
-
-            $searchText = $data["allQUedan"];
-            $v_query->whereHas('Quedan', function ($query) use ($searchText) {
-                $query->where(function ($query) use ($searchText) {
-                    $query->where('id_quedan', 'like', '%' . $searchText . '%')
-                        ->orWhere('monto_liquido_quedan', 'like', '%' . $searchText . '%');
+            if (isset($data['id_estado_req_pago'])) {
+                $v_query->where('id_estado_req_pago', 'like', '%' . $data["id_estado_req_pago"] . '%');
+            }
+            if (isset($data['mes_requerimiento_pago'])) {
+                $v_query->where('mes_requerimiento_pago', 'like', '%' . $data["mes_requerimiento_pago"] . '%');
+            }
+            if (isset($data['anio_requerimiento_pago'])) {
+                $v_query->where('anio_requerimiento_pago', 'like', '%' . $data["mes_requerimiento_pago"] . '%');
+            }
+            if (isset($data['allQUedan'])) {
+                $searchText = $data["allQUedan"];
+                $v_query->whereHas('Quedan', function ($query) use ($searchText) {
+                    $query->where(function ($query) use ($searchText) {
+                        $query->where('id_quedan', 'like', '%' . $searchText . '%')
+                            ->orWhere('monto_liquido_quedan', 'like', '%' . $searchText . '%');
+                    });
                 });
-            });
+
+            }
+
         }
 
         $v_requerimientos = $v_query->paginate($v_length)->onEachSide(1);
@@ -92,14 +99,21 @@ class RequerimientoController extends Controller
         if ($assigned_amount_requirement > $request->monto_requerimiento_pago) {
             return response()->json(['logical_error' => 'Error, no puede reducir el monto del requerimiento a un valor menor a lo ya asignado: $' . $assigned_amount_requirement], 422);
         } else {
+            // $estado='';
+            // if($assigned_amount_requirement == $request->monto_requerimiento_pago){
+            //     $estado=2;
+            // }else{
+            //     $estado=1;
+            // }
             try {
                 DB::beginTransaction();
                 $v_requerimiento = RequerimientoPago::where('id_requerimiento_pago', $request->input("id_requerimiento_pago"))->update([
                     'numero_requerimiento_pago'      => $request->input("numero_requerimiento_pago"),
+                    //'id_estado_req_pago'             => $estado,
                     'descripcion_requerimiento_pago' => $request->input("descripcion_requerimiento_pago"),
                     'monto_requerimiento_pago'       => $request->input("monto_requerimiento_pago"),
                     'fecha_mod_requerimiento_pago'   => Carbon::now(),
-                    'usuario_requerimiento_pago'    => $request->user()->nick_usuario,
+                    'usuario_requerimiento_pago'     => $request->user()->nick_usuario,
                     'ip_requerimiento_pago'          => $request->ip(),
                 ]);
                 DB::commit();
@@ -116,9 +130,6 @@ class RequerimientoController extends Controller
             ->with(["detalle_quedan", "proveedor.giro", "proveedor.sujeto_retencion", "tesorero"])
             ->orderBy("id_quedan", "desc")
             ->where("id_estado_quedan", 1)
-            ->when($request["data"]["suppiler"], function ($query) use ($request) {
-                return $query->where("id_proveedor", $request["data"]["suppiler"]);
-            })
             ->when($request["data"]["rangeDate"], function ($query) use ($request) {
                 $date = explode("to", $request["data"]["rangeDate"]);
                 return $query->whereDate('fecha_emision_quedan', '>=', $date[0])
@@ -132,10 +143,14 @@ class RequerimientoController extends Controller
             })
             ->when($request["data"]["monto"], function ($query) use ($request) {
                 return $query->where("monto_liquido_quedan", "like", "%" . $request["data"]["monto"] . "%");
-            })
-            ->get();
-
-        return $query;
+            });
+        if (isset($request["data"]["suppiler"])) {
+            $query->when($request["data"]["suppiler"], function ($query) use ($request) {
+                return $query->where("id_proveedor", $request["data"]["suppiler"]);
+            });
+        }
+        $results = $query->get();
+        return $results;
     }
 
     public function addANumerRequestToQuedan(Request $request)
@@ -149,31 +164,31 @@ class RequerimientoController extends Controller
         $request->validate($rules);
         //sumando el total del requerimiento_pago
         $totRequerimiento = 0;
-        foreach ($request->itemsToAddNumber as $key => $value) {
+        foreach ( $request->itemsToAddNumber as $key => $value ) {
             $totRequerimiento = $totRequerimiento + $value["monto_liquido_quedan"];
         }
         $monto_requerimiento_pago = RequerimientoPago::select('*')->where('id_requerimiento_pago', $request->numberRequest)->get();
         $quedanExistente = Quedan::select('*')->where('id_requerimiento_pago', $request->numberRequest)->get();
-        foreach ($quedanExistente as $key => $value) {
+        foreach ( $quedanExistente as $key => $value ) {
             $totRequerimiento = $totRequerimiento + $value["monto_liquido_quedan"];
         }
         if ($totRequerimiento <= $monto_requerimiento_pago[0]->monto_requerimiento_pago) {
-            foreach ($request->itemsToAddNumber as $key => $value) {
+            foreach ( $request->itemsToAddNumber as $key => $value ) {
                 $tieneHistorial = LiquidacionQuedan::where("id_quedan", $value["id_quedan"])->get();
                 $estado = $tieneHistorial->isEmpty() ? 2 : 3;
                 Quedan::where("id_quedan", $value["id_quedan"])->update([
-                    'id_requerimiento_pago'     => $request->numberRequest, 
-                    "id_estado_quedan"          => $estado,
-                    'usuario_quedan'            => $request->user()->nick_usuario,
-                    'fecha_mod_quedan'          => Carbon::now(),
-                    'ip_quedan'                 => $request->ip(),
+                    'id_requerimiento_pago' => $request->numberRequest,
+                    "id_estado_quedan"      => $estado,
+                    'usuario_quedan'        => $request->user()->nick_usuario,
+                    'fecha_mod_quedan'      => Carbon::now(),
+                    'ip_quedan'             => $request->ip(),
                 ]);
             }
             return response()->json(['message' => 'Actualización exitosa'], 200);
         } else {
             DB::rollback();
             return response()
-                ->json('Error, el monto total a asignar es de: $'.$totRequerimiento.' el cual excede el techo de $'.$monto_requerimiento_pago[0]->monto_requerimiento_pago.' del requerimiento.', 422);
+                ->json('Error, el monto total a asignar es de: $' . $totRequerimiento . ' el cual excede el techo de $' . $monto_requerimiento_pago[0]->monto_requerimiento_pago . ' del requerimiento.', 422);
         }
     }
     //El monto total a asignar es de: $XXXX el cual excede el techo asignado al requerimiento que es de: $XXXX
@@ -182,11 +197,11 @@ class RequerimientoController extends Controller
     {
         # code...
         Quedan::where("id_quedan", $request->id_quedan)->update([
-            'id_requerimiento_pago'     => null, 
-            "id_estado_quedan"          => 1,
-            'usuario_quedan'            => $request->user()->nick_usuario,
-            'fecha_mod_quedan'          => Carbon::now(),
-            'ip_quedan'                 => $request->ip(),
+            'id_requerimiento_pago' => null,
+            "id_estado_quedan"      => 1,
+            'usuario_quedan'        => $request->user()->nick_usuario,
+            'fecha_mod_quedan'      => Carbon::now(),
+            'ip_quedan'             => $request->ip(),
         ]);
         return response()->json(['message' => 'Actualización exitosa'], 200);
     }

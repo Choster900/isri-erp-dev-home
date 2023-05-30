@@ -6,7 +6,7 @@ import moment from 'moment';
 import axios from 'axios';
 </script>
 <template>
-    <ModalBasicVue :title="numeroRequerimiento" id="scrollbar-modal" maxWidth="5xl" :modalOpen="modalIsOpen"
+    <ModalBasicVue :title="tittleModal" id="scrollbar-modal" maxWidth="5xl" :modalOpen="modalIsOpen"
         @close-modal="$emit('close-definitive')">
 
         <div class=" px-10 py-5 ">
@@ -58,7 +58,7 @@ import axios from 'axios';
                         </th>
                         <th
                             class="text-white bg-[#001b47] px-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap rounded-tr-2xl">
-                            <div class=" text-center  ">POR PAGAR: <br> 
+                            <div class=" text-center  ">POR PAGAR: <br>
                                 <span class="text-sm">{{ restRequest }}</span>
 
                             </div>
@@ -212,7 +212,7 @@ import axios from 'axios';
 
                                 <tr v-if="data.mostrarDetalle">
                                     <td></td>
-                                    <td colspan="2" class="text-end py-2"
+                                    <td colspan="2" class="text-end text-sm py-2"
                                         :class="{ 'border-b border-b-gray-300': j < data.liquidacion_quedan.length - 1 && data.liquidacion_quedan.length > 1 }">
                                         <span class="font-medium">{{ formatDate(liquidacion.fecha_liquidacion_quedan) }} -
                                         </span>
@@ -275,6 +275,7 @@ export default {
         totalPagadoForCalculate: 0,//Data que almacena el total pagado para calcular
         sumSeguimientPago: 0,//Data que almacena la suma de seguimiento de pagos en la tabla liquidaciones
         dataForRows: [],//data que se mostrara en la tabla
+        tittleModal: '',//almacena el titulo del modal
     }),
 
     methods: {
@@ -419,7 +420,7 @@ export default {
                         icon: 'question',
                         iconHtml: '❓',
                         confirmButtonText: '<p class="text-[14px]">Si, eliminar<p>',
-                        confirmButtonColor: '#D2691E',
+                        confirmButtonColor: '#950909',
                         cancelButtonText: 'Cancelar',
                         showCancelButton: true,
                         showCloseButton: true
@@ -500,7 +501,7 @@ export default {
                         icon: 'question',
                         iconHtml: '❓',
                         confirmButtonText: '<p class="text-[14px]">Si, Agregar<p>',
-                        confirmButtonColor: '#196F3D',
+                        confirmButtonColor: '#001b47',
                         cancelButtonText: 'Cancelar',
                         showCancelButton: true,
                         showCloseButton: true
@@ -571,8 +572,8 @@ export default {
                 const elementoArray = proxyArray[0];
                 const objeto = Object.assign({}, elementoArray);
                 this.dataRequest = objeto
-
                 this.setDataForRows()
+                this.tittleModal = `Requerimiento: ${this.dataRequest.numero_requerimiento_pago}`;
 
             } else {
                 this.dataRequest = []
@@ -582,6 +583,7 @@ export default {
                 this.sumSeguimientPago = 0
                 this.dataForRows = []
                 this.liquidacionesHistorial = []
+                this.tittleModal = ''
             }
         },
     },

@@ -16,7 +16,7 @@ import axios from 'axios';
 
 <template>
   <Head title="Administracion" />
-  <AppLayoutVue>
+  <AppLayoutVue nameSubModule="Activo Fijo - Modelos">
     <div class="sm:flex sm:justify-end sm:items-center mb-2">
       <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
         <GeneralButton @click="addModel()" v-if="permits.insertar==1" color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add" />
@@ -43,19 +43,19 @@ import axios from 'axios';
           <tbody class="text-sm divide-y divide-slate-200">
             <tr v-for="model in models" :key="model.id_modelo">
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                <div class="font-medium text-slate-800">{{ model.id_modelo }}</div>
+                <div class="font-medium text-slate-800 text-center">{{ model.id_modelo }}</div>
+              </td>
+              <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px td-data-table">
+                <div class="font-medium text-slate-800 ellipsis text-center">{{ model.nombre_marca }}</div>
+              </td>
+              <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px td-data-table">
+                <div class="font-medium text-slate-800 ellipsis text-center">{{ model.nombre_modelo }}</div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                <div class="font-medium text-slate-800">{{ model.nombre_marca }}</div>
+                <div class="font-medium text-slate-800 text-center">{{ formatearFecha(model.fecha_reg_modelo) }}</div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                <div class="font-medium text-slate-800">{{ model.nombre_modelo }}</div>
-              </td>
-              <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                <div class="font-medium text-slate-800">{{ moment(model.fecha_reg_modelo).format('dddd Do MMMM YYYY') }}</div>
-              </td>
-              <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                <div class="font-medium text-slate-800">
+                <div class="font-medium text-slate-800 text-center">
                   <div v-if="(model.estado_modelo == 1)"
                     class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
                     Activo
@@ -68,24 +68,49 @@ import axios from 'axios';
               </td>
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="space-x-1">
-                  <button @click="editModel(model)" v-if="permits.actualizar==1" class="text-slate-400 hover:text-slate-500 rounded-full">
-                    <span class="sr-only">Edit</span>
-                    <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
-                      <path
-                        d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z">
-                      </path>
-                    </svg>
-                  </button>
-                  <button @click="changeStateModel(model)" v-if="permits.eliminar==1" 
-                    class="text-rose-500 hover:text-rose-600 rounded-full">
-                    <span class="sr-only">Delete</span><svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
-                      <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
-                      </path>
-                      <path
-                        d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z">
-                      </path>
-                    </svg>
-                  </button>
+                  <DropDownOptions>
+                    <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                      v-if="permits.actualizar == 1 && model.estado_modelo == 1"
+                      @click="editModel(model)">
+                      <div class="w-8 text-green-900">
+                        <span class="text-xs">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 002.25-2.25V6a2.25 2.25 0 00-2.25-2.25H6A2.25 2.25 0 003.75 6v2.25A2.25 2.25 0 006 10.5zm0 9.75h2.25A2.25 2.25 0 0010.5 18v-2.25a2.25 2.25 0 00-2.25-2.25H6a2.25 2.25 0 00-2.25 2.25V18A2.25 2.25 0 006 20.25zm9.75-9.75H18a2.25 2.25 0 002.25-2.25V6A2.25 2.25 0 0018 3.75h-2.25A2.25 2.25 0 0013.5 6v2.25a2.25 2.25 0 002.25 2.25z" />
+                          </svg>
+                        </span>
+                      </div>
+                      <div class="font-semibold">Editar</div>
+                    </div>
+                    <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                      @click="changeStateModel(model)"
+                      v-if="permits.eliminar == 1">
+                      <div class="w-8 text-red-900"><span class="text-xs">
+                          <svg fill="#7F1D1D" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" width="20px"
+                            height="20px" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 97.994 97.994"
+                            xml:space="preserve" stroke="#7F1D1D">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier">
+                              <g>
+                                <g>
+                                  <path
+                                    d="M97.155,9.939c-0.582-0.416-1.341-0.49-1.991-0.193l-10.848,4.935C74.08,5.29,60.815,0.118,46.966,0.118 c-15.632,0-30.602,6.666-41.07,18.289c-0.359,0.399-0.543,0.926-0.51,1.461c0.033,0.536,0.28,1.036,0.686,1.388l11.301,9.801 c0.818,0.711,2.055,0.639,2.787-0.162c6.866-7.512,16.636-11.821,26.806-11.821c6.135,0,12.229,1.584,17.622,4.583l-7.826,3.561 c-0.65,0.296-1.095,0.916-1.163,1.627c-0.069,0.711,0.247,1.405,0.828,1.82l34.329,24.52c0.346,0.246,0.753,0.373,1.163,0.373 c0.281,0,0.563-0.06,0.828-0.181c0.65-0.296,1.095-0.916,1.163-1.627l4.075-41.989C98.053,11.049,97.737,10.355,97.155,9.939z">
+                                  </path>
+                                  <path
+                                    d="M80.619,66.937c-0.819-0.709-2.055-0.639-2.787,0.162c-6.866,7.514-16.638,11.822-26.806,11.822 c-6.135,0-12.229-1.584-17.622-4.583l7.827-3.561c0.65-0.296,1.094-0.916,1.163-1.628c0.069-0.711-0.247-1.404-0.828-1.819 L7.237,42.811c-0.583-0.416-1.341-0.49-1.991-0.193c-0.65,0.296-1.094,0.916-1.163,1.627L0.009,86.233 c-0.069,0.712,0.247,1.406,0.828,1.822c0.583,0.416,1.341,0.488,1.991,0.192l10.848-4.935 c10.237,9.391,23.502,14.562,37.351,14.562c15.632,0,30.602-6.666,41.07-18.289c0.358-0.398,0.543-0.926,0.51-1.461 c-0.033-0.536-0.28-1.036-0.687-1.388L80.619,66.937z">
+                                  </path>
+                                </g>
+                              </g>
+                            </g>
+                          </svg>
+                        </span></div>
+                      <div class="font-semibold">
+                        {{ model.estado_modelo ? 'Desactivar' : 'Activar' }}
+                      </div>
+                    </div>
+                  </DropDownOptions>
                 </div>
               </td>
             </tr>
@@ -132,7 +157,7 @@ import axios from 'axios';
     </div>
 
     <ModalAdminModeloVue :showModal="showModal" :modalData="modalData"
-            @cerrar-modal="showModal=false" @get-table="this.getModels(this.tableData.currentPage)"/>
+            @cerrar-modal="showModal=false" @get-table="getModels(tableData.currentPage)"/>
 
   </AppLayoutVue>
   
@@ -180,7 +205,7 @@ export default {
         length: 5,
         search: "",
         column: 0,
-        dir: "asc",
+        dir: "desc",
         total: ""
       },
       showModal:false,
@@ -188,32 +213,18 @@ export default {
     }
   },
   methods:{
+    formatearFecha(date) {
+      return moment(date).format('DD/MM/YYYY');
+    },
     editModel(model){
-      if(model.estado_marca==0){
-        this.$swal.fire({
-          title: 'Operación cancelada',
-          text: 'Debes activar la marca para este modelo.',
-          icon: 'warning',
-          timer:5000
-        })
-      }else{
         this.modalData = model
         this.showModal=true
-      }
     },
     addModel(){
       this.modalData=[]
       this.showModal=true
     },
     changeStateModel(model){
-      if(model.estado_marca==0){
-        this.$swal.fire({
-          title: 'Operación cancelada',
-          text: 'Debes activar la marca para este modelo.',
-          icon: 'warning',
-          timer:5000
-        })
-      }else{
         let msg
         model.estado_modelo == 1 ? msg = "Desactivar" : msg = "Activar"
         this.$swal.fire({
@@ -235,7 +246,7 @@ export default {
                 this.$swal.fire({
                   text: response.data.mensaje,
                   icon: 'success',
-                  timer: 2000
+                  timer: 5000
                 })
                 this.getModels(this.tableData.currentPage);
               })
@@ -250,12 +261,11 @@ export default {
               })
           }
         })
-      }
     },
     async getModels(url = "/modelos") {
       this.tableData.draw++;
       this.tableData.currentPage=url
-      await axios.get(url, { params: this.tableData }).then((response) => {
+      await axios.post(url,this.tableData).then((response) => {
         let data = response.data;
         if (this.tableData.draw == data.draw) {
           this.links = data.data.links;
@@ -308,3 +318,15 @@ export default {
   }
 }
 </script>
+<style>
+.td-data-table {
+  max-width: 100px;
+  white-space: nowrap;
+  height: 50px;
+}
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+</style>

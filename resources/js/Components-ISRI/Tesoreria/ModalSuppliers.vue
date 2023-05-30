@@ -34,9 +34,7 @@ import moment from 'moment';
                                             <tr>
                                                 <td class="border text-xs" colspan="2">FECHA DE CREACION:
                                                     <span class="text-xs underline">{{ moment(
-                                                        supplier.fecha_registro_proveedor).format('MMMM Do YYYY') }}</span>
-                                                    <!--  <span class="text-xs">{{ supplier.fecha_registro_proveedor }}</span>
-                                                    {{ moment( supplier.fecha_registro_proveedor).format('dddd Do MMMM YYYY') }} -->
+                                                        supplier.fecha_registro_proveedor).format('Do MMMM YYYY') }}</span>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -48,7 +46,7 @@ import moment from 'moment';
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="razon-social" v-model="supplier.razon_social_proveedor"
                                     :value="supplier.razon_social_proveedor" type="text" placeholder="Razón social"
-                                    @update:modelValue="supplier.razon_social_proveedor = supplier.razon_social_proveedor.toUpperCase()">
+                                    @update:modelValue="validateInput('razon_social_proveedor', limit=145, upper=true)">
                                     <LabelToInput icon="standard" forLabel="razon-social" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errosModel.razon_social_proveedor" />
@@ -56,14 +54,15 @@ import moment from 'moment';
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="nombre-comercial" v-model="supplier.nombre_comercial_proveedor"
                                     :value="supplier.nombre_comercial_proveedor" type="text" placeholder="Nombre comercial"
-                                    @update:modelValue="supplier.nombre_comercial_proveedor = supplier.nombre_comercial_proveedor.toUpperCase()">
+                                    @update:modelValue="validateInput('nombre_comercial_proveedor', limit=145, upper=true)">
                                     <LabelToInput icon="standard" forLabel="nombre-comercial" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errosModel.nombre_comercial_proveedor" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput :required="false" id="nrc-proveedor" v-model="supplier.nrc_proveedor"
-                                    @update:modelValue="typeNrcSupplier()" :value="supplier.nrc_proveedor" type="text"
+                                    :value="supplier.nrc_proveedor" type="text"
+                                    @update:modelValue="validateInput('nrc_proveedor', limit=10, false, number=true)" 
                                     placeholder="NRC Proveedor">
                                     <LabelToInput icon="personalInformation" forLabel="nrc-proveedor" />
                                 </TextInput>
@@ -73,16 +72,16 @@ import moment from 'moment';
                         <div class="mb-7 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="dui-proveedor" v-model="supplier.dui_proveedor"
-                                    @update:modelValue="typeDuiSupplier()" :value="supplier.dui_proveedor" type="text"
-                                    placeholder="Dui">
+                                    type="text" placeholder="Dui" :value="supplier.dui_proveedor" 
+                                    @update:modelValue="validateInput('dui_proveedor', limit=10, false, false, dui=true)">
                                     <LabelToInput icon="personalInformation" forLabel="dui-proveedor" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errosModel.dui_proveedor" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput :required="false" id="nit-proveedor" v-model="supplier.nit_proveedor"
-                                    @update:modelValue="typeNitSupplier()" :value="supplier.nit_proveedor" type="text"
-                                    placeholder="NIT">
+                                    :value="supplier.nit_proveedor" type="text" placeholder="NIT"
+                                    @update:modelValue="validateInput('nit_proveedor', limit=17, false, false, false, nit=true)">
                                     <LabelToInput icon="personalInformation" forLabel="nit-proveedor" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errosModel.nit_proveedor" />
@@ -135,23 +134,24 @@ import moment from 'moment';
                         <div class="mb-7 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput :required="false" id="telefono" v-model="supplier.telefono1_proveedor"
-                                    :value="supplier.telefono1_proveedor" type="text" placeholder="Telefono"
-                                    @update:modelValue="telefonoProveedor()">
+                                    :value="supplier.telefono1_proveedor" type="text" placeholder="Telefono 1"
+                                    @update:modelValue="validateInput('telefono1_proveedor', limit=10, false, false, false, false, phone_numer=true)">
                                     <LabelToInput icon="personalPhoneNumber" forLabel="telefono" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errosModel.telefono1_proveedor" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput :required="false" id="telefono2-proveedor" v-model="supplier.telefono2_proveedor"
-                                    @update:modelValue="telefono2Proveedor()" :value="supplier.telefono2_proveedor"
-                                    type="text" placeholder="Telefono">
+                                    :value="supplier.telefono2_proveedor" type="text" placeholder="Telefono 2"
+                                    @update:modelValue="validateInput('telefono2_proveedor', limit=10, false, false, false, false, phone_numer=true)">
                                     <LabelToInput icon="personalPhoneNumber" forLabel="telefono2-proveedor" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errosModel.telefono2_proveedor" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput :required="false" id="Direccion" v-model="supplier.direccion_proveedor"
-                                    :value="supplier.direccion_proveedor" type="tex" placeholder="Direccion">
+                                    :value="supplier.direccion_proveedor" type="tex" placeholder="Direccion"
+                                    @update:modelValue="validateInput('direccion_proveedor', limit=250, false, false, false, false, false)">
                                     <LabelToInput icon="house" forLabel="Direccion" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errosModel.direccion_proveedor" />
@@ -160,7 +160,8 @@ import moment from 'moment';
                         <div class="mb-7 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput :required="false" id="contacto-proveedor" v-model="supplier.contacto_proveedor"
-                                    :value="supplier.contacto_proveedor" type="text" placeholder="Contacto ">
+                                    :value="supplier.contacto_proveedor" type="text" placeholder="Contacto "
+                                    @update:modelValue="validateInput('contacto_proveedor', limit=95, false, false, false, false, false)">
                                     <LabelToInput icon="personalInformation" forLabel="contacto-proveedor" />
                                 </TextInput>
                             </div>
@@ -177,7 +178,8 @@ import moment from 'moment';
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput :required="false" id="email-proveedor" v-model="supplier.email_proveedor"
-                                    :value="supplier.email_proveedor" type="email" placeholder="Email ">
+                                    :value="supplier.email_proveedor" type="email" placeholder="Email "
+                                    @update:modelValue="validateInput('email_proveedor', limit=95, false, false, false, false, false)">
                                     <LabelToInput icon="email" forLabel="email-proveedor" />
                                 </TextInput>
                             </div>
@@ -250,6 +252,29 @@ export default {
         }
     },
     methods: {
+        //Function to validate data entry
+        validateInput(field, limit, upper_case, number, dui, nit, phone_number) {
+            if (this.supplier[field] && this.supplier[field].length > limit) {
+                this.supplier[field] = this.supplier[field].substring(0, limit);
+            }
+            if(upper_case){
+                this.toUpperCase(field)
+            }
+            if(number){
+                this.onlyNumbersAndSixDigits(field)
+            }
+            if(dui){
+                //Revisar funcion, al borrar un numero regresa el apuntador al final
+                this.typeDuiSupplier(field)
+            }
+            if(nit){
+                //Verificar ya que al borrar numeros los guiones siempre quedan visibles
+                this.typeNitSupplier(field)
+            }
+            if(phone_number){
+                this.phoneNumberFormat(field)
+            }
+        },
         async listOptionsSelect() {//metodo que trae toda la info de todos los select
             await axios.get("/list-option-select-suppliers").then((response) => {
                 this.allSelectOptios.location = response.data.location
@@ -267,26 +292,30 @@ export default {
                     });
                 });
         },
-        telefonoProveedor() {
-            var telefono = this.supplier.telefono1_proveedor.replace(/\D/g, '').match(/(\d{0,4})(\d{0,4})/);
-            this.supplier.telefono1_proveedor = !telefono[2] ? telefono[1] : '' + telefono[1] + '-' + telefono[2];
+        toUpperCase(field){
+            //Converts field to uppercase
+            this.supplier[field] = this.supplier[field].toUpperCase()
         },
-        telefono2Proveedor() {
-            var telefono2 = this.supplier.telefono2_proveedor.replace(/\D/g, '').match(/(\d{0,4})(\d{0,4})/);
-            this.supplier.telefono2_proveedor = !telefono2[2] ? telefono2[1] : '' + telefono2[1] + '-' + telefono2[2];
+        phoneNumberFormat(field){
+            //Validates the phone number format
+            var telefono = this.supplier[field].replace(/\D/g, '').match(/(\d{0,4})(\d{0,4})/);
+            this.supplier[field] = !telefono[2] ? telefono[1] : '' + telefono[1] + '-' + telefono[2];
         },
-        typeDuiSupplier() {
-            var dui = this.supplier.dui_proveedor.replace(/\D/g, '').match(/(\d{0,8})(\d{0,1})/);
-            this.supplier.dui_proveedor = !dui[2] ? dui[1] : '' + dui[1] + '-' + dui[2];
+        typeDuiSupplier(field) {
+            //Specific format for dui number
+            var dui = this.supplier[field].replace(/\D/g, '').match(/(\d{0,8})(\d{0,1})/);
+            this.supplier[field] = !dui[2] ? dui[1] : '' + dui[1] + '-' + dui[2];
         },
-        typeNitSupplier() {
-            let nit = this.supplier.nit_proveedor.replace(/\D/g, '').match(/(\d{0,4})(\d{0,6})(\d{0,3})(\d{0,1})/);
-            this.supplier.nit_proveedor = nit[1] + "-" + nit[2] + "-" + nit[3] + "-" + nit[4];
+        typeNitSupplier(field) {
+            //Specific format for nit number
+            let nit = this.supplier[field].replace(/\D/g, '').match(/(\d{0,4})(\d{0,6})(\d{0,3})(\d{0,1})/);
+            this.supplier[field] = nit[1] + "-" + nit[2] + "-" + nit[3] + "-" + nit[4];
         },
-        typeNrcSupplier() {
+        onlyNumbersAndSixDigits(field) {
+            //Allows only numbers and six digits
             const regex = /^\d{0,6}$/;
-            if (!regex.test(this.supplier.nrc_proveedor)) {
-                this.supplier.nrc_proveedor = this.supplier.nrc_proveedor.replace(/[^\d]/g, '').substring(0, 6);
+            if (!regex.test(this.supplier[field])) {
+                this.supplier[field] = this.supplier[field].replace(/[^\d]/g, '').substring(0, 6);
             }
         },
         updateSupplier() {
@@ -308,6 +337,7 @@ export default {
                             transition: "zoom",
                             toastBackgroundColor: "white",
                         });
+                        this.$emit('close-definitive')
                     }).catch((errors) => {
                         if (errors.response.status === 422) {
                             if (errors.response.data.logical_error) {
@@ -370,6 +400,7 @@ export default {
                             toastBackgroundColor: "white",
                         });
                         this.limpiarCampos()
+                        this.$emit('close-definitive')
                         this.$emit("showTableAgain")
                     }).catch((Error) => {
                         console.log(Error);
