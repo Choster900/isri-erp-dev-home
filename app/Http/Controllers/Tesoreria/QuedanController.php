@@ -27,7 +27,7 @@ class QuedanController extends Controller
             'id_estado_quedan',
             'id_prioridad_pago',
             'id_requerimiento_pago',
-            'id_tesorero',
+            'id_empleado_tesoreria',
             'id_proy_financiado',
             'id_serie_retencion_iva',
             'id_proveedor',
@@ -91,8 +91,9 @@ class QuedanController extends Controller
             });
 
             if (isset($data['numero_requerimiento_pago'])) {
-                $v_query->whereHas('requerimiento_pago', function ($query) use ($data) {
-                    $query->where('numero_requerimiento_pago', 'like', '%' . $data["numero_requerimiento_pago"] . '%');
+                $requerimiento = $data["numero_requerimiento_pago"];
+                $v_query->whereHas('requerimiento_pago', function ($query) use ($requerimiento) {
+                    $query->where('numero_requerimiento_pago', 'like', '%' . $requerimiento["numero_requerimiento_pago"] . '%');
                 });
             }
             $v_query->whereHas('proveedor', function ($query) use ($data) {
