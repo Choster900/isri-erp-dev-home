@@ -202,7 +202,7 @@ export default {
                     { value: "0", label: "Inactivo" }
                 ]
             },
-            { width: "5%", label: "", name: "Acciones" },
+            { width: "1%", label: "", name: "Acciones" },
         ];
         columns.forEach((column) => {
             if (column.name === "id_proveedor")
