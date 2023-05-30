@@ -1,331 +1,287 @@
+<script setup>
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
+import moment from 'moment';
+import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
+import { jsPDF } from "jspdf";
+import html2pdf from 'html2pdf.js'
+</script>
 <template>
-    <div class="w-[18.5] h-[12.5cm] ml-[1.7cm] mr-[1.3cm] mt-[0.80cm] mb-[0.6cm]">
-        <!-- Contenido para la sección superior aquí -->
-        <div class="h-[2.7cm] invisible">
-            <div class="flex justify-between items-center">
-                <!-- Encabezado izquierdo  -->
-                <div class="flex-none w-[33.33%] flex flex-col justify-center items-center ml-0">
-                    <img src="../../../img/escudo-nacional.png" alt="Escudo El Salvador"
-                        class="w-[50px] h-[50px] object-contain">
-                    <div class="text-center">
-                        <div class="text-[11px] font-bold ml-0 mr-5 text-left">REPUBLICA DE EL SALVADOR</div>
-                        <div class="text-[11px] font-bold ml-0 mr-5 text-left">MINISTERIO DE SALUD</div>
-                    </div>
-                </div>
-                <!-- Encabezado centrado  -->
-                <div class="title-container w-[33.33%] flex flex-col justify-center items-center">
-                    <h1 class=" text-[12px] font-bold">RECIBO DE INGRESO</h1>
-                    <p class=" text-[11px] font-bold mt-[20px]">ORIGINAL - INTERESADO</p>
-                </div>
-                <!-- Encabezado derecho -->
-                <div class="flex-none w-[33.33%] flex flex-col justify-center items-center">
-                    <img src="../../../img/isri-logo2.png" alt="Logo ISRI" class="w-[50px] h-[50px] object-contain ">
-                    <div class="text-center text-[11px] font-bold ml-5 mr-0" style="text-align: center;">INSTITUTO
-                        SALVADOREÑO DE
-                        REHABILITACION INTEGRAL</div>
+    <div class="m-1.5 p-10">
+        <ProcessModal maxWidth='4xl' :show="view_receipt" @close="$emit('cerrar-modal')">
+            <div class=" flex   justify-center pt-2 content-between">
+                <div class="px-2">
+                    <GeneralButton color="bg-red-700   hover:bg-red-800" text="PDF" icon="pdf" @click="printPdf()" />
                 </div>
             </div>
-            <!-- Contenedor 3 -->
-            <div class="flex justify-between items-center">
-                <div class="flex text-left w-full">
-                    <div class="relative flex w-full flex-row">
-                        <label for="" class="flex items-center text-[10px]">1) UNIDAD FINANCIERA INSTITUCIONAL
-                            (UFI-ISRI)</label>
+            <div id="income-receipt-pdf">
+                <!-- Contenedor 1 -->
+                <div class="flex justify-between items-center mt-1">
+                    <!-- Encabezado izquierdo  -->
+                    <div class="flex-none w-[30%] flex flex-col justify-center items-center">
+                        <img src="../../../img/escudo-nacional.png" alt="Escudo El Salvador"
+                            class="w-[100px] h-[100px] object-contain mb-[10px]">
+                        <div class="text-center text-[14px] font-bold mx-5">REPUBLICA DE EL SALVADOR</div>
+                        <div class="text-center text-[14px] font-bold mx-5">MINISTERIO DE SALUD</div>
+                    </div>
+                    <!-- Encabezado centrado  -->
+                    <div class="title-container flex flex-col justify-center items-center">
+                        <h1 class="text-[16px] font-bold h-[117px]">RECIBO DE INGRESO</h1>
+                        <div class="relative flex flex-row justify-center">
+                            <label for="" class="mt-[10px] flex items-center text-[12px]">Numero</label>
+                            <input type="text" readonly v-model="receipt_to_print.numero_recibo_ingreso"
+                                class="font-bold text-center w-[150px] border-b border-black-600 border-opacity-50 border-solid border-0 py-0 text-[12px] text-red-500 mt-[10px]">
+                        </div>
+                    </div>
+                    <!-- Encabezado derecho -->
+                    <div class="flex-none w-[30%] flex flex-col justify-center items-center">
+                        <img src="../../../img/isri-logo2.png" alt="Logo ISRI"
+                            class="w-[100px] h-[100px] object-contain mb-[10px]">
+                        <div class="text-center text-[14px] font-bold mx-5" style="text-align: center;">INSTITUTO
+                            SALVADOREÑO DE
+                            REHABILITACION INTEGRAL</div>
                     </div>
                 </div>
-            </div>
-        </div>
-        <div class="h-full w-[18.6cm]">
-                    <!-- Contenido para la sección superior aquí -->
-        <div class="h-[0.6cm] w-full "></div>
-        <div class="h-[2.6cm] w-full ">
-        </div>
-        <div class="h-[0.5cm] w-full"></div>
-        <div class="h-[0.5cm] w-full ">
-            <div class="h-[0.5cm] flex w-full justify-between items-center">
-                <div class="h-[0.5cm] flex text-left w-[10.7cm] invisible">
-                    <div class="relative flex w-full flex-row ">
-                        <label for="" class="flex items-center text-[10px]">2) Institucion: INSTITUTO SALVADOREÑO DE
-                            REHABILITACION DE INVALIDOS</label>
+                <!-- Contenedor 3 -->
+                <div class="flex justify-between items-center mt-4 mb-2">
+                    <div class="flex text-left w-2/3 ml-5">
+                        <div class="relative flex w-full flex-row">
+                            <label for="" class="flex items-center text-[12px]">Unidad Financiera Institucional
+                                (UFI-ISRI)</label>
+                        </div>
                     </div>
-                </div>
-                <div class="h-[0.5cm] flex w-[7.9cm] text-left">
-                    <div class="relative flex w-full flex-row">
-                        <label for="" class="w-[3.5cm] flex items-center text-[10px] invisible">3) LUGAR Y FECHA </label>
-                        <div class="w-[4.4cm] ml-1 text-center  text-[10px] font-bold ">
-                            <p class="mb-[5px]"> {{ ciudad + ' ' + fecha_recibo }}</p>
+                    <div class="flex w-1/3 text-left mr-5">
+                        <div class="relative flex w-full flex-row">
+                            <label for="" class="flex items-center text-[12px]">Fecha</label>
+                            <input type="text" readonly v-model="fecha_recibo"
+                                class="text-[12px] font-bold text-center w-full border-b border-black-600 border-opacity-50 border-solid border-0 py-0">
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="h-[0.4cm] flex w-full justify-between items-center"></div>
 
-            <div class="h-[8.5cm] flex justify-between items-center w-full">
-                <table class="h-full table-auto w-full">
-                    <tbody class="h-full w-full">
-                        <tr class="h-[1.85cm] w-full">
-                            <td class="h-full w-full " colspan="2">
-                                <!-- First row, first container -->
-                                <div class="flex w-full h-[0.45cm] justify-between items-center">
-                                    <div class="h-full flex w-full text-left">
-                                        <div class="h-full relative flex w-full flex-row">
-                                            <label for=""
-                                                class="h-full flex w-[4cm] items-center text-[10px] mb-0.3 mt-[-2px] invisible">4)
-                                                Nombre o
-                                                Razón Social</label>
-                                            <div class="h-full ml-1 text-left w-[14.5cm] text-[10px] font-bold">
-                                                <p class="ml-4">{{ receipt_to_print.cliente_recibo_ingreso
-                                                }}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- First row, second container -->
-                                <div class="h-[0.45cm] w-full flex justify-between items-center">
-                                    <div class="h-full flex w-full text-left">
-                                        <div class="flex w-[4.5cm] text-left">
+                <div class="flex justify-between items-center mt-2 mb-5">
+                    <table class="table-auto w-full mx-5">
+                        <tbody>
+                            <tr>
+                                <td class="h-auto border border-black" colspan="2">
+                                    <!-- First row, first container -->
+                                    <div class="flex justify-between items-center mt-1 mb-2">
+                                        <div class="flex w-3/4 text-left ml-2">
                                             <div class="relative flex w-full flex-row">
-                                                <label for=""
-                                                    class="w-[1.1cm] flex items-center text-[10px] mb-0.3 mt-[-2px] invisible">5)
-                                                    Por</label>
-                                                <div class="text-center w-[3.4cm]  text-[10px] font-bold">
-                                                    <p class="ml-4">{{ formatedAmount }}</p>
+                                                <label for="" class="flex items-center text-[12px] w-max-1/3">Nombre o Razón
+                                                    Social</label>
+                                                <input type="text" readonly
+                                                    v-model="receipt_to_print.cliente_recibo_ingreso"
+                                                    class="text-[12px] font-bold text-left border-b border-black-600 border-opacity-50 border-solid border-0 py-0"
+                                                    style="width:485px;">
+                                            </div>
+                                        </div>
+                                        <div class="flex w-1/4 text-left mr-2">
+                                            <div class="relative flex w-full flex-row">
+                                                <label for="" class="flex items-center text-[12px]">Por</label>
+                                                <input type="text" readonly v-model="formatedAmount"
+                                                    class="text-[12px] font-bold text-center w-full border-b border-black-600 border-opacity-50 border-solid border-0 py-0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- First row, second container -->
+                                    <div class="flex justify-between items-center mt-1 mb-2">
+                                        <div class="flex w-full text-left ml-2">
+                                            <div class="relative flex w-full flex-row">
+                                                <label for="" class="flex items-center text-[12px] w-max-1/3">Total en
+                                                    Letras</label>
+                                                <input type="text" readonly v-model="receipt_to_print.monto_letras"
+                                                    class="text-[11px] font-bold text-left border-b border-black-600 border-opacity-50 border-solid border-0 py-0"
+                                                    style="width:750px;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="h-auto">
+                                <td class="text-center w-1/2 border border-black">
+                                    <h2 class="text-[12px]">CARGO EN CAJA</h2>
+                                </td>
+                                <td class="text-center w-1/2 border border-black">
+                                    <h2 class=" text-[12px]">CONCEPTO O MANDAMIENTO DE INGRESO</h2>
+                                </td>
+                            </tr>
+                            <tr class="h-auto">
+                                <td class="justify-center items-start border-black border-l border-b">
+                                    <div class="h-72 flex flex-col">
+                                        <div class="flex justify-center items-start mb-2 h-3/4">
+                                            <div class="flex w-full text-left mx-4 mt-2">
+                                                <div class="font-bold flex items-center text-[12px]">
+                                                    {{ receipt_to_print.descripcion_recibo_ingreso }}
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="relative flex w-[14cm] flex-row">
-                                            <label for=""
-                                                class="w-[2.8cm] flex items-center text-[10px] mb-0.3 mt-[-2px] invisible">6)
-                                                Total
-                                                en
-                                                Letras</label>
-                                            <div class="text-left w-[11.2cm] text-[9px] font-bold">
-                                                <p class="ml-4">{{ letras1 }}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="h-[0.45cm] w-full flex justify-between items-center">
-                                    <div class="h-full flex w-full text-left">
-                                        <div class="h-full relative flex w-full flex-row">
-                                            <div class="text-left w-full  text-[9px] font-bold">
-                                                <p class="ml-4">{{ letras2 ? letras2: '' }}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="h-[0.45cm] w-full flex justify-between items-center">
-                                <div class="h-full flex w-full text-left">
-                                    <div class="h-full relative flex w-full flex-row">
-                                        <div class="text-left w-full  text-[10px] font-bold ">
-                                            <p class="">{{ letras2 ? letras2 : '' }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="h-[0.5cm] w-full flex justify-between items-center">
-                            </div>
-                        </td>
-                    </tr>
-                    <tr class="h-[0.60cm] w-full invisible">
-                        <td class="text-center w-[9.15cm] border border-black border-t-0 border-r-0 ">
-                            <h2 class="text-[10px] ">7) CARGO EN CAJA</h2>
-                        </td>
-                        <td class="text-center w-[9.45cm] border border-black border-t-0">
-                            <h2 class="text-[10px] ">8) CONCEPTO O MANDAMIENTO DE INGRESO</h2>
-                        </td>
-                    </tr>
-                    <tr class="h-[5.2cm] w-full">
-                        <td class="h-full w-[9.15cm] justify-center items-start ">
-                            <div class="h-full w-full flex flex-col">
-                                <div class="h-[4cm] w-full flex justify-center items-start mx-2">
-                                    <div class="flex w-full text-left mt-0">
-                                        <div class="w-full font-bold flex items-center text-[10px]">
-                                            {{ receipt_to_print.descripcion_recibo_ingreso }}
-                                        </div>
-                                    </div>
-                                </div>
 
-                                    <div class="flex justify-center items-start mb-2 h-[1.2cm]">
-                                        <div class="w-full flex flex-col h-full">
-                                            <div class="w-max-full flex justify-center mx-4 h-[0.5cm]">
-                                                <div class="ml-1 text-center w-full text-[9px] font-bold">
-                                                    <p class="ml-1 mb-0.3 mt-[-2px]">{{ empleado }}</p>
+                                        <div class="flex justify-center items-start mb-2 h-1/4">
+                                            <div class="w-full flex flex-col h-auto">
+                                                <div
+                                                    class="flex w-max-full justify-center mx-4 h-1/2 border-t border-black border-solid">
+                                                    <p class="w-max-full flex items-center text-[12px]">Tesorero,
+                                                        Pagador o Colector</p>
+                                                </div>
+                                                <div class="w-max-full flex justify-center mx-4 h-1/2">
+                                                    <input type="text" readonly v-model="empleado"
+                                                        class="w-full font-bold text-center border-0 py-0 text-[12px]">
                                                 </div>
                                             </div>
-                                            <div
-                                                class="flex w-max-full justify-center mx-4 h-[0.7cm] border-t border-black border-solid invisible">
-                                                <p class="w-max-full flex items-center text-[11px]">Tesorero,
-                                                    Pagador o Colector</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="border border-black">
+                                    <div class="h-72 flex flex-col">
+                                        <div class="flex justify-center items-start mb-2 h-[10%]">
+                                            <div class="font-bold flex w-full text-left text-[10px] mx-4 mt-2">
+                                                {{ receipt_to_print.id_ccta_presupuestal }} {{ nombre_cuenta }}
                                             </div>
                                         </div>
-                                        <div
-                                            class="h-[0.7cm] flex w-max-full justify-center mx-4 border-t border-black border-solid invisible ">
-                                            <p class="w-max-full flex items-center text-[11px]">Tesorero,
-                                                Pagador o Colector</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="h-full w-[9.45cm] ">
-                            <div class="h-full w-full flex flex-col">
-                                <div class="h-[0.6cm] w-full flex justify-center items-start ">
-                                    <div class="font-bold flex w-full text-left text-[9px] mx-3 mt-0">
-                                        {{ receipt_to_print.id_ccta_presupuestal }} {{ nombre_cuenta }}
-                                    </div>
-                                </div>
 
-                                    <div class="flex justify-center items-start h-[4.5cm]">
-                                        <div class="w-full flex flex-col h-full">
-                                            <div v-for="(detail, index) in receipt_to_print.detalles" :key="index"
-                                                class="relative flex w-full h-[0.5cm] flex-row center-vertically mt-1">
-                                                <div class="font-bold flex items-center text-[9px] w-2/3 mx-4">
-                                                    <label class="">
+                                        <div class="flex justify-center items-start mb-2 h-[90%]">
+                                            <div class="w-full flex flex-col h-full">
+                                                <div v-for="(detail, index) in receipt_to_print.detalles" :key="index"
+                                                    class="relative flex w-full flex-row center-vertically h-1/11">
+                                                    <label for=""
+                                                        class="font-bold flex items-center text-[10px] w-2/3 mx-4 mt-0">
                                                         {{ detail.concepto_ingreso.dependencia ?
                                                             detail.concepto_ingreso.dependencia.codigo_dependencia + ' - ' : ''
                                                         }}
                                                         {{
                                                             detail.concepto_ingreso.nombre_concepto_ingreso }}
                                                     </label>
-                                                </div>
-                                                <div class="w-1/3 relative mr-2">
-                                                    <span
-                                                        class=" absolute left-0 top-1/2 transform text-[9px] -translate-y-1/2 font-bold">$</span>
-                                                    <div class="text-right w-full text-[9px] font-bold pl-8 py-0">
-                                                        <p class="">{{ detail.monto_det_recibo_ingreso }}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="flex justify-center items-start h-[0.5cm] mt-1">
-                                                <div class="relative flex w-full flex-row h-full">
-                                                    <label for=""
-                                                        class="font-bold flex items-center text-[9px] w-2/3 mx-4 mt-0 h-full">
-                                                        TOTAL:
-                                                    </label>
-                                                    <div class="w-1/3 relative mr-2 h-full">
+                                                    <div class="w-1/3 relative">
                                                         <span
-                                                            class="absolute left-0 top-1/2 transform text-[9px] -translate-y-1/2 font-bold">$</span>
-                                                        <div
-                                                            class="border-t border-gray-700 text-right w-full text-[9px] font-bold pl-8 py-0">
-                                                            <p class="">{{ receipt_to_print.monto_recibo_ingreso }}</p>
+                                                            class="mt-[1px] absolute left-0 top-1/2 transform text-[10px] -translate-y-1/2 font-bold">$</span>
+                                                        <input type="text" readonly
+                                                            v-model="detail.monto_det_recibo_ingreso"
+                                                            class="w-full font-bold text-right border-0 text-[10px] pl-8 py-0">
+                                                    </div>
+                                                    <!-- <input type="text" readonly v-model="detail.monto_det_recibo_ingreso"
+                                                    class="w-1/3 font-bold text-right border-0 py-0 text-sm"> -->
+                                                </div>
+                                                <div
+                                                    class="flex justify-center items-start mb-2 h-1/11 mt-1 center-vertically">
+                                                    <div class="relative flex w-full flex-row">
+                                                        <label for=""
+                                                            class="font-bold flex items-center text-[10px] w-2/3 mx-4 mt-0">
+                                                            TOTAL:
+                                                        </label>
+                                                        <div class="w-1/3 relative">
+                                                            <span
+                                                                class="absolute left-0 top-1/2 transform text-[10px] -translate-y-1/2 font-bold">$</span>
+                                                            <input type="text" readonly
+                                                                v-model="receipt_to_print.monto_recibo_ingreso"
+                                                                class="w-full font-bold text-right border-0 border-t py-0 text-[10px] pl-8">
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr class="h-[0.85cm] w-full invisible ">
-                        <td class="h-full w-full border-t-0 border-r-0 border border-black">
-                        </td>
-                        <td class="h-full w-full border-t-0 border border-black">
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="h-[0.7cm] "></div>
-        </div>
-        <div class="h-full w-[1.55cm]">
-            <!-- Contenido del tercer div -->
-        </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+
+        </ProcessModal>
     </div>
 </template>
 
 <script>
-import moment from 'moment';
+import IncomeReceiptPDF from '@/pdf/Tesoreria/IncomeReceiptPDF.vue';
+import ReciboIngresoMatricialVue from '@/pdf/Tesoreria/ReciboIngresoMatricial.vue';
+import { createApp, h } from 'vue'
 export default {
     props: {
+        view_receipt: {
+            type: Boolean,
+            default: false,
+        },
         receipt_to_print: {
             type: Array,
             default: [],
         },
-        formatedAmount: {
-            type: String,
-            default: '',
-        },
-        empleado: {
-            type: String,
-            default: '',
-        },
-        nombre_cuenta: {
-            type: String,
-            default: '',
-        },
-        fecha_recibo: {
-            type: String,
-            default: '',
-        },
-        letras1: {
-            type: String,
-            default: '',
-        },
-        letras2: {
-            type: String,
-            default: '',
-        }
     },
     data: function () {
         return {
-            ciudad: 'S.S'
         }
     },
+    methods: {
+        printPdf() {
+            let fecha = moment().format('DD-MM-YYYY');
+            let name = 'RECIBO ' + this.receipt_to_print.numero_recibo_ingreso + ' - ' + fecha;
+            const opt = {
+                margin: 0,
+                filename: name,
+                //pagebreak: {mode:'css',before:'#pagebreak'},
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 3, useCORS: true },
+                //jsPDF: { unit: 'cm', format: [13.95,21.5], orientation: 'landscape' }
+                jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' },
+            };
+
+            const limiteCaracteres = 70;
+            if (this.receipt_to_print.monto_letras.length <= limiteCaracteres) {
+                this.letras1 = this.receipt_to_print.monto_letras;
+                this.letras2 = ''
+            } else {
+                let textoTruncado = this.receipt_to_print.monto_letras.slice(0, limiteCaracteres);
+                let ultimoEspacio = textoTruncado.lastIndexOf(' ');
+                this.letras1 = textoTruncado.slice(0, ultimoEspacio);
+                this.letras2 = this.receipt_to_print.monto_letras.slice(ultimoEspacio + 1);
+            }
+
+            const app = createApp(ReciboIngresoMatricialVue, {
+                receipt_to_print: this.receipt_to_print,
+                formatedAmount: this.receipt_to_print.monto_recibo_ingreso,
+                empleado: this.empleado,
+                nombre_cuenta: this.nombre_cuenta,
+                fecha_recibo: this.fecha_recibo,
+                letras1: this.letras1,
+                letras2: this.letras2
+            });
+            const div = document.createElement('div');
+            const pdfPrint = app.mount(div);
+            const html = div.outerHTML;
+
+            html2pdf().set(opt).from(html).save();
+            //html2pdf().set(opt).from(html).output('dataurlnewwindow');
+        }
+    },
+    watch: {
+    },
     computed: {
-    }
+        formatedAmount() {
+            return '$' + this.receipt_to_print.monto_recibo_ingreso
+        },
+        empleado() {
+            return this.receipt_to_print.empleado_tesoreria ? this.receipt_to_print.empleado_tesoreria.nombre_empleado_tesoreria : ''
+        },
+        nombre_cuenta() {
+            return this.receipt_to_print.cuenta_presupuestal ? this.receipt_to_print.cuenta_presupuestal.nombre_ccta_presupuestal : ''
+        },
+        fecha_recibo() {
+            return this.receipt_to_print.cuenta_presupuestal ? moment(this.receipt_to_print.fecha_recibo_ingreso, 'Y-M-D').format('DD/MM/Y') : ''
+        },
+    },
 }
 </script>
+
 <style>
 .center-vertically {
     align-items: center;
-}
-
-.left {
-    flex: 0 0 50%;
-    text-align: left;
-    font-size: 16px;
-    font-weight: bold;
-    margin-left: 20px;
-}
-
-.right {
-    flex: 0 0 50%;
-    text-align: left;
-    font-size: 16px;
-    font-weight: bold;
-    margin-right: 20px;
 }
 
 .title-container {
     flex: 1;
     text-align: center;
     align-self: flex-start;
-}
-
-.logo-container {
-    flex: 0 0 30%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.logo {
-    width: 50px;
-    height: 50px;
-    object-fit: contain;
-    margin-bottom: 10px;
-}
-
-.institution {
-    text-align: center;
-    font-size: 14px;
-    font-weight: bold;
-    margin-left: 20px;
-    margin-right: 20px;
 }
 </style>
