@@ -1,10 +1,7 @@
 <script setup>
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
-import moment from 'moment';
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
-import { jsPDF } from "jspdf";
-import html2pdf from 'html2pdf.js'
 </script>
 <template>
     <div class="m-1.5">
@@ -19,18 +16,9 @@ import html2pdf from 'html2pdf.js'
                         </div>
                         <div class="px-2" v-else>
                             <template v-if="dataQuedan.id_estado_quedan === 1">
-                                <GeneralButton color="bg-orange-700   hover:bg-orange-800" text="MODIFICAR" icon="update"
-                                    @click="updateQuedan()" />
-                            </template>
-                        </div>
-                        <div class="px-2" v-if="dataQuedan != ''">
-                            <GeneralButton color="bg-red-700   hover:bg-red-800" text="GENERAR QUEDAN" icon="pdf"
-                                @click="printPdf()" />
-                        </div>
-                        <div class="px-2" v-if="dataQuedan != ''">
-                            <template v-if="dataQuedan.monto_total_quedan >= 113">
-                                <GeneralButton color="bg-[#0A3158]/90  hover:bg-[#0A3158]" text="GENERAR RETENCION"
-                                    icon="pdf" @click="generarComprobanteRetencionPdf()" />
+                                <GeneralButton
+                                    :color="['bg-orange-700 hover:bg-orange-800', incoherencia ? 'animate-pulse animate-infinite animate-duration-[3000ms]P' : '']"
+                                    text="MODIFICAR" icon="update" @click="updateQuedan()" />
                             </template>
                         </div>
                         <svg class="h-7 w-7 absolute top-0 right-0 mt-2 cursor-pointer" viewBox="0 0 25 25"
@@ -403,13 +391,7 @@ import html2pdf from 'html2pdf.js'
 </template>
 
 <script>
-
-import quedanPDFVue from '@/pdf/Tesoreria/quedanPDF.vue';
-import comprobanteRetencion from '@/pdf/Tesoreria/ComprobanteRetencionBlanco.vue';
-import { createApp, h } from 'vue'
-
 export default {
-
     props: {
         showModal: {//prop muestra estado del modal para abrir y cerrar
             type: Boolean,
@@ -486,95 +468,10 @@ export default {
                     },
                 },
             },
+            incoherencia: false,
         };
-    }
-    ,
-    components: {
-        quedanPDFVue
     },
     methods: {
-        printPdf() {
-            // Opciones de configuración para generar el PDF
-            let fecha = moment().format('DD-MM-YYYY');
-            let name = 'QUEDAN ' + this.dataInputs.id_quedan + ' - ' + fecha;
-            const opt = {
-                margin: 0.1,
-                filename: name,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-            };
-
-            // Crear una instancia de la aplicación Vue para generar el componente quedanPDFVue
-            const app = createApp(quedanPDFVue, {
-                dataQuedan: this.dataQuedan,
-                totalCheque: this.dataInputs.monto_total_quedan,
-                renta: this.dataInputs.monto_isr_quedan,
-                iva: this.dataInputs.monto_iva_quedan,
-                cheque: this.dataInputs.monto_liquido_quedan,
-            });
-
-            // Crear un elemento div y montar la instancia de la aplicación en él
-            const div = document.createElement('div');
-            const pdfPrint = app.mount(div);
-            const html = div.outerHTML;
-
-            // Generar y guardar el PDF utilizando html2pdf
-            html2pdf().set(opt).from(html).save();
-        },
-        generarComprobanteRetencionPdf() {
-            if (this.dataInputs.numero_retencion_iva_quedan === null) {
-                // Validar si se ha ingresado un número de retención
-                toast.error("El documento necesita un número de retención", {
-                    autoClose: 5000,
-                    position: "top-right",
-                    transition: "zoom",
-                    toastBackgroundColor: "red",
-                });
-            } else {
-                // Opciones de configuración para generar el PDF
-                let fecha = moment().format('DD-MM-YYYY');
-                let name = 'COMPROBANTE DE RENTENCION ' + this.dataInputs.numero_retencion_iva_quedan + ' - ' + fecha;
-                const opt = {
-                    margin: 0.1,
-                    filename: name,
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2 },
-                    jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' },
-                };
-
-                // Crear una instancia de la aplicación Vue para generar el componente comprobanteRetencion
-                const app = createApp(comprobanteRetencion, {
-                    dataQuedan: this.dataQuedan,
-                    totalCheque: this.dataInputs.monto_total_quedan,
-                    renta: this.dataInputs.monto_isr_quedan,
-                    iva: this.dataInputs.monto_iva_quedan,
-                    cheque: this.dataInputs.monto_liquido_quedan,
-                });
-
-                // Crear un elemento div y montar la instancia de la aplicación en él
-                const div = document.createElement('div');
-                const pdfPrint = app.mount(div);
-                const html = div.outerHTML;
-
-                // Generar y guardar el PDF utilizando html2pdf
-                html2pdf().set(opt).from(html).save();
-
-                // Actualizar la fecha de retención de IVA en el servidor
-                axios.post('/updateFechaRetencionIva', { id_quedan: this.dataInputs.id_quedan })
-                    .then((response) => {
-                    })
-                    .catch(errors => {
-                        let msg = this.manageError(errors);
-                        this.$swal.fire({
-                            title: "Operación cancelada",
-                            text: msg,
-                            icon: "warning",
-                            timer: 5000,
-                        });
-                    });
-            }
-        },
         onCellEdit(rowIndex, cellIndex, event) {
             this.rowsData[rowIndex][cellIndex] = event
         },
@@ -619,8 +516,6 @@ export default {
         },
 
         getInformationBySupplier(supplier) {
-            console.log(supplier);
-
             if (supplier != null) {
                 // Buscar el proveedor en la lista de proveedores
                 const selectedSupplier = this.dataForSelectInRow.proveedor.find((suppliers) => suppliers.value === supplier);
@@ -726,7 +621,6 @@ export default {
                 }
             });
             this.dataForCalculate.monto_total_quedan_por_proveedor = parseFloat(total)
-
         },
 
         onInputDescripcionQuedan(event) {
@@ -1080,6 +974,22 @@ export default {
 
                     this.calculateAmount();
                     this.getAmountBySupplier(newDataQuedan.proveedor.id_proveedor);
+
+
+                    if (this.dataQuedan.monto_liquido_quedan != this.dataInputs.monto_liquido_quedan) {
+                        setTimeout(() => {
+                            toast.warning("Se han detectado cambios en los datos del proveedor después de haber utilizado el sujeto de retención correspondiente. Esto ha generado una inconsistencia en la información. Por favor, actualice el registro de quedan para restablecer la coherencia de los datos.", {
+                                autoClose: 10000,
+                                position: "top-right",
+                                transition: "zoom",
+                                toastBackgroundColor: "white",
+                            });
+                            this.incoherencia = true
+                        }, 1500);
+                    }else{
+                        this.incoherencia = false
+                    }
+
                 } else {
                     // Si dataQuedan está vacío, agregamos una nueva fila y restablecemos los valores de entrada
                     this.addRow();
@@ -1090,7 +1000,7 @@ export default {
                 this.rowsData = [];
                 this.conditionButton = true; // Cambiamos el estado del botón para agregar en lugar de actualizar
             }
-        }
+        },
     }
 }
 </script>

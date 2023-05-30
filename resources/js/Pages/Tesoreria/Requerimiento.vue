@@ -161,12 +161,12 @@ export default {
         let sortOrders = {};
         let columns = [
             { width: "5%", label: "Numero requerimiento", name: "numero_requerimiento_pago", type: "text" },
-            { width: "20%", label: "Descripcion", name: "descripcion_requerimiento_pago", type: "text" },
+            { width: "30%", label: "Descripcion", name: "descripcion_requerimiento_pago", type: "text" },
             { width: "10%", label: "Monto", name: "monto_requerimiento_pago", type: "text" },
             { width: "10%", label: "Mes", name: "mes_requerimiento_pago", type: "text" },
             { width: "10%", label: "Año", name: "anio_requerimiento_pago", type: "text" },
 
-            { width: "10%", label: "Acciones", name: "Acciones" },
+            { width: "1%", label: "Acciones", name: "Acciones" },
         ];
         columns.forEach((column) => {
             if (column.name === 'id_persona')
