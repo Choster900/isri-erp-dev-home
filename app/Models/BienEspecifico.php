@@ -24,4 +24,8 @@ class BienEspecifico extends Model
         'ip_bien_especifico',
     ];
 
+    public function activos_fijos()
+    {
+        return $this->hasMany('App\Models\ActivoFijo','id_bien_especifico','id_bien_especifico');
+    }
 }
