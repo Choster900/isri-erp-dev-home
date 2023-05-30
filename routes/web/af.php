@@ -4,6 +4,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\ActivoFijo\MarcaController;
 use App\Http\Controllers\ActivoFijo\ModeloController;
 use App\Http\Controllers\ActivoFijo\BienEspecificoController;
+use App\Http\Controllers\ActivoFijo\ActivoFijoController;
 
 Route::group(['middleware' => ['auth','access']], function () {
     
@@ -47,4 +48,12 @@ Route::group(['middleware' => ['auth','access']], function () {
     Route::get('get-select-specific-asset', [BienEspecificoController::class, 'getSelectSpecificAsset'])->name('bienEspecifico.getSelectSpecificAsset');
     Route::post('save-specific-asset', [BienEspecificoController::class, 'saveSpecificAsset'])->name('bienEspecifico.saveSpecificAsset');
     Route::post('update-specific-asset', [BienEspecificoController::class, 'updateSpecificAsset'])->name('bienEspecifico.updateSpecificAsset');
+
+    //Manage bienes muebles y vehiculos
+    Route::get('af/muebles-vehiculos', function () {
+        return Inertia::render('ActivoFijo/BienesMueblesYVehiculos', [
+            'menu' => session()->get('menu')
+        ]);
+    })->name('af.bienesMyV');
+    Route::post('get-activos', [ActivoFijoController::class, 'getActivos'])->name('activoFijoController.getActivos');
 });

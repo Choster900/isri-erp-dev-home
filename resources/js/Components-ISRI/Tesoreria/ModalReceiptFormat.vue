@@ -223,7 +223,8 @@ export default {
                 //pagebreak: {mode:'css',before:'#pagebreak'},
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 3, useCORS: true },
-                jsPDF: { unit: 'cm', format: [21.5, 13.95], orientation: 'landscape' }
+                //jsPDF: { unit: 'cm', format: [13.95,21.5], orientation: 'landscape' }
+                jsPDF: { unit: 'cm', format: [21.6,27.9], orientation: 'portrait' },
             };
 
             const limiteCaracteres = 70;
@@ -239,7 +240,7 @@ export default {
 
             const app = createApp(ReciboIngresoMatricialVue, {
                 receipt_to_print: this.receipt_to_print,
-                formatedAmount: this.formatedAmount,
+                formatedAmount: this.receipt_to_print.monto_recibo_ingreso,
                 empleado: this.empleado,
                 nombre_cuenta: this.nombre_cuenta,
                 fecha_recibo: this.fecha_recibo,
