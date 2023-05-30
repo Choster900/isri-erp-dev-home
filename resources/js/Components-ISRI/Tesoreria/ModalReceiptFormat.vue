@@ -224,7 +224,7 @@ export default {
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 3, useCORS: true },
                 //jsPDF: { unit: 'cm', format: [13.95,21.5], orientation: 'landscape' }
-                jsPDF: { unit: 'cm', format: [21.6,27.9], orientation: 'portrait' },
+                jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' },
             };
 
             const limiteCaracteres = 70;
