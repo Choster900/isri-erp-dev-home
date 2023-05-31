@@ -1,3 +1,11 @@
+<script setup>
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
+import moment from 'moment';
+import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
+import { jsPDF } from "jspdf";
+import html2pdf from 'html2pdf.js'
+</script>
 <template>
     <div class="w-[18.5] h-[12.5cm] ml-[1.7cm] mr-[1.3cm] mt-[0.80cm] mb-[0.6cm]">
         <!-- Contenido para la sección superior aquí -->
@@ -211,9 +219,15 @@
 </template>
 
 <script>
-import moment from 'moment';
+import IncomeReceiptPDF from '@/pdf/Tesoreria/IncomeReceiptPDF.vue';
+import ReciboIngresoMatricialVue from '@/pdf/Tesoreria/ReciboIngresoMatricial.vue';
+import { createApp, h } from 'vue'
 export default {
     props: {
+        view_receipt: {
+            type: Boolean,
+            default: false,
+        },
         receipt_to_print: {
             type: Array,
             default: [],
@@ -245,60 +259,77 @@ export default {
     },
     data: function () {
         return {
-            ciudad: 'S.S'
         }
     },
+    methods: {
+        printPdf() {
+            let fecha = moment().format('DD-MM-YYYY');
+            let name = 'RECIBO ' + this.receipt_to_print.numero_recibo_ingreso + ' - ' + fecha;
+            const opt = {
+                margin: 0,
+                filename: name,
+                //pagebreak: {mode:'css',before:'#pagebreak'},
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 3, useCORS: true },
+                //jsPDF: { unit: 'cm', format: [13.95,21.5], orientation: 'landscape' }
+                jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' },
+            };
+
+            const limiteCaracteres = 70;
+            if (this.receipt_to_print.monto_letras.length <= limiteCaracteres) {
+                this.letras1 = this.receipt_to_print.monto_letras;
+                this.letras2 = ''
+            } else {
+                let textoTruncado = this.receipt_to_print.monto_letras.slice(0, limiteCaracteres);
+                let ultimoEspacio = textoTruncado.lastIndexOf(' ');
+                this.letras1 = textoTruncado.slice(0, ultimoEspacio);
+                this.letras2 = this.receipt_to_print.monto_letras.slice(ultimoEspacio + 1);
+            }
+
+            const app = createApp(ReciboIngresoMatricialVue, {
+                receipt_to_print: this.receipt_to_print,
+                formatedAmount: this.receipt_to_print.monto_recibo_ingreso,
+                empleado: this.empleado,
+                nombre_cuenta: this.nombre_cuenta,
+                fecha_recibo: this.fecha_recibo,
+                letras1: this.letras1,
+                letras2: this.letras2
+            });
+            const div = document.createElement('div');
+            const pdfPrint = app.mount(div);
+            const html = div.outerHTML;
+
+            html2pdf().set(opt).from(html).save();
+            //html2pdf().set(opt).from(html).output('dataurlnewwindow');
+        }
+    },
+    watch: {
+    },
     computed: {
-    }
+        formatedAmount() {
+            return '$' + this.receipt_to_print.monto_recibo_ingreso
+        },
+        empleado() {
+            return this.receipt_to_print.empleado_tesoreria ? this.receipt_to_print.empleado_tesoreria.nombre_empleado_tesoreria : ''
+        },
+        nombre_cuenta() {
+            return this.receipt_to_print.cuenta_presupuestal ? this.receipt_to_print.cuenta_presupuestal.nombre_ccta_presupuestal : ''
+        },
+        fecha_recibo() {
+            return this.receipt_to_print.cuenta_presupuestal ? moment(this.receipt_to_print.fecha_recibo_ingreso, 'Y-M-D').format('DD/MM/Y') : ''
+        },
+    },
 }
 </script>
+
 <style>
 .center-vertically {
     align-items: center;
-}
-
-.left {
-    flex: 0 0 50%;
-    text-align: left;
-    font-size: 16px;
-    font-weight: bold;
-    margin-left: 20px;
-}
-
-.right {
-    flex: 0 0 50%;
-    text-align: left;
-    font-size: 16px;
-    font-weight: bold;
-    margin-right: 20px;
 }
 
 .title-container {
     flex: 1;
     text-align: center;
     align-self: flex-start;
-}
-
-.logo-container {
-    flex: 0 0 30%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.logo {
-    width: 50px;
-    height: 50px;
-    object-fit: contain;
-    margin-bottom: 10px;
-}
-
-.institution {
-    text-align: center;
-    font-size: 14px;
-    font-weight: bold;
-    margin-left: 20px;
-    margin-right: 20px;
 }
 </style>
