@@ -55,5 +55,6 @@ Route::group(['middleware' => ['auth','access']], function () {
             'menu' => session()->get('menu')
         ]);
     })->name('af.bienesMyV');
-    Route::post('get-activos', [ActivoFijoController::class, 'getActivos'])->name('activoFijoController.getActivos');
+    Route::post('get-activos', [ActivoFijoController::class, 'getActivos'])->name('activoFijo.getActivos');
+    Route::get('get-select-mv-asset', [ActivoFijoController::class, 'getSelectMVAsset'])->name('activoFijo.getSelectMVAsset');
 });
