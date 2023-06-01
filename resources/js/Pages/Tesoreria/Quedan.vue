@@ -228,7 +228,7 @@ import html2pdf from 'html2pdf.js'
 </template>
 <script>
 import quedanPDFVue from '@/pdf/Tesoreria/quedanPDF.vue';
-import comprobanteRetencion from '@/pdf/Tesoreria/ComprobanteRetencionBlanco.vue';
+import comprobanteRetencion from '@/pdf/Tesoreria/Retencion.vue';
 import { createApp, h } from 'vue'
 
 export default {
