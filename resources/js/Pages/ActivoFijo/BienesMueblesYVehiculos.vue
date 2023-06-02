@@ -4,7 +4,7 @@ import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
-import ModalBienEspecificoVue from '@/Components-ISRI/ActivoFijo/ModalBienEspecifico.vue';
+import ModalMueblesYVehiculosVue from '@/Components-ISRI/ActivoFijo/ModalBienesMYV.vue';
 import moment from 'moment';
 
 import { toast } from 'vue3-toastify';
@@ -19,7 +19,7 @@ import axios from 'axios';
   <AppLayoutVue nameSubModule="Activo Fijo - Bienes Muebles y Vehiculos">
     <div class="sm:flex sm:justify-end sm:items-center mb-2">
       <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-        <GeneralButton @click="addSpecificAsset()" v-if="permits.insertar==1" color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add" />
+        <GeneralButton @click="addMYVAsset()" v-if="permits.insertar==1" color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add" />
       </div>
     </div>
     <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
@@ -74,7 +74,7 @@ import axios from 'axios';
                   <DropDownOptions>
                     <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                       v-if="permits.actualizar == 1 && asset.estado_af == 1"
-                      @click="editSpecificAsset(asset)">
+                      @click="editMYVAsset(asset)">
                       <div class="w-8 text-green-900">
                         <span class="text-xs">
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -159,9 +159,8 @@ import axios from 'axios';
       </div>
     </div>
 
-    <ModalBienEspecificoVue :show_modal_specific_asset="show_modal_specific_asset" 
-    :modalData="modalData" :budget_accounts="budget_accounts" 
-    @cerrar-modal="show_modal_specific_asset = false" @get-table="getMoveableAssetsAndVehicles(tableData.currentPage)" />
+    <ModalMueblesYVehiculosVue :show_modal_asset="show_modal_asset" :modalData="modalData" :specific_assets = "specific_assets"
+    @cerrar-modal="show_modal_asset = false" @get-table="getMoveableAssetsAndVehicles(tableData.currentPage)" />
 
   </AppLayoutVue>
   
@@ -200,7 +199,8 @@ export default {
     return {
       permits : [],
       movable_vehicle: [],
-      budget_accounts:[],
+      specific_assets:[],
+      suppliers: [],
       links: [],
       columns: columns,
       sortKey: "id_af",
@@ -216,23 +216,23 @@ export default {
         total: "",
         asset_types:[1,2]
       },
-      show_modal_specific_asset:false,
+      show_modal_asset:false,
       modalData : [],
     }
   },
   methods:{
-    editSpecificAsset(asset){
+    editMYVAsset(asset){
         this.modalData = asset
-        this.show_modal_specific_asset=true
+        this.show_modal_asset=true
     },
-    addSpecificAsset(){
+    addMYVAsset(){
       this.modalData=[]
-      this.show_modal_specific_asset=true
+      this.show_modal_asset=true
     },
     getModalSelect(){
-      axios.get("/get-select-specific-asset")
+      axios.get("/get-select-mv-asset")
         .then((response) => {
-          this.budget_accounts = response.data.budget_accounts
+          this.specific_assets = response.data.specific_assets
         })
         .catch((errors) => {
           let msg = this.manageError(errors);

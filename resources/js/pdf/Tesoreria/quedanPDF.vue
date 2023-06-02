@@ -201,7 +201,7 @@
             </tr>
         </table>
         <div class="flex justify-center pt-8">
-            <table class="mx-auto">
+            <table class="mx-auto w-[300px]">
                 <tr>
                     <td class="text-right text-[11pt] font-bold">F.</td>
                     <td class="border border-b-black border-x-transparent border-t-transparent w-[225px]">
@@ -217,9 +217,8 @@
                     </td>
                 </tr>
                 <tr>
-                    <td class="h-5"></td>
-                    <td class=" w-[225px] text-center">
-                        <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt] font-semibold">TESORERO INSTITUCIONAL
+                    <td colspan="2" class=" w-[300px] text-center">
+                        <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt] font-semibold">TESORERO INSTITUCIONAL / CORREO example@gmail.com / TEL 1565-5666
                         </div>
                     </td>
                 </tr>

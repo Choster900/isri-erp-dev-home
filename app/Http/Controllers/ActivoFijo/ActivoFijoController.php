@@ -4,6 +4,7 @@ namespace App\Http\Controllers\ActivoFijo;
 
 use App\Http\Controllers\Controller;
 use App\Models\ActivoFijo;
+use App\Models\BienEspecifico;
 use Illuminate\Http\Request;
 
 class ActivoFijoController extends Controller
@@ -44,5 +45,12 @@ class ActivoFijoController extends Controller
 
         $bienes = $query->paginate($length)->onEachSide(1);
         return ['data' => $bienes, 'draw' => $request->input('draw')];
+    }
+    public function getSelectMVAsset(Request $request){
+        $bien_especifico = BienEspecifico::select('id_bien_especifico as value', 'nombre_bien_especifico as label', 'id_ccta_presupuestal')
+            ->where('estado_bien_especifico', '=', 1)
+            ->orderBy('nombre_bien_especifico')
+            ->get();
+        return ['specific_assets' => $bien_especifico];
     }
 }
