@@ -93,7 +93,7 @@ class QuedanController extends Controller
             if (isset($data['numero_requerimiento_pago'])) {
                 $requerimiento = $data["numero_requerimiento_pago"];
                 $v_query->whereHas('requerimiento_pago', function ($query) use ($requerimiento) {
-                    $query->where('numero_requerimiento_pago', 'like', '%' . $requerimiento["numero_requerimiento_pago"] . '%');
+                    $query->where('numero_requerimiento_pago', 'like', '%' . $requerimiento . '%');
                 });
             }
             $v_query->whereHas('proveedor', function ($query) use ($data) {
