@@ -29,6 +29,7 @@ import DatepickerTest from "@/Components-ISRI/ComponentsToForms/FlatPickr.vue";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import flatPickr from "vue-flatpickr-component";
 import DropDownOptions from "@/Components-ISRI/DropDownOptions.vue";
+import InputError from "@/Components/InputError.vue";
 
 import jQuery from "jquery";
 window.jQuery = window.$ = jQuery;
@@ -70,6 +71,7 @@ createInertiaApp({
             .use(plugin)
             .use(VueSweetalert2)
             .component("AppLayoutVue", AppLayoutVue)
+            .component("InputError", InputError)
             .component("Multiselect", Multiselect)
             .component("DropDownOptions", DropDownOptions)
             .component("GeneralButton", GeneralButton)
