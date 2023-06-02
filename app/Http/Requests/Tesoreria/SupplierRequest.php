@@ -45,7 +45,6 @@ class SupplierRequest extends FormRequest
             'id_tipo_contribuyente'      => ['required'],
             'id_sujeto_retencion'        => ['required'],
             'id_municipio'               => ['required'],
-            'id_giro'                    => ['required'],
         ];
     }
 
@@ -60,7 +59,6 @@ class SupplierRequest extends FormRequest
             'id_tipo_contribuyente.required'      => 'El campo tipo de contribuyente es requerido',
             'id_sujeto_retencion.required'        => 'El campo sujeto de rentencion es requerido',
             'id_municipio.required'               => 'El campo municipio es requerido',
-            'id_giro.required'                    => 'El campo giro es requerido',
             'dui_proveedor.required_without'      => 'Debes proporcionar DUI o NIT.',
             'nit_proveedor.required_without'      => 'Debes proporcionar DUI o NIT.',
         ];

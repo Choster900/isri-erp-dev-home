@@ -18,7 +18,7 @@ import axios from "axios";
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="name-client" v-model="income_receipt.client" :value="income_receipt.client"
                                     type="text" placeholder="Nombre o Razón Social"
-                                    @update:modelValue="validateInput('client', limit = 145)">
+                                    @update:modelValue="validateInput('client', limit = 145, upper = true)">
                                     <LabelToInput icon="standard" forLabel="name-client" />
                                 </TextInput>
                                 <InputError v-for="(item, index) in errors.client" :key="index" class="mt-2"
@@ -40,7 +40,7 @@ import axios from "axios";
                             </div>
                         </div>
                         <div class="mb-2 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Fuente Financiamiento <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -54,7 +54,16 @@ import axios from "axios";
                                     :message="item" />
                                 <InputError class="mt-2" :message="custom_error" />
                             </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
+                                <TextInput id="number" v-model="income_receipt.number" :value="income_receipt.number"
+                                    type="text" placeholder="Numero de recibo"
+                                    @update:modelValue="validateInput('number', limit = 145, false, number=true)">
+                                    <LabelToInput icon="standard" forLabel="number" />
+                                </TextInput>
+                                <InputError v-for="(item, index) in errors.number" :key="index" class="mt-2"
+                                    :message="item" />
+                            </div>
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Tesorero, Pagador o Colector <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -82,7 +91,7 @@ import axios from "axios";
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="document-client" v-model="income_receipt.document"
                                     :value="income_receipt.document" type="text" placeholder="Documento"
-                                    @update:modelValue="validateInput('document', limit = 17, number = true)">
+                                    @update:modelValue="validateInput('document', limit = 17,false, number = true)">
                                     <LabelToInput icon="standard" forLabel="document-client" />
                                 </TextInput>
                                 <InputError v-for="(item, index) in errors.document" :key="index" class="mt-2"
@@ -152,7 +161,7 @@ import axios from "axios";
                                     <div class="mb-2 md:mr-2 md:mb-0 basis-1/3">
                                         <TextInput id="detail-amount" v-model="row.amount" :value="row.amount"
                                             :label-input="false" type="text" placeholder="Monto"
-                                            @update:modelValue="validateInput('amount', limit = 11, false, monto = true, index)">
+                                            @update:modelValue="validateInput('amount', limit = 11, false, false, monto = true, index)">
                                             <LabelToInput icon="money" forLabel="detail-amount" />
                                         </TextInput>
                                         <InputError v-for="(item, index2) in errors['income_detail.' + index + '.amount']"
@@ -235,12 +244,13 @@ export default {
                 client: '',
                 description: '',
                 income_detail: [],
+                number:''
             },
         };
     },
     methods: {
         //Function to validate data entry
-        validateInput(field, limit, number, amount, index_amount) {
+        validateInput(field, limit, upper_case, number, amount, index_amount) {
             if (amount) {
                 //Validacion especial en caso que sea un detalle
                 let amount_validate = this.income_receipt.income_detail[index_amount][field]
@@ -258,7 +268,13 @@ export default {
             if (number) {
                 this.income_receipt[field] = this.income_receipt[field].replace(/[^0-9-]/g, '');
             }
-
+            if (upper_case) {
+                this.toUpperCase(field)
+            }
+        },
+        toUpperCase(field) {
+            //Converts field to uppercase
+            this.income_receipt[field] = this.income_receipt[field].toUpperCase()
         },
         typeAmountIncome(index) {
             let x = this.income_receipt.income_detail[index].amount.replace(/^\./, '').replace(/[^0-9.]/g, '')
@@ -457,7 +473,6 @@ export default {
                             })
                             .catch((errors) => {
                                 if (errors.response.status === 422) {
-                                    console.log(errors.response.data);
                                     toast.warning(
                                         "Tienes algunos errores por favor verifica tus datos.",
                                         {
@@ -468,6 +483,9 @@ export default {
                                         }
                                     );
                                     this.errors = errors.response.data.errors;
+                                    setTimeout(() => {
+                                        this.errors = []
+                                    }, 5000);
                                 } else {
                                     let msg = this.manageError(errors);
                                     this.$swal.fire({
@@ -533,6 +551,10 @@ export default {
                                             }
                                         );
                                         this.errors = errors.response.data.errors;
+                                        this.errors = errors.response.data.errors;
+                                        setTimeout(() => {
+                                            this.errors = []
+                                        }, 5000);
                                     }
                                 } else {
                                     let msg = this.manageError(errors);
@@ -597,6 +619,7 @@ export default {
                 this.income_receipt.document = this.modal_data.doc_identidad_recibo_ingreso
                 this.income_receipt.client = this.modal_data.cliente_recibo_ingreso
                 this.income_receipt.description = this.modal_data.descripcion_recibo_ingreso
+                this.income_receipt.number = this.modal_data.numero_recibo_ingreso
                 this.income_receipt.income_detail = []
 
                 if (this.modal_data != '') {
