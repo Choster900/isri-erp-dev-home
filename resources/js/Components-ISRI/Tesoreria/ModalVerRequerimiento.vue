@@ -7,7 +7,7 @@ import { jsPDF } from "jspdf";
 import html2pdf from 'html2pdf.js'
 </script>
 <template>
-    <ProcessModal maxWidth='2xl' :show="view_req_info" :center="true" @close="$emit('cerrar-modal')"
+    <ProcessModal maxWidth='4xl' :show="view_req_info" :center="true" @close="$emit('cerrar-modal')"
         :show_request="show_request">
         <div class="m-1.5 p-2 bg-white max-w-full max-h-full">
 
@@ -46,17 +46,19 @@ import html2pdf from 'html2pdf.js'
                 <table class="w-full" id="tabla_modal_validacion_arranque">
                     <thead class="bg-[#001c48] text-white">
                         <tr class="">
-                            <th class="rounded-tl-lg w-10 py-2 border border-l-white">N°</th>
-                            <th class="w-60 border border-l-white">PROVEEDOR</th>
-                            <th class="w-10 border border-l-white">IVA</th>
-                            <th class="w-10 border border-l-white">RENTA</th>
-                            <th class="rounded-tr-lg w-10">LIQUIDO</th>
+                            <th class="rounded-tl-lg w-[10%] py-2 border border-l-white">N°</th>
+                            <th class="w-[50%] border border-l-white">PROVEEDOR</th>
+                            <th class="w-[10%] border border-l-white">MONTO</th>
+                            <th class="w-[10%] border border-l-white">IVA</th>
+                            <th class="w-[10%] border border-l-white">RENTA</th>
+                            <th class="rounded-tr-lg w-[10%]">LIQUIDO</th>
                         </tr>
                     </thead>
                     <tbody class="text-sm divide-y divide-slate-200">
                         <tr v-for="quedan in show_request.quedan" :key="quedan.id_quedan" class="hover:bg-[#141414]/10">
                             <td class="text-center whitespace-normal">{{ quedan.id_quedan }}</td>
                             <td class="text-center whitespace-normal">{{ quedan.proveedor.razon_social_proveedor }}</td>
+                            <td class="text-center whitespace-normal text-red-600">{{ quedan.monto_total_quedan }}</td>
                             <td class="text-center whitespace-normal text-red-600">{{ quedan.monto_iva_quedan }}</td>
                             <td class="text-center whitespace-normal text-red-600">{{ quedan.monto_isr_quedan }}</td>
                             <td class="text-center whitespace-normal text-green-600">{{ quedan.monto_liquido_quedan }}</td>
@@ -64,6 +66,7 @@ import html2pdf from 'html2pdf.js'
                         <tr v-if="show_request.quedan != ''" class="font-bold">
                             <td class="text-center whitespace-normal"></td>
                             <td class="text-center whitespace-normal">Total</td>
+                            <td class="text-center whitespace-normal">{{ total_monto_total_quedan }}</td>
                             <td class="text-center whitespace-normal">{{ total_iva_quedan }}</td>
                             <td class="text-center whitespace-normal">{{ total_isr_quedan }}</td>
                             <td class="text-center whitespace-normal">{{ total_liquido_quedan }}</td>
@@ -132,6 +135,17 @@ export default {
                 let total = 0
                 this.show_request.quedan.forEach((value, index) => {
                     total += parseFloat(value.monto_isr_quedan)
+                })
+                return total.toFixed(2)
+            }
+        },
+        total_monto_total_quedan() {
+            if (this.show_request == '') {
+                return '0.00'
+            } else {
+                let total = 0
+                this.show_request.quedan.forEach((value, index) => {
+                    total += parseFloat(value.monto_total_quedan)
                 })
                 return total.toFixed(2)
             }

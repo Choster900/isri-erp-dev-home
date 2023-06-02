@@ -29,6 +29,7 @@ class IncomeReceiptRequest extends FormRequest
         $rules["client"] = ['required'];
         $rules["treasury_clerk_id"] = ['required'];
         $rules["budget_account_id"] = ['required'];
+        $rules["number"] = ['required'];
         $rules["description"] = ['required'];
         $rules["financing_source_id"] = ['required'];
         $rules["direction"] = ['required_if:budget_account_id,16304'];
@@ -56,6 +57,7 @@ class IncomeReceiptRequest extends FormRequest
     {
         $messages = [];   
         $messages["client.required"] = "Debe ingresar el nombre o razón social.";
+        $messages["number.required"] = "Debe ingresar el numero del recibo.";
         $messages["budget_account_id.required"] = "Debe seleccionar el especifico presupuestario.";
         $messages["description.required"] = "Debe ingresar la descripción del recibo.";
         $messages["treasury_clerk_id.required"] = "Debe seleccionar Tesorero.";

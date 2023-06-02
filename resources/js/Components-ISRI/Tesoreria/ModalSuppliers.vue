@@ -338,6 +338,7 @@ export default {
                             toastBackgroundColor: "white",
                         });
                         this.$emit('close-definitive')
+                        this.$emit("showTableAgain")
                     }).catch((errors) => {
                         if (errors.response.status === 422) {
                             if (errors.response.data.logical_error) {
@@ -350,7 +351,6 @@ export default {
                                         toastBackgroundColor: "white",
                                     }
                                 );
-                                this.$emit("showTableAgain")
                                 this.$emit('close-definitive')
                                 this.limpiarCampos()
                             } else {
