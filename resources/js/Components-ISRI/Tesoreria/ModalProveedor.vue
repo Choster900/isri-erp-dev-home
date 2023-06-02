@@ -58,8 +58,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput :required="false" id="nrc-proveedor" v-model="supplier.nrc_proveedor"
-                                    :value="supplier.nrc_proveedor" type="text"
-                                    @update:modelValue="validateInput('nrc_proveedor', limit = 10, false, number = true)"
+                                    :value="supplier.nrc_proveedor" type="text" @update:modelValue="validarnrc()"
                                     placeholder="NRC Proveedor">
                                     <LabelToInput icon="personalInformation" forLabel="nrc-proveedor" />
                                 </TextInput>
@@ -123,7 +122,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                     </div>
 
                     <div id="addres-information">
-                        <div class="mb-4 md:flex flex-row justify-between">
+                        <div class="mb-3 md:flex flex-row justify-between">
                             <span class="font-semibold text-slate-800 mb-2 text-lg underline underline-offset-2">
                                 Dirección e información adicional
                             </span>
@@ -154,7 +153,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                 <InputError class="mt-2" :message="errosModel.direccion_proveedor" />
                             </div>
                         </div>
-                        <div class="mb-4 md:flex flex-row justify-items-start">
+                        <div class="mb-1 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput :required="false" id="contacto-proveedor" v-model="supplier.contacto_proveedor"
                                     :value="supplier.contacto_proveedor" type="text" placeholder="Contacto "
@@ -250,7 +249,7 @@ export default {
     },
     methods: {
         //Function to validate data entry
-        validateInput(field, limit, upper_case, number, dui, nit, phone_number) {
+        validateInput(field, limit, upper_case, number, dui, nit, phone_number, nrc) {
             if (this.supplier[field] && this.supplier[field].length > limit) {
                 this.supplier[field] = this.supplier[field].substring(0, limit);
             }
@@ -264,12 +263,28 @@ export default {
                 //Revisar funcion, al borrar un numero regresa el apuntador al final
                 this.typeDuiSupplier(field)
             }
+            if (nrc) {
+                //Revisar funcion, al borrar un numero regresa el apuntador al final
+                this.typeNrc(field)
+            }
             if (nit) {
                 //Verificar ya que al borrar numeros los guiones siempre quedan visibles
                 this.typeNitSupplier(field)
             }
             if (phone_number) {
                 this.phoneNumberFormat(field)
+            }
+            if (nrc) {
+                this.phoneNumberFormat(field)
+            }
+        },
+        validarnrc() {
+            // Remover todos los caracteres excepto los números y guiones
+            this.supplier.nrc_proveedor = this.supplier.nrc_proveedor.replace(/[^0-9-]/g, "");
+
+            // Limitar la entrada a un máximo de 7 caracteres
+            if (this.supplier.nrc_proveedor.length > 8) {
+                this.supplier.nrc_proveedor = this.supplier.nrc_proveedor.slice(0, 8);
             }
         },
         async listOptionsSelect() {//metodo que trae toda la info de todos los select
@@ -307,6 +322,16 @@ export default {
             //Specific format for nit number
             let nit = this.supplier[field].replace(/\D/g, '').match(/(\d{0,4})(\d{0,6})(\d{0,3})(\d{0,1})/);
             this.supplier[field] = nit[1] + "-" + nit[2] + "-" + nit[3] + "-" + nit[4];
+        },
+        typeNrc(field) {
+            //Specific format for nit number
+            // Remover todos los caracteres excepto los números y guiones
+            this.supplier.nrc_proveedor = this.supplier.nrc_proveedor.replace(/[^0-9-]/g, "");
+
+            // Colocar guiones después de los primeros cuatro dígitos
+            if (this.supplier.nrc_proveedor.length > 4) {
+                this.supplier.nrc_proveedor = this.supplier.nrc_proveedor.slice(0, 4) + "-" + this.supplier.nrc_proveedor.slice(4);
+            }
         },
         onlyNumbersAndSixDigits(field) {
             //Allows only numbers and six digits
@@ -503,4 +528,5 @@ export default {
     /* Agregando tamaño a letra a tabla resumen */
     font-size: 10px;
     font-weight: 900;
-}</style>
+}
+</style>
