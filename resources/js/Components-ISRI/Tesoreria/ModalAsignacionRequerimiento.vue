@@ -200,20 +200,22 @@ import axios from 'axios';
                                                 </div>
                                             </td>
                                             <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                                <div v-for="(detalle, i) in quedan.detalle_quedan" :key="i"
-                                                    class="font-medium text-slate-800 text-[12px] text-center wrap flex justify-center items-center">
-                                                    <div
-                                                        :class="{ 'border-b-2 border-b-gray-500': i < quedan.detalle_quedan.length - 1 && quedan.detalle_quedan.length > 1 }">
-                                                        FACTURA: {{ detalle.numero_factura_det_quedan }}
-                                                        <br>
-                                                        PRODUCTO: ${{ detalle.producto_factura_det_quedan || 0 }}
-                                                        <br>
-                                                        SERVICIO: ${{ detalle.servicio_factura_det_quedan || 0 }}
-                                                        <br>
-                                                        <div class="font-semibold">TOTAL: ${{
-                                                            (parseFloat(detalle.servicio_factura_det_quedan) || 0) +
-                                                            (parseFloat(detalle.producto_factura_det_quedan) || 0) }}</div>
-                                                    </div>
+                                                <div class="max-h-[165px] overflow-y-auto scrollbar">
+                                                    <template v-for="(detalle, i) in quedan.detalle_quedan" :key="i">
+                                                        <div class="mb-2 text-center">
+                                                            <p class="text-[10pt]">
+                                                                <span class="font-medium">FACTURA </span>{{
+                                                                    detalle.numero_factura_det_quedan
+                                                                }}<br>
+                                                                <span class="font-medium">MONTO:</span> ${{
+                                                                    (parseFloat(detalle.servicio_factura_det_quedan) || 0) +
+                                                                    (parseFloat(detalle.producto_factura_det_quedan) || 0) }}
+                                                            </p>
+                                                        </div>
+                                                        <template v-if="i < quedan.detalle_quedan.length - 1">
+                                                            <hr class="my-2 border-t border-gray-300">
+                                                        </template>
+                                                    </template>
                                                 </div>
                                             </td>
 

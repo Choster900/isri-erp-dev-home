@@ -65,7 +65,7 @@ import html2pdf from 'html2pdf.js'
                                 </div>
                             </td>
                             <td class="px-5">
-                                <div class="max-h-40 overflow-y-auto scrollbar">
+                                <div class="max-h-[165px] overflow-y-auto scrollbar">
                                     <template v-for="(detalle, i) in data.detalle_quedan" :key="i">
                                         <div class="mb-2 text-center">
                                             <p class="text-[10pt]">

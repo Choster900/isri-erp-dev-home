@@ -50,7 +50,7 @@ import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalL
                                     </div>
                                 </td>
                                 <td>
-                                    <div v-for="(quedan, i) in  data.quedan" :key="i"
+                                    <!-- <div v-for="(quedan, i) in  data.quedan" :key="i"
                                         class="font-medium text-slate-800 text-center flex justify-center items-center">
                                         <p
                                             :class="{ 'border-b-2 border-b-gray-500': i < data.quedan.length - 1 && data.quedan.length > 1 }">
@@ -58,6 +58,22 @@ import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalL
                                             <br>
                                             MONTO TOTAL: {{ quedan.monto_liquido_quedan }}
                                         </p>
+                                    </div> -->
+
+
+                                    <div class="max-h-[165px] overflow-y-auto scrollbar">
+                                        <template v-for="(quedan, i) in data.quedan" :key="i">
+                                            <div class="mb-2 text-center">
+                                                <p class="text-[10pt]">
+                                                    <span class="font-medium">FACTURA</span>{{ quedan.id_quedan }}<br>
+                                                    <span class="font-medium">MONTO:</span> ${{ quedan.monto_liquido_quedan
+                                                    }}
+                                                </p>
+                                            </div>
+                                            <template v-if="i < data.quedan.length - 1">
+                                                <hr class="my-2 border-t border-gray-300">
+                                            </template>
+                                        </template>
                                     </div>
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5">
@@ -202,6 +218,7 @@ export default {
                 column: 0,
                 dir: "desc",
                 search: {},
+                onlyLiquida: true,
             },
             pagination: {
                 lastPage: "",
@@ -223,10 +240,7 @@ export default {
                 let data = response.data;
                 if (this.tableData.draw == data.draw) {
                     this.links = data.data.links
-                    //sumando los que requerimiento que tengan queda
-                    let nuevoArray = data.data.data.filter(elemento => elemento.quedan != '')
-                    let cantidad = nuevoArray.length;
-                    this.pagination.total = cantidad
+                    this.pagination.total = data.data.total
                     this.links[0].label = "Anterior"
                     this.links[this.links.length - 1].label = "Siguiente"
                     this.dataRequerimientoForTable = data.data.data
@@ -248,7 +262,6 @@ export default {
         async getListForSelect() {
             await axios.get('/get-list-select').then((response) => {
                 this.dataForSelect = response.data;
-                console.log(response.data.numeroRequerimiento);
             }).catch((errors) => {
                 let msg = this.manageError(errors);
                 this.$swal.fire({
@@ -307,5 +320,23 @@ export default {
 .wrap2 {
     width: 100%;
     white-space: pre-wrap;
+}
+
+
+.scrollbar::-webkit-scrollbar {
+    width: 5px;
+}
+
+.scrollbar::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+    background-color: #001c48;
+    border-radius: 4px;
+}
+
+.scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
 }
 </style>
