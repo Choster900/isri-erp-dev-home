@@ -1,14 +1,16 @@
 <script setup>
 import { Head } from "@inertiajs/vue3";
 import ModalBasicVue from "@/Components-ISRI/AllModal/ModalBasic.vue";
+import Modal from "@/Components-ISRI/AllModal/Modal.vue";
+
 import { toast } from 'vue3-toastify';
 import InputError from "@/Components/InputError.vue";
 import 'vue3-toastify/dist/index.css';
 </script>
 
 <template>
-    <ModalBasicVue title="Gestión número de requerimiento. " id="scrollbar-modal" maxWidth="2xl" :modal_data="modal_data"
-        :modalOpen="requerimientoModalOpen" @close-modal="$emit('close-definitive')">
+    <Modal modal-title="Gestión número de requerimiento."  maxWidth="2xl"
+        :show="ModalIsOpen" @close="$emit('close-modal')">
         <div class="py-5">
             <div class="flex-row justify-center items-center mb-7 mx-4">
                 <div class="mb-4 md:flex flex-row justify-items-start mx-8">
@@ -36,7 +38,7 @@ import 'vue3-toastify/dist/index.css';
                         Descripcion
                     </label>
                     <textarea v-model="dataRequerimiento.descripcion_requerimiento_pago" id="descripcion" name="descripcion"
-                        class="resize-none w-full h-16 overflow-y-auto peer text-xs font-semibold rounded-r-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
+                        class="resize-none w-full h-16 overflow-y-auto peer text-xs font-semibold rounded-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
                         @input="validateInput('descripcion_requerimiento_pago', limit = 255)">
                     </textarea>
                     <InputError v-for="(item, index) in errors.description" :key="index" class="mt-2" :message="item" />
@@ -48,18 +50,18 @@ import 'vue3-toastify/dist/index.css';
                     <GeneralButton v-else @click="addRequerimiento()" color="bg-green-700  hover:bg-green-800"
                         text="Agregar" icon="add" />
                     <div class="mb-4 md:mr-2 md:mb-0 px-1">
-                        <GeneralButton text="Cancelar" icon="add" @click="requerimientoModalOpen = false" />
+                        <GeneralButton text="Cancelar" icon="add" @click="ModalIsOpen = false" />
                     </div>
                 </div>
             </div>
         </div>
-    </ModalBasicVue>
+    </Modal>
 </template>
 
 <script>
 export default {
     props: {
-        requerimientoModalOpen: {
+        ModalIsOpen: {
             type: Boolean,
             default: false,
         },
@@ -131,7 +133,7 @@ export default {
                                 transition: "zoom",
                                 toastBackgroundColor: "white",
                             });
-                            this.$emit('close-definitive')
+                            this.$emit('close-modal')
                             this.$emit("updateTable")
                         }).catch((errors) => {
                             if (errors.response.status === 422) {
@@ -186,7 +188,7 @@ export default {
                                 toastBackgroundColor: "white",
                             });
                             this.$emit("updateTable")
-                            this.$emit('close-definitive')
+                            this.$emit('close-modal')
                         }).catch((errors) => {
                             if (errors.response.status === 422) {
                                 if (errors.response.data.logical_error) {
@@ -227,7 +229,7 @@ export default {
         },
     },
     watch: {
-        requerimientoModalOpen: function (value) {
+        ModalIsOpen: function (value) {
             if (value) {
                 this.errors = [];
 

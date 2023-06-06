@@ -65,14 +65,15 @@ import html2pdf from 'html2pdf.js'
                                 </div>
                             </td>
                             <td class="px-5">
-                                <div class="max-h-40 overflow-y-auto scrollbar">
+                                <div class="max-h-[165px] overflow-y-auto scrollbar">
                                     <template v-for="(detalle, i) in data.detalle_quedan" :key="i">
                                         <div class="mb-2 text-center">
                                             <p class="text-[10pt]">
-                                                <span class="font-medium">FACTURA</span>
-                                                {{ detalle.numero_factura_det_quedan }}<br> <span class="font-medium">MONTO:
-                                                </span> ${{ (parseFloat(detalle.servicio_factura_det_quedan) || 0)
-                                                    + (parseFloat(detalle.producto_factura_det_quedan) || 0) }}
+                                                <span class="font-medium">FACTURA</span>{{ detalle.numero_factura_det_quedan
+                                                }}<br>
+                                                <span class="font-medium">MONTO:</span> ${{
+                                                    (parseFloat(detalle.servicio_factura_det_quedan) || 0) +
+                                                    (parseFloat(detalle.producto_factura_det_quedan) || 0) }}
                                             </p>
                                         </div>
                                         <template v-if="i < data.detalle_quedan.length - 1">
@@ -122,12 +123,12 @@ import html2pdf from 'html2pdf.js'
                                             </div>
                                             <div class="font-semibold">VER</div>
                                         </div>
-                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer" 
-                                            @click.stop="printPdf(data)">
+                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                            title="Genera este quedan en un documento de pdf" @click.stop="printPdf(data)">
                                             <div class="w-8 text-blue-900">
                                                 <span class="text-xs">
-                                                    <svg fill="#bc0101" width="23px" height="23px" viewBox="0 0 1920 1920"  class="pr-1"
-                                                        xmlns="http://www.w3.org/2000/svg" stroke="#bc0101">
+                                                    <svg fill="#bc0101" width="23px" height="23px" viewBox="0 0 1920 1920"
+                                                        class="pr-1" xmlns="http://www.w3.org/2000/svg" stroke="#bc0101">
                                                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                                                         <g id="SVGRepo_tracerCarrier" stroke-linecap="round"
                                                             stroke-linejoin="round"></g>
@@ -144,14 +145,16 @@ import html2pdf from 'html2pdf.js'
                                                     </svg>
                                                 </span>
                                             </div>
-                                            <div class="font-semibold">GENERAR QUEDAN</div>
+                                            <div class="font-semibold">QUEDAN</div>
                                         </div>
-                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer" v-if="data.monto_total_quedan > 113"
+                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                            title="Genera un comprobante de retencion para este quedan"
+                                            v-if="data.monto_total_quedan > 113"
                                             @click.stop="generarComprobanteRetencionPdf(data)">
                                             <div class="w-8 text-blue-900">
                                                 <span class="text-xs">
-                                                    <svg fill="#bc0101" width="23px" height="23px" viewBox="0 0 1920 1920" class="pr-1"
-                                                        xmlns="http://www.w3.org/2000/svg" stroke="#bc0101">
+                                                    <svg fill="#bc0101" width="23px" height="23px" viewBox="0 0 1920 1920"
+                                                        class="pr-1" xmlns="http://www.w3.org/2000/svg" stroke="#bc0101">
                                                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                                                         <g id="SVGRepo_tracerCarrier" stroke-linecap="round"
                                                             stroke-linejoin="round"></g>
@@ -168,7 +171,7 @@ import html2pdf from 'html2pdf.js'
                                                     </svg>
                                                 </span>
                                             </div>
-                                            <div class="font-semibold">GENERAR COMPROBANTE DE RETENCION</div>
+                                            <div class="font-semibold">RETENCION</div>
                                         </div>
                                     </DropDownOptions>
 
@@ -516,4 +519,5 @@ export default {
 
 .scrollbar::-webkit-scrollbar-thumb:hover {
     background-color: #555;
-}</style>
+}
+</style>

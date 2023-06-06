@@ -27,12 +27,11 @@ class RequerimientoController extends Controller
         ];
 
         $v_length = $request->input('length');
-        $v_column = $request->input('column'); //Index
+        $v_column = $request->input('column');
         $v_dir = $request->input('dir');
         $data = $request->input('search');
         $v_query = RequerimientoPago::select("*")->with(["Quedan", "Quedan.liquidacion_quedan", "Quedan.proveedor"])
-            ->orderBy($v_columns[$v_column], $v_dir);
-
+            ->orderBy($v_columns[$v_column], $v_dir)->whereHas("Quedan");
         if ($data) {
             $v_query->where('numero_requerimiento_pago', 'like', '%' . $data["numero_requerimiento_pago"] . '%')
                 ->where('numero_requerimiento_pago', 'like', '%' . $data["numero_requerimiento_pago"] . '%');

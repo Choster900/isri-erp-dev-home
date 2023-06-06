@@ -17,9 +17,10 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                         <div class="px-2" v-else>
                             <template v-if="dataQuedan.id_estado_quedan === 1">
                                 <GeneralButton
-                                    :color="['bg-orange-700 hover:bg-orange-800', incoherencia ? 'animate-pulse animate-infinite animate-duration-[3000ms]P' : '']"
+                                    :color="['bg-orange-700 hover:bg-orange-800', incoherencia ? 'animate-pulse animate-infinite animate-duration-[3000ms]' : '']"
                                     text="MODIFICAR" icon="update" @click="updateQuedan()" />
                             </template>
+                            <div v-else class="my-10"> </div>
                         </div>
                         <svg class="h-7 w-7 absolute top-0 right-0 mt-2 cursor-pointer" viewBox="0 0 25 25"
                             @click="$emit('cerrar-modal')">
@@ -183,8 +184,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                         <td class="border-2 border-black"
                                             :class="dataInputs.numero_acuerdo_quedan == '' ? 'bg-[#fdfd96]' : ''"
                                             colspan="3" contenteditable="false">
-                                            <input type="number" v-model="dataInputs.numero_acuerdo_quedan"
-                                                @input="limitarCaracteres('numero_acuerdo_quedan')"
+                                            <input type="text" v-model="dataInputs.numero_acuerdo_quedan" maxlength="10"
                                                 :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                 :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
                                                 class="peer w-full text-sm bg-transparent text-center h-16 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
@@ -521,7 +521,7 @@ export default {
                 const selectedSupplier = this.dataForSelectInRow.proveedor.find((suppliers) => suppliers.value === supplier);
                 if (selectedSupplier) {
                     // Datos que se pintan en los inputs
-                    this.dataInputs.giro = `${selectedSupplier.codigo_giro} - ${selectedSupplier.nombre_giro}`;
+                    this.dataInputs.giro = selectedSupplier.codigo_giro && selectedSupplier.nombre_giro ? `${selectedSupplier.codigo_giro} - ${selectedSupplier.nombre_giro}` : 'GIRO NO ESPECIFICADO!';
                     this.dataInputs.irs = `${selectedSupplier.isrl_sujeto_retencion * 100} %`;
                     this.dataInputs.iva = `${selectedSupplier.iva_sujeto_retencion * 100} %`;
 
@@ -986,7 +986,7 @@ export default {
                             });
                             this.incoherencia = true
                         }, 1500);
-                    }else{
+                    } else {
                         this.incoherencia = false
                     }
 

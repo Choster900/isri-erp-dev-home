@@ -1,52 +1,49 @@
 <script setup>
-import ModalBasicVue from '@/Components-ISRI/AllModal/ModalBasic.vue';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
-import InputError from "@/Components/InputError.vue";
 import moment from 'moment';
+import Modal from "@/Components-ISRI/AllModal/Modal.vue";
 
 </script>
 <template>
     <div class="m-1.5">
-        <ModalBasicVue title="Proveedor" id="scrollbar-modal" maxWidth="3xl" :modalOpen="scrollbarModalOpen"
-            @close-modal="$emit('close-definitive')">
+        <Modal :show="ModalIsOpen" @close="$emit('close-modal')" modal-title="Proveedores" maxWidth="3xl">
             <div class="px-5 py-4">
-                <div class="space-y-2">
+                <div class="space-y-1">
                     <div id="personal-information">
-                        <div class="pb-4 mb-4 md:flex flex-row justify-between">
-                            <span class="font-semibold text-slate-800 mb-2 text-lg underline underline-offset-2">
+                        <div class="pb-4 md:flex flex-row justify-between">
+                            <div class="font-semibold  text-slate-800 text-lg underline underline-offset-2">
                                 Información general
-                            </span>
-                            <span class="">
-                                <div class=" overflow-hidden rounded border border-slate-200  ">
-                                    <table id="resumen" class="table table-bordered text-center p-0 mt-2 w-full">
-                                        <tbody>
-                                            <tr>
-                                                <td class="border px-3 text-xs">IVA SUJETO DE RETENCION<br />
-                                                    <span class="text-red-500 text-xs">{{ (supplier.sujetoRetencion.iva *
-                                                        100) }}%</span>
-                                                </td>
-                                                <td class="border px-3 text-xs">ISRL SUJETO DE RETENCION<br />
-                                                    <span class="text-red-500 text-xs">{{ (supplier.sujetoRetencion.isrl *
-                                                        100) }}%</span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="border text-xs" colspan="2">FECHA DE CREACION:
-                                                    <span class="text-xs underline">{{ moment(
-                                                        supplier.fecha_registro_proveedor).format('Do MMMM YYYY') }}</span>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </span>
+                            </div>
+                            <div class="overflow-hidden rounded border border-slate-200  ">
+                                <table id="resumen" class="table table-bordered text-center p-0 mt-2 w-full">
+                                    <tbody>
+                                        <tr>
+                                            <td class="border px-3 text-xs">IVA SUJETO DE RETENCION<br />
+                                                <span class="text-red-500 text-xs font-medium">{{
+                                                    (supplier.sujetoRetencion.iva * 100) }}%</span>
+                                            </td>
+                                            <td class="border px-3 text-xs">ISRL SUJETO DE RETENCION<br />
+                                                <span class="text-red-500 text-xs font-medium">{{
+                                                    (supplier.sujetoRetencion.isrl * 100) }}%</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="border text-xs" colspan="2">FECHA DE CREACION:
+                                                <span class="text-xs font-medium">{{
+                                                    moment(supplier.fecha_registro_proveedor).format('Do MMMM YYYY')
+                                                }}</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                        <div class="mb-7 md:flex flex-row justify-items-start">
+                        <div class="mb-5 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="razon-social" v-model="supplier.razon_social_proveedor"
                                     :value="supplier.razon_social_proveedor" type="text" placeholder="Razón social"
-                                    @update:modelValue="validateInput('razon_social_proveedor', limit=145, upper=true)">
+                                    @update:modelValue="validateInput('razon_social_proveedor', limit = 145, upper = true)">
                                     <LabelToInput icon="standard" forLabel="razon-social" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errosModel.razon_social_proveedor" />
@@ -54,26 +51,25 @@ import moment from 'moment';
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="nombre-comercial" v-model="supplier.nombre_comercial_proveedor"
                                     :value="supplier.nombre_comercial_proveedor" type="text" placeholder="Nombre comercial"
-                                    @update:modelValue="validateInput('nombre_comercial_proveedor', limit=145, upper=true)">
+                                    @update:modelValue="validateInput('nombre_comercial_proveedor', limit = 145, upper = true)">
                                     <LabelToInput icon="standard" forLabel="nombre-comercial" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errosModel.nombre_comercial_proveedor" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput :required="false" id="nrc-proveedor" v-model="supplier.nrc_proveedor"
-                                    :value="supplier.nrc_proveedor" type="text"
-                                    @update:modelValue="validateInput('nrc_proveedor', limit=10, false, number=true)" 
+                                    :value="supplier.nrc_proveedor" type="text" @update:modelValue="validarnrc()"
                                     placeholder="NRC Proveedor">
                                     <LabelToInput icon="personalInformation" forLabel="nrc-proveedor" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errosModel.nrc_proveedor" />
                             </div>
                         </div>
-                        <div class="mb-7 md:flex flex-row justify-items-start">
+                        <div class="mb-5 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="dui-proveedor" v-model="supplier.dui_proveedor"
-                                    type="text" placeholder="Dui" :value="supplier.dui_proveedor" 
-                                    @update:modelValue="validateInput('dui_proveedor', limit=10, false, false, dui=true)">
+                                <TextInput id="dui-proveedor" v-model="supplier.dui_proveedor" type="text" placeholder="Dui"
+                                    :value="supplier.dui_proveedor"
+                                    @update:modelValue="validateInput('dui_proveedor', limit = 10, false, false, dui = true)">
                                     <LabelToInput icon="personalInformation" forLabel="dui-proveedor" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errosModel.dui_proveedor" />
@@ -81,7 +77,7 @@ import moment from 'moment';
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput :required="false" id="nit-proveedor" v-model="supplier.nit_proveedor"
                                     :value="supplier.nit_proveedor" type="text" placeholder="NIT"
-                                    @update:modelValue="validateInput('nit_proveedor', limit=17, false, false, false, nit=true)">
+                                    @update:modelValue="validateInput('nit_proveedor', limit = 17, false, false, false, nit = true)">
                                     <LabelToInput icon="personalInformation" forLabel="nit-proveedor" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errosModel.nit_proveedor" />
@@ -90,7 +86,7 @@ import moment from 'moment';
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Tipo de contribuyente <span class="text-red-600 font-extrabold">*</span>
                                 </label>
-                                <div class="relative font-semibold  flex h-8 w-full flex-row-reverse ">
+                                <div class="relative font-medium  flex h-8 w-full flex-row-reverse ">
                                     <Multiselect placeholder="Tipo contribuyente" v-model="supplier.id_tipo_contribuyente"
                                         id="estado-civil" :options="allSelectOptios.typeContribuyent" :searchable="true" />
                                     <LabelToInput icon="list" />
@@ -98,12 +94,12 @@ import moment from 'moment';
                                 <InputError class="mt-2" :message="errosModel.id_tipo_contribuyente" />
                             </div>
                         </div>
-                        <div class="mb-7 md:flex flex-row justify-items-start">
+                        <div class="mb-5 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Sujeto de retencion <span class="text-red-600 font-extrabold">*</span>
                                 </label>
-                                <div class="relative font-semibold  flex h-8 w-full flex-row-reverse ">
+                                <div class="relative font-medium  flex h-8 w-full flex-row-reverse ">
                                     <Multiselect placeholder="Sujeto retencion" v-model="supplier.id_sujeto_retencion"
                                         id="estado-civil" @select="evaluteValue($event)"
                                         :options="allSelectOptios.retention" :searchable="true" />
@@ -115,7 +111,7 @@ import moment from 'moment';
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Giro <span class="text-red-600 font-extrabold">*</span>
                                 </label>
-                                <div class="relative font-semibold  flex h-8 w-full flex-row-reverse ">
+                                <div class="relative font-medium  flex h-8 w-full flex-row-reverse ">
                                     <Multiselect placeholder="Giro" v-model="supplier.id_giro" id="giro"
                                         :options="allSelectOptios.giro" :searchable="true" />
                                     <LabelToInput icon="list" />
@@ -126,16 +122,16 @@ import moment from 'moment';
                     </div>
 
                     <div id="addres-information">
-                        <div class="pb-4 mb-4 md:flex flex-row justify-between">
+                        <div class="mb-3 md:flex flex-row justify-between">
                             <span class="font-semibold text-slate-800 mb-2 text-lg underline underline-offset-2">
                                 Dirección e información adicional
                             </span>
                         </div>
-                        <div class="mb-7 md:flex flex-row justify-items-start">
+                        <div class="mb-4 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput :required="false" id="telefono" v-model="supplier.telefono1_proveedor"
                                     :value="supplier.telefono1_proveedor" type="text" placeholder="Telefono 1"
-                                    @update:modelValue="validateInput('telefono1_proveedor', limit=10, false, false, false, false, phone_numer=true)">
+                                    @update:modelValue="validateInput('telefono1_proveedor', limit = 10, false, false, false, false, phone_numer = true)">
                                     <LabelToInput icon="personalPhoneNumber" forLabel="telefono" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errosModel.telefono1_proveedor" />
@@ -143,7 +139,7 @@ import moment from 'moment';
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput :required="false" id="telefono2-proveedor" v-model="supplier.telefono2_proveedor"
                                     :value="supplier.telefono2_proveedor" type="text" placeholder="Telefono 2"
-                                    @update:modelValue="validateInput('telefono2_proveedor', limit=10, false, false, false, false, phone_numer=true)">
+                                    @update:modelValue="validateInput('telefono2_proveedor', limit = 10, false, false, false, false, phone_numer = true)">
                                     <LabelToInput icon="personalPhoneNumber" forLabel="telefono2-proveedor" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errosModel.telefono2_proveedor" />
@@ -151,17 +147,17 @@ import moment from 'moment';
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput :required="false" id="Direccion" v-model="supplier.direccion_proveedor"
                                     :value="supplier.direccion_proveedor" type="tex" placeholder="Direccion"
-                                    @update:modelValue="validateInput('direccion_proveedor', limit=250, false, false, false, false, false)">
+                                    @update:modelValue="validateInput('direccion_proveedor', limit = 250, false, false, false, false, false)">
                                     <LabelToInput icon="house" forLabel="Direccion" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errosModel.direccion_proveedor" />
                             </div>
                         </div>
-                        <div class="mb-7 md:flex flex-row justify-items-start">
+                        <div class="mb-1 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput :required="false" id="contacto-proveedor" v-model="supplier.contacto_proveedor"
                                     :value="supplier.contacto_proveedor" type="text" placeholder="Contacto "
-                                    @update:modelValue="validateInput('contacto_proveedor', limit=95, false, false, false, false, false)">
+                                    @update:modelValue="validateInput('contacto_proveedor', limit = 95, false, false, false, false, false)">
                                     <LabelToInput icon="personalInformation" forLabel="contacto-proveedor" />
                                 </TextInput>
                             </div>
@@ -169,7 +165,7 @@ import moment from 'moment';
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Municipio <span class="text-red-600 font-extrabold">*</span>
                                 </label>
-                                <div class="relative font-semibold  flex h-8 w-full flex-row-reverse ">
+                                <div class="relative font-medium  flex h-8 w-full flex-row-reverse ">
                                     <Multiselect placeholder="Municipio" v-model="supplier.id_municipio" id="estado-civil"
                                         :options="allSelectOptios.location" :searchable="true" />
                                     <LabelToInput icon="list" />
@@ -179,7 +175,7 @@ import moment from 'moment';
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput :required="false" id="email-proveedor" v-model="supplier.email_proveedor"
                                     :value="supplier.email_proveedor" type="email" placeholder="Email "
-                                    @update:modelValue="validateInput('email_proveedor', limit=95, false, false, false, false, false)">
+                                    @update:modelValue="validateInput('email_proveedor', limit = 95, false, false, false, false, false)">
                                     <LabelToInput icon="email" forLabel="email-proveedor" />
                                 </TextInput>
                             </div>
@@ -187,7 +183,7 @@ import moment from 'moment';
                     </div>
                 </div>
             </div>
-            <div class="sticky bottom-0 px-5 py-4 bg-white border-t border-slate-200">
+            <div class="sticky bottom-0 px-5 py-2 bg-white border-t border-slate-200">
                 <div class="flex flex-wrap justify-end space-x-3">
                     <button
                         class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600 underline underline-offset-1"
@@ -198,15 +194,15 @@ import moment from 'moment';
                         text="Agregar proveedor" icon="add" />
                 </div>
             </div>
-        </ModalBasicVue>
+
+        </Modal>
         <!-- End -->
     </div>
 </template>
-
 <script>
 export default {
     props: {
-        scrollbarModalOpen: {
+        ModalIsOpen: {
             type: Boolean,
             default: false,
         },
@@ -253,26 +249,42 @@ export default {
     },
     methods: {
         //Function to validate data entry
-        validateInput(field, limit, upper_case, number, dui, nit, phone_number) {
+        validateInput(field, limit, upper_case, number, dui, nit, phone_number, nrc) {
             if (this.supplier[field] && this.supplier[field].length > limit) {
                 this.supplier[field] = this.supplier[field].substring(0, limit);
             }
-            if(upper_case){
+            if (upper_case) {
                 this.toUpperCase(field)
             }
-            if(number){
+            if (number) {
                 this.onlyNumbersAndSixDigits(field)
             }
-            if(dui){
+            if (dui) {
                 //Revisar funcion, al borrar un numero regresa el apuntador al final
                 this.typeDuiSupplier(field)
             }
-            if(nit){
+            if (nrc) {
+                //Revisar funcion, al borrar un numero regresa el apuntador al final
+                this.typeNrc(field)
+            }
+            if (nit) {
                 //Verificar ya que al borrar numeros los guiones siempre quedan visibles
                 this.typeNitSupplier(field)
             }
-            if(phone_number){
+            if (phone_number) {
                 this.phoneNumberFormat(field)
+            }
+            if (nrc) {
+                this.phoneNumberFormat(field)
+            }
+        },
+        validarnrc() {
+            // Remover todos los caracteres excepto los números y guiones
+            this.supplier.nrc_proveedor = this.supplier.nrc_proveedor.replace(/[^0-9-]/g, "");
+
+            // Limitar la entrada a un máximo de 7 caracteres
+            if (this.supplier.nrc_proveedor.length > 8) {
+                this.supplier.nrc_proveedor = this.supplier.nrc_proveedor.slice(0, 8);
             }
         },
         async listOptionsSelect() {//metodo que trae toda la info de todos los select
@@ -292,11 +304,11 @@ export default {
                     });
                 });
         },
-        toUpperCase(field){
+        toUpperCase(field) {
             //Converts field to uppercase
             this.supplier[field] = this.supplier[field].toUpperCase()
         },
-        phoneNumberFormat(field){
+        phoneNumberFormat(field) {
             //Validates the phone number format
             var telefono = this.supplier[field].replace(/\D/g, '').match(/(\d{0,4})(\d{0,4})/);
             this.supplier[field] = !telefono[2] ? telefono[1] : '' + telefono[1] + '-' + telefono[2];
@@ -310,6 +322,16 @@ export default {
             //Specific format for nit number
             let nit = this.supplier[field].replace(/\D/g, '').match(/(\d{0,4})(\d{0,6})(\d{0,3})(\d{0,1})/);
             this.supplier[field] = nit[1] + "-" + nit[2] + "-" + nit[3] + "-" + nit[4];
+        },
+        typeNrc(field) {
+            //Specific format for nit number
+            // Remover todos los caracteres excepto los números y guiones
+            this.supplier.nrc_proveedor = this.supplier.nrc_proveedor.replace(/[^0-9-]/g, "");
+
+            // Colocar guiones después de los primeros cuatro dígitos
+            if (this.supplier.nrc_proveedor.length > 4) {
+                this.supplier.nrc_proveedor = this.supplier.nrc_proveedor.slice(0, 4) + "-" + this.supplier.nrc_proveedor.slice(4);
+            }
         },
         onlyNumbersAndSixDigits(field) {
             //Allows only numbers and six digits
@@ -337,8 +359,8 @@ export default {
                             transition: "zoom",
                             toastBackgroundColor: "white",
                         });
-                        this.$emit('close-definitive')
-                        this.$emit("showTableAgain")
+                        this.$emit("reload-table")
+                        this.limpiarCampos()
                     }).catch((errors) => {
                         if (errors.response.status === 422) {
                             if (errors.response.data.logical_error) {
@@ -351,8 +373,6 @@ export default {
                                         toastBackgroundColor: "white",
                                     }
                                 );
-                                this.$emit('close-definitive')
-                                this.limpiarCampos()
                             } else {
                                 let data = errors.response.data.errors
                                 var myData = new Object();
@@ -399,9 +419,8 @@ export default {
                             transition: "zoom",
                             toastBackgroundColor: "white",
                         });
+                        this.$emit("reload-table")
                         this.limpiarCampos()
-                        this.$emit('close-definitive')
-                        this.$emit("showTableAgain")
                     }).catch((Error) => {
                         console.log(Error);
                         if (Error.response.status === 422) {
@@ -417,9 +436,6 @@ export default {
                                 transition: "zoom",
                                 toastBackgroundColor: "white",
                             });
-                            // setTimeout(() => {
-                            //     this.errosModel = {}
-                            // }, 9000);
                         } else {
                             let msg = this.manageError(Error);
                             this.$swal.fire({
@@ -468,10 +484,9 @@ export default {
         this.listOptionsSelect()
     },
     watch: {
-        scrollbarModalOpen: function (value) {
+        ModalIsOpen: function (value) {
             if (value) {
                 this.errosModel = {}
-
                 this.supplier.id_proveedor = this.infoSupplier.id_proveedor
                 this.supplier.razon_social_proveedor = this.infoSupplier.razon_social_proveedor
                 this.supplier.nombre_comercial_proveedor = this.infoSupplier.nombre_comercial_proveedor

@@ -305,7 +305,7 @@ class QuedanController extends Controller
 
         $v_Proveedor = DB::table('proveedor')
             ->select('id_proveedor as value', 'razon_social_proveedor as label', 'giro.codigo_giro', 'giro.nombre_giro', 'sujeto_retencion.iva_sujeto_retencion', 'sujeto_retencion.isrl_sujeto_retencion')
-            ->join('giro', 'giro.id_giro', '=', 'proveedor.id_giro')
+            ->leftJoin('giro', 'giro.id_giro', '=', 'proveedor.id_giro')
             ->join('sujeto_retencion', 'sujeto_retencion.id_sujeto_retencion', '=', 'proveedor.id_sujeto_retencion')
             ->where('estado_proveedor', 1)
             ->get();

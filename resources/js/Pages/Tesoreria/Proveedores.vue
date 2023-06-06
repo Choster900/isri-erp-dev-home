@@ -1,14 +1,14 @@
 <script setup>
 import { Head } from "@inertiajs/vue3";
 import Datatable from "@/Components-ISRI/Datatable.vue";
-import ModalSuppliersVue from '@/Components-ISRI/Tesoreria/ModalSuppliers.vue';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
+import ModalProveedortVue from '@/Components-ISRI/Tesoreria/ModalProveedor.vue';
 </script>
 <template>
     <Head title="Catalogo - Proveedor" />
     <AppLayoutVue nameSubModule="Tesoreria - Proveedores">
-        <div class="sm:flex sm:justify-end sm:items-center mb-2">
+        <div class="sm:flex sm:justify-end sm:items-center">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
                 <GeneralButton v-if="permits.insertar == 1" @click="addDataSupplier()"
                     color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add" />
@@ -78,13 +78,11 @@ import 'vue3-toastify/dist/index.css';
                                             @click.stop="getSuppiler(proveedor)">
                                             <div class="w-8 text-green-900">
                                                 <span class="text-xs">
-
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                         stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 002.25-2.25V6a2.25 2.25 0 00-2.25-2.25H6A2.25 2.25 0 003.75 6v2.25A2.25 2.25 0 006 10.5zm0 9.75h2.25A2.25 2.25 0 0010.5 18v-2.25a2.25 2.25 0 00-2.25-2.25H6a2.25 2.25 0 00-2.25 2.25V18A2.25 2.25 0 006 20.25zm9.75-9.75H18a2.25 2.25 0 002.25-2.25V6A2.25 2.25 0 0018 3.75h-2.25A2.25 2.25 0 0013.5 6v2.25a2.25 2.25 0 002.25 2.25z" />
                                                     </svg>
-
                                                 </span>
                                             </div>
                                             <div class="font-semibold">Editar</div>
@@ -92,33 +90,23 @@ import 'vue3-toastify/dist/index.css';
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                                             v-if="permits.eliminar == 1"
                                             @click="enableStateForSupplier(proveedor.id_proveedor, proveedor.estado_proveedor)">
-                                            <div class="w-8 text-red-900">
-                                                <!-- <span class="text-xs">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                                                    </svg>
-                                                </span> -->
-                                                <svg fill="#7F1D1D" version="1.1" id="Capa_1"
-                                                    xmlns="http://www.w3.org/2000/svg" width="20px" height="20px"
-                                                    xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 97.994 97.994"
-                                                    xml:space="preserve" stroke="#7F1D1D">
-                                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round"
-                                                        stroke-linejoin="round"></g>
-                                                    <g id="SVGRepo_iconCarrier">
-                                                        <g>
-                                                            <g>
-                                                                <path
-                                                                    d="M97.155,9.939c-0.582-0.416-1.341-0.49-1.991-0.193l-10.848,4.935C74.08,5.29,60.815,0.118,46.966,0.118 c-15.632,0-30.602,6.666-41.07,18.289c-0.359,0.399-0.543,0.926-0.51,1.461c0.033,0.536,0.28,1.036,0.686,1.388l11.301,9.801 c0.818,0.711,2.055,0.639,2.787-0.162c6.866-7.512,16.636-11.821,26.806-11.821c6.135,0,12.229,1.584,17.622,4.583l-7.826,3.561 c-0.65,0.296-1.095,0.916-1.163,1.627c-0.069,0.711,0.247,1.405,0.828,1.82l34.329,24.52c0.346,0.246,0.753,0.373,1.163,0.373 c0.281,0,0.563-0.06,0.828-0.181c0.65-0.296,1.095-0.916,1.163-1.627l4.075-41.989C98.053,11.049,97.737,10.355,97.155,9.939z">
-                                                                </path>
-                                                                <path
-                                                                    d="M80.619,66.937c-0.819-0.709-2.055-0.639-2.787,0.162c-6.866,7.514-16.638,11.822-26.806,11.822 c-6.135,0-12.229-1.584-17.622-4.583l7.827-3.561c0.65-0.296,1.094-0.916,1.163-1.628c0.069-0.711-0.247-1.404-0.828-1.819 L7.237,42.811c-0.583-0.416-1.341-0.49-1.991-0.193c-0.65,0.296-1.094,0.916-1.163,1.627L0.009,86.233 c-0.069,0.712,0.247,1.406,0.828,1.822c0.583,0.416,1.341,0.488,1.991,0.192l10.848-4.935 c10.237,9.391,23.502,14.562,37.351,14.562c15.632,0,30.602-6.666,41.07-18.289c0.358-0.398,0.543-0.926,0.51-1.461 c-0.033-0.536-0.28-1.036-0.687-1.388L80.619,66.937z">
-                                                                </path>
-                                                            </g>
-                                                        </g>
-                                                    </g>
+                                            <div class="w-8">
+                                                <svg v-if="proveedor.estado_proveedor == 1" width="28px"
+                                                    style="margin-left: -2px;" height="28px" viewBox="0 0 24 24"
+                                                    fill="none">
+                                                    <path
+                                                        d="M12.0769 19C13.5389 19 14.9634 18.532 16.1462 17.6631C17.329 16.7942 18.2094 15.569 18.6612 14.1631C19.1129 12.7572 19.1129 11.2428 18.6612 9.83688C18.2094 8.43098 17.329 7.20578 16.1462 6.33688C14.9634 5.46798 13.5389 5 12.0769 5C10.6149 5 9.19043 5.46799 8.00764 6.33688C6.82485 7.20578 5.94447 8.43098 5.49268 9.83688C5.0409 11.2428 5.0409 12.7572 5.49269 14.1631M6.5 12.7778L5.53846 14.3333L4 13.1667"
+                                                        stroke="#a80000" stroke-linecap="round" stroke-linejoin="round">
+                                                    </path>
+                                                </svg>
+
+                                                <svg v-else style="margin-left: -2px;" width="28px" height="28px"
+                                                    viewBox="0 0 24 24" fill="none">
+                                                    <path
+                                                        d="M11.9231 19C10.4611 19 9.03659 18.532 7.85379 17.6631C6.671 16.7942 5.79063 15.569 5.33884 14.1631C4.88705 12.7572 4.88705 11.2428 5.33884 9.83688C5.79063 8.43098 6.671 7.20578 7.8538 6.33688C9.03659 5.46798 10.4611 5 11.9231 5C13.3851 5 14.8096 5.46799 15.9924 6.33688C17.1752 7.20578 18.0555 8.43098 18.5073 9.83688C18.9591 11.2428 18.9591 12.7572 18.5073 14.1631M17.5 12.7778L18.4615 14.3333L20 13.1667"
+                                                        stroke="#006113" stroke-linecap="round" stroke-linejoin="round">
+                                                    </path>
+
                                                 </svg>
                                             </div>
                                             <div class="font-semibold">
@@ -133,7 +121,7 @@ import 'vue3-toastify/dist/index.css';
                 </datatable>
             </div>
         </div>
-        <div class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
+        <div class="px-6 py-4 bg-white shadow-lg rounded-sm border-slate-200 relative">
             <div>
                 <nav class="flex justify-between" role="navigation" aria-label="Navigation">
 
@@ -171,11 +159,8 @@ import 'vue3-toastify/dist/index.css';
                 </nav>
             </div>
         </div>
-
-        <ModalSuppliersVue :scrollbarModalOpen="scrollbarModalOpen" @close-definitive="scrollbarModalOpen = false"
-            :infoSupplier="infoSupplier" @showTableAgain="getSuppilers(lastUrl)" />
-
-
+        <ModalProveedortVue :ModalIsOpen="stateModal" @close-modal="stateModal = false" :infoSupplier="infoSupplier"
+            @reload-table="getSuppilers(lastUrl)" />
     </AppLayoutVue>
 </template>
 <script>
@@ -212,7 +197,7 @@ export default {
         });
         return {
             permits: [],
-            scrollbarModalOpen: false,
+            stateModal: false,
             proveedores: [],
             links: [],
             lastUrl: "/proveedores",
@@ -252,6 +237,8 @@ export default {
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
                     this.proveedores = data.data.data;
+
+                    this.stateModal = false
                 }
             }).catch((errors) => {
                 let msg = this.manageError(errors);
@@ -277,11 +264,11 @@ export default {
         },
         async getSuppiler(supplier) {
             this.infoSupplier = supplier;
-            this.scrollbarModalOpen = !this.scrollbarModalOpen;
+            this.stateModal = !this.stateModal;
         },
         addDataSupplier() {
             this.infoSupplier = [];
-            this.scrollbarModalOpen = !this.scrollbarModalOpen;
+            this.stateModal = !this.stateModal;
         },
         async enable(id_persona, estado) {
             await axios.post("/update-state-supplier", { id_proveedor: id_persona, estado_proveedor: estado })
@@ -301,8 +288,10 @@ export default {
         },
         enableStateForSupplier(id_proveedor, estado) {
             let state = estado == 0 ? "habilitar" : "deshabilitar";
+            let stateToas = estado == 0 ? "habilitado" : "deshabilitado";
+
             this.$swal.fire({
-                title: "¿Esta seguro de " + state + " el registro ?",
+                title: `¿Esta seguro de ${state}  el registro ?`,
                 icon: "question",
                 iconHtml: "❓",
                 confirmButtonText: "Si, " + state + "",
@@ -313,12 +302,12 @@ export default {
             }).then((result) => {
                 if (result.isConfirmed) {
                     this.enable(id_proveedor, estado); //peticion async hace la modificacion 
-                    //no la llamamos en el mismo metodo por que dejaria de ser asyn y hay problema al momento de actulizar la tabla
-                    this.$swal.fire({
-                        text: 'Acción realizada!',
-                        icon: 'success',
-                        timer: 5000
-                    })
+                    toast.success(`El proveedor se ha ${stateToas} con exito`, {
+                        autoClose: 4000,
+                        position: "top-right",
+                        transition: "zoom",
+                        toastBackgroundColor: "white",
+                    });
                 }
             });
         },
