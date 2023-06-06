@@ -143,8 +143,8 @@ import ModalVerRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalVerRequer
         </div>
     </AppLayoutVue>
 
-    <ModalRequerimientoVue :requerimientoModalOpen="requerimientoModalOpen"
-        @close-definitive="requerimientoModalOpen = false" :modal_data="modal_data"
+    <ModalRequerimientoVue :ModalIsOpen="requerimientoModalState"
+        @close-modal="requerimientoModalState = false" :modal_data="modal_data"
         @updateTable="getDataRequerimiento(lastUrl)" />
 
     <ModalVerRequerimientoVue :view_req_info="view_req_info" :show_request="show_request" :center="true"
@@ -201,7 +201,7 @@ export default {
                 from: "",
                 to: "",
             },
-            requerimientoModalOpen: false,
+            requerimientoModalState: false,
             view_req_info: false,
             modal_data: [],
             errorNumber: null,
@@ -246,11 +246,11 @@ export default {
         },
         editRequerimiento(request) {
             this.modal_data = request
-            this.requerimientoModalOpen = true
+            this.requerimientoModalState = true
         },
         openModal() {
             this.modal_data = []
-            this.requerimientoModalOpen = true
+            this.requerimientoModalState = true
         },
         validarCamposVacios(objeto) {
             for (var propiedad in objeto) {

@@ -197,7 +197,6 @@ export default {
         });
         return {
             permits: [],
-            scrollbarModalOpen: false,
             stateModal: false,
             proveedores: [],
             links: [],
@@ -289,8 +288,10 @@ export default {
         },
         enableStateForSupplier(id_proveedor, estado) {
             let state = estado == 0 ? "habilitar" : "deshabilitar";
+            let stateToas = estado == 0 ? "habilitado" : "deshabilitado";
+
             this.$swal.fire({
-                title: "¿Esta seguro de " + state + " el registro ?",
+                title: `¿Esta seguro de ${state}  el registro ?`,
                 icon: "question",
                 iconHtml: "❓",
                 confirmButtonText: "Si, " + state + "",
@@ -301,12 +302,12 @@ export default {
             }).then((result) => {
                 if (result.isConfirmed) {
                     this.enable(id_proveedor, estado); //peticion async hace la modificacion 
-                    //no la llamamos en el mismo metodo por que dejaria de ser asyn y hay problema al momento de actulizar la tabla
-                    this.$swal.fire({
-                        text: 'Acción realizada!',
-                        icon: 'success',
-                        timer: 5000
-                    })
+                    toast.success(`El proveedor se ha ${stateToas} con exito`, {
+                        autoClose: 4000,
+                        position: "top-right",
+                        transition: "zoom",
+                        toastBackgroundColor: "white",
+                    });
                 }
             });
         },
