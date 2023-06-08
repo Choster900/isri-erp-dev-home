@@ -1,13 +1,13 @@
 <script setup>
-import ModalBasicVue from '@/Components-ISRI/AllModal/ModalBasic.vue';
+import Modal from "@/Components-ISRI/AllModal/Modal.vue";
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import moment from 'moment';
 import axios from 'axios';
 </script>
 <template>
-    <ModalBasicVue :title="tittleModal" id="scrollbar-modal" maxWidth="5xl" :modalOpen="modalIsOpen"
-        @close-modal="$emit('close-definitive')">
+    <Modal :modal-title="tittleModal"  maxWidth="5xl" :show="modalIsOpen"
+        @close="$emit('close-definitive')">
 
         <div class=" px-10 py-5 ">
             <table class="table-auto">
@@ -253,7 +253,7 @@ import axios from 'axios';
             </div>
 
         </div>
-    </ModalBasicVue>
+    </Modal>
 </template>
   
 <script>
