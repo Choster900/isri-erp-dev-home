@@ -38,18 +38,18 @@ import axios from 'axios';
       </header>
 
       <div class="overflow-x-auto">
-        <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" 
-        @sort="sortBy" @datos-enviados="handleData($event)">
+        <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
+        @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getMoveableAssetsAndVehicles()">
           <tbody class="text-sm divide-y divide-slate-200">
             <tr v-for="asset in movable_vehicle" :key="asset.id_af">
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800 text-center">{{ asset.id_af }}</div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px td-data-table">
-                <div class="font-medium text-slate-800 ellipsis text-center">{{ asset.bien_especifico.nombre_bien_especifico }}</div>
+                <div class="font-medium text-slate-800 ellipsis text-center">{{ asset.nombre_bien_especifico }}</div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                <div class="font-medium text-slate-800 text-center">{{ asset.modelo.marca.nombre_marca }}</div>
+                <div class="font-medium text-slate-800 text-center">{{ asset.nombre_marca }}</div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800 text-center">{{ asset.serie_af }}</div>
@@ -160,7 +160,9 @@ import axios from 'axios';
     </div>
 
     <ModalMueblesYVehiculosVue :show_modal_asset="show_modal_asset" :modalData="modalData" :specific_assets = "specific_assets"
-    @cerrar-modal="show_modal_asset = false" @get-table="getMoveableAssetsAndVehicles(tableData.currentPage)" />
+    :conditions="conditions" :financing_sources="financing_sources" :suppliers="suppliers" :brands="brands"
+    :dependencies="dependencies"
+    @cerrar-modal="show_modal_asset = false" @get-table="getMoveableAssetsAndVehicles(tableData.currentPage)"/>
 
   </AppLayoutVue>
   
@@ -201,6 +203,10 @@ export default {
       movable_vehicle: [],
       specific_assets:[],
       suppliers: [],
+      conditions:[],
+      financing_sources: [],
+      dependencies: [],
+      brands: [],
       links: [],
       columns: columns,
       sortKey: "id_af",
@@ -214,7 +220,7 @@ export default {
         column: 0,
         dir: "desc",
         total: "",
-        asset_types:[1,2]
+        asset_types:[2,3]
       },
       show_modal_asset:false,
       modalData : [],
@@ -233,6 +239,11 @@ export default {
       axios.get("/get-select-mv-asset")
         .then((response) => {
           this.specific_assets = response.data.specific_assets
+          this.conditions = response.data.conditions
+          this.suppliers = response.data.suppliers
+          this.financing_sources = response.data.financing_sources
+          this.brands = response.data.brands
+          this.dependencies = response.data.dependencies
         })
         .catch((errors) => {
           let msg = this.manageError(errors);
@@ -335,7 +346,7 @@ export default {
     handleData(myEventData) {
       console.log(myEventData);
       this.tableData.search = myEventData;
-      this.getMoveableAssetsAndVehicles()
+      //this.getMoveableAssetsAndVehicles()
     }
   }
 }
