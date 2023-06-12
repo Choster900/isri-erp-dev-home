@@ -640,8 +640,8 @@ export default {
             this.dataInputs.monto_liquido_quedan = montoLiquidoQuedan;
 
 
-            this.dataInputs.monto_iva_quedan = totalIva;
-            this.dataInputs.monto_isr_quedan = totalRenta;
+            this.dataInputs.monto_iva_quedan = totalIva.toFixed(2);
+            this.dataInputs.monto_isr_quedan = totalRenta.toFixed(2);
 
 
         },
@@ -1067,7 +1067,7 @@ export default {
                         });
                     });
 
-                    this.calculateAmount();
+                    this.taxesByRow();
                     this.getAmountBySupplier(newDataQuedan.proveedor.id_proveedor);
 
 

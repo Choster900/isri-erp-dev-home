@@ -180,14 +180,14 @@ class QuedanController extends Controller
                 if ($value[7]) {
                     $new_detalle = [
                         'id_quedan'                   => $quedan,
-                        'numero_factura_det_quedan'   => $value[2],
-                        'id_dependencia'              => $value[3],
-                        'numero_acta_det_quedan'      => $value[4],
-                        'descripcion_det_quedan'      => $value[5],
-                        'producto_factura_det_quedan' => $value[6]['producto'],
-                        'servicio_factura_det_quedan' => $value[6]['servicio'],
-                        'fecha_factura_det_quedan'    => $value[8],
-                        'fecha_reg_det_quedan'        => Carbon::now(),
+                        'numero_factura_det_quedan'   => $value["numero_factura_det_quedan"],
+                        'id_dependencia'              => $value["id_dependencia"],
+                        'numero_acta_det_quedan'      => $value["numero_acta_det_quedan"],
+                      //  'descripcion_det_quedan'      => $value[5],
+                        'producto_factura_det_quedan' => $value["monto"]['producto_factura_det_quedan'],
+                        'servicio_factura_det_quedan' => $value["monto"]['servicio_factura_det_quedan'],
+                        'fecha_factura_det_quedan'    => $value["fecha_factura_det_quedan"],
+                        'fecha_mod_det_quedan'        => Carbon::now(),
                         'usuario_det_quedan'          => $request->user()->nick_usuario,
                         'ip_det_quedan'               => $request->ip(),
                     ];
@@ -243,32 +243,32 @@ class QuedanController extends Controller
                 if ($value[0] == '') {
                     // Actualizar un detalle de quedan existente
                     $new_detalle = array(
-                        'numero_factura_det_quedan'   => $value[2],
-                        'id_dependencia'              => $value[3],
-                        'numero_acta_det_quedan'      => $value[4],
-                        'descripcion_det_quedan'      => $value[5],
-                        'producto_factura_det_quedan' => $value[6]['producto'],
-                        'servicio_factura_det_quedan' => $value[6]['servicio'],
-                        'fecha_factura_det_quedan'    => $value[8],
+                        'numero_factura_det_quedan'   => $value["numero_factura_det_quedan"],
+                        'id_dependencia'              => $value["id_dependencia"],
+                        'numero_acta_det_quedan'      => $value["numero_acta_det_quedan"],
+                      //  'descripcion_det_quedan'      => $value[5],
+                        'producto_factura_det_quedan' => $value["monto"]['producto_factura_det_quedan'],
+                        'servicio_factura_det_quedan' => $value["monto"]['servicio_factura_det_quedan'],
+                        'fecha_factura_det_quedan'    => $value["fecha_factura_det_quedan"],
                         'fecha_mod_det_quedan'        => Carbon::now(),
                         'usuario_det_quedan'          => $request->user()->nick_usuario,
                         'ip_det_quedan'               => $request->ip(),
                     );
-                    DetalleQuedan::where("id_det_quedan", $value[1])->update($new_detalle);
+                    DetalleQuedan::where("id_det_quedan", $value["id_det_quedan"])->update($new_detalle);
                 }
                 if ($value[0] == 1 && $value[7] !== false) {
                     //Al momento de editar puede que agrege filas entonces se valida que la fila sea nueva 
                     // Agregar un nuevo detalle_quedan
                     $new_detalle = array(
                         'id_quedan'                   => $id_quedan,
-                        'numero_factura_det_quedan'   => $value[2],
-                        'id_dependencia'              => $value[3],
-                        'numero_acta_det_quedan'      => $value[4],
-                        'descripcion_det_quedan'      => $value[5],
-                        'producto_factura_det_quedan' => $value[6]['producto'],
-                        'servicio_factura_det_quedan' => $value[6]['servicio'],
-                        'fecha_factura_det_quedan'    => $value[8],
-                        'fecha_reg_det_quedan'        => Carbon::now(),
+                        'numero_factura_det_quedan'   => $value["numero_factura_det_quedan"],
+                        'id_dependencia'              => $value["id_dependencia"],
+                        'numero_acta_det_quedan'      => $value["numero_acta_det_quedan"],
+                      //  'descripcion_det_quedan'      => $value[5],
+                        'producto_factura_det_quedan' => $value["monto"]['producto_factura_det_quedan'],
+                        'servicio_factura_det_quedan' => $value["monto"]['servicio_factura_det_quedan'],
+                        'fecha_factura_det_quedan'    => $value["fecha_factura_det_quedan"],
+                        'fecha_mod_det_quedan'        => Carbon::now(),
                         'usuario_det_quedan'          => $request->user()->nick_usuario,
                         'ip_det_quedan'               => $request->ip(),
                     );
