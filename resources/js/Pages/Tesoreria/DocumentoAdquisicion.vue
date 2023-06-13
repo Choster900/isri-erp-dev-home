@@ -1,10 +1,8 @@
 <script setup>
-import Modal from "@/Components/Modal.vue";
 import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
-import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
-import ModalIncomeConceptVue from '@/Components-ISRI/Tesoreria/ModalIncomeConcept.vue';
+import ModalDocAdquisicionVue from '@/Components-ISRI/Tesoreria/ModalDocAdquisicion.vue';
 import moment from 'moment';
 
 import { toast } from 'vue3-toastify';
@@ -19,7 +17,7 @@ import axios from 'axios';
   <AppLayoutVue nameSubModule="Tesoreria - Documentos de Adquisicion">
     <div class="sm:flex sm:justify-end sm:items-center mb-2">
       <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-        <GeneralButton @click="addIncomeConcept()" v-if="permits.insertar == 1" color="bg-green-700  hover:bg-green-800"
+        <GeneralButton @click="addAcqDoc()" v-if="permits.insertar == 1" color="bg-green-700  hover:bg-green-800"
           text="Agregar Elemento" icon="add" />
       </div>
     </div>
@@ -169,9 +167,9 @@ import axios from 'axios';
       </div>
     </div>
 
-    <ModalIncomeConceptVue :showModalIncome="showModalIncome" :modalData="modalData"
+    <ModalDocAdquisicionVue :show_modal_acq_doc="show_modal_acq_doc" :modalData="modalData"
       :financing_sources="financing_sources" :budget_accounts="budget_accounts" :dependencies="dependencies"
-      @cerrar-modal="showModalIncome = false" @get-table="getAcquisitionDoc(tableData.currentPage)" />
+      @cerrar-modal="show_modal_acq_doc = false" @get-table="getAcquisitionDoc(tableData.currentPage)" />
 
   </AppLayoutVue>
 </template>
@@ -181,7 +179,7 @@ export default {
   created() {
     this.getAcquisitionDoc()
     this.getPermits()
-    this.getSelectsIncomeConcept()
+    this.getSelectsAcquisitionDoc()
   },
   data() {
     let sortOrders = {};
@@ -210,13 +208,16 @@ export default {
       //Data for datatable
       acquisition_docs: [],
       //Data for modal
-      showModalIncome: false,
+      show_modal_acq_doc: false,
       modalData: [],
-
-      permits: [],
+      doc_types:[],
+      suppliers:[],
+      management_types:[],
       budget_accounts: [],
       dependencies: [],
       financing_sources: [],
+      //Permissions
+      permits: [],
       links: [],
       columns: columns,
       sortKey: "id_doc_adquisicion",
@@ -239,15 +240,16 @@ export default {
       this.modalData = income_concept
       this.showModalIncome = true
     },
-    addIncomeConcept() {
+    addAcqDoc() {
       this.modalData = []
-      this.showModalIncome = true
+      this.show_modal_acq_doc = true
     },
-    getSelectsIncomeConcept() {
-      axios.get("/get-selects-income-concept")
+    getSelectsAcquisitionDoc() {
+      axios.get("/get-selects-acq-doc")
         .then((response) => {
-          this.budget_accounts = response.data.budget_accounts
-          this.dependencies = response.data.dependencies
+          this.doc_types = response.data.doc_types
+          this.management_types = response.data.management_types
+          this.suppliers = response.data.suppliers
           this.financing_sources = response.data.financing_sources
         })
         .catch((errors) => {
