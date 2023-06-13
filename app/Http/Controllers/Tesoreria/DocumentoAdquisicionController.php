@@ -49,4 +49,54 @@ class DocumentoAdquisicionController extends Controller
         $acquisition_docs = $query->paginate($length)->onEachSide(1);
         return ['data' => $acquisition_docs, 'draw' => $request->input('draw')];
     }
+    public function changeStateAcqdoc(Request $request)
+    {
+        // $servicio = ConceptoIngreso::find($request->id_service);
+        // if ($servicio->estado_concepto_ingreso == 1) {
+        //     if ($request->state_service == 1) {
+        //         $servicio->update([
+        //             'estado_concepto_ingreso' => 0,
+        //             'fecha_mod_concepto_ingreso' => Carbon::now(),
+        //             'usuario_concepto_ingreso' => $request->user()->nick_usuario,
+        //             'ip_concepto_ingreso' => $request->ip(),
+        //         ]);
+        //         return ['mensaje' => 'Concepto de ingreso ' . $servicio->nombre_concepto_ingreso . ' ha sido desactivado con exito'];
+        //     } else {
+        //         return ['mensaje' => 'El concepto de ingreso seleccionado ya ha sido activado por otro usuario'];
+        //     }
+        // } else {
+        //     if ($servicio->estado_concepto_ingreso == 0) {
+        //         if ($request->state_service == 0) {
+        //             $servicio->update([
+        //                 'estado_concepto_ingreso' => 1,
+        //                 'fecha_mod_concepto_ingreso' => Carbon::now(),
+        //                 'usuario_concepto_ingreso' => $request->user()->nick_usuario,
+        //                 'ip_concepto_ingreso' => $request->ip(),
+        //             ]);
+        //             return ['mensaje' => 'Concepto de ingreso ' . $servicio->nombre_concepto_ingreso . ' ha sido activado con exito'];
+        //         } else {
+        //             return ['mensaje' => 'El concepto de ingreso seleccionado ya ha sido desactivado por otro usuario'];
+        //         }
+        //     }
+        // }
+    }
+    public function getSelectsAcqDoc(Request $request)
+    {
+        // $budget_accounts = CuentaPresupuestal::selectRaw("id_ccta_presupuestal as value , concat(id_ccta_presupuestal, ' - ', nombre_ccta_presupuestal) as label")
+        //     ->where('tesoreria_ccta_presupuestal', '=', 1)
+        //     ->where('estado_ccta_presupuestal', '=', 1)
+        //     ->orderBy('nombre_ccta_presupuestal')
+        //     ->get();
+        // $dependencies = Dependencia::selectRaw("id_dependencia as value , concat(codigo_dependencia, ' - ', nombre_dependencia) as label")
+        //     ->where('id_tipo_dependencia', '=', 1)
+        //     ->orderBy('nombre_dependencia')
+        //     ->get();
+        // $financing_sources = ProyectoFinanciado::select('id_proy_financiado as value', 'nombre_proy_financiado as label')
+        //     ->where('estado_proy_financiado', '=', 1)
+        //     ->orderBy('nombre_proy_financiado')
+        //     ->get();
+
+        // return ['budget_accounts' => $budget_accounts, 'dependencies' => $dependencies, 'financing_sources' => $financing_sources];
+    }
+
 }
