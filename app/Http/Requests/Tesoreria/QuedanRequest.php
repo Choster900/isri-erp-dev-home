@@ -30,13 +30,13 @@ class QuedanRequest extends FormRequest
         $rules = [];
         collect($this->input('detalle_quedan', [])) // Convertir el arreglo en una colección
             ->each(function ($detalle, $key) use (&$rules) { // Iterar sobre cada detalle
-                if (!empty($detalle[7])) { // Validar si el campo 7 está lleno
-                    $rules["detalle_quedan.{$key}.3"] = ['required'];
+                if (!empty($detalle["isDelete"])) { // Validar si el campo 7 está lleno
+                    $rules["detalle_quedan.{$key}.id_dependencia"] = ['required'];
 
-                    $rules["detalle_quedan.{$key}.4"] = [
+                    $rules["detalle_quedan.{$key}.numero_acta_det_quedan"] = [
                         Rule::unique('detalle_quedan', 'numero_acta_det_quedan')->where(function ($query) use ($detalle) {
-                                return $query->where('id_dependencia', $detalle[3])->where('numero_acta_det_quedan', $detalle[4]);
-                            })->ignore($detalle[1], 'id_det_quedan')
+                                return $query->where('id_dependencia', $detalle["id_dependencia"])->where('numero_acta_det_quedan', $detalle["numero_acta_det_quedan"]);
+                            })->ignore($detalle["id_det_quedan"], 'id_det_quedan')
                     ];
                 }
             });
@@ -47,15 +47,17 @@ class QuedanRequest extends FormRequest
     {
         $messages = [];
         foreach ( $this->input('detalle_quedan', []) as $key => $value ) {
-            if ($this->input("detalle_quedan.{$key}.7")) {
-                $messages["detalle_quedan.{$key}.4.unique"] = '1';
+            if ($this->input("detalle_quedan.{$key}.isDelete")) {
+                $messages["detalle_quedan.{$key}.id_dependencia.required"] = 'LA DEPENDENCIA ES UN DATO REQUERIDO';
             }
         }
+
         foreach ( $this->input('detalle_quedan', []) as $key => $value ) {
-            if ($this->input("detalle_quedan.{$key}.7")) {
-                $messages["detalle_quedan.{$key}.3.required"] = 'LA DEPENDENCIA ES UN DATO REQUERIDO';
+            if ($this->input("detalle_quedan.{$key}.isDelete")) {
+                $messages["detalle_quedan.{$key}.numero_acta_det_quedan.unique"] = '1';
             }
         }
+
 
         return $messages;
     }

@@ -31,7 +31,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                     </div>
 
                     <button type="button" @click="addRow()"
-                        :class="rowsData.filter((e) => e[7] === true).length === 7 ? 'cursor-not-allowed' : ''"
+                        :class="rowsData.filter((e) => e['isDelete'] === true).length === 7 ? 'cursor-not-allowed' : ''"
                         style="float: right;margin-right:-4px;margin-top:399px; font-size: 30px; padding: 0 10px; border: 0; background-color: transparent;">
                         <span type="button" data-toggle="tooltip" data-placement="right"
                             :title="rowsData.length === 7 ? 'Llego al limite del factura por quedan' : 'Agregar factura'">
@@ -144,19 +144,20 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                         </div>
 
                         <div class="max-w-7xl mx-auto pb-20 sm:px-6 lg:px-8 overflow-x-auto">
-                            <table class="table-auto mx-auto">
+                            <table class="table-auto mx-auto">  
                                 <thead>
                                     <tr>
                                         <th class="border-2 border-black h-7 " colspan="2">
                                             <p class="px-[55px] text-sm text-gray-600">PROVEEDOR</p>
                                         </th>
-                                        <th class="border-2 border-black text-sm text-gray-600" colspan="9"
-                                            contenteditable="false">
+                                        <th class="border-2 border-black text-sm text-gray-600" colspan="5">
                                             DATOS DEL QUEDAN
                                         </th>
                                     </tr>
+
+
                                     <tr>
-                                        <td class="border-2 border-black" colspan="2" contenteditable="false">
+                                        <td class="border-2 border-black" colspan="2">
                                             <div class="relative flex h-8 w-full flex-row-reverse "
                                                 :class="{ 'condition-select': dataInputs.id_proveedor == '' }">
                                                 <Multiselect v-model="dataInputs.id_proveedor"
@@ -165,51 +166,60 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                     @input="getInformationBySupplier($event)" />
                                             </div>
                                         </td>
-                                        <th class="border-2 border-black text-sm text-gray-600" colspan="3">
+                                        <th class="border-2 border-black text-xs text-gray-600" colspan="2">
+                                            TIPO CONTRATACION
+                                        </th>
+                                        <th class="border-2 border-black text-xs text-gray-600">
                                             NUMERO DE ACUERDO
                                         </th>
-                                        <th class="border-2 border-black text-sm text-gray-600" colspan="4">
+                                        <th class="border-2 border-black text-xs text-gray-600">
                                             NUMERO DE COMPROMISO
                                         </th>
-                                        <th class="border-2 border-black text-sm text-gray-600" colspan="4">
+                                        <th class="border-2 border-black text-xs text-gray-600">
                                             NUMERO DE RETENCION
                                         </th>
 
                                     </tr>
 
+
                                     <tr>
-                                        <th class="border-2 border-black h-16 text-sm text-gray-600" colspan="2">
-                                            ACUERDO CONTRATACION
+                                        <th class="border-2 border-black h-12 text-sm text-gray-600" colspan="2">
+                                            CONTRATO
                                         </th>
-                                        <td class="border-2 border-black"
-                                            :class="dataInputs.numero_acuerdo_quedan == '' ? 'bg-[#fdfd96]' : ''"
-                                            colspan="3" contenteditable="false">
+                                        <td class="border-2 border-black" colspan="2"
+                                            :class="dataInputs.numero_acuerdo_quedan == '' ? 'bg-[#fdfd96]' : ''">
                                             <input type="text" v-model="dataInputs.numero_acuerdo_quedan" maxlength="10"
                                                 :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                 :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
-                                                class="peer w-full text-sm bg-transparent text-center h-16 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
+                                                class="peer w-full text-sm bg-transparent text-center h-12 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                         </td>
                                         <td class="border-2 border-black"
-                                            :class="dataInputs.numero_compromiso_ppto_quedan == '' ? 'bg-[#fdfd96]' : ''"
-                                            colspan="4" contenteditable="false">
+                                            :class="dataInputs.numero_compromiso_ppto_quedan == '' ? 'bg-[#fdfd96]' : ''">
                                             <input type="number" v-model="dataInputs.numero_compromiso_ppto_quedan"
                                                 @input="limitarCaracteres('numero_compromiso_ppto_quedan')"
                                                 :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                 :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
-                                                class="peer w-full text-sm bg-transparent text-center h-16 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
+                                                class="peer w-full text-sm bg-transparent text-center h-12 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                         </td>
                                         <td class="border-2 border-black"
-                                            :class="dataInputs.numero_retencion_iva_quedan == '' ? 'bg-[#fdfd96]' : ''"
-                                            colspan="4" contenteditable="false">
+                                            :class="dataInputs.numero_retencion_iva_quedan == '' ? 'bg-[#fdfd96]' : ''">
                                             <input type="number" v-model="dataInputs.numero_retencion_iva_quedan"
                                                 @input="limitarCaracteres('numero_retencion_iva_quedan')"
                                                 :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                 :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
-                                                class="peer w-full text-sm bg-transparent text-center h-16 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
+                                                class="peer w-full text-sm bg-transparent text-center h-12 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
+                                        </td>
+                                        <td class="border-2 border-black"
+                                            :class="dataInputs.numero_retencion_iva_quedan == '' ? 'bg-[#fdfd96]' : ''">
+                                            <input type="number" v-model="dataInputs.numero_retencion_iva_quedan"
+                                                @input="limitarCaracteres('numero_retencion_iva_quedan')"
+                                                :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
+                                                :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
+                                                class="peer w-full text-sm bg-transparent text-center h-12 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="border-2 border-black" colspan="2" contenteditable="false">
+                                        <td class="border-2 border-black" colspan="2">
                                             <div class="relative flex h-8 w-full flex-row-reverse"
                                                 :class="{ 'condition-select': dataInputs.id_acuerdo_compra == '' }">
                                                 <Multiselect v-model="dataInputs.id_acuerdo_compra"
@@ -217,60 +227,62 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                     :options="dataForSelectInRow.acuerdoCompras" :searchable="true" />
                                             </div>
                                         </td>
-                                        <th class="border-2 border-black text-sm text-gray-600" colspan="9"
-                                            contenteditable="false">
+                                        <th class="border-2 border-black text-sm text-gray-600" colspan="5">
                                             DETALLE QUEDAN
                                         </th>
                                     </tr>
-                                    <tr>
-                                        <th class="border-2 border-black text-sm w-32 text-gray-600">FACTURA</th>
-                                        <th class="border-2 border-black text-sm text-gray-600">FECHA DE EMISION</th>
-                                        <th class="border-2 border-black text-sm px-10 text-gray-600" colspan="2">
-                                            DEPENDENCIA</th>
-                                        <th class="border-2 border-black text-sm px-8 text-gray-600" colspan="2">NUMERO ACTA
-                                        </th>
-                                        <th class="border-2 border-black w-56 max-w-[200px] text-sm px-10 text-gray-600"
-                                            colspan="3">
-                                            CONCEPTO</th>
-                                        <th class="border-2 border-black w-40 text-sm px-10 text-gray-600" colspan="4">MONTO
-                                        </th>
+
+
+                                     <tr>
+                                        <th class="border-2 border-black text-sm px-2 text-gray-600 w-40">FACTURA</th>
+                                        <th class="border-2 border-black text-sm px-2 text-gray-600" colspan="2">FECHA EMISION</th>
+                                        <th class="border-2 border-black text-sm px-3 text-gray-600">DEPENDENCIA</th>
+                                        <th class="border-2 border-black text-sm px-4 text-gray-600">NUMERO ACTA</th>
+                                        <th class="border-2 border-black text-sm px-7 text-gray-600">MONTO</th>
+                                        <th class="border-2 border-black text-sm px-7 text-gray-600">RETENCIONES</th>
                                     </tr>
                                 </thead>
+
                                 <tbody class="text-sm" id="content">
 
-                                    <template v-for="( row, rowIndex ) in  rowsData " :key="rowIndex">
-                                        <template v-if="row[7]">
+                                     <template v-for="( row, rowIndex ) in  rowsData " :key="rowIndex">
+                                        <template v-if="row['isDelete']">
                                             <tr @dblclick="deleteRow(rowIndex)">
                                                 <template v-for="( cell, cellIndex ) in  row " :key="cellIndex">
-                                                    <td v-if="cellIndex == 2" class="border-2 border-black"
+                                                    <td v-if="cellIndex == 'numero_factura_det_quedan'"
+                                                        class="border-2 border-black"
                                                         :class="[cell == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']">
-                                                        <input type="text" v-model="rowsData[rowIndex][2]" maxlength="10"
+                                                        <input type="text"
+                                                            v-model="rowsData[rowIndex]['numero_factura_det_quedan']"
+                                                            maxlength="10"
                                                             :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                             :class="[cell == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']"
-                                                            class="peer w-full text-sm bg-transparent text-center h-[180px] border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
+                                                            class="peer w-full text-sm bg-transparent text-center  border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                                     </td>
-                                                    <td v-if="cellIndex == 2" class="border-2 border-black">
+                                                    <td v-else-if="cellIndex == 'fecha_factura_det_quedan'" colspan="2"
+                                                        class="border-2 border-black">
                                                         <div class="mb-4  md:mb-0">
-                                                            <flat-pickr v-model="rowsData[rowIndex][8]"
+                                                            <flat-pickr
+                                                                v-model="rowsData[rowIndex]['fecha_factura_det_quedan']"
                                                                 :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
-                                                                :class="[rowsData[rowIndex][8] == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']"
+                                                                :class="[rowsData[rowIndex]['fecha_factura_det_quedan'] == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']"
                                                                 class="w-[126px]  text-xs text-center cursor-pointer rounded-md border h-8 border-slate-400 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
                                                                 :config="config" />
                                                         </div>
 
                                                     </td>
-                                                    <td v-else-if="cellIndex == 3" class="border-2 border-black" colspan="2"
-                                                        :class="{ 'condition-select': rowsData[rowIndex][3] == '' }">
+                                                    <td v-else-if="cellIndex == 'id_dependencia'" class="border-2 border-black"
+                                                        :class="{ 'condition-select': rowsData[rowIndex]['id_dependencia'] == '' }">
                                                         <div class="relative flex h-8 w-full flex-row-reverse ">
-                                                            <Multiselect v-model="rowsData[rowIndex][3]"
+                                                            <Multiselect v-model="rowsData[rowIndex]['id_dependencia']"
                                                                 :options="dataForSelectInRow.dependencias"
                                                                 :searchable="true"
                                                                 :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                                 @select="onCellEdit(rowIndex, cellIndex, $event)" />
                                                         </div>
                                                     </td>
-                                                    <td v-else-if="cellIndex == 4"
-                                                        class="border-2 border-black max-w-[75px]" colspan="2" :class="[
+                                                    <td v-else-if="cellIndex == 'numero_acta_det_quedan'"
+                                                        class="border-2 border-black max-w-[75px]" :class="[
                                                             cell == '' ? 'bg-[#fdfd96]' : '',
                                                             errosDetalleQuedan[rowIndex] ? 'bg-[#fd9696]' : '',
                                                             errosrNumeroActa.includes(rowIndex) ? 'bg-[#fd9696]' : '',
@@ -279,43 +291,64 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                         @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
                                                         :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true">{{
                                                             cell }}</td>
-                                                    <td v-else-if="cellIndex == 5" colspan="4"
-                                                        @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
-                                                        class="border-2 border-black px-1 max-w-[200px]"
-                                                        :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
-                                                        :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true">
-                                                        {{ cell }}
-                                                    </td>
-                                                    <td v-else-if="cellIndex == 6" class="border-2 border-black">
+
+
+                                                    <td v-else-if="cellIndex == 'monto'" class="border-2 border-black">
                                                         <table>
                                                             <tr>
-                                                                <th class="border-2 border-r-black border-b-black border-l-transparent border-t-transparent text-sm text-gray-600 py-2"
+                                                                <th class="border-2 border-r-black border-b-black border-l-transparent border-t-transparent text-xs text-gray-600 py-1"
                                                                     style="writing-mode: vertical-rl; transform: rotate(180deg);">
                                                                     PRODUCTO
                                                                 </th>
-                                                                <td :class="[cell.producto == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']"
+                                                                <td :class="[cell.producto_factura_det_quedan == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']"
                                                                     class="w-full border-2 border-b-black border-x-transparent border-t-transparent">
                                                                     <input type="text"
-                                                                        v-model="rowsData[rowIndex][6].producto"
+                                                                        v-model="rowsData[rowIndex]['monto'].producto_factura_det_quedan"
                                                                         maxlength="10"
-                                                                        @input="onlyNumberDecimal(rowIndex, cellIndex, $event, 'producto')"
+                                                                        @input="onlyNumberDecimal(rowIndex, cellIndex, $event, 'producto_factura_det_quedan')"
                                                                         :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
-                                                                        class="peer w-full h-20 text-sm bg-transparent text-center  border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
+                                                                        class="peer w-full  text-sm bg-transparent text-center  border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                                                 </td>
                                                             </tr>
                                                             <tr>
-                                                                <th class="border-2 border-r-black border-t-black border-l-transparent border-b-transparent text-gray-600 py-2"
+                                                                <th class="border-2 border-r-black border-t-black border-l-transparent border-b-transparent text-xs text-gray-600 py-1"
                                                                     style="writing-mode: vertical-rl; transform: rotate(180deg);">
                                                                     SERVICIO
                                                                 </th>
                                                                 <td
-                                                                    :class="[cell.servicio == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']">
+                                                                    :class="[cell.servicio_factura_det_quedan == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']">
                                                                     <input type="text"
-                                                                        v-model="rowsData[rowIndex][6].servicio"
+                                                                        v-model="rowsData[rowIndex]['monto'].servicio_factura_det_quedan"
                                                                         maxlength="10"
-                                                                        @input="onlyNumberDecimal(rowIndex, cellIndex, $event, 'servicio')"
+                                                                        @input="onlyNumberDecimal(rowIndex, cellIndex, $event, 'servicio_factura_det_quedan')"
                                                                         :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
-                                                                        class="peer w-full h-20 text-sm bg-transparent text-center  border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
+                                                                        class="peer w-full  text-sm bg-transparent text-center  border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+
+                                                    </td>
+
+                                                    <td v-else-if="cellIndex == 'calculos'" class="border-2 border-black">
+                                                        <table>
+                                                            <tr>
+                                                                <th class="border-2 border-r-black border-b-black border-l-transparent border-t-transparent text-sm text-gray-600"
+                                                                    style="writing-mode: vertical-rl; transform: rotate(180deg);">
+                                                                    <span class="py-6">IVA</span>
+                                                                </th>
+                                                                <td :class="[dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']"
+                                                                    class="w-full border-2 border-b-black border-x-transparent border-t-transparent ">
+                                                                    {{ cell.iva }}
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th class="border-2 border-r-black border-t-black border-l-transparent border-b-transparent text-gray-600"
+                                                                    style="writing-mode: vertical-rl; transform: rotate(180deg);">
+                                                                    <span class="py-2">RENTA</span>
+                                                                </th>
+                                                                <td :class="[dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']"
+                                                                    class="">
+                                                                    {{ cell.renta }}
                                                                 </td>
                                                             </tr>
                                                         </table>
@@ -329,31 +362,31 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                         </template>
                                     </template>
                                 </tbody>
-                                <tbody>
+                                 <tbody>
                                     <tr id="esconder" class="border-none">
                                         <td contenteditable="false" class="py-3 border-none"></td>
                                     </tr>
                                     <tr>
-                                        <td class="border-2 border-black " colspan="2" rowspan="2" contenteditable="false">
+                                        <td class="border-2 border-black " colspan="1" rowspan="2" contenteditable="false">
                                             Descripción
                                         </td>
-                                        <td class="border-2 border-black max-w-[250px]" colspan="5" rowspan="2"
+                                        <td class="border-2 border-black max-w-[250px]" colspan="4" rowspan="2"
                                             :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true"
                                             @input="onInputDescripcionQuedan"
                                             :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''">
                                             {{ dataInputs.descripcion_quedan }}
 
                                         </td>
-                                        <th class="border-2 border-black text-sm text-gray-600" colspan="2">
+                                        <th class="border-2 border-black text-sm text-gray-600" colspan="1">
                                             PRIORIDAD DE PAGO
                                         </th>
-                                        <th class="border-2 border-black py-0 text-sm text-gray-600" colspan="3">
+                                        <th class="border-2 border-black py-0 text-sm text-gray-600" colspan="1">
                                             PROYECTO FINANCIADO
                                         </th>
                                     </tr>
                                     <tr>
 
-                                        <td class="border-2 border-black " colspan="2" contenteditable="false">
+                                        <td class="border-2 border-black " colspan="1" contenteditable="false">
                                             <div class="relative flex h-8 w-full flex-row-reverse "
                                                 :class="{ 'condition-select': dataInputs.id_prioridad_pago == '' }">
                                                 <Multiselect v-model="dataInputs.id_prioridad_pago"
@@ -361,7 +394,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                     :options="dataForSelectInRow.prioridadPago" :searchable="true" />
                                             </div>
                                         </td>
-                                        <td class="border-2 border-black " colspan="3" contenteditable="false">
+                                        <td class="border-2 border-black " colspan="1" contenteditable="false">
                                             <div class="relative flex h-8 w-full flex-row-reverse "
                                                 :class="{ 'condition-select': dataInputs.id_proy_financiado == '' }">
                                                 <Multiselect v-model="dataInputs.id_proy_financiado"
@@ -443,6 +476,7 @@ export default {
                 irs: '',
                 iva: '',
                 id_proveedor: '',
+                dui_proveedor: '',
                 monto_liquido_quedan: '',
                 monto_iva_quedan: '',
                 monto_isr_quedan: '',
@@ -512,7 +546,8 @@ export default {
             }
             //Seteamos la informacion a objeto con indice x y celda y
             this.rowsData[rowIndex][cellIndex][type] = event.target.value;
-            this.calculateAmount()
+            // this.calculateAmount()
+            this.taxesByRow(rowIndex, cellIndex, type, event.target.value)
         },
 
         getInformationBySupplier(supplier) {
@@ -521,52 +556,116 @@ export default {
                 const selectedSupplier = this.dataForSelectInRow.proveedor.find((suppliers) => suppliers.value === supplier);
                 if (selectedSupplier) {
                     // Datos que se pintan en los inputs
-                    this.dataInputs.giro = selectedSupplier.codigo_giro && selectedSupplier.nombre_giro ? `${selectedSupplier.codigo_giro} - ${selectedSupplier.nombre_giro}` : 'GIRO NO ESPECIFICADO!';
-                    this.dataInputs.irs = `${selectedSupplier.isrl_sujeto_retencion * 100} %`;
-                    this.dataInputs.iva = `${selectedSupplier.iva_sujeto_retencion * 100} %`;
+                    this.dataInputs.giro = selectedSupplier.codigo_giro && selectedSupplier.nombre_giro ? `${selectedSupplier.codigo_giro} - ${selectedSupplier.nombre_giro}` : 'GIRO NO ESPECIFICADO!'
+                    this.dataInputs.irs = `${selectedSupplier.isrl_sujeto_retencion * 100} %`
+                    this.dataInputs.iva = `${selectedSupplier.iva_sujeto_retencion * 100} %`
 
                     // Datos que se usan para cálculos
-                    this.dataForCalculate.irs = selectedSupplier.isrl_sujeto_retencion;
-                    this.dataForCalculate.iva = selectedSupplier.iva_sujeto_retencion;
-
-                    this.dataInputs.id_proveedor = selectedSupplier.value;
+                    this.dataForCalculate.irs = selectedSupplier.isrl_sujeto_retencion
+                    this.dataForCalculate.dui_proveedor = selectedSupplier.dui_proveedor
+                    this.dataForCalculate.iva = selectedSupplier.iva_sujeto_retencion
+                    this.dataInputs.id_proveedor = selectedSupplier.value
                 }
 
                 this.getAmountBySupplier(supplier);
-                this.calculateAmount();
+                //    this.calculateAmount();
+                this.taxesByRow();
+
             } else {
                 this.dataInputs.giro = ""
                 this.dataInputs.irs = ""
                 this.dataInputs.iva = ""
                 this.dataInputs.id_proveedor = ""
-
-
+                this.dataForCalculate.dui_proveedor = ""
                 this.dataForCalculate.irs = ''
                 this.dataForCalculate.iva = ''
                 this.dataForCalculate.id_proveedor = ''
 
-                this.calculateAmount();
+                // this.calculateAmount();
+                this.taxesByRow();
 
             }
 
         },
-        calculateAmount() {
+        taxesByRow(rowIndex = ""/* , cellIndex = "", type = "", value = "" */) {
+
+            let rowsData = this.rowsData.filter((element) => element['isDelete'] === true);
+
+
+            if (rowIndex !== "") {//CUANDO ESCRIBA EN AL CELDA DE MONTO PODRA HACER CALCULOS 
+                let rowData = rowsData.find((element, index) => {
+                    return index === rowIndex && element['isDelete'] === true;
+                });
+
+                if (rowData) {
+                    const productoMont = parseFloat(rowData.monto['producto_factura_det_quedan']) || 0;
+                    const servicioMont = parseFloat(rowData.monto['servicio_factura_det_quedan']) || 0;
+                    let amountByRow = productoMont + servicioMont;
+                    let liquido = amountByRow / 1.13;
+                    console.log(liquido);
+                    let ivaByFila = liquido * this.dataForCalculate.iva;
+                    rowsData[rowIndex]["calculos"].iva = Number(ivaByFila.toFixed(2));
+
+                    let montoIsrQuedan = (servicioMont * this.dataForCalculate.irs)
+                    rowsData[rowIndex]["calculos"].renta = this.dataForCalculate.dui_proveedor != null ? Number(montoIsrQuedan.toFixed(2)) : (0).toFixed(2);
+
+                }
+
+
+
+            } else {//CUANDO SE HAGA ALGUNA CAMBIO EN GENERAL SE RECORRERA TODO EL CONTENIDO LAS ROWS PARA HACER LOS CALCULOS EN EL FOREACH
+                this.rowsData.forEach((element, index) => {
+                    console.log(element, index);
+
+                    const productoMont = parseFloat(element.monto['producto_factura_det_quedan']) || 0;
+                    const servicioMont = parseFloat(element.monto['servicio_factura_det_quedan']) || 0;
+                    let amountByRow = (productoMont + servicioMont);
+                    let liquido = amountByRow / 1.13;
+                    let ivaByFila = (liquido * this.dataForCalculate.iva);
+                    rowsData[index]["calculos"].iva = Number(ivaByFila.toFixed(2));
+
+                    let montoIsrQuedan = (servicioMont * this.dataForCalculate.irs)
+                    rowsData[index]["calculos"].renta = this.dataForCalculate.dui_proveedor != null ? Number(montoIsrQuedan.toFixed(2)) : (0).toFixed(2);
+
+
+                });
+            }
+
+            let totalIva = rowsData.reduce((iva, obj) => iva + parseFloat(obj["calculos"].iva), 0);
+            let totalRenta = rowsData.reduce((iva, obj) => iva + parseFloat(obj["calculos"].renta), 0);
+
+            // Calcular el monto líquido (total - IVA - ISR)
+
+            let totalAmountInMonto = rowsData.reduce((monto, obj) => monto + (parseFloat(obj["monto"].producto_factura_det_quedan) || 0) + (parseFloat(obj["monto"].servicio_factura_det_quedan) || 0), 0);
+
+            this.dataInputs.monto_total_quedan = totalAmountInMonto.toFixed(2);
+
+            let montoLiquidoQuedan = (totalAmountInMonto - totalIva - totalRenta);
+            this.dataInputs.monto_liquido_quedan = montoLiquidoQuedan.toFixed(2);
+
+
+            this.dataInputs.monto_iva_quedan = totalIva.toFixed(2);
+            this.dataInputs.monto_isr_quedan = totalRenta.toFixed(2);
+
+
+        },
+        /* calculateAmount() {
             let totMontoByRow = 0;
             let liquido = 0;
             let montoServicios = 0;
 
-            let quedanArray = this.rowsData.filter((element) => element[7] === true);
+            let quedanArray = this.rowsData.filter((element) => element['isDelete'] === true);
 
             // Sumar todos los montos de todas las filas
             quedanArray.forEach((valores, index) => {
-                totMontoByRow += parseFloat(valores[6].producto) || 0; // Sumar el monto del producto
-                totMontoByRow += parseFloat(valores[6].servicio) || 0; // Sumar el monto del servicio
+                totMontoByRow += parseFloat(valores['monto'].producto_factura_det_quedan) || 0; // Sumar el monto del producto
+                totMontoByRow += parseFloat(valores['monto'].servicio_factura_det_quedan) || 0; // Sumar el monto del servicio
             });
 
             // Sumar solo los montos de servicios de todas las filas
             quedanArray.forEach((valores, index) => {
-                if (valores[6].servicio !== '') {
-                    montoServicios += parseFloat(valores[6].servicio) || 0;
+                if (valores['monto'].servicio_factura_det_quedan !== '') {
+                    montoServicios += parseFloat(valores['monto'].servicio_factura_det_quedan) || 0;
                 }
             });
 
@@ -584,7 +683,7 @@ export default {
 
             // Calcular el monto de ISR (Impuesto Sobre la Renta)
             let montoIsrQuedan = (montoServicios * this.dataForCalculate.irs).toFixed(2);
-            this.dataInputs.monto_isr_quedan = montoIsrQuedan;
+            this.dataInputs.monto_isr_quedan = this.dataForCalculate.dui_proveedor != null ? montoIsrQuedan : (0).toFixed(2);
 
             // Calcular el monto líquido (total - IVA - ISR)
             let montoLiquidoQuedan = (totMontoByRow - montoIvaQuedan - montoIsrQuedan).toFixed(2);
@@ -594,7 +693,7 @@ export default {
             this.dataInputs.monto_total_quedan = totMontoByRow.toFixed(2);
             this.getAmountBySupplier(this.dataInputs.id_proveedor);
 
-        },
+        }, */
         getAmountBySupplier(id_proveedor) {
             // Crear una copia de la matriz totalAmountBySupplier
             let newDataSupplier = JSON.parse(JSON.stringify(this.totalAmountBySupplier));
@@ -681,17 +780,17 @@ export default {
             // Función para agregar una nueva fila a rowsData
 
             //Verifica que solo tenga como maximo 7 facturas por quedan tomando las filas existentes
-            if (this.rowsData.filter((e) => e[7] === true).length !== 7) {
+            if (this.rowsData.filter((e) => e['isDelete'] === true).length !== 7) {
                 this.rowsData.push({
-                    0: 1,                  // numberRow
-                    1: '',                 // Id__detalle_quedan
-                    2: '',                 // FACTURA
-                    3: '',                 // DEPENDENCIA
-                    4: '',                 // NUMERO ACTA
-                    5: '',                 // CONCEPTO
-                    6: { producto: '', servicio: '' },  // Monto en producto y servicio
-                    7: true,               // eliminado_logico
-                    8: ''                  // fecha_factura_det_quedan
+                    numberRow: 1,
+                    id_det_quedan: '',
+                    numero_factura_det_quedan: '',
+                    fecha_factura_det_quedan: '',
+                    id_dependencia: '',
+                    numero_acta_det_quedan: '',
+                    monto: { producto_factura_det_quedan: '', servicio_factura_det_quedan: '' },
+                    calculos: { iva: '0.00', renta: '0.00' },
+                    isDelete: true,
                 });
             } else {
                 toast.error("Solo se permiten 7 facturas por quedan :(", {
@@ -933,7 +1032,7 @@ export default {
             }).then((result) => {
                 if (result.isConfirmed) {
                     // Modificar el objeto para que la fila desaparezca de la tabla (valor en posición 7 se establece como false)
-                    this.rowsData[rowIndex][7] = false;
+                    this.rowsData[rowIndex]['isDelete'] = false;
                     this.calculateAmount()
                     // Mostrar mensaje de advertencia
                     toast.warning("La fila actual se eliminó temporalmente hasta que guarde los cambios", {
@@ -960,19 +1059,19 @@ export default {
                     newDataQuedan.detalle_quedan.forEach((value, index) => {
                         // Agregamos cada detalle_quedan a la matriz rowsData
                         this.rowsData.push({
-                            0: '', // numberRow
-                            1: value.id_det_quedan, // Id__detalle_quedan
-                            2: value.numero_factura_det_quedan, // FACTURA
-                            3: value.id_dependencia, // DEPENDENCIA
-                            4: value.numero_acta_det_quedan, // NUMERO ACTA
-                            5: value.descripcion_det_quedan, // CONCEPTO
-                            6: { producto: value.producto_factura_det_quedan, servicio: value.servicio_factura_det_quedan }, // Monto de producto y servicio
-                            7: true, // eliminado_logico
-                            8: value.fecha_factura_det_quedan // fecha_factura_det_quedan
+                            numberRow: '',
+                            id_det_quedan: value.id_det_quedan,
+                            numero_factura_det_quedan: value.numero_factura_det_quedan,
+                            fecha_factura_det_quedan: value.fecha_factura_det_quedan,
+                            id_dependencia: value.id_dependencia,
+                            numero_acta_det_quedan: value.numero_acta_det_quedan,
+                            monto: { producto_factura_det_quedan: value.producto_factura_det_quedan, servicio_factura_det_quedan: value.servicio_factura_det_quedan },
+                            calculos: { iva: '', renta: '' },
+                            isDelete: true,
                         });
                     });
 
-                    this.calculateAmount();
+                    this.taxesByRow();
                     this.getAmountBySupplier(newDataQuedan.proveedor.id_proveedor);
 
 

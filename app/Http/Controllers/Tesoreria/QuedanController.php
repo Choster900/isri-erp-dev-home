@@ -177,16 +177,16 @@ class QuedanController extends Controller
             // Insertar los registros de detalle_quedan
             $detalleData = [];
             foreach ( $detalle_quedan as $key => $value ) {
-                if ($value[7]) {
+                if ($value["isDelete"]) {
                     $new_detalle = [
                         'id_quedan'                   => $quedan,
-                        'numero_factura_det_quedan'   => $value[2],
-                        'id_dependencia'              => $value[3],
-                        'numero_acta_det_quedan'      => $value[4],
-                        'descripcion_det_quedan'      => $value[5],
-                        'producto_factura_det_quedan' => $value[6]['producto'],
-                        'servicio_factura_det_quedan' => $value[6]['servicio'],
-                        'fecha_factura_det_quedan'    => $value[8],
+                        'numero_factura_det_quedan'   => $value["numero_factura_det_quedan"],
+                        'id_dependencia'              => $value["id_dependencia"],
+                        'numero_acta_det_quedan'      => $value["numero_acta_det_quedan"],
+                      //  'descripcion_det_quedan'      => $value[5],
+                        'producto_factura_det_quedan' => $value["monto"]['producto_factura_det_quedan'],
+                        'servicio_factura_det_quedan' => $value["monto"]['servicio_factura_det_quedan'],
+                        'fecha_factura_det_quedan'    => $value["fecha_factura_det_quedan"],
                         'fecha_reg_det_quedan'        => Carbon::now(),
                         'usuario_det_quedan'          => $request->user()->nick_usuario,
                         'ip_det_quedan'               => $request->ip(),
@@ -240,41 +240,41 @@ class QuedanController extends Controller
 
             foreach ( $detalle_quedan as $key => $value ) {
 
-                if ($value[0] == '') {
+                if ($value["numberRow"] == '') {
                     // Actualizar un detalle de quedan existente
                     $new_detalle = array(
-                        'numero_factura_det_quedan'   => $value[2],
-                        'id_dependencia'              => $value[3],
-                        'numero_acta_det_quedan'      => $value[4],
-                        'descripcion_det_quedan'      => $value[5],
-                        'producto_factura_det_quedan' => $value[6]['producto'],
-                        'servicio_factura_det_quedan' => $value[6]['servicio'],
-                        'fecha_factura_det_quedan'    => $value[8],
+                        'numero_factura_det_quedan'   => $value["numero_factura_det_quedan"],
+                        'id_dependencia'              => $value["id_dependencia"],
+                        'numero_acta_det_quedan'      => $value["numero_acta_det_quedan"],
+                      //  'descripcion_det_quedan'      => $value[5],
+                        'producto_factura_det_quedan' => $value["monto"]['producto_factura_det_quedan'],
+                        'servicio_factura_det_quedan' => $value["monto"]['servicio_factura_det_quedan'],
+                        'fecha_factura_det_quedan'    => $value["fecha_factura_det_quedan"],
                         'fecha_mod_det_quedan'        => Carbon::now(),
                         'usuario_det_quedan'          => $request->user()->nick_usuario,
                         'ip_det_quedan'               => $request->ip(),
                     );
-                    DetalleQuedan::where("id_det_quedan", $value[1])->update($new_detalle);
+                    DetalleQuedan::where("id_det_quedan", $value["id_det_quedan"])->update($new_detalle);
                 }
-                if ($value[0] == 1 && $value[7] !== false) {
+                if ($value["numberRow"] == 1 && $value["isDelete"] !== false) {
                     //Al momento de editar puede que agrege filas entonces se valida que la fila sea nueva 
                     // Agregar un nuevo detalle_quedan
                     $new_detalle = array(
                         'id_quedan'                   => $id_quedan,
-                        'numero_factura_det_quedan'   => $value[2],
-                        'id_dependencia'              => $value[3],
-                        'numero_acta_det_quedan'      => $value[4],
-                        'descripcion_det_quedan'      => $value[5],
-                        'producto_factura_det_quedan' => $value[6]['producto'],
-                        'servicio_factura_det_quedan' => $value[6]['servicio'],
-                        'fecha_factura_det_quedan'    => $value[8],
-                        'fecha_reg_det_quedan'        => Carbon::now(),
+                        'numero_factura_det_quedan'   => $value["numero_factura_det_quedan"],
+                        'id_dependencia'              => $value["id_dependencia"],
+                        'numero_acta_det_quedan'      => $value["numero_acta_det_quedan"],
+                      //  'descripcion_det_quedan'      => $value[5],
+                        'producto_factura_det_quedan' => $value["monto"]['producto_factura_det_quedan'],
+                        'servicio_factura_det_quedan' => $value["monto"]['servicio_factura_det_quedan'],
+                        'fecha_factura_det_quedan'    => $value["fecha_factura_det_quedan"],
+                        'fecha_mod_det_quedan'        => Carbon::now(),
                         'usuario_det_quedan'          => $request->user()->nick_usuario,
                         'ip_det_quedan'               => $request->ip(),
                     );
                     DetalleQuedan::create($new_detalle);
                 }
-                if ($value[7] === false && $value[0] == '') {
+                if ($value["isDelete"] === false && $value["numberRow"] == '') {
                     //validar que la fila sea eliminada
                     // Eliminar un detalle_quedan
                     DetalleQuedan::destroy($value[1]);
@@ -304,7 +304,7 @@ class QuedanController extends Controller
             )->get();
 
         $v_Proveedor = DB::table('proveedor')
-            ->select('id_proveedor as value', 'razon_social_proveedor as label', 'giro.codigo_giro', 'giro.nombre_giro', 'sujeto_retencion.iva_sujeto_retencion', 'sujeto_retencion.isrl_sujeto_retencion')
+            ->select('id_proveedor as value', 'razon_social_proveedor as label','dui_proveedor', 'giro.codigo_giro', 'giro.nombre_giro', 'sujeto_retencion.iva_sujeto_retencion', 'sujeto_retencion.isrl_sujeto_retencion')
             ->leftJoin('giro', 'giro.id_giro', '=', 'proveedor.id_giro')
             ->join('sujeto_retencion', 'sujeto_retencion.id_sujeto_retencion', '=', 'proveedor.id_sujeto_retencion')
             ->where('estado_proveedor', 1)
