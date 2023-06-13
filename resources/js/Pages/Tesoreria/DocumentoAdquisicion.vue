@@ -15,8 +15,8 @@ import axios from 'axios';
 </script>
 
 <template>
-  <Head title="Catalogo - Conceptos" />
-  <AppLayoutVue nameSubModule="Tesoreria - Conceptos de Ingreso">
+  <Head title="Catalogo - Documento Adquisicion" />
+  <AppLayoutVue nameSubModule="Tesoreria - Documentos de Adquisicion">
     <div class="sm:flex sm:justify-end sm:items-center mb-2">
       <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
         <GeneralButton @click="addIncomeConcept()" v-if="permits.insertar == 1" color="bg-green-700  hover:bg-green-800"
@@ -28,12 +28,12 @@ import axios from 'axios';
         <div class="mb-4 md:flex flex-row justify-items-start">
           <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
             <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-              <Multiselect v-model="tableData.length" @select="getIncomeConcept()" :options="perPage" :searchable="true"
+              <Multiselect v-model="tableData.length" @select="getAcquisitionDoc()" :options="perPage" :searchable="true"
                 placeholder="Cantidad a mostrar" />
               <LabelToInput icon="list2" />
             </div>
           </div>
-          <h2 class="font-semibold text-slate-800 pt-1">Total Conceptos Ingreso <span
+          <h2 class="font-semibold text-slate-800 pt-1">Total Documentos Adquisicion <span
               class="text-slate-400 font-medium">{{
                 tableData.total
               }}</span></h2>
@@ -41,28 +41,37 @@ import axios from 'axios';
       </header>
 
       <div class="overflow-x-auto">
-        <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy"
-          @datos-enviados="handleData($event)">
+        <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy" :searchButton="true"
+          @datos-enviados="handleData($event)" @execute-search="getAcquisitionDoc()">
           <tbody class="text-sm divide-y divide-slate-200">
-            <tr v-for="service in income_concept" :key="service.id_concepto_ingreso">
+            <tr v-for="doc in acquisition_docs" :key="doc.id_doc_adquisicion">
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                <div class="font-medium text-slate-800 text-center">{{ service.id_concepto_ingreso }}</div>
+                <div class="font-medium text-slate-800 text-center">{{ doc.nombre_tipo_doc_adquisicion }}</div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5 td-data-table">
                 <div class="font-medium text-slate-800 ellipsis text-center">
-                  {{ service.codigo_dependencia && service.nombre_dependencia ? service.codigo_dependencia + ' - ' +
-                    service.nombre_dependencia : '' }}
+                  {{ doc.numero_doc_adquisicion }}
                 </div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5 td-data-table">
-                <div class="font-medium text-slate-800 ellipsis text-center">{{ service.nombre_concepto_ingreso }}</div>
+                <div class="font-medium text-slate-800 ellipsis text-center">{{ doc.razon_social_proveedor }}</div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                <div class="font-medium text-slate-800 text-center">{{ service.id_ccta_presupuestal }}</div>
+                <div class="font-medium text-slate-800 text-center">${{ doc.monto_doc_adquisicion }}</div>
+              </td>
+              <td class="px-2 first:pl-5 last:pr-5 whitespace-nowrap w-px">
+                <div class="font-medium text-slate-800 text-center">
+                  <ul>
+                    <li v-for="detalle in doc.detalles" :key="detalle.id">
+                      <span>{{ detalle.compromiso_ppto_det_doc_adquisicion }}</span> - <span>${{
+                        detalle.monto_det_doc_adquisicion }}</span>
+                    </li>
+                  </ul>
+                </div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800">
-                  <div v-if="(service.estado_concepto_ingreso == 1)"
+                  <div v-if="(doc.estado_doc_adquisicion == 1)"
                     class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
                     Activo
                   </div>
@@ -76,8 +85,7 @@ import axios from 'axios';
                 <div class="space-x-1">
                   <DropDownOptions>
                     <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                      v-if="permits.actualizar == 1 && service.estado_concepto_ingreso == 1"
-                      @click="editIncomeConcept(service)">
+                      v-if="permits.actualizar == 1 && doc.estado_doc_adquisicion == 1" @click="editIncomeConcept(doc)">
                       <div class="w-8 text-green-900">
                         <span class="text-xs">
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -90,8 +98,7 @@ import axios from 'axios';
                       <div class="font-semibold">Editar</div>
                     </div>
                     <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                      @click="changeStateIncomeConcept(service.id_concepto_ingreso, service.nombre_concepto_ingreso, service.estado_concepto_ingreso)"
-                      v-if="permits.eliminar == 1">
+                      @click="changeStateIncomeConcept(doc)" v-if="permits.eliminar == 1">
                       <div class="w-8 text-red-900"><span class="text-xs">
                           <svg fill="#7F1D1D" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" width="20px"
                             height="20px" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 97.994 97.994"
@@ -113,7 +120,7 @@ import axios from 'axios';
                           </svg>
                         </span></div>
                       <div class="font-semibold">
-                        {{ service.estado_concepto_ingreso ? 'Desactivar' : 'Activar' }}
+                        {{ doc.estado_doc_adquisicion ? 'Desactivar' : 'Activar' }}
                       </div>
                     </div>
                   </DropDownOptions>
@@ -136,7 +143,7 @@ import axios from 'axios';
                   :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
 
                   <div class="flex-1 text-right ml-2">
-                    <a @click="getIncomeConcept(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                    <a @click="getAcquisitionDoc(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                   text-indigo-500">
                       &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                     </a>
@@ -145,7 +152,7 @@ import axios from 'axios';
                 <span v-else-if="(link.label == 'Siguiente')"
                   :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                   <div class="flex-1 text-right ml-2">
-                    <a @click="getIncomeConcept(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                    <a @click="getAcquisitionDoc(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                   text-indigo-500">
                       <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                     </a>
@@ -153,7 +160,7 @@ import axios from 'axios';
                 </span>
                 <span class="cursor-pointer" v-else
                   :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
-                    class=" w-5" @click="getIncomeConcept(link.url)">{{ link.label }}</span>
+                    class=" w-5" @click="getAcquisitionDoc(link.url)">{{ link.label }}</span>
                 </span>
               </li>
             </ul>
@@ -164,7 +171,7 @@ import axios from 'axios';
 
     <ModalIncomeConceptVue :showModalIncome="showModalIncome" :modalData="modalData"
       :financing_sources="financing_sources" :budget_accounts="budget_accounts" :dependencies="dependencies"
-      @cerrar-modal="showModalIncome = false" @get-table="getIncomeConcept(tableData.currentPage)" />
+      @cerrar-modal="showModalIncome = false" @get-table="getAcquisitionDoc(tableData.currentPage)" />
 
   </AppLayoutVue>
 </template>
@@ -172,35 +179,36 @@ import axios from 'axios';
 <script>
 export default {
   created() {
-    this.getIncomeConcept()
+    this.getAcquisitionDoc()
     this.getPermits()
     this.getSelectsIncomeConcept()
   },
   data() {
     let sortOrders = {};
     let columns = [
-      { width: "10%", label: "ID", name: "id_concepto_ingreso", type: "text" },
-      { width: "30%", label: "Dependencia", name: "nombre_dependencia", type: "text" },
-      { width: "30%", label: "Concepto Ingreso", name: "nombre_concepto_ingreso", type: "text" },
-      { width: "10%", label: "Especifico", name: "id_ccta_presupuestal", type: "text" },
+      { width: "15%", label: "Tipo", name: "nombre_tipo_doc_adquisicion", type: "text" },
+      { width: "15%", label: "Numero", name: "numero_doc_adquisicion", type: "text" },
+      { width: "25%", label: "Proveedor", name: "razon_social_proveedor", type: "text" },
+      { width: "15%", label: "Monto", name: "monto_doc_adquisicion", type: "text" },
+      { width: "15%", label: "Compromisos", name: "compromiso_ppto_det_doc_adquisicion", type: "text" },
       {
-        width: "10%", label: "Estado", name: "estado_concepto_ingreso", type: "select",
+        width: "10%", label: "Estado", name: "estado_doc_adquisicion", type: "select",
         options: [
           { value: "1", label: "Activo" },
           { value: "0", label: "Inactivo" }
         ]
       },
-      { width: "10%", label: "Acciones", name: "Acciones" },
+      { width: "5%", label: "Acciones", name: "Acciones" },
     ];
     columns.forEach((column) => {
-      if (column.name === 'id_concepto_ingreso')
+      if (column.name === 'id_doc_adquisicion')
         sortOrders[column.name] = 1;
       else
         sortOrders[column.name] = -1;
     });
     return {
       //Data for datatable
-      income_concept: [],
+      acquisition_docs: [],
       //Data for modal
       showModalIncome: false,
       modalData: [],
@@ -211,7 +219,7 @@ export default {
       financing_sources: [],
       links: [],
       columns: columns,
-      sortKey: "id_concepto_ingreso",
+      sortKey: "id_doc_adquisicion",
       sortOrders: sortOrders,
       perPage: ["10", "20", "30"],
       tableData: {
@@ -292,7 +300,7 @@ export default {
         }
       })
     },
-    async getIncomeConcept(url = "/ingresos") {
+    async getAcquisitionDoc(url = "/doc-adquisicion") {
       this.tableData.draw++;
       this.tableData.currentPage = url
       await axios.post(url, this.tableData).then((response) => {
@@ -302,7 +310,7 @@ export default {
           this.tableData.total = data.data.total;
           this.links[0].label = "Anterior";
           this.links[this.links.length - 1].label = "Siguiente";
-          this.income_concept = data.data.data;
+          this.acquisition_docs = data.data.data;
         }
       }).catch((errors) => {
         let msg = this.manageError(errors)
@@ -321,7 +329,7 @@ export default {
         this.sortOrders[key] = this.sortOrders[key] * -1;
         this.tableData.column = this.getIndex(this.columns, "name", key);
         this.tableData.dir = this.sortOrders[key] === 1 ? "asc" : "desc";
-        this.getIncomeConcept();
+        this.getAcquisitionDoc();
       }
     },
     getIndex(array, key, value) {
@@ -342,7 +350,10 @@ export default {
     },
     handleData(myEventData) {
       this.tableData.search = myEventData;
-      this.getIncomeConcept()
+      const data = Object.values(myEventData);
+      if (data.every(error => error === '')) {
+        this.getAcquisitionDoc()
+      }
     }
   }
 }

@@ -29,7 +29,7 @@ import axios from "axios";
                                 :class="{ 'w-[22%]': !vehicle, 'w-1/6': vehicle }">
                                 <div class="w-full bg-gray-300 rounded items-center align-middle align-center flex-1">
                                     <div class="bg-green-400 text-xs leading-none py-1 text-center text-gray-darkest rounded"
-                                        :style="{ width: vehicle ? page1_w + '%' : '100%' }"></div>
+                                        :style="{ width: page1_w + '%' }"></div>
                                 </div>
                             </div>
 
