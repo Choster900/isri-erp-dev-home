@@ -94,7 +94,7 @@ const maxWidthClass = computed(() => {
                         class="sin-scroll inset-x-0 bottom-0 mx-auto max-h-full overflow-y-auto bg-white rounded-lg shadow-xl transform transition-all sm:w-full sm:mx-auto"
                         :class="maxWidthClass">
                         <header class="bg-[#001c48] py-2 px-6 flex justify-between items-center">
-                            <h2 class="text-lg text-gray-800 dark:text-white">{{ modalTitle }}</h2>
+                            <h2 class="text-lg text-white">{{ modalTitle }}</h2>
                             <button @click="close">
                                 <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" class="">
                                     <path id="Vector" d="M18 18L12 12M12 12L6 6M12 12L18 6M12 12L6 18" stroke="#ffff"
