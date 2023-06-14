@@ -144,7 +144,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                         </div>
 
                         <div class="max-w-7xl mx-auto pb-20 sm:px-6 lg:px-8 overflow-x-auto">
-                            <table class="table-auto mx-auto">  
+                            <table class="table-auto mx-auto">
                                 <thead>
                                     <tr>
                                         <th class="border-2 border-black h-7 " colspan="2">
@@ -162,8 +162,10 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                 :class="{ 'condition-select': dataInputs.id_proveedor == '' }">
                                                 <Multiselect v-model="dataInputs.id_proveedor"
                                                     :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
+                                                    noOptionsText="<p class='text-xs'>sin proveedores<p>"
+                                                    noResultsText="<p class='text-xs'>sin registros<p>"
                                                     :options="dataForSelectInRow.proveedor" :searchable="true"
-                                                    @input="getInformationBySupplier($event)" />
+                                                    @change="getInformationBySupplier($event)" />
                                             </div>
                                         </td>
                                         <th class="border-2 border-black text-xs text-gray-600" colspan="2">
@@ -187,33 +189,30 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                             CONTRATO
                                         </th>
                                         <td class="border-2 border-black" colspan="2"
-                                            :class="dataInputs.numero_acuerdo_quedan == '' ? 'bg-[#fdfd96]' : ''">
-                                            <input type="text" v-model="dataInputs.numero_acuerdo_quedan" maxlength="10"
+                                            :class="dataInputs.nombre_tipo_doc_adquisicion == '' ? 'bg-[#fdfd96]' : ''">
+                                            <input type="text" v-model="dataInputs.nombre_tipo_doc_adquisicion"
+                                                maxlength="20" :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
+                                                :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
+                                                class="peer w-full text-sm bg-transparent text-center h-12 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
+                                        </td>
+                                        <td class="border-2 border-black"
+                                            :class="dataInputs.numero_doc_adquisicion == '' ? 'bg-[#fdfd96]' : ''">
+                                            <input type="text" v-model="dataInputs.numero_doc_adquisicion" maxlength="20"
                                                 :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                 :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
                                                 class="peer w-full text-sm bg-transparent text-center h-12 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                         </td>
                                         <td class="border-2 border-black"
-                                            :class="dataInputs.numero_compromiso_ppto_quedan == '' ? 'bg-[#fdfd96]' : ''">
-                                            <input type="number" v-model="dataInputs.numero_compromiso_ppto_quedan"
-                                                @input="limitarCaracteres('numero_compromiso_ppto_quedan')"
-                                                :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
+                                            :class="dataInputs.compromiso_ppto_det_doc_adquisicion == '' ? 'bg-[#fdfd96]' : ''">
+                                            <input type="text" v-model="dataInputs.compromiso_ppto_det_doc_adquisicion"
+                                                maxlength="20" :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                 :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
                                                 class="peer w-full text-sm bg-transparent text-center h-12 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                         </td>
                                         <td class="border-2 border-black"
                                             :class="dataInputs.numero_retencion_iva_quedan == '' ? 'bg-[#fdfd96]' : ''">
                                             <input type="number" v-model="dataInputs.numero_retencion_iva_quedan"
-                                                @input="limitarCaracteres('numero_retencion_iva_quedan')"
-                                                :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
-                                                :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
-                                                class="peer w-full text-sm bg-transparent text-center h-12 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
-                                        </td>
-                                        <td class="border-2 border-black"
-                                            :class="dataInputs.numero_retencion_iva_quedan == '' ? 'bg-[#fdfd96]' : ''">
-                                            <input type="number" v-model="dataInputs.numero_retencion_iva_quedan"
-                                                @input="limitarCaracteres('numero_retencion_iva_quedan')"
-                                                :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
+                                                maxlength="20" :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                 :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
                                                 class="peer w-full text-sm bg-transparent text-center h-12 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                         </td>
@@ -221,10 +220,13 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                     <tr>
                                         <td class="border-2 border-black" colspan="2">
                                             <div class="relative flex h-8 w-full flex-row-reverse"
-                                                :class="{ 'condition-select': dataInputs.id_acuerdo_compra == '' }">
-                                                <Multiselect v-model="dataInputs.id_acuerdo_compra"
+                                                :class="{ 'condition-select': dataInputs.id_det_doc_adquisicion == '' }">
+                                                <Multiselect v-model="dataInputs.id_det_doc_adquisicion"
+                                                    @change="DocumentoAdquisicionSelected($event)"
+                                                    noOptionsText="<p class='text-xs'>sin contratos<p>"
+                                                    noResultsText="<p class='text-xs'>contrato no encontrados<p>"
                                                     :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
-                                                    :options="dataForSelectInRow.acuerdoCompras" :searchable="true" />
+                                                    :options="documentoAdquisicion" :searchable="true" />
                                             </div>
                                         </td>
                                         <th class="border-2 border-black text-sm text-gray-600" colspan="5">
@@ -233,9 +235,10 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                     </tr>
 
 
-                                     <tr>
+                                    <tr>
                                         <th class="border-2 border-black text-sm px-2 text-gray-600 w-40">FACTURA</th>
-                                        <th class="border-2 border-black text-sm px-2 text-gray-600" colspan="2">FECHA EMISION</th>
+                                        <th class="border-2 border-black text-sm px-2 text-gray-600" colspan="2">FECHA
+                                            EMISION</th>
                                         <th class="border-2 border-black text-sm px-3 text-gray-600">DEPENDENCIA</th>
                                         <th class="border-2 border-black text-sm px-4 text-gray-600">NUMERO ACTA</th>
                                         <th class="border-2 border-black text-sm px-7 text-gray-600">MONTO</th>
@@ -245,7 +248,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 
                                 <tbody class="text-sm" id="content">
 
-                                     <template v-for="( row, rowIndex ) in  rowsData " :key="rowIndex">
+                                    <template v-for="( row, rowIndex ) in  rowsData " :key="rowIndex">
                                         <template v-if="row['isDelete']">
                                             <tr @dblclick="deleteRow(rowIndex)">
                                                 <template v-for="( cell, cellIndex ) in  row " :key="cellIndex">
@@ -271,7 +274,8 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                         </div>
 
                                                     </td>
-                                                    <td v-else-if="cellIndex == 'id_dependencia'" class="border-2 border-black"
+                                                    <td v-else-if="cellIndex == 'id_dependencia'"
+                                                        class="border-2 border-black"
                                                         :class="{ 'condition-select': rowsData[rowIndex]['id_dependencia'] == '' }">
                                                         <div class="relative flex h-8 w-full flex-row-reverse ">
                                                             <Multiselect v-model="rowsData[rowIndex]['id_dependencia']"
@@ -362,7 +366,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                         </template>
                                     </template>
                                 </tbody>
-                                 <tbody>
+                                <tbody>
                                     <tr id="esconder" class="border-none">
                                         <td contenteditable="false" class="py-3 border-none"></td>
                                     </tr>
@@ -451,14 +455,17 @@ export default {
             errosDetalleQuedan: [], // Errores relacionados con detalle_quedan
             errosrNumeroActa: [], // Errores relacionados con numero_acta
             montoTotalProveedorMes: [], // Monto total del proveedor por mes
+            documentoAdquisicion: [], // Contiene contratos por proveedor
             dataInputs: {
                 giro: '',
                 irs: '',
                 iva: '',
                 id_proveedor: '',
-                id_acuerdo_compra: '',
-                numero_acuerdo_quedan: '',
-                numero_compromiso_ppto_quedan: '',
+                id_det_doc_adquisicion: '',
+                id_tipo_doc_adquisicion: '',//TODO: YA NO SE USARA (esto era el tipo de contraro)
+                nombre_tipo_doc_adquisicion: '',//TODO: YA NO SE USARA
+                numero_doc_adquisicion: '',//TODO: YA NO SE USARA
+                compromiso_ppto_det_doc_adquisicion: '',//TODO: YA NO SE USARA
                 numero_retencion_iva_quedan: '',
                 descripcion_quedan: '',
                 monto_liquido_quedan: '',
@@ -509,12 +516,6 @@ export default {
         onCellEdit(rowIndex, cellIndex, event) {
             this.rowsData[rowIndex][cellIndex] = event
         },
-        limitarCaracteres(campos) {
-            if (this.dataInputs[campos].toString().length > 10) {
-                this.dataInputs[campos] = parseInt(this.dataInputs[campos].toString().slice(0, 10), 10);
-            }
-        },
-
         onlyNumberDecimal(rowIndex, cellIndex, event, type) {
             let inputValue = event.target.value;
             const regex = /^(\d+)?(\.\d{0,2})?$/;
@@ -551,149 +552,127 @@ export default {
         },
 
         getInformationBySupplier(supplier) {
-            if (supplier != null) {
+            if (supplier) {
                 // Buscar el proveedor en la lista de proveedores
                 const selectedSupplier = this.dataForSelectInRow.proveedor.find((suppliers) => suppliers.value === supplier);
+
+                // Limpiar la variable this.documentoAdquisicion antes de asignarle nuevos valores
+                this.documentoAdquisicion = [];
+
+                // Filtrar los contratos por proveedor
+                const filteredContracts = this.dataForSelectInRow.documentoAdquisicion.filter((doc) => doc.id_proveedor === supplier);
+
+                if (filteredContracts.length > 0) {
+                    // Asignar los contratos del proveedor a this.documentoAdquisicion
+                    this.documentoAdquisicion = filteredContracts;
+                } else {
+                    this.dataInputs.id_det_doc_adquisicion = '';
+                }
+
                 if (selectedSupplier) {
                     // Datos que se pintan en los inputs
-                    this.dataInputs.giro = selectedSupplier.codigo_giro && selectedSupplier.nombre_giro ? `${selectedSupplier.codigo_giro} - ${selectedSupplier.nombre_giro}` : 'GIRO NO ESPECIFICADO!'
-                    this.dataInputs.irs = `${selectedSupplier.isrl_sujeto_retencion * 100} %`
-                    this.dataInputs.iva = `${selectedSupplier.iva_sujeto_retencion * 100} %`
+                    this.dataInputs.giro = selectedSupplier.codigo_giro && selectedSupplier.nombre_giro ? `${selectedSupplier.codigo_giro} - ${selectedSupplier.nombre_giro}` : 'GIRO NO ESPECIFICADO!';
+                    this.dataInputs.irs = `${selectedSupplier.isrl_sujeto_retencion * 100} %`;
+                    this.dataInputs.iva = `${selectedSupplier.iva_sujeto_retencion * 100} %`;
 
                     // Datos que se usan para cálculos
-                    this.dataForCalculate.irs = selectedSupplier.isrl_sujeto_retencion
-                    this.dataForCalculate.dui_proveedor = selectedSupplier.dui_proveedor
-                    this.dataForCalculate.iva = selectedSupplier.iva_sujeto_retencion
-                    this.dataInputs.id_proveedor = selectedSupplier.value
+                    this.dataForCalculate.irs = selectedSupplier.isrl_sujeto_retencion;
+                    this.dataForCalculate.dui_proveedor = selectedSupplier.dui_proveedor;
+                    this.dataForCalculate.iva = selectedSupplier.iva_sujeto_retencion;
+                    this.dataInputs.id_proveedor = selectedSupplier.value;
                 }
 
                 this.getAmountBySupplier(supplier);
-                //    this.calculateAmount();
-                this.taxesByRow();
-
             } else {
-                this.dataInputs.giro = ""
-                this.dataInputs.irs = ""
-                this.dataInputs.iva = ""
-                this.dataInputs.id_proveedor = ""
-                this.dataForCalculate.dui_proveedor = ""
-                this.dataForCalculate.irs = ''
-                this.dataForCalculate.iva = ''
-                this.dataForCalculate.id_proveedor = ''
-
-                // this.calculateAmount();
-                this.taxesByRow();
-
+                // Limpiar los valores cuando el proveedor es null
+                this.dataInputs.giro = '';
+                this.dataInputs.irs = '';
+                this.dataInputs.iva = '';
+                this.dataInputs.id_proveedor = '';
+                this.dataForCalculate.dui_proveedor = '';
+                this.dataForCalculate.irs = '';
+                this.dataForCalculate.iva = '';
+                this.dataForCalculate.id_proveedor = '';
+                this.dataInputs.id_det_doc_adquisicion = '';
+                this.dataInputs.id_tipo_doc_adquisicion = '';
+                this.dataInputs.nombre_tipo_doc_adquisicion = '';
+                this.dataInputs.numero_doc_adquisicion = '';
+                this.dataInputs.compromiso_ppto_det_doc_adquisicion = '';
+                this.documentoAdquisicion = [];
             }
-
+            this.taxesByRow();
         },
-        taxesByRow(rowIndex = ""/* , cellIndex = "", type = "", value = "" */) {
-
+        DocumentoAdquisicionSelected(id_documentoAdquisicion) {
+            //al seleccionar contrato
+            if (id_documentoAdquisicion != null) {
+                let document = JSON.parse(JSON.stringify(this.dataForSelectInRow.documentoAdquisicion.find((doc) => doc.value === id_documentoAdquisicion)))
+                this.dataInputs.id_tipo_doc_adquisicion = document.id_tipo_doc_adquisicion
+                this.dataInputs.nombre_tipo_doc_adquisicion = document.nombre_tipo_doc_adquisicion
+                this.dataInputs.numero_doc_adquisicion = document.numero_doc_adquisicion
+                this.dataInputs.compromiso_ppto_det_doc_adquisicion = document.compromiso_ppto_det_doc_adquisicion
+                this.dataInputs.id_proy_financiado = document.id_proy_financiado
+            }
+            else {
+                this.dataInputs.id_det_doc_adquisicion = ''
+                this.dataInputs.id_tipo_doc_adquisicion = ''
+                this.dataInputs.nombre_tipo_doc_adquisicion = ''
+                this.dataInputs.numero_doc_adquisicion = ''
+                this.dataInputs.compromiso_ppto_det_doc_adquisicion = ''
+                this.dataInputs.id_proy_financiado = ''
+            }
+        },
+        taxesByRow(rowIndex = "") {
+            // Filtrar las filas marcadas para eliminar
             let rowsData = this.rowsData.filter((element) => element['isDelete'] === true);
 
-
-            if (rowIndex !== "") {//CUANDO ESCRIBA EN AL CELDA DE MONTO PODRA HACER CALCULOS 
-                let rowData = rowsData.find((element, index) => {
-                    return index === rowIndex && element['isDelete'] === true;
-                });
+            if (rowIndex !== "") {
+                // Cuando se proporciona un índice de fila, realizar cálculos solo para esa fila
+                let rowData = rowsData[rowIndex];
 
                 if (rowData) {
                     const productoMont = parseFloat(rowData.monto['producto_factura_det_quedan']) || 0;
                     const servicioMont = parseFloat(rowData.monto['servicio_factura_det_quedan']) || 0;
+
                     let amountByRow = productoMont + servicioMont;
                     let liquido = amountByRow / 1.13;
-                    console.log(liquido);
+
                     let ivaByFila = liquido * this.dataForCalculate.iva;
-                    rowsData[rowIndex]["calculos"].iva = Number(ivaByFila.toFixed(2));
+                    rowsData[rowIndex]["calculos"].iva = ivaByFila.toFixed(2);
 
-                    let montoIsrQuedan = (servicioMont * this.dataForCalculate.irs)
-                    rowsData[rowIndex]["calculos"].renta = this.dataForCalculate.dui_proveedor != null ? Number(montoIsrQuedan.toFixed(2)) : (0).toFixed(2);
-
+                    let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
+                    rowsData[rowIndex]["calculos"].renta = this.dataForCalculate.dui_proveedor != null ? montoIsrQuedan.toFixed(2) : (0).toFixed(2);
                 }
-
-
-
-            } else {//CUANDO SE HAGA ALGUNA CAMBIO EN GENERAL SE RECORRERA TODO EL CONTENIDO LAS ROWS PARA HACER LOS CALCULOS EN EL FOREACH
-                this.rowsData.forEach((element, index) => {
-                    console.log(element, index);
-
+            } else {
+                // Recorrer todas las filas y realizar los cálculos
+                rowsData.forEach((element, index) => {
                     const productoMont = parseFloat(element.monto['producto_factura_det_quedan']) || 0;
                     const servicioMont = parseFloat(element.monto['servicio_factura_det_quedan']) || 0;
-                    let amountByRow = (productoMont + servicioMont);
+
+                    let amountByRow = productoMont + servicioMont;
                     let liquido = amountByRow / 1.13;
-                    let ivaByFila = (liquido * this.dataForCalculate.iva);
+
+                    let ivaByFila = liquido * this.dataForCalculate.iva;
                     rowsData[index]["calculos"].iva = Number(ivaByFila.toFixed(2));
 
-                    let montoIsrQuedan = (servicioMont * this.dataForCalculate.irs)
+                    let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
                     rowsData[index]["calculos"].renta = this.dataForCalculate.dui_proveedor != null ? Number(montoIsrQuedan.toFixed(2)) : (0).toFixed(2);
-
-
                 });
             }
 
+            // Calcular el total de IVA y Renta sumando los valores de cada fila
             let totalIva = rowsData.reduce((iva, obj) => iva + parseFloat(obj["calculos"].iva), 0);
             let totalRenta = rowsData.reduce((iva, obj) => iva + parseFloat(obj["calculos"].renta), 0);
 
-            // Calcular el monto líquido (total - IVA - ISR)
-
+            // Calcular el monto total y líquido sumando los valores de cada fila
             let totalAmountInMonto = rowsData.reduce((monto, obj) => monto + (parseFloat(obj["monto"].producto_factura_det_quedan) || 0) + (parseFloat(obj["monto"].servicio_factura_det_quedan) || 0), 0);
+            let montoLiquidoQuedan = totalAmountInMonto - totalIva - totalRenta;
 
+            // Actualizar los valores en this.dataInputs
             this.dataInputs.monto_total_quedan = totalAmountInMonto.toFixed(2);
-
-            let montoLiquidoQuedan = (totalAmountInMonto - totalIva - totalRenta);
             this.dataInputs.monto_liquido_quedan = montoLiquidoQuedan.toFixed(2);
-
-
             this.dataInputs.monto_iva_quedan = totalIva.toFixed(2);
             this.dataInputs.monto_isr_quedan = totalRenta.toFixed(2);
-
-
         },
-        /* calculateAmount() {
-            let totMontoByRow = 0;
-            let liquido = 0;
-            let montoServicios = 0;
-
-            let quedanArray = this.rowsData.filter((element) => element['isDelete'] === true);
-
-            // Sumar todos los montos de todas las filas
-            quedanArray.forEach((valores, index) => {
-                totMontoByRow += parseFloat(valores['monto'].producto_factura_det_quedan) || 0; // Sumar el monto del producto
-                totMontoByRow += parseFloat(valores['monto'].servicio_factura_det_quedan) || 0; // Sumar el monto del servicio
-            });
-
-            // Sumar solo los montos de servicios de todas las filas
-            quedanArray.forEach((valores, index) => {
-                if (valores['monto'].servicio_factura_det_quedan !== '') {
-                    montoServicios += parseFloat(valores['monto'].servicio_factura_det_quedan) || 0;
-                }
-            });
-
-            // Calcular el monto líquido (sin IVA)
-            liquido = (totMontoByRow / 1.13).toFixed(2);
-
-            let montoIvaQuedan = (0).toFixed(2);
-
-            // Verificar si el monto total excede el umbral => ($ 113.00) para aplicar IVA
-            if (parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) + parseFloat(totMontoByRow) >= 113) {
-                montoIvaQuedan = (liquido * this.dataForCalculate.iva).toFixed(2);
-            }
-
-            this.dataInputs.monto_iva_quedan = montoIvaQuedan;
-
-            // Calcular el monto de ISR (Impuesto Sobre la Renta)
-            let montoIsrQuedan = (montoServicios * this.dataForCalculate.irs).toFixed(2);
-            this.dataInputs.monto_isr_quedan = this.dataForCalculate.dui_proveedor != null ? montoIsrQuedan : (0).toFixed(2);
-
-            // Calcular el monto líquido (total - IVA - ISR)
-            let montoLiquidoQuedan = (totMontoByRow - montoIvaQuedan - montoIsrQuedan).toFixed(2);
-            this.dataInputs.monto_liquido_quedan = montoLiquidoQuedan;
-
-            // Asignar el monto total
-            this.dataInputs.monto_total_quedan = totMontoByRow.toFixed(2);
-            this.getAmountBySupplier(this.dataInputs.id_proveedor);
-
-        }, */
         getAmountBySupplier(id_proveedor) {
             // Crear una copia de la matriz totalAmountBySupplier
             let newDataSupplier = JSON.parse(JSON.stringify(this.totalAmountBySupplier));
@@ -745,6 +724,8 @@ export default {
             this.dataInputs.id_proy_financiado = this.dataQuedan.id_proy_financiado;
             this.dataInputs.monto_total_quedan = this.dataQuedan.monto_total_quedan;
             this.dataInputs.numero_retencion_iva_quedan = this.dataQuedan.numero_retencion_iva_quedan;
+            
+            this.dataInputs.id_det_doc_adquisicion = this.dataQuedan.id_det_doc_adquisicion;
         },
         resetValuesToInput() {
             //funcion para limpiar la data que la llamaremos cuando la data no traiga nada
@@ -752,9 +733,11 @@ export default {
             this.dataInputs.irs = ""
             this.dataInputs.iva = ""
             this.dataInputs.id_proveedor = ""
-            this.dataInputs.id_acuerdo_compra = ""
-            this.dataInputs.numero_acuerdo_quedan = ""
-            this.dataInputs.numero_compromiso_ppto_quedan = ""
+            this.dataInputs.id_tipo_doc_adquisicion = ''
+            this.dataInputs.nombre_tipo_doc_adquisicion = ''
+            this.dataInputs.numero_doc_adquisicion = ''
+            this.dataInputs.compromiso_ppto_det_doc_adquisicion = ''
+            this.dataInputs.id_det_doc_adquisicion = ''
             this.dataInputs.descripcion_quedan = ""
             this.dataInputs.monto_liquido_quedan = ""
             this.dataInputs.monto_iva_quedan = ""
@@ -775,6 +758,8 @@ export default {
             this.dataForCalculate.monto_iva_quedan = ''
             this.dataForCalculate.monto_isr_quedan = ''
             this.dataForCalculate.monto_total_quedan = ''
+            this.documentoAdquisicion = []
+
         },
         addRow() {
             // Función para agregar una nueva fila a rowsData
@@ -809,11 +794,11 @@ export default {
             // Recorrer las filas de rowsData
             for (let i = 0; i < this.rowsData.length; i++) {
                 const row = this.rowsData[i];
-                const number = row[4]; // Obtener el número de acta en la posición 4
-                const dependency = row[3]; // Obtener la dependencia en la posición 3
+                const number = row["numero_acta_det_quedan"]; // Obtener el número de acta en la posición 4
+                const dependency = row["id_dependencia"]; // Obtener la dependencia en la posición 3
 
                 // Verificar si la fila no está marcada como eliminada
-                if (row[7] !== false) {
+                if (row["isDelete"] !== false) {
                     // Verificar si no existe la dependencia en duplicatePositions
                     if (!duplicatePositions[dependency]) {
                         duplicatePositions[dependency] = {};
@@ -1033,7 +1018,7 @@ export default {
                 if (result.isConfirmed) {
                     // Modificar el objeto para que la fila desaparezca de la tabla (valor en posición 7 se establece como false)
                     this.rowsData[rowIndex]['isDelete'] = false;
-                    this.calculateAmount()
+                    this.taxesByRow()
                     // Mostrar mensaje de advertencia
                     toast.warning("La fila actual se eliminó temporalmente hasta que guarde los cambios", {
                         autoClose: 5000,
@@ -1055,7 +1040,7 @@ export default {
                     this.conditionButton = false; // Cambiamos el estado del botón para actualizar en lugar de agregar
                     this.setValuesToInput();
                     this.getInformationBySupplier(newDataQuedan.proveedor.id_proveedor);
-
+                    this.DocumentoAdquisicionSelected(newDataQuedan.id_det_doc_adquisicion)
                     newDataQuedan.detalle_quedan.forEach((value, index) => {
                         // Agregamos cada detalle_quedan a la matriz rowsData
                         this.rowsData.push({
