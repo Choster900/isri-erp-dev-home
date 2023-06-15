@@ -185,36 +185,48 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 
 
                                     <tr>
-                                        <th class="border-2 border-black h-12 text-sm text-gray-600" colspan="2">
+                                        <th class="border-2 border-black h-8 text-sm text-gray-600" colspan="2">
                                             CONTRATO
                                         </th>
                                         <td class="border-2 border-black" colspan="2"
-                                            :class="dataInputs.nombre_tipo_doc_adquisicion == '' ? 'bg-[#fdfd96]' : ''">
-                                            <input type="text" v-model="dataInputs.nombre_tipo_doc_adquisicion"
+                                            >
+                                            <!--   <input type="text" v-model="dataInputs.nombre_tipo_doc_adquisicion"
                                                 maxlength="20" :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                 :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
                                                 class="peer w-full text-sm bg-transparent text-center h-12 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
+                                       -->
+                                       <div class="relative flex h-8 w-full flex-row-reverse "
+                                                :class="{ 'condition-select': dataInputs.id_tipo_doc_adquisicion == '' }">
+                                                <Multiselect v-model="dataInputs.id_tipo_doc_adquisicion"
+                                                :classes="{    containerOpen: 'rounded-b-none',
+}"
+                                                    :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
+                                                    noOptionsText="<p class='text-xs'>sin proveedores<p>"
+                                                    noResultsText="<p class='text-xs'>sin registros<p>"
+                                                    :options="dataForSelectInRow.tipoAdquisicion" :searchable="true"
+                                                     />
+                                            </div>
                                         </td>
                                         <td class="border-2 border-black"
                                             :class="dataInputs.numero_doc_adquisicion == '' ? 'bg-[#fdfd96]' : ''">
                                             <input type="text" v-model="dataInputs.numero_doc_adquisicion" maxlength="20"
                                                 :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                 :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
-                                                class="peer w-full text-sm bg-transparent text-center h-12 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
+                                                class="peer w-full text-sm bg-transparent text-center h-10 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                         </td>
                                         <td class="border-2 border-black"
                                             :class="dataInputs.compromiso_ppto_det_doc_adquisicion == '' ? 'bg-[#fdfd96]' : ''">
                                             <input type="text" v-model="dataInputs.compromiso_ppto_det_doc_adquisicion"
                                                 maxlength="20" :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                 :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
-                                                class="peer w-full text-sm bg-transparent text-center h-12 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
+                                                class="peer w-full text-sm bg-transparent text-center h-10 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                         </td>
                                         <td class="border-2 border-black"
                                             :class="dataInputs.numero_retencion_iva_quedan == '' ? 'bg-[#fdfd96]' : ''">
                                             <input type="number" v-model="dataInputs.numero_retencion_iva_quedan"
                                                 maxlength="20" :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                 :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
-                                                class="peer w-full text-sm bg-transparent text-center h-12 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
+                                                class="peer w-full text-sm bg-transparent text-center h-10 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                         </td>
                                     </tr>
                                     <tr>
@@ -556,8 +568,9 @@ export default {
                 // Buscar el proveedor en la lista de proveedores
                 const selectedSupplier = this.dataForSelectInRow.proveedor.find((suppliers) => suppliers.value === supplier);
 
-                // Limpiar la variable this.documentoAdquisicion antes de asignarle nuevos valores
+                // Limpiar la variable (this.documentoAdquisicion, this.dataInputs.id_det_doc_adquisicion) antes de asignarle nuevos valores
                 this.documentoAdquisicion = [];
+                this.dataInputs.id_det_doc_adquisicion = '';
 
                 // Filtrar los contratos por proveedor
                 const filteredContracts = this.dataForSelectInRow.documentoAdquisicion.filter((doc) => doc.id_proveedor === supplier);
@@ -724,7 +737,7 @@ export default {
             this.dataInputs.id_proy_financiado = this.dataQuedan.id_proy_financiado;
             this.dataInputs.monto_total_quedan = this.dataQuedan.monto_total_quedan;
             this.dataInputs.numero_retencion_iva_quedan = this.dataQuedan.numero_retencion_iva_quedan;
-            
+
             this.dataInputs.id_det_doc_adquisicion = this.dataQuedan.id_det_doc_adquisicion;
         },
         resetValuesToInput() {
