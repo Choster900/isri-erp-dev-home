@@ -189,7 +189,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                             CONTRATO
                                         </th>
                                         <td class="border-2 border-black" colspan="2">
-                                            <div class="relative flex h-8 w-full flex-row-reverse "
+                                            <!-- <div class="relative flex h-8 w-full flex-row-reverse "
                                                 :class="{ 'condition-select': dataInputs.id_tipo_doc_adquisicion == '' }">
                                                 <Multiselect v-model="dataInputs.id_tipo_doc_adquisicion" :classes="{
                                                     containerOpen: 'rounded-b-none',
@@ -197,20 +197,21 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                     noOptionsText="<p class='text-xs'>sin tipos de contratos<p>"
                                                     noResultsText="<p class='text-xs'>sin registros<p>"
                                                     :options="tipoDocumentoAdquisicion" :searchable="true" />
-                                            </div>
-                                        </td>
-                                        <td class="border-2 border-black"
-                                            :class="dataInputs.numero_doc_adquisicion == '' ? 'bg-[#fdfd96]' : ''">
-                                            <input type="text" v-model="dataInputs.numero_doc_adquisicion" maxlength="20"
-                                                :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
-                                                :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
+                                            </div> -->
+
+
+                                            <input type="text" v-model="dataInputs.nombre_tipo_doc_adquisicion"
+                                                :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''" disabled
                                                 class="peer w-full text-sm bg-transparent text-center h-10 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                         </td>
-                                        <td class="border-2 border-black"
-                                            :class="dataInputs.compromiso_ppto_det_doc_adquisicion == '' ? 'bg-[#fdfd96]' : ''">
+                                        <td class="border-2 border-black">
+                                            <input type="text" v-model="dataInputs.numero_doc_adquisicion" maxlength="20"
+                                                disabled
+                                                class="peer w-full text-sm bg-transparent text-center h-10 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
+                                        </td>
+                                        <td class="border-2 border-black">
                                             <input type="text" v-model="dataInputs.compromiso_ppto_det_doc_adquisicion"
-                                                maxlength="20" :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
-                                                :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
+                                                disabled maxlength="20"
                                                 class="peer w-full text-sm bg-transparent text-center h-10 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                         </td>
                                         <td class="border-2 border-black"
@@ -224,15 +225,16 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                     <tr>
                                         <td class="border-2 border-black" colspan="2">
                                             <div class="relative flex h-8 w-full flex-row-reverse"
-                                                :class="{ 'condition-select': dataInputs.id_det_doc_adquisicion == '' }">
+                                                :class="[documentoAdquisicion != '' ? { 'condition-select': dataInputs.id_det_doc_adquisicion == '' } : '']">
                                                 <Multiselect v-model="dataInputs.id_det_doc_adquisicion"
                                                     @change="DocumentoAdquisicionSelected($event)"
-                                                    :classes="{ containerDisabled: 'cursor-default bg-gray-100', }"
+                                                    :classes="{ containerDisabled: 'cursor-not-allowed bg-gray-200 ', }"
                                                     noOptionsText="<p class='text-xs'>sin contratos<p>"
                                                     noResultsText="<p class='text-xs'>contrato no encontrados<p>"
                                                     :disabled="dataQuedan.id_estado_quedan > 1 ? true : documentoAdquisicion == '' ? true : false"
                                                     :options="documentoAdquisicion" :searchable="true" />
                                             </div>
+
                                         </td>
                                         <th class="border-2 border-black text-sm text-gray-600" colspan="5">
                                             DETALLE QUEDAN
@@ -574,11 +576,13 @@ export default {
                     let tipos = JSON.parse(JSON.stringify(this.dataForSelectInRow.tipoAdquisicion.filter((type) => type.estado_tipo_doc_adquisicion == 1)))
                     this.documentoAdquisicion = filteredContracts
                     this.tipoDocumentoAdquisicion = tipos
+                    this.dataInputs.nombre_tipo_doc_adquisicion = ""
 
                 } else {
                     let tipos = JSON.parse(JSON.stringify(this.dataForSelectInRow.tipoAdquisicion.filter((type) => type.estado_tipo_doc_adquisicion == 2)))
                     this.dataInputs.id_det_doc_adquisicion = ''
                     this.tipoDocumentoAdquisicion = tipos
+                    this.dataInputs.nombre_tipo_doc_adquisicion = "FACTURA"
                 }
 
 
@@ -634,8 +638,6 @@ export default {
                 this.dataInputs.compromiso_ppto_det_doc_adquisicion = ''
                 this.dataInputs.id_proy_financiado = ''
                 this.dataForCalculate.monto_doc_adquisicion = ''
-                this.dataForCalculate.monto_total_quedan_por_proveedor = ''
-
             }
             this.taxesByRow();
 
@@ -691,16 +693,27 @@ export default {
             this.dataInputs.monto_total_quedan = totalAmountInMonto.toFixed(2)
             this.dataInputs.monto_liquido_quedan = montoLiquidoQuedan.toFixed(2)
 
+            console.log("MONTO DE CONTRATO: " + this.dataForCalculate.monto_doc_adquisicion);
+            console.log("MONTO DEL QUEDAN: " + this.dataInputs.monto_total_quedan);
+            console.log("MONTO DE PROVEEDORES EN EL MES: " + this.dataForCalculate.monto_total_quedan_por_proveedor);
 
             let sum = (parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) || 0) + (parseFloat(this.dataInputs.monto_total_quedan) || 0)
-
+            console.log("SUMA DEL QUEDAN MAS EL MONTO DE PROVEEDORES EN EL MES: " + sum);
 
             if (this.documentoAdquisicion != "") {
-                this.dataInputs.monto_iva_quedan = this.dataForCalculate.monto_doc_adquisicion <= sum ? totalIva.toFixed(2) : (0).toFixed(2);
-            } else {
-                this.dataInputs.monto_iva_quedan = 113 <= sum ? totalIva.toFixed(2) : (0).toFixed(2);
-            }
 
+                if (this.dataForCalculate.monto_doc_adquisicion <= sum) {
+                    this.dataInputs.monto_iva_quedan = totalIva.toFixed(2)
+                } else {
+                    this.dataInputs.monto_iva_quedan = (0).toFixed(2)
+                }
+            } else {
+                if (113 <= sum) {
+                    this.dataInputs.monto_iva_quedan = totalIva.toFixed(2)
+                } else {
+                    this.dataInputs.monto_iva_quedan = (0).toFixed(2)
+                }
+            }
             this.dataInputs.monto_isr_quedan = totalRenta.toFixed(2)
         },
         getAmountBySupplier(id_proveedor) {
