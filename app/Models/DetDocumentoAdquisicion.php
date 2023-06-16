@@ -31,4 +31,8 @@ class DetDocumentoAdquisicion extends Model
     {
         return $this->belongsTo('App\Models\DocumentoAdquisicion','id_doc_adquisicion','id_doc_adquisicion');
     }
+    public function fuente_financiamiento()
+    {
+        return $this->belongsTo('App\Models\ProyectoFinanciado','id_proy_financiado','id_proy_financiado');
+    }
 }

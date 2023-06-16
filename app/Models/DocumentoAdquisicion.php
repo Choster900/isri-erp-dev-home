@@ -16,6 +16,7 @@ class DocumentoAdquisicion extends Model
     protected $fillable = [
         'id_tipo_gestion_compra',
         'id_tipo_doc_adquisicion',
+        'id_proveedor',
         'monto_doc_adquisicion',
         'numero_doc_adquisicion',
         'numero_gestion_doc_adquisicion',
@@ -30,6 +31,6 @@ class DocumentoAdquisicion extends Model
 
     public function detalles()
     {
-        return $this->hasMany('App\Models\DetDocumentoAdquisicion','id_doc_adquisicion','id_doc_adquisicion');
+        return $this->hasMany('App\Models\DetDocumentoAdquisicion', 'id_doc_adquisicion', 'id_doc_adquisicion')->where('estado_det_doc_adquisicion', 1);
     }
 }

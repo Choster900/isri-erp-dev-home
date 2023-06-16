@@ -125,8 +125,8 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('doc-adquisicion', [DocumentoAdquisicionController::class, 'getDocAdquisicion'])->name('documentoAdquisicion.getDocAdquisicion');
     Route::post('change-state-acq-doc', [DocumentoAdquisicionController::class, 'changeStateAcqdoc'])->name('documentoAdquisicion.changeStateAcqdoc');
     Route::get('get-selects-acq-doc', [DocumentoAdquisicionController::class, 'getSelectsAcqDoc'])->name('documentoAdquisicion.getSelectsAcqDoc');
-    Route::post('save-income-concept', [ConceptoIngresoController::class, 'saveIncomeConcept'])->name('conceptoIngreso.saveIncomeConcept');
-    Route::post('update-income-concept', [ConceptoIngresoController::class, 'updateIncomeConcept'])->name('conceptoIngreso.updateIncomeConcept');
+    Route::post('save-acq-doc', [DocumentoAdquisicionController::class, 'saveAcqDoc'])->name('documentoAdquisicion.saveAcqDoc');
+    Route::post('update-acq-doc', [DocumentoAdquisicionController::class, 'updateAcqDoc'])->name('documentoAdquisicion.updateAcqDoc');
 
 
     Route::get(

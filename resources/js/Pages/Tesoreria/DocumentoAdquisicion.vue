@@ -18,7 +18,7 @@ import axios from 'axios';
     <div class="sm:flex sm:justify-end sm:items-center mb-2">
       <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
         <GeneralButton @click="addAcqDoc()" v-if="permits.insertar == 1" color="bg-green-700  hover:bg-green-800"
-          text="Agregar Elemento" icon="add" />
+          text="Agregar Documento" icon="add" />
       </div>
     </div>
     <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
@@ -60,9 +60,9 @@ import axios from 'axios';
               <td class="px-2 first:pl-5 last:pr-5 whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800 text-center">
                   <ul>
-                    <li v-for="detalle in doc.detalles" :key="detalle.id">
+                    <li v-for="(detalle,index) in doc.detalles" :key="index" :class="index!=0 ? 'border-t border-gray-400':''">
                       <span>{{ detalle.compromiso_ppto_det_doc_adquisicion }}</span> - <span>${{
-                        detalle.monto_det_doc_adquisicion }}</span>
+                        detalle.monto_det_doc_adquisicion }}</span> - {{ detalle.fuente_financiamiento.codigo_proy_financiado }}<span></span>
                     </li>
                   </ul>
                 </div>
@@ -83,7 +83,7 @@ import axios from 'axios';
                 <div class="space-x-1">
                   <DropDownOptions>
                     <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                      v-if="permits.actualizar == 1 && doc.estado_doc_adquisicion == 1" @click="editIncomeConcept(doc)">
+                      v-if="permits.actualizar == 1 && doc.estado_doc_adquisicion == 1" @click="editAcqDoc(doc)">
                       <div class="w-8 text-green-900">
                         <span class="text-xs">
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -96,7 +96,7 @@ import axios from 'axios';
                       <div class="font-semibold">Editar</div>
                     </div>
                     <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                      @click="changeStateIncomeConcept(doc)" v-if="permits.eliminar == 1">
+                      @click="changeStateAcqDoc(doc)" v-if="permits.eliminar == 1">
                       <div class="w-8 text-red-900"><span class="text-xs">
                           <svg fill="#7F1D1D" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" width="20px"
                             height="20px" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 97.994 97.994"
@@ -168,7 +168,7 @@ import axios from 'axios';
     </div>
 
     <ModalDocAdquisicionVue :show_modal_acq_doc="show_modal_acq_doc" :modalData="modalData"
-      :financing_sources="financing_sources" :budget_accounts="budget_accounts" :dependencies="dependencies"
+      :financing_sources="financing_sources" :suppliers="suppliers" :doc_types="doc_types" :management_types="management_types"
       @cerrar-modal="show_modal_acq_doc = false" @get-table="getAcquisitionDoc(tableData.currentPage)" />
 
   </AppLayoutVue>
@@ -235,10 +235,9 @@ export default {
     }
   },
   methods: {
-    editIncomeConcept(income_concept) {
-      //var array = {nombre_marca:marca.nombre_marca}
-      this.modalData = income_concept
-      this.showModalIncome = true
+    editAcqDoc(doc) {
+      this.modalData = doc
+      this.show_modal_acq_doc = true
     },
     addAcqDoc() {
       this.modalData = []
@@ -263,11 +262,11 @@ export default {
           this.$emit("cerrar-modal");
         });
     },
-    changeStateIncomeConcept(id_service, name_service, state_service) {
+    changeStateAcqDoc(doc) {
       let msg
-      state_service == 1 ? msg = "Desactivar" : msg = "Activar"
+      doc.estado_doc_adquisicion == 1 ? msg = "Desactivar" : msg = "Activar"
       this.$swal.fire({
-        title: msg + ' concepto de ingreso: ' + name_service + '.',
+        title: msg + ' documento de adquisicion: ' + doc.numero_doc_adquisicion + '.',
         text: "¿Estas seguro?",
         icon: "question",
         iconHtml: "❓",
@@ -278,9 +277,9 @@ export default {
         showCloseButton: true
       }).then((result) => {
         if (result.isConfirmed) {
-          axios.post("/change-state-income-concept", {
-            id_service: id_service,
-            state_service: state_service
+          axios.post("/change-state-acq-doc", {
+            id_acq_doc: doc.id_doc_adquisicion,
+            state_acq_doc: doc.estado_doc_adquisicion
           })
             .then((response) => {
               this.$swal.fire({
@@ -288,7 +287,7 @@ export default {
                 icon: 'success',
                 timer: 5000
               })
-              this.getIncomeConcept(this.tableData.currentPage);
+              this.getAcquisitionDoc(this.tableData.currentPage);
             })
             .catch((errors) => {
               let msg = this.manageError(errors)
