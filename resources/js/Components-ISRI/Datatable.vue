@@ -1,6 +1,6 @@
 <template>
     <table class="table-auto w-full editor_listing_table ">
-        <thead class="text-xs font-semibold uppercase text-white bg-[#001b47] border-t border-b border-slate-200">
+        <thead class="text-xs font-semibold uppercase  text-white bg-[#001c48] border-t border-b border-slate-200">
             <tr>
                 <th v-for="column in columns" :key="column.name" @click="$emit('sort', column.name)"
                     :class="sortKey === column.name ? (sortOrders[column.name] > 0 ? 'sorting_asc' : 'sorting_desc') : 'sorting'"
