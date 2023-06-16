@@ -307,7 +307,8 @@ class QuedanController extends Controller
         $tipoAdquisicion = DB::table('tipo_documento_adquisicion')
             ->select(
                 'id_tipo_doc_adquisicion as value',
-                'nombre_tipo_doc_adquisicion as label'
+                'nombre_tipo_doc_adquisicion as label',
+                'estado_tipo_doc_adquisicion'
             )->get();
 
         $v_Proveedor = DB::table('proveedor')
@@ -348,6 +349,7 @@ class QuedanController extends Controller
                 'proveedor.id_proveedor',
                 'proyecto_financiado.id_proy_financiado',
                 'documento_adquisicion.numero_doc_adquisicion',
+                'documento_adquisicion.monto_doc_adquisicion',
                 'detalle_documento_adquisicion.compromiso_ppto_det_doc_adquisicion',
                 'tipo_documento_adquisicion.id_tipo_doc_adquisicion',
                 'tipo_documento_adquisicion.nombre_tipo_doc_adquisicion'
