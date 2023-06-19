@@ -33,8 +33,8 @@ import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalL
 
             </header>
             <div class="overflow-x-auto">
-                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy"
-                    @datos-enviados="handleData($event)">
+                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
+                    @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getDataLiquidaciones()">
                     <tbody class="text-sm divide-y divide-slate-200">
                         <template v-for="data in dataRequerimientoForTable" :key="data.id_requerimiento_pago">
                             <tr v-if="data.quedan != ''">
@@ -120,8 +120,12 @@ import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalL
                     </tbody>
                 </datatable>
             </div>
+            <div v-if="empty_object" class="flex text-center py-2">
+                <p class="font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se encontraron
+                    registros.</p>
+            </div>
         </div>
-        <div class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
+        <div v-if="!empty_object" class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
             <div>
                 <nav class="flex justify-between" role="navigation" aria-label="Navigation">
 
@@ -200,6 +204,7 @@ export default {
                 sortOrders[column.name] = -1;
         });
         return {
+            empty_object: false,
             showModalAsignacionRequerimiento: false,
             showModalLiquidacionRequerimiento: false,
             dataLiquidaciones: [],//data que contiene todos los totales de todos los requerimientos
@@ -244,6 +249,7 @@ export default {
                     this.links[0].label = "Anterior"
                     this.links[this.links.length - 1].label = "Siguiente"
                     this.dataRequerimientoForTable = data.data.data
+                    this.dataRequerimientoForTable.length>0 ? this.empty_object=false : this.empty_object=true
                 }
             }).catch((errors) => {
                 let msg = this.manageError(errors);
@@ -303,7 +309,7 @@ export default {
                 this.getDataLiquidaciones()
             } else {
                 this.tableData.search = myEventData;
-                this.getDataLiquidaciones()
+                //this.getDataLiquidaciones()
             }
         },
     },
