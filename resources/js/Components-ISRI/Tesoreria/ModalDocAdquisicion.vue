@@ -14,6 +14,14 @@ import axios from "axios";
                 <div class="text-sm">
                     <!-- Page 1 -->
                     <div id="page1" v-show="currentPage === 1">
+                        <div class="mb-2 md:flex flex-row justify-between">
+                            <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
+                                Información general
+                            </span>
+                            <span class="font-semibold text-slate-800 text-[14px]">
+                                Página 1 de 2
+                            </span>
+                        </div>
                         <!-- First row -->
                         <div class="mb-5 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
@@ -53,7 +61,7 @@ import axios from "axios";
                                 </label>
                                 <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                                     <Multiselect v-model="acq_doc.management_type_id" :options="management_types"
-                                        placeholder="Seleccione gestion" :searchable="true"/>
+                                        placeholder="Seleccione gestion" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
                                 <InputError class="mt-2" :message="errors.management_type_id" />
@@ -64,7 +72,7 @@ import axios from "axios";
                                 </label>
                                 <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                                     <Multiselect v-model="acq_doc.supplier_id" :options="suppliers"
-                                        placeholder="Seleccione proveedor" :searchable="true"/>
+                                        placeholder="Seleccione proveedor" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
                                 <InputError class="mt-2" :message="errors.supplier_id" />
@@ -97,6 +105,14 @@ import axios from "axios";
                     </div>
                     <!-- Page 2 -->
                     <div id="page2" v-show="currentPage === 2">
+                        <div class="mb-2 md:flex flex-row justify-between">
+                            <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
+                                Items
+                            </span>
+                            <span class="font-semibold text-slate-800 text-[14px]">
+                                Página 2 de 2
+                            </span>
+                        </div>
                         <!-- Item inputs -->
                         <!-- First row -->
                         <div class="mb-4 md:flex flex-row justify-items-start">
@@ -106,7 +122,7 @@ import axios from "axios";
                                 </label>
                                 <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                                     <Multiselect v-model="array_item.financing_source_id" :options="financing_sources"
-                                        placeholder="Seleccion financiamiento" :searchable="true"/>
+                                        placeholder="Seleccion financiamiento" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
                                 <InputError class="mt-2" :message="item_errors.financing_source_id" />
@@ -145,7 +161,7 @@ import axios from "axios";
                         <!-- third row -->
                         <div class="mb-4 md:mr-2 md:mb-0 basis-full" style="border: none; background-color: transparent;">
                             <label class="block mb-2 text-xs font-light text-gray-600" for="descripcion">
-                                Administrador de contrato
+                                Administrador de documento
                             </label>
                             <textarea v-model="array_item.contract_manager" id="cotract-manager" name="contract-manager"
                                 class="resize-none w-full h-10 overflow-y-auto peer text-xs font-semibold rounded-r-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
@@ -156,10 +172,10 @@ import axios from "axios";
                         <!-- Add item button -->
                         <div class="flex justify-center mb-2 mt-1">
                             <div class="flex items-center">
-                                <GeneralButton color="bg-blue-600" :text="new_item ? 'Agregar Item' : 'Actualizar Item'"
-                                    icon="add" @click="addItem()" />
-                                <GeneralButton class="ml-2" text="Limpiar" icon="delete" 
-                                @click="cleanArrayItem()"/>
+                                <GeneralButton class="mr-1" :text="new_item ? 'Limpiar' : 'Cancelar'"
+                                    color="bg-red-600 hover:bg-red-700" icon="delete" @click="cleanArrayItem()" />
+                                <GeneralButton class="ml-1" color="bg-blue-600 hover:bg-blue-700"
+                                    :text="new_item ? 'Agregar Item' : 'Actualizar Item'" icon="add" @click="addItem()" />
                             </div>
                         </div>
                         <!-- Items table -->
@@ -215,7 +231,7 @@ import axios from "axios";
                             </table>
                         </div>
                         <!-- Total amount of items -->
-                        <div class="w-full flex flex-row mt-1">
+                        <div v-if="item_available" class="w-full flex flex-row mt-1">
                             <div class="w-[15%]"></div>
                             <div class="w-[50%]">
                                 <p class="text-[14px] text-right font-semibold">TOTAL DOCUMENTO</p>
@@ -227,12 +243,17 @@ import axios from "axios";
                             </div>
                             <div class="w-[15%]"></div>
                         </div>
+                        <div v-else class="mt-2">
+                            <p class="text-[14px] text-black text-center font-semibold">
+                                SIN ITEMS ASIGNADOS
+                            </p>
+                        </div>
                     </div>
                     <!-- Buttons to navigate -->
                     <div class="flex justify-center mt-5">
                         <div class="flex items-center mr-1">
                             <button v-if="currentPage != 1"
-                                class="flex items-center bg-gray-600 hover:bg-gray-600 text-white pl-2 pr-3 py-1.5 text-center mb-2 rounded"
+                                class="flex items-center bg-gray-600 hover:bg-gray-700 text-white pl-2 pr-3 py-1.5 text-center mb-2 rounded"
                                 :disabled="currentPage === 1" @click="goToPreviousPage">
                                 <svg width="20px" height="20px" viewBox="-3 0 32 32" version="1.1"
                                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -255,7 +276,7 @@ import axios from "axios";
                         </div>
                         <div class="flex items-center ml-1">
                             <button v-if="currentPage != 2"
-                                class="flex items-center bg-blue-600 hover:bg-blue-600 text-white pl-3 pr-2 py-1.5 text-center mb-2 rounded"
+                                class="flex items-center bg-blue-600 hover:bg-blue-700 text-white pl-3 pr-2 py-1.5 text-center mb-2 rounded"
                                 :disabled="disabled_next_button" @click="goToNextPage">
                                 <div class="text-[12px]">SIGUIENTE</div>
                                 <span
@@ -717,8 +738,8 @@ export default {
             this.array_item.contract_manager = item.contract_manager
             this.array_item.index = index
             this.array_item.financing_source_id = item.financing_source_id
-            this.array_item.deleted=false
-            this.array_item.selected=true
+            this.array_item.deleted = false
+            this.array_item.selected = true
             this.acq_doc.items[index].selected = true
         },
         deleteItem(index) {
@@ -770,10 +791,10 @@ export default {
             }
             this.acq_doc.total = sum.toFixed(2);
         },
-        cleanArrayItem(){
-            if(this.array_item.index!=-1){
-                if(this.acq_doc.items[this.array_item.index]){
-                    this.acq_doc.items[this.array_item.index].selected=false
+        cleanArrayItem() {
+            if (this.array_item.index != -1) {
+                if (this.acq_doc.items[this.array_item.index]) {
+                    this.acq_doc.items[this.array_item.index].selected = false
                 }
             }
             // Empty the array
@@ -825,6 +846,23 @@ export default {
         },
     },
     computed: {
+        item_available() {
+            let exist = false
+            if (this.acq_doc.items) {
+                for (var i = 0; i < this.acq_doc.items.length; i++) {
+                    if (this.acq_doc.items[i].deleted == false) {
+                        exist = true
+                    }
+                }
+                if (exist) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
     }
 };
 </script>

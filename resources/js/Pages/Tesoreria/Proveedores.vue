@@ -11,7 +11,7 @@ import ModalProveedortVue from '@/Components-ISRI/Tesoreria/ModalProveedor.vue';
         <div class="sm:flex sm:justify-end sm:items-center">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
                 <GeneralButton v-if="permits.insertar == 1" @click="addDataSupplier()"
-                    color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add" />
+                    color="bg-green-700  hover:bg-green-800" text="Agregar Proveedor" icon="add" />
             </div>
         </div>
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
@@ -32,8 +32,8 @@ import ModalProveedortVue from '@/Components-ISRI/Tesoreria/ModalProveedor.vue';
 
             </header>
             <div class="overflow-x-auto">
-                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy"
-                    @datos-enviados="handleData($event)">
+                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
+                @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getSuppilers()">
                     <tbody class="text-sm divide-y divide-slate-200">
                         <tr v-for="proveedor in proveedores" :key="proveedor.id_proveedor">
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
@@ -326,7 +326,7 @@ export default {
             }
             else {
                 this.tableData.search = myEventData;
-                this.getSuppilers();
+                //this.getSuppilers();
             }
         },
         getPermits() {
