@@ -10,7 +10,7 @@ import ModalVerRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalVerRequer
     <AppLayoutVue nameSubModule="Tesoreria - Requerimientos">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add"
+                <GeneralButton color="bg-green-700  hover:bg-green-800" text="Agregar Requerimiento" icon="add"
                     @click="openModal()" />
             </div>
         </div>

@@ -14,9 +14,9 @@ import axios from "axios";
             <div class="px-5 py-4">
                 <div class="text-sm">
 
-                    <div class="pb-4 mb-4 md:flex flex-row justify-between">
-                        <span class="font-semibold text-slate-800 mb-2 text-lg underline underline-offset-2">
-                            Información de Ingreso
+                    <div class="mb-4 md:flex flex-row justify-between">
+                        <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
+                            Información de concepto
                         </span>
                     </div>
 
