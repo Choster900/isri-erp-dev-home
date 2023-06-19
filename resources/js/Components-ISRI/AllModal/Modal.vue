@@ -18,6 +18,10 @@ const props = defineProps({
         type: String,
         default: 'Titulo del modal',
     },
+    closeOutSide: {
+        type: Boolean,
+        default: true,
+    }
 });
 
 const emit = defineEmits(['close']);
@@ -38,7 +42,14 @@ const close = () => {
         emit('close');
     }
 };
+const closeOutSide = () => {
 
+    if (props.closeOutSide) {
+        if (props.closeable) {
+            emit('close');
+        }
+    }
+};
 const closeOnEscape = (e) => {
     if (e.key === 'Escape' && props.show) {
         close();
@@ -55,8 +66,8 @@ onUnmounted(() => {
 const isContentTooLarge = computed(() => {
     const content = document.querySelector('.modal-content');
     return content ? content.scrollHeight > window.innerHeight : false;
-  });
-  
+});
+
 const maxWidthClass = computed(() => {
     return {
         sm: 'sm:max-w-sm',
@@ -80,7 +91,7 @@ const maxWidthClass = computed(() => {
                 <transition enter-active-class="ease-out duration-300" enter-from-class="opacity-0"
                     enter-to-class="opacity-100" leave-active-class="ease-in duration-200" leave-from-class="opacity-100"
                     leave-to-class="opacity-0">
-                    <div v-show="show" class="fixed inset-0 transform transition-all" @click="close">
+                    <div v-show="show" class="fixed inset-0 transform transition-all" @click="closeOutSide">
                         <div class="absolute inset-0 bg-gray-900 opacity-75" />
                     </div>
                 </transition>
@@ -109,7 +120,7 @@ const maxWidthClass = computed(() => {
         </transition>
     </teleport>
 </template>
-  <style>
+<style>
 .sin-scroll {
     overflow: auto;
     scrollbar-width: none;
