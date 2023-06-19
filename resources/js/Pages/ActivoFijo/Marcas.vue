@@ -39,8 +39,8 @@ import axios from 'axios';
       </header>
 
       <div class="overflow-x-auto">
-        <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy"
-          @datos-enviados="handleData($event)">
+        <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true" @sort="sortBy"
+          @datos-enviados="handleData($event)" @execute-search="getBrands()">
           <tbody class="text-sm divide-y divide-slate-200">
             <tr v-for="brand in brands" :key="brand.id_marca">
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
@@ -66,11 +66,10 @@ import axios from 'axios';
                 </div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                <div class="space-x-1">
+                <div class="space-x-1 text-center">
                   <DropDownOptions>
                     <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                      v-if="permits.actualizar == 1 && brand.estado_marca == 1"
-                      @click="editBrand(brand)">
+                      v-if="permits.actualizar == 1 && brand.estado_marca == 1" @click="editBrand(brand)">
                       <div class="w-8 text-green-900">
                         <span class="text-xs">
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -117,9 +116,12 @@ import axios from 'axios';
         </datatable>
 
       </div>
+      <div v-if="empty_object" class="flex text-center py-2">
+        <p class="font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se encontraron registros.</p>
+      </div>
     </div>
 
-    <div class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
+    <div v-if="!empty_object" class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
       <div>
         <nav class="flex justify-between" role="navigation" aria-label="Navigation">
           <div class="grow text-center">
@@ -189,7 +191,8 @@ export default {
         sortOrders[column.name] = -1;
     });
     return {
-      //permits: [],
+      empty_object: false,
+      permits: [],
       brands: [],
       links: [],
       columns: columns,
@@ -263,7 +266,7 @@ export default {
     async getBrands(url = "/marcas") {
       this.tableData.draw++;
       this.tableData.currentPage = url
-      await axios.post(url,this.tableData).then((response) => {
+      await axios.post(url, this.tableData).then((response) => {
         let data = response.data;
         if (this.tableData.draw == data.draw) {
           this.links = data.data.links;
@@ -271,6 +274,7 @@ export default {
           this.links[0].label = "Anterior";
           this.links[this.links.length - 1].label = "Siguiente";
           this.brands = data.data.data;
+          this.brands.length > 0 ? this.empty_object = false : this.empty_object = true
         }
       }).catch((errors) => {
         let msg = this.manageError(errors)
@@ -309,9 +313,11 @@ export default {
       })
     },
     handleData(myEventData) {
-      console.log(myEventData);
       this.tableData.search = myEventData;
-      this.getBrands()
+      const data = Object.values(myEventData);
+      if (data.every(error => error === '')) {
+        this.getBrands()
+      }
     }
   }
 }
