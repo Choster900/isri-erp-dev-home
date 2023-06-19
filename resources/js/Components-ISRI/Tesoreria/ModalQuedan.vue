@@ -470,10 +470,10 @@ export default {
                 iva: '',
                 id_proveedor: '',
                 id_det_doc_adquisicion: '',
-                id_tipo_doc_adquisicion: '',//TODO: YA NO SE USARA (esto era el tipo de contraro)
-                nombre_tipo_doc_adquisicion: '',//TODO: YA NO SE USARA
-                numero_doc_adquisicion: '',//TODO: YA NO SE USARA
-                compromiso_ppto_det_doc_adquisicion: '',//TODO: YA NO SE USARA
+                id_tipo_doc_adquisicion: '',
+                nombre_tipo_doc_adquisicion: '',
+                numero_doc_adquisicion: '',
+                compromiso_ppto_det_doc_adquisicion: '',
                 numero_retencion_iva_quedan: '',
                 descripcion_quedan: '',
                 monto_liquido_quedan: '',
@@ -661,7 +661,7 @@ export default {
 
                     rowsData[rowIndex]["calculos"].iva = ivaByFila.toFixed(2);
                     let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
-                    rowsData[rowIndex]["calculos"].renta = this.dataForCalculate.dui_proveedor != null ? montoIsrQuedan.toFixed(2) : (0).toFixed(2);
+                    rowsData[rowIndex]["calculos"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : "0";
                 }
             } else {
                 // Recorrer todas las filas y realizar los cálculos
@@ -674,12 +674,13 @@ export default {
 
                     let ivaByFila = liquido * this.dataForCalculate.iva;
 
-                    rowsData[index]["calculos"].iva = Number(ivaByFila.toFixed(2));
+                    rowsData[index]["calculos"].iva = ivaByFila.toFixed(2);
 
                     let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
-                    rowsData[index]["calculos"].renta = this.dataForCalculate.dui_proveedor != null ? Number(montoIsrQuedan.toFixed(2)) : (0).toFixed(2);
+                    rowsData[index]["calculos"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : "0";
                 });
             }
+
 
             // Calcular el total de IVA y Renta sumando los valores de cada fila
             let totalIva = rowsData.reduce((iva, obj) => iva + parseFloat(obj["calculos"].iva), 0)
@@ -693,27 +694,14 @@ export default {
             this.dataInputs.monto_total_quedan = totalAmountInMonto.toFixed(2)
             this.dataInputs.monto_liquido_quedan = montoLiquidoQuedan.toFixed(2)
 
-            console.log("MONTO DE CONTRATO: " + this.dataForCalculate.monto_doc_adquisicion);
-            console.log("MONTO DEL QUEDAN: " + this.dataInputs.monto_total_quedan);
-            console.log("MONTO DE PROVEEDORES EN EL MES: " + this.dataForCalculate.monto_total_quedan_por_proveedor);
-
             let sum = (parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) || 0) + (parseFloat(this.dataInputs.monto_total_quedan) || 0)
-            console.log("SUMA DEL QUEDAN MAS EL MONTO DE PROVEEDORES EN EL MES: " + sum);
 
-            if (this.documentoAdquisicion != "") {
-
-                if (this.dataForCalculate.monto_doc_adquisicion <= sum) {
-                    this.dataInputs.monto_iva_quedan = totalIva.toFixed(2)
-                } else {
-                    this.dataInputs.monto_iva_quedan = (0).toFixed(2)
-                }
+            if (this.documentoAdquisicion !== "") {
+                this.dataInputs.monto_iva_quedan = (this.dataForCalculate.monto_doc_adquisicion <= sum) ? totalIva.toFixed(2) : (0).toFixed(2);
             } else {
-                if (113 <= sum) {
-                    this.dataInputs.monto_iva_quedan = totalIva.toFixed(2)
-                } else {
-                    this.dataInputs.monto_iva_quedan = (0).toFixed(2)
-                }
+                this.dataInputs.monto_iva_quedan = (113 <= sum) ? totalIva.toFixed(2) : (0).toFixed(2);
             }
+
             this.dataInputs.monto_isr_quedan = totalRenta.toFixed(2)
         },
         getAmountBySupplier(id_proveedor) {
