@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Tesoreria;
 
 use App\Http\Controllers\Controller;
+use App\Models\DocumentoAdquisicion;
 use App\Models\EmpleadoTesoreria;
 use App\Models\Proveedor;
 use Illuminate\Http\Request;
@@ -146,29 +147,31 @@ class QuedanController extends Controller
             DB::beginTransaction();
 
             $quedanData = [
-                'id_estado_quedan'              => 1,
-                'id_proy_financiado'            => $request->quedan["id_proy_financiado"],
-                'id_prioridad_pago'             => $request->quedan["id_prioridad_pago"],
-                'id_proveedor'                  => $request->quedan["id_proveedor"],
-                'id_serie_retencion_iva'        => 1, //VALOR QUEDAMO POR EL MOMENTO
-                'id_acuerdo_compra'             => $request->quedan["id_acuerdo_compra"],
-                'numero_acuerdo_quedan'         => $request->quedan["numero_acuerdo_quedan"],
-                'numero_compromiso_ppto_quedan' => $request->quedan["numero_compromiso_ppto_quedan"],
-                'numero_retencion_iva_quedan'   => $request->quedan["numero_retencion_iva_quedan"],
-                'descripcion_quedan'            => $request->quedan["descripcion_quedan"],
-                'monto_liquido_quedan'          => $request->quedan["monto_liquido_quedan"],
-                'monto_iva_quedan'              => $request->quedan["monto_iva_quedan"],
-                'monto_isr_quedan'              => $request->quedan["monto_isr_quedan"],
-                'monto_total_quedan'            => $request->quedan["monto_total_quedan"],
-                'id_empleado_tesoreria'         => EmpleadoTesoreria::select("id_empleado_tesoreria")
+                'id_estado_quedan'            => 1,
+                'id_proy_financiado'          => $request->quedan["id_proy_financiado"],
+                'id_prioridad_pago'           => $request->quedan["id_prioridad_pago"],
+                'id_proveedor'                => $request->quedan["id_proveedor"],
+                'id_serie_retencion_iva'      => 1,
+                //VALOR QUEDAMO POR EL MOMENTO
+                'id_det_doc_adquisicion'      => $request->quedan["id_det_doc_adquisicion"],
+                //'numero_acuerdo_quedan'         => $request->quedan["numero_acuerdo_quedan"],
+                //'numero_compromiso_ppto_quedan' => $request->quedan["numero_compromiso_ppto_quedan"],
+                'id_tipo_doc_adquisicion'     => $request->quedan["id_tipo_doc_adquisicion"],
+                'numero_retencion_iva_quedan' => $request->quedan["numero_retencion_iva_quedan"],
+                'descripcion_quedan'          => $request->quedan["descripcion_quedan"],
+                'monto_liquido_quedan'        => $request->quedan["monto_liquido_quedan"],
+                'monto_iva_quedan'            => $request->quedan["monto_iva_quedan"],
+                'monto_isr_quedan'            => $request->quedan["monto_isr_quedan"],
+                'monto_total_quedan'          => $request->quedan["monto_total_quedan"],
+                'id_empleado_tesoreria'       => EmpleadoTesoreria::select("id_empleado_tesoreria")
                     ->where('estado_empleado_tesoreria', 1)
                     ->where("id_cargo_tesoreria", 1)
                     ->value('id_empleado_tesoreria'),
-                'fecha_emision_quedan'          => Carbon::now(),
-                'estado_quedan'                 => 1,
-                'fecha_reg_quedan'              => Carbon::now(),
-                'usuario_quedan'                => $request->user()->nick_usuario,
-                'ip_quedan'                     => $request->ip(),
+                'fecha_emision_quedan'        => Carbon::now(),
+                'estado_quedan'               => 1,
+                'fecha_reg_quedan'            => Carbon::now(),
+                'usuario_quedan'              => $request->user()->nick_usuario,
+                'ip_quedan'                   => $request->ip(),
             ];
 
             // Insertar el registro de quedan y obtener el ID generado
@@ -183,7 +186,7 @@ class QuedanController extends Controller
                         'numero_factura_det_quedan'   => $value["numero_factura_det_quedan"],
                         'id_dependencia'              => $value["id_dependencia"],
                         'numero_acta_det_quedan'      => $value["numero_acta_det_quedan"],
-                      //  'descripcion_det_quedan'      => $value[5],
+                        //  'descripcion_det_quedan'      => $value[5],
                         'producto_factura_det_quedan' => $value["monto"]['producto_factura_det_quedan'],
                         'servicio_factura_det_quedan' => $value["monto"]['servicio_factura_det_quedan'],
                         'fecha_factura_det_quedan'    => $value["fecha_factura_det_quedan"],
@@ -223,9 +226,13 @@ class QuedanController extends Controller
             // Actualizar los campos principales del quedan
             Quedan::where("id_quedan", $id_quedan)->update([
                 'id_proveedor'                  => $request->quedan["id_proveedor"],
-                'id_acuerdo_compra'             => $request->quedan["id_acuerdo_compra"],
-                'numero_acuerdo_quedan'         => $request->quedan["numero_acuerdo_quedan"],
-                'numero_compromiso_ppto_quedan' => $request->quedan["numero_compromiso_ppto_quedan"],
+                //'id_acuerdo_compra'             => $request->quedan["id_acuerdo_compra"],
+                'id_det_doc_adquisicion'      => $request->quedan["id_det_doc_adquisicion"],
+
+                /* 'numero_acuerdo_quedan'         => $request->quedan["numero_acuerdo_quedan"],
+                'numero_compromiso_ppto_quedan' => $request->quedan["numero_compromiso_ppto_quedan"], */
+                'id_tipo_doc_adquisicion'     => $request->quedan["id_tipo_doc_adquisicion"],
+
                 'numero_retencion_iva_quedan'   => $request->quedan["numero_retencion_iva_quedan"],
                 'descripcion_quedan'            => $request->quedan["descripcion_quedan"],
                 'monto_liquido_quedan'          => $request->quedan["monto_liquido_quedan"],
@@ -246,7 +253,7 @@ class QuedanController extends Controller
                         'numero_factura_det_quedan'   => $value["numero_factura_det_quedan"],
                         'id_dependencia'              => $value["id_dependencia"],
                         'numero_acta_det_quedan'      => $value["numero_acta_det_quedan"],
-                      //  'descripcion_det_quedan'      => $value[5],
+                        //  'descripcion_det_quedan'      => $value[5],
                         'producto_factura_det_quedan' => $value["monto"]['producto_factura_det_quedan'],
                         'servicio_factura_det_quedan' => $value["monto"]['servicio_factura_det_quedan'],
                         'fecha_factura_det_quedan'    => $value["fecha_factura_det_quedan"],
@@ -264,11 +271,11 @@ class QuedanController extends Controller
                         'numero_factura_det_quedan'   => $value["numero_factura_det_quedan"],
                         'id_dependencia'              => $value["id_dependencia"],
                         'numero_acta_det_quedan'      => $value["numero_acta_det_quedan"],
-                      //  'descripcion_det_quedan'      => $value[5],
+                        //  'descripcion_det_quedan'      => $value[5],
                         'producto_factura_det_quedan' => $value["monto"]['producto_factura_det_quedan'],
                         'servicio_factura_det_quedan' => $value["monto"]['servicio_factura_det_quedan'],
                         'fecha_factura_det_quedan'    => $value["fecha_factura_det_quedan"],
-                        'fecha_mod_det_quedan'        => Carbon::now(),
+                        'fecha_reg_det_quedan'        => Carbon::now(),
                         'usuario_det_quedan'          => $request->user()->nick_usuario,
                         'ip_det_quedan'               => $request->ip(),
                     );
@@ -277,7 +284,7 @@ class QuedanController extends Controller
                 if ($value["isDelete"] === false && $value["numberRow"] == '') {
                     //validar que la fila sea eliminada
                     // Eliminar un detalle_quedan
-                    DetalleQuedan::destroy($value[1]);
+                    DetalleQuedan::destroy($value["id_det_quedan"]);
                 }
             }
 
@@ -297,14 +304,15 @@ class QuedanController extends Controller
                 DB::raw("CONCAT(' - ',codigo_dependencia) AS label")
             )->whereNull('dep_id_dependencia')->get();
 
-        $v_AcuerdoCompra = DB::table('acuerdo_compra')
+        $tipoAdquisicion = DB::table('tipo_documento_adquisicion')
             ->select(
-                'id_acuerdo_compra as value',
-                'nombre_acuerdo_compra as label'
+                'id_tipo_doc_adquisicion as value',
+                'nombre_tipo_doc_adquisicion as label',
+                'estado_tipo_doc_adquisicion'
             )->get();
 
         $v_Proveedor = DB::table('proveedor')
-            ->select('id_proveedor as value', 'razon_social_proveedor as label','dui_proveedor', 'giro.codigo_giro', 'giro.nombre_giro', 'sujeto_retencion.iva_sujeto_retencion', 'sujeto_retencion.isrl_sujeto_retencion')
+            ->select('id_proveedor as value', 'razon_social_proveedor as label', 'dui_proveedor', 'giro.codigo_giro', 'giro.nombre_giro', 'sujeto_retencion.iva_sujeto_retencion', 'sujeto_retencion.isrl_sujeto_retencion')
             ->leftJoin('giro', 'giro.id_giro', '=', 'proveedor.id_giro')
             ->join('sujeto_retencion', 'sujeto_retencion.id_sujeto_retencion', '=', 'proveedor.id_sujeto_retencion')
             ->where('estado_proveedor', 1)
@@ -334,14 +342,34 @@ class QuedanController extends Controller
                 'nombre_proy_financiado AS label',
             )->get();
 
+        $documentosAdquisicion = DB::table('documento_adquisicion')
+            ->select(
+                'detalle_documento_adquisicion.id_det_doc_adquisicion as value',
+                DB::raw("UPPER(CONCAT(documento_adquisicion.numero_doc_adquisicion, ' - COMPROMISO ', detalle_documento_adquisicion.compromiso_ppto_det_doc_adquisicion, ' - ',proyecto_financiado.codigo_proy_financiado)) AS label"),
+                'proveedor.id_proveedor',
+                'proyecto_financiado.id_proy_financiado',
+                'documento_adquisicion.numero_doc_adquisicion',
+                'documento_adquisicion.monto_doc_adquisicion',
+                'detalle_documento_adquisicion.compromiso_ppto_det_doc_adquisicion',
+                'tipo_documento_adquisicion.id_tipo_doc_adquisicion',
+                'tipo_documento_adquisicion.nombre_tipo_doc_adquisicion'
+            )
+            ->join('detalle_documento_adquisicion', 'documento_adquisicion.id_doc_adquisicion', '=', 'detalle_documento_adquisicion.id_doc_adquisicion')
+            ->join('proyecto_financiado', 'detalle_documento_adquisicion.id_proy_financiado', '=', 'proyecto_financiado.id_proy_financiado')
+            ->join('proveedor', 'proveedor.id_proveedor', '=', 'documento_adquisicion.id_proveedor')
+            ->join('tipo_documento_adquisicion', 'tipo_documento_adquisicion.id_tipo_doc_adquisicion', '=', 'documento_adquisicion.id_tipo_doc_adquisicion')
+            ->get();
+
+
 
         return [
-            "dependencias"        => $v_Dependencias,
-            "acuerdoCompras"      => $v_AcuerdoCompra,
-            "proveedor"           => $v_Proveedor,
-            "numeroRequerimiento" => $v_Requerimiento,
-            "prioridadPago"       => $v_Prioridad_pago,
-            "proyectoFinanciado"  => $v_Proyecto_finanziado,
+            "dependencias"         => $v_Dependencias,
+            "tipoAdquisicion"       => $tipoAdquisicion,
+            "proveedor"            => $v_Proveedor,
+            "numeroRequerimiento"  => $v_Requerimiento,
+            "prioridadPago"        => $v_Prioridad_pago,
+            "proyectoFinanciado"   => $v_Proyecto_finanziado,
+            "documentoAdquisicion" => $documentosAdquisicion,
         ];
     }
     public function updateFechaRetencionIva(Request $request) //Metodo utilizado al momento de seleccionar proveedor y hacer los calculos 
