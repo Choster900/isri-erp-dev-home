@@ -107,7 +107,7 @@ import axios from "axios";
                     <div id="page2" v-show="currentPage === 2">
                         <div class="mb-2 md:flex flex-row justify-between">
                             <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
-                                Items
+                                Detalles
                             </span>
                             <span class="font-semibold text-slate-800 text-[14px]">
                                 Página 2 de 2
@@ -115,7 +115,7 @@ import axios from "axios";
                         </div>
                         <!-- Item inputs -->
                         <!-- First row -->
-                        <div class="mb-4 md:flex flex-row justify-items-start">
+                        <div class="mb-4 md:flex flex-row justify   Detalles-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Fuente Financiamiento <span class="text-red-600 font-extrabold">*</span>
@@ -129,8 +129,8 @@ import axios from "axios";
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="commt-number" v-model="array_item.commitment_number"
-                                    :value="array_item.commitment_number" type="text" placeholder="Numero compromiso"
-                                    @update:modelValue="validateItemInput('commitment_number', 10, monto = true)">
+                                    :value="array_item.commitment_number" type="text" placeholder="Numero compromiso(s)"
+                                    @update:modelValue="validateItemInput('commitment_number', 20, false, commitment_number = true)">
                                     <LabelToInput icon="objects" forLabel="commt-number" />
                                 </TextInput>
                                 <InputError
@@ -175,7 +175,7 @@ import axios from "axios";
                                 <GeneralButton class="mr-1" :text="new_item ? 'Limpiar' : 'Cancelar'"
                                     color="bg-red-600 hover:bg-red-700" icon="delete" @click="cleanArrayItem()" />
                                 <GeneralButton class="ml-1" color="bg-blue-600 hover:bg-blue-700"
-                                    :text="new_item ? 'Agregar Item' : 'Actualizar Item'" icon="add" @click="addItem()" />
+                                    :text="new_item ? 'Agregar' : 'Actualizar'" icon="add" @click="addItem()" />
                             </div>
                         </div>
                         <!-- Items table -->
@@ -183,7 +183,7 @@ import axios from "axios";
                             <table class="w-full" id="">
                                 <thead class="bg-[#1F3558] text-white">
                                     <tr class="">
-                                        <th class="rounded-tl-lg w-[15%] py-1">COMPROMISO</th>
+                                        <th class="rounded-tl-lg w-[15%] py-1">COMPROMISO(S)</th>
                                         <th class="w-[40%]">NOMBRE</th>
                                         <th class="w-[10%]">FUENTE</th>
                                         <th class="w-[20%]">MONTO</th>
@@ -393,12 +393,12 @@ export default {
     },
     methods: {
         //Function to validate data entry
-        validateGeneralInput(field, limit, amount) {
+        validateGeneralInput(field, limit) {
             if (this.acq_doc[field] && this.acq_doc[field].length > limit) {
                 this.acq_doc[field] = this.acq_doc[field].substring(0, limit);
             }
         },
-        validateItemInput(field, limit, amount) {
+        validateItemInput(field, limit, amount, commitment_number) {
             if (this.array_item[field] && this.array_item[field].length > limit) {
                 this.array_item[field] = this.array_item[field].substring(0, limit);
             }
@@ -408,6 +408,13 @@ export default {
             if (field === 'commitment_number') {
                 this.index_errors = []
                 this.backend_errors = []
+                const newValue = this.array_item.commitment_number.replace(/[^\d, ]/g, '');
+                if (newValue !== this.array_item.commitment_number) {
+                    this.array_item.commitment_number = newValue;
+                }
+            }
+            if (commitment_number) {
+                this.array_item.commitment_number.replace(/[^\d, ]/g, '')
             }
         },
         typeAmount(field) {
