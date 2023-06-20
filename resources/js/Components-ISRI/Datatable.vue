@@ -21,7 +21,7 @@
                         <input :type="column.type" class="tabla text-xs font-normal w-full " @input="sendData($event)"
                             value="" :id="column.name" ref="myInput" v-if="column.name != 'Acciones'">
                         <div v-if="column.name == 'Acciones' && searchButton" class="flex justify-center">
-                            <button @click="$emit('execute-search')">
+                            <button @click="$emit('execute-search')" title="Filtrar por criterios de busqueda">
                                 <svg viewBox="0 0 600 600" version="1.1" id="svg9724" sodipodi:docname="search.svg"
                                 inkscape:version="1.2.2 (1:1.2.2+202212051550+b0a8486541)" width="22px" height="22px"
                                 xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"

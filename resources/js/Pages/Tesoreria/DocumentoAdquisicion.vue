@@ -60,9 +60,11 @@ import axios from 'axios';
               <td class="px-2 first:pl-5 last:pr-5 whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800 text-center">
                   <ul>
-                    <li v-for="(detalle,index) in doc.detalles" :key="index" :class="index!=0 ? 'border-t border-gray-400':''">
+                    <li v-for="(detalle, index) in doc.detalles" :key="index"
+                      :class="index != 0 ? 'border-t border-gray-400' : ''">
                       <span>{{ detalle.compromiso_ppto_det_doc_adquisicion }}</span> - <span>${{
-                        detalle.monto_det_doc_adquisicion }}</span> - {{ detalle.fuente_financiamiento.codigo_proy_financiado }}<span></span>
+                        detalle.monto_det_doc_adquisicion }}</span> - {{
+    detalle.fuente_financiamiento.codigo_proy_financiado }}<span></span>
                     </li>
                   </ul>
                 </div>
@@ -79,8 +81,8 @@ import axios from 'axios';
                   </div>
                 </div>
               </td>
-              <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                <div class="space-x-1">
+              <td class="px-2 first:pl-5 last:pr-5">
+                <div class="space-x-1 text-center">
                   <DropDownOptions>
                     <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                       v-if="permits.actualizar == 1 && doc.estado_doc_adquisicion == 1" @click="editAcqDoc(doc)">
@@ -95,8 +97,8 @@ import axios from 'axios';
                       </div>
                       <div class="font-semibold">Editar</div>
                     </div>
-                    <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                      @click="changeStateAcqDoc(doc)" v-if="permits.eliminar == 1">
+                    <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer" @click="changeStateAcqDoc(doc)"
+                      v-if="permits.eliminar == 1">
                       <div class="w-8 text-red-900"><span class="text-xs">
                           <svg fill="#7F1D1D" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" width="20px"
                             height="20px" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 97.994 97.994"
@@ -129,9 +131,13 @@ import axios from 'axios';
         </datatable>
 
       </div>
+      <div v-if="empty_object" class="flex text-center py-2">
+        <p class="font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se encontraron registros.</p>
+      </div>
+
     </div>
 
-    <div class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
+    <div v-if="!empty_object" class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
       <div>
         <nav class="flex justify-between" role="navigation" aria-label="Navigation">
           <div class="grow text-center">
@@ -168,8 +174,9 @@ import axios from 'axios';
     </div>
 
     <ModalDocAdquisicionVue :show_modal_acq_doc="show_modal_acq_doc" :modalData="modalData"
-      :financing_sources="financing_sources" :suppliers="suppliers" :doc_types="doc_types" :management_types="management_types"
-      @cerrar-modal="show_modal_acq_doc = false" @get-table="getAcquisitionDoc(tableData.currentPage)" />
+      :financing_sources="financing_sources" :suppliers="suppliers" :doc_types="doc_types"
+      :management_types="management_types" @cerrar-modal="show_modal_acq_doc = false"
+      @get-table="getAcquisitionDoc(tableData.currentPage)" />
 
   </AppLayoutVue>
 </template>
@@ -205,14 +212,15 @@ export default {
         sortOrders[column.name] = -1;
     });
     return {
+      empty_object:false,
       //Data for datatable
       acquisition_docs: [],
       //Data for modal
       show_modal_acq_doc: false,
       modalData: [],
-      doc_types:[],
-      suppliers:[],
-      management_types:[],
+      doc_types: [],
+      suppliers: [],
+      management_types: [],
       budget_accounts: [],
       dependencies: [],
       financing_sources: [],
@@ -312,6 +320,7 @@ export default {
           this.links[0].label = "Anterior";
           this.links[this.links.length - 1].label = "Siguiente";
           this.acquisition_docs = data.data.data;
+          this.acquisition_docs.length>0 ? this.empty_object=false : this.empty_object=true
         }
       }).catch((errors) => {
         let msg = this.manageError(errors)
@@ -355,8 +364,9 @@ export default {
       if (data.every(error => error === '')) {
         this.getAcquisitionDoc()
       }
-    }
-  }
+    },
+
+  },
 }
 </script>
 
