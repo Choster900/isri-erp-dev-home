@@ -495,7 +495,7 @@ export default {
         },
 
     },
-    created() {
+    mounted() {
         this.getDataQuedan()
         this.getListForSelect()
     },
