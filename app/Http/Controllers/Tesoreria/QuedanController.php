@@ -151,11 +151,8 @@ class QuedanController extends Controller
                 'id_proy_financiado'          => $request->quedan["id_proy_financiado"],
                 'id_prioridad_pago'           => $request->quedan["id_prioridad_pago"],
                 'id_proveedor'                => $request->quedan["id_proveedor"],
-                'id_serie_retencion_iva'      => 1,
-                //VALOR QUEDAMO POR EL MOMENTO
+                'id_serie_retencion_iva'      => 1, //VALOR QUEDAMO POR EL MOMENTO
                 'id_det_doc_adquisicion'      => $request->quedan["id_det_doc_adquisicion"],
-                //'numero_acuerdo_quedan'         => $request->quedan["numero_acuerdo_quedan"],
-                //'numero_compromiso_ppto_quedan' => $request->quedan["numero_compromiso_ppto_quedan"],
                 'id_tipo_doc_adquisicion'     => $request->quedan["id_tipo_doc_adquisicion"],
                 'numero_retencion_iva_quedan' => $request->quedan["numero_retencion_iva_quedan"],
                 'descripcion_quedan'          => $request->quedan["descripcion_quedan"],
@@ -186,9 +183,10 @@ class QuedanController extends Controller
                         'numero_factura_det_quedan'   => $value["numero_factura_det_quedan"],
                         'id_dependencia'              => $value["id_dependencia"],
                         'numero_acta_det_quedan'      => $value["numero_acta_det_quedan"],
-                        //  'descripcion_det_quedan'      => $value[5],
                         'producto_factura_det_quedan' => $value["monto"]['producto_factura_det_quedan'],
                         'servicio_factura_det_quedan' => $value["monto"]['servicio_factura_det_quedan'],
+                        'iva_factura_det_quedan'      => $value["retenciones"]['iva'],
+                        'isr_factura_det_quedan'      => $value["retenciones"]['renta'],
                         'fecha_factura_det_quedan'    => $value["fecha_factura_det_quedan"],
                         'fecha_reg_det_quedan'        => Carbon::now(),
                         'usuario_det_quedan'          => $request->user()->nick_usuario,
@@ -225,24 +223,19 @@ class QuedanController extends Controller
             DB::beginTransaction();
             // Actualizar los campos principales del quedan
             Quedan::where("id_quedan", $id_quedan)->update([
-                'id_proveedor'                  => $request->quedan["id_proveedor"],
-                //'id_acuerdo_compra'             => $request->quedan["id_acuerdo_compra"],
+                'id_proveedor'                => $request->quedan["id_proveedor"],
                 'id_det_doc_adquisicion'      => $request->quedan["id_det_doc_adquisicion"],
-
-                /* 'numero_acuerdo_quedan'         => $request->quedan["numero_acuerdo_quedan"],
-                'numero_compromiso_ppto_quedan' => $request->quedan["numero_compromiso_ppto_quedan"], */
                 'id_tipo_doc_adquisicion'     => $request->quedan["id_tipo_doc_adquisicion"],
-
-                'numero_retencion_iva_quedan'   => $request->quedan["numero_retencion_iva_quedan"],
-                'descripcion_quedan'            => $request->quedan["descripcion_quedan"],
-                'monto_liquido_quedan'          => $request->quedan["monto_liquido_quedan"],
-                'monto_iva_quedan'              => $request->quedan["monto_iva_quedan"],
-                'monto_isr_quedan'              => $request->quedan["monto_isr_quedan"],
-                'monto_total_quedan'            => $request->quedan["monto_total_quedan"],
-                'id_proy_financiado'            => $request->quedan["id_proy_financiado"],
-                'id_prioridad_pago'             => $request->quedan["id_prioridad_pago"],
-                'usuario_quedan'                => $request->user()->nick_usuario,
-                'fecha_mod_quedan'              => Carbon::now(),
+                'numero_retencion_iva_quedan' => $request->quedan["numero_retencion_iva_quedan"],
+                'descripcion_quedan'          => $request->quedan["descripcion_quedan"],
+                'monto_liquido_quedan'        => $request->quedan["monto_liquido_quedan"],
+                'monto_iva_quedan'            => $request->quedan["monto_iva_quedan"],
+                'monto_isr_quedan'            => $request->quedan["monto_isr_quedan"],
+                'monto_total_quedan'          => $request->quedan["monto_total_quedan"],
+                'id_proy_financiado'          => $request->quedan["id_proy_financiado"],
+                'id_prioridad_pago'           => $request->quedan["id_prioridad_pago"],
+                'usuario_quedan'              => $request->user()->nick_usuario,
+                'fecha_mod_quedan'            => Carbon::now(),
             ]);
 
             foreach ( $detalle_quedan as $key => $value ) {
@@ -253,9 +246,10 @@ class QuedanController extends Controller
                         'numero_factura_det_quedan'   => $value["numero_factura_det_quedan"],
                         'id_dependencia'              => $value["id_dependencia"],
                         'numero_acta_det_quedan'      => $value["numero_acta_det_quedan"],
-                        //  'descripcion_det_quedan'      => $value[5],
                         'producto_factura_det_quedan' => $value["monto"]['producto_factura_det_quedan'],
                         'servicio_factura_det_quedan' => $value["monto"]['servicio_factura_det_quedan'],
+                        'iva_factura_det_quedan'      => $value["retenciones"]['iva'],
+                        'isr_factura_det_quedan'      => $value["retenciones"]['renta'],
                         'fecha_factura_det_quedan'    => $value["fecha_factura_det_quedan"],
                         'fecha_mod_det_quedan'        => Carbon::now(),
                         'usuario_det_quedan'          => $request->user()->nick_usuario,
@@ -271,9 +265,10 @@ class QuedanController extends Controller
                         'numero_factura_det_quedan'   => $value["numero_factura_det_quedan"],
                         'id_dependencia'              => $value["id_dependencia"],
                         'numero_acta_det_quedan'      => $value["numero_acta_det_quedan"],
-                        //  'descripcion_det_quedan'      => $value[5],
                         'producto_factura_det_quedan' => $value["monto"]['producto_factura_det_quedan'],
                         'servicio_factura_det_quedan' => $value["monto"]['servicio_factura_det_quedan'],
+                        'iva_factura_det_quedan'      => $value["retenciones"]['iva'],
+                        'isr_factura_det_quedan'      => $value["retenciones"]['renta'],
                         'fecha_factura_det_quedan'    => $value["fecha_factura_det_quedan"],
                         'fecha_reg_det_quedan'        => Carbon::now(),
                         'usuario_det_quedan'          => $request->user()->nick_usuario,
@@ -364,7 +359,7 @@ class QuedanController extends Controller
 
         return [
             "dependencias"         => $v_Dependencias,
-            "tipoAdquisicion"       => $tipoAdquisicion,
+            "tipoAdquisicion"      => $tipoAdquisicion,
             "proveedor"            => $v_Proveedor,
             "numeroRequerimiento"  => $v_Requerimiento,
             "prioridadPago"        => $v_Prioridad_pago,

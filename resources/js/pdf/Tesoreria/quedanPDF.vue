@@ -121,7 +121,7 @@
             </tr>
         </table>
         <table>
-            <tr>
+           <!--  <tr>
                 <td class="text-[11pt] font-bold" v-if="dataQuedan.acuerdo_compra.id_acuerdo_compra === 1">{{dataQuedan.acuerdo_compra.nombre_acuerdo_compra }} N°</td>
                 <td class="text-[11pt] font-bold" v-if="dataQuedan.acuerdo_compra.id_acuerdo_compra === 2">{{dataQuedan.acuerdo_compra.nombre_acuerdo_compra }} N°</td>
                 <td class="text-[11pt] font-bold" v-if="dataQuedan.acuerdo_compra.id_acuerdo_compra === 3">{{dataQuedan.acuerdo_compra.nombre_acuerdo_compra }} N°</td>
@@ -131,7 +131,7 @@
                         <span style="font-family:  Arial, Helvetica, sans-serif;">{{dataQuedan.numero_acuerdo_quedan }}</span>
                     </div>
                 </td>
-            </tr>
+            </tr> -->
         </table>
         <table>
             <tr>
@@ -343,7 +343,7 @@
             </tr>
         </table>
         <table>
-            <tr>
+            <!-- <tr>
                 <td class="text-[11pt] font-bold" v-if="dataQuedan.acuerdo_compra.id_acuerdo_compra === 1">{{
                     dataQuedan.acuerdo_compra.nombre_acuerdo_compra }} N°</td>
                 <td class="text-[11pt] font-bold" v-if="dataQuedan.acuerdo_compra.id_acuerdo_compra === 2">{{
@@ -359,7 +359,7 @@
                             dataQuedan.numero_acuerdo_quedan }}</span>
                     </div>
                 </td>
-            </tr>
+            </tr> -->
         </table>
         <table>
             <tr>

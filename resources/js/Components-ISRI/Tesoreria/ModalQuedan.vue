@@ -55,91 +55,93 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                             </div>
                         </div>
 
-                        <div class="mx-20 mb-3 encabezado">
-                            <div class="mb-7 md:flex flex-row justify-items-center">
-                                <div class="mb-4 md:mr-2 md:mb-0 w-100">
-                                    <div class="relative flex w-full flex-row">
-                                        <label for="" class="flex items-center text-[14px] text-sm">Giro del
-                                            proveedor:</label>
-                                        <input type="text" style="width: 350px;" disabled v-model="dataInputs.giro"
-                                            class="border-b-2 border-black bg-gray-200 placeholder-slate-400 text-sm py-0 transition-colors duration-300 focus:border-[#001b47] focus:outline-none">
+                        <div class="overflow-x-auto">
+
+                            <div class="mx-20 mb-3 encabezado">
+                                <div class="mb-7 md:flex flex-row justify-items-center">
+                                    <div class="mb-4 md:mr-2 md:mb-0 w-100">
+                                        <div class="relative flex w-full flex-row">
+                                            <label for="" class="flex items-center text-[14px] text-sm">Giro del proveedor:</label>
+                                            <input type="text" style="width: 350px;" disabled v-model="dataInputs.giro"
+                                                class="border-b-2 border-black bg-gray-200 placeholder-slate-400 text-sm py-0 transition-colors duration-300 focus:border-[#001b47] focus:outline-none">
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="mb-4 md:mr-2 md:mb-0 w-25">
-                                    <div class="relative flex w-full flex-row">
-                                        <label for="" class="flex items-center text-[14px]">Porcentaje de IVA:</label>
-                                        <input type="text" style="width: 75px;" v-model="dataInputs.iva" disabled
-                                            class="border-b-2 border-black bg-gray-200 placeholder-slate-400 text-sm text-center py-0 transition-colors duration-300 focus:border-[#001b47] focus:outline-none">
+                                    <div class="mb-4 md:mr-2 md:mb-0 w-25">
+                                        <div class="relative flex w-full flex-row">
+                                            <label for="" class="flex items-center text-[14px]">Porcentaje de IVA:</label>
+                                            <input type="text" style="width: 75px;" v-model="dataInputs.iva" disabled
+                                                class="border-b-2 border-black bg-gray-200 placeholder-slate-400 text-sm text-center py-0 transition-colors duration-300 focus:border-[#001b47] focus:outline-none">
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="mb-4 md:mr-2 md:mb-0 w-25">
-                                    <div class="relative flex w-full flex-row">
-                                        <label for="" class="flex items-center text-[14px] text-sm">Porcentaje de
-                                            ISR:</label>
-                                        <input type="text" style="width: 75px;" v-model="dataInputs.irs" disabled
-                                            class="border-b-2 border-black bg-gray-200 placeholder-slate-400 text-sm py-0 text-center transition-colors duration-300 focus:border-[#001b47] focus:outline-none">
+                                    <div class="mb-4 md:mr-2 md:mb-0 w-25">
+                                        <div class="relative flex w-full flex-row">
+                                            <label for="" class="flex items-center text-[14px] text-sm">Porcentaje de
+                                                ISR:</label>
+                                            <input type="text" style="width: 75px;" v-model="dataInputs.irs" disabled
+                                                class="border-b-2 border-black bg-gray-200 placeholder-slate-400 text-sm py-0 text-center transition-colors duration-300 focus:border-[#001b47] focus:outline-none">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="pl-16 mb-7 encabezado">
-                            <div class=" mb-7 md:flex flex-row ">
-                                <div class="mb-4 md:mr-2 md:mb-0 w-25 h-5">
-                                    <div class="relative flex  w-full flex-row">
-                                        <label for="" class="flex items-center  text-[14px] text-sm">Quedan:
-                                        </label>
-                                        <input type="text" style="width: 80px;" disabled v-model="dataInputs.id_quedan"
-                                            class="placeholder-slate-400 bg-gray-200 text-sm py-0 text-center font-bold transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
+    
+                            <div class="pl-16 mb-7 encabezado">
+                                <div class=" mb-7 md:flex flex-row ">
+                                    <div class="mb-4 md:mr-2 md:mb-0 w-25 h-5">
+                                        <div class="relative flex  w-full flex-row">
+                                            <label for="" class="flex items-center  text-[14px] text-sm">Quedan:
+                                            </label>
+                                            <input type="text" style="width: 80px;" disabled v-model="dataInputs.id_quedan"
+                                                class="placeholder-slate-400 bg-gray-200 text-sm py-0 text-center font-bold transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="mb-4 md:mr-2 md:mb-0 w-25 h-5">
-                                    <div class="relative flex  w-full flex-row">
-                                        <label for="" class="flex items-center  text-[14px] text-sm">Fecha emision:
-                                        </label>
-                                        <input type="date" style="width: 150px;" v-model="dataInputs.fecha_emision"
-                                            class="placeholder-slate-400 bg-gray-200 text-sm py-0 text-center font-bold transition-colors duration-300 focus:border-[#001b47 focus:outline-none border-b-0">
+                                    <div class="mb-4 md:mr-2 md:mb-0 w-25 h-5">
+                                        <div class="relative flex  w-full flex-row">
+                                            <label for="" class="flex items-center  text-[14px] text-sm">Fecha emision:
+                                            </label>
+                                            <input type="date" style="width: 150px;" v-model="dataInputs.fecha_emision"
+                                                class="placeholder-slate-400 bg-gray-200 text-sm py-0 text-center font-bold transition-colors duration-300 focus:border-[#001b47 focus:outline-none border-b-0">
+                                        </div>
                                     </div>
-                                </div>
-
-                                <div class="mb-4 md:mr-2 md:mb-0  w-40 h-5">
-                                    <div class="relative flex  w-full flex-row">
-                                        <label for="" class="flex items-center text-[14px]">Cheque :</label>
-                                        <input type="text" style="width: 80px;" v-model="dataInputs.monto_liquido_quedan"
-                                            disabled
-                                            class="placeholder-slate-400 text-sm bg-gray-200 text-center py-0 transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
+    
+                                    <div class="mb-4 md:mr-2 md:mb-0  w-40 h-5">
+                                        <div class="relative flex  w-full flex-row">
+                                            <label for="" class="flex items-center text-[14px]">Cheque :</label>
+                                            <input type="text" style="width: 80px;" v-model="dataInputs.monto_liquido_quedan"
+                                                disabled
+                                                class="placeholder-slate-400 text-sm bg-gray-200 text-center py-0 transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
+                                        </div>
                                     </div>
-                                </div>
-
-                                <div class="mb-4 md:mr-2 md:mb-0 w-25 h-5">
-                                    <div class="relative flex  w-full flex-row">
-                                        <label for="" class="flex items-center text-[14px] text-sm">Renta:</label>
-                                        <input type="text" style="width: 80px;" v-model="dataInputs.monto_isr_quedan"
-                                            disabled
-                                            class="placeholder-slate-400 bg-gray-200 text-sm py-0 text-center  transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
+    
+                                    <div class="mb-4 md:mr-2 md:mb-0 w-25 h-5">
+                                        <div class="relative flex  w-full flex-row">
+                                            <label for="" class="flex items-center text-[14px] text-sm">Renta:</label>
+                                            <input type="text" style="width: 80px;" v-model="dataInputs.monto_isr_quedan"
+                                                disabled
+                                                class="placeholder-slate-400 bg-gray-200 text-sm py-0 text-center  transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
+                                        </div>
                                     </div>
-                                </div>
-
-                                <div class="mb-4 md:mr-2 md:mb-0 w-25 h-5">
-                                    <div class="relative flex  w-full flex-row">
-                                        <label for="" class="flex items-center text-[14px]">IVA: </label>
-                                        <input type="text" style="width: 80px;" v-model="dataInputs.monto_iva_quedan"
-                                            disabled
-                                            class="placeholder-slate-400 bg-gray-200 text-sm text-center py-0 transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
+    
+                                    <div class="mb-4 md:mr-2 md:mb-0 w-25 h-5">
+                                        <div class="relative flex  w-full flex-row">
+                                            <label for="" class="flex items-center text-[14px]">IVA: </label>
+                                            <input type="text" style="width: 80px;" v-model="dataInputs.monto_iva_quedan"
+                                                disabled
+                                                class="placeholder-slate-400 bg-gray-200 text-sm text-center py-0 transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
+                                        </div>
                                     </div>
-                                </div>
-
-                                <div class="mb-4 md:mr-2 md:mb-0 w-25 h-5">
-                                    <div class="relative flex  w-full flex-row">
-                                        <label for="" class="flex items-center  text-[14px] text-sm">Total:
-                                        </label>
-                                        <input type="text" style="width: 80px;" disabled
-                                            v-model="dataInputs.monto_total_quedan"
-                                            class="placeholder-slate-400 bg-gray-200 text-sm py-0 text-center font-bold transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
+    
+                                    <div class="mb-4 md:mr-2 md:mb-0 w-25 h-5">
+                                        <div class="relative flex  w-full flex-row">
+                                            <label for="" class="flex items-center  text-[14px] text-sm">Total:
+                                            </label>
+                                            <input type="text" style="width: 80px;" disabled
+                                                v-model="dataInputs.monto_total_quedan"
+                                                class="placeholder-slate-400 bg-gray-200 text-sm py-0 text-center font-bold transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
+                                        </div>
                                     </div>
+    
+    
                                 </div>
-
-
                             </div>
                         </div>
 
@@ -340,7 +342,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 
                                                     </td>
 
-                                                    <td v-else-if="cellIndex == 'calculos'" class="border-2 border-black">
+                                                    <td v-else-if="cellIndex == 'retenciones'" class="border-2 border-black">
                                                         <table>
                                                             <tr>
                                                                 <th class="border-2 border-r-black border-b-black border-l-transparent border-t-transparent text-sm text-gray-600"
@@ -659,9 +661,9 @@ export default {
 
                     let ivaByFila = liquido * this.dataForCalculate.iva;
 
-                    rowsData[rowIndex]["calculos"].iva = ivaByFila.toFixed(2);
+                    rowsData[rowIndex]["retenciones"].iva = ivaByFila.toFixed(2);
                     let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
-                    rowsData[rowIndex]["calculos"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : "0";
+                    rowsData[rowIndex]["retenciones"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : "0";
                 }
             } else {
                 // Recorrer todas las filas y realizar los cálculos
@@ -674,17 +676,17 @@ export default {
 
                     let ivaByFila = liquido * this.dataForCalculate.iva;
 
-                    rowsData[index]["calculos"].iva = ivaByFila.toFixed(2);
+                    rowsData[index]["retenciones"].iva = ivaByFila.toFixed(2);
 
                     let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
-                    rowsData[index]["calculos"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : "0";
+                    rowsData[index]["retenciones"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : "0";
                 });
             }
 
 
             // Calcular el total de IVA y Renta sumando los valores de cada fila
-            let totalIva = rowsData.reduce((iva, obj) => iva + parseFloat(obj["calculos"].iva), 0)
-            let totalRenta = rowsData.reduce((iva, obj) => iva + parseFloat(obj["calculos"].renta), 0)
+            let totalIva = rowsData.reduce((iva, obj) => iva + parseFloat(obj["retenciones"].iva), 0)
+            let totalRenta = rowsData.reduce((iva, obj) => iva + parseFloat(obj["retenciones"].renta), 0)
 
             // Calcular el monto total y líquido sumando los valores de cada fila
             let totalAmountInMonto = rowsData.reduce((monto, obj) => monto + (parseFloat(obj["monto"].producto_factura_det_quedan) || 0) + (parseFloat(obj["monto"].servicio_factura_det_quedan) || 0), 0);
@@ -808,7 +810,7 @@ export default {
                     id_dependencia: '',
                     numero_acta_det_quedan: '',
                     monto: { producto_factura_det_quedan: '', servicio_factura_det_quedan: '' },
-                    calculos: { iva: '0.00', renta: '0.00' },
+                    retenciones: { iva: '0.00', renta: '0.00' },
                     isDelete: true,
                 });
             } else {
@@ -1085,7 +1087,7 @@ export default {
                             id_dependencia: value.id_dependencia,
                             numero_acta_det_quedan: value.numero_acta_det_quedan,
                             monto: { producto_factura_det_quedan: value.producto_factura_det_quedan, servicio_factura_det_quedan: value.servicio_factura_det_quedan },
-                            calculos: { iva: '', renta: '' },
+                            retenciones: { iva: '', renta: '' },
                             isDelete: true,
                         });
                     });
@@ -1129,29 +1131,6 @@ export default {
     border-bottom: 2px solid black;
 }
 
-.encabezado input[type="date"] {
-    width: 50%;
-}
-
-.encabezado input[type="text"] {
-    width: 60%;
-}
-
-.encabezado .row:nth-child(2) .col-6:nth-child(1) {
-    margin-left: 60px;
-}
-
-.encabezado .row:nth-child(2) .col-6:nth-child(1) input {
-    width: 80%;
-}
-
-.encabezado .row:nth-child(2) .col-2:nth-child(2) {
-    margin-left: -25px;
-}
-
-.encabezado .row:nth-child(2) .col-6:nth-child(2) input {
-    width: 20%;
-}
 
 table.rounded-lg {
     border: 2px solid red;
