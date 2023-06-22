@@ -61,7 +61,8 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                 <div class="mb-7 md:flex flex-row justify-items-center">
                                     <div class="mb-4 md:mr-2 md:mb-0 w-100">
                                         <div class="relative flex w-full flex-row">
-                                            <label for="" class="flex items-center text-[14px] text-sm">Giro del proveedor:</label>
+                                            <label for="" class="flex items-center text-[14px] text-sm">Giro del
+                                                proveedor:</label>
                                             <input type="text" style="width: 350px;" disabled v-model="dataInputs.giro"
                                                 class="border-b-2 border-black bg-gray-200 placeholder-slate-400 text-sm py-0 transition-colors duration-300 focus:border-[#001b47] focus:outline-none">
                                         </div>
@@ -83,7 +84,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                     </div>
                                 </div>
                             </div>
-    
+
                             <div class="pl-16 mb-7 encabezado">
                                 <div class=" mb-7 md:flex flex-row ">
                                     <div class="mb-4 md:mr-2 md:mb-0 w-25 h-5">
@@ -102,16 +103,16 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                 class="placeholder-slate-400 bg-gray-200 text-sm py-0 text-center font-bold transition-colors duration-300 focus:border-[#001b47 focus:outline-none border-b-0">
                                         </div>
                                     </div>
-    
+
                                     <div class="mb-4 md:mr-2 md:mb-0  w-40 h-5">
                                         <div class="relative flex  w-full flex-row">
                                             <label for="" class="flex items-center text-[14px]">Cheque :</label>
-                                            <input type="text" style="width: 80px;" v-model="dataInputs.monto_liquido_quedan"
-                                                disabled
+                                            <input type="text" style="width: 80px;"
+                                                v-model="dataInputs.monto_liquido_quedan" disabled
                                                 class="placeholder-slate-400 text-sm bg-gray-200 text-center py-0 transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
                                         </div>
                                     </div>
-    
+
                                     <div class="mb-4 md:mr-2 md:mb-0 w-25 h-5">
                                         <div class="relative flex  w-full flex-row">
                                             <label for="" class="flex items-center text-[14px] text-sm">Renta:</label>
@@ -120,7 +121,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                 class="placeholder-slate-400 bg-gray-200 text-sm py-0 text-center  transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
                                         </div>
                                     </div>
-    
+
                                     <div class="mb-4 md:mr-2 md:mb-0 w-25 h-5">
                                         <div class="relative flex  w-full flex-row">
                                             <label for="" class="flex items-center text-[14px]">IVA: </label>
@@ -129,7 +130,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                 class="placeholder-slate-400 bg-gray-200 text-sm text-center py-0 transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
                                         </div>
                                     </div>
-    
+
                                     <div class="mb-4 md:mr-2 md:mb-0 w-25 h-5">
                                         <div class="relative flex  w-full flex-row">
                                             <label for="" class="flex items-center  text-[14px] text-sm">Total:
@@ -139,8 +140,8 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                 class="placeholder-slate-400 bg-gray-200 text-sm py-0 text-center font-bold transition-colors duration-300 focus:border-[#001b47] focus:outline-none border-b-0">
                                         </div>
                                     </div>
-    
-    
+
+
                                 </div>
                             </div>
                         </div>
@@ -259,11 +260,24 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 
                                     <template v-for="( row, rowIndex ) in  rowsData " :key="rowIndex">
                                         <template v-if="row['isDelete']">
-                                            <tr @dblclick="deleteRow(rowIndex)">
+
+                                            <tr @contextmenu.prevent="deleteRow(rowIndex)">
                                                 <template v-for="( cell, cellIndex ) in  row " :key="cellIndex">
                                                     <td v-if="cellIndex == 'numero_factura_det_quedan'"
                                                         class="border-2 border-black"
                                                         :class="[cell == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']">
+                                                        <button type="button" @click="addJustification(rowIndex)"
+                                                            style="float: right;margin-right: -857px;margin-top: -39px;x;font-size: 30px;padding: 0px 10px;border: 0px;background-color: transparent;">
+                                                            <span type="button" data-toggle="tooltip"
+                                                                data-placement="right">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                                    viewBox="0 0 24 24" stroke-width="1.5"
+                                                                    stroke="currentColor" class="w-5 h-5">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z" />
+                                                                </svg>
+                                                            </span>
+                                                        </button>
                                                         <input type="text"
                                                             v-model="rowsData[rowIndex]['numero_factura_det_quedan']"
                                                             maxlength="10"
@@ -302,8 +316,8 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                             dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''
                                                         ]"
                                                         @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
-                                                        :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true">{{
-                                                            cell }}</td>
+                                                        :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true">
+                                                        {{ cell }}</td>
 
 
                                                     <td v-else-if="cellIndex == 'monto'" class="border-2 border-black">
@@ -342,7 +356,8 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 
                                                     </td>
 
-                                                    <td v-else-if="cellIndex == 'retenciones'" class="border-2 border-black">
+                                                    <td v-else-if="cellIndex == 'retenciones'"
+                                                        class="border-2 border-black">
                                                         <table>
                                                             <tr>
                                                                 <th class="border-2 border-r-black border-b-black border-l-transparent border-t-transparent text-sm text-gray-600"
@@ -370,6 +385,58 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 
                                                 </template>
 
+                                            </tr>
+                                            <tr v-show="row['reajuste']">
+                                                <!-- <th class="" rowspan="2"></th> -->
+                                                <th class="text-xs border-2 border-black" colspan="2" rowspan="2">
+                                                    <div class="flex justify-center mt-1">
+
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                            class="w-5 h-5 pb-1">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                        </svg>
+                                                        <span class="font-semibold">JUSTIICACIÓN REAJUSTES</span>
+                                                    </div>
+                                                </th>
+                                                <th class="border-2 border-black text-sm px-3 text-gray-600" colspan="3"
+                                                    rowspan="2"
+                                                    :class="row['justificacion_det_quedan'] == '' ? 'bg-[#fdfd96]' : ''">
+
+                                                    <input type="text" v-model="row['justificacion_det_quedan']"
+                                                        maxlength="20"
+                                                        :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
+                                                        :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
+                                                        class="peer w-full text-sm font-normal bg-transparent text-center h-10 border-none px-2 text-slate-900  transition-colors duration-300 focus:border-none focus:outline-none">
+                                                </th>
+                                                <th class="border-2 border-black text-sm px-3 text-gray-600">REAJUSTE
+                                                    PRODUCTO</th>
+                                                <th class="border-2 border-black text-sm px-3 text-gray-600">REAJUSTE
+                                                    SERVICIO</th>
+                                            </tr>
+                                            <tr v-show="row['reajuste']">
+
+                                                <td class="border-2 border-black text-sm px-3 text-white bg-red-500/90">
+                                                    <input type="text"
+                                                        v-model="row['reajuste_monto'].ajuste_producto_factura_det_quedan"
+                                                        maxlength="10"
+                                                        @input="onlyNumberDecimal(rowIndex, 'reajuste_monto', $event, 'ajuste_producto_factura_det_quedan')"
+                                                        :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
+                                                        :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
+                                                        class="peer w-full text-sm font-normal text-white bg-transparent text-center h-6 border-none px-2   transition-colors duration-300 focus:border-none focus:outline-none">
+                                                </td>
+                                                <td class="border-2 border-black text-sm px-3 text-white bg-red-500/90">
+                                                    <input type="text"
+                                                        v-model="row['reajuste_monto'].ajuste_servicio_factura_det_quedan"
+                                                        maxlength="10"
+                                                        @input="onlyNumberDecimal(rowIndex, 'reajuste_monto', $event, 'ajuste_servicio_factura_det_quedan')"
+                                                        :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
+                                                        :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
+                                                        class="peer w-full text-sm font-normal bg-transparent text-center h-6 border-none px-2  transition-colors duration-300 focus:border-none focus:outline-none">
+                                                </td>
                                             </tr>
 
                                         </template>
@@ -559,7 +626,7 @@ export default {
             //Seteamos la informacion a objeto con indice x y celda y
             this.rowsData[rowIndex][cellIndex][type] = event.target.value;
             // this.calculateAmount()
-            this.taxesByRow(rowIndex, cellIndex, type, event.target.value)
+            this.taxesByRow(rowIndex)
         },
 
         getInformationBySupplier(supplier) {
@@ -644,68 +711,252 @@ export default {
             this.taxesByRow();
 
         },
-        taxesByRow(rowIndex = "") {
-            // Filtrar las filas marcadas para eliminar
+        /*        taxesByRow(rowIndex = "") {
+                   // Filtrar las filas marcadas para eliminar
+                   let rowsData = this.rowsData.filter((element) => element['isDelete'] === true);
+       
+                   if (rowIndex !== "") {
+                       // Cuando se proporciona un índice de fila, realizar cálculos solo para esa fila
+                       let rowData = rowsData[rowIndex];
+       
+                       if (rowData) {
+       
+                           let productoMont = 0
+                           let servicioMont = 0
+       
+                           let sumProducto = 0
+                           let sumServicio = 0
+                           if (!this.rowsData[rowIndex].reajuste) {
+                               productoMont = parseFloat(rowData.monto['producto_factura_det_quedan']) || 0;
+                               servicioMont = parseFloat(rowData.monto['servicio_factura_det_quedan']) || 0;
+       
+                               sumProducto = rowsData.reduce((prod, obj) => prod + parseFloat(obj["monto"].producto_factura_det_quedan), 0)
+                               sumServicio = rowsData.reduce((servc, obj) => servc + parseFloat(obj["monto"].servicio_factura_det_quedan), 0)
+       
+                           } else {
+                               productoMont = parseFloat(rowData.reajuste_monto['ajuste_producto_factura_det_quedan']) || 0;
+                               servicioMont = parseFloat(rowData.reajuste_monto['ajuste_servicio_factura_det_quedan']) || 0;
+       
+                               sumProducto = rowsData.reduce((prod, obj) => prod + parseFloat(obj["reajuste_monto"].ajuste_producto_factura_det_quedan), 0)
+                               sumServicio = rowsData.reduce((servc, obj) => servc + parseFloat(obj["reajuste_monto"].ajuste_servicio_factura_det_quedan), 0)
+                           }
+       
+                           let amountByRow = productoMont + servicioMont;
+                           let liquido = amountByRow / 1.13;
+                           let ivaByFila = liquido * this.dataForCalculate.iva;
+       
+                           let sum = (parseFloat(sumProducto) || 0) + (parseFloat(sumServicio) || 0) + (parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) || 0)
+       
+                           if (this.documentoAdquisicion != "") {
+       
+                               if (this.dataForCalculate.monto_doc_adquisicion <= sum) {
+                                   rowsData[rowIndex]["retenciones"].iva = ivaByFila.toFixed(2);
+                                   let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
+                                   rowsData[rowIndex]["retenciones"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : "0";
+                               } else {
+                                   rowsData[rowIndex]["retenciones"].iva = 0;
+                                   let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
+                                   rowsData[rowIndex]["retenciones"].renta = 0;
+                               }
+       
+                           } else {
+       
+                               if (113 <= sum) {
+                                   rowsData[rowIndex]["retenciones"].iva = ivaByFila.toFixed(2);
+                                   let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
+                                   rowsData[rowIndex]["retenciones"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : "0";
+                               } else {
+                                   rowsData[rowIndex]["retenciones"].iva = 0;
+                                   let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
+                                   rowsData[rowIndex]["retenciones"].renta = 0;
+                               }
+                           }
+       
+                       }
+                   } else {
+                       // Recorrer todas las filas y realizar los cálculos
+                       rowsData.forEach((element, index) => {
+                           let productoMont = 0
+                           let servicioMont = 0
+       
+       
+                           if (element.reajuste) {
+                               productoMont = parseFloat(element.monto['producto_factura_det_quedan']) || 0;
+                               servicioMont = parseFloat(element.monto['servicio_factura_det_quedan']) || 0;
+       
+                           } else {
+                               productoMont = parseFloat(element.reajuste_monto['ajuste_producto_factura_det_quedan']) || 0;
+                               servicioMont = parseFloat(element.reajuste_monto['ajuste_servicio_factura_det_quedan']) || 0;
+       
+                           }
+       
+                           let amountByRow = productoMont + servicioMont;
+                           let liquido = amountByRow / 1.13;
+       
+                           let ivaByFila = liquido * this.dataForCalculate.iva;
+       
+                           let sum = (parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) || 0) + (parseFloat(this.dataInputs.monto_total_quedan) || 0)
+                           if (this.documentoAdquisicion != "") {
+                               if (this.dataForCalculate.monto_doc_adquisicion <= sum) {
+                                   rowsData[index]["retenciones"].iva = ivaByFila.toFixed(2);
+                                   let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
+                                   rowsData[index]["retenciones"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : "0";
+                               } else {
+                                   rowsData[index]["retenciones"].iva = 0
+                                   rowsData[index]["retenciones"].renta = 0
+                               }
+                           } else {
+                               if (113 <= sum) {
+                                   rowsData[index]["retenciones"].iva = ivaByFila.toFixed(2);
+                                   let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
+                                   rowsData[index]["retenciones"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : "0";
+                               } else {
+                                   rowsData[index]["retenciones"].iva = 0
+                                   rowsData[index]["retenciones"].renta = 0
+                               }
+                           }
+                       });
+                   }
+       
+                   // Calcular el total de IVA y Renta sumando los valores de cada fila
+                   let totalIva = rowsData.reduce((iva, obj) => iva + parseFloat(obj["retenciones"].iva), 0)
+                   let totalRenta = rowsData.reduce((iva, obj) => iva + parseFloat(obj["retenciones"].renta), 0)
+       
+                   // Calcular el monto total y líquido sumando los valores de cada fila
+                   let totalAmountInMonto = rowsData.reduce((monto, obj) => monto + (parseFloat(obj["monto"].producto_factura_det_quedan) || 0) + (parseFloat(obj["monto"].servicio_factura_det_quedan) || 0), 0);
+                   let montoLiquidoQuedan = totalAmountInMonto - totalIva - totalRenta;
+       
+                   // Actualizar los valores en this.dataInputs
+                   this.dataInputs.monto_total_quedan = totalAmountInMonto.toFixed(2)
+                   this.dataInputs.monto_liquido_quedan = montoLiquidoQuedan.toFixed(2)
+       
+                   this.dataInputs.monto_isr_quedan = totalRenta.toFixed(2)
+       
+                   let sum = (parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) || 0) + (parseFloat(this.dataInputs.monto_total_quedan) || 0)
+                   if (this.documentoAdquisicion != "") {
+                       this.dataInputs.monto_iva_quedan = (this.dataForCalculate.monto_doc_adquisicion <= sum) ? totalIva.toFixed(2) : (0).toFixed(2);
+                   } else {
+                       this.dataInputs.monto_iva_quedan = (113 <= sum) ? totalIva.toFixed(2) : (0).toFixed(2);
+                   }
+       
+       
+               }, */
+
+
+        taxesByRow() {
             let rowsData = this.rowsData.filter((element) => element['isDelete'] === true);
 
-            if (rowIndex !== "") {
-                // Cuando se proporciona un índice de fila, realizar cálculos solo para esa fila
-                let rowData = rowsData[rowIndex];
+            let totalMonto = rowsData.reduce((monto, obj) => {
+                let productoMont = parseFloat(obj["monto"].producto_factura_det_quedan) || 0;
+                let servicioMont = parseFloat(obj["monto"].servicio_factura_det_quedan) || 0;
+                let ajusteProductoMont = parseFloat(obj["reajuste_monto"].ajuste_producto_factura_det_quedan) || 0;
+                let ajusteServicioMont = parseFloat(obj["reajuste_monto"].ajuste_servicio_factura_det_quedan) || 0;
 
-                if (rowData) {
-                    const productoMont = parseFloat(rowData.monto['producto_factura_det_quedan']) || 0;
-                    const servicioMont = parseFloat(rowData.monto['servicio_factura_det_quedan']) || 0;
+                let subtotal = obj["reajuste"] ? ajusteProductoMont + ajusteServicioMont : productoMont + servicioMont;
+                return monto + (isNaN(subtotal) ? 0 : subtotal);
+            }, 0);
 
-                    let amountByRow = productoMont + servicioMont;
-                    let liquido = amountByRow / 1.13;
+            rowsData.forEach((element, index) => {
+                let productoMont = 0
+                let servicioMont = 0
 
-                    let ivaByFila = liquido * this.dataForCalculate.iva;
+                if (!element.reajuste) {
+                    productoMont = parseFloat(element.monto['producto_factura_det_quedan']) || 0;
+                    servicioMont = parseFloat(element.monto['servicio_factura_det_quedan']) || 0;
 
-                    rowsData[rowIndex]["retenciones"].iva = ivaByFila.toFixed(2);
-                    let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
-                    rowsData[rowIndex]["retenciones"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : "0";
+                } else {
+                    productoMont = parseFloat(element.reajuste_monto['ajuste_producto_factura_det_quedan']) || 0;
+                    servicioMont = parseFloat(element.reajuste_monto['ajuste_servicio_factura_det_quedan']) || 0;
+
                 }
-            } else {
-                // Recorrer todas las filas y realizar los cálculos
-                rowsData.forEach((element, index) => {
-                    const productoMont = parseFloat(element.monto['producto_factura_det_quedan']) || 0;
-                    const servicioMont = parseFloat(element.monto['servicio_factura_det_quedan']) || 0;
 
-                    let amountByRow = productoMont + servicioMont;
-                    let liquido = amountByRow / 1.13;
-
-                    let ivaByFila = liquido * this.dataForCalculate.iva;
-
-                    rowsData[index]["retenciones"].iva = ivaByFila.toFixed(2);
-
-                    let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
-                    rowsData[index]["retenciones"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : "0";
-                });
-            }
+                let amountByRow = productoMont + servicioMont;
+                let liquido = amountByRow / 1.13;
+                let ivaByFila = liquido * this.dataForCalculate.iva;
 
 
-            // Calcular el total de IVA y Renta sumando los valores de cada fila
-            let totalIva = rowsData.reduce((iva, obj) => iva + parseFloat(obj["retenciones"].iva), 0)
-            let totalRenta = rowsData.reduce((iva, obj) => iva + parseFloat(obj["retenciones"].renta), 0)
+                //SUMA DEL MONTO DEL CONTRATO POR PROVEEDOR Y EL TOTAL DEL QUEDAN 
+                let sum = (parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) || 0) + (parseFloat(totalMonto) || 0)
+                console.log(sum);
+                if (this.documentoAdquisicion != "") {
+                    if (this.dataForCalculate.monto_doc_adquisicion <= sum) {
+                        //CALCULANDO RETENCIONES IVA Y RENTA
+                        rowsData[index]["retenciones"].iva = ivaByFila.toFixed(2);
+                        let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
+                        rowsData[index]["retenciones"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : (0).toFixed(2);
+                    } else {
 
-            // Calcular el monto total y líquido sumando los valores de cada fila
-            let totalAmountInMonto = rowsData.reduce((monto, obj) => monto + (parseFloat(obj["monto"].producto_factura_det_quedan) || 0) + (parseFloat(obj["monto"].servicio_factura_det_quedan) || 0), 0);
-            let montoLiquidoQuedan = totalAmountInMonto - totalIva - totalRenta;
+                        rowsData[index]["retenciones"].iva = (0).toFixed(2);
+                        rowsData[index]["retenciones"].renta = (0).toFixed(2)
+                    }
+                } else {
+                    if (113 <= sum) {
+                        rowsData[index]["retenciones"].iva = ivaByFila.toFixed(2);
+                        let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
+                        rowsData[index]["retenciones"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : (0).toFixed(2);
+                    } else {
 
-            // Actualizar los valores en this.dataInputs
-            this.dataInputs.monto_total_quedan = totalAmountInMonto.toFixed(2)
-            this.dataInputs.monto_liquido_quedan = montoLiquidoQuedan.toFixed(2)
+                        rowsData[index]["retenciones"].iva = (0).toFixed(2);
+                        rowsData[index]["retenciones"].renta = (0).toFixed(2)
+                    }
+                }
 
-            let sum = (parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) || 0) + (parseFloat(this.dataInputs.monto_total_quedan) || 0)
+                let totalIva = rowsData.reduce((iva, obj) => iva + parseFloat(obj["retenciones"].iva), 0)
+                let totalRenta = rowsData.reduce((iva, obj) => iva + parseFloat(obj["retenciones"].renta), 0)
+                let montoLiquidoQuedan = totalMonto - totalIva - totalRenta;
 
-            if (this.documentoAdquisicion !== "") {
-                this.dataInputs.monto_iva_quedan = (this.dataForCalculate.monto_doc_adquisicion <= sum) ? totalIva.toFixed(2) : (0).toFixed(2);
-            } else {
-                this.dataInputs.monto_iva_quedan = (113 <= sum) ? totalIva.toFixed(2) : (0).toFixed(2);
-            }
-
-            this.dataInputs.monto_isr_quedan = totalRenta.toFixed(2)
+                // Actualizar los valores en this.dataInputs
+                this.dataInputs.monto_total_quedan = totalMonto.toFixed(2)
+                this.dataInputs.monto_liquido_quedan = montoLiquidoQuedan.toFixed(2)
+                this.dataInputs.monto_isr_quedan = totalRenta.toFixed(2)
+                this.dataInputs.monto_iva_quedan = totalIva.toFixed(2)
+            });
         },
+
+        /* calcularTodos() {
+            let rowsData = this.rowsData.filter((element) => element['isDelete'] === true);
+
+            rowsData.forEach((element, index) => {
+                let productoMont = 0
+                let servicioMont = 0
+
+                if (!element.reajuste) {
+                    productoMont = parseFloat(element.monto['producto_factura_det_quedan']) || 0;
+                    servicioMont = parseFloat(element.monto['servicio_factura_det_quedan']) || 0;
+
+                } else {
+                    productoMont = parseFloat(element.reajuste_monto['ajuste_producto_factura_det_quedan']) || 0;
+                    servicioMont = parseFloat(element.reajuste_monto['ajuste_servicio_factura_det_quedan']) || 0;
+
+                }
+
+                let amountByRow = productoMont + servicioMont;
+                let liquido = amountByRow / 1.13;
+                let ivaByFila = liquido * this.dataForCalculate.iva;
+
+
+                rowsData[index]["retenciones"].iva = ivaByFila.toFixed(2);
+                let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
+                rowsData[index]["retenciones"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : "0";
+
+
+                // Calcular el total de IVA y RENTA sumando los valores de cada fila
+                let totalIva = rowsData.reduce((iva, obj) => iva + parseFloat(obj["retenciones"].iva), 0)
+                let totalRenta = rowsData.reduce((iva, obj) => iva + parseFloat(obj["retenciones"].renta), 0)
+
+                // Calcular el monto total y líquido sumando los valores de cada fila
+                let totalAmountInMonto = rowsData.reduce((monto, obj) => monto + (parseFloat(obj["monto"].producto_factura_det_quedan) || 0) + (parseFloat(obj["monto"].servicio_factura_det_quedan) || 0), 0);
+                let montoLiquidoQuedan = totalAmountInMonto - totalIva - totalRenta;
+
+                // Actualizar los valores en this.dataInputs
+                this.dataInputs.monto_total_quedan = totalAmountInMonto.toFixed(2)
+                this.dataInputs.monto_liquido_quedan = montoLiquidoQuedan.toFixed(2)
+                this.dataInputs.monto_isr_quedan = totalRenta.toFixed(2)
+                this.dataInputs.monto_iva_quedan = totalIva.toFixed(2)
+
+
+            });
+        }, */
         getAmountBySupplier(id_proveedor) {
             // Crear una copia de la matriz totalAmountBySupplier
             let newDataSupplier = JSON.parse(JSON.stringify(this.totalAmountBySupplier));
@@ -736,7 +987,17 @@ export default {
             this.dataForCalculate.monto_total_quedan_por_proveedor = parseFloat(total)
         },
 
-        onInputDescripcionQuedan(event) {
+        addJustification(row) {
+            this.rowsData[row].reajuste = !this.rowsData[row].reajuste
+
+            let rowsData = this.rowsData.filter((element) => element['isDelete'] === true);
+
+
+
+            this.taxesByRow()
+
+        },
+        onInputDescripcionQuedan(event) {//TODO:VERIFICAR ESTA FUNCIONA PARA QUE SIRVE
             this.dataInputs.descripcion_quedan = event.target.innerText;
         },
         setValuesToInput() {
@@ -811,6 +1072,9 @@ export default {
                     numero_acta_det_quedan: '',
                     monto: { producto_factura_det_quedan: '', servicio_factura_det_quedan: '' },
                     retenciones: { iva: '0.00', renta: '0.00' },
+                    reajuste: false,
+                    justificacion_det_quedan: '',
+                    reajuste_monto: { ajuste_producto_factura_det_quedan: '', ajuste_servicio_factura_det_quedan: '' },
                     isDelete: true,
                 });
             } else {
@@ -1087,7 +1351,10 @@ export default {
                             id_dependencia: value.id_dependencia,
                             numero_acta_det_quedan: value.numero_acta_det_quedan,
                             monto: { producto_factura_det_quedan: value.producto_factura_det_quedan, servicio_factura_det_quedan: value.servicio_factura_det_quedan },
-                            retenciones: { iva: '', renta: '' },
+                            retenciones: { iva: value.iva_factura_det_quedan, renta: value.isr_factura_det_quedan },
+                            reajuste: value.justificacion_det_quedan !== null && value.justificacion_det_quedan !== "",
+                            justificacion_det_quedan: value.justificacion_det_quedan,
+                            reajuste_monto: { ajuste_producto_factura_det_quedan: value.ajuste_producto_factura_det_quedan, ajuste_servicio_factura_det_quedan: value.ajuste_servicio_factura_det_quedan },
                             isDelete: true,
                         });
                     });
