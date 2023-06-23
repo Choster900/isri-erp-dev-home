@@ -20,13 +20,16 @@ class DetalleQuedan extends Model
         'fecha_factura_det_quedan',
         'producto_factura_det_quedan',
         'servicio_factura_det_quedan',
+        'ajuste_producto_factura_det_quedan',
+        'ajuste_servicio_factura_det_quedan',
+        'iva_factura_det_quedan',
+        'isr_factura_det_quedan',
         'descripcion_det_quedan',
+        'justificacion_det_quedan',
         'fecha_reg_det_quedan',
         'fecha_mod_det_quedan',
         'usuario_det_quedan',
         'ip_det_quedan',
-
-
     ];
 
 

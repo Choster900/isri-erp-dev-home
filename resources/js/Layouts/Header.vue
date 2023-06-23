@@ -14,7 +14,7 @@ import MenuSidebarVue from '@/Components-ISRI/SidebarComponents/MenuSidebar.vue'
                 <div class="flex">
                     <!-- Hamburger button -->
                     <button class="text-slate-500 hover:text-slate-600 lg:hidden" @click="$emit('OpenOrCloseModal')"
-                        aria-controls="sidebar" :aria-expanded="sidebarOpen">
+                        aria-controls="sidebar">
                         <span class="sr-only">Open sidebar</span>
                         <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <rect x="4" y="5" width="16" height="2" />
@@ -68,7 +68,7 @@ import Help from '@/Components-ISRI/HeaderComponents/Help.vue';
 
 
 export default {
-    data: function () {
+    data() {
         return {
             stateLocal: false,
         }

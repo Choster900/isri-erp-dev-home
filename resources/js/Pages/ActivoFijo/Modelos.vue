@@ -38,8 +38,8 @@ import axios from 'axios';
       </header>
 
       <div class="overflow-x-auto">
-        <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" 
-        @sort="sortBy" @datos-enviados="handleData($event)">
+        <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
+        @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getModels()">
           <tbody class="text-sm divide-y divide-slate-200">
             <tr v-for="model in models" :key="model.id_modelo">
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
@@ -67,7 +67,7 @@ import axios from 'axios';
                 </div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                <div class="space-x-1">
+                <div class="space-x-1 text-center">
                   <DropDownOptions>
                     <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                       v-if="permits.actualizar == 1 && model.estado_modelo == 1"
@@ -116,11 +116,13 @@ import axios from 'axios';
             </tr>
           </tbody>
         </datatable>
-
+      </div>
+      <div v-if="empty_object" class="flex text-center py-2">
+        <p class="font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se encontraron registros.</p>
       </div>
     </div>
 
-    <div class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
+    <div v-if="!empty_object" class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
       <div>
         <nav class="flex justify-between" role="navigation" aria-label="Navigation">
           <div class="grow text-center">
@@ -273,6 +275,7 @@ export default {
           this.links[0].label = "Anterior";
           this.links[this.links.length - 1].label = "Siguiente";
           this.models = data.data.data;
+          this.models.length>0 ? this.empty_object=false : this.empty_object=true
         }
       }).catch((errors) => {
           let msg = this.manageError(errors)
@@ -311,9 +314,11 @@ export default {
       })
     },
     handleData(myEventData) {
-      console.log(myEventData);
       this.tableData.search = myEventData;
-      this.getModels()
+      const data = Object.values(myEventData);
+      if (data.every(error => error === '')) {
+        this.getModels()
+      }
     }
   }
 }

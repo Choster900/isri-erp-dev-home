@@ -14,7 +14,7 @@ import html2pdf from 'html2pdf.js'
     <AppLayoutVue nameSubModule="Tesoreria - Quedan">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="createQuedan()" color="bg-green-700  hover:bg-green-800" text="Agregar Elemento"
+                <GeneralButton @click="createQuedan()" color="bg-green-700  hover:bg-green-800" text="Agregar quedan"
                     icon="add" />
             </div>
         </div>
@@ -36,8 +36,8 @@ import html2pdf from 'html2pdf.js'
 
             </header>
             <div class="overflow-x-auto">
-                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy"
-                    @datos-enviados="handleData($event)">
+                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
+                    @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getDataQuedan()">
                     <tbody class="text-sm divide-y divide-slate-200">
                         <tr v-for="data in dataQuedanForTable" :key="data.id_quedan">
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
@@ -65,7 +65,7 @@ import html2pdf from 'html2pdf.js'
                                 </div>
                             </td>
                             <td class="px-5">
-                                <div class="max-h-40 overflow-y-auto scrollbar">
+                                <div class="max-h-[165px] overflow-y-auto scrollbar">
                                     <template v-for="(detalle, i) in data.detalle_quedan" :key="i">
                                         <div class="mb-2 text-center">
                                             <p class="text-[10pt]">
@@ -182,8 +182,12 @@ import html2pdf from 'html2pdf.js'
                     </tbody>
                 </datatable>
             </div>
+            <div v-if="empty_object" class="flex text-center py-2">
+                <p class="font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se encontraron
+                    registros.</p>
+            </div>
         </div>
-        <div class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
+        <div v-if="!empty_object" class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
             <div>
                 <nav class="flex justify-between" role="navigation" aria-label="Navigation">
 
@@ -264,6 +268,7 @@ export default {
                 sortOrders[column.name] = -1;
         });
         return {
+            empty_object: false,
             dropdownOpen: '',
             trigger: '',
             dropdown: '',
@@ -325,6 +330,7 @@ export default {
 
                     // Obtener el monto por proveedor
                     this.getAmountBySupplier();
+                    this.dataQuedanForTable.length > 0 ? this.empty_object = false : this.empty_object = true
                 }
             } catch (error) {
                 let msg = this.manageError(error);
@@ -394,7 +400,7 @@ export default {
                 this.getDataQuedan()
             } else {
                 this.tableData.search = myEventData;
-                this.getDataQuedan()
+                //this.getDataQuedan()
             }
         },
         formatDate(dateString) {
@@ -489,7 +495,7 @@ export default {
         },
 
     },
-    created() {
+    mounted() {
         this.getDataQuedan()
         this.getListForSelect()
     },

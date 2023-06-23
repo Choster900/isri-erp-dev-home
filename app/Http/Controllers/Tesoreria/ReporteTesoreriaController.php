@@ -59,18 +59,16 @@ class ReporteTesoreriaController extends Controller
         $array = DB::select(
             '
             SELECT 
-            q.numero_quedan,
+            q.id_quedan,
             p.razon_social_proveedor, 
             rp.numero_requerimiento_pago, 
-            DATE_FORMAT(rp.fecha_requerimiento_pago,"%d/%m/%Y") as fecha_requerimiento_pago, 
-
-            -- ((IFNULL(dq.producto_factura_det_quedan,0)+IFNULL(dq.servicio_factura_det_quedan,0))- ROUND(IF((IFNULL(q.monto_liquido_quedan,0)+IFNULL(q.monto_iva_quedan,0)+IFNULL(q.monto_isr_quedan,0))>=113,
-			-- (((IFNULL(dq.producto_factura_det_quedan,0)+IFNULL(dq.servicio_factura_det_quedan,0))/1.13)*sr.iva_sujeto_retencion),0),2) - ROUND(IFNULL((dq.servicio_factura_det_quedan*sr.isrl_sujeto_retencion),0),2)) as liquido,
-            -- det.fechas,
+            DATE_FORMAT(rp.fecha_requerimiento_pago,"%d/%m/%Y") as fecha_requerimiento_pago,
+            q.monto_total_quedan,
+            q.monto_iva_quedan,
+            q.monto_isr_quedan, 
             q.monto_liquido_quedan,
             IFNULL((SELECT SUM(lq.monto_liquidacion_quedan) FROM liquidacion_quedan lq WHERE lq.id_quedan = q.id_quedan GROUP BY lq.id_quedan ), 0) AS monto_pagado, 
             det.fechas,
-            -- DATE_FORMAT(q.fecha_emision_quedan,"%d/%m/%Y") as fecha_factura_det_quedan, 
             pp.nivel_prioridad_pago,
             pp.nombre_prioridad_pago 
             FROM 
@@ -95,13 +93,13 @@ class ReporteTesoreriaController extends Controller
 
         $array = json_decode(json_encode($array), true);
 
-        array_unshift($array, array('NUMERO', 'SUMINISTRANTE', 'N° REQUERIMIENTO', 'FECHA REQUERIMIENTO', 'MONTO LIQUIDO', 'MONTO PAGADO', 'FECHA FACTURA', 'PRIORIDAD', 'DESCRIPCION'));
+        array_unshift($array, array('NUMERO', 'SUMINISTRANTE', 'N° REQUERIMIENTO', 'FECHA REQUERIMIENTO','TOTAL','IVA','ISR', 'LIQUIDO', 'MONTO PAGADO', 'FACTURA(FECHA)', 'PRIORIDAD', 'DESCRIPCION'));
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
         $sheet->getStyle('3')->getFont()->setBold(true);
-        $columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+        $columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H','I','J'];
         foreach ($columns as $column) {
             $sheet->getColumnDimension($column)->setAutoSize(true);
         }
@@ -109,8 +107,8 @@ class ReporteTesoreriaController extends Controller
         $sheet->fromArray($array, NULL, 'A3');
 
         // Combina las celdas 
-        $sheet->mergeCells('A2:H2');
-        $sheet->mergeCells('A1:H1');
+        $sheet->mergeCells('A2:K2');
+        $sheet->mergeCells('A1:K1');
 
         if ($request->start_date == $request->end_date) {
             $fecha_fin = Carbon::createFromFormat('Y-m-d', $request->end_date);
@@ -146,27 +144,49 @@ class ReporteTesoreriaController extends Controller
             }
         }
 
-        //Calculo de la suma de monto liquido
+        //Calculo de la sumatorias
+        $total = 0;
+        $total_iva = 0;
+        $total_isr = 0;
         $total_liquido = 0;
         $total_pagado = 0;
         $lastRow = $sheet->getHighestDataRow(); // obtiene el número de la última fila con datos
         for ($i = 3; $i <= $lastRow; $i++) { // comienza en la fila 3 (primer dato) y recorre hasta la última fila con datos
-            $value_liquido = $sheet->getCell('E' . $i)->getValue(); // obtiene el valor de la celda D de la fila actual
+            $value_total = $sheet->getCell('E' . $i)->getValue(); // obtiene el valor de la celda E de la fila actual
+            if (is_numeric($value_total)) { // comprueba que el valor sea numérico
+                $total += $value_total; // suma el valor a la variable $total
+            }
+            $value_iva = $sheet->getCell('F' . $i)->getValue(); // obtiene el valor de la celda F de la fila actual
+            if (is_numeric($value_iva)) { // comprueba que el valor sea numérico
+                $total_iva += $value_iva; // suma el valor a la variable $total
+            }
+            $value_isr = $sheet->getCell('G' . $i)->getValue(); // obtiene el valor de la celda F de la fila actual
+            if (is_numeric($value_isr)) { // comprueba que el valor sea numérico
+                $total_isr += $value_isr; // suma el valor a la variable $total
+            }
+            $value_liquido = $sheet->getCell('H' . $i)->getValue(); // obtiene el valor de la celda H de la fila actual
             if (is_numeric($value_liquido)) { // comprueba que el valor sea numérico
                 $total_liquido += $value_liquido; // suma el valor a la variable $total
             }
-            $value_pagado = $sheet->getCell('F' . $i)->getValue(); // obtiene el valor de la celda D de la fila actual
+            $value_pagado = $sheet->getCell('I' . $i)->getValue(); // obtiene el valor de la celda I de la fila actual
             if (is_numeric($value_pagado)) { // comprueba que el valor sea numérico
                 $total_pagado += $value_pagado; // suma el valor a la variable $total
             }
         }
-        $sheet->setCellValue('E' . ($lastRow + 1), $total_liquido);
-        $sheet->setCellValue('F' . ($lastRow + 1), $total_pagado);
-        $sheet->setCellValue('D' . ($lastRow + 1), 'TOTAL');
+        $sheet->setCellValue('D' . ($lastRow + 1), 'SUMATORIAS');
+        $sheet->setCellValue('E' . ($lastRow + 1), $total);
+        $sheet->setCellValue('F' . ($lastRow + 1), $total_iva);
+        $sheet->setCellValue('G' . ($lastRow + 1), $total_isr);
+        $sheet->setCellValue('H' . ($lastRow + 1), $total_liquido);
+        $sheet->setCellValue('I' . ($lastRow + 1), $total_pagado);
+
         //Definiendo en negrita las celdas para el total y los montos sumados
         $sheet->getStyle('D' . ($lastRow + 1))->getFont()->setBold(true);
         $sheet->getStyle('E' . ($lastRow + 1))->getFont()->setBold(true);
         $sheet->getStyle('F' . ($lastRow + 1))->getFont()->setBold(true);
+        $sheet->getStyle('G' . ($lastRow + 1))->getFont()->setBold(true);
+        $sheet->getStyle('H' . ($lastRow + 1))->getFont()->setBold(true);
+        $sheet->getStyle('I' . ($lastRow + 1))->getFont()->setBold(true);
 
         // Definimos encabezado
         $sheet->setCellValue('A2', 'REPORTE DE QUEDAN DEL ' . $fechaFormateada . ' - ' . $quedan_state . ' - ' . $fuente_financiamiento);
@@ -236,12 +256,10 @@ class ReporteTesoreriaController extends Controller
 			q.numero_compromiso_ppto_quedan,
 			rp.numero_requerimiento_pago,
             DATE_FORMAT(dq.fecha_factura_det_quedan,"%d/%m/%Y") as fecha_factura_det_quedan,
-			(IFNULL(dq.producto_factura_det_quedan,0)+IFNULL(dq.servicio_factura_det_quedan,0)) AS total_factura,
-			ROUND(IF((IFNULL(q.monto_liquido_quedan,0)+IFNULL(q.monto_iva_quedan,0)+IFNULL(q.monto_isr_quedan,0))>=113,
-			(((IFNULL(dq.producto_factura_det_quedan,0)+IFNULL(dq.servicio_factura_det_quedan,0))/1.13)*sr.iva_sujeto_retencion),0),2) as retencion_iva,
-			ROUND(IFNULL((dq.servicio_factura_det_quedan*sr.isrl_sujeto_retencion),0),2) AS rentencion_isr,
-			((IFNULL(dq.producto_factura_det_quedan,0)+IFNULL(dq.servicio_factura_det_quedan,0))- ROUND(IF((IFNULL(q.monto_liquido_quedan,0)+IFNULL(q.monto_iva_quedan,0)+IFNULL(q.monto_isr_quedan,0))>=113,
-			(((IFNULL(dq.producto_factura_det_quedan,0)+IFNULL(dq.servicio_factura_det_quedan,0))/1.13)*sr.iva_sujeto_retencion),0),2) - ROUND(IFNULL((dq.servicio_factura_det_quedan*sr.isrl_sujeto_retencion),0),2)) as liquido,
+            COALESCE(dq.producto_factura_det_quedan, 0) + COALESCE(dq.servicio_factura_det_quedan, 0) AS monto_total_factura,
+            COALESCE(dq.iva_factura_det_quedan, 0) AS iva_factura_det_quedan,
+            COALESCE(dq.isr_factura_det_quedan, 0) AS isr_factura_det_quedan,
+            COALESCE(dq.producto_factura_det_quedan, 0) + COALESCE(dq.servicio_factura_det_quedan, 0) - COALESCE(dq.iva_factura_det_quedan, 0) - COALESCE(dq.isr_factura_det_quedan, 0) AS liquido,
 			pp.nombre_prioridad_pago,
             pp.nivel_prioridad_pago
             FROM 
@@ -264,7 +282,7 @@ class ReporteTesoreriaController extends Controller
         }
 
         $array = json_decode(json_encode($array), true);
-        array_unshift($array, array('NIT/DUI', 'SUMINISTRANTE', 'CENTRO', 'COMPROMISO', 'REQ', 'FECHA', 'MONTO', 'RENTA', '1% IVA', 'LIQUIDO', 'CONCEPTO', 'PRIORIDAD'));
+        array_unshift($array, array('NIT/DUI', 'SUMINISTRANTE', 'DEPENDENCIA', 'COMPROMISO', 'REQUERIMIENTO', 'FECHA', 'MONTO', 'RENTA', 'IVA', 'LIQUIDO', 'CONCEPTO', 'PRIORIDAD'));
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 

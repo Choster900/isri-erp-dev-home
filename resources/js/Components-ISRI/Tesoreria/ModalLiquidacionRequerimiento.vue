@@ -1,13 +1,13 @@
 <script setup>
-import ModalBasicVue from '@/Components-ISRI/AllModal/ModalBasic.vue';
+import Modal from "@/Components-ISRI/AllModal/Modal.vue";
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import moment from 'moment';
 import axios from 'axios';
 </script>
 <template>
-    <ModalBasicVue :title="tittleModal" id="scrollbar-modal" maxWidth="5xl" :modalOpen="modalIsOpen"
-        @close-modal="$emit('close-definitive')">
+    <Modal :modal-title="tittleModal"  maxWidth="5xl" :show="modalIsOpen"
+        @close="$emit('close-definitive')">
 
         <div class=" px-10 py-5 ">
             <table class="table-auto">
@@ -253,7 +253,7 @@ import axios from 'axios';
             </div>
 
         </div>
-    </ModalBasicVue>
+    </Modal>
 </template>
   
 <script>
@@ -393,13 +393,13 @@ export default {
                     return false;
                 }
                 //contar cuantos campos vacios hay en monto_liquidacion_quedan
-                if (filterQuedanEnLiquidacion[index]["monto_liquidacion_quedan"] == 0) {
+                if (filterQuedanEnLiquidacion[index]["monto_liquidacion_quedan"] == 0 || filterQuedanEnLiquidacion[index]["notifica_liquidacion_quedan"] == '') {
                     flag++
                 }
             }
             //validando que el numero de campos vacios en monto_liquidacion_quedan no sean igual a la cantidad de campos que hay
             if (flag == filterQuedanEnLiquidacion.length) {
-                toast.warning("Tienes campos vacios", {
+                toast.warning("Asegurate de llenar la descripcion y el monto de la liquidacion", {
                     autoClose: 4000,
                     position: "top-right",
                     transition: "zoom",
@@ -553,16 +553,10 @@ export default {
             //Restamos el saldo menos el total que es el tota de las liquidaciones
             return (saldo - total).toFixed(2)
         },
-
         formatDate(dateString) {
-            //Funcion utilizada para formatear la fecha a : dd/mm/yyyy
-            const date = new Date(dateString);
-            const day = date.getDate().toString().padStart(2, '0');
-            const month = (date.getMonth() + 1).toString().padStart(2, '0');
-            const year = date.getFullYear().toString();
-            return `${day}/${month}/${year}`;
+            const date = moment(dateString).format('DD/MM/YYYY');
+            return date;
         }
-
     },
     watch: {
         modalIsOpen: function (newValue, oldValue) {

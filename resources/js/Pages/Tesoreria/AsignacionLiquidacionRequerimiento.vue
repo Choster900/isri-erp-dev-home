@@ -13,7 +13,7 @@ import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalL
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
                 <GeneralButton @click="showModalAsignacionRequerimiento = true" color="bg-green-700  hover:bg-green-800"
-                    text="Agregar Elemento" icon="add" />
+                    text="Agregar requerimientos" icon="add" />
             </div>
         </div>
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
@@ -33,8 +33,8 @@ import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalL
 
             </header>
             <div class="overflow-x-auto">
-                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy"
-                    @datos-enviados="handleData($event)">
+                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
+                    @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getDataLiquidaciones()">
                     <tbody class="text-sm divide-y divide-slate-200">
                         <template v-for="data in dataRequerimientoForTable" :key="data.id_requerimiento_pago">
                             <tr v-if="data.quedan != ''">
@@ -50,7 +50,7 @@ import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalL
                                     </div>
                                 </td>
                                 <td>
-                                    <div v-for="(quedan, i) in  data.quedan" :key="i"
+                                    <!-- <div v-for="(quedan, i) in  data.quedan" :key="i"
                                         class="font-medium text-slate-800 text-center flex justify-center items-center">
                                         <p
                                             :class="{ 'border-b-2 border-b-gray-500': i < data.quedan.length - 1 && data.quedan.length > 1 }">
@@ -58,6 +58,22 @@ import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalL
                                             <br>
                                             MONTO TOTAL: {{ quedan.monto_liquido_quedan }}
                                         </p>
+                                    </div> -->
+
+
+                                    <div class="max-h-[165px] overflow-y-auto scrollbar">
+                                        <template v-for="(quedan, i) in data.quedan" :key="i">
+                                            <div class="mb-2 text-center">
+                                                <p class="text-[10pt]">
+                                                    <span class="font-medium">FACTURA</span>{{ quedan.id_quedan }}<br>
+                                                    <span class="font-medium">MONTO:</span> ${{ quedan.monto_liquido_quedan
+                                                    }}
+                                                </p>
+                                            </div>
+                                            <template v-if="i < data.quedan.length - 1">
+                                                <hr class="my-2 border-t border-gray-300">
+                                            </template>
+                                        </template>
                                     </div>
                                 </td>
                                 <td class="px-2 first:pl-5 last:pr-5">
@@ -104,8 +120,12 @@ import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalL
                     </tbody>
                 </datatable>
             </div>
+            <div v-if="empty_object" class="flex text-center py-2">
+                <p class="font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se encontraron
+                    registros.</p>
+            </div>
         </div>
-        <div class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
+        <div v-if="!empty_object" class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
             <div>
                 <nav class="flex justify-between" role="navigation" aria-label="Navigation">
 
@@ -184,6 +204,7 @@ export default {
                 sortOrders[column.name] = -1;
         });
         return {
+            empty_object: false,
             showModalAsignacionRequerimiento: false,
             showModalLiquidacionRequerimiento: false,
             dataLiquidaciones: [],//data que contiene todos los totales de todos los requerimientos
@@ -202,6 +223,7 @@ export default {
                 column: 0,
                 dir: "desc",
                 search: {},
+                onlyLiquida: true,
             },
             pagination: {
                 lastPage: "",
@@ -223,13 +245,11 @@ export default {
                 let data = response.data;
                 if (this.tableData.draw == data.draw) {
                     this.links = data.data.links
-                    //sumando los que requerimiento que tengan queda
-                    let nuevoArray = data.data.data.filter(elemento => elemento.quedan != '')
-                    let cantidad = nuevoArray.length;
-                    this.pagination.total = cantidad
+                    this.pagination.total = data.data.total
                     this.links[0].label = "Anterior"
                     this.links[this.links.length - 1].label = "Siguiente"
                     this.dataRequerimientoForTable = data.data.data
+                    this.dataRequerimientoForTable.length>0 ? this.empty_object=false : this.empty_object=true
                 }
             }).catch((errors) => {
                 let msg = this.manageError(errors);
@@ -248,7 +268,6 @@ export default {
         async getListForSelect() {
             await axios.get('/get-list-select').then((response) => {
                 this.dataForSelect = response.data;
-                console.log(response.data.numeroRequerimiento);
             }).catch((errors) => {
                 let msg = this.manageError(errors);
                 this.$swal.fire({
@@ -290,7 +309,7 @@ export default {
                 this.getDataLiquidaciones()
             } else {
                 this.tableData.search = myEventData;
-                this.getDataLiquidaciones()
+                //this.getDataLiquidaciones()
             }
         },
     },
@@ -307,5 +326,23 @@ export default {
 .wrap2 {
     width: 100%;
     white-space: pre-wrap;
+}
+
+
+.scrollbar::-webkit-scrollbar {
+    width: 5px;
+}
+
+.scrollbar::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+    background-color: #001c48;
+    border-radius: 4px;
+}
+
+.scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
 }
 </style>

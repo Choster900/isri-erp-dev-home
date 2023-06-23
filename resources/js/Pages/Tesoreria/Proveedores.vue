@@ -11,7 +11,7 @@ import ModalProveedortVue from '@/Components-ISRI/Tesoreria/ModalProveedor.vue';
         <div class="sm:flex sm:justify-end sm:items-center">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
                 <GeneralButton v-if="permits.insertar == 1" @click="addDataSupplier()"
-                    color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add" />
+                    color="bg-green-700  hover:bg-green-800" text="Agregar Proveedor" icon="add" />
             </div>
         </div>
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
@@ -32,8 +32,8 @@ import ModalProveedortVue from '@/Components-ISRI/Tesoreria/ModalProveedor.vue';
 
             </header>
             <div class="overflow-x-auto">
-                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy"
-                    @datos-enviados="handleData($event)">
+                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
+                    @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getSuppilers()">
                     <tbody class="text-sm divide-y divide-slate-200">
                         <tr v-for="proveedor in proveedores" :key="proveedor.id_proveedor">
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
@@ -71,7 +71,7 @@ import ModalProveedortVue from '@/Components-ISRI/Tesoreria/ModalProveedor.vue';
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
-                                <div class="space-x-1">
+                                <div class="space-x-1 text-center">
                                     <DropDownOptions>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                                             v-if="permits.actualizar == 1 && proveedor.estado_proveedor == 1"
@@ -120,8 +120,12 @@ import ModalProveedortVue from '@/Components-ISRI/Tesoreria/ModalProveedor.vue';
                     </tbody>
                 </datatable>
             </div>
+            <div v-if="empty_object" class="flex text-center py-2">
+                <p class="font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se encontraron
+                    registros.</p>
+            </div>
         </div>
-        <div class="px-6 py-4 bg-white shadow-lg rounded-sm border-slate-200 relative">
+        <div v-if="!empty_object" class="px-6 py-4 bg-white shadow-lg rounded-sm border-slate-200 relative">
             <div>
                 <nav class="flex justify-between" role="navigation" aria-label="Navigation">
 
@@ -196,8 +200,8 @@ export default {
                 sortOrders[column.name] = -1;
         });
         return {
+            empty_object:false,
             permits: [],
-            scrollbarModalOpen: false,
             stateModal: false,
             proveedores: [],
             links: [],
@@ -238,8 +242,8 @@ export default {
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
                     this.proveedores = data.data.data;
-
                     this.stateModal = false
+                    this.proveedores.length>0 ? this.empty_object=false : this.empty_object=true
                 }
             }).catch((errors) => {
                 let msg = this.manageError(errors);
@@ -289,8 +293,10 @@ export default {
         },
         enableStateForSupplier(id_proveedor, estado) {
             let state = estado == 0 ? "habilitar" : "deshabilitar";
+            let stateToas = estado == 0 ? "habilitado" : "deshabilitado";
+
             this.$swal.fire({
-                title: "¿Esta seguro de " + state + " el registro ?",
+                title: `¿Esta seguro de ${state}  el registro ?`,
                 icon: "question",
                 iconHtml: "❓",
                 confirmButtonText: "Si, " + state + "",
@@ -301,12 +307,12 @@ export default {
             }).then((result) => {
                 if (result.isConfirmed) {
                     this.enable(id_proveedor, estado); //peticion async hace la modificacion 
-                    //no la llamamos en el mismo metodo por que dejaria de ser asyn y hay problema al momento de actulizar la tabla
-                    this.$swal.fire({
-                        text: 'Acción realizada!',
-                        icon: 'success',
-                        timer: 5000
-                    })
+                    toast.success(`El proveedor se ha ${stateToas} con exito`, {
+                        autoClose: 4000,
+                        position: "top-right",
+                        transition: "zoom",
+                        toastBackgroundColor: "white",
+                    });
                 }
             });
         },
@@ -325,7 +331,7 @@ export default {
             }
             else {
                 this.tableData.search = myEventData;
-                this.getSuppilers();
+                //this.getSuppilers();
             }
         },
         getPermits() {
