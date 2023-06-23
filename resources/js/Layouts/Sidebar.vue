@@ -21,7 +21,7 @@ import DropdownLink from '@/Components/DropdownLink.vue';
             <!-- Logo -->
             <DropdownLink :href="route('dashboard')" method="get" as="button" aria-current="page"
                 class="router-link-active router-link-exact-active block">
-                <img style="width:118px" src="../../img/isri-logo2.png" alt="GOBIERNO DE EL SALVADOR">
+                <img style="width:200px" src="../../img/logoSidebar.png" alt="GOBIERNO DE EL SALVADOR">
             </DropdownLink>
         </div>
         <MenuSidebarVue :stateFromSidebarProp="stateFromSidebar" @emitToShowModalFromMenu="changeStateFromSidebar" />

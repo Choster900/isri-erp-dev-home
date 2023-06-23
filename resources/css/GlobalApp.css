@@ -33,6 +33,8 @@
 }
 :root {
     --toastify-toast-min-height: 50px !important;
+    --ms-option-bg-disabled: #FFFFFF;
+    --ms-option-color-disabled: #D1D5DB;
 }
 
 * {

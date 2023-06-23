@@ -16,8 +16,10 @@ import DropdownLink from '@/Components/DropdownLink.vue';
 export default {
     props: ["infoModule"],
     components: { DropdownLink },
-    return: function () {
-        return { match: false }
+    data() {
+        return {
+            match: false,
+        };
     },
     methods: {
         getAbsolutePath() {
@@ -35,6 +37,4 @@ export default {
 }
 </script>
 
-<style>
-
-</style>
+<style></style>

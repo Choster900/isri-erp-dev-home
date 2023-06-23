@@ -9,6 +9,7 @@ use App\Http\Controllers\Tesoreria\ConceptoIngresoController;
 use App\Http\Controllers\Tesoreria\ReciboIngresoController;
 use App\Http\Controllers\Tesoreria\LiquidacionQuedanController;
 use App\Http\Controllers\Tesoreria\ReporteTesoreriaController;
+use App\Http\Controllers\Tesoreria\DocumentoAdquisicionController;
 
 Route::group(['middleware' => ['auth', 'access']], function () {
 
@@ -111,6 +112,21 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('update-income-receipt', [ReciboIngresoController::class, 'updateIncomeReceipt'])->name('conceptoIngreso.updateIncomeReceipt');
     Route::get('get-select-financing-source', [ReciboIngresoController::class, 'getSelectFinancingSource'])->name('reciboIngreso.getSelectFinancingSource');
     Route::get('get-select-income-concept', [ReciboIngresoController::class, 'getSelectIncomeConcept'])->name('reciboIngreso.getSelectIncomeConcept');
+
+    //Routes to manage acquisition doc
+    Route::get(
+        '/ts/doc-adquisicion',
+        function () {
+            return Inertia::render('Tesoreria/DocumentoAdquisicion', [
+                'menu' => session()->get('menu')
+            ]);
+        }
+    )->name('ts.docAdquisicion');
+    Route::post('doc-adquisicion', [DocumentoAdquisicionController::class, 'getDocAdquisicion'])->name('documentoAdquisicion.getDocAdquisicion');
+    Route::post('change-state-acq-doc', [DocumentoAdquisicionController::class, 'changeStateAcqdoc'])->name('documentoAdquisicion.changeStateAcqdoc');
+    Route::get('get-selects-acq-doc', [DocumentoAdquisicionController::class, 'getSelectsAcqDoc'])->name('documentoAdquisicion.getSelectsAcqDoc');
+    Route::post('save-acq-doc', [DocumentoAdquisicionController::class, 'saveAcqDoc'])->name('documentoAdquisicion.saveAcqDoc');
+    Route::post('update-acq-doc', [DocumentoAdquisicionController::class, 'updateAcqDoc'])->name('documentoAdquisicion.updateAcqDoc');
 
 
     Route::get(

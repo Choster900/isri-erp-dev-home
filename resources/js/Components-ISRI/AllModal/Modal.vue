@@ -18,6 +18,10 @@ const props = defineProps({
         type: String,
         default: 'Titulo del modal',
     },
+    closeOutSide: {
+        type: Boolean,
+        default: true,
+    }
 });
 
 const emit = defineEmits(['close']);
@@ -38,7 +42,14 @@ const close = () => {
         emit('close');
     }
 };
+const closeOutSide = () => {
 
+    if (props.closeOutSide) {
+        if (props.closeable) {
+            emit('close');
+        }
+    }
+};
 const closeOnEscape = (e) => {
     if (e.key === 'Escape' && props.show) {
         close();
@@ -55,8 +66,8 @@ onUnmounted(() => {
 const isContentTooLarge = computed(() => {
     const content = document.querySelector('.modal-content');
     return content ? content.scrollHeight > window.innerHeight : false;
-  });
-  
+});
+
 const maxWidthClass = computed(() => {
     return {
         sm: 'sm:max-w-sm',
@@ -80,8 +91,8 @@ const maxWidthClass = computed(() => {
                 <transition enter-active-class="ease-out duration-300" enter-from-class="opacity-0"
                     enter-to-class="opacity-100" leave-active-class="ease-in duration-200" leave-from-class="opacity-100"
                     leave-to-class="opacity-0">
-                    <div v-show="show" class="fixed inset-0 transform transition-all" @click="close">
-                        <div class="absolute inset-0 bg-gray-500 dark:bg-gray-900 opacity-75" />
+                    <div v-show="show" class="fixed inset-0 transform transition-all" @click="closeOutSide">
+                        <div class="absolute inset-0 bg-gray-900 opacity-75" />
                     </div>
                 </transition>
 
@@ -94,7 +105,7 @@ const maxWidthClass = computed(() => {
                         class="sin-scroll inset-x-0 bottom-0 mx-auto max-h-full overflow-y-auto bg-white rounded-lg shadow-xl transform transition-all sm:w-full sm:mx-auto"
                         :class="maxWidthClass">
                         <header class="bg-[#001c48] py-2 px-6 flex justify-between items-center">
-                            <h2 class="text-lg text-gray-800 dark:text-white">{{ modalTitle }}</h2>
+                            <h2 class="text-lg text-white">{{ modalTitle }}</h2>
                             <button @click="close">
                                 <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" class="">
                                     <path id="Vector" d="M18 18L12 12M12 12L6 6M12 12L18 6M12 12L6 18" stroke="#ffff"
@@ -109,7 +120,7 @@ const maxWidthClass = computed(() => {
         </transition>
     </teleport>
 </template>
-  <style>
+<style>
 .sin-scroll {
     overflow: auto;
     scrollbar-width: none;

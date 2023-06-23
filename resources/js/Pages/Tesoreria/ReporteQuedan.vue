@@ -23,23 +23,23 @@ import axios from 'axios';
                     <label class="block mb-2 text-xs font-light text-gray-600" for="fecha_nacimiento">
                         Fecha Inicio<span class="text-red-600 font-extrabold">*</span>
                     </label>
-                    <div class="relative flex h-8 flex-row-reverse">
-                        <flat-pickr
-                            class="peer w-[460px] text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
-                            :config="config" v-model="debt_table.start_date" :placeholder="'Seleccione Fecha Inicial'" />
+                    <div class="relative flex">
                         <LabelToInput icon="date" />
+                        <flat-pickr
+                            class="peer text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none w-full"
+                            :config="config" v-model="debt_table.start_date" :placeholder="'Seleccione Fecha Inicial'" />
                     </div>
                     <InputError v-for="(item, index) in errors.start_date" :key="index" class="mt-2" :message="item" />
                 </div>
-                <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                <div class="mb-4 md:ml-1 md:mb-0 basis-1/2">
                     <label class="block mb-2 text-xs font-light text-gray-600" for="fecha_nacimiento">
                         Fecha Fin<span class="text-red-600 font-extrabold">*</span>
                     </label>
-                    <div class="relative flex flex-row-reverse">
-                        <flat-pickr
-                            class="peer w-[460px] text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
-                            :config="config" v-model="debt_table.end_date" :placeholder="'Seleccione Fecha Final'" />
+                    <div class="relative flex">
                         <LabelToInput icon="date" />
+                        <flat-pickr
+                            class="peer text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none w-full"
+                            :config="config" v-model="debt_table.end_date" :placeholder="'Seleccione Fecha Final'" />
                     </div>
                     <InputError v-for="(item, index) in errors.end_date" :key="index" class="mt-2" :message="item" />
                 </div>
@@ -103,7 +103,7 @@ export default {
             financing_sources: [],
             config: {
                 altInput: true,
-                static: true,
+                //static: true,
                 monthSelectorType: 'static',
                 altFormat: "d/m/Y",
                 dateFormat: "Y-m-d",
@@ -197,7 +197,7 @@ export default {
 
                 })
                 .catch(errors => {
-                    console.log(errors);
+                    //console.log(errors);
                     if (errors.response.status === 422) {
                         toast.warning(
                             "Tienes algunos errores por favor verifica tus datos.",
@@ -232,7 +232,7 @@ export default {
                             reader.readAsText(errors.response.data);
                             reader.onload = () => {
                                 const errors = JSON.parse(reader.result);
-                                console.log(errors);
+                                //console.log(errors);
                             };
 
                             let msg = this.manageError(errors);
@@ -254,7 +254,7 @@ export default {
                     this.states_quedan = response.data.states_quedan
                 })
                 .catch((errors) => {
-                    console.log(errors);
+                    //console.log(errors);
                     let msg = this.manageError(errors);
                     this.$swal.fire({
                         title: "Operación cancelada",
