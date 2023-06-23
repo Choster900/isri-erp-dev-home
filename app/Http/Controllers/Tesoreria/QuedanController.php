@@ -61,6 +61,7 @@ class QuedanController extends Controller
             "requerimiento_pago",
             "liquidacion_quedan",
             "proyecto_financiado",
+            "tipo_documento_adquisicion.documento_adquisicion",
             "serie_retencion_iva",
             "proveedor.giro",
             "proveedor.sujeto_retencion",
