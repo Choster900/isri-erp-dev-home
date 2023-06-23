@@ -266,18 +266,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                     <td v-if="cellIndex == 'numero_factura_det_quedan'"
                                                         class="border-2 border-black"
                                                         :class="[cell == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']">
-                                                        <button type="button" @click="addJustification(rowIndex)"
-                                                            style="float: right;margin-right: -857px;margin-top: -39px;x;font-size: 30px;padding: 0px 10px;border: 0px;background-color: transparent;">
-                                                            <span type="button" data-toggle="tooltip"
-                                                                data-placement="right">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                                    viewBox="0 0 24 24" stroke-width="1.5"
-                                                                    stroke="currentColor" class="w-5 h-5">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                                        d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z" />
-                                                                </svg>
-                                                            </span>
-                                                        </button>
+
                                                         <input type="text"
                                                             v-model="rowsData[rowIndex]['numero_factura_det_quedan']"
                                                             maxlength="10"
@@ -358,6 +347,19 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 
                                                     <td v-else-if="cellIndex == 'retenciones'"
                                                         class="border-2 border-black">
+                                                        <button type="button" @click="addJustification(rowIndex)"
+                                                            title="Reajustar factura"
+                                                            style="float: right;margin-right: -42px;margin-top: -1px;x;font-size: 30px;padding: 0px 10px;border: 0px;background-color: transparent;">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                                class="w-6 h-6">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                            </svg>
+
+                                                        </button>
                                                         <table>
                                                             <tr>
                                                                 <th class="border-2 border-r-black border-b-black border-l-transparent border-t-transparent text-sm text-gray-600"
@@ -388,47 +390,53 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                             </tr>
                                             <tr v-show="row['reajuste']">
                                                 <!-- <th class="" rowspan="2"></th> -->
-                                                <th class="text-xs border-2 border-black" colspan="2" rowspan="2">
-                                                    <div class="flex justify-center mt-1">
+                                                <th class="text-xs border-2 border-black  text-white bg-[#E75E2B]"
+                                                    colspan="2" rowspan="2">
+                                                    <div class="flex justify-center ">
 
                                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                                            class="w-5 h-5 pb-1">
+                                                            class="w-5 h-5 text-white">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                                 d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
                                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                                 d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                         </svg>
-                                                        <span class="font-semibold">JUSTIICACIÓN REAJUSTES</span>
+                                                        <span class="font-semibold text-white mt-0.5">JUSTIICACIÓN
+                                                            REAJUSTES</span>
                                                     </div>
                                                 </th>
                                                 <th class="border-2 border-black text-sm px-3 text-gray-600" colspan="3"
                                                     rowspan="2"
-                                                    :class="row['justificacion_det_quedan'] == '' ? 'bg-[#fdfd96]' : ''">
+                                                    :class="row['justificacion_det_quedan'] == '' || row['justificacion_det_quedan'] === null ? 'bg-[#fdfd96]' : ''">
 
                                                     <input type="text" v-model="row['justificacion_det_quedan']"
-                                                        maxlength="20"
+                                                        maxlength="50"
                                                         :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                         :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
-                                                        class="peer w-full text-sm font-normal bg-transparent text-center h-10 border-none px-2 text-slate-900  transition-colors duration-300 focus:border-none focus:outline-none">
+                                                        class="peer w-full text-sm font-medium bg-transparent text-center h-10 border-none px-2 text-slate-900  transition-colors duration-300 focus:border-none focus:outline-none">
                                                 </th>
-                                                <th class="border-2 border-black text-sm px-3 text-gray-600">REAJUSTE
+                                                <th class="border-2 border-black text-sm px-3 text-white bg-[#E75E2B]">
+                                                    REAJUSTE
                                                     PRODUCTO</th>
-                                                <th class="border-2 border-black text-sm px-3 text-gray-600">REAJUSTE
+                                                <th class="border-2 border-black text-sm px-3 text-white bg-[#E75E2B]">
+                                                    REAJUSTE
                                                     SERVICIO</th>
                                             </tr>
                                             <tr v-show="row['reajuste']">
 
-                                                <td class="border-2 border-black text-sm px-3 text-white bg-red-500/90">
+                                                <td class="border-2 border-black text-sm px-3"
+                                                    :class="row['reajuste_monto'].ajuste_producto_factura_det_quedan == '' || row['reajuste_monto'].ajuste_producto_factura_det_quedan === null ? 'bg-[#fdfd96]' : ''">
                                                     <input type="text"
                                                         v-model="row['reajuste_monto'].ajuste_producto_factura_det_quedan"
                                                         maxlength="10"
                                                         @input="onlyNumberDecimal(rowIndex, 'reajuste_monto', $event, 'ajuste_producto_factura_det_quedan')"
                                                         :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                         :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
-                                                        class="peer w-full text-sm font-normal text-white bg-transparent text-center h-6 border-none px-2   transition-colors duration-300 focus:border-none focus:outline-none">
+                                                        class="peer w-full text-sm font-normal  bg-transparent text-center h-6 border-none px-2   transition-colors duration-300 focus:border-none focus:outline-none">
                                                 </td>
-                                                <td class="border-2 border-black text-sm px-3 text-white bg-red-500/90">
+                                                <td class="border-2 border-black text-sm px-3"
+                                                    :class="row['reajuste_monto'].ajuste_servicio_factura_det_quedan == '' || row['reajuste_monto'].ajuste_servicio_factura_det_quedan === null ? 'bg-[#fdfd96]' : ''">
                                                     <input type="text"
                                                         v-model="row['reajuste_monto'].ajuste_servicio_factura_det_quedan"
                                                         maxlength="10"
@@ -468,7 +476,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 
                                         <td class="border-2 border-black " colspan="1" contenteditable="false">
                                             <div class="relative flex h-8 w-full flex-row-reverse "
-                                                :class="{ 'condition-select': dataInputs.id_prioridad_pago == '' }">
+                                                :class="{ 'condition-select': dataInputs.id_prioridad_pago == '' || dataInputs.id_prioridad_pago === null }">
                                                 <Multiselect v-model="dataInputs.id_prioridad_pago"
                                                     :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                     :options="dataForSelectInRow.prioridadPago" :searchable="true" />
@@ -628,29 +636,31 @@ export default {
             // this.calculateAmount()
             this.taxesByRow(rowIndex)
         },
-
+        //TODO:REVISAR POR QUE CUANDO TENGO UN PROVEEDOR SELECCIONADO AL SELECCINA UN PROVEEDOR SIN CONTRATO NO ME PONE EL NOMBRE DE FACTURA EN TIPO DE CONTRATO
         getInformationBySupplier(supplier) {
             if (supplier) {
                 // Buscar el proveedor en la lista de proveedores
                 const selectedSupplier = this.dataForSelectInRow.proveedor.find((suppliers) => suppliers.value === supplier);
-
+                
                 // Limpiar la variable (this.documentoAdquisicion, this.dataInputs.id_det_doc_adquisicion) antes de asignarle nuevos valores
                 this.documentoAdquisicion = []
 
                 // Filtrar los contratos por proveedor
-                const filteredContracts = this.dataForSelectInRow.documentoAdquisicion.filter((doc) => doc.id_proveedor === supplier);
-
+                const filteredContracts =  JSON.parse(JSON.stringify(this.dataForSelectInRow.documentoAdquisicion.filter((doc) => doc.id_proveedor === supplier)));
+                console.log(filteredContracts);
                 if (filteredContracts.length > 0) {
                     // Asignar los contratos del proveedor a this.documentoAdquisicion
                     let tipos = JSON.parse(JSON.stringify(this.dataForSelectInRow.tipoAdquisicion.filter((type) => type.estado_tipo_doc_adquisicion == 1)))
                     this.documentoAdquisicion = filteredContracts
                     this.tipoDocumentoAdquisicion = tipos
-                    this.dataInputs.nombre_tipo_doc_adquisicion = ""
+                   // this.dataInputs.nombre_tipo_doc_adquisicion = ""
 
                 } else {
                     let tipos = JSON.parse(JSON.stringify(this.dataForSelectInRow.tipoAdquisicion.filter((type) => type.estado_tipo_doc_adquisicion == 2)))
                     this.dataInputs.id_det_doc_adquisicion = ''
                     this.tipoDocumentoAdquisicion = tipos
+                    console.log(tipos);
+                    this.dataInputs.id_tipo_doc_adquisicion = 3
                     this.dataInputs.nombre_tipo_doc_adquisicion = "FACTURA"
                 }
 
@@ -690,8 +700,7 @@ export default {
             //al seleccionar contrato
             if (id_documentoAdquisicion != null) {
                 let document = JSON.parse(JSON.stringify(this.dataForSelectInRow.documentoAdquisicion.find((doc) => doc.value === id_documentoAdquisicion)))
-                console.log(document);
-
+                console.log(document.nombre_tipo_doc_adquisicion);
                 this.dataInputs.id_tipo_doc_adquisicion = document.id_tipo_doc_adquisicion
                 this.dataInputs.nombre_tipo_doc_adquisicion = document.nombre_tipo_doc_adquisicion
                 this.dataInputs.numero_doc_adquisicion = document.numero_doc_adquisicion
@@ -711,141 +720,12 @@ export default {
             this.taxesByRow();
 
         },
-        /*        taxesByRow(rowIndex = "") {
-                   // Filtrar las filas marcadas para eliminar
-                   let rowsData = this.rowsData.filter((element) => element['isDelete'] === true);
-       
-                   if (rowIndex !== "") {
-                       // Cuando se proporciona un índice de fila, realizar cálculos solo para esa fila
-                       let rowData = rowsData[rowIndex];
-       
-                       if (rowData) {
-       
-                           let productoMont = 0
-                           let servicioMont = 0
-       
-                           let sumProducto = 0
-                           let sumServicio = 0
-                           if (!this.rowsData[rowIndex].reajuste) {
-                               productoMont = parseFloat(rowData.monto['producto_factura_det_quedan']) || 0;
-                               servicioMont = parseFloat(rowData.monto['servicio_factura_det_quedan']) || 0;
-       
-                               sumProducto = rowsData.reduce((prod, obj) => prod + parseFloat(obj["monto"].producto_factura_det_quedan), 0)
-                               sumServicio = rowsData.reduce((servc, obj) => servc + parseFloat(obj["monto"].servicio_factura_det_quedan), 0)
-       
-                           } else {
-                               productoMont = parseFloat(rowData.reajuste_monto['ajuste_producto_factura_det_quedan']) || 0;
-                               servicioMont = parseFloat(rowData.reajuste_monto['ajuste_servicio_factura_det_quedan']) || 0;
-       
-                               sumProducto = rowsData.reduce((prod, obj) => prod + parseFloat(obj["reajuste_monto"].ajuste_producto_factura_det_quedan), 0)
-                               sumServicio = rowsData.reduce((servc, obj) => servc + parseFloat(obj["reajuste_monto"].ajuste_servicio_factura_det_quedan), 0)
-                           }
-       
-                           let amountByRow = productoMont + servicioMont;
-                           let liquido = amountByRow / 1.13;
-                           let ivaByFila = liquido * this.dataForCalculate.iva;
-       
-                           let sum = (parseFloat(sumProducto) || 0) + (parseFloat(sumServicio) || 0) + (parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) || 0)
-       
-                           if (this.documentoAdquisicion != "") {
-       
-                               if (this.dataForCalculate.monto_doc_adquisicion <= sum) {
-                                   rowsData[rowIndex]["retenciones"].iva = ivaByFila.toFixed(2);
-                                   let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
-                                   rowsData[rowIndex]["retenciones"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : "0";
-                               } else {
-                                   rowsData[rowIndex]["retenciones"].iva = 0;
-                                   let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
-                                   rowsData[rowIndex]["retenciones"].renta = 0;
-                               }
-       
-                           } else {
-       
-                               if (113 <= sum) {
-                                   rowsData[rowIndex]["retenciones"].iva = ivaByFila.toFixed(2);
-                                   let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
-                                   rowsData[rowIndex]["retenciones"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : "0";
-                               } else {
-                                   rowsData[rowIndex]["retenciones"].iva = 0;
-                                   let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
-                                   rowsData[rowIndex]["retenciones"].renta = 0;
-                               }
-                           }
-       
-                       }
-                   } else {
-                       // Recorrer todas las filas y realizar los cálculos
-                       rowsData.forEach((element, index) => {
-                           let productoMont = 0
-                           let servicioMont = 0
-       
-       
-                           if (element.reajuste) {
-                               productoMont = parseFloat(element.monto['producto_factura_det_quedan']) || 0;
-                               servicioMont = parseFloat(element.monto['servicio_factura_det_quedan']) || 0;
-       
-                           } else {
-                               productoMont = parseFloat(element.reajuste_monto['ajuste_producto_factura_det_quedan']) || 0;
-                               servicioMont = parseFloat(element.reajuste_monto['ajuste_servicio_factura_det_quedan']) || 0;
-       
-                           }
-       
-                           let amountByRow = productoMont + servicioMont;
-                           let liquido = amountByRow / 1.13;
-       
-                           let ivaByFila = liquido * this.dataForCalculate.iva;
-       
-                           let sum = (parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) || 0) + (parseFloat(this.dataInputs.monto_total_quedan) || 0)
-                           if (this.documentoAdquisicion != "") {
-                               if (this.dataForCalculate.monto_doc_adquisicion <= sum) {
-                                   rowsData[index]["retenciones"].iva = ivaByFila.toFixed(2);
-                                   let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
-                                   rowsData[index]["retenciones"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : "0";
-                               } else {
-                                   rowsData[index]["retenciones"].iva = 0
-                                   rowsData[index]["retenciones"].renta = 0
-                               }
-                           } else {
-                               if (113 <= sum) {
-                                   rowsData[index]["retenciones"].iva = ivaByFila.toFixed(2);
-                                   let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
-                                   rowsData[index]["retenciones"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : "0";
-                               } else {
-                                   rowsData[index]["retenciones"].iva = 0
-                                   rowsData[index]["retenciones"].renta = 0
-                               }
-                           }
-                       });
-                   }
-       
-                   // Calcular el total de IVA y Renta sumando los valores de cada fila
-                   let totalIva = rowsData.reduce((iva, obj) => iva + parseFloat(obj["retenciones"].iva), 0)
-                   let totalRenta = rowsData.reduce((iva, obj) => iva + parseFloat(obj["retenciones"].renta), 0)
-       
-                   // Calcular el monto total y líquido sumando los valores de cada fila
-                   let totalAmountInMonto = rowsData.reduce((monto, obj) => monto + (parseFloat(obj["monto"].producto_factura_det_quedan) || 0) + (parseFloat(obj["monto"].servicio_factura_det_quedan) || 0), 0);
-                   let montoLiquidoQuedan = totalAmountInMonto - totalIva - totalRenta;
-       
-                   // Actualizar los valores en this.dataInputs
-                   this.dataInputs.monto_total_quedan = totalAmountInMonto.toFixed(2)
-                   this.dataInputs.monto_liquido_quedan = montoLiquidoQuedan.toFixed(2)
-       
-                   this.dataInputs.monto_isr_quedan = totalRenta.toFixed(2)
-       
-                   let sum = (parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) || 0) + (parseFloat(this.dataInputs.monto_total_quedan) || 0)
-                   if (this.documentoAdquisicion != "") {
-                       this.dataInputs.monto_iva_quedan = (this.dataForCalculate.monto_doc_adquisicion <= sum) ? totalIva.toFixed(2) : (0).toFixed(2);
-                   } else {
-                       this.dataInputs.monto_iva_quedan = (113 <= sum) ? totalIva.toFixed(2) : (0).toFixed(2);
-                   }
-       
-       
-               }, */
-
 
         taxesByRow() {
-            let rowsData = this.rowsData.filter((element) => element['isDelete'] === true);
+            // Filtrar los elementos que no se han eliminado
+            let rowsData = this.rowsData.filter(element => element['isDelete'] === true);
 
+            // Calcular el total del monto
             let totalMonto = rowsData.reduce((monto, obj) => {
                 let productoMont = parseFloat(obj["monto"].producto_factura_det_quedan) || 0;
                 let servicioMont = parseFloat(obj["monto"].servicio_factura_det_quedan) || 0;
@@ -856,107 +736,66 @@ export default {
                 return monto + (isNaN(subtotal) ? 0 : subtotal);
             }, 0);
 
+            // Recorre todas las filas del detalle del quedan
             rowsData.forEach((element, index) => {
-                let productoMont = 0
-                let servicioMont = 0
+                let productoMont = 0;
+                let servicioMont = 0;
 
+                // Obtener los montos de producto y servicio dependiendo de si existe un reajuste o no
                 if (!element.reajuste) {
                     productoMont = parseFloat(element.monto['producto_factura_det_quedan']) || 0;
                     servicioMont = parseFloat(element.monto['servicio_factura_det_quedan']) || 0;
-
                 } else {
                     productoMont = parseFloat(element.reajuste_monto['ajuste_producto_factura_det_quedan']) || 0;
                     servicioMont = parseFloat(element.reajuste_monto['ajuste_servicio_factura_det_quedan']) || 0;
-
                 }
 
+                // Sumando los producto y servicios de todas las filas
                 let amountByRow = productoMont + servicioMont;
+                // Diviendo entre 1.13
                 let liquido = amountByRow / 1.13;
+                // Tomando el iva del monto liquido que se divio antes por el porcentaje del proveedor que se ha seleccionado
                 let ivaByFila = liquido * this.dataForCalculate.iva;
 
+                // Obtener la suma de los totales de todas las facturas que ha tenido en el mes y sumando el monto acual
+                let sum = (parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) || 0) + (parseFloat(totalMonto) || 0);
 
-                //SUMA DEL MONTO DEL CONTRATO POR PROVEEDOR Y EL TOTAL DEL QUEDAN 
-                let sum = (parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) || 0) + (parseFloat(totalMonto) || 0)
-                console.log(sum);
-                if (this.documentoAdquisicion != "") {
+                // Validando si el proveedor tiene contrato o no
+                if (this.documentoAdquisicion !== "") {
+                    //Si la suma total de todas las facturas de el proveedor seleccionado es mayor al el monto del contrato u orden de compra se calculas las retenciones
                     if (this.dataForCalculate.monto_doc_adquisicion <= sum) {
-                        //CALCULANDO RETENCIONES IVA Y RENTA
+                        
                         rowsData[index]["retenciones"].iva = ivaByFila.toFixed(2);
                         let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
                         rowsData[index]["retenciones"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : (0).toFixed(2);
                     } else {
-
                         rowsData[index]["retenciones"].iva = (0).toFixed(2);
-                        rowsData[index]["retenciones"].renta = (0).toFixed(2)
+                        rowsData[index]["retenciones"].renta = (0).toFixed(2);
                     }
-                } else {
+                } else {// Si el el proveedor no tiene contrato se asimila que es una factura por lo cual solo se valida que no pase de los 113 dolares
                     if (113 <= sum) {
                         rowsData[index]["retenciones"].iva = ivaByFila.toFixed(2);
                         let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
                         rowsData[index]["retenciones"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : (0).toFixed(2);
                     } else {
-
                         rowsData[index]["retenciones"].iva = (0).toFixed(2);
-                        rowsData[index]["retenciones"].renta = (0).toFixed(2)
+                        rowsData[index]["retenciones"].renta = (0).toFixed(2);
                     }
                 }
 
-                let totalIva = rowsData.reduce((iva, obj) => iva + parseFloat(obj["retenciones"].iva), 0)
-                let totalRenta = rowsData.reduce((iva, obj) => iva + parseFloat(obj["retenciones"].renta), 0)
+                // Obteniendo el iva, la renta y el monto liquido del quedan
+                let totalIva = rowsData.reduce((iva, obj) => iva + parseFloat(obj["retenciones"].iva), 0);
+                let totalRenta = rowsData.reduce((iva, obj) => iva + parseFloat(obj["retenciones"].renta), 0);
                 let montoLiquidoQuedan = totalMonto - totalIva - totalRenta;
 
                 // Actualizar los valores en this.dataInputs
-                this.dataInputs.monto_total_quedan = totalMonto.toFixed(2)
-                this.dataInputs.monto_liquido_quedan = montoLiquidoQuedan.toFixed(2)
-                this.dataInputs.monto_isr_quedan = totalRenta.toFixed(2)
-                this.dataInputs.monto_iva_quedan = totalIva.toFixed(2)
+                this.dataInputs.monto_total_quedan = totalMonto.toFixed(2);
+                this.dataInputs.monto_liquido_quedan = montoLiquidoQuedan.toFixed(2);
+                this.dataInputs.monto_isr_quedan = totalRenta.toFixed(2);
+                this.dataInputs.monto_iva_quedan = totalIva.toFixed(2);
             });
         },
 
-        /* calcularTodos() {
-            let rowsData = this.rowsData.filter((element) => element['isDelete'] === true);
-
-            rowsData.forEach((element, index) => {
-                let productoMont = 0
-                let servicioMont = 0
-
-                if (!element.reajuste) {
-                    productoMont = parseFloat(element.monto['producto_factura_det_quedan']) || 0;
-                    servicioMont = parseFloat(element.monto['servicio_factura_det_quedan']) || 0;
-
-                } else {
-                    productoMont = parseFloat(element.reajuste_monto['ajuste_producto_factura_det_quedan']) || 0;
-                    servicioMont = parseFloat(element.reajuste_monto['ajuste_servicio_factura_det_quedan']) || 0;
-
-                }
-
-                let amountByRow = productoMont + servicioMont;
-                let liquido = amountByRow / 1.13;
-                let ivaByFila = liquido * this.dataForCalculate.iva;
-
-
-                rowsData[index]["retenciones"].iva = ivaByFila.toFixed(2);
-                let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
-                rowsData[index]["retenciones"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : "0";
-
-
-                // Calcular el total de IVA y RENTA sumando los valores de cada fila
-                let totalIva = rowsData.reduce((iva, obj) => iva + parseFloat(obj["retenciones"].iva), 0)
-                let totalRenta = rowsData.reduce((iva, obj) => iva + parseFloat(obj["retenciones"].renta), 0)
-
-                // Calcular el monto total y líquido sumando los valores de cada fila
-                let totalAmountInMonto = rowsData.reduce((monto, obj) => monto + (parseFloat(obj["monto"].producto_factura_det_quedan) || 0) + (parseFloat(obj["monto"].servicio_factura_det_quedan) || 0), 0);
-                let montoLiquidoQuedan = totalAmountInMonto - totalIva - totalRenta;
-
-                // Actualizar los valores en this.dataInputs
-                this.dataInputs.monto_total_quedan = totalAmountInMonto.toFixed(2)
-                this.dataInputs.monto_liquido_quedan = montoLiquidoQuedan.toFixed(2)
-                this.dataInputs.monto_isr_quedan = totalRenta.toFixed(2)
-                this.dataInputs.monto_iva_quedan = totalIva.toFixed(2)
-
-
-            });
-        }, */
         getAmountBySupplier(id_proveedor) {
             // Crear una copia de la matriz totalAmountBySupplier
             let newDataSupplier = JSON.parse(JSON.stringify(this.totalAmountBySupplier));
@@ -965,10 +804,9 @@ export default {
             newDataSupplier.forEach((element) => {
                 if (element.id_proveedor == id_proveedor) {
                     if (this.dataInputs.id_quedan != "") {
-                        console.log(element);
+ 
                         // Filtrar los elementos de quedan según el id_quedan ingresado
                         let quedanArray = element.quedan.filter((element) => element.id_quedan < this.dataInputs.id_quedan);
-                        console.log(quedanArray);
 
                         // Ordenar el array quedanArray por id_quedan en orden descendente
                         quedanArray.sort((a, b) => b.id_quedan - a.id_quedan);
@@ -980,7 +818,6 @@ export default {
                         let montoTotal = element.quedan.reduce((total, element) =>
                             (parseFloat(total) + parseFloat(element.monto_total_quedan)).toFixed(2), 0);
                         total = montoTotal;
-                        console.log(total);
                     }
                 }
             });
@@ -1171,36 +1008,56 @@ export default {
                         })
                         .catch((error) => {
                             if (error.response.status === 422) {
-                                if (error.response.data.message === "LA DEPENDENCIA ES UN DATO REQUERIDO") {
-                                    // Mostrar mensaje de error si falta la dependencia
-                                    toast.error("La dependencia es requerida en este caso", {
-                                        autoClose: 5000,
-                                        position: "top-right",
-                                        transition: "zoom",
-                                        toastBackgroundColor: "white",
-                                    });
-                                } else {
-                                    // Mostrar mensaje de error si el número de acta ya existe
-                                    toast.error("Al parecer el numero de acta ya existe en este contexto", {
-                                        autoClose: 5000,
-                                        position: "top-right",
-                                        transition: "zoom",
-                                        toastBackgroundColor: "white",
-                                    });
-                                    const data = error.response.data.errors;
-                                    const myData = {};
-                                    for (const errorBack in data) {
-                                        const split = errorBack.split(".");
-                                        const newIndexSplit = split[1];
-                                        myData[newIndexSplit] = data[errorBack][0];
-                                    }
-                                    this.errosDetalleQuedan = myData;
 
-                                    // Limpiar errosDetalleQuedan después de 5 segundos
-                                    setTimeout(() => {
-                                        this.errosDetalleQuedan = [];
-                                    }, 5000);
+                                let data = error.response.data.errors
+                                var myData = new Object();
+                                for (const errorBack in data) {
+                                    myData[errorBack] = data[errorBack][0]
                                 }
+
+                                Object.keys(myData).forEach(key => {
+                                    const mensaje = myData[key];
+
+
+                                    toast.error(`${mensaje}`, {
+                                        autoClose: 5000,
+                                        position: "top-right",
+                                        transition: "zoom",
+                                        toastBackgroundColor: "white",
+                                    });
+
+                                })
+
+                                /*  if (error.response.data.message === "LA DEPENDENCIA ES UN DATO REQUERIDO") {
+                                     // Mostrar mensaje de error si falta la dependencia
+                                     toast.error("La dependencia es requerida en este caso", {
+                                         autoClose: 5000,
+                                         position: "top-right",
+                                         transition: "zoom",
+                                         toastBackgroundColor: "white",
+                                     });
+                                 } else {
+                                     // Mostrar mensaje de error si el número de acta ya existe
+                                     toast.error("Al parecer el numero de acta ya existe en este contexto", {
+                                         autoClose: 5000,
+                                         position: "top-right",
+                                         transition: "zoom",
+                                         toastBackgroundColor: "white",
+                                     });
+                                     const data = error.response.data.errors;
+                                     const myData = {};
+                                     for (const errorBack in data) {
+                                         const split = errorBack.split(".");
+                                         const newIndexSplit = split[1];
+                                         myData[newIndexSplit] = data[errorBack][0];
+                                     }
+                                     this.errosDetalleQuedan = myData;
+ 
+                                     // Limpiar errosDetalleQuedan después de 5 segundos
+                                     setTimeout(() => {
+                                         this.errosDetalleQuedan = [];
+                                     }, 5000);
+                                 } */
                             } else {
                                 // Mostrar mensaje de error genérico si faltan datos
                                 toast.error("Al parecer te hacen falta datos por ingresar", {
@@ -1252,7 +1109,33 @@ export default {
                         })
                         .catch((error) => {
                             if (error.response.status === 422) {
-                                if (error.response.data.message === "LA DEPENDENCIA ES UN DATO REQUERIDO") {
+
+
+                                let data = error.response.data.errors
+                                var myData = new Object();
+                                for (const errorBack in data) {
+                                    myData[errorBack] = data[errorBack][0]
+                                }
+
+
+                                Object.keys(myData).forEach(key => {
+                                    const mensaje = myData[key];
+
+
+                                    toast.error(`${mensaje}`, {
+                                        autoClose: 5000,
+                                        position: "top-right",
+                                        transition: "zoom",
+                                        toastBackgroundColor: "white",
+                                    });
+
+                                })
+
+
+
+
+
+                                /* if (error.response.data.message === "LA DEPENDENCIA ES UN DATO REQUERIDO") {
                                     // Mostrar mensaje de error si falta la dependencia
                                     toast.error("La dependencia es requerida en este caso", {
                                         autoClose: 5000,
@@ -1281,7 +1164,7 @@ export default {
                                     setTimeout(() => {
                                         this.errosDetalleQuedan = [];
                                     }, 5000);
-                                }
+                                } */
                             } else {
                                 // Mostrar mensaje de error genérico si faltan datos
                                 toast.error("Al parecer te hacen falta datos por ingresar", {
