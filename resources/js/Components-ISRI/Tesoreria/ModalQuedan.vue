@@ -192,29 +192,21 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                             CONTRATO
                                         </th>
                                         <td class="border-2 border-black" colspan="2">
-                                            <!-- <div class="relative flex h-8 w-full flex-row-reverse "
-                                                :class="{ 'condition-select': dataInputs.id_tipo_doc_adquisicion == '' }">
-                                                <Multiselect v-model="dataInputs.id_tipo_doc_adquisicion" :classes="{
-                                                    containerOpen: 'rounded-b-none',
-                                                }" :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
-                                                    noOptionsText="<p class='text-xs'>sin tipos de contratos<p>"
-                                                    noResultsText="<p class='text-xs'>sin registros<p>"
-                                                    :options="tipoDocumentoAdquisicion" :searchable="true" />
-                                            </div> -->
-
-
                                             <input type="text" v-model="dataInputs.nombre_tipo_doc_adquisicion"
                                                 :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''" disabled
                                                 class="peer w-full text-sm bg-transparent text-center h-10 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                         </td>
-                                        <td class="border-2 border-black">
+                                        <td class="border-2 border-black"
+                                            :class="{ 'bg-[#fdfd96]': dataInputs.numero_doc_adquisicion == '' }">
                                             <input type="text" v-model="dataInputs.numero_doc_adquisicion" maxlength="20"
-                                                disabled
+                                                :disabled="dataInputs.compromiso_ppto_det_doc_adquisicion == '' ? false : true"
                                                 class="peer w-full text-sm bg-transparent text-center h-10 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                         </td>
-                                        <td class="border-2 border-black">
+                                        <td class="border-2 border-black"
+                                            :class="{ 'bg-[#fdfd96]': dataInputs.compromiso_ppto_det_doc_adquisicion == '' }">
                                             <input type="text" v-model="dataInputs.compromiso_ppto_det_doc_adquisicion"
-                                                disabled maxlength="20"
+                                                :disabled="dataInputs.compromiso_ppto_det_doc_adquisicion == '' ? false : true"
+                                                maxlength="20"
                                                 class="peer w-full text-sm bg-transparent text-center h-10 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                         </td>
                                         <td class="border-2 border-black"
@@ -230,9 +222,11 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                             <div class="relative flex h-8 w-full flex-row-reverse"
                                                 :class="[documentoAdquisicion != '' ? { 'condition-select': dataInputs.id_det_doc_adquisicion == '' } : '']">
                                                 <Multiselect v-model="dataInputs.id_det_doc_adquisicion"
-                                                    @change="DocumentoAdquisicionSelected($event)"
-                                                    :classes="{ containerDisabled: 'cursor-not-allowed bg-gray-200 ', }"
-                                                    noOptionsText="<p class='text-xs'>sin contratos<p>"
+                                                    @input="DocumentoAdquisicionSelected($event)"
+                                                    :placeholder="documentoAdquisicion == '' ? 'sin contratos' : 'seleccione contrato'"
+                                                    :classes="{
+                                                        containerDisabled: 'cursor-not-allowed bg-gray-200 ', placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                                    }" noOptionsText="<p class='text-xs'>sin contratos<p>"
                                                     noResultsText="<p class='text-xs'>contrato no encontrados<p>"
                                                     :disabled="dataQuedan.id_estado_quedan > 1 ? true : documentoAdquisicion == '' ? true : false"
                                                     :options="documentoAdquisicion" :searchable="true" />
@@ -540,7 +534,7 @@ export default {
             errosrNumeroActa: [], // Errores relacionados con numero_acta
             montoTotalProveedorMes: [], // Monto total del proveedor por mes
             documentoAdquisicion: [], // Contiene contratos por proveedor
-            tipoDocumentoAdquisicion: [], // Contiene los tipos de documentos de adquisicion
+            tipoDocumentoAdquisicion: [], // Contiene los tipos de documentos de adquisicion TODO:FOR REMOVE
             dataInputs: {
                 giro: '',
                 irs: '',
@@ -641,29 +635,31 @@ export default {
             if (supplier) {
                 // Buscar el proveedor en la lista de proveedores
                 const selectedSupplier = this.dataForSelectInRow.proveedor.find((suppliers) => suppliers.value === supplier);
-                
-                // Limpiar la variable (this.documentoAdquisicion, this.dataInputs.id_det_doc_adquisicion) antes de asignarle nuevos valores
+
+                // Limpiar la variable (this.documentoAdquisicion, this.dataInputs.id_det_doc_adquisicion) que contiene los contratos antes de asignarle nuevos contratos
                 this.documentoAdquisicion = []
 
                 // Filtrar los contratos por proveedor
-                const filteredContracts =  JSON.parse(JSON.stringify(this.dataForSelectInRow.documentoAdquisicion.filter((doc) => doc.id_proveedor === supplier)));
-                console.log(filteredContracts);
-                if (filteredContracts.length > 0) {
-                    // Asignar los contratos del proveedor a this.documentoAdquisicion
-                    let tipos = JSON.parse(JSON.stringify(this.dataForSelectInRow.tipoAdquisicion.filter((type) => type.estado_tipo_doc_adquisicion == 1)))
+                const filteredContracts = JSON.parse(JSON.stringify(this.dataForSelectInRow.documentoAdquisicion.filter((doc) => doc.id_proveedor === supplier)));
+
+
+                let tipos = JSON.parse(JSON.stringify(this.dataForSelectInRow.tipoAdquisicion))
+                console.log(tipos);
+
+                console.log(this.dataInputs.nombre_tipo_doc_adquisicion);
+                if (filteredContracts != "") {
                     this.documentoAdquisicion = filteredContracts
-                    this.tipoDocumentoAdquisicion = tipos
-                   // this.dataInputs.nombre_tipo_doc_adquisicion = ""
+                    this.dataInputs.nombre_tipo_doc_adquisicion = ''
 
                 } else {
-                    let tipos = JSON.parse(JSON.stringify(this.dataForSelectInRow.tipoAdquisicion.filter((type) => type.estado_tipo_doc_adquisicion == 2)))
-                    this.dataInputs.id_det_doc_adquisicion = ''
-                    this.tipoDocumentoAdquisicion = tipos
-                    console.log(tipos);
-                    this.dataInputs.id_tipo_doc_adquisicion = 3
-                    this.dataInputs.nombre_tipo_doc_adquisicion = "FACTURA"
-                }
+                    this.dataInputs.id_det_doc_adquisicion = ''//ID_DETALLE_CONTRATO
+                    this.dataInputs.id_tipo_doc_adquisicion = 3//ID TIPO CONTRATO
+                    this.dataInputs.nombre_tipo_doc_adquisicion = "FACTURA"//NOMBRE CONTRATO
+                    this.dataInputs.numero_doc_adquisicion = ''
+                    this.dataInputs.compromiso_ppto_det_doc_adquisicion = ''
+                    this.dataInputs.id_proy_financiado = ''
 
+                }
 
                 // Datos que se pintan en los inputs
                 this.dataInputs.giro = selectedSupplier.codigo_giro && selectedSupplier.nombre_giro ? `${selectedSupplier.codigo_giro} - ${selectedSupplier.nombre_giro}` : 'GIRO NO ESPECIFICADO!';
@@ -764,7 +760,7 @@ export default {
                 if (this.documentoAdquisicion !== "") {
                     //Si la suma total de todas las facturas de el proveedor seleccionado es mayor al el monto del contrato u orden de compra se calculas las retenciones
                     if (this.dataForCalculate.monto_doc_adquisicion <= sum) {
-                        
+
                         rowsData[index]["retenciones"].iva = ivaByFila.toFixed(2);
                         let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
                         rowsData[index]["retenciones"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : (0).toFixed(2);
@@ -804,7 +800,7 @@ export default {
             newDataSupplier.forEach((element) => {
                 if (element.id_proveedor == id_proveedor) {
                     if (this.dataInputs.id_quedan != "") {
- 
+
                         // Filtrar los elementos de quedan según el id_quedan ingresado
                         let quedanArray = element.quedan.filter((element) => element.id_quedan < this.dataInputs.id_quedan);
 
@@ -892,7 +888,7 @@ export default {
             this.dataForCalculate.monto_isr_quedan = ''
             this.dataForCalculate.monto_total_quedan = ''
             this.documentoAdquisicion = []
-            this.tipoDocumentoAdquisicion = []
+            this.tipoDocumentoAdquisicion = []//TODO: for remove
 
         },
         addRow() {
