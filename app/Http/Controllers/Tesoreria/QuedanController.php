@@ -12,6 +12,7 @@ use App\Models\DetalleQuedan;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\Tesoreria\QuedanRequest;
+use App\Models\DetDocumentoAdquisicion;
 use App\Models\RequerimientoPago;
 use Luecano\NumeroALetras\NumeroALetras;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -358,24 +359,12 @@ class QuedanController extends Controller
                 'detalle_documento_adquisicion.compromiso_ppto_det_doc_adquisicion',
                 'tipo_documento_adquisicion.id_tipo_doc_adquisicion',
                 'tipo_documento_adquisicion.nombre_tipo_doc_adquisicion',
-                DB::raw('IFNULL(SUM(quedan.monto_liquido_quedan),0) as total_amount')
+                'detalle_documento_adquisicion.monto_det_doc_adquisicion'
             )
             ->join('detalle_documento_adquisicion', 'documento_adquisicion.id_doc_adquisicion', '=', 'detalle_documento_adquisicion.id_doc_adquisicion')
             ->join('proyecto_financiado', 'detalle_documento_adquisicion.id_proy_financiado', '=', 'proyecto_financiado.id_proy_financiado')
             ->join('proveedor', 'proveedor.id_proveedor', '=', 'documento_adquisicion.id_proveedor')
             ->join('tipo_documento_adquisicion', 'tipo_documento_adquisicion.id_tipo_doc_adquisicion', '=', 'documento_adquisicion.id_tipo_doc_adquisicion')
-            ->leftJoin('quedan', 'detalle_documento_adquisicion.id_det_doc_adquisicion', '=', 'quedan.id_det_doc_adquisicion')
-            ->groupBy(
-                'detalle_documento_adquisicion.id_det_doc_adquisicion',
-                'documento_adquisicion.numero_doc_adquisicion',
-                'documento_adquisicion.monto_doc_adquisicion',
-                'detalle_documento_adquisicion.compromiso_ppto_det_doc_adquisicion',
-                'tipo_documento_adquisicion.id_tipo_doc_adquisicion',
-                'tipo_documento_adquisicion.nombre_tipo_doc_adquisicion',
-                'proveedor.id_proveedor',
-                'proyecto_financiado.id_proy_financiado',
-                'proyecto_financiado.codigo_proy_financiado'
-            )
             ->get();
 
 
@@ -425,6 +414,39 @@ class QuedanController extends Controller
                 'razon_social'  => $proveedor->razon_social_proveedor,
                 'quedan'        => $quedan_con_detalle,
                 'total_mensual' => $total_mensual,
+            ];
+            // Agregar el arreglo del proveedor al resultado
+            array_push($resultado, $proveedor_arr);
+        }
+        return $resultado;
+    }
+    public function getAmountByDet(Request $request)
+    {
+        // Obtener el mes actual
+        //$mesActual = Carbon::now()->format('m');
+        $resultado = [];
+
+        // Obtener proveedores con quedans del mes actual
+        $details = DetDocumentoAdquisicion::with('quedan')->get()->filter(function ($det) {
+            // Filtrar proveedores con quedans no vacíos
+            return $det->quedan->isNotEmpty();
+        });
+        foreach ( $details as $detail ) {
+            // Mapear quedans con detalles para el proveedor actual
+            $quedan_con_detalle = $detail->quedan->map(function ($quedan) {
+                return [
+                    'id_quedan'          => $quedan->id_quedan,
+                    'monto_liquido_quedan' => $quedan->monto_liquido_quedan,
+                ];
+            });
+            // Calcular el total mensual para el proveedor actual
+            $total_detail = $detail->quedan->sum('monto_liquido_quedan');
+            // Crear un arreglo con los datos del proveedor actual
+            $proveedor_arr = [
+                'id_det'  => $detail->id_det_doc_adquisicion,
+                'monto_det'  => $detail->monto_det_doc_adquisicion,
+                'quedan'        => $quedan_con_detalle,
+                'sumatoria_detail' => $total_detail,
             ];
             // Agregar el arreglo del proveedor al resultado
             array_push($resultado, $proveedor_arr);

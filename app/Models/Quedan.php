@@ -24,6 +24,7 @@ class Quedan extends Model
         'id_serie_retencion_iva',
         'id_tipo_doc_adquisicion',
         'id_proveedor',
+        'id_det_doc_adquisicion',
         'numero_quedan',
         'numero_retencion_iva_quedan',
         'numero_compromiso_ppto_quedan',
