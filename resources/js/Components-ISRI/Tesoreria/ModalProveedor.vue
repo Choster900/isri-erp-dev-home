@@ -109,7 +109,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
-                                    Giro <span class="text-red-600 font-extrabold">*</span>
+                                    Giro
                                 </label>
                                 <div class="relative font-medium  flex h-8 w-full flex-row-reverse ">
                                     <Multiselect placeholder="Giro" v-model="supplier.id_giro" id="giro"
