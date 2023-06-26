@@ -358,7 +358,7 @@ class QuedanController extends Controller
                 'detalle_documento_adquisicion.compromiso_ppto_det_doc_adquisicion',
                 'tipo_documento_adquisicion.id_tipo_doc_adquisicion',
                 'tipo_documento_adquisicion.nombre_tipo_doc_adquisicion',
-                DB::raw('IFNULL(SUM(quedan.monto_liquido_quedan),0) as total_amount')
+                DB::raw('IFNULL(SUM(quedan.monto_liquido_quedan),0) as total_asignado')
             )
             ->join('detalle_documento_adquisicion', 'documento_adquisicion.id_doc_adquisicion', '=', 'detalle_documento_adquisicion.id_doc_adquisicion')
             ->join('proyecto_financiado', 'detalle_documento_adquisicion.id_proy_financiado', '=', 'proyecto_financiado.id_proy_financiado')

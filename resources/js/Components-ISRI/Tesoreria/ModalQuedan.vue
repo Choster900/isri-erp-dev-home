@@ -641,11 +641,8 @@ export default {
                 // Filtrar los contratos por proveedor
                 const filteredContracts = JSON.parse(JSON.stringify(this.dataForSelectInRow.documentoAdquisicion.filter((doc) => doc.id_proveedor === supplier)));
 
-
                 let tipos = JSON.parse(JSON.stringify(this.dataForSelectInRow.tipoAdquisicion))
-                console.log(tipos);
 
-                console.log(this.dataInputs.nombre_tipo_doc_adquisicion);
                 if (filteredContracts != "") {
                     this.documentoAdquisicion = filteredContracts
                     this.dataInputs.nombre_tipo_doc_adquisicion = ''
@@ -695,7 +692,6 @@ export default {
             //al seleccionar contrato
             if (id_documentoAdquisicion != null) {
                 let document = JSON.parse(JSON.stringify(this.dataForSelectInRow.documentoAdquisicion.find((doc) => doc.value === id_documentoAdquisicion)))
-                console.log(document.nombre_tipo_doc_adquisicion);
                 this.dataInputs.id_tipo_doc_adquisicion = document.id_tipo_doc_adquisicion
                 this.dataInputs.nombre_tipo_doc_adquisicion = document.nombre_tipo_doc_adquisicion
                 this.dataInputs.numero_doc_adquisicion = document.numero_doc_adquisicion
@@ -754,11 +750,9 @@ export default {
 
                 // Obtener la suma de los totales de todas las facturas que ha tenido en el mes y sumando el monto acual
                 // let sum = (parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) || 0) + (parseFloat(totalMonto) || 0);
-                console.log(totalMonto);
                 // Validando si el proveedor tiene contrato o no  
                 if (this.documentoAdquisicion != "") {
                     //Si la suma total de todas las facturas de el proveedor seleccionado es mayor al el monto del contrato u orden de compra se calculas las retenciones
-                    console.log(this.dataForCalculate.monto_doc_adquisicion);
                     if (113 <= this.dataForCalculate.monto_doc_adquisicion) {
                         rowsData[index]["retenciones"].iva = ivaByFila.toFixed(2);
                         let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
