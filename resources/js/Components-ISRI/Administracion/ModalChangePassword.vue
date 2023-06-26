@@ -1,100 +1,173 @@
 <script setup>
-import Modal from "@/Components/Modal.vue";
 import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import axios from 'axios';
-import Targets from '@/Components-ISRI/Targets.vue';
+import moment from 'moment';
 </script>
 
 <template>
-    <ModalVue :show="showModalChangePassword" @close-modal="closeModal()" 
-    v-bind:title="'Cambio de contraseña para : ' + modalDataChangePassword.nick_usuario" @close="closeModal()"> 
-        <div class="px-5 pt-4 pb-1">
+  <ModalVue :show="showModalChangePassword" @close-modal="$emit('cerrar-modal')"
+    v-bind:title="'Cambio de contraseña para : ' + user.nick_usuario" @close="$emit('cerrar-modal')">
+    <div class="px-5 pt-4 pb-1">
 
-    <div class="text-sm">
-      <div class="mb-4 md:flex flex-row justify-center">Ingresa nueva contraseña</div>
-      <div class="mb-4 md:flex flex-row justify-center">
-        <div class="md:mr-2 md:mb-0 basis-1/2">       
-          <TextInput v-model="modalDataChangePassword.password" :label-input="false" id="personal-information" type="password"
-            placeholder="Nueva contraseña">
-            <LabelToInput icon="password" forLabel="personal-information" />
-          </TextInput>
+      <div class="text-sm">
+        <div class="mb-4 md:flex flex-row justify-center">Ingresa nueva contraseña</div>
+        <div class="mb-4 md:flex flex-row justify-center">
+          <div class="md:mr-2 md:mb-0 basis-2/3">
+            <TextInput v-model="user.password" :label-input="false" id="personal-information"
+              placeholder="Nueva contraseña" :type="show_password ? 'text' : 'password'"
+              @update:modelValue="validateInput('password', limit = 100)">
+
+              <div class="cursor-pointer no-select absolute inset-y-0 right-0 flex items-center px-4 focus:outline-none"
+                @click="toggleShow">
+                <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" v-if="show_password" class="mr-1"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                  <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                  <g id="SVGRepo_iconCarrier">
+                    <g id="style=doutone">
+                      <g id="eye-close">
+                        <path id="vector (Stroke)" fill-rule="evenodd" clip-rule="evenodd"
+                          d="M2.2827 9.27342C4.69287 5.94267 8.19606 3.96997 12 3.96997C13.3515 3.96997 14.6695 4.21968 15.9154 4.69366C16.3026 4.84093 16.497 5.27417 16.3497 5.66131C16.2025 6.04846 15.7692 6.24292 15.3821 6.09564C14.3024 5.68491 13.1649 5.46997 12 5.46997C8.74406 5.46997 5.66741 7.15436 3.49759 10.1532L3.49687 10.1542C3.15894 10.6197 2.96497 11.2866 2.96497 11.995C2.96497 12.7033 3.15894 13.3703 3.49687 13.8357L3.49759 13.8367C3.92863 14.4325 4.3957 14.9764 4.89269 15.4654C5.18793 15.7559 5.19175 16.2308 4.90122 16.526C4.61069 16.8213 4.13584 16.8251 3.8406 16.5346C3.28219 15.9851 2.76085 15.3774 2.28234 14.716C1.72077 13.942 1.46497 12.9478 1.46497 11.995C1.46497 11.0419 1.72088 10.0475 2.2827 9.27342ZM18.7729 7.18838C19.0534 6.88361 19.5279 6.86393 19.8327 7.14444C20.5154 7.77278 21.1469 8.48525 21.7176 9.27392C22.2792 10.0479 22.535 11.0421 22.535 11.995C22.535 12.948 22.279 13.9424 21.7172 14.7165C19.3071 18.0473 15.8039 20.02 12 20.02C10.5114 20.02 9.06377 19.717 7.70845 19.1455C7.32679 18.9846 7.14786 18.5447 7.30881 18.163C7.46976 17.7813 7.90964 17.6024 8.2913 17.7634C9.46746 18.2594 10.7172 18.52 12 18.52C15.2559 18.52 18.3325 16.8356 20.5023 13.8367L20.5031 13.8357C20.841 13.3703 21.035 12.7033 21.035 11.995C21.035 11.2866 20.841 10.6197 20.5031 10.1542L20.5023 10.1532C19.9883 9.44277 19.423 8.80602 18.8169 8.24813C18.5121 7.96762 18.4924 7.49316 18.7729 7.18838Z"
+                          fill="#000000"></path>
+                        <path id="vector (Stroke)_2" fill-rule="evenodd" clip-rule="evenodd"
+                          d="M12 9.75C10.755 9.75 9.75 10.755 9.75 12C9.75 12.5484 9.94405 13.0481 10.2674 13.4375C10.532 13.7562 10.4881 14.229 10.1694 14.4936C9.85076 14.7582 9.37792 14.7144 9.11332 14.3957C8.57407 13.7462 8.25 12.9102 8.25 12C8.25 9.92657 9.92657 8.25 12 8.25C13.0215 8.25 13.9486 8.658 14.6243 9.31951C14.9203 9.60929 14.9253 10.0841 14.6355 10.3801C14.3457 10.6761 13.8709 10.6811 13.5749 10.3913C13.1691 9.99399 12.6147 9.75 12 9.75ZM15 11.25C15.4142 11.25 15.75 11.5858 15.75 12C15.75 14.0734 14.0734 15.75 12 15.75C11.5858 15.75 11.25 15.4142 11.25 15C11.25 14.5858 11.5858 14.25 12 14.25C13.245 14.25 14.25 13.245 14.25 12C14.25 11.5858 14.5858 11.25 15 11.25Z"
+                          fill="#000000"></path>
+                        <path id="vector (Stroke)_3" fill-rule="evenodd" clip-rule="evenodd"
+                          d="M22.5533 2.19366C22.8329 2.49926 22.8119 2.97366 22.5063 3.25328L2.5063 21.5533C2.2007 21.8329 1.7263 21.8118 1.44668 21.5062C1.16706 21.2006 1.18812 20.7262 1.49371 20.4466L21.4937 2.14663C21.7993 1.86701 22.2737 1.88807 22.5533 2.19366Z"
+                          fill="#000000"></path>
+                      </g>
+                    </g>
+                  </g>
+                </svg>
+                <svg width="28px" height="28px" viewBox="-2.4 -2.4 28.80 28.80" fill="none" v-else
+                  xmlns="http://www.w3.org/2000/svg" stroke="#000000" stroke-width="0.00024000000000000003">
+                  <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                  <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#CCCCCC"
+                    stroke-width="0.624"></g>
+                  <g id="SVGRepo_iconCarrier">
+                    <g id="style=doutone">
+                      <g id="eye-open">
+                        <path id="vector (Stroke)" fill-rule="evenodd" clip-rule="evenodd"
+                          d="M12 9.75C10.755 9.75 9.75 10.755 9.75 12C9.75 13.245 10.755 14.25 12 14.25C13.245 14.25 14.25 13.245 14.25 12C14.25 10.755 13.245 9.75 12 9.75ZM8.25 12C8.25 9.92657 9.92657 8.25 12 8.25C14.0734 8.25 15.75 9.92657 15.75 12C15.75 14.0734 14.0734 15.75 12 15.75C9.92657 15.75 8.25 14.0734 8.25 12Z"
+                          fill="#000000"></path>
+                        <path id="vector (Stroke)_2" fill-rule="evenodd" clip-rule="evenodd"
+                          d="M2.28282 9.27342C4.69299 5.94267 8.19618 3.96997 12.0001 3.96997C15.8042 3.96997 19.3075 5.94286 21.7177 9.27392C22.2793 10.0479 22.5351 11.0421 22.5351 11.995C22.5351 12.948 22.2792 13.9424 21.7174 14.7165C19.3072 18.0473 15.804 20.02 12.0001 20.02C8.19599 20.02 4.69264 18.0471 2.28246 14.716C1.7209 13.942 1.46509 12.9478 1.46509 11.995C1.46509 11.0419 1.721 10.0475 2.28282 9.27342ZM12.0001 5.46997C8.74418 5.46997 5.66753 7.15436 3.49771 10.1532L3.497 10.1542C3.15906 10.6197 2.96509 11.2866 2.96509 11.995C2.96509 12.7033 3.15906 13.3703 3.497 13.8357L3.49771 13.8367C5.66753 16.8356 8.74418 18.52 12.0001 18.52C15.256 18.52 18.3326 16.8356 20.5025 13.8367L20.5032 13.8357C20.8411 13.3703 21.0351 12.7033 21.0351 11.995C21.0351 11.2866 20.8411 10.6197 20.5032 10.1542L20.5025 10.1532C18.3326 7.15436 15.256 5.46997 12.0001 5.46997Z"
+                          fill="#000000"></path>
+                      </g>
+                    </g>
+                  </g>
+                </svg>
+              </div>
+              <LabelToInput icon="password" forLabel="personal-information" />
+            </TextInput>
+          </div>
         </div>
-      </div>
-      <div class="mb-4 md:flex flex-row justify-center">
-        <div class="mb-4 md:mr-2 md:mb-0 px-1">
-          <GeneralButton @click="saveNewPassword()" color="bg-green-700  hover:bg-green-800" text="Guardar" icon="add" />
+        <div class="mb-4 md:flex flex-row justify-center">
+          <div class="mb-4 md:mr-2 md:mb-0 px-1">
+            <GeneralButton @click="saveNewPassword()" color="bg-green-700  hover:bg-green-800" text="Guardar"
+              icon="add" />
+          </div>
+          <div class="mb-4 md:mr-2 md:mb-0 px-1">
+            <GeneralButton text="Cancelar" icon="add" @click="$emit('cerrar-modal')" />
+          </div>
         </div>
-        <div class="mb-4 md:mr-2 md:mb-0 px-1">
-          <GeneralButton text="Cancelar" icon="add" @click="closeModal()" />
-        </div>
-      </div>
-        <div class="text-xs text-slate-500">ISRI2023</div>
+        <div class="text-xs text-slate-500">ISRI {{ moment().format('YYYY') }}</div>
       </div>
     </div>
-    </ModalVue>
+  </ModalVue>
 </template>
 
 <script>
 export default {
-  props: ["showModalChangePassword",'modalDataChangePassword'],
+  props: {
+    showModalChangePassword: {
+      type: Boolean,
+      default: false,
+    },
+    modalData: {
+      type: Array,
+      default: []
+    },
+  }
+  ,
   data: function (data) {
     return {
+      show_password: false,
+      user: {
+        id: '',
+        nick_usuario: '',
+        password: ''
+      }
     }
   },
   methods: {
-    closeModal(){
-      this.modalDataChangePassword.password=''
-      this.$emit('cerrar-modal')
+    //Function to validate data entry
+    validateInput(field, limit) {
+      if (this.user[field] && this.user[field].length > limit) {
+        this.user[field] = this.user[field].substring(0, limit);
+      }
     },
-    saveNewPassword(){
-        if(this.modalDataChangePassword.password==""){
-          this.$swal.fire({
-            title: 'Información incompleta',
-            text: "Debes escribir la nueva contraseña",
-            icon: 'warning',
-            timer: 5000
-          })
-        }else{
-            this.$swal.fire({
-          title: 'Esta seguro de guardar la nueva contraseña',
-          icon: 'question',
-          iconHtml: '✅',
-          confirmButtonText: 'Si, Guardar',
-          confirmButtonColor: '#15803D',
-          cancelButtonText: 'Cancelar',
-          showCancelButton: true,
-          showCloseButton: true
-        }).then((result) => {
-          if (result.isConfirmed) {
-            axios.post("/change-password-user", {
-              id_usuario: this.modalDataChangePassword.id_usuario,
-              password: this.modalDataChangePassword.password,
-            }).then((response) => {
-              toast.success(response.data.mensaje, {
-                autoClose: 3000,
-                position: "top-right",
-                transition: "zoom",
-                toastBackgroundColor: "white",
-              });
-              this.$emit('cerrar-modal')
-              this.modalDataChangePassword.password = ""
-            }).catch((errors) => {
-              let msg = this.manageError(errors)
-              this.$swal.fire({
-                title: 'Operación cancelada',
-                text: msg,
-                icon: 'warning',
-                timer:5000
-              })
-              this.$emit('cerrar-modal')
-              this.modalDataChangePassword.password=''
-            })
-          }
+    toggleShow() {
+      this.show_password = !this.show_password;
+    },
+    saveNewPassword() {
+      if (this.user.password == "") {
+        this.$swal.fire({
+          title: 'Información incompleta',
+          text: "Debes escribir la nueva contraseña",
+          icon: 'warning',
+          timer: 5000
         })
-        }
+      } else {
+        this.$swal
+          .fire({
+            title: '¿Está seguro de guardar la nueva contraseña?',
+            icon: 'question',
+            iconHtml: '❓',
+            confirmButtonText: 'Si, Guardar',
+            confirmButtonColor: '#141368',
+            cancelButtonText: 'Cancelar',
+            showCancelButton: true,
+            showCloseButton: true
+          }).then((result) => {
+            if (result.isConfirmed) {
+              axios.post("/change-password-user", {
+                id_usuario: this.user.id,
+                password: this.user.password,
+              }).then((response) => {
+                toast.success(response.data.mensaje, {
+                  autoClose: 5000,
+                  position: "top-right",
+                  transition: "zoom",
+                  toastBackgroundColor: "white",
+                });
+                this.$emit('cerrar-modal')
+              }).catch((errors) => {
+                let msg = this.manageError(errors)
+                this.$swal.fire({
+                  title: 'Operación cancelada',
+                  text: msg,
+                  icon: 'warning',
+                  timer: 5000
+                })
+                this.$emit('cerrar-modal')
+              })
+            }
+          })
+      }
     }
+  },
+  watch: {
+    showModalChangePassword: function (value, oldValue) {
+      if (value) {
+        //this.errors = [];
+        this.user.id = this.modalData.id_usuario
+        this.user.nick_usuario = this.modalData.nick_usuario;
+        this.user.password = this.modalData.password_usuario;
+      }
+    },
   },
 };
 </script>

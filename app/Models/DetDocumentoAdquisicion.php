@@ -35,4 +35,8 @@ class DetDocumentoAdquisicion extends Model
     {
         return $this->belongsTo('App\Models\ProyectoFinanciado','id_proy_financiado','id_proy_financiado');
     }
+    public function quedan()
+    {
+        return $this->hasMany('App\Models\Quedan','id_det_doc_adquisicion','id_det_doc_adquisicion');
+    }
 }
