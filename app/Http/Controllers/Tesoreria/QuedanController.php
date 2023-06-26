@@ -347,7 +347,7 @@ class QuedanController extends Controller
                 'nombre_proy_financiado AS label',
             )->get();
 
-        $documentosAdquisicion = DB::table('documento_adquisicion')
+            $documentosAdquisicion = DB::table('documento_adquisicion')
             ->select(
                 'detalle_documento_adquisicion.id_det_doc_adquisicion as value',
                 DB::raw("UPPER(CONCAT(documento_adquisicion.numero_doc_adquisicion, ' - COMPROMISO ', detalle_documento_adquisicion.compromiso_ppto_det_doc_adquisicion, ' - ',proyecto_financiado.codigo_proy_financiado)) AS label"),
@@ -357,12 +357,25 @@ class QuedanController extends Controller
                 'documento_adquisicion.monto_doc_adquisicion',
                 'detalle_documento_adquisicion.compromiso_ppto_det_doc_adquisicion',
                 'tipo_documento_adquisicion.id_tipo_doc_adquisicion',
-                'tipo_documento_adquisicion.nombre_tipo_doc_adquisicion'
+                'tipo_documento_adquisicion.nombre_tipo_doc_adquisicion',
+                DB::raw('IFNULL(SUM(quedan.monto_liquido_quedan),0) as total_amount')
             )
             ->join('detalle_documento_adquisicion', 'documento_adquisicion.id_doc_adquisicion', '=', 'detalle_documento_adquisicion.id_doc_adquisicion')
             ->join('proyecto_financiado', 'detalle_documento_adquisicion.id_proy_financiado', '=', 'proyecto_financiado.id_proy_financiado')
             ->join('proveedor', 'proveedor.id_proveedor', '=', 'documento_adquisicion.id_proveedor')
             ->join('tipo_documento_adquisicion', 'tipo_documento_adquisicion.id_tipo_doc_adquisicion', '=', 'documento_adquisicion.id_tipo_doc_adquisicion')
+            ->leftJoin('quedan', 'detalle_documento_adquisicion.id_det_doc_adquisicion', '=', 'quedan.id_det_doc_adquisicion')
+            ->groupBy(
+                'detalle_documento_adquisicion.id_det_doc_adquisicion',
+                'documento_adquisicion.numero_doc_adquisicion',
+                'documento_adquisicion.monto_doc_adquisicion',
+                'detalle_documento_adquisicion.compromiso_ppto_det_doc_adquisicion',
+                'tipo_documento_adquisicion.id_tipo_doc_adquisicion',
+                'tipo_documento_adquisicion.nombre_tipo_doc_adquisicion',
+                'proveedor.id_proveedor',
+                'proyecto_financiado.id_proy_financiado',
+                'proyecto_financiado.codigo_proy_financiado'
+            )
             ->get();
 
 
