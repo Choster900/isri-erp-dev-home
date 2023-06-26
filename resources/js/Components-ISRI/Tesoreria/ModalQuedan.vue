@@ -199,14 +199,13 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                         <td class="border-2 border-black"
                                             :class="{ 'bg-[#fdfd96]': dataInputs.numero_doc_adquisicion == '' }">
                                             <input type="text" v-model="dataInputs.numero_doc_adquisicion" maxlength="20"
-                                                :disabled="dataInputs.compromiso_ppto_det_doc_adquisicion == '' ? false : true"
+                                                :disabled="documentoAdquisicion == '' ? false : true"
                                                 class="peer w-full text-sm bg-transparent text-center h-10 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                         </td>
                                         <td class="border-2 border-black"
                                             :class="{ 'bg-[#fdfd96]': dataInputs.compromiso_ppto_det_doc_adquisicion == '' }">
                                             <input type="text" v-model="dataInputs.compromiso_ppto_det_doc_adquisicion"
-                                                :disabled="dataInputs.compromiso_ppto_det_doc_adquisicion == '' ? false : true"
-                                                maxlength="20"
+                                                :disabled="documentoAdquisicion == '' ? false : true" maxlength="20"
                                                 class="peer w-full text-sm bg-transparent text-center h-10 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                         </td>
                                         <td class="border-2 border-black"
@@ -642,11 +641,8 @@ export default {
                 // Filtrar los contratos por proveedor
                 const filteredContracts = JSON.parse(JSON.stringify(this.dataForSelectInRow.documentoAdquisicion.filter((doc) => doc.id_proveedor === supplier)));
 
-
                 let tipos = JSON.parse(JSON.stringify(this.dataForSelectInRow.tipoAdquisicion))
-                console.log(tipos);
 
-                console.log(this.dataInputs.nombre_tipo_doc_adquisicion);
                 if (filteredContracts != "") {
                     this.documentoAdquisicion = filteredContracts
                     this.dataInputs.nombre_tipo_doc_adquisicion = ''
@@ -696,7 +692,6 @@ export default {
             //al seleccionar contrato
             if (id_documentoAdquisicion != null) {
                 let document = JSON.parse(JSON.stringify(this.dataForSelectInRow.documentoAdquisicion.find((doc) => doc.value === id_documentoAdquisicion)))
-                console.log(document.nombre_tipo_doc_adquisicion);
                 this.dataInputs.id_tipo_doc_adquisicion = document.id_tipo_doc_adquisicion
                 this.dataInputs.nombre_tipo_doc_adquisicion = document.nombre_tipo_doc_adquisicion
                 this.dataInputs.numero_doc_adquisicion = document.numero_doc_adquisicion
@@ -754,13 +749,11 @@ export default {
                 let ivaByFila = liquido * this.dataForCalculate.iva;
 
                 // Obtener la suma de los totales de todas las facturas que ha tenido en el mes y sumando el monto acual
-                let sum = (parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) || 0) + (parseFloat(totalMonto) || 0);
-
-                // Validando si el proveedor tiene contrato o no
-                if (this.documentoAdquisicion !== "") {
+                // let sum = (parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) || 0) + (parseFloat(totalMonto) || 0);
+                // Validando si el proveedor tiene contrato o no  
+                if (this.documentoAdquisicion != "") {
                     //Si la suma total de todas las facturas de el proveedor seleccionado es mayor al el monto del contrato u orden de compra se calculas las retenciones
-                    if (this.dataForCalculate.monto_doc_adquisicion <= sum) {
-
+                    if (113 <= this.dataForCalculate.monto_doc_adquisicion) {
                         rowsData[index]["retenciones"].iva = ivaByFila.toFixed(2);
                         let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
                         rowsData[index]["retenciones"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : (0).toFixed(2);
@@ -769,7 +762,7 @@ export default {
                         rowsData[index]["retenciones"].renta = (0).toFixed(2);
                     }
                 } else {// Si el el proveedor no tiene contrato se asimila que es una factura por lo cual solo se valida que no pase de los 113 dolares
-                    if (113 <= sum) {
+                    if (totalMonto >= 113) {
                         rowsData[index]["retenciones"].iva = ivaByFila.toFixed(2);
                         let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
                         rowsData[index]["retenciones"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : (0).toFixed(2);

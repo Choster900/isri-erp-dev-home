@@ -11,7 +11,7 @@ import axios from 'axios';
         @close="$emit('close-definitive')">
 
         <div class="flex flex-col md:flex-row  md:space-y-0 p-3">
-            <div class="flex-1 px-3 pt-3 shadow-lg   rounded-2xl shadow-black border bg-gray-100 ">
+            <div class="flex-1 px-3 pt-3 shadow-2xl   rounded-xl shadow-black border bg-gray-100 ">
                 <div class="mb-7 md:flex flex-row justify-items-start">
                     <div class="mb-4 md:mr-2 md:mb-0 basis-full">
                         <label class="block mb-2 text-xs font-light text-gray-600">

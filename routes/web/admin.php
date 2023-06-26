@@ -42,6 +42,10 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get('get-dui', [UserController::class, 'getDui'])->name('user.getDui');
     Route::post('save-user', [UserController::class, 'saveUser'])->name('user.saveUser');
 
+    Route::get('get-selects-create-user', [UserController::class, 'getSelectsCreateUser'])->name('user.getSelectsCreateUser');
+    Route::get('get-roles-user', [UserController::class, 'getRolesUser'])->name('user.getRolesUser');
+    //Route::get('get-roles-per-sistema', [UserController::class, 'getRolesPerSistema'])->name('user.getRolesPerSistema');
+
     //Manage Roles
     //This route obtains roles based on the parameters sent from the page.
     Route::get('roles', [RolController::class, 'getRoles'])->name('rol.getRoles');
