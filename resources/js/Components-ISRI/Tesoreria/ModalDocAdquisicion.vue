@@ -152,8 +152,7 @@ import axios from "axios";
                         <div class="mb-4 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-full">
                                 <TextInput id="item-name" v-model="array_item.name" :value="array_item.name" type="text"
-                                    placeholder="Nombre"
-                                    @update:modelValue="validateItemInput('name', 250, monto = false)">
+                                    placeholder="Nombre" @update:modelValue="validateItemInput('name', 250, monto = false)">
                                     <LabelToInput icon="standard" forLabel="item-name" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="item_errors.name" />
@@ -179,7 +178,7 @@ import axios from "axios";
                                     :text="new_item ? 'Agregar' : 'Actualizar'" icon="add" @click="addItem()" />
                             </div>
                         </div>
-                        
+
                         <!-- Items table -->
                         <div class="tabla-modal">
                             <table class="w-full" id="">
@@ -254,29 +253,6 @@ import axios from "axios";
                     <!-- Buttons to navigate -->
                     <div class="flex justify-center mt-5">
                         <div class="flex items-center mr-1">
-                            <button v-if="currentPage != 1"
-                                class="flex items-center bg-gray-600 hover:bg-gray-700 text-white pl-2 pr-3 py-1.5 text-center mb-2 rounded"
-                                :disabled="currentPage === 1" @click="goToPreviousPage">
-                                <svg width="20px" height="20px" viewBox="-3 0 32 32" version="1.1"
-                                    xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                                    fill="#ffffff" stroke="#ffffff">
-                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                                    <g id="SVGRepo_iconCarrier">
-                                        <g id="icomoon-ignore"> </g>
-                                        <path
-                                            d="M13.114 2.887c-7.243 0-13.114 5.871-13.114 13.113s5.871 13.113 13.114 13.113c7.242 0 13.112-5.871 13.112-13.113s-5.87-13.113-13.112-13.113zM13.114 28.064c-6.653 0-12.065-5.412-12.065-12.064s5.412-12.063 12.065-12.063c6.652 0 12.063 5.412 12.063 12.063s-5.411 12.064-12.063 12.064z"
-                                            fill="#ffffff"> </path>
-                                        <path
-                                            d="M12.318 10.363l-0.742-0.742-6.379 6.379 6.379 6.379 0.742-0.742-5.113-5.113h12.726v-1.049h-12.726z"
-                                            fill="#ffffff"> </path>
-                                    </g>
-                                </svg>
-                                <span class="ml-1 px-1 py-2.5 text-base text-gray-100 border-l-2 border-gray-100"></span>
-                                <div class="text-[12px]">ANTERIOR</div>
-                            </button>
-                        </div>
-                        <div class="flex items-center ml-1">
                             <button v-if="currentPage != 2"
                                 class="flex items-center bg-blue-600 hover:bg-blue-700 text-white pl-3 pr-2 py-1.5 text-center mb-2 rounded"
                                 :disabled="disabled_next_button" @click="goToNextPage">
@@ -299,11 +275,41 @@ import axios from "axios";
                                     </g>
                                 </svg>
                             </button>
+                        </div>
+                        <div class="flex items-center ml-1">
+                            <div class="flex w-1/2">
+                                <button v-if="currentPage != 1"
+                                    class="flex items-center bg-gray-600 hover:bg-gray-700 text-white pl-2 pr-3 py-1.5 text-center mb-2 rounded"
+                                    :disabled="currentPage === 1" @click="goToPreviousPage">
+                                    <svg width="20px" height="20px" viewBox="-3 0 32 32" version="1.1"
+                                        xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                                        fill="#ffffff" stroke="#ffffff">
+                                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                        <g id="SVGRepo_iconCarrier">
+                                            <g id="icomoon-ignore"> </g>
+                                            <path
+                                                d="M13.114 2.887c-7.243 0-13.114 5.871-13.114 13.113s5.871 13.113 13.114 13.113c7.242 0 13.112-5.871 13.112-13.113s-5.87-13.113-13.112-13.113zM13.114 28.064c-6.653 0-12.065-5.412-12.065-12.064s5.412-12.063 12.065-12.063c6.652 0 12.063 5.412 12.063 12.063s-5.411 12.064-12.063 12.064z"
+                                                fill="#ffffff"> </path>
+                                            <path
+                                                d="M12.318 10.363l-0.742-0.742-6.379 6.379 6.379 6.379 0.742-0.742-5.113-5.113h12.726v-1.049h-12.726z"
+                                                fill="#ffffff"> </path>
+                                        </g>
+                                    </svg>
+                                    <span
+                                        class="ml-1 px-1 py-2.5 text-base text-gray-100 border-l-2 border-gray-100"></span>
+                                    <div class="text-[12px]">ANTERIOR</div>
+                                </button>
+                            </div>
 
-                            <GeneralButton v-if="modalData != '' && currentPage === 2" @click="updateNewAcqDoc()"
-                                color="bg-orange-700 hover:bg-orange-800" text="Actualizar doc." icon="update" />
-                            <GeneralButton v-if="modalData == '' && currentPage === 2" @click="saveNewAcqDoc()"
-                                color="bg-green-700 hover:bg-green-800" text="Guardar doc." icon="add" />
+                            <div class="w-1/2">
+                                <GeneralButton v-if="modalData != '' && currentPage === 2 && !itemSelected"
+                                    @click="updateNewAcqDoc()" color="bg-orange-700 hover:bg-orange-800"
+                                    text="Actualizar" icon="update" class="" />
+                                <GeneralButton v-if="modalData == '' && currentPage === 2 && !itemSelected"
+                                    @click="saveNewAcqDoc()" color="bg-green-700 hover:bg-green-800" text="Guardar"
+                                    icon="add" class="" />
+                            </div>
                         </div>
 
                     </div>
@@ -822,6 +828,7 @@ export default {
                 this.backend_errors = []
                 this.item_errors = []
                 this.index_errors = []
+                this.new_item = true
                 this.acq_doc = Object.assign({}, {
                     id: this.modalData.id_doc_adquisicion ?? '',
                     type_id: this.modalData.id_tipo_doc_adquisicion ?? '',
@@ -870,6 +877,14 @@ export default {
                 }
             } else {
                 return false;
+            }
+        },
+        itemSelected() {
+            const itemToClean = this.acq_doc.items.find(item => item.selected);
+            if (itemToClean) {
+                return true
+            } else {
+                return false
             }
         }
     }
