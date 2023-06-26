@@ -122,16 +122,14 @@
         </table>
         <table>
             <tr>
-                <td class="text-[11pt] font-bold" v-if="dataQuedan.acuerdo_compra.id_acuerdo_compra === 1">{{dataQuedan.acuerdo_compra.nombre_acuerdo_compra }} N°</td>
-                <td class="text-[11pt] font-bold" v-if="dataQuedan.acuerdo_compra.id_acuerdo_compra === 2">{{dataQuedan.acuerdo_compra.nombre_acuerdo_compra }} N°</td>
-                <td class="text-[11pt] font-bold" v-if="dataQuedan.acuerdo_compra.id_acuerdo_compra === 3">{{dataQuedan.acuerdo_compra.nombre_acuerdo_compra }} N°</td>
-                <td class="text-[11pt] font-bold" v-if="dataQuedan.acuerdo_compra.id_acuerdo_compra === 4">{{dataQuedan.acuerdo_compra.nombre_acuerdo_compra }}</td>
+                <td class="text-[11pt] font-bold"> {{dataQuedan.tipo_documento_adquisicion.nombre_tipo_doc_adquisicion }}</td>
+
                 <td class="border border-b-black border-x-transparent border-t-transparent w-[200px]">
                     <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
                         <span style="font-family:  Arial, Helvetica, sans-serif;">{{dataQuedan.numero_acuerdo_quedan }}</span>
                     </div>
                 </td>
-            </tr>
+            </tr> -->
         </table>
         <table>
             <tr>
@@ -343,7 +341,7 @@
             </tr>
         </table>
         <table>
-            <tr>
+            <!-- <tr>
                 <td class="text-[11pt] font-bold" v-if="dataQuedan.acuerdo_compra.id_acuerdo_compra === 1">{{
                     dataQuedan.acuerdo_compra.nombre_acuerdo_compra }} N°</td>
                 <td class="text-[11pt] font-bold" v-if="dataQuedan.acuerdo_compra.id_acuerdo_compra === 2">{{
@@ -359,7 +357,7 @@
                             dataQuedan.numero_acuerdo_quedan }}</span>
                     </div>
                 </td>
-            </tr>
+            </tr> -->
         </table>
         <table>
             <tr>

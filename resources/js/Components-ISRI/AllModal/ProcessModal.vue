@@ -40,9 +40,9 @@ const close = () => {
 };
 
 const closeOnEscape = (e) => {
-    /* if (e.key === 'Escape' && props.show) {
+    if (e.key === 'Escape' && props.show) {
         close();
-    } */
+    }
 };
 
 onMounted(() => document.addEventListener('keydown', closeOnEscape));

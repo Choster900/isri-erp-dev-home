@@ -22,6 +22,7 @@ class Quedan extends Model
         'id_proy_financiado',
         'id_acuerdo_compra',
         'id_serie_retencion_iva',
+        'id_tipo_doc_adquisicion',
         'id_proveedor',
         'numero_quedan',
         'numero_retencion_iva_quedan',
@@ -49,6 +50,10 @@ class Quedan extends Model
     public function proveedor()
     { //(FOREING KEY, PRIMARY KEY)
         return $this->belongsTo(Proveedor::class, "id_proveedor", "id_proveedor");
+    }
+    public function tipo_documento_adquisicion()
+    { //(FOREING KEY, PRIMARY KEY)
+        return $this->belongsTo(TipoDocumentoAdquisicion::class, "id_tipo_doc_adquisicion", "id_tipo_doc_adquisicion");
     }
     public function tesorero()
     { //(FOREING KEY, PRIMARY KEY)
