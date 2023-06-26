@@ -168,7 +168,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                     noOptionsText="<p class='text-xs'>sin proveedores<p>"
                                                     noResultsText="<p class='text-xs'>sin registros<p>"
                                                     :options="dataForSelectInRow.proveedor" :searchable="true"
-                                                    @input="getInformationBySupplier($event)" />
+                                                    @change="getInformationBySupplier($event)" />
                                             </div>
                                         </td>
                                         <th class="border-2 border-black text-xs text-gray-600" colspan="2">

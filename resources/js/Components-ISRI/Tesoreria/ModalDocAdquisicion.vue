@@ -113,6 +113,7 @@ import axios from "axios";
                                 Página 2 de 2
                             </span>
                         </div>
+
                         <!-- Item inputs -->
                         <!-- First row -->
                         <div class="mb-4 md:flex flex-row justify   Detalles-start">
@@ -129,7 +130,7 @@ import axios from "axios";
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="commt-number" v-model="array_item.commitment_number"
-                                    :value="array_item.commitment_number" type="text" placeholder="Numero compromiso(s)"
+                                    :value="array_item.commitment_number" type="text" placeholder="Numero(s) compromiso(s)"
                                     @update:modelValue="validateItemInput('commitment_number', 20, false, commitment_number = true)">
                                     <LabelToInput icon="objects" forLabel="commt-number" />
                                 </TextInput>
@@ -140,7 +141,7 @@ import axios from "axios";
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="amount" v-model="array_item.amount" :value="array_item.amount" type="text"
-                                    placeholder="Monto compromiso"
+                                    placeholder="Monto detalle"
                                     @update:modelValue="validateItemInput('amount', 11, monto = true)">
                                     <LabelToInput icon="money" forLabel="amount" />
                                 </TextInput>
@@ -151,7 +152,7 @@ import axios from "axios";
                         <div class="mb-4 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-full">
                                 <TextInput id="item-name" v-model="array_item.name" :value="array_item.name" type="text"
-                                    placeholder="Nombre Item"
+                                    placeholder="Nombre"
                                     @update:modelValue="validateItemInput('name', 250, monto = false)">
                                     <LabelToInput icon="standard" forLabel="item-name" />
                                 </TextInput>
@@ -178,6 +179,7 @@ import axios from "axios";
                                     :text="new_item ? 'Agregar' : 'Actualizar'" icon="add" @click="addItem()" />
                             </div>
                         </div>
+                        
                         <!-- Items table -->
                         <div class="tabla-modal">
                             <table class="w-full" id="">
@@ -196,7 +198,7 @@ import axios from "axios";
                                             :class="[
                                                 'hover:bg-[#141414]/10',
                                                 'border-b-2',
-                                                item.selected ? 'bg-green-300 hover:bg-green-400' :
+                                                item.selected ? 'bg-orange-300 hover:bg-orange-400' :
                                                     index_errors.includes(index) ? 'bg-red-300 hover:bg-red-400' : '']">
                                             <td class="text-center">{{ item.commitment_number }}</td>
                                             <td class="text-center">{{ item.name }}</td>
