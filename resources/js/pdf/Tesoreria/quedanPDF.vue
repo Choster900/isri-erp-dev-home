@@ -129,7 +129,7 @@
                         <span style="font-family:  Arial, Helvetica, sans-serif;">{{dataQuedan.numero_acuerdo_quedan }}</span>
                     </div>
                 </td>
-            </tr>
+            </tr> -->
         </table>
         <table>
             <tr>
