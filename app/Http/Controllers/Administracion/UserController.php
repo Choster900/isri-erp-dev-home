@@ -223,7 +223,10 @@ class UserController extends Controller
     //Methods to create a new user
     public function getDui(Request $request)
     {
-        $person = Persona::select(DB::raw('CONCAT(pnombre_persona," ",IFNULL(snombre_persona,"")," ",IFNULL(tnombre_persona,"")," ",papellido_persona," ",IFNULL(sapellido_persona,"")," ",IFNULL(tapellido_persona,"")) AS nombre_persona'), 'id_persona', 'fecha_nac_persona')
+        $person = Persona::select(DB::raw('CONCAT(pnombre_persona," ",IFNULL(snombre_persona,"")," ",IFNULL(tnombre_persona,"")," ",papellido_persona," ",IFNULL(sapellido_persona,"")," ",IFNULL(tapellido_persona,"")) AS nombre_persona'), 'id_persona', 'fecha_nac_persona', 'telefono_persona','nombre_municipio')
+            ->join('municipio', function ($join) {
+                $join->on('persona.id_municipio', '=', 'municipio.id_municipio');
+            })
             ->where('dui_persona', '=', $request->input('dui'))
             ->first();
         if ($person) {
