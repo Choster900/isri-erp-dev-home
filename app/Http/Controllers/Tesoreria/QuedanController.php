@@ -365,6 +365,8 @@ class QuedanController extends Controller
             ->join('proyecto_financiado', 'detalle_documento_adquisicion.id_proy_financiado', '=', 'proyecto_financiado.id_proy_financiado')
             ->join('proveedor', 'proveedor.id_proveedor', '=', 'documento_adquisicion.id_proveedor')
             ->join('tipo_documento_adquisicion', 'tipo_documento_adquisicion.id_tipo_doc_adquisicion', '=', 'documento_adquisicion.id_tipo_doc_adquisicion')
+            ->where('detalle_documento_adquisicion.estado_det_doc_adquisicion', 1)
+            ->where('documento_adquisicion.estado_doc_adquisicion', 1)
             ->get();
 
 

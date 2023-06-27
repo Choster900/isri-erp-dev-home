@@ -1,6 +1,6 @@
 <script setup>
-import Modal from "@/Components/Modal.vue";
-import ModalBasicVue from "@/Components-ISRI/AllModal/ModalBasic.vue";
+import Modal from "@/Components-ISRI/AllModal/Modal.vue";
+
 import InputError from "@/Components/InputError.vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
@@ -9,7 +9,7 @@ import axios from "axios";
 
 <template>
     <div class="m-1.5">
-        <ModalBasicVue :modalOpen="showModalIncome" @close-modal="$emit('cerrar-modal')" :title="'Concepto de ingresos. '"
+        <Modal :show="showModalIncome"  @close="$emit('cerrar-modal')" :modal-title="'Concepto de ingresos. '"
             maxWidth="3xl">
             <div class="px-5 py-4">
                 <div class="text-sm">
@@ -97,7 +97,7 @@ import axios from "axios";
                     <div class="text-xs text-slate-500">ISRI2023</div>
                 </div>
             </div>
-        </ModalBasicVue>
+        </Modal>
     </div>
 </template>
 

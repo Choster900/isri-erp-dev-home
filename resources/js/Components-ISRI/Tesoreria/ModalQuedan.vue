@@ -11,16 +11,20 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                 <div class="text-center">
                     <div class=" flex   justify-center pt-2 content-between">
                         <div class="px-2" v-if="dataQuedan == ''">
-                            <GeneralButton color="bg-green-700   hover:bg-green-800" text="AGREGAR" icon="add"
-                                @click="createQuedan()" />
+                            <template v-if="this.dataForCalculate.montoSuperador == false">
+                                <GeneralButton color="bg-green-700   hover:bg-green-800" text="AGREGAR" icon="add"
+                                    @click="createQuedan()" />
+                            </template>
+                            <div v-else class="py-4"></div>
                         </div>
                         <div class="px-2" v-else>
-                            <template v-if="dataQuedan.id_estado_quedan === 1">
+
+                            <template v-if="this.dataForCalculate.montoSuperador == false">
                                 <GeneralButton
                                     :color="['bg-orange-700 hover:bg-orange-800', incoherencia ? 'animate-pulse animate-infinite animate-duration-[3000ms]' : '']"
                                     text="MODIFICAR" icon="update" @click="updateQuedan()" />
                             </template>
-                            <div v-else class="my-10"> </div>
+                            <div v-else class="py-4"></div>
                         </div>
                         <svg class="h-7 w-7 absolute top-0 right-0 mt-2 cursor-pointer" viewBox="0 0 25 25"
                             @click="$emit('cerrar-modal')">
@@ -168,7 +172,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                     noOptionsText="<p class='text-xs'>sin proveedores<p>"
                                                     noResultsText="<p class='text-xs'>sin registros<p>"
                                                     :options="dataForSelectInRow.proveedor" :searchable="true"
-                                                    @change="getInformationBySupplier($event)" />
+                                                    @input="getInformationBySupplier($event)" />
                                             </div>
                                         </td>
                                         <th class="border-2 border-black text-xs text-gray-600" colspan="2">
@@ -466,7 +470,6 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                         </th>
                                     </tr>
                                     <tr>
-
                                         <td class="border-2 border-black " colspan="1" contenteditable="false">
                                             <div class="relative flex h-8 w-full flex-row-reverse "
                                                 :class="{ 'condition-select': dataInputs.id_prioridad_pago == '' || dataInputs.id_prioridad_pago === null }">
@@ -479,7 +482,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                             <div class="relative flex h-8 w-full flex-row-reverse "
                                                 :class="{ 'condition-select': dataInputs.id_proy_financiado == '' }">
                                                 <Multiselect v-model="dataInputs.id_proy_financiado"
-                                                    :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
+                                                    :disabled="dataQuedan.id_estado_quedan > 1 ? true : documentoAdquisicion != '' ? true : false"
                                                     :options="dataForSelectInRow.proyectoFinanciado" :searchable="true" />
                                             </div>
                                         </td>
@@ -567,7 +570,7 @@ export default {
                 iva: '',
                 id_proveedor: '',
                 dui_proveedor: '',
-                monto_liquido_quedan: '',
+                montoLiquidoQuedan: '',
                 monto_iva_quedan: '',
                 monto_isr_quedan: '',
                 monto_total_quedan: '',
@@ -575,6 +578,7 @@ export default {
                 monto_doc_adquisicion: '',
                 montoTotalDetalleDocumentoAdquisicion: '',//OBTIENE EL TOTAL UTILIZADO 
                 monto_det_doc_adquisicion: '',//OBTIENE EL TOTAL DEL DETALLE QUE ESTA EN LA BASE
+                montoSuperador: false,
             },
             config: {
                 altInput: true,
@@ -724,93 +728,78 @@ export default {
 
         taxesByRow() {
             // Filtrar los elementos que no se han eliminado
-            let rowsData = this.rowsData.filter(element => element['isDelete'] === true);
+            const rowsData = this.rowsData.filter(element => element['isDelete'] === true);
 
             // Calcular el total del monto
-            let totalMonto = rowsData.reduce((monto, obj) => {
+            const totalMonto = rowsData.reduce((monto, obj) => {
                 let productoMont = parseFloat(obj["monto"].producto_factura_det_quedan) || 0;
                 let servicioMont = parseFloat(obj["monto"].servicio_factura_det_quedan) || 0;
                 let ajusteProductoMont = parseFloat(obj["reajuste_monto"].ajuste_producto_factura_det_quedan) || 0;
                 let ajusteServicioMont = parseFloat(obj["reajuste_monto"].ajuste_servicio_factura_det_quedan) || 0;
-
                 let subtotal = obj["reajuste"] ? ajusteProductoMont + ajusteServicioMont : productoMont + servicioMont;
                 return monto + (isNaN(subtotal) ? 0 : subtotal);
             }, 0);
 
+            const totalCalculosMonto = rowsData.reduce((monto, obj) => {
+                let productoMont = parseFloat(obj["monto"].producto_factura_det_quedan) || 0;
+                let servicioMont = parseFloat(obj["monto"].servicio_factura_det_quedan) || 0;
+                let subtotal = productoMont + servicioMont;
+                return monto + (isNaN(subtotal) ? 0 : subtotal);
+            }, 0);
+
+
             // Recorre todas las filas del detalle del quedan
             rowsData.forEach((element, index) => {
-                let productoMont = 0;
-                let servicioMont = 0;
-
                 // Obtener los montos de producto y servicio dependiendo de si existe un reajuste o no
-                if (!element.reajuste) {
-                    productoMont = parseFloat(element.monto['producto_factura_det_quedan']) || 0;
-                    servicioMont = parseFloat(element.monto['servicio_factura_det_quedan']) || 0;
-                } else {
-                    productoMont = parseFloat(element.reajuste_monto['ajuste_producto_factura_det_quedan']) || 0;
-                    servicioMont = parseFloat(element.reajuste_monto['ajuste_servicio_factura_det_quedan']) || 0;
-                }
+                const productoMont = element.reajuste ? parseFloat(element.reajuste_monto.ajuste_producto_factura_det_quedan) || 0 : parseFloat(element.monto.producto_factura_det_quedan) || 0;
+                const servicioMont = element.reajuste ? parseFloat(element.reajuste_monto.ajuste_servicio_factura_det_quedan) || 0 : parseFloat(element.monto.servicio_factura_det_quedan) || 0;
 
                 // Sumando los producto y servicios de todas las filas
-                let amountByRow = productoMont + servicioMont;
+                const amountByRow = productoMont + servicioMont;
                 // Diviendo entre 1.13
-                let liquido = amountByRow / 1.13;
+                const liquido = amountByRow / 1.13;
                 // Tomando el iva del monto liquido que se divio antes por el porcentaje del proveedor que se ha seleccionado
-                let ivaByFila = liquido * this.dataForCalculate.iva;
+                const ivaByFila = liquido * this.dataForCalculate.iva;
 
-                // Obtener la suma de los totales de todas las facturas que ha tenido en el mes y sumando el monto acual
-                // let sum = (parseFloat(this.dataForCalculate.monto_total_quedan_por_proveedor) || 0) + (parseFloat(totalMonto) || 0);
                 // Validando si el proveedor tiene contrato o no  
+                const totalFacturas = this.dataForCalculate.monto_doc_adquisicion;
+                const montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
                 if (this.documentoAdquisicion != "") {
-                    //Si la suma total de todas las facturas de el proveedor seleccionado es mayor al el monto del contrato u orden de compra se calculas las retenciones
-                    if (113 <= this.dataForCalculate.monto_doc_adquisicion) {
-                        rowsData[index]["retenciones"].iva = ivaByFila.toFixed(2);
-                        let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
-                        rowsData[index]["retenciones"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : (0).toFixed(2);
-                    } else {
-                        rowsData[index]["retenciones"].iva = (0).toFixed(2);
-                        rowsData[index]["retenciones"].renta = (0).toFixed(2);
-                    }
-                } else {// Si el el proveedor no tiene contrato se asimila que es una factura por lo cual solo se valida que no pase de los 113 dolares
-                    if (totalMonto >= 113) {
-                        rowsData[index]["retenciones"].iva = ivaByFila.toFixed(2);
-                        let montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
-                        rowsData[index]["retenciones"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : (0).toFixed(2);
-                    } else {
-                        rowsData[index]["retenciones"].iva = (0).toFixed(2);
-                        rowsData[index]["retenciones"].renta = (0).toFixed(2);
-                    }
+
+                    rowsData[index]["retenciones"].iva = totalFacturas >= 113 ? ivaByFila.toFixed(2) : (0).toFixed(2);
+                    rowsData[index]["retenciones"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : (0).toFixed(2);
+                } else {
+                    rowsData[index]["retenciones"].iva = totalMonto >= 113 ? ivaByFila.toFixed(2) : (0).toFixed(2);
+                    rowsData[index]["retenciones"].renta = this.dataForCalculate.dui_proveedor !== null ? montoIsrQuedan.toFixed(2) : (0).toFixed(2);
                 }
-
-                console.log(this.dataForCalculate);
-                console.log(this.dataForCalculate.montoTotalDetalleDocumentoAdquisicion);
-                console.log(this.dataForCalculate.monto_det_doc_adquisicion);
-
-                console.log(this.dataForCalculate.montoTotalDetalleDocumentoAdquisicion + totalMonto);
-                if (this.dataInputs.id_det_doc_adquisicion) {
-
-                    if (this.dataForCalculate.montoTotalDetalleDocumentoAdquisicion + totalMonto > this.dataForCalculate.monto_det_doc_adquisicion) {
-                        toast.warning("El monto del quedan supera el monto definido", {
-                            autoClose: 4000,
-                            position: "top-right",
-                            transition: "zoom",
-                            toastBackgroundColor: "white",
-                        });
-                    }
-                }
-
 
                 // Obteniendo el iva, la renta y el monto liquido del quedan
-                let totalIva = rowsData.reduce((iva, obj) => iva + parseFloat(obj["retenciones"].iva), 0);
-                let totalRenta = rowsData.reduce((iva, obj) => iva + parseFloat(obj["retenciones"].renta), 0);
-                let montoLiquidoQuedan = totalMonto - totalIva - totalRenta;
+                const totalIva = rowsData.reduce((iva, obj) => iva + parseFloat(obj["retenciones"].iva), 0);
+                const totalRenta = rowsData.reduce((iva, obj) => iva + parseFloat(obj["retenciones"].renta), 0);
+                const montoLiquidoQuedan = totalMonto - totalIva - totalRenta;
 
                 // Actualizar los valores en this.dataInputs
                 this.dataInputs.monto_total_quedan = totalMonto.toFixed(2);
                 this.dataInputs.monto_liquido_quedan = montoLiquidoQuedan.toFixed(2);
                 this.dataInputs.monto_isr_quedan = totalRenta.toFixed(2);
                 this.dataInputs.monto_iva_quedan = totalIva.toFixed(2);
+                this.dataForCalculate.montoLiquidoQuedan = montoLiquidoQuedan;
             });
+            console.log("SUMATORIA SEGUIMIENTO MAS EL QUEDAN ACTUAL: ", (parseFloat(this.dataForCalculate.montoTotalDetalleDocumentoAdquisicion) || 0) + (parseFloat(this.dataForCalculate.montoLiquidoQuedan) || 0));
+            console.log("MONTO LIQUIDO QUEDAN ACTUAL: ", this.dataForCalculate.montoLiquidoQuedan)
+            const sumaLiquida = (parseFloat(this.dataForCalculate.montoTotalDetalleDocumentoAdquisicion) || 0) + (parseFloat(this.dataForCalculate.montoLiquidoQuedan) || 0)
+            if (this.dataInputs.id_det_doc_adquisicion && sumaLiquida > this.dataForCalculate.monto_det_doc_adquisicion) {
+                toast.error("El monto del quedan supera el monto definido en el item seleccionado", {
+                    autoClose: 4000,
+                    position: "top-right",
+                    transition: "zoom",
+                    limit: 2,
+                    toastBackgroundColor: "white",
+                });
+                this.dataForCalculate.montoSuperador = true;
+            } else {
+                this.dataForCalculate.montoSuperador = false;
+            }
         },
 
         getAmountBySupplier(id_proveedor) {
@@ -862,6 +851,7 @@ export default {
             } else {
                 this.dataForCalculate.montoTotalDetalleDocumentoAdquisicion = 0
             }
+            console.log("SEGUIMIENTO: " + this.dataForCalculate.montoTotalDetalleDocumentoAdquisicion);
 
         },
 
