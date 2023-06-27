@@ -523,7 +523,12 @@ export default {
             type: Array,
             default: [],
             required: true,
-        }
+        },
+        amountByAcquisitionDocumentsDetails: {
+            type: Array,
+            default: [],
+            required: true,
+        },
 
     },
     data() {
@@ -568,6 +573,8 @@ export default {
                 monto_total_quedan: '',
                 monto_total_quedan_por_proveedor: '',
                 monto_doc_adquisicion: '',
+                montoTotalDetalleDocumentoAdquisicion: '',//OBTIENE EL TOTAL UTILIZADO 
+                monto_det_doc_adquisicion: '',//OBTIENE EL TOTAL DEL DETALLE QUE ESTA EN LA BASE
             },
             config: {
                 altInput: true,
@@ -689,15 +696,18 @@ export default {
             this.taxesByRow();
         },
         DocumentoAdquisicionSelected(id_documentoAdquisicion) {
+            this.getAmountByDetalleDocumentoAdquisicion(id_documentoAdquisicion)
             //al seleccionar contrato
             if (id_documentoAdquisicion != null) {
                 let document = JSON.parse(JSON.stringify(this.dataForSelectInRow.documentoAdquisicion.find((doc) => doc.value === id_documentoAdquisicion)))
+                console.log(document);
                 this.dataInputs.id_tipo_doc_adquisicion = document.id_tipo_doc_adquisicion
                 this.dataInputs.nombre_tipo_doc_adquisicion = document.nombre_tipo_doc_adquisicion
                 this.dataInputs.numero_doc_adquisicion = document.numero_doc_adquisicion
                 this.dataInputs.compromiso_ppto_det_doc_adquisicion = document.compromiso_ppto_det_doc_adquisicion
                 this.dataInputs.id_proy_financiado = document.id_proy_financiado
                 this.dataForCalculate.monto_doc_adquisicion = document.monto_doc_adquisicion
+                this.dataForCalculate.monto_det_doc_adquisicion = document.monto_det_doc_adquisicion
             }
             else {
                 this.dataInputs.id_det_doc_adquisicion = ''
@@ -772,6 +782,24 @@ export default {
                     }
                 }
 
+                console.log(this.dataForCalculate);
+                console.log(this.dataForCalculate.montoTotalDetalleDocumentoAdquisicion);
+                console.log(this.dataForCalculate.monto_det_doc_adquisicion);
+
+                console.log(this.dataForCalculate.montoTotalDetalleDocumentoAdquisicion + totalMonto);
+                if (this.dataInputs.id_det_doc_adquisicion) {
+
+                    if (this.dataForCalculate.montoTotalDetalleDocumentoAdquisicion + totalMonto > this.dataForCalculate.monto_det_doc_adquisicion) {
+                        toast.warning("El monto del quedan supera el monto definido", {
+                            autoClose: 4000,
+                            position: "top-right",
+                            transition: "zoom",
+                            toastBackgroundColor: "white",
+                        });
+                    }
+                }
+
+
                 // Obteniendo el iva, la renta y el monto liquido del quedan
                 let totalIva = rowsData.reduce((iva, obj) => iva + parseFloat(obj["retenciones"].iva), 0);
                 let totalRenta = rowsData.reduce((iva, obj) => iva + parseFloat(obj["retenciones"].renta), 0);
@@ -788,7 +816,7 @@ export default {
         getAmountBySupplier(id_proveedor) {
             // Crear una copia de la matriz totalAmountBySupplier
             let newDataSupplier = JSON.parse(JSON.stringify(this.totalAmountBySupplier));
-
+            //TODO: CALCULAR POR LIQUIDO (YA NO POR EL TOTAL DEL QUEDAN) 
             let total = 0;
             newDataSupplier.forEach((element) => {
                 if (element.id_proveedor == id_proveedor) {
@@ -811,6 +839,30 @@ export default {
                 }
             });
             this.dataForCalculate.monto_total_quedan_por_proveedor = parseFloat(total)
+        },
+
+
+        getAmountByDetalleDocumentoAdquisicion(id_det_doc_adquisicion) {
+            const documentArrays = JSON.parse(JSON.stringify(this.amountByAcquisitionDocumentsDetails.filter(
+                (doc) => doc.id_det == id_det_doc_adquisicion
+            )))
+
+            if (Array.isArray(documentArrays) && documentArrays.length > 0) {
+                const total = documentArrays[0].quedan.reduce((acc, quedan) => {
+                    if (this.dataInputs.id_quedan !== "") {
+                        return quedan.id_quedan !== this.dataInputs.id_quedan
+                            ? acc + parseFloat(quedan.monto_liquido_quedan) || 0
+                            : acc;
+                    } else {
+                        return acc + parseFloat(quedan.monto_liquido_quedan) || 0;
+                    }
+                }, 0);
+                this.dataForCalculate.montoTotalDetalleDocumentoAdquisicion = total
+
+            } else {
+                this.dataForCalculate.montoTotalDetalleDocumentoAdquisicion = 0
+            }
+
         },
 
         addJustification(row) {

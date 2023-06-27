@@ -228,7 +228,7 @@ import html2pdf from 'html2pdf.js'
 
         <ModalQuedan :showModal="showModal" @cerrar-modal="showModal = false" :data-quedan="dataQuedan"
             :dataForSelectInRow="dataForSelectInRow" @actualizar-table-data="getDataQuedan()"
-            :totalAmountBySupplier="totalAmountBySupplier" />
+            :totalAmountBySupplier="totalAmountBySupplier" :amountByAcquisitionDocumentsDetails="amountByAcquisitionDocumentsDetails" />
 
 
     </AppLayoutVue>
@@ -276,6 +276,7 @@ export default {
             showModal: false,
             dataQuedan: [],//Datos del quedan hasta los detalles de este
             totalAmountBySupplier: [],//Datos de proveedores
+            amountByAcquisitionDocumentsDetails: [],//Datos de proveedores
             permits: [],
             dataForSelectInRow: [],
             scrollbarModalOpen: false,
@@ -376,6 +377,15 @@ export default {
             //metodo que trae todos los proveedores del mes actual, se mandan los parametros al modal
             await axios.post('/getAmountBySupplierPerMonth').then((response) => {
                 this.totalAmountBySupplier = response.data
+            }).catch((errors) => {
+                console.log(errors);
+            });
+        },
+        async getAmountByDetail() {
+            //metodo que trae todos los proveedores del mes actual, se mandan los parametros al modal
+            await axios.post('/getAmountByDocumentDetail').then((response) => {
+               // console.log(response.data);
+                this.amountByAcquisitionDocumentsDetails = response.data
             }).catch((errors) => {
                 console.log(errors);
             });
@@ -498,6 +508,7 @@ export default {
     mounted() {
         this.getDataQuedan()
         this.getListForSelect()
+        this.getAmountByDetail()
     },
 
 };
