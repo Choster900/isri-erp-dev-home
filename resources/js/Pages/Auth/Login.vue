@@ -25,7 +25,7 @@ const submit = () => {
             <!-- Sidebar -->
             <div class="hidden lg:flex flex-col justify-between bg-[#001b47] lg:p-8 xl:p-12 lg:max-w-sm xl:max-w-lg">
                 <div class="flex justify-center">
-                    <img style="width:425px" src="../../../img/logoSidebar.png" alt="GOBIERNO DE EL SALVADOR" />
+                    <img style="width:330px" src="../../../img/logoSidebar.png" alt="GOBIERNO DE EL SALVADOR" />
                 </div>
 
                 <div class="flex justify-center">
