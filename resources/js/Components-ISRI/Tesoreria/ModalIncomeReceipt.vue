@@ -1,6 +1,5 @@
 <script setup>
-import Modal from "@/Components/Modal.vue";
-import ModalBasicVue from "@/Components-ISRI/AllModal/ModalBasic.vue";
+import Modal from "@/Components-ISRI/AllModal/Modal.vue";
 import InputError from "@/Components/InputError.vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
@@ -9,8 +8,8 @@ import axios from "axios";
 
 <template>
     <div class="m-1.5">
-        <ModalBasicVue :modalOpen="show_modal_receipt" :title="'Administración de recibos de ingreso. '" maxWidth="4xl"
-            @close-modal="$emit('cerrar-modal')">
+        <Modal :show="show_modal_receipt" :modal-title="'Administración de recibos de ingreso. '" maxWidth="4xl"
+            @close="$emit('cerrar-modal')">
             <div class="px-5 py-8">
                 <div class="space-y-2">
                     <div class="mb-2" id="app">
@@ -57,7 +56,7 @@ import axios from "axios";
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="number" v-model="income_receipt.number" :value="income_receipt.number"
                                     type="text" placeholder="Numero de recibo"
-                                    @update:modelValue="validateInput('number', limit = 145, false, number=true)">
+                                    @update:modelValue="validateInput('number', limit = 145, false, number = true)">
                                     <LabelToInput icon="standard" forLabel="number" />
                                 </TextInput>
                                 <InputError v-for="(item, index) in errors.number" :key="index" class="mt-2"
@@ -91,7 +90,7 @@ import axios from "axios";
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="document-client" v-model="income_receipt.document"
                                     :value="income_receipt.document" type="text" placeholder="Documento"
-                                    @update:modelValue="validateInput('document', limit = 17,false, number = true)">
+                                    @update:modelValue="validateInput('document', limit = 17, false, number = true)">
                                     <LabelToInput icon="standard" forLabel="document-client" />
                                 </TextInput>
                                 <InputError v-for="(item, index) in errors.document" :key="index" class="mt-2"
@@ -149,10 +148,9 @@ import axios from "axios";
                                         <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                                             <Multiselect v-model="row.income_concept_id" :value="row.income_concept_id"
                                                 @input="selectConcept($event, row.income_concept_id)"
-                                                :options="income_concept_select" 
-                                                :placeholder=" is_loading ? 'Cargando...' : 'Seleccione Concepto' "
-                                                :disabled="is_loading"
-                                                :searchable="true" />
+                                                :options="filter_income_concept_select"
+                                                :placeholder="is_loading ? 'Cargando...' : 'Seleccione Concepto'"
+                                                :disabled="is_loading" :searchable="true" />
                                             <LabelToInput icon="list" />
                                         </div>
                                         <InputError
@@ -192,16 +190,17 @@ import axios from "axios";
 
                     <div class="mt-4 mb-4 md:flex flex-row justify-center">
                         <GeneralButton v-if="modal_data != ''" @click="updateIncomeReceipt()"
-                            color="bg-orange-700  hover:bg-orange-800" text="Actualizar" icon="update" :disabled="is_loading"/>
+                            color="bg-orange-700  hover:bg-orange-800" text="Actualizar" icon="update"
+                            :disabled="is_loading" />
                         <GeneralButton v-else @click="saveIncomeReceipt()" color="bg-green-700  hover:bg-green-800"
-                            text="Agregar" icon="add" :disabled="is_loading"/>
+                            text="Agregar" icon="add" :disabled="is_loading" />
                         <div class="mb-4 md:mr-2 md:mb-0 px-1">
                             <GeneralButton text="Cancelar" icon="add" @click="$emit('cerrar-modal')" />
                         </div>
                     </div>
                 </div>
             </div>
-        </ModalBasicVue>
+        </Modal>
     </div>
 </template>
 
@@ -247,7 +246,7 @@ export default {
                 client: '',
                 description: '',
                 income_detail: [],
-                number:''
+                number: ''
             },
         };
     },
@@ -661,6 +660,12 @@ export default {
                 })
                 return count
             }
+        },
+        filter_income_concept_select() {
+            const filteredArray = this.income_concept_select.filter(value1 => {
+                return value1.estado === 1 || this.income_receipt.income_detail.some(value2 => value1.value === value2.income_concept_id);
+            });
+            return filteredArray;
         }
     }
 };

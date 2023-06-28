@@ -319,9 +319,23 @@ export default {
             this.supplier[field] = !dui[2] ? dui[1] : '' + dui[1] + '-' + dui[2];
         },
         typeNitSupplier(field) {
-            //Specific format for nit number
             let nit = this.supplier[field].replace(/\D/g, '').match(/(\d{0,4})(\d{0,6})(\d{0,3})(\d{0,1})/);
-            this.supplier[field] = nit[1] + "-" + nit[2] + "-" + nit[3] + "-" + nit[4];
+
+            let formattedNit = nit[1];
+
+            if (nit[2]) {
+                formattedNit += "-" + nit[2];
+            }
+
+            if (nit[3]) {
+                formattedNit += "-" + nit[3];
+            }
+
+            if (nit[4]) {
+                formattedNit += "-" + nit[4];
+            }
+
+            this.supplier[field] = formattedNit;
         },
         typeNrc(field) {
             //Specific format for nit number

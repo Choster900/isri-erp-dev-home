@@ -1,5 +1,5 @@
 <script setup>
-import ModalBasicVue from "@/Components-ISRI/AllModal/ModalBasic.vue";
+import Modal from "@/Components-ISRI/AllModal/Modal.vue";
 import InputError from "@/Components/InputError.vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
@@ -8,8 +8,8 @@ import axios from "axios";
 
 <template>
     <div class="m-1.5">
-        <ModalBasicVue :modalOpen="show_modal_acq_doc" @close-modal="$emit('cerrar-modal')"
-            :title="'Administración de Documentos de Adquisicion.'" maxWidth="4xl">
+        <Modal :show="show_modal_acq_doc" @close="$emit('cerrar-modal')" :closeOutSide="false"
+            modal-title="Administración de Documentos de Adquisicion." maxWidth="4xl">
             <div class="px-5 py-4">
                 <div class="text-sm">
                     <!-- Page 1 -->
@@ -145,8 +145,7 @@ import axios from "axios";
                                     @update:modelValue="validateItemInput('amount', 11, monto = true)">
                                     <LabelToInput icon="money" forLabel="amount" />
                                 </TextInput>
-                                <InputError
-                                    v-for="(item, index) in backend_errors['items.' + array_item.index + '.amount']"
+                                <InputError v-for="(item, index) in backend_errors['items.' + array_item.index + '.amount']"
                                     :key="index" class="mt-2" :message="item" />
                                 <InputError class="mt-2" :message="item_errors.amount" />
                             </div>
@@ -254,7 +253,7 @@ import axios from "axios";
                         </div>
                     </div>
                     <!-- Buttons to navigate -->
-                    <div class="flex justify-center mt-5" :class="modalData == '' ? 'mr-2': ''">
+                    <div class="flex justify-center mt-5" :class="modalData == '' ? 'mr-2' : ''">
                         <div class="flex items-center mr-1">
                             <button v-if="currentPage != 2"
                                 class="flex items-center bg-blue-600 hover:bg-blue-700 text-white pl-3 pr-2 py-1.5 text-center mb-2 rounded"
@@ -280,8 +279,8 @@ import axios from "axios";
                             </button>
                         </div>
                         <div class="flex items-center ml-1">
-                            <div class="flex w-1/2" >
-                                <button v-if="currentPage != 1" :class="modalData == '' ? 'mr-4': ''"
+                            <div class="flex w-1/2">
+                                <button v-if="currentPage != 1" :class="modalData == '' ? 'mr-4' : ''"
                                     class="flex items-center bg-gray-600 hover:bg-gray-700 text-white pl-2 pr-3 py-1.5 text-center mb-2 rounded"
                                     :disabled="currentPage === 1" @click="goToPreviousPage">
                                     <svg width="20px" height="20px" viewBox="-3 0 32 32" version="1.1"
@@ -319,7 +318,7 @@ import axios from "axios";
                 </div>
             </div>
 
-        </ModalBasicVue>
+        </Modal>
     </div>
 </template>
 
@@ -648,7 +647,7 @@ export default {
 
             const errors = Object.values(this.errors);
             if (errors.every(error => error === '')) {
-                this.item_errors=[]
+                this.item_errors = []
                 this.currentPage++;
             } else {
                 if (page_with_errors !== this.currentPage) {
@@ -830,7 +829,7 @@ export default {
             this.acq_doc.total = sum.toFixed(2);
         },
         cleanArrayItem() {
-            this.item_errors=[]
+            this.item_errors = []
             if (this.array_item.index != -1) {
                 if (this.acq_doc.items[this.array_item.index]) {
                     this.acq_doc.items[this.array_item.index].selected = false
