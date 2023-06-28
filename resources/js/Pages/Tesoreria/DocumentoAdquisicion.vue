@@ -100,9 +100,9 @@ import axios from 'axios';
                     <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer" @click="changeStateAcqDoc(doc)"
                       v-if="permits.eliminar == 1">
                       <div class="w-8 text-red-900"><span class="text-xs">
-                          <svg fill="#7F1D1D" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" width="20px"
+                          <svg :fill="doc.estado_doc_adquisicion == 1 ? '#991B1B' : '#166534'" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" width="20px"
                             height="20px" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 97.994 97.994"
-                            xml:space="preserve" stroke="#7F1D1D">
+                            xml:space="preserve" :stroke="doc.estado_doc_adquisicion == 1 ? '#991B1B' : '#166534'">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                             <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
                             <g id="SVGRepo_iconCarrier">
