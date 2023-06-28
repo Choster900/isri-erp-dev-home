@@ -24,7 +24,7 @@ class DocumentoAdquisicionController extends Controller
         $search_value = $request->search;
 
         $query = DocumentoAdquisicion::select('*')
-            ->with('detalles.fuente_financiamiento')
+            ->with('detalles.fuente_financiamiento','detalles.quedan')
             ->join('tipo_gestion_compra', function ($join) {
                 $join->on('documento_adquisicion.id_tipo_gestion_compra', '=', 'tipo_gestion_compra.id_tipo_gestion_compra');
             })

@@ -145,6 +145,9 @@ import axios from "axios";
                                     @update:modelValue="validateItemInput('amount', 11, monto = true)">
                                     <LabelToInput icon="money" forLabel="amount" />
                                 </TextInput>
+                                <InputError
+                                    v-for="(item, index) in backend_errors['items.' + array_item.index + '.amount']"
+                                    :key="index" class="mt-2" :message="item" />
                                 <InputError class="mt-2" :message="item_errors.amount" />
                             </div>
                         </div>
@@ -246,12 +249,12 @@ import axios from "axios";
                         </div>
                         <div v-else class="mt-2">
                             <p class="text-[14px] text-black text-center font-semibold">
-                                SIN ITEMS ASIGNADOS
+                                SIN DETALLES ASIGNADOS
                             </p>
                         </div>
                     </div>
                     <!-- Buttons to navigate -->
-                    <div class="flex justify-center mt-5">
+                    <div class="flex justify-center mt-5" :class="modalData == '' ? 'mr-2': ''">
                         <div class="flex items-center mr-1">
                             <button v-if="currentPage != 2"
                                 class="flex items-center bg-blue-600 hover:bg-blue-700 text-white pl-3 pr-2 py-1.5 text-center mb-2 rounded"
@@ -277,8 +280,8 @@ import axios from "axios";
                             </button>
                         </div>
                         <div class="flex items-center ml-1">
-                            <div class="flex w-1/2">
-                                <button v-if="currentPage != 1"
+                            <div class="flex w-1/2" >
+                                <button v-if="currentPage != 1" :class="modalData == '' ? 'mr-4': ''"
                                     class="flex items-center bg-gray-600 hover:bg-gray-700 text-white pl-2 pr-3 py-1.5 text-center mb-2 rounded"
                                     :disabled="currentPage === 1" @click="goToPreviousPage">
                                     <svg width="20px" height="20px" viewBox="-3 0 32 32" version="1.1"
@@ -304,8 +307,8 @@ import axios from "axios";
 
                             <div class="w-1/2">
                                 <GeneralButton v-if="modalData != '' && currentPage === 2 && !itemSelected"
-                                    @click="updateNewAcqDoc()" color="bg-orange-700 hover:bg-orange-800"
-                                    text="Actualizar" icon="update" class="" />
+                                    @click="updateAcqDoc()" color="bg-orange-700 hover:bg-orange-800" text="Actualizar"
+                                    icon="update" class="" />
                                 <GeneralButton v-if="modalData == '' && currentPage === 2 && !itemSelected"
                                     @click="saveNewAcqDoc()" color="bg-green-700 hover:bg-green-800" text="Guardar"
                                     icon="add" class="" />
@@ -376,6 +379,7 @@ export default {
                 amount: '',
                 contract_manager: '',
                 name: '',
+                has_quedan: '',
                 selected: false,
                 deleted: false
             },
@@ -426,6 +430,8 @@ export default {
             }
         },
         typeAmount(field) {
+            this.index_errors = []
+            this.backend_errors = []
             let x = this.array_item[field].replace(/^\./, '').replace(/[^0-9.]/g, '')
             this.array_item[field] = x
             const regex = /^(\d+)?([.]?\d{0,2})?$/
@@ -445,7 +451,7 @@ export default {
             const all_deleted = this.acq_doc.items.every(item => item.deleted === true);
             if (all_deleted) {
                 toast.warning(
-                    "Debes agregar al menos un item al documento.",
+                    "Debes agregar al menos un detalle al documento.",
                     {
                         autoClose: 5000,
                         position: "top-right",
@@ -516,11 +522,11 @@ export default {
                     });
             }
         },
-        updateNewAcqDoc() {
+        updateAcqDoc() {
             const all_deleted = this.acq_doc.items.every(item => item.deleted === true);
             if (all_deleted) {
                 toast.warning(
-                    "Debes agregar al menos un item al documento.",
+                    "Debes agregar al menos un detalle al documento.",
                     {
                         autoClose: 5000,
                         position: "top-right",
@@ -529,6 +535,7 @@ export default {
                     }
                 );
             } else {
+                console.log(this.acq_doc);
                 this.$swal
                     .fire({
                         title: '¿Está seguro de actualizar el documento de adquisicion?',
@@ -641,6 +648,7 @@ export default {
 
             const errors = Object.values(this.errors);
             if (errors.every(error => error === '')) {
+                this.item_errors=[]
                 this.currentPage++;
             } else {
                 if (page_with_errors !== this.currentPage) {
@@ -684,7 +692,7 @@ export default {
             });
             const errors = Object.values(this.item_errors);
             if (errors.every(error => error === '')) {
-                const { id, index, financing_source_id, commitment_number, amount, contract_manager, name } = this.array_item;
+                const { id, index, financing_source_id, commitment_number, amount, contract_manager, name, has_quedan } = this.array_item;
                 const parsedAmount = parseFloat(amount);
                 const formattedAmount = parsedAmount.toFixed(2);
                 const arrayInsert = {
@@ -695,6 +703,7 @@ export default {
                     amount: formattedAmount ? formattedAmount : '',
                     contract_manager: contract_manager ? contract_manager : '',
                     name: name ? name : '',
+                    has_quedan: has_quedan ? has_quedan : '',
                     selected: false,
                     deleted: false
                 };
@@ -753,9 +762,11 @@ export default {
             this.array_item.contract_manager = item.contract_manager
             this.array_item.index = index
             this.array_item.financing_source_id = item.financing_source_id
+            this.array_item.has_quedan = item.has_quedan
             this.array_item.deleted = false
             this.array_item.selected = true
             this.acq_doc.items[index].selected = true
+            console.log(this.array_item);
         },
         deleteItem(index) {
             this.$swal.fire({
@@ -769,19 +780,31 @@ export default {
                 confirmButtonText: 'Si, Eliminar.'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    if (this.acq_doc.items[index].selected) {
-                        // Empty the array
-                        Object.keys(this.array_item).forEach(key => {
-                            this.array_item[key] = '';
-                        });
-                    }
-                    if (this.acq_doc.items[index].id === '') {
-                        this.acq_doc.items.splice(index, 1)
+                    if (this.acq_doc.items[index].has_quedan) {
+                        toast.error(
+                            "No puedes eliminar este detalle porque tiene quedan asignados, elimina primero los quedan asignados.",
+                            {
+                                autoClose: 5000,
+                                position: "top-right",
+                                transition: "zoom",
+                                toastBackgroundColor: "white",
+                            }
+                        );
                     } else {
-                        this.acq_doc.items[index].deleted = true
-                        this.acq_doc.items[index].selected = false
+                        if (this.acq_doc.items[index].selected) {
+                            // Empty the array
+                            Object.keys(this.array_item).forEach(key => {
+                                this.array_item[key] = '';
+                            });
+                        }
+                        if (this.acq_doc.items[index].id === '') {
+                            this.acq_doc.items.splice(index, 1)
+                        } else {
+                            this.acq_doc.items[index].deleted = true
+                            this.acq_doc.items[index].selected = false
+                        }
+                        this.updateTotal()
                     }
-                    this.updateTotal()
                 }
             })
         },
@@ -807,6 +830,7 @@ export default {
             this.acq_doc.total = sum.toFixed(2);
         },
         cleanArrayItem() {
+            this.item_errors=[]
             if (this.array_item.index != -1) {
                 if (this.acq_doc.items[this.array_item.index]) {
                     this.acq_doc.items[this.array_item.index].selected = false
@@ -851,6 +875,7 @@ export default {
                             amount: value.monto_det_doc_adquisicion,
                             contract_manager: value.admon_det_doc_adquisicion,
                             name: value.nombre_det_doc_adquisicion,
+                            has_quedan: value.quedan.length > 0 ? true : false,
                             selected: false,
                             deleted: false,
                         };
