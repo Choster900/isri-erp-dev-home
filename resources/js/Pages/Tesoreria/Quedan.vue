@@ -24,7 +24,8 @@ import html2pdf from 'html2pdf.js'
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
                             <Multiselect v-model="tableData.length" placeholder="Cantidad a mostrar"
-                                @select="getDataQuedan()" :options="perPage" :searchable="true" />
+                                @select="getDataQuedan()" @deselect=" tableData.length = 5; getDataQuedan()"
+                                @clear="tableData.length = 5; getDataQuedan()" :options="perPage" :searchable="true" />
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
@@ -228,7 +229,8 @@ import html2pdf from 'html2pdf.js'
 
         <ModalQuedan :showModal="showModal" @cerrar-modal="showModal = false" :data-quedan="dataQuedan"
             :dataForSelectInRow="dataForSelectInRow" @actualizar-table-data="getDataQuedan()"
-            :totalAmountBySupplier="totalAmountBySupplier" :amountByAcquisitionDocumentsDetails="amountByAcquisitionDocumentsDetails" />
+            :totalAmountBySupplier="totalAmountBySupplier"
+            :amountByAcquisitionDocumentsDetails="amountByAcquisitionDocumentsDetails" />
 
 
     </AppLayoutVue>
@@ -385,7 +387,7 @@ export default {
         async getAmountByDetail() {
             //metodo que trae todos los proveedores del mes actual, se mandan los parametros al modal
             await axios.post('/getAmountByDocumentDetail').then((response) => {
-               // console.log(response.data);
+                // console.log(response.data);
                 this.amountByAcquisitionDocumentsDetails = response.data
             }).catch((errors) => {
                 console.log(errors);
