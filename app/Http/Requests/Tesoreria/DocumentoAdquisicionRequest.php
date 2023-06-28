@@ -50,6 +50,24 @@ class DocumentoAdquisicionRequest extends FormRequest
                     }
                 }
             ];
+            $rules["items.{$key}.amount"] = [
+                function ($attribute, $value, $fail) use ($key, $items) {
+                    if (!$items['deleted'] && !empty($value)) {
+                        if($items['id']!=''){
+                            $db_amount = DetDocumentoAdquisicion::find($items['id']);
+                            if ($db_amount->quedan->isNotEmpty()) {
+                                $total=0;
+                                foreach($db_amount->quedan as $quedan){
+                                    $total = $total + $quedan->monto_liquido_quedan;
+                                }
+                                if($items['amount']<$total){
+                                    $fail("No puedes reducir el monto a una cantidad menor a la ya asignada en quedan: $".$total);
+                                }
+                            }
+                        }
+                    }
+                }
+            ];
         }
         return $rules;
     }
