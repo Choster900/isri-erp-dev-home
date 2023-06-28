@@ -212,7 +212,7 @@ export default {
         sortOrders[column.name] = -1;
     });
     return {
-      empty_object:false,
+      empty_object: false,
       //Data for datatable
       acquisition_docs: [],
       //Data for modal
@@ -298,13 +298,25 @@ export default {
               this.getAcquisitionDoc(this.tableData.currentPage);
             })
             .catch((errors) => {
-              let msg = this.manageError(errors)
-              this.$swal.fire({
-                title: 'Operación cancelada',
-                text: msg,
-                icon: 'warning',
-                timer: 5000
-              })
+              if (errors.response.data.logical_error) {
+                toast.error(
+                  errors.response.data.logical_error,
+                  {
+                    autoClose: 5000,
+                    position: "top-right",
+                    transition: "zoom",
+                    toastBackgroundColor: "white",
+                  }
+                );
+              } else {
+                let msg = this.manageError(errors)
+                this.$swal.fire({
+                  title: 'Operación cancelada',
+                  text: msg,
+                  icon: 'warning',
+                  timer: 5000
+                })
+              }
             })
         }
       })
@@ -320,7 +332,7 @@ export default {
           this.links[0].label = "Anterior";
           this.links[this.links.length - 1].label = "Siguiente";
           this.acquisition_docs = data.data.data;
-          this.acquisition_docs.length>0 ? this.empty_object=false : this.empty_object=true
+          this.acquisition_docs.length > 0 ? this.empty_object = false : this.empty_object = true
         }
       }).catch((errors) => {
         let msg = this.manageError(errors)

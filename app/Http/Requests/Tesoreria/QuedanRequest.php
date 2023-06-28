@@ -78,13 +78,11 @@ class QuedanRequest extends FormRequest
                 // Reemplazar el número de acta en el mensaje de error
                 $messages["detalle_quedan.{$key}.numero_acta_det_quedan.unique"] = $customMessage;
                
-               // $messages["detalle_quedan.{$key}.reajuste_monto.ajuste_producto_factura_det_quedan.required_without"] = 'El reajuste por producto es requerido';
-                //$messages["detalle_quedan.{$key}.reajuste_monto.ajuste_servicio_factura_det_quedan.required_without"] = 'El reajuste por servicio es requerido';
-                $messages["detalle_quedan.{$key}.monto.producto_factura_det_quedan.required_without"] = 'El MONTO por producto es requerido';
-                $messages["detalle_quedan.{$key}.monto.servicio_factura_det_quedan.required_without"] = 'El MONTO por servicio es requerido';
+                $messages["detalle_quedan.{$key}.monto.producto_factura_det_quedan.required_without"] = 'Debe ingresar monto de producto o servicio';
+                $messages["detalle_quedan.{$key}.monto.servicio_factura_det_quedan.required_without"] = 'Debe ingresar monto de producto o servicio';
 
-                $messages["detalle_quedan.{$key}.reajuste_monto.ajuste_servicio_factura_det_quedan.required_with"] = 'El monto por servicio de reajuste es requerido';
-                $messages["detalle_quedan.{$key}.reajuste_monto.ajuste_servicio_factura_det_quedan.required_with"] = 'El monto por producto de reajuste es requerido';
+                $messages["detalle_quedan.{$key}.reajuste_monto.ajuste_servicio_factura_det_quedan.required_with"] = 'El monto de reajuste por servicio es requerido';
+                $messages["detalle_quedan.{$key}.reajuste_monto.ajuste_producto_factura_det_quedan.required_with"] = 'El monto de reajuste por producto es requerido';
             }
         }
         return $messages;
