@@ -142,7 +142,7 @@ import axios from "axios";
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="amount" v-model="array_item.amount" :value="array_item.amount" type="text"
                                     placeholder="Monto detalle"
-                                    @update:modelValue="validateItemInput('amount', 11, monto = true)">
+                                    @update:modelValue="validateItemInput('amount', 10, monto = true)">
                                     <LabelToInput icon="money" forLabel="amount" />
                                 </TextInput>
                                 <InputError v-for="(item, index) in backend_errors['items.' + array_item.index + '.amount']"
@@ -167,7 +167,7 @@ import axios from "axios";
                             </label>
                             <textarea v-model="array_item.contract_manager" id="cotract-manager" name="contract-manager"
                                 class="resize-none w-full h-10 overflow-y-auto peer text-xs font-semibold rounded-r-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
-                                @input="validateItemInput('contract_manager', limit = 500)">
+                                @input="validateItemInput('contract_manager', limit = 250)">
                             </textarea>
                             <InputError class="mt-2" :message="item_errors.contract_manager" />
                         </div>
@@ -202,7 +202,7 @@ import axios from "axios";
                                                 item.selected ? 'bg-orange-300 hover:bg-orange-400' :
                                                     index_errors.includes(index) ? 'bg-red-300 hover:bg-red-400' : '']">
                                             <td class="text-center">{{ item.commitment_number }}</td>
-                                            <td class="text-center">{{ item.name }}</td>
+                                            <td class="text-center">{{ truncateName(item.name) }}</td>
                                             <td class="text-center">{{ showFinancingSource(item.financing_source_id) }}</td>
                                             <td class="text-center">${{ item.amount }}</td>
                                             <td class="text-center">
@@ -840,6 +840,17 @@ export default {
                 this.array_item[key] = '';
             });
             this.new_item = true
+        },
+        truncateName(name) {
+            const words = name.split(' ');
+            const truncatedWords = words.map(word => {
+                if (word.length >= 22) {
+                    return word.substring(0, 22) + '...';
+                } else {
+                    return word;
+                }
+            });
+            return truncatedWords.join(' ');
         }
     },
     watch: {
