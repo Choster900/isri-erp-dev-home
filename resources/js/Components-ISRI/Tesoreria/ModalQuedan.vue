@@ -154,17 +154,17 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                             <table class="table-auto mx-auto">
                                 <thead>
                                     <tr>
-                                        <th class="border-2 border-black h-7 " colspan="2">
+                                        <th class="border-2 border-black h-7 " colspan="1">
                                             <p class="px-[55px] text-sm text-gray-600">PROVEEDOR</p>
                                         </th>
-                                        <th class="border-2 border-black text-sm text-gray-600" colspan="5">
+                                        <th class="border-2 border-black text-sm text-gray-600" colspan="6">
                                             DATOS DEL QUEDAN
                                         </th>
                                     </tr>
 
 
                                     <tr>
-                                        <td class="border-2 border-black" colspan="2">
+                                        <td class="border-2 border-black" colspan="1">
                                             <div class="relative flex h-8 w-full flex-row-reverse "
                                                 :class="{ 'condition-select': dataInputs.id_proveedor == '' }">
                                                 <Multiselect v-model="dataInputs.id_proveedor"
@@ -175,7 +175,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                     @input="getInformationBySupplier($event)" />
                                             </div>
                                         </td>
-                                        <th class="border-2 border-black text-xs text-gray-600" colspan="2">
+                                        <th class="border-2 border-black text-xs text-gray-600" colspan="3">
                                             TIPO CONTRATACION
                                         </th>
                                         <th class="border-2 border-black text-xs text-gray-600">
@@ -192,10 +192,10 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 
 
                                     <tr>
-                                        <th class="border-2 border-black h-8 text-sm text-gray-600" colspan="2">
+                                        <th class="border-2 border-black h-8 text-sm text-gray-600" colspan="1">
                                             CONTRATO
                                         </th>
-                                        <td class="border-2 border-black" colspan="2">
+                                        <td class="border-2 border-black" colspan="3">
                                             <input type="text" v-model="dataInputs.nombre_tipo_doc_adquisicion"
                                                 :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''" disabled
                                                 class="peer w-full text-sm bg-transparent text-center h-10 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
@@ -221,7 +221,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="border-2 border-black" colspan="2">
+                                        <td class="border-2 border-black" colspan="1">
                                             <div class="relative flex h-8 w-full flex-row-reverse"
                                                 :class="[documentoAdquisicion != '' ? { 'condition-select': dataInputs.id_det_doc_adquisicion == '' } : '']">
                                                 <Multiselect v-model="dataInputs.id_det_doc_adquisicion"
@@ -236,7 +236,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                             </div>
 
                                         </td>
-                                        <th class="border-2 border-black text-sm text-gray-600" colspan="5">
+                                        <th class="border-2 border-black text-sm text-gray-600" colspan="6">
                                             DETALLE QUEDAN
                                         </th>
                                     </tr>
@@ -344,7 +344,8 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 
                                                     <td v-else-if="cellIndex == 'retenciones'"
                                                         class="border-2 border-black">
-                                                        <button type="button" @click="addJustification(rowIndex)"
+                                                        <button type="button"
+                                                            @click="rowsData[rowIndex].reajuste = !rowsData[rowIndex].reajuste; taxesByRow()"
                                                             title="Reajustar factura"
                                                             style="float: right;margin-right: -42px;margin-top: -1px;x;font-size: 30px;padding: 0px 10px;border: 0px;background-color: transparent;">
                                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -388,7 +389,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                             <tr v-show="row['reajuste']">
                                                 <!-- <th class="" rowspan="2"></th> -->
                                                 <th class="text-xs border-2 border-black  text-white bg-[#E75E2B]"
-                                                    colspan="2" rowspan="2">
+                                                    colspan="1" rowspan="2">
                                                     <div class="flex justify-center ">
 
                                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -403,7 +404,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                             REAJUSTES</span>
                                                     </div>
                                                 </th>
-                                                <th class="border-2 border-black text-sm px-3 text-gray-600" colspan="3"
+                                                <th class="border-2 border-black text-sm px-3 text-gray-600" colspan="4"
                                                     rowspan="2"
                                                     :class="row['justificacion_det_quedan'] == '' || row['justificacion_det_quedan'] === null ? 'bg-[#fdfd96]' : ''">
 
@@ -541,7 +542,6 @@ export default {
             errosrNumeroActa: [], // Errores relacionados con numero_acta
             montoTotalProveedorMes: [], // Monto total del proveedor por mes
             documentoAdquisicion: [], // Contiene contratos por proveedor
-            tipoDocumentoAdquisicion: [], // Contiene los tipos de documentos de adquisicion TODO:FOR REMOVE
             dataInputs: {
                 giro: '',
                 irs: '',
@@ -574,7 +574,6 @@ export default {
                 monto_iva_quedan: '',
                 monto_isr_quedan: '',
                 monto_total_quedan: '',
-                monto_total_quedan_por_proveedor: '',
                 monto_doc_adquisicion: '',
                 montoTotalDetalleDocumentoAdquisicion: '',//OBTIENE EL TOTAL UTILIZADO 
                 monto_det_doc_adquisicion: '',//OBTIENE EL TOTAL DEL DETALLE QUE ESTA EN LA BASE
@@ -606,6 +605,7 @@ export default {
         onCellEdit(rowIndex, cellIndex, event) {
             this.rowsData[rowIndex][cellIndex] = event
         },
+        // Valida que sean solo decimales en los inputs
         onlyNumberDecimal(rowIndex, cellIndex, event, type) {
             let inputValue = event.target.value;
             const regex = /^(\d+)?(\.\d{0,2})?$/;
@@ -652,8 +652,6 @@ export default {
                 // Filtrar los contratos por proveedor
                 const filteredContracts = JSON.parse(JSON.stringify(this.dataForSelectInRow.documentoAdquisicion.filter((doc) => doc.id_proveedor === supplier)));
 
-                let tipos = JSON.parse(JSON.stringify(this.dataForSelectInRow.tipoAdquisicion))
-
                 if (filteredContracts != "") {
                     this.documentoAdquisicion = filteredContracts
                     this.dataInputs.nombre_tipo_doc_adquisicion = ''
@@ -679,7 +677,6 @@ export default {
                 this.dataForCalculate.iva = selectedSupplier.iva_sujeto_retencion
                 this.dataInputs.id_proveedor = selectedSupplier.value
 
-                this.getAmountBySupplier(supplier);
             } else {
                 // Limpiar los valores cuando el proveedor es null
                 this.dataInputs.giro = ''
@@ -694,11 +691,13 @@ export default {
                 this.dataInputs.nombre_tipo_doc_adquisicion = ''
                 this.dataInputs.numero_doc_adquisicion = ''
                 this.dataInputs.compromiso_ppto_det_doc_adquisicion = ''
+                this.dataInputs.id_proy_financiado = ''
                 this.documentoAdquisicion = [];
-                this.tipoDocumentoAdquisicion = []
             }
-            this.taxesByRow();
+            this.taxesByRow(); // funciona que calcula los impuestos (mas informacion Ctrl+click)
         },
+
+        // Setea la informacion a la data necesaria al seleccionar un item
         DocumentoAdquisicionSelected(id_documentoAdquisicion) {
             this.getAmountByDetalleDocumentoAdquisicion(id_documentoAdquisicion)
             //al seleccionar contrato
@@ -713,7 +712,7 @@ export default {
                 this.dataForCalculate.monto_doc_adquisicion = document.monto_doc_adquisicion
                 this.dataForCalculate.monto_det_doc_adquisicion = document.monto_det_doc_adquisicion
             }
-            else {
+            else {// Si viene vacio limpiamos todo
                 this.dataInputs.id_det_doc_adquisicion = ''
                 this.dataInputs.id_tipo_doc_adquisicion = ''
                 this.dataInputs.nombre_tipo_doc_adquisicion = ''
@@ -722,28 +721,42 @@ export default {
                 this.dataInputs.id_proy_financiado = ''
                 this.dataForCalculate.monto_doc_adquisicion = ''
             }
-            this.taxesByRow();
+            this.taxesByRow(); // funciona que calcula los impuestos (mas informacion Ctrl+click)
 
         },
 
+        // Calcula los impuestos por fila 
         taxesByRow() {
             // Filtrar los elementos que no se han eliminado
             const rowsData = this.rowsData.filter(element => element['isDelete'] === true);
 
             // Calcular el total del monto
+            // Calcular el total del monto
             const totalMonto = rowsData.reduce((monto, obj) => {
-                let productoMont = parseFloat(obj["monto"].producto_factura_det_quedan) || 0;
-                let servicioMont = parseFloat(obj["monto"].servicio_factura_det_quedan) || 0;
-                let ajusteProductoMont = parseFloat(obj["reajuste_monto"].ajuste_producto_factura_det_quedan) || 0;
-                let ajusteServicioMont = parseFloat(obj["reajuste_monto"].ajuste_servicio_factura_det_quedan) || 0;
-                let subtotal = obj["reajuste"] ? ajusteProductoMont + ajusteServicioMont : productoMont + servicioMont;
+                // Obtener los montos de producto y servicio
+                const productoMont = parseFloat(obj["monto"].producto_factura_det_quedan) || 0;
+                const servicioMont = parseFloat(obj["monto"].servicio_factura_det_quedan) || 0;
+
+                // Obtener los montos de reajuste si existen
+                const ajusteProductoMont = parseFloat(obj["reajuste_monto"]?.ajuste_producto_factura_det_quedan) || 0;
+                const ajusteServicioMont = parseFloat(obj["reajuste_monto"]?.ajuste_servicio_factura_det_quedan) || 0;
+
+                // Calcular el subtotal considerando reajustes
+                const subtotal = obj["reajuste"] ? ajusteProductoMont + ajusteServicioMont : productoMont + servicioMont;
+
+                // Sumar el subtotal al monto acumulado
                 return monto + (isNaN(subtotal) ? 0 : subtotal);
             }, 0);
 
             const totalCalculosMonto = rowsData.reduce((monto, obj) => {
-                let productoMont = parseFloat(obj["monto"].producto_factura_det_quedan) || 0;
-                let servicioMont = parseFloat(obj["monto"].servicio_factura_det_quedan) || 0;
-                let subtotal = productoMont + servicioMont;
+                // Obtener los montos de producto y servicio
+                const productoMont = parseFloat(obj["monto"].producto_factura_det_quedan) || 0;
+                const servicioMont = parseFloat(obj["monto"].servicio_factura_det_quedan) || 0;
+
+                // Calcular el subtotal sin considerar reajustes
+                const subtotal = productoMont + servicioMont;
+
+                // Sumar el subtotal al monto acumulado
                 return monto + (isNaN(subtotal) ? 0 : subtotal);
             }, 0);
 
@@ -805,35 +818,7 @@ export default {
             }
         },
 
-        getAmountBySupplier(id_proveedor) {
-            // Crear una copia de la matriz totalAmountBySupplier
-            let newDataSupplier = JSON.parse(JSON.stringify(this.totalAmountBySupplier));
-            //TODO: CALCULAR POR LIQUIDO (YA NO POR EL TOTAL DEL QUEDAN) 
-            let total = 0;
-            newDataSupplier.forEach((element) => {
-                if (element.id_proveedor == id_proveedor) {
-                    if (this.dataInputs.id_quedan != "") {
-
-                        // Filtrar los elementos de quedan según el id_quedan ingresado
-                        let quedanArray = element.quedan.filter((element) => element.id_quedan < this.dataInputs.id_quedan);
-
-                        // Ordenar el array quedanArray por id_quedan en orden descendente
-                        quedanArray.sort((a, b) => b.id_quedan - a.id_quedan);
-
-                        // Sumar el monto_total_quedan de cada objeto en el array quedanArray
-                        total = quedanArray.reduce((acc, obj) => acc + parseFloat(obj.monto_total_quedan), 0);
-                    } else {
-                        // Calcular el monto total sumando el monto_total_quedan de cada objeto en la matriz quedan
-                        let montoTotal = element.quedan.reduce((total, element) =>
-                            (parseFloat(total) + parseFloat(element.monto_total_quedan)).toFixed(2), 0);
-                        total = montoTotal;
-                    }
-                }
-            });
-            this.dataForCalculate.monto_total_quedan_por_proveedor = parseFloat(total)
-        },
-
-
+        // Obtiene el seguimiento de los montos totale de los quedan que se ha usado el item del contrato u orden de compra seleccionado
         getAmountByDetalleDocumentoAdquisicion(id_det_doc_adquisicion) {
             const documentArrays = JSON.parse(JSON.stringify(this.amountByAcquisitionDocumentsDetails.filter(
                 (doc) => doc.id_det == id_det_doc_adquisicion
@@ -855,18 +840,6 @@ export default {
                 this.dataForCalculate.montoTotalDetalleDocumentoAdquisicion = 0
             }
             console.log("SEGUIMIENTO: " + this.dataForCalculate.montoTotalDetalleDocumentoAdquisicion);
-
-        },
-
-        addJustification(row) {
-            this.rowsData[row].reajuste = !this.rowsData[row].reajuste
-
-            let rowsData = this.rowsData.filter((element) => element['isDelete'] === true);
-
-
-
-            this.taxesByRow()
-
         },
         onInputDescripcionQuedan(event) {//TODO:VERIFICAR ESTA FUNCIONA PARA QUE SIRVE
             this.dataInputs.descripcion_quedan = event.target.innerText;
@@ -891,7 +864,6 @@ export default {
             this.dataInputs.id_proy_financiado = this.dataQuedan.id_proy_financiado;
             this.dataInputs.monto_total_quedan = this.dataQuedan.monto_total_quedan;
             this.dataInputs.numero_retencion_iva_quedan = this.dataQuedan.numero_retencion_iva_quedan;
-
             this.dataInputs.id_det_doc_adquisicion = this.dataQuedan.id_det_doc_adquisicion;
         },
         resetValuesToInput() {
@@ -921,12 +893,13 @@ export default {
             this.dataForCalculate.irs = ''
             this.dataForCalculate.iva = ''
             this.dataForCalculate.id_proveedor = ''
-            this.dataForCalculate.monto_liquido_quedan = ''
             this.dataForCalculate.monto_iva_quedan = ''
             this.dataForCalculate.monto_isr_quedan = ''
             this.dataForCalculate.monto_total_quedan = ''
+            this.dataForCalculate.montoTotalDetalleDocumentoAdquisicion = ''
+            this.dataForCalculate.monto_det_doc_adquisicion = ''
+            this.dataForCalculate.montoSuperador = ''
             this.documentoAdquisicion = []
-            this.tipoDocumentoAdquisicion = []//TODO: for remove
 
         },
         addRow() {
@@ -959,6 +932,7 @@ export default {
             // Agregar un nuevo objeto al final del array rowsData
 
         },
+        // Metodo que pinta las celdas donde el numero de acta sea repetido
         paintPositionRepet() {
             const duplicatePositions = {}; // Objeto para almacenar las posiciones duplicadas de actas
 
@@ -1006,7 +980,7 @@ export default {
 
             return this.errosrNumeroActa.length; // Devolver la cantidad de posiciones duplicadas encontradas
         },
-
+        // Envia la informacion del quedan al backend para procesarla (Guardar)
         async createQuedan() {
             // Mostrar confirmación al usuario
             const confirmed = await this.$swal.fire({
@@ -1061,37 +1035,6 @@ export default {
                                     });
 
                                 })
-
-                                /*  if (error.response.data.message === "LA DEPENDENCIA ES UN DATO REQUERIDO") {
-                                     // Mostrar mensaje de error si falta la dependencia
-                                     toast.error("La dependencia es requerida en este caso", {
-                                         autoClose: 5000,
-                                         position: "top-right",
-                                         transition: "zoom",
-                                         toastBackgroundColor: "white",
-                                     });
-                                 } else {
-                                     // Mostrar mensaje de error si el número de acta ya existe
-                                     toast.error("Al parecer el numero de acta ya existe en este contexto", {
-                                         autoClose: 5000,
-                                         position: "top-right",
-                                         transition: "zoom",
-                                         toastBackgroundColor: "white",
-                                     });
-                                     const data = error.response.data.errors;
-                                     const myData = {};
-                                     for (const errorBack in data) {
-                                         const split = errorBack.split(".");
-                                         const newIndexSplit = split[1];
-                                         myData[newIndexSplit] = data[errorBack][0];
-                                     }
-                                     this.errosDetalleQuedan = myData;
- 
-                                     // Limpiar errosDetalleQuedan después de 5 segundos
-                                     setTimeout(() => {
-                                         this.errosDetalleQuedan = [];
-                                     }, 5000);
-                                 } */
                             } else {
                                 // Mostrar mensaje de error genérico si faltan datos
                                 toast.error("Al parecer te hacen falta datos por ingresar", {
@@ -1113,6 +1056,7 @@ export default {
                 }
             }
         },
+        // Envia la informacion del quedan al backend para procesarla (Editar)
         async updateQuedan() {
             // Mostrar confirmación al usuario
             const confirmed = await this.$swal.fire({
@@ -1164,41 +1108,6 @@ export default {
                                     });
 
                                 })
-
-
-
-
-
-                                /* if (error.response.data.message === "LA DEPENDENCIA ES UN DATO REQUERIDO") {
-                                    // Mostrar mensaje de error si falta la dependencia
-                                    toast.error("La dependencia es requerida en este caso", {
-                                        autoClose: 5000,
-                                        position: "top-right",
-                                        transition: "zoom",
-                                        toastBackgroundColor: "white",
-                                    });
-                                } else {
-                                    // Mostrar mensaje de error si el número de acta ya existe
-                                    toast.error("Al parecer el numero de acta ya existe en este contexto", {
-                                        autoClose: 5000,
-                                        position: "top-right",
-                                        transition: "zoom",
-                                        toastBackgroundColor: "white",
-                                    });
-                                    const data = error.response.data.errors;
-                                    const myData = {};
-                                    for (const errorBack in data) {
-                                        const split = errorBack.split(".");
-                                        const newIndexSplit = split[1];
-                                        myData[newIndexSplit] = data[errorBack][0];
-                                    }
-                                    this.errosDetalleQuedan = myData;
-
-                                    // Limpiar errosDetalleQuedan después de 5 segundos
-                                    setTimeout(() => {
-                                        this.errosDetalleQuedan = [];
-                                    }, 5000);
-                                } */
                             } else {
                                 // Mostrar mensaje de error genérico si faltan datos
                                 toast.error("Al parecer te hacen falta datos por ingresar", {
@@ -1220,6 +1129,7 @@ export default {
                 }
             }
         },
+        // Elimina la fila del objeto RowData que contiene todas las celdas que se muestran en la tabla
         deleteRow(rowIndex) {
             // Mostrar confirmación al usuario
             this.$swal.fire({
@@ -1275,9 +1185,8 @@ export default {
                             isDelete: true,
                         });
                     });
-
-                    this.taxesByRow();
-                    this.getAmountBySupplier(newDataQuedan.proveedor.id_proveedor);
+                    
+                    this.taxesByRow(); // funciona que calcula los impuestos (mas informacion Ctrl+click)
 
 
                     if (this.dataQuedan.monto_liquido_quedan != this.dataInputs.monto_liquido_quedan) {
