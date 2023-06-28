@@ -238,7 +238,7 @@
             </h3>
 
             <div style class="text-center">
-                ORIGINAL - CLIENTE
+                COPIA - CONTABILIDAD
             </div>
         </div>
         <div class="mb-0 basis-1/4 pr-2">
