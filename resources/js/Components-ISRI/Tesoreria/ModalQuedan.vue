@@ -783,10 +783,13 @@ export default {
                 this.dataInputs.monto_liquido_quedan = montoLiquidoQuedan.toFixed(2);
                 this.dataInputs.monto_isr_quedan = totalRenta.toFixed(2);
                 this.dataInputs.monto_iva_quedan = totalIva.toFixed(2);
-                this.dataForCalculate.montoLiquidoQuedan = montoLiquidoQuedan;
+                this.dataForCalculate.montoLiquidoQuedan = totalCalculosMonto - totalIva - totalRenta;
             });
+
             console.log("SUMATORIA SEGUIMIENTO MAS EL QUEDAN ACTUAL: ", (parseFloat(this.dataForCalculate.montoTotalDetalleDocumentoAdquisicion) || 0) + (parseFloat(this.dataForCalculate.montoLiquidoQuedan) || 0));
-            console.log("MONTO LIQUIDO QUEDAN ACTUAL: ", this.dataForCalculate.montoLiquidoQuedan)
+            console.log("MONTO LIQUIDO QUEDAN ACTUAL: ", this.dataInputs.monto_liquido_quedan)
+            console.log("TOTAL LIQUIDO PERO NO ES EL ORIGINAL: ", this.dataForCalculate.montoLiquidoQuedan)
+
             const sumaLiquida = (parseFloat(this.dataForCalculate.montoTotalDetalleDocumentoAdquisicion) || 0) + (parseFloat(this.dataForCalculate.montoLiquidoQuedan) || 0)
             if (this.dataInputs.id_det_doc_adquisicion && sumaLiquida > this.dataForCalculate.monto_det_doc_adquisicion) {
                 toast.error("El monto del quedan supera el monto definido en el item seleccionado", {

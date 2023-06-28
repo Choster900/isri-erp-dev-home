@@ -331,6 +331,7 @@ export default {
 
                     // Obtener el monto por proveedor
                     this.getAmountBySupplier();
+                    this.getAmountByDetail()
                     this.dataQuedanForTable.length > 0 ? this.empty_object = false : this.empty_object = true
                 }
             } catch (error) {
@@ -508,7 +509,6 @@ export default {
     mounted() {
         this.getDataQuedan()
         this.getListForSelect()
-        this.getAmountByDetail()
     },
 
 };

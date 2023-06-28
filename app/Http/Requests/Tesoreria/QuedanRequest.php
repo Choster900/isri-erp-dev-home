@@ -26,7 +26,6 @@ class QuedanRequest extends FormRequest
      */
     public function rules(Request $request)
     {
-
         $rules = [];
         collect($this->input('detalle_quedan', [])) // Convertir el arreglo en una colección
             ->each(function ($detalle, $key) use (&$rules) { // Iterar sobre cada detalle
@@ -37,26 +36,13 @@ class QuedanRequest extends FormRequest
                                 return $query->where('id_dependencia', $detalle["id_dependencia"])->where('numero_acta_det_quedan', $detalle["numero_acta_det_quedan"]);
                             })->ignore($detalle["id_det_quedan"], 'id_det_quedan')
                     ];
-
                     $rules["detalle_quedan.{$key}.monto.producto_factura_det_quedan"] = ["required_without:detalle_quedan.{$key}.monto.servicio_factura_det_quedan"];
                     $rules["detalle_quedan.{$key}.monto.servicio_factura_det_quedan"] = ["required_without:detalle_quedan.{$key}.monto.producto_factura_det_quedan"];
-                    /*
-                    if ($detalle["reajuste"]) {
-                    $rules["detalle_quedan.{$key}.justificacion_det_quedan"] = ['required'];
-                    $rules["detalle_quedan.{$key}.reajuste_monto.ajuste_producto_factura_det_quedan"] = ["required_without:detalle_quedan.{$key}.reajuste_monto.ajuste_servicio_factura_det_quedan"];
-                    $rules["detalle_quedan.{$key}.reajuste_monto.ajuste_servicio_factura_det_quedan"] = ["required_without:detalle_quedan.{$key}.reajuste_monto.ajuste_producto_factura_det_quedan"];
-                    } */
-
-
                     if ($detalle["reajuste"]) {
                         $rules["detalle_quedan.{$key}.justificacion_det_quedan"] = ['required'];
                         $rules["detalle_quedan.{$key}.reajuste_monto.ajuste_producto_factura_det_quedan"] = ["required_with:detalle_quedan.{$key}.monto.producto_factura_det_quedan"];
                         $rules["detalle_quedan.{$key}.reajuste_monto.ajuste_servicio_factura_det_quedan"] = ["required_with:detalle_quedan.{$key}.monto.servicio_factura_det_quedan"];
-
                     } 
-
-
-
                 }
             });
         return $rules;
@@ -77,10 +63,8 @@ class QuedanRequest extends FormRequest
                 $customMessage = "El número de acta {$repeatedNumeroActa} ya ha sido utilizado en la dependencia {$dependenciaNombre}";
                 // Reemplazar el número de acta en el mensaje de error
                 $messages["detalle_quedan.{$key}.numero_acta_det_quedan.unique"] = $customMessage;
-               
                 $messages["detalle_quedan.{$key}.monto.producto_factura_det_quedan.required_without"] = 'Debe ingresar monto de producto o servicio';
                 $messages["detalle_quedan.{$key}.monto.servicio_factura_det_quedan.required_without"] = 'Debe ingresar monto de producto o servicio';
-
                 $messages["detalle_quedan.{$key}.reajuste_monto.ajuste_servicio_factura_det_quedan.required_with"] = 'El monto de reajuste por servicio es requerido';
                 $messages["detalle_quedan.{$key}.reajuste_monto.ajuste_producto_factura_det_quedan.required_with"] = 'El monto de reajuste por producto es requerido';
             }
