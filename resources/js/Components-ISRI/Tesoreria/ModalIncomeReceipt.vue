@@ -161,7 +161,7 @@ import axios from "axios";
                                     <div class="mb-2 md:mr-2 md:mb-0 basis-1/3">
                                         <TextInput id="detail-amount" v-model="row.amount" :value="row.amount"
                                             :label-input="false" type="text" placeholder="Monto"
-                                            @update:modelValue="validateInput('amount', limit = 11, false, false, monto = true, index)">
+                                            @update:modelValue="validateInput('amount', limit = 10, false, false, monto = true, index)">
                                             <LabelToInput icon="money" forLabel="detail-amount" />
                                         </TextInput>
                                         <InputError v-for="(item, index2) in errors['income_detail.' + index + '.amount']"
