@@ -187,7 +187,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                 <div class="flex flex-wrap justify-end space-x-3">
                     <button
                         class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600 underline underline-offset-1"
-                        @click.stop="$emit('close-definitive')">Cerrar</button>
+                        @click.stop="$emit('close-modal')">Cerrar</button>
                     <GeneralButton v-if="infoSupplier != ''" @click="updateSupplier()"
                         color="bg-orange-700  hover:bg-orange-800" text="Editar proveedor" icon="update" />
                     <GeneralButton v-else @click="addSupplier()" color="bg-green-700  hover:bg-green-800"

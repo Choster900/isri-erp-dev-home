@@ -249,6 +249,9 @@ export default {
                 this.getDataRequerimiento();
             }
         },
+        getIndex(array, key, value) {
+            return array.findIndex((i) => i[key] == value);
+        },
         editRequerimiento(request) {
             this.modal_data = request
             this.requerimientoModalState = true
