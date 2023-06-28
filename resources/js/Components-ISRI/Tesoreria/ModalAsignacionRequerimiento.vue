@@ -245,7 +245,7 @@ import axios from 'axios';
                             <tr v-if="dataQuedan.length == 0">
                                 <td colspan="8" class="pb-3 text-xs whitespace-nowrap text-center h-20">
                                     <span v-if="withoutDataInDb">SIN DATOS EN LA BASE DE DATOS...</span>
-                                    <span v-else>Utilize los filtros o simplemente precio buscar.</span>
+                                    <span v-else>Utilize los filtros o simplemente presione buscar.</span>
                                 </td>
 
                             </tr>
@@ -440,7 +440,7 @@ export default {
 
                 }
             } else {
-                toast.error("Al parecer no haz seleccionado ningun quedan", {
+                toast.error("Al parecer no has seleccionado ningun quedan", {
                     autoClose: 5000,
                     position: "top-right",
                     transition: "zoom",
