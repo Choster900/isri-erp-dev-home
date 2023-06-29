@@ -122,7 +122,7 @@ import ModalProveedortVue from '@/Components-ISRI/Tesoreria/ModalProveedor.vue';
                 </datatable>
             </div>
             <div v-if="empty_object" class="flex text-center py-2">
-                <p class="font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se encontraron
+                <p class="text-red-500 font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se encontraron
                     registros.</p>
             </div>
         </div>
