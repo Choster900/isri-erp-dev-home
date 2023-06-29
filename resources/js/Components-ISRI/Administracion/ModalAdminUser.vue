@@ -5,6 +5,7 @@ import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import axios from "axios";
 import moment from 'moment';
+import ModalAsignacionRequerimiento from '@/Components-ISRI/Tesoreria/ModalAsignacionRequerimiento.vue';
 </script>
 
 <template>
@@ -37,6 +38,7 @@ import moment from 'moment';
                                     </div>
                                     <div v-if="user_modal.person_id !== ''" class="text-center mt-2">
                                         <h2 class="font-semibold">{{ user_modal.name }}</h2>
+                                        <p class="text-gray-700">{{ user_modal.nick_usuario }}</p>
                                         <p class="text-gray-700">{{ formatBirthDate }}</p>
                                         <p class="text-gray-700">{{ user_modal.address }}</p>
                                         <p class="text-gray-700">{{ user_modal.phone_number }}</p>
@@ -51,7 +53,7 @@ import moment from 'moment';
                         </div>
                     </div>
                     <div v-if="found_user" class="w-full md:w-[60%]">
-                        
+
                         <div>
                             <span class="font-semibold text-slate-800 mb-4 text-lg">Selecciona un sistema y un rol:</span>
                         </div>
@@ -74,19 +76,19 @@ import moment from 'moment';
                                 </label>
                                 <div class="relative font-semibold  flex h-8 w-full flex-row-reverse ">
                                     <Multiselect :disabled="is_loadig_roles" v-model="row.id_rol" :options="roles"
-                                        placeholder="Rol" :searchable="true" @select="selectRol($event)"/>
+                                        placeholder="Rol" :searchable="true" @select="selectRol($event)" />
                                     <LabelToInput icon="list" />
                                 </div>
                             </div>
                         </div>
                         <div class="flex justify-center mb-2 mt-1">
                             <div class="flex items-center">
-                                <GeneralButton v-if="row.id_rol!='' || row.id_sistema!=''"
-                                    class="mr-1 py-1" color="bg-red-500 hover:bg-red-700" icon="delete"
+                                <GeneralButton class="ml-1 py-1" color="bg-blue-500 hover:bg-blue-700"
+                                    :icon="new_item ? 'add' : 'update'" :text="new_item ? 'Agregar' : 'Actualizar'"
+                                    @click="new_item ? saveRol() : updateRol()" :disabled="is_loadig_roles" />
+                                <GeneralButton v-if="row.id_rol != '' || row.id_sistema != ''" class="mr-1 py-1"
+                                    color="bg-red-500 hover:bg-red-700" icon="delete"
                                     :text="new_item ? 'Limpiar' : 'Cancelar'" @click="new_item ? clean() : cancel()"
-                                    :disabled="is_loadig_roles" />
-                                <GeneralButton class="ml-1 py-1" color="bg-blue-500 hover:bg-blue-700" icon="add"
-                                    :text="new_item ? 'Agregar' : 'Actualizar'" @click="new_item ? saveRol() : updateRol()"
                                     :disabled="is_loadig_roles" />
                             </div>
                         </div>
@@ -118,7 +120,8 @@ import moment from 'moment';
                                                             </path>
                                                         </svg>
                                                     </button>
-                                                    <button v-if="!rol.selected" @click="deleteRol(rol.id_rol, rol.nombre_rol, rol.sistema.id_sistema)"
+                                                    <button v-if="!rol.selected"
+                                                        @click="deleteRol(rol.id_rol, rol.nombre_rol, rol.sistema.id_sistema)"
                                                         class="text-rose-500 hover:text-rose-600 rounded-full">
                                                         <span class="sr-only">Delete</span><svg class="w-6 h-6 fill-current"
                                                             viewBox="0 0 32 32">
@@ -141,6 +144,13 @@ import moment from 'moment';
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
+                        <div class="flex justify-center mt-5">
+                            <GeneralButton class="mr-1" v-if="modalData != '' && !itemSelected"
+                                color="bg-orange-700  hover:bg-orange-800" text="Actualizar" icon="update" />
+                            <GeneralButton class="mr-1" v-else-if="!itemSelected" color="bg-green-700  hover:bg-green-800"
+                                text="Guardar" icon="add" />
+                            <GeneralButton class="ml-1" text="Cancelar" icon="delete" @click="$emit('cerrar-modal')" />
                         </div>
                     </div>
                 </div>
@@ -176,7 +186,8 @@ export default {
                 password: '',
                 birth_date: '',
                 address: '',
-                phone_number: ''
+                phone_number: '',
+                nick_usuario: ''
             },
             row: {
                 id_sistema: '',
@@ -370,7 +381,9 @@ export default {
                     this.roles = []
                 }
             } else {
-                toast.warning("Debes seleccionar sistema y rol", {
+                let msg
+                this.filteredSystemOptions.length != 0 ? msg = 'Debes seleccionar sistema y rol.' : msg = 'Este usuario ya posee un rol en cada sistema.'
+                toast.warning(msg, {
                     autoClose: 5000,
                     position: "top-right",
                     transition: "zoom",
@@ -378,7 +391,7 @@ export default {
                 });
             }
         },
-        deleteRol(id_rol, nombre_rol,id_sistema) {
+        deleteRol(id_rol, nombre_rol, id_sistema) {
             if (this.modalData != '') {
                 this.$swal.fire({
                     title: 'Desactivar Rol ' + nombre_rol,
@@ -436,8 +449,8 @@ export default {
             this.new_item = true
             this.row.id_rol = ''
             this.row.id_sistema = ''
-            this.roles=[]
-            this.modalData!='' ? this.getRoles(this.modalData.id_usuario) : ''
+            this.roles = []
+            this.modalData != '' ? this.getRoles(this.modalData.id_usuario) : ''
         },
         //Methods to save a new user
         searchDui() {
@@ -532,10 +545,16 @@ export default {
                 this.new_option = []
                 this.user_modal.id = this.modalData.id_usuario ?? ''
                 this.user_modal.person_id = this.modalData.id_persona ?? ''
-                this.user_modal.name = this.modalData.pnombre_persona + ' ' + this.modalData.snombre_persona + ' ' + this.modalData.papellido_persona
+                this.user_modal.name = this.modalData.pnombre_persona + ' '
+                    + this.modalData.snombre_persona + ' '
+                    + (this.modalData.tnombre_persona ?? ' ')
+                    + this.modalData.papellido_persona + ' '
+                    + (this.modalData.sapellido_persona ?? ' ')
+                    + (this.modalData.tapellido_persona ?? '')
                 this.user_modal.birth_date = this.modalData.fecha_nac_persona ?? ''
                 this.user_modal.address = this.modalData.nombre_municipio ?? ''
                 this.user_modal.phone_number = this.modalData.telefono_persona ?? ''
+                this.user_modal.nick_usuario = this.modalData.nick_usuario ?? ''
                 this.user_modal.roles = []
                 if (this.modalData != '') {
                     this.found_user = true
@@ -552,6 +571,14 @@ export default {
         },
         filteredSystemOptions() {
             return this.sistemas.filter(item => !item.assigned);
+        },
+        itemSelected() {
+            const item = this.user_modal.roles.find(item => item.selected);
+            if (item) {
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 };

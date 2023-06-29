@@ -37,7 +37,7 @@ import ModalChangePasswordVue from '@/Components-ISRI/Administracion/ModalChange
         <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true" @sort="sortBy"
           @datos-enviados="handleData($event)" @execute-search="getUsers()">
           <tbody class="text-sm divide-y divide-slate-200">
-            <tr v-for="user in users" :key="user.id_usuario">
+            <tr v-for="(user,index) in users" :key="index">
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800 text-center">{{ user.id_usuario }}</div>
               </td>
