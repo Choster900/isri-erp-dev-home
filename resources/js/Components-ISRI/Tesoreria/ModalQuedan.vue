@@ -11,7 +11,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                 <div class="text-center">
                     <div class=" flex   justify-center pt-2 content-between">
                         <div class="px-2" v-if="dataQuedan == ''">
-                            <template v-if="this.dataForCalculate.montoSuperador == false">
+                            <template v-if="dataForCalculate.montoSuperador == false">
                                 <GeneralButton color="bg-green-700   hover:bg-green-800" text="AGREGAR" icon="add"
                                     @click="createQuedan()" />
                             </template>
@@ -19,7 +19,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                         </div>
                         <div class="px-2" v-else>
 
-                            <template v-if="this.dataForCalculate.montoSuperador == false">
+                            <template v-if="dataForCalculate.montoSuperador == false">
                                 <GeneralButton
                                     :color="['bg-orange-700 hover:bg-orange-800', incoherencia ? 'animate-pulse animate-infinite animate-duration-[3000ms]' : '']"
                                     text="MODIFICAR" icon="update" @click="updateQuedan()" />
