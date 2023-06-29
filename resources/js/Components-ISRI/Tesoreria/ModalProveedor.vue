@@ -42,7 +42,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                         <div class="mb-5 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="razon-social" v-model="supplier.razon_social_proveedor"
-                                    :value="supplier.razon_social_proveedor" type="text" placeholder="Razón social"
+                                    type="text" placeholder="Razón social"
                                     @update:modelValue="validateInput('razon_social_proveedor', limit = 145, upper = true)">
                                     <LabelToInput icon="standard" forLabel="razon-social" />
                                 </TextInput>
@@ -50,7 +50,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="nombre-comercial" v-model="supplier.nombre_comercial_proveedor"
-                                    :value="supplier.nombre_comercial_proveedor" type="text" placeholder="Nombre comercial"
+                                   type="text" placeholder="Nombre comercial"
                                     @update:modelValue="validateInput('nombre_comercial_proveedor', limit = 145, upper = true)">
                                     <LabelToInput icon="standard" forLabel="nombre-comercial" />
                                 </TextInput>
@@ -58,7 +58,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput :required="false" id="nrc-proveedor" v-model="supplier.nrc_proveedor"
-                                    :value="supplier.nrc_proveedor" type="text" @update:modelValue="validarnrc()"
+                                   type="text" @update:modelValue="validarnrc()"
                                     placeholder="NRC Proveedor">
                                     <LabelToInput icon="personalInformation" forLabel="nrc-proveedor" />
                                 </TextInput>
@@ -68,7 +68,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                         <div class="mb-5 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="dui-proveedor" v-model="supplier.dui_proveedor" type="text" placeholder="Dui"
-                                    :value="supplier.dui_proveedor"
+                                   
                                     @update:modelValue="validateInput('dui_proveedor', limit = 10, false, false, dui = true)">
                                     <LabelToInput icon="personalInformation" forLabel="dui-proveedor" />
                                 </TextInput>
@@ -76,7 +76,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput :required="false" id="nit-proveedor" v-model="supplier.nit_proveedor"
-                                    :value="supplier.nit_proveedor" type="text" placeholder="NIT"
+                                    type="text" placeholder="NIT"
                                     @update:modelValue="validateInput('nit_proveedor', limit = 17, false, false, false, nit = true)">
                                     <LabelToInput icon="personalInformation" forLabel="nit-proveedor" />
                                 </TextInput>
@@ -130,7 +130,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                         <div class="mb-4 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput :required="false" id="telefono" v-model="supplier.telefono1_proveedor"
-                                    :value="supplier.telefono1_proveedor" type="text" placeholder="Telefono 1"
+                                    type="text" placeholder="Telefono 1"
                                     @update:modelValue="validateInput('telefono1_proveedor', limit = 10, false, false, false, false, phone_numer = true)">
                                     <LabelToInput icon="personalPhoneNumber" forLabel="telefono" />
                                 </TextInput>
@@ -138,7 +138,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput :required="false" id="telefono2-proveedor" v-model="supplier.telefono2_proveedor"
-                                    :value="supplier.telefono2_proveedor" type="text" placeholder="Telefono 2"
+                                 type="text" placeholder="Telefono 2"
                                     @update:modelValue="validateInput('telefono2_proveedor', limit = 10, false, false, false, false, phone_numer = true)">
                                     <LabelToInput icon="personalPhoneNumber" forLabel="telefono2-proveedor" />
                                 </TextInput>
@@ -146,7 +146,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput :required="false" id="Direccion" v-model="supplier.direccion_proveedor"
-                                    :value="supplier.direccion_proveedor" type="tex" placeholder="Direccion"
+                                   type="tex" placeholder="Direccion"
                                     @update:modelValue="validateInput('direccion_proveedor', limit = 250, false, false, false, false, false)">
                                     <LabelToInput icon="house" forLabel="Direccion" />
                                 </TextInput>
@@ -156,7 +156,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                         <div class="mb-1 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput :required="false" id="contacto-proveedor" v-model="supplier.contacto_proveedor"
-                                    :value="supplier.contacto_proveedor" type="text" placeholder="Contacto "
+                                  type="text" placeholder="Contacto "
                                     @update:modelValue="validateInput('contacto_proveedor', limit = 95, false, false, false, false, false)">
                                     <LabelToInput icon="personalInformation" forLabel="contacto-proveedor" />
                                 </TextInput>
@@ -174,7 +174,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput :required="false" id="email-proveedor" v-model="supplier.email_proveedor"
-                                    :value="supplier.email_proveedor" type="email" placeholder="Email "
+                                    type="email" placeholder="Email "
                                     @update:modelValue="validateInput('email_proveedor', limit = 95, false, false, false, false, false)">
                                     <LabelToInput icon="email" forLabel="email-proveedor" />
                                 </TextInput>

@@ -52,17 +52,6 @@ import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalL
                                     </div>
                                 </td>
                                 <td>
-                                    <!-- <div v-for="(quedan, i) in  data.quedan" :key="i"
-                                        class="font-medium text-slate-800 text-center flex justify-center items-center">
-                                        <p
-                                            :class="{ 'border-b-2 border-b-gray-500': i < data.quedan.length - 1 && data.quedan.length > 1 }">
-                                            QUEDAN: {{ quedan.id_quedan }}
-                                            <br>
-                                            MONTO TOTAL: {{ quedan.monto_liquido_quedan }}
-                                        </p>
-                                    </div> -->
-
-
                                     <div class="max-h-[165px] overflow-y-auto scrollbar">
                                         <template v-for="(quedan, i) in data.quedan" :key="i">
                                             <div class="mb-2 text-center">
@@ -246,7 +235,6 @@ export default {
             this.tableData.draw++
             await axios.post(url, this.tableData).then((response) => {
                 let data = response.data;
-                console.log(data);
                 if (this.tableData.draw == data.draw) {
                     this.links = data.data.links
                     this.pagination.total = data.data.total

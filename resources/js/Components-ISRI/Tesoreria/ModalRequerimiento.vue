@@ -60,6 +60,7 @@ import 'vue3-toastify/dist/index.css';
 
 <script>
 export default {
+    emits: ['close-modal',"updateTable"], 
     props: {
         ModalIsOpen: {
             type: Boolean,

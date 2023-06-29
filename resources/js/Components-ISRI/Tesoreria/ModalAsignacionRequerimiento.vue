@@ -259,6 +259,7 @@ import axios from 'axios';
 <script>
 
 export default {
+    emits: ['close-definitive','reload-table'], // Declara el evento personalizado que emite el componente
     props: {
         modalIsOpen: {
             type: Boolean,

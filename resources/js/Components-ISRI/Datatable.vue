@@ -32,27 +32,7 @@
                                     <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
                                     <g id="SVGRepo_iconCarrier">
                                         <defs id="defs9728"></defs>
-                                        <sodipodi:namedview id="namedview9726" pagecolor="#ffffff" bordercolor="#666666"
-                                            borderopacity="1.0" inkscape:showpageshadow="2" inkscape:pageopacity="0.0"
-                                            inkscape:pagecheckerboard="0" inkscape:deskcolor="#d1d1d1" showgrid="true"
-                                            inkscape:zoom="0.84118632" inkscape:cx="29.125533" inkscape:cy="385.76471"
-                                            inkscape:window-width="1920" inkscape:window-height="1009" inkscape:window-x="0"
-                                            inkscape:window-y="1080" inkscape:window-maximized="1"
-                                            inkscape:current-layer="g10449" showguides="true">
-                                            <inkscape:grid type="xygrid" id="grid9972" originx="0" originy="0">
-                                            </inkscape:grid>
-                                            <sodipodi:guide position="-260,300" orientation="0,-1" id="guide383"
-                                                inkscape:locked="false"></sodipodi:guide>
-                                            <sodipodi:guide position="300,520" orientation="1,0" id="guide385"
-                                                inkscape:locked="false">
-                                            </sodipodi:guide>
-                                            <sodipodi:guide position="240,520" orientation="0,-1" id="guide939"
-                                                inkscape:locked="false">
-                                            </sodipodi:guide>
-                                            <sodipodi:guide position="220,80" orientation="0,-1" id="guide941"
-                                                inkscape:locked="false">
-                                            </sodipodi:guide>
-                                        </sodipodi:namedview>
+                                      
                                         <g id="g10449" transform="matrix(0.95173205,0,0,0.95115787,13.901174,12.168794)"
                                             style="stroke-width:1.05103">
                                             <path
@@ -106,8 +86,8 @@ export default {
             default: ''
         },
         sortOrders: {
-            type: String,
-            default: ''
+            type: Object,
+            default: []
         },
         searchButton: {
             type: Boolean,

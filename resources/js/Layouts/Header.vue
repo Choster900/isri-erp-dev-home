@@ -82,7 +82,6 @@ export default {
     props: {
         nameSubModule: {//prop muestra estado del modal para abrir y cerrar
             type: String,
-            required: true,
         }
     }
 }

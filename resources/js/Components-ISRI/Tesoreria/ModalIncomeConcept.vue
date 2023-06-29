@@ -50,7 +50,7 @@ import axios from "axios";
                     <!-- Second row -->
                     <div class="mb-7 md:flex flex-row justify-items-start">
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                            <TextInput id="name-income" v-model="income_concept.name" :value="income_concept.name"
+                            <TextInput id="name-income" v-model="income_concept.name" 
                                 type="text" placeholder="Concepto de Ingreso" 
                                 @update:modelValue="validateInput('name', limit=145, upper=true)">
                                 <LabelToInput icon="standard" forLabel="name-income" />
@@ -75,7 +75,7 @@ import axios from "axios";
                     <div class="mb-7 md:flex flex-row justify-items-start">
                         <div class="mb-4 md:mr-2 md:mb-0 basis-full">
                             <TextInput :required="false" id="detalle-concepto" v-model="income_concept.detail"
-                                :value="income_concept.detail" type="text" placeholder="Detalle concepto ingreso"
+                            type="text" placeholder="Detalle concepto ingreso"
                                 @update:modelValue="validateInput('detail', limit=145)">
                                 <LabelToInput icon="standard" forLabel="detalle-concepto" />
                             </TextInput>

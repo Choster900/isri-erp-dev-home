@@ -3,9 +3,6 @@ import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 import { computed, ref } from "vue"
-//import { DoughnutChart } from "vue-chart-3"
-//import { ArcElement, Chart, DoughnutController } from "chart.js"
-//Chart.register(DoughnutController, ArcElement)
 import { BarChart } from "vue-chart-3"
 import { Chart, BarController, CategoryScale, LinearScale, BarElement } from "chart.js"
 Chart.register(BarController, CategoryScale, LinearScale, BarElement)
@@ -109,6 +106,7 @@ Chart.register(BarController, CategoryScale, LinearScale, BarElement)
 <script>
 
 export default {
+    emits: ['cerrar-modal'], 
     props: {
         view_req_info: {
             type: Boolean,
