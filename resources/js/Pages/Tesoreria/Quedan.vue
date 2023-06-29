@@ -70,9 +70,10 @@ import html2pdf from 'html2pdf.js'
                                     <template v-for="(detalle, i) in data.detalle_quedan" :key="i">
                                         <div class="mb-2 text-center">
                                             <p class="text-[10pt]">
-                                                <span class="font-medium">FACTURA</span>{{ detalle.numero_factura_det_quedan
+                                                <span class="font-medium">FACTURA: </span>${{
+                                                    detalle.numero_factura_det_quedan
                                                 }}<br>
-                                                <span class="font-medium">MONTO:</span> ${{
+                                                <span class="font-medium">MONTO: </span> ${{
                                                     (parseFloat(detalle.servicio_factura_det_quedan) || 0) +
                                                     (parseFloat(detalle.producto_factura_det_quedan) || 0) }}
                                             </p>
@@ -184,7 +185,8 @@ import html2pdf from 'html2pdf.js'
                 </datatable>
             </div>
             <div v-if="empty_object" class="flex text-center py-2">
-                <p class="text-red-500 font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se encontraron
+                <p class="text-red-500 font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se
+                    encontraron
                     registros.</p>
             </div>
         </div>

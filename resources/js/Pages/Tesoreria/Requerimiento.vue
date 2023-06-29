@@ -1,9 +1,12 @@
 <script setup>
 import Datatable from "@/Components-ISRI/Datatable.vue";
+import { Head } from "@inertiajs/vue3";
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import ModalRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalRequerimiento.vue';
 import ModalVerRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalVerRequerimiento.vue';
+import axios from 'axios';
+import moment from 'moment';
 </script>
 <template>
     <Head title="Catalogo - Requerimiento" />
@@ -103,7 +106,8 @@ import ModalVerRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalVerRequer
                 </datatable>
             </div>
             <div v-if="empty_object" class="flex text-center py-2">
-                <p class="text-red-500 font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se encontraron
+                <p class="text-red-500 font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se
+                    encontraron
                     registros.</p>
             </div>
         </div>
@@ -154,8 +158,7 @@ import ModalVerRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalVerRequer
         @cerrar-modal="view_req_info = false" />
 </template>
 <script>
-import axios from 'axios';
-import moment from 'moment';
+
 export default {
     created() {
         this.getDataRequerimiento();
@@ -178,7 +181,7 @@ export default {
                 sortOrders[column.name] = -1;
         });
         return {
-            empty_object:false,
+            empty_object: false,
             errors: [],
             scrollbarModalOpen: false,
             requerimientos: [],
@@ -228,7 +231,7 @@ export default {
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
                     this.requerimientos = data.data.data;
-                    this.requerimientos.length>0 ? this.empty_object=false : this.empty_object=true
+                    this.requerimientos.length > 0 ? this.empty_object = false : this.empty_object = true
                 }
             }).catch((errors) => {
                 let msg = this.manageError(errors);

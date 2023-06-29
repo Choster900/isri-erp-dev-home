@@ -33,7 +33,7 @@ import axios from 'axios';
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Total Conceptos Ingreso <span
+                    <h2 class="font-semibold text-slate-800 pt-1">Concepto Ingresos: <span
                             class="text-slate-400 font-medium">{{
                                 tableData.total
                             }}</span></h2>

@@ -11,7 +11,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                 <div class="text-center">
                     <div class=" flex   justify-center pt-2 content-between">
                         <div class="px-2" v-if="dataQuedan == ''">
-                            <template v-if="this.dataForCalculate.montoSuperador == false">
+                            <template v-if="dataForCalculate.montoSuperador == false">
                                 <GeneralButton color="bg-green-700   hover:bg-green-800" text="AGREGAR" icon="add"
                                     @click="createQuedan()" />
                             </template>
@@ -19,7 +19,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                         </div>
                         <div class="px-2" v-else>
 
-                            <template v-if="this.dataForCalculate.montoSuperador == false">
+                            <template v-if="dataForCalculate.montoSuperador == false">
                                 <GeneralButton
                                     :color="['bg-orange-700 hover:bg-orange-800', incoherencia ? 'animate-pulse animate-infinite animate-duration-[3000ms]' : '']"
                                     text="MODIFICAR" icon="update" @click="updateQuedan()" />
@@ -396,7 +396,8 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                 <th class="text-xs border-2 border-black  text-white bg-[#E75E2B]"
                                                     colspan="1" rowspan="2">
                                                     <div class="flex justify-center ">
-                                                        <span class="font-semibold text-white mt-0.5">JUSTIICACIÓN REAJUSTES</span>
+                                                        <span class="font-semibold text-white mt-0.5">JUSTIICACIÓN
+                                                            REAJUSTES</span>
                                                     </div>
                                                 </th>
                                                 <th class="border-2 border-black text-sm px-3 text-gray-600" colspan="4"
@@ -515,7 +516,7 @@ export default {
             required: true,
         },
         dataForSelectInRow: {//prop que muestra information en row
-            type: [],
+            type: Object,
             required: true,
         },
         totalAmountBySupplier: {

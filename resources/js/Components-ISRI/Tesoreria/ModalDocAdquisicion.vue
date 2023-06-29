@@ -36,7 +36,7 @@ import axios from "axios";
                                 <InputError class="mt-2" :message="errors.type_id" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                                <TextInput id="doc-number" v-model="acq_doc.number" :value="acq_doc.number" type="text"
+                                <TextInput id="doc-number" v-model="acq_doc.number"  type="text"
                                     placeholder="Numero documento" @update:modelValue="validateGeneralInput('number', 20)">
                                     <LabelToInput icon="objects" forLabel="doc-number" />
                                 </TextInput>
@@ -46,7 +46,7 @@ import axios from "axios";
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="mngm-number" v-model="acq_doc.management_number"
-                                    :value="acq_doc.management_number" type="text" placeholder="Numero gestion"
+                                     type="text" placeholder="Numero gestion"
                                     @update:modelValue="validateGeneralInput('management_number', 20)">
                                     <LabelToInput icon="objects" forLabel="mngm-number" />
                                 </TextInput>
@@ -94,7 +94,7 @@ import axios from "axios";
                                 <InputError class="mt-2" :message="errors.award_date" />
                             </div>
                             <div class="mb-4 md:mx-2 md:mb-0 basis-1/2">
-                                <TextInput id="mngm-number" v-model="acq_doc.award_number" :value="acq_doc.award_number"
+                                <TextInput id="mngm-number" v-model="acq_doc.award_number" 
                                     type="text" placeholder="Numero adjudicacion" :required="false"
                                     @update:modelValue="validateGeneralInput('award_number', 20)">
                                     <LabelToInput icon="objects" forLabel="mngm-number" />
@@ -130,7 +130,7 @@ import axios from "axios";
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="commt-number" v-model="array_item.commitment_number"
-                                    :value="array_item.commitment_number" type="text" placeholder="Numero(s) compromiso(s)"
+                                 type="text" placeholder="Numero(s) compromiso(s)"
                                     @update:modelValue="validateItemInput('commitment_number', 20, false, commitment_number = true)">
                                     <LabelToInput icon="objects" forLabel="commt-number" />
                                 </TextInput>
@@ -140,7 +140,7 @@ import axios from "axios";
                                 <InputError class="mt-2" :message="item_errors.commitment_number" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                                <TextInput id="amount" v-model="array_item.amount" :value="array_item.amount" type="text"
+                                <TextInput id="amount" v-model="array_item.amount" type="text"
                                     placeholder="Monto detalle"
                                     @update:modelValue="validateItemInput('amount', 10, monto = true)">
                                     <LabelToInput icon="money" forLabel="amount" />
@@ -153,7 +153,7 @@ import axios from "axios";
                         <!-- Second row -->
                         <div class="mb-4 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-full">
-                                <TextInput id="item-name" v-model="array_item.name" :value="array_item.name" type="text"
+                                <TextInput id="item-name" v-model="array_item.name" type="text"
                                     placeholder="Nombre" @update:modelValue="validateItemInput('name', 250, monto = false)">
                                     <LabelToInput icon="standard" forLabel="item-name" />
                                 </TextInput>
@@ -257,7 +257,7 @@ import axios from "axios";
                         <div class="flex items-center mr-1">
                             <button v-if="currentPage != 2"
                                 class="flex items-center bg-blue-600 hover:bg-blue-700 text-white pl-3 pr-2 py-1.5 text-center mb-2 rounded"
-                                :disabled="disabled_next_button" @click="goToNextPage">
+                                @click="goToNextPage">
                                 <div class="text-[12px]">SIGUIENTE</div>
                                 <span
                                     class="ml-1 pl-1 pr-0 py-2.5 text-base text-gray-100 border-l-2 border-gray-100"></span>

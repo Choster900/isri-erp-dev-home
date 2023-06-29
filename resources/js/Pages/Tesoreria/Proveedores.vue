@@ -26,7 +26,7 @@ import ModalProveedortVue from '@/Components-ISRI/Tesoreria/ModalProveedor.vue';
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Total Proveedores
+                    <h2 class="font-semibold text-slate-800 pt-1">Proveedores:
                         <span class="text-slate-400 font-medium">{{ pagination.total }}</span>
                     </h2>
                 </div>
