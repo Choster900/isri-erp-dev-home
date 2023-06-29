@@ -21,8 +21,10 @@ import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalL
                 <div class="mb-4 md:flex flex-row justify-items-start">
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-                            <Multiselect v-model="tableData.length" @input="getDataLiquidaciones()" :options="perPage"
-                                :searchable="true" placeholder="Cantidad a mostrar" />
+                            <Multiselect v-model="tableData.length" @select="getDataLiquidaciones()"
+                                @deselect=" tableData.length = 5; getDataLiquidaciones()"
+                                @clear="tableData.length = 5; getDataLiquidaciones()" :options="perPage" :searchable="true"
+                                placeholder="Cantidad a mostrar" />
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
@@ -121,7 +123,8 @@ import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalL
                 </datatable>
             </div>
             <div v-if="empty_object" class="flex text-center py-2">
-                <p class="text-red-500 font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se encontraron
+                <p class="text-red-500 font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se
+                    encontraron
                     registros.</p>
             </div>
         </div>
@@ -243,13 +246,14 @@ export default {
             this.tableData.draw++
             await axios.post(url, this.tableData).then((response) => {
                 let data = response.data;
+                console.log(data);
                 if (this.tableData.draw == data.draw) {
                     this.links = data.data.links
                     this.pagination.total = data.data.total
                     this.links[0].label = "Anterior"
                     this.links[this.links.length - 1].label = "Siguiente"
                     this.dataRequerimientoForTable = data.data.data
-                    this.dataRequerimientoForTable.length>0 ? this.empty_object=false : this.empty_object=true
+                    this.dataRequerimientoForTable.length > 0 ? this.empty_object = false : this.empty_object = true
                 }
             }).catch((errors) => {
                 let msg = this.manageError(errors);

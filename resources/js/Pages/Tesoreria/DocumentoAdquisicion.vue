@@ -26,15 +26,15 @@ import axios from 'axios';
         <div class="mb-4 md:flex flex-row justify-items-start">
           <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
             <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-              <Multiselect v-model="tableData.length" @select="getAcquisitionDoc()" :options="perPage" :searchable="true"
-                placeholder="Cantidad a mostrar" />
+              <Multiselect v-model="tableData.length" @select="getAcquisitionDoc()"
+                @deselect=" tableData.length = 5; getAcquisitionDoc()" @clear="tableData.length = 5; getAcquisitionDoc()"
+                :options="perPage" :searchable="true" placeholder="Cantidad a mostrar" />
               <LabelToInput icon="list2" />
             </div>
           </div>
-          <h2 class="font-semibold text-slate-800 pt-1">Total Documentos Adquisicion <span
-              class="text-slate-400 font-medium">{{
-                tableData.total
-              }}</span></h2>
+          <h2 class="font-semibold text-slate-800 pt-1">Documento Adquisicion: <span class="text-slate-400 font-medium">{{
+            tableData.total
+          }}</span></h2>
         </div>
       </header>
 
@@ -100,9 +100,10 @@ import axios from 'axios';
                     <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer" @click="changeStateAcqDoc(doc)"
                       v-if="permits.eliminar == 1">
                       <div class="w-8 text-red-900"><span class="text-xs">
-                          <svg :fill="doc.estado_doc_adquisicion == 1 ? '#991B1B' : '#166534'" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" width="20px"
-                            height="20px" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 97.994 97.994"
-                            xml:space="preserve" :stroke="doc.estado_doc_adquisicion == 1 ? '#991B1B' : '#166534'">
+                          <svg :fill="doc.estado_doc_adquisicion == 1 ? '#991B1B' : '#166534'" version="1.1" id="Capa_1"
+                            xmlns="http://www.w3.org/2000/svg" width="20px" height="20px"
+                            xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 97.994 97.994" xml:space="preserve"
+                            :stroke="doc.estado_doc_adquisicion == 1 ? '#991B1B' : '#166534'">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                             <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
                             <g id="SVGRepo_iconCarrier">
@@ -132,7 +133,8 @@ import axios from 'axios';
 
       </div>
       <div v-if="empty_object" class="flex text-center py-2">
-        <p class="text-red-500 font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se encontraron registros.</p>
+        <p class="text-red-500 font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se encontraron
+          registros.</p>
       </div>
 
     </div>
