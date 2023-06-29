@@ -15,17 +15,18 @@ import ModalProveedortVue from '@/Components-ISRI/Tesoreria/ModalProveedor.vue';
             </div>
         </div>
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
-            <!-- TODO: Improve view table - this is temporal and doesn't mean is permanent -->
             <header class="px-5 py-4">
                 <div class="mb-4 md:flex flex-row justify-items-start">
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-                            <Multiselect v-model="tableData.length" @select="getSuppilers()" :options="perPage"
-                                :searchable="true" placeholder="Cantidad a mostrar" />
+                            <Multiselect v-model="tableData.length" @select="getSuppilers()"
+                                @deselect=" tableData.length = 5; getSuppilers()"
+                                @clear="tableData.length = 5; getSuppilers()" :options="perPage" :searchable="true"
+                                placeholder="Cantidad a mostrar" />
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Total Proveedores
+                    <h2 class="font-semibold text-slate-800 pt-1">Proveedores:
                         <span class="text-slate-400 font-medium">{{ pagination.total }}</span>
                     </h2>
                 </div>
@@ -121,7 +122,7 @@ import ModalProveedortVue from '@/Components-ISRI/Tesoreria/ModalProveedor.vue';
                 </datatable>
             </div>
             <div v-if="empty_object" class="flex text-center py-2">
-                <p class="font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se encontraron
+                <p class="text-red-500 font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se encontraron
                     registros.</p>
             </div>
         </div>
@@ -137,9 +138,7 @@ import ModalProveedortVue from '@/Components-ISRI/Tesoreria/ModalProveedor.vue';
 
                                     <div class="flex-1 text-right ml-2">
                                         <a @click="getSuppilers(link.url)"
-                                            class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                                                                                                                                                                                                      text-indigo-500">
-                                            &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
+                                            class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer text-indigo-500">&lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
                                     </div>
                                 </span>
@@ -147,8 +146,7 @@ import ModalProveedortVue from '@/Components-ISRI/Tesoreria/ModalProveedor.vue';
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                                     <div class="flex-1 text-right ml-2">
                                         <a @click="getSuppilers(link.url)"
-                                            class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                                                                                                                                                                                                                                                                                                                                                                                                                      text-indigo-500">
+                                            class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
                                     </div>
@@ -200,7 +198,7 @@ export default {
                 sortOrders[column.name] = -1;
         });
         return {
-            empty_object:false,
+            empty_object: false,
             permits: [],
             stateModal: false,
             proveedores: [],
@@ -243,7 +241,7 @@ export default {
                     this.links[this.links.length - 1].label = "Siguiente";
                     this.proveedores = data.data.data;
                     this.stateModal = false
-                    this.proveedores.length>0 ? this.empty_object=false : this.empty_object=true
+                    this.proveedores.length > 0 ? this.empty_object = false : this.empty_object = true
                 }
             }).catch((errors) => {
                 let msg = this.manageError(errors);

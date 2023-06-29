@@ -16,7 +16,7 @@ class DocumentoAdquisicionController extends Controller
 {
     public function getDocAdquisicion(Request $request)
     {
-        $columns = ['id_doc_adquisicion','nombre_tipo_doc_adquisicion', 'numero_doc_adquisicion', 'razon_social_proveedor', 'monto_doc_adquisicion', 'compromiso_ppto_det_doc_adquisicion', 'estado_doc_adquisicion'];
+        $columns = ['id_doc_adquisicion', 'nombre_tipo_doc_adquisicion', 'numero_doc_adquisicion', 'razon_social_proveedor', 'monto_doc_adquisicion', 'compromiso_ppto_det_doc_adquisicion', 'estado_doc_adquisicion'];
 
         $length = $request->length;
         $column = $request->column; //Index
@@ -24,7 +24,7 @@ class DocumentoAdquisicionController extends Controller
         $search_value = $request->search;
 
         $query = DocumentoAdquisicion::select('*')
-            ->with('detalles.fuente_financiamiento')
+            ->with('detalles.fuente_financiamiento','detalles.quedan')
             ->join('tipo_gestion_compra', function ($join) {
                 $join->on('documento_adquisicion.id_tipo_gestion_compra', '=', 'tipo_gestion_compra.id_tipo_gestion_compra');
             })
@@ -59,30 +59,35 @@ class DocumentoAdquisicionController extends Controller
     public function changeStateAcqdoc(Request $request)
     {
         $acq_doc = DocumentoAdquisicion::find($request->id_acq_doc);
-        if ($acq_doc->estado_doc_adquisicion == 1) {
-            if ($request->state_acq_doc == 1) {
-                $acq_doc->update([
-                    'estado_doc_adquisicion' => 0,
-                    'fecha_mod_doc_adquisicion' => Carbon::now(),
-                    'usuario_doc_adquisicion' => $request->user()->nick_usuario,
-                    'ip_doc_adquisicion' => $request->ip(),
-                ]);
-                return ['mensaje' => 'Documento de aquisicion numero ' . $acq_doc->numero_doc_adquisicion . ' ha sido desactivado con exito'];
-            } else {
-                return ['mensaje' => 'El documento de adquisicion seleccionado ya ha sido activado por otro usuario'];
-            }
+        $has_assigned = $acq_doc->detalles()->whereHas('quedan')->exists();
+        if ($has_assigned) {
+            return response()->json(['logical_error' => 'Error, el documento seleccionado no puede ser desactivado porque ya tiene quedan asignados.'], 422);
         } else {
-            if ($acq_doc->estado_doc_adquisicion == 0) {
-                if ($request->state_acq_doc == 0) {
+            if ($acq_doc->estado_doc_adquisicion == 1) {
+                if ($request->state_acq_doc == 1) {
                     $acq_doc->update([
-                        'estado_doc_adquisicion' => 1,
+                        'estado_doc_adquisicion' => 0,
                         'fecha_mod_doc_adquisicion' => Carbon::now(),
                         'usuario_doc_adquisicion' => $request->user()->nick_usuario,
                         'ip_doc_adquisicion' => $request->ip(),
                     ]);
-                    return ['mensaje' => 'Documento de adquisicion numero ' . $acq_doc->numero_doc_adquisicion . ' ha sido activado con exito'];
+                    return ['mensaje' => 'Documento de aquisicion numero ' . $acq_doc->numero_doc_adquisicion . ' ha sido desactivado con exito'];
                 } else {
-                    return ['mensaje' => 'El documento de adquisicion seleccionado ya ha sido desactivado por otro usuario'];
+                    return ['mensaje' => 'El documento de adquisicion seleccionado ya ha sido activado por otro usuario'];
+                }
+            } else {
+                if ($acq_doc->estado_doc_adquisicion == 0) {
+                    if ($request->state_acq_doc == 0) {
+                        $acq_doc->update([
+                            'estado_doc_adquisicion' => 1,
+                            'fecha_mod_doc_adquisicion' => Carbon::now(),
+                            'usuario_doc_adquisicion' => $request->user()->nick_usuario,
+                            'ip_doc_adquisicion' => $request->ip(),
+                        ]);
+                        return ['mensaje' => 'Documento de adquisicion numero ' . $acq_doc->numero_doc_adquisicion . ' ha sido activado con exito'];
+                    } else {
+                        return ['mensaje' => 'El documento de adquisicion seleccionado ya ha sido desactivado por otro usuario'];
+                    }
                 }
             }
         }
@@ -91,7 +96,7 @@ class DocumentoAdquisicionController extends Controller
     {
         $doc_types = DB::table('tipo_documento_adquisicion')
             ->select('id_tipo_doc_adquisicion as value', 'nombre_tipo_doc_adquisicion as label')
-            ->where('estado_tipo_doc_adquisicion',1)
+            ->where('estado_tipo_doc_adquisicion', 1)
             ->orderBy('nombre_tipo_doc_adquisicion')
             ->get();
         $management_types = DB::table('tipo_gestion_compra')

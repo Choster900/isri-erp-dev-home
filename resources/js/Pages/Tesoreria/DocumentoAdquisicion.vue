@@ -26,15 +26,15 @@ import axios from 'axios';
         <div class="mb-4 md:flex flex-row justify-items-start">
           <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
             <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-              <Multiselect v-model="tableData.length" @select="getAcquisitionDoc()" :options="perPage" :searchable="true"
-                placeholder="Cantidad a mostrar" />
+              <Multiselect v-model="tableData.length" @select="getAcquisitionDoc()"
+                @deselect=" tableData.length = 5; getAcquisitionDoc()" @clear="tableData.length = 5; getAcquisitionDoc()"
+                :options="perPage" :searchable="true" placeholder="Cantidad a mostrar" />
               <LabelToInput icon="list2" />
             </div>
           </div>
-          <h2 class="font-semibold text-slate-800 pt-1">Total Documentos Adquisicion <span
-              class="text-slate-400 font-medium">{{
-                tableData.total
-              }}</span></h2>
+          <h2 class="font-semibold text-slate-800 pt-1">Documento Adquisicion: <span class="text-slate-400 font-medium">{{
+            tableData.total
+          }}</span></h2>
         </div>
       </header>
 
@@ -100,9 +100,10 @@ import axios from 'axios';
                     <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer" @click="changeStateAcqDoc(doc)"
                       v-if="permits.eliminar == 1">
                       <div class="w-8 text-red-900"><span class="text-xs">
-                          <svg fill="#7F1D1D" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" width="20px"
-                            height="20px" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 97.994 97.994"
-                            xml:space="preserve" stroke="#7F1D1D">
+                          <svg :fill="doc.estado_doc_adquisicion == 1 ? '#991B1B' : '#166534'" version="1.1" id="Capa_1"
+                            xmlns="http://www.w3.org/2000/svg" width="20px" height="20px"
+                            xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 97.994 97.994" xml:space="preserve"
+                            :stroke="doc.estado_doc_adquisicion == 1 ? '#991B1B' : '#166534'">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                             <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
                             <g id="SVGRepo_iconCarrier">
@@ -132,7 +133,8 @@ import axios from 'axios';
 
       </div>
       <div v-if="empty_object" class="flex text-center py-2">
-        <p class="font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se encontraron registros.</p>
+        <p class="text-red-500 font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se encontraron
+          registros.</p>
       </div>
 
     </div>
@@ -212,7 +214,7 @@ export default {
         sortOrders[column.name] = -1;
     });
     return {
-      empty_object:false,
+      empty_object: false,
       //Data for datatable
       acquisition_docs: [],
       //Data for modal
@@ -298,13 +300,25 @@ export default {
               this.getAcquisitionDoc(this.tableData.currentPage);
             })
             .catch((errors) => {
-              let msg = this.manageError(errors)
-              this.$swal.fire({
-                title: 'Operación cancelada',
-                text: msg,
-                icon: 'warning',
-                timer: 5000
-              })
+              if (errors.response.data.logical_error) {
+                toast.error(
+                  errors.response.data.logical_error,
+                  {
+                    autoClose: 5000,
+                    position: "top-right",
+                    transition: "zoom",
+                    toastBackgroundColor: "white",
+                  }
+                );
+              } else {
+                let msg = this.manageError(errors)
+                this.$swal.fire({
+                  title: 'Operación cancelada',
+                  text: msg,
+                  icon: 'warning',
+                  timer: 5000
+                })
+              }
             })
         }
       })
@@ -320,7 +334,7 @@ export default {
           this.links[0].label = "Anterior";
           this.links[this.links.length - 1].label = "Siguiente";
           this.acquisition_docs = data.data.data;
-          this.acquisition_docs.length>0 ? this.empty_object=false : this.empty_object=true
+          this.acquisition_docs.length > 0 ? this.empty_object = false : this.empty_object = true
         }
       }).catch((errors) => {
         let msg = this.manageError(errors)

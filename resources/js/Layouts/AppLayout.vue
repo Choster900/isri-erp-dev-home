@@ -1,4 +1,4 @@
-<script setup>
+ <script setup>
 import Modal from "@/Components/Modal.vue";
 import HeaderVue from "@/Layouts/Header.vue";
 import Sidebar from "@/Layouts/Sidebar.vue";
@@ -32,7 +32,7 @@ export default {
         nameSubModule: {//prop muestra estado del modal para abrir y cerrar
             type: String,
             default: 'nombre modulo',
-
+            required: true,
         }
     }
 }

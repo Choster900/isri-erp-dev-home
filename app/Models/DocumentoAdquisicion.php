@@ -35,8 +35,7 @@ class DocumentoAdquisicion extends Model
     }
     public function tipo_documento_adquisicion()
     { 
-        return
-         $this->belongsTo(TipoDocumentoAdquisicion::class, "id_tipo_doc_adquisicion", "id_tipo_doc_adquisicion");
+        return $this->belongsTo(TipoDocumentoAdquisicion::class, "id_tipo_doc_adquisicion", "id_tipo_doc_adquisicion");
     }
     public function Quedan()
     {

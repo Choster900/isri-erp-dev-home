@@ -24,7 +24,8 @@ import html2pdf from 'html2pdf.js'
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
                             <Multiselect v-model="tableData.length" placeholder="Cantidad a mostrar"
-                                @select="getDataQuedan()" :options="perPage" :searchable="true" />
+                                @select="getDataQuedan()" @deselect=" tableData.length = 5; getDataQuedan()"
+                                @clear="tableData.length = 5; getDataQuedan()" :options="perPage" :searchable="true" />
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
@@ -69,9 +70,10 @@ import html2pdf from 'html2pdf.js'
                                     <template v-for="(detalle, i) in data.detalle_quedan" :key="i">
                                         <div class="mb-2 text-center">
                                             <p class="text-[10pt]">
-                                                <span class="font-medium">FACTURA</span>{{ detalle.numero_factura_det_quedan
+                                                <span class="font-medium">FACTURA: </span>${{
+                                                    detalle.numero_factura_det_quedan
                                                 }}<br>
-                                                <span class="font-medium">MONTO:</span> ${{
+                                                <span class="font-medium">MONTO: </span> ${{
                                                     (parseFloat(detalle.servicio_factura_det_quedan) || 0) +
                                                     (parseFloat(detalle.producto_factura_det_quedan) || 0) }}
                                             </p>
@@ -183,7 +185,8 @@ import html2pdf from 'html2pdf.js'
                 </datatable>
             </div>
             <div v-if="empty_object" class="flex text-center py-2">
-                <p class="font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se encontraron
+                <p class="text-red-500 font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se
+                    encontraron
                     registros.</p>
             </div>
         </div>
@@ -228,7 +231,8 @@ import html2pdf from 'html2pdf.js'
 
         <ModalQuedan :showModal="showModal" @cerrar-modal="showModal = false" :data-quedan="dataQuedan"
             :dataForSelectInRow="dataForSelectInRow" @actualizar-table-data="getDataQuedan()"
-            :totalAmountBySupplier="totalAmountBySupplier" />
+            :totalAmountBySupplier="totalAmountBySupplier"
+            :amountByAcquisitionDocumentsDetails="amountByAcquisitionDocumentsDetails" />
 
 
     </AppLayoutVue>
@@ -276,6 +280,7 @@ export default {
             showModal: false,
             dataQuedan: [],//Datos del quedan hasta los detalles de este
             totalAmountBySupplier: [],//Datos de proveedores
+            amountByAcquisitionDocumentsDetails: [],//Datos de proveedores
             permits: [],
             dataForSelectInRow: [],
             scrollbarModalOpen: false,
@@ -330,6 +335,7 @@ export default {
 
                     // Obtener el monto por proveedor
                     this.getAmountBySupplier();
+                    this.getAmountByDetail()
                     this.dataQuedanForTable.length > 0 ? this.empty_object = false : this.empty_object = true
                 }
             } catch (error) {
@@ -376,6 +382,15 @@ export default {
             //metodo que trae todos los proveedores del mes actual, se mandan los parametros al modal
             await axios.post('/getAmountBySupplierPerMonth').then((response) => {
                 this.totalAmountBySupplier = response.data
+            }).catch((errors) => {
+                console.log(errors);
+            });
+        },
+        async getAmountByDetail() {
+            //metodo que trae todos los proveedores del mes actual, se mandan los parametros al modal
+            await axios.post('/getAmountByDocumentDetail').then((response) => {
+                // console.log(response.data);
+                this.amountByAcquisitionDocumentsDetails = response.data
             }).catch((errors) => {
                 console.log(errors);
             });

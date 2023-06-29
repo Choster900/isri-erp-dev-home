@@ -1,5 +1,5 @@
 <script setup>
-import ModalBasicVue from "@/Components-ISRI/AllModal/ModalBasic.vue";
+import Modal from "@/Components-ISRI/AllModal/Modal.vue";
 import InputError from "@/Components/InputError.vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
@@ -8,8 +8,8 @@ import axios from "axios";
 
 <template>
     <div class="m-1.5">
-        <ModalBasicVue :modalOpen="show_modal_acq_doc" @close-modal="$emit('cerrar-modal')"
-            :title="'Administración de Documentos de Adquisicion.'" maxWidth="4xl">
+        <Modal :show="show_modal_acq_doc" @close="$emit('cerrar-modal')" :closeOutSide="false"
+            modal-title="Administración de Documentos de Adquisicion." maxWidth="4xl">
             <div class="px-5 py-4">
                 <div class="text-sm">
                     <!-- Page 1 -->
@@ -36,7 +36,7 @@ import axios from "axios";
                                 <InputError class="mt-2" :message="errors.type_id" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                                <TextInput id="doc-number" v-model="acq_doc.number" :value="acq_doc.number" type="text"
+                                <TextInput id="doc-number" v-model="acq_doc.number"  type="text"
                                     placeholder="Numero documento" @update:modelValue="validateGeneralInput('number', 20)">
                                     <LabelToInput icon="objects" forLabel="doc-number" />
                                 </TextInput>
@@ -46,7 +46,7 @@ import axios from "axios";
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="mngm-number" v-model="acq_doc.management_number"
-                                    :value="acq_doc.management_number" type="text" placeholder="Numero gestion"
+                                     type="text" placeholder="Numero gestion"
                                     @update:modelValue="validateGeneralInput('management_number', 20)">
                                     <LabelToInput icon="objects" forLabel="mngm-number" />
                                 </TextInput>
@@ -94,7 +94,7 @@ import axios from "axios";
                                 <InputError class="mt-2" :message="errors.award_date" />
                             </div>
                             <div class="mb-4 md:mx-2 md:mb-0 basis-1/2">
-                                <TextInput id="mngm-number" v-model="acq_doc.award_number" :value="acq_doc.award_number"
+                                <TextInput id="mngm-number" v-model="acq_doc.award_number" 
                                     type="text" placeholder="Numero adjudicacion" :required="false"
                                     @update:modelValue="validateGeneralInput('award_number', 20)">
                                     <LabelToInput icon="objects" forLabel="mngm-number" />
@@ -130,7 +130,7 @@ import axios from "axios";
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="commt-number" v-model="array_item.commitment_number"
-                                    :value="array_item.commitment_number" type="text" placeholder="Numero(s) compromiso(s)"
+                                 type="text" placeholder="Numero(s) compromiso(s)"
                                     @update:modelValue="validateItemInput('commitment_number', 20, false, commitment_number = true)">
                                     <LabelToInput icon="objects" forLabel="commt-number" />
                                 </TextInput>
@@ -140,18 +140,20 @@ import axios from "axios";
                                 <InputError class="mt-2" :message="item_errors.commitment_number" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                                <TextInput id="amount" v-model="array_item.amount" :value="array_item.amount" type="text"
+                                <TextInput id="amount" v-model="array_item.amount" type="text"
                                     placeholder="Monto detalle"
-                                    @update:modelValue="validateItemInput('amount', 11, monto = true)">
+                                    @update:modelValue="validateItemInput('amount', 10, monto = true)">
                                     <LabelToInput icon="money" forLabel="amount" />
                                 </TextInput>
+                                <InputError v-for="(item, index) in backend_errors['items.' + array_item.index + '.amount']"
+                                    :key="index" class="mt-2" :message="item" />
                                 <InputError class="mt-2" :message="item_errors.amount" />
                             </div>
                         </div>
                         <!-- Second row -->
                         <div class="mb-4 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-full">
-                                <TextInput id="item-name" v-model="array_item.name" :value="array_item.name" type="text"
+                                <TextInput id="item-name" v-model="array_item.name" type="text"
                                     placeholder="Nombre" @update:modelValue="validateItemInput('name', 250, monto = false)">
                                     <LabelToInput icon="standard" forLabel="item-name" />
                                 </TextInput>
@@ -165,7 +167,7 @@ import axios from "axios";
                             </label>
                             <textarea v-model="array_item.contract_manager" id="cotract-manager" name="contract-manager"
                                 class="resize-none w-full h-10 overflow-y-auto peer text-xs font-semibold rounded-r-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
-                                @input="validateItemInput('contract_manager', limit = 500)">
+                                @input="validateItemInput('contract_manager', limit = 250)">
                             </textarea>
                             <InputError class="mt-2" :message="item_errors.contract_manager" />
                         </div>
@@ -200,7 +202,7 @@ import axios from "axios";
                                                 item.selected ? 'bg-orange-300 hover:bg-orange-400' :
                                                     index_errors.includes(index) ? 'bg-red-300 hover:bg-red-400' : '']">
                                             <td class="text-center">{{ item.commitment_number }}</td>
-                                            <td class="text-center">{{ item.name }}</td>
+                                            <td class="text-center">{{ truncateName(item.name) }}</td>
                                             <td class="text-center">{{ showFinancingSource(item.financing_source_id) }}</td>
                                             <td class="text-center">${{ item.amount }}</td>
                                             <td class="text-center">
@@ -246,16 +248,16 @@ import axios from "axios";
                         </div>
                         <div v-else class="mt-2">
                             <p class="text-[14px] text-black text-center font-semibold">
-                                SIN ITEMS ASIGNADOS
+                                SIN DETALLES ASIGNADOS
                             </p>
                         </div>
                     </div>
                     <!-- Buttons to navigate -->
-                    <div class="flex justify-center mt-5">
+                    <div class="flex justify-center mt-5" :class="modalData == '' ? 'mr-2' : ''">
                         <div class="flex items-center mr-1">
                             <button v-if="currentPage != 2"
                                 class="flex items-center bg-blue-600 hover:bg-blue-700 text-white pl-3 pr-2 py-1.5 text-center mb-2 rounded"
-                                :disabled="disabled_next_button" @click="goToNextPage">
+                                @click="goToNextPage">
                                 <div class="text-[12px]">SIGUIENTE</div>
                                 <span
                                     class="ml-1 pl-1 pr-0 py-2.5 text-base text-gray-100 border-l-2 border-gray-100"></span>
@@ -278,7 +280,7 @@ import axios from "axios";
                         </div>
                         <div class="flex items-center ml-1">
                             <div class="flex w-1/2">
-                                <button v-if="currentPage != 1"
+                                <button v-if="currentPage != 1" :class="modalData == '' ? 'mr-4' : ''"
                                     class="flex items-center bg-gray-600 hover:bg-gray-700 text-white pl-2 pr-3 py-1.5 text-center mb-2 rounded"
                                     :disabled="currentPage === 1" @click="goToPreviousPage">
                                     <svg width="20px" height="20px" viewBox="-3 0 32 32" version="1.1"
@@ -304,8 +306,8 @@ import axios from "axios";
 
                             <div class="w-1/2">
                                 <GeneralButton v-if="modalData != '' && currentPage === 2 && !itemSelected"
-                                    @click="updateNewAcqDoc()" color="bg-orange-700 hover:bg-orange-800"
-                                    text="Actualizar" icon="update" class="" />
+                                    @click="updateAcqDoc()" color="bg-orange-700 hover:bg-orange-800" text="Actualizar"
+                                    icon="update" class="" />
                                 <GeneralButton v-if="modalData == '' && currentPage === 2 && !itemSelected"
                                     @click="saveNewAcqDoc()" color="bg-green-700 hover:bg-green-800" text="Guardar"
                                     icon="add" class="" />
@@ -316,7 +318,7 @@ import axios from "axios";
                 </div>
             </div>
 
-        </ModalBasicVue>
+        </Modal>
     </div>
 </template>
 
@@ -376,6 +378,7 @@ export default {
                 amount: '',
                 contract_manager: '',
                 name: '',
+                has_quedan: '',
                 selected: false,
                 deleted: false
             },
@@ -426,6 +429,8 @@ export default {
             }
         },
         typeAmount(field) {
+            this.index_errors = []
+            this.backend_errors = []
             let x = this.array_item[field].replace(/^\./, '').replace(/[^0-9.]/g, '')
             this.array_item[field] = x
             const regex = /^(\d+)?([.]?\d{0,2})?$/
@@ -445,7 +450,7 @@ export default {
             const all_deleted = this.acq_doc.items.every(item => item.deleted === true);
             if (all_deleted) {
                 toast.warning(
-                    "Debes agregar al menos un item al documento.",
+                    "Debes agregar al menos un detalle al documento.",
                     {
                         autoClose: 5000,
                         position: "top-right",
@@ -516,11 +521,11 @@ export default {
                     });
             }
         },
-        updateNewAcqDoc() {
+        updateAcqDoc() {
             const all_deleted = this.acq_doc.items.every(item => item.deleted === true);
             if (all_deleted) {
                 toast.warning(
-                    "Debes agregar al menos un item al documento.",
+                    "Debes agregar al menos un detalle al documento.",
                     {
                         autoClose: 5000,
                         position: "top-right",
@@ -529,6 +534,7 @@ export default {
                     }
                 );
             } else {
+                console.log(this.acq_doc);
                 this.$swal
                     .fire({
                         title: '¿Está seguro de actualizar el documento de adquisicion?',
@@ -641,6 +647,7 @@ export default {
 
             const errors = Object.values(this.errors);
             if (errors.every(error => error === '')) {
+                this.item_errors = []
                 this.currentPage++;
             } else {
                 if (page_with_errors !== this.currentPage) {
@@ -684,7 +691,7 @@ export default {
             });
             const errors = Object.values(this.item_errors);
             if (errors.every(error => error === '')) {
-                const { id, index, financing_source_id, commitment_number, amount, contract_manager, name } = this.array_item;
+                const { id, index, financing_source_id, commitment_number, amount, contract_manager, name, has_quedan } = this.array_item;
                 const parsedAmount = parseFloat(amount);
                 const formattedAmount = parsedAmount.toFixed(2);
                 const arrayInsert = {
@@ -695,6 +702,7 @@ export default {
                     amount: formattedAmount ? formattedAmount : '',
                     contract_manager: contract_manager ? contract_manager : '',
                     name: name ? name : '',
+                    has_quedan: has_quedan ? has_quedan : '',
                     selected: false,
                     deleted: false
                 };
@@ -753,9 +761,11 @@ export default {
             this.array_item.contract_manager = item.contract_manager
             this.array_item.index = index
             this.array_item.financing_source_id = item.financing_source_id
+            this.array_item.has_quedan = item.has_quedan
             this.array_item.deleted = false
             this.array_item.selected = true
             this.acq_doc.items[index].selected = true
+            console.log(this.array_item);
         },
         deleteItem(index) {
             this.$swal.fire({
@@ -769,19 +779,31 @@ export default {
                 confirmButtonText: 'Si, Eliminar.'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    if (this.acq_doc.items[index].selected) {
-                        // Empty the array
-                        Object.keys(this.array_item).forEach(key => {
-                            this.array_item[key] = '';
-                        });
-                    }
-                    if (this.acq_doc.items[index].id === '') {
-                        this.acq_doc.items.splice(index, 1)
+                    if (this.acq_doc.items[index].has_quedan) {
+                        toast.error(
+                            "No puedes eliminar este detalle porque tiene quedan asignados, elimina primero los quedan asignados.",
+                            {
+                                autoClose: 5000,
+                                position: "top-right",
+                                transition: "zoom",
+                                toastBackgroundColor: "white",
+                            }
+                        );
                     } else {
-                        this.acq_doc.items[index].deleted = true
-                        this.acq_doc.items[index].selected = false
+                        if (this.acq_doc.items[index].selected) {
+                            // Empty the array
+                            Object.keys(this.array_item).forEach(key => {
+                                this.array_item[key] = '';
+                            });
+                        }
+                        if (this.acq_doc.items[index].id === '') {
+                            this.acq_doc.items.splice(index, 1)
+                        } else {
+                            this.acq_doc.items[index].deleted = true
+                            this.acq_doc.items[index].selected = false
+                        }
+                        this.updateTotal()
                     }
-                    this.updateTotal()
                 }
             })
         },
@@ -807,6 +829,7 @@ export default {
             this.acq_doc.total = sum.toFixed(2);
         },
         cleanArrayItem() {
+            this.item_errors = []
             if (this.array_item.index != -1) {
                 if (this.acq_doc.items[this.array_item.index]) {
                     this.acq_doc.items[this.array_item.index].selected = false
@@ -817,6 +840,17 @@ export default {
                 this.array_item[key] = '';
             });
             this.new_item = true
+        },
+        truncateName(name) {
+            const words = name.split(' ');
+            const truncatedWords = words.map(word => {
+                if (word.length >= 22) {
+                    return word.substring(0, 22) + '...';
+                } else {
+                    return word;
+                }
+            });
+            return truncatedWords.join(' ');
         }
     },
     watch: {
@@ -851,6 +885,7 @@ export default {
                             amount: value.monto_det_doc_adquisicion,
                             contract_manager: value.admon_det_doc_adquisicion,
                             name: value.nombre_det_doc_adquisicion,
+                            has_quedan: value.quedan.length > 0 ? true : false,
                             selected: false,
                             deleted: false,
                         };

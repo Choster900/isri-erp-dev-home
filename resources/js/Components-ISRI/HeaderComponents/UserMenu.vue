@@ -30,13 +30,13 @@
                 </div>
                 <ul ref="dropdown" @focusin="dropdownOpen = true" @focusout="dropdownOpen = false">
                     <li>
-                        <DropdownLink :href="route('index.createCambiarContraseña')" method="get" as="a"
+                        <DropdownLink :href="route('index.createCambiarContraseña')" method="get" as="button"
                             class="font-bold text-sm text-indigo-500 flex items-center py-0.5 px-3 hover:text-indigo-700">
                             Cambiar Contraseña
                         </DropdownLink>
                     </li>
                     <li>
-                        <DropdownLink :href="route('logout')" method="post" as="a"
+                        <DropdownLink :href="route('logout')" method="post" as="button"
                             class="font-bold text-sm text-indigo-500 flex items-center py-1 px-3  hover:text-indigo-700">
                             Logout
                         </DropdownLink>
