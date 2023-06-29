@@ -1,6 +1,5 @@
 <script setup>
-import Modal from "@/Components/Modal.vue";
-import ModalBasicVue from "@/Components-ISRI/AllModal/ModalBasic.vue";
+import Modal from "@/Components-ISRI/AllModal/Modal.vue";
 import InputError from "@/Components/InputError.vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
@@ -9,8 +8,8 @@ import axios from "axios";
 
 <template>
     <div class="m-1.5">
-        <ModalBasicVue :modalOpen="show_modal_receipt" :title="'Administración de recibos de ingreso. '" maxWidth="4xl"
-            @close-modal="$emit('cerrar-modal')">
+        <Modal :show="show_modal_receipt" :modal-title="'Administración de recibos de ingreso. '" maxWidth="4xl"
+            @close="$emit('cerrar-modal')">
             <div class="px-5 py-8">
                 <div class="space-y-2">
                     <div class="mb-2" id="app">
@@ -47,7 +46,7 @@ import axios from "axios";
                                 <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                                     <Multiselect v-model="income_receipt.financing_source_id" :options="financing_sources"
                                         :disabled="financing_select" @select="selectFinancingSource($event)"
-                                        placeholder="Seleccione Financiamiento" :searchable="true" />
+                                        placeholder="Seleccion Financiamiento" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
                                 <InputError v-for="(item, index) in errors.financing_source_id" :key="index" class="mt-2"
@@ -57,7 +56,7 @@ import axios from "axios";
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="number" v-model="income_receipt.number" :value="income_receipt.number"
                                     type="text" placeholder="Numero de recibo"
-                                    @update:modelValue="validateInput('number', limit = 145, false, number=true)">
+                                    @update:modelValue="validateInput('number', limit = 145, false, number = true)">
                                     <LabelToInput icon="standard" forLabel="number" />
                                 </TextInput>
                                 <InputError v-for="(item, index) in errors.number" :key="index" class="mt-2"
@@ -91,7 +90,7 @@ import axios from "axios";
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="document-client" v-model="income_receipt.document"
                                     :value="income_receipt.document" type="text" placeholder="Documento"
-                                    @update:modelValue="validateInput('document', limit = 17,false, number = true)">
+                                    @update:modelValue="validateInput('document', limit = 17, false, number = true)">
                                     <LabelToInput icon="standard" forLabel="document-client" />
                                 </TextInput>
                                 <InputError v-for="(item, index) in errors.document" :key="index" class="mt-2"
@@ -149,8 +148,9 @@ import axios from "axios";
                                         <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                                             <Multiselect v-model="row.income_concept_id" :value="row.income_concept_id"
                                                 @input="selectConcept($event, row.income_concept_id)"
-                                                :options="income_concept_select" placeholder="Seleccione Concepto"
-                                                :searchable="true" />
+                                                :options="filter_income_concept_select"
+                                                :placeholder="is_loading ? 'Cargando...' : 'Seleccione Concepto'"
+                                                :disabled="is_loading" :searchable="true" />
                                             <LabelToInput icon="list" />
                                         </div>
                                         <InputError
@@ -161,7 +161,7 @@ import axios from "axios";
                                     <div class="mb-2 md:mr-2 md:mb-0 basis-1/3">
                                         <TextInput id="detail-amount" v-model="row.amount" :value="row.amount"
                                             :label-input="false" type="text" placeholder="Monto"
-                                            @update:modelValue="validateInput('amount', limit = 11, false, false, monto = true, index)">
+                                            @update:modelValue="validateInput('amount', limit = 10, false, false, monto = true, index)">
                                             <LabelToInput icon="money" forLabel="detail-amount" />
                                         </TextInput>
                                         <InputError v-for="(item, index2) in errors['income_detail.' + index + '.amount']"
@@ -190,16 +190,17 @@ import axios from "axios";
 
                     <div class="mt-4 mb-4 md:flex flex-row justify-center">
                         <GeneralButton v-if="modal_data != ''" @click="updateIncomeReceipt()"
-                            color="bg-orange-700  hover:bg-orange-800" text="Actualizar" icon="update" />
+                            color="bg-orange-700  hover:bg-orange-800" text="Actualizar" icon="update"
+                            :disabled="is_loading" />
                         <GeneralButton v-else @click="saveIncomeReceipt()" color="bg-green-700  hover:bg-green-800"
-                            text="Agregar" icon="add" />
+                            text="Agregar" icon="add" :disabled="is_loading" />
                         <div class="mb-4 md:mr-2 md:mb-0 px-1">
                             <GeneralButton text="Cancelar" icon="add" @click="$emit('cerrar-modal')" />
                         </div>
                     </div>
                 </div>
             </div>
-        </ModalBasicVue>
+        </Modal>
     </div>
 </template>
 
@@ -226,6 +227,7 @@ export default {
     created() { },
     data: function (data) {
         return {
+            is_loading: false,
             financing_sources: [],
             receipt_id: '',
             income_concept_select: [],
@@ -244,7 +246,7 @@ export default {
                 client: '',
                 description: '',
                 income_detail: [],
-                number:''
+                number: ''
             },
         };
     },
@@ -350,13 +352,10 @@ export default {
         },
         selectBudgetAccount(new_selection, old_selection, load = true) {
             //Nueva seleccion
-            console.log('selectBudgetAccount');
-            console.log(new_selection, old_selection);
             if (new_selection != null && old_selection == null) {
                 //console.log('filtra fuentes de financiamiento');
                 if (load) {
                     this.clearDetailSelectionsAndTotal()
-                    console.log('entra al select de fuente');
                     //Limpiando select de concept de ingresos
                     this.income_concept_select = []
                     this.getFinanceSource(new_selection)
@@ -382,7 +381,6 @@ export default {
             }
         },
         selectFinancingSource(new_selection, load = true) {
-            console.log('selectFinancingSource');
             if (this.modal_data == '') {
                 this.clearDetailSelectionsAndTotal()
                 this.getIncomeConcept(new_selection)
@@ -420,7 +418,6 @@ export default {
 
         },
         selectConcept(newSelection, oldSelection) {
-            console.log(newSelection, oldSelection);
             if (newSelection == null) {
                 this.income_concept_select.forEach((value, index) => {
                     if (value.value == oldSelection) {
@@ -582,23 +579,23 @@ export default {
                 });
             }
         },
-        getIncomeConcept(new_selection) {
-            console.log('si entra');
-            axios.get("/get-select-income-concept", { params: { financing_source_id: new_selection, budget_account_id: this.income_receipt.budget_account_id } })
-                .then((response) => {
-                    this.income_concept_select = response.data.income_concept_select
-                    this.getAndSetDetails(this.income_receipt.income_detail)
-                })
-                .catch((errors) => {
-                    let msg = this.manageError(errors);
-                    this.$swal.fire({
-                        title: "Operación cancelada",
-                        text: msg,
-                        icon: "warning",
-                        timer: 5000,
-                    });
-                    this.$emit("cerrar-modal");
+        async getIncomeConcept(new_selection) {
+            try {
+                this.is_loading = true;  // Activar el estado de carga
+                const response = await axios.get("/get-select-income-concept", { params: { financing_source_id: new_selection, budget_account_id: this.income_receipt.budget_account_id } });
+                this.income_concept_select = response.data.income_concept_select
+                this.getAndSetDetails(this.income_receipt.income_detail)
+            } catch (errors) {
+                let msg = this.manageError(errors);
+                this.$swal.fire({
+                    title: 'Operación cancelada',
+                    text: msg,
+                    icon: 'warning',
+                    timer: 5000
                 });
+            } finally {
+                this.is_loading = false;  // Desactivar el estado de carga
+            }
         }
     },
     watch: {
@@ -623,12 +620,12 @@ export default {
                 this.income_receipt.income_detail = []
 
                 if (this.modal_data != '') {
+                    this.is_loading = true
                     this.financing_sources = []
                     this.modal_data.detalles.forEach((value, index) => {
                         if (value.estado_det_recibo_ingreso == 1) {
                             var array = { nombre_concepto: value.concepto_ingreso.nombre_concepto_ingreso, detail_id: value.id_det_recibo_ingreso, income_concept_id: value.id_concepto_ingreso, amount: value.monto_det_recibo_ingreso, deleted: false }
                             this.income_receipt.income_detail.push(array)
-                            console.log('guarda un activo');
                         } else {
                             var array = { nombre_concepto: value.concepto_ingreso.nombre_concepto_ingreso, detail_id: value.id_det_recibo_ingreso, income_concept_id: value.id_concepto_ingreso, amount: value.monto_det_recibo_ingreso, deleted: true }
                             this.income_receipt.income_detail.push(array)
@@ -663,6 +660,12 @@ export default {
                 })
                 return count
             }
+        },
+        filter_income_concept_select() {
+            const filteredArray = this.income_concept_select.filter(value1 => {
+                return value1.estado === 1 || this.income_receipt.income_detail.some(value2 => value1.value === value2.income_concept_id);
+            });
+            return filteredArray;
         }
     }
 };

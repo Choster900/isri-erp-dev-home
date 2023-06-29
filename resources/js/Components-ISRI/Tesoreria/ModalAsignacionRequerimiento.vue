@@ -66,7 +66,7 @@ import axios from 'axios';
                     </div>
                     <div class="grid px-2 grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
                         <GeneralButton color="bg-[#7a0000]  hover:bg-[#7a0000]/90" text="Limpiar todo" icon="delete"
-                            @click="resetData()" />
+                            @click="dataQuedan = []; resetData()" />
                     </div>
                 </div>
             </div>
@@ -168,9 +168,6 @@ import axios from 'axios';
                                 <th class="px-4 py-2  min-w-10 max-w-10 ">
                                     <div class="font-medium text-center w-20  text-[12px]">RETENCIONES</div>
                                 </th>
-                                <!-- <th class="px-4 py-2  min-w-10 max-w-10 ">
-                                    <div class="font-medium text-center  w-10 text-[12px]">ISR</div>
-                                </th> -->
                                 <th class="px-4 py-2 min-w-10 max-w-10 rounded-tr-2xl">
                                     <div class="font-medium text-center w-20 text-[12px]">MONTO</div>
                                 </th>
@@ -245,7 +242,7 @@ import axios from 'axios';
                             <tr v-if="dataQuedan.length == 0">
                                 <td colspan="8" class="pb-3 text-xs whitespace-nowrap text-center h-20">
                                     <span v-if="withoutDataInDb">SIN DATOS EN LA BASE DE DATOS...</span>
-                                    <span v-else>Utilize los filtros o simplemente precio buscar.</span>
+                                    <span v-else>Utilize los filtros o simplemente presione buscar.</span>
                                 </td>
 
                             </tr>
@@ -262,6 +259,7 @@ import axios from 'axios';
 <script>
 
 export default {
+    emits: ['close-definitive','reload-table'], // Declara el evento personalizado que emite el componente
     props: {
         modalIsOpen: {
             type: Boolean,
@@ -335,7 +333,7 @@ export default {
                     this.collectItems = []
                     this.id_requerimiento_pago = ''
                     this.numero_requerimiento = ''
-                    this.selectAll = false//FIXME: cuando se cierra el modal se supone que tiene que quedar en falso (lo hace) pero el checbox igual queda marcado cuando se sabe por que
+                    this.selectAll = false
                     this.infoReqForTableInfo.numeroReq = ''
                     this.infoReqForTableInfo.montoReq = ''
                     this.infoReqForTableInfo.restanteReq = ''
@@ -440,7 +438,7 @@ export default {
 
                 }
             } else {
-                toast.error("Al parecer no haz seleccionado ningun quedan", {
+                toast.error("Al parecer no has seleccionado ningun quedan", {
                     autoClose: 5000,
                     position: "top-right",
                     transition: "zoom",
@@ -450,9 +448,6 @@ export default {
 
         },
         seleccionarRequerimiento(event) {
-
-            console.log(event);
-
             if (event !== null) {
                 const opcionSeleccionada = this.dataForSelect.numeroRequerimiento.filter(item => item.value === event);
                 this.numero_requerimiento = opcionSeleccionada
@@ -477,7 +472,7 @@ export default {
             return montoTotal.toLocaleString(); // Agrega comas como separadores de miles
         },
         resetData() {
-            this.dataQuedan = []
+           // this.dataQuedan = []
             this.collectItems = []
             this.id_requerimiento_pago = ''
             this.numero_requerimiento = ''
@@ -487,7 +482,7 @@ export default {
             this.filter.iva = ''
             this.filter.isr = ''
             this.filter.monto = ''
-            this.selectAll = false//FIXME: cuando se cierra el modal se supone que tiene que quedar en falso (lo hace) pero el checbox igual queda marcado cuando se sabe por que
+            this.selectAll = false
             this.infoReqForTableInfo.numeroReq = ''
             this.infoReqForTableInfo.montoReq = ''
             this.infoReqForTableInfo.restanteReq = ''
@@ -504,7 +499,7 @@ export default {
         modalIsOpen: function (newValue, oldValue) {
 
             this.resetData()
-
+            this.dataQuedan = []
         },
     },
 }

@@ -35,7 +35,7 @@ import 'vue3-toastify/dist/index.css';
                 </div>
                 <div class="mb-4 mx-8 basis-full" style="border: none; background-color: transparent;">
                     <label class="block mb-2 text-xs font-light text-gray-600" for="descripcion">
-                        Descripcion
+                        Descripción
                     </label>
                     <textarea v-model="dataRequerimiento.descripcion_requerimiento_pago" id="descripcion" name="descripcion"
                         class="resize-none w-full h-16 overflow-y-auto peer text-xs font-semibold rounded-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
@@ -60,6 +60,7 @@ import 'vue3-toastify/dist/index.css';
 
 <script>
 export default {
+    emits: ['close-modal',"updateTable"], 
     props: {
         ModalIsOpen: {
             type: Boolean,

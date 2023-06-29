@@ -6,8 +6,7 @@ import moment from 'moment';
 import axios from 'axios';
 </script>
 <template>
-    <Modal :modal-title="tittleModal"  maxWidth="5xl" :show="modalIsOpen"
-        @close="$emit('close-definitive')">
+    <Modal :modal-title="tittleModal" maxWidth="5xl" :show="modalIsOpen" @close="$emit('close-definitive')">
 
         <div class=" px-10 py-5 ">
             <table class="table-auto">
@@ -19,7 +18,7 @@ import axios from 'axios';
                         <th colspan="2" class="pl-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap rounded-tr-2xl ">
 
                             <div class="flex justify-between">
-                                <div class="text-center" :class="restanteIngreso < 0 ? 'text-red-600' : ''">
+                                <div class="text-center">
                                     <label class="flex items-center">
                                         <div class="checkbox-icon bg-green-600"></div>
                                         <span class="ml-2 text-[10px] text-green-600">Liquidado</span>
@@ -30,7 +29,7 @@ import axios from 'axios';
                                     </label>
                                 </div>
 
-                                <div class="text-start pr-5" :class="restanteIngreso < 0 ? 'text-red-600' : ''">
+                                <div class="text-start pr-5">
                                     <label class="flex items-center">
                                         <div class="checkbox-icon bg-red-600"></div>
                                         <span class="ml-2 text-[10px] text-red-600">Error de las liquidaciones</span>
@@ -214,7 +213,8 @@ import axios from 'axios';
                                     <td></td>
                                     <td colspan="2" class="text-end text-sm py-2"
                                         :class="{ 'border-b border-b-gray-300': j < data.liquidacion_quedan.length - 1 && data.liquidacion_quedan.length > 1 }">
-                                        <span class="font-medium">{{ formatDate(liquidacion.fecha_liquidacion_quedan) }} -
+                                        <span class="font-medium">{{
+                                            moment(liquidacion.fecha_liquidacion_quedan).format('DD/MM/YYYY') }} -
                                         </span>
 
 
@@ -258,6 +258,7 @@ import axios from 'axios';
   
 <script>
 export default {
+    emits: ['close-definitive', 'reload-table', 'reload-data-for-select', 'reload-table-and-close'], // Declara el evento personalizado que emite el componente
     props: {
         modalIsOpen: {
             type: Boolean,
@@ -438,13 +439,7 @@ export default {
                             }
                             this.sumAmountPayAndAmountRest()//llamando la funcion para que haga el recalculo de nuevo
 
-                            // this.calculateWhenIsDelete(this.dataForRows[index].liquidacion_quedan)
-
-
                             let cantidadEliminada = this.dataForRows.filter((item, i) => item.eliminadoLogicoQuedan <= false);
-                            console.log(cantidadEliminada.length);
-                            console.log(this.dataForRows.length);
-
                             if (cantidadEliminada.length == this.dataForRows.length) {
                                 this.$emit("reload-table-and-close")
                             }
@@ -484,11 +479,6 @@ export default {
             } catch (error) {
                 return false; // indicate failure
             }
-        },
-        calculateWhenIsDelete(data) {
-            console.log(
-                data
-            );
         },
         async setLiquidaciones() {
             //Funcion que envia la informacion a la tabla liquidacion_quedan
@@ -553,10 +543,6 @@ export default {
             //Restamos el saldo menos el total que es el tota de las liquidaciones
             return (saldo - total).toFixed(2)
         },
-        formatDate(dateString) {
-            const date = moment(dateString).format('DD/MM/YYYY');
-            return date;
-        }
     },
     watch: {
         modalIsOpen: function (newValue, oldValue) {
