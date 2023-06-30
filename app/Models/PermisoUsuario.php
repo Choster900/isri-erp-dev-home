@@ -18,6 +18,10 @@ class PermisoUsuario extends Pivot
         'id_rol',
         'id_usuario',
         'estado_permiso_usuario',
+        'fecha_reg_permiso_usuario',
+        'fecha_mod_permiso_usuario',
+        'usuario_permiso_usuario',
+        'ip_permiso_usuario',
     ];
 
 

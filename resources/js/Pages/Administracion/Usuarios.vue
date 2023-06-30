@@ -1,5 +1,4 @@
 <script setup>
-import Modal from "@/Components/Modal.vue";
 import { Head } from "@inertiajs/vue3";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import ModalAdministracionVue from '@/Components-ISRI/Administracion/ModalAdministracion.vue';
@@ -13,9 +12,7 @@ import ModalChangePasswordVue from '@/Components-ISRI/Administracion/ModalChange
     <div class="sm:flex sm:justify-end sm:items-center mb-2">
       <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
         <GeneralButton v-if="permits.insertar == 1" @click="createNewUser()" color="bg-green-700  hover:bg-green-800"
-          text="Admin User" icon="add" class="mr-2" />
-        <GeneralButton v-if="permits.insertar == 1" @click="createUser()" color="bg-green-700  hover:bg-green-800"
-          text="Agregar Usuario" icon="add" />
+          text="Agregar Usuario" icon="add" class="mr-2" />
       </div>
     </div>
     <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
@@ -37,7 +34,7 @@ import ModalChangePasswordVue from '@/Components-ISRI/Administracion/ModalChange
         <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true" @sort="sortBy"
           @datos-enviados="handleData($event)" @execute-search="getUsers()">
           <tbody class="text-sm divide-y divide-slate-200">
-            <tr v-for="(user,index) in users" :key="index">
+            <tr v-for="(user, index) in users" :key="index">
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                 <div class="font-medium text-slate-800 text-center">{{ user.id_usuario }}</div>
               </td>
@@ -194,7 +191,8 @@ import ModalChangePasswordVue from '@/Components-ISRI/Administracion/ModalChange
     <ModalChangePasswordVue :showModalChangePassword="showModalChangePassword" :modalData="modalData"
       @cerrar-modal="showModalChangePassword = !showModalChangePassword" @abrir-modal="showModalChangePassword = true" />
 
-    <ModalAdminUserVue :show="show" @cerrar-modal="show = !show" :modalData="modalData"/>
+    <ModalAdminUserVue :show="show" @cerrar-modal="show = !show" :modalData="modalData"
+      @update-table="getUpdateTable()" />
   </AppLayoutVue>
 </template>
 <script>
@@ -228,23 +226,23 @@ export default {
     });
     return {
       show: false,
-      systems:[],
+      systems: [],
 
       empty_object: false,
       permits: [],
       modalData: []
-        // userRoles: [],
-        // id_usuario: "",
-        // nombre_usuario: "",
-        // sistemas: "",
-        // roles: "",
-        // id_sistema: "",
-        // id_rol: "",
-        // sistema_edit: "",
-        // id_rol_edit: "",
-        // roles_edit: "",
-        // id_sistema_edit: "",
-        // permiso_usuario: ""
+      // userRoles: [],
+      // id_usuario: "",
+      // nombre_usuario: "",
+      // sistemas: "",
+      // roles: "",
+      // id_sistema: "",
+      // id_rol: "",
+      // sistema_edit: "",
+      // id_rol_edit: "",
+      // roles_edit: "",
+      // id_sistema_edit: "",
+      // permiso_usuario: ""
       ,
       modalDataCreate: {
         dui: '',
@@ -299,8 +297,8 @@ export default {
         })
       })
     },
-    createNewUser(){
-      this.show =true
+    createNewUser() {
+      this.show = true
       this.modalData = []
     },
     changePasswordUser(user) {
