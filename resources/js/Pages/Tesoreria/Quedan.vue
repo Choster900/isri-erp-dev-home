@@ -55,8 +55,7 @@ import html2pdf from 'html2pdf.js'
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class=" text-slate-800 text-center text-[9pt]" v-if="data.requerimiento_pago">
-                                    {{ data.requerimiento_pago.numero_requerimiento_pago
-                                    }}-{{ data.requerimiento_pago.anio_requerimiento_pago }}
+                                    {{ data.requerimiento_pago.numero_requerimiento_pago}}-{{ data.requerimiento_pago.anio_requerimiento_pago }}
                                 </div>
                                 <div class=" text-slate-800 text-center" v-else>
                                     <div
@@ -70,7 +69,7 @@ import html2pdf from 'html2pdf.js'
                                     <template v-for="(detalle, i) in data.detalle_quedan" :key="i">
                                         <div class="mb-2 text-center">
                                             <p class="text-[10pt]">
-                                                <span class="font-medium">FACTURA: </span>${{
+                                                <span class="font-medium">FACTURA: </span>{{
                                                     detalle.numero_factura_det_quedan
                                                 }}<br>
                                                 <span class="font-medium">MONTO: </span> ${{

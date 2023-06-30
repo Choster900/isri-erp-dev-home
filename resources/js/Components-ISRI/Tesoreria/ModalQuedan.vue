@@ -208,6 +208,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                         </td>
                                         <td class="border-2 border-black"
                                             :class="{ 'bg-[#fdfd96]': dataInputs.compromiso_ppto_det_doc_adquisicion == '' }">
+                                            
                                             <input type="text" v-model="dataInputs.compromiso_ppto_det_doc_adquisicion"
                                                 :disabled="documentoAdquisicion == '' ? false : true" maxlength="20"
                                                 class="peer w-full text-sm bg-transparent text-center h-10 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
@@ -225,7 +226,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                             <div class="relative flex h-8 w-full flex-row-reverse"
                                                 :class="[documentoAdquisicion != '' ? { 'condition-select': dataInputs.id_det_doc_adquisicion == '' } : '']">
                                                 <Multiselect v-model="dataInputs.id_det_doc_adquisicion"
-                                                    @input="DocumentoAdquisicionSelected($event)"
+                                                    @input="DocumentoAdquisicionSelected($event, true)"
                                                     :placeholder="documentoAdquisicion == '' ? 'sin contratos' : 'seleccione contrato'"
                                                     :classes="{
                                                         containerDisabled: 'cursor-not-allowed bg-gray-200 ', placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
@@ -638,72 +639,72 @@ export default {
         },
         //TODO:REVISAR POR QUE CUANDO TENGO UN PROVEEDOR SELECCIONADO AL SELECCINA UN PROVEEDOR SIN CONTRATO NO ME PONE EL NOMBRE DE FACTURA EN TIPO DE CONTRATO
         getInformationBySupplier(supplier, clear = false) {
-            if (!supplier) {
-                // Limpiar los valores cuando el proveedor es null
-                this.dataInputs.giro = '';
-                this.dataInputs.irs = '';
-                this.dataInputs.iva = '';
-                this.dataInputs.id_proveedor = '';
-                this.dataForCalculate.irs = '';
-                this.dataForCalculate.iva = '';
-                this.dataForCalculate.id_proveedor = '';
-                this.dataInputs.id_det_doc_adquisicion = '';
-                this.dataInputs.id_tipo_doc_adquisicion = '';
-                this.dataInputs.nombre_tipo_doc_adquisicion = '';
-                this.dataInputs.numero_doc_adquisicion = '';
-                this.dataInputs.compromiso_ppto_det_doc_adquisicion = '';
-                this.dataInputs.id_proy_financiado = '';
-                this.documentoAdquisicion = [];
-                this.taxesByRow();
-                return;
-            }
+            if (supplier) {
+                // Buscar el proveedor en la lista de proveedores
+                const selectedSupplier = this.dataForSelectInRow.proveedor.find((suppliers) => suppliers.value === supplier);
 
-            // Buscar el proveedor en la lista de proveedores
-            const selectedSupplier = this.dataForSelectInRow.proveedor.find((suppliers) => suppliers.value === supplier);
+                // Limpiar la variable (this.documentoAdquisicion, this.dataInputs.id_det_doc_adquisicion) que contiene los contratos antes de asignarle nuevos contratos
+                this.documentoAdquisicion = []
 
-            if (clear) {
-                // Limpiar la variable que contiene los contratos antes de asignar nuevos contratos
-                this.documentoAdquisicion = [];
-                this.dataInputs.id_det_doc_adquisicion = '';
-                this.dataInputs.id_tipo_doc_adquisicion = '';
-                this.dataInputs.nombre_tipo_doc_adquisicion = '';
-                this.dataInputs.numero_doc_adquisicion = '';
-                this.dataInputs.compromiso_ppto_det_doc_adquisicion = '';
-                this.dataInputs.id_proy_financiado = '';
-            }
+                if (clear) {//Este if basicamente es utilizado para limpiar toda esta data cuando y solo cuando se haga la seleccion desde el MultiSelect
+                    this.dataInputs.id_det_doc_adquisicion = ''//ID_DETALLE_CONTRATO
+                    this.dataInputs.id_tipo_doc_adquisicion = ''//ID TIPO CONTRATO
+                    this.dataInputs.nombre_tipo_doc_adquisicion = ''//NOMBRE CONTRATO
+                    this.dataInputs.numero_doc_adquisicion = ''
+                    this.dataInputs.compromiso_ppto_det_doc_adquisicion = ''
+                    this.dataInputs.id_proy_financiado = ''
+                }
+                // Filtrar los contratos por proveedor
+                const filteredContracts = JSON.parse(JSON.stringify(this.dataForSelectInRow.documentoAdquisicion.filter((doc) => doc.id_proveedor === supplier)));
 
-            // Filtrar los contratos por proveedor
-            const filteredContracts = this.dataForSelectInRow.documentoAdquisicion.filter((doc) => doc.id_proveedor === supplier);
+                if (filteredContracts != "") {
+                    this.documentoAdquisicion = filteredContracts
+                    this.dataInputs.nombre_tipo_doc_adquisicion = ''
+                } else {
+                    this.dataInputs.id_tipo_doc_adquisicion = 3//ID TIPO CONTRATO
+                    this.dataInputs.nombre_tipo_doc_adquisicion = "FACTURA"//NOMBRE CONTRATO
+                   /*  this.dataInputs.id_det_doc_adquisicion = ''//ID_DETALLE_CONTRATO
+                    this.dataInputs.numero_doc_adquisicion = ''
+                    this.dataInputs.compromiso_ppto_det_doc_adquisicion = ''
+                    this.dataInputs.id_proy_financiado = '' */
 
-            if (filteredContracts.length > 0) {
-                this.documentoAdquisicion = filteredContracts;
-                this.dataInputs.nombre_tipo_doc_adquisicion = '';
+                }
+
+
+                // Datos que se pintan en los inputs
+                this.dataInputs.giro = selectedSupplier.codigo_giro && selectedSupplier.nombre_giro ? `${selectedSupplier.codigo_giro} - ${selectedSupplier.nombre_giro}` : 'GIRO NO ESPECIFICADO!';
+                this.dataInputs.irs = `${selectedSupplier.isrl_sujeto_retencion * 100} %`
+                this.dataInputs.iva = `${selectedSupplier.iva_sujeto_retencion * 100} %`
+
+                // Datos que se usan para cálculos
+                this.dataForCalculate.irs = selectedSupplier.isrl_sujeto_retencion
+                this.dataForCalculate.dui_proveedor = selectedSupplier.dui_proveedor
+                this.dataForCalculate.iva = selectedSupplier.iva_sujeto_retencion
+                this.dataInputs.id_proveedor = selectedSupplier.value
+
             } else {
+                // Limpiar los valores cuando el proveedor es null
+                this.dataInputs.giro = ''
+                this.dataInputs.irs = ''
+                this.dataInputs.iva = ''
+                this.dataInputs.id_proveedor = ''
+                this.dataForCalculate.irs = ''
+                this.dataForCalculate.iva = ''
+                this.dataForCalculate.id_proveedor = ''
+                this.dataInputs.id_det_doc_adquisicion = ''
+                this.dataInputs.id_tipo_doc_adquisicion = ''
+                this.dataInputs.nombre_tipo_doc_adquisicion = ''
+                this.dataInputs.numero_doc_adquisicion = ''
+                this.dataInputs.compromiso_ppto_det_doc_adquisicion = ''
+                this.dataInputs.id_proy_financiado = ''
                 this.documentoAdquisicion = [];
-                this.dataInputs.id_det_doc_adquisicion = '';
-                this.dataInputs.id_tipo_doc_adquisicion = 3;
-                this.dataInputs.nombre_tipo_doc_adquisicion = 'FACTURA';
-                this.dataInputs.numero_doc_adquisicion = '';
-                this.dataInputs.compromiso_ppto_det_doc_adquisicion = '';
-                this.dataInputs.id_proy_financiado = '';
             }
-
-            // Datos que se pintan en los inputs
-            this.dataInputs.giro = selectedSupplier.codigo_giro && selectedSupplier.nombre_giro ? `${selectedSupplier.codigo_giro} - ${selectedSupplier.nombre_giro}` : 'GIRO NO ESPECIFICADO!';
-            this.dataInputs.irs = `${selectedSupplier.isrl_sujeto_retencion * 100} %`;
-            this.dataInputs.iva = `${selectedSupplier.iva_sujeto_retencion * 100} %`;
-
-            // Datos que se usan para cálculos
-            this.dataForCalculate.irs = selectedSupplier.isrl_sujeto_retencion;
-            this.dataForCalculate.dui_proveedor = selectedSupplier.dui_proveedor;
-            this.dataForCalculate.iva = selectedSupplier.iva_sujeto_retencion;
-            this.dataInputs.id_proveedor = selectedSupplier.value;
-
-            this.taxesByRow(); // función que calcula los impuestos (más información Ctrl+click)
+            this.taxesByRow(); // funciona que calcula los impuestos (mas informacion Ctrl+click)
+            console.log(this.dataInputs.nombre_tipo_doc_adquisicion);
         },
 
         // Setea la informacion a la data necesaria al seleccionar un item
-        DocumentoAdquisicionSelected(id_documentoAdquisicion) {
+        DocumentoAdquisicionSelected(id_documentoAdquisicion, clear = false) {
             this.getAmountByDetalleDocumentoAdquisicion(id_documentoAdquisicion)
             //al seleccionar contrato
             if (id_documentoAdquisicion != null) {
@@ -717,7 +718,7 @@ export default {
                 this.dataForCalculate.monto_doc_adquisicion = document.monto_doc_adquisicion
                 this.dataForCalculate.monto_det_doc_adquisicion = document.monto_det_doc_adquisicion
             }
-            else {// Si viene vacio limpiamos todo
+            else if (clear) {// Si viene vacio limpiamos todo
                 this.dataInputs.id_det_doc_adquisicion = ''
                 this.dataInputs.id_tipo_doc_adquisicion = ''
                 this.dataInputs.nombre_tipo_doc_adquisicion = ''
@@ -725,6 +726,10 @@ export default {
                 this.dataInputs.compromiso_ppto_det_doc_adquisicion = ''
                 this.dataInputs.id_proy_financiado = ''
                 this.dataForCalculate.monto_doc_adquisicion = ''
+            }
+            else{
+                this.dataForCalculate.monto_doc_adquisicion = ''
+                this.dataForCalculate.monto_det_doc_adquisicion = ''
             }
             this.taxesByRow(); // funciona que calcula los impuestos (mas informacion Ctrl+click)
 
@@ -803,10 +808,7 @@ export default {
                 this.dataInputs.monto_iva_quedan = totalIva.toFixed(2);
                 this.dataForCalculate.montoLiquidoQuedan = totalCalculosMonto - totalIva.toFixed(2) - totalRenta.toFixed(2);
             });
-
-            const sumaLiquida = (parseFloat(this.dataForCalculate.montoTotalDetalleDocumentoAdquisicion) || 0) +
-                (parseFloat(this.dataForCalculate.montoLiquidoQuedan) || 0);
-
+            const sumaLiquida = (parseFloat(this.dataForCalculate.montoTotalDetalleDocumentoAdquisicion) || 0) + (parseFloat(this.dataForCalculate.montoLiquidoQuedan) || 0);
             const sumaLiquidaFixed = sumaLiquida.toFixed(2); // Limita el número de decimales a 2
             const montoDetDocAdquisicionFixed = parseFloat(this.dataForCalculate.monto_det_doc_adquisicion).toFixed(2);
 
@@ -814,8 +816,9 @@ export default {
             console.log("MONTO A SUPERAR: ", montoDetDocAdquisicionFixed)
             console.log("MONTO LIQUIDO QUEDAN ACTUAL: ", this.dataInputs.monto_liquido_quedan)
             console.log("TOTAL LIQUIDO PERO NO ES EL ORIGINAL: ", this.dataForCalculate.montoLiquidoQuedan)
+            console.log("ID DOCUMENTO ADQUISCION: ", this.dataInputs.id_det_doc_adquisicion)
 
-            if (this.dataInputs.id_det_doc_adquisicion && parseFloat(sumaLiquidaFixed) > parseFloat(montoDetDocAdquisicionFixed)) {
+            if (this.dataInputs.id_det_doc_adquisicion &&  parseFloat(sumaLiquidaFixed) > parseFloat(montoDetDocAdquisicionFixed)) {
                 toast.error("El monto del quedan supera el monto definido en el item seleccionado", {
                     autoClose: 4000,
                     position: "top-right",
@@ -827,6 +830,7 @@ export default {
             } else {
                 this.dataForCalculate.montoSuperador = false;
             }
+
         },
 
         // Obtiene el seguimiento de los montos totale de los quedan que se ha usado el item del contrato u orden de compra seleccionado
@@ -861,8 +865,7 @@ export default {
             this.dataInputs.irs = `${(this.dataForSelectInRow.proveedor["isrl_sujeto_retencion"] * 100)} %`;
             this.dataInputs.iva = `${(this.dataForSelectInRow.proveedor["iva_sujeto_retencion"] * 100)} %`;
             this.dataInputs.id_proveedor = this.dataQuedan.proveedor.id_proveedor;
-            this.dataInputs.numero_acuerdo_quedan = this.dataQuedan.numero_acuerdo_quedan;
-            this.dataInputs.numero_compromiso_ppto_quedan = this.dataQuedan.numero_compromiso_ppto_quedan;
+
             this.dataInputs.descripcion_quedan = this.dataQuedan.descripcion_quedan;
             this.dataInputs.monto_liquido_quedan = this.dataQuedan.monto_liquido_quedan;
             this.dataInputs.monto_iva_quedan = this.dataQuedan.monto_iva_quedan;
@@ -875,6 +878,19 @@ export default {
             this.dataInputs.monto_total_quedan = this.dataQuedan.monto_total_quedan;
             this.dataInputs.numero_retencion_iva_quedan = this.dataQuedan.numero_retencion_iva_quedan;
             this.dataInputs.id_det_doc_adquisicion = this.dataQuedan.id_det_doc_adquisicion;
+            this.dataInputs.nombre_tipo_doc_adquisicion = this.dataQuedan.tipo_documento_adquisicion.nombre_tipo_doc_adquisicion;
+
+
+            if (this.dataQuedan.numero_acuerdo_quedan != '' && this.dataQuedan.numero_compromiso_ppto_quedan != '') {
+                
+                this.dataInputs.numero_doc_adquisicion = this.dataQuedan.numero_acuerdo_quedan;
+                this.dataInputs.compromiso_ppto_det_doc_adquisicion = this.dataQuedan.numero_compromiso_ppto_quedan;
+            }
+
+            console.log(this.dataInputs.numero_doc_adquisicion);
+            console.log(this.dataInputs.compromiso_ppto_det_doc_adquisicion);
+            /* this.dataInputs.numero_doc_adquisicion = this.dataQuedan.numero_compromiso_ppto_quedan;
+            this.dataInputs.compromiso_ppto_det_doc_adquisicion = this.dataQuedan.numero_acuerdo_quedan; */
         },
         resetValuesToInput() {
             //funcion para limpiar la data que la llamaremos cuando la data no traiga nada
@@ -1196,7 +1212,7 @@ export default {
                         });
                     });
 
-                    //this.taxesByRow(); // funciona que calcula los impuestos (mas informacion Ctrl+click)
+                    this.taxesByRow(); // funciona que calcula los impuestos (mas informacion Ctrl+click)
 
 
                     if (this.dataQuedan.monto_liquido_quedan != this.dataInputs.monto_liquido_quedan) {
