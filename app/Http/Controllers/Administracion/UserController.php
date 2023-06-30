@@ -27,7 +27,22 @@ class UserController extends Controller
         $dir = $request->input('dir');
         $search_value = $request->input('search');
 
-        $query = User::select('*')
+        $query = User::select(
+            'usuario.id_usuario',
+            'persona.pnombre_persona',
+            'persona.snombre_persona',
+            'persona.tnombre_persona',
+            'persona.papellido_persona',
+            'persona.sapellido_persona',
+            'persona.tapellido_persona',
+            'usuario.estado_usuario',
+            'persona.dui_persona',
+            'usuario.nick_usuario',
+            'persona.id_persona',
+            'persona.fecha_nac_persona',
+            'municipio.nombre_municipio',
+            'persona.telefono_persona'
+        )
             ->with('roles')
             ->join('persona', function ($join) {
                 $join->on('usuario.id_persona', '=', 'persona.id_persona');
@@ -223,7 +238,7 @@ class UserController extends Controller
     //Methods to create a new user
     public function getDui(Request $request)
     {
-        $person = Persona::select(DB::raw('CONCAT(pnombre_persona," ",IFNULL(snombre_persona,"")," ",IFNULL(tnombre_persona,"")," ",papellido_persona," ",IFNULL(sapellido_persona,"")," ",IFNULL(tapellido_persona,"")) AS nombre_persona'), 'id_persona', 'fecha_nac_persona', 'telefono_persona','nombre_municipio')
+        $person = Persona::select(DB::raw('CONCAT(pnombre_persona," ",IFNULL(snombre_persona,"")," ",IFNULL(tnombre_persona,"")," ",papellido_persona," ",IFNULL(sapellido_persona,"")," ",IFNULL(tapellido_persona,"")) AS nombre_persona'), 'id_persona', 'fecha_nac_persona', 'telefono_persona', 'nombre_municipio')
             ->join('municipio', function ($join) {
                 $join->on('persona.id_municipio', '=', 'municipio.id_municipio');
             })
@@ -241,43 +256,42 @@ class UserController extends Controller
     }
     public function saveUser(Request $request)
     {
-        $existUser = false;
-        $user = User::where('nick_usuario', '=', $request->nick_usuario)->first();
-        if ($user) {
-            $existUser = true;
-            $mensaje = 'El nombre de usuario ya existe, intente nuevamente';
-            return response()->json($mensaje, 422);
-        } else {
-            $person = Persona::find($request->id_persona);
-            $ip = $request->ip();
-            //Saving the new user
-            $new_user = new User();
-            $new_user->nick_usuario = $request->nick_usuario;
-            $new_user->password_usuario = Hash::make($request->password);
-            $new_user->id_persona = $request->id_persona;
-            $new_user->estado_usuario = 1;
-            $new_user->fecha_reg_usuario = Carbon::now();
-            $new_user->ip_usuario = $ip;
-            $new_user->usuario_usuario = $request->user()->nick_usuario;
-            $new_user->save();
-            //Updating person table
-            $person->id_usuario = $new_user->id_usuario;
-            $person->fecha_mod_persona = Carbon::now();
-            $person->ip_persona = $ip;
-            $person->usuario_persona = $request->user()->nick_usuario;
-            $person->update();
-            //Creating the relationship between user and role.
-            $new_permiso_user = new PermisoUsuario();
-            $new_permiso_user->id_rol = $request->id_role;
-            $new_permiso_user->id_usuario = $new_user->id_usuario;
-            $new_permiso_user->estado_permiso_usuario = 1;
-            $new_permiso_user->ip_permiso_usuario = $ip;
-            $new_permiso_user->fecha_reg_permiso_usuario = Carbon::now();
-            $new_permiso_user->usuario_permiso_usuario = $request->user()->nick_usuario;
-            $new_permiso_user->save();
-            $mensaje = 'Guardado usuario ' . $new_user->nick_usuario . ' con exito';
-            return ['mensaje' => $mensaje];
+        $person = Persona::find($request->person_id);
+        $first_name = $person->pnombre_persona;
+        $last_name = $person->papellido_persona;
+
+        $username = strtolower($first_name . '.' . $last_name);
+
+        $count = 2;
+        while (User::where('nick_usuario', $username)->exists()) {
+            // If the username already exists, append a number to make it unique
+            $username = strtolower($first_name . '.' . $last_name . $count);
+            $count++;
         }
+
+        $new_user = new User([
+            'id_persona' => $request->person_id,
+            'nick_usuario' => $username,
+            'password_usuario' => Hash::make($request->password),
+            'estado_usuario' => 1,
+            'fecha_reg_usuario' => Carbon::now(),
+            'usuario_usuario' => $request->user()->nick_usuario,
+            'ip_usuario' => $request->ip(),
+        ]);
+        $new_user->save();
+
+        foreach ($request->roles as $rol) {
+            $new_user_permission = new PermisoUsuario([
+                'id_rol' => $rol['id_rol'],
+                'id_usuario' => $new_user->id_usuario,
+                'estado_permiso_usuario' => 1,
+                'fecha_reg_permiso_usuario' => Carbon::now(),
+                'usuario_permiso_usuario' => $request->user()->nick_usuario,
+                'ip_permiso_usuario' => $request->ip(),
+            ]);
+            $new_user_permission->save();
+        }
+        return ['mensaje' => 'Guardado usuario ' . $new_user->nick_usuario . ' con exito.'];
     }
 
     public function changePasswordUser(Request $request)
