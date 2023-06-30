@@ -727,6 +727,10 @@ export default {
                 this.dataInputs.id_proy_financiado = ''
                 this.dataForCalculate.monto_doc_adquisicion = ''
             }
+            else{
+                this.dataForCalculate.monto_doc_adquisicion = ''
+                this.dataForCalculate.monto_det_doc_adquisicion = ''
+            }
             this.taxesByRow(); // funciona que calcula los impuestos (mas informacion Ctrl+click)
 
         },
@@ -804,19 +808,17 @@ export default {
                 this.dataInputs.monto_iva_quedan = totalIva.toFixed(2);
                 this.dataForCalculate.montoLiquidoQuedan = totalCalculosMonto - totalIva.toFixed(2) - totalRenta.toFixed(2);
             });
-
-            const sumaLiquida = (parseFloat(this.dataForCalculate.montoTotalDetalleDocumentoAdquisicion) || 0) +
-                (parseFloat(this.dataForCalculate.montoLiquidoQuedan) || 0);
-
+            const sumaLiquida = (parseFloat(this.dataForCalculate.montoTotalDetalleDocumentoAdquisicion) || 0) + (parseFloat(this.dataForCalculate.montoLiquidoQuedan) || 0);
             const sumaLiquidaFixed = sumaLiquida.toFixed(2); // Limita el número de decimales a 2
             const montoDetDocAdquisicionFixed = parseFloat(this.dataForCalculate.monto_det_doc_adquisicion).toFixed(2);
 
-            /* console.log("SUMATORIA SEGUIMIENTO MAS EL QUEDAN ACTUAL: ", sumaLiquidaFixed);
+            console.log("SUMATORIA SEGUIMIENTO MAS EL QUEDAN ACTUAL: ", sumaLiquidaFixed);
             console.log("MONTO A SUPERAR: ", montoDetDocAdquisicionFixed)
             console.log("MONTO LIQUIDO QUEDAN ACTUAL: ", this.dataInputs.monto_liquido_quedan)
-            console.log("TOTAL LIQUIDO PERO NO ES EL ORIGINAL: ", this.dataForCalculate.montoLiquidoQuedan) */
+            console.log("TOTAL LIQUIDO PERO NO ES EL ORIGINAL: ", this.dataForCalculate.montoLiquidoQuedan)
+            console.log("ID DOCUMENTO ADQUISCION: ", this.dataInputs.id_det_doc_adquisicion)
 
-            if (this.dataInputs.id_det_doc_adquisicion && parseFloat(sumaLiquidaFixed) > parseFloat(montoDetDocAdquisicionFixed)) {
+            if (this.dataInputs.id_det_doc_adquisicion &&  parseFloat(sumaLiquidaFixed) > parseFloat(montoDetDocAdquisicionFixed)) {
                 toast.error("El monto del quedan supera el monto definido en el item seleccionado", {
                     autoClose: 4000,
                     position: "top-right",
@@ -879,8 +881,11 @@ export default {
             this.dataInputs.nombre_tipo_doc_adquisicion = this.dataQuedan.tipo_documento_adquisicion.nombre_tipo_doc_adquisicion;
 
 
-            this.dataInputs.numero_doc_adquisicion = this.dataQuedan.numero_compromiso_ppto_quedan;
-            this.dataInputs.compromiso_ppto_det_doc_adquisicion = this.dataQuedan.numero_acuerdo_quedan;
+            if (this.dataQuedan.numero_acuerdo_quedan != '' && this.dataQuedan.numero_compromiso_ppto_quedan != '') {
+                
+                this.dataInputs.numero_doc_adquisicion = this.dataQuedan.numero_acuerdo_quedan;
+                this.dataInputs.compromiso_ppto_det_doc_adquisicion = this.dataQuedan.numero_compromiso_ppto_quedan;
+            }
 
             console.log(this.dataInputs.numero_doc_adquisicion);
             console.log(this.dataInputs.compromiso_ppto_det_doc_adquisicion);
@@ -1207,7 +1212,7 @@ export default {
                         });
                     });
 
-                    //this.taxesByRow(); // funciona que calcula los impuestos (mas informacion Ctrl+click)
+                    this.taxesByRow(); // funciona que calcula los impuestos (mas informacion Ctrl+click)
 
 
                     if (this.dataQuedan.monto_liquido_quedan != this.dataInputs.monto_liquido_quedan) {
