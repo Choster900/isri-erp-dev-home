@@ -87,7 +87,7 @@ import axios from "axios";
                                 <div class="relative flex">
                                     <LabelToInput icon="date" />
                                     <flat-pickr
-                                        class="peer text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none w-full"
+                                        class="font-semibold peer text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none w-full"
                                         :config="config" v-model="acq_doc.award_date"
                                         :placeholder="'Seleccione fecha adjudicacion'" />
                                 </div>
