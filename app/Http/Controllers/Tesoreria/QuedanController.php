@@ -230,19 +230,21 @@ class QuedanController extends Controller
             DB::beginTransaction();
             // Actualizar los campos principales del quedan
             Quedan::where("id_quedan", $id_quedan)->update([
-                'id_proveedor'                => $request->quedan["id_proveedor"],
-                'id_det_doc_adquisicion'      => $request->quedan["id_det_doc_adquisicion"],
-                'id_tipo_doc_adquisicion'     => $request->quedan["id_tipo_doc_adquisicion"],
-                'numero_retencion_iva_quedan' => $request->quedan["numero_retencion_iva_quedan"],
-                'descripcion_quedan'          => $request->quedan["descripcion_quedan"],
-                'monto_liquido_quedan'        => $request->quedan["monto_liquido_quedan"],
-                'monto_iva_quedan'            => $request->quedan["monto_iva_quedan"],
-                'monto_isr_quedan'            => $request->quedan["monto_isr_quedan"],
-                'monto_total_quedan'          => $request->quedan["monto_total_quedan"],
-                'id_proy_financiado'          => $request->quedan["id_proy_financiado"],
-                'id_prioridad_pago'           => $request->quedan["id_prioridad_pago"],
-                'usuario_quedan'              => $request->user()->nick_usuario,
-                'fecha_mod_quedan'            => Carbon::now(),
+                'id_proveedor'                  => $request->quedan["id_proveedor"],
+                'id_det_doc_adquisicion'        => $request->quedan["id_det_doc_adquisicion"],
+                'id_tipo_doc_adquisicion'       => $request->quedan["id_tipo_doc_adquisicion"],
+                'numero_retencion_iva_quedan'   => $request->quedan["numero_retencion_iva_quedan"],
+                'numero_compromiso_ppto_quedan' => $request->quedan["id_tipo_doc_adquisicion"] == 3 ? $request->quedan["numero_doc_adquisicion"] : '',
+                'numero_acuerdo_quedan'         => $request->quedan["id_tipo_doc_adquisicion"] == 3 ? $request->quedan["compromiso_ppto_det_doc_adquisicion"] : '',
+                'descripcion_quedan'            => $request->quedan["descripcion_quedan"],
+                'monto_liquido_quedan'          => $request->quedan["monto_liquido_quedan"],
+                'monto_iva_quedan'              => $request->quedan["monto_iva_quedan"],
+                'monto_isr_quedan'              => $request->quedan["monto_isr_quedan"],
+                'monto_total_quedan'            => $request->quedan["monto_total_quedan"],
+                'id_proy_financiado'            => $request->quedan["id_proy_financiado"],
+                'id_prioridad_pago'             => $request->quedan["id_prioridad_pago"],
+                'usuario_quedan'                => $request->user()->nick_usuario,
+                'fecha_mod_quedan'              => Carbon::now(),
             ]);
 
             foreach ( $detalle_quedan as $key => $value ) {
