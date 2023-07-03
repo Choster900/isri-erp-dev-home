@@ -159,7 +159,7 @@ import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalL
 
         <ModalAsignacionRequerimiento :modalIsOpen="showModalAsignacionRequerimiento"
             @close-definitive="showModalAsignacionRequerimiento = false" :dataForSelect="dataForSelect"
-            @reload-table="[getDataLiquidaciones(lastUrl), getListForSelect()]" />2
+            @reload-table="[getDataLiquidaciones(lastUrl), getListForSelect()]" />
 
 
         <ModalLiquidacionRequerimientoVue :modalIsOpen="showModalLiquidacionRequerimiento"
