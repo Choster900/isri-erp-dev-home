@@ -561,7 +561,7 @@ export default {
                 id_quedan: '',
                 id_prioridad_pago: '',
                 id_proy_financiado: '',
-                numero_acuerdo_quedan:'',
+                numero_acuerdo_quedan: '',
                 numero_compromiso_ppto_quedan: '',
             },
             dataForCalculate: {
