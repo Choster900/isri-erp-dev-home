@@ -32,7 +32,7 @@ import axios from 'axios';
               <LabelToInput icon="list2" />
             </div>
           </div>
-          <h2 class="font-semibold text-slate-800 pt-1">Documento Adquisicion: <span class="text-slate-400 font-medium">{{
+          <h2 class="font-semibold text-slate-800 pt-1">Documentos Adquisicion: <span class="text-slate-400 font-medium">{{
             tableData.total
           }}</span></h2>
         </div>
@@ -44,7 +44,12 @@ import axios from 'axios';
           <tbody class="text-sm divide-y divide-slate-200">
             <tr v-for="doc in acquisition_docs" :key="doc.id_doc_adquisicion">
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                <div class="font-medium text-slate-800 text-center">{{ doc.nombre_tipo_doc_adquisicion }}</div>
+                <div class="font-medium text-slate-800 text-center">{{ doc.id_doc_adquisicion }}</div>
+              </td>
+              <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                <div class="font-medium text-slate-800 text-center">{{ 
+                  doc.nombre_tipo_doc_adquisicion==='CONTRATO' ? 'CONT.' : 'ORDEN'
+                  }}</div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5 td-data-table">
                 <div class="font-medium text-slate-800 ellipsis text-center">
@@ -70,7 +75,7 @@ import axios from 'axios';
                 </div>
               </td>
               <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                <div class="font-medium text-slate-800">
+                <div class="font-medium text-slate-800 text-center">
                   <div v-if="(doc.estado_doc_adquisicion == 1)"
                     class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
                     Activo
@@ -193,9 +198,10 @@ export default {
   data() {
     let sortOrders = {};
     let columns = [
-      { width: "15%", label: "Tipo", name: "nombre_tipo_doc_adquisicion", type: "text" },
+      { width: "9%", label: "ID", name: "id_doc_adquisicion", type: "text" },
+      { width: "9%", label: "Tipo", name: "nombre_tipo_doc_adquisicion", type: "text" },
       { width: "15%", label: "Numero", name: "numero_doc_adquisicion", type: "text" },
-      { width: "25%", label: "Proveedor", name: "razon_social_proveedor", type: "text" },
+      { width: "22%", label: "Proveedor", name: "razon_social_proveedor", type: "text" },
       { width: "15%", label: "Monto", name: "monto_doc_adquisicion", type: "text" },
       { width: "15%", label: "Compromisos", name: "compromiso_ppto_det_doc_adquisicion", type: "text" },
       {

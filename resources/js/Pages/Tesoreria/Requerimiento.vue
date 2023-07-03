@@ -27,7 +27,7 @@ import moment from 'moment';
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Total Requerimientos
+                    <h2 class="font-semibold text-slate-800 pt-1">Requerimientos: 
                         <span class="text-slate-400 font-medium">{{ pagination.total }}</span>
                     </h2>
                 </div>
@@ -175,7 +175,7 @@ export default {
             { width: "1%", label: "Acciones", name: "Acciones" },
         ];
         columns.forEach((column) => {
-            if (column.name === 'id_persona')
+            if (column.name === 'id_requerimiento_pago')
                 sortOrders[column.name] = 1;
             else
                 sortOrders[column.name] = -1;

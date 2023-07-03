@@ -1,11 +1,8 @@
 <script setup>
-import Modal from "@/Components/Modal.vue";
 import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
-import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
-import ModalIncomeReceiptVue from '@/Components-ISRI/Tesoreria/ModalIncomeReceipt.vue';
-import ModalReceiptFormatVue from '@/Components-ISRI/Tesoreria/ModalReceiptFormat.vue';
+import ModalDocAdquisicionVue from '@/Components-ISRI/Tesoreria/ModalDocAdquisicion.vue';
 import moment from 'moment';
 
 import { toast } from 'vue3-toastify';
@@ -16,12 +13,12 @@ import axios from 'axios';
 </script>
 
 <template>
-    <Head title="Proceso - Ingreso" />
-    <AppLayoutVue nameSubModule="Tesoreria - Recibos de Ingreso">
+    <Head title="RRHH - Gestion Empleados" />
+    <AppLayoutVue nameSubModule="RRHH - Empleados">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="addIncomeConcept()" v-if="permits.insertar == 1"
-                    color="bg-green-700  hover:bg-green-800" text="Agregar Recibo" icon="add" />
+                <GeneralButton @click="addEmployees()" v-if="permits.insertar == 1" color="bg-green-700  hover:bg-green-800"
+                    text="Agregar Empleado" icon="add" />
             </div>
         </div>
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
@@ -29,52 +26,52 @@ import axios from 'axios';
                 <div class="mb-4 md:flex flex-row justify-items-start">
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-                            <Multiselect v-model="tableData.length" @select="getIncomeReceipts()" :options="perPage"
-                                :searchable="true" placeholder="Cantidad a mostrar" />
+                            <Multiselect v-model="tableData.length" @select="getEmployees()"
+                                @deselect=" tableData.length = 5; getEmployees()"
+                                @clear="tableData.length = 5; getEmployees()" :options="perPage" :searchable="true"
+                                placeholder="Cantidad a mostrar" />
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Recibos Ingreso: <span
-                            class="text-slate-400 font-medium">{{
-                                tableData.total
-                            }}</span></h2>
+                    <h2 class="font-semibold text-slate-800 pt-1">Empleados: <span class="text-slate-400 font-medium">{{
+                        tableData.total
+                    }}</span></h2>
                 </div>
             </header>
 
             <div class="overflow-x-auto">
-                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
-                    @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getIncomeReceipts()">
+                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy"
+                    :searchButton="true" @datos-enviados="handleData($event)" @execute-search="getEmployees()">
                     <tbody class="text-sm divide-y divide-slate-200">
-                        <tr v-for="receipt in income_receipts" :key="receipt.id_recibo_ingreso">
-                            <td class="px-2 first:pl-5 last:pr-5 td-data-table">
-                                <div class="font-medium text-slate-800 text-center">{{ receipt.numero_recibo_ingreso }}
-                                </div>
+                        <tr v-for="employee in employees" :key="employee.id_empleado">
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800 text-center">{{ employee.id_empleado }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
                                 <div class="font-medium text-slate-800 ellipsis text-center">
-                                    {{ formatearFecha(receipt.fecha_recibo_ingreso) }}
+                                    {{ employee.codigo_empleado }}
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5 td-data-table">
-                                <div class="font-medium text-slate-800 ellipsis text-center">{{
-                                    receipt.cliente_recibo_ingreso }}</div>
-                            </td>
-                            <td class="px-2 first:pl-5 last:pr-5 td-data-table">
-                                <div class="font-medium text-slate-800 ellipsis text-center">{{
-                                    receipt.descripcion_recibo_ingreso }}
-                                </div>
-                            </td>
-                            <td class="px-2 first:pl-5 last:pr-5 td-data-table">
-                                <div class="font-medium text-slate-800 text-center">{{ receipt.id_ccta_presupuestal }}</div>
-                            </td>
-                            <td class="px-2 first:pl-5 last:pr-5 td-data-table">
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ receipt.monto_recibo_ingreso ? '$' + receipt.monto_recibo_ingreso : '' }}
+                                    {{ employee.persona.pnombre_persona }}
+                                    {{ employee.persona.snombre_persona }}
+                                    {{ employee.persona.tnombre_persona }}
+                                    {{ employee.persona.papellido_persona }}
+                                    {{ employee.persona.sapellido_persona }}
+                                    {{ employee.persona.tapellido_persona }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
+                                <div class="font-medium text-slate-800 ellipsis text-center">{{ employee.persona.dui_persona
+                                }}</div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800 text-center">{{ employee.persona.email_persona }}</div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
-                                    <div v-if="(receipt.estado_recibo_ingreso == 1)"
+                                    <div v-if="(employee.estado_empleado == 1)"
                                         class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
                                         Activo
                                     </div>
@@ -84,17 +81,14 @@ import axios from 'axios';
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5 td-data-table">
-                                <div class="flex justify-center items-center">
-
-
+                            <td class="px-2 first:pl-5 last:pr-5">
+                                <div class="space-x-1 text-center">
                                     <DropDownOptions>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            @click="editIncomeReceipt(receipt)"
-                                            v-if="permits.actualizar == 1 && receipt.estado_recibo_ingreso == 1">
+                                            v-if="permits.actualizar == 1 && employee.estado_empleado == 1"
+                                            @click="editEmployee(employee)">
                                             <div class="w-8 text-green-900">
                                                 <span class="text-xs">
-
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                         stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -105,16 +99,14 @@ import axios from 'axios';
                                             <div class="font-semibold">Editar</div>
                                         </div>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            @click="changeStateIncomeReceipt(receipt.id_recibo_ingreso, receipt.numero_recibo_ingreso, receipt.estado_recibo_ingreso)"
-                                            v-if="permits.eliminar == 1">
-                                            <div class="w-8 text-red-900">
-                                                <span class="text-xs">
-                                                    <svg :fill="receipt.estado_recibo_ingreso == 1 ? '#991B1B' : '#166534'"
+                                            @click="changeStatusEmployee(employee)" v-if="permits.eliminar == 1">
+                                            <div class="w-8 text-red-900"><span class="text-xs">
+                                                    <svg :fill="employee.estado_empleado == 1 ? '#991B1B' : '#166534'"
                                                         version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
                                                         width="20px" height="20px"
                                                         xmlns:xlink="http://www.w3.org/1999/xlink"
                                                         viewBox="0 0 97.994 97.994" xml:space="preserve"
-                                                        :stroke="receipt.estado_recibo_ingreso == 1 ? '#991B1B' : '#166534'">
+                                                        :stroke="employee.estado_empleado == 1 ? '#991B1B' : '#166534'">
                                                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                                                         <g id="SVGRepo_tracerCarrier" stroke-linecap="round"
                                                             stroke-linejoin="round"></g>
@@ -131,26 +123,10 @@ import axios from 'axios';
                                                             </g>
                                                         </g>
                                                     </svg>
-                                                </span>
-                                            </div>
+                                                </span></div>
                                             <div class="font-semibold">
-                                                {{ receipt.estado_recibo_ingreso ? 'Desactivar' : 'Activar' }}
+                                                {{ employee.estado_empleado ? 'Desactivar' : 'Activar' }}
                                             </div>
-                                        </div>
-                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            v-if="receipt.estado_recibo_ingreso == 1" @click="viewReceipt(receipt)">
-                                            <div class="w-8 text-blue-900">
-                                                <span class="text-xs">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                    </svg>
-                                                </span>
-                                            </div>
-                                            <div class="font-semibold">Ver</div>
                                         </div>
                                     </DropDownOptions>
                                 </div>
@@ -161,9 +137,11 @@ import axios from 'axios';
 
             </div>
             <div v-if="empty_object" class="flex text-center py-2">
-                <p class="text-red-500 font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se encontraron
+                <p class="text-red-500 font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se
+                    encontraron
                     registros.</p>
             </div>
+
         </div>
 
         <div v-if="!empty_object" class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
@@ -176,8 +154,8 @@ import axios from 'axios';
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
 
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getIncomeReceipts(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                            text-indigo-500">
+                                        <a @click="getEmployees(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                  text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
                                     </div>
@@ -185,15 +163,15 @@ import axios from 'axios';
                                 <span v-else-if="(link.label == 'Siguiente')"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getIncomeReceipts(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                            text-indigo-500">
+                                        <a @click="getEmployees(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                  text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
                                     </div>
                                 </span>
                                 <span class="cursor-pointer" v-else
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
-                                        class=" w-5" @click="getIncomeReceipts(link.url)">{{ link.label }}</span>
+                                        class=" w-5" @click="getEmployees(link.url)">{{ link.label }}</span>
                                 </span>
                             </li>
                         </ul>
@@ -202,12 +180,10 @@ import axios from 'axios';
             </div>
         </div>
 
-        <ModalIncomeReceiptVue :show_modal_receipt="show_modal_receipt" :modal_data="modal_data"
-            :budget_accounts="budget_accounts" :treasury_clerk="treasury_clerk" @cerrar-modal="show_modal_receipt = false"
-            @get-table="getIncomeReceipts(tableData.currentPage)" />
-
-        <ModalReceiptFormatVue :view_receipt="view_receipt" :receipt_to_print="receipt_to_print"
-            @cerrar-modal="view_receipt = false" />
+        <!-- <ModalDocAdquisicionVue :show_modal_acq_doc="show_modal_acq_doc" :modalData="modalData"
+            :financing_sources="financing_sources" :suppliers="suppliers" :doc_types="doc_types"
+            :management_types="management_types" @cerrar-modal="show_modal_acq_doc = false"
+            @get-table="getAcquisitionDoc(tableData.currentPage)" /> -->
 
     </AppLayoutVue>
 </template>
@@ -215,51 +191,51 @@ import axios from 'axios';
 <script>
 export default {
     created() {
-        this.getIncomeReceipts()
+        this.getEmployees()
         this.getPermits()
-        this.getModalReceiptSelects()
+        //this.getSelectsAcquisitionDoc()
     },
     data() {
         let sortOrders = {};
         let columns = [
-            { width: "11%", label: "Numero", name: "numero_recibo_ingreso", type: "text" },
-            { width: "6%", label: "Fecha", name: "fecha_recibo_ingreso", type: "date" },
-            { width: "25%", label: "Cliente", name: "cliente_recibo_ingreso", type: "text" },
-            { width: "25%", label: "Descripcion", name: "descripcion_recibo_ingreso", type: "text" },
-            { width: "5%", label: "Especifico", name: "id_ccta_presupuestal", type: "text" },
-            { width: "5%", label: "Monto", name: "monto_recibo_ingreso", type: "text" },
+            { width: "10%", label: "ID", name: "id_empleado", type: "text" },
+            { width: "15%", label: "Codigo", name: "codigo_empleado", type: "text" },
+            { width: "35%", label: "Nombre", name: "nombre_persona", type: "text" },
+            { width: "15%", label: "Dui", name: "dui_persona", type: "text" },
+            { width: "10%", label: "Dependencia", name: "email_persona", type: "text" },
             {
-                width: "5%", label: "Estado", name: "estado_recibo_ingreso", type: "select",
+                width: "10%", label: "Estado", name: "estado_empleado", type: "select",
                 options: [
                     { value: "1", label: "Activo" },
                     { value: "0", label: "Inactivo" }
                 ]
             },
-            { width: "18%", label: "Acciones", name: "Acciones" },
+            { width: "5%", label: "Acciones", name: "Acciones" },
         ];
         columns.forEach((column) => {
-            if (column.name === 'id_recibo_ingreso')
+            if (column.name === 'id_empleado')
                 sortOrders[column.name] = 1;
             else
                 sortOrders[column.name] = -1;
         });
         return {
             empty_object: false,
-            view_receipt: false,
-            receipt_to_print: [],
             //Data for datatable
-            income_receipts: [],
+            employees: [],
             //Data for modal
-            income_concepts: [],
-            financing_sources: [],
-            treasury_clerk: [],
-            show_modal_receipt: false,
-            modal_data: [],
-            permits: [],
+            show_modal_employee: false,
+            modalData: [],
+            doc_types: [],
+            suppliers: [],
+            management_types: [],
             budget_accounts: [],
+            dependencies: [],
+            financing_sources: [],
+            //Permissions
+            permits: [],
             links: [],
             columns: columns,
-            sortKey: "id_recibo_ingreso",
+            sortKey: "id_empleado",
             sortOrders: sortOrders,
             perPage: ["10", "20", "30"],
             tableData: {
@@ -274,32 +250,21 @@ export default {
         }
     },
     methods: {
-        formatearFecha(date) {
-            return moment(date).format('DD/MM/YYYY');
+        editEmployee(employee) {
+            this.modalData = employee
+            this.show_modal_employee = true
         },
-        viewReceipt(receipt) {
-            const filteredReceipt = {
-                ...receipt,
-                detalles: receipt.detalles.filter(detalle => detalle.estado_det_recibo_ingreso === 1)
-            };
-            this.receipt_to_print = filteredReceipt
-            this.view_receipt = true
+        addEmployee() {
+            this.modalData = []
+            this.show_modal_employee = true
         },
-        editIncomeReceipt(income_concept) {
-            this.modal_data = income_concept
-            this.show_modal_receipt = true
-        },
-        addIncomeConcept() {
-            this.modal_data = []
-            this.show_modal_receipt = true
-        },
-        getModalReceiptSelects() {
-            axios.get("/get-modal-receipt-selects")
+        getSelectsAcquisitionDoc() {
+            axios.get("/get-selects-acq-doc")
                 .then((response) => {
-                    this.budget_accounts = response.data.budget_accounts
-                    this.income_concepts = response.data.income_concepts
-                    this.treasury_clerk = response.data.treasury_clerk
-                    //this.financing_sources = response.data.financing_sources
+                    this.doc_types = response.data.doc_types
+                    this.management_types = response.data.management_types
+                    this.suppliers = response.data.suppliers
+                    this.financing_sources = response.data.financing_sources
                 })
                 .catch((errors) => {
                     let msg = this.manageError(errors);
@@ -312,11 +277,11 @@ export default {
                     this.$emit("cerrar-modal");
                 });
         },
-        changeStateIncomeReceipt(income_receipt_id, income_receipt_number, income_receipt_state) {
+        changeStatusEmployee(employee) {
             let msg
-            income_receipt_state == 1 ? msg = "Desactivar" : msg = "Activar"
+            employee.estado_empleado == 1 ? msg = "Desactivar" : msg = "Activar"
             this.$swal.fire({
-                title: msg + ' recibo de ingreso numero: ' + income_receipt_number + '.',
+                title: msg + ' empleado codigo: ' + employee.codigo_empleado + '.',
                 text: "¿Estas seguro?",
                 icon: "question",
                 iconHtml: "❓",
@@ -327,9 +292,9 @@ export default {
                 showCloseButton: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    axios.post("/change-state-income-receipt", {
-                        income_receipt_id: income_receipt_id,
-                        income_receipt_state: income_receipt_state
+                    axios.post("/change-state-acq-doc", {
+                        id: employee.id_empleado,
+                        status: employee.estado_empleado
                     })
                         .then((response) => {
                             this.$swal.fire({
@@ -337,21 +302,33 @@ export default {
                                 icon: 'success',
                                 timer: 5000
                             })
-                            this.getIncomeReceipts(this.tableData.currentPage);
+                            this.getEmployees(this.tableData.currentPage);
                         })
                         .catch((errors) => {
-                            let msg = this.manageError(errors)
-                            this.$swal.fire({
-                                title: 'Operación cancelada',
-                                text: msg,
-                                icon: 'warning',
-                                timer: 5000
-                            })
+                            if (errors.response.data.logical_error) {
+                                toast.error(
+                                    errors.response.data.logical_error,
+                                    {
+                                        autoClose: 5000,
+                                        position: "top-right",
+                                        transition: "zoom",
+                                        toastBackgroundColor: "white",
+                                    }
+                                );
+                            } else {
+                                let msg = this.manageError(errors)
+                                this.$swal.fire({
+                                    title: 'Operación cancelada',
+                                    text: msg,
+                                    icon: 'warning',
+                                    timer: 5000
+                                })
+                            }
                         })
                 }
             })
         },
-        async getIncomeReceipts(url = "/recibos-ingreso") {
+        async getEmployees(url = "/employees") {
             this.tableData.draw++;
             this.tableData.currentPage = url
             await axios.post(url, this.tableData).then((response) => {
@@ -361,8 +338,8 @@ export default {
                     this.tableData.total = data.data.total;
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
-                    this.income_receipts = data.data.data;
-                    this.income_receipts.length > 0 ? this.empty_object = false : this.empty_object = true
+                    this.employees = data.data.data;
+                    this.employees.length > 0 ? this.empty_object = false : this.empty_object = true
                 }
             }).catch((errors) => {
                 let msg = this.manageError(errors)
@@ -381,7 +358,7 @@ export default {
                 this.sortOrders[key] = this.sortOrders[key] * -1;
                 this.tableData.column = this.getIndex(this.columns, "name", key);
                 this.tableData.dir = this.sortOrders[key] === 1 ? "asc" : "desc";
-                this.getIncomeReceipts();
+                this.getAcquisitionDoc();
             }
         },
         getIndex(array, key, value) {
@@ -404,10 +381,11 @@ export default {
             this.tableData.search = myEventData;
             const data = Object.values(myEventData);
             if (data.every(error => error === '')) {
-                this.getIncomeReceipts()
+                this.getEmployees()
             }
-        }
-    }
+        },
+
+    },
 }
 </script>
 
@@ -421,5 +399,4 @@ export default {
 .ellipsis {
     overflow: hidden;
     text-overflow: ellipsis;
-}
-</style>
+}</style>

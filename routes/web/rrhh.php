@@ -1,17 +1,19 @@
 <?php
+
+use App\Http\Controllers\RRHH\EmpleadoController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::group(['middleware' => ['auth','access']], function () {
-    Route::get('rrhh/consultar', function () {
-        return Inertia::render('RRHH/ConsultaEmpleados', [
-            'menu' => session()->get('menu')
-        ]);
-    })->name('consulta.empleados');
+    Route::get(
+        '/rrhh/empleados',
+        function () {
+            return Inertia::render('RRHH/Empleados', [
+                'menu' => session()->get('menu')
+            ]);
+        }
+    )->name('rrhh.empleados');
 
-    Route::get('rrhh/empleados', function () {
-        return Inertia::render('RRHH/GestionEmpleados', [
-            'menu' => session()->get('menu')
-        ]);
-    })->name('gestion.empleados');
+    Route::post('employees', [EmpleadoController::class, 'getEmployees'])->name('empleado.getEmployees');
+
 });
