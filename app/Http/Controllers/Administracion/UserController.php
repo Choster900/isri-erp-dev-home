@@ -280,6 +280,13 @@ class UserController extends Controller
         ]);
         $new_user->save();
 
+        $person->update([
+            'id_usuario' => $new_user->id_usuario,
+            'fecha_mod_persona' => Carbon::now(),
+            'usuario_persona' => $request->user()->nick_usuario,
+            'ip_persona' => $request->ip(),
+        ]);
+
         foreach ($request->roles as $rol) {
             $new_user_permission = new PermisoUsuario([
                 'id_rol' => $rol['id_rol'],

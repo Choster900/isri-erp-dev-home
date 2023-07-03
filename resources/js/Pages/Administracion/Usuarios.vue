@@ -1,9 +1,7 @@
 <script setup>
 import { Head } from "@inertiajs/vue3";
 import Datatable from "@/Components-ISRI/Datatable.vue";
-import ModalAdministracionVue from '@/Components-ISRI/Administracion/ModalAdministracion.vue';
 import ModalAdminUserVue from '@/Components-ISRI/Administracion/ModalAdminUser.vue';
-import ModalCreateUserVue from '@/Components-ISRI/Administracion/ModalCreateUser.vue';
 import ModalChangePasswordVue from '@/Components-ISRI/Administracion/ModalChangePassword.vue';
 </script>
 <template>
@@ -143,7 +141,7 @@ import ModalChangePasswordVue from '@/Components-ISRI/Administracion/ModalChange
         </datatable>
       </div>
       <div v-if="empty_object" class="flex text-center py-2">
-        <p class="font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se encontraron registros.</p>
+        <p class="font-semibold text-red-500 text-[16px]" style="margin: 0 auto; text-align: center;">No se encontraron registros.</p>
       </div>
     </div>
     <div v-if="!empty_object" class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
@@ -182,11 +180,6 @@ import ModalChangePasswordVue from '@/Components-ISRI/Administracion/ModalChange
         </nav>
       </div>
     </div>
-    <ModalCreateUserVue :modalDataCreate="modalDataCreate" :showModalCreate="showModalCreate"
-      @update-table="getUpdateTable()" @cerrar-modal="showModalCreate = !showModalCreate" />
-
-    <ModalAdministracionVue :modalVar="modalVar" :showModal="showModal" :modalData="modalData" @cerrar-modal="closeVars()"
-      @update-table="getUpdateTable()" @abrir-modal="showModal = true" />
 
     <ModalChangePasswordVue :showModalChangePassword="showModalChangePassword" :modalData="modalData"
       @cerrar-modal="showModalChangePassword = !showModalChangePassword" @abrir-modal="showModalChangePassword = true" />
@@ -231,18 +224,6 @@ export default {
       empty_object: false,
       permits: [],
       modalData: []
-      // userRoles: [],
-      // id_usuario: "",
-      // nombre_usuario: "",
-      // sistemas: "",
-      // roles: "",
-      // id_sistema: "",
-      // id_rol: "",
-      // sistema_edit: "",
-      // id_rol_edit: "",
-      // roles_edit: "",
-      // id_sistema_edit: "",
-      // permiso_usuario: ""
       ,
       modalDataCreate: {
         dui: '',

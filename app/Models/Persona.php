@@ -13,6 +13,12 @@ class Persona extends Model
     public $timestamps = false;
 
     protected $fillable = [
+        'id_usuario',
+        'id_genero',
+        'id_estado_civil',
+        'id_nivel_educativo',
+        'id_municipio',
+        'id_profesion',
         'pnombre_persona',
         'snombre_persona',
         'tnombre_persona',
@@ -22,16 +28,15 @@ class Persona extends Model
         'telefono_persona',
         'dui_persona',
         'email_persona',
-        'id_genero',
-        'id_estado_civil',
         'nombre_conyuge_persona',
         'nombre_madre_persona',
         'nombre_padre_persona',
         'fecha_nac_persona',
-        'id_nivel_educativo',
-        'id_municipio',
-        'id_profesion',
+        'fecha_reg_persona',
+        'fecha_mod_persona',
         'estado_persona',
+        'usuario_persona',
+        'ip_persona'
     ];
 
 
