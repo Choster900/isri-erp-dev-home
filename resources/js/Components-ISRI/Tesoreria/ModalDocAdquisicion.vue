@@ -199,7 +199,7 @@ import axios from "axios";
                                             :class="[
                                                 'hover:bg-[#141414]/10',
                                                 'border-b-2',
-                                                item.selected ? 'bg-orange-300 hover:bg-orange-400' :
+                                                item.selected ? 'bg-orange-400 hover:bg-orange-500' :
                                                     index_errors.includes(index) ? 'bg-red-300 hover:bg-red-400' : '']">
                                             <td class="text-center">{{ item.commitment_number }}</td>
                                             <td class="text-center">{{ truncateName(item.name) }}</td>

@@ -45,7 +45,7 @@ import InputError from "@/Components/InputError.vue";
 
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="segundo-nombre" v-model="persona.snombre_persona"
+                                <TextInput id="segundo-nombre" v-model="persona.snombre_persona" :required="false"
                                     :value="persona.snombre_persona" type="text" placeholder="Segundo nombre">
                                     <LabelToInput icon="personalInformation" forLabel="segundo-nombre" />
                                 </TextInput>
@@ -93,7 +93,7 @@ import InputError from "@/Components/InputError.vue";
                         <div class="mb-7 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="telefono" v-model="persona.telefono_persona" @change="typePhoneNumber"
-                                    :value="persona.telefono_persona" type="text" placeholder="Telefono" :required="false"
+                                    :value="persona.telefono_persona" type="text" placeholder="Telefono"
                                     @update:modelValue="typePhoneNumber()">
                                     <LabelToInput icon="personalInformation" forLabel="telefono" />
                                 </TextInput>
@@ -143,7 +143,7 @@ import InputError from "@/Components/InputError.vue";
                         <div class="mb-7 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
-                                    Estado civil
+                                    Estado civil <span class="text-red-600 font-extrabold">*</span>
                                 </label>
                                 <div class="relative font-semibold  flex h-8 w-full flex-row-reverse ">
                                     <Multiselect placeholder="Estado civil" v-model="persona.id_estado_civil"
@@ -238,7 +238,7 @@ import InputError from "@/Components/InputError.vue";
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
-                                    Nivel profesion
+                                    Nivel profesion <span class="text-red-600 font-extrabold">*</span>
                                 </label>
                                 <div class="relative font-semibold flex h-8 w-full flex-row-reverse ">
                                     <Multiselect placeholder="Nivel profesion" v-model="persona.id_profesion"
