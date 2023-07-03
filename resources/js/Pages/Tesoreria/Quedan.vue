@@ -240,6 +240,7 @@ import html2pdf from 'html2pdf.js'
 <script>
 import quedanPDFVue from '@/pdf/Tesoreria/quedanPDF.vue';
 import comprobanteRetencion from '@/pdf/Tesoreria/Retencion.vue';
+//import comprobanteRetencion from '@/pdf/Tesoreria/ComprobatenRetencionPdf.vue';
 import { createApp, h } from 'vue'
 
 export default {

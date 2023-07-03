@@ -11,7 +11,6 @@ import GeneralButton from "@/Components-ISRI/ComponentsToForms/GeneralButton.vue
 import TextInput from "@/Components-ISRI/ComponentsToForms/TextInput.vue";
 import LabelToInput from "@/Components-ISRI/ComponentsToForms/LabelToInput.vue";
 import Checkbox from "@/Components-ISRI/ComponentsToForms/Checkbox.vue"; //TODO: Fix style
-import moment from "moment";
 import Multiselect from "@vueform/multiselect";
 import Datepicker from "vue3-datepicker";
 import RadioButton from "@/Components-ISRI/ComponentsToForms/RadioButton.vue"; //TODO: Fix style

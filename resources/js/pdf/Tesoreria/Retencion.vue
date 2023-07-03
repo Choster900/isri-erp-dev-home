@@ -84,8 +84,9 @@
                             <td v-else class=" border-l border-r border-white border-b">&nbsp;</td>
                             <td v-if="dataQuedan.detalle_quedan[i - 1]" class=" border-r border-white border-b text-left"
                                 colspan="4">
-                                <div style="margin-top: -12px; margin-left: -12px;" class="py-[9px] text-[8pt] font-bold uppercase">
-                                    {{ truncateText(dataQuedan.detalle_quedan[i - 1].descripcion_det_quedan,100) }}
+                                <div style="margin-top: -12px; margin-left: -12px;"
+                                    class="py-[9px] text-[8pt] font-bold uppercase">
+                                    {{ truncateText(dataQuedan.detalle_quedan[i - 1].descripcion_det_quedan, 100) }}
 
                                 </div>
                             </td>
@@ -179,8 +180,8 @@
                         <tr>
                             <td class="border-l border-r border-white border-b text-left" colspan="2">
                                 <div style="margin-top: -12px;" class="pl-1 py-[9px] text-[8pt] text-white">
-                                    <span
-                                        class="font-extrabold ml-[15px] mt-[7px] text-black text-[8px]">{{ dataQuedan.tesorero.nombre_empleado_tesoreria }}</span>
+                                    <span class="font-extrabold ml-[15px] mt-[7px] text-black text-[8px]">{{
+                                        dataQuedan.tesorero.nombre_empleado_tesoreria }}</span>
                                 </div>
                             </td>
                             <td class="border-r border-white border-b text-left">
@@ -200,7 +201,8 @@
                         </tr>
                         <tr>
                             <td class="border-l border-r border-white border-b text-left" colspan="2">
-                                <div style="margin-top: -12px; margin-left: -15px;" class="pl-1 py-[9px] text-[8pt] text-white">
+                                <div style="margin-top: -12px; margin-left: -15px;"
+                                    class="pl-1 py-[9px] text-[8pt] text-white">
                                     D.U.I. <span class="font-extrabold text-black">{{
                                         dataQuedan.tesorero.dui_empleado_tesoreria
                                     }}</span>
@@ -278,6 +280,10 @@ export default {
             return `${day}/${month}/${year}`;
         },
         truncateText(text, maxLength) {
+            if (!text || text.length === 0) {
+                return "";
+            }
+
             if (text.length <= maxLength) {
                 return text;
             } else {
@@ -291,5 +297,6 @@ export default {
 <style scoped>
 * {
     font-family: Arial, Helvetica, sans-serif;
-}</style>
+}
+</style>
   
