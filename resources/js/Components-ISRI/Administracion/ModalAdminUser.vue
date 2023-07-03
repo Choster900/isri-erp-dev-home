@@ -84,8 +84,7 @@ import ModalAsignacionRequerimiento from '@/Components-ISRI/Tesoreria/ModalAsign
                                             </div>
                                             <LabelToInput icon="password" forLabel="personal-information" />
                                         </TextInput>
-                                        <InputError v-for="(item, index) in errors.password" :key="index" class="mt-2"
-                                            :message="item" />
+                                        <InputError class="mt-2" :message="errors.password" />
                                     </div>
                                 </div>
                             </div>
@@ -119,8 +118,8 @@ import ModalAsignacionRequerimiento from '@/Components-ISRI/Tesoreria/ModalAsign
                             <span class="font-semibold text-slate-800 mb-4 text-lg">Selecciona un sistema y un rol:</span>
                         </div>
                         <!-- <div class="mb-2">Selecciona un sistema y un rol:</div> -->
-                        <div class="mb-2 ml-2 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                        <div class="mb-4 md:flex flex-row justify-items-start">
+                            <div class="mb-4 md:ml-2 md:mb-0 basis-1/2">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Sistema <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -144,23 +143,28 @@ import ModalAsignacionRequerimiento from '@/Components-ISRI/Tesoreria/ModalAsign
                         </div>
                         <div class="flex justify-center mb-4">
                             <div class="flex items-center">
-                                <button
+                                <!-- <button
                                     class="mr-4 btn-sm border-slate-200 hover:border-slate-300 text-slate-600 underline underline-offset-1"
-                                    @:disabled="is_loadig_roles"
-                                    @click="new_item ? saveRol() : updateRol()"
-                                    :class="new_item ? 'text-green-600' : 'text-orange-600'"
-                                    >
+                                    @:disabled="is_loadig_roles" @click="new_item ? saveRol() : updateRol()"
+                                    :class="new_item ? 'text-green-600' : 'text-orange-600'">
                                     {{ new_item ? 'AGREGAR' : 'ACTUALIZAR' }}
                                 </button>
 
                                 <button
                                     class="ml-0 btn-sm border-slate-200 hover:border-slate-300 underline underline-offset-1"
-                                    @:disabled="is_loadig_roles"
-                                    @click="new_item ? clean() : cancel()"
-                                    :class="new_item ? 'text-gray-600' : 'text-red-600'"
-                                    >
+                                    @:disabled="is_loadig_roles" @click="new_item ? clean() : cancel()"
+                                    :class="new_item ? 'text-gray-600' : 'text-red-600'">
                                     {{ new_item ? 'LIMPIAR' : 'CANCELAR' }}
-                                </button>
+                                </button> -->
+
+                                <GeneralButton class="mr-1 py-1" color="bg-blue-500 hover:bg-blue-700"
+                                    :icon="new_item ? 'add' : 'update'" :text="new_item ? 'Agregar' : 'Actualizar'"
+                                    @click="new_item ? saveRol() : updateRol()" :disabled="is_loadig_roles" />
+                                <GeneralButton v-if="itemSelected" class="ml-1 py-1"
+                                    color="bg-red-500 hover:bg-red-700" icon="delete"
+                                    text="Cancelar" @click="cancel()"
+                                    :disabled="is_loadig_roles" />
+
                             </div>
                         </div>
                         <div class="tabla-modal">
@@ -220,8 +224,8 @@ import ModalAsignacionRequerimiento from '@/Components-ISRI/Tesoreria/ModalAsign
                             <GeneralButton class="mr-1" v-if="modalData != '' && !itemSelected && !allDeleted"
                                 color="bg-orange-700  hover:bg-orange-800" text="Actualizar" icon="update"
                                 @click="updateUser()" />
-                            <GeneralButton class="mr-1" v-if="modalData == '' && !itemSelected" color="bg-green-700  hover:bg-green-800"
-                                text="Guardar" icon="add" @click="saveNewUser()" />
+                            <GeneralButton class="mr-1" v-if="modalData == '' && !itemSelected"
+                                color="bg-green-700  hover:bg-green-800" text="Guardar" icon="add" @click="saveNewUser()" />
                             <GeneralButton class="ml-1" text="Cancelar" icon="delete" @click="$emit('cerrar-modal')" />
                         </div>
                     </div>
@@ -614,54 +618,10 @@ export default {
             this.user_modal.dui = !x[2] ? x[1] : '' + x[1] + '-' + x[2] + (x[4] ? '-' + x[4] : '');
         },
         saveNewUser() {
-            const roles = this.user_modal.roles.length;
-            if (roles > 0) {
-                this.$swal.fire({
-                    title: '¿Está seguro de guardar el usuario?',
-                    icon: 'question',
-                    iconHtml: '✅',
-                    confirmButtonText: 'Si, Guardar',
-                    confirmButtonColor: '#15803D',
-                    cancelButtonText: 'Cancelar',
-                    showCancelButton: true,
-                    showCloseButton: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        axios.post("/save-user", this.user_modal).then((response) => {
-                            toast.success(response.data.mensaje, {
-                                autoClose: 3000,
-                                position: "top-right",
-                                transition: "zoom",
-                                toastBackgroundColor: "white",
-                            });
-                            this.$emit("update-table")
-                            this.$emit("cerrar-modal")
-                        }).catch((errors) => {
-                            if (errors.response.status === 422) {
-                                toast.warning(
-                                    "Tienes algunos errores por favor verifica tus datos.",
-                                    {
-                                        autoClose: 5000,
-                                        position: "top-right",
-                                        transition: "zoom",
-                                        toastBackgroundColor: "white",
-                                    }
-                                );
-                            } else {
-                                let msg = this.manageError(errors)
-                                this.$swal.fire({
-                                    title: 'Operación cancelada',
-                                    text: msg,
-                                    icon: 'warning',
-                                    timer: 5000
-                                })
-                            }
-                        })
-                    }
-                })
-            } else {
+            if (this.user_modal.password == '') {
+                this.errors.password = 'La contraseña es obligatoria.'
                 toast.warning(
-                    "Debes agregar al menos un rol al usuario.",
+                    "Tienes algunos errores por favor verifica tus datos.",
                     {
                         autoClose: 5000,
                         position: "top-right",
@@ -669,6 +629,66 @@ export default {
                         toastBackgroundColor: "white",
                     }
                 );
+                setTimeout(() => {
+                    this.errors.password = ''; // Clear the error message after 5 seconds
+                }, 5000); // 5000 milliseconds = 5 seconds
+            } else {
+                const roles = this.user_modal.roles.length;
+                if (roles > 0) {
+                    this.$swal.fire({
+                        title: '¿Está seguro de guardar el usuario?',
+                        icon: 'question',
+                        iconHtml: '✅',
+                        confirmButtonText: 'Si, Guardar',
+                        confirmButtonColor: '#15803D',
+                        cancelButtonText: 'Cancelar',
+                        showCancelButton: true,
+                        showCloseButton: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            axios.post("/save-user", this.user_modal).then((response) => {
+                                toast.success(response.data.mensaje, {
+                                    autoClose: 3000,
+                                    position: "top-right",
+                                    transition: "zoom",
+                                    toastBackgroundColor: "white",
+                                });
+                                this.$emit("update-table")
+                                this.$emit("cerrar-modal")
+                            }).catch((errors) => {
+                                if (errors.response.status === 422) {
+                                    toast.warning(
+                                        "Tienes algunos errores por favor verifica tus datos.",
+                                        {
+                                            autoClose: 5000,
+                                            position: "top-right",
+                                            transition: "zoom",
+                                            toastBackgroundColor: "white",
+                                        }
+                                    );
+                                } else {
+                                    let msg = this.manageError(errors)
+                                    this.$swal.fire({
+                                        title: 'Operación cancelada',
+                                        text: msg,
+                                        icon: 'warning',
+                                        timer: 5000
+                                    })
+                                }
+                            })
+                        }
+                    })
+                } else {
+                    toast.warning(
+                        "Debes agregar al menos un rol al usuario.",
+                        {
+                            autoClose: 5000,
+                            position: "top-right",
+                            transition: "zoom",
+                            toastBackgroundColor: "white",
+                        }
+                    );
+                }
             }
         },
         updateUser() {
@@ -754,11 +774,11 @@ export default {
                 return false;
             }
         },
-        allDeleted(){
+        allDeleted() {
             const all_deleted = this.user_modal.roles.every(item => item.pivot.estado_permiso_usuario == 0);
-            if(all_deleted){
+            if (all_deleted) {
                 return true
-            }else{
+            } else {
                 return false
             }
         }

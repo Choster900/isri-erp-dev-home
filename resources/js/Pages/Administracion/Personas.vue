@@ -9,11 +9,11 @@ import ModalAdministracionPersonasVue from '@/Components-ISRI/Administracion/Mod
 </script>
 <template>
     <Head title="Administracion" />
-    <AppLayoutVue>
+    <AppLayoutVue nameSubModule="Administracion - Personas">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton v-if="permits.insertar==1" @click="AddInformationPerson()" color="bg-green-700  hover:bg-green-800"
-                    text="Agregar Elemento" icon="add" />
+                <GeneralButton v-if="permits.insertar == 1" @click="AddInformationPerson()"
+                    color="bg-green-700  hover:bg-green-800" text="Agregar Persona" icon="add" />
             </div>
         </div>
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
@@ -22,29 +22,30 @@ import ModalAdministracionPersonasVue from '@/Components-ISRI/Administracion/Mod
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
                             <Multiselect v-model="tableData.length" @select="getPersonas()" :options="perPage"
-                                :searchable="true" />
-                            <LabelToInput icon="date" />
+                                :searchable="true" placeholder="Cantidad a mostrar" />
+                            <LabelToInput icon="list2" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Todas las personas <span class="text-slate-400 font-medium">{{
-                    pagination.total
-                }}</span></h2>
+                    <h2 class="font-semibold text-slate-800 pt-1">Todas las personas <span
+                            class="text-slate-400 font-medium">{{
+                                pagination.total
+                            }}</span></h2>
                 </div>
-             
+
             </header>
             <div class="overflow-x-auto">
-                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" 
-                @sort="sortBy" @datos-enviados="handleData($event)">
+                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
+                    @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getPersonas()">
                     <tbody class="text-sm divide-y divide-slate-200">
                         <tr v-for="persona in personas" :key="persona.id_persona">
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800">{{ persona.id_persona }}</div>
+                                <div class="font-medium text-slate-800 text-center">{{ persona.id_persona }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800">{{ persona.dui_persona }}</div>
+                                <div class="font-medium text-slate-800 text-center">{{ persona.dui_persona }}</div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 wrap">
+                            <td class="px-2 first:pl-5 last:pr-5 td-data-table">
+                                <div class="font-medium text-slate-800 ellipsis text-center">
                                     {{ persona.pnombre_persona }}
                                     {{ persona.snombre_persona }}
                                     {{ persona.tnombre_persona }}
@@ -54,54 +55,89 @@ import ModalAdministracionPersonasVue from '@/Components-ISRI/Administracion/Mod
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800">
-                                    {{ moment(persona.fecha_nac_persona).format('dddd Do MMMM YYYY') }}
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{ moment(persona.fecha_nac_persona).format('DD/MM/YYYY') }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800">
+                                <div class="font-medium text-slate-800 text-center">
                                     <div v-if="(persona.estado_persona == 1)"
-                                        class="inline-flex font-medium rounded-full text-xs text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
-                                        A
+                                        class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
+                                        Activo
                                     </div>
                                     <div v-else
-                                        class="inline-flex font-medium rounded-full text-xs text-center px-2.5 py-0.5 bg-rose-100 text-rose-600">
-                                        I
+                                        class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-rose-100 text-rose-600">
+                                        Inactivo
                                     </div>
                                 </div>
                             </td>
 
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="space-x-1">
-                                    <button v-if="permits.actualizar==1" @click.stop="getInformationPersons(persona.id_persona)"
-                                        class="text-slate-400 hover:text-slate-500 rounded-full">
-                                        <span class="sr-only">Edit</span>
-                                        <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
-                                            <path
-                                                d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z">
-                                            </path>
-                                        </svg>
-                                    </button>
-                                    <!-- CAMBIAR ICONO DE BOTON POR QUE VA A SER ACTIVAR Y DESCATIVAR -->
-                                    <button v-if="permits.eliminar==1" @click="enableStateForPerson(persona.id_persona, persona.estado_persona)"
-                                        class="text-rose-500 hover:text-rose-600 rounded-full">
-                                        <span class="sr-only">Delete</span><svg class="w-8 h-8 fill-current"
-                                            viewBox="0 0 32 32">
-                                            <path d="M13 15h2v6h-2zM17 15h2v6h-2z">
-                                            </path>
-                                            <path
-                                                d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z">
-                                            </path>
-                                        </svg>
-                                    </button>
+                                <div class="space-x-1 text-center">
+
+                                    <DropDownOptions>
+                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                            v-if="permits.actualizar == 1 && persona.estado_persona == 1"
+                                            @click="getInformationPersons(persona.id_persona)">
+                                            <div class="w-8 text-green-900">
+                                                <span class="text-xs">
+                                                    <span class="text-xs">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                            class="w-6 h-6">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 002.25-2.25V6a2.25 2.25 0 00-2.25-2.25H6A2.25 2.25 0 003.75 6v2.25A2.25 2.25 0 006 10.5zm0 9.75h2.25A2.25 2.25 0 0010.5 18v-2.25a2.25 2.25 0 00-2.25-2.25H6a2.25 2.25 0 00-2.25 2.25V18A2.25 2.25 0 006 20.25zm9.75-9.75H18a2.25 2.25 0 002.25-2.25V6A2.25 2.25 0 0018 3.75h-2.25A2.25 2.25 0 0013.5 6v2.25a2.25 2.25 0 002.25 2.25z" />
+                                                        </svg>
+                                                    </span>
+                                                </span>
+                                            </div>
+                                            <div class="font-semibold">Editar</div>
+                                        </div>
+                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                            @click="enableStateForPerson(persona.id_persona, persona.estado_persona)"
+                                            v-if="permits.eliminar == 1">
+                                            <div class="w-8 text-red-900"><span class="text-xs">
+                                                    <svg :fill="persona.estado_persona == 1 ? '#991B1B' : '#166534'"
+                                                        version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
+                                                        width="20px" height="20px"
+                                                        xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                        viewBox="0 0 97.994 97.994" xml:space="preserve"
+                                                        :stroke="persona.estado_persona == 1 ? '#991B1B' : '#166534'">
+                                                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round"
+                                                            stroke-linejoin="round"></g>
+                                                        <g id="SVGRepo_iconCarrier">
+                                                            <g>
+                                                                <g>
+                                                                    <path
+                                                                        d="M97.155,9.939c-0.582-0.416-1.341-0.49-1.991-0.193l-10.848,4.935C74.08,5.29,60.815,0.118,46.966,0.118 c-15.632,0-30.602,6.666-41.07,18.289c-0.359,0.399-0.543,0.926-0.51,1.461c0.033,0.536,0.28,1.036,0.686,1.388l11.301,9.801 c0.818,0.711,2.055,0.639,2.787-0.162c6.866-7.512,16.636-11.821,26.806-11.821c6.135,0,12.229,1.584,17.622,4.583l-7.826,3.561 c-0.65,0.296-1.095,0.916-1.163,1.627c-0.069,0.711,0.247,1.405,0.828,1.82l34.329,24.52c0.346,0.246,0.753,0.373,1.163,0.373 c0.281,0,0.563-0.06,0.828-0.181c0.65-0.296,1.095-0.916,1.163-1.627l4.075-41.989C98.053,11.049,97.737,10.355,97.155,9.939z">
+                                                                    </path>
+                                                                    <path
+                                                                        d="M80.619,66.937c-0.819-0.709-2.055-0.639-2.787,0.162c-6.866,7.514-16.638,11.822-26.806,11.822 c-6.135,0-12.229-1.584-17.622-4.583l7.827-3.561c0.65-0.296,1.094-0.916,1.163-1.628c0.069-0.711-0.247-1.404-0.828-1.819 L7.237,42.811c-0.583-0.416-1.341-0.49-1.991-0.193c-0.65,0.296-1.094,0.916-1.163,1.627L0.009,86.233 c-0.069,0.712,0.247,1.406,0.828,1.822c0.583,0.416,1.341,0.488,1.991,0.192l10.848-4.935 c10.237,9.391,23.502,14.562,37.351,14.562c15.632,0,30.602-6.666,41.07-18.289c0.358-0.398,0.543-0.926,0.51-1.461 c-0.033-0.536-0.28-1.036-0.687-1.388L80.619,66.937z">
+                                                                    </path>
+                                                                </g>
+                                                            </g>
+                                                        </g>
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                            <div class="font-semibold">
+                                                {{ persona.estado_persona ? 'Desactivar' : 'Activar' }}
+                                            </div>
+                                        </div>
+                                    </DropDownOptions>
                                 </div>
                             </td>
                         </tr>
                     </tbody>
                 </datatable>
             </div>
+            <div v-if="empty_object" class="flex text-center py-2">
+                <p class="font-semibold text-red-500 text-[16px]" style="margin: 0 auto; text-align: center;">No se
+                    encontraron registros.</p>
+            </div>
         </div>
-        <div class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
+        <div v-if="!empty_object" class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
             <div>
                 <nav class="flex justify-between" role="navigation" aria-label="Navigation">
 
@@ -161,8 +197,8 @@ export default {
             {
                 width: "10%", label: "Estado", name: "estado_persona", type: "select",
                 options: [
-                {value: "1", label: "Activo"},
-                {value: "0", label: "Inactivo"}
+                    { value: "1", label: "Activo" },
+                    { value: "0", label: "Inactivo" }
                 ]
             },
             { width: "10%", label: "Acciones", name: "Acciones" },
@@ -174,7 +210,8 @@ export default {
                 sortOrders[column.name] = -1;
         });
         return {
-            permits : [],
+            empty_object: false,
+            permits: [],
             scrollbarModalOpen: false,
             personas: [],
             links: [],
@@ -204,16 +241,16 @@ export default {
         };
     },
     methods: {
-        getPermits(){
+        getPermits() {
             var URLactual = window.location.pathname
             let data = this.$page.props.menu;
             let menu = JSON.parse(JSON.stringify(data['urls']))
             menu.forEach((value, index) => {
                 value.submenu.forEach((value2, index2) => {
-                if(value2.url===URLactual){
-                    var array = {'insertar':value2.insertar,'actualizar':value2.actualizar,'eliminar':value2.eliminar,'ejecutar':value2.ejecutar}
-                    this.permits = array
-                }
+                    if (value2.url === URLactual) {
+                        var array = { 'insertar': value2.insertar, 'actualizar': value2.actualizar, 'eliminar': value2.eliminar, 'ejecutar': value2.ejecutar }
+                        this.permits = array
+                    }
                 })
             })
         },
@@ -228,9 +265,10 @@ export default {
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
                     this.personas = data.data.data;
+                    this.personas.length > 0 ? this.empty_object = false : this.empty_object = true
                 }
             }).catch((errors) => {
-                console.log(errors);
+                this.errorMethod(errors)
             });
         },
         sortBy(key) {
@@ -251,7 +289,7 @@ export default {
                     this.infoPerson = res.data
                 })
                 .catch(err => {
-                    console.error(err);
+                    this.errorMethod(err)
                 })
             this.scrollbarModalOpen = !this.scrollbarModalOpen
         },
@@ -261,7 +299,7 @@ export default {
                     console.log(res)
                 })
                 .catch(err => {
-                    console.error(err);
+                    this.errorMethod(err)
                 })
             this.getPersonas(this.lastUrl)//llamamos de nuevo el metodo para que actualize la tabla 
         },
@@ -280,12 +318,10 @@ export default {
                 if (result.isConfirmed) {
                     this.enable(id_persona, estado)//peticion async hace la modificacion 
                     //no la llamamos en el mismo metodo por que dejaria de ser asyn y hay problema al momento de actulizar la tabla
-                    toast.info("Hecho", {
+                    toast.success("Accion ejecutada", {
                         autoClose: 5000,
                         position: "top-right",
-                        transition: "bounce",
                         toastBackgroundColor: "white",
-                        icon: "✔️",
                     });
                 }
             })
@@ -296,16 +332,32 @@ export default {
         },
         handleData(myEventData) {
             this.tableData.search = myEventData;
-            this.getPersonas()
+            const data = Object.values(myEventData);
+            if (data.every(error => error === '')) {
+                this.getPersonas()
+            }
+        },
+        errorMethod(errors) {
+            let msg = this.manageError(errors)
+            this.$swal.fire({
+                title: 'Operación cancelada',
+                text: msg,
+                icon: 'warning',
+                timer: 5000
+            })
         }
     },
 };
 </script>
   
 <style>
-.wrap,
-.wrap2 {
-    width: 70%;
-    white-space: pre-wrap;
+.td-data-table {
+    max-width: 100px;
+    white-space: nowrap;
+    height: 50px;
 }
-</style>
+
+.ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}</style>

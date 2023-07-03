@@ -128,7 +128,7 @@
             </tr>
         </table>
         <table>
-            <tr>
+            <tr v-if="dataQuedan.tipo_documento_adquisicion.documento_adquisicion">
                 <td class="text-[11pt] font-bold"> {{ dataQuedan.tipo_documento_adquisicion.nombre_tipo_doc_adquisicion }}
                 </td>
 
@@ -136,6 +136,18 @@
                     <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
                         <span style="font-family:  Arial, Helvetica, sans-serif;">{{
                             dataQuedan.tipo_documento_adquisicion.documento_adquisicion.numero_doc_adquisicion
+                        }}</span>
+                    </div>
+                </td>
+            </tr>
+            <tr v-else>
+                <td class="text-[11pt] font-bold"> {{  dataQuedan.tipo_documento_adquisicion.nombre_tipo_doc_adquisicion }}:
+                </td>
+
+                <td class="border border-b-black border-x-transparent border-t-transparent w-[170px]">
+                    <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
+                        <span style="font-family:  Arial, Helvetica, sans-serif;">{{
+                            dataQuedan.numero_compromiso_ppto_quedan
                         }}</span>
                     </div>
                 </td>
@@ -357,7 +369,7 @@
             </tr>
         </table>
         <table>
-            <tr>
+            <tr v-if="dataQuedan.tipo_documento_adquisicion.documento_adquisicion">
                 <td class="text-[11pt] font-bold"> {{ dataQuedan.tipo_documento_adquisicion.nombre_tipo_doc_adquisicion }}
                 </td>
 
@@ -365,6 +377,18 @@
                     <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
                         <span style="font-family:  Arial, Helvetica, sans-serif;">{{
                             dataQuedan.tipo_documento_adquisicion.documento_adquisicion.numero_doc_adquisicion
+                        }}</span>
+                    </div>
+                </td>
+            </tr>
+            <tr v-else>
+                <td class="text-[11pt] font-bold"> {{ dataQuedan.tipo_documento_adquisicion.nombre_tipo_doc_adquisicion }}:
+                </td>
+
+                <td class="border border-b-black border-x-transparent border-t-transparent w-[170px]">
+                    <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
+                        <span style="font-family:  Arial, Helvetica, sans-serif;">{{
+                            dataQuedan.numero_compromiso_ppto_quedan
                         }}</span>
                     </div>
                 </td>
