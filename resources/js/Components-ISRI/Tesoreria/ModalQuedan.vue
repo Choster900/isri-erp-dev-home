@@ -699,7 +699,6 @@ export default {
             }
 
             if (clear) {//Este if basicamente es utilizado para limpiar toda esta data cuando y solo cuando se haga la seleccion desde el MultiSelect
-
                 this.taxesByRow(); // funciona que calcula los impuestos (mas informacion Ctrl+click)
             }
         },
