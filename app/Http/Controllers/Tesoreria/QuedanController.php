@@ -30,6 +30,7 @@ class QuedanController extends Controller
             'id_prioridad_pago',
             'id_requerimiento_pago',
             'id_empleado_tesoreria',
+            'detalle_documento_adquisicion',
             'id_proy_financiado',
             'id_serie_retencion_iva',
             'id_proveedor',
@@ -66,6 +67,7 @@ class QuedanController extends Controller
             "serie_retencion_iva",
             "proveedor.giro",
             "proveedor.sujeto_retencion",
+            "detalle_documento_adquisicion",
         ])->orderBy($v_columns[$v_column], $v_dir);
 
         // Aplicar filtro para requerimientos de número mayor o igual a 2

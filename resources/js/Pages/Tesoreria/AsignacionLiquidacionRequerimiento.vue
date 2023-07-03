@@ -21,9 +21,9 @@ import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalL
                 <div class="mb-4 md:flex flex-row justify-items-start">
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-                            <Multiselect v-model="tableData.length" @select="getDataLiquidaciones()"
-                                @deselect=" tableData.length = 5; getDataLiquidaciones()"
-                                @clear="tableData.length = 5; getDataLiquidaciones()" :options="perPage" :searchable="true"
+                            <Multiselect v-model="tableData.length" @select="getDataLiquidaciones(lastUrl)"
+                                @deselect=" tableData.length = 5; getDataLiquidaciones(lastUrl)"
+                                @clear="tableData.length = 5; getDataLiquidaciones(lastUrl)" :options="perPage" :searchable="true"
                                 placeholder="Cantidad a mostrar" />
                             <LabelToInput icon="list2" />
                         </div>
@@ -36,7 +36,7 @@ import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalL
             </header>
             <div class="overflow-x-auto">
                 <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
-                    @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getDataLiquidaciones()">
+                    @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getDataLiquidaciones(lastUrl)">
                     <tbody class="text-sm divide-y divide-slate-200">
                         <template v-for="data in dataRequerimientoForTable" :key="data.id_requerimiento_pago">
                             <tr v-if="data.quedan != ''">
@@ -159,12 +159,12 @@ import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalL
 
         <ModalAsignacionRequerimiento :modalIsOpen="showModalAsignacionRequerimiento"
             @close-definitive="showModalAsignacionRequerimiento = false" :dataForSelect="dataForSelect"
-            @reload-table="[getDataLiquidaciones(), getListForSelect()]" />
+            @reload-table="[getDataLiquidaciones(lastUrl), getListForSelect()]" />2
 
 
         <ModalLiquidacionRequerimientoVue :modalIsOpen="showModalLiquidacionRequerimiento"
-            @close-definitive="showModalLiquidacionRequerimiento = false" @reload-table="getDataLiquidaciones()"
-            @reload-table-and-close="[getDataLiquidaciones(), showModalLiquidacionRequerimiento = false]"
+            @close-definitive="showModalLiquidacionRequerimiento = false" @reload-table="getDataLiquidaciones(lastUrl)"
+            @reload-table-and-close="[getDataLiquidaciones(lastUrl), showModalLiquidacionRequerimiento = false]"
             :dataLiquidaciones="dataLiquidaciones" @reload-data-for-select="getListForSelect()" />
     </AppLayoutVue>
 </template>
@@ -190,7 +190,7 @@ export default {
             { width: "5%", label: "", name: "Acciones" },
         ];
         columns.forEach((column) => {
-            if (column.name === 'id_quedan')
+            if (column.name === 'id_requerimiento_pago')
                 sortOrders[column.name] = 1;
             else
                 sortOrders[column.name] = -1;
@@ -204,7 +204,7 @@ export default {
             dataForSelect: [],
             dataRequerimientoForTable: [],
             links: [],
-            lastUrl: '/requerimientos',
+            lastUrl: '/asignados',
             columns: columns,
             sortKey: "id_requerimiento_pago",
             sortOrders: sortOrders,
@@ -230,11 +230,12 @@ export default {
         }
     },
     methods: {
-        async getDataLiquidaciones(url = "/requerimientos") {
+        async getDataLiquidaciones(url = "/asignados") {
             this.lastUrl = url
             this.tableData.draw++
             await axios.post(url, this.tableData).then((response) => {
                 let data = response.data;
+                console.log(data);
                 if (this.tableData.draw == data.draw) {
                     this.links = data.data.links
                     this.pagination.total = data.data.total

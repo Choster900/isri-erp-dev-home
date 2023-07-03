@@ -208,7 +208,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                         </td>
                                         <td class="border-2 border-black"
                                             :class="{ 'bg-[#fdfd96]': dataInputs.compromiso_ppto_det_doc_adquisicion == '' }">
-                                            
+
                                             <input type="text" v-model="dataInputs.compromiso_ppto_det_doc_adquisicion"
                                                 :disabled="documentoAdquisicion == '' ? false : true" maxlength="20"
                                                 class="peer w-full text-sm bg-transparent text-center h-10 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
@@ -226,7 +226,9 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                             <div class="relative flex h-8 w-full flex-row-reverse"
                                                 :class="[documentoAdquisicion != '' ? { 'condition-select': dataInputs.id_det_doc_adquisicion == '' } : '']">
                                                 <Multiselect v-model="dataInputs.id_det_doc_adquisicion"
-                                                    @input="DocumentoAdquisicionSelected($event, true)"
+                                                    @deselect="clearDataWhenIsDisSelectDocumentAdquisicion()"
+                                                    @clear="clearDataWhenIsDisSelectDocumentAdquisicion()"
+                                                    @select="DocumentoAdquisicionSelected($event, true)"
                                                     :placeholder="documentoAdquisicion == '' ? 'sin contratos' : 'seleccione contrato'"
                                                     :classes="{
                                                         containerDisabled: 'cursor-not-allowed bg-gray-200 ', placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
@@ -235,7 +237,6 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                     :disabled="dataQuedan.id_estado_quedan > 1 ? true : documentoAdquisicion == '' ? true : false"
                                                     :options="documentoAdquisicion" :searchable="true" />
                                             </div>
-
                                         </td>
                                         <th class="border-2 border-black text-sm text-gray-600" colspan="6">
                                             DETALLE QUEDAN
@@ -560,6 +561,8 @@ export default {
                 id_quedan: '',
                 id_prioridad_pago: '',
                 id_proy_financiado: '',
+                numero_acuerdo_quedan:'',
+                numero_compromiso_ppto_quedan: '',
             },
             dataForCalculate: {
                 giro: '',
@@ -663,11 +666,6 @@ export default {
                 } else {
                     this.dataInputs.id_tipo_doc_adquisicion = 3//ID TIPO CONTRATO
                     this.dataInputs.nombre_tipo_doc_adquisicion = "FACTURA"//NOMBRE CONTRATO
-                   /*  this.dataInputs.id_det_doc_adquisicion = ''//ID_DETALLE_CONTRATO
-                    this.dataInputs.numero_doc_adquisicion = ''
-                    this.dataInputs.compromiso_ppto_det_doc_adquisicion = ''
-                    this.dataInputs.id_proy_financiado = '' */
-
                 }
 
 
@@ -699,17 +697,19 @@ export default {
                 this.dataInputs.id_proy_financiado = ''
                 this.documentoAdquisicion = [];
             }
-            this.taxesByRow(); // funciona que calcula los impuestos (mas informacion Ctrl+click)
-            console.log(this.dataInputs.nombre_tipo_doc_adquisicion);
+
+            if (clear) {//Este if basicamente es utilizado para limpiar toda esta data cuando y solo cuando se haga la seleccion desde el MultiSelect
+
+                this.taxesByRow(); // funciona que calcula los impuestos (mas informacion Ctrl+click)
+            }
         },
 
         // Setea la informacion a la data necesaria al seleccionar un item
         DocumentoAdquisicionSelected(id_documentoAdquisicion, clear = false) {
-            this.getAmountByDetalleDocumentoAdquisicion(id_documentoAdquisicion)
             //al seleccionar contrato
+            this.getAmountByDetalleDocumentoAdquisicion(id_documentoAdquisicion)
             if (id_documentoAdquisicion != null) {
                 let document = JSON.parse(JSON.stringify(this.dataForSelectInRow.documentoAdquisicion.find((doc) => doc.value === id_documentoAdquisicion)))
-                console.log(document);
                 this.dataInputs.id_tipo_doc_adquisicion = document.id_tipo_doc_adquisicion
                 this.dataInputs.nombre_tipo_doc_adquisicion = document.nombre_tipo_doc_adquisicion
                 this.dataInputs.numero_doc_adquisicion = document.numero_doc_adquisicion
@@ -718,21 +718,19 @@ export default {
                 this.dataForCalculate.monto_doc_adquisicion = document.monto_doc_adquisicion
                 this.dataForCalculate.monto_det_doc_adquisicion = document.monto_det_doc_adquisicion
             }
-            else if (clear) {// Si viene vacio limpiamos todo
-                this.dataInputs.id_det_doc_adquisicion = ''
-                this.dataInputs.id_tipo_doc_adquisicion = ''
-                this.dataInputs.nombre_tipo_doc_adquisicion = ''
-                this.dataInputs.numero_doc_adquisicion = ''
-                this.dataInputs.compromiso_ppto_det_doc_adquisicion = ''
-                this.dataInputs.id_proy_financiado = ''
-                this.dataForCalculate.monto_doc_adquisicion = ''
-            }
-            else{
-                this.dataForCalculate.monto_doc_adquisicion = ''
-                this.dataForCalculate.monto_det_doc_adquisicion = ''
-            }
             this.taxesByRow(); // funciona que calcula los impuestos (mas informacion Ctrl+click)
 
+        },
+        clearDataWhenIsDisSelectDocumentAdquisicion() {
+            console.log("LIMPIAMOS TODOS")
+            this.dataInputs.id_det_doc_adquisicion = ''
+            this.dataInputs.id_tipo_doc_adquisicion = ''
+            this.dataInputs.nombre_tipo_doc_adquisicion = ''
+            this.dataInputs.numero_doc_adquisicion = ''
+            this.dataInputs.compromiso_ppto_det_doc_adquisicion = ''
+            this.dataInputs.id_proy_financiado = ''
+            this.dataForCalculate.monto_doc_adquisicion = ''
+            this.taxesByRow();
         },
 
         // Calcula los impuestos por fila 
@@ -810,15 +808,20 @@ export default {
             });
             const sumaLiquida = (parseFloat(this.dataForCalculate.montoTotalDetalleDocumentoAdquisicion) || 0) + (parseFloat(this.dataForCalculate.montoLiquidoQuedan) || 0);
             const sumaLiquidaFixed = sumaLiquida.toFixed(2); // Limita el número de decimales a 2
-            const montoDetDocAdquisicionFixed = parseFloat(this.dataForCalculate.monto_det_doc_adquisicion).toFixed(2);
+            const montoDetDocAdquisicionFixed = isNaN(parseFloat(this.dataForCalculate.monto_det_doc_adquisicion)) ? 0 : parseFloat(this.dataForCalculate.monto_det_doc_adquisicion);
 
-            console.log("SUMATORIA SEGUIMIENTO MAS EL QUEDAN ACTUAL: ", sumaLiquidaFixed);
+            /* console.log("MONTO LIQUIDO", this.dataForCalculate.montoLiquidoQuedan);
+            console.log("id_det_doc_adquisicion: ", this.dataInputs.id_det_doc_adquisicion)
+            console.log("SUMATORIA SEGUIMIENTO MAS EL MONTO LIQUIDO: ", parseFloat(sumaLiquidaFixed));
             console.log("MONTO A SUPERAR: ", montoDetDocAdquisicionFixed)
+            console.log("----------------------------------------------------------------------");
             console.log("MONTO LIQUIDO QUEDAN ACTUAL: ", this.dataInputs.monto_liquido_quedan)
             console.log("TOTAL LIQUIDO PERO NO ES EL ORIGINAL: ", this.dataForCalculate.montoLiquidoQuedan)
-            console.log("ID DOCUMENTO ADQUISCION: ", this.dataInputs.id_det_doc_adquisicion)
+            console.log("ID DOCUMENTO ADQUISCION: ", this.dataInputs.id_det_doc_adquisicion) */
 
-            if (this.dataInputs.id_det_doc_adquisicion &&  parseFloat(sumaLiquidaFixed) > parseFloat(montoDetDocAdquisicionFixed)) {
+
+
+            if (this.dataInputs.id_det_doc_adquisicion && parseFloat(sumaLiquidaFixed) > parseFloat(montoDetDocAdquisicionFixed)) {
                 toast.error("El monto del quedan supera el monto definido en el item seleccionado", {
                     autoClose: 4000,
                     position: "top-right",
@@ -882,19 +885,14 @@ export default {
 
 
             if (this.dataQuedan.numero_acuerdo_quedan != '' && this.dataQuedan.numero_compromiso_ppto_quedan != '') {
-                
+
                 this.dataInputs.numero_doc_adquisicion = this.dataQuedan.numero_acuerdo_quedan;
                 this.dataInputs.compromiso_ppto_det_doc_adquisicion = this.dataQuedan.numero_compromiso_ppto_quedan;
             }
-
-            console.log(this.dataInputs.numero_doc_adquisicion);
-            console.log(this.dataInputs.compromiso_ppto_det_doc_adquisicion);
-            /* this.dataInputs.numero_doc_adquisicion = this.dataQuedan.numero_compromiso_ppto_quedan;
-            this.dataInputs.compromiso_ppto_det_doc_adquisicion = this.dataQuedan.numero_acuerdo_quedan; */
         },
         resetValuesToInput() {
             //funcion para limpiar la data que la llamaremos cuando la data no traiga nada
-            this.dataInputs.giro = ""
+            /* this.dataInputs.giro = ""
             this.dataInputs.irs = ""
             this.dataInputs.iva = ""
             this.dataInputs.id_proveedor = ""
@@ -914,9 +912,30 @@ export default {
             this.dataInputs.id_prioridad_pago = ""
             this.dataInputs.id_proy_financiado = ""
             this.dataInputs.monto_total_quedan = ""
-            this.dataInputs.numero_retencion_iva_quedan = ""
+            this.dataInputs.numero_retencion_iva_quedan = "" */
 
-            this.dataForCalculate.irs = ''
+            this.dataInputs.giro = ''
+            this.dataInputs.irs = ''
+            this.dataInputs.iva = ''
+            this.dataInputs.id_proveedor = ''
+            this.dataInputs.id_det_doc_adquisicion = ''
+            this.dataInputs.id_tipo_doc_adquisicion = ''
+            this.dataInputs.nombre_tipo_doc_adquisicion = ''
+            this.dataInputs.numero_doc_adquisicion = ''
+            this.dataInputs.compromiso_ppto_det_doc_adquisicion = ''
+            this.dataInputs.numero_retencion_iva_quedan = ''
+            this.dataInputs.descripcion_quedan = ''
+            this.dataInputs.monto_liquido_quedan = ''
+            this.dataInputs.monto_iva_quedan = ''
+            this.dataInputs.monto_isr_quedan = ''
+            this.dataInputs.monto_total_quedan = ''
+            this.dataInputs.nombre_empleado_tesoreria = ''
+            this.dataInputs.fecha_emision = ''
+            this.dataInputs.id_quedan = ''
+            this.dataInputs.id_prioridad_pago = ''
+            this.dataInputs.id_proy_financiado = ''
+
+            /* this.dataForCalculate.irs = ''
             this.dataForCalculate.iva = ''
             this.dataForCalculate.id_proveedor = ''
             this.dataForCalculate.monto_iva_quedan = ''
@@ -925,7 +944,21 @@ export default {
             this.dataForCalculate.montoTotalDetalleDocumentoAdquisicion = ''
             this.dataForCalculate.monto_det_doc_adquisicion = ''
             this.dataForCalculate.montoSuperador = ''
-            this.documentoAdquisicion = []
+            this.documentoAdquisicion = [] */
+
+            this.dataForCalculate.giro = ''
+            this.dataForCalculate.irs = ''
+            this.dataForCalculate.iva = ''
+            this.dataForCalculate.id_proveedor = ''
+            this.dataForCalculate.dui_proveedor = ''
+            this.dataForCalculate.montoLiquidoQuedan = ''
+            this.dataForCalculate.monto_iva_quedan = ''
+            this.dataForCalculate.monto_isr_quedan = ''
+            this.dataForCalculate.monto_total_quedan = ''
+            this.dataForCalculate.monto_doc_adquisicion = ''
+            this.dataForCalculate.montoTotalDetalleDocumentoAdquisicion = ''
+            this.dataForCalculate.monto_det_doc_adquisicion = ''
+            this.dataForCalculate.montoSuperador = false
 
         },
         addRow() {
@@ -1190,10 +1223,9 @@ export default {
                 if (this.dataQuedan != "") {
                     // Si dataQuedan tiene valor, realizamos las siguientes acciones
                     let newDataQuedan = JSON.parse(JSON.stringify(this.dataQuedan));
-                    this.conditionButton = false; // Cambiamos el estado del botón para actualizar en lugar de agregar
+
                     this.setValuesToInput();
                     this.getInformationBySupplier(newDataQuedan.proveedor.id_proveedor);
-                    this.DocumentoAdquisicionSelected(newDataQuedan.id_det_doc_adquisicion)
                     newDataQuedan.detalle_quedan.forEach((value, index) => {
                         // Agregamos cada detalle_quedan a la matriz rowsData
                         this.rowsData.push({
@@ -1212,7 +1244,15 @@ export default {
                         });
                     });
 
-                    this.taxesByRow(); // funciona que calcula los impuestos (mas informacion Ctrl+click)
+                    if (newDataQuedan.detalle_documento_adquisicion) {
+
+                        this.DocumentoAdquisicionSelected(newDataQuedan.detalle_documento_adquisicion.id_det_doc_adquisicion)
+                    }
+                    this.conditionButton = false; // Cambiamos el estado del botón para actualizar en lugar de agregar
+
+
+
+                    // this.taxesByRow(); // funciona que calcula los impuestos (mas informacion Ctrl+click)
 
 
                     if (this.dataQuedan.monto_liquido_quedan != this.dataInputs.monto_liquido_quedan) {

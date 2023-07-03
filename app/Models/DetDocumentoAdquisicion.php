@@ -37,6 +37,6 @@ class DetDocumentoAdquisicion extends Model
     }
     public function quedan()
     {
-        return $this->hasMany('App\Models\Quedan','id_det_doc_adquisicion','id_det_doc_adquisicion');
+        return $this->hasMany(Quedan::class,'id_det_doc_adquisicion','id_det_doc_adquisicion');
     }
 }
