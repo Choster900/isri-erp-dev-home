@@ -27,9 +27,7 @@ class PersonaRequest extends FormRequest
     {
         return [
             'pnombre_persona'    => 'required',
-            'snombre_persona'    => 'required',
             'papellido_persona'  => 'required',
-            'sapellido_persona'  => 'required',
             'telefono_persona'   => 'required',
             'dui_persona'        => ['required', new DuiValidationRule, 
             Rule::unique('persona','dui_persona')
@@ -47,9 +45,7 @@ class PersonaRequest extends FormRequest
     {
         return [
             'pnombre_persona.required'    => 'El campo primer nombre es requerido ',
-            'snombre_persona.required'    => 'El campo segundo nombre es requerido ',
             'papellido_persona.required'  => 'El campo primer apellido es requerido ',
-            'sapellido_persona.required'  => 'El campo segundo nombre es requerido ',
             'telefono_persona.required'   => 'El campo telefono es requerido ',
             'dui_persona.required'        => 'El campo dui es requerido ',
             'email_persona.required'      => 'El campo email es requerido ',

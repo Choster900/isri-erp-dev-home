@@ -39,5 +39,8 @@ class Persona extends Model
         'ip_persona'
     ];
 
-
+    public function empleado()
+    {
+        return $this->hasOne('App\Models\Empleado','id_persona','id_persona');
+    }
 }

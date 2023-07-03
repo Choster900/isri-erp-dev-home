@@ -18,12 +18,10 @@ class RequerimientoController extends Controller
         $v_columns = [
             'id_requerimiento_pago',
             'numero_requerimiento_pago',
-            'fecha_requerimiento_pago',
-            'fecha_reg_requerimiento_pago',
-            'fecha_mod_requerimiento_pago',
-            'usuario_requerimiento_pago',
-            'ip_requerimiento_pago',
             'descripcion_requerimiento_pago',
+            'monto_requerimiento_pago',
+            'mes_requerimiento_pago',
+            'anio_requerimiento_pago',
         ];
 
         $v_length = $request->input('length');
@@ -31,7 +29,7 @@ class RequerimientoController extends Controller
         $v_dir = $request->input('dir');
         $data = $request->input('search');
         $v_query = RequerimientoPago::select("*")->with(["Quedan", "Quedan.liquidacion_quedan", "Quedan.proveedor"])
-            ->orderBy($v_columns[$v_column], $v_dir);
+            ->orderBy($v_columns[$v_column+1], $v_dir);
         if ($data) {
             $v_query->where('numero_requerimiento_pago', 'like', '%' . $data["numero_requerimiento_pago"] . '%')
                 ->where('numero_requerimiento_pago', 'like', '%' . $data["numero_requerimiento_pago"] . '%');
