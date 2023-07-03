@@ -80,7 +80,8 @@ import axios from 'axios';
                             <div class="relative flex h-7  flex-row-reverse select-bg">
                                 <Multiselect :options="numeroRequerimientoFiltrado"
                                     @input="seleccionarRequerimiento($event)" v-model="id_requerimiento_pago"
-                                    :searchable="true" />
+                                    :searchable="true" noOptionsText="<p class='text-xs'>sin requerimientos<p>"
+                                    noResultsText="<p class='text-xs'>requerimiento no encontrado<p>" />
                             </div>
                         </div>
                         <div class="mb-4 md:mr-2 md:mb-0 basis-full mt-4 h-5"
@@ -144,8 +145,7 @@ import axios from 'axios';
                 </div>
                 <div class="sidebar-style-isri" style="overflow-x:auto; max-height: 435px; max-width: 800px;">
                     <table class="table-auto">
-                        <thead
-                            class="text-xs uppercase text-white bg-[#001b47]   border-slate-200 sticky top-0">
+                        <thead class="text-xs uppercase text-white bg-[#001b47]   border-slate-200 sticky top-0">
                             <tr>
                                 <th class="px-4 py-3 w-[1px]  rounded-tl-2xl">
                                     <div class="flex items-center">
@@ -259,7 +259,7 @@ import axios from 'axios';
 <script>
 
 export default {
-    emits: ['close-definitive','reload-table'], // Declara el evento personalizado que emite el componente
+    emits: ['close-definitive', 'reload-table'], // Declara el evento personalizado que emite el componente
     props: {
         modalIsOpen: {
             type: Boolean,
@@ -472,7 +472,7 @@ export default {
             return montoTotal.toLocaleString(); // Agrega comas como separadores de miles
         },
         resetData() {
-           // this.dataQuedan = []
+            // this.dataQuedan = []
             this.collectItems = []
             this.id_requerimiento_pago = ''
             this.numero_requerimiento = ''

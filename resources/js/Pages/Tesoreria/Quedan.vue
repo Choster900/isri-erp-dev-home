@@ -55,8 +55,8 @@ import html2pdf from 'html2pdf.js'
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class=" text-slate-800 text-center text-[9pt]" v-if="data.requerimiento_pago">
-                                    {{ data.requerimiento_pago.numero_requerimiento_pago
-                                    }}-{{ data.requerimiento_pago.anio_requerimiento_pago }}
+                                    {{ data.requerimiento_pago.numero_requerimiento_pago }}-{{
+                                        data.requerimiento_pago.anio_requerimiento_pago }}
                                 </div>
                                 <div class=" text-slate-800 text-center" v-else>
                                     <div
@@ -70,7 +70,7 @@ import html2pdf from 'html2pdf.js'
                                     <template v-for="(detalle, i) in data.detalle_quedan" :key="i">
                                         <div class="mb-2 text-center">
                                             <p class="text-[10pt]">
-                                                <span class="font-medium">FACTURA: </span>${{
+                                                <span class="font-medium">FACTURA: </span>{{
                                                     detalle.numero_factura_det_quedan
                                                 }}<br>
                                                 <span class="font-medium">MONTO: </span> ${{
@@ -151,7 +151,7 @@ import html2pdf from 'html2pdf.js'
                                         </div>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                                             title="Genera un comprobante de retencion para este quedan"
-                                            v-if="data.monto_total_quedan > 113"
+                                            v-if="data.monto_isr_quedan > 0"
                                             @click.stop="generarComprobanteRetencionPdf(data)">
                                             <div class="w-8 text-blue-900">
                                                 <span class="text-xs">
@@ -240,6 +240,7 @@ import html2pdf from 'html2pdf.js'
 <script>
 import quedanPDFVue from '@/pdf/Tesoreria/quedanPDF.vue';
 import comprobanteRetencion from '@/pdf/Tesoreria/Retencion.vue';
+//import comprobanteRetencion from '@/pdf/Tesoreria/ComprobatenRetencionPdf.vue';
 import { createApp, h } from 'vue'
 
 export default {
@@ -247,11 +248,11 @@ export default {
     data: function (data) {
         let sortOrders = {};
         let columns = [
-            { width: "15%", label: "Id", name: "id_quedan", type: "text" },
+            { width: "10%", label: "Id", name: "id_quedan", type: "text" },
             { width: "10%", label: "Fecha", name: "fecha_emision_quedan", type: "date" },
             { width: "20%", label: "Proveedor", name: "razon_social_proveedor", type: "text" },
             { width: "5%", label: "Numero requerimiento", name: "numero_requerimiento_pago", type: "text" },
-            { width: "40%", label: "Detalle quedan", name: "buscar_por_detalle_quedan", type: "text" },
+            { width: "20%", label: "Detalle quedan", name: "buscar_por_detalle_quedan", type: "text" },
             { width: "10%", label: "Monto", name: "monto_liquido_quedan", type: "text" },
             {
                 width: "10%", label: "Estado", name: "id_estado_quedan", type: "select",

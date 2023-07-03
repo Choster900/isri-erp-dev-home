@@ -30,6 +30,7 @@ class QuedanController extends Controller
             'id_prioridad_pago',
             'id_requerimiento_pago',
             'id_empleado_tesoreria',
+            'detalle_documento_adquisicion',
             'id_proy_financiado',
             'id_serie_retencion_iva',
             'id_proveedor',
@@ -66,6 +67,7 @@ class QuedanController extends Controller
             "serie_retencion_iva",
             "proveedor.giro",
             "proveedor.sujeto_retencion",
+            "detalle_documento_adquisicion",
         ])->orderBy($v_columns[$v_column], $v_dir);
 
         // Aplicar filtro para requerimientos de número mayor o igual a 2
@@ -148,29 +150,31 @@ class QuedanController extends Controller
             DB::beginTransaction();
 
             $quedanData = [
-                'id_estado_quedan'            => 1,
-                'id_proy_financiado'          => $request->quedan["id_proy_financiado"],
-                'id_prioridad_pago'           => $request->quedan["id_prioridad_pago"],
-                'id_proveedor'                => $request->quedan["id_proveedor"],
-                'id_serie_retencion_iva'      => 1,
+                'id_estado_quedan'              => 1,
+                'id_proy_financiado'            => $request->quedan["id_proy_financiado"],
+                'id_prioridad_pago'             => $request->quedan["id_prioridad_pago"],
+                'id_proveedor'                  => $request->quedan["id_proveedor"],
+                'id_serie_retencion_iva'        => 1,
                 //VALOR QUEDAMO POR EL MOMENTO
-                'id_det_doc_adquisicion'      => $request->quedan["id_det_doc_adquisicion"],
-                'id_tipo_doc_adquisicion'     => $request->quedan["id_tipo_doc_adquisicion"],
-                'numero_retencion_iva_quedan' => $request->quedan["numero_retencion_iva_quedan"],
-                'descripcion_quedan'          => $request->quedan["descripcion_quedan"],
-                'monto_liquido_quedan'        => $request->quedan["monto_liquido_quedan"],
-                'monto_iva_quedan'            => $request->quedan["monto_iva_quedan"],
-                'monto_isr_quedan'            => $request->quedan["monto_isr_quedan"],
-                'monto_total_quedan'          => $request->quedan["monto_total_quedan"],
-                'id_empleado_tesoreria'       => EmpleadoTesoreria::select("id_empleado_tesoreria")
+                'id_det_doc_adquisicion'        => $request->quedan["id_det_doc_adquisicion"],
+                'id_tipo_doc_adquisicion'       => $request->quedan["id_tipo_doc_adquisicion"],
+                'numero_compromiso_ppto_quedan' => $request->quedan["id_tipo_doc_adquisicion"] == 3 ? $request->quedan["numero_doc_adquisicion"] : '',
+                'numero_acuerdo_quedan'         => $request->quedan["id_tipo_doc_adquisicion"] == 3 ? $request->quedan["compromiso_ppto_det_doc_adquisicion"] : '',
+                'numero_retencion_iva_quedan'   => $request->quedan["numero_retencion_iva_quedan"],
+                'descripcion_quedan'            => $request->quedan["descripcion_quedan"],
+                'monto_liquido_quedan'          => $request->quedan["monto_liquido_quedan"],
+                'monto_iva_quedan'              => $request->quedan["monto_iva_quedan"],
+                'monto_isr_quedan'              => $request->quedan["monto_isr_quedan"],
+                'monto_total_quedan'            => $request->quedan["monto_total_quedan"],
+                'id_empleado_tesoreria'         => EmpleadoTesoreria::select("id_empleado_tesoreria")
                     ->where('estado_empleado_tesoreria', 1)
                     ->where("id_cargo_tesoreria", 1)
                     ->value('id_empleado_tesoreria'),
-                'fecha_emision_quedan'        => Carbon::now(),
-                'estado_quedan'               => 1,
-                'fecha_reg_quedan'            => Carbon::now(),
-                'usuario_quedan'              => $request->user()->nick_usuario,
-                'ip_quedan'                   => $request->ip(),
+                'fecha_emision_quedan'          => Carbon::now(),
+                'estado_quedan'                 => 1,
+                'fecha_reg_quedan'              => Carbon::now(),
+                'usuario_quedan'                => $request->user()->nick_usuario,
+                'ip_quedan'                     => $request->ip(),
             ];
 
             // Insertar el registro de quedan y obtener el ID generado
@@ -228,19 +232,21 @@ class QuedanController extends Controller
             DB::beginTransaction();
             // Actualizar los campos principales del quedan
             Quedan::where("id_quedan", $id_quedan)->update([
-                'id_proveedor'                => $request->quedan["id_proveedor"],
-                'id_det_doc_adquisicion'      => $request->quedan["id_det_doc_adquisicion"],
-                'id_tipo_doc_adquisicion'     => $request->quedan["id_tipo_doc_adquisicion"],
-                'numero_retencion_iva_quedan' => $request->quedan["numero_retencion_iva_quedan"],
-                'descripcion_quedan'          => $request->quedan["descripcion_quedan"],
-                'monto_liquido_quedan'        => $request->quedan["monto_liquido_quedan"],
-                'monto_iva_quedan'            => $request->quedan["monto_iva_quedan"],
-                'monto_isr_quedan'            => $request->quedan["monto_isr_quedan"],
-                'monto_total_quedan'          => $request->quedan["monto_total_quedan"],
-                'id_proy_financiado'          => $request->quedan["id_proy_financiado"],
-                'id_prioridad_pago'           => $request->quedan["id_prioridad_pago"],
-                'usuario_quedan'              => $request->user()->nick_usuario,
-                'fecha_mod_quedan'            => Carbon::now(),
+                'id_proveedor'                  => $request->quedan["id_proveedor"],
+                'id_det_doc_adquisicion'        => $request->quedan["id_det_doc_adquisicion"],
+                'id_tipo_doc_adquisicion'       => $request->quedan["id_tipo_doc_adquisicion"],
+                'numero_retencion_iva_quedan'   => $request->quedan["numero_retencion_iva_quedan"],
+                'numero_compromiso_ppto_quedan' => $request->quedan["id_tipo_doc_adquisicion"] == 3 ? $request->quedan["numero_doc_adquisicion"] : '',
+                'numero_acuerdo_quedan'         => $request->quedan["id_tipo_doc_adquisicion"] == 3 ? $request->quedan["compromiso_ppto_det_doc_adquisicion"] : '',
+                'descripcion_quedan'            => $request->quedan["descripcion_quedan"],
+                'monto_liquido_quedan'          => $request->quedan["monto_liquido_quedan"],
+                'monto_iva_quedan'              => $request->quedan["monto_iva_quedan"],
+                'monto_isr_quedan'              => $request->quedan["monto_isr_quedan"],
+                'monto_total_quedan'            => $request->quedan["monto_total_quedan"],
+                'id_proy_financiado'            => $request->quedan["id_proy_financiado"],
+                'id_prioridad_pago'             => $request->quedan["id_prioridad_pago"],
+                'usuario_quedan'                => $request->user()->nick_usuario,
+                'fecha_mod_quedan'              => Carbon::now(),
             ]);
 
             foreach ( $detalle_quedan as $key => $value ) {
@@ -348,7 +354,7 @@ class QuedanController extends Controller
                 'nombre_proy_financiado AS label',
             )->get();
 
-            $documentosAdquisicion = DB::table('documento_adquisicion')
+        $documentosAdquisicion = DB::table('documento_adquisicion')
             ->select(
                 'detalle_documento_adquisicion.id_det_doc_adquisicion as value',
                 DB::raw("UPPER(CONCAT(documento_adquisicion.numero_doc_adquisicion, ' - COMPROMISO ', detalle_documento_adquisicion.compromiso_ppto_det_doc_adquisicion, ' - ',proyecto_financiado.codigo_proy_financiado)) AS label"),
@@ -437,7 +443,7 @@ class QuedanController extends Controller
             // Mapear quedans con detalles para el proveedor actual
             $quedan_con_detalle = $detail->quedan->map(function ($quedan) {
                 return [
-                    'id_quedan'          => $quedan->id_quedan,
+                    'id_quedan'            => $quedan->id_quedan,
                     'monto_liquido_quedan' => $quedan->monto_liquido_quedan,
                 ];
             });
@@ -445,9 +451,9 @@ class QuedanController extends Controller
             $total_detail = $detail->quedan->sum('monto_liquido_quedan');
             // Crear un arreglo con los datos del proveedor actual
             $proveedor_arr = [
-                'id_det'  => $detail->id_det_doc_adquisicion,
-                'monto_det'  => $detail->monto_det_doc_adquisicion,
-                'quedan'        => $quedan_con_detalle,
+                'id_det'           => $detail->id_det_doc_adquisicion,
+                'monto_det'        => $detail->monto_det_doc_adquisicion,
+                'quedan'           => $quedan_con_detalle,
                 'sumatoria_detail' => $total_detail,
             ];
             // Agregar el arreglo del proveedor al resultado

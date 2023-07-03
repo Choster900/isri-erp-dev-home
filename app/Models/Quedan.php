@@ -48,6 +48,10 @@ class Quedan extends Model
     { //(FOREING KEY, PRIMARY KEY)
         return $this->hasMany(DetalleQuedan::class, "id_quedan", "id_quedan");
     }
+    public function detalle_documento_adquisicion()
+    { //(FOREING KEY, PRIMARY KEY)
+        return $this->belongsTo(DetDocumentoAdquisicion::class, "id_det_doc_adquisicion", "id_det_doc_adquisicion");
+    }
     public function proveedor()
     { //(FOREING KEY, PRIMARY KEY)
         return $this->belongsTo(Proveedor::class, "id_proveedor", "id_proveedor");
@@ -78,7 +82,7 @@ class Quedan extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function liquidacion_quedan():HasMany
+    public function liquidacion_quedan(): HasMany
     {
         return $this->hasMany(LiquidacionQuedan::class, 'id_quedan', 'id_quedan');
     }
@@ -97,6 +101,4 @@ class Quedan extends Model
     {
         return $this->hasOne(SerieRetencionIva::class, 'id_serie_retencion_iva', 'id_serie_retencion_iva');
     }
-
-    
 }
