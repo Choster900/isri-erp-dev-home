@@ -561,7 +561,7 @@ export default {
                 id_quedan: '',
                 id_prioridad_pago: '',
                 id_proy_financiado: '',
-                numero_acuerdo_quedan:'',
+                numero_acuerdo_quedan: '',
                 numero_compromiso_ppto_quedan: '',
             },
             dataForCalculate: {
@@ -674,24 +674,31 @@ export default {
                 this.dataInputs.irs = `${selectedSupplier.isrl_sujeto_retencion * 100} %`
                 this.dataInputs.iva = `${selectedSupplier.iva_sujeto_retencion * 100} %`
 
-            // Filtrar los contratos por proveedor
-            const filteredContracts = this.dataForSelectInRow.documentoAdquisicion.filter((doc) => doc.id_proveedor === supplier);
+                // Datos que se usan para cálculos
+                this.dataForCalculate.irs = selectedSupplier.isrl_sujeto_retencion
+                this.dataForCalculate.dui_proveedor = selectedSupplier.dui_proveedor
+                this.dataForCalculate.iva = selectedSupplier.iva_sujeto_retencion
+                this.dataInputs.id_proveedor = selectedSupplier.value
 
-            if (filteredContracts.length > 0) {
-                this.documentoAdquisicion = filteredContracts;
-                this.dataInputs.nombre_tipo_doc_adquisicion = '';
             } else {
+                // Limpiar los valores cuando el proveedor es null
+                this.dataInputs.giro = ''
+                this.dataInputs.irs = ''
+                this.dataInputs.iva = ''
+                this.dataInputs.id_proveedor = ''
+                this.dataForCalculate.irs = ''
+                this.dataForCalculate.iva = ''
+                this.dataForCalculate.id_proveedor = ''
+                this.dataInputs.id_det_doc_adquisicion = ''
+                this.dataInputs.id_tipo_doc_adquisicion = ''
+                this.dataInputs.nombre_tipo_doc_adquisicion = ''
+                this.dataInputs.numero_doc_adquisicion = ''
+                this.dataInputs.compromiso_ppto_det_doc_adquisicion = ''
+                this.dataInputs.id_proy_financiado = ''
                 this.documentoAdquisicion = [];
-                this.dataInputs.id_det_doc_adquisicion = '';
-                this.dataInputs.id_tipo_doc_adquisicion = 3;
-                this.dataInputs.nombre_tipo_doc_adquisicion = 'FACTURA';
-                this.dataInputs.numero_doc_adquisicion = '';
-                this.dataInputs.compromiso_ppto_det_doc_adquisicion = '';
-                this.dataInputs.id_proy_financiado = '';
             }
 
             if (clear) {//Este if basicamente es utilizado para limpiar toda esta data cuando y solo cuando se haga la seleccion desde el MultiSelect
-
                 this.taxesByRow(); // funciona que calcula los impuestos (mas informacion Ctrl+click)
             }
         },
