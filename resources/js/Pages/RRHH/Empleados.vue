@@ -2,7 +2,7 @@
 import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
-import ModalDocAdquisicionVue from '@/Components-ISRI/Tesoreria/ModalDocAdquisicion.vue';
+import ModalEmployeesVue from '@/Components-ISRI/RRHH/ModalEmployees.vue';
 import moment from 'moment';
 
 import { toast } from 'vue3-toastify';
@@ -17,7 +17,7 @@ import axios from 'axios';
     <AppLayoutVue nameSubModule="RRHH - Empleados">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="addEmployees()" v-if="permits.insertar == 1" color="bg-green-700  hover:bg-green-800"
+                <GeneralButton @click="addEmployee()" v-if="permits.insertar == 1" color="bg-green-700  hover:bg-green-800"
                     text="Agregar Empleado" icon="add" />
             </div>
         </div>
@@ -179,11 +179,9 @@ import axios from 'axios';
                 </nav>
             </div>
         </div>
-
-        <!-- <ModalDocAdquisicionVue :show_modal_acq_doc="show_modal_acq_doc" :modalData="modalData"
-            :financing_sources="financing_sources" :suppliers="suppliers" :doc_types="doc_types"
-            :management_types="management_types" @cerrar-modal="show_modal_acq_doc = false"
-            @get-table="getAcquisitionDoc(tableData.currentPage)" /> -->
+        
+        <ModalEmployeesVue :show_modal_employee="show_modal_employee" :select_options="select_options"
+        @cerrar-modal="show_modal_employee = false"/>
 
     </AppLayoutVue>
 </template>
@@ -193,7 +191,7 @@ export default {
     created() {
         this.getEmployees()
         this.getPermits()
-        //this.getSelectsAcquisitionDoc()
+        this.getSelectsEmployeeModal()
     },
     data() {
         let sortOrders = {};
@@ -202,7 +200,7 @@ export default {
             { width: "15%", label: "Codigo", name: "codigo_empleado", type: "text" },
             { width: "35%", label: "Nombre", name: "nombre_persona", type: "text" },
             { width: "15%", label: "Dui", name: "dui_persona", type: "text" },
-            { width: "10%", label: "Dependencia", name: "email_persona", type: "text" },
+            { width: "10%", label: "Email", name: "email_persona", type: "text" },
             {
                 width: "10%", label: "Estado", name: "estado_empleado", type: "select",
                 options: [
@@ -223,14 +221,24 @@ export default {
             //Data for datatable
             employees: [],
             //Data for modal
-            show_modal_employee: false,
+            show_modal_employee: false,   
             modalData: [],
+            select_options:{
+                marital_status:[],
+                gender:[],
+                municipality:[],
+                educational_level:[],
+                occupation:[]
+            },
+
             doc_types: [],
             suppliers: [],
             management_types: [],
             budget_accounts: [],
             dependencies: [],
             financing_sources: [],
+
+            
             //Permissions
             permits: [],
             links: [],
@@ -258,13 +266,14 @@ export default {
             this.modalData = []
             this.show_modal_employee = true
         },
-        getSelectsAcquisitionDoc() {
-            axios.get("/get-selects-acq-doc")
+        getSelectsEmployeeModal() {
+            axios.get("/get-selects-options-employee")
                 .then((response) => {
-                    this.doc_types = response.data.doc_types
-                    this.management_types = response.data.management_types
-                    this.suppliers = response.data.suppliers
-                    this.financing_sources = response.data.financing_sources
+                    this.select_options.marital_status = response.data.marital_status
+                    this.select_options.municipality = response.data.municipality
+                    this.select_options.gender = response.data.gender
+                    this.select_options.educational_level = response.data.educational_level
+                    this.select_options.occupation = response.data.occupation
                 })
                 .catch((errors) => {
                     let msg = this.manageError(errors);

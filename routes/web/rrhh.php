@@ -15,5 +15,7 @@ Route::group(['middleware' => ['auth','access']], function () {
     )->name('rrhh.empleados');
 
     Route::post('employees', [EmpleadoController::class, 'getEmployees'])->name('empleado.getEmployees');
+    Route::get('search-person-by-dui', [EmpleadoController::class, 'searchPersonByDUI'])->name('empleado.seachPersonByDUI');
+    Route::get('get-selects-options-employee', [EmpleadoController::class, 'getSelectOptionsEmployee'])->name('empleado.getSelectOptionsEmployee');
 
 });
