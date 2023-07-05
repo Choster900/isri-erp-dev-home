@@ -180,7 +180,7 @@ import axios from 'axios';
             </div>
         </div>
         
-        <ModalEmployeesVue :show_modal_employee="show_modal_employee" :select_options="select_options"
+        <ModalEmployeesVue :show_modal_employee="show_modal_employee"
         @cerrar-modal="show_modal_employee = false"/>
 
     </AppLayoutVue>
@@ -191,7 +191,6 @@ export default {
     created() {
         this.getEmployees()
         this.getPermits()
-        this.getSelectsEmployeeModal()
     },
     data() {
         let sortOrders = {};
@@ -223,21 +222,6 @@ export default {
             //Data for modal
             show_modal_employee: false,   
             modalData: [],
-            select_options:{
-                marital_status:[],
-                gender:[],
-                municipality:[],
-                educational_level:[],
-                occupation:[]
-            },
-
-            doc_types: [],
-            suppliers: [],
-            management_types: [],
-            budget_accounts: [],
-            dependencies: [],
-            financing_sources: [],
-
             
             //Permissions
             permits: [],
@@ -265,26 +249,6 @@ export default {
         addEmployee() {
             this.modalData = []
             this.show_modal_employee = true
-        },
-        getSelectsEmployeeModal() {
-            axios.get("/get-selects-options-employee")
-                .then((response) => {
-                    this.select_options.marital_status = response.data.marital_status
-                    this.select_options.municipality = response.data.municipality
-                    this.select_options.gender = response.data.gender
-                    this.select_options.educational_level = response.data.educational_level
-                    this.select_options.occupation = response.data.occupation
-                })
-                .catch((errors) => {
-                    let msg = this.manageError(errors);
-                    this.$swal.fire({
-                        title: "Operación cancelada",
-                        text: msg,
-                        icon: "warning",
-                        timer: 5000,
-                    });
-                    this.$emit("cerrar-modal");
-                });
         },
         changeStatusEmployee(employee) {
             let msg

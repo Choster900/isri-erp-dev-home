@@ -43,4 +43,9 @@ class Persona extends Model
     {
         return $this->hasOne('App\Models\Empleado','id_persona','id_persona');
     }
+
+    public function residencias()
+    { 
+        return $this->hasMany('App\Models\Residencia','id_persona','id_persona');
+    }
 }

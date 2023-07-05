@@ -4,6 +4,7 @@ namespace App\Http\Controllers\RRHH;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Banco;
 use App\Models\Departamento;
 use App\Models\Empleado;
 use App\Models\EstadoCivil;
@@ -12,6 +13,7 @@ use App\Models\Municipio;
 use App\Models\NivelEducativo;
 use App\Models\Persona;
 use App\Models\Profesion;
+use App\Models\TipoPension;
 use Illuminate\Support\Facades\DB;
 
 class EmpleadoController extends Controller
@@ -72,6 +74,12 @@ class EmpleadoController extends Controller
 
         if ($correct_dui) {
             $person = Persona::select('*')
+                ->with(['residencias' => function ($query) {
+                    $query->where('estado_residencia', 1)
+                        ->orderBy('fecha_mod_residencia', 'desc')
+                        ->orderBy('fecha_reg_residencia', 'desc')
+                        ->first();
+                }])
                 ->where('dui_persona', $dui)
                 ->first();
             return ['person' => $person ?? ''];
@@ -98,7 +106,14 @@ class EmpleadoController extends Controller
             ->get();
         $educational_level = NivelEducativo::select('id_nivel_educativo as value', 'nombre_nivel_educativo as label')
             ->get();
-        $occupation = Profesion::select('id_profesion as value','nombre_profesion as label')
+        $occupation = Profesion::select('id_profesion as value', 'nombre_profesion as label')
+            ->get();
+        $pension_type = TipoPension::select('id_tipo_pension as value', 'codigo_tipo_pension as label')
+            ->get();
+        $bank = Banco::select('id_banco as value', 'nombre_banco as label')
+            ->get();
+        $professional_title = DB::table('titulo_profesional')
+            ->select('id_titulo_profesional as value', 'nombre_titulo_profesional as label')
             ->get();
 
         return [
@@ -106,7 +121,10 @@ class EmpleadoController extends Controller
             "gender"            => $gender,
             "municipality"      => $municipality,
             'educational_level' => $educational_level,
-            'occupation'        => $occupation
+            'occupation'        => $occupation,
+            'pension_type'      => $pension_type,
+            'bank'              => $bank,
+            'professional_title' => $professional_title
         ];
     }
 }

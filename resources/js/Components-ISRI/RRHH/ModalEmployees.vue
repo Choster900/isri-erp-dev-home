@@ -24,7 +24,7 @@ import axios from "axios";
                     <div v-if="!correct_dui" class="flex justify-center">
                         <div class="flex flex-col items-center w-full">
                             <input id="dui" type="text" class="p-1 mb-2 w-[75%] rounded-lg" placeholder="Ingresa DUI"
-                                v-model="employee.person_info.dui" @keyup.enter="searchDui()" @input="typeDUI()">
+                                v-model="employee.person_info.dui_persona" @keyup.enter="searchDui()" @input="typeDUI()">
                             <div class="flex justify-center">
                                 <button
                                     class="ml-1.5 btn-sm border-slate-200 hover:border-slate-300 text-slate-600 underline underline-offset-1"
@@ -35,14 +35,19 @@ import axios from "axios";
 
                     <!-- Page 1: Personal information -->
                     <div v-if="correct_dui && current_page == 1">
-                        <div class="mb-4 md:flex flex-row justify-start">
-                            <div class="text-center">
+                        <div class="mb-2 md:flex flex-row justify-between">
+                            <div class="md:w-1/2">
                                 <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
-                                    Informacion Personal
+                                    Informacion personal
+                                </span>
+                            </div>
+                            <div class="md:w-1/2 md:text-right">
+                                <span class="font-semibold text-slate-800 text-[14px]">
+                                    Página 1 de 3
                                 </span>
                             </div>
                         </div>
-                        <!-- First row -->
+                        <!-- First row Page1 -->
                         <div class="mb-5 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="primer-nombre" v-model="employee.person_info.pnombre_persona" type="text"
@@ -69,8 +74,8 @@ import axios from "axios";
                                     class="mt-2" :message="item" />
                             </div>
                         </div>
-                        <!-- End first row -->
-                        <!-- Second row -->
+                        <!-- End first row Page1 -->
+                        <!-- Second row Page1 -->
                         <div class="mb-5 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="primer-apellido" v-model="employee.person_info.papellido_persona" type="text"
@@ -97,9 +102,17 @@ import axios from "axios";
                                     class="mt-2" :message="item" />
                             </div>
                         </div>
-                        <!-- End second row -->
-                        <!-- Third row -->
+                        <!-- End second row Page1 -->
+                        <!-- Third row Page1 -->
                         <div class="mb-5 md:flex flex-row justify-items-start">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                                <TextInput id="DUI" v-model="employee.person_info.dui_persona" type="text" placeholder="DUI"
+                                    @update:modelValue="typeDUI()">
+                                    <LabelToInput icon="personalInformation" forLabel="DUI" />
+                                </TextInput>
+                                <InputError v-for="(item, index) in errors.person_info.dui_persona" :key="index"
+                                    class="mt-2" :message="item" />
+                            </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="telefono" v-model="employee.person_info.telefono_persona" type="text"
                                     placeholder="Telefono" @update:modelValue="typePhoneNumber()">
@@ -109,31 +122,23 @@ import axios from "axios";
                                     class="mt-2" :message="item" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="DUI" v-model="employee.person_info.dui" type="text" placeholder="DUI"
-                                    @update:modelValue="typeDUI()">
-                                    <LabelToInput icon="personalInformation" forLabel="DUI" />
-                                </TextInput>
-                                <InputError v-for="(item, index) in errors.person_info.dui" :key="index" class="mt-2"
-                                    :message="item" />
-                            </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="Correo" v-model="employee.person_info.email_persona" type="email"
-                                    placeholder="Correo electronico">
+                                    placeholder="Correo electronico" :required="false">
                                     <LabelToInput icon="email" forLabel="Correo" />
                                 </TextInput>
                                 <InputError v-for="(item, index) in errors.person_info.email_persona" :key="index"
                                     class="mt-2" :message="item" />
                             </div>
                         </div>
-                        <!-- End third row -->
-                        <!-- Fourth row -->
+                        <!-- End third row Page1 -->
+                        <!-- Fourth row Page1 -->
                         <div class="mb-5 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-4 md:mb-0 w-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Genero <span class="text-red-600 font-extrabold">*</span>
                                 </label>
                                 <div class="relative font-semibold flex h-8 w-full flex-row-reverse ">
-                                    <Multiselect placeholder="Genero" v-model="employee.person_info.id_genero"
+                                    <Multiselect placeholder="Seleccione genero" v-model="employee.person_info.id_genero"
                                         :options="select_options.gender" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
@@ -142,57 +147,18 @@ import axios from "axios";
                             </div>
                             <div class="w-2/3 ml-2"></div>
                         </div>
-                        <!-- End fourth row -->
-                    </div>
-
-                    <!-- Page 2: Personal details -->
-                    <div v-if="correct_dui && current_page == 2">
-                        <!-- Complementary information -->
+                        <!-- End fourth row Page1 -->
+                        <!-- Birth information -->
                         <div class="mb-4 md:flex flex-row justify-start">
                             <div class="text-center">
                                 <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
-                                    Informacion Complementaria
+                                    Informacion de nacimiento
                                 </span>
                             </div>
                         </div>
-                        <!-- First row -->
+                        <!-- Fifth row Page1 -->
                         <div class="mb-5 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                                <label class="block mb-2 text-xs font-light text-gray-600">
-                                    Municipio residencia <span class="text-red-600 font-extrabold">*</span>
-                                </label>
-                                <div class="relative flex h-8 w-full flex-row-reverse ">
-                                    <Multiselect placeholder="Municipio" v-model="employee.person_info.id_municipio"
-                                        :options="select_options.municipality" :searchable="true" />
-                                    <LabelToInput icon="list" />
-                                </div>
-                                <InputError v-for="(item, index) in errors.person_info.id_municipio" :key="index"
-                                    class="mt-2" :message="item" />
-                            </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                                <label class="block mb-2 text-xs font-light text-gray-600">
-                                    Estado civil <span class="text-red-600 font-extrabold">*</span>
-                                </label>
-                                <div class="relative flex h-8 w-full flex-row-reverse ">
-                                    <Multiselect placeholder="Estado civil" v-model="employee.person_info.id_estado_civil"
-                                        id="estado-civil" :options="select_options.marital_status" :searchable="true" />
-                                    <LabelToInput icon="list" />
-                                </div>
-                                <InputError v-for="(item, index) in errors.person_info.id_estado_civil" :key="index"
-                                    class="mt-2" :message="item" />
-                            </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                                <TextInput id="nombre-conyuge" v-model="employee.person_info.nombre_conyuge_persona"
-                                    :required="false" type="text" placeholder="Nombre cónyuge">
-                                    <LabelToInput icon="personalInformation" forLabel="nombre-conyuge" />
-                                </TextInput>
-                                <InputError v-for="(item, index) in errors.person_info.nombre_conyuge_persona" :key="index"
-                                    class="mt-2" :message="item" />
-                            </div>
-                        </div>
-                        <!-- Second row -->
-                        <div class="mb-5 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
+                            <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600" for="fecha_nacimiento">
                                     Fecha de nacimiento <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -201,12 +167,71 @@ import axios from "axios";
                                     <flat-pickr
                                         class="peer font-semibold text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none w-full"
                                         :config="config" v-model="employee.person_info.fecha_nac_persona"
-                                        :placeholder="'Seleccione fecha nacimiento'" />
+                                        :placeholder="'Seleccione fecha'" />
                                 </div>
                                 <InputError v-for="(item, index) in errors.person_info.fecha_nac_persona" :key="index"
                                     class="mt-2" :message="item" />
                             </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
+                            <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
+                                <label class="block mb-2 text-xs font-light text-gray-600">
+                                    Municipio nacimiento <span class="text-red-600 font-extrabold">*</span>
+                                </label>
+                                <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
+                                    <Multiselect placeholder="Seleccione municipio"
+                                        v-model="employee.person_info.id_municipio" :options="select_options.municipality"
+                                        :searchable="true" />
+                                    <LabelToInput icon="list" />
+                                </div>
+                                <InputError v-for="(item, index) in errors.person_info.id_municipio" :key="index"
+                                    class="mt-2" :message="item" />
+                            </div>
+                            <div class="w-1/3"></div>
+                        </div>
+                        <!-- End fifth row Page1 -->
+                    </div>
+
+                    <!-- Page 2: Personal details -->
+                    <div v-if="correct_dui && current_page == 2">
+                        <!-- Family information -->
+                        <div class="mb-2 md:flex flex-row justify-between">
+                            <div class="md:w-1/2">
+                                <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
+                                    Informacion familiar
+                                </span>
+                            </div>
+                            <div class="md:w-1/2 md:text-right">
+                                <span class="font-semibold text-slate-800 text-[14px]">
+                                    Página 2 de 3
+                                </span>
+                            </div>
+                        </div>
+                        <!-- First row Page2 -->
+                        <div class="mb-5 md:flex flex-row justify-items-start">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                                <label class="block mb-2 text-xs font-light text-gray-600">
+                                    Estado civil <span class="text-red-600 font-extrabold">*</span>
+                                </label>
+                                <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
+                                    <Multiselect placeholder="Seleccione estado civil"
+                                        v-model="employee.person_info.id_estado_civil" id="estado-civil"
+                                        :options="select_options.marital_status" :searchable="true" />
+                                    <LabelToInput icon="list" />
+                                </div>
+                                <InputError v-for="(item, index) in errors.person_info.id_estado_civil" :key="index"
+                                    class="mt-2" :message="item" />
+                            </div>
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                                <TextInput id="nombre-conyuge" v-model="employee.person_info.nombre_conyuge_persona"
+                                    :required="false" type="text" placeholder="Nombre cónyuge">
+                                    <LabelToInput icon="personalInformation" forLabel="nombre-conyuge" />
+                                </TextInput>
+                                <InputError v-for="(item, index) in errors.person_info.nombre_conyuge_persona" :key="index"
+                                    class="mt-2" :message="item" />
+                            </div>
+                        </div>
+                        <!-- Second row Page2 -->
+                        <div class="mb-5 md:flex flex-row justify-items-start">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="nombre-madre" v-model="employee.person_info.nombre_madre_persona" type="text"
                                     :required="false" placeholder="Nombre - madre (completo)">
                                     <LabelToInput icon="personalInformation" forLabel="nombre-madre" />
@@ -214,10 +239,9 @@ import axios from "axios";
                                 <InputError v-for="(item, index) in errors.person_info.nombre_madre_persona" :key="index"
                                     class="mt-2" :message="item" />
                             </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                                <TextInput id="nombre-padre" v-model="employee.person_info.nombre_padre_persona"
-                                    type="text" :required="false"
-                                    placeholder="Nombre - padre (completo)">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                                <TextInput id="nombre-padre" v-model="employee.person_info.nombre_padre_persona" type="text"
+                                    :required="false" placeholder="Nombre - padre (completo)">
                                     <LabelToInput icon="personalInformation" forLabel="nombre-padre" />
                                 </TextInput>
                             </div>
@@ -226,38 +250,201 @@ import axios from "axios";
                         <div class="mb-4 md:flex flex-row justify-start">
                             <div class="text-center">
                                 <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
-                                    Informacion Profesional
+                                    Informacion profesional
                                 </span>
                             </div>
                         </div>
-                        <!-- Third row -->
+                        <!-- Third row Page2 -->
                         <div class="mb-4 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Nivel educativo <span class="text-red-600 font-extrabold">*</span>
                                 </label>
                                 <div class="relative font-semibold flex h-8 w-full flex-row-reverse ">
-                                    <Multiselect placeholder="Nivel educativo" v-model="employee.person_info.id_nivel_educativo"
+                                    <Multiselect placeholder="Seleccione nivel educativo"
+                                        v-model="employee.person_info.id_nivel_educativo"
                                         :options="select_options.educational_level" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
                                 <InputError v-for="(item, index) in errors.person_info.id_nivel_educativo" :key="index"
                                     class="mt-2" :message="item" />
                             </div>
-                            <div class="mb-4 md:mr-4 md:mb-0 w-1/3">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Nivel profesion <span class="text-red-600 font-extrabold">*</span>
                                 </label>
                                 <div class="relative font-semibold flex h-8 w-full flex-row-reverse ">
-                                    <Multiselect placeholder="Nivel profesion" v-model="employee.person_info.id_profesion"
-                                        :options="select_options.occupation" :searchable="true" />
+                                    <Multiselect placeholder="Seleccione nivel profesion"
+                                        v-model="employee.person_info.id_profesion" :options="select_options.occupation"
+                                        :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
                                 <InputError v-for="(item, index) in errors.person_info.id_profesion" :key="index"
                                     class="mt-2" :message="item" />
                             </div>
-                            <div class="w-1/3"></div>
                         </div>
+                        <!-- Residence information -->
+                        <div class="mb-4 md:flex flex-row justify-start">
+                            <div class="text-center">
+                                <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
+                                    Informacion de residencia
+                                </span>
+                            </div>
+                        </div>
+                        <!-- Fourth row Page2 -->
+                        <div class="mb-10 md:flex flex-row justify-items-start">
+                            <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
+                                <label class="block mb-2 text-xs font-light text-gray-600">
+                                    Municipio residencia <span class="text-red-600 font-extrabold">*</span>
+                                </label>
+                                <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
+                                    <Multiselect placeholder="Seleccione municipio"
+                                        v-model="employee.person_info.residencias[0].id_municipio"
+                                        :options="select_options.municipality" :searchable="true" />
+                                    <LabelToInput icon="list" />
+                                </div>
+                                <InputError v-for="(item, index) in errors.person_info.residencias.id_municipio" :key="index"
+                                    class="mt-2" :message="item" />
+                            </div>
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-2/3">
+                                <TextInput id="residence" v-model="employee.person_info.residencias[0].direccion_residencia" type="text"
+                                    :required="false" placeholder="Direccion">
+                                    <LabelToInput icon="standard" forLabel="residence" />
+                                </TextInput>
+                                <InputError v-for="(item, index) in errors.person_info.residencias.direccion_residencia" :key="index"
+                                    class="mt-2" :message="item" />
+                            </div>
+                        </div>
+                        <!-- End fourth row Page2 -->
+                    </div>
+
+                    <!-- Page 3: All employee information -->
+                    <div v-if="correct_dui && current_page == 3">
+                        <!-- Employee information -->
+                        <div class="mb-2 md:flex flex-row justify-between">
+                            <div class="md:w-1/2">
+                                <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
+                                    Informacion del empleado
+                                </span>
+                            </div>
+                            <div class="md:w-1/2 md:text-right">
+                                <span class="font-semibold text-slate-800 text-[14px]">
+                                    Página 3 de 3
+                                </span>
+                            </div>
+                        </div>
+                        <!-- First row Page3 -->
+                        <div class="mb-5 md:flex flex-row justify-items-start">
+                            <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
+                                <label class="block mb-2 text-xs font-light text-gray-600">
+                                    Tipo pension <span class="text-red-600 font-extrabold">*</span>
+                                </label>
+                                <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
+                                    <Multiselect placeholder="Seleccione tipo" v-model="employee.pension_type_id"
+                                        :options="select_options.pension_type" :searchable="true" />
+                                    <LabelToInput icon="list" />
+                                </div>
+                                <InputError v-for="(item, index) in errors.pension_type_id" :key="index" class="mt-2"
+                                    :message="item" />
+                            </div>
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
+                                <TextInput id="nup" v-model="employee.nup" type="text" placeholder="NUP">
+                                    <LabelToInput icon="standard" forLabel="nup" />
+                                </TextInput>
+                                <InputError v-for="(item, index) in errors.nup" :key="index" class="mt-2" :message="item" />
+                            </div>
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
+                                <TextInput id="isss" v-model="employee.isss" type="text" placeholder="Numero ISSS">
+                                    <LabelToInput icon="standard" forLabel="isss" />
+                                </TextInput>
+                                <InputError v-for="(item, index) in errors.isss" :key="index" class="mt-2"
+                                    :message="item" />
+                            </div>
+                        </div>
+                        <!-- End first row Page3 -->
+                        <!-- Second row Page3 -->
+                        <div class="mb-5 md:flex flex-row justify-items-start">
+                            <div class="mb-4 md:mr-2 md:mb-0 w-1/2">
+                                <label class="block mb-2 text-xs font-light text-gray-600">
+                                    Titulo profesional <span class="text-red-600 font-extrabold">*</span>
+                                </label>
+                                <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
+                                    <Multiselect placeholder="Seleccione titulo profesional"
+                                        v-model="employee.professional_title_id"
+                                        :options="select_options.professional_title" :searchable="true" />
+                                    <LabelToInput icon="list" />
+                                </div>
+                                <InputError v-for="(item, index) in errors.professional_title_id" :key="index" class="mt-2"
+                                    :message="item" />
+                            </div>
+                            <div class="mb-4 md:mr-2 md:mb-0 w-1/2">
+                                <label class="block mb-2 text-xs font-light text-gray-600" for="fecha_nacimiento">
+                                    Fecha de contratacion <span class="text-red-600 font-extrabold">*</span>
+                                </label>
+                                <div class="relative flex">
+                                    <LabelToInput icon="date" />
+                                    <flat-pickr
+                                        class="peer font-semibold text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none w-full"
+                                        :config="config" v-model="employee.date_of_hire"
+                                        :placeholder="'Seleccione fecha'" />
+                                </div>
+                                <InputError v-for="(item, index) in errors.date_of_hire" :key="index" class="mt-2"
+                                    :message="item" />
+                            </div>
+                        </div>
+                        <!-- End second row Page3 -->
+                        <!-- Third row Page3 -->
+                        <div class="mb-5 md:flex flex-row justify-items-start">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                                <TextInput id="email1" v-model="employee.institutional_email" :required="false" type="email"
+                                    placeholder="Email institucional">
+                                    <LabelToInput icon="email" forLabel="email1" />
+                                </TextInput>
+                                <InputError v-for="(item, index) in errors.institutional_email" :key="index" class="mt-2"
+                                    :message="item" />
+                            </div>
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                                <TextInput id="email2" v-model="employee.alternative_email" :required="false" type="email"
+                                    placeholder="Email alternativo">
+                                    <LabelToInput icon="email" forLabel="email2" />
+                                </TextInput>
+                                <InputError v-for="(item, index) in errors.alternative_email" :key="index" class="mt-2"
+                                    :message="item" />
+                            </div>
+                        </div>
+                        <!-- End third row Page3 -->
+                        <!-- Bank details -->
+                        <div class="mb-4 md:flex flex-row justify-start">
+                            <div class="text-center">
+                                <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
+                                    Informacion bancaria
+                                </span>
+                            </div>
+                        </div>
+                        <!-- Fourth row Page3 -->
+                        <div class="mb-20 md:flex flex-row justify-items-start">
+                            <div class="mb-4 md:mr-2 md:mb-0 w-1/2">
+                                <label class="block mb-2 text-xs font-light text-gray-600">
+                                    Banco
+                                </label>
+                                <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
+                                    <Multiselect placeholder="Seleccione banco" v-model="employee.bank_id"
+                                        :options="select_options.bank" :searchable="true" />
+                                    <LabelToInput icon="list" />
+                                </div>
+                                <InputError v-for="(item, index) in errors.bank_id" :key="index" class="mt-2"
+                                    :message="item" />
+                            </div>
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                                <TextInput id="bank-account" v-model="employee.bank_account" type="text"
+                                    placeholder="Numero de cuenta de banco" :required="false">
+                                    <LabelToInput icon="standard" forLabel="bank-account" />
+                                </TextInput>
+                                <InputError v-for="(item, index) in errors.bank_account" :key="index" class="mt-2"
+                                    :message="item" />
+                            </div>
+                        </div>
+                        <!-- End fourth row Page3 -->
                     </div>
 
                     <div class="flex items-center ml-1 mt-2">
@@ -266,7 +453,7 @@ import axios from "axios";
                                 @click="$emit('cerrar-modal')" />
 
                             <button v-if="current_page != 1"
-                                class="flex items-center bg-gray-600 hover:bg-gray-700 text-white pl-2 pr-3 py-1.5 text-center mb-2 rounded"
+                                class="mr-1 flex items-center bg-gray-600 hover:bg-gray-700 text-white pl-2 pr-3 py-1.5 text-center mb-2 rounded"
                                 @click="goToPreviousPage()">
                                 <svg width="20px" height="20px" viewBox="-3 0 32 32" version="1.1"
                                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -288,7 +475,7 @@ import axios from "axios";
                             </button>
                         </div>
                         <div v-if="correct_dui" class="w-1/2">
-                            <button
+                            <button v-if="current_page != 3"
                                 class="ml-1 flex items-center bg-blue-600 hover:bg-blue-700 text-white pl-3 pr-2 py-1.5 text-center mb-2 rounded"
                                 @click="goToNextPage()">
                                 <div class="text-[12px]">SIGUIENTE</div>
@@ -310,6 +497,11 @@ import axios from "axios";
                                     </g>
                                 </svg>
                             </button>
+                            <!-- <GeneralButton v-if="modalData != '' && currentPage === 2 && !itemSelected"
+                                    @click="updateAcqDoc()" color="bg-orange-700 hover:bg-orange-800" text="Actualizar"
+                                    icon="update" class="" /> -->
+                            <GeneralButton v-if="current_page === 3" @click="storeNewEmployee()"
+                                color="bg-green-700 hover:bg-green-800" text="Guardar" icon="add" class="ml-1" />
                         </div>
                     </div>
                 </div>
@@ -329,10 +521,6 @@ export default {
             type: Boolean,
             default: false,
         },
-        select_options: {
-            type: Array,
-            default: []
-        },
     },
     created() { },
     data: function (data) {
@@ -340,15 +528,26 @@ export default {
             correct_dui: false,
             found_employee: false,
             found_person: false,
-            person_info: [],
             current_page: 1,
             errors: {
-                person_info: []
+                person_info: {
+                    residencias:[]
+                }
             },
             employee: {
+                id: '',
+                pension_type_id: '',
+                isss: '',
+                nup: '',
+                professional_title_id: '',
+                date_of_hire: '',
+                institutional_email: '',
+                alternative_email: '',
+                bank_id: '',
+                bank_account: '',
                 person_info: {
-                    id: '',
-                    dui: '',
+                    id_persona: '',
+                    dui_persona: '',
                     pnombre_persona: '',
                     snombre_persona: '',
                     tnombre_persona: '',
@@ -359,9 +558,21 @@ export default {
                     id_estado_civil: '',
                     nombre_conyuge_persona: '',
                     nombre_madre_persona: '',
-                    nombre_padre_persona:'',
-                    fecha_nac_persona:''
+                    nombre_padre_persona: '',
+                    fecha_nac_persona: '',
+                    id_nivel_educativo: '',
+                    id_profesion: ''
                 },
+            },
+            select_options: {
+                marital_status: [],
+                gender: [],
+                municipality: [],
+                educational_level: [],
+                occupation: [],
+                pension_type: [],
+                bank: [],
+                professional_title: []
             },
             config: {
                 altInput: true,
@@ -398,11 +609,11 @@ export default {
             this.income_concept[field] = this.income_concept[field].toUpperCase()
         },
         typeDUI() {
-            var x = this.employee.person_info.dui.replace(/\D/g, '').match(/(\d{0,8})(\d{0,1})/);
-            this.employee.person_info.dui = !x[2] ? x[1] : '' + x[1] + '-' + x[2] + (x[4] ? '-' + x[4] : '');
+            var x = this.employee.person_info.dui_persona.replace(/\D/g, '').match(/(\d{0,8})(\d{0,1})/);
+            this.employee.person_info.dui_persona = !x[2] ? x[1] : '' + x[1] + '-' + x[2] + (x[4] ? '-' + x[4] : '');
         },
         searchDui() {
-            if (this.employee.person_info.dui == "") {
+            if (this.employee.person_info.dui_persona == "") {
                 toast.warning(
                     "Debe digitar el numero de dui.",
                     {
@@ -414,12 +625,13 @@ export default {
             } else {
                 axios.get('/search-person-by-dui', {
                     params: {
-                        dui: this.employee.person_info.dui
+                        dui: this.employee.person_info.dui_persona
                     }
                 })
                     .then((response) => {
                         this.correct_dui = true
-                        let person_info = response.data.person
+                        const person_info = response.data.person
+                        //console.log(response.data.person);
                         if (person_info === "") {
                             this.found_employee = false
                             this.found_person = false
@@ -441,6 +653,8 @@ export default {
                                 })
                             } else {
                                 this.found_employee = false
+                                this.employee.person_info = { ...person_info };
+                                console.log(this.employee.person_info);
                             }
                         }
                     })
@@ -472,19 +686,45 @@ export default {
         },
         goToPreviousPage() {
             this.current_page--
+        },
+        getSelectsEmployeeModal() {
+            axios.get("/get-selects-options-employee")
+                .then((response) => {
+                    this.select_options.marital_status = response.data.marital_status
+                    this.select_options.municipality = response.data.municipality
+                    this.select_options.gender = response.data.gender
+                    this.select_options.educational_level = response.data.educational_level
+                    this.select_options.occupation = response.data.occupation
+                    this.select_options.bank = response.data.bank
+                    this.select_options.professional_title = response.data.professional_title
+                    this.select_options.pension_type = response.data.pension_type
+                })
+                .catch((errors) => {
+                    let msg = this.manageError(errors);
+                    this.$swal.fire({
+                        title: "Operación cancelada",
+                        text: msg,
+                        icon: "warning",
+                        timer: 5000,
+                    });
+                    this.$emit("cerrar-modal");
+                });
+        },
+        loadOptions() {
+            this.select_options.gender = []
+            this.select_options.marital_status = []
+            this.select_options.educational_level = []
+            this.select_options.municipality = []
+            this.select_options.occupation = []
+            this.getSelectsEmployeeModal()
         }
 
     },
     watch: {
-        showModalIncome: function (value, oldValue) {
+        show_modal_employee: function (value, oldValue) {
             if (value) {
-                this.errors = [];
-                this.income_concept.income_concept_id = this.modalData.id_concepto_ingreso;
-                this.income_concept.dependency_id = this.modalData.id_dependencia;
-                this.income_concept.budget_account_id = this.modalData.id_ccta_presupuestal;
-                this.income_concept.name = this.modalData.nombre_concepto_ingreso;
-                this.income_concept.financing_source_id = this.modalData.id_proy_financiado;
-                this.income_concept.detail = this.modalData.detalle_concepto_ingreso;
+                this.loadOptions()
+                //this.errors = [];
             }
         },
     },
