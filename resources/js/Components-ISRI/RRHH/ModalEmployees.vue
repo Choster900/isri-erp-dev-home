@@ -43,7 +43,7 @@ import axios from "axios";
                             </div>
                             <div class="md:w-1/2 md:text-right">
                                 <span class="font-semibold text-slate-800 text-[14px]">
-                                    Página 1 de 3
+                                    Página 1 de 4
                                 </span>
                             </div>
                         </div>
@@ -201,7 +201,7 @@ import axios from "axios";
                             </div>
                             <div class="md:w-1/2 md:text-right">
                                 <span class="font-semibold text-slate-800 text-[14px]">
-                                    Página 2 de 3
+                                    Página 2 de 4
                                 </span>
                             </div>
                         </div>
@@ -303,16 +303,16 @@ import axios from "axios";
                                         :options="select_options.municipality" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
-                                <InputError v-for="(item, index) in errors.person_info.residencias.id_municipio" :key="index"
-                                    class="mt-2" :message="item" />
+                                <InputError v-for="(item, index) in errors.person_info.residencias.id_municipio"
+                                    :key="index" class="mt-2" :message="item" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-2/3">
-                                <TextInput id="residence" v-model="employee.person_info.residencias[0].direccion_residencia" type="text"
-                                    :required="false" placeholder="Direccion">
+                                <TextInput id="residence" v-model="employee.person_info.residencias[0].direccion_residencia"
+                                    type="text" :required="false" placeholder="Direccion">
                                     <LabelToInput icon="standard" forLabel="residence" />
                                 </TextInput>
-                                <InputError v-for="(item, index) in errors.person_info.residencias.direccion_residencia" :key="index"
-                                    class="mt-2" :message="item" />
+                                <InputError v-for="(item, index) in errors.person_info.residencias.direccion_residencia"
+                                    :key="index" class="mt-2" :message="item" />
                             </div>
                         </div>
                         <!-- End fourth row Page2 -->
@@ -329,7 +329,7 @@ import axios from "axios";
                             </div>
                             <div class="md:w-1/2 md:text-right">
                                 <span class="font-semibold text-slate-800 text-[14px]">
-                                    Página 3 de 3
+                                    Página 3 de 4
                                 </span>
                             </div>
                         </div>
@@ -447,6 +447,142 @@ import axios from "axios";
                         <!-- End fourth row Page3 -->
                     </div>
 
+                    <!-- Page 4: All employee information -->
+                    <div v-if="correct_dui && current_page == 4">
+                        <!-- Employee information -->
+                        <div class="mb-2 md:flex flex-row justify-between">
+                            <div class="md:w-1/2">
+                                <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
+                                    Informacion de la plaza
+                                </span>
+                            </div>
+                            <div class="md:w-1/2 md:text-right">
+                                <span class="font-semibold text-slate-800 text-[14px]">
+                                    Página 4 de 4
+                                </span>
+                            </div>
+                        </div>
+                        <!-- First row Page4 -->
+                        <div class="mb-5 md:flex flex-row justify-items-start">
+                            <div class="mb-4 md:mr-2 md:mb-0 w-1/2">
+                                <label class="block mb-2 text-xs font-light text-gray-600">
+                                    Dependencia <span class="text-red-600 font-extrabold">*</span>
+                                </label>
+                                <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
+                                    <Multiselect placeholder="Seleccione dependencia" v-model="employee.dependency_id"
+                                        :options="select_options.dependencies" :searchable="true"
+                                        @select="getUplt($event)" />
+                                    <LabelToInput icon="list" />
+                                </div>
+                                <InputError v-for="(item, index) in errors.dependency_id" :key="index" class="mt-2"
+                                    :message="item" />
+                            </div>
+                            <div class="mb-4 md:mr-2 md:mb-0 w-1/2">
+                                <label class="block mb-2 text-xs font-light text-gray-600">
+                                    Unidad presupuestaria - Linea de trabajo <span
+                                        class="text-red-600 font-extrabold">*</span>
+                                </label>
+                                <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
+                                    <Multiselect placeholder="Seleccione Uplt" v-model="employee.uplt_id"
+                                        :options="select_options.uplt" :searchable="true" @select="getActivities($event)" />
+                                    <LabelToInput icon="list" />
+                                </div>
+                                <InputError v-for="(item, index) in errors.uplt_id" :key="index" class="mt-2"
+                                    :message="item" />
+                            </div>
+                        </div>
+                        <!-- End first row Page4 -->
+                        <div class="mb-5 md:flex flex-row justify-items-start">
+                            <div class="mb-4 md:mr-2 md:mb-0 w-1/2">
+                                <label class="block mb-2 text-xs font-light text-gray-600">
+                                    Actividad <span class="text-red-600 font-extrabold">*</span>
+                                </label>
+                                <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
+                                    <Multiselect placeholder="Seleccione Actividad" v-model="employee.activity_id"
+                                        :options="select_options.activities" :searchable="true" />
+                                    <LabelToInput icon="list" />
+                                </div>
+                                <InputError v-for="(item, index) in errors.activity_id" :key="index" class="mt-2"
+                                    :message="item" />
+                            </div>
+                            <div class="mb-4 md:mr-2 md:mb-0 w-1/2">
+                                <label class="block mb-2 text-xs font-light text-gray-600">
+                                    Fuente Financiamiento <span class="text-red-600 font-extrabold">*</span>
+                                </label>
+                                <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
+                                    <Multiselect placeholder="Seleccione Fuente Financiamiento"
+                                        v-model="employee.financing_source_id" :options="select_options.financing_sources"
+                                        :searchable="true" @select="getJobPositions($event)" />
+                                    <LabelToInput icon="list" />
+                                </div>
+                                <InputError v-for="(item, index) in errors.financing_source_id" :key="index" class="mt-2"
+                                    :message="item" />
+                            </div>
+                        </div>
+                        <div class="mb-4 md:flex flex-row justify-start">
+                            <div class="text-center">
+                                <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
+                                    Informacion de contratacion
+                                </span>
+                            </div>
+                        </div>
+                        <div class="mb-5 md:flex flex-row justify-items-start">
+                            <div class="mb-4 md:mr-2 md:mb-0 w-1/2">
+                                <label class="block mb-2 text-xs font-light text-gray-600">
+                                    Plaza <span class="text-red-600 font-extrabold">*</span>
+                                </label>
+                                <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
+                                    <Multiselect placeholder="Seleccione Plaza" v-model="employee.job_position_id"
+                                        :options="select_options.job_positions" :searchable="true" 
+                                        @select="setSalaryLimits($event)"/>
+                                    <LabelToInput icon="list" />
+                                </div>
+                                <InputError v-for="(item, index) in errors.job_position_id" :key="index" class="mt-2"
+                                    :message="item" />
+                            </div>
+                            <div class="mb-4 md:mr-2 md:mb-0 w-1/2">
+                                <TextInput id="salary" v-model="employee.salary" type="text" 
+                                :placeholder="'Salario($'+lower_salary_limit+' - $'+upper_salary_limit+')'">
+                                    <LabelToInput icon="money" forLabel="salary" />
+                                </TextInput>
+                                <InputError v-for="(item, index) in errors.salary" :key="index" class="mt-2"
+                                    :message="item" />
+                            </div>
+                        </div>
+                        <div class="mb-5 md:flex flex-row justify-items-start">
+                            <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
+                                <label class="block mb-2 text-xs font-light text-gray-600">
+                                    Tipo contratacion <span class="text-red-600 font-extrabold">*</span>
+                                </label>
+                                <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
+                                    <Multiselect placeholder="Seleccione tipo" v-model="employee.contract_type_id"
+                                        :options="select_options.contract_types" :searchable="true" 
+                                        />
+                                    <LabelToInput icon="list" />
+                                </div>
+                                <InputError v-for="(item, index) in errors.contract_type_id" :key="index" class="mt-2"
+                                    :message="item" />
+                            </div>
+                            <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
+                                <TextInput id="account" v-model="employee.account" type="text" 
+                                placeholder="Partida">
+                                    <LabelToInput icon="standard" forLabel="account" />
+                                </TextInput>
+                                <InputError v-for="(item, index) in errors.salary" :key="index" class="mt-2"
+                                    :message="item" />
+                            </div>
+                            <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
+                                <TextInput id="subaccount" v-model="employee.subaccount" type="text" 
+                                placeholder="Subpartida">
+                                    <LabelToInput icon="standard" forLabel="subaccount" />
+                                </TextInput>
+                                <InputError v-for="(item, index) in errors.salary" :key="index" class="mt-2"
+                                    :message="item" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- buttons -->
                     <div class="flex items-center ml-1 mt-2">
                         <div class="flex" :class="correct_dui ? 'justify-end w-1/2' : 'justify-center w-full'">
                             <GeneralButton v-if="current_page == 1" class="mr-1" text="Cancelar" icon="delete"
@@ -475,7 +611,7 @@ import axios from "axios";
                             </button>
                         </div>
                         <div v-if="correct_dui" class="w-1/2">
-                            <button v-if="current_page != 3"
+                            <button v-if="current_page != 4"
                                 class="ml-1 flex items-center bg-blue-600 hover:bg-blue-700 text-white pl-3 pr-2 py-1.5 text-center mb-2 rounded"
                                 @click="goToNextPage()">
                                 <div class="text-[12px]">SIGUIENTE</div>
@@ -500,7 +636,7 @@ import axios from "axios";
                             <!-- <GeneralButton v-if="modalData != '' && currentPage === 2 && !itemSelected"
                                     @click="updateAcqDoc()" color="bg-orange-700 hover:bg-orange-800" text="Actualizar"
                                     icon="update" class="" /> -->
-                            <GeneralButton v-if="current_page === 3" @click="storeNewEmployee()"
+                            <GeneralButton v-if="current_page === 4" @click="storeNewEmployee()"
                                 color="bg-green-700 hover:bg-green-800" text="Guardar" icon="add" class="ml-1" />
                         </div>
                     </div>
@@ -525,13 +661,15 @@ export default {
     created() { },
     data: function (data) {
         return {
+            lower_salary_limit:'',
+            upper_salary_limit:'',
             correct_dui: false,
             found_employee: false,
             found_person: false,
             current_page: 1,
             errors: {
                 person_info: {
-                    residencias:[]
+                    residencias: []
                 }
             },
             employee: {
@@ -545,6 +683,9 @@ export default {
                 alternative_email: '',
                 bank_id: '',
                 bank_account: '',
+                dependency_id: '',
+                uplt_id: '',
+                activity_id: '',
                 person_info: {
                     id_persona: '',
                     dui_persona: '',
@@ -561,7 +702,13 @@ export default {
                     nombre_padre_persona: '',
                     fecha_nac_persona: '',
                     id_nivel_educativo: '',
-                    id_profesion: ''
+                    id_profesion: '',
+                    residencias: [
+                        {
+                            id_municipio: '',
+                            direccion_residencia: ''
+                        }
+                    ]
                 },
             },
             select_options: {
@@ -572,7 +719,13 @@ export default {
                 occupation: [],
                 pension_type: [],
                 bank: [],
-                professional_title: []
+                professional_title: [],
+                dependencies: [],
+                uplt: [],
+                activities: [],
+                financing_sources: [],
+                job_positions: [],
+                contract_types:[]
             },
             config: {
                 altInput: true,
@@ -698,6 +851,9 @@ export default {
                     this.select_options.bank = response.data.bank
                     this.select_options.professional_title = response.data.professional_title
                     this.select_options.pension_type = response.data.pension_type
+                    this.select_options.dependencies = response.data.dependencies
+                    this.select_options.financing_sources = response.data.financing_sources
+                    this.select_options.contract_types = response.data.contract_types
                 })
                 .catch((errors) => {
                     let msg = this.manageError(errors);
@@ -709,6 +865,64 @@ export default {
                     });
                     this.$emit("cerrar-modal");
                 });
+        },
+        getUplt(dependency_id) {
+            //console.log(dependency_id)
+            axios.get("/get-uplt", { params: { dependency_id: dependency_id } })
+                .then((response) => {
+                    this.select_options.uplt = response.data.uplt
+                })
+                .catch((errors) => {
+                    let msg = this.manageError(errors);
+                    this.$swal.fire({
+                        title: "Operación cancelada",
+                        text: msg,
+                        icon: "warning",
+                        timer: 5000,
+                    });
+                    //this.$emit("cerrar-modal");
+                });
+        },
+        getActivities(field_work_id) {
+            //console.log(dependency_id)
+            axios.get("/get-institutional-activities", { params: { field_work_id: field_work_id } })
+                .then((response) => {
+                    this.select_options.activities = response.data.activities
+                })
+                .catch((errors) => {
+                    let msg = this.manageError(errors);
+                    this.$swal.fire({
+                        title: "Operación cancelada",
+                        text: msg,
+                        icon: "warning",
+                        timer: 5000,
+                    });
+                    //this.$emit("cerrar-modal");
+                });
+        },
+        getJobPositions(financing_source_id) {
+            axios.get("/get-job-positions", { params: { financing_source_id: financing_source_id } })
+                .then((response) => {
+                    this.select_options.job_positions = response.data.job_positions
+                })
+                .catch((errors) => {
+                    let msg = this.manageError(errors);
+                    this.$swal.fire({
+                        title: "Operación cancelada",
+                        text: msg,
+                        icon: "warning",
+                        timer: 5000,
+                    });
+                    //this.$emit("cerrar-modal");
+                });
+        },
+        setSalaryLimits(job_position_id){
+            this.select_options.job_positions.forEach((value,index) => {
+                if(value.value === job_position_id){
+                    this.lower_salary_limit = value.salario_base_plaza
+                    this.upper_salary_limit = value.salario_tope_plaza
+                }
+            })
         },
         loadOptions() {
             this.select_options.gender = []
