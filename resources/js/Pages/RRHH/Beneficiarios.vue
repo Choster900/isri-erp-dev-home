@@ -18,7 +18,7 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
     <AppLayoutVue nameSubModule="RRHH - Empleados">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="showModalBeneficiario = !showModalBeneficiario"
+                <GeneralButton @click="dataBeneficiariosToSendModal = []; showModalBeneficiario = !showModalBeneficiario"
                     color="bg-green-700  hover:bg-green-800" text="Agregar Beneficiario" icon="add" />
             </div>
         </div>
@@ -27,9 +27,9 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
                 <div class="mb-4 md:flex flex-row justify-items-start">
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-                            <Multiselect v-model="tableData.length" @select="getEmployees()"
-                                @deselect=" tableData.length = 5; getEmployees()"
-                                @clear="tableData.length = 5; getEmployees()" :options="perPage" :searchable="true"
+                            <Multiselect v-model="tableData.length" @select="getBeneficiarios()"
+                                @deselect=" tableData.length = 5; getBeneficiarios()"
+                                @clear="tableData.length = 5; getBeneficiarios()" :options="perPage" :searchable="true"
                                 placeholder="Cantidad a mostrar" />
                             <LabelToInput icon="list2" />
                         </div>
@@ -42,98 +42,114 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
 
             <div class="overflow-x-auto">
                 <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy"
-                    :searchButton="true" @datos-enviados="handleData($event)" @execute-search="getEmployees()">
-                    <!--   <tbody class="text-sm divide-y divide-slate-200">
-                        <tr v-for="employee in employees" :key="employee.id_empleado">
+                    :searchButton="true" @datos-enviados="handleData($event)" @execute-search="getBeneficiarios()">
+                    <tbody class="text-sm divide-y divide-slate-200">
+                        <tr v-for="beneficiario in beneficiarios" :key="beneficiario.id_persona">
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">{{ employee.id_empleado }}</div>
+                                <div class="font-medium text-slate-800 text-center">{{ beneficiario.id_persona }}</div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5 td-data-table">
-                                <div class="font-medium text-slate-800 ellipsis text-center">
-                                    {{ employee.codigo_empleado }}
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{ `${beneficiario.pnombre_persona} ${beneficiario.snombre_persona}
+                                                                        ${beneficiario.tapellido_persona}` }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ employee.persona.pnombre_persona }}
-                                    {{ employee.persona.snombre_persona }}
-                                    {{ employee.persona.tnombre_persona }}
-                                    {{ employee.persona.papellido_persona }}
-                                    {{ employee.persona.sapellido_persona }}
-                                    {{ employee.persona.tapellido_persona }}
+                                    {{ `${beneficiario.sapellido_persona} ${beneficiario.snombre_persona}
+                                                                        ${beneficiario.tapellido_persona}` }}
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5 td-data-table">
-                                <div class="font-medium text-slate-800 ellipsis text-center">{{ employee.persona.dui_persona
-                                }}</div>
-                            </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">{{ employee.persona.email_persona }}</div>
-                            </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">
-                                    <div v-if="(employee.estado_empleado == 1)"
-                                        class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
-                                        Activo
-                                    </div>
-                                    <div v-else
-                                        class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-rose-100 text-rose-600">
-                                        Inactivo
-                                    </div>
+                                <div class="max-h-[165px] overflow-y-auto scrollbar">
+                                    <template v-for="(familiar, i) in beneficiario.familiar" :key="i">
+                                        <div class="mb-2 text-center">
+                                            <p class="text-[10pt]">
+                                                <span class="font-medium"> </span>{{
+                                                    familiar.nombre_familiar
+                                                }}
+                                            </p>
+                                        </div>
+                                        <template v-if="i < beneficiario.familiar.length - 1">
+                                            <hr class="my-2 border-t border-gray-300">
+                                        </template>
+                                    </template>
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5">
-                                <div class="space-x-1 text-center">
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="max-h-[165px] overflow-y-auto scrollbar">
+                                    <template v-for="(familiar, i) in beneficiario.familiar" :key="i">
+                                        <div class="mb-2 text-center">
+                                            <p class="text-[10pt]">
+                                                <span class="font-medium"></span>{{
+                                                    familiar.parentesco.nombre_parentesco
+                                                }}
+                                            </p>
+                                        </div>
+                                        <template v-if="i < beneficiario.familiar.length - 1">
+                                            <hr class="my-2 border-t border-gray-300">
+                                        </template>
+                                    </template>
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="max-h-[165px] overflow-y-auto scrollbar">
+                                    <template v-for="(familiar, i) in beneficiario.familiar" :key="i">
+                                        <div class="mb-2 text-center">
+                                            <p class="text-[10pt]">
+                                                <span class="font-medium"></span>{{
+                                                    familiar.porcentaje_familiar
+                                                }} %
+                                            </p>
+                                        </div>
+                                        <template v-if="i < beneficiario.familiar.length - 1">
+                                            <hr class="my-2 border-t border-gray-300">
+                                        </template>
+                                    </template>
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="max-h-[165px] overflow-y-auto scrollbar">
+                                    <template v-for="(familiar, i) in beneficiario.familiar" :key="i">
+                                        <div class="mb-2 text-center">
+                                            <p class="text-[10pt]">
+                                                <span class="font-medium"></span>{{
+                                                    familiar.estado_familiar
+                                                }}
+                                            </p>
+                                        </div>
+                                        <template v-if="i < beneficiario.familiar.length - 1">
+                                            <hr class="my-2 border-t border-gray-300">
+                                        </template>
+                                    </template>
+                                </div>
+                            </td>
+                            <td class="first:pl-5 last:pr-5">
+                                <div class="space-x-1">
                                     <DropDownOptions>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            v-if="permits.actualizar == 1 && employee.estado_empleado == 1"
-                                            @click="editEmployee(employee)">
-                                            <div class="w-8 text-green-900">
+                                            @click.stop="dataBeneficiariosToSendModal = beneficiario; showModalBeneficiario = !showModalBeneficiario">
+                                            <div class="w-8 text-blue-900">
                                                 <span class="text-xs">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                         stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 002.25-2.25V6a2.25 2.25 0 00-2.25-2.25H6A2.25 2.25 0 003.75 6v2.25A2.25 2.25 0 006 10.5zm0 9.75h2.25A2.25 2.25 0 0010.5 18v-2.25a2.25 2.25 0 00-2.25-2.25H6a2.25 2.25 0 00-2.25 2.25V18A2.25 2.25 0 006 20.25zm9.75-9.75H18a2.25 2.25 0 002.25-2.25V6A2.25 2.25 0 0018 3.75h-2.25A2.25 2.25 0 0013.5 6v2.25a2.25 2.25 0 002.25 2.25z" />
+                                                            d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                     </svg>
                                                 </span>
                                             </div>
-                                            <div class="font-semibold">Editar</div>
+                                            <div class="font-semibold">VER</div>
                                         </div>
-                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            @click="changeStatusEmployee(employee)" v-if="permits.eliminar == 1">
-                                            <div class="w-8 text-red-900"><span class="text-xs">
-                                                    <svg :fill="employee.estado_empleado == 1 ? '#991B1B' : '#166534'"
-                                                        version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
-                                                        width="20px" height="20px"
-                                                        xmlns:xlink="http://www.w3.org/1999/xlink"
-                                                        viewBox="0 0 97.994 97.994" xml:space="preserve"
-                                                        :stroke="employee.estado_empleado == 1 ? '#991B1B' : '#166534'">
-                                                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round"
-                                                            stroke-linejoin="round"></g>
-                                                        <g id="SVGRepo_iconCarrier">
-                                                            <g>
-                                                                <g>
-                                                                    <path
-                                                                        d="M97.155,9.939c-0.582-0.416-1.341-0.49-1.991-0.193l-10.848,4.935C74.08,5.29,60.815,0.118,46.966,0.118 c-15.632,0-30.602,6.666-41.07,18.289c-0.359,0.399-0.543,0.926-0.51,1.461c0.033,0.536,0.28,1.036,0.686,1.388l11.301,9.801 c0.818,0.711,2.055,0.639,2.787-0.162c6.866-7.512,16.636-11.821,26.806-11.821c6.135,0,12.229,1.584,17.622,4.583l-7.826,3.561 c-0.65,0.296-1.095,0.916-1.163,1.627c-0.069,0.711,0.247,1.405,0.828,1.82l34.329,24.52c0.346,0.246,0.753,0.373,1.163,0.373 c0.281,0,0.563-0.06,0.828-0.181c0.65-0.296,1.095-0.916,1.163-1.627l4.075-41.989C98.053,11.049,97.737,10.355,97.155,9.939z">
-                                                                    </path>
-                                                                    <path
-                                                                        d="M80.619,66.937c-0.819-0.709-2.055-0.639-2.787,0.162c-6.866,7.514-16.638,11.822-26.806,11.822 c-6.135,0-12.229-1.584-17.622-4.583l7.827-3.561c0.65-0.296,1.094-0.916,1.163-1.628c0.069-0.711-0.247-1.404-0.828-1.819 L7.237,42.811c-0.583-0.416-1.341-0.49-1.991-0.193c-0.65,0.296-1.094,0.916-1.163,1.627L0.009,86.233 c-0.069,0.712,0.247,1.406,0.828,1.822c0.583,0.416,1.341,0.488,1.991,0.192l10.848-4.935 c10.237,9.391,23.502,14.562,37.351,14.562c15.632,0,30.602-6.666,41.07-18.289c0.358-0.398,0.543-0.926,0.51-1.461 c-0.033-0.536-0.28-1.036-0.687-1.388L80.619,66.937z">
-                                                                    </path>
-                                                                </g>
-                                                            </g>
-                                                        </g>
-                                                    </svg>
-                                                </span></div>
-                                            <div class="font-semibold">
-                                                {{ employee.estado_empleado ? 'Desactivar' : 'Activar' }}
-                                            </div>
-                                        </div>
+
                                     </DropDownOptions>
+
+
                                 </div>
                             </td>
                         </tr>
-                    </tbody> -->
+                    </tbody>
                 </datatable>
 
             </div>
@@ -181,7 +197,8 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
             </div>
         </div> -->
 
-        <ModalBeneficiarios :showModal="showModalBeneficiario" @cerrar-modal="showModalBeneficiario = false" />
+        <ModalBeneficiarios :showModal="showModalBeneficiario" :data-beneficiarios="dataBeneficiariosToSendModal"
+            @cerrar-modal="showModalBeneficiario = false" />
 
     </AppLayoutVue>
 </template>
@@ -192,11 +209,12 @@ export default {
     data() {
         let sortOrders = {};
         let columns = [
-            { width: "10%", label: "ID", name: "id_familiar", type: "text" },
-            { width: "15%", label: "Persona", name: "id_persona", type: "text" },
+            { width: "10%", label: "ID", name: "id_persona", type: "text" },
+            { width: "15%", label: "Nombres", name: "id_persona", type: "text" },
+            { width: "15%", label: "Apellidos", name: "id_persona", type: "text" },
             { width: "35%", label: "Nombre del familiar", name: "nombre_familiar", type: "text" },
-            { width: "15%", label: "beneficiado_familiar", name: "beneficiado_familiar", type: "text" },
-            { width: "10%", label: "Porcentaje del beneficio", name: "porcentaje_familiar", type: "text" },
+            { width: "35%", label: "Parentesco", name: "nombre_familiar", type: "text" },
+            { width: "35%", label: "Porcentaje asignado", name: "nombre_familiar", type: "text" },
             {
                 width: "10%", label: "Estado", name: "estado_familiar", type: "select",
                 options: [
@@ -204,56 +222,88 @@ export default {
                     { value: "0", label: "Inactivo" }
                 ]
             },
-            { width: "5%", label: "Acciones", name: "Reload" },
+            { width: "5%", label: "", name: "Reload" },
         ];
         columns.forEach((column) => {
-            if (column.name === 'id_familiar')
+            if (column.name === 'id_persona')
                 sortOrders[column.name] = 1;
             else
                 sortOrders[column.name] = -1;
         });
         return {
             empty_object: false,
-            //Data for datatable
-            employees: [],
-            //Data for modal
-            showModalBeneficiario: false,
-            modalData: [],
-            select_options: {
-                marital_status: [],
-                gender: [],
-                municipality: [],
-                educational_level: [],
-                occupation: []
-            },
-
-            doc_types: [],
-            suppliers: [],
-            management_types: [],
-            budget_accounts: [],
-            dependencies: [],
-            financing_sources: [],
-
-
-            //Permissions
             permits: [],
+            stateModal: false,
+            beneficiarios: [],
+            dataBeneficiariosToSendModal: [],
+            showModalBeneficiario: false,
             links: [],
+            lastUrl: "/beneficiarios",
             columns: columns,
-            sortKey: "id_familiar",
+            sortKey: "id_proveedor",
             sortOrders: sortOrders,
             perPage: ["10", "20", "30"],
             tableData: {
-                currentPage: '',
                 draw: 0,
                 length: 5,
-                search: "",
                 column: 0,
                 dir: "desc",
-                total: ""
+                search: {},
+            },
+            pagination: {
+                lastPage: "",
+                currentPage: "",
+                total: "",
+                lastPageUrl: "",
+                nextPageUrl: "",
+                prevPageUrl: "",
+                from: "",
+                to: "",
             },
         }
     },
+    methods: {
+        async getBeneficiarios(url = "/beneficiarios") {
+            this.lastUrl = url;
+            this.tableData.draw++;
+            await axios.post(url, this.tableData).then((response) => {
+                let data = response.data;
+                if (this.tableData.draw == data.draw) {
+                    this.links = data.data.links;
+                    this.pagination.total = data.data.total;
+                    this.links[0].label = "Anterior";
+                    this.links[this.links.length - 1].label = "Siguiente";
+                    this.beneficiarios = data.data.data;
+                    this.stateModal = false
+                    this.beneficiarios.length > 0 ? this.empty_object = false : this.empty_object = true
 
+                }
+            }).catch((errors) => {
+                /* let msg = this.manageError(errors);
+                this.$swal.fire({
+                    title: "Operación cancelada",
+                    text: msg,
+                    icon: "warning",
+                    timer: 5000,
+                }); */
+            });
+        },
+        sortBy(key) {
+            if (key != "Acciones") {
+                this.sortKey = key;
+                this.sortOrders[key] = this.sortOrders[key] * -1;
+                this.tableData.column = this.getIndex(this.columns, "name", key);
+                this.tableData.dir = this.sortOrders[key] === 1 ? "asc" : "desc";
+                this.getBeneficiarios();
+            }
+        },
+        getIndex(array, key, value) {
+            return array.findIndex((i) => i[key] == value);
+        },
+    },
+    created() {
+        this.getBeneficiarios()
+    },
 }
 </script>
 

@@ -60,5 +60,4 @@ class Persona extends Model
     {
         return $this->hasMany(Familiar::class, 'id_persona', 'id_persona');
     }
-
 }

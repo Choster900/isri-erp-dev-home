@@ -4,14 +4,22 @@ namespace App\Http\Controllers\RRHH;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\ActividadInstitucional;
+use App\Models\Banco;
 use App\Models\Departamento;
+use App\Models\Dependencia;
 use App\Models\Empleado;
 use App\Models\EstadoCivil;
 use App\Models\Genero;
+use App\Models\LineaTrabajo;
 use App\Models\Municipio;
 use App\Models\NivelEducativo;
 use App\Models\Persona;
+use App\Models\Plaza;
 use App\Models\Profesion;
+use App\Models\ProyectoFinanciado;
+use App\Models\TipoPension;
+use App\Models\UpltDependencia;
 use Illuminate\Support\Facades\DB;
 
 class EmpleadoController extends Controller
@@ -72,6 +80,12 @@ class EmpleadoController extends Controller
 
         if ($correct_dui) {
             $person = Persona::select('*')
+                ->with(['residencias' => function ($query) {
+                    $query->where('estado_residencia', 1)
+                        ->orderBy('fecha_mod_residencia', 'desc')
+                        ->orderBy('fecha_reg_residencia', 'desc')
+                        ->first();
+                }])
                 ->where('dui_persona', $dui)
                 ->first();
             return ['person' => $person ?? ''];
@@ -85,6 +99,7 @@ class EmpleadoController extends Controller
 
     public function getSelectOptionsEmployee(Request $request)
     {
+        //You should validate the state of each catalog
         $marital_status = EstadoCivil::select('id_estado_civil as value', 'nombre_estado_civil as label')
             //->where('estado_estado_civil',1)
             ->get();
@@ -98,15 +113,66 @@ class EmpleadoController extends Controller
             ->get();
         $educational_level = NivelEducativo::select('id_nivel_educativo as value', 'nombre_nivel_educativo as label')
             ->get();
-        $occupation = Profesion::select('id_profesion as value','nombre_profesion as label')
+        $occupation = Profesion::select('id_profesion as value', 'nombre_profesion as label')
+            ->get();
+        $pension_type = TipoPension::select('id_tipo_pension as value', 'codigo_tipo_pension as label')
+            ->get();
+        $bank = Banco::select('id_banco as value', 'nombre_banco as label')
+            ->get();
+        $professional_title = DB::table('titulo_profesional')
+            ->select('id_titulo_profesional as value', 'nombre_titulo_profesional as label')
+            ->get();
+        $dependencies = Dependencia::selectRaw("id_dependencia as value , concat(codigo_dependencia, ' - ', nombre_dependencia) as label")
+            ->where('id_tipo_dependencia', '=', 1)
+            ->orderBy('nombre_dependencia')
+            ->get();
+        $financing_sources = ProyectoFinanciado::select('id_proy_financiado as value', 'nombre_proy_financiado as label')
+            ->where('estado_proy_financiado', '=', 1)
+            ->orderBy('nombre_proy_financiado')
+            ->get();
+        $contract_types = DB::table('tipo_contrato')
+            ->select('id_tipo_contrato as value', 'nombre_tipo_contrato as label')
             ->get();
 
         return [
-            "marital_status"    => $marital_status,
-            "gender"            => $gender,
-            "municipality"      => $municipality,
-            'educational_level' => $educational_level,
-            'occupation'        => $occupation
+            "marital_status"      => $marital_status,
+            "gender"              => $gender,
+            "municipality"        => $municipality,
+            'educational_level'   => $educational_level,
+            'occupation'          => $occupation,
+            'pension_type'        => $pension_type,
+            'bank'                => $bank,
+            'professional_title'  => $professional_title,
+            'dependencies'        => $dependencies,
+            'financing_sources'   => $financing_sources,
+            'contract_types'      => $contract_types
         ];
+    }
+    public function getUplt(Request $request)
+    {
+        $uplt = UpltDependencia::selectRaw("uplt_dependencia.id_linea_trabajo as value, concat(unidad_presupuestaria.codigo_unidad_ppto, linea_trabajo.codigo_linea_trabajo) as label")
+            ->join('linea_trabajo', function ($join) {
+                $join->on('uplt_dependencia.id_linea_trabajo', '=', 'linea_trabajo.id_linea_trabajo');
+            })
+            ->join('unidad_presupuestaria', function ($join) {
+                $join->on('linea_trabajo.id_unidad_ppto', '=', 'unidad_presupuestaria.id_unidad_ppto');
+            })
+            ->where('id_dependencia', $request->dependency_id)
+            ->get();
+        return ['uplt' => $uplt];
+    }
+    public function getInstitutionalActivities(Request $request)
+    {
+        $activities = ActividadInstitucional::select('id_actividad_institucional as value', 'nombre_actividad_institucional as label')
+            ->where('id_linea_trabajo', $request->field_work_id)
+            ->get();
+        return ['activities' => $activities];
+    }
+    public function getJobPositions(Request $request)
+    {
+        $job_positions = Plaza::select('id_plaza as value', 'nombre_plaza as label', 'salario_base_plaza', 'salario_tope_plaza')
+            ->where('id_proy_financiado', $request->financing_source_id)
+            ->get();
+        return ['job_positions' => $job_positions];
     }
 }

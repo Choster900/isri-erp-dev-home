@@ -1,11 +1,10 @@
 <?php
 
-use App\Http\Controllers\RRHH\BeneficiarioController;
 use App\Http\Controllers\RRHH\EmpleadoController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::group(['middleware' => ['auth', 'access']], function () {
+Route::group(['middleware' => ['auth','access']], function () {
     Route::get(
         '/rrhh/empleados',
         function () {
@@ -22,15 +21,3 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get('get-institutional-activities', [EmpleadoController::class, 'getInstitutionalActivities'])->name('empleado.getInstitutionalActivities');
     Route::get('get-job-positions', [EmpleadoController::class, 'getJobPositions'])->name('empleado.getJobPositions');
 });
-
-Route::get(
-    '/rrhh/beneficiarios',
-    function () {
-        return Inertia::render('RRHH/Beneficiarios', [
-            'menu' => session()->get('menu')
-        ]);
-    }
-)->name('rrhh.beneficiarios');
-Route::post('beneficiarios', [BeneficiarioController::class, 'getDataNemefocoarops'])->name('beneficiarios.getEmployees');
-Route::get('search-people-by-name/{name}', [BeneficiarioController::class, 'searchPeopleByName'])->name('empleado.seachPersonByName');
-Route::post('add-familiares', [BeneficiarioController::class, 'addRelatives'])->name('add.familiares');
