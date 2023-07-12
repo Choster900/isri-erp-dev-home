@@ -24,7 +24,7 @@ import axios from "axios";
                     <div v-if="!correct_dui" class="flex justify-center">
                         <div class="flex flex-col items-center w-full">
                             <input id="dui" type="text" class="p-1 mb-2 w-[75%] rounded-lg" placeholder="Ingresa DUI"
-                                v-model="employee.person_info.dui_persona" @keyup.enter="searchDui()" @input="typeDUI()">
+                                v-model="employee.persona.dui_persona" @keyup.enter="searchDui()" @input="typeDUI()">
                             <div class="flex justify-center">
                                 <button
                                     class="ml-1.5 btn-sm border-slate-200 hover:border-slate-300 text-slate-600 underline underline-offset-1"
@@ -43,34 +43,34 @@ import axios from "axios";
                             </div>
                             <div class="md:w-1/2 md:text-right">
                                 <span class="font-semibold text-slate-800 text-[14px]">
-                                    Página 1 de 4
+                                    Pagina 1 de {{ modalData == '' ? '4' : '3' }}
                                 </span>
                             </div>
                         </div>
                         <!-- First row Page1 -->
                         <div class="mb-5 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                                <TextInput id="primer-nombre" v-model="employee.person_info.pnombre_persona" type="text"
+                                <TextInput id="primer-nombre" v-model="employee.persona.pnombre_persona" type="text"
                                     placeholder="Primer nombre">
                                     <LabelToInput icon="personalInformation" forLabel="primer-nombre" />
                                 </TextInput>
-                                <InputError v-for="(item, index) in errors.person_info.pnombre_persona" :key="index"
+                                <InputError v-for="(item, index) in errors.persona.pnombre_persona" :key="index"
                                     class="mt-2" :message="item" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                                <TextInput id="segundo-nombre" v-model="employee.person_info.snombre_persona"
-                                    :required="false" type="text" placeholder="Segundo nombre">
+                                <TextInput id="segundo-nombre" v-model="employee.persona.snombre_persona" :required="false"
+                                    type="text" placeholder="Segundo nombre">
                                     <LabelToInput icon="personalInformation" forLabel="segundo-nombre" />
                                 </TextInput>
-                                <InputError v-for="(item, index) in errors.person_info.snombre_persona" :key="index"
+                                <InputError v-for="(item, index) in errors.persona.snombre_persona" :key="index"
                                     class="mt-2" :message="item" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                                <TextInput id="tercer-nombre" v-model="employee.person_info.tnombre_persona"
-                                    :required="false" type="text" placeholder="Tercer nombre">
+                                <TextInput id="tercer-nombre" v-model="employee.persona.tnombre_persona" :required="false"
+                                    type="text" placeholder="Tercer nombre">
                                     <LabelToInput icon="personalInformation" forLabel="tercer-nombre" />
                                 </TextInput>
-                                <InputError v-for="(item, index) in errors.person_info.tnombre_persona" :key="index"
+                                <InputError v-for="(item, index) in errors.persona.tnombre_persona" :key="index"
                                     class="mt-2" :message="item" />
                             </div>
                         </div>
@@ -78,27 +78,27 @@ import axios from "axios";
                         <!-- Second row Page1 -->
                         <div class="mb-5 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="primer-apellido" v-model="employee.person_info.papellido_persona" type="text"
+                                <TextInput id="primer-apellido" v-model="employee.persona.papellido_persona" type="text"
                                     placeholder="Primer apellido">
                                     <LabelToInput icon="personalInformation" forLabel="primer-apellido" />
                                 </TextInput>
-                                <InputError v-for="(item, index) in errors.person_info.papellido_persona" :key="index"
+                                <InputError v-for="(item, index) in errors.persona.papellido_persona" :key="index"
                                     class="mt-2" :message="item" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="segundo-apellido" v-model="employee.person_info.sapellido_persona"
+                                <TextInput id="segundo-apellido" v-model="employee.persona.sapellido_persona"
                                     :required="false" type="text" placeholder="Segundo apellido">
                                     <LabelToInput icon="personalInformation" forLabel="segundo-apellido" />
                                 </TextInput>
-                                <InputError v-for="(item, index) in errors.person_info.sapellido_persona" :key="index"
+                                <InputError v-for="(item, index) in errors.persona.sapellido_persona" :key="index"
                                     class="mt-2" :message="item" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="tercer-apellido" v-model="employee.person_info.tapellido_persona"
+                                <TextInput id="tercer-apellido" v-model="employee.persona.tapellido_persona"
                                     :required="false" type="text" placeholder="Tercer apellido">
                                     <LabelToInput icon="personalInformation" forLabel="tercer-apellido" />
                                 </TextInput>
-                                <InputError v-for="(item, index) in errors.person_info.tapellido_persona" :key="index"
+                                <InputError v-for="(item, index) in errors.persona.tapellido_persona" :key="index"
                                     class="mt-2" :message="item" />
                             </div>
                         </div>
@@ -106,28 +106,28 @@ import axios from "axios";
                         <!-- Third row Page1 -->
                         <div class="mb-5 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="DUI" v-model="employee.person_info.dui_persona" type="text" placeholder="DUI"
+                                <TextInput id="DUI" v-model="employee.persona.dui_persona" type="text" placeholder="DUI"
                                     @update:modelValue="typeDUI()">
                                     <LabelToInput icon="personalInformation" forLabel="DUI" />
                                 </TextInput>
-                                <InputError v-for="(item, index) in errors.person_info.dui_persona" :key="index"
-                                    class="mt-2" :message="item" />
+                                <InputError v-for="(item, index) in errors.persona.dui_persona" :key="index" class="mt-2"
+                                    :message="item" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="telefono" v-model="employee.person_info.telefono_persona" type="text"
-                                    placeholder="Telefono" @update:modelValue="typePhoneNumber()">
+                                <TextInput id="telefono" v-model="employee.persona.telefono_persona" type="text"
+                                    placeholder="Telefono">
                                     <LabelToInput icon="personalInformation" forLabel="telefono" />
                                 </TextInput>
-                                <InputError v-for="(item, index) in errors.person_info.telefono_persona" :key="index"
+                                <InputError v-for="(item, index) in errors.persona.telefono_persona" :key="index"
                                     class="mt-2" :message="item" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="Correo" v-model="employee.person_info.email_persona" type="email"
+                                <TextInput id="Correo" v-model="employee.persona.email_persona" type="email"
                                     placeholder="Correo electronico" :required="false">
                                     <LabelToInput icon="email" forLabel="Correo" />
                                 </TextInput>
-                                <InputError v-for="(item, index) in errors.person_info.email_persona" :key="index"
-                                    class="mt-2" :message="item" />
+                                <InputError v-for="(item, index) in errors.persona.email_persona" :key="index" class="mt-2"
+                                    :message="item" />
                             </div>
                         </div>
                         <!-- End third row Page1 -->
@@ -138,11 +138,11 @@ import axios from "axios";
                                     Genero <span class="text-red-600 font-extrabold">*</span>
                                 </label>
                                 <div class="relative font-semibold flex h-8 w-full flex-row-reverse ">
-                                    <Multiselect placeholder="Seleccione genero" v-model="employee.person_info.id_genero"
+                                    <Multiselect placeholder="Seleccione genero" v-model="employee.persona.id_genero"
                                         :options="select_options.gender" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
-                                <InputError v-for="(item, index) in errors.person_info.id_genero" :key="index" class="mt-2"
+                                <InputError v-for="(item, index) in errors.persona.id_genero" :key="index" class="mt-2"
                                     :message="item" />
                             </div>
                             <div class="w-2/3 ml-2"></div>
@@ -166,10 +166,10 @@ import axios from "axios";
                                     <LabelToInput icon="date" />
                                     <flat-pickr
                                         class="peer font-semibold text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none w-full"
-                                        :config="config" v-model="employee.person_info.fecha_nac_persona"
+                                        :config="config" v-model="employee.persona.fecha_nac_persona"
                                         :placeholder="'Seleccione fecha'" />
                                 </div>
-                                <InputError v-for="(item, index) in errors.person_info.fecha_nac_persona" :key="index"
+                                <InputError v-for="(item, index) in errors.persona.fecha_nac_persona" :key="index"
                                     class="mt-2" :message="item" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
@@ -177,13 +177,12 @@ import axios from "axios";
                                     Municipio nacimiento <span class="text-red-600 font-extrabold">*</span>
                                 </label>
                                 <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
-                                    <Multiselect placeholder="Seleccione municipio"
-                                        v-model="employee.person_info.id_municipio" :options="select_options.municipality"
-                                        :searchable="true" />
+                                    <Multiselect placeholder="Seleccione municipio" v-model="employee.persona.id_municipio"
+                                        :options="select_options.municipality" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
-                                <InputError v-for="(item, index) in errors.person_info.id_municipio" :key="index"
-                                    class="mt-2" :message="item" />
+                                <InputError v-for="(item, index) in errors.persona.id_municipio" :key="index" class="mt-2"
+                                    :message="item" />
                             </div>
                             <div class="w-1/3"></div>
                         </div>
@@ -201,7 +200,7 @@ import axios from "axios";
                             </div>
                             <div class="md:w-1/2 md:text-right">
                                 <span class="font-semibold text-slate-800 text-[14px]">
-                                    Página 2 de 4
+                                    Pagina 2 de {{ modalData == '' ? '4' : '3' }}
                                 </span>
                             </div>
                         </div>
@@ -213,34 +212,34 @@ import axios from "axios";
                                 </label>
                                 <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
                                     <Multiselect placeholder="Seleccione estado civil"
-                                        v-model="employee.person_info.id_estado_civil" id="estado-civil"
+                                        v-model="employee.persona.id_estado_civil" id="estado-civil"
                                         :options="select_options.marital_status" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
-                                <InputError v-for="(item, index) in errors.person_info.id_estado_civil" :key="index"
+                                <InputError v-for="(item, index) in errors.persona.id_estado_civil" :key="index"
                                     class="mt-2" :message="item" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="nombre-conyuge" v-model="employee.person_info.nombre_conyuge_persona"
+                                <TextInput id="nombre-conyuge" v-model="employee.persona.nombre_conyuge_persona"
                                     :required="false" type="text" placeholder="Nombre cónyuge">
                                     <LabelToInput icon="personalInformation" forLabel="nombre-conyuge" />
                                 </TextInput>
-                                <InputError v-for="(item, index) in errors.person_info.nombre_conyuge_persona" :key="index"
+                                <InputError v-for="(item, index) in errors.persona.nombre_conyuge_persona" :key="index"
                                     class="mt-2" :message="item" />
                             </div>
                         </div>
                         <!-- Second row Page2 -->
                         <div class="mb-5 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="nombre-madre" v-model="employee.person_info.nombre_madre_persona" type="text"
+                                <TextInput id="nombre-madre" v-model="employee.persona.nombre_madre_persona" type="text"
                                     :required="false" placeholder="Nombre - madre (completo)">
                                     <LabelToInput icon="personalInformation" forLabel="nombre-madre" />
                                 </TextInput>
-                                <InputError v-for="(item, index) in errors.person_info.nombre_madre_persona" :key="index"
+                                <InputError v-for="(item, index) in errors.persona.nombre_madre_persona" :key="index"
                                     class="mt-2" :message="item" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="nombre-padre" v-model="employee.person_info.nombre_padre_persona" type="text"
+                                <TextInput id="nombre-padre" v-model="employee.persona.nombre_padre_persona" type="text"
                                     :required="false" placeholder="Nombre - padre (completo)">
                                     <LabelToInput icon="personalInformation" forLabel="nombre-padre" />
                                 </TextInput>
@@ -262,11 +261,11 @@ import axios from "axios";
                                 </label>
                                 <div class="relative font-semibold flex h-8 w-full flex-row-reverse ">
                                     <Multiselect placeholder="Seleccione nivel educativo"
-                                        v-model="employee.person_info.id_nivel_educativo"
+                                        v-model="employee.persona.id_nivel_educativo"
                                         :options="select_options.educational_level" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
-                                <InputError v-for="(item, index) in errors.person_info.id_nivel_educativo" :key="index"
+                                <InputError v-for="(item, index) in errors.persona.id_nivel_educativo" :key="index"
                                     class="mt-2" :message="item" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
@@ -275,12 +274,12 @@ import axios from "axios";
                                 </label>
                                 <div class="relative font-semibold flex h-8 w-full flex-row-reverse ">
                                     <Multiselect placeholder="Seleccione nivel profesion"
-                                        v-model="employee.person_info.id_profesion" :options="select_options.occupation"
+                                        v-model="employee.persona.id_profesion" :options="select_options.occupation"
                                         :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
-                                <InputError v-for="(item, index) in errors.person_info.id_profesion" :key="index"
-                                    class="mt-2" :message="item" />
+                                <InputError v-for="(item, index) in errors.persona.id_profesion" :key="index" class="mt-2"
+                                    :message="item" />
                             </div>
                         </div>
                         <!-- Residence information -->
@@ -299,19 +298,19 @@ import axios from "axios";
                                 </label>
                                 <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
                                     <Multiselect placeholder="Seleccione municipio"
-                                        v-model="employee.person_info.residencias[0].id_municipio"
+                                        v-model="employee.persona.residencias[0].id_municipio"
                                         :options="select_options.municipality" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
-                                <InputError v-for="(item, index) in errors.person_info.residencias.id_municipio"
-                                    :key="index" class="mt-2" :message="item" />
+                                <InputError v-for="(item, index) in errors.persona.residencias.id_municipio" :key="index"
+                                    class="mt-2" :message="item" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-2/3">
-                                <TextInput id="residence" v-model="employee.person_info.residencias[0].direccion_residencia"
+                                <TextInput id="residence" v-model="employee.persona.residencias[0].direccion_residencia"
                                     type="text" :required="false" placeholder="Direccion">
                                     <LabelToInput icon="standard" forLabel="residence" />
                                 </TextInput>
-                                <InputError v-for="(item, index) in errors.person_info.residencias.direccion_residencia"
+                                <InputError v-for="(item, index) in errors.persona.residencias.direccion_residencia"
                                     :key="index" class="mt-2" :message="item" />
                             </div>
                         </div>
@@ -329,7 +328,7 @@ import axios from "axios";
                             </div>
                             <div class="md:w-1/2 md:text-right">
                                 <span class="font-semibold text-slate-800 text-[14px]">
-                                    Página 3 de 4
+                                    Pagina 3 de {{ modalData == '' ? '4' : '3' }}
                                 </span>
                             </div>
                         </div>
@@ -340,24 +339,26 @@ import axios from "axios";
                                     Tipo pension <span class="text-red-600 font-extrabold">*</span>
                                 </label>
                                 <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
-                                    <Multiselect placeholder="Seleccione tipo" v-model="employee.pension_type_id"
+                                    <Multiselect placeholder="Seleccione tipo" v-model="employee.id_tipo_pension"
                                         :options="select_options.pension_type" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
-                                <InputError v-for="(item, index) in errors.pension_type_id" :key="index" class="mt-2"
+                                <InputError v-for="(item, index) in errors.id_tipo_pension" :key="index" class="mt-2"
                                     :message="item" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                                <TextInput id="nup" v-model="employee.nup" type="text" placeholder="NUP">
-                                    <LabelToInput icon="standard" forLabel="nup" />
+                                <TextInput id="nup_empleado" v-model="employee.nup_empleado" type="text" placeholder="NUP">
+                                    <LabelToInput icon="standard" forLabel="nup_empleado" />
                                 </TextInput>
-                                <InputError v-for="(item, index) in errors.nup" :key="index" class="mt-2" :message="item" />
+                                <InputError v-for="(item, index) in errors.nup_empleado" :key="index" class="mt-2"
+                                    :message="item" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                                <TextInput id="isss" v-model="employee.isss" type="text" placeholder="Numero ISSS">
-                                    <LabelToInput icon="standard" forLabel="isss" />
+                                <TextInput id="isss-empleado" v-model="employee.isss_empleado" type="text"
+                                    placeholder="Numero ISSS">
+                                    <LabelToInput icon="standard" forLabel="isss-empleado" />
                                 </TextInput>
-                                <InputError v-for="(item, index) in errors.isss" :key="index" class="mt-2"
+                                <InputError v-for="(item, index) in errors.isss_empleado" :key="index" class="mt-2"
                                     :message="item" />
                             </div>
                         </div>
@@ -370,11 +371,11 @@ import axios from "axios";
                                 </label>
                                 <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
                                     <Multiselect placeholder="Seleccione titulo profesional"
-                                        v-model="employee.professional_title_id"
+                                        v-model="employee.id_titulo_profesional"
                                         :options="select_options.professional_title" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
-                                <InputError v-for="(item, index) in errors.professional_title_id" :key="index" class="mt-2"
+                                <InputError v-for="(item, index) in errors.id_titulo_profesional" :key="index" class="mt-2"
                                     :message="item" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 w-1/2">
@@ -385,31 +386,31 @@ import axios from "axios";
                                     <LabelToInput icon="date" />
                                     <flat-pickr
                                         class="peer font-semibold text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none w-full"
-                                        :config="config" v-model="employee.date_of_hire"
+                                        :config="config" v-model="employee.fecha_contratacion_empleado"
                                         :placeholder="'Seleccione fecha'" />
                                 </div>
-                                <InputError v-for="(item, index) in errors.date_of_hire" :key="index" class="mt-2"
-                                    :message="item" />
+                                <InputError v-for="(item, index) in errors.fecha_contratacion_empleado" :key="index"
+                                    class="mt-2" :message="item" />
                             </div>
                         </div>
                         <!-- End second row Page3 -->
                         <!-- Third row Page3 -->
                         <div class="mb-5 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="email1" v-model="employee.institutional_email" :required="false" type="email"
-                                    placeholder="Email institucional">
+                                <TextInput id="email1" v-model="employee.email_institucional_empleado" :required="false"
+                                    type="email" placeholder="Email institucional">
                                     <LabelToInput icon="email" forLabel="email1" />
                                 </TextInput>
-                                <InputError v-for="(item, index) in errors.institutional_email" :key="index" class="mt-2"
-                                    :message="item" />
+                                <InputError v-for="(item, index) in errors.email_institucional_empleado" :key="index"
+                                    class="mt-2" :message="item" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="email2" v-model="employee.alternative_email" :required="false" type="email"
-                                    placeholder="Email alternativo">
+                                <TextInput id="email2" v-model="employee.email_alternativo_empleado" :required="false"
+                                    type="email" placeholder="Email alternativo">
                                     <LabelToInput icon="email" forLabel="email2" />
                                 </TextInput>
-                                <InputError v-for="(item, index) in errors.alternative_email" :key="index" class="mt-2"
-                                    :message="item" />
+                                <InputError v-for="(item, index) in errors.email_alternativo_empleado" :key="index"
+                                    class="mt-2" :message="item" />
                             </div>
                         </div>
                         <!-- End third row Page3 -->
@@ -428,19 +429,19 @@ import axios from "axios";
                                     Banco
                                 </label>
                                 <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
-                                    <Multiselect placeholder="Seleccione banco" v-model="employee.bank_id"
+                                    <Multiselect placeholder="Seleccione banco" v-model="employee.id_banco"
                                         :options="select_options.bank" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
-                                <InputError v-for="(item, index) in errors.bank_id" :key="index" class="mt-2"
+                                <InputError v-for="(item, index) in errors.id_banco" :key="index" class="mt-2"
                                     :message="item" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="bank-account" v-model="employee.bank_account" type="text"
+                                <TextInput id="bank-account" v-model="employee.cuenta_banco_empleado" type="text"
                                     placeholder="Numero de cuenta de banco" :required="false">
                                     <LabelToInput icon="standard" forLabel="bank-account" />
                                 </TextInput>
-                                <InputError v-for="(item, index) in errors.bank_account" :key="index" class="mt-2"
+                                <InputError v-for="(item, index) in errors.cuenta_banco_empleado" :key="index" class="mt-2"
                                     :message="item" />
                             </div>
                         </div>
@@ -453,7 +454,7 @@ import axios from "axios";
                         <div class="mb-2 md:flex flex-row justify-between">
                             <div class="md:w-1/2">
                                 <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
-                                    Informacion de la plaza
+                                    Informacion de contratacion
                                 </span>
                             </div>
                             <div class="md:w-1/2 md:text-right">
@@ -470,8 +471,7 @@ import axios from "axios";
                                 </label>
                                 <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
                                     <Multiselect placeholder="Seleccione dependencia" v-model="employee.dependency_id"
-                                        :options="select_options.dependencies" :searchable="true"
-                                        @select="getUplt($event)" />
+                                        :options="select_options.dependencies" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
                                 <InputError v-for="(item, index) in errors.dependency_id" :key="index" class="mt-2"
@@ -479,107 +479,46 @@ import axios from "axios";
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 w-1/2">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
-                                    Unidad presupuestaria - Linea de trabajo <span
-                                        class="text-red-600 font-extrabold">*</span>
-                                </label>
-                                <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
-                                    <Multiselect placeholder="Seleccione Uplt" v-model="employee.uplt_id"
-                                        :options="select_options.uplt" :searchable="true" @select="getActivities($event)" />
-                                    <LabelToInput icon="list" />
-                                </div>
-                                <InputError v-for="(item, index) in errors.uplt_id" :key="index" class="mt-2"
-                                    :message="item" />
-                            </div>
-                        </div>
-                        <!-- End first row Page4 -->
-                        <div class="mb-5 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/2">
-                                <label class="block mb-2 text-xs font-light text-gray-600">
-                                    Actividad <span class="text-red-600 font-extrabold">*</span>
-                                </label>
-                                <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
-                                    <Multiselect placeholder="Seleccione Actividad" v-model="employee.activity_id"
-                                        :options="select_options.activities" :searchable="true" />
-                                    <LabelToInput icon="list" />
-                                </div>
-                                <InputError v-for="(item, index) in errors.activity_id" :key="index" class="mt-2"
-                                    :message="item" />
-                            </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/2">
-                                <label class="block mb-2 text-xs font-light text-gray-600">
-                                    Fuente Financiamiento <span class="text-red-600 font-extrabold">*</span>
-                                </label>
-                                <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
-                                    <Multiselect placeholder="Seleccione Fuente Financiamiento"
-                                        v-model="employee.financing_source_id" :options="select_options.financing_sources"
-                                        :searchable="true" @select="getJobPositions($event)" />
-                                    <LabelToInput icon="list" />
-                                </div>
-                                <InputError v-for="(item, index) in errors.financing_source_id" :key="index" class="mt-2"
-                                    :message="item" />
-                            </div>
-                        </div>
-                        <div class="mb-4 md:flex flex-row justify-start">
-                            <div class="text-center">
-                                <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
-                                    Informacion de contratacion
-                                </span>
-                            </div>
-                        </div>
-                        <div class="mb-5 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/2">
-                                <label class="block mb-2 text-xs font-light text-gray-600">
                                     Plaza <span class="text-red-600 font-extrabold">*</span>
                                 </label>
                                 <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
                                     <Multiselect placeholder="Seleccione Plaza" v-model="employee.job_position_id"
-                                        :options="select_options.job_positions" :searchable="true" 
-                                        @select="setSalaryLimits($event)"/>
+                                        :options="select_options.job_positions" :searchable="true"
+                                        @select="setSalaryLimits($event)" />
                                     <LabelToInput icon="list" />
                                 </div>
                                 <InputError v-for="(item, index) in errors.job_position_id" :key="index" class="mt-2"
                                     :message="item" />
                             </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/2">
-                                <TextInput id="salary" v-model="employee.salary" type="text" 
-                                :placeholder="'Salario($'+lower_salary_limit+' - $'+upper_salary_limit+')'">
+                        </div>
+                        <!-- End first row Page4 -->
+                        <!-- Second row Page4 -->
+                        <div class="mb-10 md:flex flex-row justify-items-start">
+                            <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
+                                <TextInput id="salary" v-model="employee.salary" type="text"
+                                    :placeholder="'Salario ($' + lower_salary_limit + ' - $' + upper_salary_limit + ')'">
                                     <LabelToInput icon="money" forLabel="salary" />
                                 </TextInput>
                                 <InputError v-for="(item, index) in errors.salary" :key="index" class="mt-2"
                                     :message="item" />
                             </div>
-                        </div>
-                        <div class="mb-5 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
-                                <label class="block mb-2 text-xs font-light text-gray-600">
-                                    Tipo contratacion <span class="text-red-600 font-extrabold">*</span>
-                                </label>
-                                <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
-                                    <Multiselect placeholder="Seleccione tipo" v-model="employee.contract_type_id"
-                                        :options="select_options.contract_types" :searchable="true" 
-                                        />
-                                    <LabelToInput icon="list" />
-                                </div>
-                                <InputError v-for="(item, index) in errors.contract_type_id" :key="index" class="mt-2"
-                                    :message="item" />
-                            </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
-                                <TextInput id="account" v-model="employee.account" type="text" 
-                                placeholder="Partida">
+                                <TextInput id="account" v-model="employee.account" type="text" placeholder="Partida">
                                     <LabelToInput icon="standard" forLabel="account" />
                                 </TextInput>
                                 <InputError v-for="(item, index) in errors.salary" :key="index" class="mt-2"
                                     :message="item" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
-                                <TextInput id="subaccount" v-model="employee.subaccount" type="text" 
-                                placeholder="Subpartida">
+                                <TextInput id="subaccount" v-model="employee.subaccount" type="text"
+                                    placeholder="Subpartida">
                                     <LabelToInput icon="standard" forLabel="subaccount" />
                                 </TextInput>
                                 <InputError v-for="(item, index) in errors.salary" :key="index" class="mt-2"
                                     :message="item" />
                             </div>
                         </div>
+                        <!-- End second row Page4 -->
                     </div>
 
                     <!-- buttons -->
@@ -611,7 +550,7 @@ import axios from "axios";
                             </button>
                         </div>
                         <div v-if="correct_dui" class="w-1/2">
-                            <button v-if="current_page != 4"
+                            <button v-if="validateButton"
                                 class="ml-1 flex items-center bg-blue-600 hover:bg-blue-700 text-white pl-3 pr-2 py-1.5 text-center mb-2 rounded"
                                 @click="goToNextPage()">
                                 <div class="text-[12px]">SIGUIENTE</div>
@@ -633,10 +572,9 @@ import axios from "axios";
                                     </g>
                                 </svg>
                             </button>
-                            <!-- <GeneralButton v-if="modalData != '' && currentPage === 2 && !itemSelected"
-                                    @click="updateAcqDoc()" color="bg-orange-700 hover:bg-orange-800" text="Actualizar"
-                                    icon="update" class="" /> -->
-                            <GeneralButton v-if="current_page === 4" @click="storeNewEmployee()"
+                            <GeneralButton v-if="modalData != '' && current_page === 3" @click="updateEmployee()"
+                                color="bg-orange-700 hover:bg-orange-800" text="Actualizar" icon="update" class="ml-1" />
+                            <GeneralButton v-if="current_page === 4 && modalData == ''" @click="storeNewEmployee()"
                                 color="bg-green-700 hover:bg-green-800" text="Guardar" icon="add" class="ml-1" />
                         </div>
                     </div>
@@ -661,32 +599,37 @@ export default {
     created() { },
     data: function (data) {
         return {
-            lower_salary_limit:'',
-            upper_salary_limit:'',
+            lower_salary_limit: '',
+            upper_salary_limit: '',
             correct_dui: false,
             found_employee: false,
             found_person: false,
             current_page: 1,
             errors: {
-                person_info: {
+                persona: {
                     residencias: []
                 }
             },
             employee: {
-                id: '',
-                pension_type_id: '',
-                isss: '',
-                nup: '',
-                professional_title_id: '',
-                date_of_hire: '',
-                institutional_email: '',
-                alternative_email: '',
-                bank_id: '',
-                bank_account: '',
+                id_empleado: '',
+                id_tipo_pension: '',
+                isss_empleado: '',
+                nup_empleado: '',
+                id_titulo_profesional: '',
+                fecha_contratacion_empleado: '',
+                email_institucional_empleado: '',
+                email_alternativo_empleado: '',
+                id_banco: '',
+                cuenta_banco_empleado: '',
+                //Fields for 'PlazaAsignada'
                 dependency_id: '',
-                uplt_id: '',
-                activity_id: '',
-                person_info: {
+                work_area_id: '',
+                job_position_id: '',
+                salary: '',
+                account: '',
+                subaccount: '',
+                //Until here
+                persona: {
                     id_persona: '',
                     dui_persona: '',
                     pnombre_persona: '',
@@ -696,13 +639,16 @@ export default {
                     sapellido_persona: '',
                     tapellido_persona: '',
                     id_genero: '',
+                    telefono_persona: '',
                     id_estado_civil: '',
+                    id_municipio: '',
                     nombre_conyuge_persona: '',
                     nombre_madre_persona: '',
                     nombre_padre_persona: '',
                     fecha_nac_persona: '',
                     id_nivel_educativo: '',
                     id_profesion: '',
+                    email_persona: '',
                     residencias: [
                         {
                             id_municipio: '',
@@ -721,11 +667,7 @@ export default {
                 bank: [],
                 professional_title: [],
                 dependencies: [],
-                uplt: [],
-                activities: [],
-                financing_sources: [],
-                job_positions: [],
-                contract_types:[]
+                job_positions: []
             },
             config: {
                 altInput: true,
@@ -762,11 +704,11 @@ export default {
             this.income_concept[field] = this.income_concept[field].toUpperCase()
         },
         typeDUI() {
-            var x = this.employee.person_info.dui_persona.replace(/\D/g, '').match(/(\d{0,8})(\d{0,1})/);
-            this.employee.person_info.dui_persona = !x[2] ? x[1] : '' + x[1] + '-' + x[2] + (x[4] ? '-' + x[4] : '');
+            var x = this.employee.persona.dui_persona.replace(/\D/g, '').match(/(\d{0,8})(\d{0,1})/);
+            this.employee.persona.dui_persona = !x[2] ? x[1] : '' + x[1] + '-' + x[2] + (x[4] ? '-' + x[4] : '');
         },
         searchDui() {
-            if (this.employee.person_info.dui_persona == "") {
+            if (this.employee.persona.dui_persona == "") {
                 toast.warning(
                     "Debe digitar el numero de dui.",
                     {
@@ -778,36 +720,35 @@ export default {
             } else {
                 axios.get('/search-person-by-dui', {
                     params: {
-                        dui: this.employee.person_info.dui_persona
+                        dui: this.employee.persona.dui_persona
                     }
                 })
                     .then((response) => {
-                        this.correct_dui = true
-                        const person_info = response.data.person
-                        //console.log(response.data.person);
-                        if (person_info === "") {
+                        const persona = response.data.person
+                        if (persona === "") {
                             this.found_employee = false
                             this.found_person = false
-                            this.$swal.fire({
-                                title: 'Information',
-                                text: 'Person and employee have not yet been created.',
-                                icon: 'warning',
-                                timer: 5000
-                            })
+                            this.correct_dui = true
                         } else {
                             this.found_person = true
-                            if (person_info.id_empleado) {
+                            if (persona.id_empleado) {
+                                this.correct_dui = false
                                 this.found_employee = true
                                 this.$swal.fire({
-                                    title: 'Information',
-                                    text: 'Person and employee have already been created.',
+                                    title: 'Informacion',
+                                    text: 'La persona con este dui ya esta registrada como empleado.',
                                     icon: 'warning',
                                     timer: 5000
                                 })
+                                //this.$emit('cerrar-modal')
                             } else {
+                                this.correct_dui = true
                                 this.found_employee = false
-                                this.employee.person_info = { ...person_info };
-                                console.log(this.employee.person_info);
+                                this.employee.persona = { ...persona };
+                                if (this.employee.persona.residencias.length == 0) {
+                                    var array = { id_residencia: '', id_municipio: '', direccion_residencia: '' }
+                                    this.employee.persona.residencias.push(array)
+                                }
                             }
                         }
                     })
@@ -852,8 +793,7 @@ export default {
                     this.select_options.professional_title = response.data.professional_title
                     this.select_options.pension_type = response.data.pension_type
                     this.select_options.dependencies = response.data.dependencies
-                    this.select_options.financing_sources = response.data.financing_sources
-                    this.select_options.contract_types = response.data.contract_types
+                    this.select_options.job_positions = response.data.job_positions
                 })
                 .catch((errors) => {
                     let msg = this.manageError(errors);
@@ -866,61 +806,63 @@ export default {
                     this.$emit("cerrar-modal");
                 });
         },
-        getUplt(dependency_id) {
-            //console.log(dependency_id)
-            axios.get("/get-uplt", { params: { dependency_id: dependency_id } })
-                .then((response) => {
-                    this.select_options.uplt = response.data.uplt
+        storeNewEmployee() {
+            this.$swal
+                .fire({
+                    title: '¿Está seguro de guardar el empleado?',
+                    icon: 'question',
+                    iconHtml: '❓',
+                    confirmButtonText: 'Si, Guardar',
+                    confirmButtonColor: '#141368',
+                    cancelButtonText: 'Cancelar',
+                    showCancelButton: true,
+                    showCloseButton: true
                 })
-                .catch((errors) => {
-                    let msg = this.manageError(errors);
-                    this.$swal.fire({
-                        title: "Operación cancelada",
-                        text: msg,
-                        icon: "warning",
-                        timer: 5000,
-                    });
-                    //this.$emit("cerrar-modal");
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        axios
+                            .post("/store-employee", this.employee)
+                            .then((response) => {
+                                toast.success(response.data.mensaje, {
+                                    autoClose: 3000,
+                                    position: "top-right",
+                                    transition: "zoom",
+                                    toastBackgroundColor: "white",
+                                });
+                                this.$emit("get-table");
+                                //this.$emit("cerrar-modal");
+                            })
+                            .catch((errors) => {
+                                if (errors.response.status === 422) {
+                                    toast.warning(
+                                        "Tienes algunos errores por favor verifica tus datos.",
+                                        {
+                                            autoClose: 5000,
+                                            position: "top-right",
+                                            transition: "zoom",
+                                            toastBackgroundColor: "white",
+                                        }
+                                    );
+                                } else {
+                                    let msg = this.manageError(errors);
+                                    this.$swal.fire({
+                                        title: "Operación cancelada",
+                                        text: msg,
+                                        icon: "warning",
+                                        timer: 5000,
+                                    });
+                                    this.$emit("cerrar-modal");
+                                }
+                            });
+                    }
                 });
         },
-        getActivities(field_work_id) {
-            //console.log(dependency_id)
-            axios.get("/get-institutional-activities", { params: { field_work_id: field_work_id } })
-                .then((response) => {
-                    this.select_options.activities = response.data.activities
-                })
-                .catch((errors) => {
-                    let msg = this.manageError(errors);
-                    this.$swal.fire({
-                        title: "Operación cancelada",
-                        text: msg,
-                        icon: "warning",
-                        timer: 5000,
-                    });
-                    //this.$emit("cerrar-modal");
-                });
-        },
-        getJobPositions(financing_source_id) {
-            axios.get("/get-job-positions", { params: { financing_source_id: financing_source_id } })
-                .then((response) => {
-                    this.select_options.job_positions = response.data.job_positions
-                })
-                .catch((errors) => {
-                    let msg = this.manageError(errors);
-                    this.$swal.fire({
-                        title: "Operación cancelada",
-                        text: msg,
-                        icon: "warning",
-                        timer: 5000,
-                    });
-                    //this.$emit("cerrar-modal");
-                });
-        },
-        setSalaryLimits(job_position_id){
-            this.select_options.job_positions.forEach((value,index) => {
-                if(value.value === job_position_id){
+        setSalaryLimits(job_position_id) {
+            this.select_options.job_positions.forEach((value, index) => {
+                if (value.value === job_position_id) {
                     this.lower_salary_limit = value.salario_base_plaza
                     this.upper_salary_limit = value.salario_tope_plaza
+                    this.employee.work_area_id = value.id_lt
                 }
             })
         },
@@ -930,17 +872,55 @@ export default {
             this.select_options.educational_level = []
             this.select_options.municipality = []
             this.select_options.occupation = []
+            this.select_options.pension_type = []
+            this.select_options.bank = []
+            this.select_options.professional_title = []
+            this.select_options.dependencies = []
+            this.select_options.job_positions = []
             this.getSelectsEmployeeModal()
-        }
-
+        },
+        recursivelySetEmptyStrings(obj) {
+            Object.keys(obj).forEach(key => {
+                if (typeof obj[key] === 'object' && obj[key] !== null) {
+                    this.recursivelySetEmptyStrings(obj[key]);
+                } else {
+                    obj[key] = '';
+                }
+            });
+        },
     },
     watch: {
         show_modal_employee: function (value, oldValue) {
             if (value) {
+                this.current_page = 1
                 this.loadOptions()
-                //this.errors = [];
+                if (this.modalData != '') {
+                    this.correct_dui = true
+                    this.employee = JSON.parse(JSON.stringify(this.modalData));
+                } else {
+                    this.correct_dui = false
+                    this.recursivelySetEmptyStrings(this.employee);
+                }
+
             }
         },
     },
+    computed: {
+        validateButton() {
+            if (this.current_page === 3) {
+                if (this.modalData == '') {
+                    return true
+                } else {
+                    return false
+                }
+            } else {
+                if (this.current_page === 4) {
+                    return false
+                } else {
+                    return true
+                }
+            }
+        }
+    }
 };
 </script>

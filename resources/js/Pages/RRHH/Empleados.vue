@@ -67,7 +67,7 @@ import axios from 'axios';
                                 }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">{{ employee.persona.email_persona }}</div>
+                                <div class="font-medium text-slate-800 text-center">{{ employee.email_institucional_empleado }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
@@ -180,8 +180,8 @@ import axios from 'axios';
             </div>
         </div>
         
-        <ModalEmployeesVue :show_modal_employee="show_modal_employee"
-        @cerrar-modal="show_modal_employee = false"/>
+        <ModalEmployeesVue :show_modal_employee="show_modal_employee" :modalData="modalData"
+        @cerrar-modal="show_modal_employee = false" @get-table="getEmployees()"/>
 
     </AppLayoutVue>
 </template>

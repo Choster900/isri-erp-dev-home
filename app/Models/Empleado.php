@@ -25,6 +25,7 @@ class Empleado extends Model
         'fecha_contratacion_empleado',
         'email_institucional_empleado',
         'email_alternativo_empleado',
+        'estado_empleado',
         'fecha_reg_empleado',
         'fecha_mod_empleado',
         'usuario_empleado',
@@ -35,8 +36,9 @@ class Empleado extends Model
     {
         return $this->hasOne('App\Models\Persona','id_persona','id_persona');
     }
-    // public function dependencia()
-    // {
-    //     return $this->belongsTo('App\Models\Dependencia','id_depedencia','id_dependencia');
-    // }
+
+    public function plazas_asignadas()
+    {
+        return $this->belongsTo('App\Models\PlazaAsignada','id_empleado','id_empleado');
+    }
 }

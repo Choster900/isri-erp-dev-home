@@ -14,6 +14,7 @@ class Persona extends Model
 
     protected $fillable = [
         'id_usuario',
+        'id_empleado',
         'id_genero',
         'id_estado_civil',
         'id_nivel_educativo',
@@ -32,6 +33,9 @@ class Persona extends Model
         'nombre_madre_persona',
         'nombre_padre_persona',
         'fecha_nac_persona',
+        'peso_persona',
+        'estatura_persona',
+        'observacion_persona',
         'fecha_reg_persona',
         'fecha_mod_persona',
         'estado_persona',

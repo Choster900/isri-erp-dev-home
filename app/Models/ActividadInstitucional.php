@@ -14,7 +14,7 @@ class ActividadInstitucional extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'id_linea_trabajo',
+        'id_lt',
         'codigo_actividad_institucional',
         'nombre_actividad_institucional',
         'estado_actividad_institucional',
@@ -23,4 +23,14 @@ class ActividadInstitucional extends Model
         'usuario_actividad_institucional',
         'ip_actividad_institucional',
     ];
+
+    public function linea_trabajo()
+    {
+        return $this->belongsTo('App\Models\LineaTrabajo','id_lt','id_lt');
+    }
+
+    public function detalles_plaza()
+    {
+        return $this->hasMany('App\Models\DetallePlaza','id_actividad_institucional','id_actividad_institucional');
+    }
 }

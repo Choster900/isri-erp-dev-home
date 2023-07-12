@@ -4,22 +4,19 @@ namespace App\Http\Controllers\RRHH;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\ActividadInstitucional;
 use App\Models\Banco;
-use App\Models\Departamento;
 use App\Models\Dependencia;
+use App\Models\DetallePlaza;
 use App\Models\Empleado;
 use App\Models\EstadoCivil;
 use App\Models\Genero;
-use App\Models\LineaTrabajo;
-use App\Models\Municipio;
 use App\Models\NivelEducativo;
 use App\Models\Persona;
-use App\Models\Plaza;
+use App\Models\PlazaAsignada;
 use App\Models\Profesion;
-use App\Models\ProyectoFinanciado;
+use App\Models\Residencia;
 use App\Models\TipoPension;
-use App\Models\UpltDependencia;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class EmpleadoController extends Controller
@@ -34,7 +31,15 @@ class EmpleadoController extends Controller
         $search_value = $request->search;
 
         $query = Empleado::select('*')
-            ->with('persona')
+            ->with([
+                'persona.residencias' =>
+                function ($query) {
+                    $query->where('estado_residencia', 1)
+                        //->orderBy('fecha_mod_residencia', 'desc')
+                        ->orderBy('fecha_reg_residencia', 'desc')
+                        ->get();
+                }
+            ])
             ->orderBy($columns[$column], $dir);
 
         if ($search_value) {
@@ -82,7 +87,7 @@ class EmpleadoController extends Controller
             $person = Persona::select('*')
                 ->with(['residencias' => function ($query) {
                     $query->where('estado_residencia', 1)
-                        ->orderBy('fecha_mod_residencia', 'desc')
+                        //->orderBy('fecha_mod_residencia', 'desc')
                         ->orderBy('fecha_reg_residencia', 'desc')
                         ->first();
                 }])
@@ -126,12 +131,12 @@ class EmpleadoController extends Controller
             ->where('id_tipo_dependencia', '=', 1)
             ->orderBy('nombre_dependencia')
             ->get();
-        $financing_sources = ProyectoFinanciado::select('id_proy_financiado as value', 'nombre_proy_financiado as label')
-            ->where('estado_proy_financiado', '=', 1)
-            ->orderBy('nombre_proy_financiado')
-            ->get();
-        $contract_types = DB::table('tipo_contrato')
-            ->select('id_tipo_contrato as value', 'nombre_tipo_contrato as label')
+        $job_positions = DetallePlaza::selectRaw("detalle_plaza.id_det_plaza as value, concat(detalle_plaza.codigo_det_plaza,' - ',plaza.nombre_plaza,' - ',tipo_contrato.codigo_tipo_contrato)  as label, plaza.salario_base_plaza, plaza.salario_tope_plaza, linea_trabajo.id_lt")
+            ->join('plaza', 'detalle_plaza.id_plaza', '=', 'plaza.id_plaza')
+            ->join('tipo_contrato', 'detalle_plaza.id_tipo_contrato', '=', 'tipo_contrato.id_tipo_contrato')
+            ->join('actividad_institucional', 'detalle_plaza.id_actividad_institucional', '=', 'actividad_institucional.id_actividad_institucional')
+            ->join('linea_trabajo', 'actividad_institucional.id_lt', '=', 'linea_trabajo.id_lt')
+            ->whereIn('detalle_plaza.id_estado_plaza', [1, 2])
             ->get();
 
         return [
@@ -144,35 +149,143 @@ class EmpleadoController extends Controller
             'bank'                => $bank,
             'professional_title'  => $professional_title,
             'dependencies'        => $dependencies,
-            'financing_sources'   => $financing_sources,
-            'contract_types'      => $contract_types
+            'job_positions'       => $job_positions
         ];
     }
-    public function getUplt(Request $request)
+
+    public function storeEmployee(Request $request)
     {
-        $uplt = UpltDependencia::selectRaw("uplt_dependencia.id_linea_trabajo as value, concat(unidad_presupuestaria.codigo_unidad_ppto, linea_trabajo.codigo_linea_trabajo) as label")
-            ->join('linea_trabajo', function ($join) {
-                $join->on('uplt_dependencia.id_linea_trabajo', '=', 'linea_trabajo.id_linea_trabajo');
-            })
-            ->join('unidad_presupuestaria', function ($join) {
-                $join->on('linea_trabajo.id_unidad_ppto', '=', 'unidad_presupuestaria.id_unidad_ppto');
-            })
-            ->where('id_dependencia', $request->dependency_id)
-            ->get();
-        return ['uplt' => $uplt];
-    }
-    public function getInstitutionalActivities(Request $request)
-    {
-        $activities = ActividadInstitucional::select('id_actividad_institucional as value', 'nombre_actividad_institucional as label')
-            ->where('id_linea_trabajo', $request->field_work_id)
-            ->get();
-        return ['activities' => $activities];
-    }
-    public function getJobPositions(Request $request)
-    {
-        $job_positions = Plaza::select('id_plaza as value', 'nombre_plaza as label', 'salario_base_plaza', 'salario_tope_plaza')
-            ->where('id_proy_financiado', $request->financing_source_id)
-            ->get();
-        return ['job_positions' => $job_positions];
+        $first_two_characters = substr($request->persona['papellido_persona'], 0, 2);
+        $last_employee_code = Empleado::where('codigo_empleado', 'like', $first_two_characters . '%')
+            ->orderByDesc('codigo_empleado')
+            ->first();
+        $last_correlative = $last_employee_code ? intval(substr($last_employee_code->codigo_empleado, 2)) : 0;
+        $correlative = str_pad($last_correlative + 1, 3, '0', STR_PAD_LEFT);
+        $employee_code = strtoupper($first_two_characters) . $correlative;
+
+        $personId = $request->persona['id_persona'] ?? '';
+        $person = $personId ? Persona::find($personId) : new Persona();
+
+        $residenceId = $request->persona['residencias'][0]['id_residencia'] ?? '';
+        $residence = $residenceId ? Residencia::find($residenceId) : new Residencia();
+
+        // Set common attributes for Persona
+        $personAttributes = [
+            'id_genero' => $request->persona['id_genero'],
+            'id_estado_civil' => $request->persona['id_estado_civil'],
+            'id_nivel_educativo' => $request->persona['id_nivel_educativo'],
+            'id_municipio' => $request->persona['id_municipio'],
+            'id_profesion' => $request->persona['id_profesion'],
+            'pnombre_persona' => $request->persona['pnombre_persona'],
+            'snombre_persona' => $request->persona['snombre_persona'],
+            'tnombre_persona' => $request->persona['tnombre_persona'],
+            'papellido_persona' => $request->persona['papellido_persona'],
+            'sapellido_persona' => $request->persona['sapellido_persona'],
+            'tapellido_persona' => $request->persona['tapellido_persona'],
+            'telefono_persona' => $request->persona['telefono_persona'],
+            'dui_persona' => $request->persona['dui_persona'],
+            'email_persona' => $request->persona['email_persona'],
+            'nombre_conyuge_persona' => $request->persona['nombre_conyuge_persona'],
+            'nombre_madre_persona' => $request->persona['nombre_madre_persona'],
+            'nombre_padre_persona' => $request->persona['nombre_padre_persona'],
+            'fecha_nac_persona' => $request->persona['fecha_nac_persona'],
+            'usuario_persona' => $request->user()->nick_usuario,
+            'ip_persona' => $request->ip(),
+        ];
+
+        // Set attributes based on the condition
+        if ($request->persona['id_persona'] == '') {
+            $person->fill($personAttributes);
+            $person->fecha_reg_persona = Carbon::now();
+            $person->estado_persona = 1;
+            $person->save();
+        } else {
+            $person->update($personAttributes);
+            $person->fecha_mod_persona = Carbon::now();
+            $person->save();
+        }
+
+        // Set common attributes for Residencia
+        $residenceAttributes = [
+            'id_persona' => $person->id_persona,
+            'id_municipio' => $request->persona['residencias'][0]['id_municipio'],
+            'direccion_residencia' => $request->persona['residencias'][0]['direccion_residencia'],
+            'estado_residencia' => 1,
+            'fecha_reg_residencia' => Carbon::now(),
+            'usuario_residencia' => $request->user()->nick_usuario,
+            'ip_residencia' => $request->ip(),
+        ];
+
+        if ($residenceId != '') {
+            $hasChanged = ($residence->id_municipio != $request->persona['residencias'][0]['id_municipio'])
+                || ($residence->direccion_residencia != $request->persona['residencias'][0]['direccion_residencia']);
+
+            if ($hasChanged) {
+                $newResidence = new Residencia($residenceAttributes);
+                $newResidence->save();
+
+                $residence->estado_residencia = 0;
+                $residence->update();
+            }
+        } else {
+            $newResidence = new Residencia($residenceAttributes);
+            $newResidence->save();
+        }
+
+
+        //$residencia = Residencia::where('id_persona',$person->id)
+
+        $new_employee = new Empleado([
+            'id_persona'                    => $request->persona['id_persona'] == '' ? $person->id_persona : $request->persona['id_persona'],
+            'id_tipo_pension'               => $request->id_tipo_pension,
+            'id_banco'                      => $request->id_banco,
+            'id_titulo_profesional'         => $request->id_titulo_profesional,
+            'codigo_empleado'               => $employee_code,
+            'nup_empleado'                  => $request->nup_empleado,
+            'isss_empleado'                 => $request->isss_empleado,
+            'cuenta_banco_empleado'         => $request->cuenta_banco_empleado,
+            'fecha_contratacion_empleado'   => $request->fecha_contratacion_empleado,
+            'email_institucional_empleado'  => $request->email_institucional_empleado,
+            'email_alternativo_empleado'    => $request->email_alternativo_empleado,
+            'estado_empleado'               => 1,
+            'fecha_reg_empleado'            => Carbon::now(),
+            'usuario_empleado'              => $request->user()->nick_usuario,
+            'ip_empleado'                   => $request->ip(),
+        ]);
+        $new_employee->save();
+
+        $person->update([
+            'id_empleado'           => $new_employee->id_empleado,
+            'fecha_mod_persona'     => Carbon::now(),
+            'usuario_persona'       => $request->user()->nick_usuario,
+            'ip_persona'            => $request->ip(),
+        ]);
+
+        $new_assigned_job_position = new PlazaAsignada([
+            'id_empleado'                   => $new_employee->id_empleado,
+            'id_lt'                         => $request->work_area_id,
+            'id_dependencia'                => $request->dependency_id,
+            'id_det_plaza'                  => $request->job_position_id,
+            'salario_plaza_asignada'        => $request->salary,
+            'partida_plaza_asignada'        => $request->account,
+            'subpartida_plaza_asignada'     => $request->subaccount,
+            //This is the same date when the employee was hired, we don't ask for it in the form
+            'fecha_plaza_asignada'          => $request->fecha_contratacion_empleado,
+            'estado_plaza_asignada'         => 1,
+            'fecha_reg_plaza_asignada'      => Carbon::now(),
+            'usuario_plaza_asignada'        => $request->user()->nick_usuario,
+            'ip_plaza_asignada'             => $request->ip(),
+        ]);
+        $new_assigned_job_position->save();
+
+        $job_position_det = DetallePlaza::find($request->job_position_id);
+        $job_position_det->update([
+            'id_estado_plaza'           => 3,
+            'fecha_mod_plaza_asignada'  => Carbon::now(),
+            'usuario_plaza_asignada'    => $request->user()->nick_usuario,
+            'ip_plaza_asignada'         => $request->ip(),
+        ]);
+
+        return ['mensaje' => 'Empleado guardado con éxito'];
     }
 }

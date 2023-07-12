@@ -10,7 +10,7 @@ class UnidadPresupuestaria extends Model
     use HasFactory;
 
     protected $table = 'unidad_presupuestaria';
-    protected $primaryKey = 'id_unidad_ppto';
+    protected $primaryKey = 'id_up';
     public $timestamps = false;
 
     protected $fillable = [
