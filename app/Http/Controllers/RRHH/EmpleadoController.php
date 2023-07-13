@@ -4,6 +4,7 @@ namespace App\Http\Controllers\RRHH;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\RRHH\EmpleadoRequest;
 use App\Models\Banco;
 use App\Models\Dependencia;
 use App\Models\DetallePlaza;
@@ -23,7 +24,7 @@ class EmpleadoController extends Controller
 {
     public function getEmployees(Request $request)
     {
-        $columns = ['id_empleado', 'codigo_empleado', 'nombre_persona', 'dui_persona', 'email_persona', 'estado_empleado'];
+        $columns = ['id_empleado', 'codigo_empleado', 'nombre_persona', 'dui_persona', 'dependencia', 'estado_empleado'];
 
         $length = $request->length;
         $column = $request->column; //Index
@@ -32,23 +33,40 @@ class EmpleadoController extends Controller
 
         $query = Empleado::select('*')
             ->with([
-                'persona.residencias' =>
-                function ($query) {
+                'persona.residencias' => function ($query) {
                     $query->where('estado_residencia', 1)
-                        //->orderBy('fecha_mod_residencia', 'desc')
-                        ->orderBy('fecha_reg_residencia', 'desc')
-                        ->get();
+                        ->orderBy('fecha_reg_residencia', 'desc');
+                },
+                'plazas_asignadas' => function ($query) {
+                    $query->join('dependencia', 'plaza_asignada.id_dependencia', '=', 'dependencia.id_dependencia')
+                        ->orderBy('dependencia.codigo_dependencia');
+                },
+                'plazas_asignadas.dependencia'
+            ]);
+
+        if ($column == 2) {
+            $query->orderByRaw('(SELECT pnombre_persona FROM persona WHERE persona.id_empleado = empleado.id_empleado) ' . $dir);
+        } else {
+            if ($column == 3) {
+                $query->orderByRaw('(SELECT dui_persona FROM persona WHERE persona.id_empleado = empleado.id_empleado) ' . $dir);
+            } else {
+                if ($column == 4) {
+                    $query->orderByRaw('(SELECT MIN(codigo_dependencia) FROM dependencia WHERE dependencia.id_dependencia IN (SELECT id_dependencia FROM plaza_asignada WHERE plaza_asignada.id_empleado = empleado.id_empleado) ) ' . $dir);
+                } else {
+                    $query->orderBy($columns[$column], $dir);
                 }
-            ])
-            ->orderBy($columns[$column], $dir);
+            }
+        }
 
         if ($search_value) {
             $query->where('id_empleado', 'like', '%' . $search_value['id_empleado'] . '%')
                 ->where('codigo_empleado', 'like', '%' . $search_value['codigo_empleado'] . '%')
                 ->where('estado_empleado', 'like', '%' . $search_value['estado_empleado'] . '%')
                 ->whereHas('persona', function ($query) use ($search_value) {
-                    $query->where('dui_persona', 'like', '%' . $search_value["dui_persona"] . '%')
-                        ->where('email_persona', 'like', '%' . $search_value["email_persona"] . '%');
+                    $query->where('dui_persona', 'like', '%' . $search_value["dui_persona"] . '%');
+                })
+                ->whereHas('plazas_asignadas.dependencia', function ($query) use ($search_value) {
+                    $query->where('codigo_dependencia', 'like', '%' . $search_value["dependencia"] . '%');
                 })
                 ->whereHas(
                     'persona',
@@ -153,7 +171,7 @@ class EmpleadoController extends Controller
         ];
     }
 
-    public function storeEmployee(Request $request)
+    public function storeEmployee(EmpleadoRequest $request)
     {
         $first_two_characters = substr($request->persona['papellido_persona'], 0, 2);
         $last_employee_code = Empleado::where('codigo_empleado', 'like', $first_two_characters . '%')
@@ -232,9 +250,6 @@ class EmpleadoController extends Controller
             $newResidence->save();
         }
 
-
-        //$residencia = Residencia::where('id_persona',$person->id)
-
         $new_employee = new Empleado([
             'id_persona'                    => $request->persona['id_persona'] == '' ? $person->id_persona : $request->persona['id_persona'],
             'id_tipo_pension'               => $request->id_tipo_pension,
@@ -287,5 +302,71 @@ class EmpleadoController extends Controller
         ]);
 
         return ['mensaje' => 'Empleado guardado con éxito'];
+    }
+
+    public function updateEmployee(EmpleadoRequest $request)
+    {
+        $person = Persona::find($request->persona['id_persona']);
+        $residence = Residencia::find($request->persona['residencias'][0]['id_residencia']);
+        $employee = Empleado::find($request->id_empleado);
+
+        $person->update([
+            'id_genero'                     => $request->persona['id_genero'],
+            'id_estado_civil'               => $request->persona['id_estado_civil'],
+            'id_nivel_educativo'            => $request->persona['id_nivel_educativo'],
+            'id_municipio'                  => $request->persona['id_municipio'],
+            'id_profesion'                  => $request->persona['id_profesion'],
+            'pnombre_persona'               => $request->persona['pnombre_persona'],
+            'snombre_persona'               => $request->persona['snombre_persona'],
+            'tnombre_persona'               => $request->persona['tnombre_persona'],
+            'papellido_persona'             => $request->persona['papellido_persona'],
+            'sapellido_persona'             => $request->persona['sapellido_persona'],
+            'tapellido_persona'             => $request->persona['tapellido_persona'],
+            'telefono_persona'              => $request->persona['telefono_persona'],
+            'dui_persona'                   => $request->persona['dui_persona'],
+            'email_persona'                 => $request->persona['email_persona'],
+            'nombre_conyuge_persona'        => $request->persona['nombre_conyuge_persona'],
+            'nombre_madre_persona'          => $request->persona['nombre_madre_persona'],
+            'nombre_padre_persona'          => $request->persona['nombre_padre_persona'],
+            'fecha_nac_persona'             => $request->persona['fecha_nac_persona'],
+            'fecha_mod_persona'             => Carbon::now(),
+            'usuario_persona'               => $request->user()->nick_usuario,
+            'ip_persona'                    => $request->ip(),
+        ]);
+
+        $hasChanged = ($residence->id_municipio != $request->persona['residencias'][0]['id_municipio'])
+            || ($residence->direccion_residencia != $request->persona['residencias'][0]['direccion_residencia']);
+
+        if ($hasChanged) {
+            $newResidence = new Residencia([
+                'id_persona' => $person->id_persona,
+                'id_municipio' => $request->persona['residencias'][0]['id_municipio'],
+                'direccion_residencia' => $request->persona['residencias'][0]['direccion_residencia'],
+                'estado_residencia' => 1,
+                'fecha_reg_residencia' => Carbon::now(),
+                'usuario_residencia' => $request->user()->nick_usuario,
+                'ip_residencia' => $request->ip(),
+            ]);
+            $newResidence->save();
+
+            $residence->estado_residencia = 0;
+            $residence->update();
+        }
+
+        $employee->update([
+            'id_tipo_pension'               => $request->id_tipo_pension,
+            'id_banco'                      => $request->id_banco,
+            'id_titulo_profesional'         => $request->id_titulo_profesional,
+            'nup_empleado'                  => $request->nup_empleado,
+            'isss_empleado'                 => $request->isss_empleado,
+            'cuenta_banco_empleado'         => $request->cuenta_banco_empleado,
+            'email_institucional_empleado'  => $request->email_institucional_empleado,
+            'email_alternativo_empleado'    => $request->email_alternativo_empleado,
+            'fecha_mod_empleado'            => Carbon::now(),
+            'usuario_empleado'              => $request->user()->nick_usuario,
+            'ip_empleado'                   => $request->ip(),
+        ]);
+
+        return ['mensaje' => 'Empleado actualizado con éxito'];
     }
 }

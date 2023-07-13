@@ -541,7 +541,6 @@ export default {
                     }
                 );
             } else {
-                console.log(this.acq_doc);
                 this.$swal
                     .fire({
                         title: '¿Está seguro de actualizar el documento de adquisicion?',

@@ -67,7 +67,7 @@ import axios from 'axios';
                                 }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">{{ employee.email_institucional_empleado }}</div>
+                                <div class="font-medium text-slate-800 text-center">{{ showDependencies(employee.plazas_asignadas) }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
@@ -196,10 +196,10 @@ export default {
         let sortOrders = {};
         let columns = [
             { width: "10%", label: "ID", name: "id_empleado", type: "text" },
-            { width: "15%", label: "Codigo", name: "codigo_empleado", type: "text" },
-            { width: "35%", label: "Nombre", name: "nombre_persona", type: "text" },
+            { width: "10%", label: "Codigo", name: "codigo_empleado", type: "text" },
+            { width: "30%", label: "Nombre", name: "nombre_persona", type: "text" },
             { width: "15%", label: "Dui", name: "dui_persona", type: "text" },
-            { width: "10%", label: "Email", name: "email_persona", type: "text" },
+            { width: "20%", label: "Dependencia", name: "dependencia", type: "text" },
             {
                 width: "10%", label: "Estado", name: "estado_empleado", type: "select",
                 options: [
@@ -331,7 +331,7 @@ export default {
                 this.sortOrders[key] = this.sortOrders[key] * -1;
                 this.tableData.column = this.getIndex(this.columns, "name", key);
                 this.tableData.dir = this.sortOrders[key] === 1 ? "asc" : "desc";
-                this.getAcquisitionDoc();
+                this.getEmployees();
             }
         },
         getIndex(array, key, value) {
@@ -357,6 +357,17 @@ export default {
                 this.getEmployees()
             }
         },
+        showDependencies(arrayDependencies){
+            let dependencies = ''
+            arrayDependencies.forEach((value,index) => {
+                if(dependencies==''){
+                    dependencies = dependencies + value.dependencia.codigo_dependencia
+                }else{
+                    dependencies = dependencies + ", " + value.dependencia.codigo_dependencia
+                }
+            })
+            return dependencies
+        }
 
     },
 }

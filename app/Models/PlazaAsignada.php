@@ -28,4 +28,13 @@ class PlazaAsignada extends Model
         'usuario_plaza_asignada',
         'ip_plaza_asignada',
     ];
+
+    public function empleado()
+    {
+        return $this->belongsTo('App\Models\Empleado','id_empleado','id_empleado');
+    }
+    public function dependencia()
+    {
+        return $this->belongsTo('App\Models\Dependencia','id_dependencia','id_dependencia');
+    }
 }

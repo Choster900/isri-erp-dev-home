@@ -39,6 +39,6 @@ class Empleado extends Model
 
     public function plazas_asignadas()
     {
-        return $this->belongsTo('App\Models\PlazaAsignada','id_empleado','id_empleado');
+        return $this->hasMany('App\Models\PlazaAsignada','id_empleado','id_empleado');
     }
 }
