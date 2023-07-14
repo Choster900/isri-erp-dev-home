@@ -24,4 +24,9 @@ class Plaza extends Model
         'usuario_plaza',
         'ip_plaza',
     ];
+
+    public function detalles_plaza()
+    {
+        return $this->hasMany('App\Models\DetallePlaza','id_plaza','id_plaza');
+    }
 }

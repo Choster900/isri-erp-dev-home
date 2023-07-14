@@ -29,6 +29,10 @@ class PlazaAsignada extends Model
         'ip_plaza_asignada',
     ];
 
+    public function detalle_plaza()
+    {
+        return $this->belongsTo('App\Models\DetallePlaza','id_det_plaza','id_det_plaza');
+    }
     public function empleado()
     {
         return $this->belongsTo('App\Models\Empleado','id_empleado','id_empleado');

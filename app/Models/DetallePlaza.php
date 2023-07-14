@@ -27,8 +27,23 @@ class DetallePlaza extends Model
         'ip_det_plaza',
     ];
 
+    public function plaza()
+    {
+        return $this->belongsTo('App\Models\Plaza', 'id_plaza', 'id_plaza');
+    }
+
     public function actividad_institucional()
     {
-        return $this->belongsTo('App\Models\ActividadInstitucional','id_actividad_institucional','id_actividad_institucional');
+        return $this->belongsTo('App\Models\ActividadInstitucional', 'id_actividad_institucional', 'id_actividad_institucional');
+    }
+
+    public function plazas_asignadas()
+    {
+        return $this->hasMany('App\Models\PlazaAsignada', 'id_det_plaza', 'id_det_plaza');
+    }
+
+    public function plaza_asignada_activa()
+    {
+        return $this->hasOne('App\Models\PlazaAsignada', 'id_det_plaza', 'id_det_plaza')->where('estado_plaza_asignada', 1);
     }
 }
