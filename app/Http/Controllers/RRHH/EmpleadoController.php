@@ -147,6 +147,7 @@ class EmpleadoController extends Controller
             ->get();
         $dependencies = Dependencia::selectRaw("id_dependencia as value , concat(codigo_dependencia, ' - ', nombre_dependencia) as label")
             ->where('id_tipo_dependencia', '=', 1)
+            ->where('estado_dependencia', '=', 1)
             ->orderBy('nombre_dependencia')
             ->get();
         $job_positions = DetallePlaza::selectRaw("detalle_plaza.id_det_plaza as value, concat(detalle_plaza.codigo_det_plaza,' - ',plaza.nombre_plaza,' - ',tipo_contrato.codigo_tipo_contrato)  as label, plaza.salario_base_plaza, plaza.salario_tope_plaza, linea_trabajo.id_lt")
