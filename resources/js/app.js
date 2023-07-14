@@ -19,7 +19,9 @@ import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import flatPickr from "vue-flatpickr-component";
 import DropDownOptions from "@/Components-ISRI/DropDownOptions.vue";
 import InputError from "@/Components/InputError.vue";
-
+import { localeData } from 'moment_spanish_locale';
+import moment from 'moment';
+moment.locale('es', localeData)
 import jQuery from "jquery";
 window.jQuery = window.$ = jQuery;
 
@@ -60,6 +62,7 @@ createInertiaApp({
             .use(plugin)
             .use(VueSweetalert2)
             .component("AppLayoutVue", AppLayoutVue)
+            .component("moment", moment)
             .component("InputError", InputError)
             .component("Multiselect", Multiselect)
             .component("DropDownOptions", DropDownOptions)

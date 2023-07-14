@@ -31,6 +31,34 @@ Route::get(
         ]);
     }
 )->name('rrhh.beneficiarios');
+
+
+
+Route::get(
+    '/rrhh/crearBeneficiario',
+    function () {
+        return Inertia::render('RRHH/Beneficiarios', [
+            'menu' => session()->get('menu')
+        ]);
+    }
+)->name('rrhh.crearBeneficiario');
+
+
+/* Route::get(
+    '/rrhh/crearBeneficiario',
+    [BeneficiarioController::class, 'indexBefe']
+)->name('rrhh.crearBeneficiario'); */
+
+/* Route::get(
+    '/rrhh/crearBeneficiario',
+    function () {
+        return Inertia::render('RRHH/Beneficiarios', [
+            'menu' => session()->get('menu')
+        ]);
+    }
+)->name('rrhh.beneficiarios'); */
+
 Route::post('beneficiarios', [BeneficiarioController::class, 'getDataNemefocoarops'])->name('beneficiarios.getEmployees');
-Route::get('search-people-by-name/{name}', [BeneficiarioController::class, 'searchPeopleByName'])->name('empleado.seachPersonByName');
-Route::post('add-familiares', [BeneficiarioController::class, 'addRelatives'])->name('add.familiares');
+Route::post('search-people', [BeneficiarioController::class, 'searchPeopleByNameOrId'])->name('empleado.seachPersonByName');
+Route::post('add-relatives', [BeneficiarioController::class, 'addRelatives'])->name('add.relatives');
+Route::post('update-relatives', [BeneficiarioController::class, 'updateRelatives'])->name('update.relatives');

@@ -35,14 +35,14 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
                         </div>
                     </div>
                     <h2 class="font-semibold text-slate-800 pt-1">Beneficiarios: <span class="text-slate-400 font-medium">{{
-                        tableData.total
+                        beneficiarios.length
                     }}</span></h2>
                 </div>
             </header>
 
             <div class="overflow-x-auto">
-                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy"
-                    :searchButton="true" @datos-enviados="handleData($event)" @execute-search="getBeneficiarios()">
+                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
+                    @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getBeneficiarios()">
                     <tbody class="text-sm divide-y divide-slate-200">
                         <tr v-for="beneficiario in beneficiarios" :key="beneficiario.id_persona">
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
@@ -50,14 +50,16 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ `${beneficiario.pnombre_persona} ${beneficiario.snombre_persona}
-                                                                        ${beneficiario.tapellido_persona}` }}
+                                    {{ `${beneficiario.pnombre_persona ? beneficiario.pnombre_persona : ''}
+                                                                        ${beneficiario.snombre_persona ? beneficiario.snombre_persona : ''}
+                                                                        ${beneficiario.tapellido_persona ? beneficiario.tapellido_persona : ''}` }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ `${beneficiario.sapellido_persona} ${beneficiario.snombre_persona}
-                                                                        ${beneficiario.tapellido_persona}` }}
+                                    {{ `${beneficiario.papellido_persona ? beneficiario.papellido_persona : ''}
+                                                                        ${beneficiario.sapellido_persona ? beneficiario.sapellido_persona : ''}
+                                                                        ${beneficiario.tapellido_persona ? beneficiario.tapellido_persona : ''}` }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
@@ -108,22 +110,6 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
                                     </template>
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="max-h-[165px] overflow-y-auto scrollbar">
-                                    <template v-for="(familiar, i) in beneficiario.familiar" :key="i">
-                                        <div class="mb-2 text-center">
-                                            <p class="text-[10pt]">
-                                                <span class="font-medium"></span>{{
-                                                    familiar.estado_familiar
-                                                }}
-                                            </p>
-                                        </div>
-                                        <template v-if="i < beneficiario.familiar.length - 1">
-                                            <hr class="my-2 border-t border-gray-300">
-                                        </template>
-                                    </template>
-                                </div>
-                            </td>
                             <td class="first:pl-5 last:pr-5">
                                 <div class="space-x-1">
                                     <DropDownOptions>
@@ -161,7 +147,7 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
 
         </div>
 
-        <!--   <div v-if="!empty_object" class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
+        <div v-if="!empty_object" class="px-6 py-4 bg-white shadow-lg rounded-sm border-slate-200 relative">
             <div>
                 <nav class="flex justify-between" role="navigation" aria-label="Navigation">
                     <div class="grow text-center">
@@ -169,9 +155,8 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
                             <li v-for="link in links" :key="link.label">
                                 <span v-if="(link.label == 'Anterior')"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
-
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getEmployees(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                        <a @click="getBeneficiarios(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                   text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
@@ -180,7 +165,7 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
                                 <span v-else-if="(link.label == 'Siguiente')"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getEmployees(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                        <a @click="getBeneficiarios(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                   text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
@@ -188,17 +173,18 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
                                 </span>
                                 <span class="cursor-pointer" v-else
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
-                                        class=" w-5" @click="getEmployees(link.url)">{{ link.label }}</span>
+                                        class=" w-5" @click="getBeneficiarios(link.url)">{{ link.label }}</span>
                                 </span>
                             </li>
                         </ul>
                     </div>
                 </nav>
             </div>
-        </div> -->
+        </div>
 
         <ModalBeneficiarios :showModal="showModalBeneficiario" :data-beneficiarios="dataBeneficiariosToSendModal"
-            @cerrar-modal="showModalBeneficiario = false" />
+            @cerrar-modal="showModalBeneficiario = false"
+            @actualizar-table-data="getBeneficiarios(lastUrl); showModalBeneficiario = false" />
 
     </AppLayoutVue>
 </template>
@@ -210,19 +196,36 @@ export default {
         let sortOrders = {};
         let columns = [
             { width: "10%", label: "ID", name: "id_persona", type: "text" },
-            { width: "15%", label: "Nombres", name: "id_persona", type: "text" },
-            { width: "15%", label: "Apellidos", name: "id_persona", type: "text" },
+            { width: "20%", label: "Nombres", name: "collecNombre", type: "text" },
+            { width: "20%", label: "Apellidos", name: "collecApellido", type: "text" },
             { width: "35%", label: "Nombre del familiar", name: "nombre_familiar", type: "text" },
-            { width: "35%", label: "Parentesco", name: "nombre_familiar", type: "text" },
-            { width: "35%", label: "Porcentaje asignado", name: "nombre_familiar", type: "text" },
             {
-                width: "10%", label: "Estado", name: "estado_familiar", type: "select",
+                width: "10%", label: "Parentesco", name: "id_parentesco", type: "select",
                 options: [
-                    { value: "1", label: "Activo" },
-                    { value: "0", label: "Inactivo" }
+                    { value: '1', label: 'MADRE', unico_parentesco: 1 },
+                    { value: '2', label: 'PADRE', unico_parentesco: 1 },
+                    { value: '3', label: 'ABUELO/A', unico_parentesco: 0 },
+                    { value: '4', label: 'BISABUELO/A', unico_parentesco: 0 },
+                    { value: '5', label: 'HERMANO/A', unico_parentesco: 0 },
+                    { value: '6', label: 'CONYUGE', unico_parentesco: 0 },
+                    { value: '7', label: 'HIJO/A', unico_parentesco: 0 },
+                    { value: '8', label: 'NIETO/A', unico_parentesco: 0 },
+                    { value: '9', label: 'BISNIETO/A', unico_parentesco: 0 },
+                    { value: '10', label: 'TIO/A', unico_parentesco: 0 },
+                    { value: '11', label: 'PRIMO/A', unico_parentesco: 0 },
+                    { value: '12', label: 'SOBRINO/A', unico_parentesco: 0 },
+                    { value: '13', label: 'SUEGRO/A', unico_parentesco: 0 },
+                    { value: '14', label: 'NUERA', unico_parentesco: 0 },
+                    { value: '15', label: 'YERNO', unico_parentesco: 0 },
+                    { value: '16', label: 'CUÑADO/A', unico_parentesco: 0 },
+                    { value: '17', label: 'PADRASTRO', unico_parentesco: 0 },
+                    { value: '18', label: 'MADASTRA', unico_parentesco: 0 },
+                    { value: '19', label: 'HIJASTRO/A', unico_parentesco: 0 },
+                    { value: '20', label: 'AMIGO/A', unico_parentesco: 0 },
                 ]
             },
-            { width: "5%", label: "", name: "Reload" },
+            { width: "35%", label: "Porcentaje asignado", name: "porcentaje_familiar", type: "text" },
+            { width: "1%", label: "", name: "Acciones" },
         ];
         columns.forEach((column) => {
             if (column.name === 'id_persona')
@@ -240,7 +243,7 @@ export default {
             links: [],
             lastUrl: "/beneficiarios",
             columns: columns,
-            sortKey: "id_proveedor",
+            sortKey: "id_persona",
             sortOrders: sortOrders,
             perPage: ["10", "20", "30"],
             tableData: {
@@ -273,19 +276,27 @@ export default {
                     this.pagination.total = data.data.total;
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
-                    this.beneficiarios = data.data.data;
+
+                    // Como eloquent no me filtra los familiares que estan desactivados si no que me trae todos por igual
+                    const filteredData = data.data.data.map((obj) => {
+                        // Tenemos que hacer esto
+                        const filteredFamiliar = obj.familiar.filter(
+                            (familiar) => familiar.estado_familiar === 1
+                        );
+                        return { ...obj, familiar: filteredFamiliar };
+                    });
+
+                    console.log(filteredData);
+
+                    this.beneficiarios = filteredData;
                     this.stateModal = false
                     this.beneficiarios.length > 0 ? this.empty_object = false : this.empty_object = true
 
+
+
                 }
             }).catch((errors) => {
-                /* let msg = this.manageError(errors);
-                this.$swal.fire({
-                    title: "Operación cancelada",
-                    text: msg,
-                    icon: "warning",
-                    timer: 5000,
-                }); */
+
             });
         },
         sortBy(key) {
@@ -300,6 +311,39 @@ export default {
         getIndex(array, key, value) {
             return array.findIndex((i) => i[key] == value);
         },
+
+        validarCamposVacios(objeto) {
+            for (var propiedad in objeto) {
+                if (objeto[propiedad] !== "") {
+                    return false;
+                }
+            }
+            return true;
+        },
+        handleData(myEventData) {
+            if (this.validarCamposVacios(myEventData)) {
+                this.tableData.search = {};
+                this.getBeneficiarios();
+            }
+            else {
+                this.tableData.search = myEventData;
+                //this.getSuppilers();
+            }
+        },
+        getPermits() {
+            var URLactual = window.location.pathname;
+            let data = this.$page.props.menu;
+            let menu = JSON.parse(JSON.stringify(data["urls"]));
+            menu.forEach((value, index) => {
+                value.submenu.forEach((value2, index2) => {
+                    if (value2.url === URLactual) {
+                        var array = { "insertar": value2.insertar, "actualizar": value2.actualizar, "eliminar": value2.eliminar, "ejecutar": value2.ejecutar };
+                        this.permits = array;
+                    }
+                });
+            });
+        },
+
     },
     created() {
         this.getBeneficiarios()
