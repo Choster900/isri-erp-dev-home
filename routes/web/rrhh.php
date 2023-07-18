@@ -57,18 +57,3 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('add-relatives', [BeneficiarioController::class, 'addRelatives'])->name('add.relatives');
     Route::post('update-relatives', [BeneficiarioController::class, 'updateRelatives'])->name('update.relatives');
 });
-
-
-/* Route::get(
-    '/rrhh/crearBeneficiario',
-    [BeneficiarioController::class, 'indexBefe']
-)->name('rrhh.crearBeneficiario'); */
-
-/* Route::get(
-    '/rrhh/crearBeneficiario',
-    function () {
-        return Inertia::render('RRHH/Beneficiarios', [
-            'menu' => session()->get('menu')
-        ]);
-    }
-)->name('rrhh.beneficiarios'); */

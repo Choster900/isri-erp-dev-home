@@ -5,6 +5,7 @@ import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import axios from "axios";
 import moment from 'moment';
+
 </script>
 
 <template>
@@ -217,7 +218,7 @@ import moment from 'moment';
 
                         <button
                             class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600 underline underline-offset-1"
-                            @click.stop="$emit('close-modal')">Cerrar</button>
+                            @click.stop="$emit('cerrar-modal')">Cerrar</button>
 
                         <GeneralButton v-if="dataBeneficiarios == ''" @click="addRelatives()"
                             color="bg-green-700  hover:bg-green-800" text="agregar" icon="add" />
@@ -225,7 +226,7 @@ import moment from 'moment';
                         <GeneralButton v-else @click="updateRelatives()" color="bg-orange-700  hover:bg-orange-800"
                             text="Modificar" icon="add" />
 
-                        <button @click="displayPromise">display promise</button>
+                        <!-- <button @click="displayPromise">display promise</button> -->
 
                     </div>
                 </div>
@@ -233,37 +234,7 @@ import moment from 'moment';
         </Modal>
     </div>
 </template>
-
 <script>
-
-const displayPromise = () => {
-    const resolveAfter3Sec = new Promise(resolve => setTimeout(resolve, 3000));
-    toast.promise(
-        resolveAfter3Sec,
-        {
-            pending: 'Promise is pending',
-            success: 'Promise resolved 👌',
-            error: 'Promise rejected 🤯',
-        },
-        {
-            position: toast.POSITION.BOTTOM_CENTER,
-        },
-    );
-
-    const functionThatReturnPromise = () => new Promise((resolve, reject) => setTimeout(reject, 3000));
-    toast.promise(
-        functionThatReturnPromise,
-        {
-            pending: 'Promise is pending',
-            success: 'Promise resolved 👌',
-            error: 'Promise rejected 🤯',
-        },
-        {
-            position: toast.POSITION.BOTTOM_CENTER,
-        },
-    );
-}
-
 export default {
     props: {
         showModal: {
@@ -324,24 +295,25 @@ export default {
     }),
     methods: {
         async handleSearch(query) {
-            if (query != '') {
-                if (query.by == 'name' && query.query.length >= 5) {
-                    this.isLoadingToSearch = true;
-                    const response = await axios.post('/search-people', query);
-                    const data = await response.data;
-                    this.personaOptions = data;
+            if (query !== '') {
+                try {
+                    if (query.by === 'name' && query.query.length >= 5) {
+                        this.isLoadingToSearch = true;
+                        const response = await axios.post('/search-people', query);
+                        this.personaOptions = response.data;
+                    } else if (query.by === 'id') {
+                        this.loading = true;
+                        const response = await axios.post('/search-people', query);
+                        this.personaOptions = response.data;
+                        this.personaWasSelected(query.query);
+                    }
+                } catch (error) {
+                    console.log('Error en la búsqueda:', error);
+                } finally {
                     this.isLoadingToSearch = false;
-                } else if (query.by == 'id') {
-                    this.loading = true;
-                    const response = await axios.post('/search-people', query);
-                    const data = await response.data;
-                    this.personaOptions = data;
                     this.loading = false;
-                    this.personaWasSelected(query.query)
                 }
             }
-
-
         },
         personaWasSelected(id_persona) {
             let persona = JSON.parse(JSON.stringify(this.personaOptions.find((index) => index.value == id_persona)));
@@ -358,7 +330,7 @@ export default {
             this.dataToShow.name = persona.label
         },
 
-        everyOneHasMoreThan1Percent() {
+        areAllPercentagesAboveOne() {
             // Traemos los registros que no hallan sido eliminados
             const allData = this.dataSent.dataRow.filter((obj) => obj.isDelete === false)
             console.log(allData);
@@ -370,75 +342,11 @@ export default {
             }
             return true; // Ninguno tiene un porcentaje menor a 1, retornar true
         },
-        async addRelatives() {
-            if (this.totalPorcentajeAsignado >= 100) {
-                this.$swal.fire({
-                    title: '¿Esta seguro de guardar los datos?',
-                    icon: 'question',
-                    iconHtml: '❓',
-                    confirmButtonText: 'Si, Guardar',
-                    confirmButtonColor: '#001b47',
-                    cancelButtonText: 'Cancelar',
-                    showCancelButton: true,
-                    showCloseButton: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        console.log(this.everyOneHasMoreThan1Percent());
-                        if (this.everyOneHasMoreThan1Percent()) {
 
-                            axios.post('/add-relatives', this.dataSent).then((response) => {
-                                toast.success("El registro se ha agregado correctamente", {
-                                    autoClose: 5000,
-                                    position: "top-right",
-                                    transition: "zoom",
-                                    toastBackgroundColor: "white",
-                                });
-                                console.log(response);
-                                this.$emit("actualizar-table-data");
-                            }).catch((errors) => {
-                                if (errors.response.status === 422) {
-
-                                    let data = errors.response.data.errors
-                                    var myData = {}
-                                    for (const nombreErrorBack in data) {
-                                        myData[nombreErrorBack] = data[nombreErrorBack][0];
-                                    }
-                                    this.errosModel = myData
-                                    toast.warning("Tienes algunos errores por favor verifica tus datos", {
-                                        autoClose: 5000,
-                                        position: "top-right",
-                                        transition: "zoom",
-                                        toastBackgroundColor: "white",
-                                    });
-
-                                }
-
-                            });
-                        } else {
-                            toast.warning("El porcentaje debe ser distribuido en cada familiar", {
-                                autoClose: 5000,
-                                position: "top-right",
-                                transition: "zoom",
-                                toastBackgroundColor: "white",
-                            });
-                        }
-                    }
-                })
-            } else {
-                toast.warning("Debes hacer asginar el 100% a tus familiares", {
-                    autoClose: 5000,
-                    position: "top-right",
-                    transition: "zoom",
-                    toastBackgroundColor: "white",
-                });
-            }
-        },
-
-
-        updateRelativesRequest() {
+        createRelativesRequest() {
             return new Promise(async (resolve, reject) => {
                 try {
-                    const resp = await axios.post('/update-relatives', this.dataSent);
+                    const resp = await axios.post('/add-relatives', this.dataSent);
                     this.$emit("actualizar-table-data");
                     resolve(resp); // Resolvemos la promesa con la respuesta exitosa
 
@@ -451,6 +359,9 @@ export default {
                         }
                         this.errosModel = myData;
 
+                        setTimeout(() => {
+                            this.errosModel = [];
+                        }, 50000);
                     } else {
                         console.log("Error en la solicitud: ", error);
                     }
@@ -458,104 +369,101 @@ export default {
                 }
             });
         },
+        async addRelatives() {
+            if (this.totalPorcentajeAsignado >= 100) {
+                this.$swal.fire({
+                    title: '<p class="text-[20pt] text-center">¿Esta seguro de guardar los datos?</p>',
+                    icon: 'question',
+                    iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
+                    confirmButtonText: 'Si, Editar',
+                    confirmButtonColor: '#001b47',
+                    cancelButtonText: 'Cancelar',
+                    showCancelButton: true,
+                    showCloseButton: true,
 
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        if (this.areAllPercentagesAboveOne()) {
 
+                            this.executeRequest(
+                                this.createRelativesRequest(),
+                                '¡Los datos se han ingresado correctamente!'
+                            )
+                        } else {
+                            toast.warning("El porcentaje debe ser distribuido en cada familiar", {
+                                autoClose: 5000,
+                                position: "top-right",
+                                transition: "zoom",
+                                toastBackgroundColor: "white",
+                            });
+                        }
+                    }
+                })
+            } else {
+                toast.warning("La asignación de porcentaje a tus familiares debe sumar el 100%", {
+                    autoClose: 5000,
+                    position: "top-right",
+                    transition: "zoom",
+                    toastBackgroundColor: "white",
+                });
+            }
+        },
+        updateRelativesRequest() {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    const resp = await axios.post('/update-relatives', this.dataSent);
+                    this.$emit("actualizar-table-data");
+                    resolve(resp); // Resolvemos la promesa con la respuesta exitosa (OBLIGATORIA)
+                } catch (error) {
+                    if (error.response && error.response.status === 422) {
+                        let data = error.response.data.errors;
+                        var myData = {};
+                        for (const nombreErrorBack in data) {
+                            myData[nombreErrorBack] = data[nombreErrorBack][0];
+                        }
+                        this.errosModel = myData;
+
+                        setTimeout(() => {
+                            this.errosModel = [];
+                        }, 50000);
+                    } else {
+                        console.log("Error en la solicitud: ", error);
+                    }
+                    reject(error); // Rechazamos la promesa en caso de excepción (OBLIGATORIO)
+                }
+            });
+        },
         async updateRelatives() {
             if (this.totalPorcentajeAsignado >= 100) {
                 this.$swal.fire({
-                    title: '¿Esta seguro de editar los datos?',
+                    title: '<p class="text-[20pt] text-center">¿Esta seguro de modificar los datos?</p>',
                     icon: 'question',
-                    iconHtml: '❓',
+                    iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
                     confirmButtonText: 'Si, Editar',
                     confirmButtonColor: '#001b47',
                     cancelButtonText: 'Cancelar',
                     showCancelButton: true,
                     showCloseButton: true
                 }).then(async (result) => {
-                    if (this.everyOneHasMoreThan1Percent()) {
-
+                    if (this.areAllPercentagesAboveOne()) {
                         if (result.isConfirmed) {
-                            const respuesta = this.updateRelativesRequest()
-                            let newDataQuedan = JSON.parse(JSON.stringify(respuesta));
-
-                            console.log(newDataQuedan);
-                            toast.promise(
+                            this.executeRequest(
                                 this.updateRelativesRequest(),
-                                {
-                                    pending: 'Promise is pending',
-                                    success: 'Promise resolved 👌',
-                                    error: 'Promise rejected 🤯',
-                                },
-                                {
-                                    position: "top-right",
-                                },
-                            ).catch((error) => {
-
-                                let errorMessage = '';
-                                switch (error.response.status) {
-                                    case 400:
-                                        errorMessage = 'Error de solicitud';
-                                        break;
-                                    case 401:
-                                        errorMessage = 'No autorizado';
-                                        break;
-                                    case 404:
-                                        errorMessage = 'Recurso no encontrado';
-                                        break;
-                                    default:
-                                        errorMessage = 'Error desconocido';
-                                        break;
-                                }
-
-
-                                console.log('Código de error:', error.response.status);
-                                toast.success(`ERROR ${errorMessage}`, {
-                                    autoClose: 5000,
-                                    position: "top-right",
-                                    transition: "zoom",
-                                    toastBackgroundColor: "white",
-                                });
-                                // Resto de la lógica de manejo de error
-                            });
-                            /* const resp = await axios.post('/update-relatives', this.dataSent)// .then((response) => { 
-                            toast.success("El registro se ha editado correctamente", {
-                                autoClose: 5000,
-                                position: "top-right",
-                                transition: "zoom",
-                                toastBackgroundColor: "white",
-                            });
-                            this.$emit("actualizar-table-data");
-                            console.log(resp.response.status);
-                            // }).catch((errors) => { 
-                            if (resp.response.status === 422) {
-
-                                let data = errors.response.data.errors
-                                var myData = {}
-                                for (const nombreErrorBack in data) {
-                                    myData[nombreErrorBack] = data[nombreErrorBack][0];
-                                }
-                                this.errosModel = myData
-                                toast.warning("Tienes algunos errores por favor verifica tus datos", {
-                                    autoClose: 5000,
-                                    position: "top-right",
-                                    transition: "zoom",
-                                    toastBackgroundColor: "white",
-                                });
-
-                            } */
-                            /* }); */
+                                '¡Los datos se han actualizado correctamente!'
+                            )
                         }
                     } else {
-                        toast.warning("Cada miembro debe tener por lo menos 1% de asignacion", {
+                        toast.warning("Cada miembro debe tener asignado al menos un 1% de porcentaje", {
                             autoClose: 5000,
                             position: "top-right",
                             transition: "zoom",
                             toastBackgroundColor: "white",
                         });
+
                     }
                 })
             } else {
-                toast.warning("Debes hacer asginar el 100% a tus familiares", {
+                toast.warning("La asignación de porcentaje a tus familiares debe sumar el 100%", {
                     autoClose: 5000,
                     position: "top-right",
                     transition: "zoom",

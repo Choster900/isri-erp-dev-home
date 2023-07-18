@@ -23,10 +23,10 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
             </div>
         </div>
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
-            <header class="px-5 py-4">
-                <div class="mb-4 md:flex flex-row justify-items-start">
-                    <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
-                        <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
+            <header class="px-5 py-2">
+                <div class=" md:flex flex-row justify-items-start">
+                    <div class=" md:mr-2 md:mb-0 basis-1/4">
+                        <div class="relative flex h-7 w-full flex-row-reverse div-multiselect">
                             <Multiselect v-model="tableData.length" @select="getBeneficiarios()"
                                 @deselect=" tableData.length = 5; getBeneficiarios()"
                                 @clear="tableData.length = 5; getBeneficiarios()" :options="perPage" :searchable="true"
@@ -34,9 +34,7 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Beneficiarios: <span class="text-slate-400 font-medium">{{
-                        beneficiarios.length
-                    }}</span></h2>
+                    <h2 class="font-semibold text-slate-800 pt-1">Beneficiarios: <span class="text-slate-400 font-medium">{{beneficiarios.length}}</span></h2>
                 </div>
             </header>
 
@@ -46,7 +44,7 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
                     <tbody class="text-sm divide-y divide-slate-200">
                         <tr v-for="beneficiario in beneficiarios" :key="beneficiario.id_persona">
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">{{ beneficiario.id_persona }}</div>
+                                <div class="font-medium text-slate-800 text-center ">{{ beneficiario.id_persona }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
@@ -67,9 +65,7 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
                                     <template v-for="(familiar, i) in beneficiario.familiar" :key="i">
                                         <div class="mb-2 text-center">
                                             <p class="text-[10pt]">
-                                                <span class="font-medium"> </span>{{
-                                                    familiar.nombre_familiar
-                                                }}
+                                                <span class="font-medium"> </span>{{ familiar.nombre_familiar }}
                                             </p>
                                         </div>
                                         <template v-if="i < beneficiario.familiar.length - 1">
@@ -83,9 +79,7 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
                                     <template v-for="(familiar, i) in beneficiario.familiar" :key="i">
                                         <div class="mb-2 text-center">
                                             <p class="text-[10pt]">
-                                                <span class="font-medium"></span>{{
-                                                    familiar.parentesco.nombre_parentesco
-                                                }}
+                                                <span class="font-medium"></span>{{ familiar.parentesco.nombre_parentesco }}
                                             </p>
                                         </div>
                                         <template v-if="i < beneficiario.familiar.length - 1">
@@ -98,10 +92,8 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
                                 <div class="max-h-[165px] overflow-y-auto scrollbar">
                                     <template v-for="(familiar, i) in beneficiario.familiar" :key="i">
                                         <div class="mb-2 text-center">
-                                            <p class="text-[10pt]">
-                                                <span class="font-medium"></span>{{
-                                                    familiar.porcentaje_familiar
-                                                }} %
+                                            <p class="text-[10pt] text-emerald-500">
+                                                <span class="font-medium"></span>{{ familiar.porcentaje_familiar }} %
                                             </p>
                                         </div>
                                         <template v-if="i < beneficiario.familiar.length - 1">
@@ -128,10 +120,7 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
                                             </div>
                                             <div class="font-semibold">VER</div>
                                         </div>
-
                                     </DropDownOptions>
-
-
                                 </div>
                             </td>
                         </tr>
@@ -141,8 +130,7 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
             </div>
             <div v-if="empty_object" class="flex text-center py-2">
                 <p class="text-red-500 font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se
-                    encontraron
-                    registros.</p>
+                    encontraron registros.</p>
             </div>
 
         </div>
@@ -153,21 +141,34 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
                     <div class="grow text-center">
                         <ul class="inline-flex text-sm font-medium -space-x-px">
                             <li v-for="link in links" :key="link.label">
-                                <span v-if="(link.label == 'Anterior')"
+                                <span v-if="link.label === 'Anterior'"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
-                                    <div class="flex-1 text-right ml-2">
-                                        <a @click="getBeneficiarios(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                  text-indigo-500">
-                                            &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
-                                        </a>
-                                    </div>
+                                    <a @click="getBeneficiarios(link.url)"
+                                        class="btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer text-indigo-500">
+                                        <div class="flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M6.75 15.75L3 12m0 0l3.75-3.75M3 12h18" />
+                                            </svg>
+                                            <span class="hidden sm:inline ml-1">Anterior</span>
+                                        </div>
+                                    </a>
                                 </span>
                                 <span v-else-if="(link.label == 'Siguiente')"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getBeneficiarios(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                  text-indigo-500">
-                                            <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
+                                        <a @click="getBeneficiarios(link.url)"
+                                            class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer text-indigo-500">
+
+                                            <div class="flex items-center">
+                                                <span class="hidden sm:inline">Siguiente&nbsp;</span> <svg
+                                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                    stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+                                                </svg>
+                                            </div>
                                         </a>
                                     </div>
                                 </span>

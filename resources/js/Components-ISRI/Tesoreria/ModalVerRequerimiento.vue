@@ -61,7 +61,8 @@ Chart.register(BarController, CategoryScale, LinearScale, BarElement)
                             <tr v-for="quedan in show_request.quedan" :key="quedan.id_quedan" class="hover:bg-[#141414]/10">
                                 <td class="text-center whitespace-normal">{{ quedan.id_quedan }}</td>
                                 <td class="text-center whitespace-normal">{{ quedan.proveedor.razon_social_proveedor }}</td>
-                                <td class="text-center whitespace-normal text-blue-600">${{ quedan.monto_total_quedan }}</td>
+                                <td class="text-center whitespace-normal text-blue-600">${{ quedan.monto_total_quedan }}
+                                </td>
                                 <td class="text-center whitespace-normal ">
                                     <div class="px-1  text-sm flex justify-between">
                                         <span class="text-left">
@@ -89,7 +90,8 @@ Chart.register(BarController, CategoryScale, LinearScale, BarElement)
                                 <td class="text-center whitespace-normal"></td>
                                 <td class="text-center whitespace-normal">Total</td>
                                 <td class="text-center whitespace-normal">{{ total_monto_total_quedan }}</td>
-                                <td class="text-center whitespace-normal">{{ parseFloat(total_iva_quedan) + parseFloat(total_isr_quedan) }}</td>
+                                <td class="text-center whitespace-normal">{{ parseFloat(total_iva_quedan) +
+                                    parseFloat(total_isr_quedan) }}</td>
                                 <!--  <td class="text-center whitespace-normal">{{ total_isr_quedan }}</td> -->
                                 <td class="text-center whitespace-normal">{{ total_liquido_quedan }}</td>
                             </tr>
@@ -106,7 +108,7 @@ Chart.register(BarController, CategoryScale, LinearScale, BarElement)
 <script>
 
 export default {
-    emits: ['cerrar-modal'], 
+    emits: ['cerrar-modal'],
     props: {
         view_req_info: {
             type: Boolean,
