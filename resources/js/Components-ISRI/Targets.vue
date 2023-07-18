@@ -12,7 +12,7 @@ const props = defineProps({
     <DropdownLink :href="route('index.getMenus', modulo.id_rol)" method="get" as="button">
         <div
             class="relative cursor-pointer py-6 px-6 rounded-md w-64 my-4 bg-white shadow-lg hover:scale-110 transform transition-all duration-500 hover:shadow-slate-600">
-            <div class=" flex items-center absolute rounded-full py-2 px-2 shadow-xl bg-[#1c1e4d] left-4 -top-6"
+            <div class=" flex items-center absolute rounded-full p-1 shadow-xl bg-[#1c1e4d] left-4 -top-6"
                 ref="container">
             </div>
             <div class="mt-8">
