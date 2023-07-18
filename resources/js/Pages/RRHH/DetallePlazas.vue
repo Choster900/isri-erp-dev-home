@@ -4,7 +4,7 @@ import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
-import ModalIncomeConceptVue from '@/Components-ISRI/Tesoreria/ModalIncomeConcept.vue';
+import ModalDetPlazasVue from '@/Components-ISRI/RRHH/ModalDetPlazas.vue';
 import moment from 'moment';
 
 import { toast } from 'vue3-toastify';
@@ -19,7 +19,7 @@ import axios from 'axios';
     <AppLayoutVue nameSubModule="RRHH - Plazas">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="addIncomeConcept()" v-if="permits.insertar == 1"
+                <GeneralButton @click="addJobPositionDet()" v-if="permits.insertar == 1"
                     color="bg-green-700  hover:bg-green-800" text="Agregar Plaza" icon="add" />
             </div>
         </div>
@@ -48,13 +48,13 @@ import axios from 'axios';
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">{{ position.id_det_plaza }}</div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5 td-data-table">
-                                <div class="font-medium text-slate-800 ellipsis text-center">
+                            <td class="px-2 first:pl-5 last:pr-5">
+                                <div class="font-medium text-slate-800 flex items-center justify-center min-h-[50px]">
                                     {{ position.codigo_det_plaza }}
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5 td-data-table">
-                                <div class="font-medium text-slate-800 ellipsis text-center">
+                            <td class="px-2 first:pl-5 last:pr-5">
+                                <div class="font-medium text-slate-800 text-center">
                                     {{ position.plaza.nombre_plaza }}
                                 </div>
                             </td>
@@ -70,20 +70,24 @@ import axios from 'axios';
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">
-                                    {{ getDependencieCode(position) }}
+                                <div class="font-medium text-center">
+                                    <span class="text-slate-800">
+                                        {{ getDependencieCode(position) }}
+                                    </span>
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5 td-data-table">
-                                <div class="font-medium text-slate-800 ellipsis text-center">
-                                    {{ getEmployeeName(position) }}
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-center">
+                                    <span class="text-slate-800">
+                                        {{ getEmployeeName(position) }}
+                                    </span>
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="space-x-1 text-center">
                                     <DropDownOptions>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            v-if="permits.actualizar == 1" @click="editIncomeConcept(position)">
+                                            v-if="permits.actualizar == 1" @click="editJobPositionDet(position)">
                                             <div class="w-8 text-green-900">
                                                 <span class="text-xs">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -175,9 +179,8 @@ import axios from 'axios';
             </div>
         </div>
 
-        <ModalIncomeConceptVue :showModalIncome="showModalIncome" :modalData="modalData"
-            :financing_sources="financing_sources" :budget_accounts="budget_accounts" :dependencies="dependencies"
-            @cerrar-modal="showModalIncome = false" @get-table="getJobPositions(tableData.currentPage)" />
+        <ModalDetPlazasVue :showModalJobPositionDet="showModalJobPositionDet" :modalData="modalData"
+            @cerrar-modal="showModalJobPositionDet = false" @get-table="getJobPositions(tableData.currentPage)" />
 
     </AppLayoutVue>
 </template>
@@ -187,7 +190,6 @@ export default {
     created() {
         this.getJobPositions()
         this.getPermits()
-        //this.getSelectsIncomeConcept()
     },
     data() {
         let sortOrders = {};
@@ -195,7 +197,14 @@ export default {
             { width: "8%", label: "ID", name: "id_det_plaza", type: "text" },
             { width: "10%", label: "Codigo", name: "codigo_det_plaza", type: "text" },
             { width: "25%", label: "Nombre", name: "nombre_plaza", type: "text" },
-            { width: "12%", label: "Estado", name: "estado_plaza", type: "text" },
+            {
+                width: "12%", label: "Estado", name: "id_estado_plaza", type: "select",
+                options: [
+                    { value: "1", label: "Vacante" },
+                    { value: "2", label: "Proc. Selec." },
+                    { value: "3", label: "Asignado" },
+                ]
+            },
             { width: "10%", label: "Dependencia", name: "codigo_dependencia", type: "text" },
             { width: "25%", label: "Empleado", name: "nombre_empleado", type: "text" },
             { width: "10%", label: "Acciones", name: "Acciones" },
@@ -211,13 +220,14 @@ export default {
             //Data for datatable
             jobPositions: [],
             //Data for modal
-            showModalJobPosition: false,
+            showModalJobPositionDet: false,
             modalData: [],
-
             permits: [],
+
             budget_accounts: [],
             dependencies: [],
             financing_sources: [],
+
             links: [],
             columns: columns,
             sortKey: "id_det_plaza",
@@ -235,32 +245,13 @@ export default {
         }
     },
     methods: {
-        editIncomeConcept(income_concept) {
-            //var array = {nombre_marca:marca.nombre_marca}
-            this.modalData = income_concept
-            this.showModalIncome = true
+        editJobPositionDet(jobPosition) {
+            this.modalData = jobPosition
+            this.showModalJobPositionDet = true
         },
-        addIncomeConcept() {
+        addJobPositionDet() {
             this.modalData = []
-            this.showModalIncome = true
-        },
-        getSelectsIncomeConcept() {
-            axios.get("/get-selects-income-concept")
-                .then((response) => {
-                    this.budget_accounts = response.data.budget_accounts
-                    this.dependencies = response.data.dependencies
-                    this.financing_sources = response.data.financing_sources
-                })
-                .catch((errors) => {
-                    let msg = this.manageError(errors);
-                    this.$swal.fire({
-                        title: "Operación cancelada",
-                        text: msg,
-                        icon: "warning",
-                        timer: 5000,
-                    });
-                    this.$emit("cerrar-modal");
-                });
+            this.showModalJobPositionDet = true
         },
         changeStateIncomeConcept(id_service, name_service, state_service) {
             let msg
