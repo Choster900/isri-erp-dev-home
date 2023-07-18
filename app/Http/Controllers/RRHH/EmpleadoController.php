@@ -156,6 +156,7 @@ class EmpleadoController extends Controller
             ->join('actividad_institucional', 'detalle_plaza.id_actividad_institucional', '=', 'actividad_institucional.id_actividad_institucional')
             ->join('linea_trabajo', 'actividad_institucional.id_lt', '=', 'linea_trabajo.id_lt')
             ->whereIn('detalle_plaza.id_estado_plaza', [1, 2])
+            ->where('detalle_plaza.estado_det_plaza',1)
             ->get();
 
         return [
