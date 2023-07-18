@@ -10,11 +10,23 @@ const props = defineProps({
         type: String,
         default: '',
     },
+    showPlaceholder: {
+        type: Boolean,
+        default: true,
+    },
     icon: {
         type: String,
         default: 'defaultBruh',
     },
     type: {
+        type: String,
+        default: '',
+    },
+    min: {
+        type: String,
+        default: '',
+    },
+    max: {
         type: String,
         default: '',
     },
@@ -34,7 +46,7 @@ const props = defineProps({
         type: Boolean,
         default: true
     },
-    disabled:{
+    disabled: {
         type: Boolean,
         default: false
     }
@@ -61,7 +73,7 @@ defineExpose({ focus: () => input.value.focus() });
     </label>
     <div class="relative flex h-8 w-full flex-row-reverse overflow-clip "
         style="border: none; background-color: transparent;">
-        <input :id="id" :placeholder="placeholder" :type="type" :readOnly="readOnly" :disabled="disabled"
+        <input :id="id" :min="min" :max="max" :placeholder="showPlaceholder ? placeholder : ''" :type="type" :readOnly="readOnly" :disabled="disabled"
             class="peer w-full text-xs font-medium  rounded-r-md border border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
             :value="modelValue" @input="$emit('update:modelValue', $event.target.value)" ref="input" />
         <slot />

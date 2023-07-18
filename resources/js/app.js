@@ -2,11 +2,12 @@ import "./bootstrap";
 import "../css/app.css";
 import "../css/GlobalApp.css";
 import "./plugins/chart.js"
+import "./plugins/requestHelpers.js"
 import { createApp, h } from "vue";
 import { createInertiaApp } from "@inertiajs/vue3";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { ZiggyVue } from "../../vendor/tightenco/ziggy/dist/vue.m";
-
+import { executeRequest } from "@/plugins/requestHelpers.js";
 import GeneralButton from "@/Components-ISRI/ComponentsToForms/GeneralButton.vue";
 import TextInput from "@/Components-ISRI/ComponentsToForms/TextInput.vue";
 import LabelToInput from "@/Components-ISRI/ComponentsToForms/LabelToInput.vue";
@@ -19,7 +20,9 @@ import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import flatPickr from "vue-flatpickr-component";
 import DropDownOptions from "@/Components-ISRI/DropDownOptions.vue";
 import InputError from "@/Components/InputError.vue";
-
+import { localeData } from 'moment_spanish_locale';
+import moment from 'moment';
+moment.locale('es', localeData)
 import jQuery from "jquery";
 window.jQuery = window.$ = jQuery;
 
@@ -60,6 +63,7 @@ createInertiaApp({
             .use(plugin)
             .use(VueSweetalert2)
             .component("AppLayoutVue", AppLayoutVue)
+            .component("moment", moment)
             .component("InputError", InputError)
             .component("Multiselect", Multiselect)
             .component("DropDownOptions", DropDownOptions)
@@ -71,7 +75,7 @@ createInertiaApp({
             .component("Datepicker", Datepicker)
             .component("RadioButton", RadioButton)
             .component("DatepickerTest", DatepickerTest)
-            .mixin({ methods: { manageError } })
+            .mixin({ methods: { manageError,executeRequest } })
             .use(ZiggyVue, Ziggy)
             .mount(el);
     },

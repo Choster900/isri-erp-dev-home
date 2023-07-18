@@ -379,14 +379,6 @@ export default {
                 });
             });
         },
-        async getAmountBySupplier(dataQuedan) {
-            //metodo que trae todos los proveedores del mes actual, se mandan los parametros al modal
-            await axios.post('/getAmountBySupplierPerMonth').then((response) => {
-                this.totalAmountBySupplier = response.data
-            }).catch((errors) => {
-                console.log(errors);
-            });
-        },
         async getAmountByDetail() {
             //metodo que trae todos los proveedores del mes actual, se mandan los parametros al modal
             await axios.post('/getAmountByDocumentDetail').then((response) => {

@@ -105,7 +105,7 @@ class UserController extends Controller
         }
     }
 
-    //New methods
+    //New method
     public function getSelectsCreateUser()
     {
         $systems = Sistema::select('id_sistema as value', 'nombre_sistema as label')
@@ -114,12 +114,6 @@ class UserController extends Controller
             ->orderBy('nombre_sistema')
             ->get();
         return ['systems' => $systems];
-    }
-
-    public function getRolesUser(Request $request)
-    {
-        $user = User::find($request->id_usuario);
-        return ['roles' => $user->roles->load('sistema')];
     }
     //until here
 
@@ -205,22 +199,7 @@ class UserController extends Controller
         $permiso_user->update();
         return ['mensaje' => 'Desactivado rol ' . $rol->nombre_rol . ' con exito'];
     }
-    public function getRolesPerSystemEdit(Request $request)
-    {
-        $id_usuario = $request->input('id_usuario');
-        $id_rol = $request->input('id_rol_edit');
-        $id_sistema = $request->input('id_sistema_edit');
-        $permiso_user = PermisoUsuario::where('id_usuario', '=', $id_usuario)->where('id_rol', '=', $id_rol)->first();
-        $sistema = Sistema::find($id_sistema);
-        foreach ($sistema->roles as $rol) {
-            if ($rol->estado_rol == 1) {
-                $array_sistemas['value'] = $rol->id_rol;
-                $array_sistemas['label'] = $rol->nombre_rol;
-                $array_sis[] = $array_sistemas;
-            }
-        }
-        return ['roles' => $array_sis, 'permiso_usuario' => $permiso_user->id_permiso_usuario];
-    }
+
     public function updateRol(Request $request)
     {
         $id_permiso_usuario = $request->input('permiso_usuario');
