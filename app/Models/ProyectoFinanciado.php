@@ -43,4 +43,8 @@ class ProyectoFinanciado extends Model
     {
         return $this->hasMany('App\Models\ReciboIngreso', 'id_proy_financiado', 'id_proy_financiado');
     }
+    public function detalles_plaza()
+    {
+        return $this->hasMany('App\Models\DetallePlaza', 'id_proy_financiado', 'id_proy_financiado');
+    }
 }

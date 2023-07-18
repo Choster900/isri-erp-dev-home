@@ -391,43 +391,6 @@ class QuedanController extends Controller
     { //se hacen esta peticion por que al no existir el quedan no existen registos previos de la base de datos y no podemos ver a que provedor pertenece
         return Quedan::where("id_quedan", $request->id_quedan)->update(["fecha_retencion_iva_quedan" => Carbon::now()]);
     }
-    public function getAmountBySupplierPerMonth(Request $request)
-    {
-        // Obtener el mes actual
-        $mesActual = Carbon::now()->format('m');
-        $resultado = [];
-
-        // Obtener proveedores con quedans del mes actual
-        $proveedores = Proveedor::with([
-            'quedan' => function ($query) use ($mesActual) {
-                $query->whereMonth('fecha_emision_quedan', $mesActual);
-            }
-        ])->get()->filter(function ($proveedor) {
-            // Filtrar proveedores con quedans no vacíos
-            return $proveedor->quedan->isNotEmpty();
-        });
-        foreach ( $proveedores as $proveedor ) {
-            // Mapear quedans con detalles para el proveedor actual
-            $quedan_con_detalle = $proveedor->quedan->map(function ($quedan) {
-                return [
-                    'id_quedan'          => $quedan->id_quedan,
-                    'monto_total_quedan' => $quedan->monto_total_quedan,
-                ];
-            });
-            // Calcular el total mensual para el proveedor actual
-            $total_mensual = $proveedor->quedan->sum('monto_total_quedan');
-            // Crear un arreglo con los datos del proveedor actual
-            $proveedor_arr = [
-                'id_proveedor'  => $proveedor->id_proveedor,
-                'razon_social'  => $proveedor->razon_social_proveedor,
-                'quedan'        => $quedan_con_detalle,
-                'total_mensual' => $total_mensual,
-            ];
-            // Agregar el arreglo del proveedor al resultado
-            array_push($resultado, $proveedor_arr);
-        }
-        return $resultado;
-    }
     public function getAmountByDet(Request $request)
     {
         // Obtener el mes actual

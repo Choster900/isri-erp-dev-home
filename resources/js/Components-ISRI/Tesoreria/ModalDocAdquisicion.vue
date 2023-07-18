@@ -15,13 +15,18 @@ import axios from "axios";
                     <!-- Page 1 -->
                     <div id="page1" v-show="currentPage === 1">
                         <div class="mb-2 md:flex flex-row justify-between">
-                            <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
-                                Información general
-                            </span>
-                            <span class="font-semibold text-slate-800 text-[14px]">
-                                Página 1 de 2
-                            </span>
+                            <div class="md:w-1/2">
+                                <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
+                                    Informacion general
+                                </span>
+                            </div>
+                            <div class="md:w-1/2 md:text-right">
+                                <span class="font-semibold text-slate-800 text-[14px]">
+                                    Página 1 de 2
+                                </span>
+                            </div>
                         </div>
+
                         <!-- First row -->
                         <div class="mb-5 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
@@ -36,7 +41,7 @@ import axios from "axios";
                                 <InputError class="mt-2" :message="errors.type_id" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                                <TextInput id="doc-number" v-model="acq_doc.number"  type="text"
+                                <TextInput id="doc-number" v-model="acq_doc.number" type="text"
                                     placeholder="Numero documento" @update:modelValue="validateGeneralInput('number', 20)">
                                     <LabelToInput icon="objects" forLabel="doc-number" />
                                 </TextInput>
@@ -45,8 +50,8 @@ import axios from "axios";
                                 <InputError class="mt-2" :message="errors.number" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                                <TextInput id="mngm-number" v-model="acq_doc.management_number"
-                                     type="text" placeholder="Numero gestion"
+                                <TextInput id="mngm-number" v-model="acq_doc.management_number" type="text"
+                                    placeholder="Numero gestion"
                                     @update:modelValue="validateGeneralInput('management_number', 20)">
                                     <LabelToInput icon="objects" forLabel="mngm-number" />
                                 </TextInput>
@@ -94,8 +99,8 @@ import axios from "axios";
                                 <InputError class="mt-2" :message="errors.award_date" />
                             </div>
                             <div class="mb-4 md:mx-2 md:mb-0 basis-1/2">
-                                <TextInput id="mngm-number" v-model="acq_doc.award_number" 
-                                    type="text" placeholder="Numero adjudicacion" :required="false"
+                                <TextInput id="mngm-number" v-model="acq_doc.award_number" type="text"
+                                    placeholder="Numero adjudicacion" :required="false"
                                     @update:modelValue="validateGeneralInput('award_number', 20)">
                                     <LabelToInput icon="objects" forLabel="mngm-number" />
                                 </TextInput>
@@ -106,14 +111,17 @@ import axios from "axios";
                     <!-- Page 2 -->
                     <div id="page2" v-show="currentPage === 2">
                         <div class="mb-2 md:flex flex-row justify-between">
-                            <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
-                                Detalles
-                            </span>
-                            <span class="font-semibold text-slate-800 text-[14px]">
-                                Página 2 de 2
-                            </span>
+                            <div class="md:w-1/2">
+                                <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
+                                    Detalles
+                                </span>
+                            </div>
+                            <div class="md:w-1/2 md:text-right">
+                                <span class="font-semibold text-slate-800 text-[14px]">
+                                    Página 2 de 2
+                                </span>
+                            </div>
                         </div>
-
                         <!-- Item inputs -->
                         <!-- First row -->
                         <div class="mb-4 md:flex flex-row justify   Detalles-start">
@@ -129,8 +137,8 @@ import axios from "axios";
                                 <InputError class="mt-2" :message="item_errors.financing_source_id" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                                <TextInput id="commt-number" v-model="array_item.commitment_number"
-                                 type="text" placeholder="Numero(s) compromiso(s)"
+                                <TextInput id="commt-number" v-model="array_item.commitment_number" type="text"
+                                    placeholder="Numero(s) compromiso(s)"
                                     @update:modelValue="validateItemInput('commitment_number', 20, false, commitment_number = true)">
                                     <LabelToInput icon="objects" forLabel="commt-number" />
                                 </TextInput>
@@ -140,8 +148,7 @@ import axios from "axios";
                                 <InputError class="mt-2" :message="item_errors.commitment_number" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                                <TextInput id="amount" v-model="array_item.amount" type="text"
-                                    placeholder="Monto detalle"
+                                <TextInput id="amount" v-model="array_item.amount" type="text" placeholder="Monto detalle"
                                     @update:modelValue="validateItemInput('amount', 10, monto = true)">
                                     <LabelToInput icon="money" forLabel="amount" />
                                 </TextInput>
@@ -153,8 +160,8 @@ import axios from "axios";
                         <!-- Second row -->
                         <div class="mb-4 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-full">
-                                <TextInput id="item-name" v-model="array_item.name" type="text"
-                                    placeholder="Nombre" @update:modelValue="validateItemInput('name', 250, monto = false)">
+                                <TextInput id="item-name" v-model="array_item.name" type="text" placeholder="Nombre"
+                                    @update:modelValue="validateItemInput('name', 250, monto = false)">
                                     <LabelToInput icon="standard" forLabel="item-name" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="item_errors.name" />
@@ -534,7 +541,6 @@ export default {
                     }
                 );
             } else {
-                console.log(this.acq_doc);
                 this.$swal
                     .fire({
                         title: '¿Está seguro de actualizar el documento de adquisicion?',

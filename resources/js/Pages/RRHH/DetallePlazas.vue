@@ -1,8 +1,10 @@
 <script setup>
+import Modal from "@/Components/Modal.vue";
 import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
-import ModalEmployeesVue from '@/Components-ISRI/RRHH/ModalEmployees.vue';
+import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
+import ModalIncomeConceptVue from '@/Components-ISRI/Tesoreria/ModalIncomeConcept.vue';
 import moment from 'moment';
 
 import { toast } from 'vue3-toastify';
@@ -13,12 +15,12 @@ import axios from 'axios';
 </script>
 
 <template>
-    <Head title="RRHH - Gestion Empleados" />
-    <AppLayoutVue nameSubModule="RRHH - Empleados">
+    <Head title="Catalogo - Plazas" />
+    <AppLayoutVue nameSubModule="RRHH - Plazas">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="addEmployee()" v-if="permits.insertar == 1" color="bg-green-700  hover:bg-green-800"
-                    text="Agregar Empleado" icon="add" />
+                <GeneralButton @click="addIncomeConcept()" v-if="permits.insertar == 1"
+                    color="bg-green-700  hover:bg-green-800" text="Agregar Plaza" icon="add" />
             </div>
         </div>
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
@@ -26,67 +28,62 @@ import axios from 'axios';
                 <div class="mb-4 md:flex flex-row justify-items-start">
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-                            <Multiselect v-model="tableData.length" @select="getEmployees()"
-                                @deselect=" tableData.length = 5; getEmployees()"
-                                @clear="tableData.length = 5; getEmployees()" :options="perPage" :searchable="true"
-                                placeholder="Cantidad a mostrar" />
+                            <Multiselect v-model="tableData.length" @select="getJobPositions()" :options="perPage"
+                                :searchable="true" placeholder="Cantidad a mostrar" />
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Empleados: <span class="text-slate-400 font-medium">{{
-                        tableData.total
-                    }}</span></h2>
+                    <h2 class="font-semibold text-slate-800 pt-1">Detalle Plazas: <span
+                            class="text-slate-400 font-medium">{{
+                                tableData.total
+                            }}</span></h2>
                 </div>
             </header>
 
             <div class="overflow-x-auto">
-                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy"
-                    :searchButton="true" @datos-enviados="handleData($event)" @execute-search="getEmployees()">
+                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
+                    @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getJobPositions()">
                     <tbody class="text-sm divide-y divide-slate-200">
-                        <tr v-for="employee in employees" :key="employee.id_empleado">
+                        <tr v-for="position in jobPositions" :key="position.id_det_plaza">
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">{{ employee.id_empleado }}</div>
+                                <div class="font-medium text-slate-800 text-center">{{ position.id_det_plaza }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
                                 <div class="font-medium text-slate-800 ellipsis text-center">
-                                    {{ employee.codigo_empleado }}
-                                </div>
-                            </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">
-                                    {{ employee.persona.pnombre_persona }}
-                                    {{ employee.persona.snombre_persona }}
-                                    {{ employee.persona.tnombre_persona }}
-                                    {{ employee.persona.papellido_persona }}
-                                    {{ employee.persona.sapellido_persona }}
-                                    {{ employee.persona.tapellido_persona }}
+                                    {{ position.codigo_det_plaza }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
-                                <div class="font-medium text-slate-800 ellipsis text-center">{{ employee.persona.dui_persona
-                                }}</div>
+                                <div class="font-medium text-slate-800 ellipsis text-center">
+                                    {{ position.plaza.nombre_plaza }}
+                                </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">{{ showDependencies(employee.plazas_asignadas) }}</div>
+                                <div class="font-medium text-center">
+                                    <span v-if="position.id_estado_plaza === 1"
+                                        class="font-medium text-red-500">Vacante</span>
+                                    <span v-else-if="position.id_estado_plaza === 2"
+                                        class="font-medium text-indigo-600">Proc.
+                                        Selec.</span>
+                                    <span v-else-if="position.id_estado_plaza === 3"
+                                        class="font-medium text-green-500">Asignado</span>
+                                </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
-                                    <div v-if="(employee.estado_empleado == 1)"
-                                        class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
-                                        Activo
-                                    </div>
-                                    <div v-else
-                                        class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-rose-100 text-rose-600">
-                                        Inactivo
-                                    </div>
+                                    {{ getDependencieCode(position) }}
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5">
+                            <td class="px-2 first:pl-5 last:pr-5 td-data-table">
+                                <div class="font-medium text-slate-800 ellipsis text-center">
+                                    {{ getEmployeeName(position) }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="space-x-1 text-center">
                                     <DropDownOptions>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            v-if="permits.actualizar == 1 && employee.estado_empleado == 1"
-                                            @click="editEmployee(employee)">
+                                            v-if="permits.actualizar == 1" @click="editIncomeConcept(position)">
                                             <div class="w-8 text-green-900">
                                                 <span class="text-xs">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -99,14 +96,14 @@ import axios from 'axios';
                                             <div class="font-semibold">Editar</div>
                                         </div>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            @click="changeStatusEmployee(employee)" v-if="permits.eliminar == 1">
+                                            @click="changeStateAcqDoc(position)" v-if="permits.eliminar == 1">
                                             <div class="w-8 text-red-900"><span class="text-xs">
-                                                    <svg :fill="employee.estado_empleado == 1 ? '#991B1B' : '#166534'"
+                                                    <svg :fill="position.estado_det_plaza == 1 ? '#991B1B' : '#166534'"
                                                         version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
                                                         width="20px" height="20px"
                                                         xmlns:xlink="http://www.w3.org/1999/xlink"
                                                         viewBox="0 0 97.994 97.994" xml:space="preserve"
-                                                        :stroke="employee.estado_empleado == 1 ? '#991B1B' : '#166534'">
+                                                        :stroke="position.estado_det_plaza == 1 ? '#991B1B' : '#166534'">
                                                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                                                         <g id="SVGRepo_tracerCarrier" stroke-linecap="round"
                                                             stroke-linejoin="round"></g>
@@ -125,7 +122,7 @@ import axios from 'axios';
                                                     </svg>
                                                 </span></div>
                                             <div class="font-semibold">
-                                                {{ employee.estado_empleado ? 'Desactivar' : 'Activar' }}
+                                                {{ position.estado_det_plaza ? 'Desactivar' : 'Activar' }}
                                             </div>
                                         </div>
                                     </DropDownOptions>
@@ -136,15 +133,13 @@ import axios from 'axios';
                 </datatable>
 
             </div>
-            <div v-if="empty_object" class="flex text-center py-2">
-                <p class="text-red-500 font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se
-                    encontraron
-                    registros.</p>
+            <div v-if="emptyObject" class="flex text-center py-2">
+                <p class="font-semibold text-red-500 text-[16px]" style="margin: 0 auto; text-align: center;">No se
+                    encontraron registros.</p>
             </div>
-
         </div>
 
-        <div v-if="!empty_object" class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
+        <div v-if="!emptyObject" class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
             <div>
                 <nav class="flex justify-between" role="navigation" aria-label="Navigation">
                     <div class="grow text-center">
@@ -154,7 +149,7 @@ import axios from 'axios';
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
 
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getEmployees(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                        <a @click="getJobPositions(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                   text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
@@ -163,7 +158,7 @@ import axios from 'axios';
                                 <span v-else-if="(link.label == 'Siguiente')"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getEmployees(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                        <a @click="getJobPositions(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                   text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
@@ -171,7 +166,7 @@ import axios from 'axios';
                                 </span>
                                 <span class="cursor-pointer" v-else
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
-                                        class=" w-5" @click="getEmployees(link.url)">{{ link.label }}</span>
+                                        class=" w-5" @click="getJobPositions(link.url)">{{ link.label }}</span>
                                 </span>
                             </li>
                         </ul>
@@ -179,9 +174,10 @@ import axios from 'axios';
                 </nav>
             </div>
         </div>
-        
-        <ModalEmployeesVue :show_modal_employee="show_modal_employee" :modalData="modalData"
-        @cerrar-modal="show_modal_employee = false" @get-table="getEmployees()"/>
+
+        <ModalIncomeConceptVue :showModalIncome="showModalIncome" :modalData="modalData"
+            :financing_sources="financing_sources" :budget_accounts="budget_accounts" :dependencies="dependencies"
+            @cerrar-modal="showModalIncome = false" @get-table="getJobPositions(tableData.currentPage)" />
 
     </AppLayoutVue>
 </template>
@@ -189,45 +185,42 @@ import axios from 'axios';
 <script>
 export default {
     created() {
-        this.getEmployees()
+        this.getJobPositions()
         this.getPermits()
+        //this.getSelectsIncomeConcept()
     },
     data() {
         let sortOrders = {};
         let columns = [
-            { width: "10%", label: "ID", name: "id_empleado", type: "text" },
-            { width: "10%", label: "Codigo", name: "codigo_empleado", type: "text" },
-            { width: "30%", label: "Nombre", name: "nombre_persona", type: "text" },
-            { width: "15%", label: "Dui", name: "dui_persona", type: "text" },
-            { width: "20%", label: "Dependencia", name: "dependencia", type: "text" },
-            {
-                width: "10%", label: "Estado", name: "estado_empleado", type: "select",
-                options: [
-                    { value: "1", label: "Activo" },
-                    { value: "0", label: "Inactivo" }
-                ]
-            },
-            { width: "5%", label: "Acciones", name: "Acciones" },
+            { width: "8%", label: "ID", name: "id_det_plaza", type: "text" },
+            { width: "10%", label: "Codigo", name: "codigo_det_plaza", type: "text" },
+            { width: "25%", label: "Nombre", name: "nombre_plaza", type: "text" },
+            { width: "12%", label: "Estado", name: "estado_plaza", type: "text" },
+            { width: "10%", label: "Dependencia", name: "codigo_dependencia", type: "text" },
+            { width: "25%", label: "Empleado", name: "nombre_empleado", type: "text" },
+            { width: "10%", label: "Acciones", name: "Acciones" },
         ];
         columns.forEach((column) => {
-            if (column.name === 'id_empleado')
+            if (column.name === 'id_det_plaza')
                 sortOrders[column.name] = 1;
             else
                 sortOrders[column.name] = -1;
         });
         return {
-            empty_object: false,
+            emptyObject: false,
             //Data for datatable
-            employees: [],
+            jobPositions: [],
             //Data for modal
-            show_modal_employee: false,   
+            showModalJobPosition: false,
             modalData: [],
-            
-            //Permissions
+
             permits: [],
+            budget_accounts: [],
+            dependencies: [],
+            financing_sources: [],
             links: [],
             columns: columns,
-            sortKey: "id_empleado",
+            sortKey: "id_det_plaza",
             sortOrders: sortOrders,
             perPage: ["10", "20", "30"],
             tableData: {
@@ -242,19 +235,38 @@ export default {
         }
     },
     methods: {
-        editEmployee(employee) {
-            this.modalData = employee
-            this.show_modal_employee = true
+        editIncomeConcept(income_concept) {
+            //var array = {nombre_marca:marca.nombre_marca}
+            this.modalData = income_concept
+            this.showModalIncome = true
         },
-        addEmployee() {
+        addIncomeConcept() {
             this.modalData = []
-            this.show_modal_employee = true
+            this.showModalIncome = true
         },
-        changeStatusEmployee(employee) {
+        getSelectsIncomeConcept() {
+            axios.get("/get-selects-income-concept")
+                .then((response) => {
+                    this.budget_accounts = response.data.budget_accounts
+                    this.dependencies = response.data.dependencies
+                    this.financing_sources = response.data.financing_sources
+                })
+                .catch((errors) => {
+                    let msg = this.manageError(errors);
+                    this.$swal.fire({
+                        title: "Operación cancelada",
+                        text: msg,
+                        icon: "warning",
+                        timer: 5000,
+                    });
+                    this.$emit("cerrar-modal");
+                });
+        },
+        changeStateIncomeConcept(id_service, name_service, state_service) {
             let msg
-            employee.estado_empleado == 1 ? msg = "Desactivar" : msg = "Activar"
+            state_service == 1 ? msg = "Desactivar" : msg = "Activar"
             this.$swal.fire({
-                title: msg + ' empleado codigo: ' + employee.codigo_empleado + '.',
+                title: msg + ' concepto de ingreso: ' + name_service + '.',
                 text: "¿Estas seguro?",
                 icon: "question",
                 iconHtml: "❓",
@@ -265,43 +277,32 @@ export default {
                 showCloseButton: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    axios.post("/change-state-acq-doc", {
-                        id: employee.id_empleado,
-                        status: employee.estado_empleado
+                    axios.post("/change-state-income-concept", {
+                        id_service: id_service,
+                        state_service: state_service
                     })
                         .then((response) => {
-                            this.$swal.fire({
-                                text: response.data.mensaje,
-                                icon: 'success',
-                                timer: 5000
-                            })
-                            this.getEmployees(this.tableData.currentPage);
+                            toast.success(response.data.mensaje, {
+                                autoClose: 4000,
+                                position: "top-right",
+                                transition: "zoom",
+                                toastBackgroundColor: "white",
+                            });
+                            this.getJobPositions(this.tableData.currentPage);
                         })
                         .catch((errors) => {
-                            if (errors.response.data.logical_error) {
-                                toast.error(
-                                    errors.response.data.logical_error,
-                                    {
-                                        autoClose: 5000,
-                                        position: "top-right",
-                                        transition: "zoom",
-                                        toastBackgroundColor: "white",
-                                    }
-                                );
-                            } else {
-                                let msg = this.manageError(errors)
-                                this.$swal.fire({
-                                    title: 'Operación cancelada',
-                                    text: msg,
-                                    icon: 'warning',
-                                    timer: 5000
-                                })
-                            }
+                            let msg = this.manageError(errors)
+                            this.$swal.fire({
+                                title: 'Operación cancelada',
+                                text: msg,
+                                icon: 'warning',
+                                timer: 5000
+                            })
                         })
                 }
             })
         },
-        async getEmployees(url = "/employees") {
+        async getJobPositions(url = "/det-job-positions") {
             this.tableData.draw++;
             this.tableData.currentPage = url
             await axios.post(url, this.tableData).then((response) => {
@@ -311,8 +312,8 @@ export default {
                     this.tableData.total = data.data.total;
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
-                    this.employees = data.data.data;
-                    this.employees.length > 0 ? this.empty_object = false : this.empty_object = true
+                    this.jobPositions = data.data.data;
+                    this.jobPositions.length > 0 ? this.emptyObject = false : this.emptyObject = true
                 }
             }).catch((errors) => {
                 let msg = this.manageError(errors)
@@ -331,7 +332,7 @@ export default {
                 this.sortOrders[key] = this.sortOrders[key] * -1;
                 this.tableData.column = this.getIndex(this.columns, "name", key);
                 this.tableData.dir = this.sortOrders[key] === 1 ? "asc" : "desc";
-                this.getEmployees();
+                this.getJobPositions();
             }
         },
         getIndex(array, key, value) {
@@ -354,22 +355,47 @@ export default {
             this.tableData.search = myEventData;
             const data = Object.values(myEventData);
             if (data.every(error => error === '')) {
-                this.getEmployees()
+                this.getJobPositions()
             }
         },
-        showDependencies(arrayDependencies){
-            let dependencies = ''
-            arrayDependencies.forEach((value,index) => {
-                if(dependencies==''){
-                    dependencies = dependencies + value.dependencia.codigo_dependencia
-                }else{
-                    dependencies = dependencies + ", " + value.dependencia.codigo_dependencia
-                }
-            })
-            return dependencies
+        getDependencieCode(jobPosition) {
+            if (jobPosition.plaza_asignada_activa) {
+                return jobPosition.plaza_asignada_activa.dependencia.codigo_dependencia
+            } else {
+                return 'N/Asign.'
+            }
+        },
+        getEmployeeName(jobPosition) {
+            const asignadaActiva = jobPosition.plaza_asignada_activa;
+
+            if (asignadaActiva) {
+                const empleado = asignadaActiva.empleado;
+                const persona = empleado.persona;
+
+                const pnombre = persona.pnombre_persona;
+                const snombre = persona.snombre_persona;
+                const tnombre = persona.tnombre_persona;
+                const papellido = persona.papellido_persona;
+                const sapellido = persona.sapellido_persona;
+                const tapellido = persona.tapellido_persona;
+
+                let employeeName = pnombre;
+
+                if (snombre) employeeName += ' ' + snombre;
+                if (tnombre) employeeName += ' ' + tnombre;
+                if (papellido) employeeName += ' ' + papellido;
+                if (sapellido) employeeName += ' ' + sapellido;
+                if (tapellido) employeeName += ' ' + tapellido;
+
+                return employeeName;
+            } else {
+                return 'N/Asign.';
+            }
         }
 
     },
+    computed: {
+    }
 }
 </script>
 
@@ -383,4 +409,5 @@ export default {
 .ellipsis {
     overflow: hidden;
     text-overflow: ellipsis;
-}</style>
+}
+</style>

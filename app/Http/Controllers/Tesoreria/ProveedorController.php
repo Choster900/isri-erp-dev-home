@@ -43,7 +43,7 @@ class ProveedorController extends Controller
                 ->where('nombre_comercial_proveedor', 'like', '%' . $data["nombre_comercial_proveedor"] . '%')
                 ->where('estado_proveedor', 'like', '%' . $data["estado_proveedor"] . '%');
         }
-
+        
         $v_roles = $v_query->paginate($v_length)->onEachSide(1);
         return [
             'data' => $v_roles,
