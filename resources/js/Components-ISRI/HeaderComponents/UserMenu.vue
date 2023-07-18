@@ -5,15 +5,24 @@
 
             <div class="w-9 h-9 rounded-full text-lg flex items-center justify-center bg-[#001c48] text-blue-300">
                 <span class="uppercase text-xl text-white">{{ dynamicUsername }}</span>
+                <!--  <lord-icon
+                    src="https://cdn.lordicon.com/bhfjfgqz.json"
+                    trigger="hover"
+                    colors="primary:white"
+                    style="width:250px;height:250px">
+                </lord-icon> -->
             </div>
 
-            <div class="flex items-center truncate">
+            <div class="flex items-center truncate gap-1">
                 <span class="truncate ml-2 text-sm font-medium group-hover:text-slate-800">
                     {{ $page.props.auth.user.nick_usuario }}
                 </span>
-                <svg class="w-3 h-3 shrink-0 ml-1 fill-current text-slate-400" viewBox="0 0 12 12">
+                 <svg class="w-3 h-3 shrink-0 ml-1 fill-current text-slate-400" viewBox="0 0 12 12">
                     <path d="M5.9 11.4L.5 6l1.4-1.4 4 4 4-4L11.3 6z"></path>
                 </svg>
+                <!-- <lord-icon src="https://cdn.lordicon.com/hwuyodym.json" trigger="hover" colors="primary:#121331"
+                    style="width:24px;height:24px">
+                </lord-icon> -->
             </div>
         </button>
 
@@ -27,6 +36,8 @@
                     <div class="text-xs text-slate-500">{{
                         $page.props.menu ? $page.props.menu.rol : 'Bienvenido al sistema ISRI'
                     }}</div>
+
+
                 </div>
                 <ul ref="dropdown" @focusin="dropdownOpen = true" @focusout="dropdownOpen = false">
                     <li>

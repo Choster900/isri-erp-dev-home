@@ -39,7 +39,7 @@ class BeneficiariosRequest extends FormRequest
                     'required',
                     Rule::unique('familiar', 'id_parentesco')->where(function ($query) use ($familiar) {
                         return $query->where('id_persona', $this->input('id_persona'))
-                            ->whereIn('id_parentesco', [1, 2, 3, 4]);
+                            ->where("estado_familiar", 1)->whereIn('id_parentesco', [1, 2, 6]);
                     })->ignore($familiar["id_familiar"], 'id_familiar'),
                 ];
                 $rules["dataRow.{$key}.porcentaje_familiar"] = ['required', 'min:1'];

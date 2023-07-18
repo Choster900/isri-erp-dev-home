@@ -203,52 +203,40 @@ class BeneficiarioController extends Controller
     }
     function updateRelatives(BeneficiariosRequest $request)
     {
-
-        $relativesData = [];
         try {
             DB::beginTransaction();
 
-            foreach ( $request->dataRow as $key => $value ) {
+            foreach ( $request->dataRow as $value ) {
                 if (!$value["isDelete"]) {
-                    $relatives = array(
+                    $relatives = [
                         'id_parentesco'        => $value["id_parentesco"],
                         'id_persona'           => $request->id_persona,
                         'nombre_familiar'      => $value["nombre_familiar"],
                         'beneficiado_familiar' => 1,
                         'porcentaje_familiar'  => $value["porcentaje_familiar"],
                         'estado_familiar'      => 1,
-                        'fecha_mod_familiar'   => Carbon::now(),
                         'usuario_familiar'     => $request->user()->nick_usuario,
                         'ip_familiar'          => $request->ip(),
-                    );
-                    Familiar::where("id_familiar", $value["id_familiar"])->update($relatives);
-                }
-                if ($value["id_familiar"] == '' && !$value["isDelete"]) {
-                    $relatives = array(
-                        'id_parentesco'        => $value["id_parentesco"],
-                        'id_persona'           => $request->id_persona,
-                        'nombre_familiar'      => $value["nombre_familiar"],
-                        'beneficiado_familiar' => 1,
-                        'porcentaje_familiar'  => $value["porcentaje_familiar"],
-                        'estado_familiar'      => 1,
-                        'fecha_reg_familiar'   => Carbon::now(),
-                        'usuario_familiar'     => $request->user()->nick_usuario,
-                        'ip_familiar'          => $request->ip(),
-                    );
-                    Familiar::create($relatives);
-                }
-                if ($value["isDelete"] && $value["id_familiar"] != '') {
-                    Familiar::where("id_familiar", $value["id_familiar"])->update(array('estado_familiar' => 0));
+                    ];
+
+                    if ($value["id_familiar"] == '') {
+                        $relatives['fecha_reg_familiar'] = Carbon::now();
+                        Familiar::create($relatives);
+                    } else {
+                        $relatives['fecha_mod_familiar'] = Carbon::now();
+                        Familiar::where("id_familiar", $value["id_familiar"])->update($relatives);
+                    }
+                } elseif ($value["id_familiar"] != '') {
+                    Familiar::where("id_familiar", $value["id_familiar"])->update(['estado_familiar' => 0]);
                 }
             }
 
             DB::commit();
             return true;
         } catch (\Throwable $th) {
-            //throw $th;
             DB::rollback();
             return response()->json($th->getMessage(), 500);
         }
-
     }
+
 }

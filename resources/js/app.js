@@ -2,11 +2,12 @@ import "./bootstrap";
 import "../css/app.css";
 import "../css/GlobalApp.css";
 import "./plugins/chart.js"
+import "./plugins/requestHelpers.js"
 import { createApp, h } from "vue";
 import { createInertiaApp } from "@inertiajs/vue3";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { ZiggyVue } from "../../vendor/tightenco/ziggy/dist/vue.m";
-
+import { executeRequest } from "@/plugins/requestHelpers.js";
 import GeneralButton from "@/Components-ISRI/ComponentsToForms/GeneralButton.vue";
 import TextInput from "@/Components-ISRI/ComponentsToForms/TextInput.vue";
 import LabelToInput from "@/Components-ISRI/ComponentsToForms/LabelToInput.vue";
@@ -74,7 +75,7 @@ createInertiaApp({
             .component("Datepicker", Datepicker)
             .component("RadioButton", RadioButton)
             .component("DatepickerTest", DatepickerTest)
-            .mixin({ methods: { manageError } })
+            .mixin({ methods: { manageError,executeRequest } })
             .use(ZiggyVue, Ziggy)
             .mount(el);
     },

@@ -1,17 +1,28 @@
 <template>
     <div class="relative inline-flex">
-        <div class="bg-gray-200 text-sm text-gray-500 leading-none border-2 border-gray-200 rounded-full inline-flex"
+        <div class=" text-sm text-gray-500 leading-none b  inline-flex"
             ref="trigger" @click.prevent="dropdownOpen = !dropdownOpen" :aria-expanded="dropdownOpen" aria-haspopup="true">
             <button
                 class="inline-flex items-center transition-colors duration-300 ease-in focus:outline-none hover:text-indigo-600 focus:text-indigo-600 rounded-full px-2 py-1.5 active"
                 id="grid">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                     class="text-indigo-600 w-4 h-4">
                     <circle cx="12" cy="12" r="1"></circle>
                     <circle cx="12" cy="5" r="1"></circle>
                     <circle cx="12" cy="19" r="1"></circle>
                 </svg>
+                <!-- <lord-icon
+    src="https://cdn.lordicon.com/ynwbvguu.json"
+    trigger="hover"
+    colors="primary:#121331"
+    style="width:20px;height:20px">
+</lord-icon> -->
+                <!-- <svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
+                    <circle cx="16" cy="16" r="2"></circle>
+                    <circle cx="10" cy="16" r="2"></circle>
+                    <circle cx="22" cy="16" r="2"></circle>
+                </svg> -->
             </button>
         </div>
 
