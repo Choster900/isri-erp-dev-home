@@ -18,12 +18,12 @@ class DetallePlazaController extends Controller
     public function getDetJobPositions(Request $request)
     {
         $columns = [
-            'id_det_plaza',
             'codigo_det_plaza',
             'nombre_plaza',
             'id_estado_plaza',
             'codigo_dependencia',
-            'nombre_empleado'
+            'nombre_empleado',
+            'estado_det_plaza'
         ];
 
         $length = $request->length;
@@ -38,27 +38,32 @@ class DetallePlazaController extends Controller
                 'plaza_asignada_activa.dependencia',
                 'actividad_institucional.linea_trabajo'
             ]);
-        if ($column == 2) {
-            $query->orderByRaw('(SELECT nombre_plaza FROM plaza WHERE plaza.id_plaza = detalle_plaza.id_plaza) ' . $dir);
+
+        if ($column == -1) {
+            $query->orderBy('id_det_plaza', 'desc');
         } else {
-            if ($column == 4) {
-                $query->orderByRaw('(SELECT codigo_dependencia FROM dependencia WHERE dependencia.id_dependencia = (SELECT id_dependencia FROM plaza_asignada WHERE plaza_asignada.id_det_plaza = detalle_plaza.id_det_plaza) ) ' . $dir);
+            if ($column == 1) {
+                $query->orderByRaw('(SELECT nombre_plaza FROM plaza WHERE plaza.id_plaza = detalle_plaza.id_plaza) ' . $dir);
             } else {
-                if ($column == 5) {
-                    $query->orderByRaw('
-                    (SELECT pnombre_persona FROM persona WHERE persona.id_persona = 
-                        (SELECT id_persona FROM empleado WHERE empleado.id_empleado = 
-                            (SELECT id_empleado FROM plaza_asignada WHERE plaza_asignada.id_det_plaza = detalle_plaza.id_det_plaza)
-                                ) ) ' . $dir);
+                if ($column == 3) {
+                    $query->orderByRaw('(SELECT codigo_dependencia FROM dependencia WHERE dependencia.id_dependencia = (SELECT id_dependencia FROM plaza_asignada WHERE plaza_asignada.id_det_plaza = detalle_plaza.id_det_plaza) ) ' . $dir);
                 } else {
-                    $query->orderBy($columns[$column], $dir);
+                    if ($column == 4) {
+                        $query->orderByRaw('
+                        (SELECT pnombre_persona FROM persona WHERE persona.id_persona = 
+                            (SELECT id_persona FROM empleado WHERE empleado.id_empleado = 
+                                (SELECT id_empleado FROM plaza_asignada WHERE plaza_asignada.id_det_plaza = detalle_plaza.id_det_plaza)
+                                    ) ) ' . $dir);
+                    } else {
+                        $query->orderBy($columns[$column], $dir);
+                    }
                 }
             }
         }
 
         if ($search_value) {
-            $query->where('id_det_plaza', 'like', '%' . $search_value['id_det_plaza'] . '%')
-                ->where('codigo_det_plaza', 'like', '%' . $search_value['codigo_det_plaza'] . '%')
+            $query->where('codigo_det_plaza', 'like', '%' . $search_value['codigo_det_plaza'] . '%')
+                ->where('estado_det_plaza', 'like', '%' . $search_value['estado_det_plaza'] . '%')
                 ->where('id_estado_plaza', 'like', '%' . $search_value["id_estado_plaza"] . '%')
                 ->where(function ($query) use ($search_value) {
                     $query->whereHas('plaza', function ($query) use ($search_value) {
@@ -159,17 +164,53 @@ class DetallePlazaController extends Controller
     public function updateJobPositionDet(DetallePlazaRequest $request)
     {
         $jobPositionDet = DetallePlaza::findOrFail($request->id_det_plaza);
-        $data = [
-            'id_proy_financiado' => $request->id_proy_financiado,
-            'id_tipo_contrato' => $request->id_tipo_contrato,
-            'id_actividad_institucional' => $request->id_actividad_institucional,
-            'id_plaza' => $request->id_plaza,
-            'fecha_mod_det_plaza' => Carbon::now(),
-            'usuario_det_plaza' => $request->user()->nick_usuario,
-            'ip_det_plaza' => $request->ip(),
-        ];
-        $jobPositionDet->update($data);
+        if ($jobPositionDet->estado_det_plaza == 0) {
+            return response()->json(['logical_error' => 'Error, la plaza seleccionada ha sida desactivada por otro usuario.'], 422);
+        } else {
+            $data = [
+                'id_proy_financiado' => $request->id_proy_financiado,
+                'id_tipo_contrato' => $request->id_tipo_contrato,
+                'id_actividad_institucional' => $request->id_actividad_institucional,
+                'id_plaza' => $request->id_plaza,
+                'fecha_mod_det_plaza' => Carbon::now(),
+                'usuario_det_plaza' => $request->user()->nick_usuario,
+                'ip_det_plaza' => $request->ip(),
+            ];
+            $jobPositionDet->update($data);
 
-        return response()->json(['mensaje' => 'Plaza actualizada con éxito']);
+            return response()->json(['mensaje' => 'Plaza actualizada con éxito']);
+        }
+    }
+
+    public function changeStatusJobPositionDet(Request $request)
+    {
+        $servicio = DetallePlaza::find($request->id);
+        if ($servicio->estado_det_plaza == 1) {
+            if ($request->status == 1) {
+                $servicio->update([
+                    'estado_det_plaza' => 0,
+                    'fecha_mod_det_plaza' => Carbon::now(),
+                    'usuario_det_plaza' => $request->user()->nick_usuario,
+                    'ip_det_plaza' => $request->ip(),
+                ]);
+                return ['mensaje' => 'Plaza codigo ' . $servicio->codigo_det_plaza . ' ha sido desactivada con exito'];
+            } else {
+                return ['mensaje' => 'La plaza seleccionada ya ha sido activada por otro usuario'];
+            }
+        } else {
+            if ($servicio->estado_det_plaza == 0) {
+                if ($request->status == 0) {
+                    $servicio->update([
+                        'estado_det_plaza' => 1,
+                        'fecha_mod_det_plaza' => Carbon::now(),
+                        'usuario_det_plaza' => $request->user()->nick_usuario,
+                        'ip_det_plaza' => $request->ip(),
+                    ]);
+                    return ['mensaje' => 'Plaza codigo ' . $servicio->codigo_det_plaza . ' ha sido activada con exito'];
+                } else {
+                    return ['mensaje' => 'La plaza seleccionada ya ha sido desactivada por otro usuario'];
+                }
+            }
+        }
     }
 }

@@ -132,9 +132,8 @@ import axios from "axios";
                                 Estado plaza <span class="text-red-600 font-extrabold">*</span>
                             </label>
                             <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
-                                <Multiselect v-model="jobPositionDet.id_estado_plaza"
-                                    :options="statusOptions" :searchable="true"
-                                    :placeholder="isLoading ? 'Cargando...' : 'Seleccione estado'"
+                                <Multiselect v-model="jobPositionDet.id_estado_plaza" :options="statusOptions"
+                                    :searchable="true" :placeholder="isLoading ? 'Cargando...' : 'Seleccione estado'"
                                     :disabled="true" />
                                 <LabelToInput icon="list" />
                             </div>
@@ -242,18 +241,31 @@ export default {
             this.$emit("cerrar-modal");
         },
         handleErrorResponse(errors) {
-            console.log(errors);
             if (errors.response.status === 422) {
-                toast.warning(
-                    "Tienes algunos errores por favor verifica tus datos.",
-                    {
-                        autoClose: 5000,
-                        position: "top-right",
-                        transition: "zoom",
-                        toastBackgroundColor: "white",
-                    }
-                );
-                this.errors = errors.response.data.errors;
+                if (errors.response.data.logical_error) {
+                    toast.error(
+                        errors.response.data.logical_error,
+                        {
+                            autoClose: 5000,
+                            position: "top-right",
+                            transition: "zoom",
+                            toastBackgroundColor: "white",
+                        }
+                    );
+                    this.$emit("get-table");
+                    this.$emit("cerrar-modal");
+                } else {
+                    toast.warning(
+                        "Tienes algunos errores por favor verifica tus datos.",
+                        {
+                            autoClose: 5000,
+                            position: "top-right",
+                            transition: "zoom",
+                            toastBackgroundColor: "white",
+                        }
+                    );
+                    this.errors = errors.response.data.errors;
+                }
             } else {
                 let msg = this.manageError(errors);
                 this.$swal.fire({
@@ -306,8 +318,8 @@ export default {
                 this.selectOptions.allActivities = response.data.activities
                 if (this.modalData != '') {
                     this.filterActivities(this.jobPositionDet.actividad_institucional.linea_trabajo.id_lt, false)
-                }else{
-                    this.jobPositionDet.id_estado_plaza=1
+                } else {
+                    this.jobPositionDet.id_estado_plaza = 1
                 }
             } catch (errors) {
                 let msg = this.manageError(errors);

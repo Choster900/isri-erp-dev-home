@@ -45,9 +45,6 @@ import axios from 'axios';
                     @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getJobPositions()">
                     <tbody class="text-sm divide-y divide-slate-200">
                         <tr v-for="position in jobPositions" :key="position.id_det_plaza">
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">{{ position.id_det_plaza }}</div>
-                            </td>
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 flex items-center justify-center min-h-[50px]">
                                     {{ position.codigo_det_plaza }}
@@ -84,10 +81,22 @@ import axios from 'axios';
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800 text-center">
+                                    <div v-if="(position.estado_det_plaza == 1)"
+                                        class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
+                                        Activo
+                                    </div>
+                                    <div v-else
+                                        class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-rose-100 text-rose-600">
+                                        Inactivo
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="space-x-1 text-center">
                                     <DropDownOptions>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            v-if="permits.actualizar == 1" @click="editJobPositionDet(position)">
+                                            v-if="permits.actualizar == 1 && position.estado_det_plaza==1" @click="editJobPositionDet(position)">
                                             <div class="w-8 text-green-900">
                                                 <span class="text-xs">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -100,7 +109,7 @@ import axios from 'axios';
                                             <div class="font-semibold">Editar</div>
                                         </div>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            @click="changeStateAcqDoc(position)" v-if="permits.eliminar == 1">
+                                            @click="changeStatusJobPosition(position)" v-if="permits.eliminar == 1 && position.id_estado_plaza!=3">
                                             <div class="w-8 text-red-900"><span class="text-xs">
                                                     <svg :fill="position.estado_det_plaza == 1 ? '#991B1B' : '#166534'"
                                                         version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
@@ -180,7 +189,7 @@ import axios from 'axios';
         </div>
 
         <ModalDetPlazasVue :showModalJobPositionDet="showModalJobPositionDet" :modalData="modalData"
-            @cerrar-modal="showModalJobPositionDet = false" @get-table="getJobPositions(tableData.currentPage)" />
+            @cerrar-modal="showModalJobPositionDet = false" @get-table="tableData.column = -1; getJobPositions(tableData.currentPage)" />
 
     </AppLayoutVue>
 </template>
@@ -194,11 +203,10 @@ export default {
     data() {
         let sortOrders = {};
         let columns = [
-            { width: "8%", label: "ID", name: "id_det_plaza", type: "text" },
             { width: "10%", label: "Codigo", name: "codigo_det_plaza", type: "text" },
             { width: "25%", label: "Nombre", name: "nombre_plaza", type: "text" },
             {
-                width: "12%", label: "Estado", name: "id_estado_plaza", type: "select",
+                width: "12%", label: "Estado Plaza", name: "id_estado_plaza", type: "select",
                 options: [
                     { value: "1", label: "Vacante" },
                     { value: "2", label: "Proc. Selec." },
@@ -207,10 +215,17 @@ export default {
             },
             { width: "10%", label: "Dependencia", name: "codigo_dependencia", type: "text" },
             { width: "25%", label: "Empleado", name: "nombre_empleado", type: "text" },
+            {
+                width: "8%", label: "Estado", name: "estado_det_plaza", type: "select",
+                options: [
+                    { value: "1", label: "Activo" },
+                    { value: "0", label: "Inactivo" }
+                ]
+            },
             { width: "10%", label: "Acciones", name: "Acciones" },
         ];
         columns.forEach((column) => {
-            if (column.name === 'id_det_plaza')
+            if (column.name === 'codigo_det_plaza')
                 sortOrders[column.name] = 1;
             else
                 sortOrders[column.name] = -1;
@@ -230,7 +245,7 @@ export default {
 
             links: [],
             columns: columns,
-            sortKey: "id_det_plaza",
+            sortKey: "codigo_det_plaza",
             sortOrders: sortOrders,
             perPage: ["10", "20", "30"],
             tableData: {
@@ -238,7 +253,7 @@ export default {
                 draw: 0,
                 length: 5,
                 search: "",
-                column: 0,
+                column: -1,
                 dir: "desc",
                 total: ""
             },
@@ -382,7 +397,58 @@ export default {
             } else {
                 return 'N/Asign.';
             }
-        }
+        },
+        changeStatusJobPosition(position) {
+            let msg
+            position.estado_det_plaza == 1 ? msg = "Desactivar" : msg = "Activar"
+            this.$swal.fire({
+                title: msg + ' plaza codigo: <br>' + position.codigo_det_plaza + '.',
+                text: "¿Estas seguro?",
+                icon: "question",
+                iconHtml: "❓",
+                confirmButtonText: 'Si, ' + msg,
+                confirmButtonColor: "#001b47",
+                cancelButtonText: "Cancelar",
+                showCancelButton: true,
+                showCloseButton: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.post("/change-status-job-position-det", {
+                        id: position.id_det_plaza,
+                        status: position.estado_det_plaza
+                    })
+                        .then((response) => {
+                            this.$swal.fire({
+                                text: response.data.mensaje,
+                                icon: 'success',
+                                timer: 5000
+                            })
+                            this.getJobPositions(this.tableData.currentPage);
+                        })
+                        .catch((errors) => {
+                            if (errors.response.data.logical_error) {
+                                toast.error(
+                                    errors.response.data.logical_error,
+                                    {
+                                        autoClose: 5000,
+                                        position: "top-right",
+                                        transition: "zoom",
+                                        toastBackgroundColor: "white",
+                                    }
+                                );
+                            } else {
+                                let msg = this.manageError(errors)
+                                this.$swal.fire({
+                                    title: 'Operación cancelada',
+                                    text: msg,
+                                    icon: 'warning',
+                                    timer: 5000
+                                })
+                            }
+                        })
+                }
+            })
+        },
 
     },
     computed: {
