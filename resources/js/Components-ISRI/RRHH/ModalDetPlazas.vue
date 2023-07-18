@@ -7,10 +7,6 @@ import axios from "axios";
 </script>
 
 <template>
-    <!-- <div v-if="isLoading"
-        class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
-        <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12"></div>
-    </div> -->
     <div class="m-1.5">
         <div v-if="isLoading"
             class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
@@ -40,12 +36,12 @@ import axios from "axios";
                                 Informacion de la plaza
                             </span>
                         </div>
-                        <div v-if="this.modalData != ''" class="md:w-1/2 md:text-right">
+                        <div v-if="modalData != ''" class="md:w-1/2 md:text-right">
                             <span class="font-semibold text-slate-800 text-lg">
                                 Codigo plaza:
                             </span>
                             <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
-                                {{ this.jobPositionDet.codigo_det_plaza }}
+                                {{ jobPositionDet.codigo_det_plaza }}
                             </span>
                         </div>
                     </div>
@@ -197,7 +193,8 @@ export default {
                 id_plaza: '',
                 id_proy_financiado: '',
                 id_tipo_contrato: '',
-                plaza_asignada_activa: null
+                plaza_asignada_activa: null,
+                codigo_det_plaza:''
             },
         };
     },
@@ -353,6 +350,7 @@ export default {
             this.jobPositionDet.id_tipo_contrato = ''
             this.jobPositionDet.id_actividad_institucional = ''
             this.jobPositionDet.plaza_asignada_activa = null
+            this.jobPositionDet.codigo_det_plaza = ''
         }
     },
     watch: {
