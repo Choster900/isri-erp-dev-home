@@ -259,49 +259,10 @@ export default {
     },
     data: function () {
         return {
+            ciudad: 'S.S '
         }
     },
     methods: {
-        printPdf() {
-            let fecha = moment().format('DD-MM-YYYY');
-            let name = 'RECIBO ' + this.receipt_to_print.numero_recibo_ingreso + ' - ' + fecha;
-            const opt = {
-                margin: 0,
-                filename: name,
-                //pagebreak: {mode:'css',before:'#pagebreak'},
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 3, useCORS: true },
-                //jsPDF: { unit: 'cm', format: [13.95,21.5], orientation: 'landscape' }
-                jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' },
-            };
-
-            const limiteCaracteres = 70;
-            if (this.receipt_to_print.monto_letras.length <= limiteCaracteres) {
-                this.letras1 = this.receipt_to_print.monto_letras;
-                this.letras2 = ''
-            } else {
-                let textoTruncado = this.receipt_to_print.monto_letras.slice(0, limiteCaracteres);
-                let ultimoEspacio = textoTruncado.lastIndexOf(' ');
-                this.letras1 = textoTruncado.slice(0, ultimoEspacio);
-                this.letras2 = this.receipt_to_print.monto_letras.slice(ultimoEspacio + 1);
-            }
-
-            const app = createApp(ReciboIngresoMatricialVue, {
-                receipt_to_print: this.receipt_to_print,
-                formatedAmount: this.receipt_to_print.monto_recibo_ingreso,
-                empleado: this.empleado,
-                nombre_cuenta: this.nombre_cuenta,
-                fecha_recibo: this.fecha_recibo,
-                letras1: this.letras1,
-                letras2: this.letras2
-            });
-            const div = document.createElement('div');
-            const pdfPrint = app.mount(div);
-            const html = div.outerHTML;
-
-            html2pdf().set(opt).from(html).save();
-            //html2pdf().set(opt).from(html).output('dataurlnewwindow');
-        }
     },
     watch: {
     },

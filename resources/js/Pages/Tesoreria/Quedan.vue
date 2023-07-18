@@ -14,7 +14,7 @@ import html2pdf from 'html2pdf.js'
     <AppLayoutVue nameSubModule="Tesoreria - Quedan">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="createQuedan()" color="bg-green-700  hover:bg-green-800" text="Agregar Elemento"
+                <GeneralButton @click="createQuedan()" color="bg-green-700  hover:bg-green-800" text="Agregar quedan"
                     icon="add" />
             </div>
         </div>
@@ -24,7 +24,8 @@ import html2pdf from 'html2pdf.js'
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
                             <Multiselect v-model="tableData.length" placeholder="Cantidad a mostrar"
-                                @select="getDataQuedan()" :options="perPage" :searchable="true" />
+                                @select="getDataQuedan()" @deselect=" tableData.length = 5; getDataQuedan()"
+                                @clear="tableData.length = 5; getDataQuedan()" :options="perPage" :searchable="true" />
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
@@ -36,8 +37,8 @@ import html2pdf from 'html2pdf.js'
 
             </header>
             <div class="overflow-x-auto">
-                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy"
-                    @datos-enviados="handleData($event)">
+                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
+                    @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getDataQuedan()">
                     <tbody class="text-sm divide-y divide-slate-200">
                         <tr v-for="data in dataQuedanForTable" :key="data.id_quedan">
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
@@ -54,8 +55,8 @@ import html2pdf from 'html2pdf.js'
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class=" text-slate-800 text-center text-[9pt]" v-if="data.requerimiento_pago">
-                                    {{ data.requerimiento_pago.numero_requerimiento_pago
-                                    }}-{{ data.requerimiento_pago.anio_requerimiento_pago }}
+                                    {{ data.requerimiento_pago.numero_requerimiento_pago }}-{{
+                                        data.requerimiento_pago.anio_requerimiento_pago }}
                                 </div>
                                 <div class=" text-slate-800 text-center" v-else>
                                     <div
@@ -65,14 +66,16 @@ import html2pdf from 'html2pdf.js'
                                 </div>
                             </td>
                             <td class="px-5">
-                                <div class="max-h-40 overflow-y-auto scrollbar">
+                                <div class="max-h-[165px] overflow-y-auto scrollbar">
                                     <template v-for="(detalle, i) in data.detalle_quedan" :key="i">
                                         <div class="mb-2 text-center">
                                             <p class="text-[10pt]">
-                                                <span class="font-medium">FACTURA</span>
-                                                {{ detalle.numero_factura_det_quedan }}<br> <span class="font-medium">MONTO:
-                                                </span> ${{ (parseFloat(detalle.servicio_factura_det_quedan) || 0)
-                                                    + (parseFloat(detalle.producto_factura_det_quedan) || 0) }}
+                                                <span class="font-medium">FACTURA: </span>{{
+                                                    detalle.numero_factura_det_quedan
+                                                }}<br>
+                                                <span class="font-medium">MONTO: </span> ${{
+                                                    (parseFloat(detalle.servicio_factura_det_quedan) || 0) +
+                                                    (parseFloat(detalle.producto_factura_det_quedan) || 0) }}
                                             </p>
                                         </div>
                                         <template v-if="i < data.detalle_quedan.length - 1">
@@ -122,12 +125,12 @@ import html2pdf from 'html2pdf.js'
                                             </div>
                                             <div class="font-semibold">VER</div>
                                         </div>
-                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer" 
-                                            @click.stop="printPdf(data)">
+                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                            title="Genera este quedan en un documento de pdf" @click.stop="printPdf(data)">
                                             <div class="w-8 text-blue-900">
                                                 <span class="text-xs">
-                                                    <svg fill="#bc0101" width="23px" height="23px" viewBox="0 0 1920 1920"  class="pr-1"
-                                                        xmlns="http://www.w3.org/2000/svg" stroke="#bc0101">
+                                                    <svg fill="#bc0101" width="23px" height="23px" viewBox="0 0 1920 1920"
+                                                        class="pr-1" xmlns="http://www.w3.org/2000/svg" stroke="#bc0101">
                                                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                                                         <g id="SVGRepo_tracerCarrier" stroke-linecap="round"
                                                             stroke-linejoin="round"></g>
@@ -144,14 +147,16 @@ import html2pdf from 'html2pdf.js'
                                                     </svg>
                                                 </span>
                                             </div>
-                                            <div class="font-semibold">GENERAR QUEDAN</div>
+                                            <div class="font-semibold">QUEDAN</div>
                                         </div>
-                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer" v-if="data.monto_total_quedan > 113"
+                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                            title="Genera un comprobante de retencion para este quedan"
+                                            v-if="data.monto_isr_quedan > 0"
                                             @click.stop="generarComprobanteRetencionPdf(data)">
                                             <div class="w-8 text-blue-900">
                                                 <span class="text-xs">
-                                                    <svg fill="#bc0101" width="23px" height="23px" viewBox="0 0 1920 1920" class="pr-1"
-                                                        xmlns="http://www.w3.org/2000/svg" stroke="#bc0101">
+                                                    <svg fill="#bc0101" width="23px" height="23px" viewBox="0 0 1920 1920"
+                                                        class="pr-1" xmlns="http://www.w3.org/2000/svg" stroke="#bc0101">
                                                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                                                         <g id="SVGRepo_tracerCarrier" stroke-linecap="round"
                                                             stroke-linejoin="round"></g>
@@ -168,7 +173,7 @@ import html2pdf from 'html2pdf.js'
                                                     </svg>
                                                 </span>
                                             </div>
-                                            <div class="font-semibold">GENERAR COMPROBANTE DE RETENCION</div>
+                                            <div class="font-semibold">RETENCION</div>
                                         </div>
                                     </DropDownOptions>
 
@@ -179,8 +184,13 @@ import html2pdf from 'html2pdf.js'
                     </tbody>
                 </datatable>
             </div>
+            <div v-if="empty_object" class="flex text-center py-2">
+                <p class="text-red-500 font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se
+                    encontraron
+                    registros.</p>
+            </div>
         </div>
-        <div class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
+        <div v-if="!empty_object" class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
             <div>
                 <nav class="flex justify-between" role="navigation" aria-label="Navigation">
 
@@ -221,14 +231,16 @@ import html2pdf from 'html2pdf.js'
 
         <ModalQuedan :showModal="showModal" @cerrar-modal="showModal = false" :data-quedan="dataQuedan"
             :dataForSelectInRow="dataForSelectInRow" @actualizar-table-data="getDataQuedan()"
-            :totalAmountBySupplier="totalAmountBySupplier" />
+            :totalAmountBySupplier="totalAmountBySupplier"
+            :amountByAcquisitionDocumentsDetails="amountByAcquisitionDocumentsDetails" />
 
 
     </AppLayoutVue>
 </template>
 <script>
 import quedanPDFVue from '@/pdf/Tesoreria/quedanPDF.vue';
-import comprobanteRetencion from '@/pdf/Tesoreria/ComprobanteRetencionBlanco.vue';
+import comprobanteRetencion from '@/pdf/Tesoreria/Retencion.vue';
+//import comprobanteRetencion from '@/pdf/Tesoreria/ComprobatenRetencionPdf.vue';
 import { createApp, h } from 'vue'
 
 export default {
@@ -236,11 +248,11 @@ export default {
     data: function (data) {
         let sortOrders = {};
         let columns = [
-            { width: "15%", label: "Id", name: "id_quedan", type: "text" },
+            { width: "10%", label: "Id", name: "id_quedan", type: "text" },
             { width: "10%", label: "Fecha", name: "fecha_emision_quedan", type: "date" },
             { width: "20%", label: "Proveedor", name: "razon_social_proveedor", type: "text" },
             { width: "5%", label: "Numero requerimiento", name: "numero_requerimiento_pago", type: "text" },
-            { width: "40%", label: "Detalle quedan", name: "buscar_por_detalle_quedan", type: "text" },
+            { width: "20%", label: "Detalle quedan", name: "buscar_por_detalle_quedan", type: "text" },
             { width: "10%", label: "Monto", name: "monto_liquido_quedan", type: "text" },
             {
                 width: "10%", label: "Estado", name: "id_estado_quedan", type: "select",
@@ -261,6 +273,7 @@ export default {
                 sortOrders[column.name] = -1;
         });
         return {
+            empty_object: false,
             dropdownOpen: '',
             trigger: '',
             dropdown: '',
@@ -268,6 +281,7 @@ export default {
             showModal: false,
             dataQuedan: [],//Datos del quedan hasta los detalles de este
             totalAmountBySupplier: [],//Datos de proveedores
+            amountByAcquisitionDocumentsDetails: [],//Datos de proveedores
             permits: [],
             dataForSelectInRow: [],
             scrollbarModalOpen: false,
@@ -322,6 +336,8 @@ export default {
 
                     // Obtener el monto por proveedor
                     this.getAmountBySupplier();
+                    this.getAmountByDetail()
+                    this.dataQuedanForTable.length > 0 ? this.empty_object = false : this.empty_object = true
                 }
             } catch (error) {
                 let msg = this.manageError(error);
@@ -363,10 +379,11 @@ export default {
                 });
             });
         },
-        async getAmountBySupplier(dataQuedan) {
+        async getAmountByDetail() {
             //metodo que trae todos los proveedores del mes actual, se mandan los parametros al modal
-            await axios.post('/getAmountBySupplierPerMonth').then((response) => {
-                this.totalAmountBySupplier = response.data
+            await axios.post('/getAmountByDocumentDetail').then((response) => {
+                // console.log(response.data);
+                this.amountByAcquisitionDocumentsDetails = response.data
             }).catch((errors) => {
                 console.log(errors);
             });
@@ -391,7 +408,7 @@ export default {
                 this.getDataQuedan()
             } else {
                 this.tableData.search = myEventData;
-                this.getDataQuedan()
+                //this.getDataQuedan()
             }
         },
         formatDate(dateString) {
@@ -486,7 +503,7 @@ export default {
         },
 
     },
-    created() {
+    mounted() {
         this.getDataQuedan()
         this.getListForSelect()
     },
@@ -516,4 +533,5 @@ export default {
 
 .scrollbar::-webkit-scrollbar-thumb:hover {
     background-color: #555;
-}</style>
+}
+</style>

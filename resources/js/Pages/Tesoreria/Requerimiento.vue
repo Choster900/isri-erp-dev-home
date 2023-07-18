@@ -1,16 +1,19 @@
 <script setup>
 import Datatable from "@/Components-ISRI/Datatable.vue";
+import { Head } from "@inertiajs/vue3";
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import ModalRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalRequerimiento.vue';
 import ModalVerRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalVerRequerimiento.vue';
+import axios from 'axios';
+import moment from 'moment';
 </script>
 <template>
     <Head title="Catalogo - Requerimiento" />
     <AppLayoutVue nameSubModule="Tesoreria - Requerimientos">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton color="bg-green-700  hover:bg-green-800" text="Agregar Elemento" icon="add"
+                <GeneralButton color="bg-green-700  hover:bg-green-800" text="Agregar Requerimiento" icon="add"
                     @click="openModal()" />
             </div>
         </div>
@@ -24,15 +27,15 @@ import ModalVerRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalVerRequer
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Total Requerimientos
+                    <h2 class="font-semibold text-slate-800 pt-1">Requerimientos: 
                         <span class="text-slate-400 font-medium">{{ pagination.total }}</span>
                     </h2>
                 </div>
 
             </header>
             <div class="overflow-x-auto">
-                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy"
-                    @datos-enviados="handleData($event)">
+                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
+                    @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getDataRequerimiento()">
                     <tbody class="text-sm divide-y divide-slate-200">
                         <tr v-for="requerimiento in requerimientos" :key="requerimiento.id_requerimiento_pago">
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
@@ -63,7 +66,7 @@ import ModalVerRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalVerRequer
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
-                                <div class="space-x-1">
+                                <div class="space-x-1 text-center">
 
                                     <DropDownOptions>
                                         <div v-if="requerimiento.id_estado_req_pago != 2"
@@ -102,8 +105,13 @@ import ModalVerRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalVerRequer
                     </tbody>
                 </datatable>
             </div>
+            <div v-if="empty_object" class="flex text-center py-2">
+                <p class="text-red-500 font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se
+                    encontraron
+                    registros.</p>
+            </div>
         </div>
-        <div class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
+        <div v-if="!empty_object" class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
             <div>
                 <nav class="flex justify-between" role="navigation" aria-label="Navigation">
 
@@ -143,16 +151,14 @@ import ModalVerRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalVerRequer
         </div>
     </AppLayoutVue>
 
-    <ModalRequerimientoVue :requerimientoModalOpen="requerimientoModalOpen"
-        @close-definitive="requerimientoModalOpen = false" :modal_data="modal_data"
-        @updateTable="getDataRequerimiento(lastUrl)" />
+    <ModalRequerimientoVue :ModalIsOpen="requerimientoModalState" @close-modal="requerimientoModalState = false"
+        :modal_data="modal_data" @updateTable="getDataRequerimiento(lastUrl)" />
 
     <ModalVerRequerimientoVue :view_req_info="view_req_info" :show_request="show_request" :center="true"
         @cerrar-modal="view_req_info = false" />
 </template>
 <script>
-import axios from 'axios';
-import moment from 'moment';
+
 export default {
     created() {
         this.getDataRequerimiento();
@@ -169,12 +175,13 @@ export default {
             { width: "1%", label: "Acciones", name: "Acciones" },
         ];
         columns.forEach((column) => {
-            if (column.name === 'id_persona')
+            if (column.name === 'id_requerimiento_pago')
                 sortOrders[column.name] = 1;
             else
                 sortOrders[column.name] = -1;
         });
         return {
+            empty_object: false,
             errors: [],
             scrollbarModalOpen: false,
             requerimientos: [],
@@ -201,7 +208,7 @@ export default {
                 from: "",
                 to: "",
             },
-            requerimientoModalOpen: false,
+            requerimientoModalState: false,
             view_req_info: false,
             modal_data: [],
             errorNumber: null,
@@ -224,6 +231,7 @@ export default {
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
                     this.requerimientos = data.data.data;
+                    this.requerimientos.length > 0 ? this.empty_object = false : this.empty_object = true
                 }
             }).catch((errors) => {
                 let msg = this.manageError(errors);
@@ -244,13 +252,16 @@ export default {
                 this.getDataRequerimiento();
             }
         },
+        getIndex(array, key, value) {
+            return array.findIndex((i) => i[key] == value);
+        },
         editRequerimiento(request) {
             this.modal_data = request
-            this.requerimientoModalOpen = true
+            this.requerimientoModalState = true
         },
         openModal() {
             this.modal_data = []
-            this.requerimientoModalOpen = true
+            this.requerimientoModalState = true
         },
         validarCamposVacios(objeto) {
             for (var propiedad in objeto) {
@@ -267,7 +278,7 @@ export default {
             }
             else {
                 this.tableData.search = myEventData;
-                this.getDataRequerimiento();
+                //this.getDataRequerimiento();
             }
         },
     },

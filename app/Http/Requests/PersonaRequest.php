@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Rules\DuiValidationRule;
+use Illuminate\Validation\Rule;
 
 class PersonaRequest extends FormRequest
 {
@@ -26,11 +27,11 @@ class PersonaRequest extends FormRequest
     {
         return [
             'pnombre_persona'    => 'required',
-            'snombre_persona'    => 'required',
             'papellido_persona'  => 'required',
-            'sapellido_persona'  => 'required',
             'telefono_persona'   => 'required',
-            'dui_persona'        => ['required', new DuiValidationRule, 'unique:persona'],
+            'dui_persona'        => ['required', new DuiValidationRule, 
+            Rule::unique('persona','dui_persona')
+            ->ignore($this->input('id_persona'), 'id_persona')],
             'email_persona'      => ['required', 'email'],
             'id_genero'          => 'required',
             'id_estado_civil'    => 'required',
@@ -43,21 +44,19 @@ class PersonaRequest extends FormRequest
     public function messages()
     {
         return [
-            'pnombre_persona.required'    => 'El campos primer nombre es requerido ',
-            'snombre_persona.required'    => 'El campos segundo nombre es requerido ',
-            'papellido_persona.required'  => 'El campos primer apellido es requerido ',
-            'sapellido_persona.required'  => 'El campos segundo nombre es requerido ',
-            'telefono_persona.required'   => 'El campos telefono es requerido ',
-            'dui_persona.required'        => 'El campos dui es requerido ',
-            'email_persona.required'      => 'El campos email es requerido ',
+            'pnombre_persona.required'    => 'El campo primer nombre es requerido ',
+            'papellido_persona.required'  => 'El campo primer apellido es requerido ',
+            'telefono_persona.required'   => 'El campo telefono es requerido ',
+            'dui_persona.required'        => 'El campo dui es requerido ',
+            'email_persona.required'      => 'El campo email es requerido ',
             'email_persona.email'         => 'El correo tiene que ser valido ',
-            'dui_persona.unique'          => 'El Dui correspondiente tiene el formato correcto pero esta repetido ',
-            'id_genero.required'          => 'El campos genero es requerido ',
-            'id_estado_civil.required'    => 'El campos estado civil es requerido ',
-            'fecha_nac_persona.required'  => 'El campos fecha nacimiento es requerido ',
-            'id_municipio.required'       => 'El campos municipio es requerido ',
-            'id_profesion.required'       => 'El campos profesión es requerido ',
-            'id_nivel_educativo.required' => 'El campos nivel educativo es requerido ',
+            'dui_persona.unique'          => 'Este numero de DUI ya se encuentra registrado.',
+            'id_genero.required'          => 'El campo genero es requerido ',
+            'id_estado_civil.required'    => 'El campo estado civil es requerido ',
+            'fecha_nac_persona.required'  => 'El campo fecha nacimiento es requerido ',
+            'id_municipio.required'       => 'El campo municipio es requerido ',
+            'id_profesion.required'       => 'El campo profesión es requerido ',
+            'id_nivel_educativo.required' => 'El campo nivel educativo es requerido ',
         ];
     }
 }

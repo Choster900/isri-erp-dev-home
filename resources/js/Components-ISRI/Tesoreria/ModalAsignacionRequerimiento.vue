@@ -1,5 +1,5 @@
 <script setup>
-import ModalBasicVue from '@/Components-ISRI/AllModal/ModalBasic.vue';
+import Modal from "@/Components-ISRI/AllModal/Modal.vue";
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import moment from 'moment';
@@ -7,11 +7,11 @@ import axios from 'axios';
 
 </script>
 <template>
-    <ModalBasicVue title="Asignando numero de requerimiento" id="scrollbar-modal" maxWidth="6xl" :modalOpen="modalIsOpen"
-        @close-modal="$emit('close-definitive')">
+    <Modal modal-title="Asignando numero de requerimiento" maxWidth="6xl" :show="modalIsOpen"
+        @close="$emit('close-definitive')">
 
-        <div class="flex flex-col md:flex-row  md:space-y-0  ">
-            <div class="flex-1 px-3 pt-3 shadow-sm  bg-white shadow-[#001b47] border-r border-r-gray-500/20">
+        <div class="flex flex-col md:flex-row  md:space-y-0 p-3">
+            <div class="flex-1 px-3 pt-3 shadow-2xl   rounded-xl shadow-black border bg-gray-100 ">
                 <div class="mb-7 md:flex flex-row justify-items-start">
                     <div class="mb-4 md:mr-2 md:mb-0 basis-full">
                         <label class="block mb-2 text-xs font-light text-gray-600">
@@ -66,205 +66,200 @@ import axios from 'axios';
                     </div>
                     <div class="grid px-2 grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
                         <GeneralButton color="bg-[#7a0000]  hover:bg-[#7a0000]/90" text="Limpiar todo" icon="delete"
-                            @click="resetData()" />
+                            @click="dataQuedan = []; resetData()" />
                     </div>
                 </div>
             </div>
-            <div class="flex-1">
-                <div class=" p-4 rounded-md overflow-x-auto">
-                    <div class="sm:flex sm:justify-between sm:items-center mb-4">
-                        <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-full">
-                                <label class="block text-xs font-light text-gray-600">
-                                    Numero de requerimiento <span class="text-red-600 font-extrabold">*</span>
-                                </label>
-                                <div class="relative flex h-7  flex-row-reverse select-bg">
-                                    <Multiselect :options="numeroRequerimientoFiltrado"
-                                        @input="seleccionarRequerimiento($event)" v-model="id_requerimiento_pago"
-                                        :searchable="true" />
-                                </div>
-                            </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-full mt-4 h-5"
-                                :class="(collectItems != '' && id_requerimiento_pago != '' ? 'animate-bounce' : '')">
-                                <button @click="addNumber()"
-                                    class="inline-flex items-center justify-center px-3 h-6 text-sm py-1 text-white rounded-md shadow"
-                                    :class="(collectItems != '' && id_requerimiento_pago != '' ? ' bg-orange-600' : ' bg-gray-600')">
-                                    Agregar a requerimiento
-                                </button>
-                            </div>
-
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-full">
-                                <table id="resumen" class="table table-bordered text-center p-0 mt-2 w-[400px]">
-                                    <tbody>
-                                        <tr>
-                                            <td class="border-2 px-3  text-xs">NUMERO<br />
-                                                <span class="text-green-600 text-xs">
-                                                    {{ infoReqForTableInfo.numeroReq != "" ? infoReqForTableInfo.numeroReq :
-                                                        "0" }}
-                                                </span>
-                                            </td>
-                                            <td class="border-2 px-3 text-xs">MONTO<br />
-                                                <span class="text-green-600 text-xs">$
-                                                    {{ infoReqForTableInfo.montoReq != "" ? infoReqForTableInfo.montoReq :
-                                                        "0.00" }}
-                                                </span>
-                                            </td>
-                                            <td class="border-2 px-3 text-xs">DIFERENCIA<br />
-                                                <span class="text-green-600 text-xs"
-                                                    v-if="infoReqForTableInfo.cantSelected === '' && infoReqForTableInfo.restanteReq === ''">
-                                                    $0.00
-                                                </span>
-                                                <span v-else
-                                                    :class="infoReqForTableInfo.restanteReq < infoReqForTableInfo.cantSelected ? 'text-red-600 text-xs' : 'text-green-600 text-xs'">
-                                                    $
-                                                    {{ (infoReqForTableInfo.cantSelected === '' ?
-                                                        infoReqForTableInfo.restanteReq :
-                                                        (parseFloat(infoReqForTableInfo.restanteReq) -
-                                                            parseFloat(infoReqForTableInfo.cantSelected) || 0).toFixed(2)) }}
-                                                </span>
-                                            </td>
-
-                                            <td class=" border-2 px-3 text-xs">CANT. SELECT<br />
-                                                <span
-                                                    :class="infoReqForTableInfo.restanteReq < infoReqForTableInfo.cantSelected ? 'text-red-600 text-xs' : 'text-green-600 text-xs'">$
-                                                    {{ infoReqForTableInfo.cantSelected != ""
-                                                        ? (infoReqForTableInfo.cantSelected).toFixed(2) : "0.00" }}</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="border-2 text-xs max-w-[350px] min-w-w-[350px]" colspan="4">
-                                                DESCRIPCION:
-                                                <span class="text-xs">{{ infoReqForTableInfo.descripcionReq
-                                                }}</span>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+            <div class="px-4 py-2 rounded-md overflow-x-auto">
+                <div class="sm:flex sm:justify-between sm:items-center mb-4">
+                    <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
+                        <div class="mb-4 md:mr-2 md:mb-0 basis-full">
+                            <label class="block text-xs font-light text-gray-600">
+                                Numero de requerimiento <span class="text-red-600 font-extrabold">*</span>
+                            </label>
+                            <div class="relative flex h-7  flex-row-reverse select-bg">
+                                <Multiselect :options="numeroRequerimientoFiltrado"
+                                    @input="seleccionarRequerimiento($event)" v-model="id_requerimiento_pago"
+                                    :searchable="true" noOptionsText="<p class='text-xs'>sin requerimientos<p>"
+                                    noResultsText="<p class='text-xs'>requerimiento no encontrado<p>" />
                             </div>
                         </div>
-                    </div>
-                    <div class="sidebar-style-isri" style="overflow-x:auto; max-height: 440px; max-width: 800px;">
-                        <table class="table-auto">
-                            <thead
-                                class="text-xs font-semibold uppercase text-white bg-[#001b47] border-t border-b border-slate-200 sticky top-0">
-                                <tr>
-                                    <th class="px-4 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <Checkbox @click="selectAllItems()" :checked="selectAll ? true : false">
-                                            </Checkbox>
-                                        </div>
-                                    </th>
-                                    <th class="px-4 py-2 ">
-                                        <div class="font-medium text-center text-[12px] w-1">ID</div>
-                                    </th>
-                                    <th class="px-4 py-2  min-w-48 max-w-48 ">
-                                        <div class="font-medium text-center w-40 text-[12px] tracking-wider">PROVEEDOR</div>
-                                    </th>
-                                    <th class="px-4 py-2 min-w-48 max-w-48 ">
-                                        <div class="font-medium text-center w-40 text-[12px]">DETALLE</div>
-                                    </th>
-                                    <th class="px-4 py-2 min-w-20 max-w-20 ">
-                                        <div class="font-medium text-center w-10 text-[12px]">FECHA</div>
-                                    </th>
-                                    <th class="px-4 py-2  min-w-10 max-w-10 ">
-                                        <div class="font-medium text-center w-10  text-[12px]">IVA</div>
-                                    </th>
-                                    <th class="px-4 py-2  min-w-10 max-w-10 ">
-                                        <div class="font-medium text-center  w-10 text-[12px]">ISR</div>
-                                    </th>
-                                    <th class="px-4 py-2 min-w-10 max-w-10 ">
-                                        <div class="font-medium text-center w-20 text-[12px]">MONTO</div>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <!-- Table body -->
-                            <tbody name="fade" class="text-sm text-gray-700 bg-white divide-y divide-slate-200">
-                                <template v-for="quedan in dataQuedan" :key="quedan.id_quedan">
+                        <div class="mb-4 md:mr-2 md:mb-0 basis-full mt-4 h-5"
+                            :class="(collectItems != '' && id_requerimiento_pago != '' ? 'animate-bounce' : '')">
+                            <button @click="addNumber()"
+                                class="inline-flex items-center justify-center px-3 h-6 text-[9pt] py-1 text-white rounded-md shadow"
+                                :class="(collectItems != '' && id_requerimiento_pago != '' ? ' bg-orange-600' : ' bg-gray-600')">
+                                Agregar a requerimiento
+                            </button>
+                        </div>
 
-                                    <transition enter-active-class="slide-out-right-enter-active"
-                                        leave-active-class="slide-out-right-leave-active">
-                                        <tr v-show="quedan.mostrar">
-                                            <td class="px-4 first:pl-5 last:pr-5 py-3 whitespace-nowrap w-px">
-                                                <div class="flex items-center">
-                                                    <Checkbox :value="quedan.id_quedan" :checked="selectAll ? true : false"
-                                                        @update:checked="(value) => selectItem(quedan.id_quedan, value, quedan.monto_liquido_quedan)">
-                                                    </Checkbox>
-                                                </div>
-                                            </td>
-                                            <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                                <div class="text-center  text-[12px]">{{ quedan.id_quedan }}</div>
-                                            </td>
-                                            <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                                <div class="text-center text-[12px] wrapTable whitespace-pre-wrap">
-                                                    {{ quedan.proveedor.razon_social_proveedor }}
-                                                </div>
-                                            </td>
-                                            <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                                <div v-for="(detalle, i) in quedan.detalle_quedan" :key="i"
-                                                    class="font-medium text-slate-800 text-[12px] text-center wrap flex justify-center items-center">
-                                                    <div
-                                                        :class="{ 'border-b-2 border-b-gray-500': i < quedan.detalle_quedan.length - 1 && quedan.detalle_quedan.length > 1 }">
-                                                        FACTURA: {{ detalle.numero_factura_det_quedan }}
-                                                        <br>
-                                                        PRODUCTO: ${{ detalle.producto_factura_det_quedan || 0 }}
-                                                        <br>
-                                                        SERVICIO: ${{ detalle.servicio_factura_det_quedan || 0 }}
-                                                        <br>
-                                                        <div class="font-semibold">TOTAL: ${{
-                                                            (parseFloat(detalle.servicio_factura_det_quedan) || 0) +
-                                                            (parseFloat(detalle.producto_factura_det_quedan) || 0) }}</div>
-                                                    </div>
-                                                </div>
-                                            </td>
+                        <div class="mb-4 md:mr-2 md:mb-0 basis-full">
+                            <table id="resumen" class="table table-bordered text-center p-0 mt-2 w-[380px]">
+                                <tbody>
+                                    <tr>
+                                        <td class="border-2 px-3  text-[8pt]">NUMERO<br />
+                                            <span class="text-green-600 text-xs">
+                                                {{ infoReqForTableInfo.numeroReq != "" ? infoReqForTableInfo.numeroReq :
+                                                    "0" }}
+                                            </span>
+                                        </td>
+                                        <td class="border-2 px-3 text-[8pt]">MONTO<br />
+                                            <span class="text-green-600 text-xs">$
+                                                {{ infoReqForTableInfo.montoReq != "" ? infoReqForTableInfo.montoReq :
+                                                    "0.00" }}
+                                            </span>
+                                        </td>
+                                        <td class="border-2 px-3 text-[8pt]">DIFERENCIA<br />
+                                            <span class="text-green-600 text-xs"
+                                                v-if="infoReqForTableInfo.cantSelected === '' && infoReqForTableInfo.restanteReq === ''">
+                                                $0.00
+                                            </span>
+                                            <span v-else
+                                                :class="infoReqForTableInfo.restanteReq < infoReqForTableInfo.cantSelected ? 'text-red-600 text-xs' : 'text-green-600 text-xs'">
+                                                $
+                                                {{ (infoReqForTableInfo.cantSelected === '' ?
+                                                    infoReqForTableInfo.restanteReq :
+                                                    (parseFloat(infoReqForTableInfo.restanteReq) -
+                                                        parseFloat(infoReqForTableInfo.cantSelected) || 0).toFixed(2)) }}
+                                            </span>
+                                        </td>
 
-                                            <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                                <div class="text-center  text-[12px]">{{ quedan.fecha_emision_quedan }}
-                                                </div>
-                                            </td>
-                                            <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                                <div class="text-center text-red-600 text-[12px]">-${{
-                                                    quedan.monto_iva_quedan
-                                                }}
-                                                </div>
-                                            </td>
-                                            <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap">
-                                                <div class="text-center text-red-600 text-[12px]">-${{
-                                                    quedan.monto_isr_quedan
-                                                }}
-                                                </div>
-                                            </td>
-                                            <td class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap ">
-                                                <div class="text-center  text-[12px] font-semibold text-green-600">${{
-                                                    quedan.monto_liquido_quedan }}</div>
-                                            </td>
-                                        </tr>
-
-                                    </transition>
-
-                                </template>
-
-
-
-                                <tr v-if="dataQuedan.length == 0">
-                                    <td colspan="8" class="pb-3 text-xs whitespace-nowrap text-center h-20">
-                                        <span v-if="withoutDataInDb">SIN DATOS EN LA BASE DE DATOS...</span>
-                                        <span v-else>Utilize los filtros o simplemente precio buscar.</span>
-                                    </td>
-
-                                </tr>
-                            </tbody>
-                        </table>
+                                        <td class=" border-2 px-3 text-[8pt]">CANT. SELECT<br />
+                                            <span
+                                                :class="infoReqForTableInfo.restanteReq < infoReqForTableInfo.cantSelected ? 'text-red-600 text-xs' : 'text-green-600 text-xs'">$
+                                                {{ infoReqForTableInfo.cantSelected != ""
+                                                    ? (infoReqForTableInfo.cantSelected).toFixed(2) : "0.00" }}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="border-2 text-[8pt] max-w-[350px] min-w-w-[350px]" colspan="4">
+                                            DESCRIPCION:
+                                            <span class="text-[8pt]">{{ infoReqForTableInfo.descripcionReq
+                                            }}</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
+                <div class="sidebar-style-isri" style="overflow-x:auto; max-height: 435px; max-width: 800px;">
+                    <table class="table-auto">
+                        <thead class="text-xs uppercase text-white bg-[#001b47]   border-slate-200 sticky top-0">
+                            <tr>
+                                <th class="px-4 py-3 w-[1px]  rounded-tl-2xl">
+                                    <div class="flex items-center">
+                                        <Checkbox @click="selectAllItems()" :checked="selectAll ? true : false">
+                                        </Checkbox>
+                                    </div>
+                                </th>
+                                <th class="px-4 py-2 ">
+                                    <div class="font-medium text-center text-[12px] w-[1px]">ID</div>
+                                </th>
+                                <th class="px-4 py-2  min-w-48 max-w-48 ">
+                                    <div class="font-medium text-center w-40 text-[12px] tracking-wider">PROVEEDOR</div>
+                                </th>
+                                <th class="px-4 py-2 min-w-48 max-w-48 ">
+                                    <div class="font-medium text-center w-40 text-[12px]">DETALLE</div>
+                                </th>
+                                <th class="px-4 py-2 min-w-20 max-w-20 ">
+                                    <div class="font-medium text-center w-10 text-[12px]">FECHA</div>
+                                </th>
+                                <th class="px-4 py-2  min-w-10 max-w-10 ">
+                                    <div class="font-medium text-center w-20  text-[12px]">RETENCIONES</div>
+                                </th>
+                                <th class="px-4 py-2 min-w-10 max-w-10 rounded-tr-2xl">
+                                    <div class="font-medium text-center w-20 text-[12px]">MONTO</div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <!-- Table body -->
+                        <tbody name="fade" class="text-sm text-gray-700 bg-white divide-y divide-slate-200">
+                            <template v-for="quedan in dataQuedan" :key="quedan.id_quedan">
+
+                                <transition enter-active-class="slide-out-right-enter-active"
+                                    leave-active-class="slide-out-right-leave-active">
+                                    <tr v-show="quedan.mostrar">
+                                        <td class="px-4 py-3 w-[1px]">
+                                            <div class="flex items-center">
+                                                <Checkbox :value="quedan.id_quedan" :checked="selectAll ? true : false"
+                                                    @update:checked="(value) => selectItem(quedan.id_quedan, value, quedan.monto_liquido_quedan)">
+                                                </Checkbox>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="text-center text-[12px]">{{ quedan.id_quedan }}</div>
+                                        </td>
+                                        <td class="px-2 ">
+                                            <div class="text-center text-[12px] wrapTable whitespace-pre-wrap">
+                                                {{ quedan.proveedor.razon_social_proveedor }}
+                                            </div>
+                                        </td>
+                                        <td class="px-2 py-2">
+                                            <div class="max-h-[165px] overflow-y-auto scrollbar">
+                                                <template v-for="(detalle, i) in quedan.detalle_quedan" :key="i">
+                                                    <div class="mb-2 text-center">
+                                                        <p class="text-[10pt]">
+                                                            <span class="font-medium">FACTURA </span>{{
+                                                                detalle.numero_factura_det_quedan
+                                                            }}<br>
+                                                            <span class="font-medium">MONTO:</span> ${{
+                                                                (parseFloat(detalle.servicio_factura_det_quedan) || 0) +
+                                                                (parseFloat(detalle.producto_factura_det_quedan) || 0) }}
+                                                        </p>
+                                                    </div>
+                                                    <template v-if="i < quedan.detalle_quedan.length - 1">
+                                                        <hr class="my-2 border-t border-gray-300">
+                                                    </template>
+                                                </template>
+                                            </div>
+                                        </td>
+
+                                        <td class="px-2">
+                                            <div class="text-center  text-[12px]">{{
+                                                moment(quedan.fecha_emision_quedan).format('DD/MM/YYYY') }}
+                                            </div>
+                                        </td>
+                                        <td class="px-2 ">
+                                            <div class="text-center text-red-600 text-[12px]">
+                                                - IVA: ${{ quedan.monto_iva_quedan.toLocaleString() }}<br>
+                                                - ISR: ${{ quedan.monto_isr_quedan }}
+                                            </div>
+                                        </td>
+
+                                        <td class="px-2">
+                                            <div class="text-center  text-[12px] font-semibold text-green-600">
+                                                ${{ quedan.monto_liquido_quedan }}</div>
+                                        </td>
+                                    </tr>
+
+                                </transition>
+
+                            </template>
+
+
+
+                            <tr v-if="dataQuedan.length == 0">
+                                <td colspan="8" class="pb-3 text-xs whitespace-nowrap text-center h-20">
+                                    <span v-if="withoutDataInDb">SIN DATOS EN LA BASE DE DATOS...</span>
+                                    <span v-else>Utilize los filtros o simplemente presione buscar.</span>
+                                </td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
         </div>
-    </ModalBasicVue>
+    </Modal>
 </template>
 
 
 <script>
 
 export default {
+    emits: ['close-definitive', 'reload-table'], // Declara el evento personalizado que emite el componente
     props: {
         modalIsOpen: {
             type: Boolean,
@@ -338,7 +333,7 @@ export default {
                     this.collectItems = []
                     this.id_requerimiento_pago = ''
                     this.numero_requerimiento = ''
-                    this.selectAll = false//FIXME: cuando se cierra el modal se supone que tiene que quedar en falso (lo hace) pero el checbox igual queda marcado cuando se sabe por que
+                    this.selectAll = false
                     this.infoReqForTableInfo.numeroReq = ''
                     this.infoReqForTableInfo.montoReq = ''
                     this.infoReqForTableInfo.restanteReq = ''
@@ -443,7 +438,7 @@ export default {
 
                 }
             } else {
-                toast.error("Al parecer no haz seleccionado ningun quedan", {
+                toast.error("Al parecer no has seleccionado ningun quedan", {
                     autoClose: 5000,
                     position: "top-right",
                     transition: "zoom",
@@ -453,9 +448,6 @@ export default {
 
         },
         seleccionarRequerimiento(event) {
-
-            console.log(event);
-
             if (event !== null) {
                 const opcionSeleccionada = this.dataForSelect.numeroRequerimiento.filter(item => item.value === event);
                 this.numero_requerimiento = opcionSeleccionada
@@ -472,8 +464,15 @@ export default {
             }
 
         },
+        formatearMontoTotal() {
+            const montoTotal = this.dataQuedan.reduce((total, quedan) => {
+                return total + parseFloat(quedan.monto_liquido_quedan);
+            }, 0);
+
+            return montoTotal.toLocaleString(); // Agrega comas como separadores de miles
+        },
         resetData() {
-            this.dataQuedan = []
+            // this.dataQuedan = []
             this.collectItems = []
             this.id_requerimiento_pago = ''
             this.numero_requerimiento = ''
@@ -483,7 +482,7 @@ export default {
             this.filter.iva = ''
             this.filter.isr = ''
             this.filter.monto = ''
-            this.selectAll = false//FIXME: cuando se cierra el modal se supone que tiene que quedar en falso (lo hace) pero el checbox igual queda marcado cuando se sabe por que
+            this.selectAll = false
             this.infoReqForTableInfo.numeroReq = ''
             this.infoReqForTableInfo.montoReq = ''
             this.infoReqForTableInfo.restanteReq = ''
@@ -500,7 +499,7 @@ export default {
         modalIsOpen: function (newValue, oldValue) {
 
             this.resetData()
-
+            this.dataQuedan = []
         },
     },
 }

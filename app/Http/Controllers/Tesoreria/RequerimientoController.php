@@ -18,27 +18,28 @@ class RequerimientoController extends Controller
         $v_columns = [
             'id_requerimiento_pago',
             'numero_requerimiento_pago',
-            'fecha_requerimiento_pago',
-            'fecha_reg_requerimiento_pago',
-            'fecha_mod_requerimiento_pago',
-            'usuario_requerimiento_pago',
-            'ip_requerimiento_pago',
             'descripcion_requerimiento_pago',
+            'monto_requerimiento_pago',
+            'mes_requerimiento_pago',
+            'anio_requerimiento_pago',
         ];
 
         $v_length = $request->input('length');
-        $v_column = $request->input('column'); //Index
+        $v_column = $request->input('column');
         $v_dir = $request->input('dir');
         $data = $request->input('search');
         $v_query = RequerimientoPago::select("*")->with(["Quedan", "Quedan.liquidacion_quedan", "Quedan.proveedor"])
-            ->orderBy($v_columns[$v_column], $v_dir);
-
+            ->orderBy($v_columns[$v_column+1], $v_dir);
         if ($data) {
             $v_query->where('numero_requerimiento_pago', 'like', '%' . $data["numero_requerimiento_pago"] . '%')
                 ->where('numero_requerimiento_pago', 'like', '%' . $data["numero_requerimiento_pago"] . '%');
 
-            $v_query->where('descripcion_requerimiento_pago', 'like', '%' . $data["descripcion_requerimiento_pago"] . '%');
-
+            if (isset($data['descripcion_requerimiento_pago'])) {
+                $v_query->where(function ($query) use ($data) {
+                    $query->where('descripcion_requerimiento_pago', 'like', '%' . $data['descripcion_requerimiento_pago'] . '%')
+                        ->orWhereNull('descripcion_requerimiento_pago');
+                });
+            }
             $v_query->where('monto_requerimiento_pago', 'like', '%' . $data["monto_requerimiento_pago"] . '%');
             if (isset($data['id_estado_req_pago'])) {
                 $v_query->where('id_estado_req_pago', 'like', '%' . $data["id_estado_req_pago"] . '%');
@@ -57,9 +58,7 @@ class RequerimientoController extends Controller
                             ->orWhere('monto_liquido_quedan', 'like', '%' . $searchText . '%');
                     });
                 });
-
             }
-
         }
 
         $v_requerimientos = $v_query->paginate($v_length)->onEachSide(1);
@@ -164,16 +163,16 @@ class RequerimientoController extends Controller
         $request->validate($rules);
         //sumando el total del requerimiento_pago
         $totRequerimiento = 0;
-        foreach ( $request->itemsToAddNumber as $key => $value ) {
+        foreach ($request->itemsToAddNumber as $key => $value) {
             $totRequerimiento = $totRequerimiento + $value["monto_liquido_quedan"];
         }
         $monto_requerimiento_pago = RequerimientoPago::select('*')->where('id_requerimiento_pago', $request->numberRequest)->get();
         $quedanExistente = Quedan::select('*')->where('id_requerimiento_pago', $request->numberRequest)->get();
-        foreach ( $quedanExistente as $key => $value ) {
+        foreach ($quedanExistente as $key => $value) {
             $totRequerimiento = $totRequerimiento + $value["monto_liquido_quedan"];
         }
         if ($totRequerimiento <= $monto_requerimiento_pago[0]->monto_requerimiento_pago) {
-            foreach ( $request->itemsToAddNumber as $key => $value ) {
+            foreach ($request->itemsToAddNumber as $key => $value) {
                 $tieneHistorial = LiquidacionQuedan::where("id_quedan", $value["id_quedan"])->get();
                 $estado = $tieneHistorial->isEmpty() ? 2 : 3;
                 Quedan::where("id_quedan", $value["id_quedan"])->update([

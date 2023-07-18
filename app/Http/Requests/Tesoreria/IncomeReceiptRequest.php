@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Tesoreria;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Request;
 
 class IncomeReceiptRequest extends FormRequest
 {
@@ -21,7 +22,7 @@ class IncomeReceiptRequest extends FormRequest
      *
      * @return array<string, mixed>
      */
-    public function rules()
+    public function rules(Request $request)
     {
         $rules = [
             'budget_account_id' => ['required'],
@@ -29,6 +30,7 @@ class IncomeReceiptRequest extends FormRequest
         $rules["client"] = ['required'];
         $rules["treasury_clerk_id"] = ['required'];
         $rules["budget_account_id"] = ['required'];
+        $rules["number"] = ['required','unique:recibo_ingreso,numero_recibo_ingreso,' . $request->input("income_receipt_id") . ',id_recibo_ingreso'];
         $rules["description"] = ['required'];
         $rules["financing_source_id"] = ['required'];
         $rules["direction"] = ['required_if:budget_account_id,16304'];
@@ -56,6 +58,8 @@ class IncomeReceiptRequest extends FormRequest
     {
         $messages = [];   
         $messages["client.required"] = "Debe ingresar el nombre o razón social.";
+        $messages["number.required"] = "Debe ingresar el numero del recibo.";
+        $messages["number.unique"] = "Este numero de recibo ya ha sido registrado.";
         $messages["budget_account_id.required"] = "Debe seleccionar el especifico presupuestario.";
         $messages["description.required"] = "Debe ingresar la descripción del recibo.";
         $messages["treasury_clerk_id.required"] = "Debe seleccionar Tesorero.";

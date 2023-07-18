@@ -22,7 +22,9 @@ class Quedan extends Model
         'id_proy_financiado',
         'id_acuerdo_compra',
         'id_serie_retencion_iva',
+        'id_tipo_doc_adquisicion',
         'id_proveedor',
+        'id_det_doc_adquisicion',
         'numero_quedan',
         'numero_retencion_iva_quedan',
         'numero_compromiso_ppto_quedan',
@@ -46,9 +48,17 @@ class Quedan extends Model
     { //(FOREING KEY, PRIMARY KEY)
         return $this->hasMany(DetalleQuedan::class, "id_quedan", "id_quedan");
     }
+    public function detalle_documento_adquisicion()
+    { //(FOREING KEY, PRIMARY KEY)
+        return $this->belongsTo(DetDocumentoAdquisicion::class, "id_det_doc_adquisicion", "id_det_doc_adquisicion");
+    }
     public function proveedor()
     { //(FOREING KEY, PRIMARY KEY)
         return $this->belongsTo(Proveedor::class, "id_proveedor", "id_proveedor");
+    }
+    public function tipo_documento_adquisicion()
+    { //(FOREING KEY, PRIMARY KEY)
+        return $this->belongsTo(TipoDocumentoAdquisicion::class, "id_tipo_doc_adquisicion", "id_tipo_doc_adquisicion");
     }
     public function tesorero()
     { //(FOREING KEY, PRIMARY KEY)
@@ -72,7 +82,7 @@ class Quedan extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function liquidacion_quedan():HasMany
+    public function liquidacion_quedan(): HasMany
     {
         return $this->hasMany(LiquidacionQuedan::class, 'id_quedan', 'id_quedan');
     }
@@ -91,6 +101,4 @@ class Quedan extends Model
     {
         return $this->hasOne(SerieRetencionIva::class, 'id_serie_retencion_iva', 'id_serie_retencion_iva');
     }
-
-    
 }

@@ -1,13 +1,12 @@
 <script setup>
-import ModalBasicVue from '@/Components-ISRI/AllModal/ModalBasic.vue';
+import Modal from "@/Components-ISRI/AllModal/Modal.vue";
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import moment from 'moment';
 import axios from 'axios';
 </script>
 <template>
-    <ModalBasicVue :title="tittleModal" id="scrollbar-modal" maxWidth="5xl" :modalOpen="modalIsOpen"
-        @close-modal="$emit('close-definitive')">
+    <Modal :modal-title="tittleModal" maxWidth="5xl" :show="modalIsOpen" @close="$emit('close-definitive')">
 
         <div class=" px-10 py-5 ">
             <table class="table-auto">
@@ -19,7 +18,7 @@ import axios from 'axios';
                         <th colspan="2" class="pl-4 py-2 first:pl-5 last:pr-5  whitespace-nowrap rounded-tr-2xl ">
 
                             <div class="flex justify-between">
-                                <div class="text-center" :class="restanteIngreso < 0 ? 'text-red-600' : ''">
+                                <div class="text-center">
                                     <label class="flex items-center">
                                         <div class="checkbox-icon bg-green-600"></div>
                                         <span class="ml-2 text-[10px] text-green-600">Liquidado</span>
@@ -30,7 +29,7 @@ import axios from 'axios';
                                     </label>
                                 </div>
 
-                                <div class="text-start pr-5" :class="restanteIngreso < 0 ? 'text-red-600' : ''">
+                                <div class="text-start pr-5">
                                     <label class="flex items-center">
                                         <div class="checkbox-icon bg-red-600"></div>
                                         <span class="ml-2 text-[10px] text-red-600">Error de las liquidaciones</span>
@@ -214,7 +213,8 @@ import axios from 'axios';
                                     <td></td>
                                     <td colspan="2" class="text-end text-sm py-2"
                                         :class="{ 'border-b border-b-gray-300': j < data.liquidacion_quedan.length - 1 && data.liquidacion_quedan.length > 1 }">
-                                        <span class="font-medium">{{ formatDate(liquidacion.fecha_liquidacion_quedan) }} -
+                                        <span class="font-medium">{{
+                                            moment(liquidacion.fecha_liquidacion_quedan).format('DD/MM/YYYY') }} -
                                         </span>
 
 
@@ -253,11 +253,12 @@ import axios from 'axios';
             </div>
 
         </div>
-    </ModalBasicVue>
+    </Modal>
 </template>
   
 <script>
 export default {
+    emits: ['close-definitive', 'reload-table', 'reload-data-for-select', 'reload-table-and-close'], // Declara el evento personalizado que emite el componente
     props: {
         modalIsOpen: {
             type: Boolean,
@@ -393,13 +394,13 @@ export default {
                     return false;
                 }
                 //contar cuantos campos vacios hay en monto_liquidacion_quedan
-                if (filterQuedanEnLiquidacion[index]["monto_liquidacion_quedan"] == 0) {
+                if (filterQuedanEnLiquidacion[index]["monto_liquidacion_quedan"] == 0 || filterQuedanEnLiquidacion[index]["notifica_liquidacion_quedan"] == '') {
                     flag++
                 }
             }
             //validando que el numero de campos vacios en monto_liquidacion_quedan no sean igual a la cantidad de campos que hay
             if (flag == filterQuedanEnLiquidacion.length) {
-                toast.warning("Tienes campos vacios", {
+                toast.warning("Asegurate de llenar la descripcion y el monto de la liquidacion", {
                     autoClose: 4000,
                     position: "top-right",
                     transition: "zoom",
@@ -438,13 +439,7 @@ export default {
                             }
                             this.sumAmountPayAndAmountRest()//llamando la funcion para que haga el recalculo de nuevo
 
-                            // this.calculateWhenIsDelete(this.dataForRows[index].liquidacion_quedan)
-
-
                             let cantidadEliminada = this.dataForRows.filter((item, i) => item.eliminadoLogicoQuedan <= false);
-                            console.log(cantidadEliminada.length);
-                            console.log(this.dataForRows.length);
-
                             if (cantidadEliminada.length == this.dataForRows.length) {
                                 this.$emit("reload-table-and-close")
                             }
@@ -484,11 +479,6 @@ export default {
             } catch (error) {
                 return false; // indicate failure
             }
-        },
-        calculateWhenIsDelete(data) {
-            console.log(
-                data
-            );
         },
         async setLiquidaciones() {
             //Funcion que envia la informacion a la tabla liquidacion_quedan
@@ -553,16 +543,6 @@ export default {
             //Restamos el saldo menos el total que es el tota de las liquidaciones
             return (saldo - total).toFixed(2)
         },
-
-        formatDate(dateString) {
-            //Funcion utilizada para formatear la fecha a : dd/mm/yyyy
-            const date = new Date(dateString);
-            const day = date.getDate().toString().padStart(2, '0');
-            const month = (date.getMonth() + 1).toString().padStart(2, '0');
-            const year = date.getFullYear().toString();
-            return `${day}/${month}/${year}`;
-        }
-
     },
     watch: {
         modalIsOpen: function (newValue, oldValue) {

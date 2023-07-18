@@ -12,13 +12,20 @@
         <!-- Fonts -->
         <!-- <link rel="stylesheet" href="{{ asset("css/font_nunito.css") }}">-->
         <link rel="stylesheet" type="text/css" href="{{ url('../css/font_nunito.css') }}" >
-
+        <script src="https://cdn.lordicon.com/bhenfmcm.js"></script>
         <!-- Scripts -->
         @routes
         @vite(['resources/js/app.js', "resources/js/Pages/{$page['component']}.vue"])
         @inertiaHead
     </head>
+     <!--       
+                   _
+               .__(.)< (MEOW)
+                \___)   
+            ~~~~~~~~~~~~~~~~~~
+        -->
     <body class="font-sans antialiased">
         @inertia
     </body>
+   
 </html>

@@ -1,6 +1,5 @@
 <script setup>
-import Modal from "@/Components/Modal.vue";
-import ModalBasicVue from "@/Components-ISRI/AllModal/ModalBasic.vue";
+import Modal from "@/Components-ISRI/AllModal/Modal.vue";
 import InputError from "@/Components/InputError.vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
@@ -9,14 +8,14 @@ import axios from "axios";
 
 <template>
     <div class="m-1.5">
-        <ModalBasicVue :modalOpen="showModalIncome" @close-modal="$emit('cerrar-modal')" :title="'Concepto de ingresos. '"
+        <Modal :show="showModalIncome"  @close="$emit('cerrar-modal')" :modal-title="'Concepto de ingresos. '"
             maxWidth="3xl">
             <div class="px-5 py-4">
                 <div class="text-sm">
 
-                    <div class="pb-4 mb-4 md:flex flex-row justify-between">
-                        <span class="font-semibold text-slate-800 mb-2 text-lg underline underline-offset-2">
-                            Información de Ingreso
+                    <div class="mb-4 md:flex flex-row justify-between">
+                        <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
+                            Información de concepto
                         </span>
                     </div>
 
@@ -51,7 +50,7 @@ import axios from "axios";
                     <!-- Second row -->
                     <div class="mb-7 md:flex flex-row justify-items-start">
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                            <TextInput id="name-income" v-model="income_concept.name" :value="income_concept.name"
+                            <TextInput id="name-income" v-model="income_concept.name" 
                                 type="text" placeholder="Concepto de Ingreso" 
                                 @update:modelValue="validateInput('name', limit=145, upper=true)">
                                 <LabelToInput icon="standard" forLabel="name-income" />
@@ -76,7 +75,7 @@ import axios from "axios";
                     <div class="mb-7 md:flex flex-row justify-items-start">
                         <div class="mb-4 md:mr-2 md:mb-0 basis-full">
                             <TextInput :required="false" id="detalle-concepto" v-model="income_concept.detail"
-                                :value="income_concept.detail" type="text" placeholder="Detalle concepto ingreso"
+                            type="text" placeholder="Detalle concepto ingreso"
                                 @update:modelValue="validateInput('detail', limit=145)">
                                 <LabelToInput icon="standard" forLabel="detalle-concepto" />
                             </TextInput>
@@ -97,7 +96,7 @@ import axios from "axios";
                     <div class="text-xs text-slate-500">ISRI2023</div>
                 </div>
             </div>
-        </ModalBasicVue>
+        </Modal>
     </div>
 </template>
 

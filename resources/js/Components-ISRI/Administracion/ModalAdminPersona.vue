@@ -45,7 +45,7 @@ import InputError from "@/Components/InputError.vue";
 
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="segundo-nombre" v-model="persona.snombre_persona"
+                                <TextInput id="segundo-nombre" v-model="persona.snombre_persona" :required="false"
                                     :value="persona.snombre_persona" type="text" placeholder="Segundo nombre">
                                     <LabelToInput icon="personalInformation" forLabel="segundo-nombre" />
                                 </TextInput>
@@ -54,8 +54,8 @@ import InputError from "@/Components/InputError.vue";
                             </div>
 
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="tercer-nombre" v-model="persona.tnombre_persona"
-                                    :value="persona.tnombre_persona" type="text" placeholder="Tercer nombre (opcional)">
+                                <TextInput id="tercer-nombre" v-model="persona.tnombre_persona" :required="false"
+                                    :value="persona.tnombre_persona" type="text" placeholder="Tercer nombre">
                                     <LabelToInput icon="personalInformation" forLabel="tercer-nombre" />
                                 </TextInput>
 
@@ -73,17 +73,17 @@ import InputError from "@/Components/InputError.vue";
                             </div>
 
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="segundo-apellido" v-model="persona.sapellido_persona"
-                                    :value="persona.sapellido_persona" type="text" placeholder="Segundo apellido">
-                                    <LabelToInput icon="personalInformation" forLabel="segundo-apellido" />
+                                <TextInput id="segundo-apellido" v-model="persona.sapellido_persona" :required="false"
+                                    :value="persona.sapellido_persona" type="text" placeholder="Segundo apellido" >
+                                    <LabelToInput icon="personalInformation" forLabel="segundo-apellido"/>
                                 </TextInput>
                                 <InputError class="mt-2" :message="errosModel.sapellido_persona" />
 
                             </div>
 
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="tercer-apellido" v-model="persona.tapellido_persona"
-                                    :value="persona.tapellido_persona" type="text" placeholder="Tercer apellido (opcional)">
+                                <TextInput id="tercer-apellido" v-model="persona.tapellido_persona" :required="false"
+                                    :value="persona.tapellido_persona" type="text" placeholder="Tercer apellido">
                                     <LabelToInput icon="personalInformation" forLabel="tercer-apellido" />
                                 </TextInput>
 
@@ -155,7 +155,7 @@ import InputError from "@/Components/InputError.vue";
                             </div>
 
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="nombre-conyuge" v-model="persona.nombre_conyuge_persona"
+                                <TextInput id="nombre-conyuge" v-model="persona.nombre_conyuge_persona" :required="false"
                                     :value="persona.sapellido_persona" type="text" placeholder="Nombre cónyuge">
                                     <LabelToInput icon="personalInformation" forLabel="nombre-conyuge" />
                                 </TextInput>
@@ -163,7 +163,7 @@ import InputError from "@/Components/InputError.vue";
 
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="nombre-madre" v-model="persona.nombre_madre_persona"
-                                    :value="persona.nombre_madre_persona" type="text"
+                                    :value="persona.nombre_madre_persona" type="text" :required="false"
                                     placeholder="Nombre - madre (completo)">
                                     <LabelToInput icon="personalInformation" forLabel="nombre-madre" />
                                 </TextInput>
@@ -172,7 +172,7 @@ import InputError from "@/Components/InputError.vue";
                         <div class="mb-7 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="nombre-padre" v-model="persona.nombre_padre_persona"
-                                    :value="persona.nombre_padre_persona" type="text"
+                                    :value="persona.nombre_padre_persona" type="text" :required="false"
                                     placeholder="Nombre - padre (completo)">
                                     <LabelToInput icon="personalInformation" forLabel="nombre-padre" />
                                 </TextInput>
@@ -204,11 +204,12 @@ import InputError from "@/Components/InputError.vue";
                                 <label class="block mb-2 text-xs font-light text-gray-600" for="fecha_nacimiento">
                                     Fecha de nacimiento <span class="text-red-600 font-extrabold">*</span>
                                 </label>
-                                <div class="relative flex h-8 w-full flex-row-reverse">
-                                    <flat-pickr
-                                        class="peer w-full text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
-                                        :config="config" v-model="persona.fecha_nac_persona" />
+                                <div class="relative flex">
                                     <LabelToInput icon="date" />
+                                    <flat-pickr
+                                        class="peer font-semibold text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
+                                        :config="config" v-model="persona.fecha_nac_persona" 
+                                        :placeholder="'Seleccione fecha nacimiento'"/>
                                 </div>
                                 <InputError class="mt-2" :message="errosModel.fecha_nac_persona" />
 
@@ -323,7 +324,7 @@ export default {
             config: {
                 altInput: true,
                 monthSelectorType: 'static',
-                altFormat: "M j, Y",
+                altFormat: "d/m/Y",
                 dateFormat: "Y-m-d",
                 defaultDate: this.infoPersona.fecha_nac_persona,
                 prevArrow: '<svg class="fill-current" width="7" height="11" viewBox="0 0 7 11"><path d="M5.4 10.8l1.4-1.4-4-4 4-4L5.4 0 0 5.4z" /></svg>',
@@ -416,13 +417,13 @@ export default {
             }).then((result) => {
                 if (result.isConfirmed) {
                     axios.post('/update-persona', this.persona).then((response) => {
-                        console.log(response.data);
                         toast.success("El registro se edito con exito", {
                             autoClose: 5000,
                             position: "top-right",
                             transition: "zoom",
                             toastBackgroundColor: "white",
                         });
+                        this.$emit('close-definitive')
                     }).catch((Error) => {
                         if (Error.response.status === 422) {
                             toast.warning("Tienes algunos errores por favor verifica tus datos", {

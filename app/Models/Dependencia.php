@@ -28,6 +28,11 @@ class Dependencia extends Model
         'ip_dependencia',
     ];
 
+    public function plazas_asignadas()
+    {
+        return $this->hasMany('App\Models\PlazaAsignada','id_dependencia','id_dependencia');
+    }
+
     public function detalle_quedan()
     { //(FOREING KEY, PRIMARY KEY)
         return $this->hasMany(DetalleQuedan::class, "id_quedan", "id_quedan");

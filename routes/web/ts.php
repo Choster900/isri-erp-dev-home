@@ -9,6 +9,7 @@ use App\Http\Controllers\Tesoreria\ConceptoIngresoController;
 use App\Http\Controllers\Tesoreria\ReciboIngresoController;
 use App\Http\Controllers\Tesoreria\LiquidacionQuedanController;
 use App\Http\Controllers\Tesoreria\ReporteTesoreriaController;
+use App\Http\Controllers\Tesoreria\DocumentoAdquisicionController;
 
 Route::group(['middleware' => ['auth', 'access']], function () {
 
@@ -46,7 +47,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('add-quedan', [QuedanController::class, 'addQuedan'])->name('add-quedan');
     Route::post('update-detalle-quedan', [QuedanController::class, 'updateDetalleQuedan'])->name('update-detalle-quedan');
     Route::post('updateFechaRetencionIva', [QuedanController::class, 'updateFechaRetencionIva'])->name('update-fecha-liquidacion');
-    Route::post('getAmountBySupplierPerMonth', [QuedanController::class, 'getAmountBySupplierPerMonth'])->name('get-amount-by-supplier');
+    Route::post('getAmountByDocumentDetail', [QuedanController::class, 'getAmountByDet'])->name('get-amount-by-supplier');
 
 
     //Manage requerimiento pago
@@ -112,6 +113,21 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get('get-select-financing-source', [ReciboIngresoController::class, 'getSelectFinancingSource'])->name('reciboIngreso.getSelectFinancingSource');
     Route::get('get-select-income-concept', [ReciboIngresoController::class, 'getSelectIncomeConcept'])->name('reciboIngreso.getSelectIncomeConcept');
 
+    //Routes to manage acquisition doc
+    Route::get(
+        '/ts/doc-adquisicion',
+        function () {
+            return Inertia::render('Tesoreria/DocumentoAdquisicion', [
+                'menu' => session()->get('menu')
+            ]);
+        }
+    )->name('ts.docAdquisicion');
+    Route::post('doc-adquisicion', [DocumentoAdquisicionController::class, 'getDocAdquisicion'])->name('documentoAdquisicion.getDocAdquisicion');
+    Route::post('change-state-acq-doc', [DocumentoAdquisicionController::class, 'changeStateAcqdoc'])->name('documentoAdquisicion.changeStateAcqdoc');
+    Route::get('get-selects-acq-doc', [DocumentoAdquisicionController::class, 'getSelectsAcqDoc'])->name('documentoAdquisicion.getSelectsAcqDoc');
+    Route::post('save-acq-doc', [DocumentoAdquisicionController::class, 'saveAcqDoc'])->name('documentoAdquisicion.saveAcqDoc');
+    Route::post('update-acq-doc', [DocumentoAdquisicionController::class, 'updateAcqDoc'])->name('documentoAdquisicion.updateAcqDoc');
+
 
     Route::get(
         '/ts/liquidacion',
@@ -121,6 +137,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             ]);
         }
     )->name('ts.liquidacion');
+    Route::post('asignados', [LiquidacionQuedanController::class, 'getRequerimientosAsiganos'])->name('asignados');
     Route::post('liquidar-quedan', [LiquidacionQuedanController::class, 'processLiquidacionQuedan'])->name('liquidar-quedan');
     Route::post('total-liquidacion-by-quedan', [LiquidacionQuedanController::class, 'totalLiquidacionesByQuedan'])->name('total-liquidacion-by-quedan');
     Route::post('delete-quedan-from-request', [LiquidacionQuedanController::class, 'deleteQuedanFromRequest'])->name('delete-quedan-from-request');

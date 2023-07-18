@@ -125,11 +125,11 @@ class ReciboIngresoController extends Controller
 
     public function getSelectIncomeConcept(Request $request)
     {
-        $income_concept_select = ConceptoIngreso::selectRaw("concepto_ingreso.id_concepto_ingreso as value , concat(coalesce(concat(dependencia.codigo_dependencia,' - '), ''), concepto_ingreso.nombre_concepto_ingreso) as label")
+        $income_concept_select = ConceptoIngreso::selectRaw("concepto_ingreso.id_concepto_ingreso as value , concat(coalesce(concat(dependencia.codigo_dependencia,' - '), ''), concepto_ingreso.nombre_concepto_ingreso) as label, concepto_ingreso.estado_concepto_ingreso as estado")
             ->leftJoin('dependencia', function ($join) {
                 $join->on('concepto_ingreso.id_dependencia', '=', 'dependencia.id_dependencia');
             })
-            ->where('concepto_ingreso.estado_concepto_ingreso', '=', 1)
+            //->where('concepto_ingreso.estado_concepto_ingreso', '=', 1)
             ->where('concepto_ingreso.id_proy_financiado', '=', $request->financing_source_id)
             ->where('concepto_ingreso.id_ccta_presupuestal', '=', $request->budget_account_id)
             ->get();
@@ -138,15 +138,15 @@ class ReciboIngresoController extends Controller
 
     public function saveIncomeReceipt(IncomeReceiptRequest $request)
     {
-        $current_year = Carbon::now()->year;
-        $last_receipt = ReciboIngreso::where('numero_recibo_ingreso', 'like', '%' . $current_year . '%')->orderBy('id_recibo_ingreso', 'desc')->first();
-        if ($last_receipt) {
-            $last_number = $last_receipt->numero_recibo_ingreso;
-            $correlative = intval(substr($last_number, 0, strpos($last_number, '-'))) + 1;
-        } else {
-            $correlative = 1;
-        }
-        $receipt_number = $correlative . '-' . $current_year;
+        // $current_year = Carbon::now()->year;
+        // $last_receipt = ReciboIngreso::where('numero_recibo_ingreso', 'like', '%' . $current_year . '%')->orderBy('id_recibo_ingreso', 'desc')->first();
+        // if ($last_receipt) {
+        //     $last_number = $last_receipt->numero_recibo_ingreso;
+        //     $correlative = intval(substr($last_number, 0, strpos($last_number, '-'))) + 1;
+        // } else {
+        //     $correlative = 1;
+        // }
+        // $receipt_number = $correlative . '-' . $current_year;
 
         $new_income_receipt = new ReciboIngreso([
             'id_ccta_presupuestal' => $request->budget_account_id,
@@ -156,7 +156,7 @@ class ReciboIngresoController extends Controller
             'descripcion_recibo_ingreso' => $request->description,
             'doc_identidad_recibo_ingreso' => $request->document,
             'direccion_cliente_recibo_ingreso' => $request->direction,
-            'numero_recibo_ingreso' => $receipt_number,
+            'numero_recibo_ingreso' => $request->number,
             'fecha_recibo_ingreso' => Carbon::now(),
             'monto_recibo_ingreso' => $request->total,
             'estado_recibo_ingreso' => 1,
@@ -195,6 +195,7 @@ class ReciboIngresoController extends Controller
                 'descripcion_recibo_ingreso' => $request->description,
                 'doc_identidad_recibo_ingreso' => $request->document,
                 'direccion_cliente_recibo_ingreso' => $request->direction,
+                'numero_recibo_ingreso' => $request->number,
                 'monto_recibo_ingreso' => $request->total,
                 'fecha_mod_recibo_ingreso' => Carbon::now(),
                 'usuario_recibo_ingreso' => $request->user()->nick_usuario,

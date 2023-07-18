@@ -1,9 +1,9 @@
 <template>
-    <div class="mb-5 mt-3 md:flex flex-row justify-between">
+    <div class="mb-5 mt-5 flex flex-row justify-between">
         <div class=" basis-1/5 pl-6">
             <img src="../../../img/isri-logo2.png" width="100px">
         </div>
-        <div class="md:mx-10 md:mb-0 basis-1/2">
+        <div class=" basis-1/2">
             <h3 style class="text-[15pt] font-semibold text-center">
                 INSTITUTO SALVADOREÑO DE REHABILITACIÓN INTEGRAL
             </h3>
@@ -12,7 +12,7 @@
                 ORIGINAL - CLIENTE
             </div>
         </div>
-        <div class="md:mb-0 basis-1/4 pr-2">
+        <div class="mb-0 basis-1/4 pr-2">
             <div class="justify-end">
                 <table class="mx-auto">
                     <tr>
@@ -20,8 +20,7 @@
                         <td class="border border-b-black border-x-transparent border-t-transparent w-[75px]">
                             <div style="margin-top: -12px;" class="pl-2 pt-2 pb-2 text-[8pt] text-right">
                                 <span class="font-semibold text-[10pt]" style="font-family: Arial, Helvetica, sans-serif">{{
-                                    cheque
-                                }}</span>
+                                    cheque }}</span>
                             </div>
                         </td>
                     </tr>
@@ -68,16 +67,12 @@
     </div>
     <div class="text-center pb-5" style="margin-top: -40px;">
         <span class="text-[15pt] font-bold">QUEDAN N°</span>
-        <span class="text-[18pt] pl-2" style="font-family: 'Courier New', Courier, monospace;">
-            {{
-                dataQuedan.id_quedan.toString().padStart(7, '0')
-            }}
+        <span class="text-[18pt] pl-2" style="font-family: 'Courier New', Courier, monospace;">{{
+            dataQuedan.id_quedan.toString().padStart(7, '0') }}
         </span>
-
     </div>
     <div class="px-5 pb-9 border border-dashed border-b-black border-x-transparent border-t-transparent">
         <p class="font-medium text-[12pt]">QUEDAN EN NUESTRO PODER PARA TRAMITE DE PAGO LOS SIGUIENTES DOCUMENTOS:</p>
-
         <table>
             <tr>
                 <td class="text-[11pt] font-bold">RECIBO(S) No.</td>
@@ -96,17 +91,16 @@
                 <td class="border border-b-black border-x-transparent border-t-transparent w-[390px]">
                     <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
                         <span v-for="(detalle, i) in dataQuedan.detalle_quedan" :key="i">
-                            <template v-if="i != 0 && i != detalle.length"> , </template> <span
-                                style="font-family:  Arial, Helvetica, sans-serif;">{{
-                                    detalle.numero_factura_det_quedan }}</span>
+                            <span v-if="i != 0 && i != detalle.length"> , </span>
+                            <span style="font-family:  Arial, Helvetica, sans-serif;">{{ detalle.numero_factura_det_quedan
+                            }}</span>
                         </span>
                     </div>
                 </td>
                 <td class="text-[11pt] font-bold">POR: US $</td>
                 <td class="border border-b-black border-x-transparent border-t-transparent w-[128px]">
                     <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
-                        <span style="font-family:  Arial, Helvetica, sans-serif;">{{
-                            totalCheque }}</span>
+                        <span style="font-family:  Arial, Helvetica, sans-serif;">{{ totalCheque }}</span>
                     </div>
                 </td>
             </tr>
@@ -117,7 +111,8 @@
                 <td class="border border-b-black border-x-transparent border-t-transparent w-[625px]">
                     <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
                         <span style="font-family:  Arial, Helvetica, sans-serif;">{{
-                            dataQuedan.proveedor.nombre_comercial_proveedor }}</span>
+                            dataQuedan.proveedor.nombre_comercial_proveedor
+                        }}</span>
                     </div>
                 </td>
             </tr>
@@ -127,27 +122,33 @@
                 <td class="text-[11pt] font-bold">QUE AMPARA:</td>
                 <td class="border border-b-black border-x-transparent border-t-transparent w-[610px]">
                     <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
-                        <span style="font-family:  Arial, Helvetica, sans-serif;">{{
-                            dataQuedan.descripcion_quedan }}</span>
+                        <span style="font-family:  Arial, Helvetica, sans-serif;">{{ dataQuedan.descripcion_quedan }}</span>
                     </div>
                 </td>
             </tr>
         </table>
         <table>
-            <tr>
-                <td class="text-[11pt] font-bold" v-if="dataQuedan.acuerdo_compra.id_acuerdo_compra === 1">{{
-                    dataQuedan.acuerdo_compra.nombre_acuerdo_compra }} N°</td>
-                <td class="text-[11pt] font-bold" v-if="dataQuedan.acuerdo_compra.id_acuerdo_compra === 2">{{
-                    dataQuedan.acuerdo_compra.nombre_acuerdo_compra }} N°</td>
-                <td class="text-[11pt] font-bold" v-if="dataQuedan.acuerdo_compra.id_acuerdo_compra === 3">{{
-                    dataQuedan.acuerdo_compra.nombre_acuerdo_compra }} N°</td>
-                <td class="text-[11pt] font-bold" v-if="dataQuedan.acuerdo_compra.id_acuerdo_compra === 4">{{
-                    dataQuedan.acuerdo_compra.nombre_acuerdo_compra }}</td>
+            <tr v-if="dataQuedan.tipo_documento_adquisicion.documento_adquisicion">
+                <td class="text-[11pt] font-bold"> {{ dataQuedan.tipo_documento_adquisicion.nombre_tipo_doc_adquisicion }}
+                </td>
 
-                <td class="border border-b-black border-x-transparent border-t-transparent w-[200px]">
+                <td class="border border-b-black border-x-transparent border-t-transparent w-[170px]">
                     <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
                         <span style="font-family:  Arial, Helvetica, sans-serif;">{{
-                            dataQuedan.numero_acuerdo_quedan }}</span>
+                            dataQuedan.tipo_documento_adquisicion.documento_adquisicion.numero_doc_adquisicion
+                        }}</span>
+                    </div>
+                </td>
+            </tr>
+            <tr v-else>
+                <td class="text-[11pt] font-bold"> {{  dataQuedan.tipo_documento_adquisicion.nombre_tipo_doc_adquisicion }}:
+                </td>
+
+                <td class="border border-b-black border-x-transparent border-t-transparent w-[170px]">
+                    <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
+                        <span style="font-family:  Arial, Helvetica, sans-serif;">{{
+                            dataQuedan.numero_compromiso_ppto_quedan
+                        }}</span>
                     </div>
                 </td>
             </tr>
@@ -155,11 +156,11 @@
         <table>
             <tr>
                 <td class="text-[11pt] font-bold">FINANCIAMIENTO</td>
-                <td class="border border-b-black border-x-transparent border-t-transparent w-[170px]">
+                <td class="border border-b-black border-x-transparent border-t-transparent w-[300px]">
                     <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
                         <span style="font-family:  Arial, Helvetica, sans-serif;">{{
-                            dataQuedan.proyecto_financiado.nombre_proy_financiado }}</span>
-
+                            dataQuedan.proyecto_financiado.nombre_proy_financiado
+                        }}</span>
                     </div>
                 </td>
             </tr>
@@ -167,10 +168,11 @@
         <table>
             <tr>
                 <td class="text-[11pt] font-bold">N° DE COMPROMISO</td>
-                <td class="border border-b-black border-x-transparent border-t-transparent w-[158px]">
+                <td class="border border-b-black border-x-transparent border-t-transparent w-[170px]">
                     <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
                         <span style="font-family:  Arial, Helvetica, sans-serif;">{{
-                            dataQuedan.numero_compromiso_ppto_quedan }}</span>
+                            dataQuedan.numero_compromiso_ppto_quedan
+                        }}</span>
                     </div>
                 </td>
             </tr>
@@ -181,27 +183,30 @@
                 <td class="border border-b-black border-x-transparent border-t-transparent w-[100px]">
                     <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
                         <span style="font-family:  Arial, Helvetica, sans-serif;">{{
-                            (dataQuedan.fecha_emision_quedan).split("-")[2] }}</span>
+                            (dataQuedan.fecha_emision_quedan).split("-")[2]
+                        }}</span>
                     </div>
                 </td>
                 <td class="text-[11pt] font-bold">DE</td>
                 <td class="border border-b-black border-x-transparent border-t-transparent w-[100px]">
                     <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt]">
                         <span style="font-family:  Arial, Helvetica, sans-serif;">{{
-                            (dataQuedan.fecha_emision_quedan).split("-")[1] }}</span>
+                            (dataQuedan.fecha_emision_quedan).split("-")[1]
+                        }}</span>
                     </div>
                 </td>
                 <td class="text-[11pt] font-bold">DE</td>
                 <td class="border border-b-black border-x-transparent border-t-transparent w-[100px]">
                     <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt]">
                         <span style="font-family:  Arial, Helvetica, sans-serif;">{{
-                            (dataQuedan.fecha_emision_quedan).split("-")[0] }}</span>
+                            (dataQuedan.fecha_emision_quedan).split("-")[0]
+                        }}</span>
                     </div>
                 </td>
             </tr>
         </table>
         <div class="flex justify-center pt-8">
-            <table class="mx-auto">
+            <table class="mx-auto w-[300px]">
                 <tr>
                     <td class="text-right text-[11pt] font-bold">F.</td>
                     <td class="border border-b-black border-x-transparent border-t-transparent w-[225px]">
@@ -217,9 +222,17 @@
                     </td>
                 </tr>
                 <tr>
-                    <td class="h-5"></td>
-                    <td class=" w-[225px] text-center">
+                    <td class="text-right text-[11pt] font-bold"></td>
+                    <td class=" w-[300px] text-center">
                         <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt] font-semibold">TESORERO INSTITUCIONAL
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-right text-[11pt] font-bold"></td>
+                    <td class=" w-[300px] text-cente">
+                        <div style="margin-top: -12px; font-family: Arial, Helvetica, sans-serif;"
+                            class="pl-2 pt-2 text-[8pt] font-normal">auxiliar.tesoreria@isri.gob.sv / 2240-6421
                         </div>
                     </td>
                 </tr>
@@ -227,19 +240,20 @@
         </div>
 
     </div>
-    <div class="mb-5 mt-3 md:flex flex-row justify-between">
+    <div class="mb-5 mt-5 flex flex-row justify-between">
         <div class=" basis-1/5 pl-6">
             <img src="../../../img/isri-logo2.png" width="100px">
         </div>
-        <div class="md:mx-10 md:mb-0 basis-1/2">
+        <div class=" basis-1/2">
             <h3 style class="text-[15pt] font-semibold text-center">
                 INSTITUTO SALVADOREÑO DE REHABILITACIÓN INTEGRAL
             </h3>
+
             <div style class="text-center">
                 COPIA - CONTABILIDAD
             </div>
         </div>
-        <div class="md:mb-0 basis-1/4 pr-2">
+        <div class="mb-0 basis-1/4 pr-2">
             <div class="justify-end">
                 <table class="mx-auto">
                     <tr>
@@ -247,8 +261,7 @@
                         <td class="border border-b-black border-x-transparent border-t-transparent w-[75px]">
                             <div style="margin-top: -12px;" class="pl-2 pt-2 pb-2 text-[8pt] text-right">
                                 <span class="font-semibold text-[10pt]" style="font-family: Arial, Helvetica, sans-serif">{{
-                                    cheque
-                                }}</span>
+                                    cheque }}</span>
                             </div>
                         </td>
                     </tr>
@@ -295,16 +308,12 @@
     </div>
     <div class="text-center pb-5" style="margin-top: -40px;">
         <span class="text-[15pt] font-bold">QUEDAN N°</span>
-        <span class="text-[18pt] pl-2" style="font-family: 'Courier New', Courier, monospace;">
-            {{
-                dataQuedan.id_quedan.toString().padStart(7, '0')
-            }}
+        <span class="text-[18pt] pl-2" style="font-family: 'Courier New', Courier, monospace;">{{
+            dataQuedan.id_quedan.toString().padStart(7, '0') }}
         </span>
-
     </div>
-    <div class="px-5">
+    <div class="px-5 pb-9 ">
         <p class="font-medium text-[12pt]">QUEDAN EN NUESTRO PODER PARA TRAMITE DE PAGO LOS SIGUIENTES DOCUMENTOS:</p>
-
         <table>
             <tr>
                 <td class="text-[11pt] font-bold">RECIBO(S) No.</td>
@@ -323,17 +332,16 @@
                 <td class="border border-b-black border-x-transparent border-t-transparent w-[390px]">
                     <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
                         <span v-for="(detalle, i) in dataQuedan.detalle_quedan" :key="i">
-                            <template v-if="i != 0 && i != detalle.length"> , </template> <span
-                                style="font-family:  Arial, Helvetica, sans-serif;">{{
-                                    detalle.numero_factura_det_quedan }}</span>
+                            <span v-if="i != 0 && i != detalle.length"> , </span>
+                            <span style="font-family:  Arial, Helvetica, sans-serif;">{{ detalle.numero_factura_det_quedan
+                            }}</span>
                         </span>
                     </div>
                 </td>
                 <td class="text-[11pt] font-bold">POR: US $</td>
                 <td class="border border-b-black border-x-transparent border-t-transparent w-[128px]">
                     <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
-                        <span style="font-family:  Arial, Helvetica, sans-serif;">{{
-                            totalCheque }}</span>
+                        <span style="font-family:  Arial, Helvetica, sans-serif;">{{ totalCheque }}</span>
                     </div>
                 </td>
             </tr>
@@ -344,7 +352,8 @@
                 <td class="border border-b-black border-x-transparent border-t-transparent w-[625px]">
                     <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
                         <span style="font-family:  Arial, Helvetica, sans-serif;">{{
-                            dataQuedan.proveedor.nombre_comercial_proveedor }}</span>
+                            dataQuedan.proveedor.nombre_comercial_proveedor
+                        }}</span>
                     </div>
                 </td>
             </tr>
@@ -354,27 +363,33 @@
                 <td class="text-[11pt] font-bold">QUE AMPARA:</td>
                 <td class="border border-b-black border-x-transparent border-t-transparent w-[610px]">
                     <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
-                        <span style="font-family:  Arial, Helvetica, sans-serif;">{{
-                            dataQuedan.descripcion_quedan }}</span>
+                        <span style="font-family:  Arial, Helvetica, sans-serif;">{{ dataQuedan.descripcion_quedan }}</span>
                     </div>
                 </td>
             </tr>
         </table>
         <table>
-            <tr>
-                <td class="text-[11pt] font-bold" v-if="dataQuedan.acuerdo_compra.id_acuerdo_compra === 1">{{
-                    dataQuedan.acuerdo_compra.nombre_acuerdo_compra }} N°</td>
-                <td class="text-[11pt] font-bold" v-if="dataQuedan.acuerdo_compra.id_acuerdo_compra === 2">{{
-                    dataQuedan.acuerdo_compra.nombre_acuerdo_compra }} N°</td>
-                <td class="text-[11pt] font-bold" v-if="dataQuedan.acuerdo_compra.id_acuerdo_compra === 3">{{
-                    dataQuedan.acuerdo_compra.nombre_acuerdo_compra }} N°</td>
-                <td class="text-[11pt] font-bold" v-if="dataQuedan.acuerdo_compra.id_acuerdo_compra === 4">{{
-                    dataQuedan.acuerdo_compra.nombre_acuerdo_compra }}</td>
+            <tr v-if="dataQuedan.tipo_documento_adquisicion.documento_adquisicion">
+                <td class="text-[11pt] font-bold"> {{ dataQuedan.tipo_documento_adquisicion.nombre_tipo_doc_adquisicion }}
+                </td>
 
-                <td class="border border-b-black border-x-transparent border-t-transparent w-[200px]">
+                <td class="border border-b-black border-x-transparent border-t-transparent w-[170px]">
                     <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
                         <span style="font-family:  Arial, Helvetica, sans-serif;">{{
-                            dataQuedan.numero_acuerdo_quedan }}</span>
+                            dataQuedan.tipo_documento_adquisicion.documento_adquisicion.numero_doc_adquisicion
+                        }}</span>
+                    </div>
+                </td>
+            </tr>
+            <tr v-else>
+                <td class="text-[11pt] font-bold"> {{ dataQuedan.tipo_documento_adquisicion.nombre_tipo_doc_adquisicion }}:
+                </td>
+
+                <td class="border border-b-black border-x-transparent border-t-transparent w-[170px]">
+                    <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
+                        <span style="font-family:  Arial, Helvetica, sans-serif;">{{
+                            dataQuedan.numero_compromiso_ppto_quedan
+                        }}</span>
                     </div>
                 </td>
             </tr>
@@ -382,11 +397,11 @@
         <table>
             <tr>
                 <td class="text-[11pt] font-bold">FINANCIAMIENTO</td>
-                <td class="border border-b-black border-x-transparent border-t-transparent w-[170px]">
+                <td class="border border-b-black border-x-transparent border-t-transparent w-[300px]">
                     <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
                         <span style="font-family:  Arial, Helvetica, sans-serif;">{{
-                            dataQuedan.proyecto_financiado.nombre_proy_financiado }}</span>
-
+                            dataQuedan.proyecto_financiado.nombre_proy_financiado
+                        }}</span>
                     </div>
                 </td>
             </tr>
@@ -394,41 +409,45 @@
         <table>
             <tr>
                 <td class="text-[11pt] font-bold">N° DE COMPROMISO</td>
-                <td class="border border-b-black border-x-transparent border-t-transparent w-[158px]">
+                <td class="border border-b-black border-x-transparent border-t-transparent w-[170px]">
                     <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
                         <span style="font-family:  Arial, Helvetica, sans-serif;">{{
-                            dataQuedan.numero_compromiso_ppto_quedan }}</span>
+                            dataQuedan.numero_compromiso_ppto_quedan
+                        }}</span>
                     </div>
                 </td>
             </tr>
         </table>
         <table>
             <tr>
-                <td class="text-[11pt] font-bold">SAN SALVADOIR</td>
+                <td class="text-[11pt] font-bold">SAN SALVADOR</td>
                 <td class="border border-b-black border-x-transparent border-t-transparent w-[100px]">
                     <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
                         <span style="font-family:  Arial, Helvetica, sans-serif;">{{
-                            (dataQuedan.fecha_emision_quedan).split("-")[2] }}</span>
+                            (dataQuedan.fecha_emision_quedan).split("-")[2]
+                        }}</span>
                     </div>
                 </td>
                 <td class="text-[11pt] font-bold">DE</td>
                 <td class="border border-b-black border-x-transparent border-t-transparent w-[100px]">
                     <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt]">
                         <span style="font-family:  Arial, Helvetica, sans-serif;">{{
-                            (dataQuedan.fecha_emision_quedan).split("-")[1] }}</span>
+                            (dataQuedan.fecha_emision_quedan).split("-")[1]
+                        }}</span>
                     </div>
                 </td>
                 <td class="text-[11pt] font-bold">DE</td>
                 <td class="border border-b-black border-x-transparent border-t-transparent w-[100px]">
                     <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt]">
                         <span style="font-family:  Arial, Helvetica, sans-serif;">{{
-                            (dataQuedan.fecha_emision_quedan).split("-")[0] }}</span>
+                            (dataQuedan.fecha_emision_quedan).split("-")[0]
+                        }}</span>
                     </div>
                 </td>
             </tr>
         </table>
         <div class="flex justify-center pt-8">
-            <table class="mx-auto">
+            <table class="mx-auto w-[300px]">
                 <tr>
                     <td class="text-right text-[11pt] font-bold">F.</td>
                     <td class="border border-b-black border-x-transparent border-t-transparent w-[225px]">
@@ -444,9 +463,17 @@
                     </td>
                 </tr>
                 <tr>
-                    <td class="h-5"></td>
-                    <td class=" w-[225px] text-center">
+                    <td class="text-right text-[11pt] font-bold"></td>
+                    <td class=" w-[300px] text-center">
                         <div style="margin-top: -12px;" class="pl-2 pt-2 text-[8pt] font-semibold">TESORERO INSTITUCIONAL
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-right text-[11pt] font-bold"></td>
+                    <td class=" w-[300px] text-cente">
+                        <div style="margin-top: -12px; font-family: Arial, Helvetica, sans-serif;"
+                            class="pl-2 pt-2 text-[8pt] font-normal">auxiliar.tesoreria@isri.gob.sv / 2240-6421
                         </div>
                     </td>
                 </tr>
