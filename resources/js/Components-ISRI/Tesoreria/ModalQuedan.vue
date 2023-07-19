@@ -1235,6 +1235,7 @@ export default {
             } else {
                 // Si el modal está cerrado, reiniciamos la matriz rowsData y cambiamos el estado del botón
                 this.rowsData = [];
+                this.errors = [];
                 this.conditionButton = true; // Cambiamos el estado del botón para agregar en lugar de actualizar
             }
         },
