@@ -1053,14 +1053,14 @@ export default {
         async createQuedan() {
             // Mostrar confirmación al usuario
             const confirmed = await this.$swal.fire({
-                title: '¿Está seguro de crear un nuevo quedan?',
+                title: '<p class="text-[20pt] text-center">¿Esta seguro de crear un nuevo quedan?</p>',
                 icon: 'question',
-                iconHtml: '❓',
-                confirmButtonText: 'Si, Agregar el quedan',
-                confirmButtonColor: '#141368',
+                iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
+                confirmButtonText: 'Si, Editar',
+                confirmButtonColor: '#001b47',
                 cancelButtonText: 'Cancelar',
                 showCancelButton: true,
-                showCloseButton: true
+                showCloseButton: true,
             });
             if (confirmed.isConfirmed) {
                 // Verificar si no hay posiciones duplicadas de números de acta
@@ -1118,14 +1118,14 @@ export default {
         async updateQuedan() {
             // Mostrar confirmación al usuario
             const confirmed = await this.$swal.fire({
-                title: '¿Está seguro de actualizar el quedan?',
+                title: '<p class="text-[20pt] text-center">¿Esta seguro de actualizar el quedan?</p>',
                 icon: 'question',
-                iconHtml: '❓',
-                confirmButtonText: 'Si, Actualizar',
-                confirmButtonColor: '#141368',
+                iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
+                confirmButtonText: 'Si, Editar',
+                confirmButtonColor: '#001b47',
                 cancelButtonText: 'Cancelar',
                 showCancelButton: true,
-                showCloseButton: true
+                showCloseButton: true,
             });
 
             if (confirmed.isConfirmed) {
