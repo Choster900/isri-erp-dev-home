@@ -29,8 +29,11 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             ]);
         }
     )->name('rrhh.detPlazas');
-    Route::post('det-job-positions', [DetallePlazaController::class, 'getDetJobPositions'])->name('plaza.getDetJobPositions');
-
+    Route::post('det-job-positions', [DetallePlazaController::class, 'getDetJobPositions'])->name('detallePlaza.getDetJobPositions');
+    Route::get('get-selects-job-position-det', [DetallePlazaController::class, 'getSelectsJobPositionDet'])->name('detallePlaza.getSelectsJobPositionDet');
+    Route::post('store-job-position-det', [DetallePlazaController::class, 'storeJobPositionDet'])->name('detallePlaza.storeJobPositionDet');
+    Route::post('update-job-position-det', [DetallePlazaController::class, 'updateJobPositionDet'])->name('detallePlaza.updateJobPositionDet');
+    Route::post('change-status-job-position-det', [DetallePlazaController::class, 'changeStatusJobPositionDet'])->name('detallePlaza.changeStatusJobPositionDet');
 
     Route::get(
         '/rrhh/beneficiarios',
