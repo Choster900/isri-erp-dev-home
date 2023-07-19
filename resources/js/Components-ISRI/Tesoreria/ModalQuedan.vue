@@ -201,15 +201,17 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                 class="peer w-full text-sm bg-transparent text-center h-10 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                         </td>
                                         <td class="border-2 border-black"
-                                            :class="{ 'bg-[#fdfd96]': dataInputs.numero_doc_adquisicion == '' }">
+                                            :class="errors['quedan.numero_doc_adquisicion'] ? 'bg-red-300' : dataInputs.numero_doc_adquisicion == '' ? 'bg-[#fdfd96]' : ''">
+
                                             <input type="text" v-model="dataInputs.numero_doc_adquisicion" maxlength="20"
+                                                :title="errors['quedan.numero_doc_adquisicion']"
                                                 :disabled="documentoAdquisicion == '' ? false : true"
                                                 class="peer w-full text-sm bg-transparent text-center h-10 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                         </td>
                                         <td class="border-2 border-black"
-                                            :class="{ 'bg-[#fdfd96]': dataInputs.compromiso_ppto_det_doc_adquisicion == '' }">
-
+                                            :class="errors['quedan.compromiso_ppto_det_doc_adquisicion'] ? 'bg-red-300' : dataInputs.compromiso_ppto_det_doc_adquisicion == '' ? 'bg-[#fdfd96]' : ''">
                                             <input type="text" v-model="dataInputs.compromiso_ppto_det_doc_adquisicion"
+                                                :title="errors['quedan.compromiso_ppto_det_doc_adquisicion']"
                                                 :disabled="documentoAdquisicion == '' ? false : true" maxlength="20"
                                                 class="peer w-full text-sm bg-transparent text-center h-10 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
                                         </td>
@@ -232,7 +234,8 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                     :placeholder="documentoAdquisicion == '' ? 'sin contratos' : 'seleccione contrato'"
                                                     :classes="{
                                                         containerDisabled: 'cursor-not-allowed bg-gray-200 ', placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                                    }" noOptionsText="<p class='text-xs'>sin contratos<p>"
+                                                    }
+                                                        " noOptionsText="<p class='text-xs'>sin contratos<p>"
                                                     noResultsText="<p class='text-xs'>contrato no encontrados<p>"
                                                     :disabled="dataQuedan.id_estado_quedan > 1 ? true : documentoAdquisicion == '' ? true : false"
                                                     :options="documentoAdquisicion" :searchable="true" />
@@ -257,11 +260,11 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 
                                 <tbody class="text-sm" id="content">
 
-                                    <template v-for="( row, rowIndex ) in  rowsData " :key="rowIndex">
+                                    <template v-for="(  row, rowIndex  ) in   rowsData  " :key="rowIndex">
                                         <template v-if="row['isDelete']">
 
                                             <tr @contextmenu.prevent="deleteRow(rowIndex)">
-                                                <template v-for="( cell, cellIndex ) in  row " :key="cellIndex">
+                                                <template v-for="(  cell, cellIndex  ) in   row  " :key="cellIndex">
                                                     <td v-if="cellIndex == 'numero_factura_det_quedan'"
                                                         class="border-2 border-black"
                                                         :class="[cell == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']">
@@ -282,20 +285,26 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                                 :class="[rowsData[rowIndex]['fecha_factura_det_quedan'] == '' ? 'bg-[#fdfd96]' : '',
                                                                 dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''
 
-                                                                ]"
+                                                                ]
+                                                                    "
                                                                 class="w-[126px] text-xs text-center cursor-pointer rounded-[5px] border h-8 border-slate-400 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
                                                                 :config="config" />
                                                         </div>
 
                                                     </td>
                                                     <td v-else-if="cellIndex == 'id_dependencia'"
-                                                        class="border-2 border-black"
-                                                        :class="{ 'condition-select': rowsData[rowIndex]['id_dependencia'] == '' }">
+                                                        class="border-2 border-black" :class="{
+                                                            'condition-select': rowsData[rowIndex]['id_dependencia'] == '',//validando si esta vacio
+                                                            'condition-error-select': errors[`detalle_quedan.${rowIndex}.id_dependencia`]//validando si tiene errores
+                                                        }
+                                                            ">
                                                         <div class="relative flex h-8 w-full flex-row-reverse ">
                                                             <Multiselect v-model="rowsData[rowIndex]['id_dependencia']"
+                                                                :title="errors[`detalle_quedan.${rowIndex}.id_dependencia`]"
                                                                 placeholder="seleccione" :classes="{
-                                                                    placeholder: 'flex items-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                                                }" :options="dataForSelectInRow.dependencias"
+                                                                    placeholder: 'flex items-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-black rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ',
+                                                                }
+                                                                    " :options="dataForSelectInRow.dependencias"
                                                                 :searchable="true"
                                                                 :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                                 @select="onCellEdit(rowIndex, cellIndex, $event)" />
@@ -303,12 +312,15 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                     </td>
                                                     <td v-else-if="cellIndex == 'numero_acta_det_quedan'"
                                                         class="border-2 border-black max-w-[75px]" :class="[
-                                                            cell == '' ? 'bg-[#fdfd96]' : '',
+                                                            errors[`detalle_quedan.${rowIndex}.numero_acta_det_quedan`] ? 'bg-red-300' :
+                                                                cell == '' ? 'bg-[#fdfd96]' : '',
                                                             errosDetalleQuedan[rowIndex] ? 'bg-[#fd9696]' : '',
                                                             errosrNumeroActa.includes(rowIndex) ? 'bg-[#fd9696]' : '',
                                                             dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''
-                                                        ]"
+                                                        ]
+                                                            "
                                                         @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
+                                                        :title="errors[`detalle_quedan.${rowIndex}.numero_acta_det_quedan`]"
                                                         :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true">
                                                         {{ cell }}</td>
 
@@ -320,9 +332,10 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                                     style="writing-mode: vertical-rl; transform: rotate(180deg);">
                                                                     PRODUCTO
                                                                 </th>
-                                                                <td :class="[cell.producto_factura_det_quedan == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']"
+                                                                <td :class="[errors[`detalle_quedan.${rowIndex}.monto.producto_factura_det_quedan`] ? 'bg-red-300' : cell.producto_factura_det_quedan == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']"
                                                                     class="w-full border-2 border-b-black border-x-transparent border-t-transparent">
                                                                     <input type="text"
+                                                                        :title="errors[`detalle_quedan.${rowIndex}.monto.producto_factura_det_quedan`]"
                                                                         v-model="rowsData[rowIndex]['monto'].producto_factura_det_quedan"
                                                                         maxlength="10"
                                                                         @input="onlyNumberDecimal(rowIndex, cellIndex, $event, 'producto_factura_det_quedan')"
@@ -336,8 +349,9 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                                     SERVICIO
                                                                 </th>
                                                                 <td
-                                                                    :class="[cell.servicio_factura_det_quedan == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']">
+                                                                    :class="[errors[`detalle_quedan.${rowIndex}.monto.servicio_factura_det_quedan`] ? 'bg-red-300' : cell.servicio_factura_det_quedan == '' ? 'bg-[#fdfd96]' : '', dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : '']">
                                                                     <input type="text"
+                                                                        :title="errors[`detalle_quedan.${rowIndex}.monto.servicio_factura_det_quedan`]"
                                                                         v-model="rowsData[rowIndex]['monto'].servicio_factura_det_quedan"
                                                                         maxlength="10"
                                                                         @input="onlyNumberDecimal(rowIndex, cellIndex, $event, 'servicio_factura_det_quedan')"
@@ -355,14 +369,6 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                             @click="rowsData[rowIndex].reajuste = !rowsData[rowIndex].reajuste; taxesByRow()"
                                                             title="Reajustar factura"
                                                             style="float: right;margin-right: -42px;margin-top: -1px;x;font-size: 30px;padding: 0px 10px;border: 0px;background-color: transparent;">
-                                                            <!--  <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                                                class="w-6 h-6">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                            </svg> -->
                                                             <lord-icon src="https://cdn.lordicon.com/hwuyodym.json"
                                                                 trigger="click" colors="primary:#121331"
                                                                 style="width:24px;height:24px">
@@ -408,9 +414,10 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                 </th>
                                                 <th class="border-2 border-black text-sm px-3 text-gray-600" colspan="4"
                                                     rowspan="2"
-                                                    :class="row['justificacion_det_quedan'] == '' || row['justificacion_det_quedan'] === null ? 'bg-[#fdfd96]' : ''">
+                                                    :class="errors[`detalle_quedan.${rowIndex}.justificacion_det_quedan`] ? 'bg-red-300' : row['justificacion_det_quedan'] == '' || row['justificacion_det_quedan'] === null ? 'bg-[#fdfd96]' : ''">
 
                                                     <input type="text" v-model="row['justificacion_det_quedan']"
+                                                        :title="errors[`detalle_quedan.${rowIndex}.justificacion_det_quedan`]"
                                                         maxlength="50"
                                                         :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                         :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''"
@@ -426,9 +433,10 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                             <tr v-show="row['reajuste']">
 
                                                 <td class="border-2 border-black text-sm px-3"
-                                                    :class="row['reajuste_monto'].ajuste_producto_factura_det_quedan == '' || row['reajuste_monto'].ajuste_producto_factura_det_quedan === null ? 'bg-[#fdfd96]' : ''">
+                                                    :class="errors[`detalle_quedan.${rowIndex}.reajuste_monto.ajuste_producto_factura_det_quedan`] ? 'bg-red-300' : row['reajuste_monto'].ajuste_producto_factura_det_quedan == '' || row['reajuste_monto'].ajuste_producto_factura_det_quedan === null ? 'bg-[#fdfd96]' : ''">
                                                     <input type="text"
                                                         v-model="row['reajuste_monto'].ajuste_producto_factura_det_quedan"
+                                                        :title="errors[`detalle_quedan.${rowIndex}.reajuste_monto.ajuste_producto_factura_det_quedan`]"
                                                         maxlength="10"
                                                         @input="onlyNumberDecimal(rowIndex, 'reajuste_monto', $event, 'ajuste_producto_factura_det_quedan')"
                                                         :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
@@ -436,9 +444,10 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                         class="peer w-full text-sm font-normal  bg-transparent text-center h-6 border-none px-2   transition-colors duration-300 focus:border-none focus:outline-none">
                                                 </td>
                                                 <td class="border-2 border-black text-sm px-3"
-                                                    :class="row['reajuste_monto'].ajuste_servicio_factura_det_quedan == '' || row['reajuste_monto'].ajuste_servicio_factura_det_quedan === null ? 'bg-[#fdfd96]' : ''">
+                                                    :class="errors[`detalle_quedan.${rowIndex}.reajuste_monto.ajuste_servicio_factura_det_quedan`] ? 'bg-red-300' : row['reajuste_monto'].ajuste_servicio_factura_det_quedan == '' || row['reajuste_monto'].ajuste_servicio_factura_det_quedan === null ? 'bg-[#fdfd96]' : ''">
                                                     <input type="text"
                                                         v-model="row['reajuste_monto'].ajuste_servicio_factura_det_quedan"
+                                                        :title="errors[`detalle_quedan.${rowIndex}.reajuste_monto.ajuste_servicio_factura_det_quedan`]"
                                                         maxlength="10"
                                                         @input="onlyNumberDecimal(rowIndex, 'reajuste_monto', $event, 'ajuste_servicio_factura_det_quedan')"
                                                         :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
@@ -460,7 +469,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                         </td>
                                         <td class="border-2 border-black max-w-[250px]" colspan="4" rowspan="2"
                                             :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true"
-                                            @input="onInputDescripcionQuedan"
+                                            @input="dataInputs.descripcion_quedan = $event.target.innerText"
                                             :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''">
                                             {{ dataInputs.descripcion_quedan }}
 
@@ -602,6 +611,7 @@ export default {
                     },
                 },
             },
+            errors: [],
             incoherencia: false,
         };
     },
@@ -862,9 +872,6 @@ export default {
             }
             console.log("SEGUIMIENTO: " + this.dataForCalculate.montoTotalDetalleDocumentoAdquisicion);
         },
-        onInputDescripcionQuedan(event) {//TODO:VERIFICAR ESTA FUNCIONA PARA QUE SIRVE
-            this.dataInputs.descripcion_quedan = event.target.innerText;
-        },
         setValuesToInput() {
             // Asignar los valores correspondientes a los atributos de dataInputs utilizando los datos de dataForSelectInRow y dataQuedan
             this.dataInputs.giro = `${this.dataForSelectInRow.proveedor["codigo_giro"]} - ${this.dataForSelectInRow.proveedor["nombre_giro"]}`;
@@ -894,29 +901,6 @@ export default {
             }
         },
         resetValuesToInput() {
-            //funcion para limpiar la data que la llamaremos cuando la data no traiga nada
-            /* this.dataInputs.giro = ""
-            this.dataInputs.irs = ""
-            this.dataInputs.iva = ""
-            this.dataInputs.id_proveedor = ""
-            this.dataInputs.id_tipo_doc_adquisicion = ''
-            this.dataInputs.nombre_tipo_doc_adquisicion = ''
-            this.dataInputs.numero_doc_adquisicion = ''
-            this.dataInputs.compromiso_ppto_det_doc_adquisicion = ''
-            this.dataInputs.id_det_doc_adquisicion = ''
-            this.dataInputs.descripcion_quedan = ""
-            this.dataInputs.monto_liquido_quedan = ""
-            this.dataInputs.monto_iva_quedan = ""
-            this.dataInputs.monto_isr_quedan = ""
-            this.dataInputs.total = ""
-            this.dataInputs.nombre_empleado_tesoreria = ""
-            this.dataInputs.fecha_emision = ""
-            this.dataInputs.id_quedan = ""
-            this.dataInputs.id_prioridad_pago = ""
-            this.dataInputs.id_proy_financiado = ""
-            this.dataInputs.monto_total_quedan = ""
-            this.dataInputs.numero_retencion_iva_quedan = "" */
-
             this.dataInputs.giro = ''
             this.dataInputs.irs = ''
             this.dataInputs.iva = ''
@@ -938,17 +922,6 @@ export default {
             this.dataInputs.id_prioridad_pago = ''
             this.dataInputs.id_proy_financiado = ''
 
-            /* this.dataForCalculate.irs = ''
-            this.dataForCalculate.iva = ''
-            this.dataForCalculate.id_proveedor = ''
-            this.dataForCalculate.monto_iva_quedan = ''
-            this.dataForCalculate.monto_isr_quedan = ''
-            this.dataForCalculate.monto_total_quedan = ''
-            this.dataForCalculate.montoTotalDetalleDocumentoAdquisicion = ''
-            this.dataForCalculate.monto_det_doc_adquisicion = ''
-            this.dataForCalculate.montoSuperador = ''
-            this.documentoAdquisicion = [] */
-
             this.dataForCalculate.giro = ''
             this.dataForCalculate.irs = ''
             this.dataForCalculate.iva = ''
@@ -962,6 +935,8 @@ export default {
             this.dataForCalculate.montoTotalDetalleDocumentoAdquisicion = ''
             this.dataForCalculate.monto_det_doc_adquisicion = ''
             this.dataForCalculate.montoSuperador = false
+
+            this.errors = []
 
         },
         addRow() {
@@ -1042,6 +1017,38 @@ export default {
 
             return this.errosrNumeroActa.length; // Devolver la cantidad de posiciones duplicadas encontradas
         },
+
+        createQuedanRequest() {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    const resp = await axios.post('/add-quedan', { quedan: this.dataInputs, detalle_quedan: this.rowsData })
+                    this.$emit("actualizar-table-data");
+                    resolve(resp); // Resolvemos la promesa con la respuesta exitosa
+                } catch (error) {
+                    if (error.response.status === 422) {
+                        let data = error.response.data.errors
+                        var myData = new Object();
+                        for (const errorBack in data) {
+                            myData[errorBack] = data[errorBack][0]
+                        }
+                        this.errors = myData
+                        console.table(myData);
+                        setTimeout(() => {
+                            this.errosModel = [];
+                        }, 50000);
+                    } else {
+                        // Mostrar mensaje de error genérico si faltan datos
+                        toast.error("Al parecer te hacen falta datos por ingresar", {
+                            autoClose: 5000,
+                            position: "top-right",
+                            transition: "zoom",
+                            toastBackgroundColor: "white",
+                        });
+                    }
+                    reject(error); // Rechazamos la promesa en caso de excepción
+                }
+            });
+        },
         // Envia la informacion del quedan al backend para procesarla (Guardar)
         async createQuedan() {
             // Mostrar confirmación al usuario
@@ -1055,58 +1062,13 @@ export default {
                 showCancelButton: true,
                 showCloseButton: true
             });
-
             if (confirmed.isConfirmed) {
                 // Verificar si no hay posiciones duplicadas de números de acta
                 if (this.paintPositionRepet() === 0) {
-                    axios.post('/add-quedan', { quedan: this.dataInputs, detalle_quedan: this.rowsData })
-                        .then((response) => {
-                            // Actualizar la tabla de datos
-                            this.$emit("actualizar-table-data");
-                            // Limpiar rowsData y restablecer valores de entrada
-                            this.rowsData = [];
-                            this.resetValuesToInput();
-                            // Agregar una nueva fila vacía
-                            this.addRow();
-                            // Mostrar mensaje de éxito
-                            toast.success("El quedan fue guardado con éxito", {
-                                autoClose: 5000,
-                                position: "top-right",
-                                transition: "zoom",
-                                toastBackgroundColor: "white",
-                            });
-                        })
-                        .catch((error) => {
-                            if (error.response.status === 422) {
-
-                                let data = error.response.data.errors
-                                var myData = new Object();
-                                for (const errorBack in data) {
-                                    myData[errorBack] = data[errorBack][0]
-                                }
-
-                                Object.keys(myData).forEach(key => {
-                                    const mensaje = myData[key];
-
-
-                                    toast.error(`${mensaje}`, {
-                                        autoClose: 5000,
-                                        position: "top-right",
-                                        transition: "zoom",
-                                        toastBackgroundColor: "white",
-                                    });
-
-                                })
-                            } else {
-                                // Mostrar mensaje de error genérico si faltan datos
-                                toast.error("Al parecer te hacen falta datos por ingresar", {
-                                    autoClose: 5000,
-                                    position: "top-right",
-                                    transition: "zoom",
-                                    toastBackgroundColor: "white",
-                                });
-                            }
-                        });
+                    this.executeRequest(
+                        this.createQuedanRequest(),
+                        '¡Los datos se han ingresado correctamente!'
+                    )
                 } else {
                     // Mostrar mensaje de error si hay posiciones duplicadas de números de acta
                     toast.error("Al parecer el numero de acta ya existe en este contexto", {
@@ -1118,6 +1080,40 @@ export default {
                 }
             }
         },
+
+        updateQuedanRequest() {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    const resp = await axios.post('/update-detalle-quedan', { quedan: this.dataInputs, id_quedan: this.dataQuedan.id_quedan, detalle_quedan: this.rowsData })
+                    this.$emit("actualizar-table-data");
+                    resolve(resp); // Resolvemos la promesa con la respuesta exitosa
+                } catch (error) {
+                    if (error.response.status === 422) {
+                        let data = error.response.data.errors
+                        var myData = new Object();
+                        for (const errorBack in data) {
+                            myData[errorBack] = data[errorBack][0]
+                        }
+                        this.errors = myData
+                        console.table(myData);
+                        setTimeout(() => {
+                            this.errosModel = [];
+                        }, 50000);
+                    } else {
+                        // Mostrar mensaje de error genérico si faltan datos
+                        toast.error("Al parecer te hacen falta datos por ingresar", {
+                            autoClose: 5000,
+                            position: "top-right",
+                            transition: "zoom",
+                            toastBackgroundColor: "white",
+                        });
+                    }
+                    reject(error); // Rechazamos la promesa en caso de excepción
+                }
+            });
+        },
+
+
         // Envia la informacion del quedan al backend para procesarla (Editar)
         async updateQuedan() {
             // Mostrar confirmación al usuario
@@ -1135,51 +1131,10 @@ export default {
             if (confirmed.isConfirmed) {
                 // Verificar si no hay posiciones duplicadas de números de acta
                 if (this.paintPositionRepet() === 0) {
-                    axios.post('/update-detalle-quedan', { quedan: this.dataInputs, id_quedan: this.dataQuedan.id_quedan, detalle_quedan: this.rowsData })
-                        .then((response) => {
-                            // Actualizar la tabla de datos
-                            this.$emit("actualizar-table-data");
-                            // Mostrar mensaje de éxito
-                            toast.success("El quedan se ha actualizado con éxito", {
-                                autoClose: 5000,
-                                position: "top-right",
-                                transition: "zoom",
-                                toastBackgroundColor: "white",
-                            });
-                        })
-                        .catch((error) => {
-                            if (error.response.status === 422) {
-
-
-                                let data = error.response.data.errors
-                                var myData = new Object();
-                                for (const errorBack in data) {
-                                    myData[errorBack] = data[errorBack][0]
-                                }
-
-
-                                Object.keys(myData).forEach(key => {
-                                    const mensaje = myData[key];
-
-
-                                    toast.error(`${mensaje}`, {
-                                        autoClose: 5000,
-                                        position: "top-right",
-                                        transition: "zoom",
-                                        toastBackgroundColor: "white",
-                                    });
-
-                                })
-                            } else {
-                                // Mostrar mensaje de error genérico si faltan datos
-                                toast.error("Al parecer te hacen falta datos por ingresar", {
-                                    autoClose: 5000,
-                                    position: "top-right",
-                                    transition: "zoom",
-                                    toastBackgroundColor: "white",
-                                });
-                            }
-                        });
+                    this.executeRequest(
+                        this.updateQuedanRequest(),
+                        '¡Los datos se han actualizado correctamente!'
+                    )
                 } else {
                     // Mostrar mensaje de error si hay posiciones duplicadas de números de acta
                     toast.error("Al parecer el numero de acta ya existe en este contexto", {
@@ -1314,6 +1269,24 @@ table.rounded-lg {
     /* BACKGROUN COLOR INPUT */
     background-color: #fdfd96;
 }
+
+
+.condition-error-select .multiselect {
+    /* BACKGROUND SELECT */
+    background: var(--ms-bg, #fd9696);
+
+}
+
+.condition-error-select .multiselect-placeholder {
+    /* COLOR SELECT TEXT */
+    color: #000000;
+}
+
+.condition-error-select .multiselect-wrapper input {
+    /* BACKGROUN COLOR INPUT */
+    background-color: #fd9696;
+}
+
 
 .condition-acta {
     /* BACKGROUND SELECT */
