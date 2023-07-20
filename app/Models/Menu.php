@@ -42,17 +42,13 @@ class Menu extends Model
             ]);
     }
 
-    public function childrenMenus()
+    public function children_menus()
     {
-        return $this->hasMany('App\Models\Menu', 'id_menu_padre', 'id_menu')->with('roles');
+        return $this->hasMany('App\Models\Menu', 'id_menu_padre', 'id_menu')
+        ->with('roles');
     }
 
-    public function allChildrenMenus()
-    {
-        return $this->childrenMenus()->with('allChildrenMenus');
-    }
-
-    public function parentMenu()
+    public function parent_menu()
     {
         return $this->hasOne('App\Models\Menu', 'id_menu', 'id_menu_padre');
     }

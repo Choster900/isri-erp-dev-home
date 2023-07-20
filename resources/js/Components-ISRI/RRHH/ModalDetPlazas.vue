@@ -264,13 +264,7 @@ export default {
                     this.errors = errors.response.data.errors;
                 }
             } else {
-                let msg = this.manageError(errors);
-                this.$swal.fire({
-                    title: "Operación cancelada",
-                    text: msg,
-                    icon: "warning",
-                    timer: 5000,
-                });
+                this.manageError(errors,this)
                 this.$emit("cerrar-modal");
             }
         },
@@ -319,13 +313,7 @@ export default {
                     this.jobPositionDet.id_estado_plaza = 1
                 }
             } catch (errors) {
-                let msg = this.manageError(errors);
-                this.$swal.fire({
-                    title: 'Operación cancelada',
-                    text: msg,
-                    icon: 'warning',
-                    timer: 5000
-                });
+                this.manageError(errors,this)
             } finally {
                 this.isLoading = false;  // Desactivar el estado de carga
             }

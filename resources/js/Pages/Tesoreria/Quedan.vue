@@ -340,13 +340,7 @@ export default {
                     this.dataQuedanForTable.length > 0 ? this.empty_object = false : this.empty_object = true
                 }
             } catch (error) {
-                let msg = this.manageError(error);
-                this.$swal.fire({
-                    title: "Operación cancelada",
-                    text: msg,
-                    icon: "warning",
-                    timer: 5000,
-                });
+                this.manageError(error,this)
             }
         },
         sortBy(key) {
@@ -370,13 +364,7 @@ export default {
             await axios.get('/get-list-select').then((response) => {
                 this.dataForSelectInRow = response.data;
             }).catch((errors) => {
-                let msg = this.manageError(errors);
-                this.$swal.fire({
-                    title: "Operación cancelada",
-                    text: msg,
-                    icon: "warning",
-                    timer: 5000,
-                });
+                this.manageError(errors,this)
             });
         },
         async getAmountByDetail() {
@@ -385,7 +373,7 @@ export default {
                 // console.log(response.data);
                 this.amountByAcquisitionDocumentsDetails = response.data
             }).catch((errors) => {
-                console.log(errors);
+                this.manageError(errors,this)
             });
         },
         async showQuedan(dataQuedan) {
@@ -491,13 +479,7 @@ export default {
                     .then((response) => {
                     })
                     .catch(errors => {
-                        let msg = this.manageError(errors);
-                        this.$swal.fire({
-                            title: "Operación cancelada",
-                            text: msg,
-                            icon: "warning",
-                            timer: 5000,
-                        });
+                        this.manageError(errors,this)
                     });
             }
         },
@@ -506,6 +488,7 @@ export default {
     mounted() {
         this.getDataQuedan()
         this.getListForSelect()
+        this.getPermissions(this)
     },
 
 };
