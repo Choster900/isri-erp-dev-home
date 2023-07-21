@@ -6,7 +6,7 @@ use App\Http\Controllers\Administracion\UserController;
 use App\Http\Controllers\Administracion\RolController;
 use App\Http\Controllers\Administracion\PersonaController;
 
-Route::group(['middleware' => ['auth', 'access']], function () {
+Route::group(['middleware' => ['access','auth']], function () {
     //Manage Usuarios
     Route::get(
         'adm/usuarios',

@@ -6,11 +6,12 @@ use App\Models\User;
 use App\Models\Rol;
 use App\Models\Menu;
 
+use Illuminate\Support\Collection;
+
 
 if (!function_exists('getMenusByUsuarioRol')) {
     function getMenusByUsuarioRol($id_usuario, $id_rol)
     {
-        //$id_usuario = $request->user()->id_usuario;
         $user = User::find($id_usuario);
         if ($user && $user->hasRole($id_usuario, $id_rol)) {
             $rol = Rol::find($id_rol);
@@ -54,7 +55,7 @@ if (!function_exists('getMenusByUsuarioRol')) {
             $rolxsistema['urls'] = $menu_padre;
             return $rolxsistema;
         } else {
-            return "No existe usuario o rol";
+            return false;
         }
     }
 }
@@ -63,8 +64,8 @@ if (!function_exists('userRolHasThisUrl')) {
     function userRolHasThisUrl(array $menus, String $url)
     {
         $hasUrl = false;
-        foreach ($menus as $value) {
-            $menu = $value["urls"];
+        //foreach ($menus as $value) {
+            $menu = $menus["urls"];
             foreach ($menu as $value2) {
                 $submenu = $value2["submenu"];
                 foreach ($submenu as $value3) {
@@ -73,7 +74,7 @@ if (!function_exists('userRolHasThisUrl')) {
                     }
                 }
             }
-        }
+        //}
         return $hasUrl;
     }
 }

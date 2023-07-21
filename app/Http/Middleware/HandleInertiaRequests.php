@@ -9,6 +9,7 @@ use App\Models\Menu;
 use App\Models\Rol;
 use App\Models\User;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Redirect;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -34,12 +35,7 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        //$var2 = getMenusByUsuario($request->user()->id_usuario);
-        //$url2 = "/adm/usuarios";
-        //$url = userHasThisUrl($var2,$url2);
-        //dd($url);
-
-        //We obtain the roles of the logged in user.
+        $menuRolUsuario = [];
         if ($request->user()) {
             $r_object = (object) $request->user()->roles()->get();
             $id_usuario = $request->user()->id_usuario;
@@ -63,6 +59,21 @@ class HandleInertiaRequests extends Middleware
                     array_push($roles, $rolxsistema);
                 }
             }
+
+            $id_rol = session()->get('id_rol');
+            if ($id_rol) {
+                $url = $request->path();
+                $url2 = "/" . $url;
+                $menuRolUsuario = getMenusByUsuarioRol($id_usuario, $id_rol);
+                if ($menuRolUsuario) {
+                    $hasUrl = userRolHasThisUrl($menuRolUsuario, $url2);
+                    if($hasUrl){
+    
+                    }else{
+                        return redirect('dashboard');
+                    }
+                }
+            }
         }
 
         //We send arrays that will be accessible throughout the app.
@@ -76,6 +87,7 @@ class HandleInertiaRequests extends Middleware
                 ]);
             },
             "menus" => $request->user() ? $roles : [],
+            "menuRolUsuario" => $menuRolUsuario,
             'flash' => [
                 'message' => fn () => $request->session()->get('message')
             ],

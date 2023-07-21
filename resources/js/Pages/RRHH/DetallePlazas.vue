@@ -199,7 +199,6 @@ export default {
     created() {
         this.getJobPositions()
         this.getPermissions(this)
-        this.getSideBarMenu()
     },
     data() {
         let sortOrders = {};
@@ -383,10 +382,6 @@ export default {
                         })
                 }
             })
-        },
-        getSideBarMenu(){
-            let roles = JSON.parse(JSON.stringify(this.$page.props.userPermissions.roles))
-            console.log(roles);
         }
 
     },
