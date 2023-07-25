@@ -1,14 +1,34 @@
 <?php
 
-//namespace App\Helpers;
-
 use App\Models\User;
 use App\Models\Rol;
 use App\Models\Menu;
+use Inertia\Inertia;
 
-use Illuminate\Support\Collection;
+//This method check if the user has access to the specific url
+if (!function_exists('checkModuleAccessAndRedirect')) {
+    function checkModuleAccessAndRedirect(Int $id_usuario, String $url, String $page)
+    {
+        $id_rol = session()->get('id_rol');
 
+        if (!$id_usuario || !$id_rol) {
+            return redirect('dashboard');
+        }
 
+        $menuRolUsuario = getMenusByUsuarioRol($id_usuario, $id_rol);
+        if ($menuRolUsuario) {
+            $allowed_url = $menuRolUsuario && userRolHasThisUrl($menuRolUsuario, $url);
+
+            return $allowed_url
+                ? Inertia::render($page, ['menu' => $menuRolUsuario])
+                : redirect('dashboard');
+        } else {
+            redirect('dashboard');
+        }
+    }
+}
+
+//This method obtains the user menu for a given role.
 if (!function_exists('getMenusByUsuarioRol')) {
     function getMenusByUsuarioRol($id_usuario, $id_rol)
     {
@@ -60,21 +80,20 @@ if (!function_exists('getMenusByUsuarioRol')) {
     }
 }
 
+//This method defines whether a role has a specific url assigned to it.
 if (!function_exists('userRolHasThisUrl')) {
     function userRolHasThisUrl(array $menus, String $url)
     {
         $hasUrl = false;
-        //foreach ($menus as $value) {
-            $menu = $menus["urls"];
-            foreach ($menu as $value2) {
-                $submenu = $value2["submenu"];
-                foreach ($submenu as $value3) {
-                    if ($value3['url'] === $url) {
-                        $hasUrl = true;
-                    }
+        $menu = $menus["urls"];
+        foreach ($menu as $value2) {
+            $submenu = $value2["submenu"];
+            foreach ($submenu as $value3) {
+                if ($value3['url'] === $url) {
+                    $hasUrl = true;
                 }
             }
-        //}
+        }
         return $hasUrl;
     }
 }

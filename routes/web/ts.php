@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Tesoreria\ProveedorController;
 use App\Http\Controllers\Tesoreria\QuedanController;
 use App\Http\Controllers\Tesoreria\RequerimientoController;
@@ -11,16 +12,14 @@ use App\Http\Controllers\Tesoreria\LiquidacionQuedanController;
 use App\Http\Controllers\Tesoreria\ReporteTesoreriaController;
 use App\Http\Controllers\Tesoreria\DocumentoAdquisicionController;
 
-Route::group(['middleware' => ['auth', 'access']], function () {
+Route::group(['middleware' => ['auth']], function () {
 
     //Manage supplier
     //This route obtains supplier based on the parameters sent from the page.
     Route::get(
         '/ts/proveedores',
-        function () {
-            return Inertia::render('Tesoreria/Proveedores', [
-                'menu' => session()->get('menu')
-            ]);
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/ts/proveedores','Tesoreria/Proveedores');
         }
     )->name('ts.proveedores');
     Route::post('proveedores', [ProveedorController::class, 'getProveedores'])->name('proveedor.getProveedor');
@@ -35,10 +34,8 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     //This route obtains Quedan based on the parameters sent from the page.
     Route::get(
         '/ts/quedan',
-        function () {
-            return Inertia::render('Tesoreria/Quedan', [
-                'menu' => session()->get('menu')
-            ]);
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/ts/quedan','Tesoreria/Quedan');
         }
     )->name('ts.quedan');
 
@@ -54,10 +51,8 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     //This route obtains Requerimiento pago based on the parameters sent from the page.
     Route::get(
         '/ts/requerimientos',
-        function () {
-            return Inertia::render('Tesoreria/Requerimiento', [
-                'menu' => session()->get('menu')
-            ]);
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/ts/requerimientos','Tesoreria/Requerimiento');
         }
     )->name('ts.requerimientos');
 
@@ -83,10 +78,8 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     //Routes to manage income concept
     Route::get(
         '/ts/conceptos-ingreso',
-        function () {
-            return Inertia::render('Tesoreria/ConceptosIngreso', [
-                'menu' => session()->get('menu')
-            ]);
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/ts/conceptos-ingreso','Tesoreria/ConceptosIngreso');
         }
     )->name('ts.conceptosIngreso');
     Route::post('ingresos', [ConceptoIngresoController::class, 'getConceptoIngresos'])->name('conceptoIngreso.getConceptoIngresos');
@@ -98,10 +91,8 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     //Routes to manage income
     Route::get(
         '/ts/recibos-ingreso',
-        function () {
-            return Inertia::render('Tesoreria/RecibosIngreso', [
-                'menu' => session()->get('menu')
-            ]);
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/ts/recibos-ingreso','Tesoreria/RecibosIngreso');
         }
     )->name('ts.recibosIngreso');
     Route::post('recibos-ingreso', [ReciboIngresoController::class, 'getRecibosIngreso'])->name('reciboIngreso.getRecibosIngreso');
@@ -116,10 +107,8 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     //Routes to manage acquisition doc
     Route::get(
         '/ts/doc-adquisicion',
-        function () {
-            return Inertia::render('Tesoreria/DocumentoAdquisicion', [
-                'menu' => session()->get('menu')
-            ]);
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/ts/doc-adquisicion','Tesoreria/DocumentoAdquisicion');
         }
     )->name('ts.docAdquisicion');
     Route::post('doc-adquisicion', [DocumentoAdquisicionController::class, 'getDocAdquisicion'])->name('documentoAdquisicion.getDocAdquisicion');
@@ -131,10 +120,8 @@ Route::group(['middleware' => ['auth', 'access']], function () {
 
     Route::get(
         '/ts/liquidacion',
-        function () {
-            return Inertia::render('Tesoreria/LiquidacionRequerimiento', [
-                'menu' => session()->get('menu')
-            ]);
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/ts/liquidacion','Tesoreria/AsignacionLiquidacionRequerimiento');
         }
     )->name('ts.liquidacion');
     Route::post('asignados', [LiquidacionQuedanController::class, 'getRequerimientosAsiganos'])->name('asignados');
@@ -144,10 +131,8 @@ Route::group(['middleware' => ['auth', 'access']], function () {
 
     Route::get(
         '/ts/reporte-quedan',
-        function () {
-            return Inertia::render('Tesoreria/ReporteQuedan', [
-                'menu' => session()->get('menu')
-            ]);
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/ts/reporte-quedan','Tesoreria/ReporteQuedan');
         }
     )->name('ts.reporteQuedan');
     Route::post('create-quedan-report', [ReporteTesoreriaController::class, 'createQuedanReport'])->name('reporteTesoreria.createQuedanReport');
@@ -155,49 +140,39 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get('get-selects-report', [ReporteTesoreriaController::class, 'getSelectsReport'])->name('reporteTesoreria.getSelectsReport');
     Route::get(
         '/ts/reporte-facturas',
-        function () {
-            return Inertia::render('Tesoreria/ReporteFactura', [
-                'menu' => session()->get('menu')
-            ]);
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/ts/reporte-facturas','Tesoreria/ReporteFactura');
         }
     )->name('ts.reporteFactura');
     Route::get('get-selects-invoice-reporting', [ReporteTesoreriaController::class, 'getSelectsInvoiceReporting'])->name('reporteTesoreria.getSelectsInvoiceReporting');
     Route::post('create-invoice-report', [ReporteTesoreriaController::class, 'createInvoiceReport'])->name('reporteTesoreria.createInvoiceReport');
     Route::get(
         '/ts/reporte-retencion-isr',
-        function () {
-            return Inertia::render('Tesoreria/ReporteRetencionISR', [
-                'menu' => session()->get('menu')
-            ]);
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/ts/reporte-retencion-isr','Tesoreria/ReporteRetencionISR');
         }
     )->name('ts.reporteRetencionISR');
     Route::get('get-selects-withholding-tax-report', [ReporteTesoreriaController::class, 'getSelectsWithholdingTaxReport'])->name('reporteTesoreria.getSelectsWithholdingTaxReport');
     Route::post('create-income-tax-report', [ReporteTesoreriaController::class, 'createIncomeTaxReport'])->name('reporteTesoreria.createIncomeTaxReport');
     Route::get(
         '/ts/reporte-retencion-iva',
-        function () {
-            return Inertia::render('Tesoreria/ReporteRetencionIVA', [
-                'menu' => session()->get('menu')
-            ]);
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/ts/reporte-retencion-iva','Tesoreria/ReporteRetencionIVA');
         }
     )->name('ts.reporteRetencionIVA');
     Route::post('create-withholding-iva-report', [ReporteTesoreriaController::class, 'createWithholdingIVAReport'])->name('reporteTesoreria.createWithholdingIVAReport');
     Route::get(
         '/ts/reporte-ingresos',
-        function () {
-            return Inertia::render('Tesoreria/ReporteIngresos', [
-                'menu' => session()->get('menu')
-            ]);
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/ts/reporte-ingresos','Tesoreria/ReporteIngresos');
         }
     )->name('ts.reporteIngresos');
     Route::get('get-selects-income-report', [ReporteTesoreriaController::class, 'getSelectsIncomeReport'])->name('reporteTesoreria.getSelectsIncomeReport');
     Route::post('create-income-report', [ReporteTesoreriaController::class, 'createIncomeReport'])->name('reporteTesoreria.createIncomeReport');
     Route::get(
         '/ts/ingresos-diarios',
-        function () {
-            return Inertia::render('Tesoreria/IngresosDiarios', [
-                'menu' => session()->get('menu')
-            ]);
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/ts/ingresos-diarios','Tesoreria/IngresosDiarios');
         }
     )->name('ts.ingresosDiarios');
     Route::post('get-daily-income-report', [ReporteTesoreriaController::class, 'getDailyIncomeReport'])->name('reporteTesoreria.getDailyIncomeReport');

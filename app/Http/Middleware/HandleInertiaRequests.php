@@ -10,6 +10,8 @@ use App\Models\Rol;
 use App\Models\User;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Route;
+use Closure;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -33,9 +35,9 @@ class HandleInertiaRequests extends Middleware
      *
      * @return array<string, mixed>
      */
+
     public function share(Request $request): array
     {
-        $menuRolUsuario = [];
         if ($request->user()) {
             $r_object = (object) $request->user()->roles()->get();
             $id_usuario = $request->user()->id_usuario;
@@ -60,20 +62,6 @@ class HandleInertiaRequests extends Middleware
                 }
             }
 
-            $id_rol = session()->get('id_rol');
-            if ($id_rol) {
-                $url = $request->path();
-                $url2 = "/" . $url;
-                $menuRolUsuario = getMenusByUsuarioRol($id_usuario, $id_rol);
-                if ($menuRolUsuario) {
-                    $hasUrl = userRolHasThisUrl($menuRolUsuario, $url2);
-                    if($hasUrl){
-    
-                    }else{
-                        return redirect('dashboard');
-                    }
-                }
-            }
         }
 
         //We send arrays that will be accessible throughout the app.
@@ -87,7 +75,6 @@ class HandleInertiaRequests extends Middleware
                 ]);
             },
             "menus" => $request->user() ? $roles : [],
-            "menuRolUsuario" => $menuRolUsuario,
             'flash' => [
                 'message' => fn () => $request->session()->get('message')
             ],
