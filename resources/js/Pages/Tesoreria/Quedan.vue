@@ -335,12 +335,11 @@ export default {
                     this.dataQuedanForTable = data.data.data;
 
                     // Obtener el monto por proveedor
-                    this.getAmountBySupplier();
+                    //this.getAmountBySupplier();
                     this.getAmountByDetail()
                     this.dataQuedanForTable.length > 0 ? this.empty_object = false : this.empty_object = true
                 }
             } catch (error) {
-                console.log(error);
                 this.manageError(error,this)
             }
         },

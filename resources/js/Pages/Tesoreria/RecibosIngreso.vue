@@ -204,7 +204,7 @@ import axios from 'axios';
 
         <ModalIncomeReceiptVue :show_modal_receipt="show_modal_receipt" :modal_data="modal_data"
             :budget_accounts="budget_accounts" :treasury_clerk="treasury_clerk" @cerrar-modal="show_modal_receipt = false"
-            @get-table="getIncomeReceipts(tableData.currentPage)" />
+            @get-table="tableData.column = -1; getIncomeReceipts(tableData.currentPage)" />
 
         <ModalReceiptFormatVue :view_receipt="view_receipt" :receipt_to_print="receipt_to_print"
             @cerrar-modal="view_receipt = false" />
@@ -267,7 +267,7 @@ export default {
                 draw: 0,
                 length: 5,
                 search: "",
-                column: 0,
+                column: -1,
                 dir: "desc",
                 total: ""
             },
