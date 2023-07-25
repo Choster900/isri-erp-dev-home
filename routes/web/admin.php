@@ -1,19 +1,17 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 use App\Http\Controllers\Administracion\UserController;
 use App\Http\Controllers\Administracion\RolController;
 use App\Http\Controllers\Administracion\PersonaController;
+use Illuminate\Http\Request;
 
-Route::group(['middleware' => ['auth', 'access']], function () {
+Route::group(['middleware' => ['auth']], function () {
     //Manage Usuarios
     Route::get(
         'adm/usuarios',
-        function () {
-            return Inertia::render('Administracion/Usuarios', [
-                'menu' => session()->get('menu')
-            ]);
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/adm/usuarios','Administracion/Usuarios');
         }
     )->name('adm.usuarios');
     //This route obtains users based on the parameters sent from the page.
@@ -33,10 +31,8 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     //Manage Roles
     Route::get(
         'adm/roles',
-        function () {
-            return Inertia::render('Administracion/Roles', [
-                'menu' => session()->get('menu')
-            ]);
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/adm/roles','Administracion/Roles');
         }
     )->name('adm.roles');
     //This route obtains roles based on the parameters sent from the page.
@@ -55,10 +51,8 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     //Manage Personas
     Route::get(
         'adm/personas',
-        function () {
-            return Inertia::render('Administracion/Personas', [
-                'menu' => session()->get('menu')
-            ]);
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/adm/personas','Administracion/Personas');
         }
     )->name('adm.personas');
     //Manage Personas
