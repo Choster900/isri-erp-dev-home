@@ -18,26 +18,26 @@ class AccessMiddleware
     public function handle(Request $request, Closure $next)
     {
         $url = $request->path();
-        $url2= "/".$url;
+        $url2 = "/" . $url;
         $id_usuario = $request->user()->id_usuario;
         $user = User::find($id_usuario);
-        $user_menu = session()->get('menu');
 
+        $hasUrl = false;
         $allowed_url = false;
-        $r_object = (object) $request->user()->roles()->get();
-        foreach ($r_object as $rol) {
-            foreach ($rol->menus as $menu) {
-                if ($user->hasRole($id_usuario,$rol->id_rol) && $menu->pivot->estado_acceso_menu == 1 && $menu->url_menu == $url2 && $user_menu) {
-                    $allowed_url = true;
-                }
+        $id_rol = session()->get('id_rol');
+
+        if ($user) {
+            $menuRolUsuario = getMenusByUsuarioRol($id_usuario, $id_rol);
+            if ($menuRolUsuario) {
+                $hasUrl = userRolHasThisUrl($menuRolUsuario, $url2);
+                $allowed_url = $hasUrl;
             }
         }
 
-        if ($allowed_url || $request->ajax()){
+        if ($allowed_url || $request->ajax()) {
             return $next($request);
-        }else{
+        } else {
             return redirect('dashboard');
         }
-        
     }
 }

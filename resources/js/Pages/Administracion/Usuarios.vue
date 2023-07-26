@@ -192,7 +192,7 @@ import ModalChangePasswordVue from '@/Components-ISRI/Administracion/ModalChange
 export default {
   created() {
     this.getUsers()
-    this.getPermits()
+    this.getPermissions(this)
     this.getSelectsCreateUser()
   },
   data: function (data) {
@@ -265,19 +265,6 @@ export default {
     };
   },
   methods: {
-    getPermits() {
-      var URLactual = window.location.pathname
-      let data = this.$page.props.menu;
-      let menu = JSON.parse(JSON.stringify(data['urls']))
-      menu.forEach((value, index) => {
-        value.submenu.forEach((value2, index2) => {
-          if (value2.url === URLactual) {
-            var array = { 'insertar': value2.insertar, 'actualizar': value2.actualizar, 'eliminar': value2.eliminar, 'ejecutar': value2.ejecutar }
-            this.permits = array
-          }
-        })
-      })
-    },
     createNewUser() {
       this.show = true
       this.modalData = []
@@ -298,13 +285,7 @@ export default {
           this.systems = response.data.systems
         })
         .catch((errors) => {
-          let msg = this.manageError(errors)
-          this.$swal.fire({
-            title: 'Operación cancelada',
-            text: msg,
-            icon: 'warning',
-            timer: 5000
-          })
+          this.manageError(errors,this)
         })
     },
 
@@ -320,13 +301,7 @@ export default {
           this.showModalCreate = true
         })
         .catch((errors) => {
-          let msg = this.manageError(errors)
-          this.$swal.fire({
-            title: 'Operación cancelada',
-            text: msg,
-            icon: 'warning',
-            timer: 5000
-          })
+          this.manageError(errors,this)
         })
     },
     getUpdateTable() {
@@ -359,13 +334,7 @@ export default {
               this.getUsers(this.tableData.currentPage);
             })
             .catch((errors) => {
-              let msg = this.manageError(errors)
-              this.$swal.fire({
-                title: 'Operación cancelada',
-                text: msg,
-                icon: 'warning',
-                timer: 5000
-              })
+              this.manageError(errors,this)
             })
         }
       })
@@ -388,14 +357,7 @@ export default {
           this.users.length > 0 ? this.empty_object = false : this.empty_object = true
         }
       }).catch((errors) => {
-        let msg = this.manageError(errors)
-        //window.location.href = 'http://127.0.0.1:8000/dashboard'
-        this.$swal.fire({
-          title: 'Operación cancelada',
-          text: msg,
-          icon: 'warning',
-          timer: 5000
-        })
+        this.manageError(errors,this)
       })
     },
     sortBy(key) {

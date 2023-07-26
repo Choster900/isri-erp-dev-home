@@ -5,15 +5,14 @@ use App\Http\Controllers\RRHH\DetallePlazaController;
 use App\Http\Controllers\RRHH\BeneficiarioController;
 use App\Http\Controllers\RRHH\EmpleadoController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get(
         '/rrhh/empleados',
-        function () {
-            return Inertia::render('RRHH/Empleados', [
-                'menu' => session()->get('menu')
-            ]);
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/rrhh/empleados','RRHH/Empleados');
         }
     )->name('rrhh.empleados');
     Route::post('employees', [EmpleadoController::class, 'getEmployees'])->name('empleado.getEmployees');
@@ -24,10 +23,8 @@ Route::group(['middleware' => ['auth', 'access']], function () {
 
     Route::get(
         '/rrhh/det-plazas',
-        function () {
-            return Inertia::render('RRHH/DetallePlazas', [
-                'menu' => session()->get('menu')
-            ]);
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/rrhh/det-plazas','RRHH/DetallePlazas');
         }
     )->name('rrhh.detPlazas');
     Route::post('det-job-positions', [DetallePlazaController::class, 'getDetJobPositions'])->name('detallePlaza.getDetJobPositions');
@@ -38,10 +35,8 @@ Route::group(['middleware' => ['auth', 'access']], function () {
 
     Route::get(
         '/rrhh/beneficiarios',
-        function () {
-            return Inertia::render('RRHH/Beneficiarios', [
-                'menu' => session()->get('menu')
-            ]);
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/rrhh/beneficiarios','RRHH/Beneficiarios');
         }
     )->name('rrhh.beneficiarios');
     Route::post('beneficiarios', [BeneficiarioController::class, 'getDataFromBeneficiarios'])->name('beneficiarios.getEmployees');

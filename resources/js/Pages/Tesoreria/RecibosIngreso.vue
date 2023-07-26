@@ -204,7 +204,7 @@ import axios from 'axios';
 
         <ModalIncomeReceiptVue :show_modal_receipt="show_modal_receipt" :modal_data="modal_data"
             :budget_accounts="budget_accounts" :treasury_clerk="treasury_clerk" @cerrar-modal="show_modal_receipt = false"
-            @get-table="getIncomeReceipts(tableData.currentPage)" />
+            @get-table="tableData.column = -1; getIncomeReceipts(tableData.currentPage)" />
 
         <ModalReceiptFormatVue :view_receipt="view_receipt" :receipt_to_print="receipt_to_print"
             @cerrar-modal="view_receipt = false" />
@@ -216,7 +216,7 @@ import axios from 'axios';
 export default {
     created() {
         this.getIncomeReceipts()
-        this.getPermits()
+        this.getPermissions(this)
         this.getModalReceiptSelects()
     },
     data() {
@@ -267,7 +267,7 @@ export default {
                 draw: 0,
                 length: 5,
                 search: "",
-                column: 0,
+                column: -1,
                 dir: "desc",
                 total: ""
             },
@@ -302,13 +302,7 @@ export default {
                     //this.financing_sources = response.data.financing_sources
                 })
                 .catch((errors) => {
-                    let msg = this.manageError(errors);
-                    this.$swal.fire({
-                        title: "Operación cancelada",
-                        text: msg,
-                        icon: "warning",
-                        timer: 5000,
-                    });
+                    this.manageError(errors,this)
                     this.$emit("cerrar-modal");
                 });
         },
@@ -340,13 +334,7 @@ export default {
                             this.getIncomeReceipts(this.tableData.currentPage);
                         })
                         .catch((errors) => {
-                            let msg = this.manageError(errors)
-                            this.$swal.fire({
-                                title: 'Operación cancelada',
-                                text: msg,
-                                icon: 'warning',
-                                timer: 5000
-                            })
+                            this.manageError(errors,this)
                         })
                 }
             })
@@ -365,13 +353,7 @@ export default {
                     this.income_receipts.length > 0 ? this.empty_object = false : this.empty_object = true
                 }
             }).catch((errors) => {
-                let msg = this.manageError(errors)
-                this.$swal.fire({
-                    title: 'Operación cancelada',
-                    text: msg,
-                    icon: 'warning',
-                    timer: 5000
-                })
+                this.manageError(errors,this)
                 //console.log(errors);
             })
         },
@@ -386,19 +368,6 @@ export default {
         },
         getIndex(array, key, value) {
             return array.findIndex((i) => i[key] == value);
-        },
-        getPermits() {
-            var URLactual = window.location.pathname
-            let data = this.$page.props.menu;
-            let menu = JSON.parse(JSON.stringify(data['urls']))
-            menu.forEach((value, index) => {
-                value.submenu.forEach((value2, index2) => {
-                    if (value2.url === URLactual) {
-                        var array = { 'insertar': value2.insertar, 'actualizar': value2.actualizar, 'eliminar': value2.eliminar, 'ejecutar': value2.ejecutar }
-                        this.permits = array
-                    }
-                })
-            })
         },
         handleData(myEventData) {
             this.tableData.search = myEventData;
