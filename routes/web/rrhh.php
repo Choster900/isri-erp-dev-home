@@ -48,10 +48,8 @@ Route::group(['middleware' => ['auth', 'access']], function () {
 
     Route::get(
         '/rrhh/acuerdos',
-        function () {
-            return Inertia::render('RRHH/Acuerdos', [
-                'menu' => session()->get('menu')
-            ]);
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/rrhh/acuerdos','RRHH/Acuerdos');
         }
     )->name('rrhh.acuerdos');
     Route::post('acuerdos', [AcuerdoController::class, 'getAcuerdos'])->name('acuerdos.getAcuerdos');

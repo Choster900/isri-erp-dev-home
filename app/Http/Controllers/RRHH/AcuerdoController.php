@@ -46,7 +46,6 @@ class AcuerdoController extends Controller
 
         if ($data) {
             $query->where('id_empleado', 'like', '%' . $data["id_empleado"] . '%');
-
         }
         $acuerdos = $query->paginate($length)->onEachSide(1);
 
@@ -59,7 +58,9 @@ class AcuerdoController extends Controller
 
         return [
             'data'          => $acuerdos,
-            'dataForSelect' => ['tipo_acuerdo_laboral' => $tipo_acuerdo_laboral],
+            'dataForSelect' => [
+                'tipo_acuerdo_laboral' => $tipo_acuerdo_laboral
+            ],
             'draw'          => $request->input('draw'),
         ];
     }
@@ -123,12 +124,9 @@ class AcuerdoController extends Controller
                  ->where('estado_persona', 1)
                  ->where("id_persona", $request['query'])->get(); */
         }
-
     }
 
     function createDeals(Request $request)
     {
-        
     }
-
 }
