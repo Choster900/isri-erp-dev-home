@@ -41,6 +41,16 @@
     scroll-behavior: smooth;
    /*Comenta la línea (o dale el valor 'auto' a scroll behavior )
    para probar la diferencia con y sin scroll suavizado*/
+   
+   /*clase que evita sobrear texto*/
+    .text-selection-disable {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
 }
 /* .overflow-x-auto table tbody tr:hover {
     background-color: rgba(104, 120, 120, 0.1);

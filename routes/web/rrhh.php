@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\RRHH\AcuerdoController;
 use App\Http\Controllers\RRHH\DetallePlazaController;
 use App\Http\Controllers\RRHH\BeneficiarioController;
 use App\Http\Controllers\RRHH\EmpleadoController;
@@ -43,20 +44,24 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             ]);
         }
     )->name('rrhh.beneficiarios');
+    Route::post('beneficiarios', [BeneficiarioController::class, 'getDataFromBeneficiarios'])->name('beneficiarios.getEmployees');
+    Route::post('search-people', [BeneficiarioController::class, 'searchPeopleByNameOrId'])->name('empleado.seachPersonByName');
+    Route::post('add-relatives', [BeneficiarioController::class, 'addRelatives'])->name('add.relatives');
+    Route::post('update-relatives', [BeneficiarioController::class, 'updateRelatives'])->name('update.relatives');
 
 
 
     Route::get(
-        '/rrhh/crearBeneficiario',
+        '/rrhh/acuerdos',
         function () {
-            return Inertia::render('RRHH/Beneficiarios', [
+            return Inertia::render('RRHH/Acuerdos', [
                 'menu' => session()->get('menu')
             ]);
         }
-    )->name('rrhh.crearBeneficiario');
+    )->name('rrhh.acuerdos');
+    Route::post('acuerdos', [AcuerdoController::class, 'getAcuerdos'])->name('acuerdos.getAcuerdos');
+    Route::post('search-employe', [AcuerdoController::class, 'searchEmployeByNameOrId'])->name('empleado.seachEmployeByName');
 
-    Route::post('beneficiarios', [BeneficiarioController::class, 'getDataNemefocoarops'])->name('beneficiarios.getEmployees');
-    Route::post('search-people', [BeneficiarioController::class, 'searchPeopleByNameOrId'])->name('empleado.seachPersonByName');
-    Route::post('add-relatives', [BeneficiarioController::class, 'addRelatives'])->name('add.relatives');
-    Route::post('update-relatives', [BeneficiarioController::class, 'updateRelatives'])->name('update.relatives');
+
+    
 });

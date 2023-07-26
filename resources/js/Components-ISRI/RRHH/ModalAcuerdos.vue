@@ -1,0 +1,588 @@
+<script setup>
+import { toast } from 'vue3-toastify'; // Importar el módulo toast de vue3-toastify
+import 'vue3-toastify/dist/index.css'; // Importar los estilos de vue3-toastify
+import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'; // Importar el componente ProcessModal
+import TooltipVue from '../Tesoreria/Tooltip.vue';
+import moment from 'moment';
+import Modal from "@/Components-ISRI/AllModal/Modal.vue";
+
+</script>
+
+<template>
+    <div class="m-1.5">
+        <!-- Componente del modal ProcessModal -->
+        <Modal maxWidth="4xl" :show="showModal" @close="$emit('cerrar-modal')">
+            <div class="px-4 py-2">
+                <div class="flex flex-col md:flex-row ">
+                    <div class="w-full md:w-1/2 ">
+
+                        <div class="flex justify-start">
+                            <div class="flex-1 px-0.5 pt-3">
+                                <div class="md:flex flex-row justify-items-start mb-4">
+                                    <div class="mb-4 md:mr-2 md:mb-0 basis-full ">
+                                        <label class="block mb-1 text-xs font-light text-gray-600">
+                                            Empleado <span class="text-red-600 font-extrabold">*</span>
+                                        </label>
+                                        <div class="relative font-medium  flex h-8 w-full flex-row-reverse">
+                                            <Multiselect v-model="dataForm.id_empleado"
+                                                @search-change="handleSearch({ by: 'name', query: $event })"
+                                                :clearOnSearch="true"
+                                                placeholder="FILTRAR POR APELLIDO (SI NO APARECE ES POSIBLE QUE YA TENGA REGISTROS)"
+                                                :filter-results="false" :min-chars="10" :resolve-on-load="true"
+                                                :searchable="true" :options="employeOptions"
+                                                noOptionsText="<p class='text-xs'>Sin registros<p>" :classes="{
+                                                    placeholder: 'flex items-center h-full absolute text-[9px] left-0 top-0 pointer-events-none bg-transparent leading-snug pl-2 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                                }" />
+
+                                            <LabelToInput icon="personalInformation" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="md:flex flex-row justify-items-start mb-4">
+                                    <div class="mb-4 md:mr-2 md:mb-0 basis-full ">
+                                        <label class="block mb-1 text-xs font-light text-gray-600">
+                                            Acuerdo laboral <span class="text-red-600 font-extrabold">*</span>
+                                        </label>
+                                        <div class="relative font-medium  flex h-8 w-full flex-row-reverse">
+                                            <Multiselect v-model="dataForm.deal.id_tipo_acuerdo_laboral"
+                                                @select="dataForm.deal.nombre_tipo_acuerdo_laboral = JSON.parse(JSON.stringify(dataForSelect.tipo_acuerdo_laboral.find((index) => index.value == dataForm.deal.id_tipo_acuerdo_laboral))).label"
+                                                :clearOnSearch="true" :searchable="true"
+                                                :options="dataForSelect.tipo_acuerdo_laboral"
+                                                noResultsText="<p class='text-xs'>Registro no encontrado<p>"
+                                                noOptionsText="<p class='text-xs'>Sin registros<p>" :classes="{
+                                                    placeholder: 'flex items-center h-full absolute text-[9px] left-0 top-0 pointer-events-none bg-transparent leading-snug pl-2 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                                }" />
+                                            <LabelToInput icon="list" />
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="mb-4 md:flex flex-row justify-items-start">
+                                    <div class="mb-4 md:ml-1 md:mb-0 basis-1/2">
+                                        <label class="block mb-1 text-xs font-light text-gray-600" for="fecha_nacimiento">
+                                            Fecha<span class="text-red-600 font-extrabold">*</span>
+                                        </label>
+                                        <div class="relative flex">
+                                            <LabelToInput icon="date" />
+                                            <flat-pickr v-model="dataForm.deal.fecha_acuerdo_laboral"
+                                                class="peer text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none w-full"
+                                                :config="config" :placeholder="'Seleccione Fecha Final'" />
+                                        </div>
+                                    </div>
+                                    <div class="mb-4 md:ml-1 md:mb-0 basis-1/2">
+                                        <label class="block mb-1 text-xs font-light text-gray-600" for="fecha_nacimiento">
+                                            Fecha [Desde - Hasta]
+                                            <span class="text-red-600 font-extrabold">*</span>
+                                        </label>
+                                        <div class="relative flex">
+                                            <LabelToInput icon="date" />
+                                            <flat-pickr v-model="dataForm.deal.fecha_inicio_fecha_fin_acuerdo_laboral"
+                                                class="peer text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none w-full"
+                                                :config="configSecondInput" :placeholder="'Seleccione Fecha Final'" />
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                                <div class="mb-4 md:flex flex-row justify-items-start">
+                                    <div class="mb-1 md:mr-2 md:mb-0 basis-full">
+                                        <TextInput id="oficio-acuerdo" type="text" placeholder="Oficio"
+                                            v-model="dataForm.deal.oficio_acuerdo_laboral">
+                                            <LabelToInput icon="standard" forLabel="primer-nombre" />
+                                        </TextInput>
+                                    </div>
+                                </div>
+
+
+                                <div class="basis-full" style="border: none; background-color: transparent;">
+                                    <label class="block mb-1 text-xs font-light text-gray-600" for="descripcion">
+                                        Descripción
+                                        <span class="text-red-600 font-extrabold">*</span>
+                                    </label>
+                                    <textarea id="descripcion" name="descripcion" style="overflow-x: hidden;"
+                                        v-model="dataForm.deal.comentario_acuerdo_laboral"
+                                        class="resize-none w-full h-24 overflow-y-auto peer text-xs font-semibold rounded-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"></textarea>
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class=" flex justify-center">
+                            <div v-show="errorForm"
+                                class="animate-shake flex w-full items-center font-medium py-1.5 pr-2  rounded-md text-red-700 bg-red-100 border border-red-300 ">
+                                <div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" class="feather feather-alert-octagon w-4 h-4 mx-2">
+                                        <polygon
+                                            points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2">
+                                        </polygon>
+                                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                    </svg>
+                                </div>
+                                <div class="text-xs font-normal  max-w-full flex-initial">Todos los campos son
+                                    requeridos de este formulario</div>
+                                <div class="flex flex-auto flex-row-reverse">
+                                    <div @click="errorForm = false">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round"
+                                            class="feather feather-x cursor-pointer hover:text-red-400 rounded-full w-4 h-4 ml-2">
+                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <!-- Columna izquierda -->
+                    <!-- Columna derecha -->
+                    <div class="w-full md:w-1/2 ">
+                        <div class="px-1 md:px-2">
+                            <span class="text-slate-500 whitespace-nowrap flex items-center justify-center gap-2">
+                                <span class="flex py-1 gap-2">
+                                    <span>Seguimiento</span>
+                                    <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                        class="w-6 h-6">
+                                        <path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </span>
+                            </span>
+
+                            <div class="bg-slate-200/60 rounded-lg border border-slate-200" style="overflow-x: hidden;">
+                                <div class="flex flex-col justify-end items-center">
+                                    <div class="text-center">
+                                        <div class="sm:flex sm:justify-end sm:items-center pt-4">
+                                            <div @click="createNewDeal"
+                                                class="flex justify-center gap-2 text-[10pt] cursor-pointer hover:border-indigo-400 hover:text-indigo-400  border-2 border-dashed border-indigo-500 text-indigo-500 h-14 w-96 rounded-lg bg-transparent text-center py-4">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                    stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M12 4.5v15m7.5-7.5h-15" />
+                                                </svg>
+                                                <span class="text-selection-disable">{{ dataDeals.some((deal) =>
+                                                    deal.isEditingDeal) ?
+                                                    'AGREGAR EDICION DE ACUERDO' : 'AGREGAR ACUERDO' }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="h-[285px] max-h-full overflow-y-auto mt-2 mb-1 px-1"
+                                            v-if="dataDeals.filter((i) => !i.isDelete).length !== 0">
+                                            <div class="sm:flex sm:items-center text-selection-disable"
+                                                v-for="(deal, i) in dataDeals" :key="i">
+                                                <div class="flex overflow-hidden  cursor-pointer" :class="{
+                                                    'mb-4': dataDeals.length != i + 1,
+                                                    'rounded-lg border border-gray-400': deal.isEditingDeal,
+                                                }" v-if="!deal.isDelete">
+                                                    <div @click="deal.isEditingDeal ? createNewDeal() : editDealWhenIsClicked(deal)"
+                                                        :class="dataDeals.some((deal) => deal.isEditingDeal) ?
+                                                            deal.isEditingDeal ? 'bg-white' : 'cursor-not-allowed bg-white' : 'bg-white'"
+                                                        class="w-[336px] rounded-l-lg  py-3   max-h-full overflow-y-auto">
+                                                        <div class="text-[8pt]">
+                                                            <div class="flex flex-wrap items-center -m-1.5 mx-3 mb-1 gap-1">
+                                                                <span class="inline-flex font-medium">&#8226;{{
+                                                                    deal.fecha_acuerdo_laboral }}</span>
+                                                                <div :class="[
+                                                                    deal.id_tipo_acuerdo_laboral == 1 ? 'bg-indigo-100 text-indigo-600 ' :
+                                                                        deal.id_tipo_acuerdo_laboral == 2 ? 'bg-sky-100 text-sky-600' :
+                                                                            deal.id_tipo_acuerdo_laboral == 3 ? 'bg-emerald-100 text-emerald-600' :
+                                                                                deal.id_tipo_acuerdo_laboral == 4 ? 'bg-amber-100 text-amber-600' :
+                                                                                    deal.id_tipo_acuerdo_laboral == 5 ? 'bg-rose-100 text-rose-600' :
+                                                                                        deal.id_tipo_acuerdo_laboral == 6 ? 'bg-slate-700 text-slate-100 ' : 'bg-slate-100 text-slate-500',
+                                                                ]"
+                                                                    class="inline-flex font-medium  rounded-full text-center px-1.5 py-.5">
+                                                                    {{ deal.nombre_tipo_acuerdo_laboral }}
+                                                                </div>
+                                                            </div>
+                                                            <h1 class="mx-3 font-semibold text-justify">
+                                                                {{ deal.oficio_acuerdo_laboral }}
+                                                            </h1>
+                                                            <p class="mx-3 text-justify">
+                                                                {{ deal.comentario_acuerdo_laboral }}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div @click="deleteDealWhenIsClicked(i)"
+                                                        class="flex items-center justify-center rounded-r-lg hover:bg-slate-400/50  bg-slate-300 shadow-border hover:bg-blue-dark text-sm py-4 px-3 uppercase font-bold">
+                                                        <svg class="w-5 h-5" viewBox="0 0 1024.00 1024.00"
+                                                            stroke-width="0.01024">
+                                                            <path
+                                                                d="M779.5 1002.7h-535c-64.3 0-116.5-52.3-116.5-116.5V170.7h768v715.5c0 64.2-52.3 116.5-116.5 116.5zM213.3 256v630.1c0 17.2 14 31.2 31.2 31.2h534.9c17.2 0 31.2-14 31.2-31.2V256H213.3z"
+                                                                fill="#818cf8"></path>
+                                                            <path
+                                                                d="M917.3 256H106.7C83.1 256 64 236.9 64 213.3s19.1-42.7 42.7-42.7h810.7c23.6 0 42.7 19.1 42.7 42.7S940.9 256 917.3 256zM618.7 128H405.3c-23.6 0-42.7-19.1-42.7-42.7s19.1-42.7 42.7-42.7h213.3c23.6 0 42.7 19.1 42.7 42.7S642.2 128 618.7 128zM405.3 725.3c-23.6 0-42.7-19.1-42.7-42.7v-256c0-23.6 19.1-42.7 42.7-42.7S448 403 448 426.6v256c0 23.6-19.1 42.7-42.7 42.7zM618.7 725.3c-23.6 0-42.7-19.1-42.7-42.7v-256c0-23.6 19.1-42.7 42.7-42.7s42.7 19.1 42.7 42.7v256c-0.1 23.6-19.2 42.7-42.7 42.7z"
+                                                                fill="#818cf8"></path>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="w-full h-[300px] px-1 text-selection-disable" v-else>
+                                            <div class="flex flex-col items-center justify-center h-full">
+                                                <img src="../../../img/noData.svg" class="h-48 rounded-full mx-auto"
+                                                    alt="SVG Image" draggable="false">
+                                                <h1 class="font-medium text-center">Parece que aún no hay contratos
+                                                    registrados</h1>
+                                                <p class="text-[9pt] text-center">Cuando registres nuevos contratos, se
+                                                    mostrarán en esta área.</p>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class=" flex justify-start pt-1 "><!-- TODO: DEFINIR POSICION -->
+                                <GeneralButton color="bg-green-700   hover:bg-green-800" text="Agregar todos los acuerdos"
+                                    icon="add" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <!-- Calendario de contribuciones -->
+                <div class="p-2 bg-slate-200/60 rounded-sm shadow ">
+                    <div class="flex  justify-center">
+                        <div class="grid grid-rows-1 grid-flow-col gap-10">
+                            <template v-for="(month, mothIndex) in monthName" :key="mothIndex">
+                                <span class="text-xs">{{ month }}</span>
+                            </template>
+                        </div>
+                    </div>
+                    <div class="flex justify-center">
+                        <div class="w-1/1 ">
+                            <div class="flex flex-col justify-center items-center h-full">
+                                <div class="text-end space-y-3">
+                                    <div class="text-xs pr-1 text-black">Lun</div>
+                                    <div class="text-xs pr-1">Mie</div>
+                                    <div class="text-xs pr-1">Vie</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="w-3/1 ">
+                            <div class="flex justify-center items-center h-full">
+                                <div class="grid grid-rows-7 grid-flow-col">
+                                    <template v-for="(month, mothIndex) in month" :key="mothIndex">
+                                        <TooltipVue bg="dark" v-for="(day, weekIndex) in daysgenerater()[mothIndex]"
+                                            :key="weekIndex">
+                                            <template v-slot:contenido>
+                                                <div class="h-[11px] w-[11px] bg-gray-500 m-[1.5px] rounded-sm"></div>
+                                            </template>
+                                            <template v-slot:message>
+                                                <div class="text-xs text-slate-200 whitespace-nowrap">{{
+                                                    transFormDat(day, month, year) }}</div>
+                                            </template>
+                                        </TooltipVue>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--// Calendario de contribuciones -->
+            </div>
+        </Modal>
+    </div>
+</template>
+
+<script>
+export default {
+    props: {
+        showModal: {
+            type: Boolean,
+            default: false,
+        },
+        dataForSelect: {
+            type: Object,
+            default: {},
+        }
+    },
+    data() {
+        return {
+            employeOptions: [],
+            month: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+            monthName: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+            year: '',
+            config: {
+                altInput: true,
+                static: true,
+                monthSelectorType: 'static',
+                altFormat: "d/m/Y",
+                dateFormat: "Y-m-d",
+                locale: {
+                    firstDayOfWeek: 1,
+                    weekdays: {
+                        shorthand: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa'],
+                        longhand: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+                    },
+                    months: {
+                        shorthand: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                        longhand: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+                    },
+                },
+            },
+            configSecondInput: {
+                mode: 'range',
+                altInput: true,
+                static: true,
+                monthSelectorType: 'static',
+                altFormat: "d/m/Y",
+                dateFormat: "Y-m-d",
+                locale: {
+                    firstDayOfWeek: 1,
+                    weekdays: {
+                        shorthand: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa'],
+                        longhand: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+                    },
+                    months: {
+                        shorthand: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                        longhand: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+                    },
+                },
+            },
+            errorForm: '',
+            dataForm:
+            {
+                id_empleado: '',
+                deal: {
+                    indexDeal: '',
+                    id_acuerdo_laboral: '',
+                    id_tipo_acuerdo_laboral: '',
+                    nombre_tipo_acuerdo_laboral: '',
+                    fecha_acuerdo_laboral: '',
+                    oficio_acuerdo_laboral: '',
+                    comentario_acuerdo_laboral: '',
+                    fecha_inicio_fecha_fin_acuerdo_laboral: '',
+                    isDelete: false,
+                    isEditingDeal: false,
+                }
+            },
+            dataDeals: [],
+        }
+    },
+    methods: {
+
+
+        isDataValid() {
+            // Perform form validation here
+            const deal = this.dataForm.deal;
+            return (
+                this.dataForm.id_empleado !== '' &&
+                deal.id_tipo_acuerdo_laboral !== '' &&
+                (deal.fecha_acuerdo_laboral !== '' && deal.fecha_acuerdo_laboral !== null) &&
+                deal.oficio_acuerdo_laboral !== '' &&
+                (deal.fecha_inicio_fecha_fin_acuerdo_laboral !== '' && deal.fecha_inicio_fecha_fin_acuerdo_laboral !== null) &&
+                deal.comentario_acuerdo_laboral !== ''
+            );
+        },
+
+        resetForm() {
+            this.dataForm.deal.indexDeal = ''
+            this.dataForm.deal.id_acuerdo_laboral = ''
+            this.dataForm.deal.id_tipo_acuerdo_laboral = ''
+            this.dataForm.deal.fecha_acuerdo_laboral = ''
+            this.dataForm.deal.fecha_inicio_fecha_fin_acuerdo_laboral = ''
+            this.dataForm.deal.oficio_acuerdo_laboral = ''
+            this.dataForm.deal.comentario_acuerdo_laboral = ''
+
+        },
+
+        createNewDeal() {
+            if (this.isDataValid()) {
+                this.errorForm = false
+                const isEditingDeal = this.dataForm.deal.indexDeal !== '' || this.dataForm.deal.indexDeal === 0;
+                if (isEditingDeal) {
+                    const index = this.dataDeals.findIndex((deal) => deal.indexDeal === this.dataForm.deal.indexDeal);
+
+                    // Acuerdo encontrado, mostrar su posición (índice) y acceder al acuerdo directamente
+                    const foundDeal = this.dataDeals[index];
+                    // Modificar la propiedad isEditingDeal del acuerdo encontrado
+                    foundDeal.indexDeal = this.dataForm.deal.indexDeal
+                    foundDeal.id_acuerdo_laboral = this.dataForm.deal.id_acuerdo_laboral
+                    foundDeal.id_tipo_acuerdo_laboral = this.dataForm.deal.id_tipo_acuerdo_laboral
+                    foundDeal.nombre_tipo_acuerdo_laboral = this.dataForm.deal.nombre_tipo_acuerdo_laboral
+                    foundDeal.fecha_acuerdo_laboral = this.dataForm.deal.fecha_acuerdo_laboral
+                    foundDeal.oficio_acuerdo_laboral = this.dataForm.deal.oficio_acuerdo_laboral
+                    foundDeal.comentario_acuerdo_laboral = this.dataForm.deal.comentario_acuerdo_laboral
+                    foundDeal.fecha_inicio_fecha_fin_acuerdo_laboral = this.dataForm.deal.fecha_inicio_fecha_fin_acuerdo_laboral
+                    foundDeal.isDelete = false
+                    foundDeal.isEditingDeal = false
+
+                } else {
+                    const newDeal = { ...this.dataForm.deal }; // Create a copy of the deal object 
+                    newDeal.indexDeal = this.dataDeals.length + 1;
+                    this.dataDeals.unshift(newDeal);
+                }
+
+                this.resetForm()
+
+                // Reset form fields
+            } else {
+                this.errorForm = true
+            }
+        },
+
+        editDealWhenIsClicked(data) {
+            // Verificar si algún acuerdo ya está en estado de edición
+            const isAnyDealEditing = this.dataDeals.some((deal) => deal.isEditingDeal);
+            // Si algún acuerdo ya está en edición, no se ejecuta la función
+            if (isAnyDealEditing) {
+                //alert("ya estas editando")
+                return;
+            }
+            this.dataForm.deal.indexDeal = data.indexDeal;
+            this.dataForm.deal.id_tipo_acuerdo_laboral = data.id_tipo_acuerdo_laboral;
+            this.dataForm.deal.fecha_acuerdo_laboral = data.fecha_acuerdo_laboral;
+            this.dataForm.deal.oficio_acuerdo_laboral = data.oficio_acuerdo_laboral;
+            this.dataForm.deal.fecha_inicio_fecha_fin_acuerdo_laboral = data.fecha_inicio_fecha_fin_acuerdo_laboral;
+            this.dataForm.deal.comentario_acuerdo_laboral = data.comentario_acuerdo_laboral;
+
+            const index = this.dataDeals.findIndex((deal) => deal.indexDeal === this.dataForm.deal.indexDeal);
+            const foundDeal = this.dataDeals[index];
+            foundDeal.isEditingDeal = true
+
+        },
+
+        deleteDealWhenIsClicked(index) {
+            this.$swal.fire({
+                title: '<p class="text-[12pt] text-center">¿Está seguro de eliminar el contrato?. Todos los cambios que haga no se veran reflejados hasta que envie toda la informacion<p>',
+                icon: 'question',
+                iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
+                confirmButtonText: 'Si, Eliminar',
+                confirmButtonColor: '#D2691E',
+                cancelButtonText: 'Cancelar',
+                showCancelButton: true,
+                showCloseButton: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Modificar el objeto para que la fila desaparezca de la tabla (valor en posición 7 se establece como false)
+                    this.dataDeals[index]["isDelete"] = true;
+
+                    // Mostrar mensaje de advertencia
+                    toast.warning("La fila actual se eliminó temporalmente hasta que guarde los cambios", {
+                        autoClose: 5000,
+                        position: "top-right",
+                        transition: "zoom",
+                        toastBackgroundColor: "white",
+                    });
+                }
+            });
+        },
+        async handleSearch(query) {
+            if (query !== '') {
+                try {
+                    if (query.by === 'name' && query.query.length >= 5) {
+                        this.isLoadingToSearch = true;
+                        const response = await axios.post('/search-employe', query);
+                        this.employeOptions = response.data;
+                        console.log(this.employeOptions);
+                    } else if (query.by === 'id') {
+                        this.loading = true;
+                        const response = await axios.post('/search-employe', query);
+                        this.employeOptions = response.data;
+                        this.personaWasSelected(query.query);
+                    }
+                } catch (error) {
+                    console.log('Error en la búsqueda:', error);
+                } finally {
+                    this.isLoadingToSearch = false;
+                    this.loading = false;
+                }
+            }
+        },
+
+
+
+        days_of_month(yearin) {
+            const kabisa = (yearin) => (yearin % 4 === 0 && yearin % 100 !== 0 && yearin % 400 !== 0) || (yearin % 100 === 0 && yearin % 400 === 0);
+            const fevral = (yearin) => (kabisa(yearin) ? 29 : 28);
+            return [31, fevral(this.year), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        },
+        hafta(sol, ma) {
+            const firstDayOfMonth = new Date(sol, ma, 1).getDay();
+            return firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
+        },
+        daysgenerater() {
+            const days = [];
+            for (let k = 0; k < this.days_of_month().length; k++) {
+                days.push([]);
+                for (let i = 1; i <= this.days_of_month()[k]; i++) {
+                    days[k].push(i);
+                }
+            }
+            return days;
+        },
+        hozirgivaqt() {
+            const today = new Date();
+            this.year = today.getFullYear();
+        },
+        esHoy(kun, mes) {
+            const hoy = new Date();
+            const diaEnTabla = new Date(this.year, mes, kun);
+            return hoy.toDateString() === diaEnTabla.toDateString();
+        },
+        esSabado(kun, mes) {
+            const diaEnTabla = new Date(this.year, mes, kun);
+            return diaEnTabla.getDay() === 6;
+        },
+        firstDayOfWeek(index) {
+            return this.hafta(this.year, index);
+        },
+        transFormDat(dia, mes, año) {
+            const fechaProporcionada = `${año}-${mes}-${dia}`;
+            //console.log(moment(fechaProporcionada).format('dddd, MMMM Do YYYY'));
+            return moment(fechaProporcionada).format('dddd, MMMM D, YYYY');
+        }
+    },
+    computed: {
+        // Agrupar los días en semanas de 7 días
+        weeks() {
+            const days = this.daysgenerater();
+            const weeks = [];
+            for (let i = 0; i < days.length; i += 7) {
+                weeks.push(days.slice(i, i + 7));
+            }
+            return weeks;
+        },
+
+    },
+    created() {
+        // Al cargar el componente, establecer el año actual
+        this.hozirgivaqt();
+    },
+    watch: {
+        showModal() {
+            if (this.showModal) {
+
+            } else {
+
+                setTimeout(() => {
+                    this.dataDeals = []//vaciando medio segundo despues que cierre el modal
+                }, 500);
+            }
+        }
+    }
+}
+</script>
+
+
+<style>
+/* Estilos del scrollbar para navegadores WebKit (Chrome y Safari) */
+/* Cambia los colores y dimensiones según tu preferencia */
+div::-webkit-scrollbar {
+    width: 3px;
+}
+
+div::-webkit-scrollbar-thumb {
+    background-color: #6B7280;
+    border-radius: 4px;
+}
+
+div::-webkit-scrollbar-thumb:hover {
+    background-color: #4B5563;
+}
+</style>
