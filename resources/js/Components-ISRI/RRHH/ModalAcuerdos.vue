@@ -11,7 +11,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
 <template>
     <div class="m-1.5">
         <!-- Componente del modal ProcessModal -->
-        <Modal maxWidth="4xl" :show="showModal" @close="$emit('cerrar-modal')">
+        <Modal maxWidth="4xl" :show="showModal" modal-title="Acuerdos laborales" @close="$emit('cerrar-modal')">
             <div class="px-4 py-2">
                 <div class="flex flex-col md:flex-row ">
                     <div class="w-full md:w-1/2 ">
@@ -41,7 +41,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                 <div class="md:flex flex-row justify-items-start mb-4">
                                     <div class="mb-4 md:mr-2 md:mb-0 basis-full ">
                                         <label class="block mb-1 text-xs font-light text-gray-600">
-                                            Acuerdo laboral <span class="text-red-600 font-extrabold">*</span>
+                                            Acuerdo laboral <span class="text-red-600 font-extrabold pl-1">*</span>
                                         </label>
                                         <div class="relative font-medium  flex h-8 w-full flex-row-reverse">
                                             <Multiselect v-model="dataForm.deal.id_tipo_acuerdo_laboral"
@@ -60,12 +60,12 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                 <div class="mb-4 md:flex flex-row justify-items-start">
                                     <div class="mb-4 md:ml-1 md:mb-0 basis-1/2">
                                         <label class="block mb-1 text-xs font-light text-gray-600" for="fecha_nacimiento">
-                                            Fecha<span class="text-red-600 font-extrabold">*</span>
+                                            Fecha<span class="text-red-600 font-extrabold pl-1">*</span>
                                         </label>
                                         <div class="relative flex">
                                             <LabelToInput icon="date" />
                                             <flat-pickr v-model="dataForm.deal.fecha_acuerdo_laboral"
-                                                class="peer text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none w-full"
+                                                class="peer text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300  focus:outline-none w-full"
                                                 :config="config" :placeholder="'Seleccione Fecha Final'" />
                                         </div>
                                     </div>
@@ -77,7 +77,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                         <div class="relative flex">
                                             <LabelToInput icon="date" />
                                             <flat-pickr v-model="dataForm.deal.fecha_inicio_fecha_fin_acuerdo_laboral"
-                                                class="peer text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none w-full"
+                                                class="peer text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 f focus:outline-none w-full"
                                                 :config="configSecondInput" :placeholder="'Seleccione Fecha Final'" />
                                         </div>
                                     </div>
@@ -86,8 +86,9 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                 </div>
                                 <div class="mb-4 md:flex flex-row justify-items-start">
                                     <div class="mb-1 md:mr-2 md:mb-0 basis-full">
-                                        <TextInput id="oficio-acuerdo" type="text" placeholder="Oficio"
-                                            v-model="dataForm.deal.oficio_acuerdo_laboral">
+                                        <TextInput id="oficio-acuerdo" type="text" placeholder="Numero de referencia"
+                                            v-model="dataForm.deal.oficio_acuerdo_laboral"
+                                            @update:modelValue="dataForm.deal.oficio_acuerdo_laboral = dataForm.deal.oficio_acuerdo_laboral.toUpperCase()">
                                             <LabelToInput icon="standard" forLabel="primer-nombre" />
                                         </TextInput>
                                     </div>
@@ -101,15 +102,15 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                     </label>
                                     <textarea id="descripcion" name="descripcion" style="overflow-x: hidden;"
                                         v-model="dataForm.deal.comentario_acuerdo_laboral"
-                                        class="resize-none w-full h-24 overflow-y-auto peer text-xs font-semibold rounded-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"></textarea>
+                                        class="resize-none w-full h-24 overflow-y-auto peer text-xs font-normal rounded-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-none focus:outline-none"></textarea>
 
                                 </div>
 
                             </div>
                         </div>
                         <div class=" flex justify-center">
-                            <div v-show="errorForm"
-                                class="animate-shake flex w-full items-center font-medium py-1.5 pr-2  rounded-md text-red-700 bg-red-100 border border-red-300 ">
+                            <div v-show="errorForm" :class="{ 'animate-shake': shouldShowErrorAnimation }"
+                                class=" flex w-full items-center font-medium py-1.5 pr-2  rounded-md text-red-700 bg-red-100 border border-red-300 ">
                                 <div>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" fill="none"
                                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -121,8 +122,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                         <line x1="12" y1="16" x2="12.01" y2="16"></line>
                                     </svg>
                                 </div>
-                                <div class="text-xs font-normal  max-w-full flex-initial">Todos los campos son
-                                    requeridos de este formulario</div>
+                                <div class="text-xs font-normal  max-w-full flex-initial">{{ messageError }}</div>
                                 <div class="flex flex-auto flex-row-reverse">
                                     <div @click="errorForm = false">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" fill="none"
@@ -157,7 +157,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                 <div class="flex flex-col justify-end items-center">
                                     <div class="text-center">
                                         <div class="sm:flex sm:justify-end sm:items-center pt-4">
-                                            <div @click="createNewDeal"
+                                            <div @click="createNewDeal()"
                                                 class="flex justify-center gap-2 text-[10pt] cursor-pointer hover:border-indigo-400 hover:text-indigo-400  border-2 border-dashed border-indigo-500 text-indigo-500 h-14 w-96 rounded-lg bg-transparent text-center py-4">
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                     stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
@@ -166,7 +166,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                                 </svg>
                                                 <span class="text-selection-disable">{{ dataDeals.some((deal) =>
                                                     deal.isEditingDeal) ?
-                                                    'AGREGAR EDICION DE ACUERDO' : 'AGREGAR ACUERDO' }}</span>
+                                                    'TERMINAR MODIFICACIONES' : 'AGREGAR ACUERDO' }}</span>
                                             </div>
                                         </div>
                                         <div class="h-[285px] max-h-full overflow-y-auto mt-2 mb-1 px-1"
@@ -177,7 +177,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                                     'mb-4': dataDeals.length != i + 1,
                                                     'rounded-lg border border-gray-400': deal.isEditingDeal,
                                                 }" v-if="!deal.isDelete">
-                                                    <div @click="deal.isEditingDeal ? createNewDeal() : editDealWhenIsClicked(deal)"
+                                                    <div @click="deal.isEditingDeal ? cancelEdition(deal.indexDeal) : sendInformationWhenIsClicked(deal)"
                                                         :class="dataDeals.some((deal) => deal.isEditingDeal) ?
                                                             deal.isEditingDeal ? 'bg-white' : 'cursor-not-allowed bg-white' : 'bg-white'"
                                                         class="w-[336px] rounded-l-lg  py-3   max-h-full overflow-y-auto">
@@ -224,9 +224,9 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                             <div class="flex flex-col items-center justify-center h-full">
                                                 <img src="../../../img/noData.svg" class="h-48 rounded-full mx-auto"
                                                     alt="SVG Image" draggable="false">
-                                                <h1 class="font-medium text-center">Parece que aún no hay contratos
+                                                <h1 class="font-medium text-center">Parece que aún no hay acuerdos
                                                     registrados</h1>
-                                                <p class="text-[9pt] text-center">Cuando registres nuevos contratos, se
+                                                <p class="text-[9pt] text-center">Cuando registres nuevos acuerdos, se
                                                     mostrarán en esta área.</p>
                                             </div>
                                         </div>
@@ -234,18 +234,24 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                     </div>
                                 </div>
                             </div>
-                            <div class=" flex justify-start pt-1 "><!-- TODO: DEFINIR POSICION -->
+                            <div class="flex justify-start pt-1 gap-3"><!-- TODO: DEFINIR POSICION -->
+
+                                <select v-model.number="year"
+                                    class="border border-gray-300 rounded-lg text-gray-600 h-8 text-xs  bg-white hover:border-gray-400 focus:outline-none appearance">
+                                    <option>Filtrar por año</option>
+                                    <option value="2022">2022</option>
+                                    <option value="2023">2023</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2025">2025</option>
+                                </select>
                                 <GeneralButton color="bg-green-700   hover:bg-green-800" text="Agregar todos los acuerdos"
                                     icon="add" />
                             </div>
                         </div>
                     </div>
                 </div>
-
-
-
                 <!-- Calendario de contribuciones -->
-                <div class="p-2 bg-slate-200/60 rounded-sm shadow ">
+                <div class="p-2 bg-slate-200/60 rounded-lg border border-slate-200">
                     <div class="flex  justify-center">
                         <div class="grid grid-rows-1 grid-flow-col gap-10">
                             <template v-for="(month, mothIndex) in monthName" :key="mothIndex">
@@ -270,7 +276,9 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                         <TooltipVue bg="dark" v-for="(day, weekIndex) in daysgenerater()[mothIndex]"
                                             :key="weekIndex">
                                             <template v-slot:contenido>
-                                                <div class="h-[11px] w-[11px] bg-gray-500 m-[1.5px] rounded-sm"></div>
+                                                <div class="h-[11px] w-[11px]  m-[1.5px] rounded-sm"
+                                                    :class="esAhora(day, month, year) ? 'bg-green-900/90' : 'bg-gray-500'">
+                                                </div>
                                             </template>
                                             <template v-slot:message>
                                                 <div class="text-xs text-slate-200 whitespace-nowrap">{{
@@ -345,6 +353,8 @@ export default {
                 },
             },
             errorForm: '',
+            messageError: '',
+            shouldShowErrorAnimation: false, // Nueva propiedad para controlar la animación
             dataForm:
             {
                 id_empleado: '',
@@ -380,6 +390,22 @@ export default {
             );
         },
 
+        validarCamposUnicos(arr) {
+            const oficiosSet = new Set();
+
+            for (const obj of arr) {
+                if (obj.hasOwnProperty('oficio_acuerdo_laboral')) {
+                    const oficio = obj.oficio_acuerdo_laboral;
+                    if (oficiosSet.has(oficio)) {
+                        return false; // Se encontró un oficio_acuerdo_laboral repetido
+                    }
+                    oficiosSet.add(oficio);
+                }
+            }
+
+            return true; // Todos los oficio_acuerdo_laboral son únicos
+        },
+
         resetForm() {
             this.dataForm.deal.indexDeal = ''
             this.dataForm.deal.id_acuerdo_laboral = ''
@@ -388,45 +414,51 @@ export default {
             this.dataForm.deal.fecha_inicio_fecha_fin_acuerdo_laboral = ''
             this.dataForm.deal.oficio_acuerdo_laboral = ''
             this.dataForm.deal.comentario_acuerdo_laboral = ''
+            this.dataForm.deal.isEditingDeal = false
 
         },
 
         createNewDeal() {
-            if (this.isDataValid()) {
-                this.errorForm = false
-                const isEditingDeal = this.dataForm.deal.indexDeal !== '' || this.dataForm.deal.indexDeal === 0;
-                if (isEditingDeal) {
-                    const index = this.dataDeals.findIndex((deal) => deal.indexDeal === this.dataForm.deal.indexDeal);
+            this.errorForm = false
+            /* if (this.isDataValid()) { */
+                const oficioExists = this.dataDeals.some((deal) => deal.oficio_acuerdo_laboral === this.dataForm.deal.oficio_acuerdo_laboral);
+                //OficioExists verifica que no exista duplicidad en los acuerdo
+                //this.dataForm.deal.isEditingDeal es una variable que ve el estado del formularo (esta editando o no)
+                if (!oficioExists || this.dataForm.deal.isEditingDeal) {
+                    this.errorForm = false;//set false (0 errors)
 
-                    // Acuerdo encontrado, mostrar su posición (índice) y acceder al acuerdo directamente
-                    const foundDeal = this.dataDeals[index];
-                    // Modificar la propiedad isEditingDeal del acuerdo encontrado
-                    foundDeal.indexDeal = this.dataForm.deal.indexDeal
-                    foundDeal.id_acuerdo_laboral = this.dataForm.deal.id_acuerdo_laboral
-                    foundDeal.id_tipo_acuerdo_laboral = this.dataForm.deal.id_tipo_acuerdo_laboral
-                    foundDeal.nombre_tipo_acuerdo_laboral = this.dataForm.deal.nombre_tipo_acuerdo_laboral
-                    foundDeal.fecha_acuerdo_laboral = this.dataForm.deal.fecha_acuerdo_laboral
-                    foundDeal.oficio_acuerdo_laboral = this.dataForm.deal.oficio_acuerdo_laboral
-                    foundDeal.comentario_acuerdo_laboral = this.dataForm.deal.comentario_acuerdo_laboral
-                    foundDeal.fecha_inicio_fecha_fin_acuerdo_laboral = this.dataForm.deal.fecha_inicio_fecha_fin_acuerdo_laboral
-                    foundDeal.isDelete = false
-                    foundDeal.isEditingDeal = false
+                    const isEditingDeal = this.dataForm.deal.indexDeal !== '' || this.dataForm.deal.indexDeal === 0;
+                    // Función auxiliar para actualizar o agregar un acuerdo
+                    const updateOrCreateDeal = () => {
+                        if (isEditingDeal) {
+                            const index = this.dataDeals.findIndex((deal) => deal.indexDeal === this.dataForm.deal.indexDeal);
+                            const foundDeal = this.dataDeals[index];
+                            Object.assign(foundDeal, this.dataForm.deal);
+                            foundDeal.isDelete = false;
+                            foundDeal.isEditingDeal = false;
+                        } else {
+                            const newDeal = { ...this.dataForm.deal };
+                            newDeal.indexDeal = this.dataDeals.length + 1;
+                            this.dataDeals.unshift(newDeal);
+                        }
+                    };
 
+                    updateOrCreateDeal();
+                    this.resetForm(); // Restablecer los campos del formulario después de guardar/actualizar correctamente
                 } else {
-                    const newDeal = { ...this.dataForm.deal }; // Create a copy of the deal object 
-                    newDeal.indexDeal = this.dataDeals.length + 1;
-                    this.dataDeals.unshift(newDeal);
+                    this.errorForm = true;
+                    this.messageError = 'El numero de referencia ya existe por favor intenta otro'
+                    this.showErrorAnimation();
                 }
+           /*  } else {
+                this.errorForm = true;
+                this.messageError = 'Todos los campos son requeridos de este formulario'
+                this.showErrorAnimation();
+            } */
 
-                this.resetForm()
-
-                // Reset form fields
-            } else {
-                this.errorForm = true
-            }
         },
 
-        editDealWhenIsClicked(data) {
+        sendInformationWhenIsClicked(data) {
             // Verificar si algún acuerdo ya está en estado de edición
             const isAnyDealEditing = this.dataDeals.some((deal) => deal.isEditingDeal);
             // Si algún acuerdo ya está en edición, no se ejecuta la función
@@ -440,6 +472,7 @@ export default {
             this.dataForm.deal.oficio_acuerdo_laboral = data.oficio_acuerdo_laboral;
             this.dataForm.deal.fecha_inicio_fecha_fin_acuerdo_laboral = data.fecha_inicio_fecha_fin_acuerdo_laboral;
             this.dataForm.deal.comentario_acuerdo_laboral = data.comentario_acuerdo_laboral;
+            this.dataForm.deal.isEditingDeal = true;
 
             const index = this.dataDeals.findIndex((deal) => deal.indexDeal === this.dataForm.deal.indexDeal);
             const foundDeal = this.dataDeals[index];
@@ -463,7 +496,7 @@ export default {
                     this.dataDeals[index]["isDelete"] = true;
 
                     // Mostrar mensaje de advertencia
-                    toast.warning("La fila actual se eliminó temporalmente hasta que guarde los cambios", {
+                    toast.warning("El acuerdo se elimino temporalmente hasta que envias la informacion", {
                         autoClose: 5000,
                         position: "top-right",
                         transition: "zoom",
@@ -495,7 +528,21 @@ export default {
             }
         },
 
-
+        showErrorAnimation() {
+            // Activa la animación estableciendo shouldShowErrorAnimation en true
+            this.shouldShowErrorAnimation = true;
+            // Establece un temporizador para desactivar la animación después de un breve período de tiempo (por ejemplo, 1 segundo)
+            setTimeout(() => {
+                this.shouldShowErrorAnimation = false;
+            }, 500); // 1000 milisegundos = 1 segundo (ajústalo según la duración de tu animación)
+        },
+        cancelEdition(i) {
+            this.resetForm();
+            const index = this.dataDeals.findIndex((deal) => deal.indexDeal === i);
+            const foundDeal = this.dataDeals[index];
+            foundDeal.isDelete = false;
+            foundDeal.isEditingDeal = false;
+        },
 
         days_of_month(yearin) {
             const kabisa = (yearin) => (yearin % 4 === 0 && yearin % 100 !== 0 && yearin % 400 !== 0) || (yearin % 100 === 0 && yearin % 400 === 0);
@@ -520,17 +567,10 @@ export default {
             const today = new Date();
             this.year = today.getFullYear();
         },
-        esHoy(kun, mes) {
+        esAhora(dia, mes, anio) {
             const hoy = new Date();
-            const diaEnTabla = new Date(this.year, mes, kun);
+            const diaEnTabla = new Date(anio, mes - 1, dia); // Restamos 1 al mes para el formato correcto
             return hoy.toDateString() === diaEnTabla.toDateString();
-        },
-        esSabado(kun, mes) {
-            const diaEnTabla = new Date(this.year, mes, kun);
-            return diaEnTabla.getDay() === 6;
-        },
-        firstDayOfWeek(index) {
-            return this.hafta(this.year, index);
         },
         transFormDat(dia, mes, año) {
             const fechaProporcionada = `${año}-${mes}-${dia}`;
@@ -538,18 +578,7 @@ export default {
             return moment(fechaProporcionada).format('dddd, MMMM D, YYYY');
         }
     },
-    computed: {
-        // Agrupar los días en semanas de 7 días
-        weeks() {
-            const days = this.daysgenerater();
-            const weeks = [];
-            for (let i = 0; i < days.length; i += 7) {
-                weeks.push(days.slice(i, i + 7));
-            }
-            return weeks;
-        },
 
-    },
     created() {
         // Al cargar el componente, establecer el año actual
         this.hozirgivaqt();
