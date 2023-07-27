@@ -9,6 +9,7 @@ import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { ZiggyVue } from "../../vendor/tightenco/ziggy/dist/vue.m";
 import { manageError } from '@/mixins/handleErrorResponse.js';
 import { getPermissions } from '@/mixins/getPermissions.js';
+import { showToast } from '@/mixins/showToast.js';
 import { executeRequest } from "@/plugins/requestHelpers.js";
 import GeneralButton from "@/Components-ISRI/ComponentsToForms/GeneralButton.vue";
 import TextInput from "@/Components-ISRI/ComponentsToForms/TextInput.vue";
@@ -61,7 +62,7 @@ createInertiaApp({
             .component("Datepicker", Datepicker)
             .component("RadioButton", RadioButton)
             .component("DatepickerTest", DatepickerTest)
-            .mixin({ methods: { manageError,executeRequest,getPermissions } })
+            .mixin({ methods: { manageError,executeRequest,getPermissions,showToast } })
             .use(ZiggyVue, Ziggy)
             .mount(el);
     },

@@ -45,30 +45,30 @@ if (!function_exists('getMenusByUsuarioRol')) {
             foreach ($rol->menus as $menu) {
                 if ($menu->pivot->estado_acceso_menu == 1) {
                     $menu_hijos = [];
-                    $menu_submenu = [];
                     if ($menu->id_menu_padre == null && $menu->estado_menu == 1) {
                         $hijos = Menu::where("id_menu_padre", $menu->id_menu)->get();
                         foreach ($hijos as $hijo) {
                             if ($hijo->estado_menu == 1) {
                                 foreach ($hijo->roles as $hijo_rol) {
                                     if ($hijo_rol->pivot->estado_acceso_menu == 1 && $hijo_rol->pivot->id_rol == $rol->id_rol) {
-                                        $array_hijo['id_menu'] = $hijo->id_menu;
-                                        $array_hijo['nombre_submenu'] = $hijo->nombre_menu;
-                                        $array_hijo['nombre_ruta'] = $hijo->nombre_ruta_menu;
-                                        $array_hijo['url'] = $hijo->url_menu;
-                                        $array_hijo['insertar'] = $hijo_rol->pivot->insertar_acceso_menu;
-                                        $array_hijo['actualizar'] = $hijo_rol->pivot->actualizar_acceso_menu;
-                                        $array_hijo['eliminar'] = $hijo_rol->pivot->eliminar_acceso_menu;
-                                        $array_hijo['ejecutar'] = $hijo_rol->pivot->ejecutar_acceso_menu;
-                                        array_push($menu_hijos, $array_hijo);
-                                        $array_hijo = [];
+                                        $menu_hijos[] = [
+                                            'id_menu' => $hijo->id_menu,
+                                            'nombre_submenu' => $hijo->nombre_menu,
+                                            'nombre_ruta' => $hijo->nombre_ruta_menu,
+                                            'url' => $hijo->url_menu,
+                                            'insertar' => $hijo_rol->pivot->insertar_acceso_menu,
+                                            'actualizar' => $hijo_rol->pivot->actualizar_acceso_menu,
+                                            'eliminar' => $hijo_rol->pivot->eliminar_acceso_menu,
+                                            'ejecutar' => $hijo_rol->pivot->ejecutar_acceso_menu,
+                                        ];
                                     } //End fourth if
                                 } //End third foreach
                             } //End third if
                         } //End second foreach
-                        $menu_submenu['menu'] = $menu->nombre_menu;
-                        $menu_submenu['submenu'] = $menu_hijos;
-                        array_push($menu_padre, $menu_submenu);
+                        $menu_padre[] = [
+                            'menu' => $menu->nombre_menu,
+                            'submenu' => $menu_hijos,
+                        ];
                     }
                 } //End second if
             } //End first foreach
@@ -84,17 +84,14 @@ if (!function_exists('getMenusByUsuarioRol')) {
 if (!function_exists('userRolHasThisUrl')) {
     function userRolHasThisUrl(array $menus, String $url)
     {
-        $hasUrl = false;
-        $menu = $menus["urls"];
-        foreach ($menu as $value2) {
-            $submenu = $value2["submenu"];
-            foreach ($submenu as $value3) {
-                if ($value3['url'] === $url) {
-                    $hasUrl = true;
+        foreach ($menus['urls'] as $menu) {
+            foreach ($menu['submenu'] as $submenu) {
+                if ($submenu['url'] === $url) {
+                    return true;
                 }
             }
         }
-        return $hasUrl;
+        return false;
     }
 }
 

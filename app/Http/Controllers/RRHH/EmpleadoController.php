@@ -156,7 +156,7 @@ class EmpleadoController extends Controller
             ->join('actividad_institucional', 'detalle_plaza.id_actividad_institucional', '=', 'actividad_institucional.id_actividad_institucional')
             ->join('linea_trabajo', 'actividad_institucional.id_lt', '=', 'linea_trabajo.id_lt')
             ->whereIn('detalle_plaza.id_estado_plaza', [1, 2])
-            ->where('detalle_plaza.estado_det_plaza',1)
+            ->where('detalle_plaza.estado_det_plaza', 1)
             ->get();
 
         return [
@@ -370,5 +370,26 @@ class EmpleadoController extends Controller
         ]);
 
         return ['mensaje' => 'Empleado actualizado con éxito'];
+    }
+
+    public function uploadEmployeePhoto(Request $request)
+    {
+        $file = $request->file('file');
+
+        // Get the original file name and extension
+        $originalFileName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $extension = $file->getClientOriginalExtension();
+
+        // Generate the date and time string
+        $dateTimeString = now()->format('Ymd_His');
+
+        // Create the unique file name by combining original file name and date-time
+        $uniqueFileName = $originalFileName . '_' . $dateTimeString . '.' . $extension;
+
+        // Store the uploaded file using the unique file name
+        $path = $file->storeAs('rrhh', $uniqueFileName);
+
+        // Return the file path or other response as needed
+        return response()->json(['path' => $path]);
     }
 }

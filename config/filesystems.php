@@ -30,6 +30,16 @@ return [
 
     'disks' => [
 
+        'rrhh' => [
+            'driver' => 'local',
+            'root' => storage_path('app/rrhh'),
+        ],
+
+        // 'module2' => [
+        //     'driver' => 'local',
+        //     'root' => storage_path('app/module2'),
+        // ],
+
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app'),
