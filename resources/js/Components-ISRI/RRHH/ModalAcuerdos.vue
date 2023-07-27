@@ -166,7 +166,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                                 </svg>
                                                 <span class="text-selection-disable">{{ dataDeals.some((deal) =>
                                                     deal.isEditingDeal) ?
-                                                    'TERMINAR MODIFICACIONES' : 'AGREGAR ACUERDO' }}</span>
+                                                    'AGREGAR NUEVA MODIFICACION' : 'AGREGAR NUEVO ACUERDO' }}</span>
                                             </div>
                                         </div>
                                         <div class="h-[285px] max-h-full overflow-y-auto mt-2 mb-1 px-1"
@@ -420,7 +420,7 @@ export default {
 
         createNewDeal() {
             this.errorForm = false
-            /* if (this.isDataValid()) { */
+            if (this.isDataValid()) {
                 const oficioExists = this.dataDeals.some((deal) => deal.oficio_acuerdo_laboral === this.dataForm.deal.oficio_acuerdo_laboral);
                 //OficioExists verifica que no exista duplicidad en los acuerdo
                 //this.dataForm.deal.isEditingDeal es una variable que ve el estado del formularo (esta editando o no)
@@ -450,11 +450,11 @@ export default {
                     this.messageError = 'El numero de referencia ya existe por favor intenta otro'
                     this.showErrorAnimation();
                 }
-           /*  } else {
+            } else {
                 this.errorForm = true;
                 this.messageError = 'Todos los campos son requeridos de este formulario'
                 this.showErrorAnimation();
-            } */
+            }
 
         },
 
