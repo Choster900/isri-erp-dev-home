@@ -184,7 +184,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                                         <div class="text-[8pt]">
                                                             <div class="flex flex-wrap items-center -m-1.5 mx-3 mb-1 gap-1">
                                                                 <span class="inline-flex font-medium">&#8226;{{
-                                                                    deal.fecha_acuerdo_laboral }}</span>
+                                                                    moment(deal.fecha_acuerdo_laboral).format('L') }}</span>
                                                                 <div :class="[
                                                                     deal.id_tipo_acuerdo_laboral == 1 ? 'bg-indigo-100 text-indigo-600 ' :
                                                                         deal.id_tipo_acuerdo_laboral == 2 ? 'bg-sky-100 text-sky-600' :
@@ -234,17 +234,23 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                     </div>
                                 </div>
                             </div>
+
                             <div class="flex justify-start pt-1 gap-3"><!-- TODO: DEFINIR POSICION -->
 
-                                <select v-model.number="year"
+                                <select v-model.number="year" @change="filterDealsByYear()"
                                     class="border border-gray-300 rounded-lg text-gray-600 h-8 text-xs  bg-white hover:border-gray-400 focus:outline-none appearance">
-                                    <option>Filtrar por año</option>
-                                    <option value="2022">2022</option>
-                                    <option value="2023">2023</option>
-                                    <option value="2024">2024</option>
-                                    <option value="2025">2025</option>
+                                    <option disabled>Filtrar por año</option>
+                                    <option v-for="yearOption in getUniqueYears()" :key="yearOption" :value="yearOption">
+                                        {{ yearOption }}
+                                    </option>
+
                                 </select>
-                                <GeneralButton color="bg-green-700   hover:bg-green-800" text="Agregar todos los acuerdos"
+                                <GeneralButton @click="dataDeals.filter((i) => !i.isDelete) != '' ? addDeals() : ''"
+                                    v-if="dataAcuerdos == ''" color="bg-green-700  hover:bg-green-800"
+                                    text="Agregar todos los acuerdos" icon="add" />
+
+                                <GeneralButton @click="dataDeals.filter((i) => !i.isDelete) != '' ? updateDeals() : ''"
+                                    v-else color="bg-orange-700  hover:bg-orange-800" text="Editar todos los acuerdos"
                                     icon="add" />
                             </div>
                         </div>
@@ -273,11 +279,11 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                             <div class="flex justify-center items-center h-full">
                                 <div class="grid grid-rows-7 grid-flow-col">
                                     <template v-for="(month, mothIndex) in month" :key="mothIndex">
-                                        <TooltipVue bg="dark" v-for="(day, weekIndex) in daysgenerater()[mothIndex]"
+                                        <TooltipVue bg="dark" v-for="(day, weekIndex) in dayGenerater()[mothIndex]"
                                             :key="weekIndex">
                                             <template v-slot:contenido>
                                                 <div class="h-[11px] w-[11px]  m-[1.5px] rounded-sm"
-                                                    :class="esAhora(day, month, year) ? 'bg-green-900/90' : 'bg-gray-500'">
+                                                    :class="isDateInDataDeals(moment(`${year}-${month}-${day}`).format('L')) ? 'bg-green-900/90' : 'bg-gray-500'">
                                                 </div>
                                             </template>
                                             <template v-slot:message>
@@ -306,7 +312,11 @@ export default {
         },
         dataForSelect: {
             type: Object,
-            default: {},
+            default: [],
+        },
+        dataAcuerdos: {
+            type: Object,
+            default: [],
         }
     },
     data() {
@@ -372,11 +382,14 @@ export default {
                 }
             },
             dataDeals: [],
+            dataNewDeal:[],
         }
     },
     methods: {
 
-
+        isDateInDataDeals(date) {
+            return this.dataDeals.some((deal) => moment(deal.fecha_acuerdo_laboral).format('L') == date);
+        },
         isDataValid() {
             // Perform form validation here
             const deal = this.dataForm.deal;
@@ -408,7 +421,7 @@ export default {
 
         resetForm() {
             this.dataForm.deal.indexDeal = ''
-            this.dataForm.deal.id_acuerdo_laboral = ''
+            //this.dataForm.deal.id_acuerdo_laboral = ''
             this.dataForm.deal.id_tipo_acuerdo_laboral = ''
             this.dataForm.deal.fecha_acuerdo_laboral = ''
             this.dataForm.deal.fecha_inicio_fecha_fin_acuerdo_laboral = ''
@@ -422,8 +435,8 @@ export default {
             this.errorForm = false
             if (this.isDataValid()) {
                 const oficioExists = this.dataDeals.some((deal) => deal.oficio_acuerdo_laboral === this.dataForm.deal.oficio_acuerdo_laboral);
-                //OficioExists verifica que no exista duplicidad en los acuerdo
-                //this.dataForm.deal.isEditingDeal es una variable que ve el estado del formularo (esta editando o no)
+                // OficioExists verifica que no exista duplicidad en los acuerdo
+                // this.dataForm.deal.isEditingDeal es una variable que ve el estado del formularo (esta editando o no)
                 if (!oficioExists || this.dataForm.deal.isEditingDeal) {
                     this.errorForm = false;//set false (0 errors)
 
@@ -431,12 +444,15 @@ export default {
                     // Función auxiliar para actualizar o agregar un acuerdo
                     const updateOrCreateDeal = () => {
                         if (isEditingDeal) {
+                            // Editar
                             const index = this.dataDeals.findIndex((deal) => deal.indexDeal === this.dataForm.deal.indexDeal);
                             const foundDeal = this.dataDeals[index];
+                            console.log(foundDeal);
                             Object.assign(foundDeal, this.dataForm.deal);
                             foundDeal.isDelete = false;
                             foundDeal.isEditingDeal = false;
                         } else {
+                            // Crear
                             const newDeal = { ...this.dataForm.deal };
                             newDeal.indexDeal = this.dataDeals.length + 1;
                             this.dataDeals.unshift(newDeal);
@@ -468,6 +484,8 @@ export default {
             }
             this.dataForm.deal.indexDeal = data.indexDeal;
             this.dataForm.deal.id_tipo_acuerdo_laboral = data.id_tipo_acuerdo_laboral;
+            this.dataForm.deal.nombre_tipo_acuerdo_laboral = data.nombre_tipo_acuerdo_laboral;
+            this.dataForm.deal.id_acuerdo_laboral = data.id_acuerdo_laboral;
             this.dataForm.deal.fecha_acuerdo_laboral = data.fecha_acuerdo_laboral;
             this.dataForm.deal.oficio_acuerdo_laboral = data.oficio_acuerdo_laboral;
             this.dataForm.deal.fecha_inicio_fecha_fin_acuerdo_laboral = data.fecha_inicio_fecha_fin_acuerdo_laboral;
@@ -505,25 +523,106 @@ export default {
                 }
             });
         },
+
+        createDealsRequest() {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    const resp = await axios.post('/add-deals', { id_empleado: this.dataForm.id_empleado, deals: this.dataDeals });
+                    //this.$emit("actualizar-table-data");
+                    resolve(resp); // Resolvemos la promesa con la respuesta exitosa
+
+                } catch (error) {
+                    console.log(error);
+                    reject(error); // Rechazamos la promesa en caso de excepción
+                }
+            });
+        },
+
+
+        async addDeals() {
+
+            this.$swal.fire({
+                title: '<p class="text-[20pt] text-center">¿Esta seguro de guardar los datos?</p>',
+                icon: 'question',
+                iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
+                confirmButtonText: 'Si, Editar',
+                confirmButtonColor: '#001b47',
+                cancelButtonText: 'Cancelar',
+                showCancelButton: true,
+                showCloseButton: true,
+
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+
+                    this.executeRequest(
+                        this.createDealsRequest(),
+                        '¡Los datos se han ingresado correctamente!'
+                    )
+
+                }
+            })
+
+        },
+
+        updateDealsRequest() {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    const resp = await axios.post('/update-deals', { id_empleado: this.dataForm.id_empleado, deals: this.dataDeals });
+                    this.$emit("actualizar-table-data");
+                    resolve(resp); // Resolvemos la promesa con la respuesta exitosa
+
+                } catch (error) {
+                    console.log(error);
+                    reject(error); // Rechazamos la promesa en caso de excepción
+                }
+            });
+        },
+
+
+        async updateDeals() {
+
+            this.$swal.fire({
+                title: '<p class="text-[20pt] text-center">¿Esta seguro de editar los datos?</p>',
+                icon: 'question',
+                iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
+                confirmButtonText: 'Si, Editar',
+                confirmButtonColor: '#001b47',
+                cancelButtonText: 'Cancelar',
+                showCancelButton: true,
+                showCloseButton: true,
+
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+
+                    this.executeRequest(
+                        this.updateDealsRequest(),
+                        '¡Los datos se han modificado correctamente!'
+                    )
+
+                }
+            })
+
+        },
+
+
         async handleSearch(query) {
             if (query !== '') {
                 try {
                     if (query.by === 'name' && query.query.length >= 5) {
-                        this.isLoadingToSearch = true;
+                        this.isLoadingToSearch = true
                         const response = await axios.post('/search-employe', query);
                         this.employeOptions = response.data;
-                        console.log(this.employeOptions);
                     } else if (query.by === 'id') {
                         this.loading = true;
                         const response = await axios.post('/search-employe', query);
-                        this.employeOptions = response.data;
-                        this.personaWasSelected(query.query);
+                        this.employeOptions = response.data
+                        this.dataForm.id_empleado = this.employeOptions[0].value
                     }
                 } catch (error) {
-                    console.log('Error en la búsqueda:', error);
+                    console.log('Error en la búsqueda:', error)
                 } finally {
-                    this.isLoadingToSearch = false;
-                    this.loading = false;
+                    this.isLoadingToSearch = false
+                    this.loading = false
                 }
             }
         },
@@ -544,49 +643,80 @@ export default {
             foundDeal.isEditingDeal = false;
         },
 
-        days_of_month(yearin) {
+        daysOfMonth(yearin) {
             const kabisa = (yearin) => (yearin % 4 === 0 && yearin % 100 !== 0 && yearin % 400 !== 0) || (yearin % 100 === 0 && yearin % 400 === 0);
             const fevral = (yearin) => (kabisa(yearin) ? 29 : 28);
             return [31, fevral(this.year), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
         },
-        hafta(sol, ma) {
-            const firstDayOfMonth = new Date(sol, ma, 1).getDay();
-            return firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
-        },
-        daysgenerater() {
+
+        dayGenerater() {
             const days = [];
-            for (let k = 0; k < this.days_of_month().length; k++) {
+            for (let k = 0; k < this.daysOfMonth().length; k++) {
                 days.push([]);
-                for (let i = 1; i <= this.days_of_month()[k]; i++) {
+                for (let i = 1; i <= this.daysOfMonth()[k]; i++) {
                     days[k].push(i);
                 }
             }
             return days;
         },
-        hozirgivaqt() {
-            const today = new Date();
-            this.year = today.getFullYear();
+        getCurrentYear() {
+            const today = new Date()
+            this.year = today.getFullYear()
         },
-        esAhora(dia, mes, anio) {
-            const hoy = new Date();
-            const diaEnTabla = new Date(anio, mes - 1, dia); // Restamos 1 al mes para el formato correcto
-            return hoy.toDateString() === diaEnTabla.toDateString();
-        },
+
         transFormDat(dia, mes, año) {
-            const fechaProporcionada = `${año}-${mes}-${dia}`;
+            const fechaProporcionada = `${año}-${mes}-${dia}`
             //console.log(moment(fechaProporcionada).format('dddd, MMMM Do YYYY'));
-            return moment(fechaProporcionada).format('dddd, MMMM D, YYYY');
-        }
+            return moment(fechaProporcionada).format('dddd, MMMM D, YYYY')
+        },
+        filterDealsByYear() {
+            this.dataDeals = []
+            this.dataAcuerdos.acuerdo_laboral.filter((i) => moment(i.fecha_acuerdo_laboral).year() == this.year).forEach((obj, index) => {
+                this.dataDeals.push({
+                    indexDeal: this.dataDeals.length + 1,
+                    id_acuerdo_laboral: obj.id_acuerdo_laboral,
+                    id_tipo_acuerdo_laboral: obj.tipo_acuerdo_laboral["id_tipo_acuerdo_laboral"],
+                    nombre_tipo_acuerdo_laboral: obj.tipo_acuerdo_laboral["nombre_tipo_acuerdo_laboral"],
+                    fecha_acuerdo_laboral: obj.fecha_acuerdo_laboral,
+                    oficio_acuerdo_laboral: obj.oficio_acuerdo_laboral,
+                    comentario_acuerdo_laboral: obj.comentario_acuerdo_laboral,
+                    fecha_inicio_fecha_fin_acuerdo_laboral: `${obj.fecha_inicio_acuerdo_laboral} to ${obj.fecha_fin_acuerdo_laboral}`,
+                    isDelete: false,
+                    isEditingDeal: false,
+                })
+            })
+        },
+        getUniqueYears() {
+            if (this.dataAcuerdos != "") {
+                const uniqueYearsSet = new Set();
+                // Iteramos sobre el arreglo dataDeals y agregamos los años al conjunto
+                this.dataAcuerdos.acuerdo_laboral.forEach((obj, index) => {
+                    // Extraemos el año de la fecha_acuerdo_laboral y lo agregamos al conjunto
+                    if (obj.fecha_acuerdo_laboral) {
+                        const year = moment(obj.fecha_acuerdo_laboral).year();
+                        uniqueYearsSet.add(year);
+                    }
+                });
+                // Convertimos el conjunto a un nuevo arreglo y lo ordenamos
+                const uniqueYearsArray = Array.from(uniqueYearsSet).sort();
+
+                return uniqueYearsArray;
+            }
+        },
     },
 
     created() {
         // Al cargar el componente, establecer el año actual
-        this.hozirgivaqt();
+        
     },
     watch: {
         showModal() {
+            this.getCurrentYear();
             if (this.showModal) {
-
+                if (this.dataAcuerdos != '') {
+                    this.handleSearch({ by: 'id', query: this.dataAcuerdos.id_empleado })
+                    this.filterDealsByYear()
+                }
             } else {
 
                 setTimeout(() => {

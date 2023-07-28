@@ -12,7 +12,7 @@ import moment from 'moment';
     <AppLayoutVue nameSubModule="RRHH - Acuerdos">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="dataBeneficiariosToSendModal = []; showModalAcuerdos = !showModalAcuerdos"
+                <GeneralButton @click="dataAcuerdosToSendModal = []; showModalAcuerdos = !showModalAcuerdos"
                     color="bg-green-700  hover:bg-green-800" text="Agregar Acuerdos" icon="add" />
             </div>
         </div>
@@ -21,9 +21,9 @@ import moment from 'moment';
                 <div class="mb-4 md:flex flex-row justify-items-start">
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-                            <Multiselect v-model="tableData.length" @select="getBeneficiarios()"
-                                @deselect=" tableData.length = 5; getBeneficiarios()"
-                                @clear="tableData.length = 5; getBeneficiarios()" :options="perPage" :searchable="true"
+                            <Multiselect v-model="tableData.length" @select="getAcuerdos()"
+                                @deselect=" tableData.length = 5; getAcuerdos()"
+                                @clear="tableData.length = 5; getAcuerdos()" :options="perPage" :searchable="true"
                                 placeholder="Cantidad a mostrar" />
                             <LabelToInput icon="list2" />
                         </div>
@@ -36,7 +36,7 @@ import moment from 'moment';
 
             <div class="overflow-x-auto">
                 <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
-                    @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getBeneficiarios()">
+                    @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getAcuerdos()">
                     <tbody class="text-sm divide-y divide-slate-200">
                         <tr v-for="acuerdos in acuerdos" :key="acuerdos.id_empleado">
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
@@ -103,7 +103,7 @@ import moment from 'moment';
                                 <div class="space-x-1">
                                     <DropDownOptions>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            @click.stop="dataBeneficiariosToSendModal = acuerdos; showModalAcuerdos = !showModalAcuerdos">
+                                            @click.stop="dataAcuerdosToSendModal = acuerdos; showModalAcuerdos = !showModalAcuerdos">
                                             <div class="w-8 text-blue-900">
                                                 <span class="text-xs">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -140,7 +140,7 @@ import moment from 'moment';
                             <li v-for="link in links" :key="link.label">
                                 <span v-if="link.label === 'Anterior'"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
-                                    <a @click="getBeneficiarios(link.url)"
+                                    <a @click="getAcuerdos(link.url)"
                                         class="btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer text-indigo-500">
                                         <div class="flex items-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -155,7 +155,7 @@ import moment from 'moment';
                                 <span v-else-if="(link.label == 'Siguiente')"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getBeneficiarios(link.url)"
+                                        <a @click="getAcuerdos(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer text-indigo-500">
 
                                             <div class="flex items-center">
@@ -171,7 +171,7 @@ import moment from 'moment';
                                 </span>
                                 <span class="cursor-pointer" v-else
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
-                                        class=" w-5" @click="getBeneficiarios(link.url)">{{ link.label }}</span>
+                                        class=" w-5" @click="getAcuerdos(link.url)">{{ link.label }}</span>
                                 </span>
                             </li>
                         </ul>
@@ -180,7 +180,8 @@ import moment from 'moment';
             </div>
         </div>
 
-        <ModalAcuerdosVue :showModal="showModalAcuerdos" :dataForSelect="dataForSelect"
+        <ModalAcuerdosVue :showModal="showModalAcuerdos" :dataAcuerdos="dataAcuerdosToSendModal"
+            @actualizar-table-data="getAcuerdos(lastUrl); showModalAcuerdos = false" :dataForSelect="dataForSelect"
             @cerrar-modal="showModalAcuerdos = false" />
 
     </AppLayoutVue>
@@ -264,7 +265,7 @@ export default {
         }
     },
     methods: {
-        async getBeneficiarios(url = "/acuerdos") {
+        async getAcuerdos(url = "/acuerdos") {
             this.lastUrl = url;
             this.tableData.draw++;
             await axios.post(url, this.tableData).then((response) => {
@@ -305,7 +306,7 @@ export default {
                 this.sortOrders[key] = this.sortOrders[key] * -1;
                 this.tableData.column = this.getIndex(this.columns, "name", key);
                 this.tableData.dir = this.sortOrders[key] === 1 ? "asc" : "desc";
-                this.getBeneficiarios();
+                this.getAcuerdos();
             }
         },
         getIndex(array, key, value) {
@@ -323,7 +324,7 @@ export default {
         handleData(myEventData) {
             if (this.validarCamposVacios(myEventData)) {
                 this.tableData.search = {};
-                this.getBeneficiarios();
+                this.getAcuerdos();
             }
             else {
                 this.tableData.search = myEventData;
@@ -346,7 +347,7 @@ export default {
 
     },
     created() {
-        this.getBeneficiarios()
+        this.getAcuerdos()
     },
 }
 </script>

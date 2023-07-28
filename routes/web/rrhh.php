@@ -54,6 +54,8 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     )->name('rrhh.acuerdos');
     Route::post('acuerdos', [AcuerdoController::class, 'getAcuerdos'])->name('acuerdos.getAcuerdos');
     Route::post('search-employe', [AcuerdoController::class, 'searchEmployeByNameOrId'])->name('empleado.seachEmployeByName');
+    Route::post('add-deals', [AcuerdoController::class, 'addDeals'])->name('add.deals');
+    Route::post('update-deals', [AcuerdoController::class, 'updateDeals'])->name('update.deals');
 
 
     
