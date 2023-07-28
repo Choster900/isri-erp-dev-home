@@ -210,7 +210,7 @@ import axios from 'axios';
         <ModalEmployeesVue :show_modal_employee="show_modal_employee" :modalData="modalData"
             @cerrar-modal="show_modal_employee = false" @get-table="getEmployees()" />
 
-        <ModalFotografiaVue :showModalFlag="showModalFlag" 
+        <ModalFotografiaVue :showModalFlag="showModalFlag" :person="person"
             @cerrar-modal="showModalFlag = false" />
 
     </AppLayoutVue>
@@ -247,6 +247,7 @@ export default {
         });
         return {
             showModalFlag:false,
+            person:[],
 
             empty_object: false,
             //Data for datatable
@@ -276,6 +277,7 @@ export default {
     methods: {
         manageFiles(employee){
             this.showModalFlag=true
+            this.person = employee.persona
         },
         editEmployee(employee) {
             this.modalData = employee

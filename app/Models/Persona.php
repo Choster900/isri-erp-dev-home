@@ -55,6 +55,10 @@ class Persona extends Model
     { 
         return $this->hasMany('App\Models\Residencia','id_persona','id_persona');
     }
+    public function fotos()
+    { 
+        return $this->hasMany('App\Models\Foto','id_persona','id_persona');
+    }
     /**
      * Get all of the familiares for the Persona
      *
