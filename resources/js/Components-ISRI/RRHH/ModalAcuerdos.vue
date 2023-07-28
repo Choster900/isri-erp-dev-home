@@ -169,6 +169,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                                     'AGREGAR NUEVA MODIFICACION' : 'AGREGAR NUEVO ACUERDO' }}</span>
                                             </div>
                                         </div>
+                                        <!--  {{ dataDeals }} -->
                                         <div class="h-[285px] max-h-full overflow-y-auto mt-2 mb-1 px-1"
                                             v-if="dataDeals.filter((i) => !i.isDelete).length !== 0">
                                             <div class="sm:flex sm:items-center text-selection-disable"
@@ -205,7 +206,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                                             </p>
                                                         </div>
                                                     </div>
-                                                    <div @click="deleteDealWhenIsClicked(i)"
+                                                    <div @click="deleteDealWhenIsClicked(deal.indexDeal)"
                                                         class="flex items-center justify-center rounded-r-lg hover:bg-slate-400/50  bg-slate-300 shadow-border hover:bg-blue-dark text-sm py-4 px-3 uppercase font-bold">
                                                         <svg class="w-5 h-5" viewBox="0 0 1024.00 1024.00"
                                                             stroke-width="0.01024">
@@ -236,20 +237,20 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                             </div>
 
                             <div class="flex justify-start pt-1 gap-3"><!-- TODO: DEFINIR POSICION -->
-
                                 <select v-model.number="year" @change="filterDealsByYear()"
                                     class="border border-gray-300 rounded-lg text-gray-600 h-8 text-xs  bg-white hover:border-gray-400 focus:outline-none appearance">
                                     <option disabled>Filtrar por año</option>
-                                    <option v-for="yearOption in getUniqueYears()" :key="yearOption" :value="yearOption">
+                                    <option v-for="yearOption in listYears" :key="yearOption" :value="yearOption">
                                         {{ yearOption }}
                                     </option>
 
                                 </select>
-                                <GeneralButton @click="dataDeals.filter((i) => !i.isDelete) != '' ? addDeals() : ''"
+                                <GeneralButton @click="newDataDeals.filter((i) => !i.isDelete) != '' ? addDeals() : ''"
                                     v-if="dataAcuerdos == ''" color="bg-green-700  hover:bg-green-800"
                                     text="Agregar todos los acuerdos" icon="add" />
 
-                                <GeneralButton @click="dataDeals.filter((i) => !i.isDelete) != '' ? updateDeals() : ''"
+                                <GeneralButton
+                                    @click="[...copyDataDeals, ...newDataDeals].filter((i) => !i.isDelete) != '' ? updateDeals() : ''"
                                     v-else color="bg-orange-700  hover:bg-orange-800" text="Editar todos los acuerdos"
                                     icon="add" />
                             </div>
@@ -325,6 +326,7 @@ export default {
             month: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
             monthName: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
             year: '',
+            listYears: [],
             config: {
                 altInput: true,
                 static: true,
@@ -381,8 +383,9 @@ export default {
                     isEditingDeal: false,
                 }
             },
-            dataDeals: [],
-            dataNewDeal:[],
+            dataDeals: [], // Global data que se usaria para mostrar en la lista de acuerdos laborales
+            newDataDeals: [],// New data you add
+            copyDataDeals: [],// Data comers from DB
         }
     },
     methods: {
@@ -403,22 +406,6 @@ export default {
             );
         },
 
-        validarCamposUnicos(arr) {
-            const oficiosSet = new Set();
-
-            for (const obj of arr) {
-                if (obj.hasOwnProperty('oficio_acuerdo_laboral')) {
-                    const oficio = obj.oficio_acuerdo_laboral;
-                    if (oficiosSet.has(oficio)) {
-                        return false; // Se encontró un oficio_acuerdo_laboral repetido
-                    }
-                    oficiosSet.add(oficio);
-                }
-            }
-
-            return true; // Todos los oficio_acuerdo_laboral son únicos
-        },
-
         resetForm() {
             this.dataForm.deal.indexDeal = ''
             //this.dataForm.deal.id_acuerdo_laboral = ''
@@ -429,6 +416,27 @@ export default {
             this.dataForm.deal.comentario_acuerdo_laboral = ''
             this.dataForm.deal.isEditingDeal = false
 
+        },
+        generateShortUniqueId() {
+            // Longitud deseada del ID corto único (cambiado a 4)
+            const length = 4;
+            // Caracteres que se utilizarán para generar el ID
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let id = '';
+
+            // Generar un ID corto único concatenando caracteres aleatorios hasta alcanzar la longitud deseada
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * characters.length);
+                id += characters[randomIndex];
+            }
+
+            // Agregar la marca de tiempo para asegurarse de que sea único en cada generación
+            id += Date.now();
+
+            // Puedes usar este ID único en tu lógica de negocio o donde lo necesites
+            console.log('ID único generado:', id);
+
+            return id;
         },
 
         createNewDeal() {
@@ -445,22 +453,54 @@ export default {
                     const updateOrCreateDeal = () => {
                         if (isEditingDeal) {
                             // Editar
-                            const index = this.dataDeals.findIndex((deal) => deal.indexDeal === this.dataForm.deal.indexDeal);
-                            const foundDeal = this.dataDeals[index];
-                            console.log(foundDeal);
-                            Object.assign(foundDeal, this.dataForm.deal);
-                            foundDeal.isDelete = false;
-                            foundDeal.isEditingDeal = false;
+                            const indexCopy = this.copyDataDeals.findIndex((deal) => deal.indexDeal === this.dataForm.deal.indexDeal);
+                            const indexNew = this.newDataDeals.findIndex((deal) => deal.indexDeal === this.dataForm.deal.indexDeal);
+                            const indexShow = this.dataDeals.findIndex((deal) => deal.indexDeal === this.dataForm.deal.indexDeal);
+
+
+                            const foundDealCoyp = this.copyDataDeals[indexCopy];
+                            const foundDealShow = this.dataDeals[indexShow];
+                            const foundDealNew = this.dataDeals[indexNew];
+
+
+                            Object.assign(foundDealNew, this.dataForm.deal);//COMBINANDO EL FORM CON LA DATA QUE SE MUESTRA
+                            if (foundDealCoyp) {
+                                Object.assign(foundDealCoyp, this.dataForm.deal); // COMBINANDO EL FORMULARIO CON LA COPIA
+
+                                foundDealCoyp.isDelete = false;
+                                foundDealCoyp.isEditingDeal = false;
+                            }
+                            Object.assign(foundDealShow, this.dataForm.deal);//COMBINANDO EL FORM CON LA DATA QUE SE MUESTRA
+
+                            foundDealShow.isDelete = false;
+                            foundDealShow.isEditingDeal = false;
+                            foundDealNew.isDelete = false;
+                            foundDealNew.isEditingDeal = false;
+                            this.getUniqueYears()
+
                         } else {
                             // Crear
                             const newDeal = { ...this.dataForm.deal };
-                            newDeal.indexDeal = this.dataDeals.length + 1;
+                            /* newDeal.indexDeal = this.dataDeals.length + 1;
+                            this.dataDeals.unshift(newDeal); */
+                            newDeal.indexDeal = this.generateShortUniqueId();// FIXME:  CUANDO AGREGAR UN REGISTRO DIFERENTE AL AÑO ACTUAL NO LO AGREGAR A DATAdEALS
+                            console.log(newDeal);
                             this.dataDeals.unshift(newDeal);
+                            this.newDataDeals.unshift(newDeal);
+
+                            this.getUniqueYears()
+                            this.year = moment(newDeal.fecha_acuerdo_laboral).year()
+
                         }
                     };
 
                     updateOrCreateDeal();
+                    //this.getUniqueYears()
+                    this.filterDealsByYear()
                     this.resetForm(); // Restablecer los campos del formulario después de guardar/actualizar correctamente
+
+                    console.log(this.newDataDeals);
+                    console.log(this.dataDeals);
                 } else {
                     this.errorForm = true;
                     this.messageError = 'El numero de referencia ya existe por favor intenta otro'
@@ -511,8 +551,38 @@ export default {
             }).then((result) => {
                 if (result.isConfirmed) {
                     // Modificar el objeto para que la fila desaparezca de la tabla (valor en posición 7 se establece como false)
-                    this.dataDeals[index]["isDelete"] = true;
+                    /*   this.dataDeals[index]["isDelete"] = true;
+                      this.dataDeals[index]["isDelete"] = true;
+                      this.dataDeals[index]["isDelete"] = true; */
 
+                    const indexCopy = this.copyDataDeals.findIndex((deal) => deal.indexDeal === index);
+                    const indexNew = this.newDataDeals.findIndex((deal) => deal.indexDeal === index);
+                    const indexShow = this.dataDeals.findIndex((deal) => deal.indexDeal === index);
+
+
+                    const foundDealCoyp = this.copyDataDeals[indexCopy];
+                    const foundDealShow = this.dataDeals[indexShow];
+                    const foundDealNew = this.dataDeals[indexNew];
+
+                    if (foundDealCoyp) {
+
+                        foundDealCoyp.isDelete = true;
+                    }
+
+                    if (foundDealShow) {
+                        foundDealShow.isDelete = true;
+                    }
+
+
+
+                    if (foundDealNew) {
+                        foundDealNew.isDelete = true;
+                    }
+
+
+
+                    this.getUniqueYears()
+                    this.filterDealsByYear()
                     // Mostrar mensaje de advertencia
                     toast.warning("El acuerdo se elimino temporalmente hasta que envias la informacion", {
                         autoClose: 5000,
@@ -528,7 +598,7 @@ export default {
             return new Promise(async (resolve, reject) => {
                 try {
                     const resp = await axios.post('/add-deals', { id_empleado: this.dataForm.id_empleado, deals: this.dataDeals });
-                    //this.$emit("actualizar-table-data");
+                    this.$emit("actualizar-table-data");
                     resolve(resp); // Resolvemos la promesa con la respuesta exitosa
 
                 } catch (error) {
@@ -567,7 +637,7 @@ export default {
         updateDealsRequest() {
             return new Promise(async (resolve, reject) => {
                 try {
-                    const resp = await axios.post('/update-deals', { id_empleado: this.dataForm.id_empleado, deals: this.dataDeals });
+                    const resp = await axios.post('/update-deals', { id_empleado: this.dataForm.id_empleado, deals: [...this.copyDataDeals, ...this.newDataDeals] });
                     this.$emit("actualizar-table-data");
                     resolve(resp); // Resolvemos la promesa con la respuesta exitosa
 
@@ -669,28 +739,17 @@ export default {
             //console.log(moment(fechaProporcionada).format('dddd, MMMM Do YYYY'));
             return moment(fechaProporcionada).format('dddd, MMMM D, YYYY')
         },
-        filterDealsByYear() {
-            this.dataDeals = []
-            this.dataAcuerdos.acuerdo_laboral.filter((i) => moment(i.fecha_acuerdo_laboral).year() == this.year).forEach((obj, index) => {
-                this.dataDeals.push({
-                    indexDeal: this.dataDeals.length + 1,
-                    id_acuerdo_laboral: obj.id_acuerdo_laboral,
-                    id_tipo_acuerdo_laboral: obj.tipo_acuerdo_laboral["id_tipo_acuerdo_laboral"],
-                    nombre_tipo_acuerdo_laboral: obj.tipo_acuerdo_laboral["nombre_tipo_acuerdo_laboral"],
-                    fecha_acuerdo_laboral: obj.fecha_acuerdo_laboral,
-                    oficio_acuerdo_laboral: obj.oficio_acuerdo_laboral,
-                    comentario_acuerdo_laboral: obj.comentario_acuerdo_laboral,
-                    fecha_inicio_fecha_fin_acuerdo_laboral: `${obj.fecha_inicio_acuerdo_laboral} to ${obj.fecha_fin_acuerdo_laboral}`,
-                    isDelete: false,
-                    isEditingDeal: false,
-                })
-            })
-        },
         getUniqueYears() {
-            if (this.dataAcuerdos != "") {
+            if (this.dataDeals != "") {
                 const uniqueYearsSet = new Set();
+
+                const dealFilterByYearAndNewDeals = [
+                    ...this.copyDataDeals.filter((i) => !i.isDelete),
+                    ...this.newDataDeals.filter((i) => !i.isDelete)
+                ];
+
                 // Iteramos sobre el arreglo dataDeals y agregamos los años al conjunto
-                this.dataAcuerdos.acuerdo_laboral.forEach((obj, index) => {
+                dealFilterByYearAndNewDeals.forEach((obj, index) => {
                     // Extraemos el año de la fecha_acuerdo_laboral y lo agregamos al conjunto
                     if (obj.fecha_acuerdo_laboral) {
                         const year = moment(obj.fecha_acuerdo_laboral).year();
@@ -699,15 +758,31 @@ export default {
                 });
                 // Convertimos el conjunto a un nuevo arreglo y lo ordenamos
                 const uniqueYearsArray = Array.from(uniqueYearsSet).sort();
-
-                return uniqueYearsArray;
+                console.log({ uniqueYearsArray });
+                this.listYears = uniqueYearsArray
             }
         },
+        filterDealsByYear() {
+            if (this.year !== '') {
+                const dealFilterByYearAndNewDeals = [
+                    ...this.newDataDeals.filter((i) => moment(i.fecha_acuerdo_laboral).year() == this.year),
+                    ...this.copyDataDeals.filter((i) => moment(i.fecha_acuerdo_laboral).year() == this.year)
+                ];
+                this.dataDeals = dealFilterByYearAndNewDeals;
+            } else {
+                const dealFilterByAllYears = [
+                    ...this.newDataDeals,
+                    ...this.copyDataDeals
+                ];
+                this.dataDeals = dealFilterByAllYears;
+            }
+        },
+
     },
 
     created() {
         // Al cargar el componente, establecer el año actual
-        
+
     },
     watch: {
         showModal() {
@@ -715,13 +790,38 @@ export default {
             if (this.showModal) {
                 if (this.dataAcuerdos != '') {
                     this.handleSearch({ by: 'id', query: this.dataAcuerdos.id_empleado })
+                    this.dataAcuerdos.acuerdo_laboral.forEach((obj, index) => {
+                        //this.dataDeals.push({
+                        this.copyDataDeals.push({
+                            indexDeal: this.generateShortUniqueId(),
+                            id_acuerdo_laboral: obj.id_acuerdo_laboral,
+                            id_tipo_acuerdo_laboral: obj.tipo_acuerdo_laboral["id_tipo_acuerdo_laboral"],
+                            nombre_tipo_acuerdo_laboral: obj.tipo_acuerdo_laboral["nombre_tipo_acuerdo_laboral"],
+                            fecha_acuerdo_laboral: obj.fecha_acuerdo_laboral,
+                            oficio_acuerdo_laboral: obj.oficio_acuerdo_laboral,
+                            comentario_acuerdo_laboral: obj.comentario_acuerdo_laboral,
+                            fecha_inicio_fecha_fin_acuerdo_laboral: `${obj.fecha_inicio_acuerdo_laboral} to ${obj.fecha_fin_acuerdo_laboral}`,
+                            isDelete: false,
+                            isEditingDeal: false,
+                        })
+                    })
                     this.filterDealsByYear()
+                    this.getUniqueYears()
+
+                } else {
+
                 }
             } else {
 
                 setTimeout(() => {
                     this.dataDeals = []//vaciando medio segundo despues que cierre el modal
+                    this.copyDataDeals = []//vaciando medio segundo despues que cierre el modal
+                    this.newDataDeals = []//vaciando medio segundo despues que cierre el modal
                 }, 500);
+                this.dataForm.id_empleado = ''
+                this.employeOptions = []
+                this.listYears = []
+                //reset form cuando cierre
             }
         }
     }
