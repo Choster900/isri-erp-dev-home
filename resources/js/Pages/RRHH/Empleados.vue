@@ -3,7 +3,7 @@ import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import ModalEmployeesVue from '@/Components-ISRI/RRHH/ModalEmployees.vue';
-import ModalFotografiaVue from '@/Components-ISRI/RRHH/ModalFotografia2.vue';
+import ModalFotografiaVue from '@/Components-ISRI/RRHH/ModalFotografia.vue';
 import moment from 'moment';
 
 import { toast } from 'vue3-toastify';
@@ -107,9 +107,6 @@ import axios from 'axios';
                                                 <span class="text-xs">
                                                     <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none"
                                                         xmlns="http://www.w3.org/2000/svg">
-                                                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round"
-                                                            stroke-linejoin="round"></g>
                                                         <g id="SVGRepo_iconCarrier">
                                                             <path
                                                                 d="M12 16C13.6569 16 15 14.6569 15 13C15 11.3431 13.6569 10 12 10C10.3431 10 9 11.3431 9 13C9 14.6569 10.3431 16 12 16Z"
@@ -210,7 +207,7 @@ import axios from 'axios';
         <ModalEmployeesVue :show_modal_employee="show_modal_employee" :modalData="modalData"
             @cerrar-modal="show_modal_employee = false" @get-table="getEmployees()" />
 
-        <ModalFotografiaVue :showModalFlag="showModalFlag" :person="person"
+        <ModalFotografiaVue :showModalFlag="showModalFlag" :modalData="modalData"
             @cerrar-modal="showModalFlag = false" />
 
     </AppLayoutVue>
@@ -247,7 +244,6 @@ export default {
         });
         return {
             showModalFlag:false,
-            person:[],
 
             empty_object: false,
             //Data for datatable
@@ -277,7 +273,7 @@ export default {
     methods: {
         manageFiles(employee){
             this.showModalFlag=true
-            this.person = employee.persona
+            this.modalData = employee
         },
         editEmployee(employee) {
             this.modalData = employee

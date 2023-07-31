@@ -1,40 +1,54 @@
 <script setup>
 import Modal from "@/Components-ISRI/AllModal/Modal.vue";
-import InputError from "@/Components/InputError.vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import axios from "axios";
-
-import 'dropzone/dist/dropzone.css';
-//import 'dropzone/dist/basic.css';
-import Dropzone from 'dropzone';
-
 </script>
 
 <template>
     <div class="m-1.5">
-        <!-- <div v-if="isLoading"
-            class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
-            <div role="status" class="flex items-center">
-                <svg aria-hidden="true" class="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-800"
-                    viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                        fill="currentColor" />
-                    <path
-                        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                        fill="currentFill" />
-                </svg>
-                <div class="bg-gray-200 rounded-lg p-1 font-semibold">
-                    <span class="text-blue-800">CARGANDO...</span>
-                </div>
-            </div>
-        </div> -->
-        <Modal :show="showModalFlag" @close="$emit('cerrar-modal')" :modal-title="'Administracion plazas. '" maxWidth="3xl">
+        <div v-if="isFullScreenActive" ref="fullScreenContainer" @click="closeFullScreen"
+        :class="isFullScreenActive ? 'transition-opacity ease-in duration-700 opacity-100' : ''"
+            class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-90 z-50 flex justify-center items-center">
+            <span ref="deleteButton" class="absolute top-2 right-8 text-white text-4xl cursor-pointer"
+                @click.stop="closeFullScreen">&times;</span>
+            <img class="max-w-[90%] max-h-[90%] object-contain cursor-pointer" :src="getFullScreenImageUrl()" />
+        </div>
+
+        <Modal v-else :show="showModalFlag" @close="$emit('cerrar-modal')" :modal-title="'Administracion fotografias. '"
+            maxWidth="2xl" :closeOutSide="false">
             <div class="px-5 py-4">
-                <div class="dropzone" ref="myDropzone">
-                    <div class="dz-message">
-                        Click para subir foto o arrastra la imagen.
+                <div>
+                    <div class="card w-[90%] bg-gray-100">
+                        <div class="text-center">
+                            <p class="text-slate-800 font-bold">Fotografia para: {{ employee.codigo_empleado }}</p>
+                        </div>
+                        <div class="drag-area bg-gray-200 text-slate-800 mb-2" @dragover.prevent="onDragOver"
+                            @dragleave="onDragLeave" @drop.prevent="onDrop">
+                            <span v-if="!isDragging">
+                                Arrastra y suelta una imagen aquí o
+                                <span class="text-blue-600 ml-0 cursor-pointer transition duration-400" role="button" @click="selectFiles">
+                                    Selecciona
+                                </span>
+                            </span>
+                            <div v-else class="text-blue-600 ml-0 cursor-pointer transition duration-400">Suelta la imagen aquí</div>
+                            <input type="file" name="file" class="file" ref="fileInput" multiple @change="onFileSelect" />
+                        </div>
+                        <div class="container w-full flex flex-wrap -mx-1">
+                            <div class="image-wrapper w-1/3 px-1" v-for="(image, index) in images" :key="index">
+                                <div class="bg-slate-400 image border border-gray-400 rounded-md flex items-center justify-center"
+                                    :class="isSelectedImage(index) ? 'border-2 border-blue-600' : ''">
+                                    <span class="delete-img" @click="deleteImage(index)">&times;</span>
+                                    <img :src="image.url" @click="toggleFullScreenImage(index)" />
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <button type="button" class="bg-green-600">SUBIR</button> -->
+                    </div>
+                    <div class="flex justify-center mt-4">
+                        <GeneralButton class="mr-1" text="Cancelar" icon="delete" @click="$emit('cerrar-modal')" />
+                        <GeneralButton v-if="images.length > 0" color="bg-green-700 hover:bg-green-800" text="Guardar"
+                            icon="add" class="" @click="storeEmployePhoto()" />
                     </div>
                 </div>
             </div>
@@ -44,302 +58,311 @@ import Dropzone from 'dropzone';
 
 <script>
 export default {
-    mounted() {
-        // Initialize Dropzone when the component is mounted
-        this.initDropzone();
-    },
     props: {
-        modalData: {
-            type: Array,
-            default: [],
-        },
         showModalFlag: {
             type: Boolean,
             default: false,
         },
+        modalData: {
+            type: Array,
+            default: []
+        }
     },
     created() { },
     data: function (data) {
         return {
-            errors: [],
-            isLoading: false,
-            selectOptions: {
-                uplt: [],
-                financingSources: [],
-                jobPositions: [],
-                contractTypes: [],
-                jobPositionStatus: [],
-                allActivities: [],
-                activities: []
-            },
-            jobPositionDet: {
-                actividad_institucional: {
-                    linea_trabajo: {
-                        id_lt: ''
-                    }
-                },
-                id_actividad_institucional: '',
-                id_det_plaza: '',
-                id_estado_plaza: '',
-                id_plaza: '',
-                id_proy_financiado: '',
-                id_tipo_contrato: '',
-                plaza_asignada_activa: null,
-                codigo_det_plaza: ''
-            },
+            employee: [],
+            images: [],
+            selectedImageIndex: -1,
+            isDragging: false,
+            isFullScreenActive: false,
+            fullScreenImageIndex: null,
         };
     },
     methods: {
-        initDropzone() {
-            const vm = this;
-            // Add your Dropzone configuration here
-            const dropzoneConfig = {
+        storeEmployePhoto() {
+            this.$swal
+                .fire({
+                    title: '¿Está seguro de guardar los archivos?',
+                    icon: 'question',
+                    iconHtml: '❓',
+                    confirmButtonText: 'Si, Guardar',
+                    confirmButtonColor: '#141368',
+                    cancelButtonText: 'Cancelar',
+                    showCancelButton: true,
+                    showCloseButton: true
+                })
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        let url = '/upload-employee-photo'
+                        this.saveEmployePhoto(url)
+                    }
+                });
+        },
+        saveEmployePhoto(url) {
+            axios.post(url, {
+                file: this.images,
+                id_person: this.employee.persona.id_persona,
+                code: this.employee.codigo_empleado
+            }, {
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Content-Type': 'multipart/form-data',
                 },
-                url: '/upload-employee-photo', // Replace with your Laravel route URL for handling uploads
-                paramName: 'file',
-                maxFilesize: 5, // Max file size in MB
-                acceptedFiles: '.jpg, .jpeg, .png', // Allowed file types
-                addRemoveLinks: true
-                //previewTemplate: document.querySelector("#my-template").innerHTML
-        };
-
-
-        // Initialize Dropzone
-        this.dropzone = new Dropzone(this.$refs.myDropzone, dropzoneConfig);
-
-        this.$refs.myDropzone.addEventListener('click', this.handleDropzoneClick);
-
-        this.dropzone.on('success', this.onUploadSuccess);
-        this.dropzone.on('error', this.onUploadError);
-        console.log(this.dropzone);
-    },
-    deleteFileOnServer(file) {
-        console.log("llega al metodo vue");
-        alert("hola")
-    },
-    handleDropzoneClick(event) {
-        console.log(event);
-        // Check if the clicked element has the class "dz-remove"
-        if (event.target.classList.contains('dz-remove')) {
-            // Call your Vue method here
-            alert("are you trying to delete")
-        }
-    },
-
-
-
-
-    onUploadSuccess(file, response) {
-        // Handle successful upload
-        console.log(this.dropzone);
-    },
-    onUploadError(file, errorMessage, xhr) {
-        // Handle upload error
-        console.log(errorMessage);
-    },
-    storeJobPositionDet() {
-        this.$swal
-            .fire({
-                title: '¿Está seguro de guardar el nuevo concepto de ingreso?',
-                icon: 'question',
-                iconHtml: '❓',
-                confirmButtonText: 'Si, Guardar',
-                confirmButtonColor: '#141368',
-                cancelButtonText: 'Cancelar',
-                showCancelButton: true,
-                showCloseButton: true
             })
-            .then((result) => {
-                if (result.isConfirmed) {
-                    let url = '/store-job-position-det'
-                    this.saveJobPositionDet(url)
-                }
-            });
-    },
-    saveJobPositionDet(url) {
-        axios.post(url, this.jobPositionDet)
-            .then((response) => {
-                this.handleSuccessResponse(response.data.mensaje)
-            })
-            .catch((errors) => {
-                this.handleErrorResponse(errors)
-            });
-    },
-    handleSuccessResponse(message) {
-        toast.success(message, {
-            autoClose: 3000,
-            position: "top-right",
-            transition: "zoom",
-            toastBackgroundColor: "white",
-        });
-        this.$emit("get-table");
-        this.$emit("cerrar-modal");
-    },
-    handleErrorResponse(errors) {
-        if (errors.response.status === 422) {
-            if (errors.response.data.logical_error) {
-                toast.error(
-                    errors.response.data.logical_error,
-                    {
-                        autoClose: 5000,
-                        position: "top-right",
-                        transition: "zoom",
-                        toastBackgroundColor: "white",
-                    }
-                );
-                this.$emit("get-table");
-                this.$emit("cerrar-modal");
-            } else {
-                toast.warning(
-                    "Tienes algunos errores por favor verifica tus datos.",
-                    {
-                        autoClose: 5000,
-                        position: "top-right",
-                        transition: "zoom",
-                        toastBackgroundColor: "white",
-                    }
-                );
-                this.errors = errors.response.data.errors;
-            }
-        } else {
-            this.manageError(errors, this)
+                .then((response) => {
+                    this.handleSuccessResponse(response.data.message)
+                })
+                .catch((errors) => {
+                    this.handleErrorResponse(errors)
+                });
+        },
+        handleSuccessResponse(message) {
+            this.showToast(toast.success, message);
+            this.$emit("get-table");
             this.$emit("cerrar-modal");
-        }
-    },
-    updateJobPositionDet() {
-        this.$swal
-            .fire({
-                title: '¿Está seguro de actualizar la plaza?',
-                icon: 'question',
-                iconHtml: '❓',
-                confirmButtonText: 'Si, Actualizar',
-                confirmButtonColor: '#141368',
-                cancelButtonText: 'Cancelar',
-                showCancelButton: true,
-                showCloseButton: true
-            })
-            .then((result) => {
-                if (result.isConfirmed) {
-                    let url = '/update-job-position-det'
-                    this.saveJobPositionDet(url)
+        },
+        handleErrorResponse(errors) {
+            if (errors.response.status === 422) {
+                if (errors.response.data.logical_error) {
+                    this.showToast(toast.error, errors.response.data.logical_error);
+                    this.$emit("get-table");
+                    this.$emit("cerrar-modal");
+                } else {
+                    this.showToast(toast.warning, "Tienes algunos errores por favor verifica tus datos.");
+                }
+            } else {
+                this.manageError(errors, this)
+                this.$emit("cerrar-modal");
+            }
+        },
+        isSelectedImage(index) {
+            return this.selectedImageIndex === index; // Returns true if the image is selected
+        },
+        focusLastImage() {
+            this.$nextTick(() => {
+                const imagesWrapper = document.querySelector(".container");
+                if (imagesWrapper) {
+                    const imageWrappers = imagesWrapper.querySelectorAll(".image-wrapper");
+                    if (imageWrappers.length > 0) {
+                        this.selectedImageIndex = imageWrappers.length - 1
+                        const lastImageWrapper = imageWrappers[imageWrappers.length - 1];
+                        lastImageWrapper.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start",
+                        });
+                    }
                 }
             });
-    },
-    loadOptions() {
-        this.selectOptions.uplt = []
-        this.selectOptions.financingSources = []
-        this.selectOptions.jobPositionStatus = []
-        this.selectOptions.jobPositions = []
-        this.selectOptions.activities = []
-        this.selectOptions.allActivities = []
-        this.selectOptions.contractTypes = []
-        this.getSelectsJobPositionDet()
-    },
-    async getSelectsJobPositionDet() {
-        try {
-            this.isLoading = true;  // Activar el estado de carga
-            const response = await axios.get("/get-selects-job-position-det");
-            this.selectOptions.uplt = response.data.uplt
-            this.selectOptions.jobPositionStatus = response.data.jobPositionStatus
-            this.selectOptions.financingSources = response.data.financingSources
-            this.selectOptions.contractTypes = response.data.contractTypes
-            this.selectOptions.jobPositions = response.data.jobPositions
-            this.selectOptions.allActivities = response.data.activities
-            if (this.modalData != '') {
-                this.filterActivities(this.jobPositionDet.actividad_institucional.linea_trabajo.id_lt, false)
-            } else {
-                this.jobPositionDet.id_estado_plaza = 1
-            }
-        } catch (errors) {
-            this.manageError(errors, this)
-        } finally {
-            this.isLoading = false;  // Desactivar el estado de carga
-        }
-    },
-    filterActivities(uplt_id, load = true) {
-        if (load) {
-            this.jobPositionDet.id_actividad_institucional = ''
-        }
-        this.selectOptions.activities = []
-        this.selectOptions.activities = this.selectOptions.allActivities.filter(activity => activity.id_lt === uplt_id);
-    },
-    clearSelectUplt() {
-        this.selectOptions.activities = []
-        this.jobPositionDet.id_actividad_institucional = ''
-    },
-    cleanInputs() {
-        this.jobPositionDet.actividad_institucional.linea_trabajo.id_lt = ''
-        this.jobPositionDet.id_det_plaza = ''
-        this.jobPositionDet.id_estado_plaza = ''
-        this.jobPositionDet.id_plaza = ''
-        this.jobPositionDet.id_proy_financiado = ''
-        this.jobPositionDet.id_tipo_contrato = ''
-        this.jobPositionDet.id_actividad_institucional = ''
-        this.jobPositionDet.plaza_asignada_activa = null
-        this.jobPositionDet.codigo_det_plaza = ''
-    },
+        },
+        toggleFullScreenImage(index) {
+            this.selectedImageIndex = index;
+            this.isFullScreenActive = true;
+            this.fullScreenImageIndex = index;
+            document.body.style.overflow = "hidden"; // Hide the scrollbar while in full-screen
+        },
+        closeFullScreen(event) {
+            const fullScreenContainer = this.$refs.fullScreenContainer;
+            const deleteButton = this.$refs.deleteButton;
 
-},
-watch: {
-    showModalFlag: function (value, oldValue) {
-        if (value) {
-            this.errors = [];
-            if (this.modalData != '') {
-                this.jobPositionDet = JSON.parse(JSON.stringify(this.modalData));
-            } else {
-                this.cleanInputs()
+            if (event.target === fullScreenContainer || event.target === deleteButton) {
+                this.isFullScreenActive = false;
+                this.fullScreenImageIndex = null;
+                document.body.style.overflow = "auto"; // Restore the scrollbar after closing full-screen
             }
-            this.loadOptions()
+        },
+        getFullScreenImageUrl() {
+            if (this.fullScreenImageIndex !== null && this.fullScreenImageIndex >= 0 && this.fullScreenImageIndex < this.images.length) {
+                return this.images[this.fullScreenImageIndex].url;
+            }
+            return ""; // Return an empty string if the index is invalid or null
+        },
+        selectFiles() {
+            this.$refs.fileInput.value = '';
+            this.$refs.fileInput.click();
+        },
+        onFileSelect(event) {
+            event.preventDefault();
+            const files = event.target.files;
+            if (files.length === 0) return;
+            if (files.length + this.images.length > 2) {
+                this.showToast(toast.warning, "No puedes subir más de dos fotografias a la vez.");
+            } else {
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    if (file.type.split("/")[0] !== "image") {
+                        this.showToast(toast.warning, "Solo puedes subir archivos tipo imagen.");
+                    } else if (file.size > 2 * 1024 * 1024) {
+                        this.showToast(toast.warning, `El archivo "${file.name}" pesa mas de 2 Mb.`);
+                    } else {
+                        if (!this.images.some((e) => e.name === file.name)) {
+                            this.images.push({ name: file.name, url: URL.createObjectURL(file), file: file });
+                            this.focusLastImage();
+                        } else {
+                            this.showToast(toast.warning, `El archivo "${file.name}" ya fue cargado.`);
+                        }
+                    }
+                }
+            }
+        },
+        deleteImage(index) {
+            this.images.splice(index, 1)
+        },
+        onDragOver(event) {
+            event.preventDefault();
+            this.isDragging = true
+            event.dataTransfer.dropEffect = "copy"
+        },
+        onDragLeave(event) {
+            event.preventDefault()
+            this.isDragging = false
+        },
+        onDrop(event) {
+            event.preventDefault()
+            this.isDragging = false
+            const files = event.dataTransfer.files
+            if (files.length + this.images.length > 2) {
+                this.showToast(toast.warning, "No puedes subir más de dos fotografias a la vez.");
+            } else {
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    if (file.type.split("/")[0] !== "image") {
+                        this.showToast(toast.warning, "Solo puedes subir archivos tipo imagen.");
+                    } else if (file.size > 2 * 1024 * 1024) {
+                        this.showToast(toast.warning, `El archivo ${file.name} pesa mas de 2 Mb.`);
+                    } else {
+                        if (!this.images.some((e) => e.name === file.name)) {
+                            this.images.push({ name: file.name, url: URL.createObjectURL(file), file: file });
+                            this.focusLastImage();
+                        } else {
+                            this.showToast(toast.warning, `El archivo ${file.name} ya fue cargado.`);
+                        }
+                    }
+                }
+            }
         }
     },
-},
-computed: {
-    statusOptions() {
-        if (this.jobPositionDet.plaza_asignada_activa == null) {
-            // Filter the array and return a new array without modifying the original one
-            const filteredStatus = this.selectOptions.jobPositionStatus.filter((value) => {
-                return (value.value != 3);
-            });
-            return filteredStatus
-        } else {
-            return this.selectOptions.jobPositionStatus
-        }
+    watch: {
+        showModalFlag: function (value, oldValue) {
+            if (value) {
+                this.images = []
+                this.employee = JSON.parse(JSON.stringify(this.modalData));
+            }
+        },
+    },
+    computed: {
     }
-}
 };
 </script>
 
-<style>
+<style scoped>
+.card {
+    /* width:600px; */
+    padding: 10px;
+    margin: 0 auto;
+    box-shadow: 0 0 5px #5f5454;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.card button {
+    outline: 0;
+    border: 0;
+    color: #fff;
+    border-radius: 4px;
+    font-weight: 400;
+    padding: 8px 13px;
+    width: 25%;
+    /* background: #fe0000; */
+    display: block;
+    /* Ensure the button behaves as a block element */
+    margin: 0 auto;
+    /* Center the button horizontally */
+}
+
+.card .drag-area {
+    height: 100px;
+    border-radius: 5px;
+    border: 2px;
+    /* background: #f4f3f9; */
+    /* color: #000000; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: center;
+    -webkit-user-select: none;
+    margin-top: 10px;
+    border-style: dashed;
+}
+
+.card .drag-area .visible {
+    font-size: 18px;
+}
+
+
+
+.card .container {
+    /* width: 400px; */
+    height: auto;
+    padding-top: 10px;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    position: relative;
+    margin-bottom: 10px;
+    overflow-x: auto;
+    /* Add this line to allow horizontal scrolling */
+    max-height: 200px;
+    /* Set a maximum height to limit the container's height */
+}
+
+.card .container .image {
+    height: 180px;
+    position: relative;
+    margin-bottom: 8px;
+    box-sizing: border-box;
+
+    display: flex;
+    /* Use flexbox to center the content vertically */
+    align-items: center;
+    justify-content: center;
+}
+
+.card .container .image-wrapper {
+    flex-basis: calc(33.3333% - 2px);
+    /* Set each image wrapper's initial width to occupy 1/3 of the container minus the margin */
+}
+
+.card .container .image img {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 5px;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+.card .container .image span {
+    position: absolute;
+    top: -2px;
+    right: 9px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.card input,
+.card .drag-area .on-drop,
+.card .drag-area.dragover .visible {
+    display: none;
+}
+
+.delete-img {
+    z-index: 999;
+    color: #fe0000;
+}
+
+
 /* Customize the loader's appearance using Tailwind CSS classes or your custom styles */
 .loader {
     border-top-color: #3498db;
     border-left-color: #3498db;
-}
-
-
-
-.my-custom-file-preview {
-    border: 2px solid #3490dc;
-    background: #f0f8ff;
-    color: #3490dc;
-    padding: 10px;
-    margin: 10px;
-}
-
-.dz-remove-btn {
-    display: inline-block;
-    background: #ff5050;
-    color: #fff;
-    border: none;
-    padding: 5px 10px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-.dz-remove-btn:hover {
-    background: #cc0000;
 }
 </style>

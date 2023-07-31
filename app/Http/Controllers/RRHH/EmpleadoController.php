@@ -431,26 +431,43 @@ class EmpleadoController extends Controller
         // }
 
         // Return the file path or other response as needed
-        return response()->json(['message' => "Archivos subidos con éxito.",
-    "data new" => $newFile]);
+        return response()->json([
+            'message' => "Archivos subidos con éxito.",
+            "data new" => $newFile
+        ]);
     }
 
     public function uploadEmployeePhoto(Request $request)
     {
-        $file = $request->file('file');
+        $files = $request->file('file');
+        $code = $request->code;
+        $id_person = $request->id_person;
 
-        // Get the original file name and extension
-        $originalFileName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-        $extension = $file->getClientOriginalExtension();
+        foreach ($files as $f) {
+            $file = $f['file'];
+            // Get the original file name and extension
+            //$originalFileName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $extension = $file->getClientOriginalExtension();
 
-        // Generate the date and time string
-        $dateTimeString = now()->format('Ymd_His');
+            // Generate the date and time string
+            $dateTimeString = now()->format('Ymd_His');
 
-        // Create the unique file name by combining original file name and date-time
-        $uniqueFileName = $originalFileName . '_' . $dateTimeString . '.' . $extension;
+            // Create the unique file name by combining original file name and date-time
+            $uniqueFileName = $code . '_' . $dateTimeString . '.' . $extension;
 
-        // Store the uploaded file using the unique file name
-        $path = $file->storeAs('rrhh', $uniqueFileName);
+            // Store the uploaded file using the unique file name
+            $path = $file->storeAs('rrhh', $uniqueFileName);
+
+            $photo = new Foto([
+                'url_foto'                 => $path,
+                'id_persona'               => $id_person,
+                'estado_foto'              => 1,
+                'fecha_reg_foto'           => Carbon::now(),
+                'usuario_foto'             => $request->user()->nick_usuario,
+                'ip_foto'                  => $request->ip(),
+            ]);
+            $photo->save();
+        }
 
         // Return the file path or other response as needed
         return response()->json(['message' => "Archivos subidos con éxito."]);

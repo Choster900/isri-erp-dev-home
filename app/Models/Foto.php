@@ -15,6 +15,7 @@ class Foto extends Model
 
     protected $fillable = [
         'url_foto',
+        'id_persona',
         'estado_foto',
         'fecha_reg_foto',
         'fecha_mod_foto',
