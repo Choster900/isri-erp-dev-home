@@ -309,6 +309,7 @@ export default {
     created() {
         this.getDataLiquidaciones()
         this.getListForSelect()
+        this.getPermissions(this)
     },
 
 };

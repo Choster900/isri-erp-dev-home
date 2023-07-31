@@ -180,7 +180,7 @@ import axios from 'axios';
 export default {
   created() {
     this.getRoles()
-    this.getPermits()
+    this.getPermissions(this)
   },
   data: function (data) {
     let sortOrders = {};
@@ -269,19 +269,6 @@ export default {
     };
   },
   methods: {
-    getPermits() {
-      var URLactual = window.location.pathname
-      let data = this.$page.props.menu;
-      let menu = JSON.parse(JSON.stringify(data['urls']))
-      menu.forEach((value, index) => {
-        value.submenu.forEach((value2, index2) => {
-          if (value2.url === URLactual) {
-            var array = { 'insertar': value2.insertar, 'actualizar': value2.actualizar, 'eliminar': value2.eliminar, 'ejecutar': value2.ejecutar }
-            this.permits = array
-          }
-        })
-      })
-    },
     //Methods for creating a new role
     async createRol() {
       await axios.get("/systems-all")
@@ -290,13 +277,7 @@ export default {
           this.showModalCreate = true
         })
         .catch((errors) => {
-          let msg = this.manageError(errors)
-          this.$swal.fire({
-            title: 'Operación cancelada',
-            text: msg,
-            icon: 'warning',
-            timer: 5000
-          })
+          this.manageError(errors,this)
         })
     },
     closeModalCreate() {
@@ -366,13 +347,7 @@ export default {
               this.getRoles(this.tableData.currentPage);
             })
             .catch((errors) => {
-              let msg = this.manageError(errors)
-              this.$swal.fire({
-                title: 'Operación cancelada',
-                text: msg,
-                icon: 'warning',
-                timer: 5000
-              })
+              this.manageError(errors,this)
             })
         }
       })
@@ -396,13 +371,7 @@ export default {
           this.roles.length > 0 ? this.empty_object = false : this.empty_object = true
         }
       }).catch((errors) => {
-        let msg = this.manageError(errors)
-        this.$swal.fire({
-          title: 'Operación cancelada',
-          text: msg,
-          icon: 'warning',
-          timer: 5000
-        })
+        this.manageError(errors,this)
         //console.log(errors);
       })
     },

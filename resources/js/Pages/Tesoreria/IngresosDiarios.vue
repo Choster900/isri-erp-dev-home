@@ -55,7 +55,7 @@ import { createApp, h } from 'vue'
 import Datatable from '@/Components-ISRI/Datatable.vue';
 export default {
     created() {
-        this.getPermits()
+        this.getPermissions(this)
         this.getDataSelect()
     },
     data() {
@@ -226,13 +226,7 @@ export default {
                                 }
                             );
                         } else {
-                            let msg = this.manageError(errors);
-                            this.$swal.fire({
-                                title: "Operación cancelada",
-                                text: msg,
-                                icon: "warning",
-                                timer: 5000,
-                            });
+                            this.manageError(errors,this)
                         }
 
                     }
@@ -247,28 +241,8 @@ export default {
                     this.financing_sources = response.data.financing_sources
                 })
                 .catch((errors) => {
-                    console.log(errors);
-                    let msg = this.manageError(errors);
-                    this.$swal.fire({
-                        title: "Operación cancelada",
-                        text: msg,
-                        icon: "warning",
-                        timer: 5000,
-                    });
+                    this.manageError(errors,this)
                 });
-        },
-        getPermits() {
-            var URLactual = window.location.pathname
-            let data = this.$page.props.menu;
-            let menu = JSON.parse(JSON.stringify(data['urls']))
-            menu.forEach((value, index) => {
-                value.submenu.forEach((value2, index2) => {
-                    if (value2.url === URLactual) {
-                        var array = { 'insertar': value2.insertar, 'actualizar': value2.actualizar, 'eliminar': value2.eliminar, 'ejecutar': value2.ejecutar }
-                        this.permits = array
-                    }
-                })
-            })
         },
     }
 }

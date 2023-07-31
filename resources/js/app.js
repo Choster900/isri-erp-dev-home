@@ -7,6 +7,8 @@ import { createApp, h } from "vue";
 import { createInertiaApp } from "@inertiajs/vue3";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { ZiggyVue } from "../../vendor/tightenco/ziggy/dist/vue.m";
+import { manageError } from '@/mixins/handleErrorResponse.js';
+import { getPermissions } from '@/mixins/getPermissions.js';
 import { executeRequest } from "@/plugins/requestHelpers.js";
 import GeneralButton from "@/Components-ISRI/ComponentsToForms/GeneralButton.vue";
 import TextInput from "@/Components-ISRI/ComponentsToForms/TextInput.vue";
@@ -35,22 +37,6 @@ import "../css/FlatPickr_theme.css";
 const appName =
     window.document.getElementsByTagName("title")[0]?.innerText || "";
 
-const manageError = (errors) => {
-    let code_error = errors.response.status;
-    let msg;
-    if (code_error >= 500) {
-        console.log(errors.response.data.message);
-        msg = "Error al conectarse con el servidor.";
-    } else if (code_error >= 400 && code_error < 500) {
-        console.log(errors.response.data.message);
-        msg = "Funcionalidad no disponible, consulte con el administrador.";
-    } else {
-        console.log(errors.response.data.message);
-        msg = "Lo sentimos, hubo un error al procesar la petición.";
-    }
-    return msg;
-};
-
 createInertiaApp({
     title: (title) => `${title}  ${appName}`,
     resolve: (name) =>
@@ -75,7 +61,7 @@ createInertiaApp({
             .component("Datepicker", Datepicker)
             .component("RadioButton", RadioButton)
             .component("DatepickerTest", DatepickerTest)
-            .mixin({ methods: { manageError,executeRequest } })
+            .mixin({ methods: { manageError,executeRequest,getPermissions } })
             .use(ZiggyVue, Ziggy)
             .mount(el);
     },

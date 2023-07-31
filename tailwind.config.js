@@ -1,4 +1,4 @@
-const defaultTheme = require('tailwindcss/defaultTheme');
+const defaultTheme = require("tailwindcss/defaultTheme");
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -14,8 +14,13 @@ module.exports = {
             fontFamily: {
                 sans: ['Nunito', ...defaultTheme.fontFamily.sans],
             },
+            gridTemplateRows: {
+                // Agregando nueva clase para manejar Grid Template Rows
+                7:'repeat(7, minmax(0, 1fr))',
+                layout: '200px minmax(900px, 1fr) 100px',
+            },
         },
     },
 
-    plugins: [require('@tailwindcss/forms'), require('tailwindcss-animated')],
+    plugins: [require("@tailwindcss/forms"), require("tailwindcss-animated")],
 };

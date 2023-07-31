@@ -31,8 +31,15 @@ class ReciboIngresoController extends Controller
             ->with('detalles.concepto_ingreso.dependencia')
             ->with('cuenta_presupuestal')
             ->with('proyecto_financiado')
-            ->with('empleado_tesoreria')
-            ->orderBy($columns[$column], $dir);
+            ->with('empleado_tesoreria');
+
+            if ($column == -1) {
+                $query->orderBy('id_recibo_ingreso', 'desc');
+            } else {
+                $query->orderBy($columns[$column], $dir);
+            }
+
+
         if ($search_value) {
             $query->where('numero_recibo_ingreso', 'like', '%' . $search_value['numero_recibo_ingreso'] . '%')
                 ->where('fecha_recibo_ingreso', 'like', '%' . $search_value['fecha_recibo_ingreso'] . '%')
