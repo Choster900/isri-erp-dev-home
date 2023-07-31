@@ -781,7 +781,6 @@ export default {
                                     icon: 'warning',
                                     timer: 5000
                                 })
-                                //this.$emit('cerrar-modal')
                             } else {
                                 this.correct_dui = true
                                 this.employee.persona = { ...persona };
@@ -804,13 +803,7 @@ export default {
                                 }
                             );
                         } else {
-                            let msg = this.manageError(errors)
-                            this.$swal.fire({
-                                title: 'Operación cancelada',
-                                text: msg,
-                                icon: 'warning',
-                                timer: 5000
-                            })
+                            this.manageError(errors,this)
                         }
                     })
             }
@@ -990,13 +983,7 @@ export default {
                 this.select_options.dependencies = response.data.dependencies
                 this.select_options.job_positions = response.data.job_positions
             } catch (errors) {
-                let msg = this.manageError(errors);
-                this.$swal.fire({
-                    title: 'Operación cancelada',
-                    text: msg,
-                    icon: 'warning',
-                    timer: 5000
-                });
+                this.manageError(errors,this)
             } finally {
                 this.is_loading = false;  // Desactivar el estado de carga
             }
@@ -1039,13 +1026,7 @@ export default {
                                             }
                                         );
                                     } else {
-                                        let msg = this.manageError(errors);
-                                        this.$swal.fire({
-                                            title: "Operación cancelada",
-                                            text: msg,
-                                            icon: "warning",
-                                            timer: 5000,
-                                        });
+                                        this.manageError(errors,this)
                                         this.$emit("cerrar-modal");
                                     }
                                 });
@@ -1112,13 +1093,7 @@ export default {
                                             );
                                         }
                                     } else {
-                                        let msg = this.manageError(errors);
-                                        this.$swal.fire({
-                                            title: "Operación cancelada",
-                                            text: msg,
-                                            icon: "warning",
-                                            timer: 5000,
-                                        });
+                                        this.manageError(errors,this)
                                         this.$emit("cerrar-modal");
                                     }
                                 });

@@ -198,7 +198,7 @@ import axios from 'axios';
 export default {
     created() {
         this.getJobPositions()
-        this.getPermits()
+        this.getPermissions(this)
     },
     data() {
         let sortOrders = {};
@@ -268,46 +268,6 @@ export default {
             this.modalData = []
             this.showModalJobPositionDet = true
         },
-        changeStateIncomeConcept(id_service, name_service, state_service) {
-            let msg
-            state_service == 1 ? msg = "Desactivar" : msg = "Activar"
-            this.$swal.fire({
-                title: msg + ' concepto de ingreso: ' + name_service + '.',
-                text: "¿Estas seguro?",
-                icon: "question",
-                iconHtml: "❓",
-                confirmButtonText: 'Si, ' + msg,
-                confirmButtonColor: "#001b47",
-                cancelButtonText: "Cancelar",
-                showCancelButton: true,
-                showCloseButton: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    axios.post("/change-state-income-concept", {
-                        id_service: id_service,
-                        state_service: state_service
-                    })
-                        .then((response) => {
-                            toast.success(response.data.mensaje, {
-                                autoClose: 4000,
-                                position: "top-right",
-                                transition: "zoom",
-                                toastBackgroundColor: "white",
-                            });
-                            this.getJobPositions(this.tableData.currentPage);
-                        })
-                        .catch((errors) => {
-                            let msg = this.manageError(errors)
-                            this.$swal.fire({
-                                title: 'Operación cancelada',
-                                text: msg,
-                                icon: 'warning',
-                                timer: 5000
-                            })
-                        })
-                }
-            })
-        },
         async getJobPositions(url = "/det-job-positions") {
             this.tableData.draw++;
             this.tableData.currentPage = url
@@ -322,14 +282,7 @@ export default {
                     this.jobPositions.length > 0 ? this.emptyObject = false : this.emptyObject = true
                 }
             }).catch((errors) => {
-                let msg = this.manageError(errors)
-                this.$swal.fire({
-                    title: 'Operación cancelada',
-                    text: msg,
-                    icon: 'warning',
-                    timer: 5000
-                })
-                //console.log(errors);
+                this.manageError(errors,this)
             })
         },
         sortBy(key) {
@@ -343,19 +296,6 @@ export default {
         },
         getIndex(array, key, value) {
             return array.findIndex((i) => i[key] == value);
-        },
-        getPermits() {
-            var URLactual = window.location.pathname
-            let data = this.$page.props.menu;
-            let menu = JSON.parse(JSON.stringify(data['urls']))
-            menu.forEach((value, index) => {
-                value.submenu.forEach((value2, index2) => {
-                    if (value2.url === URLactual) {
-                        var array = { 'insertar': value2.insertar, 'actualizar': value2.actualizar, 'eliminar': value2.eliminar, 'ejecutar': value2.ejecutar }
-                        this.permits = array
-                    }
-                })
-            })
         },
         handleData(myEventData) {
             this.tableData.search = myEventData;
@@ -437,18 +377,12 @@ export default {
                                     }
                                 );
                             } else {
-                                let msg = this.manageError(errors)
-                                this.$swal.fire({
-                                    title: 'Operación cancelada',
-                                    text: msg,
-                                    icon: 'warning',
-                                    timer: 5000
-                                })
+                                this.manageError(errors,this)
                             }
                         })
                 }
             })
-        },
+        }
 
     },
     computed: {

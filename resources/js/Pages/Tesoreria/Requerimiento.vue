@@ -162,6 +162,7 @@ import moment from 'moment';
 export default {
     created() {
         this.getDataRequerimiento();
+        this.getPermissions(this)
     },
     data: function (data) {
         let sortOrders = {};
@@ -234,13 +235,7 @@ export default {
                     this.requerimientos.length > 0 ? this.empty_object = false : this.empty_object = true
                 }
             }).catch((errors) => {
-                let msg = this.manageError(errors);
-                this.$swal.fire({
-                    title: "Operación cancelada",
-                    text: msg,
-                    icon: "warning",
-                    timer: 5000,
-                });
+                this.manageError(errors,this)
             });
         },
         sortBy(key) {

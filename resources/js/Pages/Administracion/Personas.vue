@@ -185,7 +185,7 @@ import ModalAdministracionPersonasVue from '@/Components-ISRI/Administracion/Mod
 export default {
     created() {
         this.getPersonas();
-        this.getPermits()
+        this.getPermissions(this)
     },
     data: function (data) {
         let sortOrders = {};
@@ -241,19 +241,6 @@ export default {
         };
     },
     methods: {
-        getPermits() {
-            var URLactual = window.location.pathname
-            let data = this.$page.props.menu;
-            let menu = JSON.parse(JSON.stringify(data['urls']))
-            menu.forEach((value, index) => {
-                value.submenu.forEach((value2, index2) => {
-                    if (value2.url === URLactual) {
-                        var array = { 'insertar': value2.insertar, 'actualizar': value2.actualizar, 'eliminar': value2.eliminar, 'ejecutar': value2.ejecutar }
-                        this.permits = array
-                    }
-                })
-            })
-        },
         async getPersonas(url = "/personas") {
             this.lastUrl = url;
             this.tableData.draw++;
@@ -289,7 +276,7 @@ export default {
                     this.infoPerson = res.data
                 })
                 .catch(err => {
-                    this.errorMethod(err)
+                    this.manageError(err,this)
                 })
             this.scrollbarModalOpen = !this.scrollbarModalOpen
         },
@@ -299,7 +286,7 @@ export default {
                     console.log(res)
                 })
                 .catch(err => {
-                    this.errorMethod(err)
+                    this.manageError(err,this)
                 })
             this.getPersonas(this.lastUrl)//llamamos de nuevo el metodo para que actualize la tabla 
         },
@@ -337,15 +324,6 @@ export default {
                 this.getPersonas()
             }
         },
-        errorMethod(errors) {
-            let msg = this.manageError(errors)
-            this.$swal.fire({
-                title: 'Operación cancelada',
-                text: msg,
-                icon: 'warning',
-                timer: 5000
-            })
-        }
     },
 };
 </script>

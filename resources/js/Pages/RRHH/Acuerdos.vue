@@ -3,19 +3,17 @@ import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";;
 import axios from 'axios';
-import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
-
+import ModalAcuerdosVue from '@/Components-ISRI/RRHH/ModalAcuerdos.vue';
+import moment from 'moment';
 </script>
 
 <template>
-    <Head title="RRHH - Gestion Empleados" />
-    <AppLayoutVue nameSubModule="RRHH - Empleados">
+    <Head title="RRHH - Acuerdos de contratacion" />
+    <AppLayoutVue nameSubModule="RRHH - Acuerdos">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton
-                    @click="dataBeneficiariosToSendModal = []; showModalBeneficiario = !showModalBeneficiario"
-                   color="bg-green-700  hover:bg-green-800" text="Agregar Empleado"
-                    icon="add" />
+                <GeneralButton @click="dataAcuerdosToSendModal = []; showModalAcuerdos = !showModalAcuerdos"
+                    color="bg-green-700  hover:bg-green-800" text="Agregar Acuerdos" icon="add" />
             </div>
         </div>
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
@@ -23,28 +21,28 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
                 <div class="mb-4 md:flex flex-row justify-items-start">
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-                            <Multiselect v-model="tableData.length" @select="getBeneficiarios()"
-                                @deselect=" tableData.length = 5; getBeneficiarios()"
-                                @clear="tableData.length = 5; getBeneficiarios()" :options="perPage" :searchable="true"
+                            <Multiselect v-model="tableData.length" @select="getAcuerdos()"
+                                @deselect=" tableData.length = 5; getAcuerdos()"
+                                @clear="tableData.length = 5; getAcuerdos()" :options="perPage" :searchable="true"
                                 placeholder="Cantidad a mostrar" />
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
                     <h2 class="font-semibold text-slate-800 pt-1">Empleados: <span class="text-slate-400 font-medium">{{
-                        beneficiarios.length
+                        acuerdos.length
                     }}</span></h2>
                 </div>
             </header>
 
             <div class="overflow-x-auto">
                 <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
-                    @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getBeneficiarios()">
+                    @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getAcuerdos()">
                     <tbody class="text-sm divide-y divide-slate-200">
-                        <tr v-for="beneficiario in beneficiarios" :key="beneficiario.id_persona">
+                        <tr v-for="acuerdos in acuerdos" :key="acuerdos.id_empleado">
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center ">{{ beneficiario.id_persona }}</div>
+                                <div class="font-medium text-slate-800 text-center ">{{ acuerdos.id_empleado }}</div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                            <!-- <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
                                     {{ `${beneficiario.pnombre_persona ? beneficiario.pnombre_persona : ''}
                                                                         ${beneficiario.snombre_persona ? beneficiario.snombre_persona : ''}
@@ -63,7 +61,8 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
                                     <template v-for="(familiar, i) in beneficiario.familiar" :key="i">
                                         <div class="mb-2 text-center">
                                             <p class="text-[10pt]">
-                                                <span class="font-medium"> </span>{{ familiar.nombre_familiar }}
+                                                <span class="font-medium"> {{ familiar.fecha_reg_familiar }}
+                                                </span>{{ moment(familiar.fecha_reg_familiar,).format('MMMM Do YYYY,h: mm: ssa') }}
                                             </p>
                                         </div>
                                         <template v-if="i < beneficiario.familiar.length - 1">
@@ -99,12 +98,12 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
                                         </template>
                                     </template>
                                 </div>
-                            </td>
+                            </td>-->
                             <td class="first:pl-5 last:pr-5">
                                 <div class="space-x-1">
                                     <DropDownOptions>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            @click.stop="dataBeneficiariosToSendModal = beneficiario; showModalBeneficiario = !showModalBeneficiario">
+                                            @click.stop="dataAcuerdosToSendModal = acuerdos; showModalAcuerdos = !showModalAcuerdos">
                                             <div class="w-8 text-blue-900">
                                                 <span class="text-xs">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -141,7 +140,7 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
                             <li v-for="link in links" :key="link.label">
                                 <span v-if="link.label === 'Anterior'"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
-                                    <a @click="getBeneficiarios(link.url)"
+                                    <a @click="getAcuerdos(link.url)"
                                         class="btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer text-indigo-500">
                                         <div class="flex items-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -156,7 +155,7 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
                                 <span v-else-if="(link.label == 'Siguiente')"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getBeneficiarios(link.url)"
+                                        <a @click="getAcuerdos(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer text-indigo-500">
 
                                             <div class="flex items-center">
@@ -172,7 +171,7 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
                                 </span>
                                 <span class="cursor-pointer" v-else
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
-                                        class=" w-5" @click="getBeneficiarios(link.url)">{{ link.label }}</span>
+                                        class=" w-5" @click="getAcuerdos(link.url)">{{ link.label }}</span>
                                 </span>
                             </li>
                         </ul>
@@ -181,9 +180,9 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
             </div>
         </div>
 
-        <ModalBeneficiarios :showModal="showModalBeneficiario" :data-beneficiarios="dataBeneficiariosToSendModal"
-            @cerrar-modal="showModalBeneficiario = false"
-            @actualizar-table-data="getBeneficiarios(lastUrl); showModalBeneficiario = false" />
+        <ModalAcuerdosVue :showModal="showModalAcuerdos" :dataAcuerdos="dataAcuerdosToSendModal"
+            @actualizar-table-data="getAcuerdos(lastUrl); showModalAcuerdos = false" :dataForSelect="dataForSelect"
+            @cerrar-modal="showModalAcuerdos = false" />
 
     </AppLayoutVue>
 </template>
@@ -236,9 +235,10 @@ export default {
             empty_object: false,
             permits: [],
             stateModal: false,
-            beneficiarios: [],
-            dataBeneficiariosToSendModal: [],
-            showModalBeneficiario: false,
+            acuerdos: [],
+            dataForSelect: [],
+            dataAcuerdosToSendModal: [],
+            showModalAcuerdos: false,
             links: [],
             lastUrl: "/beneficiarios",
             columns: columns,
@@ -265,7 +265,7 @@ export default {
         }
     },
     methods: {
-        async getBeneficiarios(url = "/beneficiarios") {
+        async getAcuerdos(url = "/acuerdos") {
             this.lastUrl = url;
             this.tableData.draw++;
             await axios.post(url, this.tableData).then((response) => {
@@ -277,19 +277,21 @@ export default {
                     this.links[this.links.length - 1].label = "Siguiente";
 
                     // Como eloquent no me filtra los familiares que estan desactivados si no que me trae todos por igual
-                    const filteredData = data.data.data.map((obj) => {
+                    /* const filteredData = data.data.data.map((obj) => {
                         // Tenemos que hacer esto
                         const filteredFamiliar = obj.familiar.filter(
                             (familiar) => familiar.estado_familiar === 1
                         );
                         return { ...obj, familiar: filteredFamiliar };
-                    });
+                    }); */
 
-                    console.log(filteredData);
+                    //  console.log(filteredData);
 
-                    this.beneficiarios = filteredData;
+                    this.acuerdos = data.data.data;
+                    let dataForSelect = JSON.parse(JSON.stringify(data.dataForSelect));
+                    this.dataForSelect = dataForSelect
                     this.stateModal = false
-                    this.beneficiarios.length > 0 ? this.empty_object = false : this.empty_object = true
+                    this.acuerdos.length > 0 ? this.empty_object = false : this.empty_object = true
 
 
 
@@ -304,7 +306,7 @@ export default {
                 this.sortOrders[key] = this.sortOrders[key] * -1;
                 this.tableData.column = this.getIndex(this.columns, "name", key);
                 this.tableData.dir = this.sortOrders[key] === 1 ? "asc" : "desc";
-                this.getBeneficiarios();
+                this.getAcuerdos();
             }
         },
         getIndex(array, key, value) {
@@ -322,7 +324,7 @@ export default {
         handleData(myEventData) {
             if (this.validarCamposVacios(myEventData)) {
                 this.tableData.search = {};
-                this.getBeneficiarios();
+                this.getAcuerdos();
             }
             else {
                 this.tableData.search = myEventData;
@@ -345,7 +347,7 @@ export default {
 
     },
     created() {
-        this.getBeneficiarios()
+        this.getAcuerdos()
     },
 }
 </script>

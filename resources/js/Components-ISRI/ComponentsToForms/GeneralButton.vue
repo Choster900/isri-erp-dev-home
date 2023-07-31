@@ -27,7 +27,7 @@ const iconSelected = computed(() => {
         info: 'M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z',
         pdf: 'M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z',
         search: 'M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z',
-        check:'M4.5 12.75l6 6 9-13.5',
+        check: 'M4.5 12.75l6 6 9-13.5',
         'defaultBruh': 'M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9',
     }[props.icon];
 });
@@ -37,7 +37,7 @@ const iconSelected = computed(() => {
 </script>
 
 <template>
-    <button :type="type" @click="deletAlert" :class="color"
+   <!--  <button :type="type" @click="deletAlert" :class="color"
         class="inline-flex text-white  rounded-md text-sm px-3 py-1.5 text-center mb-2">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
             class="mr-1 -ml-1 w-5 h-5">
@@ -47,5 +47,25 @@ const iconSelected = computed(() => {
         <div class='text-[12px] uppercase'>
             {{ text }}
         </div>
-    </button>
+    </button> -->
+
+
+    <div class="flex rounded-md overflow-hidden mb-2 cursor-pointer">
+
+        <div class=" shadow-border py-1.5 px-2 border-r-2 border-white" :class="color">
+            <div class="w-5 h-5">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-5 h-5 text-white">
+                    <path stroke-linecap="round" stroke-linejoin="round" :d="iconSelected" />
+                </svg>
+
+            </div>
+        </div>
+        <button
+            class="block text-white shadow-border hover:bg-blue-dark text-[12px] px-2 font-sans tracking-wide uppercase font-bold rounded-r-md"
+            :class="color">
+            {{ text }}
+        </button>
+
+    </div>
 </template>

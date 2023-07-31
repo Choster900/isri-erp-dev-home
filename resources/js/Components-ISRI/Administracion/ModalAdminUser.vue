@@ -5,7 +5,6 @@ import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import axios from "axios";
 import moment from 'moment';
-import ModalAsignacionRequerimiento from '@/Components-ISRI/Tesoreria/ModalAsignacionRequerimiento.vue';
 </script>
 
 <template>
