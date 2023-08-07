@@ -35,6 +35,8 @@ import "sweetalert2/dist/sweetalert2.min.css";
 import "flatpickr/dist/flatpickr.css";
 import "../css/FlatPickr_theme.css";
 
+import VueLazyLoad from 'vue-lazyload'
+
 const appName =
     window.document.getElementsByTagName("title")[0]?.innerText || "";
 
@@ -63,7 +65,7 @@ createInertiaApp({
             .component("RadioButton", RadioButton)
             .component("DatepickerTest", DatepickerTest)
             .mixin({ methods: { manageError,executeRequest,getPermissions,showToast } })
-            .use(ZiggyVue, Ziggy)
+            .use(ZiggyVue, Ziggy, VueLazyLoad)
             .mount(el);
     },
     progress: {

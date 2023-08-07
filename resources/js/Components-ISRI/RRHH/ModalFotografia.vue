@@ -3,12 +3,14 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import axios from "axios";
+
+import VueImageLightbox from 'vue-image-lightbox';
+import 'vue-image-lightbox/dist/vue-image-lightbox.min.css';
 </script>
 
 <template>
     <div class="m-1.5">
         <div v-if="isFullScreenActive" ref="fullScreenContainer" @click="closeFullScreen"
-        :class="isFullScreenActive ? 'transition-opacity ease-in duration-700 opacity-100' : ''"
             class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-90 z-50 flex justify-center items-center">
             <span ref="deleteButton" class="absolute top-2 right-8 text-white text-4xl cursor-pointer"
                 @click.stop="closeFullScreen">&times;</span>
@@ -18,7 +20,11 @@ import axios from "axios";
         <Modal v-else :show="showModalFlag" @close="$emit('cerrar-modal')" :modal-title="'Administracion fotografias. '"
             maxWidth="2xl" :closeOutSide="false">
             <div class="px-5 py-4">
-                <div>
+                <!-- <div v-if="employee.persona">
+                    <VueImageLightbox :media="media" />
+                </div> -->
+
+                <div >
                     <div class="card w-[90%] bg-gray-100">
                         <div class="text-center">
                             <p class="text-slate-800 font-bold">Fotografia para: {{ employee.codigo_empleado }}</p>
@@ -27,11 +33,13 @@ import axios from "axios";
                             @dragleave="onDragLeave" @drop.prevent="onDrop">
                             <span v-if="!isDragging">
                                 Arrastra y suelta una imagen aquí o
-                                <span class="text-blue-600 ml-0 cursor-pointer transition duration-400" role="button" @click="selectFiles">
+                                <span class="text-blue-600 ml-0 cursor-pointer transition duration-400" role="button"
+                                    @click="selectFiles">
                                     Selecciona
                                 </span>
                             </span>
-                            <div v-else class="text-blue-600 ml-0 cursor-pointer transition duration-400">Suelta la imagen aquí</div>
+                            <div v-else class="text-blue-600 ml-0 cursor-pointer transition duration-400">Suelta la imagen
+                                aquí</div>
                             <input type="file" name="file" class="file" ref="fileInput" multiple @change="onFileSelect" />
                         </div>
                         <div class="container w-full flex flex-wrap -mx-1">
@@ -43,7 +51,6 @@ import axios from "axios";
                                 </div>
                             </div>
                         </div>
-                        <!-- <button type="button" class="bg-green-600">SUBIR</button> -->
                     </div>
                     <div class="flex justify-center mt-4">
                         <GeneralButton class="mr-1" text="Cancelar" icon="delete" @click="$emit('cerrar-modal')" />
@@ -58,6 +65,9 @@ import axios from "axios";
 
 <script>
 export default {
+    components: {
+        VueImageLightbox,
+    },
     props: {
         showModalFlag: {
             type: Boolean,
@@ -71,15 +81,32 @@ export default {
     created() { },
     data: function (data) {
         return {
+            media: [
+                { // For image
+                    thumb: '../../../img/escudo-nacional.png',
+                    src: '../../../img/escudo-nacional.png',
+                },
+                { // For image
+                    thumb: '../../../img/isri-logo2.png',
+                    src: '../../../img/isri-logo2.png',
+                }
+            ],
             employee: [],
             images: [],
             selectedImageIndex: -1,
             isDragging: false,
             isFullScreenActive: false,
             fullScreenImageIndex: null,
+            lightboxIndex: 0,
         };
     },
     methods: {
+        openLightbox(index) {
+            this.lightboxIndex = index;
+        },
+        closeLightbox() {
+            this.lightboxIndex = -1;
+        },
         storeEmployePhoto() {
             this.$swal
                 .fire({
@@ -246,10 +273,18 @@ export default {
             if (value) {
                 this.images = []
                 this.employee = JSON.parse(JSON.stringify(this.modalData));
+                console.log(this.employee);
             }
         },
     },
     computed: {
+        // photos : function(){
+        //     if(this.employee.persona){
+        //         return this.employee.persona.fotos.length
+        //     }else{
+        //         return 0
+        //     }
+        // }
     }
 };
 </script>
