@@ -284,7 +284,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                             :key="weekIndex">
                                             <template v-slot:contenido>
                                                 <div class="h-[11px] w-[11px]  m-[1.5px] rounded-sm"
-                                                    :class="isDateInDataDeals(moment(`${year}-${month}-${day}`).format('L')) ? 'bg-green-900/90' : 'bg-gray-500'">
+                                                    :class="isDateInDataDeals(moment(`${year}-${month}-${day}`).format('L')) ? 'bg-green-900/90' : 'bg-gray-500/60'">
                                                 </div>
                                             </template>
                                             <template v-slot:message>
@@ -333,6 +333,7 @@ export default {
                 monthSelectorType: 'static',
                 altFormat: "d/m/Y",
                 dateFormat: "Y-m-d",
+                maxDate: new Date(), // Bloquear fechas futuras
                 locale: {
                     firstDayOfWeek: 1,
                     weekdays: {
@@ -423,96 +424,74 @@ export default {
             // Caracteres que se utilizarán para generar el ID
             const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
             let id = '';
-
             // Generar un ID corto único concatenando caracteres aleatorios hasta alcanzar la longitud deseada
             for (let i = 0; i < length; i++) {
                 const randomIndex = Math.floor(Math.random() * characters.length);
                 id += characters[randomIndex];
             }
-
             // Agregar la marca de tiempo para asegurarse de que sea único en cada generación
             id += Date.now();
-
-            // Puedes usar este ID único en tu lógica de negocio o donde lo necesites
-            console.log('ID único generado:', id);
-
             return id;
         },
 
         createNewDeal() {
-            this.errorForm = false
-            if (this.isDataValid()) {
-                const oficioExists = this.dataDeals.some((deal) => deal.oficio_acuerdo_laboral === this.dataForm.deal.oficio_acuerdo_laboral);
-                // OficioExists verifica que no exista duplicidad en los acuerdo
-                // this.dataForm.deal.isEditingDeal es una variable que ve el estado del formularo (esta editando o no)
-                if (!oficioExists || this.dataForm.deal.isEditingDeal) {
-                    this.errorForm = false;//set false (0 errors)
+            this.errorForm = false;
 
-                    const isEditingDeal = this.dataForm.deal.indexDeal !== '' || this.dataForm.deal.indexDeal === 0;
-                    // Función auxiliar para actualizar o agregar un acuerdo
-                    const updateOrCreateDeal = () => {
-                        if (isEditingDeal) {
-                            // Editar
-                            const indexCopy = this.copyDataDeals.findIndex((deal) => deal.indexDeal === this.dataForm.deal.indexDeal);
-                            const indexNew = this.newDataDeals.findIndex((deal) => deal.indexDeal === this.dataForm.deal.indexDeal);
-                            const indexShow = this.dataDeals.findIndex((deal) => deal.indexDeal === this.dataForm.deal.indexDeal);
-
-
-                            const foundDealCoyp = this.copyDataDeals[indexCopy];
-                            const foundDealShow = this.dataDeals[indexShow];
-                            const foundDealNew = this.dataDeals[indexNew];
-
-
-                            Object.assign(foundDealNew, this.dataForm.deal);//COMBINANDO EL FORM CON LA DATA QUE SE MUESTRA
-                            if (foundDealCoyp) {
-                                Object.assign(foundDealCoyp, this.dataForm.deal); // COMBINANDO EL FORMULARIO CON LA COPIA
-
-                                foundDealCoyp.isDelete = false;
-                                foundDealCoyp.isEditingDeal = false;
-                            }
-                            Object.assign(foundDealShow, this.dataForm.deal);//COMBINANDO EL FORM CON LA DATA QUE SE MUESTRA
-
-                            foundDealShow.isDelete = false;
-                            foundDealShow.isEditingDeal = false;
-                            foundDealNew.isDelete = false;
-                            foundDealNew.isEditingDeal = false;
-                            this.getUniqueYears()
-
-                        } else {
-                            // Crear
-                            const newDeal = { ...this.dataForm.deal };
-                            /* newDeal.indexDeal = this.dataDeals.length + 1;
-                            this.dataDeals.unshift(newDeal); */
-                            newDeal.indexDeal = this.generateShortUniqueId();// FIXME:  CUANDO AGREGAR UN REGISTRO DIFERENTE AL AÑO ACTUAL NO LO AGREGAR A DATAdEALS
-                            console.log(newDeal);
-                            this.dataDeals.unshift(newDeal);
-                            this.newDataDeals.unshift(newDeal);
-
-                            this.getUniqueYears()
-                            this.year = moment(newDeal.fecha_acuerdo_laboral).year()
-
-                        }
-                    };
-
-                    updateOrCreateDeal();
-                    //this.getUniqueYears()
-                    this.filterDealsByYear()
-                    this.resetForm(); // Restablecer los campos del formulario después de guardar/actualizar correctamente
-
-                    console.log(this.newDataDeals);
-                    console.log(this.dataDeals);
-                } else {
-                    this.errorForm = true;
-                    this.messageError = 'El numero de referencia ya existe por favor intenta otro'
-                    this.showErrorAnimation();
-                }
-            } else {
+            if (!this.isDataValid()) {
                 this.errorForm = true;
-                this.messageError = 'Todos los campos son requeridos de este formulario'
+                this.messageError = 'Todos los campos son requeridos de este formulario';
                 this.showErrorAnimation();
+                return;
             }
 
+            const oficioExists = (array) => array.some(deal => deal.indexDeal !== this.dataForm.deal.indexDeal && deal.oficio_acuerdo_laboral === this.dataForm.deal.oficio_acuerdo_laboral);
+            if (oficioExists(this.dataDeals) || oficioExists(this.copyDataDeals) || oficioExists(this.newDataDeals)) {
+                this.errorForm = true;
+                this.messageError = 'El numero de referencia ya existe por favor intenta otro';
+                this.showErrorAnimation();
+                return;
+            }
+
+            const isEditingDeal = this.dataForm.deal.indexDeal !== '' || this.dataForm.deal.indexDeal === 0;
+            const updateOrCreateDeal = () => {
+                const indexDeal = this.dataForm.deal.indexDeal;
+                const foundDealShow = this.dataDeals.find(deal => deal.indexDeal === indexDeal);
+                const foundDealCopy = this.copyDataDeals.find(deal => deal.indexDeal === indexDeal);
+                const foundDealNew = this.newDataDeals.find(deal => deal.indexDeal === indexDeal);
+
+                Object.assign(foundDealShow, this.dataForm.deal);
+                foundDealShow.isDelete = false;
+                foundDealShow.isEditingDeal = false;
+
+                if (foundDealCopy) {
+                    Object.assign(foundDealCopy, this.dataForm.deal);
+                    foundDealCopy.isDelete = false;
+                    foundDealCopy.isEditingDeal = false;
+                }
+
+                if (foundDealNew) {
+                    Object.assign(foundDealNew, this.dataForm.deal);
+                    foundDealNew.isDelete = false;
+                    foundDealNew.isEditingDeal = false;
+                }
+                this.getUniqueYears();
+            };
+
+            if (isEditingDeal) {
+                updateOrCreateDeal();
+            } else {
+                const newDeal = { ...this.dataForm.deal };
+                newDeal.indexDeal = this.generateShortUniqueId();
+                this.dataDeals.unshift(newDeal);
+                this.newDataDeals.unshift(newDeal);
+                this.getUniqueYears();
+                this.year = moment(newDeal.fecha_acuerdo_laboral).year();
+            }
+
+            this.filterDealsByYear();
+            this.resetForm();
         },
+
 
         sendInformationWhenIsClicked(data) {
             // Verificar si algún acuerdo ya está en estado de edición
@@ -550,10 +529,6 @@ export default {
                 showCloseButton: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Modificar el objeto para que la fila desaparezca de la tabla (valor en posición 7 se establece como false)
-                    /*   this.dataDeals[index]["isDelete"] = true;
-                      this.dataDeals[index]["isDelete"] = true;
-                      this.dataDeals[index]["isDelete"] = true; */
 
                     const indexCopy = this.copyDataDeals.findIndex((deal) => deal.indexDeal === index);
                     const indexNew = this.newDataDeals.findIndex((deal) => deal.indexDeal === index);
@@ -582,14 +557,19 @@ export default {
 
 
                     this.getUniqueYears()
-                    this.filterDealsByYear()
-                    // Mostrar mensaje de advertencia
+
                     toast.warning("El acuerdo se elimino temporalmente hasta que envias la informacion", {
                         autoClose: 5000,
                         position: "top-right",
                         transition: "zoom",
                         toastBackgroundColor: "white",
                     });
+
+
+                    this.year = this.listYears[this.listYears.length - 1]
+                    this.filterDealsByYear()
+                    this.resetForm()
+                    
                 }
             });
         },
@@ -736,7 +716,6 @@ export default {
 
         transFormDat(dia, mes, año) {
             const fechaProporcionada = `${año}-${mes}-${dia}`
-            //console.log(moment(fechaProporcionada).format('dddd, MMMM Do YYYY'));
             return moment(fechaProporcionada).format('dddd, MMMM D, YYYY')
         },
         getUniqueYears() {
@@ -758,7 +737,6 @@ export default {
                 });
                 // Convertimos el conjunto a un nuevo arreglo y lo ordenamos
                 const uniqueYearsArray = Array.from(uniqueYearsSet).sort();
-                console.log({ uniqueYearsArray });
                 this.listYears = uniqueYearsArray
             }
         },
@@ -789,7 +767,15 @@ export default {
             this.getCurrentYear();
             if (this.showModal) {
                 if (this.dataAcuerdos != '') {
-                    this.handleSearch({ by: 'id', query: this.dataAcuerdos.id_empleado })
+
+                    let nombreEmpleado = `${this.dataAcuerdos.codigo_empleado} - ${this.dataAcuerdos.persona.pnombre_persona} ${this.dataAcuerdos.persona.snombre_persona} ${this.dataAcuerdos.persona.tnombre_persona || ''} ${this.dataAcuerdos.persona.papellido_persona} ${this.dataAcuerdos.persona.sapellido_persona} ${this.dataAcuerdos.persona.tapellido_persona || ''}`
+                    this.employeOptions = [{
+                        value: this.dataAcuerdos.id_empleado,
+                        label: nombreEmpleado
+                    }]
+                    this.dataForm.id_empleado = this.dataAcuerdos.id_empleado
+
+
                     this.dataAcuerdos.acuerdo_laboral.forEach((obj, index) => {
                         //this.dataDeals.push({
                         this.copyDataDeals.push({
@@ -817,10 +803,12 @@ export default {
                     this.dataDeals = []//vaciando medio segundo despues que cierre el modal
                     this.copyDataDeals = []//vaciando medio segundo despues que cierre el modal
                     this.newDataDeals = []//vaciando medio segundo despues que cierre el modal
+                    this.dataForm.id_empleado = ''
+                    this.employeOptions = []
+                    this.listYears = []
+                    this.errorForm = ''
+                    this.resetForm()
                 }, 500);
-                this.dataForm.id_empleado = ''
-                this.employeOptions = []
-                this.listYears = []
                 //reset form cuando cierre
             }
         }

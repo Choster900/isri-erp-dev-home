@@ -5,6 +5,7 @@ import Datatable from "@/Components-ISRI/Datatable.vue";;
 import axios from 'axios';
 import ModalAcuerdosVue from '@/Components-ISRI/RRHH/ModalAcuerdos.vue';
 import moment from 'moment';
+import TooltipVue from "@/Components-ISRI/Tesoreria/Tooltip.vue";
 </script>
 
 <template>
@@ -38,67 +39,49 @@ import moment from 'moment';
                 <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
                     @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getAcuerdos()">
                     <tbody class="text-sm divide-y divide-slate-200">
-                        <tr v-for="acuerdos in acuerdos" :key="acuerdos.id_empleado">
+                        <tr v-for="(acuerdos, i) in acuerdos" :key="i">
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center ">{{ acuerdos.id_empleado }}</div>
                             </td>
-                            <!-- <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">
-                                    {{ `${beneficiario.pnombre_persona ? beneficiario.pnombre_persona : ''}
-                                                                        ${beneficiario.snombre_persona ? beneficiario.snombre_persona : ''}
-                                                                        ${beneficiario.tapellido_persona ? beneficiario.tapellido_persona : ''}` }}
-                                </div>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800 text-center ">{{ acuerdos.codigo_empleado }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ `${beneficiario.papellido_persona ? beneficiario.papellido_persona : ''}
-                                                                        ${beneficiario.sapellido_persona ? beneficiario.sapellido_persona : ''}
-                                                                        ${beneficiario.tapellido_persona ? beneficiario.tapellido_persona : ''}` }}
+                                    {{ `${acuerdos.persona.pnombre_persona ? acuerdos.persona.pnombre_persona : ''}
+                                                                        ${acuerdos.persona.snombre_persona ? acuerdos.persona.snombre_persona : ''}
+                                                                        ${acuerdos.persona.tapellido_persona ? acuerdos.persona.tapellido_persona : ''}` }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="max-h-[165px] overflow-y-auto scrollbar">
-                                    <template v-for="(familiar, i) in beneficiario.familiar" :key="i">
-                                        <div class="mb-2 text-center">
-                                            <p class="text-[10pt]">
-                                                <span class="font-medium"> {{ familiar.fecha_reg_familiar }}
-                                                </span>{{ moment(familiar.fecha_reg_familiar,).format('MMMM Do YYYY,h: mm: ssa') }}
-                                            </p>
-                                        </div>
-                                        <template v-if="i < beneficiario.familiar.length - 1">
-                                            <hr class="my-2 border-t border-gray-300">
-                                        </template>
-                                    </template>
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{ `${acuerdos.persona.papellido_persona ? acuerdos.persona.papellido_persona : ''}
+                                                                        ${acuerdos.persona.sapellido_persona ? acuerdos.persona.sapellido_persona : ''}
+                                                                        ${acuerdos.persona.tapellido_persona ? acuerdos.persona.tapellido_persona : ''}` }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="max-h-[165px] overflow-y-auto scrollbar">
-                                    <template v-for="(familiar, i) in beneficiario.familiar" :key="i">
-                                        <div class="mb-2 text-center">
-                                            <p class="text-[10pt]">
-                                                <span class="font-medium"></span>{{ familiar.parentesco.nombre_parentesco }}
-                                            </p>
-                                        </div>
-                                        <template v-if="i < beneficiario.familiar.length - 1">
-                                            <hr class="my-2 border-t border-gray-300">
-                                        </template>
-                                    </template>
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{ acuerdos.email_institucional_empleado }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="max-h-[165px] overflow-y-auto scrollbar">
-                                    <template v-for="(familiar, i) in beneficiario.familiar" :key="i">
-                                        <div class="mb-2 text-center">
-                                            <p class="text-[10pt] text-emerald-500">
-                                                <span class="font-medium"></span>{{ familiar.porcentaje_familiar }} %
-                                            </p>
-                                        </div>
-                                        <template v-if="i < beneficiario.familiar.length - 1">
-                                            <hr class="my-2 border-t border-gray-300">
-                                        </template>
-                                    </template>
+                                <div class="font-medium text-slate-800 text-center flex justify-center gap-2">
+                                    <span>{{ acuerdos.acuerdo_laboral.length }}</span>
+
+
+
+                                    <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                        class="w-5 h-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z" />
+                                    </svg>
+
+
+
                                 </div>
-                            </td>-->
+                            </td>
                             <td class="first:pl-5 last:pr-5">
                                 <div class="space-x-1">
                                     <DropDownOptions>
@@ -194,35 +177,11 @@ export default {
         let sortOrders = {};
         let columns = [
             { width: "10%", label: "ID", name: "id_persona", type: "text" },
+            { width: "10%", label: "Codigo", name: "codigo_empleado", type: "text" },
             { width: "20%", label: "Nombres", name: "collecNombre", type: "text" },
             { width: "20%", label: "Apellidos", name: "collecApellido", type: "text" },
-            { width: "35%", label: "Nombre del familiar", name: "nombre_familiar", type: "text" },
-            {
-                width: "10%", label: "Parentesco", name: "id_parentesco", type: "select",
-                options: [
-                    { value: '1', label: 'MADRE', unico_parentesco: 1 },
-                    { value: '2', label: 'PADRE', unico_parentesco: 1 },
-                    { value: '3', label: 'ABUELO/A', unico_parentesco: 0 },
-                    { value: '4', label: 'BISABUELO/A', unico_parentesco: 0 },
-                    { value: '5', label: 'HERMANO/A', unico_parentesco: 0 },
-                    { value: '6', label: 'CONYUGE', unico_parentesco: 0 },
-                    { value: '7', label: 'HIJO/A', unico_parentesco: 0 },
-                    { value: '8', label: 'NIETO/A', unico_parentesco: 0 },
-                    { value: '9', label: 'BISNIETO/A', unico_parentesco: 0 },
-                    { value: '10', label: 'TIO/A', unico_parentesco: 0 },
-                    { value: '11', label: 'PRIMO/A', unico_parentesco: 0 },
-                    { value: '12', label: 'SOBRINO/A', unico_parentesco: 0 },
-                    { value: '13', label: 'SUEGRO/A', unico_parentesco: 0 },
-                    { value: '14', label: 'NUERA', unico_parentesco: 0 },
-                    { value: '15', label: 'YERNO', unico_parentesco: 0 },
-                    { value: '16', label: 'CUÑADO/A', unico_parentesco: 0 },
-                    { value: '17', label: 'PADRASTRO', unico_parentesco: 0 },
-                    { value: '18', label: 'MADASTRA', unico_parentesco: 0 },
-                    { value: '19', label: 'HIJASTRO/A', unico_parentesco: 0 },
-                    { value: '20', label: 'AMIGO/A', unico_parentesco: 0 },
-                ]
-            },
-            { width: "35%", label: "Porcentaje", name: "porcentaje_familiar", type: "text" },
+            { width: "20%", label: "Correo institucional", name: "email_institucional_empleado", type: "text" },
+            { width: "20%", label: "Acuerdos", name: "numAcuerdos", type: "text" },
             { width: "1%", label: "", name: "Acciones" },
         ];
         columns.forEach((column) => {
