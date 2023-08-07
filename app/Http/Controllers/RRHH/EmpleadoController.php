@@ -20,6 +20,7 @@ use App\Models\Residencia;
 use App\Models\TipoPension;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class EmpleadoController extends Controller
 {
@@ -374,99 +375,52 @@ class EmpleadoController extends Controller
         return ['mensaje' => 'Empleado actualizado con éxito'];
     }
 
-    public function uploadEmployeePhoto23(Request $request)
-    {
-        //$images = $request->all();
-
-        // foreach ($images as $image) {
-        //     // Get the original file name and extension
-        //     $originalFileName = pathinfo($image->file->getClientOriginalName(), PATHINFO_FILENAME);
-        //     $extension = $image->file->getClientOriginalExtension();
-        //     // Generate the date and time string
-        //     $dateTimeString = now()->format('Ymd_His');
-        //     // Create the unique file name by combining original file name and date-time
-        //     $uniqueFileName = $originalFileName . '_' . $dateTimeString . '.' . $extension;
-        //     // Store the uploaded file using the unique file name
-        //     $path = $image->file->storeAs('rrhh', $uniqueFileName);
-
-        //     $photo = new Foto([
-        //         'url_foto'                 => $path,
-        //         'id_persona'               => 167,
-        //         'estado_foto'              => 1,
-        //         'fecha_reg_foto'           => Carbon::now(),
-        //         'usuario_foto'             => $request->user()->nick_usuario,
-        //         'ip_foto'                  => $request->ip(),
-        //     ]);
-        //     $photo->save();
-        // }
-
-        $newFile = $request->file("file_0");
-
-        // foreach ($request->all() as $index => $file) {
-        //     // Obtener el archivo y el nombre del archivo
-        //     $uploadedFile = $request->file("file_{$index}");
-
-        //     // Get the original file name and extension
-        //     $originalFileName = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
-        //     $extension = $uploadedFile->getClientOriginalExtension();
-
-        //     // Generate the date and time string
-        //     $dateTimeString = now()->format('Ymd_His');
-
-        //     // Create the unique file name by combining original file name and date-time
-        //     $uniqueFileName = $originalFileName . '_' . $dateTimeString . '.' . $extension;
-
-        //     // Store the uploaded file using the unique file name
-        //     $path = $uploadedFile->storeAs('rrhh', $uniqueFileName);
-
-        //     $photo = new Foto([
-        //         'url_foto'                 => $path,
-        //         'id_persona'               => 167,
-        //         'estado_foto'              => 1,
-        //         'fecha_reg_foto'           => Carbon::now(),
-        //         'usuario_foto'             => $request->user()->nick_usuario,
-        //         'ip_foto'                  => $request->ip(),
-        //     ]);
-        //     $photo->save();
-        // }
-
-        // Return the file path or other response as needed
-        return response()->json([
-            'message' => "Archivos subidos con éxito.",
-            "data new" => $newFile
-        ]);
-    }
-
     public function uploadEmployeePhoto(Request $request)
     {
-        $files = $request->file('file');
+        $files = $request->file;
         $code = $request->code;
         $id_person = $request->id_person;
+        $count = 1;
 
         foreach ($files as $f) {
-            $file = $f['file'];
-            // Get the original file name and extension
-            //$originalFileName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-            $extension = $file->getClientOriginalExtension();
+            if ($f['id'] == '') {
+                $file = $f['file'];
+                // Get the original file name and extension
+                $extension = $file->getClientOriginalExtension();
 
-            // Generate the date and time string
-            $dateTimeString = now()->format('Ymd_His');
+                // Generate the date and time string
+                $dateTimeString = now()->format('Ymd_His');
 
-            // Create the unique file name by combining original file name and date-time
-            $uniqueFileName = $code . '_' . $dateTimeString . '.' . $extension;
+                // Create the unique file name by combining original file name and date-time
+                $uniqueFileName = $code . '_' . $count . $dateTimeString . '.' . $extension;
 
-            // Store the uploaded file using the unique file name
-            $path = $file->storeAs('rrhh', $uniqueFileName);
+                // Store the uploaded file using the unique file name
+                $path = $file->storeAs('rrhh', $uniqueFileName, 'public');
 
-            $photo = new Foto([
-                'url_foto'                 => $path,
-                'id_persona'               => $id_person,
-                'estado_foto'              => 1,
-                'fecha_reg_foto'           => Carbon::now(),
-                'usuario_foto'             => $request->user()->nick_usuario,
-                'ip_foto'                  => $request->ip(),
-            ]);
-            $photo->save();
+                $imageUrl = Storage::url('rrhh/' . $uniqueFileName);
+
+                $photo = new Foto([
+                    'url_foto'                 => $imageUrl,
+                    'id_persona'               => $id_person,
+                    'estado_foto'              => 1,
+                    'fecha_reg_foto'           => Carbon::now(),
+                    'usuario_foto'             => $request->user()->nick_usuario,
+                    'ip_foto'                  => $request->ip(),
+                ]);
+                $photo->save();
+                $count++;
+            } else {
+                if ($f['id'] != '' && $f['deleted'] == 'true') {
+                    $img = Foto::find($f['id']);
+                    $data = [
+                        'estado_foto'           => 0,
+                        'fecha_mod_foto'        => Carbon::now(),
+                        'usuario_foto'          => $request->user()->nick_usuario,
+                        'ip_foto'               => $request->ip(),
+                    ];
+                    $img->update($data);
+                }
+            }
         }
 
         // Return the file path or other response as needed
