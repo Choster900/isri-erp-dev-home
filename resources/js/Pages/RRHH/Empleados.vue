@@ -3,6 +3,7 @@ import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import ModalEmployeesVue from '@/Components-ISRI/RRHH/ModalEmployees.vue';
+import ModalFotografiaVue from '@/Components-ISRI/RRHH/ModalFotografia.vue';
 import moment from 'moment';
 
 import { toast } from 'vue3-toastify';
@@ -67,7 +68,8 @@ import axios from 'axios';
                                 }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">{{ showDependencies(employee.plazas_asignadas) }}</div>
+                                <div class="font-medium text-slate-800 text-center">{{
+                                    showDependencies(employee.plazas_asignadas) }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
@@ -99,6 +101,28 @@ import axios from 'axios';
                                             <div class="font-semibold">Editar</div>
                                         </div>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                            v-if="permits.actualizar == 1 && employee.estado_empleado == 1"
+                                            @click="manageFiles(employee)">
+                                            <div class="w-8 text-blue-900">
+                                                <span class="text-xs">
+                                                    <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none"
+                                                        xmlns="http://www.w3.org/2000/svg">
+                                                        <g id="SVGRepo_iconCarrier">
+                                                            <path
+                                                                d="M12 16C13.6569 16 15 14.6569 15 13C15 11.3431 13.6569 10 12 10C10.3431 10 9 11.3431 9 13C9 14.6569 10.3431 16 12 16Z"
+                                                                stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                                stroke-linejoin="round"></path>
+                                                            <path
+                                                                d="M3 16.8V9.2C3 8.0799 3 7.51984 3.21799 7.09202C3.40973 6.71569 3.71569 6.40973 4.09202 6.21799C4.51984 6 5.0799 6 6.2 6H7.25464C7.37758 6 7.43905 6 7.49576 5.9935C7.79166 5.95961 8.05705 5.79559 8.21969 5.54609C8.25086 5.49827 8.27836 5.44328 8.33333 5.33333C8.44329 5.11342 8.49827 5.00346 8.56062 4.90782C8.8859 4.40882 9.41668 4.08078 10.0085 4.01299C10.1219 4 10.2448 4 10.4907 4H13.5093C13.7552 4 13.8781 4 13.9915 4.01299C14.5833 4.08078 15.1141 4.40882 15.4394 4.90782C15.5017 5.00345 15.5567 5.11345 15.6667 5.33333C15.7216 5.44329 15.7491 5.49827 15.7803 5.54609C15.943 5.79559 16.2083 5.95961 16.5042 5.9935C16.561 6 16.6224 6 16.7454 6H17.8C18.9201 6 19.4802 6 19.908 6.21799C20.2843 6.40973 20.5903 6.71569 20.782 7.09202C21 7.51984 21 8.0799 21 9.2V16.8C21 17.9201 21 18.4802 20.782 18.908C20.5903 19.2843 20.2843 19.5903 19.908 19.782C19.4802 20 18.9201 20 17.8 20H6.2C5.0799 20 4.51984 20 4.09202 19.782C3.71569 19.5903 3.40973 19.2843 3.21799 18.908C3 18.4802 3 17.9201 3 16.8Z"
+                                                                stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                                stroke-linejoin="round"></path>
+                                                        </g>
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                            <div class="font-semibold">Fotografia</div>
+                                        </div>
+                                        <!-- <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                                             @click="changeStatusEmployee(employee)" v-if="permits.eliminar == 1">
                                             <div class="w-8 text-red-900"><span class="text-xs">
                                                     <svg :fill="employee.estado_empleado == 1 ? '#991B1B' : '#166534'"
@@ -127,7 +151,7 @@ import axios from 'axios';
                                             <div class="font-semibold">
                                                 {{ employee.estado_empleado ? 'Desactivar' : 'Activar' }}
                                             </div>
-                                        </div>
+                                        </div> -->
                                     </DropDownOptions>
                                 </div>
                             </td>
@@ -179,9 +203,12 @@ import axios from 'axios';
                 </nav>
             </div>
         </div>
-        
+
         <ModalEmployeesVue :show_modal_employee="show_modal_employee" :modalData="modalData"
-        @cerrar-modal="show_modal_employee = false" @get-table="getEmployees()"/>
+            @cerrar-modal="show_modal_employee = false" @get-table="getEmployees()" />
+
+        <ModalFotografiaVue :showModalFlag="showModalFlag" :modalData="modalData"
+            @cerrar-modal="showModalFlag = false" />
 
     </AppLayoutVue>
 </template>
@@ -216,13 +243,15 @@ export default {
                 sortOrders[column.name] = -1;
         });
         return {
+            showModalFlag:false,
+
             empty_object: false,
             //Data for datatable
             employees: [],
             //Data for modal
-            show_modal_employee: false,   
+            show_modal_employee: false,
             modalData: [],
-            
+
             //Permissions
             permits: [],
             links: [],
@@ -242,6 +271,10 @@ export default {
         }
     },
     methods: {
+        manageFiles(employee){
+            this.showModalFlag=true
+            this.modalData = employee
+        },
         editEmployee(employee) {
             this.modalData = employee
             this.show_modal_employee = true
@@ -344,12 +377,12 @@ export default {
                 this.getEmployees()
             }
         },
-        showDependencies(arrayDependencies){
+        showDependencies(arrayDependencies) {
             let dependencies = ''
-            arrayDependencies.forEach((value,index) => {
-                if(dependencies==''){
+            arrayDependencies.forEach((value, index) => {
+                if (dependencies == '') {
                     dependencies = dependencies + value.dependencia.codigo_dependencia
-                }else{
+                } else {
                     dependencies = dependencies + ", " + value.dependencia.codigo_dependencia
                 }
             })
@@ -360,8 +393,7 @@ export default {
 }
 </script>
 
-<style>
-.td-data-table {
+<style>.td-data-table {
     max-width: 100px;
     white-space: nowrap;
     height: 50px;

@@ -40,7 +40,7 @@ import axios from "axios";
                     <!-- Search dui -->
                     <div v-if="!correct_dui" class="flex justify-center">
                         <div class="flex flex-col items-center w-full">
-                            <input id="dui" type="text" class="p-1 mb-2 w-[75%] rounded-lg" placeholder="Ingresa DUI"
+                            <input id="dui" type="text" class="p-1 mb-2 w-[75%] rounded-lg text-center" placeholder="Ingresa DUI"
                                 v-model="employee.persona.dui_persona" @keyup.enter="searchDui()" @input="typeDUI()">
                             <div class="flex justify-center">
                                 <button
@@ -754,14 +754,7 @@ export default {
         },
         searchDui() {
             if (this.employee.persona.dui_persona == "") {
-                toast.warning(
-                    "Debe digitar el numero de dui.",
-                    {
-                        autoClose: 5000,
-                        position: "top-right",
-                        transition: "zoom",
-                        toastBackgroundColor: "white",
-                    })
+                this.showToast(toast.warning, "Debe digitar el numero de DUI.");
             } else {
                 axios.get('/search-person-by-dui', {
                     params: {
@@ -775,12 +768,7 @@ export default {
                         } else {
                             if (persona.id_empleado) {
                                 this.correct_dui = false
-                                this.$swal.fire({
-                                    title: 'Informacion',
-                                    text: 'La persona con este dui ya esta registrada como empleado.',
-                                    icon: 'warning',
-                                    timer: 5000
-                                })
+                                this.showToast(toast.info, "La persona con este dui ya esta registrada como empleado.");
                             } else {
                                 this.correct_dui = true
                                 this.employee.persona = { ...persona };
@@ -793,15 +781,7 @@ export default {
                     })
                     .catch((errors) => {
                         if (errors.response.data.logical_error) {
-                            toast.error(
-                                errors.response.data.logical_error,
-                                {
-                                    autoClose: 5000,
-                                    position: "top-right",
-                                    transition: "zoom",
-                                    toastBackgroundColor: "white",
-                                }
-                            );
+                            this.showToast(toast.error, errors.response.data.logical_error);
                         } else {
                             this.manageError(errors,this)
                         }
@@ -1005,26 +985,13 @@ export default {
                             axios
                                 .post("/store-employee", this.employee)
                                 .then((response) => {
-                                    toast.success(response.data.mensaje, {
-                                        autoClose: 3000,
-                                        position: "top-right",
-                                        transition: "zoom",
-                                        toastBackgroundColor: "white",
-                                    });
+                                    this.showToast(toast.success, response.data.mensaje);
                                     this.$emit("get-table");
                                     this.$emit("cerrar-modal");
                                 })
                                 .catch((errors) => {
                                     if (errors.response.status === 422) {
-                                        toast.warning(
-                                            "Tienes algunos errores por favor verifica tus datos.",
-                                            {
-                                                autoClose: 5000,
-                                                position: "top-right",
-                                                transition: "zoom",
-                                                toastBackgroundColor: "white",
-                                            }
-                                        );
+                                        this.showToast(toast.warning, "Tienes algunos errores por favor verifica tus datos.");
                                     } else {
                                         this.manageError(errors,this)
                                         this.$emit("cerrar-modal");
@@ -1053,12 +1020,7 @@ export default {
                             axios
                                 .post("/update-employee", this.employee)
                                 .then((response) => {
-                                    toast.success(response.data.mensaje, {
-                                        autoClose: 3000,
-                                        position: "top-right",
-                                        transition: "zoom",
-                                        toastBackgroundColor: "white",
-                                    });
+                                    this.showToast(toast.success, response.data.mensaje);
                                     this.$emit("get-table");
                                     this.$emit("cerrar-modal");
                                 })
@@ -1066,15 +1028,7 @@ export default {
                                     if (errors.response.status === 422) {
                                         console.log(errors.response.data.errors);
                                         if (errors.response.data.logical_error) {
-                                            toast.error(
-                                                errors.response.data.logical_error,
-                                                {
-                                                    autoClose: 5000,
-                                                    position: "top-right",
-                                                    transition: "zoom",
-                                                    toastBackgroundColor: "white",
-                                                }
-                                            );
+                                            this.showToast(toast.error, errors.response.data.logical_error);
                                             this.$emit("get-table");
                                             this.$emit("cerrar-modal");
                                         } else {
@@ -1082,15 +1036,7 @@ export default {
                                             if(this.backend_errors['persona.dui_persona']){
                                                 this.current_page=1
                                             }
-                                            toast.warning(
-                                                "Tienes algunos errores por favor verifica tus datos.",
-                                                {
-                                                    autoClose: 5000,
-                                                    position: "top-right",
-                                                    transition: "zoom",
-                                                    toastBackgroundColor: "white",
-                                                }
-                                            );
+                                            this.showToast(toast.warning, "Tienes algunos errores por favor verifica tus datos.");
                                         }
                                     } else {
                                         this.manageError(errors,this)
@@ -1134,15 +1080,7 @@ export default {
             });
         },
         showErrorAlert() {
-            toast.warning(
-                "Tienes algunos errores por favor verifica tus datos.",
-                {
-                    autoClose: 5000,
-                    position: "top-right",
-                    transition: "zoom",
-                    toastBackgroundColor: "white",
-                }
-            );
+            this.showToast(toast.warning, "Tienes algunos errores por favor verifica tus datos.");
         }
     },
     watch: {

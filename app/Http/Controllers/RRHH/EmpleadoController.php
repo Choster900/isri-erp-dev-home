@@ -10,6 +10,7 @@ use App\Models\Dependencia;
 use App\Models\DetallePlaza;
 use App\Models\Empleado;
 use App\Models\EstadoCivil;
+use App\Models\Foto;
 use App\Models\Genero;
 use App\Models\NivelEducativo;
 use App\Models\Persona;
@@ -41,7 +42,8 @@ class EmpleadoController extends Controller
                     $query->join('dependencia', 'plaza_asignada.id_dependencia', '=', 'dependencia.id_dependencia')
                         ->orderBy('dependencia.codigo_dependencia');
                 },
-                'plazas_asignadas.dependencia'
+                'plazas_asignadas.dependencia',
+                'persona.fotos'
             ]);
 
         if ($column == 2) {
@@ -156,7 +158,7 @@ class EmpleadoController extends Controller
             ->join('actividad_institucional', 'detalle_plaza.id_actividad_institucional', '=', 'actividad_institucional.id_actividad_institucional')
             ->join('linea_trabajo', 'actividad_institucional.id_lt', '=', 'linea_trabajo.id_lt')
             ->whereIn('detalle_plaza.id_estado_plaza', [1, 2])
-            ->where('detalle_plaza.estado_det_plaza',1)
+            ->where('detalle_plaza.estado_det_plaza', 1)
             ->get();
 
         return [
@@ -370,5 +372,104 @@ class EmpleadoController extends Controller
         ]);
 
         return ['mensaje' => 'Empleado actualizado con éxito'];
+    }
+
+    public function uploadEmployeePhoto23(Request $request)
+    {
+        //$images = $request->all();
+
+        // foreach ($images as $image) {
+        //     // Get the original file name and extension
+        //     $originalFileName = pathinfo($image->file->getClientOriginalName(), PATHINFO_FILENAME);
+        //     $extension = $image->file->getClientOriginalExtension();
+        //     // Generate the date and time string
+        //     $dateTimeString = now()->format('Ymd_His');
+        //     // Create the unique file name by combining original file name and date-time
+        //     $uniqueFileName = $originalFileName . '_' . $dateTimeString . '.' . $extension;
+        //     // Store the uploaded file using the unique file name
+        //     $path = $image->file->storeAs('rrhh', $uniqueFileName);
+
+        //     $photo = new Foto([
+        //         'url_foto'                 => $path,
+        //         'id_persona'               => 167,
+        //         'estado_foto'              => 1,
+        //         'fecha_reg_foto'           => Carbon::now(),
+        //         'usuario_foto'             => $request->user()->nick_usuario,
+        //         'ip_foto'                  => $request->ip(),
+        //     ]);
+        //     $photo->save();
+        // }
+
+        $newFile = $request->file("file_0");
+
+        // foreach ($request->all() as $index => $file) {
+        //     // Obtener el archivo y el nombre del archivo
+        //     $uploadedFile = $request->file("file_{$index}");
+
+        //     // Get the original file name and extension
+        //     $originalFileName = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
+        //     $extension = $uploadedFile->getClientOriginalExtension();
+
+        //     // Generate the date and time string
+        //     $dateTimeString = now()->format('Ymd_His');
+
+        //     // Create the unique file name by combining original file name and date-time
+        //     $uniqueFileName = $originalFileName . '_' . $dateTimeString . '.' . $extension;
+
+        //     // Store the uploaded file using the unique file name
+        //     $path = $uploadedFile->storeAs('rrhh', $uniqueFileName);
+
+        //     $photo = new Foto([
+        //         'url_foto'                 => $path,
+        //         'id_persona'               => 167,
+        //         'estado_foto'              => 1,
+        //         'fecha_reg_foto'           => Carbon::now(),
+        //         'usuario_foto'             => $request->user()->nick_usuario,
+        //         'ip_foto'                  => $request->ip(),
+        //     ]);
+        //     $photo->save();
+        // }
+
+        // Return the file path or other response as needed
+        return response()->json([
+            'message' => "Archivos subidos con éxito.",
+            "data new" => $newFile
+        ]);
+    }
+
+    public function uploadEmployeePhoto(Request $request)
+    {
+        $files = $request->file('file');
+        $code = $request->code;
+        $id_person = $request->id_person;
+
+        foreach ($files as $f) {
+            $file = $f['file'];
+            // Get the original file name and extension
+            //$originalFileName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $extension = $file->getClientOriginalExtension();
+
+            // Generate the date and time string
+            $dateTimeString = now()->format('Ymd_His');
+
+            // Create the unique file name by combining original file name and date-time
+            $uniqueFileName = $code . '_' . $dateTimeString . '.' . $extension;
+
+            // Store the uploaded file using the unique file name
+            $path = $file->storeAs('rrhh', $uniqueFileName);
+
+            $photo = new Foto([
+                'url_foto'                 => $path,
+                'id_persona'               => $id_person,
+                'estado_foto'              => 1,
+                'fecha_reg_foto'           => Carbon::now(),
+                'usuario_foto'             => $request->user()->nick_usuario,
+                'ip_foto'                  => $request->ip(),
+            ]);
+            $photo->save();
+        }
+
+        // Return the file path or other response as needed
+        return response()->json(['message' => "Archivos subidos con éxito."]);
     }
 }

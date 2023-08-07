@@ -220,12 +220,12 @@ import moment from 'moment';
                             </table>
                         </div>
                         <div class="flex justify-center mt-5">
-                            <GeneralButton class="mr-1" v-if="modalData != '' && !itemSelected && !allDeleted"
+                            <!-- <GeneralButton class="mr-1" v-if="modalData != '' && !itemSelected && !allDeleted"
                                 color="bg-orange-700  hover:bg-orange-800" text="Actualizar" icon="update"
-                                @click="updateUser()" />
+                                @click="updateUser()" /> -->
                             <GeneralButton class="mr-1" v-if="modalData == '' && !itemSelected"
                                 color="bg-green-700  hover:bg-green-800" text="Guardar" icon="add" @click="saveNewUser()" />
-                            <GeneralButton class="ml-1" text="Cancelar" icon="delete" @click="$emit('cerrar-modal')" />
+                            <GeneralButton class="ml-1" text="Cerrar" icon="delete" @click="$emit('cerrar-modal')" />
                         </div>
                     </div>
                 </div>
