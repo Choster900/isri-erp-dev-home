@@ -21,9 +21,6 @@ import axios from "axios";
                         <path d="M0-.5h24v24H0z" fill="none" />
                     </svg>
                 </div>
-                <div>
-                    
-                </div>
                 <img class="max-w-[81%] max-h-[90%] object-contain cursor-pointer"
                     :src="images[fullScreenImageIndex].url"/>
                 <div v-if="images.length > 1" class="cursor-pointer" @click.stop="next">
