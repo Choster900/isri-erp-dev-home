@@ -392,7 +392,7 @@ class EmpleadoController extends Controller
                 $dateTimeString = now()->format('Ymd_His');
 
                 // Create the unique file name by combining original file name and date-time
-                $uniqueFileName = $code . '_' . $count . $dateTimeString . '.' . $extension;
+                $uniqueFileName = $code . '_' . $count . '_' . $dateTimeString . '.' . $extension;
 
                 // Store the uploaded file using the unique file name
                 $path = $file->storeAs('rrhh', $uniqueFileName, 'public');
