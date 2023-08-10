@@ -110,12 +110,12 @@ import axios from 'axios';
                                                         <g id="SVGRepo_iconCarrier">
                                                             <path
                                                                 d="M12 16C13.6569 16 15 14.6569 15 13C15 11.3431 13.6569 10 12 10C10.3431 10 9 11.3431 9 13C9 14.6569 10.3431 16 12 16Z"
-                                                                stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                                stroke-linejoin="round"></path>
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"></path>
                                                             <path
                                                                 d="M3 16.8V9.2C3 8.0799 3 7.51984 3.21799 7.09202C3.40973 6.71569 3.71569 6.40973 4.09202 6.21799C4.51984 6 5.0799 6 6.2 6H7.25464C7.37758 6 7.43905 6 7.49576 5.9935C7.79166 5.95961 8.05705 5.79559 8.21969 5.54609C8.25086 5.49827 8.27836 5.44328 8.33333 5.33333C8.44329 5.11342 8.49827 5.00346 8.56062 4.90782C8.8859 4.40882 9.41668 4.08078 10.0085 4.01299C10.1219 4 10.2448 4 10.4907 4H13.5093C13.7552 4 13.8781 4 13.9915 4.01299C14.5833 4.08078 15.1141 4.40882 15.4394 4.90782C15.5017 5.00345 15.5567 5.11345 15.6667 5.33333C15.7216 5.44329 15.7491 5.49827 15.7803 5.54609C15.943 5.79559 16.2083 5.95961 16.5042 5.9935C16.561 6 16.6224 6 16.7454 6H17.8C18.9201 6 19.4802 6 19.908 6.21799C20.2843 6.40973 20.5903 6.71569 20.782 7.09202C21 7.51984 21 8.0799 21 9.2V16.8C21 17.9201 21 18.4802 20.782 18.908C20.5903 19.2843 20.2843 19.5903 19.908 19.782C19.4802 20 18.9201 20 17.8 20H6.2C5.0799 20 4.51984 20 4.09202 19.782C3.71569 19.5903 3.40973 19.2843 3.21799 18.908C3 18.4802 3 17.9201 3 16.8Z"
-                                                                stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                                stroke-linejoin="round"></path>
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"></path>
                                                         </g>
                                                     </svg>
                                                 </span>
@@ -178,7 +178,7 @@ import axios from 'axios';
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
 
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getEmployees(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                        <a @click="page!=1 ? getEmployees(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                   text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
@@ -187,7 +187,7 @@ import axios from 'axios';
                                 <span v-else-if="(link.label == 'Siguiente')"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getEmployees(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                        <a @click="hasNext ? getEmployees(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                   text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
@@ -205,10 +205,10 @@ import axios from 'axios';
         </div>
 
         <ModalEmployeesVue :show_modal_employee="show_modal_employee" :modalData="modalData"
-            @cerrar-modal="show_modal_employee = false" @get-table="getEmployees()" />
+            @cerrar-modal="show_modal_employee = false" @get-table="getEmployees(tableData.currentPage)" />
 
-        <ModalFotografiaVue :showModalFlag="showModalFlag" :modalData="modalData"
-            @cerrar-modal="showModalFlag = false" />
+        <ModalFotografiaVue :showModalFlag="showModalFlag" :modalData="modalData" @cerrar-modal="showModalFlag = false"
+            @get-table="getEmployees(tableData.currentPage)" />
 
     </AppLayoutVue>
 </template>
@@ -243,7 +243,7 @@ export default {
                 sortOrders[column.name] = -1;
         });
         return {
-            showModalFlag:false,
+            showModalFlag: false,
 
             empty_object: false,
             //Data for datatable
@@ -251,6 +251,9 @@ export default {
             //Data for modal
             show_modal_employee: false,
             modalData: [],
+
+            hasNext: false,
+            page:'',
 
             //Permissions
             permits: [],
@@ -271,8 +274,8 @@ export default {
         }
     },
     methods: {
-        manageFiles(employee){
-            this.showModalFlag=true
+        manageFiles(employee) {
+            this.showModalFlag = true
             this.modalData = employee
         },
         editEmployee(employee) {
@@ -341,21 +344,17 @@ export default {
                 let data = response.data;
                 if (this.tableData.draw == data.draw) {
                     this.links = data.data.links;
+                    this.page = data.data.current_page
                     this.tableData.total = data.data.total;
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
                     this.employees = data.data.data;
+                    this.hasNext = data.data.current_page !== data.data.last_page;
                     this.employees.length > 0 ? this.empty_object = false : this.empty_object = true
                 }
             }).catch((errors) => {
-                let msg = this.manageError(errors)
-                this.$swal.fire({
-                    title: 'Operación cancelada',
-                    text: msg,
-                    icon: 'warning',
-                    timer: 5000
-                })
-                //console.log(errors);
+                console.log(errors);
+                this.manageError(errors, this)
             })
         },
         sortBy(key) {
@@ -390,10 +389,13 @@ export default {
         }
 
     },
+    computed: {
+    }
 }
 </script>
 
-<style>.td-data-table {
+<style>
+.td-data-table {
     max-width: 100px;
     white-space: nowrap;
     height: 50px;
@@ -402,4 +404,5 @@ export default {
 .ellipsis {
     overflow: hidden;
     text-overflow: ellipsis;
-}</style>
+}
+</style>

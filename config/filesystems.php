@@ -32,8 +32,13 @@ return [
 
         'rrhh' => [
             'driver' => 'local',
-            'root' => storage_path('app/rrhh'),
+            'root' => public_path('rrhh'), // Cambiar 'storage_path' a 'public_path'
         ],
+
+        // 'rrhh' => [
+        //     'driver' => 'local',
+        //     'root' => storage_path('app/rrhh'),
+        // ],
 
         // 'module2' => [
         //     'driver' => 'local',
