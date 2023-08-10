@@ -245,6 +245,7 @@ export default {
                 }
             }).catch((errors) => {
                 this.manageError(errors,this)
+                console.log(errors);
             });
         },
         sortBy(key) {

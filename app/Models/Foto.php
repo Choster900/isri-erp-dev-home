@@ -25,6 +25,6 @@ class Foto extends Model
 
     public function persona()
     {
-        return $this->belongsTo('App\Models\Persona','id_persona','id_persona');
+        return $this->belongsTo(Persona::class,'id_persona','id_persona');
     }
 }

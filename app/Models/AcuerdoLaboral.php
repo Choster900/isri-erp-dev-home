@@ -38,6 +38,10 @@ class AcuerdoLaboral extends Model
     {
         return $this->belongsTo(TipoAcuerdoLaboral::class, 'id_tipo_acuerdo_laboral', 'id_tipo_acuerdo_laboral');
     }
+    public function scopeWithTipoAcuerdoLaboral($query)
+    {
+        return $query->with("tipo_acuerdo_laboral");
+    }
     /**
      * Get the empleados that owns the AcuerdoLaboral
      *

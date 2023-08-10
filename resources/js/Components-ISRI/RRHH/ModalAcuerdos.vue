@@ -778,7 +778,7 @@ export default {
 
                     this.dataAcuerdos.acuerdo_laboral.forEach((obj, index) => {
                         //this.dataDeals.push({
-                        this.copyDataDeals.push({
+                        this.copyDataDeals.unshift({
                             indexDeal: this.generateShortUniqueId(),
                             id_acuerdo_laboral: obj.id_acuerdo_laboral,
                             id_tipo_acuerdo_laboral: obj.tipo_acuerdo_laboral["id_tipo_acuerdo_laboral"],
