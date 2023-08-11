@@ -5,6 +5,7 @@ import ListAcuerdosVue from './ListAcuerdos.vue';
 </script>
 <template>
     <div v-show="showAcuerdos">
+        {{ deals }}
         <h2 class="text-slate-800 font-semibold mb-2">Work History</h2>
         <!-- Calendario de contribuciones -->
         <div class="p-2 bg-slate-50 rounded-lg border border-slate-200">
@@ -99,7 +100,10 @@ export default {
             type: Boolean,
             default: false,
         },
-
+        deals: {
+            type: Object,
+            default: [],
+        },
 
     },
     data() {

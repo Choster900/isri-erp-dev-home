@@ -33,18 +33,17 @@ import FooterServiciosBodyVue from './FooterServiciosBody.vue'
                     <!-- Avatar -->
                     <div class="image-container">
                         <img class="rounded-full border-4 border-white"
-                            src="https://pbs.twimg.com/profile_images/1671011526948397058/pXmXbz9B_400x400.jpg" />
+                            :src="userData && userData.fotos && userData.fotos.length > 0 ? userData.fotos[userData['fotos'].length - 1].url_foto : ''" />
                     </div>
 
                 </div>
-
             </div>
 
             <!-- Header -->
             <header class="text-center sm:text-left mb-6">
                 <!-- Name -->
                 <div class="inline-flex items-start mb-2">
-                    <h1 class="text-2xl text-slate-800 font-bold">SERGIO ADONAY LOPEZ MEJIA</h1>
+                    <h1 class="text-2xl text-slate-800 font-bold"> {{ userData != ''? `${userData.empleado.codigo_empleado} - ${userData.pnombre_persona ? userData.pnombre_persona : ''} ${userData.snombre_persona ? userData.snombre_persona : ''} ${userData.tnombre_persona ? userData.snombre_persona : ''} ${userData.papellido_persona ? userData.papellido_persona : ''} ${userData.sapellido_persona ? userData.sapellido_persona : ''} ${userData.tapellido_persona ? userData.tapellido_persona : ''} `:'' }}</h1>
                     <div class="flex space-x-2 sm:mb-2 ">
                         <DropDownOptions position="right-up">
                             <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
@@ -136,7 +135,7 @@ import FooterServiciosBodyVue from './FooterServiciosBody.vue'
 
             <!-- GENERAL -->
             <GeneralInformationVue :showInformation="isSelected.showInformation" />
-            <FooterServiciosBodyVue :showAcuerdos="isSelected.showAcuerdos" />
+            <FooterServiciosBodyVue :showAcuerdos="isSelected.showAcuerdos" :deals=" userData != ''?userData.empleado.acuerdo_laboral:[]"/>
         </div>
 
     </div>
@@ -144,7 +143,13 @@ import FooterServiciosBodyVue from './FooterServiciosBody.vue'
   
 <script>
 export default {
-    props: ['profileSidebarOpen'],
+    props: {
+        userData: {
+            type: Array,
+            required: true,
+            default: [],
+        }
+    },
     data() {
         return {
             isSelected: {
@@ -153,6 +158,11 @@ export default {
             }
         }
     },
+    watch: {
+        userData() {
+            console.log(this.userData);
+        }
+    }
 }
 </script>
 <style>

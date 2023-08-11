@@ -52,12 +52,12 @@ class Persona extends Model
         return $this->hasOne(Empleado::class, 'id_persona', 'id_persona');
     }
     public function residencias()
-    { 
-        return $this->hasMany('App\Models\Residencia','id_persona','id_persona');
+    {
+        return $this->hasMany('App\Models\Residencia', 'id_persona', 'id_persona');
     }
     public function fotos()
-    { 
-        return $this->hasMany('App\Models\Foto','id_persona','id_persona');
+    {
+        return $this->hasMany('App\Models\Foto', 'id_persona', 'id_persona');
     }
     /**
      * Get all of the familiares for the Persona
@@ -67,5 +67,42 @@ class Persona extends Model
     public function familiar(): HasMany
     {
         return $this->hasMany(Familiar::class, 'id_persona', 'id_persona');
+    }
+
+    /**
+     * Get the profesiones that owns the Empleado
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function profesion(): BelongsTo
+    {
+        return $this->belongsTo(Profesion::class, 'id_profesion', 'id_profesion');
+    }
+    /**
+     * Get the nivel_educativo that owns the Persona
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function nivel_educativo(): BelongsTo
+    {
+        return $this->belongsTo(NivelEducativo::class, 'id_nivel_educativo', 'id_nivel_educativo');
+    }
+    /**
+     * Get the estado_civil that owns the Persona
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function estado_civil(): BelongsTo
+    {
+        return $this->belongsTo(EstadoCivil::class, 'id_estado_civil', 'id_estado_civil');
+    }
+    /**
+     * Get the municipio that owns the Persona
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function municipio(): BelongsTo
+    {
+        return $this->belongsTo(Municipio::class, 'id_municipio', 'id_municipio');
     }
 }

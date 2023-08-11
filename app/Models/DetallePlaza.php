@@ -29,7 +29,7 @@ class DetallePlaza extends Model
 
     public function plaza()
     {
-        return $this->belongsTo('App\Models\Plaza', 'id_plaza', 'id_plaza');
+        return $this->belongsTo(Plaza::class, 'id_plaza', 'id_plaza');
     }
 
     public function actividad_institucional()

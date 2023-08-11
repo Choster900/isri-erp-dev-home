@@ -46,21 +46,25 @@
                     <div class="mt-4">
                         <div class="text-xs font-semibold text-slate-400 uppercase mb-3">Empleados</div>
                         <ul class="mb-6">
-                            <li class="-mx-2" v-for="users in dataResponseUser" :key="users">
-                                <button class="w-full p-2 rounded " @click.stop="$emit('close-profilesidebar')"
-                                    :title="`${users.empleado.codigo_empleado} -${users.pnombre_persona ? users.pnombre_persona : ''} ${users.snombre_persona ? users.snombre_persona : ''} ${users.tnombre_persona ? users.snombre_persona : ''} ${users.papellido_persona ? users.papellido_persona : ''} ${users.sapellido_persona ? users.sapellido_persona : ''} ${users.tapellido_persona ? users.tapellido_persona : ''} `">
+                            <li class="-mx-2" v-for="user in dataResponseUser" :key="user">
+                                <button class="w-full p-2 rounded " @click="$emit('sendUserData', user)"
+                                    :title="`${user.empleado.codigo_empleado} -${user.pnombre_persona ? user.pnombre_persona : ''} ${user.snombre_persona ? user.snombre_persona : ''} ${user.tnombre_persona ? user.snombre_persona : ''} ${user.papellido_persona ? user.papellido_persona : ''} ${user.sapellido_persona ? user.sapellido_persona : ''} ${user.tapellido_persona ? user.tapellido_persona : ''} `">
                                     <div class="flex items-center">
-                                        <div class="relative mr-2">
-                                            <img class="w-8 h-8 rounded-full"
-                                                src="https://img.freepik.com/foto-gratis/viejo-fondo-negro-textura-grunge-papel-tapiz-oscuro-pizarra-pizarra-pared-habitacion_1258-28313.jpg"
-                                                width="32" height="32" alt="User 08" />
+                                        <div class="flex flex-col items-center sm:flex-row sm:justify-between sm:items-end">
+                                            <!-- Avatar -->
+                                            <div class="contenedor-img">
+                                                <img class="rounded-full border-4 border-white"
+                                                    :src="user.fotos != '' ? user.fotos[user.fotos.length - 1].url_foto : ''" />
+                                            </div>
                                         </div>
                                         <div class="truncate">
-                                            <span class="text-sm font-medium text-slate-800" >
-                                                {{ `${users.empleado.codigo_empleado} - ${users.pnombre_persona ?
-                                                    users.pnombre_persona : ''} ${users.snombre_persona ? users.snombre_persona : ''} ${users.tnombre_persona ? users.snombre_persona : ''}
-                                                    ${users.papellido_persona ? users.papellido_persona : ''} ${users.sapellido_persona ? users.sapellido_persona : ''}
-                                                     ${users.tapellido_persona ? users.tapellido_persona : ''} ` }}
+                                            <span class="text-sm font-medium text-slate-800">
+                                                {{ `${user.empleado.codigo_empleado} - ${user.pnombre_persona ?
+                                                    user.pnombre_persona : ''} ${user.snombre_persona ? user.snombre_persona
+                                                        : ''} ${user.tnombre_persona ? user.snombre_persona : ''}
+                                                                                                ${user.papellido_persona ? user.papellido_persona : ''}
+                                                                                                ${user.sapellido_persona ? user.sapellido_persona : ''}
+                                                                                                ${user.tapellido_persona ? user.tapellido_persona : ''} ` }}
                                             </span>
                                         </div>
                                     </div>
@@ -112,6 +116,29 @@ export default {
                 }
             }
         },
+        printUserData(data) {
+            console.log(data);
+        }
     }
 }
 </script>
+<style scoped>
+.contenedor-img {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    width: 40px;
+    height: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.contenedor-img img {
+    width: 100%;
+    height: 100%;
+    /* max-height: 100px;
+    max-width: 100px; */
+    border-radius: 100%;
+}
+</style>
