@@ -18,11 +18,6 @@ class Departamento extends Model
         'nombre_departamento',
         'codigo_admon_departamento',
         'nit_departamento',
-        //'estado_departamento',
-        //'fecha_reg_departamento',
-        //'fecha_mod_departamento',
-        //'usuario_departamento',
-        //'ip_departamento',
     ];
 
     public function pais()

@@ -15,15 +15,10 @@ class TipoNivelEducativo extends Model
 
     protected $fillable = [
         'nombre_tipo_nivel_educativo',
-        //'estado_tipo_nivel_educativo',
-        //'fecha_tipo_nivel_educativo',
-        //'fecha_tipo_nivel_educativo',
-        //'usuario_tipo_nivel_educativo',
-        //'ip_tipo_nivel_educativo',
     ];
 
     public function niveles_educativos()
     {
-        return $this->hasMany('App\Models\NivelEducativo','id_tipo_nivel_educativo','id_tipo_nivel_educativo');
+        return $this->hasMany(NivelEducativo::class,'id_tipo_nivel_educativo','id_tipo_nivel_educativo');
     }
 }

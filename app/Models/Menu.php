@@ -48,7 +48,7 @@ class Menu extends Model
         ->with('roles');
     }
 
-    public function parent_menu()
+    public function parentMenu()
     {
         return $this->hasOne('App\Models\Menu', 'id_menu', 'id_menu_padre');
     }

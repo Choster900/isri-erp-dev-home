@@ -56,7 +56,7 @@ import axios from "axios";
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="number" v-model="income_receipt.number" :value="income_receipt.number"
                                     type="text" placeholder="Numero de recibo"
-                                    @update:modelValue="validateInput('number', limit = 145, false, number = true)">
+                                    @update:modelValue="validateInput('number', limit = 10, false, number = true)">
                                     <LabelToInput icon="standard" forLabel="number" />
                                 </TextInput>
                                 <InputError v-for="(item, index) in errors.number" :key="index" class="mt-2"
