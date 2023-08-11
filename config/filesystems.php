@@ -30,6 +30,21 @@ return [
 
     'disks' => [
 
+        'rrhh' => [
+            'driver' => 'local',
+            'root' => public_path('rrhh'), // Cambiar 'storage_path' a 'public_path'
+        ],
+
+        // 'rrhh' => [
+        //     'driver' => 'local',
+        //     'root' => storage_path('app/rrhh'),
+        // ],
+
+        // 'module2' => [
+        //     'driver' => 'local',
+        //     'root' => storage_path('app/module2'),
+        // ],
+
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app'),

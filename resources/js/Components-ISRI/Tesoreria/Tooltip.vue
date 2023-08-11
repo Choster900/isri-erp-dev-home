@@ -14,7 +14,7 @@
         leave-to-class="opacity-0"
       ></transition> -->
 
-        <div v-show="tooltipOpen" class="rounded overflow-hidden" :class="[
+        <div v-show="tooltipOpen" class="rounded overflow-hidden " :class="[
           bg === 'dark' ? 'bg-slate-800' : 'bg-white border border-slate-200 shadow-lg',
           sizeClasses(size),
           positionInnerClasses(position)

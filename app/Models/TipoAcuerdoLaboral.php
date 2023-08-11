@@ -33,4 +33,8 @@ class TipoAcuerdoLaboral extends Model
     {
         return $this->hasMany(AcuerdoLaboral::class, 'id_tipo_acuerdo_laboral', 'id_tipo_acuerdo_laboral');
     }
+    public function scopeWithAcuerdoLaboral()
+    {
+        return $this->hasManyThrough(TipoAcuerdoLaboral::class, AcuerdoLaboral::class);
+    }
 }

@@ -41,7 +41,7 @@ class AcuerdoController extends Controller
         $data = $request->input('search');
 
         // Construir la consulta base con las relaciones
-        $query = Empleado::select('*')->with(["acuerdo_laboral.tipo_acuerdo_laboral"])->whereHas("acuerdo_laboral", function ($query) {
+        $query = Empleado::select('*')->with(["acuerdo_laboral.tipo_acuerdo_laboral","persona"])->whereHas("acuerdo_laboral", function ($query) {
             $query->where("estado_acuerdo_laboral", 1);
         })->where("estado_empleado", 1)->orderBy($columns[$column], $dir);
 
@@ -92,13 +92,20 @@ class AcuerdoController extends Controller
                 ->join('departamento', 'departamento.id_departamento', '=', 'municipio.id_departamento')
                 ->join('pais', 'pais.id_pais', '=', 'departamento.id_pais')
                 ->where(function ($query) use ($request) {
-                    $query->where('persona.pnombre_persona', 'like', '%' . $request['query'] . '%')
+                    $query->where('empleado.codigo_empleado', 'like', '%' . $request['query'] . '%')
+                        ->orWhere('persona.pnombre_persona', 'like', '%' . $request['query'] . '%')
                         ->orWhere('persona.snombre_persona', 'like', '%' . $request['query'] . '%')
                         ->orWhere('persona.tnombre_persona', 'like', '%' . $request['query'] . '%')
                         ->orWhere('persona.papellido_persona', 'like', '%' . $request['query'] . '%')
                         ->orWhere('persona.sapellido_persona', 'like', '%' . $request['query'] . '%')
                         ->orWhere('persona.tapellido_persona', 'like', '%' . $request['query'] . '%');
-                })->where('estado_empleado', 1)->get();
+                })->where('estado_empleado', 1)->where(function ($query) {
+                    $query->doesntHave('acuerdo_laboral')
+                        ->orWhereHas('acuerdo_laboral', function ($query) {
+                            $query->where('estado_acuerdo_laboral', 0);
+                        });
+                })
+                ->get();
         } else {
             return Empleado::select(
                 'empleado.id_empleado as value',

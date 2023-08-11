@@ -9,6 +9,7 @@ import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { ZiggyVue } from "../../vendor/tightenco/ziggy/dist/vue.m";
 import { manageError } from '@/mixins/handleErrorResponse.js';
 import { getPermissions } from '@/mixins/getPermissions.js';
+import { showToast } from '@/mixins/showToast.js';
 import { executeRequest } from "@/plugins/requestHelpers.js";
 import GeneralButton from "@/Components-ISRI/ComponentsToForms/GeneralButton.vue";
 import TextInput from "@/Components-ISRI/ComponentsToForms/TextInput.vue";
@@ -33,6 +34,8 @@ import "sweetalert2/dist/sweetalert2.min.css";
 
 import "flatpickr/dist/flatpickr.css";
 import "../css/FlatPickr_theme.css";
+
+import VueLazyLoad from 'vue-lazyload'
 
 const appName =
     window.document.getElementsByTagName("title")[0]?.innerText || "";
@@ -61,8 +64,8 @@ createInertiaApp({
             .component("Datepicker", Datepicker)
             .component("RadioButton", RadioButton)
             .component("DatepickerTest", DatepickerTest)
-            .mixin({ methods: { manageError,executeRequest,getPermissions } })
-            .use(ZiggyVue, Ziggy)
+            .mixin({ methods: { manageError,executeRequest,getPermissions,showToast } })
+            .use(ZiggyVue, Ziggy, VueLazyLoad)
             .mount(el);
     },
     progress: {

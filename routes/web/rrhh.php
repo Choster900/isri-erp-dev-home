@@ -4,6 +4,7 @@ use App\Http\Controllers\RRHH\AcuerdoController;
 use App\Http\Controllers\RRHH\DetallePlazaController;
 use App\Http\Controllers\RRHH\BeneficiarioController;
 use App\Http\Controllers\RRHH\EmpleadoController;
+use App\Http\Controllers\RRHH\HojaServicioController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -20,6 +21,8 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get('get-selects-options-employee', [EmpleadoController::class, 'getSelectOptionsEmployee'])->name('empleado.getSelectOptionsEmployee');
     Route::post('store-employee', [EmpleadoController::class, 'storeEmployee'])->name('empleado.storeEmployee');
     Route::post('update-employee', [EmpleadoController::class, 'updateEmployee'])->name('empleado.updateEmployee');
+
+    Route::post('upload-employee-photo', [EmpleadoController::class, 'uploadEmployeePhoto'])->name('empleado.uploadEmployeePhoto');
 
     Route::get(
         '/rrhh/det-plazas',
@@ -58,5 +61,14 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('update-deals', [AcuerdoController::class, 'updateDeals'])->name('update.deals');
 
 
-    
+    Route::get(
+        '/rrhh/hoja-servicios',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/rrhh/hoja-servicios','RRHH/HojaServicios');
+        }
+    )->name('rrhh.hoja-servicios');
+    Route::post('search-employees', [HojaServicioController::class, 'getEmployees'])->name('empleado.SearchEmployees');
+
+
+
 });
