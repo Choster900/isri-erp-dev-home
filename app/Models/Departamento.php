@@ -11,6 +11,8 @@ class Departamento extends Model
 
     protected $table = 'departamento';
     protected $primaryKey = 'id_departamento';
+    protected $casts = [ 'id_departamento' => 'string' ];
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -22,11 +24,11 @@ class Departamento extends Model
 
     public function pais()
     {
-        return $this->belongsTo('App\Models\Pais','id_pais','id_pais');
+        return $this->belongsTo(Pais::class,'id_pais','id_pais');
     }
 
     public function municipios()
     { 
-        return $this->hasMany('App\Models\Municipio','id_departamento','id_departamento');
+        return $this->hasMany(Municipio::class,'id_departamento','id_departamento');
     }
 }

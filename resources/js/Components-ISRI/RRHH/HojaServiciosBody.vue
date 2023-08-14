@@ -1,6 +1,7 @@
 <script setup>
 import GeneralInformationVue from './GeneralInformation.vue'
 import FooterServiciosBodyVue from './FooterServiciosBody.vue'
+import moment from 'moment';
 
 </script>
 <template>
@@ -43,7 +44,12 @@ import FooterServiciosBodyVue from './FooterServiciosBody.vue'
             <header class="text-center sm:text-left mb-6">
                 <!-- Name -->
                 <div class="inline-flex items-start mb-2">
-                    <h1 class="text-2xl text-slate-800 font-bold"> {{ userData != ''? `${userData.empleado.codigo_empleado} - ${userData.pnombre_persona ? userData.pnombre_persona : ''} ${userData.snombre_persona ? userData.snombre_persona : ''} ${userData.tnombre_persona ? userData.snombre_persona : ''} ${userData.papellido_persona ? userData.papellido_persona : ''} ${userData.sapellido_persona ? userData.sapellido_persona : ''} ${userData.tapellido_persona ? userData.tapellido_persona : ''} `:'' }}</h1>
+                    <h1 class="text-2xl text-slate-800 font-bold"> {{ userData != '' ? `${userData.empleado.codigo_empleado}
+                                            - ${userData.pnombre_persona ? userData.pnombre_persona : ''} ${userData.snombre_persona ?
+                            userData.snombre_persona : ''} ${userData.tnombre_persona ? userData.snombre_persona : ''}
+                                            ${userData.papellido_persona ? userData.papellido_persona : ''} ${userData.sapellido_persona ?
+                            userData.sapellido_persona : ''} ${userData.tapellido_persona ? userData.tapellido_persona : ''}
+                        `: '' }}</h1>
                     <div class="flex space-x-2 sm:mb-2 ">
                         <DropDownOptions position="right-up">
                             <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
@@ -56,24 +62,24 @@ import FooterServiciosBodyVue from './FooterServiciosBody.vue'
                     </div>
                 </div>
                 <div class="flex flex-wrap justify-center sm:justify-start space-x-4">
-                    <div class="flex items-center">
-                        <svg fill="#64748b" class="h-5 w-5" viewBox="0 0 183.41 183.41" stroke="#64748b"
-                            stroke-width="2.7510749999999997">
+                    <div class="flex items-center ">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path
-                                d="M160.766,0H64.054c-5.307,0-9.965,2.755-12.662,6.902h8.915c1.154-0.524,2.402-0.859,3.748-0.859h96.711 c4.999,0,9.061,4.064,9.061,9.064v125.577c0,4.604-3.495,8.269-7.946,8.841c-0.292,2.29-1.054,4.422-2.259,6.26h1.145 c8.336,0,15.113-6.771,15.113-15.101V15.101C175.879,6.777,169.102,0,160.766,0z">
+                                d="M12 21C15.5 17.4 19 14.1764 19 10.2C19 6.22355 15.866 3 12 3C8.13401 3 5 6.22355 5 10.2C5 14.1764 8.5 17.4 12 21Z"
+                                stroke="#64748b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                             </path>
                             <path
-                                d="M140.057,13.804H43.348c-5.307,0-9.965,2.759-12.666,6.905h8.918c1.154-0.523,2.399-0.861,3.748-0.861h96.708 c5.011,0,9.072,4.064,9.072,9.066v125.579c0,4.604-3.501,8.258-7.946,8.83c-0.292,2.289-1.06,4.42-2.259,6.271h1.139 c8.342,0,15.125-6.771,15.125-15.113V28.914C155.176,20.581,148.398,13.804,140.057,13.804z">
-                            </path>
-                            <path
-                                d="M119.347,27.611H22.639c-8.336,0-15.113,6.771-15.113,15.107v125.58c0,8.33,6.777,15.107,15.113,15.107h96.708 c8.343,0,15.126-6.771,15.126-15.107V42.718C134.473,34.388,127.689,27.611,119.347,27.611z M128.42,168.298 c0,4.993-4.067,9.066-9.073,9.066H22.639c-5.005,0-9.07-4.067-9.07-9.066V42.718c0-4.997,4.064-9.067,9.07-9.067h96.708 c5.006,0,9.073,4.07,9.073,9.067V168.298z">
-                            </path>
-                            <path
-                                d="M80.236,107.747c6.777-4.549,11.447-13.548,11.447-21.644c0-11.43-9.252-20.7-20.688-20.7 c-11.43,0-20.685,9.271-20.685,20.7c0,8.096,4.67,17.095,11.429,21.644c-16.185,4.11-28.202,18.194-28.202,28.625 c0,12.324,74.933,12.324,74.933,0C108.46,125.941,96.452,111.857,80.236,107.747z M70.996,145.604l-10.507-10.485l8.835-21.361 H69.23l-3.428-3.945c1.668,0.597,3.386,0.962,5.188,0.962c1.806,0,3.517-0.359,5.179-0.943l-3.435,3.921h-0.076l8.842,21.361 L70.996,145.604z">
+                                d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z"
+                                stroke="#64748b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                             </path>
                         </svg>
-                        <span class="text-sm font-medium uppercase whitespace-nowrap text-slate-500 ml-2">UNIVERSITARIO
-                            8059-ING(A). DE SISTEMAS INFORMATICOS</span>
+                        <span class="text-sm font-medium uppercase whitespace-nowrap text-slate-500 ml-2">
+                            {{ userData !== undefined && userData.municipio !== undefined ? `
+                            ${userData.municipio.departamento.pais.id_pais}-${userData.municipio.departamento.pais.nombre_pais}
+                                                        ${userData.municipio.departamento.id_departamento}-${userData.municipio.departamento.nombre_departamento}
+                                                        ${userData.municipio.id_municipio}-${userData.municipio.nombre_municipio}
+                            ` : '' }}
+                        </span>
                     </div>
                     <div class="flex items-center">
                         <svg class="w-4 h-4 fill-current shrink-0 text-slate-400" viewBox="0 0 16 16">
@@ -94,8 +100,11 @@ import FooterServiciosBodyVue from './FooterServiciosBody.vue'
                                 stroke="#64748b" stroke-width="1.752" stroke-linecap="round"></path>
 
                         </svg>
-                        <a class="text-sm font-medium whitespace-nowrap text-slate-500 ml-2">Fecha de ingreso: Lunes, 5
-                            enero, 2023</a>
+                        <a class="text-sm font-medium whitespace-nowrap text-slate-500 ml-2">Fecha de ingreso: {{
+                            userData !== '' && userData.empleado !== undefined ?
+                            moment(userData.empleado.fecha_contratacion_empleado).format('dddd, MMMM D, YYYY')
+                            : '' }}</a>
+
                     </div>
 
                     <div class="flex items-center">
@@ -110,8 +119,10 @@ import FooterServiciosBodyVue from './FooterServiciosBody.vue'
                                 stroke="#64748b" stroke-width="1.5" stroke-linecap="round"></path>
 
                         </svg>
-                        <a class="text-sm font-medium whitespace-nowrap text-slate-500 ml-2">Fecha de nacimiento: 24 de
-                            julio</a>
+                        <a class="text-sm font-medium whitespace-nowrap text-slate-500 ml-2">Fecha de nacimiento: {{
+                            userData !== '' && userData.empleado !== undefined ?
+                            moment(userData.fecha_nac_persona).format('dddd, MMMM D, YYYY')
+                            : '' }}</a>
                     </div>
                 </div>
             </header>
@@ -134,10 +145,11 @@ import FooterServiciosBodyVue from './FooterServiciosBody.vue'
             </div>
 
             <!-- GENERAL -->
-            <GeneralInformationVue :showInformation="isSelected.showInformation" />
-            <FooterServiciosBodyVue :showAcuerdos="isSelected.showAcuerdos" :deals=" userData != ''?userData.empleado.acuerdo_laboral:[]"/>
+            <GeneralInformationVue :showInformation="isSelected.showInformation"
+                :moreInformacionEmployee="userData != '' ? userData : ''" />
+            <FooterServiciosBodyVue :showAcuerdos="isSelected.showAcuerdos"
+                :deals="userData != '' ? userData.empleado.acuerdo_laboral : []" />
         </div>
-
     </div>
 </template>
   

@@ -11,6 +11,8 @@ class Pais extends Model
 
     protected $table = 'pais';
     protected $primaryKey = 'id_pais';
+    protected $casts = [ 'id_pais' => 'string' ];
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -29,6 +31,6 @@ class Pais extends Model
 
     public function departamentos()
     { 
-        return $this->hasMany('App\Models\Departamento','id_pais','id_pais');
+        return $this->hasMany(Departamento::class,'id_pais','id_pais');
     }
 }
