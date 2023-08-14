@@ -426,4 +426,37 @@ class EmpleadoController extends Controller
         // Return the file path or other response as needed
         return response()->json(['message' => "Archivos subidos con éxito."]);
     }
+
+    public function getJobPositionsByEmployee(Request $request)
+    {
+        //Get the job positions by employee
+        $empleado = Empleado::with([
+            'plazas_asignadas.dependencia',
+            'plazas_asignadas.detalle_plaza',
+            'plazas_asignadas.detalle_plaza.plaza',
+            'plazas_asignadas.detalle_plaza.tipo_contrato'
+        ])
+            ->find($request->id_empleado);
+        //Get selects information
+        $dependencies = Dependencia::selectRaw("id_dependencia as value , concat(codigo_dependencia, ' - ', nombre_dependencia) as label")
+            ->where('id_tipo_dependencia', '=', 1)
+            ->where('estado_dependencia', '=', 1)
+            ->orderBy('nombre_dependencia')
+            ->get();
+        $jobPositionsToSelect = DetallePlaza::selectRaw("detalle_plaza.id_det_plaza as value, concat(detalle_plaza.codigo_det_plaza,' - ',plaza.nombre_plaza,' - ',tipo_contrato.codigo_tipo_contrato)  as label, plaza.salario_base_plaza, plaza.salario_tope_plaza, linea_trabajo.id_lt")
+            ->join('plaza', 'detalle_plaza.id_plaza', '=', 'plaza.id_plaza')
+            ->join('tipo_contrato', 'detalle_plaza.id_tipo_contrato', '=', 'tipo_contrato.id_tipo_contrato')
+            ->join('actividad_institucional', 'detalle_plaza.id_actividad_institucional', '=', 'actividad_institucional.id_actividad_institucional')
+            ->join('linea_trabajo', 'actividad_institucional.id_lt', '=', 'linea_trabajo.id_lt')
+            ->whereIn('detalle_plaza.id_estado_plaza', [1, 2])
+            ->where('detalle_plaza.estado_det_plaza', 1)
+            ->get();
+
+
+        return response()->json([
+            'jobPositions'          => $empleado,
+            'dependencies'          => $dependencies,
+            'jobPositionsToSelect'  => $jobPositionsToSelect
+        ]);
+    }
 }

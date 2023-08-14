@@ -144,7 +144,7 @@ import axios from "axios";
                         <!-- End third row Page1 -->
                         <!-- Fourth row Page1 -->
                         <div class="mb-5 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-4 md:mb-0 w-1/3">
+                            <div class="mb-4 md:mr-4 md:mb-0 basis-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Genero <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -169,7 +169,7 @@ import axios from "axios";
                         </div>
                         <!-- Fifth row Page1 -->
                         <div class="mb-5 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600" for="fecha_nacimiento">
                                     Fecha de nacimiento <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -182,7 +182,7 @@ import axios from "axios";
                                 </div>
                                 <InputError class="mt-2" :message="errors.persona.fecha_nac_persona" />
                             </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Municipio nacimiento <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -300,7 +300,7 @@ import axios from "axios";
                         </div>
                         <!-- Fourth row Page2 -->
                         <div class="mb-10 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Municipio residencia <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -341,7 +341,7 @@ import axios from "axios";
                         </div>
                         <!-- First row Page3 -->
                         <div class="mb-5 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Tipo pension <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -375,7 +375,7 @@ import axios from "axios";
                         <!-- End first row Page3 -->
                         <!-- Second row Page3 -->
                         <div class="mb-5 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/2">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Titulo profesional <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -387,7 +387,7 @@ import axios from "axios";
                                 </div>
                                 <InputError class="mt-2" :message="errors.id_titulo_profesional" />
                             </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/2">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <label class="block mb-2 text-xs font-light text-gray-600" for="fecha_nacimiento">
                                     Fecha de contratacion <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -430,7 +430,7 @@ import axios from "axios";
                         </div>
                         <!-- Fourth row Page3 -->
                         <div class="mb-20 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/2">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Banco
                                 </label>
@@ -468,7 +468,7 @@ import axios from "axios";
                         </div>
                         <!-- First row Page4 -->
                         <div class="mb-5 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/2">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Dependencia <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -479,7 +479,7 @@ import axios from "axios";
                                 </div>
                                 <InputError class="mt-2" :message="errors.dependency_id" />
                             </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/2">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Plaza <span class="text-red-600 font-extrabold">*</span>
                                 </label>
