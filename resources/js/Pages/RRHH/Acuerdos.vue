@@ -5,7 +5,7 @@ import Datatable from "@/Components-ISRI/Datatable.vue";;
 import axios from 'axios';
 import ModalAcuerdosVue from '@/Components-ISRI/RRHH/ModalAcuerdos.vue';
 import moment from 'moment';
-import TooltipVue from "@/Components-ISRI/Tesoreria/Tooltip.vue";
+import TooltipVue from "@/Components-ISRI/Tooltip.vue";
 </script>
 
 <template>
