@@ -4,7 +4,6 @@ import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import moment from 'moment';
 import axios from 'axios';
-import Modal from "@/Components-ISRI/AllModal/Modal.vue";
 
 </script>
 <template>
