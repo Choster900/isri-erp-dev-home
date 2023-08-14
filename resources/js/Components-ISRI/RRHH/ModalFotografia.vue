@@ -44,7 +44,7 @@ import axios from "axios";
                         <div class="text-center">
                             <p class="text-slate-800 font-bold">Fotografia para: {{ employee.codigo_empleado }}</p>
                         </div>
-                        <div class="h-24 rounded-md border-black border-2 border-dashed flex justify-center items-center user-select-none -webkit-user-select-none mt-4 bg-gray-200 text-slate-800 mb-2"
+                        <div class="h-24 rounded-md border-black border-2 border-dashed flex justify-center items-center mt-4 bg-gray-200 text-slate-800 mb-2"
                             @dragover.prevent="onDragOver" @dragleave="onDragLeave" @drop.prevent="onDrop">
                             <span v-if="!isDragging">
                                 Arrastra y suelta una imagen aquí o

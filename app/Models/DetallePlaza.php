@@ -46,4 +46,9 @@ class DetallePlaza extends Model
     {
         return $this->hasOne('App\Models\PlazaAsignada', 'id_det_plaza', 'id_det_plaza')->where('estado_plaza_asignada', 1);
     }
+
+    public function tipo_contrato()
+    {
+        return $this->belongsTo('App\Models\TipoContrato', 'id_tipo_contrato', 'id_tipo_contrato');
+    }
 }

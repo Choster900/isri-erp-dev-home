@@ -64,6 +64,8 @@ import axios from 'axios';
                                         Selec.</span>
                                     <span v-else-if="position.id_estado_plaza === 3"
                                         class="font-medium text-green-500">Asignado</span>
+                                    <span v-else-if="position.id_estado_plaza === 4"
+                                        class="font-medium text-orange-500">Litigio</span>
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
@@ -96,7 +98,8 @@ import axios from 'axios';
                                 <div class="space-x-1 text-center">
                                     <DropDownOptions>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            v-if="permits.actualizar == 1 && position.estado_det_plaza==1" @click="editJobPositionDet(position)">
+                                            v-if="permits.actualizar == 1 && position.estado_det_plaza == 1"
+                                            @click="editJobPositionDet(position)">
                                             <div class="w-8 text-green-900">
                                                 <span class="text-xs">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -109,7 +112,8 @@ import axios from 'axios';
                                             <div class="font-semibold">Editar</div>
                                         </div>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            @click="changeStatusJobPosition(position)" v-if="permits.eliminar == 1 && position.id_estado_plaza!=3">
+                                            @click="changeStatusJobPosition(position)"
+                                            v-if="permits.eliminar == 1 && position.id_estado_plaza != 3">
                                             <div class="w-8 text-red-900"><span class="text-xs">
                                                     <svg :fill="position.estado_det_plaza == 1 ? '#991B1B' : '#166534'"
                                                         version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
@@ -162,7 +166,7 @@ import axios from 'axios';
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
 
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="page!=1 ? getJobPositions(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                        <a @click="page != 1 ? getJobPositions(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                   text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
@@ -189,7 +193,8 @@ import axios from 'axios';
         </div>
 
         <ModalDetPlazasVue :showModalJobPositionDet="showModalJobPositionDet" :modalData="modalData"
-            @cerrar-modal="showModalJobPositionDet = false" @get-table="tableData.column = -1; getJobPositions(tableData.currentPage)" />
+            @cerrar-modal="showModalJobPositionDet = false"
+            @get-table="tableData.column = -1; getJobPositions(tableData.currentPage)" />
 
     </AppLayoutVue>
 </template>
@@ -243,7 +248,7 @@ export default {
             financing_sources: [],
             //vars to validate pages
             hasNext: false,
-            page:'',
+            page: '',
             //Until here 
             links: [],
             columns: columns,
@@ -286,7 +291,7 @@ export default {
                     this.jobPositions.length > 0 ? this.emptyObject = false : this.emptyObject = true
                 }
             }).catch((errors) => {
-                this.manageError(errors,this)
+                this.manageError(errors, this)
             })
         },
         sortBy(key) {
@@ -381,7 +386,7 @@ export default {
                                     }
                                 );
                             } else {
-                                this.manageError(errors,this)
+                                this.manageError(errors, this)
                             }
                         })
                 }
@@ -404,5 +409,4 @@ export default {
 .ellipsis {
     overflow: hidden;
     text-overflow: ellipsis;
-}
-</style>
+}</style>
