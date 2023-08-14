@@ -53,14 +53,4 @@ class Empleado extends Model
     {
         return $this->hasMany(AcuerdoLaboral::class, 'id_empleado', 'id_empleado');
     }
-
-    /**
-     * Get all of the acuerdos_laborales for the Empleado
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function acuerdo_laboral(): HasMany
-    {
-        return $this->hasMany(AcuerdoLaboral::class, 'id_empleado', 'id_empleado');
-    }
 }

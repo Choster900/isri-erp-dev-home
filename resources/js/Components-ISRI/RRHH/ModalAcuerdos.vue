@@ -2,7 +2,7 @@
 import { toast } from 'vue3-toastify'; // Importar el módulo toast de vue3-toastify
 import 'vue3-toastify/dist/index.css'; // Importar los estilos de vue3-toastify
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'; // Importar el componente ProcessModal
-import TooltipVue from '../Tesoreria/Tooltip.vue';
+import TooltipVue from '../Tooltip.vue';
 import moment from 'moment';
 import Modal from "@/Components-ISRI/AllModal/Modal.vue";
 

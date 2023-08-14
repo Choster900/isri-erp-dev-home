@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Municipio extends Model
@@ -12,6 +13,9 @@ class Municipio extends Model
 
     protected $table = 'municipio';
     protected $primaryKey = 'id_municipio';
+
+    protected $casts = [ 'id_municipio' => 'string' ];
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -20,7 +24,7 @@ class Municipio extends Model
         'codigo_admon_municipio',
     ];
 
-    public function departamento()
+    public function departamento(): BelongsTo
     {
         return $this->belongsTo(Departamento::class,'id_departamento','id_departamento');
     }

@@ -1,11 +1,14 @@
 <script setup>
-import TooltipVue from '../Tesoreria/Tooltip.vue';
+import TooltipVue from '../Tooltip.vue';
 import moment from 'moment';
 import ListAcuerdosVue from './ListAcuerdos.vue';
 </script>
 <template>
     <div v-show="showAcuerdos">
-        {{ deals }}
+        <pre>
+            {{ deals }}
+        </pre>
+        
         <h2 class="text-slate-800 font-semibold mb-2">Work History</h2>
         <!-- Calendario de contribuciones -->
         <div class="p-2 bg-slate-50 rounded-lg border border-slate-200">
@@ -33,7 +36,8 @@ import ListAcuerdosVue from './ListAcuerdos.vue';
                                 <TooltipVue bg="dark" v-for="(day, weekIndex) in dayGenerater()[mothIndex]"
                                     :key="weekIndex">
                                     <template v-slot:contenido>
-                                        <div class="h-[11px] w-[11px]  m-[1.5px] rounded-sm bg-gray-500/60">
+                                        <div :class="isDateInDataDeals(moment(`${year}-${month}-${day}`).format('L')) ? 'bg-green-900/90' : 'bg-gray-500/60'"
+                                            class="h-[11px] w-[11px]  m-[1.5px] rounded-sm bg-gray-500/60">
                                         </div>
                                     </template>
                                     <template v-slot:message>
@@ -54,9 +58,6 @@ import ListAcuerdosVue from './ListAcuerdos.vue';
                 <div class="flex-1">
                     <div class="md:py-8">
                         <div class="space-y-4">
-
-                            <!-- Block 1 -->
-
                             <div class="bg-slate-50 p-4 rounded border border-slate-200">
                                 <template v-for="index in 2 " :key="index">
                                     <div class="flex justify-start text-xs font-semibold text-slate-400 uppercase mb-4">
@@ -73,8 +74,6 @@ import ListAcuerdosVue from './ListAcuerdos.vue';
                                         More Activity</button>
                                 </div>
                             </div>
-
-
                         </div>
                     </div>
                 </div>
@@ -115,7 +114,21 @@ export default {
 
         }
     },
+    computed: {
+        acuerdosOrdenados() {
+            return this.deals.slice().sort((a, b) => {
+                const dateA = new Date(a.fecha_acuerdo_laboral);
+                const dateB = new Date(b.fecha_acuerdo_laboral);
+
+                return dateB - dateA;
+            });
+        },
+    },
     methods: {
+
+        isDateInDataDeals(date) {
+            return this.deals.some((deal) => moment(deal.fecha_acuerdo_laboral).format('L') == date);
+        },
         daysOfMonth(yearin) {
             const kabisa = (yearin) => (yearin % 4 === 0 && yearin % 100 !== 0 && yearin % 400 !== 0) || (yearin % 100 === 0 && yearin % 400 === 0);
             const fevral = (yearin) => (kabisa(yearin) ? 29 : 28);
