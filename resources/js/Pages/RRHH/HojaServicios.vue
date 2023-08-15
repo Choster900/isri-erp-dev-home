@@ -9,8 +9,9 @@ import HojaServiciosBodyVue from "@/Components-ISRI/RRHH/HojaServiciosBody.vue";
     <Head title="RRHH - Acuerdos de contratacion" />
     <AppLayoutVue nameSubModule="RRHH - Acuerdos" :autoPadding="false">
         <div class="relative flex">
-            <HojaServiciosSidebarVue @sendUserData="reciviendoUserData" />
-            <HojaServiciosBodyVue :userData="userData" />
+            <HojaServiciosSidebarVue @sendUserData="reciviendoUserData" :is-profile-selected="profileSelected"
+                @sentFirtUserData="reciviendoUserData" />
+            <HojaServiciosBodyVue :userData="userData" @profileSelected="profile" />
         </div>
     </AppLayoutVue>
 </template>
@@ -20,6 +21,7 @@ export default {
     data() {
         return {
             userData: [],
+            profileSelected: [],
         };
     },
     methods: {
@@ -27,6 +29,11 @@ export default {
             this.userData = [];
             this.userData = data;
         },
+        profile(data) {
+            this.profileSelected = [];
+            this.profileSelected = data;
+        },
+
     },
 };
 </script>

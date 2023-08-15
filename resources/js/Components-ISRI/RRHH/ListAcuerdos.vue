@@ -1,10 +1,13 @@
+<script setup>
+import moment from 'moment';
+</script>
 <template>
     <!-- Event 1 -->
     <li class="relative pb-4 last-of-type:pb-0">
         <div class="pl-6  mb-2">
             <div @click="hiddenInformation = !hiddenInformation"
-                class="flex w-full justify-between text-xs font-medium uppercase cursor-pointer text-slate-800  mb-0.5 hover:fill-indigo-500 hover:text-indigo-500">
-                <div class="justify-start text-base">RRHH-161-2023</div>
+                class="flex w-full justify-between text-xs font-semibold uppercase cursor-pointer text-slate-800  mb-0.5 hover:fill-indigo-500 hover:text-indigo-500">
+                <div class="justify-start text-base">{{ dataTest.oficio_acuerdo_laboral }}</div>
                 <div class="justify-end  ">
                     <svg class="octicon octicon-fold" viewBox="0 0 16 16" version="1.1" v-if="hiddenInformation" width="16"
                         height="16" aria-hidden="true">
@@ -22,13 +25,10 @@
                 </div>
             </div>
             <div class="text-sm mb-2" v-show="!hiddenInformation">
-                <a class="font-medium text-slate-800">
-                    <span class="font-normal ">Acuerdo Laboral -</span>
-                    Lorem ipsum dolor sit amet consectetur
-                    adipisicing elit. Cumque quibusdam optio beatae alias fugit impedit,
-                    perspiciatis dolor explicabo et, sint nihil ipsum libero mollitia
-                    molestiae repellat eligendi voluptatum vel omnis!
-                    <p class="font-normal pt-3 italic">20/2/2023 - 21/2/2023</p>
+                <a class="font-normal text-slate-800">
+                    <span class="font-medium ">{{ dataTest.tipo_acuerdo_laboral.nombre_tipo_acuerdo_laboral }} -</span>
+                    {{ dataTest.comentario_acuerdo_laboral }}
+                    <p class="font-normal pt-1 italic">{{ `${moment(dataTest.fecha_inicio_acuerdo_laboral).format('l')} - ${moment(dataTest.fecha_fin_acuerdo_laboral).format('l')}` }}</p>
                 </a>
             </div>
         </div>
@@ -44,6 +44,12 @@
 
 <script>
 export default {
+    props: {
+        dataTest: {
+            required: true,
+            default: []
+        }
+    },
     data() {
         return {
             hiddenInformation: false,

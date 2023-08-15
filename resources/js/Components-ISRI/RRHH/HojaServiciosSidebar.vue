@@ -44,17 +44,19 @@
                     </form>
                     <!-- Team members -->
                     <div class="mt-4">
-                        <div class="text-xs font-semibold text-slate-400 uppercase mb-3">Empleados</div>
+                        <div class="text-xs font-semibold text-slate-400 uppercase mb-3">Ultimos 7 empleados</div>
                         <ul class="mb-6">
-                            <li class="-mx-2" v-for="user in dataResponseUser" :key="user">
+                            <li class="-mx-2"
+                                :class="isProfileSelected.id_empleado == user.id_empleado ? 'bg-slate-300 rounded-md' : ''"
+                                v-for="user in dataResponseUser" :key="user">
                                 <button class="w-full p-2 rounded " @click="$emit('sendUserData', user)"
                                     :title="`${user.empleado.codigo_empleado} -${user.pnombre_persona ? user.pnombre_persona : ''} ${user.snombre_persona ? user.snombre_persona : ''} ${user.tnombre_persona ? user.snombre_persona : ''} ${user.papellido_persona ? user.papellido_persona : ''} ${user.sapellido_persona ? user.sapellido_persona : ''} ${user.tapellido_persona ? user.tapellido_persona : ''} `">
                                     <div class="flex items-center">
                                         <div class="flex flex-col items-center sm:flex-row sm:justify-between sm:items-end">
                                             <!-- Avatar -->
                                             <div class="contenedor-img">
-                                                <img class="rounded-full border-4 border-white"
-                                                    :src="user.fotos != '' ? user.fotos[user.fotos.length - 1].url_foto : ''" />
+                                                <img class="rounded-full mr-2 border-2 border-slate-400"
+                                                    :src="user.fotos != '' ? user.fotos[user.fotos.length - 1].url_foto : 'https://img.freepik.com/free-icon/user_318-159711.jpg?w=2000'" />
                                             </div>
                                         </div>
                                         <div class="truncate">
@@ -82,9 +84,7 @@
   
 <script>
 export default {
-    name: 'ProfileSidebar',
-    props: ['profileSidebarOpen'],
-
+    props: ['isProfileSelected'],
     data() {
         return {
             userSearched: '',
@@ -102,22 +102,29 @@ export default {
             }, 1000); // Tiempo de espera de 1 segundo
         },
         async searchingUsers() {
-            if (this.userSearched !== '') {
-                try {
-                    this.isLoadingToSearch = true
-                    const response = await axios.post('/search-employees', { data: this.userSearched });
-                    console.log(response.data);
-                    this.dataResponseUser = response.data;
-                } catch (error) {
-                    console.log('Error en la búsqueda:', error)
-                } finally {
-                    this.isLoadingToSearch = false
-                    this.loading = false
-                }
+
+            try {
+                this.isLoadingToSearch = true
+                const response = await axios.post('/search-employees', { data: this.userSearched });
+                this.dataResponseUser = response.data;
+            } catch (error) {
+                console.log('Error en la búsqueda:', error)
+            } finally {
+                this.isLoadingToSearch = false
+                this.loading = false
             }
+
         },
-        printUserData(data) {
-            console.log(data);
+    },
+    mounted() {
+        this.searchingUsers()
+    },
+    watch:{
+        dataResponseUser(){
+            if (!this.userSearched) {
+              //  console.log(this.dataResponseUser[0]);
+               this.$emit("sentFirtUserData",this.dataResponseUser[0])
+            }
         }
     }
 }
@@ -127,8 +134,8 @@ export default {
     position: relative;
     width: 100vw;
     height: 100vh;
-    width: 40px;
-    height: 45px;
+    width: 42px;
+    height: 36px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -137,8 +144,6 @@ export default {
 .contenedor-img img {
     width: 100%;
     height: 100%;
-    /* max-height: 100px;
-    max-width: 100px; */
     border-radius: 100%;
 }
 </style>

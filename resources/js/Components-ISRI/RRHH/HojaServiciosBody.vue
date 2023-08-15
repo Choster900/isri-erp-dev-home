@@ -9,9 +9,10 @@ import moment from 'moment';
         :class="profileSidebarOpen ? 'translate-x-1/3' : 'translate-x-0'">
 
         <!-- Profile background -->
-        <div class="relative h-56 bg-slate-200">
+        <div class="relative h-56">
             <img class="object-cover h-full w-full "
-                src="https://pbs.twimg.com/profile_banners/20736511/1670818292/1500x500" alt="Profile background" />
+                src="https://images.pexels.com/photos/316093/pexels-photo-316093.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+                alt="Profile background" />
             <!-- Close button -->
             <button class="md:hidden absolute top-4 left-4 sm:left-6 text-white opacity-80 hover:opacity-100"
                 @click.stop="$emit('toggle-profilesidebar')" aria-controls="profile-sidebar"
@@ -34,7 +35,7 @@ import moment from 'moment';
                     <!-- Avatar -->
                     <div class="image-container">
                         <img class="rounded-full border-4 border-white"
-                            :src="userData && userData.fotos && userData.fotos.length > 0 ? userData.fotos[userData['fotos'].length - 1].url_foto : ''" />
+                            :src="userData && userData.fotos && userData.fotos.length > 0 ? userData.fotos[userData['fotos'].length - 1].url_foto : 'https://img.freepik.com/free-icon/user_318-159711.jpg?w=2000'" />
                     </div>
 
                 </div>
@@ -172,7 +173,7 @@ export default {
     },
     watch: {
         userData() {
-            console.log(this.userData);
+            this.$emit("profileSelected", this.userData)
         }
     }
 }
