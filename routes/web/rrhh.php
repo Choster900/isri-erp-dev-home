@@ -24,6 +24,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
 
     Route::post('upload-employee-photo', [EmpleadoController::class, 'uploadEmployeePhoto'])->name('empleado.uploadEmployeePhoto');
     Route::get('get-job-positios-by-employee', [EmpleadoController::class, 'getJobPositionsByEmployee'])->name('empleado.getJobPositionsByEmployee');
+    Route::post('store-job-position', [EmpleadoController::class, 'storeJobPosition'])->name('empleado.storeJobPosition');
 
     Route::get(
         '/rrhh/det-plazas',
