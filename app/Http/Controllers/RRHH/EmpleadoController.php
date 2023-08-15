@@ -21,6 +21,7 @@ use App\Models\TipoPension;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class EmpleadoController extends Controller
 {
@@ -425,5 +426,89 @@ class EmpleadoController extends Controller
 
         // Return the file path or other response as needed
         return response()->json(['message' => "Archivos subidos con éxito."]);
+    }
+
+    public function getJobPositionsByEmployee(Request $request)
+    {
+        //Get the job positions by employee
+        $empleado = Empleado::with([
+            'plazas_asignadas.dependencia',
+            'plazas_asignadas.detalle_plaza',
+            'plazas_asignadas.detalle_plaza.plaza',
+            'plazas_asignadas.detalle_plaza.tipo_contrato'
+        ])
+            ->find($request->id_empleado);
+        //Get selects information
+        $dependencies = Dependencia::selectRaw("id_dependencia as value , concat(codigo_dependencia, ' - ', nombre_dependencia) as label")
+            ->where('id_tipo_dependencia', '=', 1)
+            ->where('estado_dependencia', '=', 1)
+            ->orderBy('nombre_dependencia')
+            ->get();
+        $jobPositionsToSelect = DetallePlaza::selectRaw("detalle_plaza.id_det_plaza as value, concat(detalle_plaza.codigo_det_plaza,' - ',plaza.nombre_plaza,' - ',tipo_contrato.codigo_tipo_contrato)  as label, plaza.salario_base_plaza, plaza.salario_tope_plaza, linea_trabajo.id_lt")
+            ->join('plaza', 'detalle_plaza.id_plaza', '=', 'plaza.id_plaza')
+            ->join('tipo_contrato', 'detalle_plaza.id_tipo_contrato', '=', 'tipo_contrato.id_tipo_contrato')
+            ->join('actividad_institucional', 'detalle_plaza.id_actividad_institucional', '=', 'actividad_institucional.id_actividad_institucional')
+            ->join('linea_trabajo', 'actividad_institucional.id_lt', '=', 'linea_trabajo.id_lt')
+            ->whereIn('detalle_plaza.id_estado_plaza', [1, 2])
+            ->where('detalle_plaza.estado_det_plaza', 1)
+            ->get();
+        //We return the data to the view
+        return response()->json([
+            'jobPositions'          => $empleado,
+            'dependencies'          => $dependencies,
+            'jobPositionsToSelect'  => $jobPositionsToSelect
+        ]);
+    }
+    public function storeJobPosition(Request $request)
+    {
+        $upperSalaryLimit = $request->upperSalaryLimit;
+        $lowerSalaryLimit = $request->lowerSalaryLimit;
+        // Define custom error messages
+        $customMessages = [
+            'jobPosition.dependencyId.required'     => 'Debe seleccionar la dependencia.',
+            'jobPosition.jobPositionId.required'    => 'Debe seleccionar la plaza.',
+            'jobPosition.salary.required'           => 'Debe escribir el salario.',
+            'jobPosition.account.required'          => 'Debe escribir el numero de partida.',
+            'jobPosition.subaccount.required'       => 'Debe escribir el numero de subpartida.',
+            'jobPosition.dateOfHired.required'      => 'Debe seleccionar la fecha de contratación.',
+            'jobPosition.salary.between'            => 'El salario debe estar entre :min y :max.',
+        ];
+
+        // Validate the request data with custom error messages
+        $validatedData = Validator::make($request->all(), [
+            'jobPosition.dependencyId'      => 'required',
+            'jobPosition.jobPositionId'     => 'required',
+            'jobPosition.salary'            => ['required', 'numeric','between:' . $lowerSalaryLimit . ',' . $upperSalaryLimit],
+            'jobPosition.account'           => 'required',
+            'jobPosition.subaccount'        => 'required',
+            'jobPosition.dateOfHired'       => 'required',
+        ], $customMessages)->validate();
+
+        $jobPosition = $request->jobPosition;
+        $new_assigned_job_position = new PlazaAsignada([
+            'id_empleado'                   => $request->employeeId,
+            'id_lt'                         => $jobPosition['workAreaId'],
+            'id_dependencia'                => $jobPosition['dependencyId'],
+            'id_det_plaza'                  => $jobPosition['jobPositionId'],
+            'salario_plaza_asignada'        => $jobPosition['salary'],
+            'partida_plaza_asignada'        => $jobPosition['account'],
+            'subpartida_plaza_asignada'     => $jobPosition['subaccount'],
+            'fecha_plaza_asignada'          => $jobPosition['dateOfHired'],
+            'estado_plaza_asignada'         => 1,
+            'fecha_reg_plaza_asignada'      => Carbon::now(),
+            'usuario_plaza_asignada'        => $request->user()->nick_usuario,
+            'ip_plaza_asignada'             => $request->ip(),
+        ]);
+        $new_assigned_job_position->save();
+
+        $job_position_det = DetallePlaza::find($jobPosition['jobPositionId']);
+        $job_position_det->update([
+            'id_estado_plaza'           => 3,
+            'fecha_mod_plaza_asignada'  => Carbon::now(),
+            'usuario_plaza_asignada'    => $request->user()->nick_usuario,
+            'ip_plaza_asignada'         => $request->ip(),
+        ]);
+
+        return response()->json(['message' => 'Plaza guardada con éxito.']);
     }
 }

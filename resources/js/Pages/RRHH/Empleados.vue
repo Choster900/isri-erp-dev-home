@@ -4,6 +4,7 @@ import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import ModalEmployeesVue from '@/Components-ISRI/RRHH/ModalEmployees.vue';
 import ModalFotografiaVue from '@/Components-ISRI/RRHH/ModalFotografia.vue';
+import ModalPlazasVue from '@/Components-ISRI/RRHH/ModalPlazas.vue';
 import moment from 'moment';
 
 import { toast } from 'vue3-toastify';
@@ -68,7 +69,8 @@ import axios from 'axios';
                                 }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">{{
+                                <div :class="showDependencies(employee.plazas_asignadas) == 'N/Asign.' ? 'text-red-600' : ''" 
+                                class="font-medium text-center {{ showDependencies(employee.plazas_asignadas) === 'N/Asign.' ? 'text-red-500' : 'text-slate-800' }} ">{{
                                     showDependencies(employee.plazas_asignadas) }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
@@ -121,6 +123,21 @@ import axios from 'axios';
                                                 </span>
                                             </div>
                                             <div class="font-semibold">Fotografia</div>
+                                        </div>
+                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                            v-if="permits.actualizar == 1 && employee.estado_empleado == 1"
+                                            @click="manageJobPositions(employee)">
+                                            <div class="w-8 text-teal-700">
+                                                <span class="text-xs">
+                                                    <svg width="25px" height="25px" viewBox="0 0 512 512" class="ml-0.5"
+                                                        xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                                                        stroke="currentColor">
+                                                        <path
+                                                            d="M277.33,0L298.67,21.33V64h128v298.67H0V64h128V21.33L149.33,0H277.33zM42.67,220.94L42.67,320H384v-99.06C341.38,233.13,298.7,240.76,256,243.81V277.33H170.67v-33.52C127.97,240.76,85.29,233.13,42.67,220.94zM384,106.67H42.67V176.43C99.64,193.93,156.51,202.67,213.33,202.67c56.82,0,113.7-8.74,170.67-26.26V106.67zM256,42.67H170.67V64H256V42.67z" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                            <div class="font-semibold">Plaza</div>
                                         </div>
                                         <!-- <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                                             @click="changeStatusEmployee(employee)" v-if="permits.eliminar == 1">
@@ -178,7 +195,7 @@ import axios from 'axios';
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
 
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="page!=1 ? getEmployees(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                        <a @click="page != 1 ? getEmployees(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                   text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
@@ -209,6 +226,9 @@ import axios from 'axios';
 
         <ModalFotografiaVue :showModalFlag="showModalFlag" :modalData="modalData" @cerrar-modal="showModalFlag = false"
             @get-table="getEmployees(tableData.currentPage)" />
+
+        <ModalPlazasVue :showModalJobPosition="showModalJobPosition" :modalData="modalData"
+            @cerrar-modal="showModalJobPosition = false" @get-table="getEmployees(tableData.currentPage)" />
 
     </AppLayoutVue>
 </template>
@@ -243,6 +263,8 @@ export default {
                 sortOrders[column.name] = -1;
         });
         return {
+            showModalJobPosition: false,
+
             showModalFlag: false,
 
             empty_object: false,
@@ -253,7 +275,7 @@ export default {
             modalData: [],
 
             hasNext: false,
-            page:'',
+            page: '',
 
             //Permissions
             permits: [],
@@ -274,6 +296,10 @@ export default {
         }
     },
     methods: {
+        manageJobPositions(employee) {
+            this.showModalJobPosition = true
+            this.modalData = employee
+        },
         manageFiles(employee) {
             this.showModalFlag = true
             this.modalData = employee
@@ -379,12 +405,15 @@ export default {
         showDependencies(arrayDependencies) {
             let dependencies = ''
             arrayDependencies.forEach((value, index) => {
-                if (dependencies == '') {
-                    dependencies = dependencies + value.dependencia.codigo_dependencia
-                } else {
-                    dependencies = dependencies + ", " + value.dependencia.codigo_dependencia
+                if (value.estado_plaza_asignada == 1) {
+                    if (dependencies == '') {
+                        dependencies = dependencies + value.dependencia.codigo_dependencia
+                    } else {
+                        dependencies = dependencies + ", " + value.dependencia.codigo_dependencia
+                    }
                 }
             })
+            dependencies == "" ? dependencies = "N/Asign." : dependencies
             return dependencies
         }
 
