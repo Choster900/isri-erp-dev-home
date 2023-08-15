@@ -52,7 +52,7 @@ import axios from 'axios';
                                 <div class="font-medium text-slate-800 ellipsis text-center">
                                     {{ service.codigo_dependencia && service.nombre_dependencia ? service.codigo_dependencia
                                         + ' - ' +
-                                        service.nombre_dependencia : '' }}
+                                        service.nombre_dependencia : 'N/A' }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
@@ -140,7 +140,7 @@ import axios from 'axios';
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
 
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getIncomeConcept(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                        <a @click="page!=1 ? getIncomeConcept(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                   text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
@@ -149,7 +149,7 @@ import axios from 'axios';
                                 <span v-else-if="(link.label == 'Siguiente')"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getIncomeConcept(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                        <a @click="hasNext ? getIncomeConcept(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                   text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
@@ -177,7 +177,7 @@ import axios from 'axios';
 export default {
     created() {
         this.getIncomeConcept()
-        this.getPermits()
+        this.getPermissions(this)
         this.getSelectsIncomeConcept()
     },
     data() {
@@ -209,7 +209,10 @@ export default {
             //Data for modal
             showModalIncome: false,
             modalData: [],
-
+            //vars to validate pages
+            hasNext: false,
+            page:'',
+            //Until here
             permits: [],
             budget_accounts: [],
             dependencies: [],
@@ -232,7 +235,6 @@ export default {
     },
     methods: {
         editIncomeConcept(income_concept) {
-            //var array = {nombre_marca:marca.nombre_marca}
             this.modalData = income_concept
             this.showModalIncome = true
         },
@@ -248,13 +250,7 @@ export default {
                     this.financing_sources = response.data.financing_sources
                 })
                 .catch((errors) => {
-                    let msg = this.manageError(errors);
-                    this.$swal.fire({
-                        title: "Operación cancelada",
-                        text: msg,
-                        icon: "warning",
-                        timer: 5000,
-                    });
+                    this.manageError(errors,this)
                     this.$emit("cerrar-modal");
                 });
         },
@@ -287,13 +283,7 @@ export default {
                             this.getIncomeConcept(this.tableData.currentPage);
                         })
                         .catch((errors) => {
-                            let msg = this.manageError(errors)
-                            this.$swal.fire({
-                                title: 'Operación cancelada',
-                                text: msg,
-                                icon: 'warning',
-                                timer: 5000
-                            })
+                            this.manageError(errors,this)
                         })
                 }
             })
@@ -304,6 +294,8 @@ export default {
             await axios.post(url, this.tableData).then((response) => {
                 let data = response.data;
                 if (this.tableData.draw == data.draw) {
+                    this.page = data.data.current_page
+                    this.hasNext = data.data.current_page !== data.data.last_page;
                     this.links = data.data.links;
                     this.tableData.total = data.data.total;
                     this.links[0].label = "Anterior";
@@ -312,14 +304,7 @@ export default {
                     this.income_concept.length > 0 ? this.empty_object = false : this.empty_object = true
                 }
             }).catch((errors) => {
-                let msg = this.manageError(errors)
-                this.$swal.fire({
-                    title: 'Operación cancelada',
-                    text: msg,
-                    icon: 'warning',
-                    timer: 5000
-                })
-                //console.log(errors);
+                this.manageError(errors,this)
             })
         },
         sortBy(key) {
@@ -333,19 +318,6 @@ export default {
         },
         getIndex(array, key, value) {
             return array.findIndex((i) => i[key] == value);
-        },
-        getPermits() {
-            var URLactual = window.location.pathname
-            let data = this.$page.props.menu;
-            let menu = JSON.parse(JSON.stringify(data['urls']))
-            menu.forEach((value, index) => {
-                value.submenu.forEach((value2, index2) => {
-                    if (value2.url === URLactual) {
-                        var array = { 'insertar': value2.insertar, 'actualizar': value2.actualizar, 'eliminar': value2.eliminar, 'ejecutar': value2.ejecutar }
-                        this.permits = array
-                    }
-                })
-            })
         },
         handleData(myEventData) {
             this.tableData.search = myEventData;

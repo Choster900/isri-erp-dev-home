@@ -8,8 +8,25 @@ import axios from "axios";
 
 <template>
     <div class="m-1.5">
-        <Modal :show="show_modal_employee" @close="$emit('cerrar-modal')" :modal-title="'Administracion empleados. '"
-            :maxWidth="correct_dui ? '3xl' : 'lg'">
+        <div v-if="is_loading && correct_dui"
+            class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
+            <div role="status" class="flex items-center">
+                <svg aria-hidden="true" class="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-800"
+                    viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                        fill="currentColor" />
+                    <path
+                        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                        fill="currentFill" />
+                </svg>
+                <div class="bg-gray-200 rounded-lg p-1 font-semibold">
+                    <span class="text-blue-800">CARGANDO...</span>
+                </div>
+            </div>
+        </div>
+        <Modal v-else :show="show_modal_employee" @close="$emit('cerrar-modal')" :modal-title="'Administracion empleados. '"
+            :maxWidth="correct_dui ? '3xl' : 'lg'" :closeOutSide="false">
             <div class="px-5 py-4">
                 <div class="text-sm">
 
@@ -23,7 +40,7 @@ import axios from "axios";
                     <!-- Search dui -->
                     <div v-if="!correct_dui" class="flex justify-center">
                         <div class="flex flex-col items-center w-full">
-                            <input id="dui" type="text" class="p-1 mb-2 w-[75%] rounded-lg" placeholder="Ingresa DUI"
+                            <input id="dui" type="text" class="p-1 mb-2 w-[75%] rounded-lg text-center" placeholder="Ingresa DUI"
                                 v-model="employee.persona.dui_persona" @keyup.enter="searchDui()" @input="typeDUI()">
                             <div class="flex justify-center">
                                 <button
@@ -127,7 +144,7 @@ import axios from "axios";
                         <!-- End third row Page1 -->
                         <!-- Fourth row Page1 -->
                         <div class="mb-5 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-4 md:mb-0 w-1/3">
+                            <div class="mb-4 md:mr-4 md:mb-0 basis-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Genero <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -152,7 +169,7 @@ import axios from "axios";
                         </div>
                         <!-- Fifth row Page1 -->
                         <div class="mb-5 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600" for="fecha_nacimiento">
                                     Fecha de nacimiento <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -165,7 +182,7 @@ import axios from "axios";
                                 </div>
                                 <InputError class="mt-2" :message="errors.persona.fecha_nac_persona" />
                             </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Municipio nacimiento <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -283,7 +300,7 @@ import axios from "axios";
                         </div>
                         <!-- Fourth row Page2 -->
                         <div class="mb-10 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Municipio residencia <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -324,7 +341,7 @@ import axios from "axios";
                         </div>
                         <!-- First row Page3 -->
                         <div class="mb-5 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Tipo pension <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -358,7 +375,7 @@ import axios from "axios";
                         <!-- End first row Page3 -->
                         <!-- Second row Page3 -->
                         <div class="mb-5 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/2">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Titulo profesional <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -370,7 +387,7 @@ import axios from "axios";
                                 </div>
                                 <InputError class="mt-2" :message="errors.id_titulo_profesional" />
                             </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/2">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <label class="block mb-2 text-xs font-light text-gray-600" for="fecha_nacimiento">
                                     Fecha de contratacion <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -413,7 +430,7 @@ import axios from "axios";
                         </div>
                         <!-- Fourth row Page3 -->
                         <div class="mb-20 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/2">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Banco
                                 </label>
@@ -451,7 +468,7 @@ import axios from "axios";
                         </div>
                         <!-- First row Page4 -->
                         <div class="mb-5 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/2">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Dependencia <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -462,7 +479,7 @@ import axios from "axios";
                                 </div>
                                 <InputError class="mt-2" :message="errors.dependency_id" />
                             </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/2">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Plaza <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -737,14 +754,7 @@ export default {
         },
         searchDui() {
             if (this.employee.persona.dui_persona == "") {
-                toast.warning(
-                    "Debe digitar el numero de dui.",
-                    {
-                        autoClose: 5000,
-                        position: "top-right",
-                        transition: "zoom",
-                        toastBackgroundColor: "white",
-                    })
+                this.showToast(toast.warning, "Debe digitar el numero de DUI.");
             } else {
                 axios.get('/search-person-by-dui', {
                     params: {
@@ -758,13 +768,7 @@ export default {
                         } else {
                             if (persona.id_empleado) {
                                 this.correct_dui = false
-                                this.$swal.fire({
-                                    title: 'Informacion',
-                                    text: 'La persona con este dui ya esta registrada como empleado.',
-                                    icon: 'warning',
-                                    timer: 5000
-                                })
-                                //this.$emit('cerrar-modal')
+                                this.showToast(toast.info, "La persona con este dui ya esta registrada como empleado.");
                             } else {
                                 this.correct_dui = true
                                 this.employee.persona = { ...persona };
@@ -777,23 +781,9 @@ export default {
                     })
                     .catch((errors) => {
                         if (errors.response.data.logical_error) {
-                            toast.error(
-                                errors.response.data.logical_error,
-                                {
-                                    autoClose: 5000,
-                                    position: "top-right",
-                                    transition: "zoom",
-                                    toastBackgroundColor: "white",
-                                }
-                            );
+                            this.showToast(toast.error, errors.response.data.logical_error);
                         } else {
-                            let msg = this.manageError(errors)
-                            this.$swal.fire({
-                                title: 'Operación cancelada',
-                                text: msg,
-                                icon: 'warning',
-                                timer: 5000
-                            })
+                            this.manageError(errors,this)
                         }
                     })
             }
@@ -973,13 +963,7 @@ export default {
                 this.select_options.dependencies = response.data.dependencies
                 this.select_options.job_positions = response.data.job_positions
             } catch (errors) {
-                let msg = this.manageError(errors);
-                this.$swal.fire({
-                    title: 'Operación cancelada',
-                    text: msg,
-                    icon: 'warning',
-                    timer: 5000
-                });
+                this.manageError(errors,this)
             } finally {
                 this.is_loading = false;  // Desactivar el estado de carga
             }
@@ -1001,34 +985,15 @@ export default {
                             axios
                                 .post("/store-employee", this.employee)
                                 .then((response) => {
-                                    toast.success(response.data.mensaje, {
-                                        autoClose: 3000,
-                                        position: "top-right",
-                                        transition: "zoom",
-                                        toastBackgroundColor: "white",
-                                    });
+                                    this.showToast(toast.success, response.data.mensaje);
                                     this.$emit("get-table");
                                     this.$emit("cerrar-modal");
                                 })
                                 .catch((errors) => {
                                     if (errors.response.status === 422) {
-                                        toast.warning(
-                                            "Tienes algunos errores por favor verifica tus datos.",
-                                            {
-                                                autoClose: 5000,
-                                                position: "top-right",
-                                                transition: "zoom",
-                                                toastBackgroundColor: "white",
-                                            }
-                                        );
+                                        this.showToast(toast.warning, "Tienes algunos errores por favor verifica tus datos.");
                                     } else {
-                                        let msg = this.manageError(errors);
-                                        this.$swal.fire({
-                                            title: "Operación cancelada",
-                                            text: msg,
-                                            icon: "warning",
-                                            timer: 5000,
-                                        });
+                                        this.manageError(errors,this)
                                         this.$emit("cerrar-modal");
                                     }
                                 });
@@ -1055,12 +1020,7 @@ export default {
                             axios
                                 .post("/update-employee", this.employee)
                                 .then((response) => {
-                                    toast.success(response.data.mensaje, {
-                                        autoClose: 3000,
-                                        position: "top-right",
-                                        transition: "zoom",
-                                        toastBackgroundColor: "white",
-                                    });
+                                    this.showToast(toast.success, response.data.mensaje);
                                     this.$emit("get-table");
                                     this.$emit("cerrar-modal");
                                 })
@@ -1068,15 +1028,7 @@ export default {
                                     if (errors.response.status === 422) {
                                         console.log(errors.response.data.errors);
                                         if (errors.response.data.logical_error) {
-                                            toast.error(
-                                                errors.response.data.logical_error,
-                                                {
-                                                    autoClose: 5000,
-                                                    position: "top-right",
-                                                    transition: "zoom",
-                                                    toastBackgroundColor: "white",
-                                                }
-                                            );
+                                            this.showToast(toast.error, errors.response.data.logical_error);
                                             this.$emit("get-table");
                                             this.$emit("cerrar-modal");
                                         } else {
@@ -1084,24 +1036,10 @@ export default {
                                             if(this.backend_errors['persona.dui_persona']){
                                                 this.current_page=1
                                             }
-                                            toast.warning(
-                                                "Tienes algunos errores por favor verifica tus datos.",
-                                                {
-                                                    autoClose: 5000,
-                                                    position: "top-right",
-                                                    transition: "zoom",
-                                                    toastBackgroundColor: "white",
-                                                }
-                                            );
+                                            this.showToast(toast.warning, "Tienes algunos errores por favor verifica tus datos.");
                                         }
                                     } else {
-                                        let msg = this.manageError(errors);
-                                        this.$swal.fire({
-                                            title: "Operación cancelada",
-                                            text: msg,
-                                            icon: "warning",
-                                            timer: 5000,
-                                        });
+                                        this.manageError(errors,this)
                                         this.$emit("cerrar-modal");
                                     }
                                 });
@@ -1142,15 +1080,7 @@ export default {
             });
         },
         showErrorAlert() {
-            toast.warning(
-                "Tienes algunos errores por favor verifica tus datos.",
-                {
-                    autoClose: 5000,
-                    position: "top-right",
-                    transition: "zoom",
-                    toastBackgroundColor: "white",
-                }
-            );
+            this.showToast(toast.warning, "Tienes algunos errores por favor verifica tus datos.");
         }
     },
     watch: {

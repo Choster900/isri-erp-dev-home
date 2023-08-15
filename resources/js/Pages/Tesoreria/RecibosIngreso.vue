@@ -161,7 +161,8 @@ import axios from 'axios';
 
             </div>
             <div v-if="empty_object" class="flex text-center py-2">
-                <p class="text-red-500 font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se encontraron
+                <p class="text-red-500 font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se
+                    encontraron
                     registros.</p>
             </div>
         </div>
@@ -176,7 +177,7 @@ import axios from 'axios';
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
 
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getIncomeReceipts(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                        <a @click="page!=1 ? getIncomeReceipts(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                             text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
@@ -185,7 +186,7 @@ import axios from 'axios';
                                 <span v-else-if="(link.label == 'Siguiente')"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getIncomeReceipts(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                        <a @click="hasNext ? getIncomeReceipts(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                             text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
@@ -204,7 +205,7 @@ import axios from 'axios';
 
         <ModalIncomeReceiptVue :show_modal_receipt="show_modal_receipt" :modal_data="modal_data"
             :budget_accounts="budget_accounts" :treasury_clerk="treasury_clerk" @cerrar-modal="show_modal_receipt = false"
-            @get-table="getIncomeReceipts(tableData.currentPage)" />
+            @get-table="tableData.column = -1; getIncomeReceipts(tableData.currentPage)" />
 
         <ModalReceiptFormatVue :view_receipt="view_receipt" :receipt_to_print="receipt_to_print"
             @cerrar-modal="view_receipt = false" />
@@ -216,7 +217,7 @@ import axios from 'axios';
 export default {
     created() {
         this.getIncomeReceipts()
-        this.getPermits()
+        this.getPermissions(this)
         this.getModalReceiptSelects()
     },
     data() {
@@ -244,7 +245,9 @@ export default {
                 sortOrders[column.name] = -1;
         });
         return {
-            empty_object: false,
+            hasNext: false, //variable to know if there is a next page.
+            page: '', //variable to find out which is the current page
+            empty_object: false, //variable to find out if there is no object in the server response.
             view_receipt: false,
             receipt_to_print: [],
             //Data for datatable
@@ -267,7 +270,7 @@ export default {
                 draw: 0,
                 length: 5,
                 search: "",
-                column: 0,
+                column: -1,
                 dir: "desc",
                 total: ""
             },
@@ -302,13 +305,7 @@ export default {
                     //this.financing_sources = response.data.financing_sources
                 })
                 .catch((errors) => {
-                    let msg = this.manageError(errors);
-                    this.$swal.fire({
-                        title: "Operación cancelada",
-                        text: msg,
-                        icon: "warning",
-                        timer: 5000,
-                    });
+                    this.manageError(errors, this)
                     this.$emit("cerrar-modal");
                 });
         },
@@ -340,13 +337,7 @@ export default {
                             this.getIncomeReceipts(this.tableData.currentPage);
                         })
                         .catch((errors) => {
-                            let msg = this.manageError(errors)
-                            this.$swal.fire({
-                                title: 'Operación cancelada',
-                                text: msg,
-                                icon: 'warning',
-                                timer: 5000
-                            })
+                            this.manageError(errors, this)
                         })
                 }
             })
@@ -357,6 +348,8 @@ export default {
             await axios.post(url, this.tableData).then((response) => {
                 let data = response.data;
                 if (this.tableData.draw == data.draw) {
+                    this.page = data.data.current_page
+                    this.hasNext = data.data.current_page !== data.data.last_page;
                     this.links = data.data.links;
                     this.tableData.total = data.data.total;
                     this.links[0].label = "Anterior";
@@ -365,14 +358,7 @@ export default {
                     this.income_receipts.length > 0 ? this.empty_object = false : this.empty_object = true
                 }
             }).catch((errors) => {
-                let msg = this.manageError(errors)
-                this.$swal.fire({
-                    title: 'Operación cancelada',
-                    text: msg,
-                    icon: 'warning',
-                    timer: 5000
-                })
-                //console.log(errors);
+                this.manageError(errors, this)
             })
         },
         sortBy(key) {
@@ -386,19 +372,6 @@ export default {
         },
         getIndex(array, key, value) {
             return array.findIndex((i) => i[key] == value);
-        },
-        getPermits() {
-            var URLactual = window.location.pathname
-            let data = this.$page.props.menu;
-            let menu = JSON.parse(JSON.stringify(data['urls']))
-            menu.forEach((value, index) => {
-                value.submenu.forEach((value2, index2) => {
-                    if (value2.url === URLactual) {
-                        var array = { 'insertar': value2.insertar, 'actualizar': value2.actualizar, 'eliminar': value2.eliminar, 'ejecutar': value2.ejecutar }
-                        this.permits = array
-                    }
-                })
-            })
         },
         handleData(myEventData) {
             this.tableData.search = myEventData;

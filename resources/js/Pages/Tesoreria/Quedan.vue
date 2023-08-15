@@ -201,7 +201,7 @@ import html2pdf from 'html2pdf.js'
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
 
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getDataQuedan(link.url)"
+                                        <a @click="page!=1 ? getDataQuedan(link.url) : ''"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
@@ -211,7 +211,7 @@ import html2pdf from 'html2pdf.js'
                                 <span v-else-if="(link.label == 'Siguiente')"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getDataQuedan(link.url)"
+                                        <a @click="hasNext ? getDataQuedan(link.url) : ''"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
@@ -273,7 +273,9 @@ export default {
                 sortOrders[column.name] = -1;
         });
         return {
-            empty_object: false,
+            hasNext: false, //variable to know if there is a next page.
+            page:'', //variable to find out which is the current page
+            empty_object: false, //variable to find out if there is no object in the server response.
             dropdownOpen: '',
             trigger: '',
             dropdown: '',
@@ -326,6 +328,9 @@ export default {
 
                 // Verificar si la respuesta corresponde al dibujo actual
                 if (this.tableData.draw === data.draw) {
+                    //Setear las variables para saber pagina actual y si hay una siguiente
+                    this.page = data.data.current_page
+                    this.hasNext = data.data.current_page !== data.data.last_page;
                     // Actualizar los enlaces de paginación y la información de la tabla
                     this.showModal = false;
                     this.links = data.data.links;
@@ -335,18 +340,12 @@ export default {
                     this.dataQuedanForTable = data.data.data;
 
                     // Obtener el monto por proveedor
-                    this.getAmountBySupplier();
+                    //this.getAmountBySupplier();
                     this.getAmountByDetail()
                     this.dataQuedanForTable.length > 0 ? this.empty_object = false : this.empty_object = true
                 }
             } catch (error) {
-                let msg = this.manageError(error);
-                this.$swal.fire({
-                    title: "Operación cancelada",
-                    text: msg,
-                    icon: "warning",
-                    timer: 5000,
-                });
+                this.manageError(error,this)
             }
         },
         sortBy(key) {
@@ -370,13 +369,7 @@ export default {
             await axios.get('/get-list-select').then((response) => {
                 this.dataForSelectInRow = response.data;
             }).catch((errors) => {
-                let msg = this.manageError(errors);
-                this.$swal.fire({
-                    title: "Operación cancelada",
-                    text: msg,
-                    icon: "warning",
-                    timer: 5000,
-                });
+                this.manageError(errors,this)
             });
         },
         async getAmountByDetail() {
@@ -385,7 +378,7 @@ export default {
                 // console.log(response.data);
                 this.amountByAcquisitionDocumentsDetails = response.data
             }).catch((errors) => {
-                console.log(errors);
+                this.manageError(errors,this)
             });
         },
         async showQuedan(dataQuedan) {
@@ -491,13 +484,7 @@ export default {
                     .then((response) => {
                     })
                     .catch(errors => {
-                        let msg = this.manageError(errors);
-                        this.$swal.fire({
-                            title: "Operación cancelada",
-                            text: msg,
-                            icon: "warning",
-                            timer: 5000,
-                        });
+                        this.manageError(errors,this)
                     });
             }
         },
@@ -506,6 +493,7 @@ export default {
     mounted() {
         this.getDataQuedan()
         this.getListForSelect()
+        this.getPermissions(this)
     },
 
 };

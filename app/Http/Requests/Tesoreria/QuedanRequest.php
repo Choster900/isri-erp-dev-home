@@ -57,8 +57,8 @@ class QuedanRequest extends FormRequest
     {
         $messages = [];
         $messages = [
-            'quedan.compromiso_ppto_det_doc_adquisicion.required_without'     => ['El numero de compromiso es requerido'],
-            'quedan.numero_doc_adquisicion.required_without'     => ['El numero de acuerdo es requerido'],
+            'quedan.compromiso_ppto_det_doc_adquisicion.required_without'     => 'El numero de compromiso es requerido',
+            'quedan.numero_doc_adquisicion.required_without'     => 'El numero de acuerdo es requerido',
         ];
 
         foreach ($this->input('detalle_quedan', []) as $key => $value) {

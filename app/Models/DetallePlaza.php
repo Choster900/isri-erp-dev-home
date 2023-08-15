@@ -29,7 +29,7 @@ class DetallePlaza extends Model
 
     public function plaza()
     {
-        return $this->belongsTo('App\Models\Plaza', 'id_plaza', 'id_plaza');
+        return $this->belongsTo(Plaza::class, 'id_plaza', 'id_plaza');
     }
 
     public function actividad_institucional()
@@ -45,5 +45,10 @@ class DetallePlaza extends Model
     public function plaza_asignada_activa()
     {
         return $this->hasOne('App\Models\PlazaAsignada', 'id_det_plaza', 'id_det_plaza')->where('estado_plaza_asignada', 1);
+    }
+
+    public function tipo_contrato()
+    {
+        return $this->belongsTo('App\Models\TipoContrato', 'id_tipo_contrato', 'id_tipo_contrato');
     }
 }

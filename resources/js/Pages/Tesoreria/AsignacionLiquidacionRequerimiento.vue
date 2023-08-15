@@ -128,7 +128,7 @@ import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalL
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
 
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getDataLiquidaciones(link.url)"
+                                        <a @click="page!=1 ? getDataLiquidaciones(link.url) : ''"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
@@ -138,7 +138,7 @@ import ModalLiquidacionRequerimientoVue from '@/Components-ISRI/Tesoreria/ModalL
                                 <span v-else-if="(link.label == 'Siguiente')"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getDataLiquidaciones(link.url)"
+                                        <a @click="hasNext ? getDataLiquidaciones(link.url) : ''"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
@@ -196,7 +196,9 @@ export default {
                 sortOrders[column.name] = -1;
         });
         return {
-            empty_object: false,
+            hasNext: false, //variable to know if there is a next page.
+            page:'', //variable to find out which is the current page
+            empty_object: false, //variable to find out if there is no object in the server response.
             showModalAsignacionRequerimiento: false,
             showModalLiquidacionRequerimiento: false,
             dataLiquidaciones: [],//data que contiene todos los totales de todos los requerimientos
@@ -237,6 +239,8 @@ export default {
                 let data = response.data;
                 console.log(data);
                 if (this.tableData.draw == data.draw) {
+                    this.page = data.data.current_page
+                    this.hasNext = data.data.current_page !== data.data.last_page;
                     this.links = data.data.links
                     this.pagination.total = data.data.total
                     this.links[0].label = "Anterior"
@@ -245,13 +249,7 @@ export default {
                     this.dataRequerimientoForTable.length > 0 ? this.empty_object = false : this.empty_object = true
                 }
             }).catch((errors) => {
-                let msg = this.manageError(errors);
-                this.$swal.fire({
-                    title: "Operación cancelada",
-                    text: msg,
-                    icon: "warning",
-                    timer: 5000,
-                });
+                this.manageError(errors,this)
             });
         },
         openModalLiquidacionQuedan(dataLiquidaciones) {
@@ -262,13 +260,7 @@ export default {
             await axios.get('/get-list-select').then((response) => {
                 this.dataForSelect = response.data;
             }).catch((errors) => {
-                let msg = this.manageError(errors);
-                this.$swal.fire({
-                    title: "Operación cancelada",
-                    text: msg,
-                    icon: "warning",
-                    timer: 5000,
-                });
+                this.manageError(errors,this)
             });
         },
         sortBy(key) {
@@ -309,6 +301,7 @@ export default {
     created() {
         this.getDataLiquidaciones()
         this.getListForSelect()
+        this.getPermissions(this)
     },
 
 };

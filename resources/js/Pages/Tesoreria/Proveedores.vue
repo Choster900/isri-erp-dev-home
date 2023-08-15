@@ -137,7 +137,7 @@ import ModalProveedortVue from '@/Components-ISRI/Tesoreria/ModalProveedor.vue';
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
 
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getSuppilers(link.url)"
+                                        <a @click="page!=1 ? getSuppilers(link.url) : ''"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer text-indigo-500">&lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
                                     </div>
@@ -145,7 +145,7 @@ import ModalProveedortVue from '@/Components-ISRI/Tesoreria/ModalProveedor.vue';
                                 <span v-else-if="(link.label == 'Siguiente')"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getSuppilers(link.url)"
+                                        <a @click="hasNext ? getSuppilers(link.url) : ''"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
@@ -169,7 +169,7 @@ import ModalProveedortVue from '@/Components-ISRI/Tesoreria/ModalProveedor.vue';
 export default {
     created() {
         this.getSuppilers();
-        this.getPermits();
+        this.getPermissions(this)
     },
     data: function (data) {
         let sortOrders = {};
@@ -198,7 +198,9 @@ export default {
                 sortOrders[column.name] = -1;
         });
         return {
-            empty_object: false,
+            hasNext: false, //variable to know if there is a next page.
+            page:'', //variable to find out which is the current page
+            empty_object: false, //variable to find out if there is no object in the server response.
             permits: [],
             stateModal: false,
             proveedores: [],
@@ -235,6 +237,8 @@ export default {
             await axios.post(url, this.tableData).then((response) => {
                 let data = response.data;
                 if (this.tableData.draw == data.draw) {
+                    this.page = data.data.current_page
+                    this.hasNext = data.data.current_page !== data.data.last_page;
                     this.links = data.data.links;
                     this.pagination.total = data.data.total;
                     this.links[0].label = "Anterior";
@@ -244,13 +248,8 @@ export default {
                     this.proveedores.length > 0 ? this.empty_object = false : this.empty_object = true
                 }
             }).catch((errors) => {
-                let msg = this.manageError(errors);
-                this.$swal.fire({
-                    title: "Operación cancelada",
-                    text: msg,
-                    icon: "warning",
-                    timer: 5000,
-                });
+                this.manageError(errors,this)
+                console.log(errors);
             });
         },
         sortBy(key) {
@@ -279,13 +278,7 @@ export default {
                     console.log(res);
                 })
                 .catch(errors => {
-                    let msg = this.manageError(errors);
-                    this.$swal.fire({
-                        title: "Operación cancelada",
-                        text: msg,
-                        icon: "warning",
-                        timer: 5000,
-                    });
+                    this.manageError(errors,this)
                 });
             this.getSuppilers(this.lastUrl); //llamamos de nuevo el metodo para que actualize la tabla 
         },
@@ -331,19 +324,6 @@ export default {
                 this.tableData.search = myEventData;
                 //this.getSuppilers();
             }
-        },
-        getPermits() {
-            var URLactual = window.location.pathname;
-            let data = this.$page.props.menu;
-            let menu = JSON.parse(JSON.stringify(data["urls"]));
-            menu.forEach((value, index) => {
-                value.submenu.forEach((value2, index2) => {
-                    if (value2.url === URLactual) {
-                        var array = { "insertar": value2.insertar, "actualizar": value2.actualizar, "eliminar": value2.eliminar, "ejecutar": value2.ejecutar };
-                        this.permits = array;
-                    }
-                });
-            });
         },
     },
 };

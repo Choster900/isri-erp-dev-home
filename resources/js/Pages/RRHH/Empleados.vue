@@ -3,6 +3,8 @@ import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import ModalEmployeesVue from '@/Components-ISRI/RRHH/ModalEmployees.vue';
+import ModalFotografiaVue from '@/Components-ISRI/RRHH/ModalFotografia.vue';
+import ModalPlazasVue from '@/Components-ISRI/RRHH/ModalPlazas.vue';
 import moment from 'moment';
 
 import { toast } from 'vue3-toastify';
@@ -67,7 +69,9 @@ import axios from 'axios';
                                 }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">{{ showDependencies(employee.plazas_asignadas) }}</div>
+                                <div :class="showDependencies(employee.plazas_asignadas) == 'N/Asign.' ? 'text-red-600' : ''" 
+                                class="font-medium text-center {{ showDependencies(employee.plazas_asignadas) === 'N/Asign.' ? 'text-red-500' : 'text-slate-800' }} ">{{
+                                    showDependencies(employee.plazas_asignadas) }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
@@ -99,6 +103,43 @@ import axios from 'axios';
                                             <div class="font-semibold">Editar</div>
                                         </div>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                            v-if="permits.actualizar == 1 && employee.estado_empleado == 1"
+                                            @click="manageFiles(employee)">
+                                            <div class="w-8 text-blue-900">
+                                                <span class="text-xs">
+                                                    <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none"
+                                                        xmlns="http://www.w3.org/2000/svg">
+                                                        <g id="SVGRepo_iconCarrier">
+                                                            <path
+                                                                d="M12 16C13.6569 16 15 14.6569 15 13C15 11.3431 13.6569 10 12 10C10.3431 10 9 11.3431 9 13C9 14.6569 10.3431 16 12 16Z"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"></path>
+                                                            <path
+                                                                d="M3 16.8V9.2C3 8.0799 3 7.51984 3.21799 7.09202C3.40973 6.71569 3.71569 6.40973 4.09202 6.21799C4.51984 6 5.0799 6 6.2 6H7.25464C7.37758 6 7.43905 6 7.49576 5.9935C7.79166 5.95961 8.05705 5.79559 8.21969 5.54609C8.25086 5.49827 8.27836 5.44328 8.33333 5.33333C8.44329 5.11342 8.49827 5.00346 8.56062 4.90782C8.8859 4.40882 9.41668 4.08078 10.0085 4.01299C10.1219 4 10.2448 4 10.4907 4H13.5093C13.7552 4 13.8781 4 13.9915 4.01299C14.5833 4.08078 15.1141 4.40882 15.4394 4.90782C15.5017 5.00345 15.5567 5.11345 15.6667 5.33333C15.7216 5.44329 15.7491 5.49827 15.7803 5.54609C15.943 5.79559 16.2083 5.95961 16.5042 5.9935C16.561 6 16.6224 6 16.7454 6H17.8C18.9201 6 19.4802 6 19.908 6.21799C20.2843 6.40973 20.5903 6.71569 20.782 7.09202C21 7.51984 21 8.0799 21 9.2V16.8C21 17.9201 21 18.4802 20.782 18.908C20.5903 19.2843 20.2843 19.5903 19.908 19.782C19.4802 20 18.9201 20 17.8 20H6.2C5.0799 20 4.51984 20 4.09202 19.782C3.71569 19.5903 3.40973 19.2843 3.21799 18.908C3 18.4802 3 17.9201 3 16.8Z"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"></path>
+                                                        </g>
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                            <div class="font-semibold">Fotografia</div>
+                                        </div>
+                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                            v-if="permits.actualizar == 1 && employee.estado_empleado == 1"
+                                            @click="manageJobPositions(employee)">
+                                            <div class="w-8 text-yellow-600">
+                                                <span class="text-xs">
+                                                    <svg width="25px" height="25px" viewBox="0 0 512 512" class="ml-0.5"
+                                                        xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                                                        stroke="currentColor">
+                                                        <path
+                                                            d="M277.33,0L298.67,21.33V64h128v298.67H0V64h128V21.33L149.33,0H277.33zM42.67,220.94L42.67,320H384v-99.06C341.38,233.13,298.7,240.76,256,243.81V277.33H170.67v-33.52C127.97,240.76,85.29,233.13,42.67,220.94zM384,106.67H42.67V176.43C99.64,193.93,156.51,202.67,213.33,202.67c56.82,0,113.7-8.74,170.67-26.26V106.67zM256,42.67H170.67V64H256V42.67z" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                            <div class="font-semibold">Plaza</div>
+                                        </div>
+                                        <!-- <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                                             @click="changeStatusEmployee(employee)" v-if="permits.eliminar == 1">
                                             <div class="w-8 text-red-900"><span class="text-xs">
                                                     <svg :fill="employee.estado_empleado == 1 ? '#991B1B' : '#166534'"
@@ -127,7 +168,7 @@ import axios from 'axios';
                                             <div class="font-semibold">
                                                 {{ employee.estado_empleado ? 'Desactivar' : 'Activar' }}
                                             </div>
-                                        </div>
+                                        </div> -->
                                     </DropDownOptions>
                                 </div>
                             </td>
@@ -154,7 +195,7 @@ import axios from 'axios';
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
 
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getEmployees(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                        <a @click="page != 1 ? getEmployees(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                   text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
@@ -163,7 +204,7 @@ import axios from 'axios';
                                 <span v-else-if="(link.label == 'Siguiente')"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getEmployees(link.url)" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                        <a @click="hasNext ? getEmployees(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                   text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
@@ -179,9 +220,15 @@ import axios from 'axios';
                 </nav>
             </div>
         </div>
-        
+
         <ModalEmployeesVue :show_modal_employee="show_modal_employee" :modalData="modalData"
-        @cerrar-modal="show_modal_employee = false" @get-table="getEmployees()"/>
+            @cerrar-modal="show_modal_employee = false" @get-table="getEmployees(tableData.currentPage)" />
+
+        <ModalFotografiaVue :showModalFlag="showModalFlag" :modalData="modalData" @cerrar-modal="showModalFlag = false"
+            @get-table="getEmployees(tableData.currentPage)" />
+
+        <ModalPlazasVue :showModalJobPosition="showModalJobPosition" :modalData="modalData"
+            @cerrar-modal="showModalJobPosition = false" @get-table="getEmployees(tableData.currentPage)" />
 
     </AppLayoutVue>
 </template>
@@ -190,7 +237,7 @@ import axios from 'axios';
 export default {
     created() {
         this.getEmployees()
-        this.getPermits()
+        this.getPermissions(this)
     },
     data() {
         let sortOrders = {};
@@ -216,13 +263,20 @@ export default {
                 sortOrders[column.name] = -1;
         });
         return {
+            showModalJobPosition: false,
+
+            showModalFlag: false,
+
             empty_object: false,
             //Data for datatable
             employees: [],
             //Data for modal
-            show_modal_employee: false,   
+            show_modal_employee: false,
             modalData: [],
-            
+
+            hasNext: false,
+            page: '',
+
             //Permissions
             permits: [],
             links: [],
@@ -242,6 +296,14 @@ export default {
         }
     },
     methods: {
+        manageJobPositions(employee) {
+            this.showModalJobPosition = true
+            this.modalData = employee
+        },
+        manageFiles(employee) {
+            this.showModalFlag = true
+            this.modalData = employee
+        },
         editEmployee(employee) {
             this.modalData = employee
             this.show_modal_employee = true
@@ -308,21 +370,17 @@ export default {
                 let data = response.data;
                 if (this.tableData.draw == data.draw) {
                     this.links = data.data.links;
+                    this.page = data.data.current_page
                     this.tableData.total = data.data.total;
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
                     this.employees = data.data.data;
+                    this.hasNext = data.data.current_page !== data.data.last_page;
                     this.employees.length > 0 ? this.empty_object = false : this.empty_object = true
                 }
             }).catch((errors) => {
-                let msg = this.manageError(errors)
-                this.$swal.fire({
-                    title: 'Operación cancelada',
-                    text: msg,
-                    icon: 'warning',
-                    timer: 5000
-                })
-                //console.log(errors);
+                console.log(errors);
+                this.manageError(errors, this)
             })
         },
         sortBy(key) {
@@ -337,19 +395,6 @@ export default {
         getIndex(array, key, value) {
             return array.findIndex((i) => i[key] == value);
         },
-        getPermits() {
-            var URLactual = window.location.pathname
-            let data = this.$page.props.menu;
-            let menu = JSON.parse(JSON.stringify(data['urls']))
-            menu.forEach((value, index) => {
-                value.submenu.forEach((value2, index2) => {
-                    if (value2.url === URLactual) {
-                        var array = { 'insertar': value2.insertar, 'actualizar': value2.actualizar, 'eliminar': value2.eliminar, 'ejecutar': value2.ejecutar }
-                        this.permits = array
-                    }
-                })
-            })
-        },
         handleData(myEventData) {
             this.tableData.search = myEventData;
             const data = Object.values(myEventData);
@@ -357,19 +402,24 @@ export default {
                 this.getEmployees()
             }
         },
-        showDependencies(arrayDependencies){
+        showDependencies(arrayDependencies) {
             let dependencies = ''
-            arrayDependencies.forEach((value,index) => {
-                if(dependencies==''){
-                    dependencies = dependencies + value.dependencia.codigo_dependencia
-                }else{
-                    dependencies = dependencies + ", " + value.dependencia.codigo_dependencia
+            arrayDependencies.forEach((value, index) => {
+                if (value.estado_plaza_asignada == 1) {
+                    if (dependencies == '') {
+                        dependencies = dependencies + value.dependencia.codigo_dependencia
+                    } else {
+                        dependencies = dependencies + ", " + value.dependencia.codigo_dependencia
+                    }
                 }
             })
+            dependencies == "" ? dependencies = "N/Asign." : dependencies
             return dependencies
         }
 
     },
+    computed: {
+    }
 }
 </script>
 
@@ -383,4 +433,5 @@ export default {
 .ellipsis {
     overflow: hidden;
     text-overflow: ellipsis;
-}</style>
+}
+</style>

@@ -13,14 +13,8 @@ use Inertia\Inertia;
 
 class BeneficiarioController extends Controller
 {
-
-    function indexBefe()
-    {
-        return Inertia::render("RRHH/Beneficiarios", ['menu' => session()->get('menu')]);
-
-    }
-    function getDataNemefocoarops(Request $request)
-    {
+    function getDataFromBeneficiarios(Request $request)
+    {//La tabla familiar tiene diferentes usos uno de ellos es guardar los beneficiarios del seguro del empleado
         $columns = [
             'id_persona',
             'id_empleado',

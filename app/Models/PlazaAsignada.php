@@ -31,7 +31,7 @@ class PlazaAsignada extends Model
 
     public function detalle_plaza()
     {
-        return $this->belongsTo('App\Models\DetallePlaza','id_det_plaza','id_det_plaza');
+        return $this->belongsTo(DetallePlaza::class,'id_det_plaza','id_det_plaza');
     }
     public function empleado()
     {

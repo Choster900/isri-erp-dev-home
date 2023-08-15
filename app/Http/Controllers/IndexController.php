@@ -60,6 +60,7 @@ class IndexController extends Controller
             } //End first foreach
           $rolxsistema['urls'] = $menu_padre;
             session(['menu' => $rolxsistema]);
+            session(['id_rol' => $id_rol]);
             return Inertia::render('Index', [
                 'menu' => $rolxsistema
             ]);

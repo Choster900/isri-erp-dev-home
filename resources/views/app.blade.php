@@ -18,14 +18,14 @@
         @vite(['resources/js/app.js', "resources/js/Pages/{$page['component']}.vue"])
         @inertiaHead
     </head>
-     <!--       
-                   _
-               .__(.)< (MEOW)
-                \___)   
-            ~~~~~~~~~~~~~~~~~~
-        -->
     <body class="font-sans antialiased">
         @inertia
     </body>
+    <!--       
+                  _
+              .__(.)< (MEOW)
+               \___)   
+           ~~~~~~~~~~~~~~~~~~
+       -->
    
 </html>

@@ -1,13 +1,7 @@
 <script setup>
 import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
-import Datatable from "@/Components-ISRI/Datatable.vue";
-import ModalEmployeesVue from '@/Components-ISRI/RRHH/ModalEmployees.vue';
-import moment from 'moment';
-
-import { toast } from 'vue3-toastify';
-import 'vue3-toastify/dist/index.css';
-
+import Datatable from "@/Components-ISRI/Datatable.vue";;
 import axios from 'axios';
 import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
 
@@ -18,15 +12,17 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
     <AppLayoutVue nameSubModule="RRHH - Empleados">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="dataBeneficiariosToSendModal = []; showModalBeneficiario = !showModalBeneficiario"
-                    color="bg-green-700  hover:bg-green-800" text="Agregar Beneficiario" icon="add" />
+                <GeneralButton
+                    @click="dataBeneficiariosToSendModal = []; showModalBeneficiario = !showModalBeneficiario"
+                   color="bg-green-700  hover:bg-green-800" text="Agregar Empleado"
+                    icon="add" />
             </div>
         </div>
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
-            <header class="px-5 py-2">
-                <div class=" md:flex flex-row justify-items-start">
-                    <div class=" md:mr-2 md:mb-0 basis-1/4">
-                        <div class="relative flex h-7 w-full flex-row-reverse div-multiselect">
+            <header class="px-5 py-4">
+                <div class="mb-4 md:flex flex-row justify-items-start">
+                    <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
+                        <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
                             <Multiselect v-model="tableData.length" @select="getBeneficiarios()"
                                 @deselect=" tableData.length = 5; getBeneficiarios()"
                                 @clear="tableData.length = 5; getBeneficiarios()" :options="perPage" :searchable="true"
@@ -34,7 +30,9 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Beneficiarios: <span class="text-slate-400 font-medium">{{beneficiarios.length}}</span></h2>
+                    <h2 class="font-semibold text-slate-800 pt-1">Empleados: <span class="text-slate-400 font-medium">{{
+                        beneficiarios.length
+                    }}</span></h2>
                 </div>
             </header>
 
@@ -225,7 +223,7 @@ export default {
                     { value: '20', label: 'AMIGO/A', unico_parentesco: 0 },
                 ]
             },
-            { width: "35%", label: "Porcentaje asignado", name: "porcentaje_familiar", type: "text" },
+            { width: "35%", label: "Porcentaje", name: "porcentaje_familiar", type: "text" },
             { width: "1%", label: "", name: "Acciones" },
         ];
         columns.forEach((column) => {
