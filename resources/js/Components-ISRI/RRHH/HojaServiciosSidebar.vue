@@ -4,10 +4,7 @@
         :class="profileSidebarOpen ? 'translate-x-0' : '-translate-x-full'">
         <div
             class="sticky top-16 bg-white overflow-x-hidden overflow-y-auto no-scrollbar shrink-0 border-r border-slate-200 md:w-72 xl:w-80 h-[calc(100vh-64px)]">
-
-            <!-- Profile group -->
             <div>
-                <!-- Group header -->
                 <div class="sticky top-0 z-10">
                     <div class="flex items-center bg-white border-b border-slate-200 px-5 h-16">
                         <div class="w-full flex items-center justify-between">
@@ -29,7 +26,7 @@
                     <!-- Search form -->
                     <form class="relative">
                         <label for="profile-search" class="sr-only">Buscar</label>
-                        <input id="profile-search" v-model="userSearched" @input="handleInput"
+                        <input v-model="userSearched" @input="handleInput"
                             class="form-input w-full pl-9 text-sm border-slate-300 focus:border-slate-300 rounded-md focus:ring-transparent"
                             type="search" placeholder="Buscar..." />
                         <button class="absolute inset-0 right-auto group" type="submit" aria-label="Search">
@@ -44,8 +41,13 @@
                     </form>
                     <!-- Team members -->
                     <div class="mt-4">
-                        <div class="text-xs font-semibold text-slate-400 uppercase mb-3">Ultimos 7 empleados</div>
-                        <ul class="mb-6">
+                        <div class="pt-2"  v-if="isLoadingToSearch">
+                            <div class="loader" ></div>
+                            <div class="text-center">
+                            <span class="text-slate-400">cargando</span>
+                        </div>
+                        </div>
+                        <ul class="mb-6" v-if="dataResponseUser != ''">
                             <li class="-mx-2"
                                 :class="isProfileSelected.id_empleado == user.id_empleado ? 'bg-slate-300 rounded-md' : ''"
                                 v-for="user in dataResponseUser" :key="user">
@@ -72,8 +74,10 @@
                                     </div>
                                 </button>
                             </li>
-
                         </ul>
+                        <div class="text-center" v-else-if="dataResponseUser == '' && !isLoadingToSearch">
+                            <span class="text-slate-400">sin coinsidencias</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -95,11 +99,11 @@ export default {
     },
     methods: {
         handleInput() {
-            this.dataResponseUser = []
             clearTimeout(this.searchTimeout);
             this.searchTimeout = setTimeout(() => {
+                this.dataResponseUser = []
                 this.searchingUsers();
-            }, 1000); // Tiempo de espera de 1 segundo
+            }, 700); // Tiempo de espera de 1 segundo
         },
         async searchingUsers() {
 
@@ -111,7 +115,6 @@ export default {
                 console.log('Error en la búsqueda:', error)
             } finally {
                 this.isLoadingToSearch = false
-                this.loading = false
             }
 
         },
@@ -119,11 +122,11 @@ export default {
     mounted() {
         this.searchingUsers()
     },
-    watch:{
-        dataResponseUser(){
+    watch: {
+        dataResponseUser() {
             if (!this.userSearched) {
-              //  console.log(this.dataResponseUser[0]);
-               this.$emit("sentFirtUserData",this.dataResponseUser[0])
+                //  console.log(this.dataResponseUser[0]);
+                this.$emit("sentFirtUserData", this.dataResponseUser[0])
             }
         }
     }
@@ -145,5 +148,46 @@ export default {
     width: 100%;
     height: 100%;
     border-radius: 100%;
+}
+
+.loader {
+    width: 8px;
+    height: 40px;
+    border-radius: 4px;
+    display: block;
+    background-color: currentColor;
+    margin: 20px auto;
+    position: relative;
+    color: #001c48;
+    animation: animloader 0.3s 0.3s linear infinite alternate;
+}
+
+.loader::after,
+.loader::before {
+    content: '';
+    width: 8px;
+    height: 40px;
+    border-radius: 4px;
+    background: currentColor;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 20px;
+    animation: animloader 0.3s 0.45s linear infinite alternate;
+}
+
+.loader::before {
+    left: -20px;
+    animation-delay: 0s;
+}
+
+@keyframes animloader {
+    0% {
+        height: 48px;
+    }
+
+    100% {
+        height: 4px;
+    }
 }
 </style>

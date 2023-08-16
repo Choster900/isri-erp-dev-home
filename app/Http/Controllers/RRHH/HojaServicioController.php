@@ -22,6 +22,7 @@ class HojaServicioController extends Controller
             'nivel_educativo.tipo_nivel_educativo',
             'empleado.acuerdo_laboral.tipo_acuerdo_laboral',
             'empleado.plazas_asignadas.detalle_plaza.plaza',
+            'empleado.plazas_asignadas.dependencia',
         ])
             ->whereHas('empleado', function ($query) use ($request) {
                 $query->where('codigo_empleado', 'like', '%' . $request["data"] . '%');
