@@ -506,7 +506,7 @@ import axios from "axios";
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
                                 <TextInput id="account" v-model="employee.account" type="text" placeholder="Partida"
-                                    @update:modelValue="validateEmployeeInputs('account', 6, true, false)">
+                                    @update:modelValue="validateEmployeeInputs('account', 3, true, false)">
                                     <LabelToInput icon="standard" forLabel="account" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errors.account" />
@@ -514,7 +514,7 @@ import axios from "axios";
                             <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
                                 <TextInput id="subaccount" v-model="employee.subaccount" type="text"
                                     placeholder="Subpartida"
-                                    @update:modelValue="validateEmployeeInputs('subaccount', 6, true, false)">
+                                    @update:modelValue="validateEmployeeInputs('subaccount', 3, true, false)">
                                     <LabelToInput icon="standard" forLabel="subaccount" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errors.subaccount" />
