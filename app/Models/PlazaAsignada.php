@@ -39,6 +39,6 @@ class PlazaAsignada extends Model
     }
     public function dependencia()
     {
-        return $this->belongsTo('App\Models\Dependencia','id_dependencia','id_dependencia');
+        return $this->belongsTo(Dependencia::class,'id_dependencia','id_dependencia');
     }
 }

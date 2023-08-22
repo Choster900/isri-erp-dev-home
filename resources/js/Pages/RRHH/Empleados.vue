@@ -127,7 +127,7 @@ import axios from 'axios';
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                                             v-if="permits.actualizar == 1 && employee.estado_empleado == 1"
                                             @click="manageJobPositions(employee)">
-                                            <div class="w-8 text-yellow-600">
+                                            <div class="w-8 text-teal-700">
                                                 <span class="text-xs">
                                                     <svg width="25px" height="25px" viewBox="0 0 512 512" class="ml-0.5"
                                                         xmlns="http://www.w3.org/2000/svg" fill="currentColor"
