@@ -5,7 +5,6 @@ import ListAcuerdosVue from './ListAcuerdos.vue';
 </script>
 <template>
     <div v-show="showAcuerdos">
-        <h2 class="text-slate-800 font-semibold mb-2">Work History</h2>
         <!-- Calendario de contribuciones -->
         <div class="p-2 bg-slate-50 rounded-lg border border-slate-200">
             <div class="flex  justify-center">
@@ -33,7 +32,8 @@ import ListAcuerdosVue from './ListAcuerdos.vue';
                                     :key="weekIndex">
                                     <template v-slot:contenido>
                                         <div :class="isDateInDataDeals(moment(`${year}-${month}-${day}`).format('L')) ? 'bg-green-900/90' : 'bg-gray-500/60'"
-                                            class="h-[11px] w-[11px]  m-[1.5px] rounded-sm bg-gray-500/60">
+                                            class="h-[11px] w-[11px]  m-[1.5px] rounded-sm ">
+                                           <!--  <span class="text-[8px]">{{ isDateInDataDeals(moment(`${year}-${month}-${day}`).format('L')) }}</span> -->
                                         </div>
                                     </template>
                                     <template v-slot:message>
@@ -57,20 +57,17 @@ import ListAcuerdosVue from './ListAcuerdos.vue';
                             <div class="bg-slate-50 p-4 rounded border border-slate-200">
                                 <template v-for="(acuerdosArray, mesAñoKey) in objectDeals" :key="mesAñoKey">
                                     <div class="flex justify-start text-xs font-semibold text-slate-400  mb-4">
-                                        <span class="mr-1">{{ moment(acuerdosArray.mesAño, 'MM-YYYY').format('MMMM YYYY')
-                                        }} </span>
+                                        <span class="mr-1">{{ moment(acuerdosArray.mesAño, 'MM-YYYY').format('MMMM YYYY')}} </span>
                                         <hr class="h-0.5 bg-slate-200 flex-grow my-1.5" aria-hidden="true">
                                     </div>
                                     <ul>
-                                        <ListAcuerdosVue v-for="acuerdos, i in acuerdosArray['acuerdos']" :key="i"
-                                            :data-test="acuerdos" />
+                                        <ListAcuerdosVue v-for="acuerdos, i in acuerdosArray['acuerdos']" :key="i" :deal="acuerdos" />
                                     </ul>
                                 </template>
                                 <div class="mt-4">
                                     <button @click="showMoreActivity()"
                                         :class="this.currentDealIndex <= this.arrDeals.length - 1 ? 'hover:border-slate-300 text-blue-900 hover:bg-slate-200' : 'text-slate-600 bg-gray-200 cursor-not-allowed'"
-                                        class="btn-sm w-full border border-slate-300 rounded-md py-1   shadow-none">Show
-                                        More Activity</button>
+                                        class="btn-sm w-full border border-slate-300 rounded-md py-1   shadow-none">Show More Activity</button>
                                 </div>
                             </div>
                         </div>

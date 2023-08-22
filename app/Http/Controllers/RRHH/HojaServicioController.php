@@ -5,6 +5,7 @@ namespace App\Http\Controllers\RRHH;
 use App\Http\Controllers\Controller;
 use App\Models\Persona;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class HojaServicioController extends Controller
 {
@@ -23,26 +24,31 @@ class HojaServicioController extends Controller
             'empleado.acuerdo_laboral.tipo_acuerdo_laboral',
             'empleado.plazas_asignadas.detalle_plaza.plaza',
             'empleado.plazas_asignadas.dependencia',
-        ])
-            ->whereHas('empleado', function ($query) use ($request) {
+        ]);
+        /* ->whereHas('empleado', function ($query) use ($request) {
                 $query->where('codigo_empleado', 'like', '%' . $request["data"] . '%');
-            })
-            ->orWhere(function ($query) use ($request) {
-                $query->where('pnombre_persona', 'like', '%' . $request["data"] . '%')
-                    ->orWhere('snombre_persona', 'like', '%' . $request["data"] . '%')
-                    ->orWhere('tnombre_persona', 'like', '%' . $request["data"] . '%')
-                    ->orWhere('papellido_persona', 'like', '%' . $request["data"] . '%')
-                    ->orWhere('sapellido_persona', 'like', '%' . $request["data"] . '%')
-                    ->orWhere('tapellido_persona', 'like', '%' . $request["data"] . '%');
-            })
-            ->whereHas('empleado');
-        
+            }); */
+        if (!empty($request["data"])) {
+            $query->orWhere(function ($query) use ($request) {
+                $query->whereRaw("MATCH ( pnombre_persona,
+                     snombre_persona,
+                      tnombre_persona, 
+                      papellido_persona,
+                       sapellido_persona,
+                        tapellido_persona )
+                         AGAINST ( '" . $request['data'] . "')");
+            }); // Limitar a los últimos 5 registros
+        }
+
+
+        $query->whereHas('empleado');
+
         if (!$request["data"]) {
             $query->take(7); // Limitar a los últimos 5 registros
         }
-        
+
         $result = $query->get();
-        
+
         return $result;
     }
 }

@@ -2,7 +2,8 @@
 import GeneralInformationVue from './GeneralInformation.vue'
 import FooterServiciosBodyVue from './FooterServiciosBody.vue'
 import moment from 'moment';
-
+import { jsPDF } from "jspdf";
+import html2pdf from 'html2pdf.js'
 </script>
 <template>
     <div class="grow flex flex-col md:translate-x-0 transition-transform duration-300 ease-in-out"
@@ -26,31 +27,20 @@ import moment from 'moment';
 
         <!-- Content -->
         <div class="relative px-4 sm:px-6 pb-8">
-
             <!-- Pre-header -->
             <div class="-mt-16 mb-6 sm:mb-3">
-
                 <div class="flex flex-col items-center sm:flex-row sm:justify-between sm:items-end">
-
                     <!-- Avatar -->
-                    <div class="image-container" >
-                        <img class="rounded-full border-4 border-white"
+                    <div class="image-container">
+                        <img class="rounded-full border-4 border-white scale-100"
                             :src="userData && userData.fotos && userData.fotos.length > 0 ? userData.fotos[userData['fotos'].length - 1].url_foto : 'https://img.freepik.com/free-icon/user_318-159711.jpg?w=2000'" />
                     </div>
-
-<!-- 
-                    <div class="animate-pulse flex space-x-4 pb-2" v-else>
-                        <div class="rounded-full bg-slate-400 h-32 w-32"></div>
-                    </div> -->
-
                 </div>
             </div>
 
             <!-- Header -->
             <header class="text-center sm:text-left mb-6">
                 <!-- Name -->
-
-
                 <div class="inline-flex items-start mb-2" v-if="userData != ''">
                     <h1 class="text-2xl text-slate-800 font-bold"> {{ userData != '' ? `${userData.empleado.codigo_empleado}
                                             - ${userData.pnombre_persona ? userData.pnombre_persona : ''} ${userData.snombre_persona ?
@@ -60,10 +50,10 @@ import moment from 'moment';
                         `: '' }}</h1>
                     <div class="flex space-x-2 sm:mb-2 ">
                         <DropDownOptions position="right-up">
-                            <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
+                            <div @click="printPdf" class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                 <div class="font-semibold text-xs">Imprimir todo</div>
                             </div>
-                            <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
+                            <div @click="pruebaDeOtroPdf" class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                 <div class="font-semibold text-xs w-full truncate">Imprimir lo selecionado</div>
                             </div>
                         </DropDownOptions>
@@ -156,7 +146,6 @@ import moment from 'moment';
                     </div>
                 </div>
             </header>
-
             <!-- Tabs -->
             <div class="relative mb-6">
                 <div class="absolute bottom-0 w-full h-px bg-slate-200" aria-hidden="true"></div>
@@ -173,7 +162,7 @@ import moment from 'moment';
                     </li>
                 </ul>
             </div>
-
+            <!--  {{ pruebaDeOtroPdf() }} -->
             <!-- GENERAL -->
             <GeneralInformationVue :showInformation="isSelected.showInformation"
                 :moreInformacionEmployee="userData != '' ? userData : ''" />
@@ -185,6 +174,8 @@ import moment from 'moment';
   
 <script>
 import { toast } from 'vue3-toastify';
+import { createApp, h } from 'vue'
+import HojaServiciosPdfVue from '@/pdf/RRHH/HojaServiciosPdf.vue';
 export default {
     props: {
         userData: {
@@ -215,8 +206,34 @@ export default {
             textarea.select();
             document.execCommand('copy');
             document.body.removeChild(textarea);
+        },
+        printPdf(dataQuedan) {
+            // Opciones de configuración para generar el PDF
+            let fecha = moment().format('DD-MM-YYYY');
+            let name = 'HOJA DE SERVICIO'// Nombre del pdf
+            // Propiedades del pdf
+            const opt = {
+                margin: 0,
+                filename: name,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+               // pagebreak: { mode: 'avoid-all', before: '#page2el' },
+                pagebreak: { mode: ['avoid-all', 'css'] },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait', lineHeight: 'lineHeight' },
+            };
 
-        }
+            // Crear una instancia de la aplicación Vue para generar el componente quedanPDFVue
+            const app = createApp(HojaServiciosPdfVue);// El pdf en cuestion
+
+            // Crear un elemento div y montar la instancia de la aplicación en él
+            const div = document.createElement('div');
+            const pdfPrint = app.mount(div);
+            const html = div.outerHTML;
+
+            // Generar y guardar el PDF utilizando html2pdf
+            html2pdf().set(opt).from(html).save();
+        },
+
     },
     watch: {
         userData() {
@@ -236,9 +253,5 @@ export default {
     width: 100%;
     height: 100%;
     object-fit: cover;
-}
-
-.foo-bar {
-    color: rgba(255, 0, 0, 0.641);
 }
 </style>

@@ -6,12 +6,12 @@ import HojaServiciosBodyVue from "@/Components-ISRI/RRHH/HojaServiciosBody.vue";
 </script>
 
 <template>
-    <Head title="RRHH - Acuerdos de contratacion" />
-    <AppLayoutVue nameSubModule="RRHH - Acuerdos" :autoPadding="false">
+    <Head title="RRHH - Hoja de servicios" />
+    <AppLayoutVue nameSubModule="RRHH - Hoja De Servicios" :autoPadding="false">
         <div class="relative flex">
-            <HojaServiciosSidebarVue @sendUserData="reciviendoUserData" :is-profile-selected="profileSelected"
-                @sentFirtUserData="reciviendoUserData" />
-            <HojaServiciosBodyVue :userData="userData" @profileSelected="profile" />
+            <HojaServiciosSidebarVue @send-user-data-when-is-click="reciveUserData" :is-profile-selected="profileSelected"
+                @send-first-user-data="reciveUserData" />
+            <HojaServiciosBodyVue :user-data="userData" @profile-selected="profile" />
         </div>
     </AppLayoutVue>
 </template>
@@ -25,7 +25,7 @@ export default {
         };
     },
     methods: {
-        reciviendoUserData(data) {
+        reciveUserData(data) {
             this.userData = [];
             this.userData = data;
         },

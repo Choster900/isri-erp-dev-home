@@ -13,7 +13,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get(
         '/rrhh/empleados',
         function (Request $request) {
-            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/rrhh/empleados','RRHH/Empleados');
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/empleados', 'RRHH/Empleados');
         }
     )->name('rrhh.empleados');
     Route::post('employees', [EmpleadoController::class, 'getEmployees'])->name('empleado.getEmployees');
@@ -29,7 +29,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get(
         '/rrhh/det-plazas',
         function (Request $request) {
-            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/rrhh/det-plazas','RRHH/DetallePlazas');
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/det-plazas', 'RRHH/DetallePlazas');
         }
     )->name('rrhh.detPlazas');
     Route::post('det-job-positions', [DetallePlazaController::class, 'getDetJobPositions'])->name('detallePlaza.getDetJobPositions');
@@ -41,7 +41,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get(
         '/rrhh/beneficiarios',
         function (Request $request) {
-            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/rrhh/beneficiarios','RRHH/Beneficiarios');
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/beneficiarios', 'RRHH/Beneficiarios');
         }
     )->name('rrhh.beneficiarios');
     Route::post('beneficiarios', [BeneficiarioController::class, 'getDataFromBeneficiarios'])->name('beneficiarios.getEmployees');
@@ -54,7 +54,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get(
         '/rrhh/acuerdos',
         function (Request $request) {
-            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/rrhh/acuerdos','RRHH/Acuerdos');
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/acuerdos', 'RRHH/Acuerdos');
         }
     )->name('rrhh.acuerdos');
     Route::post('acuerdos', [AcuerdoController::class, 'getAcuerdos'])->name('acuerdos.getAcuerdos');
@@ -66,11 +66,8 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get(
         '/rrhh/hoja-servicios',
         function (Request $request) {
-            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/rrhh/hoja-servicios','RRHH/HojaServicios');
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/hoja-servicios', 'RRHH/HojaServicios');
         }
     )->name('rrhh.hoja-servicios');
     Route::post('search-employees', [HojaServicioController::class, 'getEmployees'])->name('empleado.SearchEmployees');
-
-
-
 });

@@ -5,7 +5,6 @@ import AccordionBasicVue from '@/Components-ISRI/AccordionBasic.vue';
 <template>
     <div class="flex flex-col xl:flex-row xl:space-x-16" v-show="showInformation">
         <div class="space-y-4 mb-8 xl:mb-0">
-            <h2 class="text-slate-800 font-semibold">Work History</h2>
             <div>
                 <div class="flex flex-col md:flex-row  md:space-y-0">
                     <div class="flex-1 w-full">
@@ -23,11 +22,7 @@ import AccordionBasicVue from '@/Components-ISRI/AccordionBasic.vue';
                                                 </lord-icon>
                                                 <!-- Position -->
                                                 <div>
-                                                    <div class="font-medium text-slate-800">
-                                                        {{
-                                                        `${job.id_plaza_asignada} - ${job.detalle_plaza.plaza.nombre_plaza}`
-                                                        }}
-                                                        </div>
+                                                    <div class="font-medium text-slate-800">{{`${job.id_plaza_asignada} - ${job.detalle_plaza.plaza.nombre_plaza}`}}</div>
                                                     <div class="flex flex-nowrap items-center space-x-2 whitespace-nowrap">
                                                         <div>{{ job.estado_plaza_asignada==1?'Actual':'Ejecutada' }}</div>
                                                         <div class="text-slate-400">·</div>
@@ -83,7 +78,7 @@ import AccordionBasicVue from '@/Components-ISRI/AccordionBasic.vue';
                                 <div class="text-sm">
                                     <h3 class="font-medium uppercase text-slate-800">Telefono</h3>
                                     <div class="uppercase font-semibold">
-                                        {{ moreInformacionEmployee.telefono_persona || 'SINDATOS' }}
+                                        {{ moreInformacionEmployee.telefono_persona || 'SIN DATOS' }}
                                     </div>
                                 </div>
                             </aside>
