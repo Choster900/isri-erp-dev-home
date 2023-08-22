@@ -13,16 +13,17 @@ import axios from "axios";
             class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-90 z-50 flex flex-col items-center justify-center">
             <span ref="deleteButton" class="absolute top-2 right-8 text-white text-4xl cursor-pointer"
                 @click.stop="closeFullScreen">&times;</span>
-            <div ref="imageWrapper" :class="images.length > 1 ? 'justify-between' : 'justify-center'" class="flex items-center h-[90%] w-full px-4">
-                <div v-if="images.length > 1" class="cursor-pointer" @click.stop="prev">
+            <div ref="imageWrapper" :class="activeImages.length > 1 ? 'justify-between' : 'justify-center'"
+                class="flex items-center h-[90%] w-full px-4">
+                <div v-if="activeImages.length > 1" class="cursor-pointer" @click.stop="prev">
                     <svg class="pointer-events-none" fill="#fff" height="48" viewBox="0 0 24 24" width="48">
                         <path d="M15.41 16.09l-4.58-4.59 4.58-4.59L14 5.5l-6 6 6 6z" />
                         <path d="M0-.5h24v24H0z" fill="none" />
                     </svg>
                 </div>
                 <img class="max-w-[81%] max-h-[90%] object-contain cursor-pointer"
-                    :src="images[fullScreenImageIndex].url" />
-                <div v-if="images.length > 1" class="cursor-pointer" @click.stop="next">
+                    :src="activeImages[fullScreenImageIndex].url" />
+                <div v-if="activeImages.length > 1" class="cursor-pointer" @click.stop="next">
                     <svg class="pointer-events-none" fill="#fff" height="48" viewBox="0 0 24 24" width="48">
                         <path d="M8.59 16.34l4.58-4.59-4.58-4.59L10 5.75l6 6-6 6z" />
                         <path d="M0-.25h24v24H0z" fill="none" />
@@ -30,7 +31,7 @@ import axios from "axios";
                 </div>
             </div>
             <div class="text-white text-sm h-[10%]">
-                {{ fullScreenImageIndex + 1 }}/{{ images.length }}
+                {{ fullScreenImageIndex + 1 }}/{{ activeImages.length }}
             </div>
         </div>
 
@@ -114,7 +115,6 @@ export default {
     },
     methods: {
         onKeydown(e) {
-            //console.log('funciona');
             if (this.isFullScreenActive) {
                 switch (e.key) {
                     case 'ArrowRight':
@@ -129,7 +129,7 @@ export default {
                         e.preventDefault();
                         break;
                     case 'Escape':
-                        this.hide();
+                        this.isFullScreenActive = false;
                         break;
                 }
             }
