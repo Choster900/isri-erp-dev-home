@@ -9,23 +9,6 @@ import moment from 'moment';
 
 <template>
     <div class="m-1.5">
-        <!-- <div v-if="isLoading"
-            class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
-            <div role="status" class="flex items-center">
-                <svg aria-hidden="true" class="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-800"
-                    viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                        fill="currentColor" />
-                    <path
-                        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                        fill="currentFill" />
-                </svg>
-                <div class="bg-gray-200 rounded-lg p-1 font-semibold">
-                    <span class="text-blue-800">CARGANDO...</span>
-                </div>
-            </div>
-        </div> -->
         <Modal :show="showModalJobPosition" @close="$emit('cerrar-modal')" :modal-title="'Agregar Plaza. '" maxWidth="2xl">
 
             <div class="px-5 py-3">
@@ -52,7 +35,7 @@ import moment from 'moment';
                     <!-- Show job positions by employee -->
                     <div v-if="showJobPositions">
                         <div class="mx-4 sm:flex sm:justify-between sm:items-center mb-1">
-                            <p class="text-base font-medium text-navy-700">
+                            <p class="text-base font-medium text-navy-700 underline underline-offset-2">
                                 {{ getEmployeeName }}
                             </p>
                             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
@@ -60,9 +43,11 @@ import moment from 'moment';
                                     @click="showJobPositions = false" />
                             </div>
                         </div>
-                        <h1 class="text-center mb-1 font-semibold text-slate-800 text-medium underline underline-offset-2">
+                        <h1 v-if="jobPositions.length>0" class="text-center mb-1 font-semibold text-slate-800 text-medium">
                             PLAZAS
                             ASIGNADAS</h1>
+                        <h1 v-else class="text-center mb-1 font-semibold text-slate-800 text-medium">
+                            SIN PLAZAS ASIGNADAS</h1>
 
                         <div class="overflow-y-auto max-h-[360px]">
                             <div v-for="jobPosition in jobPositions" :key="jobPosition.id_plaza_asignada"
@@ -75,8 +60,7 @@ import moment from 'moment';
                                         <div class="w-full">
                                             <p class="text-sm text-gray-600">Dependencia</p>
                                             <p class="text-base font-medium text-navy-700 dark:text-white">
-                                                {{ jobPosition.dependencia.codigo_dependencia }} - {{
-                                                    jobPosition.dependencia.nombre_dependencia }}
+                                                {{ formattedDependency(jobPosition.dependencia) }}
                                             </p>
                                         </div>
                                         <!-- Plaza - Codigo -->
@@ -189,7 +173,7 @@ import moment from 'moment';
                             <div class="mb-10 md:flex flex-row justify-items-start">
                                 <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                     <TextInput id="account" v-model="jobPosition.account" type="text" placeholder="Partida"
-                                        @update:modelValue="validateEmployeeInputs('account', 6, true, false)">
+                                        @update:modelValue="validateEmployeeInputs('account', 3, true, false)">
                                         <LabelToInput icon="standard" forLabel="account" />
                                     </TextInput>
                                     <InputError v-for="(item, index) in errors['jobPosition.account']" :key="index"
@@ -198,7 +182,7 @@ import moment from 'moment';
                                 <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                     <TextInput id="subaccount" v-model="jobPosition.subaccount" type="text"
                                         placeholder="Subpartida"
-                                        @update:modelValue="validateEmployeeInputs('subaccount', 6, true, false)">
+                                        @update:modelValue="validateEmployeeInputs('subaccount', 3, true, false)">
                                         <LabelToInput icon="standard" forLabel="subaccount" />
                                     </TextInput>
                                     <InputError v-for="(item, index) in errors['jobPosition.subaccount']" :key="index"
@@ -207,9 +191,10 @@ import moment from 'moment';
                             </div>
                         </div>
                         <div class="flex justify-center mt-4">
-                            <GeneralButton class="mr-1" text="Cancelar" icon="delete" @click="showJobPositions = true ; jobPosition= []" />
-                            <GeneralButton color="bg-green-700 hover:bg-green-800" text="Guardar" icon="add"
+                            <GeneralButton class="mr-1" color="bg-green-700 hover:bg-green-800" text="Guardar" icon="add"
                                 @click="storeJobPosition()" />
+                            <GeneralButton text="Cancelar" icon="delete"
+                                @click="showJobPositions = true; jobPosition = []" />
                         </div>
                     </div>
                 </transition>
@@ -330,10 +315,10 @@ export default {
                     return new Promise((resolve, reject) => {
                         axios
                             .post("/store-job-position", {
-                                jobPosition : this.jobPosition,
-                                employeeId : this.employee.id_empleado,
-                                upperSalaryLimit : this.upperSalaryLimit,
-                                lowerSalaryLimit : this.lowerSalaryLimit
+                                jobPosition: this.jobPosition,
+                                employeeId: this.employee.id_empleado,
+                                upperSalaryLimit: this.upperSalaryLimit,
+                                lowerSalaryLimit: this.lowerSalaryLimit
                             })
                             .then((response) => {
                                 resolve(response.data);
@@ -360,6 +345,10 @@ export default {
                     this.manageError(error, this)
                 }
             });
+        },
+        formattedDependency(dependencie) {
+            const dependency = dependencie.parent_dependency || dependencie;
+            return dependency.codigo_dependencia + ' - ' + dependencie.nombre_dependencia;
         }
     },
     watch: {
@@ -396,7 +385,7 @@ export default {
             } else {
                 return '';
             }
-        }
+        },
     },
 };
 </script>

@@ -42,9 +42,10 @@ class EmpleadoController extends Controller
                 },
                 'plazas_asignadas' => function ($query) {
                     $query->join('dependencia', 'plaza_asignada.id_dependencia', '=', 'dependencia.id_dependencia')
+                        ->where('estado_plaza_asignada', 1)
                         ->orderBy('dependencia.codigo_dependencia');
                 },
-                'plazas_asignadas.dependencia',
+                'plazas_asignadas.dependencia.parent_dependency',
                 'persona.fotos'
             ]);
 
@@ -149,10 +150,16 @@ class EmpleadoController extends Controller
         $professional_title = DB::table('titulo_profesional')
             ->select('id_titulo_profesional as value', 'nombre_titulo_profesional as label')
             ->get();
-        $dependencies = Dependencia::selectRaw("id_dependencia as value , concat(codigo_dependencia, ' - ', nombre_dependencia) as label")
-            ->where('id_tipo_dependencia', '=', 1)
-            ->where('estado_dependencia', '=', 1)
-            ->orderBy('nombre_dependencia')
+        $dependencies = DB::table('dependencia')
+            ->selectRaw("
+                dependencia.id_dependencia as value,
+                CASE
+                    WHEN dependencia.dep_id_dependencia IS NOT NULL THEN CONCAT(dep.codigo_dependencia, ' - ', dependencia.nombre_dependencia,' (',dependencia.codigo_dependencia,')')
+                    ELSE CONCAT(dependencia.codigo_dependencia, ' - ', dependencia.nombre_dependencia)
+                END as label
+            ")
+            ->leftJoin('dependencia as dep', 'dependencia.dep_id_dependencia', '=', 'dep.id_dependencia')
+            ->where('dependencia.id_dependencia', '!=', 1)
             ->get();
         $job_positions = DetallePlaza::selectRaw("detalle_plaza.id_det_plaza as value, concat(detalle_plaza.codigo_det_plaza,' - ',plaza.nombre_plaza,' - ',tipo_contrato.codigo_tipo_contrato)  as label, plaza.salario_base_plaza, plaza.salario_tope_plaza, linea_trabajo.id_lt")
             ->join('plaza', 'detalle_plaza.id_plaza', '=', 'plaza.id_plaza')
@@ -432,18 +439,24 @@ class EmpleadoController extends Controller
     {
         //Get the job positions by employee
         $empleado = Empleado::with([
-            'plazas_asignadas.dependencia',
-            'plazas_asignadas.detalle_plaza',
-            'plazas_asignadas.detalle_plaza.plaza',
-            'plazas_asignadas.detalle_plaza.tipo_contrato'
-        ])
-            ->find($request->id_empleado);
+            'plazas_asignadas' => function ($query) {
+                $query->where('estado_plaza_asignada', 1)
+                    ->with(['dependencia.parent_dependency', 'detalle_plaza', 'detalle_plaza.plaza', 'detalle_plaza.tipo_contrato']);
+            }
+        ])->find($request->id_empleado);
         //Get selects information
-        $dependencies = Dependencia::selectRaw("id_dependencia as value , concat(codigo_dependencia, ' - ', nombre_dependencia) as label")
-            ->where('id_tipo_dependencia', '=', 1)
-            ->where('estado_dependencia', '=', 1)
-            ->orderBy('nombre_dependencia')
+        $dependencies = DB::table('dependencia')
+            ->selectRaw("
+                dependencia.id_dependencia as value,
+                CASE
+                    WHEN dependencia.dep_id_dependencia IS NOT NULL THEN CONCAT(dep.codigo_dependencia, ' - ', dependencia.nombre_dependencia,' (',dependencia.codigo_dependencia,')')
+                    ELSE CONCAT(dependencia.codigo_dependencia, ' - ', dependencia.nombre_dependencia)
+                END as label
+            ")
+            ->leftJoin('dependencia as dep', 'dependencia.dep_id_dependencia', '=', 'dep.id_dependencia')
+            ->where('dependencia.id_dependencia', '!=', 1)
             ->get();
+
         $jobPositionsToSelect = DetallePlaza::selectRaw("detalle_plaza.id_det_plaza as value, concat(detalle_plaza.codigo_det_plaza,' - ',plaza.nombre_plaza,' - ',tipo_contrato.codigo_tipo_contrato)  as label, plaza.salario_base_plaza, plaza.salario_tope_plaza, linea_trabajo.id_lt")
             ->join('plaza', 'detalle_plaza.id_plaza', '=', 'plaza.id_plaza')
             ->join('tipo_contrato', 'detalle_plaza.id_tipo_contrato', '=', 'tipo_contrato.id_tipo_contrato')
@@ -478,7 +491,7 @@ class EmpleadoController extends Controller
         $validatedData = Validator::make($request->all(), [
             'jobPosition.dependencyId'      => 'required',
             'jobPosition.jobPositionId'     => 'required',
-            'jobPosition.salary'            => ['required', 'numeric','between:' . $lowerSalaryLimit . ',' . $upperSalaryLimit],
+            'jobPosition.salary'            => ['required', 'numeric', 'between:' . $lowerSalaryLimit . ',' . $upperSalaryLimit],
             'jobPosition.account'           => 'required',
             'jobPosition.subaccount'        => 'required',
             'jobPosition.dateOfHired'       => 'required',

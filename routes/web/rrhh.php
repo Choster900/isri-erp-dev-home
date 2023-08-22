@@ -5,6 +5,7 @@ use App\Http\Controllers\RRHH\DetallePlazaController;
 use App\Http\Controllers\RRHH\BeneficiarioController;
 use App\Http\Controllers\RRHH\EmpleadoController;
 use App\Http\Controllers\RRHH\HojaServicioController;
+use App\Http\Controllers\RRHH\PermisoController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -70,4 +71,13 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('rrhh.hoja-servicios');
     Route::post('search-employees', [HojaServicioController::class, 'getEmployees'])->name('empleado.SearchEmployees');
-});
+
+    Route::get(
+        '/rrhh/permisos',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/rrhh/permisos','RRHH/Permisos');
+        }
+    )->name('rrhh.permisos');
+    Route::post('job-permissions', [PermisoController::class, 'getJobPermissions'])->name('permiso.getJobPermissions');
+    Route::get('get-data-permission-modal', [PermisoController::class, 'getDataPermissionModal'])->name('permiso.getDataPermissionModal');
+    Route::get('get-permission-data/{id_empleado}', [PermisoController::class, 'getPermissionData'])->name('permiso.getPermissionData');});
