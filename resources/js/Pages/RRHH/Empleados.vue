@@ -15,7 +15,7 @@ import axios from 'axios';
 </script>
 
 <template>
-    <Head title="RRHH - Gestion Empleados" />
+    <Head title="Proceso - Empleados" />
     <AppLayoutVue nameSubModule="RRHH - Empleados">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
@@ -69,9 +69,10 @@ import axios from 'axios';
                                 }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div :class="showDependencies(employee.plazas_asignadas) == 'N/Asign.' ? 'text-red-600' : ''" 
-                                class="font-medium text-center {{ showDependencies(employee.plazas_asignadas) === 'N/Asign.' ? 'text-red-500' : 'text-slate-800' }} ">{{
-                                    showDependencies(employee.plazas_asignadas) }}</div>
+                                <div :class="showDependencies(employee.plazas_asignadas) == 'N/Asign.' ? 'text-red-600' : ''"
+                                    class="font-medium text-center {{ showDependencies(employee.plazas_asignadas) === 'N/Asign.' ? 'text-red-500' : 'text-slate-800' }} ">
+                                    {{
+                                        showDependencies(employee.plazas_asignadas) }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
@@ -377,6 +378,7 @@ export default {
                     this.employees = data.data.data;
                     this.hasNext = data.data.current_page !== data.data.last_page;
                     this.employees.length > 0 ? this.empty_object = false : this.empty_object = true
+                    console.log(this.employees);
                 }
             }).catch((errors) => {
                 console.log(errors);
@@ -402,21 +404,14 @@ export default {
                 this.getEmployees()
             }
         },
-        showDependencies(arrayDependencies) {
-            let dependencies = ''
-            arrayDependencies.forEach((value, index) => {
-                if (value.estado_plaza_asignada == 1) {
-                    if (dependencies == '') {
-                        dependencies = dependencies + value.dependencia.codigo_dependencia
-                    } else {
-                        dependencies = dependencies + ", " + value.dependencia.codigo_dependencia
-                    }
-                }
-            })
-            dependencies == "" ? dependencies = "N/Asign." : dependencies
-            return dependencies
-        }
+        showDependencies(plazasAsignadas) {
+            const dependencies = plazasAsignadas.map(value => {
+                const dependency = value.dependencia.parent_dependency || value.dependencia;
+                return dependency.codigo_dependencia;
+            }).join(', ');
 
+            return dependencies || 'N/Asign.';
+        }
     },
     computed: {
     }

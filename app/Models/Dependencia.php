@@ -38,12 +38,12 @@ class Dependencia extends Model
         return $this->hasMany(DetalleQuedan::class, "id_quedan", "id_quedan");
     }
 
-    public function parentDependency()
+    public function parent_dependency()
     {
         return $this->hasOne('App\Models\Dependencia', 'id_dependencia', 'dep_id_dependencia');
     }
 
-    public function childrenDependencies()
+    public function children_dependencies()
     {
         return $this->hasMany('App\Models\Dependencia', 'dep_id_dependencia', 'id_dependencia');
     }

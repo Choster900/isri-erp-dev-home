@@ -49,7 +49,11 @@ class Persona extends Model
 
     public function empleado()
     {
-        return $this->hasOne(Empleado::class, 'id_persona', 'id_persona');
+        return $this->hasOne('App\Models\Empleado', 'id_persona', 'id_persona');
+    }
+    public function usuario()
+    {
+        return $this->hasOne('App\Models\User', 'id_usuario', 'id_persona');
     }
     public function residencias()
     {
