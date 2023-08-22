@@ -61,6 +61,11 @@ class User extends Authenticatable
             ]);
     }
 
+    public function persona()
+    {
+        return $this->hasOne('App\Models\Persona', 'id_usuario', 'id_usuario');
+    }
+
     //Check if the roles is active and if the user has this role assigned.
     public function hasRole($id_usuario, $id_rol)
     {
