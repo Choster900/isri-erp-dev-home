@@ -43,9 +43,11 @@ import moment from 'moment';
                                     @click="showJobPositions = false" />
                             </div>
                         </div>
-                        <h1 class="text-center mb-1 font-semibold text-slate-800 text-medium">
+                        <h1 v-if="jobPositions.length>0" class="text-center mb-1 font-semibold text-slate-800 text-medium">
                             PLAZAS
                             ASIGNADAS</h1>
+                        <h1 v-else class="text-center mb-1 font-semibold text-slate-800 text-medium">
+                            SIN PLAZAS ASIGNADAS</h1>
 
                         <div class="overflow-y-auto max-h-[360px]">
                             <div v-for="jobPosition in jobPositions" :key="jobPosition.id_plaza_asignada"

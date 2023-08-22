@@ -10,7 +10,7 @@ import moment from 'moment';
 <template>
     <div class="m-1.5">
         <Modal :show="showModalJobPermissions" @close="$emit('cerrar-modal')" :modal-title="'Solicitud de permiso. '"
-            maxWidth="2xl">
+            maxWidth="3xl">
             <div v-if="isLoading" class="flex items-center justify-center h-[100px]">
                 <div role="status" class="flex items-center">
                     <svg aria-hidden="true" class="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-800"
@@ -29,7 +29,18 @@ import moment from 'moment';
             </div>
             <div v-else class="px-5 py-3">
                 <div class="mb-4 md:flex flex-row justify-center">
-                    <div v-if="jobPositions.length > 1" class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                    <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
+                        <label class="block mb-2 text-xs font-light text-gray-600">
+                            Empleado <span class="text-red-600 font-extrabold">*</span>
+                        </label>
+                        <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
+                            <Multiselect placeholder="Seleccione empleado" v-model="permission.employeeId" ref="multi2"
+                                :options="employees" :searchable="true" @change="changeEmployee($event)"
+                                :disabled="permits.ejecutar === 0 ? true : false" />
+                            <LabelToInput icon="list" />
+                        </div>
+                    </div>
+                    <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                         <label class="block mb-2 text-xs font-light text-gray-600">
                             Plaza <span class="text-red-600 font-extrabold">*</span>
                         </label>
@@ -39,7 +50,7 @@ import moment from 'moment';
                             <LabelToInput icon="list" />
                         </div>
                     </div>
-                    <div class="mb-4 md:mr-0 md:mb-0 basis-1/2">
+                    <div class="mb-4 md:mr-0 md:mb-0 basis-1/3">
                         <label class="block mb-2 text-xs font-light text-gray-600">
                             Permiso <span class="text-red-600 font-extrabold">*</span>
                         </label>
@@ -50,7 +61,7 @@ import moment from 'moment';
                         </div>
                     </div>
                 </div>
-                <div class="rounded-lg border border-gray-400 shadow p-1 mb-4">
+                <div class="rounded-lg border border-gray-400 shadow p-1 mb-4 mx-10 text-sm">
                     <div class="flex">
                         <div class="flex-1 text-center p-1 border-r border-gray-400 ">
                             <p>Tiempo permitido</p>
@@ -110,7 +121,7 @@ import moment from 'moment';
                     <div class="w-1/3"></div>
                 </div>
                 <div :class="selectedOption === 'daily' ? 'rounded-tl-lg' : ''"
-                    class="mb-7 bg-gray-300 rounded-tr-lg rounded-b-lg">
+                    class="mb-7 rounded-tr-lg rounded-b-lg bg-gray-300">
                     <div class="mb-5 md:flex flex-row justify-items-start ml-1">
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                             <label class="block mb-2 text-xs font-light text-gray-600" for="fecha_nacimiento">
@@ -125,20 +136,22 @@ import moment from 'moment';
                             </div>
                         </div>
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                            <label v-if="selectedOption === 'daily'" class="block mb-2 text-xs font-light text-gray-600"
+                            <label class="block mb-2 text-xs font-light text-gray-600"
                                 for="fecha_nacimiento">
-                                Fecha Fin <span v-if="selectedOption === 'daily'"
+                                Fecha Fin <span 
                                     class="text-red-600 font-extrabold">*</span>
                             </label>
-                            <div v-if="selectedOption === 'daily'" class="relative flex">
+                            <div class="relative flex">
                                 <LabelToInput icon="date" />
                                 <flat-pickr
                                     class="peer font-semibold text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none w-full"
-                                    :config="config" v-model="permission.endDate" :placeholder="'Seleccione fecha fin'" />
+                                    :config="config" v-model="permission.endDate" 
+                                    :placeholder="selectedOption === 'hours' ? 'Deshabilitado' : 'Seleccione fecha fin' " 
+                                    :disabled="selectedOption === 'hours'" />
                             </div>
                         </div>
                     </div>
-                    <div v-if="selectedOption === 'hours'" class="mb-5 md:flex flex-row justify-items-start ml-1 pb-2">
+                    <div class="mb-5 md:flex flex-row justify-items-start ml-1 pb-2">
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                             <label class="block mb-2 text-xs font-light text-gray-600" for="fecha_nacimiento">
                                 Hora Inicio <span class="text-red-600 font-extrabold">*</span>
@@ -148,7 +161,7 @@ import moment from 'moment';
                                 <flat-pickr
                                     class="peer font-semibold text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none w-full"
                                     :config="configTime" v-model="permission.startTime"
-                                    :placeholder="'Seleccione hora inicio'" />
+                                    :placeholder="selectedOption === 'daily' ? 'Deshabilitado' : 'Seleccione hora inicio'" :disabled="selectedOption === 'daily'" />
                             </div>
                         </div>
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
@@ -160,7 +173,8 @@ import moment from 'moment';
                                 <flat-pickr
                                     class="peer font-semibold text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none w-full"
                                     :config="configTime" v-model="permission.endTime"
-                                    :placeholder="'Seleccione hora inicio'" />
+                                    :placeholder="selectedOption === 'daily' ? 'Deshabilitado' : 'Seleccione hora fin'" 
+                                    :disabled="selectedOption === 'daily'" />
                             </div>
                         </div>
                     </div>
@@ -181,6 +195,10 @@ export default {
         modalData: {
             type: Array,
             default: []
+        },
+        permits: {
+            type: Array,
+            default: []
         }
     },
     created() { },
@@ -193,6 +211,10 @@ export default {
                 time_24hr: true
             },
             errors: [],
+
+            employees: [],
+            isLoadingEmployee: false,
+
             jobPositionsToSelect: [],
             isLoading: false,
             jobPositions: [],
@@ -235,6 +257,10 @@ export default {
     methods: {
         handleOptionClick(option) {
             this.selectedOption = option;
+            this.permission.startDate=''
+            this.permission.endDate=''
+            this.permission.startTime=''
+            this.permission.endTime=''
         },
         formatTime(time) {
             if (this.permission.permissionId == 5 || this.permission.permissionId == 6) {
@@ -262,33 +288,39 @@ export default {
             selectedPermission ? this.showPermissionInfo.acumulatedTime = selectedPermission.total_acumulado : this.showPermissionInfo.acumulatedTime = ''
             selectedPermission ? this.showPermissionInfo.remainingTime = selectedPermission.restante : this.showPermissionInfo.remainingTime = ''
         },
-
-        onSearch(search, loading) {
-            if (search.length) {
-                loading(true);
-                this.search(loading, search, this);
-            }
-        },
-        search: _.debounce((loading, search, vm) => {
-            fetch(
-                `https://api.github.com/search/repositories?q=${escape(search)}`
-            ).then(res => {
-                res.json().then(json => (vm.options = json.items));
-                loading(false);
-            });
-        }, 350),
-
         async getPermissionData() {
             try {
                 this.isLoading = true;  // Activar el estado de carga
-                const response = await axios.get("/get-data-permission-modal");
+                const response = await axios.get("/get-data-permission-modal", {
+                    params: {
+                        ejecutar: this.permits.ejecutar
+                    }
+                });
                 this.jobPositions = response.data.jobPositions
                 this.typesOfPermissions = response.data.typesOfPermissions
+                this.employees = response.data.employees;
+                if (this.permits.ejecutar == 0) {
+                    this.permission.employeeId = this.employees[0].value
+                }
             } catch (errors) {
                 this.manageError(errors, this)
             } finally {
                 this.isLoading = false;  // Desactivar el estado de carga
             }
+        },
+        changeEmployee(id_empleado) {
+            this.typesOfPermissions=[]
+            this.jobPositions=[]
+            this.permission.jobPositionId=''
+            this.permission.permissionId=''
+            axios.get(`/get-permission-data/${id_empleado}`)
+                .then((response) => {
+                    this.typesOfPermissions = response.data.typesOfPermissions
+                    this.jobPositions = response.data.jobPositions
+                })
+                .catch((errors) => {
+                    console.log(errors);
+                });
         }
     },
     watch: {

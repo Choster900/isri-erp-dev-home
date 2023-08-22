@@ -692,9 +692,8 @@ class ReporteTesoreriaController extends Controller
                 recibo_ingreso ri
                 INNER JOIN detalle_recibo_ingreso dri ON ri.id_recibo_ingreso = dri.id_recibo_ingreso
                 INNER JOIN concepto_ingreso ci ON dri.id_concepto_ingreso = ci.id_concepto_ingreso
-                INNER JOIN dependencia d ON ci.id_dependencia = d.id_dependencia
-                WHERE 
-                ri.estado_recibo_ingreso = 1
+                LEFT JOIN dependencia d ON ci.id_dependencia = d.id_dependencia
+                WHERE ri.estado_recibo_ingreso = 1
                 AND ri.fecha_recibo_ingreso = ?
                 AND ci.id_proy_financiado = ?
                 AND ci.id_ccta_presupuestal <> 16201 

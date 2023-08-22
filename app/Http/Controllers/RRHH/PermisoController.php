@@ -26,13 +26,22 @@ class PermisoController extends Controller
         $user = User::find($request->user()->id_usuario);
         $id_empleado = $user->persona->empleado->id_empleado;
 
+        $arrayIdDependencias = [];
+        foreach ($user->persona->empleado->plazas_asignadas as $plaza) {
+            if ($plaza->estado_plaza_asignada == 1) {
+                $arrayIdDependencias[] = $plaza->id_dependencia;
+            }
+        }
+
         $length = $request->length;
         $column = $request->column; //Index
         $dir = $request->dir;
         $search_value = $request->search;
 
+        //Agregar el if para permits.ejecutar != 0
         $query = Permiso::select('*')
-            ->where('id_empleado', $id_empleado)
+            ->join('plaza_asignada', 'plaza_asignada.id_plaza_asignada', '=', 'permiso.id_plaza_asignada')
+            ->whereIn('plaza_asignada.id_dependencia', $arrayIdDependencias)
             ->orderBy($columns[$column], $dir);
 
         // if ($search_value) {
@@ -71,7 +80,58 @@ class PermisoController extends Controller
     public function getDataPermissionModal(Request $request)
     {
         $user = User::find($request->user()->id_usuario);
+        $executePermit = $request->ejecutar;
         $id_empleado = $user->persona->empleado->id_empleado;
+
+        $arrayIdDependencias = [];
+        foreach ($user->persona->empleado->plazas_asignadas as $plaza) {
+            if ($plaza->estado_plaza_asignada == 1) {
+                $arrayIdDependencias[] = $plaza->id_dependencia;
+            }
+        }
+        if ($executePermit != 0) {
+            $empleados = DB::table('empleado as e')
+                ->selectRaw('CONCAT(e.codigo_empleado, "-",CONCAT_WS(" ", p.pnombre_persona, p.snombre_persona, p.tnombre_persona,
+                p.papellido_persona, p.sapellido_persona, p.tapellido_persona)) as label,
+                 e.id_empleado as value,
+                 GROUP_CONCAT(pa.id_dependencia) as dependencias')
+                ->join('persona as p', 'e.id_persona', '=', 'p.id_persona')
+                ->join('plaza_asignada as pa', 'e.id_empleado', '=', 'pa.id_empleado')
+                ->where('pa.estado_plaza_asignada', 1)
+                ->whereIn('pa.id_dependencia', $arrayIdDependencias)
+                ->groupBy(
+                    'e.id_empleado',
+                    'e.codigo_empleado',
+                    'p.pnombre_persona',
+                    'p.snombre_persona',
+                    'p.tnombre_persona',
+                    'p.papellido_persona',
+                    'p.sapellido_persona',
+                    'p.tapellido_persona'
+                )
+                ->get();
+        } else {
+            $empleados = DB::table('empleado as e')
+                ->selectRaw('CONCAT(e.codigo_empleado, "-",CONCAT_WS(" ", p.pnombre_persona, p.snombre_persona, p.tnombre_persona,
+                p.papellido_persona, p.sapellido_persona, p.tapellido_persona)) as label,
+                 e.id_empleado as value')
+                ->join('persona as p', 'e.id_persona', '=', 'p.id_persona')
+                ->join('plaza_asignada as pa', 'e.id_empleado', '=', 'pa.id_empleado')
+                ->where('pa.estado_plaza_asignada', 1)
+                ->where('e.id_empleado', $id_empleado)
+                ->get();
+            $permissionData = $this->getPermissionData($id_empleado);
+        }
+
+        return response()->json([
+            'typesOfPermissions'          => $executePermit == 0 ? $permissionData['typesOfPermissions'] : [],
+            'jobPositions'                => $executePermit == 0 ? $permissionData['jobPositions'] : [],
+            'employees'                   => $empleados ?? []
+        ]);
+    }
+
+    public function getPermissionData($id_empleado)
+    {
         $typesOfPermissions = DB::table('tipo_permiso as tpe')
             ->leftJoin(
                 DB::raw('
@@ -107,14 +167,17 @@ class PermisoController extends Controller
             )
             ->addBinding($id_empleado)
             ->get();
+
+
         $jobPositions = PlazaAsignada::selectRaw('plaza_asignada.id_plaza_asignada as value, plaza.nombre_plaza as label')
             ->join('detalle_plaza', 'plaza_asignada.id_det_plaza', '=', 'detalle_plaza.id_det_plaza')
             ->join('plaza', 'detalle_plaza.id_plaza', '=', 'plaza.id_plaza')
             ->where('plaza_asignada.id_empleado', $id_empleado)
             ->get();
-        return response()->json([
-            'typesOfPermissions'          => $typesOfPermissions,
-            'jobPositions'                => $jobPositions
-        ]);
+
+        return [
+            'typesOfPermissions' => $typesOfPermissions ?? [],
+            'jobPositions' => $jobPositions ?? [],
+        ];
     }
 }

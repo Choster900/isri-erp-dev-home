@@ -180,7 +180,7 @@ import axios from 'axios';
             </div>
         </div>
 
-        <ModalPermisosVue :showModalJobPermissions="showModalJobPermissions" :modalData="modalData"
+        <ModalPermisosVue :showModalJobPermissions="showModalJobPermissions" :modalData="modalData" :permits="permits"
             @cerrar-modal="showModalJobPermissions = false"
             @get-table="getJobPermissions(tableData.currentPage)" />
 

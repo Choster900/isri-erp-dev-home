@@ -80,5 +80,4 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     )->name('rrhh.permisos');
     Route::post('job-permissions', [PermisoController::class, 'getJobPermissions'])->name('permiso.getJobPermissions');
     Route::get('get-data-permission-modal', [PermisoController::class, 'getDataPermissionModal'])->name('permiso.getDataPermissionModal');
-
-});
+    Route::get('get-permission-data/{id_empleado}', [PermisoController::class, 'getPermissionData'])->name('permiso.getPermissionData');});
