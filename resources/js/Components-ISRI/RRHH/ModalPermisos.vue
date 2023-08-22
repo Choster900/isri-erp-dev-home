@@ -146,7 +146,7 @@ import moment from 'moment';
                                 <flat-pickr
                                     class="peer font-semibold text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none w-full"
                                     :config="config" v-model="permission.endDate" 
-                                    :placeholder="selectedOption === 'hours' ? 'Deshabilitado' : 'Seleccione fecha fin' " 
+                                    :placeholder=" selectedOption === 'hours' ? 'Deshabilitado' : 'Seleccione fecha fin' " 
                                     :disabled="selectedOption === 'hours'" />
                             </div>
                         </div>
