@@ -86,6 +86,9 @@ import AccordionBasicVue from '@/Components-ISRI/AccordionBasic.vue';
                     </div>
                 </div>
             </div>
+            <pre>
+<!--         {{ moreInformacionEmployee.empleado.plazas_asignadas }} -->
+    </pre>
         </div>
     </div>
 </template>
