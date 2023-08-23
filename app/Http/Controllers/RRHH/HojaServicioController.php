@@ -21,6 +21,10 @@ class HojaServicioController extends Controller
             'estado_civil',
             'municipio.departamento.pais',
             'nivel_educativo.tipo_nivel_educativo',
+            'empleado.acuerdo_laboral' => function ($query) {
+                $query->where('estado_acuerdo_laboral', 1);
+                $query->orderBy('fecha_reg_acuerdo_laboral', 'desc');
+            },
             'empleado.acuerdo_laboral.tipo_acuerdo_laboral',
             'empleado.plazas_asignadas.detalle_plaza.plaza',
             'empleado.plazas_asignadas.dependencia',

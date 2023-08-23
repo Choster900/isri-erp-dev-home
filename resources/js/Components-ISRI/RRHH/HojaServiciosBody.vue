@@ -213,17 +213,18 @@ export default {
             let name = 'HOJA DE SERVICIO'// Nombre del pdf
             // Propiedades del pdf
             const opt = {
-                margin: 0,
+                //margin: 0.5, DEJANDO EL MARGEN POR DEFAUL
                 filename: name,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, useCORS: true },
-               // pagebreak: { mode: 'avoid-all', before: '#page2el' },
-                pagebreak: { mode: ['avoid-all', 'css'] },
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait', lineHeight: 'lineHeight' },
+                // pagebreak: { mode: 'avoid-all', before: '#page2el' },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
             };
 
             // Crear una instancia de la aplicación Vue para generar el componente quedanPDFVue
-            const app = createApp(HojaServiciosPdfVue);// El pdf en cuestion
+            const app = createApp(HojaServiciosPdfVue,{
+                userData: this.userData,
+            });// El pdf en cuestion
 
             // Crear un elemento div y montar la instancia de la aplicación en él
             const div = document.createElement('div');
