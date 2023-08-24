@@ -66,7 +66,7 @@ import ListAcuerdosVue from './ListAcuerdos.vue';
                                 </template>
                                 <div class="mt-4">
                                     <button @click="showMoreActivity()"
-                                        :class="this.currentDealIndex <= this.arrDeals.length - 1 ? 'hover:border-slate-300 text-blue-900 hover:bg-slate-200' : 'text-slate-600 bg-gray-200 cursor-not-allowed'"
+                                        :class="currentDealIndex <= arrDeals.length - 1 ? 'hover:border-slate-300 text-blue-900 hover:bg-slate-200' : 'text-slate-600 bg-gray-200 cursor-not-allowed'"
                                         class="btn-sm w-full border border-slate-300 rounded-md py-1   shadow-none">Show More Activity</button>
                                 </div>
                             </div>
