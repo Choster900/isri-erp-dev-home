@@ -35,6 +35,7 @@ import html2pdf from 'html2pdf.js'
                         <img class="rounded-full border-4 border-white scale-100"
                             :src="userData && userData.fotos && userData.fotos.length > 0 ? userData.fotos[userData['fotos'].length - 1].url_foto : 'https://img.freepik.com/free-icon/user_318-159711.jpg?w=2000'" />
                     </div>
+                    
                 </div>
             </div>
 

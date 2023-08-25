@@ -31,9 +31,10 @@ import ListAcuerdosVue from './ListAcuerdos.vue';
                                 <TooltipVue bg="dark" v-for="(day, weekIndex) in dayGenerater()[mothIndex]"
                                     :key="weekIndex">
                                     <template v-slot:contenido>
-                                        <div :class="isDateInDataDeals(moment(`${year}-${month}-${day}`).format('L')) ? 'bg-green-900/90' : 'bg-gray-500/60'"
+                                        <div @click="isDateInDataDeals(moment(`${year}-${month}-${day}`).format('L')) ? showMoreActivity(true, moment(`${year}-${month}-${day}`).format('L')) : ''"
+                                            :class="isDateInDataDeals(moment(`${year}-${month}-${day}`).format('L')) ? 'bg-green-900/90' : 'bg-gray-500/60'"
                                             class="h-[11px] w-[11px]  m-[1.5px] rounded-sm ">
-                                           <!--  <span class="text-[8px]">{{ isDateInDataDeals(moment(`${year}-${month}-${day}`).format('L')) }}</span> -->
+                                            <!--  <span class="text-[8px]">{{ isDateInDataDeals(moment(`${year}-${month}-${day}`).format('L')) }}</span> -->
                                         </div>
                                     </template>
                                     <template v-slot:message>
@@ -57,17 +58,20 @@ import ListAcuerdosVue from './ListAcuerdos.vue';
                             <div class="bg-slate-50 p-4 rounded border border-slate-200">
                                 <template v-for="(acuerdosArray, mesAñoKey) in objectDeals" :key="mesAñoKey">
                                     <div class="flex justify-start text-xs font-semibold text-slate-400  mb-4">
-                                        <span class="mr-1">{{ moment(acuerdosArray.mesAño, 'MM-YYYY').format('MMMM YYYY')}} </span>
+                                        <span class="mr-1">{{ moment(acuerdosArray.mesAño, 'MM-YYYY').format('MMMM YYYY') }}
+                                        </span>
                                         <hr class="h-0.5 bg-slate-200 flex-grow my-1.5" aria-hidden="true">
                                     </div>
                                     <ul>
-                                        <ListAcuerdosVue v-for="acuerdos, i in acuerdosArray['acuerdos']" :key="i" :deal="acuerdos" />
+                                        <ListAcuerdosVue v-for="acuerdos, i in acuerdosArray['acuerdos']" :key="i"
+                                            :deal="acuerdos" />
                                     </ul>
                                 </template>
-                                <div class="mt-4">
+                                <div class="mt-4"><!-- TODO: PONER LOS ESTILOS PARA BOTON DESHABILITADO CUANDO ESTE FILTRANDO POR FECHA -->
                                     <button @click="showMoreActivity()"
-                                        :class="currentDealIndex <= arrDeals.length - 1 ? 'hover:border-slate-300 text-blue-900 hover:bg-slate-200' : 'text-slate-600 bg-gray-200 cursor-not-allowed'"
-                                        class="btn-sm w-full border border-slate-300 rounded-md py-1   shadow-none">Show More Activity</button>
+                                        :class=" currentDealIndex <= arrDeals.length - 1 ? 'hover:border-slate-300 text-blue-900 hover:bg-slate-200' : 'text-slate-600 bg-gray-200 cursor-not-allowed'"
+                                        class="btn-sm w-full border border-slate-300 rounded-md py-1   shadow-none">Show
+                                        More Activity</button>
                                 </div>
                             </div>
                         </div>
@@ -75,7 +79,7 @@ import ListAcuerdosVue from './ListAcuerdos.vue';
                 </div>
                 <div class="px-4 py-2 rounded-md overflow-x-auto pt-8">
                     <div class="flex items-center justify-center pb-2" v-for="index in listYears" :key="index">
-                        <button @click="year = index; showMoreActivity(true)"
+                        <button @click="year = index;  showMoreActivity(true)"
                             :class="year == index ? 'bg-blue-900' : 'bg-gray-500 hover:bg-slate-600'"
                             class="relative  text-white p-3 w-20 h-8 rounded-lg text-sm uppercase font-semibold tracking-tight overflow-visible">
                             <span class="flex items-center justify-center h-full">{{ index }}</span>
@@ -111,6 +115,10 @@ export default {
             newDataAcuerdos: [],
             currentDealIndex: null,
             objectDeals: [],
+            isFiltering: false,
+            filterFromHereDate: null,
+            
+            
 
         }
     },
@@ -133,10 +141,11 @@ export default {
                 const fechaAcuerdo = new Date(acuerdo.fecha_acuerdo_laboral);
 
                 // Construir una clave para agrupar por mes y año
-                const mes = fechaAcuerdo.getMonth() + 1; // Sumamos 1 para ajustar el índice del mes
+                const mes = fechaAcuerdo.getMonth() ; // Sumamos 1 para ajustar el índice del mes
                 const año = fechaAcuerdo.getFullYear();
-                const mesAñoKey = `${mes < 10 ? '0' : ''}${mes}-${año}`;
-
+          //      const mesAñoKey = `${mes < 10 ? '0' : ''}${mes}-${año}`;
+                const mesAñoKey = moment(acuerdo.fecha_acuerdo_laboral).format('MM-YYYY'); // Formato "MM-YYYY"
+                console.log({mesAñoKey});
 
                 if (!this.newDataAcuerdos[mesAñoKey]) {
                     this.newDataAcuerdos[mesAñoKey] = [];
@@ -164,10 +173,44 @@ export default {
             return acuerdosData
         },
 
+
     },
     methods: {
+        newFilter(filterFromHere) {
+            this.isFiltering = true
+            const targetMonthYear = moment(filterFromHere, "DD/MM/YYYY").format("MM-YYYY");
+            const matchingArrayIndex = this.arrDeals.findIndex(item => item.mesAño === targetMonthYear);
 
-        showMoreActivity(reset = false) {
+            if (matchingArrayIndex !== -1) {
+                const matchingArray = this.arrDeals[matchingArrayIndex];
+
+                const targetCompleteDate = moment(filterFromHere, "DD/MM/YYYY").format("YYYY-MM-DD");
+                const filteredAcuerdos = matchingArray.acuerdos.filter(deal => deal.fecha_acuerdo_laboral <= targetCompleteDate);
+
+                // Crear un nuevo objeto con los acuerdos actualizados
+                const updatedMatchingArray = {
+                    ...matchingArray,
+                    acuerdos: filteredAcuerdos
+                };
+
+                // Reemplazar el objeto antiguo con el nuevo en el arreglo
+                this.arrDeals[matchingArrayIndex] = updatedMatchingArray;
+
+                return this.arrDeals.filter(item => item.mesAño <= targetMonthYear);
+
+            } else {
+                //console.log("No se encontró ningún arreglo con ese mes y año.");
+            }
+
+        },
+        showMoreActivity(reset = false, filterFromHere = '') {
+
+            if (filterFromHere) {
+                this.filterFromHereDate = filterFromHere
+                this.isFiltering = true;
+            }
+            console.log(this.arrDeals);
+
             if (reset) {
                 this.objectDeals = []
                 this.newDataAcuerdos = []
@@ -176,12 +219,20 @@ export default {
             if (this.currentDealIndex === null) {
                 this.currentDealIndex = 0;
             }
-            if (this.currentDealIndex <= this.arrDeals.length - 1) {
+
+            if (this.currentDealIndex <= this.arrDeals.length - 1 && filterFromHere == '' && !this.isFiltering) {
+
                 this.objectDeals.push(this.arrDeals[this.currentDealIndex]);
+                this.currentDealIndex++;
+
+            } else {
+                this.objectDeals.push(this.newFilter(this.filterFromHereDate)[this.currentDealIndex]);
                 this.currentDealIndex++;
             }
 
+
         },
+
 
         filterAllYearsInDeals() {
 
