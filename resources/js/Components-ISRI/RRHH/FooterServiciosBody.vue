@@ -56,7 +56,7 @@ import ListAcuerdosVue from './ListAcuerdos.vue';
                     <div class="md:py-8">
                         <div class="space-y-4">
                             <div class="bg-slate-50 p-4 rounded border border-slate-200">
-                                <template v-for="(acuerdosArray, mesAñoKey) in objectDeals" :key="mesAñoKey">
+                                <template v-for="(acuerdosArray, mesAñoKey) in objectToShowDeals" :key="mesAñoKey">
                                     <div class="flex justify-start text-xs font-semibold text-slate-400  mb-4">
                                         <span class="mr-1">{{ moment(acuerdosArray.mesAño, 'MM-YYYY').format('MMMM YYYY') }}
                                         </span>
@@ -67,9 +67,10 @@ import ListAcuerdosVue from './ListAcuerdos.vue';
                                             :deal="acuerdos" />
                                     </ul>
                                 </template>
-                                <div class="mt-4"><!-- TODO: PONER LOS ESTILOS PARA BOTON DESHABILITADO CUANDO ESTE FILTRANDO POR FECHA -->
+                                <div class="mt-4">
+                                    <!-- TODO: PONER LOS ESTILOS PARA BOTON DESHABILITADO CUANDO ESTE FILTRANDO POR FECHA -->
                                     <button @click="showMoreActivity()"
-                                        :class=" currentDealIndex <= arrDeals.length - 1 ? 'hover:border-slate-300 text-blue-900 hover:bg-slate-200' : 'text-slate-600 bg-gray-200 cursor-not-allowed'"
+                                        :class="currentDealIndex <= dataFiltered.length - 1 ? 'hover:border-slate-300 text-blue-900 hover:bg-slate-200' : 'text-slate-600 bg-gray-200 cursor-not-allowed'"
                                         class="btn-sm w-full border border-slate-300 rounded-md py-1   shadow-none">Show
                                         More Activity</button>
                                 </div>
@@ -79,7 +80,7 @@ import ListAcuerdosVue from './ListAcuerdos.vue';
                 </div>
                 <div class="px-4 py-2 rounded-md overflow-x-auto pt-8">
                     <div class="flex items-center justify-center pb-2" v-for="index in listYears" :key="index">
-                        <button @click="year = index;  showMoreActivity(true)"
+                        <button @click="year = index; showMoreActivity(true)"
                             :class="year == index ? 'bg-blue-900' : 'bg-gray-500 hover:bg-slate-600'"
                             class="relative  text-white p-3 w-20 h-8 rounded-lg text-sm uppercase font-semibold tracking-tight overflow-visible">
                             <span class="flex items-center justify-center h-full">{{ index }}</span>
@@ -112,13 +113,11 @@ export default {
             monthName: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
             year: '',
             listYears: [],
-            newDataAcuerdos: [],
+            objectToShowDeals: [],//data para imprimr 
             currentDealIndex: null,
-            objectDeals: [],
+            dataFiltered: [],
             isFiltering: false,
-            filterFromHereDate: null,
-            
-            
+            filterDate: null,
 
         }
     },
@@ -135,35 +134,28 @@ export default {
             });
 
         },
-        arrDeals() {//No podia directamente recorrer este objeto en un v-for asi que mejor lo hice aqui
+        arrDeals() {// Filtra y ordena la data por fecha
+            const dataAcuerdos = []
             this.ObjectOrderedByMonths.forEach(acuerdo => {
                 // Obtener la fecha del acuerdo laboral en formato de fecha
-                const fechaAcuerdo = new Date(acuerdo.fecha_acuerdo_laboral);
-
-                // Construir una clave para agrupar por mes y año
-                const mes = fechaAcuerdo.getMonth() ; // Sumamos 1 para ajustar el índice del mes
-                const año = fechaAcuerdo.getFullYear();
-          //      const mesAñoKey = `${mes < 10 ? '0' : ''}${mes}-${año}`;
                 const mesAñoKey = moment(acuerdo.fecha_acuerdo_laboral).format('MM-YYYY'); // Formato "MM-YYYY"
-                console.log({mesAñoKey});
-
-                if (!this.newDataAcuerdos[mesAñoKey]) {
-                    this.newDataAcuerdos[mesAñoKey] = [];
+                if (!dataAcuerdos[mesAñoKey]) {
+                    dataAcuerdos[mesAñoKey] = [];
                 }
                 // Agregar el acuerdo laboral al arreglo correspondiente al mes y año
-                this.newDataAcuerdos[mesAñoKey].push(acuerdo);
+                dataAcuerdos[mesAñoKey].push(acuerdo);
 
             });
 
             const acuerdosData = [];
 
-            for (const mesAñoKey in this.newDataAcuerdos) {
+            for (const mesAñoKey in dataAcuerdos) {
                 const mesAñoObj = {
                     mesAño: mesAñoKey,
                     acuerdos: []
                 };
 
-                const acuerdosArray = this.newDataAcuerdos[mesAñoKey];
+                const acuerdosArray = dataAcuerdos[mesAñoKey];
                 for (const acuerdo of acuerdosArray) {
                     mesAñoObj.acuerdos.push(acuerdo);
                 }
@@ -177,60 +169,53 @@ export default {
     },
     methods: {
         newFilter(filterFromHere) {
-            this.isFiltering = true
-            const targetMonthYear = moment(filterFromHere, "DD/MM/YYYY").format("MM-YYYY");
-            const matchingArrayIndex = this.arrDeals.findIndex(item => item.mesAño === targetMonthYear);
+            // Pasamos esta data a true 
+            this.isFiltering = true;
+            // Almacenamos la fecha de filtrado
+            this.filterDate = filterFromHere
 
-            if (matchingArrayIndex !== -1) {
-                const matchingArray = this.arrDeals[matchingArrayIndex];
+            // Hacer una copia de la data actual
+            const copiedData = JSON.parse(JSON.stringify(this.arrDeals));
+            const targetMonthYear = moment(this.filterDate, "DD/MM/YYYY").format("MM-YYYY");
+            const matchingArrayIndex = copiedData.findIndex(item => item.mesAño === targetMonthYear);
 
-                const targetCompleteDate = moment(filterFromHere, "DD/MM/YYYY").format("YYYY-MM-DD");
-                const filteredAcuerdos = matchingArray.acuerdos.filter(deal => deal.fecha_acuerdo_laboral <= targetCompleteDate);
+            console.log(matchingArrayIndex);
+            console.log(copiedData);
+            const matchingArray = copiedData[matchingArrayIndex];
 
-                // Crear un nuevo objeto con los acuerdos actualizados
-                const updatedMatchingArray = {
-                    ...matchingArray,
-                    acuerdos: filteredAcuerdos
-                };
+            const targetCompleteDate = moment(this.filterDate, "DD/MM/YYYY").format("YYYY-MM-DD");
 
-                // Reemplazar el objeto antiguo con el nuevo en el arreglo
-                this.arrDeals[matchingArrayIndex] = updatedMatchingArray;
+            const filteredAcuerdos = matchingArray.acuerdos.filter(deal => deal.fecha_acuerdo_laboral <= targetCompleteDate);
 
-                return this.arrDeals.filter(item => item.mesAño <= targetMonthYear);
+            const updatedMatchingArray = {
+                ...matchingArray,
+                acuerdos: filteredAcuerdos
+            };
 
-            } else {
-                //console.log("No se encontró ningún arreglo con ese mes y año.");
-            }
-
+            copiedData[matchingArrayIndex] = updatedMatchingArray;
+            return copiedData.filter(deal => deal.mesAño <= targetMonthYear);
         },
         showMoreActivity(reset = false, filterFromHere = '') {
-
-            if (filterFromHere) {
-                this.filterFromHereDate = filterFromHere
-                this.isFiltering = true;
+            // Dejar el codigo asi (NO TOCAR 🚫)
+            // Si se solicita un reinicio y también se proporciona un filtro
+            if (reset && filterFromHere) {
+                this.dataFiltered = []
+                this.objectToShowDeals = []
+                this.currentDealIndex = 0;
             }
-            console.log(this.arrDeals);
-
+            // Si se solicita un reinicio (sin filtro)
             if (reset) {
-                this.objectDeals = []
-                this.newDataAcuerdos = []
+                this.dataFiltered = []
+                this.objectToShowDeals = []
                 this.currentDealIndex = 0;
+                this.dataFiltered = filterFromHere ? this.newFilter(filterFromHere) : this.arrDeals;
             }
-            if (this.currentDealIndex === null) {
-                this.currentDealIndex = 0;
-            }
-
-            if (this.currentDealIndex <= this.arrDeals.length - 1 && filterFromHere == '' && !this.isFiltering) {
-
-                this.objectDeals.push(this.arrDeals[this.currentDealIndex]);
-                this.currentDealIndex++;
-
-            } else {
-                this.objectDeals.push(this.newFilter(this.filterFromHereDate)[this.currentDealIndex]);
+            // Si el índice actual es menor que la longitud de dataFiltered
+            if (this.currentDealIndex < this.dataFiltered.length) {
+                // Agregar el siguiente objeto al arreglo de objetos para mostrar
+                this.objectToShowDeals.push(this.dataFiltered[this.currentDealIndex]);
                 this.currentDealIndex++;
             }
-
-
         },
 
 
@@ -282,21 +267,19 @@ export default {
     },
     watch: {
         showAcuerdos() {
-            this.objectDeals = []
+            this.objectToShowDeals = []
             this.currentDealIndex = 0;
             this.filterAllYearsInDeals()
 
-            this.showMoreActivity()
+            this.showMoreActivity(true)
 
         },
         deals() {
-            this.objectDeals = []
+            this.objectToShowDeals = []
             this.currentDealIndex = 0;
             this.year = '';
-            this.objectDeals = []
-            this.newDataAcuerdos = []
             this.filterAllYearsInDeals()
-            this.showMoreActivity()
+            this.showMoreActivity(true)
 
         }
     }

@@ -10,9 +10,9 @@ import html2pdf from 'html2pdf.js'
         :class="profileSidebarOpen ? 'translate-x-1/3' : 'translate-x-0'">
 
         <!-- Profile background -->
-        <div class="relative h-56">
+        <div class="relative h-80">
             <img class="object-cover h-full w-full "
-                src="../../../img//pexels-juan-manuel-montejano-lopez-13538708.jpg"
+                src="../../../img/banerHojaDeServicio.jpg"
                 alt="Profile background" />
             <!-- Close button -->
             <button class="md:hidden absolute top-4 left-4 sm:left-6 text-white opacity-80 hover:opacity-100"
@@ -194,8 +194,8 @@ export default {
     data() {
         return {
             isSelected: {
-                showInformation: true,
-                showAcuerdos: false,
+                showInformation: false,
+                showAcuerdos: true,
             }
         }
     },

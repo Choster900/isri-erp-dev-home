@@ -32,7 +32,7 @@
                     </div>
                     <ul class="mb-6" v-if="userMatches != ''">
                         <li class="-mx-2"
-                            :class="isProfileSelected.id_empleado == user.id_empleado ? 'bg-slate-300 rounded-md' : ''"
+                            :class="{ ' bg-slate-300 rounded-md': isProfileSelected.id_empleado == user.id_empleado }"
                             v-for="user in userMatches" :key="user">
                             <button class="w-full p-2 rounded " @click="$emit('sendUserDataWhenIsClick', user)"
                                 :title="`${user.empleado.codigo_empleado} -${user.pnombre_persona ? user.pnombre_persona : ''} ${user.snombre_persona ? user.snombre_persona : ''} ${user.tnombre_persona ? user.snombre_persona : ''} ${user.papellido_persona ? user.papellido_persona : ''} ${user.sapellido_persona ? user.sapellido_persona : ''} ${user.tapellido_persona ? user.tapellido_persona : ''} `">
