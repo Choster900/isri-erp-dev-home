@@ -26,19 +26,19 @@ import axios from "axios";
             </div>
         </div>
         <Modal v-else :show="showModalJobPositionDet" @close="$emit('cerrar-modal')"
-            :modal-title="'Administracion plazas. '" maxWidth="3xl">
+            :modal-title="'Administracion puestos. '" maxWidth="3xl">
             <div class="px-5 py-4">
                 <div class="text-sm">
 
                     <div class="mb-2 md:flex flex-row justify-between">
                         <div class="md:w-1/2">
                             <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
-                                Informacion de la plaza
+                                Informacion del puesto
                             </span>
                         </div>
                         <div v-if="modalData != ''" class="md:w-1/2 md:text-right">
                             <span class="font-semibold text-slate-800 text-lg">
-                                Codigo plaza:
+                                Codigo puesto:
                             </span>
                             <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
                                 {{ jobPositionDet.codigo_det_plaza }}
@@ -125,7 +125,7 @@ import axios from "axios";
                         </div>
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                             <label class="block mb-2 text-xs font-light text-gray-600">
-                                Estado plaza <span class="text-red-600 font-extrabold">*</span>
+                                Estado puesto <span class="text-red-600 font-extrabold">*</span>
                             </label>
                             <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                                 <Multiselect v-model="jobPositionDet.id_estado_plaza" :options="statusOptions"

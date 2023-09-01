@@ -79,5 +79,9 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('rrhh.permisos');
     Route::post('job-permissions', [PermisoController::class, 'getJobPermissions'])->name('permiso.getJobPermissions');
-    Route::get('get-data-permission-modal', [PermisoController::class, 'getDataPermissionModal'])->name('permiso.getDataPermissionModal');
-    Route::get('get-permission-data/{id_empleado}', [PermisoController::class, 'getPermissionData'])->name('permiso.getPermissionData');});
+    Route::get('get-data-permission-modal/{id_empleado}', [PermisoController::class, 'getDataPermissionModal'])->name('permiso.getDataPermissionModal');
+    Route::get('get-permission-data/{id_empleado}', [PermisoController::class, 'getPermissionData'])->name('permiso.getPermissionData');
+    Route::post('store-employee-permission', [PermisoController::class, 'storeEmployeePermission'])->name('permiso.storeEmployeePermission');
+    Route::post('update-employee-permission', [PermisoController::class, 'updateEmployeePermission'])->name('permiso.updateEmployeePermission');
+
+});

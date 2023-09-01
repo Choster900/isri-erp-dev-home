@@ -53,4 +53,9 @@ class Empleado extends Model
     {
         return $this->hasMany(AcuerdoLaboral::class, 'id_empleado', 'id_empleado');
     }
+
+    public function permisos()
+    {
+        return $this->hasMany('App\Models\Permisos','id_empleado','id_empleado');
+    }
 }
