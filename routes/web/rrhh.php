@@ -4,6 +4,7 @@ use App\Http\Controllers\RRHH\AcuerdoController;
 use App\Http\Controllers\RRHH\DetallePlazaController;
 use App\Http\Controllers\RRHH\BeneficiarioController;
 use App\Http\Controllers\RRHH\EmpleadoController;
+use App\Http\Controllers\RRHH\EvaluacionController;
 use App\Http\Controllers\RRHH\HojaServicioController;
 use App\Http\Controllers\RRHH\PermisoController;
 use Illuminate\Support\Facades\Route;
@@ -75,7 +76,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get(
         '/rrhh/permisos',
         function (Request $request) {
-            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/rrhh/permisos','RRHH/Permisos');
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/permisos', 'RRHH/Permisos');
         }
     )->name('rrhh.permisos');
     Route::post('job-permissions', [PermisoController::class, 'getJobPermissions'])->name('permiso.getJobPermissions');
@@ -83,5 +84,13 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get('get-permission-data/{id_empleado}', [PermisoController::class, 'getPermissionData'])->name('permiso.getPermissionData');
     Route::post('store-employee-permission', [PermisoController::class, 'storeEmployeePermission'])->name('permiso.storeEmployeePermission');
     Route::post('update-employee-permission', [PermisoController::class, 'updateEmployeePermission'])->name('permiso.updateEmployeePermission');
+
+    Route::get(
+        '/rrhh/evaluaciones',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/evaluaciones', 'RRHH/Evaluaciones');
+        }
+    )->name('rrhh.evaluaciones');
+    Route::get('get-evaluacion-rendimiento', [EvaluacionController::class, 'getEvaluacionRendimiento'])->name('evaluacion.rendimiento');
 
 });

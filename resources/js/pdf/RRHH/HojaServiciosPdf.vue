@@ -4,11 +4,27 @@
             <div class="flex items-center gap-3">
                 <img src="../../../img/default-avatar2.jpg" alt="Foto de la persona" class="w-16 h-16 rounded-full mb-2">
                 <div class="mb-6">
-                    <h2 class="text-lg text-white font-semibold">SERGIO ADONAY LOPEZ MEJIA</h2>
-                    <p class="text-sm text-white">Tecnico en soporte informatico</p>
+                    <h2 class="text-base text-white font-semibold"> {{ userData != '' ?
+                        `${userData.empleado.codigo_empleado}
+                                            - ${userData.pnombre_persona ? userData.pnombre_persona : ''} ${userData.snombre_persona ?
+                            userData.snombre_persona : ''} ${userData.tnombre_persona ? userData.snombre_persona : ''}
+                                            ${userData.papellido_persona ? userData.papellido_persona : ''} ${userData.sapellido_persona ?
+                            userData.sapellido_persona : ''} ${userData.tapellido_persona ? userData.tapellido_persona : ''}
+                        `: '' }}</h2>
+                    <p class="text-xs text-white">
+                        {{ userData.empleado.plazas_asignadas.filter((plaza) => plaza.estado_plaza_asignada ==
+                            1).map((plaza, index) => {
+                                return `${plaza.detalle_plaza.plaza.nombre_plaza}`
+                            }
+                            ).join(", ") }}
+
+                    </p>
                 </div>
             </div>
         </div>
+        <!--  <pre>
+            {{ dataUser }}
+        </pre> -->
         <div class="ml-4">
             <div class="mb-2">
                 <div class="flex items-center"> <!-- Use "items-center" to vertically align items -->
@@ -19,8 +35,8 @@
                                 fill="#3D3D3D"></path>
                         </svg>
                     </span>
-                    <span class="ml-2 mb-4">
-                        +503 7140-5653
+                    <span class="ml-2 mb-4 text-xs">
+                        +503 {{ userData.telefono_persona || 'No definido' }}
                     </span>
                 </div>
             </div>
@@ -34,8 +50,8 @@
 
                         </svg>
                     </span>
-                    <span class="ml-2 mb-4">
-                        hello@reallygreatsite.com
+                    <span class="ml-2 mb-4 text-xs">
+                        {{ userData.empleado.email_institucional_empleado }}
                     </span>
                 </div>
             </div>
@@ -56,8 +72,11 @@
                             </g>
                         </svg>
                     </span>
-                    <span class="ml-2 mb-4">
-                        123 Anywhere St., Any City
+                    <span class="ml-2 mb-4 text-xs">
+                        {{
+                            `${userData.municipio.departamento.pais.id_pais}-${userData.municipio.departamento.pais.nombre_pais}
+                                                ${userData.municipio.departamento.id_departamento}-${userData.municipio.departamento.nombre_departamento}
+                                                ${userData.municipio.id_municipio}-${userData.municipio.nombre_municipio}` }}
                     </span>
                 </div>
             </div>
@@ -67,42 +86,54 @@
 
 
     <div class="flex items-center justify-center">
-        <div class="text-[15pt] w-1/4 -mt-16 font-bold">
+        <div class="text-[15pt] w-1/4 -mt-16 text-start font-bold">
             Sombre el empleado
         </div>
         <p class="w-1/2 text-[9.3pt] mb-1 text-justify">
 
-            El empleado SERGIO ADONAY LOPEZ MEJIA con numero de cedula N° 1-19-00827 extendedida ROSARIO DE MORA,
-            3/DICIEMBRE/1971
-            estado civil Soltero con direccion SLV-EL SALVADOR 06-SAN SALVADOR 0614-SAN SALVADOR con lugar y fecha de
-            nacimiento Rosario de mora, Depto. San Salvador
-            8/Octumbre/1995 Educacion SECRETARIA COMERCIAL, Ingreso el 19./Abril/1974, Cargo, AUXILIAR DE 4a. CLASE
-            con sueldo 120.00
+            El empleado {{ `${userData.pnombre_persona ? userData.pnombre_persona : ''} ${userData.snombre_persona ?
+                userData.snombre_persona : ''} ${userData.tnombre_persona ? userData.snombre_persona : ''}
+                        ${userData.papellido_persona ? userData.papellido_persona : ''} ${userData.sapellido_persona ?
+                    userData.sapellido_persona : ''} ${userData.tapellido_persona ? userData.tapellido_persona : ''}` }} con numero
+            de DUI {{ userData.dui_persona }} extendedida
+            (PENDIENTE)
+            {{ userData.fecha_nac_persona }}
+            con estado civil {{ userData.estado_civil.nombre_estado_civil }} con direccion {{
+                `${userData.municipio.departamento.pais.id_pais}-${userData.municipio.departamento.pais.nombre_pais}
+                        ${userData.municipio.departamento.id_departamento}-${userData.municipio.departamento.nombre_departamento}
+                        ${userData.municipio.id_municipio}-${userData.municipio.nombre_municipio}` }}, con lugar y fecha de
+            nacimiento (PENDIENTE)
+            Educacion {{ userData.profesion.nombre_profesion }}, Ingreso el {{ userData.empleado.fecha_contratacion_empleado
+            }}, Cargo,
+            {{
+                userData.empleado.plazas_asignadas.filter((plaza) => plaza.estado_plaza_asignada == 1).map((plaza, index) => {
+                    return `${plaza.detalle_plaza.plaza.nombre_plaza} con salario
+                        $${userData.empleado.plazas_asignadas.filter((plaza) => plaza.estado_plaza_asignada ==
+                        1)[index].salario_plaza_asignada}`
+                }
+                ).join(", ")
+            }}
+
+
         </p>
     </div>
 
-    <hr class="h-0.5 border-none mx-14 mb-3 mt-7 bg-[#3D3D3D]">
-    <div class="flex mx-16">
-        <div class="w-1/3">
-            <div class="text-[15pt] font-bold  bg-white sticky top-0 p-4 text-center">
-                Acuerdos
-            </div>
+    <hr class="h-0.5 border-none mx-14 mb-1 mt-7 bg-[#3D3D3D]">
+    <div class="w-1/3">
+        <div class="text-[15pt] font-bold  bg-white sticky top-0  text-start pl-24">
+            Acuerdos
         </div>
-        <div class="w-3/4">
-            <div class="text-[9.3pt]  p-4">
-                <div class=" border mt-4" v-for="index in 20" :key="index" id="page2el">
-                    <h1 class="text-sm font-bold">ACUERDO RR-HH 161-2023</h1>
-                    <h2 class="text-xs font-semibold">PRORROGA CONTRATO - <span class="italic font-light">20/12/2023</span>
-                    </h2>
-                    <p class="text-justify mb-4">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
-                        et
-                        dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                        dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                        dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                    </p>
-                   <!--   <div style="page-break-before: always;"></div> -->
-                </div>
+    </div>
+    <div class="w-11/12 flex justify-center pl-24">
+        <div class="text-[9.3pt]  pt-1">
+            <div class="" v-for="i in userData.empleado.acuerdo_laboral" :key="i" id="page2el">
+                <h1 class="text-sm font-bold pt-10">{{ i.oficio_acuerdo_laboral }}</h1>
+                <h2 class="text-xs font-semibold">{{ i.tipo_acuerdo_laboral.nombre_tipo_acuerdo_laboral }} - <span
+                        class="italic font-light">{{ i.fecha_acuerdo_laboral }}</span>
+                </h2>
+                <p class="text-justify mb-1">
+                    {{ i.comentario_acuerdo_laboral }}
+                </p>
             </div>
         </div>
     </div>
@@ -110,6 +141,7 @@
 
 <script>
 export default {
+    props: ["userData"],
     data() {
         return {
             flags: 0,
