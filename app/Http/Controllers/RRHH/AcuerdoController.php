@@ -72,7 +72,7 @@ class AcuerdoController extends Controller
 
     public function searchEmployeByNameOrId(Request $request)
     {
-        if ($request["by"] == 'name') {
+        if ($request["by"] == 'name') {//FIXME: CHECK THIS QUERY
             return Empleado::select(
                 'empleado.id_empleado as value',
                 DB::raw("CONCAT_WS(' ', pnombre_persona, snombre_persona, tnombre_persona, papellido_persona, sapellido_persona, tapellido_persona) AS label"),
@@ -80,7 +80,7 @@ class AcuerdoController extends Controller
                 'nivel_educativo.nombre_nivel_educativo',
                 'genero.nombre_genero',
                 'estado_civil.nombre_estado_civil',
-                'dui_persona',
+                'dui_persona' ,
                 'fecha_nac_persona',
                 'fecha_reg_persona',
                 'fecha_mod_persona',

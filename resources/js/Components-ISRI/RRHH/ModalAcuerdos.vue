@@ -817,7 +817,7 @@ export default {
 </script>
 
 
-<style>
+<style scoped>
 /* Estilos del scrollbar para navegadores WebKit (Chrome y Safari) */
 /* Cambia los colores y dimensiones según tu preferencia */
 div::-webkit-scrollbar {

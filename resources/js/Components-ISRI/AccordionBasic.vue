@@ -1,15 +1,17 @@
 <template>
-  <div class="px-5 py-4 rounded-sm border border-slate-200">
-    <button class="flex items-center justify-between w-full group mb-1" @click.prevent="toggleAccordion"
+  <div :class="containerClass">
+    <button class="flex items-center justify-between w-full group mb-1 pr-1.5" @click.prevent="toggleAccordion"
       :aria-expanded="open">
-      <div class="text-sm text-slate-800 font-medium">{{ title }}</div>
-      <svg class="w-8 h-8 shrink-0 fill-current text-slate-400 group-hover:text-slate-500 ml-3"
-        :class="{ 'rotate-180': open }" viewBox="0 0 32 32">
-        <path d="M16 20l-5.4-5.4 1.4-1.4 4 4 4-4 1.4 1.4z" />
-      </svg>
+      <slot name="titleContent"/>
+      <div class="border  rounded-full">
+        <svg class="w-7 h-7 shrink-0 fill-current text-slate-400 group-hover:text-slate-500"
+          :class="{ 'rotate-180': open }" viewBox="0 0 32 32">
+          <path d="M16 20l-5.4-5.4 1.4-1.4 4 4 4-4 1.4 1.4z" />
+        </svg>
+      </div>
     </button>
-    <div class="text-sm accordion-content" :class="{ 'open': open }" ref="accordionContent">
-      <slot />
+    <div class="accordion-content" :class="{ 'open': open }" ref="accordionContent">
+      <slot name="bodyContent"/>
     </div>
   </div>
 </template>
@@ -19,8 +21,8 @@ import { ref } from 'vue'
 
 export default {
   name: 'AccordionBasic',
-  props: ['title'],
-  setup() {
+  props: ['title','containerClass'],
+  setup(props) {
     const open = ref(false)
     const accordionContent = ref(null)
 
