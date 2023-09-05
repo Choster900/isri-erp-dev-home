@@ -285,9 +285,9 @@ import moment from 'moment';
                                 <label class="block mb-2 text-xs text-black" for="descripcion">
                                     Descripción
                                 </label>
-                                <textarea v-model="permission.description" id="description" name="description"
+                                <textarea v-model="permission.observation" id="description" name="description"
                                     class="resize-none w-full h-12 overflow-y-auto peer text-xs font-semibold rounded-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
-                                    @input="validateInput('description', limit = 250)">
+                                    @input="validateInput('observation', limit = 250)">
                                 </textarea>
                                 <InputError v-for="(item, index) in errors.description" :key="index" class="mt-2"
                                     :message="item" />

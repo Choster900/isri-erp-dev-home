@@ -87,7 +87,7 @@ import axios from 'axios';
                                 <div class="space-x-1 text-center">
                                     <DropDownOptions>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            v-if="permission.estado_permiso == 1" @click="viewPermission(permission)">
+                                            v-if="permission.estado_permiso == 1" @click="printPermission(permission)">
                                             <div class="w-8 text-blue-900">
                                                 <span class="text-xs">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -187,6 +187,11 @@ import axios from 'axios';
 </template>
 
 <script>
+import PermisoFormatPDFVue from '@/pdf/RRHH/PermissionFormatPDF.vue';
+import { createApp, h } from 'vue'
+import html2pdf from 'html2pdf.js'
+import { jsPDF } from "jspdf";
+
 export default {
     created() {
         this.getPermissions(this)
@@ -199,7 +204,7 @@ export default {
             { width: "25%", label: "Tipo permiso", name: "nombre_tipo_permiso", type: "text" },
             { width: "30%", label: "Empleado", name: "pnombre_persona", type: "text" },
             { width: "15%", label: "Fechas", name: "fecha_inicio_permiso", type: "date" },
-            { width: "10%", label: "Tiempo", name: "fecha_fin_permiso", type: "text" },
+            { width: "10%", label: "Tiempo", name: "horas", type: "text" },
             {
                 width: "10%", label: "Estado", name: "id_estado_permiso", type: "select",
                 options: [
@@ -218,6 +223,7 @@ export default {
                 sortOrders[column.name] = -1;
         });
         return {
+            printPermissionFlag: false,
             emptyObject: false,
             //Data for datatable
             jobPermissions: [],
@@ -250,6 +256,42 @@ export default {
         }
     },
     methods: {
+        printPermission(permission) {
+            let name = 'PERMISO ' + permission.codigo_tipo_permiso + ' - ' + permission.codigo_empleado;
+
+            const opt = {
+                margin: 0.2,
+                filename: name,
+                //pagebreak: {mode:'css',before:'#pagebreak'},
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 3, useCORS: true },
+                //jsPDF: { unit: 'cm', format: [13.95,21.5], orientation: 'landscape' }
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+            };
+
+            const app = createApp(PermisoFormatPDFVue, {
+                permission: permission,
+            });
+            const div = document.createElement('div');
+            const pdfPrint = app.mount(div);
+            const html = div.outerHTML;
+
+            //html2pdf().set(opt).from(html).save();
+
+            const currentDateTime = moment().format('DD/MM/YYYY, HH:mm:ss');
+            html2pdf().set(opt).from(html)
+                .toPdf().get('pdf').then(function (pdf) {
+                    pdf.setFontSize(10);
+                    //Text for the date and time.
+                    let date_text = 'SIGI - Generado: ' + currentDateTime
+                    //Get the text width
+                    const textWidth = pdf.getStringUnitWidth(date_text) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
+                    //Write the text in the desired coordinates.
+                    pdf.text(pdf.internal.pageSize.getWidth() - textWidth - 0.2, pdf.internal.pageSize.getHeight() - 0.4, date_text);
+                })
+                .save()
+                .catch(err => console.log(err));
+        },
         showDate(startDate, endDate) {
             if (endDate) {
                 return moment(startDate).format('DD/MM/YYYY') + ' al ' + moment(endDate).format('DD/MM/YYYY')
@@ -258,7 +300,7 @@ export default {
             }
         },
         showTime(permission) {
-            if (permission.id_tipo_permiso == 6 || permission.id_tipo_permiso == 5) {
+            if (permission.id_tipo_permiso == 6) {
                 return 'N/A'
             } else {
                 if (permission.fecha_fin_permiso && permission.fecha_inicio_permiso) {
@@ -404,4 +446,5 @@ export default {
 .ellipsis {
     overflow: hidden;
     text-overflow: ellipsis;
-}</style>
+}
+</style>

@@ -21,19 +21,17 @@ class PermisoController extends Controller
             'nombre_tipo_permiso',
             'pnombre_persona',
             'fecha_inicio_permiso',
-            'fecha_fin_permiso',
+            'horas',
             'id_estado_permiso'
         ];
 
-        $user = User::find($request->user()->id_usuario);
+        $user = $request->user();
         $id_empleado = $user->persona->empleado->id_empleado;
 
-        $arrayIdDependencias = [];
-        foreach ($user->persona->empleado->plazas_asignadas as $plaza) {
-            if ($plaza->estado_plaza_asignada == 1) {
-                $arrayIdDependencias[] = $plaza->id_dependencia;
-            }
-        }
+        $arrayIdDependencias = $user->persona->empleado->plazas_asignadas
+            ->where('estado_plaza_asignada', 1)
+            ->pluck('id_dependencia')
+            ->toArray();
 
         $length = $request->length;
         $column = $request->column; //Index
@@ -66,55 +64,38 @@ class PermisoController extends Controller
         }
 
         if ($search_value) {
-            $query->where([
-                ['id_permiso', 'like', '%' . $search_value['id_permiso'] . '%'],
-                ['nombre_tipo_permiso', 'like', '%' . $search_value['nombre_tipo_permiso'] . '%'],
-                // ['fecha_inicio_permiso', 'like', '%' . $search_value['fecha_inicio_permiso'] . '%'],
-                //['estado_usuario', 'like', '%' . $search_value['estado_usuario'] . '%'],
-                [function ($query) use ($search_value) {
-                    $query->where('pnombre_persona', 'like', '%' . $search_value['pnombre_persona'] . '%')
-                        ->orWhere('snombre_persona', 'like', '%' . $search_value['pnombre_persona'] . '%')
-                        ->orWhere('tnombre_persona', 'like', '%' . $search_value['pnombre_persona'] . '%')
-                        ->orWhere('papellido_persona', 'like', '%' . $search_value['pnombre_persona'] . '%')
-                        ->orWhere('sapellido_persona', 'like', '%' . $search_value['pnombre_persona'] . '%')
-                        ->orWhere('tapellido_persona', 'like', '%' . $search_value['pnombre_persona'] . '%');
-                }],
-                [function ($query) use ($search_value) {
-                    if ($search_value['fecha_inicio_permiso'] != '') {
-                        $fechaBusqueda = $search_value['fecha_inicio_permiso'];
-
-                        $query->whereRaw('? BETWEEN fecha_inicio_permiso AND IFNULL(fecha_fin_permiso, ?)', [$fechaBusqueda, $fechaBusqueda]);
-                    }
-                }],
-            ]);
-
-            // $query->where('id_permiso', 'like', '%' . $search_value['id_permiso'] . '%')
-            //     ->where('nombre_tipo_permiso', 'like', '%' . $search_value['nombre_tipo_permiso'] . '%')
-            //     ->where('id_estado_plaza', 'like', '%' . $search_value["pnombre_persona"] . '%');
-
-            // ->where(function ($query) use ($search_value) {
-            //     $query->whereHas('plaza', function ($query) use ($search_value) {
-            //         $query->where('nombre_plaza', 'like', '%' . $search_value["nombre_plaza"] . '%');
-            //     });
-            //     if ($search_value["codigo_dependencia"]) {
-            //         $query->whereHas('plazas_asignadas.dependencia', function ($query) use ($search_value) {
-            //             $query->where('codigo_dependencia', 'like', '%' . $search_value["codigo_dependencia"] . '%');
-            //         });
-            //     }
-            //     if ($search_value["nombre_empleado"]) {
-            //         $query->whereHas(
-            //             'plaza_asignada_activa.empleado.persona',
-            //             function ($query) use ($search_value) {
-            //                 $query->where('pnombre_persona', 'like', '%' . $search_value["nombre_empleado"] . '%')
-            //                     ->orWhere('snombre_persona', 'like', '%' . $search_value["nombre_empleado"] . '%')
-            //                     ->orWhere('tnombre_persona', 'like', '%' . $search_value["nombre_empleado"] . '%')
-            //                     ->orWhere('papellido_persona', 'like', '%' . $search_value["nombre_empleado"] . '%')
-            //                     ->orWhere('sapellido_persona', 'like', '%' . $search_value["nombre_empleado"] . '%')
-            //                     ->orWhere('tapellido_persona', 'like', '%' . $search_value["nombre_empleado"] . '%');
-            //             }
-            //         );
-            //     }
-            // });
+            $query->where(function ($query) use ($search_value) {
+                $query->where('id_permiso', 'like', '%' . $search_value['id_permiso'] . '%')
+                    ->where('nombre_tipo_permiso', 'like', '%' . $search_value['nombre_tipo_permiso'] . '%')
+                    ->where(function ($query) use ($search_value) {
+                        $query->where('pnombre_persona', 'like', '%' . $search_value['pnombre_persona'] . '%')
+                            ->orWhere('snombre_persona', 'like', '%' . $search_value['pnombre_persona'] . '%')
+                            ->orWhere('tnombre_persona', 'like', '%' . $search_value['pnombre_persona'] . '%')
+                            ->orWhere('papellido_persona', 'like', '%' . $search_value['pnombre_persona'] . '%')
+                            ->orWhere('sapellido_persona', 'like', '%' . $search_value['pnombre_persona'] . '%')
+                            ->orWhere('tapellido_persona', 'like', '%' . $search_value['pnombre_persona'] . '%');
+                    })
+                    ->where(function ($query) use ($search_value) {
+                        if ($search_value['fecha_inicio_permiso']) {
+                            $query->whereRaw('? BETWEEN fecha_inicio_permiso AND IFNULL(fecha_fin_permiso, fecha_inicio_permiso)', $search_value['fecha_inicio_permiso']);
+                        }
+                    })
+                    ->where(function ($query) use ($search_value) {
+                        if ($search_value['horas']) {
+                            $query->whereRaw(
+                                '? = (SELECT 
+                                    SUM(CASE 
+                                        WHEN fecha_inicio_permiso IS NOT NULL AND fecha_fin_permiso IS NOT NULL 
+                                            THEN (DATEDIFF(fecha_fin_permiso, fecha_inicio_permiso) + 1) * 8 * 60 * 60 
+                                        ELSE TIME_TO_SEC(TIMEDIFF(hora_salida_permiso, hora_entrada_permiso)) 
+                                    END)
+                                    FROM permiso as sub_permiso
+                                    WHERE sub_permiso.id_permiso = permiso.id_permiso) ',
+                                $search_value['horas'] * 60 * 60
+                            );
+                        }
+                    });
+            });
         }
 
         $permissions = $query->paginate($length)->onEachSide(1);
@@ -236,7 +217,7 @@ class PermisoController extends Controller
 
             $cantidadPermisos = DB::table('permiso')
                 ->where('id_tipo_permiso', 6)
-                ->where('id_estado_permiso', '!=', 4)
+                ->whereIn('id_estado_permiso', [1, 2]) // Check if id_estado_permiso is 1 or 2
                 ->where('id_empleado', $request->employeeId)
                 ->whereMonth('fecha_inicio_permiso', $mesPermiso)
                 ->count();
@@ -335,15 +316,14 @@ class PermisoController extends Controller
         } else {
             $isValidTime = true;
             if ($request->typeOfPermissionId == 6) {
-                //$fechaPermiso = Carbon::createFromFormat('d/m/Y', $request->startDate)->format('Y-m-d');
                 $fechaPermiso = Carbon::parse($request->startDate)->format('Y-m-d');
                 $mesPermiso = Carbon::createFromFormat('Y-m-d', $fechaPermiso)->format('m');
                 $mesNombre = Carbon::createFromFormat('m', $mesPermiso)->locale('es_ES')->monthName;
 
                 $cantidadPermisos = DB::table('permiso')
                     ->where('id_permiso', '!=', $request->permissionId)
+                    ->whereIn('id_estado_permiso', [1, 2]) // Check if id_estado_permiso is 1 or 2
                     ->where('id_tipo_permiso', 6)
-                    ->where('id_estado_permiso', '!=', 4)
                     ->where('id_empleado', $request->employeeId)
                     ->whereMonth('fecha_inicio_permiso', $mesPermiso)
                     ->count();
