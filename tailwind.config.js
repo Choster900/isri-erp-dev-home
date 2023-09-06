@@ -13,6 +13,8 @@ module.exports = {
         extend: {
             fontFamily: {
                 sans: ['Nunito', ...defaultTheme.fontFamily.sans],
+                'bembo': ['Bembo'],
+                'museoSans': ['MuseoSans'],
             },
             gridTemplateRows: {
                 // Agregando nueva clase para manejar Grid Template Rows
