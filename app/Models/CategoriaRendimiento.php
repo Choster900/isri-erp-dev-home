@@ -44,4 +44,13 @@ class CategoriaRendimiento extends Model
     {
         return $this->belongsTo(EvaluacionRendimiento::class, 'id_evaluacion_rendimiento', 'id_evaluacion_rendimiento');
     }
+    /**
+     * Get the detalle_evaluacion_personal that owns the CategoriaRendimiento
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function detalle_evaluacion_personal(): HasMany
+    {
+        return $this->HasMany(DetalleEvaluacionPersonal::class, 'id_cat_rendimiento', 'id_cat_rendimiento');
+    }
 }

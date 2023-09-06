@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class RubricaRendimiento extends Model
 {
@@ -14,7 +15,6 @@ class RubricaRendimiento extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'id_rubrica_rendimiento',
         'id_cat_rendimiento',
         'opcion_rubrica_rendimiento',
         'descripcion_rubrica_rendimiento',
@@ -33,5 +33,14 @@ class RubricaRendimiento extends Model
     public function categoria_rendimiento(): BelongsTo
     {
         return $this->belongsTo(CategoriaRendimiento::class, 'id_cat_rendimiento', 'id_cat_rendimiento');
+    }
+    /**
+     * Get all of the detalle_evaluaciones_pesonal for the RubricaRendimiento
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function detalle_evaluaciones_pesonal(): HasMany
+    {
+        return $this->hasMany(DetalleEvaluacionPersonal::class, 'id_rubrica_rendimiento', 'id_rubrica_rendimiento');
     }
 }

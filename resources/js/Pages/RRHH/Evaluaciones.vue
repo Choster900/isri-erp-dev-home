@@ -20,71 +20,65 @@ import ModalEvalueacionesVue from '@/Components-ISRI/RRHH/ModalEvalueaciones.vue
                 <div class="mb-4 md:flex flex-row justify-items-start">
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-                            <Multiselect v-model="tableData.length" @select="getAcuerdos()"
-                                @deselect=" tableData.length = 5; getAcuerdos()"
-                                @clear="tableData.length = 5; getAcuerdos()" :options="perPage" :searchable="true"
+                            <Multiselect v-model="tableData.length" @select="getEvaluaciones()"
+                                @deselect=" tableData.length = 5; getEvaluaciones()"
+                                @clear="tableData.length = 5; getEvaluaciones()" :options="perPage" :searchable="true"
                                 placeholder="Cantidad a mostrar" />
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
                     <h2 class="font-semibold text-slate-800 pt-1">Empleados: <span class="text-slate-400 font-medium">{{
-                        acuerdos.length
+                        evaluaciones.length
                     }}</span></h2>
                 </div>
             </header>
 
             <div class="overflow-x-auto">
                 <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
-                    @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getAcuerdos()">
+                    @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getEvaluaciones()">
                     <tbody class="text-sm divide-y divide-slate-200">
-                        <tr v-for="(acuerdos, i) in acuerdos" :key="i">
+                        <tr v-for="(evaluacion, i) in evaluaciones" :key="i">
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center ">{{ acuerdos.id_empleado }}</div>
+                                <div class="font-medium text-slate-800 text-center ">{{ evaluacion.id_empleado }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center ">{{ acuerdos.codigo_empleado }}</div>
+                                <div class="font-medium text-slate-800 text-center ">{{ evaluacion.codigo_empleado }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ `${acuerdos.persona.pnombre_persona ? acuerdos.persona.pnombre_persona : ''}
-                                                                        ${acuerdos.persona.snombre_persona ? acuerdos.persona.snombre_persona : ''}
-                                                                        ${acuerdos.persona.tapellido_persona ? acuerdos.persona.tapellido_persona : ''}` }}
+                                    {{ `${evaluacion.persona.pnombre_persona ? evaluacion.persona.pnombre_persona : ''}
+                                                                        ${evaluacion.persona.snombre_persona ? evaluacion.persona.snombre_persona : ''}
+                                                                        ${evaluacion.persona.tapellido_persona ? evaluacion.persona.tapellido_persona : ''}` }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ `${acuerdos.persona.papellido_persona ? acuerdos.persona.papellido_persona : ''}
-                                                                        ${acuerdos.persona.sapellido_persona ? acuerdos.persona.sapellido_persona : ''}
-                                                                        ${acuerdos.persona.tapellido_persona ? acuerdos.persona.tapellido_persona : ''}` }}
+                                    {{ `${evaluacion.persona.papellido_persona ? evaluacion.persona.papellido_persona : ''}
+                                                                        ${evaluacion.persona.sapellido_persona ? evaluacion.persona.sapellido_persona : ''}
+                                                                        ${evaluacion.persona.tapellido_persona ? evaluacion.persona.tapellido_persona : ''}` }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ acuerdos.email_institucional_empleado }}
+                                    {{ evaluacion.email_institucional_empleado }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center flex justify-center gap-2">
-                                    <span>{{ acuerdos.acuerdo_laboral.length }}</span>
-
-
-
+                                    <span>{{  }}</span>
                                     <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                                         class="w-5 h-5">
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                             d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" />
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z" />
                                     </svg>
-
-
-
                                 </div>
                             </td>
                             <td class="first:pl-5 last:pr-5">
                                 <div class="space-x-1">
                                     <DropDownOptions>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            @click.stop="dataEvaluacionToSendModal = acuerdos; showModalEvaluacion = !showModalEvaluacion">
+                                            @click.stop="dataEvaluacionToSendModal = evaluacion; showModalEvaluacion = !showModalEvaluacion">
                                             <div class="w-8 text-blue-900">
                                                 <span class="text-xs">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -121,7 +115,7 @@ import ModalEvalueacionesVue from '@/Components-ISRI/RRHH/ModalEvalueaciones.vue
                             <li v-for="link in links" :key="link.label">
                                 <span v-if="link.label === 'Anterior'"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
-                                    <a @click="getAcuerdos(link.url)"
+                                    <a @click="getEvaluaciones(link.url)"
                                         class="btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer text-indigo-500">
                                         <div class="flex items-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -136,7 +130,7 @@ import ModalEvalueacionesVue from '@/Components-ISRI/RRHH/ModalEvalueaciones.vue
                                 <span v-else-if="(link.label == 'Siguiente')"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="getAcuerdos(link.url)"
+                                        <a @click="getEvaluaciones(link.url)"
                                             class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer text-indigo-500">
 
                                             <div class="flex items-center">
@@ -152,7 +146,7 @@ import ModalEvalueacionesVue from '@/Components-ISRI/RRHH/ModalEvalueaciones.vue
                                 </span>
                                 <span class="cursor-pointer" v-else
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
-                                        class=" w-5" @click="getAcuerdos(link.url)">{{ link.label }}</span>
+                                        class=" w-5" @click="getEvaluaciones(link.url)">{{ link.label }}</span>
                                 </span>
                             </li>
                         </ul>
@@ -160,9 +154,7 @@ import ModalEvalueacionesVue from '@/Components-ISRI/RRHH/ModalEvalueaciones.vue
                 </nav>
             </div>
         </div>
-
-        <ModalEvalueacionesVue :showModal="showModalEvaluacion" @cerrar-modal="showModalEvaluacion = false" />
-
+        <ModalEvalueacionesVue :showModal="showModalEvaluacion" @cerrar-modal="showModalEvaluacion = false" :dataEvaluacionEmpleado="dataEvaluacionToSendModal"/>
     </AppLayoutVue>
 </template>
 
@@ -190,12 +182,11 @@ export default {
             empty_object: false,
             permits: [],
             stateModal: false,
-            acuerdos: [],
-            dataForSelect: [],
+            evaluaciones: [],
             dataEvaluacionToSendModal: [],
             showModalEvaluacion: false,
             links: [],
-            lastUrl: "/beneficiarios",
+            lastUrl: "/evaluaciones",
             columns: columns,
             sortKey: "id_persona",
             sortOrders: sortOrders,
@@ -220,7 +211,7 @@ export default {
         }
     },
     methods: {
-        async getAcuerdos(url = "/acuerdos") {
+        async getEvaluaciones(url = "/evaluaciones") {
             this.lastUrl = url;
             this.tableData.draw++;
             await axios.post(url, this.tableData).then((response) => {
@@ -230,25 +221,7 @@ export default {
                     this.pagination.total = data.data.total;
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
-
-                    // Como eloquent no me filtra los familiares que estan desactivados si no que me trae todos por igual
-                    /* const filteredData = data.data.data.map((obj) => {
-                        // Tenemos que hacer esto
-                        const filteredFamiliar = obj.familiar.filter(
-                            (familiar) => familiar.estado_familiar === 1
-                        );
-                        return { ...obj, familiar: filteredFamiliar };
-                    }); */
-
-                    //  console.log(filteredData);
-
-                    this.acuerdos = data.data.data;
-                    let dataForSelect = JSON.parse(JSON.stringify(data.dataForSelect));
-                    this.dataForSelect = dataForSelect
-                    this.stateModal = false
-                    this.acuerdos.length > 0 ? this.empty_object = false : this.empty_object = true
-
-
+                   this.evaluaciones = response.data.data.data;
 
                 }
             }).catch((errors) => {
@@ -261,7 +234,7 @@ export default {
                 this.sortOrders[key] = this.sortOrders[key] * -1;
                 this.tableData.column = this.getIndex(this.columns, "name", key);
                 this.tableData.dir = this.sortOrders[key] === 1 ? "asc" : "desc";
-                this.getAcuerdos();
+                this.getEvaluaciones();
             }
         },
         getIndex(array, key, value) {
@@ -279,7 +252,7 @@ export default {
         handleData(myEventData) {
             if (this.validarCamposVacios(myEventData)) {
                 this.tableData.search = {};
-                this.getAcuerdos();
+                this.getEvaluaciones();
             }
             else {
                 this.tableData.search = myEventData;
@@ -302,7 +275,7 @@ export default {
 
     },
     created() {
-        this.getAcuerdos()
+        this.getEvaluaciones()
     },
 }
 </script>

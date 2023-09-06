@@ -6,7 +6,7 @@ import moment from 'moment';
 import Modal from "@/Components-ISRI/AllModal/Modal.vue";
 import AccordionBasicVue from '../AccordionBasic.vue';
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue';
-
+import DocumentoEvaluacionVue from './DocumentoEvaluacion.vue';
 </script>
 
 <template>
@@ -29,10 +29,15 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue';
                                         empleado</label>
 
                                     <div class="relative flex h-8 w-full flex-row-reverse ">
-                                        <Multiselect placeholder="seleccione" noOptionsText="Sin opciones" :classes="{
-                                            noOptions: 'py-2 px-3 text-gray-600 bg-white text-left text-sm ',
-                                            placeholder: 'text-sm flex items-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-black rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ',
-                                        }" :options="[]" :searchable="true" />
+                                        <Multiselect v-model="id_empleado"
+                                            :disabled="dataEvaluacionEmpleado != '' ? true : false"
+                                            @search-change="handleEmployeeSearchChange($event)" :clearOnSearch="true"
+                                            placeholder="Puedes filtrar por apellidos" :filter-results="false"
+                                            :min-chars="10" :resolve-on-load="true" :searchable="true"
+                                            :options="employeOptions" noOptionsText="Sin opciones" :classes="{
+                                                noOptions: 'py-2 px-3 text-gray-600 bg-white text-left text-sm ',
+                                                placeholder: 'text-sm flex items-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-slate-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ',
+                                            }" />
                                     </div>
                                 </div>
                                 <div class="-mx-3 flex flex-wrap">
@@ -41,7 +46,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue';
                                         <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Fecha
                                         </label>
                                         <div class="mb-4  md:mb-0">
-                                            <flat-pickr placeholder="DD/MM/YYYY"
+                                            <flat-pickr placeholder="DD/MM/YYYY" v-model="fecha_evaluacion_personal"
                                                 class="w-[120px] text-xs text-center cursor-pointer rounded-[5px] border h-7 border-slate-400 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
                                                 :config="config" />
                                         </div>
@@ -52,12 +57,14 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue';
                                         <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Periodo
                                             evaluacion</label>
                                         <input type="text" name="lName" id="lName" placeholder="MES DIA-AÑO - MES DIA-AÑO"
+                                            v-model="periodo_evaluacion_personal"
                                             class="w-[230px] text-xs  rounded-[5px] border h-7 border-slate-400 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none" />
 
                                     </div>
                                 </div>
-                                <button
-                                    class="bg-indigo-900 rounded-lg shadow text-center text-white text-base font-normal w-full py-1 mt-5">Nueva evaluacion</button>
+                                <button @click="submitEvaluacionDocument()"
+                                    class="bg-indigo-900 rounded-sm shadow text-center text-white text-base font-light w-full py-1 mt-5">Nueva
+                                    evaluacion</button>
                             </div>
                         </div>
                     </div>
@@ -72,38 +79,46 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue';
                                     <tbody class="text-sm divide-y divide-slate-100"><!-- Row -->
                                         <tr>
                                             <td>
-                                                <template v-for="i in 10" :key="i">
+                                                <template v-for="e, i in  evaluaciones " :key="i">
                                                     <AccordionBasicVue containerClass=" rounded-sm border border-slate-200"
                                                         bodyClass="text-red-500">
                                                         <template v-slot:titleContent>
-                                                            <h1 class="text-center font-medium pl-4 py-3">Lorem ipsum
-                                                                dolor sit amet </h1>
+                                                            <h1 class="text-center font-medium pl-4 py-3">
+
+
+                                                                <ul class="ml-4 list-circle">
+                                                                    <li
+                                                                        class="relative  before:w-[10px] before:h-[10px] before:border-[3px] before:border-indigo-500 before:rounded-full before:absolute before:-left-4 before:top-1">
+                                                                        {{ e.periodo_evaluacion_personal }} </li>
+
+                                                                </ul>
+
+                                                            </h1>
                                                         </template>
                                                         <template v-slot:bodyContent>
                                                             <div
                                                                 class="bg-slate-300/40 border-l-[4px] border-y-0 border-r-0 border-l-indigo-500 ">
                                                                 <h1
-                                                                    class="text-start font-semibold pl-3 pt-5 text-indigo-500">
+                                                                    class="text-start font-semibold pl-3 pt-2 text-indigo-500">
                                                                     Lorem ipsum dolor sit amet consectetur</h1>
                                                                 <ul class="ml-10 list-circle py-4">
                                                                     <li
                                                                         class="relative  before:w-[10px] before:h-[10px] before:border-[3px] before:border-indigo-500 before:rounded-full before:absolute before:-left-4 before:top-1">
                                                                         Puntuacion</li>
-                                                                    <p>10.00</p>
+                                                                    <p>{{ e.puntaje_evaluacion_personal }}</p>
                                                                     <li
                                                                         class="relative  before:w-[10px] before:h-[10px] before:border-[3px] before:border-indigo-500 before:rounded-full before:absolute before:-left-4 before:top-1">
                                                                         Fecha Evaluado</li>
-                                                                    <p>10/12/2023</p>
-
+                                                                    <p>{{ e.fecha_evaluacion_personal }}</p>
                                                                     <li
                                                                         class="flex items-center relative before:w-[10px] before:h-[10px] before:border-[3px] before:border-indigo-500 before:rounded-full before:absolute before:-left-4 before:top-1">
                                                                         <span class="mr-2">Ver evaluacion: </span>
                                                                         <lord-icon class="cursor-pointer"
+                                                                            @click="getPersonalEvaluation(e.id_evaluacion_rendimiento)"
                                                                             src="https://cdn.lordicon.com/vufjamqa.json"
                                                                             trigger="hover" colors="primary:#121331"
                                                                             style="width:20px;height:20px"></lord-icon>
                                                                     </li>
-
                                                                 </ul>
                                                             </div>
                                                         </template>
@@ -111,7 +126,6 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue';
                                                 </template>
                                             </td>
                                         </tr>
-
                                     </tbody>
                                 </table>
                             </div>
@@ -160,150 +174,11 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue';
                             </ul>
                         </div>
                     </div>
-                    <div class=" mx-4 overflow-y-auto max-h-[calc(100vh-200px)] p-3 mb-4">
+                  <!--   <pre>
+                        {{ evaluaciones }}
+                    </pre> -->
+                    <DocumentoEvaluacionVue :dataEvaluacion="dataEvaluacionPersonal" :dataPersonalEvaluacion="evaluaciones" />
 
-                        <table>
-                            <tbody>
-                                <tr>
-                                    <td class="border border-black" rowspan="4">
-                                        <div class="w-44 px-1.5"><img src="../../../img/isri-gob.png" alt=""></div>
-                                    </td>
-                                    <td class="border border-black text-center font-medium uppercase" rowspan="2">
-                                        Seguimiento de Desempeño</td>
-                                    <td class="border border-black text-[8pt] font-semibold pr-3 px-1.5">FECHA DE CREACIÓN:
-                                        12/12/2021</td>
-                                </tr>
-                                <tr>
-                                    <td class="border border-black text-[8pt] font-semibold   px-1.5">-</td>
-                                </tr>
-                                <tr>
-                                    <td class="border border-black text-center font-medium px-8" rowspan="2">DESEMPEÑO DE
-                                        PERSONAL ADMINISTRATIVO</td>
-                                    <td class="border border-black text-[8pt] font-semibold py-0.5 px-1.5">DEPENDENCIA:
-                                        ADMON</td>
-                                </tr>
-                                <tr>
-                                    <td class="border border-black text-[8pt] font-semibold  py-0.5 px-1.5">CODIGO: VERSION
-                                        1.0</td>
-                                </tr>
-                                <tr>
-                                    <td class="border border-black bg-black h-5 text-white text-center text-[10pt] "
-                                        colspan="3">ESPECIFICACIONES</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div class="flex items-center justify-center pt-4 gap-28">
-                            <div class="flex   flex-row">
-                                <label for="" class="flex items-center text-[7pt] font-semibold">EMPLEADO: </label>
-                                <input type="text" value="SERGIO ADONAY LOPEZ MEJIA"
-                                    class=" text-left text-[9pt] w-56 text-sm font-medium capitalize  h-5 border-x-0 border-t-0">
-                            </div>
-                            <div class="flex  flex-row">
-                                <label for="" class="flex items-center text-[7pt] font-semibold">PUESTO: </label>
-                                <input type="text" value="TECNICO EN SOPORTE"
-                                    class=" text-left text-[9pt] w-52 text-sm font-medium capitalize  h-5 border-x-0 border-t-0">
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-center pt-2 gap-10 pb-7">
-                            <div class="flex   flex-row">
-                                <label for="" class="flex items-center text-[7pt] font-semibold">JEFE INME: </label>
-                                <input type="text" value="MIGUEL JOSUE TOBIAS RIVAS"
-                                    class=" text-left text-[9pt]  text-sm font-medium capitalize  h-5 border-x-0 border-t-0">
-                            </div>
-                            <div class="flex   flex-row">
-                                <label for="" class="flex items-center text-[7pt] font-semibold">PUESTO : </label>
-                                <input type="text" value="COORDINADOR DEL AREA DE SISTEMAS DE INFORMACION"
-                                    class=" text-left text-[9pt] w-56 text-sm font-medium capitalize  h-5 border-x-0 border-t-0">
-                            </div>
-                            <div class="flex  flex-row">
-                                <label for="" class="flex items-center text-[7pt] font-semibold">NOTA: </label>
-                                <input type="text" value="10"
-                                    class=" text-left text-[9pt] w-20 text-sm font-medium capitalize  h-5 border-x-0 border-t-0">
-                            </div>
-                        </div>
-
-                        <table class="pb-5" v-for="index in 4" :key="index">
-                            <tbody>
-                                <tr>
-                                    <td class="border border-black bg-black h-10 text-[10pt] text-white text-center"
-                                        colspan="2">
-                                        <div class="flex justify-between items-center">
-                                            <span class="mx-auto">CALIDAD DE TRABAJO</span>
-                                            <span class="text-end pr-4">PUNTOS: 21</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="border border-black bg-slate-300/60" rowspan="2">
-                                        <div class="w-40 p-1.5 text-[9pt] text-justify text-[#4f4f4f] font-medium">Se
-                                            refiere al cuidado, nitidez y
-                                            exactitud con
-                                            que realiza
-                                            su trabajo, utilizando adecuadamente los recursos y eliminando el desperdicio en
-                                            términos materiales, tiempo y costo.!</div>
-                                    </td>
-
-                                </tr>
-                                <tr>
-                                    <td class="border border-black">
-
-                                        <table class="">
-                                            <tr>
-                                                <td
-                                                    class="text-[9pt] border-l-0 border-r border-t-0 border-b  border-black text-center font-medium">
-                                                    Casi siempre es necesario que rectifique su trabajo. Necesita mucha
-                                                    supervisión.</td>
-                                                <td
-                                                    class="border-x-0  border-t-0 border-b  border-black justify-center text-center px-10 py-4">
-                                                    <input type="checkbox" name="" id="">
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td
-                                                    class="text-[9pt] border-l-0 border-r border-t-0 border-b  border-black text-center font-medium">
-                                                    Eventualmente comente errores que son fácilmente corregidos. Necesita
-                                                    poca
-                                                    supervisión</td>
-                                                <td
-                                                    class="border-x-0 border-t-0 border-b  border-black justify-center text-center px-10 py-4">
-                                                    <input type="checkbox" name="" id="">
-
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td
-                                                    class="text-[9pt] border-l-0 border-r border-t-0 border-b  border-black text-center font-medium">
-                                                    No comente errores. Trabaja con presión y oportunidad. No necesita
-                                                    supervisión directa.</td>
-                                                <td
-                                                    class="border-x-0 border-t-0 border-b  border-black justify-center text-center px-10 py-4">
-                                                    <input type="checkbox" name="" id="">
-
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td
-                                                    class="text-[9pt] border-l-0 border-r border-t-0 border-b  border-black text-center font-medium">
-                                                    Trabajo que excede a la normalidad realizando con máximo grado de
-                                                    precisión,
-                                                    oportunidad y exactitud.</td>
-                                                <td
-                                                    class="border-x-0 border-t-0 border-b  border-black justify-center text-center px-10 py-4">
-                                                    <input type="checkbox" name="" id="">
-
-                                                </td>
-                                            </tr>
-
-                                        </table>
-                                    </td>
-
-                                </tr>
-
-                            </tbody>
-                        </table>
-
-
-                    </div>
                 </div>
             </div>
 
@@ -318,10 +193,21 @@ export default {
             type: Boolean,
             default: false,
         },
-
+        dataEvaluacionEmpleado: {
+            type: Object,
+            default: [],
+        }
     },
     data() {
         return {
+            id_empleado: '',
+            fecha_evaluacion_personal: '',
+            periodo_evaluacion_personal: '',
+            searchTimeout: null,
+            evaluaciones: [], // Almacena las evaluaciones del empleado
+            employeOptions: [], // Opciones del multiselect
+            //   dataDocumentoEvaluacion: {},
+            dataEvaluacionPersonal: {},
             config: {
                 altInput: true,
                 static: true,
@@ -344,23 +230,113 @@ export default {
         }
     },
     methods: {
-        async getEvaluacionRendimiento(){
+        async getPersonalEvaluation(id_evaluacion_rendimiento) {
+            try {
+                this.isLoading = true
+                const response = await axios.post('/get-evaluacion', { id_evaluacion_rendimiento: id_evaluacion_rendimiento });
+                //console.log(response.data);
+                this.dataEvaluacionPersonal = response.data
+            } catch (error) {
+                console.log('Error en la búsqueda:', error)
+            } finally {
+                this.isLoading = false
+            }
+        },
+        handleEmployeeSearchChange(query) {
+            clearTimeout(this.searchTimeout);
+            if (query.trim() !== '') { // Verificar si query no está vacío o solo contiene espacios en blanco
+                this.searchTimeout = setTimeout(() => {
+                    this.searchingUsers(query);
+                }, 700); // Tiempo de espera de menos de 1 segundo
+            }
+        },
+        // Metodo para buscar empleado
+        async searchingUsers(query) {
+            // Nota: No funcionara si el empleado ya tiene evaluaciones asignadas
+            try {
+                this.isLoading = true
+                const response = await axios.post('/search-employees', { data: query });
+                console.log(response.data);
+
+                // Objeto que almacenara las opciones en multiselect
+                const newDataEmployees = response.data.map(item => {
+                    return {
+                        value: item.id_empleado,
+                        label: `${item.pnombre_persona} ${item.papellido_persona}`
+                    };
+                });
+                this.employeOptions = newDataEmployees
+                console.log(newDataEmployees);
+            } catch (error) {
+                console.log('Error en la búsqueda:', error)
+            } finally {
+                this.isLoading = false
+            }
+
+        },
+        async getDocumentoEvaluacion() {
             await axios.post('/get-evaluacion-rendimiento').then((response) => {
-                console.log(response);
+                //this.dataDocumentoEvaluacion = response.data
             })
         },
+        createEvaluacionRequest() {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    const resp = await axios.post('/create-new-evaluacion', {
+                        id_empleado: this.id_empleado,
+                        fecha_evaluacion_personal: this.fecha_evaluacion_personal,
+                        periodo_evaluacion_personal: this.periodo_evaluacion_personal,
+                    })
+                    console.log(resp);
+                    resolve(resp); // Resolvemos la promesa con la respuesta exitosa
+                } catch (error) {
+
+                    reject(error); // Rechazamos la promesa en caso de excepción
+                }
+            });
+        },
+        async submitEvaluacionDocument() {
+
+            this.$swal.fire({
+                title: '<p class="text-[20pt] text-center">¿Esta seguro de editar los datos?</p>',
+                icon: 'question',
+                iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
+                confirmButtonText: 'Si, Editar',
+                confirmButtonColor: '#001b47',
+                cancelButtonText: 'Cancelar',
+                showCancelButton: true,
+                showCloseButton: true,
+
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+
+                    this.executeRequest(
+                        this.createEvaluacionRequest(),
+                        '¡Los datos se han agregado correctamente!'
+                    )
+
+                }
+            })
+
+        },
+
     },
+
+
 
     created() {
 
-        this.getEvaluacionRendimiento()
+        this.getDocumentoEvaluacion()
     },
     watch: {
         showModal() {
             if (this.showModal) {
 
-            } else {
+                this.evaluaciones = this.dataEvaluacionEmpleado.evaluaciones_personal
+               // console.log(this.dataEvaluacionEmpleado);
 
+            } else {
+                this.dataEvaluacionPersonal = []
             }
         }
     }

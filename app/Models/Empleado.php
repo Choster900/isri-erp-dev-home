@@ -53,4 +53,13 @@ class Empleado extends Model
     {
         return $this->hasMany(AcuerdoLaboral::class, 'id_empleado', 'id_empleado');
     }
+    /**
+     * Get all of the evaluaciones_personal for the Empleado
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function evaluaciones_personal(): HasMany
+    {
+        return $this->hasMany(EvaluacionPersonal::class, 'id_empleado', 'id_empleado');
+    }
 }
