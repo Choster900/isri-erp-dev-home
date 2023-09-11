@@ -65,7 +65,7 @@ import ModalEvalueacionesVue from '@/Components-ISRI/RRHH/ModalEvalueaciones.vue
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center flex justify-center gap-2">
-                                    <span>{{  }}</span>
+                                    <span>{{ }}</span>
                                     <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                                         class="w-5 h-5">
                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -154,7 +154,8 @@ import ModalEvalueacionesVue from '@/Components-ISRI/RRHH/ModalEvalueaciones.vue
                 </nav>
             </div>
         </div>
-        <ModalEvalueacionesVue :showModal="showModalEvaluacion" @cerrar-modal="showModalEvaluacion = false" :dataEvaluacionEmpleado="dataEvaluacionToSendModal"/>
+        <ModalEvalueacionesVue :showModal="showModalEvaluacion" @cerrar-modal="showModalEvaluacion = false"
+            :evaluacionEmpleadoDBData="" @reload-table="getEvaluaciones(lastUrl)" />
     </AppLayoutVue>
 </template>
 
@@ -221,7 +222,7 @@ export default {
                     this.pagination.total = data.data.total;
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
-                   this.evaluaciones = response.data.data.data;
+                    this.evaluaciones = response.data.data.data;
 
                 }
             }).catch((errors) => {

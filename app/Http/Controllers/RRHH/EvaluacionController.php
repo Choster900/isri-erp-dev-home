@@ -4,6 +4,7 @@ namespace App\Http\Controllers\RRHH;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RRHH\EvaluacionRequest;
+use App\Models\CategoriaRendimiento;
 use App\Models\DetalleEvaluacionPersonal;
 use App\Models\Empleado;
 use App\Models\EvaluacionPersonal;
@@ -40,7 +41,11 @@ class EvaluacionController extends Controller
         $query = Empleado::select('*')
             ->with([
                 "persona",
-                "evaluaciones_personal.detalle_evaluaciones_personal"
+                "evaluaciones_personal" => function ($query) {
+                    return $query->orderBy("fecha_evaluacion_personal", "desc");
+                },
+                "evaluaciones_personal.detalle_evaluaciones_personal",
+                "plazas_asignadas.detalle_plaza.plaza"
             ])->whereHas("evaluaciones_personal")->orderBy($columns[$column], $dir);
 
         if ($data) {
@@ -68,8 +73,8 @@ class EvaluacionController extends Controller
                 $query->whereRaw("MATCH (pnombre_persona, snombre_persona, tnombre_persona, papellido_persona, sapellido_persona, tapellido_persona) AGAINST (?)", [$searchQuery]);
             });
         }
-        $query->whereHas("empleado") // Las personas que esten en la tabla de empleados
-            ->doesntHave("empleado.evaluaciones_personal"); // Los empleados que no tengan evaluaciones
+        $query->whereHas("empleado"); // Las personas que esten en la tabla de empleados
+        // ->doesntHave("empleado.evaluaciones_personal"); // Los empleados que no tengan evaluaciones
         $result = $query->get();
         return $result;
     }
@@ -88,7 +93,16 @@ class EvaluacionController extends Controller
             ];
             $evaluacionId = EvaluacionPersonal::insertGetId($evaluacionData);
             DB::commit();
-            return EvaluacionPersonal::find($evaluacionId);
+
+            return Empleado::with([
+                "persona",
+                "evaluaciones_personal" => function ($query) {
+                    return $query->orderBy("fecha_evaluacion_personal", "desc");
+                },
+                "evaluaciones_personal.detalle_evaluaciones_personal",
+                "plazas_asignadas.detalle_plaza.plaza"
+            ])->whereHas("evaluaciones_personal")->find($request->id_empleado);
+
         } catch (\Throwable $th) {
             DB::rollback();
             return response()->json($th->getMessage(), 500);
@@ -105,33 +119,78 @@ class EvaluacionController extends Controller
     }
 
     // Guardamos la respuesta que se ha seleccionado en la evaluacion
+
     function saveResponseInEvaluation(Request $request)
     {
-        // Condiciones de búsqueda
-        $conditions = [
-            'id_evaluacion_personal' => $request->id_evaluacion_personal,
-            'id_cat_rendimiento' => $request->id_cat_rendimiento,
-        ];
+        try {
+            // Buscar la evaluación personal
+            $evaluationPersonal = EvaluacionPersonal::findOrFail($request->id_evaluacion_personal);
 
-        // Datos para actualizar o insertar
-        $data = [
-            'id_evaluacion_personal' => $request->id_evaluacion_personal,
-            'id_cat_rendimiento' => $request->id_cat_rendimiento,
-            'id_rubrica_rendimiento' => $request->id_rubrica_rendimiento,
-            'fecha_reg_detalle_eva_personal' => Carbon::now(),
-            'usuario_detalle_eva_personal' => $request->user()->nick_usuario,
-            'ip_detalle_eva_personal' => $request->ip(),
-        ];
+            // Buscar la evaluación de rendimiento
+            $evaluationPerformance = EvaluacionRendimiento::findOrFail($evaluationPersonal->id_evaluacion_rendimiento);
 
-        // Intentar actualizar o insertar el registro
-        DetalleEvaluacionPersonal::updateOrInsert($conditions, $data);
+            // Obtener las categorías de rendimiento asociadas
+            $performanceCategories = CategoriaRendimiento::where("id_evaluacion_rendimiento", $evaluationPerformance->id_evaluacion_rendimiento)->get();
 
-        // Realizar cualquier otra acción necesaria
-        // ...
+            DB::beginTransaction();
 
-        // Devolver una respuesta apropiada
-        return response()->json(['message' => 'Respuesta Guardada']);
+            try {
+                $totalScore = 0;
+                // Iterar sobre las respuestas
+                foreach ($request->data as $value) {
+                    $data = [
+                        'id_evaluacion_personal' => $request->id_evaluacion_personal,
+                        'id_cat_rendimiento' => $value['id_cat_rendimiento'],
+                        'id_rubrica_rendimiento' => $value['id_rubrica_rendimiento'],
+                        'usuario_detalle_eva_personal' => $request->user()->nick_usuario,
+                        'ip_detalle_eva_personal' => $request->ip(),
+                    ];
+
+                    // Condiciones de búsqueda
+                    $conditions = [
+                        'id_evaluacion_personal' => $request->id_evaluacion_personal,
+                        'id_cat_rendimiento' => $value['id_cat_rendimiento'],
+                    ];
+
+                    // Verificar si ya existe una respuesta para esta categoría
+                    $existingResponse = DetalleEvaluacionPersonal::where($conditions)->first();
+
+                    if ($existingResponse) {
+                        // Si existe, añadir la fecha de modificación
+                        $data['fecha_mod_detalle_eva_personal'] = Carbon::now();
+                    } else {
+                        // Si no existe, añadir la fecha de creación
+                        $data['fecha_reg_detalle_eva_personal'] = Carbon::now();
+                    }
+
+                    $totalScore += $value['puntaje_rubrica_rendimiento'];
+
+                    // Actualizar o insertar el registro
+                    DetalleEvaluacionPersonal::updateOrInsert($conditions, $data);
+                }
+
+                EvaluacionPersonal::where("id_evaluacion_personal", $request->id_evaluacion_personal)->update([
+                    'puntaje_evaluacion_personal'                  => $request->puntaje_evaluacion_personal,
+                    'fecha_mod_evaluacion_personal'                  =>  Carbon::now(),
+                ]);
+
+                // Commit de la transacción
+                DB::commit();
+
+                // Respuesta exitosa
+                return response()->json(['message' => 'Respuestas guardadas exitosamente'], 200);
+            } catch (\Exception $e) {
+                // Si ocurre un error, hacer rollback de la transacción
+                DB::rollback();
+                return response()->json(['error' =>  $e], 500);
+            }
+        } catch (\Exception $e) {
+            // Manejar el caso de que no se encuentre la evaluación personal o de rendimiento
+            return response()->json(['error' => 'Evaluación no encontrada'], 404);
+        }
     }
+
+
     function getEvaluationById(Request $request)
     {
         return Empleado::select('*')

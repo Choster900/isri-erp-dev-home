@@ -99,10 +99,5 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('save-response', [EvaluacionController::class, 'saveResponseInEvaluation'])->name('evaluaciones.save-response');
     Route::post('get-by-id', [EvaluacionController::class, 'getEvaluationById'])->name('evaluaciones.get-by-id');
 
-    Route::post('get-evaluacion-rendimiento', function () {
-        return EvaluacionRendimiento::select("*")->with([
-            'tablas_rendimiento',
-            'categorias_rendimiento.rubricas_rendimiento'
-        ])->get();
-    })->name('evaluacion.rendimiento');
+
 });

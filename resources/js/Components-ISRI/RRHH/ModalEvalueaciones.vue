@@ -30,7 +30,7 @@ import DocumentoEvaluacionVue from './DocumentoEvaluacion.vue';
 
                                     <div class="relative flex h-8 w-full flex-row-reverse ">
                                         <Multiselect v-model="id_empleado"
-                                            :disabled="dataEvaluacionEmpleado != '' ? true : false"
+                                            :disabled="evaluacionEmpleadoDBData != '' ? true : false"
                                             @search-change="handleEmployeeSearchChange($event)" :clearOnSearch="true"
                                             placeholder="Puedes filtrar por apellidos" :filter-results="false"
                                             :min-chars="10" :resolve-on-load="true" :searchable="true"
@@ -70,55 +70,53 @@ import DocumentoEvaluacionVue from './DocumentoEvaluacion.vue';
                     </div>
                     <div
                         class="max-h-[calc(100vh-350px)] overflow-y-auto col-span-full xl:col-span-6 bg-white shadow-lg  border border-slate-300">
-                        <!--   <header class="px-5 py-4 border-b border-slate-100">
-                            <h2 class="font-semibold text-slate-800">LO001 - Sergio Adonay Lopez Mejia</h2>
-                        </header> -->
                         <div class="p-3">
                             <div class="max-h-[600px] ">
+                              <!--   <pre>
+                                    {{ registrosEvaluacionesRentimientoPersonal }}
+                                </pre> -->
                                 <table class="table-auto w-full">
-                                    <tbody class="text-sm divide-y divide-slate-100"><!-- Row -->
+                                    <tbody class="text-sm divide-y divide-slate-100">
                                         <tr>
                                             <td>
-                                                <template v-for="e, i in  evaluaciones " :key="i">
+                                                <template
+                                                    v-for="evaluacion, i in  registrosEvaluacionesRentimientoPersonal.evaluaciones_personal "
+                                                    :key="i">
                                                     <AccordionBasicVue containerClass=" rounded-sm border border-slate-200"
                                                         bodyClass="text-red-500">
                                                         <template v-slot:titleContent>
                                                             <h1 class="text-center font-medium pl-4 py-3">
-
-
                                                                 <ul class="ml-4 list-circle">
                                                                     <li
                                                                         class="relative  before:w-[10px] before:h-[10px] before:border-[3px] before:border-indigo-500 before:rounded-full before:absolute before:-left-4 before:top-1">
-                                                                        {{ e.periodo_evaluacion_personal }} </li>
-
+                                                                        {{ evaluacion.periodo_evaluacion_personal }} </li>
                                                                 </ul>
-
                                                             </h1>
                                                         </template>
                                                         <template v-slot:bodyContent>
                                                             <div
                                                                 class="bg-slate-300/40 border-l-[4px] border-y-0 border-r-0 border-l-indigo-500 ">
-                                                                <h1
-                                                                    class="text-start font-semibold pl-3 pt-2 text-indigo-500">
-                                                                    Lorem ipsum dolor sit amet consectetur</h1>
+
                                                                 <ul class="ml-10 list-circle py-4">
                                                                     <li
                                                                         class="relative  before:w-[10px] before:h-[10px] before:border-[3px] before:border-indigo-500 before:rounded-full before:absolute before:-left-4 before:top-1">
                                                                         Puntuacion</li>
-                                                                    <p>{{ e.puntaje_evaluacion_personal }}</p>
+                                                                    <p>{{ evaluacion.puntaje_evaluacion_personal }}</p>
                                                                     <li
                                                                         class="relative  before:w-[10px] before:h-[10px] before:border-[3px] before:border-indigo-500 before:rounded-full before:absolute before:-left-4 before:top-1">
                                                                         Fecha Evaluado</li>
-                                                                    <p>{{ e.fecha_evaluacion_personal }}</p>
+                                                                    <p>{{ evaluacion.fecha_evaluacion_personal }}</p>
                                                                     <li
                                                                         class="flex items-center relative before:w-[10px] before:h-[10px] before:border-[3px] before:border-indigo-500 before:rounded-full before:absolute before:-left-4 before:top-1">
                                                                         <span class="mr-2">Ver evaluacion: </span>
                                                                         <lord-icon class="cursor-pointer"
-                                                                            @click="getPersonalEvaluation(e.id_evaluacion_rendimiento)"
+                                                                            @click="getPersonalEvaluation(evaluacion.id_evaluacion_rendimiento);
+
+                                                                            registroEvaluacionRendimientoPersonal = evaluacion"
                                                                             src="https://cdn.lordicon.com/vufjamqa.json"
                                                                             trigger="hover" colors="primary:#121331"
-                                                                            style="width:20px;height:20px"></lord-icon>
-                                                                    </li>
+                                                                            style="width:22px;height:22px"></lord-icon>
+                                                                    </li><!-- WE COULD PUT THE ICON NEXT TO THE LIST -->
                                                                 </ul>
                                                             </div>
                                                         </template>
@@ -135,6 +133,7 @@ import DocumentoEvaluacionVue from './DocumentoEvaluacion.vue';
                 </div>
 
                 <div class=" justify-center w-4/6">
+                    <!-- Header evaluacion  -->
                     <div class=" flex  justify-center pt-2 content-between">
                         <svg class="h-7 w-7 absolute top-0 right-0 mt-2 cursor-pointer" viewBox="0 0 25 25"
                             @click="$emit('cerrar-modal')">
@@ -143,41 +142,12 @@ import DocumentoEvaluacionVue from './DocumentoEvaluacion.vue';
                         </svg>
 
                     </div>
-                    <div class="pl-4 pt-4">
-                        <h2 class="text-2xl text-slate-800 font-bold mb-6">Nombre del modal</h2><!-- Start -->
-                        <div class="mb-3 border-b border-slate-200">
-                            <ul class="text-sm font-medium flex flex-nowrap -mx-4 sm:-mx-6 lg:-mx-8 ">
-                                <li
-                                    class="pb-3 mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8">
-                                    <a class="text-indigo-500 whitespace-nowrap flex items-center" href="#0"><svg
-                                            class="w-4 h-4 shrink-0 fill-current mr-2" viewBox=" 0 0 16 16">
-                                            <path
-                                                d="M12.311 9.527c-1.161-.393-1.85-.825-2.143-1.175A3.991 3.991 0 0012 5V4c0-2.206-1.794-4-4-4S4 1.794 4 4v1c0 1.406.732 2.639 1.832 3.352-.292.35-.981.782-2.142 1.175A3.942 3.942 0 001 13.26V16h14v-2.74c0-1.69-1.081-3.19-2.689-3.733zM6 4c0-1.103.897-2 2-2s2 .897 2 2v1c0 1.103-.897 2-2 2s-2-.897-2-2V4zm7 10H3v-.74c0-.831.534-1.569 1.33-1.838 1.845-.624 3-1.436 3.452-2.422h.436c.452.986 1.607 1.798 3.453 2.422A1.943 1.943 0 0113 13.26V14z">
-                                            </path>
-                                        </svg>
-                                        <span>Comming soon</span>
-                                    </a>
-                                </li>
-                                <li
-                                    class="pb-3 mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8">
-                                    <a class="text-slate-500 hover:text-slate-600 whitespace-nowrap flex items-center"
-                                        href="#0"><svg class="w-4 h-4 shrink-0 fill-current text-slate-400 mr-2"
-                                            viewBox=" 0 0 16 16">
-                                            <path
-                                                d="M14.3.3c.4-.4 1-.4 1.4 0 .4.4.4 1 0 1.4l-8 8c-.2.2-.4.3-.7.3-.3 0-.5-.1-.7-.3-.4-.4-.4-1 0-1.4l8-8zM15 7c.6 0 1 .4 1 1 0 4.4-3.6 8-8 8s-8-3.6-8-8 3.6-8 8-8c.6 0 1 .4 1 1s-.4 1-1 1C4.7 2 2 4.7 2 8s2.7 6 6 6 6-2.7 6-6c0-.6.4-1 1-1z">
-                                            </path>
-                                        </svg>
-                                        <span>Comming soon</span>
-                                    </a>
-                                </li>
 
-                            </ul>
-                        </div>
-                    </div>
-                  <!--   <pre>
-                        {{ evaluaciones }}
-                    </pre> -->
-                    <DocumentoEvaluacionVue :dataEvaluacion="dataEvaluacionPersonal" :dataPersonalEvaluacion="evaluaciones" />
+                    <!--/ Header evaluacion  -->
+
+                      <DocumentoEvaluacionVue :contenidoEvaluacionRendimiento="contenidoEvaluacionRendimiento"
+                        :registroEvaluacionRendimientoPersonal="registroEvaluacionRendimientoPersonal"
+                        :info-employee="registroEvaluacionRendimientoPersonal" />
 
                 </div>
             </div>
@@ -193,7 +163,8 @@ export default {
             type: Boolean,
             default: false,
         },
-        dataEvaluacionEmpleado: {
+        // Almacena las evaluaciones del empleado
+        evaluacionEmpleadoDBData: {
             type: Object,
             default: [],
         }
@@ -204,10 +175,11 @@ export default {
             fecha_evaluacion_personal: '',
             periodo_evaluacion_personal: '',
             searchTimeout: null,
-            evaluaciones: [], // Almacena las evaluaciones del empleado
+            registeredPersonalEvaluations: [], // Almacena todas las evaluaciones del empleado
+            registroEvaluacionRendimientoPersonal: [], // Almacena una evaluacion con su detalle que se enviara al usuario
+            registrosEvaluacionesRentimientoPersonal: [],// Almacena todas las evaluaciones del empleado
             employeOptions: [], // Opciones del multiselect
-            //   dataDocumentoEvaluacion: {},
-            dataEvaluacionPersonal: {},
+            contenidoEvaluacionRendimiento: {},
             config: {
                 altInput: true,
                 static: true,
@@ -227,6 +199,7 @@ export default {
                     },
                 },
             },
+            informacionEmpleado: [],
         }
     },
     methods: {
@@ -234,8 +207,8 @@ export default {
             try {
                 this.isLoading = true
                 const response = await axios.post('/get-evaluacion', { id_evaluacion_rendimiento: id_evaluacion_rendimiento });
-                //console.log(response.data);
-                this.dataEvaluacionPersonal = response.data
+                console.log(response.data);
+                this.contenidoEvaluacionRendimiento = response.data
             } catch (error) {
                 console.log('Error en la búsqueda:', error)
             } finally {
@@ -256,9 +229,6 @@ export default {
             try {
                 this.isLoading = true
                 const response = await axios.post('/search-employees', { data: query });
-                console.log(response.data);
-
-                // Objeto que almacenara las opciones en multiselect
                 const newDataEmployees = response.data.map(item => {
                     return {
                         value: item.id_empleado,
@@ -266,18 +236,12 @@ export default {
                     };
                 });
                 this.employeOptions = newDataEmployees
-                console.log(newDataEmployees);
             } catch (error) {
                 console.log('Error en la búsqueda:', error)
             } finally {
                 this.isLoading = false
             }
 
-        },
-        async getDocumentoEvaluacion() {
-            await axios.post('/get-evaluacion-rendimiento').then((response) => {
-                //this.dataDocumentoEvaluacion = response.data
-            })
         },
         createEvaluacionRequest() {
             return new Promise(async (resolve, reject) => {
@@ -287,7 +251,10 @@ export default {
                         fecha_evaluacion_personal: this.fecha_evaluacion_personal,
                         periodo_evaluacion_personal: this.periodo_evaluacion_personal,
                     })
-                    console.log(resp);
+                    console.log(resp.data);
+                    this.registrosEvaluacionesRentimientoPersonal = resp.data
+                    /*this.registeredPersonalEvaluations.unshift(resp.data.evaluacionPersonal)
+                    this.informacionEmpleado = resp.data.infoEmployee*/
                     resolve(resp); // Resolvemos la promesa con la respuesta exitosa
                 } catch (error) {
 
@@ -321,22 +288,29 @@ export default {
         },
 
     },
-
-
-
     created() {
 
-        this.getDocumentoEvaluacion()
     },
     watch: {
         showModal() {
             if (this.showModal) {
+                this.registrosEvaluacionesRentimientoPersonal = this.evaluacionEmpleadoDBData || []
+                // Accion cuando abre el modal
+                if (this.evaluacionEmpleadoDBData != '') {
+                    const optionsMultiselect = [{
+                        value: this.evaluacionEmpleadoDBData.id_empleado,
+                        label: `${this.evaluacionEmpleadoDBData.persona.pnombre_persona} ${this.evaluacionEmpleadoDBData.persona.papellido_persona}`
+                    }];
+                    this.employeOptions = optionsMultiselect
 
-                this.evaluaciones = this.dataEvaluacionEmpleado.evaluaciones_personal
-               // console.log(this.dataEvaluacionEmpleado);
+                    this.id_empleado = this.evaluacionEmpleadoDBData.id_empleado
+                }
 
             } else {
-                this.dataEvaluacionPersonal = []
+                this.registrosEvaluacionesRentimientoPersonal = []
+                this.$emit("reload-table")
+                //Accion cuando cierra el modal
+
             }
         }
     }
