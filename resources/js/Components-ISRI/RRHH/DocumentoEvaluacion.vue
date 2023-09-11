@@ -49,13 +49,16 @@ import DocumentBlanck from '@/Components-ISRI/RRHH/DocumentoEvaluacionBlank.vue'
         <div class="flex items-center justify-center pt-4 gap-28">
             <div class="flex   flex-row">
                 <label for="" class="flex items-center text-[7pt] font-semibold">EMPLEADO: </label>
-                <input type="text"
+                <input type="text" :value="generateFullName(infoEmployee.persona)"
                     class="text-left text-[9pt] w-56 text-sm font-medium capitalize h-5 border-x-0 border-t-0">
             </div>
             <div class="flex  flex-row">
                 <label for="" class="flex items-center text-[7pt] font-semibold">PUESTO: </label>
-                <input type="text"
-                    class=" text-left text-[9pt] w-52 text-sm font-medium capitalize  h-5 border-x-0 border-t-0">
+                <input type="text" :value="infoEmployee.plazas_asignadas && infoEmployee.plazas_asignadas.filter((plaza) => plaza.estado_plaza_asignada == 1).map((plaza, index) => {
+                    return `${plaza.detalle_plaza.plaza.nombre_plaza}`
+                }).join(',') || ''"
+                    class="text-left text-[9pt] w-52 text-sm font-medium capitalize h-5 border-x-0 border-t-0">
+
             </div>
         </div>
         <div class="flex items-center justify-center pt-2 gap-10 pb-7">
@@ -173,19 +176,22 @@ export default {
     methods: {
 
         generateFullName(persona) {
-            const nombres = [
-                persona.pnombre_persona,
-                persona.snombre_persona,
-                persona.tnombre_persona
-            ].filter(Boolean).join(' ');
+            if (persona) {
 
-            const apellidos = [
-                persona.papellido_persona,
-                persona.sapellido_persona,
-                persona.tapellido_persona
-            ].filter(Boolean).join(' ');
+                const nombres = [
+                    persona.pnombre_persona,
+                    persona.snombre_persona,
+                    persona.tnombre_persona
+                ].filter(Boolean).join(' ');
 
-            return `${nombres} ${apellidos}`;
+                const apellidos = [
+                    persona.papellido_persona,
+                    persona.sapellido_persona,
+                    persona.tapellido_persona
+                ].filter(Boolean).join(' ');
+
+                return `${nombres} ${apellidos}`;
+            }
         },
 
         /**

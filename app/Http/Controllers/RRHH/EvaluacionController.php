@@ -21,14 +21,22 @@ class EvaluacionController extends Controller
     function getEvaluaciones(Request $request)
     {
         $columns = [
-            'id_empleado', 'id_persona',
-            'id_tipo_pension', 'id_banco',
-            'id_titulo_profesional', 'codigo_empleado',
-            'nup_empleado', 'isss_empleado',
-            'cuenta_banco_empleado', 'fecha_contratacion_empleado',
-            'email_institucional_empleado', 'email_alternativo_empleado',
-            'estado_empleado', 'fecha_reg_empleado',
-            'fecha_mod_empleado', 'usuario_empleado',
+            'id_empleado',
+            'id_persona',
+            'id_tipo_pension',
+            'id_banco',
+            'id_titulo_profesional',
+            'codigo_empleado',
+            'nup_empleado',
+            'isss_empleado',
+            'cuenta_banco_empleado',
+            'fecha_contratacion_empleado',
+            'email_institucional_empleado',
+            'email_alternativo_empleado',
+            'estado_empleado',
+            'fecha_reg_empleado',
+            'fecha_mod_empleado',
+            'usuario_empleado',
             'ip_empleado'
         ];
 
@@ -54,8 +62,8 @@ class EvaluacionController extends Controller
         $acuerdos = $query->paginate($length)->onEachSide(1);
 
         return [
-            'data'          => $acuerdos,
-            'draw'          => $request->input('draw'),
+            'data' => $acuerdos,
+            'draw' => $request->input('draw'),
         ];
     }
     // Metodo de busqueda de usuarios
@@ -85,11 +93,11 @@ class EvaluacionController extends Controller
             DB::beginTransaction();
 
             $evaluacionData = [
-                'id_empleado'                            => $request->id_empleado,
-                'id_evaluacion_rendimiento'              => 1,
-                'fecha_evaluacion_personal'              => $request->fecha_evaluacion_personal,
-                'periodo_evaluacion_personal'              => $request->periodo_evaluacion_personal,
-                'fecha_reg_evaluacion_personal'              =>  Carbon::now(),
+                'id_empleado'                   => $request->id_empleado,
+                'id_evaluacion_rendimiento'     => 1,
+                'fecha_evaluacion_personal'     => $request->fecha_evaluacion_personal,
+                'periodo_evaluacion_personal'   => $request->periodo_evaluacion_personal,
+                'fecha_reg_evaluacion_personal' => Carbon::now(),
             ];
             $evaluacionId = EvaluacionPersonal::insertGetId($evaluacionData);
             DB::commit();
@@ -102,7 +110,6 @@ class EvaluacionController extends Controller
                 "evaluaciones_personal.detalle_evaluaciones_personal",
                 "plazas_asignadas.detalle_plaza.plaza"
             ])->whereHas("evaluaciones_personal")->find($request->id_empleado);
-
         } catch (\Throwable $th) {
             DB::rollback();
             return response()->json($th->getMessage(), 500);
@@ -135,21 +142,20 @@ class EvaluacionController extends Controller
             DB::beginTransaction();
 
             try {
-                $totalScore = 0;
                 // Iterar sobre las respuestas
-                foreach ($request->data as $value) {
+                foreach ( $request->data as $value ) {
                     $data = [
-                        'id_evaluacion_personal' => $request->id_evaluacion_personal,
-                        'id_cat_rendimiento' => $value['id_cat_rendimiento'],
-                        'id_rubrica_rendimiento' => $value['id_rubrica_rendimiento'],
+                        'id_evaluacion_personal'       => $request->id_evaluacion_personal,
+                        'id_cat_rendimiento'           => $value['id_cat_rendimiento'],
+                        'id_rubrica_rendimiento'       => $value['id_rubrica_rendimiento'],
                         'usuario_detalle_eva_personal' => $request->user()->nick_usuario,
-                        'ip_detalle_eva_personal' => $request->ip(),
+                        'ip_detalle_eva_personal'      => $request->ip(),
                     ];
 
                     // Condiciones de búsqueda
                     $conditions = [
                         'id_evaluacion_personal' => $request->id_evaluacion_personal,
-                        'id_cat_rendimiento' => $value['id_cat_rendimiento'],
+                        'id_cat_rendimiento'     => $value['id_cat_rendimiento'],
                     ];
 
                     // Verificar si ya existe una respuesta para esta categoría
@@ -163,15 +169,13 @@ class EvaluacionController extends Controller
                         $data['fecha_reg_detalle_eva_personal'] = Carbon::now();
                     }
 
-                    $totalScore += $value['puntaje_rubrica_rendimiento'];
-
                     // Actualizar o insertar el registro
                     DetalleEvaluacionPersonal::updateOrInsert($conditions, $data);
                 }
 
                 EvaluacionPersonal::where("id_evaluacion_personal", $request->id_evaluacion_personal)->update([
-                    'puntaje_evaluacion_personal'                  => $request->puntaje_evaluacion_personal,
-                    'fecha_mod_evaluacion_personal'                  =>  Carbon::now(),
+                    'puntaje_evaluacion_personal'   => $request->puntaje_evaluacion_personal,
+                    'fecha_mod_evaluacion_personal' => Carbon::now(),
                 ]);
 
                 // Commit de la transacción
@@ -182,7 +186,7 @@ class EvaluacionController extends Controller
             } catch (\Exception $e) {
                 // Si ocurre un error, hacer rollback de la transacción
                 DB::rollback();
-                return response()->json(['error' =>  $e], 500);
+                return response()->json(['error' => $e], 500);
             }
         } catch (\Exception $e) {
             // Manejar el caso de que no se encuentre la evaluación personal o de rendimiento

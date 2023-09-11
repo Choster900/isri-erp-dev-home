@@ -24,9 +24,19 @@ class EvaluacionRequest extends FormRequest
     public function rules()
     {
         return [
-            'id_empleado'    => 'required',
-            'fecha_evaluacion_personal'  => 'required',
-            'periodo_evaluacion_personal'   => 'required',
+            'id_empleado'                 => 'required',
+            'fecha_evaluacion_personal'   => 'required',
+            'periodo_evaluacion_personal' => 'required',
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'id_empleado.required'                 => 'Debe seleccionar empleado',
+            'fecha_evaluacion_personal.required'   => 'Requerido',
+            'periodo_evaluacion_personal.required' => 'Ingrese un perdiodo',
+
         ];
     }
 }

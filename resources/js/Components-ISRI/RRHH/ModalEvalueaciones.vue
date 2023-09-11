@@ -39,6 +39,7 @@ import DocumentoEvaluacionVue from './DocumentoEvaluacion.vue';
                                                 placeholder: 'text-sm flex items-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-slate-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ',
                                             }" />
                                     </div>
+                                    <span class="text-xs text-red-500">{{ errors.id_empleado }}</span>
                                 </div>
                                 <div class="-mx-3 flex flex-wrap">
                                     <div class="w-full px-3 sm:w-1/3">
@@ -49,7 +50,9 @@ import DocumentoEvaluacionVue from './DocumentoEvaluacion.vue';
                                             <flat-pickr placeholder="DD/MM/YYYY" v-model="fecha_evaluacion_personal"
                                                 class="w-[120px] text-xs text-center cursor-pointer rounded-[5px] border h-7 border-slate-400 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
                                                 :config="config" />
+                                            <span class="text-xs text-red-500">{{ errors.fecha_evaluacion_personal }}</span>
                                         </div>
+
 
                                     </div>
                                     <div class="w-full px-3 sm:w-1/2">
@@ -59,6 +62,7 @@ import DocumentoEvaluacionVue from './DocumentoEvaluacion.vue';
                                         <input type="text" name="lName" id="lName" placeholder="MES DIA-AÑO - MES DIA-AÑO"
                                             v-model="periodo_evaluacion_personal"
                                             class="w-[230px] text-xs  rounded-[5px] border h-7 border-slate-400 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none" />
+                                        <span class="text-xs text-red-500">{{ errors.periodo_evaluacion_personal }}</span>
 
                                     </div>
                                 </div>
@@ -72,7 +76,7 @@ import DocumentoEvaluacionVue from './DocumentoEvaluacion.vue';
                         class="max-h-[calc(100vh-350px)] overflow-y-auto col-span-full xl:col-span-6 bg-white shadow-lg  border border-slate-300">
                         <div class="p-3">
                             <div class="max-h-[600px] ">
-                              <!--   <pre>
+                                <!--   <pre>
                                     {{ registrosEvaluacionesRentimientoPersonal }}
                                 </pre> -->
                                 <table class="table-auto w-full">
@@ -145,9 +149,9 @@ import DocumentoEvaluacionVue from './DocumentoEvaluacion.vue';
 
                     <!--/ Header evaluacion  -->
 
-                      <DocumentoEvaluacionVue :contenidoEvaluacionRendimiento="contenidoEvaluacionRendimiento"
+                    <DocumentoEvaluacionVue :contenidoEvaluacionRendimiento="contenidoEvaluacionRendimiento"
                         :registroEvaluacionRendimientoPersonal="registroEvaluacionRendimientoPersonal"
-                        :info-employee="registroEvaluacionRendimientoPersonal" />
+                        :info-employee="registrosEvaluacionesRentimientoPersonal" />
 
                 </div>
             </div>
@@ -171,6 +175,7 @@ export default {
     },
     data() {
         return {
+            errors: {},
             id_empleado: '',
             fecha_evaluacion_personal: '',
             periodo_evaluacion_personal: '',
@@ -253,11 +258,22 @@ export default {
                     })
                     console.log(resp.data);
                     this.registrosEvaluacionesRentimientoPersonal = resp.data
-                    /*this.registeredPersonalEvaluations.unshift(resp.data.evaluacionPersonal)
-                    this.informacionEmpleado = resp.data.infoEmployee*/
+
                     resolve(resp); // Resolvemos la promesa con la respuesta exitosa
                 } catch (error) {
-
+                    console.log(error);
+                    if (error.response.status === 422) {
+                        let data = error.response.data.errors
+                        var myData = new Object();
+                        for (const errorBack in data) {
+                            myData[errorBack] = data[errorBack][0]
+                        }
+                        this.errors = myData
+                        console.table(myData);
+                        setTimeout(() => {
+                            this.errors = [];
+                        }, 5000);
+                    }
                     reject(error); // Rechazamos la promesa en caso de excepción
                 }
             });
@@ -308,6 +324,9 @@ export default {
 
             } else {
                 this.registrosEvaluacionesRentimientoPersonal = []
+                this.registroEvaluacionRendimientoPersonal = []
+                this.id_empleado = ''
+                this.employeOptions = []
                 this.$emit("reload-table")
                 //Accion cuando cierra el modal
 
