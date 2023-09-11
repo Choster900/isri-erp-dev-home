@@ -155,7 +155,7 @@ import ModalEvalueacionesVue from '@/Components-ISRI/RRHH/ModalEvalueaciones.vue
             </div>
         </div>
         <ModalEvalueacionesVue :showModal="showModalEvaluacion" @cerrar-modal="showModalEvaluacion = false"
-            :evaluacionEmpleadoDBData="" @reload-table="getEvaluaciones(lastUrl)" />
+            :evaluacionEmpleadoDBData="dataEvaluacionToSendModal" @reload-table="getEvaluaciones(lastUrl)" />
     </AppLayoutVue>
 </template>
 
