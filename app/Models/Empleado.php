@@ -63,4 +63,9 @@ class Empleado extends Model
     {
         return $this->hasMany('App\Models\Permisos','id_empleado','id_empleado');
     }
+
+    public function evaluaciones_personal(): HasMany
+    {
+        return $this->hasMany(EvaluacionPersonal::class, 'id_empleado', 'id_empleado');
+    }
 }

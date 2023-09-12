@@ -39,6 +39,6 @@ class EvaluacionRendimiento extends Model
      */
     public function categorias_rendimiento(): HasMany
     {
-        return $this->hasMany(Comment::class, 'id_evaluacion_rendimiento', 'id_evaluacion_rendimiento');
+        return $this->hasMany(CategoriaRendimiento::class, 'id_evaluacion_rendimiento', 'id_evaluacion_rendimiento');
     }
 }

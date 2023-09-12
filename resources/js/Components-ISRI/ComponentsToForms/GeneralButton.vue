@@ -37,7 +37,7 @@ const iconSelected = computed(() => {
 </script>
 
 <template>
-   <!--  <button :type="type" @click="deletAlert" :class="color"
+    <!--  <button :type="type" @click="deletAlert" :class="color"
         class="inline-flex text-white  rounded-md text-sm px-3 py-1.5 text-center mb-2">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
             class="mr-1 -ml-1 w-5 h-5">
@@ -50,9 +50,9 @@ const iconSelected = computed(() => {
     </button> -->
 
 
-    <div class="flex rounded-md overflow-hidden mb-2 cursor-pointer">
+    <div class="flex rounded-md overflow-hidden mb-2 cursor-pointer" :class="color">
 
-        <div class=" shadow-border py-1.5 px-2 border-r-2 border-white" :class="color">
+        <div class=" shadow-border py-1.5 px-2 border-r-2 border-white">
             <div class="w-5 h-5">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class="w-5 h-5 text-white">
@@ -62,8 +62,7 @@ const iconSelected = computed(() => {
             </div>
         </div>
         <button
-            class="block text-white shadow-border hover:bg-blue-dark text-[12px] px-2 font-sans tracking-wide uppercase font-bold rounded-r-md"
-            :class="color">
+            class="block text-white shadow-border hover:bg-blue-dark text-[12px] px-2 font-sans tracking-wide uppercase font-bold rounded-r-md">
             {{ text }}
         </button>
 
