@@ -17,6 +17,23 @@ import axios from 'axios';
 <template>
     <Head title="Proceso - Permisos" />
     <AppLayoutVue nameSubModule="RRHH - Permisos">
+        <div v-if="isLoading"
+            class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
+            <div role="status" class="flex items-center">
+                <svg aria-hidden="true" class="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-800"
+                    viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                        fill="currentColor" />
+                    <path
+                        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                        fill="currentFill" />
+                </svg>
+                <div class="bg-gray-200 rounded-lg p-1 font-semibold">
+                    <span class="text-blue-800">CARGANDO...</span>
+                </div>
+            </div>
+        </div>
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
                 <GeneralButton @click="addJobPermission()" v-if="permits.insertar == 1"
@@ -51,7 +68,7 @@ import axios from 'axios';
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ permission.nombre_tipo_permiso }}
+                                    {{ permission.codigo_tipo_permiso }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5">
@@ -118,16 +135,17 @@ import axios from 'axios';
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                                             @click="changeStatusJobPosition(permission)" v-if="permits.eliminar == 1">
                                             <div class="w-8 text-red-900">
-                                                <svg class="text-xs" width="20" height="20" viewBox="0 0 97.994 97.994"
+                                                <svg viewBox="0 0 24 24" fill="none" class="w-6 h-6"
                                                     xmlns="http://www.w3.org/2000/svg">
-                                                    <path :fill="permission.estado_permiso == 1 ? '#991B1B' : '#166534'"
-                                                        d="M97.155,9.939c-0.582-0.416-1.341-0.49-1.991-0.193l-10.848,4.935C74.08,5.29,60.815,0.118,46.966,0.118c-15.632,0-30.602,6.666-41.07,18.289c-0.359,0.399-0.543,0.926-0.51,1.461c0.033,0.536,0.28,1.036,0.686,1.388l11.301,9.801c0.818,0.711,2.055,0.639,2.787-0.162c6.866-7.512,16.636-11.821,26.806-11.821c6.135,0,12.229,1.584,17.622,4.583l-7.826,3.561c-0.65,0.296-1.095,0.916-1.163,1.627c-0.069,0.711,0.247,1.405,0.828,1.82l34.329,24.52c0.346,0.246,0.753,0.373,1.163,0.373c0.281,0,0.563-0.06,0.828-0.181c0.65-0.296,1.095-0.916,1.163-1.627l4.075-41.989C98.053,11.049,97.737,10.355,97.155,9.939z" />
-                                                    <path :fill="permission.estado_permiso == 1 ? '#991B1B' : '#166534'"
-                                                        d="M80.619,66.937c-0.819-0.709-2.055-0.639-2.787,0.162c-6.866,7.514-16.638,11.822-26.806,11.822c-6.135,0-12.229-1.584-17.622-4.583l7.827-3.561c0.65-0.296,1.094-0.916,1.163-1.628c0.069-0.711-0.247-1.404-0.828-1.819L7.237,42.811c-0.583-0.416-1.341-0.49-1.991-0.193c-0.65,0.296-1.094,0.916-1.163,1.627L0.009,86.233c-0.069,0.712,0.247,1.406,0.828,1.822c0.583,0.416,1.341,0.488,1.991,0.192l10.848-4.935c10.237,9.391,23.502,14.562,37.351,14.562c15.632,0,30.602-6.666,41.07-18.289c0.358-0.398,0.543-0.926,0.51-1.461c-0.033-0.536-0.28-1.036-0.687-1.388L80.619,66.937z" />
+                                                    <path fill-rule="evenodd" clip-rule="evenodd"
+                                                        d="M17 5V4C17 2.89543 16.1046 2 15 2H9C7.89543 2 7 2.89543 7 4V5H4C3.44772 5 3 5.44772 3 6C3 6.55228 3.44772 7 4 7H5V18C5 19.6569 6.34315 21 8 21H16C17.6569 21 19 19.6569 19 18V7H20C20.5523 7 21 6.55228 21 6C21 5.44772 20.5523 5 20 5H17ZM15 4H9V5H15V4ZM17 7H7V18C7 18.5523 7.44772 19 8 19H16C16.5523 19 17 18.5523 17 18V7Z"
+                                                        fill="currentColor" />
+                                                    <path d="M9 9H11V17H9V9Z" fill="currentColor" />
+                                                    <path d="M13 9H15V17H13V9Z" fill="currentColor" />
                                                 </svg>
                                             </div>
                                             <div class="font-semibold">
-                                                {{ permission.estado_permiso ? 'Desactivar' : 'Activar' }}
+                                                Eliminar
                                             </div>
                                         </div>
                                     </DropDownOptions>
@@ -187,7 +205,9 @@ import axios from 'axios';
 </template>
 
 <script>
-import PermisoFormatPDFVue from '@/pdf/RRHH/PermissionFormatPDF.vue';
+import PermisoF026PDFVue from '@/pdf/RRHH/PermisoF026PDF.vue';
+import PermisoF012ControlInternoPDFVue from '@/pdf/RRHH/PermisoF012ControlInternoPDF.vue';
+import PermisoF012PDFVue from '@/pdf/RRHH/PermisoF012PDF.vue';
 import { createApp, h } from 'vue'
 import html2pdf from 'html2pdf.js'
 import { jsPDF } from "jspdf";
@@ -223,6 +243,7 @@ export default {
                 sortOrders[column.name] = -1;
         });
         return {
+            isLoading: false,
             printPermissionFlag: false,
             emptyObject: false,
             //Data for datatable
@@ -256,41 +277,213 @@ export default {
         }
     },
     methods: {
-        printPermission(permission) {
-            let name = 'PERMISO ' + permission.codigo_tipo_permiso + ' - ' + permission.codigo_empleado;
-
+        async printPermission(permission) {
+            const res = await this.getPermissionDataById(permission);
+            const updatedPermission = res.permiso;
+            const currentDateTime = moment().format('DD/MM/YYYY, HH:mm:ss');
+            const name = 'PERMISO ' + permission.codigo_tipo_permiso + ' - ' + permission.codigo_empleado;
             const opt = {
                 margin: 0.2,
                 filename: name,
-                //pagebreak: {mode:'css',before:'#pagebreak'},
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 3, useCORS: true },
-                //jsPDF: { unit: 'cm', format: [13.95,21.5], orientation: 'landscape' }
                 jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
             };
 
-            const app = createApp(PermisoFormatPDFVue, {
-                permission: permission,
-            });
+            const format = this.getFormatToPrint(updatedPermission);
+
+            const { centro1, centro2 } = this.getCentro(updatedPermission,format);
+            const { observation1, observation2 } = this.getObservation(updatedPermission,format);
+            const { role1, role2 } = this.getRole(updatedPermission,format);
+
+            let app; // Declaración de app fuera del switch
+
+            switch (format) {
+                //No marcacion
+                case 1:
+                    const fechaParseada = moment(updatedPermission.fecha_inicio_permiso);
+                    app = createApp(PermisoF026PDFVue, {
+                        permission: updatedPermission,
+                        centro1,
+                        centro2,
+                        observation1,
+                        observation2,
+                        dia: fechaParseada.format('DD'),
+                        mes: fechaParseada.format('MMMM').toUpperCase(),
+                        anio: fechaParseada.format('YYYY'),
+                        limite: res.limite
+                    });
+                    break;
+                //F012 Control interno
+                case 2:
+                    app = createApp(PermisoF012ControlInternoPDFVue, {
+                        permission: updatedPermission,
+                        centro1,
+                        centro2,
+                        observation1,
+                        observation2,
+                        role1,
+                        role2
+                    });
+                    break;
+                //F012
+                case 3:
+                    app = createApp(PermisoF012PDFVue, {
+                        permission: updatedPermission,
+                        centro1,
+                        centro2,
+                        observation1,
+                        observation2,
+                        role1,
+                        role2
+                    });
+                    break;
+
+                default:
+                    console.log('Another action');
+            }
+
+            if (app) {
+                const html = this.getHtml(app);
+                this.generatePdf(html, opt, currentDateTime);
+            }
+        },
+
+        getCentro(updatedPermission,format) {
+            const limiteCaracteres1 = format === 1 ? 40 : format === 2 ? 48 : 65;
+            const centerName = updatedPermission.plaza_asignada.dependencia.nombre_dependencia;
+            let centro1 = '';
+            let centro2 = '';
+            if (centerName) {
+                if (centerName.length <= limiteCaracteres1) {
+                    centro1 = centerName;
+                } else {
+                    const textoTruncado1 = centerName.slice(0, limiteCaracteres1);
+                    const ultimoEspacio1 = textoTruncado1.lastIndexOf(' ');
+                    centro1 = textoTruncado1.slice(0, ultimoEspacio1);
+                    centro2 = centerName.slice(ultimoEspacio1 + 1);
+                }
+            }
+            return { centro1, centro2 };
+        },
+
+        getObservation(updatedPermission,format) {
+            const observation = updatedPermission.comentarios_permiso;
+            let observation1 = '';
+            let observation2 = '';
+            if (observation) {
+                let limiteCaracteres2 = format === 1 ? 105 : format === 2 ? 110 : 94;
+                if (observation.length <= limiteCaracteres2) {
+                    observation1 = observation;
+                } else {
+                    const textoTruncado2 = observation.slice(0, limiteCaracteres2);
+                    const ultimoEspacio2 = textoTruncado2.lastIndexOf(' ');
+                    observation1 = textoTruncado2.slice(0, ultimoEspacio2);
+                    observation2 = observation.slice(ultimoEspacio2 + 1);
+                }
+            }
+            return { observation1, observation2 };
+        },
+
+        getRole(updatedPermission,format) {
+            const role = updatedPermission.plaza_asignada.detalle_plaza.plaza.nombre_plaza;
+            let role1 = '';
+            let role2 = '';
+            if (role) {
+                const limiteCaracteres3 = format === 2 ? 52 : format === 3 ? 60 : 40;
+                if (role.length <= limiteCaracteres3) {
+                    role1 = role;
+                } else {
+                    const textoTruncado3 = role.slice(0, limiteCaracteres3);
+                    const ultimoEspacio3 = textoTruncado3.lastIndexOf(' ');
+                    role1 = textoTruncado3.slice(0, ultimoEspacio3);
+                    role2 = role.slice(ultimoEspacio3 + 1);
+                }
+            }
+            return { role1, role2 };
+        },
+
+        getHtml(app) {
             const div = document.createElement('div');
             const pdfPrint = app.mount(div);
-            const html = div.outerHTML;
+            return div.outerHTML;
+        },
 
-            //html2pdf().set(opt).from(html).save();
+        getFormatToPrint(permission) {
+            //Personal con goce 
+            if (permission.id_tipo_permiso === 1) {
+                return 2;
+            }
+            //No marcacion
+            if (permission.id_tipo_permiso === 6) {
+                return 1;
+            }
+            //Todos los permisos por horas
+            if (!permission.fecha_fin_permiso) {
+                return 2;
+            }
+            //Personal sin goce mayor o igual a un día
+            if (permission.id_tipo_permiso === 2) {
+                return 3;
+            }
+            //Cantidad de dias
+            const days = this.workDaysBetween(permission.fecha_inicio_permiso, permission.fecha_fin_permiso);
+            //Enfermedad con o sin goce mayor a 3 días
+            if (permission.id_tipo_permiso === 3 || permission.id_tipo_permiso === 4) {
+                return days > 3 ? 3 : 2;
+            }
+            //Mision oficial mayor a 5 dias
+            if (permission.id_tipo_permiso === 5) {
+                return days > 5 ? 3 : 2;
+            }
+            return -1; // Valor por defecto si ninguno de los casos anteriores se cumple
+        },
 
-            const currentDateTime = moment().format('DD/MM/YYYY, HH:mm:ss');
+        workDaysBetween(date1, date2) {
+            const startDateFormated = moment(date1, 'YYYY/MM/DD').toDate()
+            const endDateFormated = moment(date2, 'YYYY/MM/DD').toDate()
+
+            let currentDate = new Date(startDateFormated);
+            let daysDifference = 0;
+
+            while (currentDate <= endDateFormated) {
+                const dayOfWeek = currentDate.getDay(); // 0 (domingo) a 6 (sábado)
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                    daysDifference++;
+                }
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            return daysDifference
+        },
+
+        generatePdf(html, opt, currentDateTime) {
             html2pdf().set(opt).from(html)
                 .toPdf().get('pdf').then(function (pdf) {
                     pdf.setFontSize(10);
-                    //Text for the date and time.
-                    let date_text = 'SIGI - Generado: ' + currentDateTime
-                    //Get the text width
+                    const date_text = 'SIGI - Generado: ' + currentDateTime;
                     const textWidth = pdf.getStringUnitWidth(date_text) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
-                    //Write the text in the desired coordinates.
                     pdf.text(pdf.internal.pageSize.getWidth() - textWidth - 0.2, pdf.internal.pageSize.getHeight() - 0.4, date_text);
                 })
                 .save()
                 .catch(err => console.log(err));
+        },
+        async getPermissionDataById(permiso) {
+            try {
+                this.isLoading = true;  // Activar el estado de carga
+                const response = await axios.post('/get-permission-info-by-id', permiso);
+                return response.data
+            } catch (errors) {
+                if (errors.response.status === 422) {
+                    if (errors.response.data.logical_error) {
+                        this.showToast(toast.error, errors.response.data.logical_error);
+                    }
+                } else {
+                    this.manageError(errors, this)
+                }
+            } finally {
+                this.isLoading = false;  // Desactivar el estado de carga
+                this.getJobPermissions(this.tableData.currentPage)
+            }
         },
         showDate(startDate, endDate) {
             if (endDate) {
@@ -300,33 +493,52 @@ export default {
             }
         },
         showTime(permission) {
-            if (permission.id_tipo_permiso == 6) {
+            if (permission.id_tipo_permiso === 6) {
                 return 'N/A'
             } else {
-                if (permission.fecha_fin_permiso && permission.fecha_inicio_permiso) {
-                    const fechaInicio = moment(permission.fecha_inicio_permiso);
-                    const fechaFin = moment(permission.fecha_fin_permiso);
+                if (permission.fecha_fin_permiso) {
+                    const startDateFormated = moment(permission.fecha_inicio_permiso, 'YYYY/MM/DD').toDate()
+                    const endDateFormated = moment(permission.fecha_fin_permiso, 'YYYY/MM/DD').toDate()
 
-                    const diferenciaEnDias = fechaFin.diff(fechaInicio, 'days');
+                    let currentDate = new Date(startDateFormated);
+                    let daysDifference = 0;
 
-                    return (diferenciaEnDias + 1) * 8 + ' H.';
-                } else if (permission.hora_entrada_permiso && permission.hora_salida_permiso) {
-                    const horaEntrada = moment(permission.hora_entrada_permiso, 'HH:mm');
-                    const horaSalida = moment(permission.hora_salida_permiso, 'HH:mm');
-
-                    const diferenciaEnHoras = horaSalida.diff(horaEntrada, 'hours');
-                    const diferenciaEnMinutos = horaSalida.diff(horaEntrada, 'minutes') % 60;
-
-                    if (diferenciaEnHoras === 0) {
-                        return `${diferenciaEnMinutos} min.`;
-                    } else if (diferenciaEnMinutos === 0) {
-                        return `${diferenciaEnHoras} H.`;
-                    } else {
-                        return `${diferenciaEnHoras} H. ${diferenciaEnMinutos} min.`;
+                    while (currentDate <= endDateFormated) {
+                        const dayOfWeek = currentDate.getDay(); // 0 (domingo) a 6 (sábado)
+                        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                            daysDifference++;
+                        }
+                        currentDate.setDate(currentDate.getDate() + 1);
                     }
+                    const resultInMinutes = daysDifference * 8 * 60
+
+                    const hours = Math.floor(resultInMinutes / 60);
+                    const minutes = resultInMinutes % 60;
+                    const formatResult = `${hours}:${minutes}`
+                    return this.formatTime(formatResult)
+
                 } else {
-                    return 'N/A.';
+                    if (permission.hora_salida_permiso) {
+                        const [endHours, endMinutes] = permission.hora_salida_permiso.split(':').map(Number);
+                        const [startHours, startMinutes] = permission.hora_entrada_permiso.split(':').map(Number);
+                        const result = ((endHours * 60) + endMinutes) - ((startHours * 60) + startMinutes)
+
+                        const hours = Math.floor(result / 60);
+                        const minutes = result % 60;
+                        const formatResult = `${hours}:${minutes}`
+                        return this.formatTime(formatResult)
+                    } else {
+                        return '0'
+                    }
                 }
+            }
+        },
+        formatTime(time) {
+            if (!time) {
+                return '0'
+            } else {
+                const [hours, minutes] = time.split(':').map(Number);
+                return `${hours > 0 ? hours + ' H. ' : ''} ${minutes > 0 ? minutes + ' min.' : ''}`
             }
         },
         editJobPermission(permission) {
@@ -352,7 +564,6 @@ export default {
                     this.links[this.links.length - 1].label = "Siguiente";
                     this.jobPermissions = data.data.data;
                     this.jobPermissions.length > 0 ? this.emptyObject = false : this.emptyObject = true
-                    console.log(this.jobPermissions);
                 }
             }).catch((errors) => {
                 this.manageError(errors, this)

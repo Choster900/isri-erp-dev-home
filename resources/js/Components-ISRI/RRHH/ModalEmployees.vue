@@ -355,7 +355,7 @@ import axios from "axios";
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="nup_empleado" v-model="employee.nup_empleado" type="text" placeholder="NUP"
-                                    @update:modelValue="validateEmployeeInputs('nup_empleado', 20, true, false)">
+                                    @update:modelValue="validateEmployeeInputs('nup_empleado', 10, true, false)">
                                     <LabelToInput icon="standard" forLabel="nup_empleado" />
                                 </TextInput>
                                 <InputError v-for="(item, index) in backend_errors['nup_empleado']" :key="index"

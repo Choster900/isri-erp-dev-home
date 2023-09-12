@@ -70,9 +70,9 @@ import axios from 'axios';
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div :class="showDependencies(employee.plazas_asignadas) == 'N/Asign.' ? 'text-red-600' : ''"
-                                    class="font-medium text-center {{ showDependencies(employee.plazas_asignadas) === 'N/Asign.' ? 'text-red-500' : 'text-slate-800' }} ">
-                                    {{
-                                        showDependencies(employee.plazas_asignadas) }}</div>
+                                    class="font-medium text-center">
+                                    {{ showDependencies(employee.plazas_asignadas) }}
+                                </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
@@ -265,9 +265,7 @@ export default {
         });
         return {
             showModalJobPosition: false,
-
             showModalFlag: false,
-
             empty_object: false,
             //Data for datatable
             employees: [],
@@ -405,13 +403,33 @@ export default {
             }
         },
         showDependencies(plazasAsignadas) {
-            const dependencies = plazasAsignadas.map(value => {
-                const dependency = value.dependencia.parent_dependency || value.dependencia;
-                return dependency.codigo_dependencia;
-            }).join(', ');
+            // Crear un objeto para mantener un recuento de las dependencias
+            const dependencyCounts = {};
 
-            return dependencies || 'N/Asign.';
+            // Iterar sobre las plazas asignadas y contar las dependencias
+            plazasAsignadas.forEach(value => {
+                const dependency = value.dependencia.parent_dependency || value.dependencia;
+                const codigoDependencia = dependency.codigo_dependencia;
+
+                if (dependencyCounts[codigoDependencia]) {
+                    // Incrementar el recuento si la dependencia ya existe en el objeto
+                    dependencyCounts[codigoDependencia]++;
+                } else {
+                    // Inicializar el recuento si es la primera vez que se encuentra la dependencia
+                    dependencyCounts[codigoDependencia] = 1;
+                }
+            });
+
+            // Crear una matriz de dependencias formateadas con el recuento (si es mayor que 1)
+            const formattedDependencies = Object.keys(dependencyCounts).map(codigoDependencia => {
+                const count = dependencyCounts[codigoDependencia];
+                return count > 1 ? `${codigoDependencia}(${count})` : codigoDependencia;
+            });
+
+            // Unir las dependencias formateadas en una cadena separada por comas
+            return formattedDependencies.join(', ') || 'N/Asign.';
         }
+
     },
     computed: {
     }

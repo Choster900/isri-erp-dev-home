@@ -38,6 +38,10 @@ class Permiso extends Model
     {
         return $this->belongsTo('App\Models\Empleado','id_empleado','id_empleado');
     }
+    public function plaza_asignada()
+    {
+        return $this->belongsTo('App\Models\PlazaAsignada','id_plaza_asignada','id_plaza_asignada');
+    }
     public function tipo_permiso()
     {
         return $this->belongsTo('App\Models\TipoPermiso','id_tipo_permiso','id_tipo_permiso');

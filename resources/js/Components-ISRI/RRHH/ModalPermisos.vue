@@ -27,7 +27,7 @@ import moment from 'moment';
                 </div>
             </div>
             <div v-else class="px-5 py-3">
-                <div class="mb-4 md:flex flex-row justify-center">
+                <div class="mb-3 md:flex flex-row justify-center">
                     <div class="md:mr-2 md:mb-0 basis-1/3">
                         <label class="block mb-2 text-xs font-light text-gray-600">
                             Empleado <span class="text-red-600 font-extrabold">*</span>
@@ -66,7 +66,7 @@ import moment from 'moment';
                             :message="item" />
                     </div>
                 </div>
-                <div class="rounded-lg border border-gray-400 shadow p-1 mb-4 mx-10 text-sm">
+                <div class="rounded-lg border border-gray-400 shadow mb-3 mx-10 text-sm">
                     <div class="flex">
                         <div class="flex-1 text-center border-r border-gray-400 ">
                             <p>Tiempo permitido</p>
@@ -225,6 +225,18 @@ import moment from 'moment';
                                         :message="item" />
                                 </div>
                             </div>
+                            <div v-if="permission.typeOfPermissionId !=5 && permission.typeOfPermissionId != 6" class="mb-4 md:mr-6 md:mb-0 basis-full mx-4 mt-2"
+                                style="border: none; background-color: transparent;">
+                                <label class="block mb-1 text-xs text-black" for="descripcion">
+                                    Observaciones
+                                </label>
+                                <textarea v-model="permission.observation" id="description" name="description"
+                                    class="resize-none w-full h-9 overflow-y-auto peer text-xs font-semibold rounded-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
+                                    @input="validateInput('observation', limit = 94)">
+                                </textarea>
+                                <InputError v-for="(item, index) in errors.description" :key="index" class="mt-2"
+                                    :message="item" />
+                            </div>
                         </div>
                     </div>
 
@@ -262,8 +274,9 @@ import moment from 'moment';
                                         :message="item" />
                                 </div>
                                 <div class="mb-4 md:mr-2 md:mb-0 basis-1/3 grid grid-cols-2 items-center md:self-center">
-                                    <label for="regresara" class="text-right mr-4 block text-xs text-black">Regresará 
-                                        <span v-if="permission.periodOfTime==1" class="text-red-600 font-extrabold">*</span></label>
+                                    <label for="regresara" class="text-right mr-4 block text-xs text-black">Regresará
+                                        <span v-if="permission.periodOfTime == 1"
+                                            class="text-red-600 font-extrabold">*</span></label>
                                     <div class="mt-1">
                                         <label class="inline-flex items-center">
                                             <span class="mr-2 text-xs">Si</span>
@@ -340,7 +353,7 @@ import moment from 'moment';
                                     </label>
                                     <textarea v-model="permission.observation" id="observation" name="observation"
                                         class="resize-none w-full h-12 overflow-y-auto peer text-xs font-semibold rounded-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
-                                        @input="validateInput('observation', limit = 250)">
+                                        @input="validateInput('observation', limit = 200)">
                                     </textarea>
                                 </div>
                             </div>
@@ -354,7 +367,7 @@ import moment from 'moment';
                         <GeneralButton v-if="!noTime && !negativeTime && modalData == ''" class="ml-1"
                             color="bg-green-700 hover:bg-green-800" text="Guardar" icon="add" @click="storePermission()" />
                         <GeneralButton v-if="!noTime && !negativeTime && modalData != ''" class="ml-1"
-                            color="bg-orange-700 hover:bg-orange-800" text="Actualizar" icon="add"
+                            color="bg-orange-700 hover:bg-orange-800" text="Actualizar" icon="update"
                             @click="updatePermission()" />
                     </div>
                 </div>
@@ -601,7 +614,7 @@ export default {
         async getPermissionData() {
             try {
                 let id_empleado = ''
-                this.modalData != '' ? id_empleado = this.modalData.id_empleado : id_empleado=0
+                this.modalData != '' ? id_empleado = this.modalData.id_empleado : id_empleado = 0
                 this.isLoading = true;  // Activar el estado de carga
                 const response = await axios.get(`/get-data-permission-modal/${id_empleado}`, {
                     params: {
@@ -668,7 +681,7 @@ export default {
                     //We subtract end time minus start time.
                     const totalMinutes = this.substractTime(this.permission.endTime, this.permission.startTime)
 
-                    if (totalMinutes>0 && !(this.permission.startTime === this.permission.endTime)) {
+                    if (totalMinutes > 0 && !(this.permission.startTime === this.permission.endTime)) {
                         this.negativeTime = false
                         const totalRemainingMinutes = this.timeFormatToMinutes(this.showPermissionInfo.initialRemaining)
 
@@ -890,7 +903,7 @@ export default {
             }
         },
         emptyObjectMision: function () {
-            if (!this.permission.destination || (this.permission.periodOfTime===1 && this.permission.comingBack === '')) {
+            if (!this.permission.destination || (this.permission.periodOfTime === 1 && this.permission.comingBack === '')) {
                 return true
             } else {
                 return false
@@ -921,19 +934,19 @@ export default {
                 return false
             }
         },
-        disableForChecks : function () {
-            if(this.permission.typeOfPermissionId == 6){
-                this.permission.periodOfTime=1
+        disableForChecks: function () {
+            if (this.permission.typeOfPermissionId == 6) {
+                this.permission.periodOfTime = 1
                 return true //disabled
-            }else{
-                if(this.timeFormatToMinutes(this.showPermissionInfo.initialRemaining) < 480 && this.permission.typeOfPermissionId != 5){
-                    this.permission.periodOfTime=1
+            } else {
+                if (this.timeFormatToMinutes(this.showPermissionInfo.initialRemaining) < 480 && this.permission.typeOfPermissionId != 5) {
+                    this.permission.periodOfTime = 1
                     return true
-                }else{
+                } else {
                     return false
                 }
             }
-        },  
+        },
     },
 };
 </script>
