@@ -97,6 +97,7 @@ class EvaluacionController extends Controller
                 'id_evaluacion_rendimiento'     => 1,
                 'fecha_evaluacion_personal'     => $request->fecha_evaluacion_personal,
                 'periodo_evaluacion_personal'   => $request->periodo_evaluacion_personal,
+                'puntaje_evaluacion_personal'   => 0,
                 'fecha_reg_evaluacion_personal' => Carbon::now(),
             ];
             $evaluacionId = EvaluacionPersonal::insertGetId($evaluacionData);
