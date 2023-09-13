@@ -75,8 +75,8 @@ import axios from 'axios';
                                     </span>
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-center">
+                            <td class="px-2 first:pl-5 last:pr-5 td-data-table">
+                                <div class="font-medium text-center ellipsis">
                                     <span class="text-slate-800">
                                         {{ getEmployeeName(position) }}
                                     </span>

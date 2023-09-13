@@ -42,7 +42,8 @@ class PermisoController extends Controller
             ->join('tipo_permiso', 'tipo_permiso.id_tipo_permiso', '=', 'permiso.id_tipo_permiso')
             ->join('empleado', 'empleado.id_empleado', '=', 'permiso.id_empleado')
             ->join('persona', 'persona.id_persona', '=', 'empleado.id_persona')
-            ->join('plaza_asignada', 'plaza_asignada.id_plaza_asignada', '=', 'permiso.id_plaza_asignada');
+            ->join('plaza_asignada', 'plaza_asignada.id_plaza_asignada', '=', 'permiso.id_plaza_asignada')
+            ->join('dependencia', 'dependencia.id_dependencia', '=', 'plaza_asignada.id_dependencia');;
         if ($request->execute != 0) {
             $query->whereIn('plaza_asignada.id_dependencia', $arrayIdDependencias);
         } else {
@@ -66,7 +67,7 @@ class PermisoController extends Controller
         if ($search_value) {
             $query->where(function ($query) use ($search_value) {
                 $query->where('id_permiso', 'like', '%' . $search_value['id_permiso'] . '%')
-                    ->where('nombre_tipo_permiso', 'like', '%' . $search_value['nombre_tipo_permiso'] . '%')
+                    ->where('codigo_tipo_permiso', 'like', '%' . $search_value['nombre_tipo_permiso'] . '%')
                     ->where(function ($query) use ($search_value) {
                         $query->where('pnombre_persona', 'like', '%' . $search_value['pnombre_persona'] . '%')
                             ->orWhere('snombre_persona', 'like', '%' . $search_value['pnombre_persona'] . '%')
@@ -107,14 +108,10 @@ class PermisoController extends Controller
         $user = User::find($request->user()->id_usuario);
         $executePermit = $request->ejecutar;
 
-        $id_empleado = $idEmpleadoFromView != 0 ? $idEmpleadoFromView : $user->persona->empleado->id_empleado;
-
-        $arrayIdDependencias = [];
-        foreach ($user->persona->empleado->plazas_asignadas as $plaza) {
-            if ($plaza->estado_plaza_asignada == 1) {
-                $arrayIdDependencias[] = $plaza->id_dependencia;
-            }
-        }
+        $arrayIdDependencias = $user->persona->empleado->plazas_asignadas
+            ->where('estado_plaza_asignada', 1)
+            ->pluck('id_dependencia')
+            ->toArray();
 
         $baseQuery = DB::table('empleado as e')
             ->selectRaw('CONCAT(e.codigo_empleado, "-",CONCAT_WS(" ", p.pnombre_persona, p.snombre_persona, p.tnombre_persona,
@@ -139,17 +136,26 @@ class PermisoController extends Controller
                 )
                 ->get();
         } else {
-            $empleados = $baseQuery->where('e.id_empleado', $id_empleado)
+            $empleados = $baseQuery->where('e.id_empleado', $user->persona->empleado->id_empleado)
                 ->get();
         }
-        $permissionData = $this->getPermissionData($id_empleado);
+
+        if($idEmpleadoFromView != 0 || $executePermit == 0){
+            if($idEmpleadoFromView==0){
+                $id_empleado = $user->persona->empleado->id_empleado;
+            }else{
+                $id_empleado = $idEmpleadoFromView;
+            }
+            $permissionData = $this->getPermissionData($id_empleado);
+        }
+        
 
         $permissionReason = DB::table('motivo_permiso')->selectRaw('id_motivo_permiso as value, nombre_motivo_permiso as label')
             ->get();
 
         return response()->json([
-            'typesOfPermissions'          => $permissionData['typesOfPermissions'],
-            'jobPositions'                => $permissionData['jobPositions'],
+            'typesOfPermissions'          => $permissionData['typesOfPermissions'] ?? [],
+            'jobPositions'                => $permissionData['jobPositions'] ?? [],
             'employees'                   => $empleados ?? [],
             'permissionReasons'           => $permissionReason ?? []
         ]);
@@ -252,10 +258,10 @@ class PermisoController extends Controller
                 'fecha_inicio_permiso'        => $startDateFormatted,
                 'fecha_fin_permiso'           => $request->periodOfTime == 2 ? $endDateFormatted : null,
                 'destino_permiso'             => $request->typeOfPermissionId == 5 ? $request->destination : null,
-                'comentarios_permiso'         => in_array($request->typeOfPermissionId, [5, 6]) ? $request->observation : null,
+                'comentarios_permiso'         => $request->observation,
                 'hora_entrada_permiso'        => $startTimeFormatted,
                 'hora_salida_permiso'         => $endTimeFormatted,
-                'retornar_permiso_empleado'   => $request->typeOfPermissionId == 5 ? $request->comingBack : null,
+                'retornar_empleado_permiso'   => $request->typeOfPermissionId == 5 ? $request->comingBack : null,
                 'estado_permiso'              => 1,
                 'fecha_reg_permiso'           => Carbon::now(),
                 'usuario_permiso'             => $request->user()->nick_usuario,
@@ -358,7 +364,7 @@ class PermisoController extends Controller
                     'fecha_inicio_permiso'        => $startDateFormatted,
                     'fecha_fin_permiso'           => $request->periodOfTime == 2 ? $endDateFormatted : null,
                     'destino_permiso'             => $request->typeOfPermissionId == 5 ? $request->destination : null,
-                    'comentarios_permiso'         => in_array($request->typeOfPermissionId, [5, 6]) ? $request->observation : null,
+                    'comentarios_permiso'         => $request->observation,
                     'hora_entrada_permiso'        => $startTimeFormatted,
                     'hora_salida_permiso'         => $endTimeFormatted,
                     'retornar_empleado_permiso'   => $request->typeOfPermissionId == 5 ? $request->comingBack : null,
@@ -378,6 +384,37 @@ class PermisoController extends Controller
                     'logical_error' => 'El tiempo seleccionado excede el tiempo restante para el permiso seleccionado.',
                     'refresh' => true
                 ], 422);
+            }
+        }
+    }
+    public function getPermissionInfoById(Request $request)
+    {
+        $permiso = Permiso::where('id_permiso', $request->id_permiso)
+            ->with(['empleado.persona', 'plaza_asignada.dependencia', 'tipo_permiso', 'plaza_asignada.detalle_plaza.plaza', 'empleado.titulo_profesional'])
+            ->first();
+
+        if (!$permiso || $permiso->estado_permiso == 0) {
+            return response()->json([
+                'logical_error' => 'El permiso seleccionado ha sido desactivado o no existe.',
+            ], 422);
+        } else {
+            if ($permiso->id_estado_permiso != $request->id_estado_permiso) {
+                return response()->json([
+                    'logical_error' => 'El permiso seleccionado ha cambiado de estado, intente nuevamente.',
+                ], 422);
+            } else {
+                $fechaPermiso = Carbon::parse($permiso->fecha_inicio_permiso)->format('m');
+                $cantidadPermisos = DB::table('permiso')
+                    ->where('id_tipo_permiso', 6)
+                    ->whereIn('id_estado_permiso', [1, 2]) // Check if id_estado_permiso is 1 or 2
+                    ->where('id_empleado', $permiso->id_empleado)
+                    ->whereMonth('fecha_inicio_permiso', $fechaPermiso)
+                    ->where('fecha_inicio_permiso', '<=', $permiso->fecha_inicio_permiso)
+                    ->count();
+                return response()->json([
+                    'permiso' => $permiso,
+                    'limite'  => $cantidadPermisos
+                ]);
             }
         }
     }
