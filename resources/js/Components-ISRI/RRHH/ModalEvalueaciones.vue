@@ -237,7 +237,7 @@ export default {
             // Nota: No funcionara si el empleado ya tiene evaluaciones asignadas
             try {
                 this.isLoading = true
-                const response = await axios.post('/search-employees', { data: query });
+                const response = await axios.post('/search-employees-for-evaluations', { data: query });
                 const newDataEmployees = response.data.map(item => {
                     return {
                         value: item.id_empleado,
