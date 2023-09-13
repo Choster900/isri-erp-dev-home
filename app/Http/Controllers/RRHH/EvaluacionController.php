@@ -81,8 +81,8 @@ class EvaluacionController extends Controller
                 $query->whereRaw("MATCH (pnombre_persona, snombre_persona, tnombre_persona, papellido_persona, sapellido_persona, tapellido_persona) AGAINST (?)", [$searchQuery]);
             });
         }
-        $query->whereHas("empleado"); // Las personas que esten en la tabla de empleados
-        // ->doesntHave("empleado.evaluaciones_personal"); // Los empleados que no tengan evaluaciones
+        $query->whereHas("empleado") // Las personas que esten en la tabla de empleados
+        ->doesntHave("empleado.evaluaciones_personal"); // Los empleados que no tengan evaluaciones
         $result = $query->get();
         return $result;
     }

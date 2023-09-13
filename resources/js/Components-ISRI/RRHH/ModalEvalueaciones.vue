@@ -154,7 +154,8 @@ import DocumentoEvaluacionVue from './DocumentoEvaluacion.vue';
 
                     <DocumentoEvaluacionVue :contenidoEvaluacionRendimiento="contenidoEvaluacionRendimiento"
                         :registroEvaluacionRendimientoPersonal="registroEvaluacionRendimientoPersonal"
-                        :info-employee="registrosEvaluacionesRentimientoPersonal" />
+                        :info-employee="registrosEvaluacionesRentimientoPersonal"
+                        @actualizar-table-data="$emit('cerrar-modal')" />
 
                 </div>
             </div>
@@ -305,7 +306,6 @@ export default {
             })
 
         },
-
     },
     created() {
 
@@ -332,6 +332,8 @@ export default {
                 this.id_empleado = ''
                 this.employeOptions = []
                 this.$emit("reload-table")
+                this.fecha_evaluacion_personal = ''
+                this.periodo_evaluacion_personal = ''
                 //Accion cuando cierra el modal
 
             }

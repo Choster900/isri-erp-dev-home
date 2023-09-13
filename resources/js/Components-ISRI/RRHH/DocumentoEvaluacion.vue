@@ -14,7 +14,7 @@ import DocumentBlanck from '@/Components-ISRI/RRHH/DocumentoEvaluacionBlank.vue'
         <div class="px-2">
 
             <GeneralButton :color="['bg-red-700 hover:bg-red-800']" text="Imprimir" icon="pdf"
-                :disabled="contenidoEvaluacionRendimiento != '' && registroEvaluacionRendimientoPersonal != '' ? false : true"
+                :disabled="contenidoEvaluacionRendimiento != '' && registroEvaluacionRendimientoPersonal != '' && contenidoEvaluacionRendimiento.categorias_rendimiento.length == responsesWithScores.length ? false : true"
                 styleDisabled="bg-red-900/80 hover:bg-red-900/80 cursor-not-allowed"
                 @click="contenidoEvaluacionRendimiento != '' && registroEvaluacionRendimientoPersonal != '' ? printPdf() : ''" />
         </div>
@@ -306,7 +306,7 @@ export default {
                         puntaje_evaluacion_personal: this.responsesWithScores.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0),
                     });
                     console.log(resp.data);
-                    // TODO:  this.$emit("actualizar-table-data");
+                    this.$emit("actualizar-table-data");
                     resolve(resp); // Resolvemos la promesa con la respuesta exitosa
                 } catch (error) {
                     console.log('Error en el envio:', error)
