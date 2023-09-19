@@ -156,10 +156,10 @@ import moment from 'moment';
                                     {{ new_item ? 'LIMPIAR' : 'CANCELAR' }}
                                 </button> -->
 
-                                <GeneralButton class="mr-1 py-1" color="bg-blue-500 hover:bg-blue-700"
+                                <GeneralButton class="mr-1" color="bg-blue-500 hover:bg-blue-700"
                                     :icon="new_item ? 'add' : 'update'" :text="new_item ? 'Agregar' : 'Actualizar'"
                                     @click="new_item ? saveRol() : updateRol()" :disabled="is_loadig_roles" />
-                                <GeneralButton v-if="itemSelected" class="ml-1 py-1"
+                                <GeneralButton v-if="itemSelected" class="ml-1"
                                     color="bg-red-500 hover:bg-red-700" icon="delete"
                                     text="Cancelar" @click="cancel()"
                                     :disabled="is_loadig_roles" />

@@ -86,6 +86,8 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('store-employee-permission', [PermisoController::class, 'storeEmployeePermission'])->name('permiso.storeEmployeePermission');
     Route::post('update-employee-permission', [PermisoController::class, 'updateEmployeePermission'])->name('permiso.updateEmployeePermission');
     Route::post('get-permission-info-by-id', [PermisoController::class, 'getPermissionInfoById'])->name('permiso.getPermissionInfoById');
+    Route::post('delete-permission', [PermisoController::class, 'deletePermission'])->name('permiso.deletePermission');
+
 
     Route::get(
         '/rrhh/evaluaciones',
