@@ -187,7 +187,7 @@ import moment from 'moment';
                                     <InputError v-for="(item, index) in errors.startDate" :key="index" class="mt-2"
                                         :message="item" />
                                 </div>
-                                <div v-if="this.permission.periodOfTime === 2" class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                                <div v-if="permission.periodOfTime === 2" class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                     <label class="block mb-2 text-xs text-black" for="fecha_nacimiento">
                                         Fecha Fin <span class="text-red-600 font-extrabold">*</span>
                                     </label>
