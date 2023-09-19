@@ -100,14 +100,14 @@ import ModalEvalueacionesVue from '@/Components-ISRI/RRHH/ModalEvalueaciones.vue
                 </datatable>
 
             </div>
-            <div v-if="empty_object" class="flex text-center py-2">
+            <div v-if="emptyObject" class="flex text-center py-2">
                 <p class="text-red-500 font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se
                     encontraron registros.</p>
             </div>
 
         </div>
 
-        <div v-if="!empty_object" class="px-6 py-4 bg-white shadow-lg rounded-sm border-slate-200 relative">
+        <div v-if="!emptyObject" class="px-6 py-4 bg-white shadow-lg rounded-sm border-slate-200 relative">
             <div>
                 <nav class="flex justify-between" role="navigation" aria-label="Navigation">
                     <div class="grow text-center">
@@ -180,7 +180,7 @@ export default {
                 sortOrders[column.name] = -1;
         });
         return {
-            empty_object: false,
+            emptyObject: false,
             permits: [],
             stateModal: false,
             evaluaciones: [],
@@ -223,6 +223,7 @@ export default {
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
                     this.evaluaciones = response.data.data.data;
+                    this.evaluaciones.length > 0 ? this.emptyObject = false : this.emptyObject = true
 
                 }
             }).catch((errors) => {

@@ -17,6 +17,14 @@ const props = defineProps({
     icon: {
         type: String,
         default: 'defaultBruh'
+    },
+    disabled: {
+        type: Boolean,
+        default: false
+    },
+    styleDisabled: {
+        type: String,
+        default: 'bg-gray-600  hover:bg-gray-700'
     }
 });
 const iconSelected = computed(() => {
@@ -37,31 +45,16 @@ const iconSelected = computed(() => {
 </script>
 
 <template>
-    <!--  <button :type="type" @click="deletAlert" :class="color"
-        class="inline-flex text-white  rounded-md text-sm px-3 py-1.5 text-center mb-2">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-            class="mr-1 -ml-1 w-5 h-5">
-            <path stroke-linecap="round" stroke-linejoin="round" :d="iconSelected" />
-        </svg>
-        <span class="px-1 py-2.5 text-base text-gray-100 border-l-2 border-gray-100"></span>
-        <div class='text-[12px] uppercase'>
-            {{ text }}
-        </div>
-    </button> -->
-
-
-    <div class="flex rounded-md overflow-hidden mb-2 cursor-pointer" :class="color">
-
+    <div class="flex rounded-md overflow-hidden mb-2 cursor-pointer" :class="[color, disabled ? styleDisabled : '']">
         <div class=" shadow-border py-1.5 px-2 border-r-2 border-white">
             <div class="w-5 h-5">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class="w-5 h-5 text-white">
                     <path stroke-linecap="round" stroke-linejoin="round" :d="iconSelected" />
                 </svg>
-
             </div>
         </div>
-        <button
+        <button :disabled="disabled"
             class="block text-white shadow-border hover:bg-blue-dark text-[12px] px-2 font-sans tracking-wide uppercase font-bold rounded-r-md">
             {{ text }}
         </button>

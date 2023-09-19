@@ -1,12 +1,22 @@
 <script setup>
+import { jsPDF } from "jspdf";
+import html2pdf from 'html2pdf.js'
 import DocumentBlanck from '@/Components-ISRI/RRHH/DocumentoEvaluacionBlank.vue';
-
 </script>
 <template>
     <div class=" flex  justify-center  content-between">
-        <div class="px-6">
+        <div class="px-2">
             <GeneralButton :color="['bg-orange-700 hover:bg-orange-800']" text="Enviar evaluación" icon="update"
-                @click="submitResponseRequest()" />
+                :disabled="contenidoEvaluacionRendimiento != '' && registroEvaluacionRendimientoPersonal != '' ? false : true"
+                styleDisabled="bg-orange-900/80 hover:bg-orange-900/80 cursor-not-allowed"
+                @click="contenidoEvaluacionRendimiento != '' && registroEvaluacionRendimientoPersonal != '' ? submitResponseRequest() : ''" />
+        </div>
+        <div class="px-2">
+
+            <GeneralButton :color="['bg-red-700 hover:bg-red-800']" text="Imprimir" icon="pdf"
+                :disabled="contenidoEvaluacionRendimiento != '' && registroEvaluacionRendimientoPersonal != '' && contenidoEvaluacionRendimiento.categorias_rendimiento.length == responsesWithScores.length ? false : true"
+                styleDisabled="bg-red-900/80 hover:bg-red-900/80 cursor-not-allowed"
+                @click="contenidoEvaluacionRendimiento != '' && registroEvaluacionRendimientoPersonal != '' ? printPdf() : ''" />
         </div>
     </div>
 
@@ -131,9 +141,7 @@ import DocumentBlanck from '@/Components-ISRI/RRHH/DocumentoEvaluacionBlank.vue'
                                                 :checked="registroEvaluacionRendimientoPersonal.detalle_evaluaciones_personal &&
                                                     registroEvaluacionRendimientoPersonal.detalle_evaluaciones_personal.length > i &&
                                                     registroEvaluacionRendimientoPersonal.detalle_evaluaciones_personal[i].id_rubrica_rendimiento == rubrica.id_rubrica_rendimiento"
-                                                :name="data.descripcion_cat_rendimiento">
-                                            <!--      {{ registroEvaluacionRendimientoPersonal.detalle_evaluaciones_personal[i].id_rubrica_rendimiento }}
-                                                {{ rubrica.id_rubrica_rendimiento }} -->
+                                                :name="data.nombre_cat_rendimiento">
                                             <span class="text-xs justify-center text-center"
                                                 :title="`${rubrica.puntaje_rubrica_rendimiento} Puntos`">{{
                                                     rubrica.opcion_rubrica_rendimiento }}</span>
@@ -154,11 +162,13 @@ import DocumentBlanck from '@/Components-ISRI/RRHH/DocumentoEvaluacionBlank.vue'
 
     </div>
 
-    <DocumentBlanck v-else></DocumentBlanck>
+    <DocumentBlanck v-else /><!-- Este es un documento en blanco -->
 </template>
 
 <script>
-
+import { createApp, h } from 'vue'
+import EvaluacionPdfpVue from '@/pdf/RRHH/EvaluacionPdf.vue';
+import moment from 'moment';
 
 export default {
     props: ["contenidoEvaluacionRendimiento", "registroEvaluacionRendimientoPersonal", "infoEmployee"],
@@ -174,7 +184,42 @@ export default {
         }
     },
     methods: {
+        printPdf(dataQuedan) {
+            // Opciones de configuración para generar el PDF
+            // let fecha = moment().format('DD-MM-YYYY');
+            let name = 'EVALUACION'// Nombre del pdf
+            // Propiedades del pdf
+            const opt = {
+                //margin: 0.5, DEJANDO EL MARGEN POR DEFAUL
+                //      margin: 0.1,
+                filename: name,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                // pagebreak: { mode: 'avoid-all', before: '#page2el' },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
 
+            };
+
+            // Crear una instancia de la aplicación Vue para generar el componente quedanPDFVue
+            const app = createApp(EvaluacionPdfpVue, {
+                contenidoEvaluacionRendimiento: this.contenidoEvaluacionRendimiento,
+                registroEvaluacionRendimientoPersonal: this.registroEvaluacionRendimientoPersonal,
+                promedio: this.responsesWithScores.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0),
+                empleado: this.generateFullName(this.infoEmployee.persona),
+                puesto: this.infoEmployee.plazas_asignadas && this.infoEmployee.plazas_asignadas.filter((plaza) => plaza.estado_plaza_asignada == 1).map((plaza, index) => {
+                    return `${plaza.detalle_plaza.plaza.nombre_plaza}`
+                }).join(',') || '',
+            });// El pdf en cuestion
+
+            // Crear un elemento div y montar la instancia de la aplicación en él
+            const div = document.createElement('div');
+            const pdfPrint = app.mount(div);
+            const html = div.outerHTML;
+
+            // Generar y guardar el PDF utilizando html2pdf
+            html2pdf().set(opt).from(html).save();
+        },
         generateFullName(persona) {
             if (persona) {
 
@@ -261,7 +306,7 @@ export default {
                         puntaje_evaluacion_personal: this.responsesWithScores.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0),
                     });
                     console.log(resp.data);
-                    // TODO:  this.$emit("actualizar-table-data");
+                    this.$emit("actualizar-table-data");
                     resolve(resp); // Resolvemos la promesa con la respuesta exitosa
                 } catch (error) {
                     console.log('Error en el envio:', error)
@@ -278,11 +323,11 @@ export default {
             const performanceCategories = this.contenidoEvaluacionRendimiento.categorias_rendimiento;
 
 
-            /* if (!personalEvaluationDetails || !performanceCategories) {
+            if (!personalEvaluationDetails || !performanceCategories) {
                 // Maneja el caso en el que alguna de las variables sea undefined
                 return;
-            } */
-            console.log(performanceCategories);
+            }
+            console.log(personalEvaluationDetails);
             personalEvaluationDetails.forEach(obj => {
                 const categoria = performanceCategories.find(cat => cat.id_cat_rendimiento === obj.id_cat_rendimiento);
                 if (!categoria) return; // No se encontró la categoría

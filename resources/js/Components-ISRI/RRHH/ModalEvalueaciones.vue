@@ -35,7 +35,10 @@ import DocumentoEvaluacionVue from './DocumentoEvaluacion.vue';
                                             placeholder="Puedes filtrar por apellidos" :filter-results="false"
                                             :min-chars="10" :resolve-on-load="true" :searchable="true"
                                             :options="employeOptions" noOptionsText="Sin opciones" :classes="{
+                                                optionSelectedDisabled: 'text-green-100 bg-green-500 bg-opacity-50 cursor-not-allowed',
                                                 noOptions: 'py-2 px-3 text-gray-600 bg-white text-left text-sm ',
+                                                containerDisabled: 'cursor-default bg-gray-100 cursor-not-allowed',
+                                                tagDisabled: 'pr-2 opacity-50 rtl:pl-2  cursor-not-allowed',
                                                 placeholder: 'text-sm flex items-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-slate-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ',
                                             }" />
                                     </div>
@@ -151,7 +154,8 @@ import DocumentoEvaluacionVue from './DocumentoEvaluacion.vue';
 
                     <DocumentoEvaluacionVue :contenidoEvaluacionRendimiento="contenidoEvaluacionRendimiento"
                         :registroEvaluacionRendimientoPersonal="registroEvaluacionRendimientoPersonal"
-                        :info-employee="registrosEvaluacionesRentimientoPersonal" />
+                        :info-employee="registrosEvaluacionesRentimientoPersonal"
+                        @actualizar-table-data="$emit('cerrar-modal')" />
 
                 </div>
             </div>
@@ -302,7 +306,6 @@ export default {
             })
 
         },
-
     },
     created() {
 
@@ -324,10 +327,13 @@ export default {
 
             } else {
                 this.registrosEvaluacionesRentimientoPersonal = []
+                this.contenidoEvaluacionRendimiento = []
                 this.registroEvaluacionRendimientoPersonal = []
                 this.id_empleado = ''
                 this.employeOptions = []
                 this.$emit("reload-table")
+                this.fecha_evaluacion_personal = ''
+                this.periodo_evaluacion_personal = ''
                 //Accion cuando cierra el modal
 
             }
