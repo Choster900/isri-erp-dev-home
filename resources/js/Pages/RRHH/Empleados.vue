@@ -430,6 +430,8 @@ export default {
             return formattedDependencies.join(', ') || 'N/Asign.';
         }
 
+            return dependencies || 'N/Asign.';
+        }
     },
     computed: {
     }
