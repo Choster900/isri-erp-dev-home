@@ -435,9 +435,6 @@ export default {
             // Unir las dependencias formateadas en una cadena separada por comas
             return formattedDependencies.join(', ') || 'N/Asign.';
         }
-
-            return dependencies || 'N/Asign.';
-        }
     },
     computed: {
     }
