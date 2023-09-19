@@ -42,7 +42,7 @@ import axios from 'axios';
             </header>
 
             <div class="overflow-x-auto">
-                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy"
+                <datatable :columns="columns" :sortKey="sortKey" :inputsToValidate="inputsToValidate" :sortOrders="sortOrders" @sort="sortBy"
                     :searchButton="true" @datos-enviados="handleData($event)" @execute-search="getEmployees()">
                     <tbody class="text-sm divide-y divide-slate-200">
                         <tr v-for="employee in employees" :key="employee.id_empleado">
@@ -272,7 +272,13 @@ export default {
             //Data for modal
             show_modal_employee: false,
             modalData: [],
-
+            inputsToValidate: [
+                { inputName: 'id_empleado', number: true, limit: 4 },
+                { inputName: 'codigo_empleado', number: false, limit: 5 },
+                { inputName: 'nombre_persona', number: false, limit: 20 },
+                { inputName: 'dui_persona', number: false, limit: 10 },
+                { inputName: 'dependencia', number: false, limit: 5 },
+            ],
             hasNext: false,
             page: '',
 
@@ -428,9 +434,6 @@ export default {
 
             // Unir las dependencias formateadas en una cadena separada por comas
             return formattedDependencies.join(', ') || 'N/Asign.';
-        }
-
-            return dependencies || 'N/Asign.';
         }
     },
     computed: {

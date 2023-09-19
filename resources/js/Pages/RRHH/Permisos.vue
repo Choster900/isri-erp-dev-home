@@ -1,10 +1,10 @@
 <script setup>
-import Modal from "@/Components/Modal.vue";
 import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
-import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
 import ModalPermisosVue from '@/Components-ISRI/RRHH/ModalPermisos.vue';
+import PermisoFormato026Vue from '@/Components-ISRI/RRHH/PermisoFormato026.vue';
+
 import moment from 'moment';
 
 import { toast } from 'vue3-toastify';
@@ -58,7 +58,8 @@ import axios from 'axios';
 
             <div class="overflow-x-auto">
                 <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
-                    @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getJobPermissions()">
+                    :inputsToValidate="inputsToValidate" @sort="sortBy" @datos-enviados="handleData($event)"
+                    @execute-search="getJobPermissions()">
                     <tbody class="text-sm divide-y divide-slate-200">
                         <tr v-for="permission in jobPermissions" :key="permission.id_permiso">
                             <td class="px-2 first:pl-5 last:pr-5">
@@ -119,7 +120,7 @@ import axios from 'axios';
                                             <div class="font-semibold">Ver</div>
                                         </div>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            v-if="permits.actualizar == 1 && permission.estado_permiso == 1 && permission.id_estado_permiso == 1"
+                                            v-if="permits.actualizar == 1 && permission.id_estado_permiso == 1"
                                             @click="editJobPermission(permission)">
                                             <div class="w-8 text-green-900">
                                                 <span class="text-xs">
@@ -133,7 +134,8 @@ import axios from 'axios';
                                             <div class="font-semibold">Editar</div>
                                         </div>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            @click="changeStatusJobPosition(permission)" v-if="permits.eliminar == 1">
+                                            @click="deletePermission(permission)"
+                                            v-if="(permits.eliminar == 1 && permission.id_estado_permiso === 1) || permits.ejecutar === 1">
                                             <div class="w-8 text-red-900">
                                                 <svg viewBox="0 0 24 24" fill="none" class="w-6 h-6"
                                                     xmlns="http://www.w3.org/2000/svg">
@@ -145,7 +147,7 @@ import axios from 'axios';
                                                 </svg>
                                             </div>
                                             <div class="font-semibold">
-                                                Eliminar
+                                                Cancelar
                                             </div>
                                         </div>
                                     </DropDownOptions>
@@ -200,6 +202,8 @@ import axios from 'axios';
 
         <ModalPermisosVue :showModalJobPermissions="showModalJobPermissions" :modalData="modalData" :permits="permits"
             @cerrar-modal="showModalJobPermissions = false" @get-table="getJobPermissions(tableData.currentPage)" />
+        <PermisoFormato026Vue :viewPermission="viewPermission" :permissionToPrint="permissionToPrint" :permits="permits"
+            @cerrar-modal="viewPermission = false" />
 
     </AppLayoutVue>
 </template>
@@ -243,11 +247,19 @@ export default {
                 sortOrders[column.name] = -1;
         });
         return {
+            viewPermission:false,
+            permissionToPrint: [],
             isLoading: false,
             printPermissionFlag: false,
             emptyObject: false,
             //Data for datatable
             jobPermissions: [],
+            inputsToValidate: [
+                { inputName: 'horas', number: true, limit: 3 },
+                { inputName: 'id_permiso', number: true, limit: 4 },
+                { inputName: 'nombre_tipo_permiso', number: false, limit: 14 },
+                { inputName: 'pnombre_persona', number: false, limit: 20 },
+            ],
             //Data for modal
             showModalJobPermissions: false,
             modalData: [],
@@ -277,6 +289,10 @@ export default {
         }
     },
     methods: {
+        viewPermissionFormat(permission) {
+            this.permissionToPrint = permission
+            this.viewPermission = true
+        },
         async printPermission(permission) {
             const res = await this.getPermissionDataById(permission);
             const updatedPermission = res.permiso;
@@ -292,9 +308,9 @@ export default {
 
             const format = this.getFormatToPrint(updatedPermission);
 
-            const { centro1, centro2 } = this.getCentro(updatedPermission,format);
-            const { observation1, observation2 } = this.getObservation(updatedPermission,format);
-            const { role1, role2 } = this.getRole(updatedPermission,format);
+            const { centro1, centro2 } = this.getCentro(updatedPermission, format);
+            const { observation1, observation2 } = this.getObservation(updatedPermission, format);
+            const { role1, role2 } = this.getRole(updatedPermission, format);
 
             let app; // Declaración de app fuera del switch
 
@@ -348,8 +364,7 @@ export default {
                 this.generatePdf(html, opt, currentDateTime);
             }
         },
-
-        getCentro(updatedPermission,format) {
+        getCentro(updatedPermission, format) {
             const limiteCaracteres1 = format === 1 ? 40 : format === 2 ? 48 : 65;
             const centerName = updatedPermission.plaza_asignada.dependencia.nombre_dependencia;
             let centro1 = '';
@@ -366,8 +381,7 @@ export default {
             }
             return { centro1, centro2 };
         },
-
-        getObservation(updatedPermission,format) {
+        getObservation(updatedPermission, format) {
             const observation = updatedPermission.comentarios_permiso;
             let observation1 = '';
             let observation2 = '';
@@ -384,8 +398,7 @@ export default {
             }
             return { observation1, observation2 };
         },
-
-        getRole(updatedPermission,format) {
+        getRole(updatedPermission, format) {
             const role = updatedPermission.plaza_asignada.detalle_plaza.plaza.nombre_plaza;
             let role1 = '';
             let role2 = '';
@@ -402,13 +415,11 @@ export default {
             }
             return { role1, role2 };
         },
-
         getHtml(app) {
             const div = document.createElement('div');
             const pdfPrint = app.mount(div);
             return div.outerHTML;
         },
-
         getFormatToPrint(permission) {
             //Personal con goce 
             if (permission.id_tipo_permiso === 1) {
@@ -438,7 +449,6 @@ export default {
             }
             return -1; // Valor por defecto si ninguno de los casos anteriores se cumple
         },
-
         workDaysBetween(date1, date2) {
             const startDateFormated = moment(date1, 'YYYY/MM/DD').toDate()
             const endDateFormated = moment(date2, 'YYYY/MM/DD').toDate()
@@ -455,7 +465,6 @@ export default {
             }
             return daysDifference
         },
-
         generatePdf(html, opt, currentDateTime) {
             html2pdf().set(opt).from(html)
                 .toPdf().get('pdf').then(function (pdf) {
@@ -583,7 +592,7 @@ export default {
         },
         handleData(myEventData) {
             this.tableData.search = myEventData;
-            const data = Object.values(myEventData);
+            const data = Object.values(this.tableData.search);
             if (data.every(error => error === '')) {
                 this.getJobPermissions()
             }
@@ -595,24 +604,23 @@ export default {
                 return 'N/Asign.'
             }
         },
-        changeStatusJobPosition(position) {
-            let msg
-            position.estado_det_plaza == 1 ? msg = "Desactivar" : msg = "Activar"
+        deletePermission(permission) {
             this.$swal.fire({
-                title: msg + ' plaza codigo: <br>' + position.codigo_det_plaza + '.',
+                title: 'Cancelar ' + permission.nombre_tipo_permiso,
                 text: "¿Estas seguro?",
                 icon: "question",
                 iconHtml: "❓",
-                confirmButtonText: 'Si, ' + msg,
-                confirmButtonColor: "#001b47",
+                confirmButtonText: 'Si, Aceptar.',
+                confirmButtonColor: "#DC2626",
                 cancelButtonText: "Cancelar",
                 showCancelButton: true,
                 showCloseButton: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    axios.post("/change-status-job-position-det", {
-                        id: position.id_det_plaza,
-                        status: position.estado_det_plaza
+                    this.isLoading = true;
+                    axios.post("/delete-permission", {
+                        id: permission.id_permiso,
+                        execute: permits.ejecutar
                     })
                         .then((response) => {
                             this.$swal.fire({
@@ -620,23 +628,19 @@ export default {
                                 icon: 'success',
                                 timer: 5000
                             })
-                            this.getJobPositions(this.tableData.currentPage);
+                            this.getJobPermissions(this.tableData.currentPage);
                         })
                         .catch((errors) => {
                             if (errors.response.data.logical_error) {
-                                toast.error(
-                                    errors.response.data.logical_error,
-                                    {
-                                        autoClose: 5000,
-                                        position: "top-right",
-                                        transition: "zoom",
-                                        toastBackgroundColor: "white",
-                                    }
-                                );
+                                this.showToast(toast.error, errors.response.data.logical_error);
+                                this.getJobPermissions(this.tableData.currentPage);
                             } else {
                                 this.manageError(errors, this)
                             }
                         })
+                        .finally(() => {
+                            this.isLoading = false;
+                        });
                 }
             })
         }
