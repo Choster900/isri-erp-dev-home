@@ -16,6 +16,7 @@ class TipoPermiso extends Model
     protected $fillable = [
         'nombre_tipo_permiso',
         'tiempo_max_tipo_permiso',
+        'codigo_tipo_permiso',
         'estado_tipo_permiso',
         'fecha_reg_tipo_permiso',
         'fecha_mod_tipo_permiso',

@@ -20,7 +20,7 @@ import axios from 'axios';
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
                 <GeneralButton @click="addJobPositionDet()" v-if="permits.insertar == 1"
-                    color="bg-green-700  hover:bg-green-800" text="Agregar Plaza" icon="add" />
+                    color="bg-green-700  hover:bg-green-800" text="Agregar Puesto" icon="add" />
             </div>
         </div>
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
@@ -33,7 +33,7 @@ import axios from 'axios';
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Detalle Plazas: <span
+                    <h2 class="font-semibold text-slate-800 pt-1">Puestos: <span
                             class="text-slate-400 font-medium">{{
                                 tableData.total
                             }}</span></h2>
@@ -75,8 +75,8 @@ import axios from 'axios';
                                     </span>
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-center">
+                            <td class="px-2 first:pl-5 last:pr-5 td-data-table">
+                                <div class="font-medium text-center ellipsis">
                                     <span class="text-slate-800">
                                         {{ getEmployeeName(position) }}
                                     </span>
@@ -211,7 +211,7 @@ export default {
             { width: "10%", label: "Codigo", name: "codigo_det_plaza", type: "text" },
             { width: "25%", label: "Nombre", name: "nombre_plaza", type: "text" },
             {
-                width: "12%", label: "Estado Plaza", name: "id_estado_plaza", type: "select",
+                width: "12%", label: "Estado Puesto", name: "id_estado_plaza", type: "select",
                 options: [
                     { value: "1", label: "Vacante" },
                     { value: "2", label: "Proc. Selec." },

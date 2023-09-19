@@ -9,7 +9,7 @@ import moment from 'moment';
 
 <template>
     <div class="m-1.5">
-        <Modal :show="showModalJobPosition" @close="$emit('cerrar-modal')" :modal-title="'Agregar Plaza. '" maxWidth="2xl">
+        <Modal :show="showModalJobPosition" @close="$emit('cerrar-modal')" :modal-title="'Agregar Puesto. '" maxWidth="2xl">
 
             <div class="px-5 py-3">
 
@@ -43,11 +43,11 @@ import moment from 'moment';
                                     @click="showJobPositions = false" />
                             </div>
                         </div>
-                        <h1 v-if="jobPositions.length>0" class="text-center mb-1 font-semibold text-slate-800 text-medium">
-                            PLAZAS
-                            ASIGNADAS</h1>
+                        <h1 v-if="jobPositions.length > 0" class="text-center mb-1 font-semibold text-slate-800 text-medium">
+                            PUESTOS
+                            ASIGNADOS</h1>
                         <h1 v-else class="text-center mb-1 font-semibold text-slate-800 text-medium">
-                            SIN PLAZAS ASIGNADAS</h1>
+                            SIN PUESTOS ASIGNADOS</h1>
 
                         <div class="overflow-y-auto max-h-[360px]">
                             <div v-for="jobPosition in jobPositions" :key="jobPosition.id_plaza_asignada"
@@ -87,7 +87,7 @@ import moment from 'moment';
                                                 </p>
                                             </div>
                                             <div class="w-full md:w-[35%]">
-                                                <p class="text-sm text-gray-600">Fecha Asignación</p>
+                                                <p class="text-sm text-gray-600">Fecha Nombramiento</p>
                                                 <p class="text-base font-medium text-navy-700 dark:text-white">
                                                     {{ moment(jobPosition.fecha_plaza_asignada).format('DD/MM/YYYY') }}
                                                 </p>
@@ -147,7 +147,7 @@ import moment from 'moment';
                             <div class="mb-5 md:flex flex-row justify-items-start">
                                 <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                     <label class="block mb-2 text-xs font-light text-gray-600" for="fecha_nacimiento">
-                                        Fecha de contratacion <span class="text-red-600 font-extrabold">*</span>
+                                        Fecha de nombramiento <span class="text-red-600 font-extrabold">*</span>
                                     </label>
                                     <div class="relative flex">
                                         <LabelToInput icon="date" />
@@ -334,6 +334,7 @@ export default {
                     this.showToast(toast.success, result.value.message);
                     this.$emit("get-table");
                     this.showJobPositions = true
+                    this.cleanJobPositionInputs()
                     this.getJobPositions()
                 }
             }).catch((error) => {
@@ -349,6 +350,11 @@ export default {
         formattedDependency(dependencie) {
             const dependency = dependencie.parent_dependency || dependencie;
             return dependency.codigo_dependencia + ' - ' + dependencie.nombre_dependencia;
+        },
+        cleanJobPositionInputs() {
+            Object.keys(this.jobPosition).forEach(key => {
+                this.jobPosition[key] = '';
+            });
         }
     },
     watch: {
