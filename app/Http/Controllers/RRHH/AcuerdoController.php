@@ -41,20 +41,23 @@ class AcuerdoController extends Controller
         $data = $request->input('search');
 
         // Construir la consulta base con las relaciones
-        $query = Empleado::select('*')->with(["acuerdo_laboral.tipo_acuerdo_laboral","persona"])->whereHas("acuerdo_laboral", function ($query) {
-            $query->where("estado_acuerdo_laboral", 1);
-        })->where("estado_empleado", 1)->orderBy($columns[$column], $dir);
+        $query = Empleado::select('*')
+            ->with([
+                "acuerdo_laboral" => function ($query) {
+                    $query->where('estado_acuerdo_laboral', 1);
+                },
+                "acuerdo_laboral.tipo_acuerdo_laboral",
+                "persona"
+            ])
+            ->whereHas("acuerdo_laboral", function ($query) {
+                $query->where("estado_acuerdo_laboral", 1);
+            })->where("estado_empleado", 1)->orderBy($columns[$column], $dir);
 
         if ($data) {
             $query->where('id_empleado', 'like', '%' . $data["id_empleado"] . '%');
         }
         $acuerdos = $query->paginate($length)->onEachSide(1);
-
-        $tipo_acuerdo_laboral = DB::table('tipo_acuerdo_laboral')
-            ->select(
-                'id_tipo_acuerdo_laboral as value',
-                'nombre_tipo_acuerdo_laboral  as label',
-            )->get();
+        $tipo_acuerdo_laboral = DB::table('tipo_acuerdo_laboral')->select('id_tipo_acuerdo_laboral as value', 'nombre_tipo_acuerdo_laboral  as label',)->get("");
 
 
         return [
@@ -69,7 +72,7 @@ class AcuerdoController extends Controller
 
     public function searchEmployeByNameOrId(Request $request)
     {
-        if ($request["by"] == 'name') {
+        if ($request["by"] == 'name') {//FIXME: CHECK THIS QUERY
             return Empleado::select(
                 'empleado.id_empleado as value',
                 DB::raw("CONCAT_WS(' ', pnombre_persona, snombre_persona, tnombre_persona, papellido_persona, sapellido_persona, tapellido_persona) AS label"),
@@ -77,7 +80,7 @@ class AcuerdoController extends Controller
                 'nivel_educativo.nombre_nivel_educativo',
                 'genero.nombre_genero',
                 'estado_civil.nombre_estado_civil',
-                'dui_persona',
+                'dui_persona' ,
                 'fecha_nac_persona',
                 'fecha_reg_persona',
                 'fecha_mod_persona',
@@ -148,8 +151,8 @@ class AcuerdoController extends Controller
                         'oficio_acuerdo_laboral' => $value["oficio_acuerdo_laboral"],
                         'comentario_acuerdo_laboral'  =>  $value["comentario_acuerdo_laboral"],
                         'estado_acuerdo_laboral' => 1,
-                        'fecha_inicio_acuerdo_laboral' =>  explode("to", $value["fecha_inicio_fecha_fin_acuerdo_laboral"])[0],
-                        'fecha_fin_acuerdo_laboral' => explode("to", $value["fecha_inicio_fecha_fin_acuerdo_laboral"])[1],
+                        'fecha_inicio_acuerdo_laboral' => strpos($value["fecha_inicio_fecha_fin_acuerdo_laboral"], "to") != '' ? explode("to", $value["fecha_inicio_fecha_fin_acuerdo_laboral"])[0] : $value["fecha_inicio_fecha_fin_acuerdo_laboral"],
+                        'fecha_fin_acuerdo_laboral' => strpos($value["fecha_inicio_fecha_fin_acuerdo_laboral"], "to") != '' ? explode("to", $value["fecha_inicio_fecha_fin_acuerdo_laboral"])[1] : $value["fecha_inicio_fecha_fin_acuerdo_laboral"],
                         'fecha_reg_acuerdo_laboral' => Carbon::now(),
                         'usuario_acuerdo_laboral' => $request->user()->nick_usuario,
                         'ip_acuerdo_laboral' => $request->ip(),

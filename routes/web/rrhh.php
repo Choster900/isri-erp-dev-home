@@ -4,8 +4,10 @@ use App\Http\Controllers\RRHH\AcuerdoController;
 use App\Http\Controllers\RRHH\DetallePlazaController;
 use App\Http\Controllers\RRHH\BeneficiarioController;
 use App\Http\Controllers\RRHH\EmpleadoController;
+use App\Http\Controllers\RRHH\EvaluacionController;
 use App\Http\Controllers\RRHH\HojaServicioController;
 use App\Http\Controllers\RRHH\PermisoController;
+use App\Models\EvaluacionRendimiento;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -75,9 +77,28 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get(
         '/rrhh/permisos',
         function (Request $request) {
-            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/rrhh/permisos','RRHH/Permisos');
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/permisos', 'RRHH/Permisos');
         }
     )->name('rrhh.permisos');
     Route::post('job-permissions', [PermisoController::class, 'getJobPermissions'])->name('permiso.getJobPermissions');
-    Route::get('get-data-permission-modal', [PermisoController::class, 'getDataPermissionModal'])->name('permiso.getDataPermissionModal');
-    Route::get('get-permission-data/{id_empleado}', [PermisoController::class, 'getPermissionData'])->name('permiso.getPermissionData');});
+    Route::get('get-data-permission-modal/{id_empleado}', [PermisoController::class, 'getDataPermissionModal'])->name('permiso.getDataPermissionModal');
+    Route::get('get-permission-data/{id_empleado}', [PermisoController::class, 'getPermissionData'])->name('permiso.getPermissionData');
+    Route::post('store-employee-permission', [PermisoController::class, 'storeEmployeePermission'])->name('permiso.storeEmployeePermission');
+    Route::post('update-employee-permission', [PermisoController::class, 'updateEmployeePermission'])->name('permiso.updateEmployeePermission');
+    Route::post('get-permission-info-by-id', [PermisoController::class, 'getPermissionInfoById'])->name('permiso.getPermissionInfoById');
+
+    Route::get(
+        '/rrhh/evaluaciones',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/evaluaciones', 'RRHH/Evaluaciones');
+        }
+    )->name('rrhh.evaluaciones');
+    Route::post('evaluaciones', [EvaluacionController::class, 'getEvaluaciones'])->name('evaluaciones.getEvaluaciones');
+    Route::post('search-employees', [EvaluacionController::class, 'searchEmployeesForNewEvaluationRequest'])->name('evaluaciones.search-employees');
+    Route::post('create-new-evaluacion', [EvaluacionController::class, 'createNewEvaluation'])->name('evaluaciones.new-evaluacion');
+    Route::post('get-evaluacion', [EvaluacionController::class, 'getPersonalPerformanceEvaluationVersion'])->name('evaluaciones.get-evaluacion');
+    Route::post('save-response', [EvaluacionController::class, 'saveResponseInEvaluation'])->name('evaluaciones.save-response');
+    Route::post('get-by-id', [EvaluacionController::class, 'getEvaluationById'])->name('evaluaciones.get-by-id');
+
+
+});
