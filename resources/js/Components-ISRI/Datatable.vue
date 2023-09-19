@@ -68,6 +68,10 @@ export default {
             type: Boolean,
             default: false
         },
+        inputsToValidate: {
+            type: Array,
+            default: []
+        }
     },
     data: function () {
         return {
@@ -85,13 +89,26 @@ export default {
     },
     methods: {
         sendData(event) {
-            const value = event.target.value;
             const id = event.target.id;
+            // Encuentra el objeto correspondiente en inputsToValidate por inputName
+            const inputToValidate = this.inputsToValidate.find(element => element.inputName === id);
+            if (inputToValidate) {
+                if (inputToValidate.number) {
+                    // Reemplazar caracteres no numéricos con una cadena vacía
+                    event.target.value = event.target.value.replace(/[^0-9]/g, '');
+                }
+                if (inputToValidate.limit) {
+                    // Limitar la longitud del valor
+                    event.target.value = event.target.value.substring(0, inputToValidate.limit);
+                }
+            }
+            const value = event.target.value;
             if (id in this.columnsComputed) {
                 this.columnsComputed[id] = value;
             }
-            this.$emit('datos-enviados', this.columnsComputed)
+            this.$emit('datos-enviados', this.columnsComputed);
         }
+
     },
 
 
@@ -130,4 +147,5 @@ select {
     text-align: center;
     font-size: 9pt;
     appearance: none;
-}</style>
+}
+</style>
