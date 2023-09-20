@@ -2,53 +2,53 @@
 import { jsPDF } from "jspdf";
 import html2pdf from 'html2pdf.js'
 import DocumentBlanck from '@/Components-ISRI/RRHH/DocumentoEvaluacionBlank.vue';
+import momentAlias from "moment";
 </script>
 <template>
     <div class=" flex  justify-center  content-between">
-        <div class="px-2">
+        <!-- <div class="px-2">
             <GeneralButton :color="['bg-orange-700 hover:bg-orange-800']" text="Enviar evaluación" icon="update"
                 :disabled="contenidoEvaluacionRendimiento != '' && registroEvaluacionRendimientoPersonal != '' ? false : true"
                 styleDisabled="bg-orange-900/80 hover:bg-orange-900/80 cursor-not-allowed"
                 @click="contenidoEvaluacionRendimiento != '' && registroEvaluacionRendimientoPersonal != '' ? submitResponseRequest() : ''" />
         </div>
         <div class="px-2">
-
             <GeneralButton :color="['bg-red-700 hover:bg-red-800']" text="Imprimir" icon="pdf"
                 :disabled="contenidoEvaluacionRendimiento != '' && registroEvaluacionRendimientoPersonal != '' && contenidoEvaluacionRendimiento.categorias_rendimiento.length == responsesWithScores.length ? false : true"
                 styleDisabled="bg-red-900/80 hover:bg-red-900/80 cursor-not-allowed"
                 @click="contenidoEvaluacionRendimiento != '' && registroEvaluacionRendimientoPersonal != '' ? printPdf() : ''" />
-        </div>
+        </div> -->
+
+
     </div>
 
-
-    <div class="mx-4 overflow-y-auto max-h-[calc(100vh-100px)] p-3 mb-4"
+    <!-- <div class="mx-4 overflow-y-auto max-h-[calc(100vh-200px)] p-3 mb-4"
         v-if="contenidoEvaluacionRendimiento != '' && registroEvaluacionRendimientoPersonal != ''"
-        :class="{ 'animate-slide-out-right': showErrorWhenValuesChanges, 'animate-slide-in-left': !showErrorWhenValuesChanges }">
-
-        <table>
+        :class="{ 'animate-slide-out-right': showErrorWhenValuesChanges, 'animate-slide-in-left': !showErrorWhenValuesChanges }"> -->
+    <div class="mx-4 overflow-y-auto max-h-[calc(100vh-200px)] p-3 mb-4"
+        v-if="contenidoEvaluacionRendimiento != '' && registroEvaluacionRendimientoPersonal != ''">
+        <table class="w-full">
             <tbody>
                 <tr>
                     <td class="border border-black" rowspan="4">
                         <div class="w-44 px-1.5"><img src="../../../img/isri-gob.png" alt=""></div>
                     </td>
-                    <td class="border border-black text-center font-medium uppercase" rowspan="2">
-                        Seguimiento de Desempeño</td>
-                    <td class="border border-black text-[8pt] font-semibold pr-3 px-1.5">FECHA DE CREACIÓN:
-                        12/12/2021</td>
+                    <td class="border border-black text-center font-medium uppercase" rowspan="2">Seguimiento de Desempeño
+                    </td>
+                    <td class="border border-black text-[8pt] font-semibold pr-3 px-1.5">FECHA : {{ momentAlias(
+                        registroEvaluacionRendimientoPersonal.fecha_evaluacion_personal).format('L') }}</td>
                 </tr>
                 <tr>
-                    <td class="border border-black text-[8pt] font-semibold   px-1.5">ID 00000-1<!-- {{
-                        dataPersonalEvaluacion[0].id_evaluacion_personal }} --></td>
+                    <td class="border border-black text-[8pt] font-semibold   px-1.5">ID 00000-{{
+                        registroEvaluacionRendimientoPersonal.id_evaluacion_personal }}</td>
                 </tr>
                 <tr>
-                    <td class="border border-black text-center font-medium px-8" rowspan="2">DESEMPEÑO DE
-                        PERSONAL ADMINISTRATIVO</td>
-                    <td class="border border-black text-[8pt] font-semibold py-0.5 px-1.5">DEPENDENCIA:
-                        ADMON</td>
+                    <td class="border border-black text-center font-medium px-8" rowspan="2">DESEMPEÑO DE PERSONAL
+                        ADMINISTRATIVO</td>
+                    <td class="border border-black text-[8pt] font-semibold py-0.5 px-1.5">DEPENDENCIA:ADMON</td>
                 </tr>
                 <tr>
-                    <td class="border border-black text-[8pt] font-semibold  py-0.5 px-1.5">CODIGO: VERSION
-                        1.0</td>
+                    <td class="border border-black text-[8pt] font-semibold  py-0.5 px-1.5">CODIGO: VERSION 1.0</td>
                 </tr>
                 <tr>
                     <td class="border border-black bg-black h-5 text-white text-center text-[10pt] " colspan="3">
@@ -68,7 +68,6 @@ import DocumentBlanck from '@/Components-ISRI/RRHH/DocumentoEvaluacionBlank.vue'
                     return `${plaza.detalle_plaza.plaza.nombre_plaza}`
                 }).join(',') || ''"
                     class="text-left text-[9pt] w-52 text-sm font-medium capitalize h-5 border-x-0 border-t-0">
-
             </div>
         </div>
         <div class="flex items-center justify-center pt-2 gap-10 pb-7">
@@ -89,16 +88,11 @@ import DocumentBlanck from '@/Components-ISRI/RRHH/DocumentoEvaluacionBlank.vue'
                     class=" text-left text-[9pt] w-20 text-sm font-medium capitalize  h-5 border-x-0 border-t-0">
             </div>
         </div>
-        <!-- 
-        <pre>
-            {{ infoEmployee.plazas_asignadas }}
-
- 
-        </pre> -->
         <table class="pb-5" v-for="(data, i) in contenidoEvaluacionRendimiento.categorias_rendimiento" :key="i">
             <tbody>
                 <tr>
-                    <td class="border border-black bg-black h-10 text-[10pt] text-white text-center" colspan="2">
+                    <td class="border border-black bg-black h-8
+                     text-[10pt] text-white text-center" colspan="2">
                         <div class="flex justify-between items-center">
                             <span class="mx-auto">{{ data.nombre_cat_rendimiento }}</span>
                             <span class="text-end pr-8">
@@ -159,16 +153,99 @@ import DocumentBlanck from '@/Components-ISRI/RRHH/DocumentoEvaluacionBlank.vue'
             </tbody>
         </table>
 
+        <div class="flex flex-col md:flex-row gap-10">
+
+            <!-- Primera tabla -->
+            <div class="w-full md:w-1/2 overflow-x-auto">
+                <table class="w-full">
+                    <tr class="text-center">
+                        <th class="py-2" colspan="5">
+                            <h1 class="text-sm font-bold ">TABLA DE VALORACIÓN</h1>
+                        </th>
+                    </tr>
+                    <tr class="text-xs text-center bg-gray-200">
+                        <th class="border border-black">FACTOR</th>
+                        <th class="border border-black">A</th>
+                        <th class="border border-black">B</th>
+                        <th class="border border-black">C</th>
+                        <th class="border border-black">D</th>
+                    </tr>
+                    <tr class="text-center text-[8pt]"
+                        v-for="(data, i) in contenidoEvaluacionRendimiento.categorias_rendimiento" :key="i">
+                        <td class="border border-black text-start px-2">
+                            {{ i + 1 }} - {{ data.nombre_cat_rendimiento }}
+                        </td>
+                        <td v-for="(rubrica, j) in data.rubricas_rendimiento" :key="j"
+                            class="border border-black w-7 text-[8pt]"
+                            :class="registroEvaluacionRendimientoPersonal.detalle_evaluaciones_personal &&
+                                registroEvaluacionRendimientoPersonal.detalle_evaluaciones_personal.length > i &&
+                                registroEvaluacionRendimientoPersonal.detalle_evaluaciones_personal[i].id_rubrica_rendimiento == rubrica.id_rubrica_rendimiento ? 'bg-red-600/90 text-slate-300' : ''">
+                            {{ rubrica.puntaje_rubrica_rendimiento }}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Segunda tabla -->
+            <div class="w-full md:w-1/3 mt-6 md:mt-0 overflow-x-auto">
+                <table class="w-full">
+                    <tr class="text-start">
+                        <th class="py-2" colspan="2">
+                            <h1 class="text-sm font-bold">CALIFICACIÓN POR PUNTOS Y POR RANGOS</h1>
+                        </th>
+                    </tr>
+                    <tr class="text-start text-[8pt]">
+                        <td class="border border-black"
+                            :class="responsesWithScores.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0) > 73 ? 'bg-slate-400' : ''">
+                            Excelente
+                        </td>
+                        <td class="border border-black">
+                            De 73 a 84 puntos
+                        </td>
+                    </tr>
+                    <tr class="text-start text-[8pt]">
+                        <td class="border border-black"
+                            :class="responsesWithScores.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0) > 56 && responsesWithScores.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0) < 56 ? 'bg-slate-400' : ''">
+
+                            Muy Bueno
+                        </td>
+                        <td class="border border-black">
+                            De 56 a 72 puntos
+                        </td>
+                    </tr>
+                    <tr class="text-start text-[8pt]">
+                        <td class="border border-black"
+                            :class="responsesWithScores.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0) > 28 && responsesWithScores.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0) < 55 ? 'bg-slate-400' : ''">
+
+                            Bueno
+                        </td>
+                        <td class="border border-black">
+                            De 28 a 55 puntos
+                        </td>
+                    </tr>
+                    <tr class="text-start text-[8pt]">
+                        <td class="border border-black"
+                            :class="responsesWithScores.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0) < 27 ? 'bg-slate-400' : ''">
+
+                            Insatisfactorio
+                        </td>
+                        <td class="border border-black">
+                            De 0 a 27 puntos
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+        </div>
+
 
     </div>
-
-    <DocumentBlanck v-else /><!-- Este es un documento en blanco -->
 </template>
 
 <script>
 import { createApp, h } from 'vue'
 import EvaluacionPdfpVue from '@/pdf/RRHH/EvaluacionPdf.vue';
-import moment from 'moment';
+import moment, { isMoment } from 'moment';
 
 export default {
     props: ["contenidoEvaluacionRendimiento", "registroEvaluacionRendimientoPersonal", "infoEmployee"],

@@ -92,6 +92,7 @@ export default {
             try {
                 this.isLoading = true
                 const response = await axios.post('/search-employees', { data: this.userSearched });
+                console.log(response);
                 this.userMatches = response.data;
             } catch (error) {
                 console.log('Error en la búsqueda:', error)
