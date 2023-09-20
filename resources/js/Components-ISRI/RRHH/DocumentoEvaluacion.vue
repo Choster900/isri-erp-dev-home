@@ -153,7 +153,7 @@ import momentAlias from "moment";
             </tbody>
         </table>
 
-        <div class="flex flex-col md:flex-row gap-10">
+        <div class="flex flex-col justify-between md:flex-row gap-10">
 
             <!-- Primera tabla -->
             <div class="w-full md:w-1/2 overflow-x-auto">
@@ -235,18 +235,13 @@ import momentAlias from "moment";
                     </tr>
                 </table>
             </div>
-
         </div>
-
-
     </div>
 </template>
 
 <script>
 import { createApp, h } from 'vue'
 import EvaluacionPdfpVue from '@/pdf/RRHH/EvaluacionPdf.vue';
-import moment, { isMoment } from 'moment';
-
 export default {
     props: ["contenidoEvaluacionRendimiento", "registroEvaluacionRendimientoPersonal", "infoEmployee"],
 
