@@ -40,10 +40,11 @@ class PermisoController extends Controller
 
         $query = Permiso::select('*')
             ->join('tipo_permiso', 'tipo_permiso.id_tipo_permiso', '=', 'permiso.id_tipo_permiso')
+            ->leftJoin('motivo_permiso', 'motivo_permiso.id_motivo_permiso', '=', 'permiso.id_motivo_permiso')
             ->join('empleado', 'empleado.id_empleado', '=', 'permiso.id_empleado')
             ->join('persona', 'persona.id_persona', '=', 'empleado.id_persona')
             ->join('plaza_asignada', 'plaza_asignada.id_plaza_asignada', '=', 'permiso.id_plaza_asignada')
-            ->join('dependencia', 'dependencia.id_dependencia', '=', 'plaza_asignada.id_dependencia');;
+            ->join('dependencia', 'dependencia.id_dependencia', '=', 'plaza_asignada.id_dependencia');
         if ($request->execute != 0) {
             $query->whereIn('plaza_asignada.id_dependencia', $arrayIdDependencias);
         } else {
@@ -261,7 +262,7 @@ class PermisoController extends Controller
                 'comentarios_permiso'         => $request->observation,
                 'hora_entrada_permiso'        => $startTimeFormatted,
                 'hora_salida_permiso'         => $endTimeFormatted,
-                'retornar_empleado_permiso'   => $request->typeOfPermissionId == 5 ? $request->comingBack : null,
+                'retornar_empleado_permiso'   => ($request->typeOfPermissionId == 5 && $request->periodOfTime == 2) ? $request->comingBack : null,
                 'estado_permiso'              => 1,
                 'fecha_reg_permiso'           => Carbon::now(),
                 'usuario_permiso'             => $request->user()->nick_usuario,
@@ -416,6 +417,17 @@ class PermisoController extends Controller
                     'limite'  => $cantidadPermisos
                 ]);
             }
+        }
+    }
+
+    public function deletePermission(Request $request){
+        $permission = Permiso::find($request->id);
+        if($permission->id_estado_permiso == 1 || $request->execute == 1){
+
+        }else{
+            return response()->json([
+                'logical_error' => 'El permiso seleccionado ha cambiado de estado.',
+            ], 422);
         }
     }
 }
