@@ -63,17 +63,7 @@ import ModalEvalueacionesVue from '@/Components-ISRI/RRHH/ModalEvalueaciones.vue
                                     {{ evaluacion.email_institucional_empleado }}
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center flex justify-center gap-2">
-                                    <span>{{ }}</span>
-                                    <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                        class="w-5 h-5">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z" />
-                                    </svg>
-                                </div>
-                            </td>
+
                             <td class="first:pl-5 last:pr-5">
                                 <div class="space-x-1">
                                     <DropDownOptions>
@@ -165,12 +155,11 @@ export default {
     data() {
         let sortOrders = {};
         let columns = [
-            { width: "10%", label: "ID", name: "id_persona", type: "text" },
+            { width: "10%", label: "ID", name: "id_empleado", type: "text" },
             { width: "10%", label: "Codigo", name: "codigo_empleado", type: "text" },
             { width: "20%", label: "Nombres", name: "collecNombre", type: "text" },
             { width: "20%", label: "Apellidos", name: "collecApellido", type: "text" },
             { width: "20%", label: "Correo institucional", name: "email_institucional_empleado", type: "text" },
-            { width: "20%", label: "Acuerdos", name: "numAcuerdos", type: "text" },
             { width: "1%", label: "", name: "Acciones" },
         ];
         columns.forEach((column) => {
@@ -182,7 +171,6 @@ export default {
         return {
             emptyObject: false,
             permits: [],
-            stateModal: false,
             evaluaciones: [],
             dataEvaluacionToSendModal: [],
             showModalEvaluacion: false,
@@ -213,6 +201,7 @@ export default {
     },
     methods: {
         async getEvaluaciones(url = "/evaluaciones") {
+            console.log("a");
             this.lastUrl = url;
             this.tableData.draw++;
             await axios.post(url, this.tableData).then((response) => {
