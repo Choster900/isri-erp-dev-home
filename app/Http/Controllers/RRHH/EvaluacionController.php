@@ -50,14 +50,35 @@ class EvaluacionController extends Controller
             ->with([
                 "persona",
                 "evaluaciones_personal" => function ($query) {
-                    return $query->orderBy("fecha_evaluacion_personal", "desc");
+                    return $query->orderBy("fecha_reg_evaluacion_personal", "desc");
                 },
                 "evaluaciones_personal.detalle_evaluaciones_personal",
-                "plazas_asignadas.detalle_plaza.plaza"
+                "plazas_asignadas.detalle_plaza.plaza",
+                "plazas_asignadas.dependencia"
             ])->whereHas("evaluaciones_personal")->orderBy($columns[$column], $dir);
 
         if ($data) {
-            //$query->where('id_empleado', 'like', '%' . $data["id_empleado"] . '%');
+            $query->where('id_empleado', 'like', '%' . $data["id_empleado"] . '%')
+                ->where('codigo_empleado', 'like', '%' . $data['codigo_empleado'] . '%')
+                ->where('email_institucional_empleado', 'like', '%' . $data['email_institucional_empleado'] . '%')
+                ->whereHas(
+                    'persona',
+                    function ($query) use ($data) {
+                        $searchNombres = $data["collecNombre"];
+                        $query->where(function ($query) use ($searchNombres) {
+                            $query->where('pnombre_persona', 'like', '%' . $searchNombres . '%')
+                                ->orWhere('snombre_persona', 'like', '%' . $searchNombres . '%')
+                                ->orWhere('tapellido_persona', 'like', '%' . $searchNombres . '%');
+                        });
+
+                        $searchApellidos = $data["collecApellido"];
+                        $query->where(function ($query) use ($searchApellidos) {
+                            $query->where('papellido_persona', 'like', '%' . $searchApellidos . '%')
+                                ->orWhere('sapellido_persona', 'like', '%' . $searchApellidos . '%')
+                                ->orWhere('tapellido_persona', 'like', '%' . $searchApellidos . '%');
+                        });
+                    }
+                );
         }
         $acuerdos = $query->paginate($length)->onEachSide(1);
 
@@ -82,10 +103,11 @@ class EvaluacionController extends Controller
             });
         }
         $query->whereHas("empleado") // Las personas que esten en la tabla de empleados
-        ->doesntHave("empleado.evaluaciones_personal"); // Los empleados que no tengan evaluaciones
+            ->doesntHave("empleado.evaluaciones_personal"); // Los empleados que no tengan evaluaciones
         $result = $query->get();
         return $result;
     }
+    
     function createNewEvaluation(EvaluacionRequest $request)
     {
 
@@ -106,10 +128,11 @@ class EvaluacionController extends Controller
             return Empleado::with([
                 "persona",
                 "evaluaciones_personal" => function ($query) {
-                    return $query->orderBy("fecha_evaluacion_personal", "desc");
+                    return $query->orderBy("fecha_reg_evaluacion_personal", "desc");
                 },
                 "evaluaciones_personal.detalle_evaluaciones_personal",
-                "plazas_asignadas.detalle_plaza.plaza"
+                "plazas_asignadas.detalle_plaza.plaza",
+                "plazas_asignadas.dependencia"
             ])->whereHas("evaluaciones_personal")->find($request->id_empleado);
         } catch (\Throwable $th) {
             DB::rollback();
@@ -144,7 +167,7 @@ class EvaluacionController extends Controller
 
             try {
                 // Iterar sobre las respuestas
-                foreach ( $request->data as $value ) {
+                foreach ($request->data as $value) {
                     $data = [
                         'id_evaluacion_personal'       => $request->id_evaluacion_personal,
                         'id_cat_rendimiento'           => $value['id_cat_rendimiento'],

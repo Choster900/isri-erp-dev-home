@@ -96,7 +96,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('rrhh.evaluaciones');
     Route::post('evaluaciones', [EvaluacionController::class, 'getEvaluaciones'])->name('evaluaciones.getEvaluaciones');
-    Route::post('search-employees', [EvaluacionController::class, 'searchEmployeesForNewEvaluationRequest'])->name('evaluaciones.search-employees');
+    Route::post('search-employees-for-evaluations', [EvaluacionController::class, 'searchEmployeesForNewEvaluationRequest'])->name('evaluaciones.search-employees');
     Route::post('create-new-evaluacion', [EvaluacionController::class, 'createNewEvaluation'])->name('evaluaciones.new-evaluacion');
     Route::post('get-evaluacion', [EvaluacionController::class, 'getPersonalPerformanceEvaluationVersion'])->name('evaluaciones.get-evaluacion');
     Route::post('save-response', [EvaluacionController::class, 'saveResponseInEvaluation'])->name('evaluaciones.save-response');
