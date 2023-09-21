@@ -201,7 +201,6 @@ export default {
     },
     methods: {
         async getEvaluaciones(url = "/evaluaciones") {
-            console.log("a");
             this.lastUrl = url;
             this.tableData.draw++;
             await axios.post(url, this.tableData).then((response) => {

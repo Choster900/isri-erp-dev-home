@@ -178,15 +178,11 @@ import DocumentoAnalisisDesempeñoVue from './DocumentoAnalisisDesempeño.vue';
                         <!-- End -->
                     </div>
 
-                    <DocumentoEvaluacionVue v-if="toShow === 'DocumentoEvalacionVue'"
+                    <DocumentoEvaluacionVue 
                         :contenidoEvaluacionRendimiento="contenidoEvaluacionRendimiento"
                         :registroEvaluacionRendimientoPersonal="registroEvaluacionRendimientoPersonal"
                         :info-employee="registrosEvaluacionesRentimientoPersonal"
-                        @actualizar-table-data="$emit('cerrar-modal')" />
-
-
-                    <DocumentoAnalisisDesempeñoVue v-if="toShow === 'DocumentoAnalisisDesempeñoVue'" />
-
+                        @actualizar-table-data="$emit('cerrar-modal')" :showMe="toShow" />
                 </div>
             </div>
         </ProcessModal>
