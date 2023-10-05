@@ -410,29 +410,13 @@ import { v4 as uuid, v4 } from "uuid";
                             </td>
                         </tr>
                     </template>
-                    <template v-for="i in 4" :key="i" v-if="incidentesEvaluaciones == ''">
+                    <template v-if="incidentesEvaluaciones == ''">
                         <tr>
-                            <td class="border border-black text-center px-1 text-xs">
-                                <svg class="h-7 w-7 cursor-pointer" viewBox="0 0 1024.00 1024.00" fill="#ff0000"
-                                    stroke="#ff0000" stroke-width="23.552">
-                                    <path
-                                        d="M512 897.6c-108 0-209.6-42.4-285.6-118.4-76-76-118.4-177.6-118.4-285.6 0-108 42.4-209.6 118.4-285.6 76-76 177.6-118.4 285.6-118.4 108 0 209.6 42.4 285.6 118.4 157.6 157.6 157.6 413.6 0 571.2-76 76-177.6 118.4-285.6 118.4z m0-760c-95.2 0-184.8 36.8-252 104-67.2 67.2-104 156.8-104 252s36.8 184.8 104 252c67.2 67.2 156.8 104 252 104 95.2 0 184.8-36.8 252-104 139.2-139.2 139.2-364.8 0-504-67.2-67.2-156.8-104-252-104z"
-                                        fill=""></path>
-                                    <path d="M707.872 329.392L348.096 689.16l-31.68-31.68 359.776-359.768z" fill=""></path>
-                                    <path d="M328 340.8l32-31.2 348 348-32 32z" fill=""></path>
-                                </svg>
-                            </td>
-                            <td class="border border-black text-center text-xs px-4"></td>
-                            <td class="border border-black text-center w-52">
-                                <div class="relative flex h-8 w-full flex-row-reverse ">
-                                   
+                            <td class="border border-black text-center  px-1 text-xs" colspan="5">
+                                <div class="flex justify-center">
+                                    <img src="../../../img/No-data.svg" alt="" class="h-48">
                                 </div>
-                            </td>
-                            <td class="border border-black text-center " style="outline: none;">
-                               
-                            </td>
-                            <td class="border border-black text-center w-96 max-w-96 text-xs px-4">
-                                    
+                                <span class="font-medium">!Al parecer no hay registro de incidentes¡</span>
                             </td>
                         </tr>
                     </template>
