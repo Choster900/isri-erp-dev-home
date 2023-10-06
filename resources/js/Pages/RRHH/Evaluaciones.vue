@@ -144,8 +144,12 @@ import ModalEvalueacionesVue from '@/Components-ISRI/RRHH/ModalEvalueaciones.vue
                 </nav>
             </div>
         </div>
-        <ModalEvalueacionesVue :showModal="showModalEvaluacion" @cerrar-modal="showModalEvaluacion = false"
-            :evaluacionEmpleadoDBData="dataEvaluacionToSendModal" @reload-table="getEvaluaciones(lastUrl)" />
+        <ModalEvalueacionesVue 
+            :showModal="showModalEvaluacion"
+            @cerrar-modal="showModalEvaluacion = false"
+            :evaluacionEmpleadoDBData="dataEvaluacionToSendModal"
+            @reload-table="getEvaluaciones(lastUrl)" 
+            />
     </AppLayoutVue>
 </template>
 
@@ -201,7 +205,6 @@ export default {
     },
     methods: {
         async getEvaluaciones(url = "/evaluaciones") {
-            console.log("a");
             this.lastUrl = url;
             this.tableData.draw++;
             await axios.post(url, this.tableData).then((response) => {
