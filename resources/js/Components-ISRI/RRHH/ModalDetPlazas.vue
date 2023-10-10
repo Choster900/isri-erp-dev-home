@@ -228,39 +228,18 @@ export default {
                 });
         },
         handleSuccessResponse(message) {
-            toast.success(message, {
-                autoClose: 3000,
-                position: "top-right",
-                transition: "zoom",
-                toastBackgroundColor: "white",
-            });
+            this.showToast(toast.success, message);
             this.$emit("get-table");
             this.$emit("cerrar-modal");
         },
         handleErrorResponse(errors) {
             if (errors.response.status === 422) {
                 if (errors.response.data.logical_error) {
-                    toast.error(
-                        errors.response.data.logical_error,
-                        {
-                            autoClose: 5000,
-                            position: "top-right",
-                            transition: "zoom",
-                            toastBackgroundColor: "white",
-                        }
-                    );
+                    this.showToast(toast.error, errors.response.data.logical_error);
                     this.$emit("get-table");
                     this.$emit("cerrar-modal");
                 } else {
-                    toast.warning(
-                        "Tienes algunos errores por favor verifica tus datos.",
-                        {
-                            autoClose: 5000,
-                            position: "top-right",
-                            transition: "zoom",
-                            toastBackgroundColor: "white",
-                        }
-                    );
+                    this.showToast(toast.warning, "Tienes algunos errores por favor verifica tus datos.");
                     this.errors = errors.response.data.errors;
                 }
             } else {
