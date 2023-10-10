@@ -4,6 +4,7 @@ namespace App\Http\Controllers\RRHH;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RRHH\EvaluacionRequest;
+use App\Http\Requests\RRHH\EvaluacionRespuestasRequest;
 use App\Models\CategoriaRendimiento;
 use App\Models\DetalleEvaluacionPersonal;
 use App\Models\Empleado;
@@ -154,7 +155,7 @@ class EvaluacionController extends Controller
 
     // Guardamos la respuesta que se ha seleccionado en la evaluacion
 
-    function saveResponseInEvaluation(Request $request)
+    function saveResponseInEvaluation(EvaluacionRespuestasRequest $request)
     {
         try {
             // Buscar la evaluación personal

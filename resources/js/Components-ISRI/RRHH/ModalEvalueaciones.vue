@@ -18,13 +18,12 @@ import DocumentoAnalisisDesempeñoVue from './DocumentoAnalisisDesempeño.vue';
 
             <div class="flex flex-col md:flex-row md:space-y-0 max-h-screen ">
                 <div class="w-full md:w-2/6 bg-slate-200/40 p-4 border">
-                    <div
-                        class="max-h-[calc(100vh-90px)] overflow-y-auto col-span-full xl:col-span-6 bg-white shadow-lg  border border-slate-300 overflow-x-auto">
+                    <div class="col-span-full xl:col-span-6 bg-white shadow-lg  border border-slate-300 ">
                         <header class="px-5 py-4 border-b-4 border-indigo-500">
                             <h2 class="font-semibold text-slate-800">Crear una nueva evaluación +</h2>
                         </header>
                         <div class="p-3">
-                            <div class="max-h-[600px] ">
+                            <div class="">
                                 <div class="mb-4">
                                     <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Nombre del
                                         empleado</label>
@@ -146,7 +145,9 @@ import DocumentoAnalisisDesempeñoVue from './DocumentoAnalisisDesempeño.vue';
 
                     <!-- With Icons -->
                     <div class="mx-6 mt-2">
-                        <h2 class="text-xl text-slate-800 font-bold mb-6">Evaluación del desempeño para personal administrativo 📝</h2>
+                        <h2 class="flex gap-2 text-xl text-slate-800 font-bold mb-6">Evaluación del desempeño para personal
+                            administrativo
+                        </h2>
                         <!-- Start -->
                         <div class="mb-1 border-b border-slate-200">
                             <ul class="text-sm font-medium flex flex-nowrap -mx-4 sm:-mx-6 lg:-mx-8 ">
@@ -165,11 +166,28 @@ import DocumentoAnalisisDesempeñoVue from './DocumentoAnalisisDesempeño.vue';
                                     class="pb-3 mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8">
                                     <a :class="toShow === 'DocumentoAnalisisDesempeñoVue' ? 'text-indigo-500' : 'text-slate-500 hover:text-slate-600'"
                                         class="  whitespace-nowrap flex items-center cursor-pointer">
-                                        <svg class="w-4 h-4 shrink-0 fill-current text-slate-400 mr-2" viewBox=" 0 0 16 16">
+                                        <svg class="w-4 h-4 shrink-0 fill-current  mr-2"
+                                            :class="toShow === 'DocumentoAnalisisDesempeñoVue' ? 'text-indigo-500' : 'text-slate-500 hover:text-slate-600'"
+                                            viewBox=" 0 0 16 16">
                                             <path
                                                 d="M14.3.3c.4-.4 1-.4 1.4 0 .4.4.4 1 0 1.4l-8 8c-.2.2-.4.3-.7.3-.3 0-.5-.1-.7-.3-.4-.4-.4-1 0-1.4l8-8zM15 7c.6 0 1 .4 1 1 0 4.4-3.6 8-8 8s-8-3.6-8-8 3.6-8 8-8c.6 0 1 .4 1 1s-.4 1-1 1C4.7 2 2 4.7 2 8s2.7 6 6 6 6-2.7 6-6c0-.6.4-1 1-1z" />
                                         </svg>
                                         <span @click="toShow = 'DocumentoAnalisisDesempeñoVue'">Análisis de Desempeño</span>
+                                    </a>
+                                </li>
+                                <li
+                                    class="pb-3 mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8">
+                                    <a :class="toShow === 'ImpresionDeDocumentos' ? 'text-indigo-500' : 'text-slate-500 hover:text-slate-600'"
+                                        class="  whitespace-nowrap flex items-center cursor-pointer">
+                                        <svg :fill="toShow === 'ImpresionDeDocumentos' ? '#6366f1' : '#94a3b8'"
+                                            class="w-4 h-4" viewBox="0 0 32.00 32.00"
+                                            :stroke="toShow === 'ImpresionDeDocumentos' ? '#6366f1' : '#94a3b8'">
+                                            <path
+                                                d="M30 13.75h-2.75v-7.75c0-0 0-0.001 0-0.001 0-0.345-0.14-0.657-0.365-0.883l-4-4c-0.226-0.226-0.539-0.366-0.885-0.366-0 0-0 0-0 0h-17c-0.69 0-1.25 0.56-1.25 1.25v0 11.75h-1.75c-0.69 0-1.25 0.56-1.25 1.25v0 9c0 0.69 0.56 1.25 1.25 1.25s1.25-0.56 1.25-1.25v0-7.75h25.5v7.75c0 0.69 0.56 1.25 1.25 1.25s1.25-0.56 1.25-1.25v0-9c-0-0.69-0.56-1.25-1.25-1.25h-0zM6.25 3.25h15.232l3.268 3.268v7.232h-18.5zM26 20.75h-20c-0.69 0-1.25 0.56-1.25 1.25v8c0 0.69 0.56 1.25 1.25 1.25h20c0.69-0.001 1.249-0.56 1.25-1.25v-8c-0.001-0.69-0.56-1.249-1.25-1.25h-0zM24.75 28.75h-17.5v-5.5h17.5zM26.879 17.62c-0.228-0.228-0.544-0.37-0.893-0.37-0.168 0-0.329 0.033-0.475 0.093l0.008-0.003c-0.16 0.060-0.295 0.156-0.399 0.279l-0.001 0.001c-0.119 0.109-0.213 0.242-0.277 0.392l-0.003 0.007c-0.059 0.142-0.095 0.306-0.1 0.479l-0 0.002c0.002 0.346 0.147 0.657 0.378 0.878l0 0c0.226 0.223 0.537 0.361 0.88 0.361s0.654-0.138 0.88-0.361l-0 0c0.233-0.222 0.378-0.533 0.381-0.878v-0c-0.005-0.174-0.041-0.339-0.103-0.49l0.003 0.009c-0.066-0.158-0.161-0.291-0.28-0.399l-0.001-0.001z">
+                                            </path>
+                                        </svg>
+                                        <span class="ml-2" @click="toShow = 'ImpresionDeDocumentos'">Imprimir
+                                            documento</span>
                                     </a>
                                 </li>
                             </ul>
