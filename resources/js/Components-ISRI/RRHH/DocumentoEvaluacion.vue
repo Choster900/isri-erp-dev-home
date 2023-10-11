@@ -24,7 +24,7 @@ import { v4 as uuid, v4 } from "uuid";
 
     <div v-if="registroEvaluacionRendimientoPersonal == ''" class="flex justify-center items-center">
         <!--  <img src="../../../img/NoEvaluationYet.svg" alt="" class="h-[500px]"> -->
-        <div class="w-full h-[550px] px-1 text-selection-disable">
+        <div class="w-full h-[500px] px-1 text-selection-disable">
             <div class="flex flex-col items-center justify-center h-full">
                 <img src="../../../img/NoEvaluationYet.svg" class="h-[400px] rounded-full mx-auto" alt="SVG Image"
                     draggable="false">
@@ -302,93 +302,8 @@ import { v4 as uuid, v4 } from "uuid";
             class="mx-4 overflow-y-auto max-h-[calc(85vh-100px)] p-3 mb-4 ">
 
 
-
-            <!--  <div class="max-h-72 overflow-y-auto">
-                <table class="w-full border border-black border-collapse">
-                    <thead>
-                        <tr>
-                            <td class="bg-black text-white text-center py-2 text-[10pt]" colspan="5">
-                                REGISTRO DE INCIDENTES CRITICOS DEN DESEMPEÑO PARA PERSONAL ADMINISTRATIVO
-                            </td>
-                        </tr>
-                        <tr class="bg-gray-200 text-gray-700 text-xs">
-                            <th class="border border-black font-semibold text-center py-1" rowspan="2"
-                                style="min-width: 20px;">
-                                #
-                            </th>
-                            <th class="border border-black font-semibold text-center" rowspan="2" style="min-width: 80px;">
-                                Fecha
-                            </th>
-                            <th class="border border-black font-semibold text-center" rowspan="2" style="min-width: 80px;">
-                                N° Factor
-                            </th>
-                            <th class="border border-black font-semibold text-center py-1" style="min-width: 40px;">
-                                F / D
-                            </th>
-                            <th class="border border-black font-semibold text-center" rowspan="2" style="min-width: 200px;">
-                                Descripción del evento
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <template v-for="(data, i) in incidentesEvaluaciones" :key="i">
-                            <tr v-if="!data.isDelete">
-                                <td class="border border-black text-center px-1 text-xs">
-                                    <svg class="h-7 w-7 cursor-pointer" viewBox="0 0 1024.00 1024.00" fill="#ff0000"
-                                        stroke="#ff0000" @click="delteIncident(data.id)" stroke-width="23.552">
-                                        <path
-                                            d="M512 897.6c-108 0-209.6-42.4-285.6-118.4-76-76-118.4-177.6-118.4-285.6 0-108 42.4-209.6 118.4-285.6 76-76 177.6-118.4 285.6-118.4 108 0 209.6 42.4 285.6 118.4 157.6 157.6 157.6 413.6 0 571.2-76 76-177.6 118.4-285.6 118.4z m0-760c-95.2 0-184.8 36.8-252 104-67.2 67.2-104 156.8-104 252s36.8 184.8 104 252c67.2 67.2 156.8 104 252 104 95.2 0 184.8-36.8 252-104 139.2-139.2 139.2-364.8 0-504-67.2-67.2-156.8-104-252-104z"
-                                            fill=""></path>
-                                        <path d="M707.872 329.392L348.096 689.16l-31.68-31.68 359.776-359.768z" fill="">
-                                        </path>
-                                        <path d="M328 340.8l32-31.2 348 348-32 32z" fill=""></path>
-                                    </svg>
-                                </td>
-                                <td class="border border-black text-center text-xs px-4">{{ momentAlias().format('L') }}
-                                </td>
-                                <td class="border border-black text-center w-52">
-                                    <div class="relative flex h-8 w-full flex-row-reverse ">
-                                        <Multiselect placeholder="seleccione"
-                                            v-model="incidentesEvaluaciones[i].id_cat_rendimiento" :classes="{
-                                                placeholder: 'flex items-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-black rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ',
-                                                noOptions: 'py-2 px-3 text-gray-600 bg-white text-left text-[8pt]',
-                                                optionsContainer: 'custom-options-container absolute z-50'// Añade una clase personalizada para el contenedor de opciones
-                                            }" :options="optionsFactor" :searchable="true" noOptionsText="sin opciones"
-                                            noResultsText="sin resultado" />
-                                    </div>
-                                </td>
-                                <td class="border border-black text-center " style="outline: none;">
-                                    <select v-model="incidentesEvaluaciones[i].resultado_incidente_evaluacion"
-                                        class="text-[9pt] py-0.5"
-                                        :class="errosModel[`dataIncidenteEvaluacion.${i}.resultado_incidente_evaluacion`] ? 'bg-red-300' : ''">
-                                        <option value="-" selected> - </option>
-                                        <option value="0">F</option>
-                                        <option value="1">D</option>
-                                    </select>
-                                </td>
-                                <td class="border border-black text-center w-96 max-w-96 text-xs px-4"
-                                    :class="errosModel[`dataIncidenteEvaluacion.${i}.comentario_incidente_evaluacion`] ? 'bg-red-300' : ''"
-                                    @input="incidentesEvaluaciones[i].comentario_incidente_evaluacion = $event.target.innerText"
-                                    contenteditable="true" style="outline: none;">{{
-                                        incidentesEvaluaciones[i].comentario_incidente_evaluacion }}
-                                </td>
-                            </tr>
-                        </template>
-                    </tbody>
-                </table>
-                <template
-                    v-if="incidentesEvaluaciones == '' || incidentesEvaluaciones.filter(Array => !Array.isDelete).length <= 0">
-                    <div class="text-center">
-                        <div class="flex justify-center">
-                            <img src="../../../img/No-data.svg" alt="" class="h-48">
-                        </div>
-                        <span class="font-medium text-center">!Al parecer no hay registro de incidentes¡</span>
-                    </div>
-
-                </template>
-            </div> -->
             <!-- Template events (secciones de eventos) -->
-            <div v-if="incidentesEvaluaciones.filter(Array => !Array.isDelete).length > 0" >
+            <div v-if="incidentesEvaluaciones.filter(Array => !Array.isDelete).length > 0">
                 <div class="xl:pl-48 xl:-translate-x-16 mb-2">
                     <ul class="flex flex-wrap -m-1">
                         <li class="m-1">
@@ -402,18 +317,6 @@ import { v4 as uuid, v4 } from "uuid";
                                 <span class="ml-2">Evento</span>
                             </a>
                         </li>
-                        <li class="m-1">
-                            <button @click="submitResponseRequest()"
-                                class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1 border border-slate-200 hover:border-slate-300 shadow-sm bg-orange-600 text-white duration-150 ease-in-out">
-                                <svg class="w-4 h-4 " viewBox="0 0 16 16">
-                                    <path class="fill-current "
-                                        d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z">
-                                    </path>
-                                </svg>
-                                <span class="ml-2">Enviar todo</span>
-                            </button>
-                        </li>
-
                     </ul>
                 </div>
                 <div>
@@ -569,12 +472,23 @@ import { v4 as uuid, v4 } from "uuid";
 
         <div :class="showMe == 'ImpresionDeDocumentos' ? '' : 'hidden'"
             class="mx-4 overflow-y-auto max-h-[calc(100vh-100px)] p-3 mb-4">
-            <div class="flex justify-between">
+            <div class="flex justify-start space-x-4">
+
                 <div @click="contenidoEvaluacionRendimiento != '' && registroEvaluacionRendimientoPersonal != '' ? printPdf() : ''"
                     class="border h-64 w-48 rounded-lg hover:bg-slate-100 cursor-pointer hover:border-2 hover:border-black/50">
                     <img src="../../../img/Documents-amico.svg" class="px-4" alt="">
                     <div class="px-4">
                         <h1 class="font-medium text-center text-xs">Descarga el documento</h1>
+                        <p class="text-[8pt] text-center">La información se verá reflejada en el documento cuando guardes
+                            los datos.</p>
+
+                    </div>
+                </div>
+                <div @click="submitResponseRequest()"
+                    class="border h-64 w-48 rounded-lg hover:bg-slate-100 cursor-pointer hover:border-2 hover:border-black/50">
+                    <img src="../../../img/update.svg" class="px-4" alt="">
+                    <div class="px-4">
+                        <h1 class="font-medium text-center text-xs">Enviar evaluacion</h1>
                         <p class="text-[8pt] text-center">La información se verá reflejada en el documento cuando guardes
                             los datos.</p>
 
