@@ -100,7 +100,8 @@ import moment from 'moment';
                         <div class="flex-1 text-center">
                             <p>Tiempo restante</p>
                             <p class="font-semibold" :class="noTime ? 'text-red-500' : 'text-green-500'">
-                                {{ formatTime(showPermissionInfo.remainingTime) }}
+                                {{ noTime ? '-' + formatTime(showPermissionInfo.remainingTime) :
+                                    formatTime(showPermissionInfo.remainingTime) }}
                             </p>
                         </div>
                     </div>
@@ -605,7 +606,7 @@ export default {
             if (this.permission.typeOfPermissionId == 5 || this.permission.typeOfPermissionId == 6) {
                 return 'NO APLICA'
             } else {
-                if (!time) {
+                if (time === '00:00' || time === '0:0' || time === '00:00:00') {
                     return '0'
                 } else {
                     const [hours, minutes] = time.split(':').map(Number);;
@@ -736,23 +737,29 @@ export default {
                         } else {
                             this.negativeTime = false
                             let daysDifference = this.workDaysBetween(this.permission.startDate, this.permission.endDate)
+                            //Tiempo disponible
                             const totalRemainingMinutes = this.timeFormatToMinutes(this.showPermissionInfo.initialRemaining)
+                            //Tiempo seleccionado
+                            const totalMinutesSelected = daysDifference * 8 * 60;
 
-                            if (daysDifference * 8 * 60 > totalRemainingMinutes) {
+                            if (totalMinutesSelected > totalRemainingMinutes) {
                                 this.showToast(toast.error, `Has excedido la cantidad de tiempo, solo tienes ${this.formatTime(this.showPermissionInfo.initialRemaining)} disponible, debes ajustar los detalles del permiso.`);
+                                this.showPermissionInfo.remainingTime = this.minutesToTimeFormat(totalMinutesSelected - totalRemainingMinutes);
+                                this.showPermissionInfo.acumulatedTime = this.minutesToTimeFormat(this.addTime(this.showPermissionInfo.totalTime, this.showPermissionInfo.remainingTime))
                                 this.noTime = true
                             } else {
-                                this.noTime = false
+                                this.showPermissionInfo.remainingTime = this.minutesToTimeFormat(totalRemainingMinutes - totalMinutesSelected);
+                                if (totalMinutesSelected === totalRemainingMinutes) {
+                                    this.showPermissionInfo.acumulatedTime = this.minutesToTimeFormat(totalMinutesSelected)
+                                    this.noTime = false
+                                } else {
+                                    this.showPermissionInfo.acumulatedTime = this.minutesToTimeFormat(this.substractTime(this.showPermissionInfo.totalTime, this.showPermissionInfo.remainingTime))
+                                    this.noTime = false
+                                }
                             }
 
                             this.totalHours = daysDifference * 8 + ' H.'
-
-                            const timeToSubstract = this.minutesToTimeFormat(daysDifference * 8 * 60)
-                            this.totalHoursFormat = timeToSubstract
-                            const result = this.substractTime(this.showPermissionInfo.initialRemaining, timeToSubstract)
-                            this.showPermissionInfo.remainingTime = this.minutesToTimeFormat(result)
-                            //Method to update the time used
-                            this.updateTimeUsed()
+                            this.totalHoursFormat = this.minutesToTimeFormat(daysDifference * 8 * 60)
                         }
                     } else {
                         this.resetTotalHours()
@@ -829,7 +836,11 @@ export default {
                 const minutes = min % 60;
                 return `${hours}:${minutes}`;
             } else {
-                return false;
+                if (min == 0) {
+                    return '00:00'
+                } else {
+                    return false;
+                }
             }
         },
         timeFormatToMinutes(timeFormat) {
@@ -876,7 +887,7 @@ export default {
                     const remainingInMinutes = this.addTime(this.showPermissionInfo.remainingTime, this.totalHoursFormat);
                     this.showPermissionInfo.remainingTime = this.minutesToTimeFormat(remainingInMinutes)
                 } else {
-                    this.showPermissionInfo.remainingTime = this.totalHoursFormat
+                    this.showPermissionInfo.remainingTime = this.showPermissionInfo.initialRemaining
                 }
                 //Method to update the time used
                 this.updateTimeUsed()
@@ -913,6 +924,8 @@ export default {
                 this.totalHours = ''
                 this.permission.periodOfTime = 1
                 this.expandedDetails ? '' : this.toggleAccordion('expandedDetails')
+            } else {
+                this.$emit("get-table")
             }
         },
     },

@@ -8,7 +8,7 @@ import html2pdf from 'html2pdf.js'
 </script>
 <template>
     <div class="m-1.5 p-10">
-        <ProcessModal maxWidth='4xl' :show="viewPermission" @close="$emit('cerrar-modal')">
+        <ProcessModal maxWidth='4xl' :show="viewPermission026" @close="$emit('cerrar-modal')">
             <div class="flex justify-center items-center h-full mt-1">
                 <div class="px-2">
                     <GeneralButton color="bg-green-600 hover:bg-green-700" text="Aprobar" icon="pdf" @click="printPdf()" />
@@ -83,12 +83,12 @@ import html2pdf from 'html2pdf.js'
                             </div>
                             <div class="text-left w-[91%] text-[14px] font-bold border-b border-gray-700">
                                 <p class="font-[MuseoSans] ml-3">
-                                    {{ permissionToPrint.pnombre_persona }}
-                                    {{ permissionToPrint.snombre_persona }}
-                                    {{ permissionToPrint.tnombre_persona }}
-                                    {{ permissionToPrint.papellido_persona }}
-                                    {{ permissionToPrint.sapellido_persona }}
-                                    {{ permissionToPrint.tapellido_persona }}
+                                    {{ permissionToPrint.empleado ? permissionToPrint.empleado.persona.pnombre_persona : '' }}
+                                    {{ permissionToPrint.empleado ? permissionToPrint.empleado.persona.snombre_persona : '' }}
+                                    {{ permissionToPrint.empleado ? permissionToPrint.empleado.persona.tnombre_persona : '' }}
+                                    {{ permissionToPrint.empleado ? permissionToPrint.empleado.persona.papellido_persona : '' }}
+                                    {{ permissionToPrint.empleado ? permissionToPrint.empleado.persona.sapellido_persona : '' }}
+                                    {{ permissionToPrint.empleado ? permissionToPrint.empleado.persona.tapellido_persona : '' }}
                                 </p>
                             </div>
                         </div>
@@ -127,7 +127,9 @@ import html2pdf from 'html2pdf.js'
                                 </label>
                             </div>
                             <div class="text-left w-[91%] text-[14px] font-bold border-b border-gray-700">
-                                <p class="font-[MuseoSans] ml-3">{{ permissionToPrint.nombre_motivo_permiso }}</p>
+                                <p class="font-[MuseoSans] ml-3">
+                                    {{ permissionToPrint.motivo_permiso ? permissionToPrint.motivo_permiso.nombre_motivo_permiso : '' }}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -170,6 +172,25 @@ import html2pdf from 'html2pdf.js'
                         </div>
                     </div>
                 </div>
+
+                <div class="flex w-full justify-between items-center mb-4 mt-4">
+                    <div class="flex w-full text-left">
+                        <div class="relative flex flex-row w-full">
+                            <div class="flex justify-start w-[90%]">
+                                <div class="flex justify-start w-[85%]">
+                                    <label for="" class="font-[MuseoSans] text-[14px] mb-0.3 mt-[-2px]">
+                                        CANTIDAD DE PERMISOS DE NO MARCACION (incluyendo este) EN 
+                                        {{ moment(permissionToPrint.fecha_inicio_permiso).format('MMMM').toUpperCase() }}:
+                                    </label>
+                                </div>
+                                <div class="text-center w-[15%] text-[14px] border-b border-gray-700">
+                                    <p class="mb-[5px] font-bold font-[MuseoSans] ">{{ limite }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="flex w-full justify-between items-center mb-2">
                     <div class="flex w-full text-left">
                         <div class="relative flex flex-row w-full">
@@ -213,7 +234,7 @@ import ReciboIngresoMatricialVue from '@/pdf/Tesoreria/ReciboIngresoMatricial.vu
 import { createApp, h } from 'vue'
 export default {
     props: {
-        viewPermission: {
+        viewPermission026: {
             type: Boolean,
             default: false,
         },
@@ -221,6 +242,10 @@ export default {
             type: Array,
             default: [],
         },
+        limite: {
+            type: String,
+            default: ''
+        }
     },
     data: function () {
         return {
@@ -273,7 +298,7 @@ export default {
         },
         getCentro() {
             let limiteCaracteres = 50;
-            let string = this.permissionToPrint.nombre_dependencia;
+            let string = this.permissionToPrint.plaza_asignada.dependencia.nombre_dependencia;
             if (string) {
                 if (string.length <= limiteCaracteres) {
                     this.centro1 = string;
@@ -313,7 +338,7 @@ export default {
         }
     },
     watch: {
-        viewPermission: function (value, oldValue) {
+        viewPermission026: function (value, oldValue) {
             if (value) {
                 this.centro1 = ''
                 this.centro2 = ''

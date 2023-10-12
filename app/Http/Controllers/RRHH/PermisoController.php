@@ -391,7 +391,7 @@ class PermisoController extends Controller
     public function getPermissionInfoById(Request $request)
     {
         $permiso = Permiso::where('id_permiso', $request->id_permiso)
-            ->with(['empleado.persona', 'plaza_asignada.dependencia', 'tipo_permiso', 'plaza_asignada.detalle_plaza.plaza', 'empleado.titulo_profesional'])
+            ->with(['empleado.persona', 'plaza_asignada.dependencia', 'tipo_permiso', 'motivo_permiso', 'plaza_asignada.detalle_plaza.plaza', 'empleado.titulo_profesional'])
             ->first();
 
         if (!$permiso || $permiso->estado_permiso == 0) {
