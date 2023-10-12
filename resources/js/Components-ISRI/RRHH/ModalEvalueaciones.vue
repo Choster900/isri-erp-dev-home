@@ -43,8 +43,8 @@ import DocumentoAnalisisDesempeñoVue from './DocumentoAnalisisDesempeño.vue';
                                     </div>
                                     <span class="text-xs text-red-500">{{ errors.id_empleado }}</span>
                                 </div>
-                                <div class="-mx-3 flex flex-wrap">
-                                    <div class="w-full px-3 sm:w-1/3">
+                                <div class="-mx-3 flex flex-wrap mb-4">
+                                    <!--   <div class="w-full px-3 sm:w-1/3">
                                         <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Fecha </label>
                                         <div class="mb-4  md:mb-0">
                                             <flat-pickr placeholder="DD/MM/YYYY" v-model="fecha_evaluacion_personal"
@@ -52,8 +52,33 @@ import DocumentoAnalisisDesempeñoVue from './DocumentoAnalisisDesempeño.vue';
                                                 :config="config" />
                                             <span class="text-xs text-red-500">{{ errors.fecha_evaluacion_personal }}</span>
                                         </div>
+                                    </div> -->
+                                    <div class="w-full px-3 ">
+                                        <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Periodo
+                                            evaluación</label>
+                                        <select id="countries" v-model="id_evaluacion_rendimiento"
+                                            class="bg-gray-50 border text-xs border-gray-300 text-gray-900  rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full  h-8 ">
+                                            <option selected>Seleccione el tipo de evaluacion</option>
+                                            <option value="1">F22 V1.0</option>
+                                            <option value="2">F21 V1.0</option>
+                                            <option value="3">F23 V1.0</option>
+                                        </select>
                                     </div>
-                                    <div class="w-full px-3 sm:w-1/2">
+                                </div>
+                                <div class="-mx-3 flex flex-wrap mb-4">
+                                    <div class="w-full px-3 ">
+                                        <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Periodo</label>
+                                        <select id="countries" v-model="periodo_evaluacion_personal"
+                                            class="bg-gray-50 border text-xs border-gray-300 text-gray-900  rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full  h-8 ">
+                                            <option selected>Seleccione evaluacion rendimiento</option>
+                                            <option value="1">Primer periodo</option>
+                                            <option value="2">Segundo periodo</option>
+
+                                        </select>
+                                    </div>
+                                </div>
+                                <!-- <div class="-mx-3 flex flex-wrap">
+                                    <div class="w-full px-3">
                                         <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Periodo
                                             evaluación</label>
                                         <input type="text" name="lName" id="lName" placeholder="MES DIA-AÑO - MES DIA-AÑO"
@@ -61,7 +86,8 @@ import DocumentoAnalisisDesempeñoVue from './DocumentoAnalisisDesempeño.vue';
                                             class="w-[230px] text-xs  rounded-[5px] border h-7 border-slate-400 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none" />
                                         <span class="text-xs text-red-500">{{ errors.periodo_evaluacion_personal }}</span>
                                     </div>
-                                </div>
+                                </div> -->
+                                <span class="text-xs text-red-500">{{ errorPerido }}</span>
 
                                 <button @click="submitEvaluacionDocument()"
                                     class="bg-indigo-900 rounded-sm shadow text-center text-white text-base font-light w-full py-2 mt-5">Nueva
@@ -179,7 +205,7 @@ import DocumentoAnalisisDesempeñoVue from './DocumentoAnalisisDesempeño.vue';
                                     class="pb-3 mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8">
                                     <a :class="toShow === 'ImpresionDeDocumentos' ? 'text-indigo-500' : 'text-slate-500 hover:text-slate-600'"
                                         class="  whitespace-nowrap flex items-center cursor-pointer">
-                                         <svg :fill="toShow === 'ImpresionDeDocumentos' ? '#6366f1' : '#94a3b8'"
+                                        <svg :fill="toShow === 'ImpresionDeDocumentos' ? '#6366f1' : '#94a3b8'"
                                             class="w-4 h-4" viewBox="0 0 32.00 32.00"
                                             :stroke="toShow === 'ImpresionDeDocumentos' ? '#6366f1' : '#94a3b8'">
                                             <path
@@ -235,7 +261,9 @@ export default {
             errors: {},// Menaja los mensajes de rrores
             id_empleado: '', // Guarda el id de empleado a evaluar
             fecha_evaluacion_personal: '',
+            errorPerido: null,
             periodo_evaluacion_personal: '',
+            id_evaluacion_rendimiento: '',
             searchTimeout: null, // Maneja tiempo de espera para empezar a buscar empleado
             registroEvaluacionRendimientoPersonal: [], // Almacena una evaluacion con su detalle para enviar al modal
             registrosEvaluacionesRentimientoPersonal: [],// Almacena todas las evaluaciones del empleado (Se envia para tomar la informacion del empleado)
@@ -320,28 +348,35 @@ export default {
         createEvaluacionRequest() {
             return new Promise(async (resolve, reject) => {
                 try {
+                    const currentDate = moment();
+                    const currentYear = currentDate.format('YYYY');
+                    const periodo = this.periodo_evaluacion_personal == 1 ? `1-${currentYear}` : `2-${currentYear}`;
+
                     const resp = await axios.post('/create-new-evaluacion', {
                         id_empleado: this.id_empleado,
-                        fecha_evaluacion_personal: this.fecha_evaluacion_personal,
-                        periodo_evaluacion_personal: this.periodo_evaluacion_personal,
-                    })
-                    console.log(resp.data);
-                    this.registrosEvaluacionesRentimientoPersonal = resp.data
+                        periodo_evaluacion_personal: periodo,
+                        id_evaluacion_rendimiento: this.id_evaluacion_rendimiento,
+                    });
 
+                    console.log(resp.data);
+                    this.registrosEvaluacionesRentimientoPersonal = resp.data;
                     resolve(resp); // Resolvemos la promesa con la respuesta exitosa
                 } catch (error) {
                     console.log(error);
                     if (error.response.status === 422) {
-                        let data = error.response.data.errors
+                        let data = error.response.data.errors;
                         var myData = new Object();
                         for (const errorBack in data) {
-                            myData[errorBack] = data[errorBack][0]
+                            myData[errorBack] = data[errorBack][0];
                         }
-                        this.errors = myData
-                        console.table(myData);
+                        this.errors = myData;
+                        console.log(this.errors);
                         setTimeout(() => {
                             this.errors = [];
                         }, 5000);
+                    } else if (error.response.status === 400) {
+                        console.log(error.response.data);
+                        this.errorPerido = error.response.data
                     }
                     reject(error); // Rechazamos la promesa en caso de excepción
                 }

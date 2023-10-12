@@ -117,10 +117,19 @@ class EvaluacionController extends Controller
         try {
             DB::beginTransaction();
 
+            // Verificar si el periodo ya existe
+            $periodoExiste = EvaluacionPersonal::where('periodo_evaluacion_personal', $request->periodo_evaluacion_personal)
+                ->where('id_empleado', $request->id_empleado)
+                ->exists();
+
+            if ($periodoExiste) {
+                return response()->json('El periodo de evaluación ya existe para este empleado', 400);
+            }
+
             $evaluacionData = [
                 'id_empleado'                   => $request->id_empleado,
-                'id_evaluacion_rendimiento'     => 1,
-                'fecha_evaluacion_personal'     => $request->fecha_evaluacion_personal,
+                'id_evaluacion_rendimiento'     => $request->id_evaluacion_rendimiento,
+                'fecha_evaluacion_personal'     => Carbon::now(),
                 'periodo_evaluacion_personal'   => $request->periodo_evaluacion_personal,
                 'puntaje_evaluacion_personal'   => 0,
                 'fecha_reg_evaluacion_personal' => Carbon::now(),
@@ -211,41 +220,41 @@ class EvaluacionController extends Controller
                 //INSERTANDO EN LA TABLA DE INCIDENTE EVALUACION
                 foreach ($request->dataIncidenteEvaluacion as $key => $value) {
 
-                        $data = [
-                            'id_evaluacion_personal'          => $request->id_evaluacion_personal,
-                            'id_cat_rendimiento'              => $value['id_cat_rendimiento'],
-                            'resultado_incidente_evaluacion'  => $value['resultado_incidente_evaluacion'],
-                            'comentario_incidente_evaluacion' => $value['comentario_incidente_evaluacion'],
-                            'estado_incidente_evaluacion'     => 1,
-                            'fecha_reg_incidente_evaluacion'  => Carbon::now(),
-                            'usuario_incidente_evaluacion'    => $request->user()->nick_usuario,
-                            'ip_incidente_evaluacion'         => $request->ip(),
-                        ];
+                    $data = [
+                        'id_evaluacion_personal'          => $request->id_evaluacion_personal,
+                        'id_cat_rendimiento'              => $value['id_cat_rendimiento'],
+                        'resultado_incidente_evaluacion'  => $value['resultado_incidente_evaluacion'],
+                        'comentario_incidente_evaluacion' => $value['comentario_incidente_evaluacion'],
+                        'estado_incidente_evaluacion'     => 1,
+                        'fecha_reg_incidente_evaluacion'  => Carbon::now(),
+                        'usuario_incidente_evaluacion'    => $request->user()->nick_usuario,
+                        'ip_incidente_evaluacion'         => $request->ip(),
+                    ];
 
 
-                        // Condiciones de búsqueda
-                        $conditions = [
-                            'id_incidente_evaluacion' => $value['id_incidente_evaluacion'],
-                            'id_evaluacion_personal'  => $request->id_evaluacion_personal,
-                        ];
+                    // Condiciones de búsqueda
+                    $conditions = [
+                        'id_incidente_evaluacion' => $value['id_incidente_evaluacion'],
+                        'id_evaluacion_personal'  => $request->id_evaluacion_personal,
+                    ];
 
-                        $existingResponse = IncidenteEvaluacion::where($conditions)->first();
+                    $existingResponse = IncidenteEvaluacion::where($conditions)->first();
 
-                        if ($existingResponse) {
-                            // Si existe, añadir la fecha de modificación
-                            $data['fecha_mod_incidente_evaluacion'] = Carbon::now();
-                        } else {
-                            // Si no existe, añadir la fecha de creación
-                            $data['fecha_reg_incidente_evaluacion'] = Carbon::now();
-                        }
-
-                        if ($value["isDelete"] && !empty($value["id_cat_rendimiento"])) {
-                            IncidenteEvaluacion::destroy($value["id_incidente_evaluacion"]);
-                        } else if(!$value["isDelete"]) {
-                            IncidenteEvaluacion::updateOrInsert($conditions, $data);
-                        }
+                    if ($existingResponse) {
+                        // Si existe, añadir la fecha de modificación
+                        $data['fecha_mod_incidente_evaluacion'] = Carbon::now();
+                    } else {
+                        // Si no existe, añadir la fecha de creación
+                        $data['fecha_reg_incidente_evaluacion'] = Carbon::now();
                     }
-                
+
+                    if ($value["isDelete"] && !empty($value["id_cat_rendimiento"])) {
+                        IncidenteEvaluacion::destroy($value["id_incidente_evaluacion"]);
+                    } else if (!$value["isDelete"]) {
+                        IncidenteEvaluacion::updateOrInsert($conditions, $data);
+                    }
+                }
+
                 // Commit de la transacción
                 DB::commit();
                 // Respuesta exitosa
