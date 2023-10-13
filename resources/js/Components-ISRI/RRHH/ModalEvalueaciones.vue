@@ -54,8 +54,8 @@ import DocumentoAnalisisDesempeñoVue from './DocumentoAnalisisDesempeño.vue';
                                         </div>
                                     </div> -->
                                     <div class="w-full px-3 ">
-                                        <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Periodo
-                                            evaluación</label>
+                                        <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Tipo de
+                                            evaluacion</label>
                                         <select id="countries" v-model="id_evaluacion_rendimiento"
                                             class="bg-gray-50 border text-xs border-gray-300 text-gray-900  rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full  h-8 ">
                                             <option selected>Seleccione el tipo de evaluacion</option>
@@ -63,11 +63,14 @@ import DocumentoAnalisisDesempeñoVue from './DocumentoAnalisisDesempeño.vue';
                                             <option value="2">F21 V1.0</option>
                                             <option value="3">F23 V1.0</option>
                                         </select>
+                                        <span class="text-xs text-red-500">{{ errors.id_evaluacion_rendimiento }}</span>
+
                                     </div>
                                 </div>
                                 <div class="-mx-3 flex flex-wrap mb-4">
                                     <div class="w-full px-3 ">
-                                        <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Periodo</label>
+                                        <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Periodo de
+                                            evaluacion</label>
                                         <select id="countries" v-model="periodo_evaluacion_personal"
                                             class="bg-gray-50 border text-xs border-gray-300 text-gray-900  rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full  h-8 ">
                                             <option selected>Seleccione evaluacion rendimiento</option>
@@ -75,6 +78,8 @@ import DocumentoAnalisisDesempeñoVue from './DocumentoAnalisisDesempeño.vue';
                                             <option value="2">Segundo periodo</option>
 
                                         </select>
+                                        <span class="text-xs text-red-500">{{ errors.periodo_evaluacion_personal }}</span>
+
                                     </div>
                                 </div>
                                 <!-- <div class="-mx-3 flex flex-wrap">
@@ -98,7 +103,7 @@ import DocumentoAnalisisDesempeñoVue from './DocumentoAnalisisDesempeño.vue';
                     <div
                         class="max-h-[calc(100vh-350px)] overflow-y-auto col-span-full xl:col-span-6 bg-white shadow-lg  border border-slate-300">
                         <div class="p-3">
-                            <div class="max-h-[600px] ">
+                            <div class="max-h-[250px] ">
                                 <table class="table-auto w-full">
                                     <tbody class="text-sm divide-y divide-slate-100">
                                         <tr>
@@ -205,25 +210,13 @@ import DocumentoAnalisisDesempeñoVue from './DocumentoAnalisisDesempeño.vue';
                                     class="pb-3 mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8">
                                     <a :class="toShow === 'ImpresionDeDocumentos' ? 'text-indigo-500' : 'text-slate-500 hover:text-slate-600'"
                                         class="  whitespace-nowrap flex items-center cursor-pointer">
-                                        <svg :fill="toShow === 'ImpresionDeDocumentos' ? '#6366f1' : '#94a3b8'"
-                                            class="w-4 h-4" viewBox="0 0 32.00 32.00"
-                                            :stroke="toShow === 'ImpresionDeDocumentos' ? '#6366f1' : '#94a3b8'">
-                                            <path
-                                                d="M30 13.75h-2.75v-7.75c0-0 0-0.001 0-0.001 0-0.345-0.14-0.657-0.365-0.883l-4-4c-0.226-0.226-0.539-0.366-0.885-0.366-0 0-0 0-0 0h-17c-0.69 0-1.25 0.56-1.25 1.25v0 11.75h-1.75c-0.69 0-1.25 0.56-1.25 1.25v0 9c0 0.69 0.56 1.25 1.25 1.25s1.25-0.56 1.25-1.25v0-7.75h25.5v7.75c0 0.69 0.56 1.25 1.25 1.25s1.25-0.56 1.25-1.25v0-9c-0-0.69-0.56-1.25-1.25-1.25h-0zM6.25 3.25h15.232l3.268 3.268v7.232h-18.5zM26 20.75h-20c-0.69 0-1.25 0.56-1.25 1.25v8c0 0.69 0.56 1.25 1.25 1.25h20c0.69-0.001 1.249-0.56 1.25-1.25v-8c-0.001-0.69-0.56-1.249-1.25-1.25h-0zM24.75 28.75h-17.5v-5.5h17.5zM26.879 17.62c-0.228-0.228-0.544-0.37-0.893-0.37-0.168 0-0.329 0.033-0.475 0.093l0.008-0.003c-0.16 0.060-0.295 0.156-0.399 0.279l-0.001 0.001c-0.119 0.109-0.213 0.242-0.277 0.392l-0.003 0.007c-0.059 0.142-0.095 0.306-0.1 0.479l-0 0.002c0.002 0.346 0.147 0.657 0.378 0.878l0 0c0.226 0.223 0.537 0.361 0.88 0.361s0.654-0.138 0.88-0.361l-0 0c0.233-0.222 0.378-0.533 0.381-0.878v-0c-0.005-0.174-0.041-0.339-0.103-0.49l0.003 0.009c-0.066-0.158-0.161-0.291-0.28-0.399l-0.001-0.001z">
-                                            </path>
-                                        </svg>
 
-                                        <!-- <svg class="h-6 w-6" viewBox="-0.5 0 25 25" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path
-                                                d="M19 3.32001H16C14.8954 3.32001 14 4.21544 14 5.32001V8.32001C14 9.42458 14.8954 10.32 16 10.32H19C20.1046 10.32 21 9.42458 21 8.32001V5.32001C21 4.21544 20.1046 3.32001 19 3.32001Z
-                                                M8 3.32001H5C3.89543 3.32001 3 4.21544 3 5.32001V8.32001C3 9.42458 3.89543 10.32 5 10.32H8C9.10457 10.32 10 9.42458 10 8.32001V5.32001C10 4.21544 9.10457 3.32001 8 3.32001Z
-                                                M19 14.32H16C14.8954 14.32 14 15.2154 14 16.32V19.32C14 20.4246 14.8954 21.32 16 21.32H19C20.1046 21.32 21 20.4246 21 19.32V16.32C21 15.2154 20.1046 14.32 19 14.32Z
-                                                M8 14.32H5C3.89543 14.32 3 15.2154 3 16.32V19.32C3 20.4246 3.89543 21.32 5 21.32H8C9.10457 21.32 10 20.4246 10 19.32V16.32C10 15.2154 9.10457 14.32 8 14.32Z"
-                                                stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"
-                                                stroke-linejoin="round">
-                                            </path>
-                                        </svg> -->
+                                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
+                                            <path d="M7 8H21M7 12H21M7 16H21M3 8H3.01M3 12H3.01M3 16H3.01"
+                                                :stroke="toShow === 'ImpresionDeDocumentos' ? '#6366f1' : '#94a3b8'"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+
+                                        </svg>
 
                                         <span class="ml-2" @click="toShow = 'ImpresionDeDocumentos'">Acciones</span>
                                     </a>
@@ -350,7 +343,7 @@ export default {
                 try {
                     const currentDate = moment();
                     const currentYear = currentDate.format('YYYY');
-                    const periodo = this.periodo_evaluacion_personal == 1 ? `1-${currentYear}` : `2-${currentYear}`;
+                    const periodo = this.periodo_evaluacion_personal == 1 ? `1-${currentYear}` : this.periodo_evaluacion_personal == 2 ? `2-${currentYear}` : '';
 
                     const resp = await axios.post('/create-new-evaluacion', {
                         id_empleado: this.id_empleado,
@@ -375,8 +368,10 @@ export default {
                             this.errors = [];
                         }, 5000);
                     } else if (error.response.status === 400) {
-                        console.log(error.response.data);
                         this.errorPerido = error.response.data
+                        setTimeout(() => {
+                            this.errorPerido = ""
+                        }, 5000);
                     }
                     reject(error); // Rechazamos la promesa en caso de excepción
                 }

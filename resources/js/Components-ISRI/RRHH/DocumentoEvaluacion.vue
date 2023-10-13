@@ -7,21 +7,6 @@ import momentAlias from "moment";
 import { v4 as uuid, v4 } from "uuid";
 </script>
 <template>
-    <div class=" flex  justify-center  content-between">
-        <!-- <div class="px-2">
-            <GeneralButton :color="['bg-orange-700 hover:bg-orange-800']" text="Enviar evaluación" icon="update"
-                :disabled="contenidoEvaluacionRendimiento != '' && registroEvaluacionRendimientoPersonal != '' ? false : true"
-                styleDisabled="bg-orange-900/80 hover:bg-orange-900/80 cursor-not-allowed"
-                @click="contenidoEvaluacionRendimiento != '' && registroEvaluacionRendimientoPersonal != '' ? submitResponseRequest() : ''" />
-        </div>
-        <div class="px-2">
-            <GeneralButton :color="['bg-red-700 hover:bg-red-800']" text="Imprimir" icon="pdf"
-                :disabled="contenidoEvaluacionRendimiento != '' && registroEvaluacionRendimientoPersonal != '' && contenidoEvaluacionRendimiento.categorias_rendimiento.length == responsesWithScores.length ? false : true"
-                styleDisabled="bg-red-900/80 hover:bg-red-900/80 cursor-not-allowed"
-                @click="contenidoEvaluacionRendimiento != '' && registroEvaluacionRendimientoPersonal != '' ? printPdf() : ''" />
-        </div> -->
-    </div>
-
     <div v-if="registroEvaluacionRendimientoPersonal == ''" class="flex justify-center items-center">
         <!--  <img src="../../../img/NoEvaluationYet.svg" alt="" class="h-[500px]"> -->
         <div class="w-full h-[500px] px-1 text-selection-disable">
@@ -325,15 +310,16 @@ import { v4 as uuid, v4 } from "uuid";
                             <div class="xl:flex">
                                 <div class="w-32 shrink-0">
                                     <div class="text-xs font-semibold uppercase text-slate-400 pt-2"> {{
-                                        momentAlias().format('MMM D, YYYY')
+                                        momentAlias(data.fecha_reg_incidente_evaluacion).format('MMM D, YYYY')
                                     }} </div>
+
                                 </div>
                                 <div class="grow pb-2 border-b border-slate-200">
                                     <header>
                                         <div class="flex justify-between">
-                                            <h2 class="text-lg text-slate-800 font-bold mb-3 w-full"
-                                                v-if="!data.editFactor">{{
-                                                    optionsFactor.find(i => i.value == data.id_cat_rendimiento).label }}</h2>
+                                            <h2 class="text-lg text-slate-800 font-bold  w-full" v-if="!data.editFactor">{{
+                                                categoriaRendimientoObject.find(i => i.value ==
+                                                    data.id_cat_rendimiento).label }}</h2>
                                             <div class="relative flex h-8  flex-row-reverse w-1/2  mb-3" v-else>
                                                 <Multiselect v-model="incidentesEvaluaciones[i].id_cat_rendimiento"
                                                     @select="incidentesEvaluaciones[i].editFactor = false"
@@ -341,7 +327,7 @@ import { v4 as uuid, v4 } from "uuid";
                                                         placeholder: 'flex items-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-black rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ',
                                                         noOptions: 'py-2 px-3 text-gray-600 bg-white text-left text-[8pt]',
                                                         optionsContainer: 'custom-options-container absolute z-50'
-                                                    }" :options="optionsFactor" :searchable="true"
+                                                    }" :options="categoriaRendimientoObject" :searchable="true"
                                                     noOptionsText="sin opciones" noResultsText="sin resultado" />
                                             </div>
                                             <button v-if="!data.editFactor"
@@ -354,7 +340,7 @@ import { v4 as uuid, v4 } from "uuid";
                                                     </path>
                                                 </svg>
                                             </button>
-                                            <button class=" border-slate-200 hover:border-slate-300  mb-3" v-else
+                                            <button class=" border-slate-200 hover:border-slate-300  " v-else
                                                 @click="incidentesEvaluaciones[i].editFactor = false">
                                                 <svg class="w-4 h-4 fill-current text-indigo-500 shrink-0"
                                                     viewBox="0 0 16 16">
@@ -364,9 +350,9 @@ import { v4 as uuid, v4 } from "uuid";
                                                 </svg>
                                             </button>
                                         </div>
-                                        <div class="flex flex-nowrap items-center space-x-2 mb-4">
+                                        <div class="flex flex-nowrap items-center space-x-2 mb-1">
                                             <div class="flex items-center">
-                                                <select class="text-[9pt] py-0.5 rounded-md"
+                                                <select class="text-[9pt] py-0.5 h-7 rounded-md"
                                                     v-model="incidentesEvaluaciones[i].resultado_incidente_evaluacion"
                                                     :class="errosModel[`dataIncidenteEvaluacion.${i}.resultado_incidente_evaluacion`] ? 'bg-red-300' : ''">
                                                     <option value="-" selected> - </option>
@@ -385,7 +371,7 @@ import { v4 as uuid, v4 } from "uuid";
                                             </div>
                                         </div>
                                     </header>
-                                    <div class="space-y-3">
+                                    <div class="space-y-">
                                         <div class="flex justify-between">
                                             <p class="text-sm" v-if="!data.editEvento">{{
                                                 data.comentario_incidente_evaluacion
@@ -429,9 +415,18 @@ import { v4 as uuid, v4 } from "uuid";
                                 </div>
                             </div>
                         </article>
-                    </div>
 
+                    </div>
+                    <div class="flex flex-row pt-28 items-center">
+                        <label for="" class="text-[10pt] font-semibold uppercase pr-2">Observaciones referentes al
+                            analisis de desempeño:</label>
+                        <textarea v-model="observacion_incidente_personal"
+                            placeholder="Escribe las observaciones de forma breve y concisa"
+                            class="text-sm font-medium resize-none border border-gray-300 rounded w-full h-24 py-2 px-3"></textarea>
+                        <!-- {{ registroEvaluacionRendimientoPersonal }} -->
+                    </div>
                 </div>
+
             </div>
 
             <div v-else>
@@ -466,6 +461,8 @@ import { v4 as uuid, v4 } from "uuid";
                 </div>
 
             </div>
+
+
         </div>
 
         <!-- Nueva seccion Comming soon -->
@@ -512,6 +509,10 @@ export default {
             type: Object,
             default: () => ({}) // Valor por defecto: un objeto vacío
         },
+        ObservacionIncidente: {
+            type: String,
+            default: null // Valor por defecto: un objeto vacío
+        },
         infoEmployee: {
             type: Object,
             default: () => ({}) // Valor por defecto: un objeto vacío
@@ -531,22 +532,25 @@ export default {
             contenidoEvaluacion: [],
             incidentesEvaluaciones: [],
             errosModel: {},
-            optionsFactor: [
-                { value: '1', label: '1. Calidad de trabajo' },
-                { value: '2', label: '2. Productividad' },
-                { value: '3', label: '3. Responsabilidad' },
-                { value: '4', label: '4. Iniciativa y Creatividad' },
-                { value: '5', label: '5. Cumplimiento de normas e instruccciones' },
-                { value: '6', label: '6. Relaciones Laborales' },
-                { value: '7', label: '7. Discrecion' },
-            ],
+            optionsFactor: [],
+            observacion_incidente_personal: null,
         }
     },
+    computed: {
+        categoriaRendimientoObject() {
+            return this.contenidoEvaluacionRendimiento.categorias_rendimiento.map(item => ({
+                value: item.id_cat_rendimiento,
+                label: item.nombre_cat_rendimiento
+            }));
+        }
+    },
+
     methods: {
         pushToIncidentes() {
             this.incidentesEvaluaciones.push({
                 id: v4(),
                 id_incidente_evaluacion: '',
+                fecha_reg_incidente_evaluacion: momentAlias().format('YYYY-MM-DD'),
                 id_cat_rendimiento: '',
                 resultado_incidente_evaluacion: '',
                 comentario_incidente_evaluacion: '',
@@ -580,6 +584,7 @@ export default {
             const app = createApp(EvaluacionPdfpVue, {
                 contenidoEvaluacionRendimiento: this.contenidoEvaluacionRendimiento,
                 registroEvaluacionRendimientoPersonal: this.registroEvaluacionRendimientoPersonal,
+                incidentesEvaluaciones: this.incidentesEvaluaciones,
                 promedio: this.responsesWithScores.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0),
                 empleado: this.generateFullName(this.infoEmployee.persona),
                 puesto: this.infoEmployee.plazas_asignadas && this.infoEmployee.plazas_asignadas.filter((plaza) => plaza.estado_plaza_asignada == 1).map((plaza, index) => {
@@ -678,6 +683,7 @@ export default {
                     const resp = await axios.post('/save-response', {
                         dataIncidenteEvaluacion: this.incidentesEvaluaciones,
                         data: this.responsesWithScoresDataSend,
+                        observacion_incidente_personal: this.observacion_incidente_personal,
                         id_evaluacion_personal: this.registroEvaluacion.id_evaluacion_personal,
                         puntaje_evaluacion_personal: this.responsesWithScores.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0),
                     });
@@ -757,6 +763,7 @@ export default {
                     id: v4(),
                     id_incidente_evaluacion: element.id_incidente_evaluacion,
                     id_cat_rendimiento: element.id_cat_rendimiento,
+                    fecha_reg_incidente_evaluacion: element.fecha_reg_incidente_evaluacion,
                     resultado_incidente_evaluacion: element.resultado_incidente_evaluacion,
                     comentario_incidente_evaluacion: element.comentario_incidente_evaluacion,
                     editFactor: false,
@@ -768,16 +775,6 @@ export default {
         },
     },
     watch: {
-        /*         registroEvaluacionRendimientoPersonal() {
-        
-                    //   alert("bruh")
-                }, */
-        dataEvaluacion() {
-            // this.evaluacionData = this.dataEvaluacion
-            //  console.log(this.evaluacionData.categorias_rendimiento);
-            //  this.responsesWithScores = []
-
-        },
         /**
          * Ejecuta accion cuando este detecta un cambio
          * @param {Object} newVal -- Nuevo valor de contenido evaluacion
@@ -785,7 +782,7 @@ export default {
         contenidoEvaluacionRendimiento(newVal) {
             this.responsesWithScores = []
             this.incidentesEvaluaciones = []
-
+            this.observacion_incidente_personal = this.registroEvaluacionRendimientoPersonal.observacion_incidente_personal
             // Activa la animación estableciendo showErrorWhenValuesChanges en true
             this.showErrorWhenValuesChanges = true;
             // Establece un temporizador para desactivar la animación después de un breve período de tiempo (por ejemplo, 1 segundo)

@@ -179,7 +179,13 @@ class EvaluacionController extends Controller
             DB::beginTransaction();
 
             try {
+
+                EvaluacionPersonal::where("id_evaluacion_personal", $request->id_evaluacion_personal)->update([
+                    'observacion_incidente_personal'          => $request->observacion_incidente_personal
+                ]);
+
                 // Iterar sobre las respuestas
+
                 foreach ($request->data as $value) {
                     $data = [
                         'id_evaluacion_personal'       => $request->id_evaluacion_personal,
@@ -226,7 +232,7 @@ class EvaluacionController extends Controller
                         'resultado_incidente_evaluacion'  => $value['resultado_incidente_evaluacion'],
                         'comentario_incidente_evaluacion' => $value['comentario_incidente_evaluacion'],
                         'estado_incidente_evaluacion'     => 1,
-                        'fecha_reg_incidente_evaluacion'  => Carbon::now(),
+                        'fecha_reg_incidente_evaluacion'  =>  $value['fecha_reg_incidente_evaluacion'],
                         'usuario_incidente_evaluacion'    => $request->user()->nick_usuario,
                         'ip_incidente_evaluacion'         => $request->ip(),
                     ];

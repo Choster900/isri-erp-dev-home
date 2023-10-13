@@ -30,7 +30,7 @@ class EvaluacionRespuestasRequest extends FormRequest
                 if (!$data["isDelete"]) {
                     $rules["dataIncidenteEvaluacion.{$key}.comentario_incidente_evaluacion"] = ['required'];
                     $rules["dataIncidenteEvaluacion.{$key}.id_cat_rendimiento"] = ['required'];
-                    $rules["dataIncidenteEvaluacion.{$key}.id_incidente_evaluacion"] = ['required'];
+                //    $rules["dataIncidenteEvaluacion.{$key}.id_incidente_evaluacion"] = ['required'];
                     $rules["dataIncidenteEvaluacion.{$key}.resultado_incidente_evaluacion"] = ['required'];
                 }
             });
@@ -51,7 +51,7 @@ class EvaluacionRespuestasRequest extends FormRequest
         return [
             'dataIncidenteEvaluacion.*.comentario_incidente_evaluacion.required' => 'El campo comentario_incidente_evaluacion es obligatorio.',
             'dataIncidenteEvaluacion.*.id_cat_rendimiento.required' => 'El campo id_cat_rendimiento es obligatorio.',
-            'dataIncidenteEvaluacion.*.id_incidente_evaluacion.required' => 'El campo id_incidente_evaluacion es obligatorio.',
+            //'dataIncidenteEvaluacion.*.id_incidente_evaluacion.required' => 'El campo id_incidente_evaluacion es obligatorio.',
             'dataIncidenteEvaluacion.*.resultado_incidente_evaluacion.required' => 'El campo resultado_incidente_evaluacion es obligatorio.'
         ];
     }
