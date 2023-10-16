@@ -153,9 +153,7 @@ import moment from 'moment';
                                         <input v-model="row.nombre_familiar" type="text" :class="row.onEdit ? '' : ''"
                                             class="rounded w-52 h-7 text-xs font-medium" placeholder="Nombre del familiar"
                                             @input="row.nombre_familiar = row.nombre_familiar.toUpperCase()">
-
                                     </div>
-                                    <!--                   {{ errosModel.id_parentesco[0] }} -->
                                     <div class="mb-4 md:mr-2 md:mb-0 basis-full">
                                         <div class="relative w-40 flex h-7 flex-row-reverse">
                                             <Multiselect :options="optionsParentesco" v-model="row.id_parentesco"
@@ -227,9 +225,6 @@ import moment from 'moment';
 
                         <GeneralButton v-else @click="updateRelatives()" color="bg-orange-700  hover:bg-orange-800"
                             text="Modificar" icon="add" />
-
-                        <!-- <button @click="displayPromise">display promise</button> -->
-
                     </div>
                 </div>
             </div>
@@ -511,6 +506,11 @@ export default {
             },)
         },
         calcularDesignacionDePorcentajes(rowIndex) {
+            // Validar si el valor del input es mayor a 100 y corregirlo si es necesario
+            if (this.dataSent.dataRow[rowIndex].porcentaje_familiar > 100) {
+                this.dataSent.dataRow[rowIndex].porcentaje_familiar = 100;
+            }
+            
             // Calcular la suma total de los porcentajes
             this.totalPorcentajeAsignado = this.dataSent.dataRow.reduce((suma, obj) => suma + parseFloat(obj.porcentaje_familiar), 0);
             if (this.totalPorcentajeAsignado > 100) {
@@ -542,8 +542,13 @@ export default {
                         this.dataSent.dataRow[rowIndex].porcentaje_familiar = (this.dataSent.dataRow[rowIndex].porcentaje_familiar + 1)
 
                     }
-                    if (this.totalPorcentajeAsignado == 100) {
-                        alert("Estas justo en las 100")
+                    else {
+                        toast.warning("La asignación de porcentaje a tus familiares no puede exceder el 100%", {
+                            autoClose: 5000,
+                            position: "top-right",
+                            transition: "zoom",
+                            toastBackgroundColor: "white",
+                        });
                     }
                     break;
                 case "resta":
