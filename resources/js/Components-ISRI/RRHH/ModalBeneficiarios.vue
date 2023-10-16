@@ -180,14 +180,16 @@ import moment from 'moment';
                                     <InputError class="mt-2" :message="errosModel[`dataRow.${rowIndex}.id_parentesco`]" />
                                 </div>
                                 <h5 class="text-sm ">0 al 100 %</h5>
-                                <div class="flex items-center" style="width: 445px;">
-
+                                <div class="flex items-center gap-3" style="width: 445px;">
+                                    <span class="text-2xl cursor-pointer"
+                                        @click="increaseOrDecreaseDesignacionDePorcentajes(rowIndex, 'resta')">-</span>
                                     <input @input="calcularDesignacionDePorcentajes(rowIndex)"
                                         v-model="row.porcentaje_familiar"
                                         class="cursor-grabbing	 rounded-lg overflow-hidden appearance-none bg-gray-400 h-3 w-full"
                                         type="range" min="0" max="100" step="1" />
                                     <span class="text-sm font-medium ml-2">{{ row.porcentaje_familiar }}%</span>
-
+                                    <span class="text-2xl cursor-pointer"
+                                        @click="increaseOrDecreaseDesignacionDePorcentajes(rowIndex, 'suma')">+</span>
                                 </div>
                                 <InputError class="mt-2" :message="errosModel[`dataRow.${rowIndex}.porcentaje_familiar`]" />
                                 <div class="flex gap-1 pt-1" v-if="row.onEdit">
@@ -528,11 +530,48 @@ export default {
                     }
                 });
             }
-
             this.totalPorcentajeAsignado = this.dataSent.dataRow.reduce((suma, obj) => suma + parseFloat(obj.porcentaje_familiar), 0);
             console.log(this.totalPorcentajeAsignado);
+        },
 
 
+        increaseOrDecreaseDesignacionDePorcentajes(rowIndex, operation) {
+            switch (operation) {
+                case "suma":
+                    if (this.totalPorcentajeAsignado < 100) {
+                        this.dataSent.dataRow[rowIndex].porcentaje_familiar = (this.dataSent.dataRow[rowIndex].porcentaje_familiar + 1)
+
+                    }
+                    if (this.totalPorcentajeAsignado == 100) {
+                        alert("Estas justo en las 100")
+                    }
+                    break;
+                case "resta":
+                    this.dataSent.dataRow[rowIndex].porcentaje_familiar = (this.dataSent.dataRow[rowIndex].porcentaje_familiar - 1)
+                    break;
+                default:
+                    break;
+            }
+            this.totalPorcentajeAsignado = this.dataSent.dataRow.reduce((suma, obj) => suma + parseFloat(obj.porcentaje_familiar), 0);
+            if (this.totalPorcentajeAsignado > 100) {
+                // Calcular el excedente
+                const ajuste = parseInt(this.totalPorcentajeAsignado) - 100;
+
+                // Ajustar los porcentajes de las filas diferentes a la actual
+                this.dataSent.dataRow.forEach((obj, index) => {
+                    if (index !== rowIndex) {
+                        if (obj.porcentaje_familiar >= ajuste) {
+                            // Restar el excedente al porcentaje
+                            obj.porcentaje_familiar -= ajuste;
+                        } else {
+                            // Establecer el porcentaje en 0 si es menor que el excedente
+                            obj.porcentaje_familiar = 0;
+                        }
+                    }
+                });
+            }
+            this.totalPorcentajeAsignado = this.dataSent.dataRow.reduce((suma, obj) => suma + parseFloat(obj.porcentaje_familiar), 0);
+            console.log(this.totalPorcentajeAsignado);
         },
         setInfoBeneficiarios(info) {
             console.log(info.familiar.reduce((suma, obj) => suma + parseFloat(obj.porcentaje_familiar), 0));
