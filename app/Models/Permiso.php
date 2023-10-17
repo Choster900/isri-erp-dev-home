@@ -46,4 +46,8 @@ class Permiso extends Model
     {
         return $this->belongsTo('App\Models\TipoPermiso','id_tipo_permiso','id_tipo_permiso');
     }
+    public function motivo_permiso()
+    {
+        return $this->belongsTo('App\Models\MotivoPermiso','id_motivo_permiso','id_motivo_permiso');
+    }
 }

@@ -736,20 +736,18 @@ export default {
             }
         },
         totalDays: function () {
-            const startDateFormated = moment(this.permission.fecha_inicio_permiso, 'YYYY/MM/DD').toDate()
-            const endDateFormated = moment(this.permission.fecha_fin_permiso, 'YYYY/MM/DD').toDate()
+            const startDateFormated = moment(this.permission.fecha_inicio_permiso, 'YYYY/MM/DD').toDate();
+            const endDateFormated = moment(this.permission.fecha_fin_permiso, 'YYYY/MM/DD').toDate();
 
             let currentDate = new Date(startDateFormated);
             let daysDifference = 0;
 
             while (currentDate <= endDateFormated) {
-                const dayOfWeek = currentDate.getDay(); // 0 (domingo) a 6 (sábado)
-                if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-                    daysDifference++;
-                }
+                daysDifference++;
                 currentDate.setDate(currentDate.getDate() + 1);
             }
-            return daysDifference
+
+            return daysDifference;
         }
     },
 }

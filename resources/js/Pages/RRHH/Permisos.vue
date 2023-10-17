@@ -4,6 +4,7 @@ import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import ModalPermisosVue from '@/Components-ISRI/RRHH/ModalPermisos.vue';
 import PermisoFormato026Vue from '@/Components-ISRI/RRHH/PermisoFormato026.vue';
+import PermisoFormato012InternoVue from '@/Components-ISRI/RRHH/PermisoFormato012Interno.vue';
 
 import moment from 'moment';
 
@@ -105,7 +106,7 @@ import axios from 'axios';
                                 <div class="space-x-1 text-center">
                                     <DropDownOptions>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            v-if="permission.estado_permiso == 1" @click="printPermission(permission)">
+                                            v-if="permission.estado_permiso == 1" @click="viewPermissionFormat(permission)">
                                             <div class="w-8 text-blue-900">
                                                 <span class="text-xs">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -133,7 +134,7 @@ import axios from 'axios';
                                             </div>
                                             <div class="font-semibold">Editar</div>
                                         </div>
-                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                        <!-- <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                                             @click="deletePermission(permission)"
                                             v-if="(permits.eliminar == 1 && permission.id_estado_permiso === 1) || permits.ejecutar === 1">
                                             <div class="w-8 text-red-900">
@@ -149,7 +150,7 @@ import axios from 'axios';
                                             <div class="font-semibold">
                                                 Cancelar
                                             </div>
-                                        </div>
+                                        </div> -->
                                     </DropDownOptions>
                                 </div>
                             </td>
@@ -202,8 +203,10 @@ import axios from 'axios';
 
         <ModalPermisosVue :showModalJobPermissions="showModalJobPermissions" :modalData="modalData" :permits="permits"
             @cerrar-modal="showModalJobPermissions = false" @get-table="getJobPermissions(tableData.currentPage)" />
-        <PermisoFormato026Vue :viewPermission="viewPermission" :permissionToPrint="permissionToPrint" :permits="permits"
-            @cerrar-modal="viewPermission = false" />
+        <PermisoFormato026Vue :viewPermission026="viewPermission026" :permissionToPrint="permissionToPrint" :limite="limite"
+            :permits="permits" @cerrar-modal="viewPermission026 = false" />
+        <PermisoFormato012InternoVue :viewPermission012I="viewPermission012I" :permissionToPrint="permissionToPrint"
+            :permits="permits" @cerrar-modal="viewPermission012I = false" />
 
     </AppLayoutVue>
 </template>
@@ -247,10 +250,12 @@ export default {
                 sortOrders[column.name] = -1;
         });
         return {
-            viewPermission:false,
+            viewPermission026: false,
+            viewPermission012: false,
+            viewPermission012I: false,
+            limite: '',
             permissionToPrint: [],
             isLoading: false,
-            printPermissionFlag: false,
             emptyObject: false,
             //Data for datatable
             jobPermissions: [],
@@ -289,9 +294,28 @@ export default {
         }
     },
     methods: {
-        viewPermissionFormat(permission) {
-            this.permissionToPrint = permission
-            this.viewPermission = true
+        async viewPermissionFormat(permission) {
+            const res = await this.getPermissionDataById(permission);
+            const updatedPermission = res.permiso;
+            this.permissionToPrint = updatedPermission
+            const format = this.getFormatToPrint(updatedPermission);
+            switch (format) {
+                //No marcacion
+                case 1:
+                    this.viewPermission026 = true
+                    this.limite = res.limite
+                    break;
+                //F012 Control interno
+                case 2:
+                    this.viewPermission012I = true
+                    break;
+                //F012
+                case 3:
+                    this.viewPermission012 = true
+                    break;
+                default:
+                    console.log('Another action');
+            }
         },
         async printPermission(permission) {
             const res = await this.getPermissionDataById(permission);
