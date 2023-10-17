@@ -141,15 +141,15 @@ class PermisoController extends Controller
                 ->get();
         }
 
-        if($idEmpleadoFromView != 0 || $executePermit == 0){
-            if($idEmpleadoFromView==0){
+        if ($idEmpleadoFromView != 0 || $executePermit == 0) {
+            if ($idEmpleadoFromView == 0) {
                 $id_empleado = $user->persona->empleado->id_empleado;
-            }else{
+            } else {
                 $id_empleado = $idEmpleadoFromView;
             }
             $permissionData = $this->getPermissionData($id_empleado);
         }
-        
+
 
         $permissionReason = DB::table('motivo_permiso')->selectRaw('id_motivo_permiso as value, nombre_motivo_permiso as label')
             ->get();
@@ -236,11 +236,15 @@ class PermisoController extends Controller
             }
         } else {
             if ($request->typeOfPermissionId != 5) {
-                if ($request->periodOfTime == 1) {
-                    $isValidTime = $this->validateTime($request->startTime, $request->endTime, $request->typeOfPermissionId, $request->employeeId, 'time');
-                } else {
-                    $isValidTime = $this->validateTime($request->startDate, $request->endDate, $request->typeOfPermissionId, $request->employeeId, 'date');
-                }
+                $dateTimeField = ($request->periodOfTime == 1) ? 'time' : 'date';
+                $isValidTime = $this->validateTime(
+                    ($request->periodOfTime == 1) ? $request->startTime : $request->startDate,
+                    ($request->periodOfTime == 1) ? $request->endTime : $request->endDate,
+                    $request->typeOfPermissionId,
+                    $request->employeeId,
+                    $request->permissionId,
+                    $dateTimeField
+                );
             }
         }
 
@@ -280,7 +284,7 @@ class PermisoController extends Controller
             ], 422);
         }
     }
-    public function validateTime($start, $end, $typeOfPermissionId, $employeeId, $type)
+    public function validateTime($start, $end, $typeOfPermissionId, $employeeId, $permissionId, $type)
     {
         if ($type == 'time') {
             $startFormatted = strlen($start) === 5 ? Carbon::createFromFormat('H:i', $start) : Carbon::createFromFormat('H:i:s', $start);
@@ -293,6 +297,15 @@ class PermisoController extends Controller
             $timeDifferenceInMinutesFromView = (($endFormatted->diffInDays($startFormatted)) + 1) * 8 * 60;
         }
 
+        if($permissionId != ''){
+            $permissionTimeInSeconds = DB::table('permiso')
+            ->selectRaw('SUM(CASE WHEN fecha_inicio_permiso IS NOT NULL AND fecha_fin_permiso IS NOT NULL THEN (DATEDIFF(fecha_fin_permiso, fecha_inicio_permiso) + 1) * 8 * 60 * 60 ELSE TIME_TO_SEC(TIMEDIFF(hora_salida_permiso, hora_entrada_permiso)) END) AS total_permiso_acumulado')
+            ->where('id_permiso', $permissionId)
+            ->value('total_permiso_acumulado');
+        }else{
+            $permissionTimeInSeconds = 0;
+        }
+
         $totalPermissionsInSecondsFromDB = DB::table('permiso')
             ->selectRaw('SUM(CASE WHEN fecha_inicio_permiso IS NOT NULL AND fecha_fin_permiso IS NOT NULL THEN (DATEDIFF(fecha_fin_permiso, fecha_inicio_permiso) + 1) * 8 * 60 * 60 ELSE TIME_TO_SEC(TIMEDIFF(hora_salida_permiso, hora_entrada_permiso)) END) AS total_permiso_acumulado')
             ->where('id_empleado', $employeeId)
@@ -302,7 +315,7 @@ class PermisoController extends Controller
 
         $permissionLimit = TipoPermiso::find($typeOfPermissionId);
 
-        $totalPermissionsInMinutesFromDB = floor($totalPermissionsInSecondsFromDB / 60);
+        $totalPermissionsInMinutesFromDB = floor(($totalPermissionsInSecondsFromDB - $permissionTimeInSeconds) / 60);
 
         $availableTimeInMinutes = ($permissionLimit->tiempo_max_tipo_permiso * 60) - $totalPermissionsInMinutesFromDB;
 
@@ -342,11 +355,15 @@ class PermisoController extends Controller
                 }
             } else {
                 if ($request->typeOfPermissionId != 5) {
-                    if ($request->periodOfTime == 1) {
-                        $isValidTime = $this->validateTime($request->startTime, $request->endTime, $request->typeOfPermissionId, $request->employeeId, 'time');
-                    } else {
-                        $isValidTime = $this->validateTime($request->startDate, $request->endDate, $request->typeOfPermissionId, $request->employeeId, 'date');
-                    }
+                    $dateTimeField = ($request->periodOfTime == 1) ? 'time' : 'date';
+                    $isValidTime = $this->validateTime(
+                        ($request->periodOfTime == 1) ? $request->startTime : $request->startDate,
+                        ($request->periodOfTime == 1) ? $request->endTime : $request->endDate,
+                        $request->typeOfPermissionId,
+                        $request->employeeId,
+                        $request->permissionId ?? '',
+                        $dateTimeField
+                    );
                 }
             }
 
@@ -420,11 +437,11 @@ class PermisoController extends Controller
         }
     }
 
-    public function deletePermission(Request $request){
+    public function deletePermission(Request $request)
+    {
         $permission = Permiso::find($request->id);
-        if($permission->id_estado_permiso == 1 || $request->execute == 1){
-
-        }else{
+        if ($permission->id_estado_permiso == 1 || $request->execute == 1) {
+        } else {
             return response()->json([
                 'logical_error' => 'El permiso seleccionado ha cambiado de estado.',
             ], 422);

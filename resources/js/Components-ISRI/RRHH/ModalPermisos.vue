@@ -107,8 +107,8 @@ import moment from 'moment';
                     </div>
                     <div class="flex border-t border-gray-400">
                         <div class="flex-1 text-center p-0.5">
-                            <span>Permiso creado:</span> <span class="font-semibold">{{ moment().format('DD-MM-YYYY')
-                            }}</span>
+                            <span>Permiso creado:</span> <span class="font-semibold">
+                                {{ permission.registrationDate ? moment(permission.registrationDate).format('DD/MM/YYYY') : moment().format('DD-MM-YYYY') }}</span>
                         </div>
                     </div>
                 </div>
@@ -456,7 +456,8 @@ export default {
                 destination: '',
                 description: '',
                 periodOfTime: '',
-                permissionReasonId: ''
+                permissionReasonId: '',
+                registrationDate: ''
             },
             config: {
                 monthSelectorType: 'static',
@@ -579,9 +580,10 @@ export default {
         },
         periodOfTimeSelected(option) {
             this.permission.periodOfTime = option
-            this.resetRemainingValue()
+            this.errors = []
             this.cleanPermissionDetails()
-            this.updateTotalHours()
+            this.showPermissionInfo.remainingTime = this.showPermissionInfo.initialRemaining
+            this.showPermissionInfo.acumulatedTime = this.minutesToTimeFormat(this.substractTime(this.showPermissionInfo.totalTime, this.showPermissionInfo.remainingTime))
         },
         toggleAccordion(section) {
             switch (section) {
@@ -606,7 +608,7 @@ export default {
             if (this.permission.typeOfPermissionId == 5 || this.permission.typeOfPermissionId == 6) {
                 return 'NO APLICA'
             } else {
-                if (time === '00:00' || time === '0:0' || time === '00:00:00') {
+                if (time === '00:00' || time === '0:0' || time === '00:00:00' || time === '' || time === null) {
                     return '0'
                 } else {
                     const [hours, minutes] = time.split(':').map(Number);;
@@ -702,24 +704,31 @@ export default {
                 if (this.flagToUpdateTimeByHours) {
                     //console.log('primer if')
                     //We subtract end time minus start time.
-                    const totalMinutes = this.substractTime(this.permission.endTime, this.permission.startTime)
+                    const totalMinutesSelected = this.substractTime(this.permission.endTime, this.permission.startTime)
 
-                    if (totalMinutes > 0 && !(this.permission.startTime === this.permission.endTime)) {
+                    if (totalMinutesSelected > 0 && !(this.permission.startTime === this.permission.endTime)) {
                         this.negativeTime = false
                         const totalRemainingMinutes = this.timeFormatToMinutes(this.showPermissionInfo.initialRemaining)
 
-                        if (totalMinutes > totalRemainingMinutes) {
+                        if (totalMinutesSelected > totalRemainingMinutes) {
                             this.showToast(toast.error, `Has excedido la cantidad de tiempo, solo tienes ${this.formatTime(this.showPermissionInfo.initialRemaining)} disponible, debes ajustar los detalles del permiso.`);
+                            this.showPermissionInfo.remainingTime = this.minutesToTimeFormat(totalMinutesSelected - totalRemainingMinutes);
+                            this.showPermissionInfo.acumulatedTime = this.minutesToTimeFormat(this.addTime(this.showPermissionInfo.totalTime, this.showPermissionInfo.remainingTime))
                             this.noTime = true
                         } else {
-                            this.noTime = false
+                            this.showPermissionInfo.remainingTime = this.minutesToTimeFormat(totalRemainingMinutes - totalMinutesSelected);
+                            if (totalMinutesSelected === totalRemainingMinutes) {
+                                this.showPermissionInfo.acumulatedTime = this.showPermissionInfo.totalTime
+                                this.noTime = false
+                            } else {
+                                this.showPermissionInfo.acumulatedTime = this.minutesToTimeFormat(this.substractTime(this.showPermissionInfo.totalTime, this.showPermissionInfo.remainingTime))
+                                this.noTime = false
+                            }
                         }
 
-                        const newTotal = this.minutesToTimeFormat(totalMinutes)
+                        const newTotal = this.minutesToTimeFormat(totalMinutesSelected)
                         this.totalHours = this.formatTime(newTotal)
                         this.totalHoursFormat = newTotal
-
-                        this.updateRemainingTime()
                     } else {
                         this.negativeTime = true
                         this.showToast(toast.error, 'La hora salida/fin debe ser mayor que la hora entrada/inicio.');
@@ -750,7 +759,7 @@ export default {
                             } else {
                                 this.showPermissionInfo.remainingTime = this.minutesToTimeFormat(totalRemainingMinutes - totalMinutesSelected);
                                 if (totalMinutesSelected === totalRemainingMinutes) {
-                                    this.showPermissionInfo.acumulatedTime = this.minutesToTimeFormat(totalMinutesSelected)
+                                    this.showPermissionInfo.acumulatedTime = this.showPermissionInfo.totalTime
                                     this.noTime = false
                                 } else {
                                     this.showPermissionInfo.acumulatedTime = this.minutesToTimeFormat(this.substractTime(this.showPermissionInfo.totalTime, this.showPermissionInfo.remainingTime))
@@ -759,7 +768,7 @@ export default {
                             }
 
                             this.totalHours = daysDifference * 8 + ' H.'
-                            this.totalHoursFormat = this.minutesToTimeFormat(daysDifference * 8 * 60)
+                            this.totalHoursFormat = this.minutesToTimeFormat(totalMinutesSelected)
                         }
                     } else {
                         this.resetTotalHours()
@@ -804,20 +813,7 @@ export default {
                 this.permission.observation = this.modalData.comentarios_permiso ? this.modalData.comentarios_permiso : ''
                 this.permission.destination = this.modalData.destino_permiso ? this.modalData.destino_permiso : ''
                 this.permission.comingBack = this.modalData.retornar_empleado_permiso
-            }
-        },
-        updateRemainingTime() {
-            if (this.permission.periodOfTime == 1) {
-                const formatStart = moment(this.permission.startTime, 'HH:mm')
-                const formatEnd = moment(this.permission.endTime, 'HH:mm')
-                var duration = moment.duration(formatEnd.diff(formatStart))
-
-                const durationFormatted = `${Math.floor(duration.asHours())}:${duration.minutes()}`;
-
-                const result = this.substractTime(this.showPermissionInfo.initialRemaining, durationFormatted)
-                this.showPermissionInfo.remainingTime = this.minutesToTimeFormat(result)
-                //Method to update the time used
-                this.updateTimeUsed()
+                this.permission.registrationDate = this.modalData.fecha_reg_permiso ?? ''
             }
         },
         substractTime(hour1, hour2) { //must be format = 'HH:mm' or 'HH:mm:ss'
@@ -866,37 +862,18 @@ export default {
             return result ? result : false
         },
         workDaysBetween(date1, date2) {
-            const startDateFormated = moment(date1, 'YYYY/MM/DD').toDate()
-            const endDateFormated = moment(date2, 'YYYY/MM/DD').toDate()
+            const startDateFormated = moment(date1, 'YYYY/MM/DD').toDate();
+            const endDateFormated = moment(date2, 'YYYY/MM/DD').toDate();
 
             let currentDate = new Date(startDateFormated);
             let daysDifference = 0;
 
             while (currentDate <= endDateFormated) {
-                const dayOfWeek = currentDate.getDay(); // 0 (domingo) a 6 (sábado)
-                if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-                    daysDifference++;
-                }
+                daysDifference++;
                 currentDate.setDate(currentDate.getDate() + 1);
             }
-            return daysDifference ?? false
-        },
-        resetRemainingValue() {
-            if (this.totalHoursFormat) {
-                if (this.showPermissionInfo.remainingTime) {
-                    const remainingInMinutes = this.addTime(this.showPermissionInfo.remainingTime, this.totalHoursFormat);
-                    this.showPermissionInfo.remainingTime = this.minutesToTimeFormat(remainingInMinutes)
-                } else {
-                    this.showPermissionInfo.remainingTime = this.showPermissionInfo.initialRemaining
-                }
-                //Method to update the time used
-                this.updateTimeUsed()
-            }
-        },
-        updateTimeUsed() {
-            const remainingTime = this.showPermissionInfo.remainingTime || '00:00';
-            const result = this.substractTime(this.showPermissionInfo.totalTime, remainingTime);
-            this.showPermissionInfo.acumulatedTime = this.minutesToTimeFormat(result);
+
+            return daysDifference;
         },
         resetTotalHours() {
             this.totalHoursFormat = ''
