@@ -7,8 +7,8 @@ import ModalEvalueacionesVue from '@/Components-ISRI/RRHH/ModalEvalueaciones.vue
 </script>
 
 <template>
-    <Head title="RRHH - Acuerdos de contratacion" />
-    <AppLayoutVue nameSubModule="RRHH - Acuerdos">
+    <Head title="RRHH - Evaluacion del personal" />
+    <AppLayoutVue nameSubModule="RRHH - Evaluacion del personal">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
                 <GeneralButton @click="dataEvaluacionToSendModal = []; showModalEvaluacion = !showModalEvaluacion"
