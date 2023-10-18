@@ -9,7 +9,7 @@ import { v4 as uuid, v4 } from "uuid";
 <template>
     <div v-if="registroEvaluacionRendimientoPersonal == ''" class="flex justify-center items-center">
         <!--  <img src="../../../img/NoEvaluationYet.svg" alt="" class="h-[500px]"> -->
-        <div class="w-full h-[500px] px-1 text-selection-disable">
+        <div class="w-full h-[500px] px-1 text-selection-disable mb-20">
             <div class="flex flex-col items-center justify-center h-full">
                 <img src="../../../img/NoEvaluationYet.svg" class="h-[400px] rounded-full mx-auto" alt="SVG Image"
                     draggable="false">
