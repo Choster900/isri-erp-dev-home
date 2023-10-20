@@ -7,6 +7,7 @@ use App\Http\Controllers\RRHH\EmpleadoController;
 use App\Http\Controllers\RRHH\EvaluacionController;
 use App\Http\Controllers\RRHH\HojaServicioController;
 use App\Http\Controllers\RRHH\PermisoController;
+use App\Http\Controllers\RRHH\SolicitudPermisoController;
 use App\Models\EvaluacionRendimiento;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -102,5 +103,12 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('save-response', [EvaluacionController::class, 'saveResponseInEvaluation'])->name('evaluaciones.save-response');
     Route::post('get-by-id', [EvaluacionController::class, 'getEvaluationById'])->name('evaluaciones.get-by-id');
 
-
+    Route::get(
+        '/rrhh/solic-permisos',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/solic-permisos', 'RRHH/SolicitudesPermiso');
+        }
+    )->name('rrhh.solicPermisos');
+    Route::post('get-permission-requests', [SolicitudPermisoController::class, 'getPermissionRequests'])->name('solicPermiso.getPermissionRequests');
+    Route::post('send-permission', [SolicitudPermisoController::class, 'sendPermission'])->name('solicPermiso.sendPermission');
 });
