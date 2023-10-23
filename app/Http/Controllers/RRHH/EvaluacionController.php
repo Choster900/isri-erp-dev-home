@@ -62,29 +62,31 @@ class EvaluacionController extends Controller
 
         if ($data) {
             $query->where('id_empleado', 'like', '%' . $data["id_empleado"] . '%')
-                ->where('codigo_empleado', 'like', '%' . $data['codigo_empleado'] . '%')
-                ->where('email_institucional_empleado', 'like', '%' . $data['email_institucional_empleado'] . '%')
-                ->whereHas(
-                    'persona',
-                    function ($query) use ($data) {
-                        $searchNombres = $data["collecNombre"];
-                        $query->where(function ($query) use ($searchNombres) {
-                            $query->where('pnombre_persona', 'like', '%' . $searchNombres . '%')
-                                ->orWhere('snombre_persona', 'like', '%' . $searchNombres . '%')
-                                ->orWhere('tapellido_persona', 'like', '%' . $searchNombres . '%');
-                        });
+                ->where('codigo_empleado', 'like', '%' . $data['codigo_empleado'] . '%');
 
-                        $searchApellidos = $data["collecApellido"];
-                        $query->where(function ($query) use ($searchApellidos) {
-                            $query->where('papellido_persona', 'like', '%' . $searchApellidos . '%')
-                                ->orWhere('sapellido_persona', 'like', '%' . $searchApellidos . '%')
-                                ->orWhere('tapellido_persona', 'like', '%' . $searchApellidos . '%');
-                        });
-                    }
-                );
+            if (isset($data['email_institucional_empleado'])) {
+                $query->where('email_institucional_empleado', 'like', '%' . $data['email_institucional_empleado'] . '%');
+            }
+            $query->whereHas(
+                'persona',
+                function ($query) use ($data) {
+                    $searchNombres = $data["collecNombre"];
+                    $query->where(function ($query) use ($searchNombres) {
+                        $query->where('pnombre_persona', 'like', '%' . $searchNombres . '%')
+                            ->orWhere('snombre_persona', 'like', '%' . $searchNombres . '%')
+                            ->orWhere('tapellido_persona', 'like', '%' . $searchNombres . '%');
+                    });
+
+                    $searchApellidos = $data["collecApellido"];
+                    $query->where(function ($query) use ($searchApellidos) {
+                        $query->where('papellido_persona', 'like', '%' . $searchApellidos . '%')
+                            ->orWhere('sapellido_persona', 'like', '%' . $searchApellidos . '%')
+                            ->orWhere('tapellido_persona', 'like', '%' . $searchApellidos . '%');
+                    });
+                }
+            );
         }
         $acuerdos = $query->paginate($length)->onEachSide(1);
-
         return [
             'data' => $acuerdos,
             'draw' => $request->input('draw'),
