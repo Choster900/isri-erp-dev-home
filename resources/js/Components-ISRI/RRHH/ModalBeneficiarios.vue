@@ -493,6 +493,15 @@ export default {
             })
         },
         addRow() {
+            if (this.dataSent.dataRow.length > 5) {
+                toast.warning("No se podran agregar mas beneficiarios. El numero maximo es de 6 familiares", {
+                    autoClose: 5000,
+                    position: "top-right",
+                    transition: "zoom",
+                    toastBackgroundColor: "white",
+                });
+                return
+            }
             this.dataSent.dataRow.push({
                 id_familiar: '',
                 nombre_familiar: '',
@@ -510,7 +519,7 @@ export default {
             if (this.dataSent.dataRow[rowIndex].porcentaje_familiar > 100) {
                 this.dataSent.dataRow[rowIndex].porcentaje_familiar = 100;
             }
-            
+
             // Calcular la suma total de los porcentajes
             this.totalPorcentajeAsignado = this.dataSent.dataRow.reduce((suma, obj) => suma + parseFloat(obj.porcentaje_familiar), 0);
             if (this.totalPorcentajeAsignado > 100) {
