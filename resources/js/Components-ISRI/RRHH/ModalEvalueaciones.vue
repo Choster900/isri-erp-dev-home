@@ -317,24 +317,35 @@ export default {
          * @param {String} query // Almacena el nombre del empleado
          */
         async searchingUsers(query) {
-            // Nota: No funcionara si el empleado ya tiene evaluaciones asignadas
+            // Nota: No funcionará si el empleado ya tiene evaluaciones asignadas
             try {
-                this.isLoading = true
+                this.isLoading = true;
                 const response = await axios.post('/search-employees-for-evaluations', { data: query });
                 const newDataEmployees = response.data.map(item => {
+                    const nombreCompleto = [
+                        item.pnombre_persona,
+                        item.snombre_persona,
+                        item.tnombre_persona,
+                        item.papellido_persona,
+                        item.sapellido_persona,
+                        item.tapellido_persona
+                    ]
+                        .filter(Boolean) // Eliminar valores falsy (null, undefined, etc.)
+                        .join(' ');
+
                     return {
                         value: item.id_empleado,
-                        label: `${item.pnombre_persona} ${item.papellido_persona}`
+                        label: nombreCompleto
                     };
                 });
-                this.employeOptions = newDataEmployees
+                this.employeOptions = newDataEmployees;
             } catch (error) {
-                console.log('Error en la búsqueda:', error)
+                console.log('Error en la búsqueda:', error);
             } finally {
-                this.isLoading = false
+                this.isLoading = false;
             }
-
         },
+
         /**
          * Peticion async enviada al backed, reject la peticion si hay un error ( revisar consola )
          */
@@ -411,7 +422,7 @@ export default {
                 if (this.evaluacionEmpleadoDBData != '') {
                     const optionsMultiselect = [{
                         value: this.evaluacionEmpleadoDBData.id_empleado,
-                        label: `${this.evaluacionEmpleadoDBData.persona.pnombre_persona} ${this.evaluacionEmpleadoDBData.persona.papellido_persona}`
+                        label: `${this.evaluacionEmpleadoDBData.persona.pnombre_persona || ''}  ${this.evaluacionEmpleadoDBData.persona.snombre_persona || ''} ${this.evaluacionEmpleadoDBData.persona.tnombre_persona || ''} ${this.evaluacionEmpleadoDBData.persona.papellido_persona || ''} ${this.evaluacionEmpleadoDBData.persona.sapellido_persona || ''} ${this.evaluacionEmpleadoDBData.persona.tapellido_persona || ''}`
                     }];
                     this.employeOptions = optionsMultiselect
                     this.id_empleado = this.evaluacionEmpleadoDBData.id_empleado
@@ -429,5 +440,6 @@ export default {
             }
         }
     }
+
 }
 </script>
