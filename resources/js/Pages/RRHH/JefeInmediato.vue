@@ -5,6 +5,7 @@ import Datatable from "@/Components-ISRI/Datatable.vue";
 import ModalPermisosVue from '@/Components-ISRI/RRHH/ModalPermisos.vue';
 import PermisoFormato026Vue from '@/Components-ISRI/RRHH/PermisoFormato026.vue';
 import PermisoFormato012InternoVue from '@/Components-ISRI/RRHH/PermisoFormato012Interno.vue';
+import PermisoFormato012Vue from '@/Components-ISRI/RRHH/PermisoFormato012.vue';
 
 import moment from 'moment';
 
@@ -33,12 +34,6 @@ import axios from 'axios';
                 <div class="bg-gray-200 rounded-lg p-1 font-semibold">
                     <span class="text-blue-800">CARGANDO...</span>
                 </div>
-            </div>
-        </div>
-        <div class="sm:flex sm:justify-end sm:items-center mb-2">
-            <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="addJobPermission()" v-if="permits.insertar == 1"
-                    color="bg-green-700  hover:bg-green-800" text="Agregar Permiso" icon="add" />
             </div>
         </div>
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
@@ -71,14 +66,17 @@ import axios from 'axios';
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ permission.codigo_tipo_permiso }}
+                                    {{ permission.tipo_permiso.codigo_tipo_permiso }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ permission.pnombre_persona }} {{ permission.snombre_persona }}
-                                    {{ permission.tnombre_persona }} {{ permission.papellido_persona }}
-                                    {{ permission.sapellido_persona }} {{ permission.tapellido_persona }}
+                                    {{ permission.empleado.persona.pnombre_persona }} {{
+                                        permission.empleado.persona.snombre_persona }}
+                                    {{ permission.empleado.persona.tnombre_persona }} {{
+                                        permission.empleado.persona.papellido_persona }}
+                                    {{ permission.empleado.persona.sapellido_persona }} {{
+                                        permission.empleado.persona.tapellido_persona }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5">
@@ -93,16 +91,12 @@ import axios from 'axios';
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-center">
-                                    <span v-if="permission.id_estado_permiso === 1"
-                                        class="font-medium text-cyan-500">Creado</span>
-                                    <span v-else-if="permission.id_estado_permiso === 2"
-                                        class="font-medium text-green-500">En proceso</span>
-                                    <span v-else-if="permission.id_estado_permiso === 3"
+                                    <span v-if="checkApproval(permission) === 1"
+                                        class="font-medium text-orange-500">Pendiente</span>
+                                    <span v-else-if="checkApproval(permission) === 2"
+                                        class="font-medium text-red-500">Denegado</span>
+                                    <span v-else-if="checkApproval(permission) === 3"
                                         class="font-medium text-green-500">Aprobado</span>
-                                    <span v-else-if="permission.id_estado_permiso === 4"
-                                        class="font-medium text-orange-500">Denegado</span>
-                                    <span v-else-if="permission.id_estado_permiso === 5"
-                                        class="font-medium text-red-500">Eliminado</span>
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
@@ -176,9 +170,14 @@ import axios from 'axios';
         <ModalPermisosVue :showModalJobPermissions="showModalJobPermissions" :modalData="modalData" :permits="permits"
             @cerrar-modal="showModalJobPermissions = false" @get-table="getPermissionRequests(tableData.currentPage)" />
         <PermisoFormato026Vue :viewPermission026="viewPermission026" :permissionToPrint="permissionToPrint" :limite="limite"
-            :permits="permits" @cerrar-modal="viewPermission026 = false" />
+            :permits="permits" @cerrar-modal="viewPermission026 = false" :stages="stages"
+            @get-table="getPermissionRequests(tableData.currentPage)" />
         <PermisoFormato012InternoVue :viewPermission012I="viewPermission012I" :permissionToPrint="permissionToPrint"
-            :permits="permits" @cerrar-modal="viewPermission012I = false" />
+            :stages="stages" :permits="permits" @cerrar-modal="viewPermission012I = false"
+            @get-table="getPermissionRequests(tableData.currentPage)" />
+        <PermisoFormato012Vue :viewPermission012="viewPermission012" :permissionToPrint="permissionToPrint" :stages="stages"
+            :permits="permits" @cerrar-modal="viewPermission012 = false"
+            @get-table="getPermissionRequests(tableData.currentPage)" />
 
     </AppLayoutVue>
 </template>
@@ -207,10 +206,9 @@ export default {
             {
                 width: "10%", label: "Estado", name: "id_estado_permiso", type: "select",
                 options: [
-                    { value: "1", label: "Creado" },
-                    { value: "2", label: "Aprobado" },
-                    { value: "3", label: "Denegado" },
-                    { value: "4", label: "Eliminado" },
+                    { value: null, label: "Pendiente" },
+                    { value: "3", label: "Aprobado" },
+                    { value: "4", label: "Denegado" },
                 ]
             },
             { width: "10%", label: "Acciones", name: "Acciones" },
@@ -222,6 +220,7 @@ export default {
                 sortOrders[column.name] = -1;
         });
         return {
+            stages: [],
             viewPermission026: false,
             viewPermission012: false,
             viewPermission012I: false,
@@ -266,9 +265,73 @@ export default {
         }
     },
     methods: {
+        checkApproval(permission) {
+            const idRol = this.$page.props.menu.id_rol
+            if (idRol === 15) { //Jefe inmediato
+                if (permission.etapa_permiso[1]) {
+                    if (permission.etapa_permiso[1].id_estado_etapa_permiso === 2) {
+                        return 3 //Approved
+                    } else {
+                        if (permission.etapa_permiso[1].id_estado_etapa_permiso === 3) {
+                            return 2 //Rejected
+                        } else {
+                            return 1
+                        }
+                    }
+                } else {
+                    return 1
+                }
+            }
+            if (idRol === 16) { //Director de centro
+                if (permission.etapa_permiso[1]) {
+                    if (permission.etapa_permiso[1].id_estado_etapa_permiso === 4) {
+                        return 3 //Approved
+                    } else {
+                        if (permission.etapa_permiso[1].id_estado_etapa_permiso === 5) {
+                            return 2 //Rejected
+                        } else {
+                            return 1
+                        }
+                    }
+                } else {
+                    return 1
+                }
+            }
+            if (idRol === 17) { //Direccion/Subdireccion Medica
+                if (permission.etapa_permiso[1]) {
+                    if (permission.etapa_permiso[1].id_estado_etapa_permiso === 6) {
+                        return 3 //Approved
+                    } else {
+                        if (permission.etapa_permiso[1].id_estado_etapa_permiso === 7) {
+                            return 2 //Rejected
+                        } else {
+                            return 1
+                        }
+                    }
+                } else {
+                    return 1
+                }
+            }
+            if (idRol === 18) { //Gerente General
+                if (permission.etapa_permiso[1]) {
+                    if (permission.etapa_permiso[1].id_estado_etapa_permiso === 8) {
+                        return 3 //Approved
+                    } else {
+                        if (permission.etapa_permiso[1].id_estado_etapa_permiso === 9) {
+                            return 2 //Rejected
+                        } else {
+                            return 1
+                        }
+                    }
+                } else {
+                    return 1
+                }
+            }
+        },
         async viewPermissionFormat(permission) {
             const res = await this.getPermissionDataById(permission);
             const updatedPermission = res.permiso;
+            this.stages = res.etapas
             this.permissionToPrint = updatedPermission
             const format = this.getFormatToPrint(updatedPermission);
             switch (format) {
@@ -498,7 +561,7 @@ export default {
             }
         },
         showTime(permission) {
-            if (permission.id_tipo_permiso === 6) {
+            if (permission.id_tipo_permiso === 6 || (permission.id_tipo_permiso === 5 && !permission.fecha_fin_permiso)) {
                 return 'N/A'
             } else {
                 if (permission.fecha_fin_permiso) {
@@ -550,7 +613,7 @@ export default {
             this.modalData = []
             this.showModalJobPermissions = true
         },
-        async getPermissionRequests(url = "/get-permission-requests") {
+        async getPermissionRequests(url = "/get-jefe-inmediato") {
             this.tableData.draw++;
             this.tableData.currentPage = url
             this.tableData.execute = this.permits.ejecutar

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\RRHH;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RRHH\PermisoRequest;
+use App\Models\EtapaPermiso;
 use App\Models\Permiso;
 use App\Models\PlazaAsignada;
 use App\Models\TipoPermiso;
@@ -182,7 +183,7 @@ class PermisoController extends Controller
                             ) AS total_permiso_acumulado
                         FROM permiso p
                         INNER JOIN tipo_permiso tp ON p.id_tipo_permiso = tp.id_tipo_permiso
-                        WHERE p.id_estado_permiso IN (1,2)
+                        WHERE p.id_estado_permiso IN (1,2,3)
                         AND p.id_empleado = ?
                         AND YEAR(p.fecha_inicio_permiso) = YEAR(CURDATE())
                         GROUP BY tp.id_tipo_permiso, tp.nombre_tipo_permiso, tp.tiempo_max_tipo_permiso
@@ -224,7 +225,7 @@ class PermisoController extends Controller
 
             $cantidadPermisos = DB::table('permiso')
                 ->where('id_tipo_permiso', 6)
-                ->whereIn('id_estado_permiso', [1, 2]) // Check if id_estado_permiso is 1 or 2
+                ->whereIn('id_estado_permiso', [1, 2, 3]) // Check if id_estado_permiso is 1 or 2
                 ->where('id_empleado', $request->employeeId)
                 ->whereMonth('fecha_inicio_permiso', $mesPermiso)
                 ->count();
@@ -342,7 +343,7 @@ class PermisoController extends Controller
 
                 $cantidadPermisos = DB::table('permiso')
                     ->where('id_permiso', '!=', $request->permissionId)
-                    ->whereIn('id_estado_permiso', [1, 2]) // Check if id_estado_permiso is 1 or 2
+                    ->whereIn('id_estado_permiso', [1, 2, 3]) // Check if id_estado_permiso is 1 or 2
                     ->where('id_tipo_permiso', 6)
                     ->where('id_empleado', $request->employeeId)
                     ->whereMonth('fecha_inicio_permiso', $mesPermiso)
@@ -408,7 +409,7 @@ class PermisoController extends Controller
     public function getPermissionInfoById(Request $request)
     {
         $permiso = Permiso::where('id_permiso', $request->id_permiso)
-            ->with(['empleado.persona', 'plaza_asignada.dependencia', 'tipo_permiso', 'motivo_permiso', 'plaza_asignada.detalle_plaza.plaza', 'empleado.titulo_profesional'])
+            ->with(['empleado.persona', 'plaza_asignada.dependencia', 'tipo_permiso', 'motivo_permiso', 'plaza_asignada.detalle_plaza.plaza', 'empleado.titulo_profesional', 'etapa_permiso'])
             ->first();
 
         if (!$permiso || $permiso->estado_permiso == 0) {
@@ -422,25 +423,90 @@ class PermisoController extends Controller
                 ], 422);
             } else {
                 $fechaPermiso = Carbon::parse($permiso->fecha_inicio_permiso)->format('m');
+                //Get the permission stages
+                $permissionStages = EtapaPermiso::with('empleado.persona','persona_etapa','estado_etapa_permiso')
+                    ->where('id_permiso',$permiso->id_permiso)->get();
+                //Special validation for no entry or exit marking
                 $cantidadPermisos = DB::table('permiso')
                     ->where('id_tipo_permiso', 6)
-                    ->whereIn('id_estado_permiso', [1, 2]) // Check if id_estado_permiso is 1 or 2
+                    ->whereIn('id_estado_permiso', [1, 2, 3]) // Check if id_estado_permiso is 1 or 2
                     ->where('id_empleado', $permiso->id_empleado)
                     ->whereMonth('fecha_inicio_permiso', $fechaPermiso)
                     ->where('fecha_inicio_permiso', '<=', $permiso->fecha_inicio_permiso)
                     ->count();
                 return response()->json([
                     'permiso' => $permiso,
-                    'limite'  => $cantidadPermisos
+                    'limite'  => $cantidadPermisos,
+                    'etapas'  => $permissionStages,
                 ]);
             }
+        }
+    }
+
+    public function sendPermission(Request $request)
+    {
+        $permiso = Permiso::find($request->id);
+        $id_rol = session()->get('id_rol');
+
+        $existStage = EtapaPermiso::where('id_permiso', $permiso->id_permiso)
+            ->first();
+
+        if (!$existStage && $permiso) {
+            DB::beginTransaction();
+            try {
+                $permissionStage = new EtapaPermiso([
+                    'id_empleado'                   => $permiso->empleado->persona->id_persona,
+                    'id_permiso'                    => $permiso->id_permiso,
+                    'id_estado_etapa_permiso'       => $id_rol == 15 ? 2 : ($id_rol == 16 ? 4 : 1),
+                    'id_persona_etapa'              => $id_rol == 15 ? 2 : ($id_rol == 16 ? 3 : 1),
+                    'fecha_reg_etapa_permiso'       => Carbon::now(),
+                    'usuario_etapa_permiso'         => $request->user()->nick_usuario,
+                    'ip_etapa_permiso'              => $request->ip(),
+                    'estado_etapa_permiso'          => 1,
+                ]);
+                $permissionStage->save();
+
+                $data = [
+                    'id_estado_permiso'           => 2,
+                    'id_tipo_flujo_control'       => $request->tipo_flujo,
+                    'fecha_mod_permiso'           => Carbon::now(),
+                    'usuario_permiso'             => $request->user()->nick_usuario,
+                    'ip_permiso'                  => $request->ip(),
+                ];
+                $permiso->update($data);
+
+                DB::commit(); // Confirma las operaciones en la base de datos
+                return response()->json([
+                    'mensaje'          => "Permiso enviado con exito",
+                ]);
+            } catch (\Exception $e) {
+                DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+                return response()->json([
+                    'logical_error' => 'Ha ocurrido un error con sus datos.',
+                    'error' => $e,
+                ], 422);
+            }
+        } else {
+            return response()->json([
+                'logical_error' => 'El permiso ya ha sido registrado.',
+            ], 422);
         }
     }
 
     public function deletePermission(Request $request)
     {
         $permission = Permiso::find($request->id);
-        if ($permission->id_estado_permiso == 1 || $request->execute == 1) {
+        if ($permission->id_estado_permiso == $request->status) {
+            $data = [
+                'id_estado_permiso'           => 5,
+                'fecha_mod_permiso'           => Carbon::now(),
+                'usuario_permiso'             => $request->user()->nick_usuario,
+                'ip_permiso'                  => $request->ip(),
+            ];
+            $permission->update($data);
+            return response()->json([
+                'mensaje'          => "Permiso eliminado con exito.",
+            ]);
         } else {
             return response()->json([
                 'logical_error' => 'El permiso seleccionado ha cambiado de estado.',

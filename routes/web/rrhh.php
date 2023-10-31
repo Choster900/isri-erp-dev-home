@@ -3,11 +3,15 @@
 use App\Http\Controllers\RRHH\AcuerdoController;
 use App\Http\Controllers\RRHH\DetallePlazaController;
 use App\Http\Controllers\RRHH\BeneficiarioController;
+use App\Http\Controllers\RRHH\DirectorCentroController;
 use App\Http\Controllers\RRHH\EmpleadoController;
 use App\Http\Controllers\RRHH\EvaluacionController;
+use App\Http\Controllers\RRHH\GerenteGeneralController;
 use App\Http\Controllers\RRHH\HojaServicioController;
+use App\Http\Controllers\RRHH\JefeInmediatoController;
 use App\Http\Controllers\RRHH\PermisoController;
 use App\Http\Controllers\RRHH\SolicitudPermisoController;
+use App\Http\Controllers\RRHH\SubDirectorMedicoController;
 use App\Models\EvaluacionRendimiento;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -88,6 +92,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('update-employee-permission', [PermisoController::class, 'updateEmployeePermission'])->name('permiso.updateEmployeePermission');
     Route::post('get-permission-info-by-id', [PermisoController::class, 'getPermissionInfoById'])->name('permiso.getPermissionInfoById');
     Route::post('delete-permission', [PermisoController::class, 'deletePermission'])->name('permiso.deletePermission');
+    Route::post('send-permission', [PermisoController::class, 'sendPermission'])->name('solicPermiso.sendPermission');
 
 
     Route::get(
@@ -104,11 +109,44 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('get-by-id', [EvaluacionController::class, 'getEvaluationById'])->name('evaluaciones.get-by-id');
 
     Route::get(
-        '/rrhh/solic-permisos',
+        '/rrhh/jefe-inmediato',
         function (Request $request) {
-            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/solic-permisos', 'RRHH/SolicitudesPermiso');
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/jefe-inmediato', 'RRHH/JefeInmediato');
         }
-    )->name('rrhh.solicPermisos');
-    Route::post('get-permission-requests', [SolicitudPermisoController::class, 'getPermissionRequests'])->name('solicPermiso.getPermissionRequests');
-    Route::post('send-permission', [SolicitudPermisoController::class, 'sendPermission'])->name('solicPermiso.sendPermission');
+    )->name('rrhh.jefeInmediato');
+    Route::post('get-jefe-inmediato', [JefeInmediatoController::class, 'getReqJefeInmediato'])->name('jefInmediato.getReqJefeInmediato');
+    Route::post('supervisor-approval', [JefeInmediatoController::class, 'setSupervisorApproval'])->name('jefInmediato.setSupervisorApproval');
+    Route::post('supervisor-denial', [JefeInmediatoController::class, 'setSupervisorDenial'])->name('jefInmediato.setSupervisorDenial');
+
+    Route::get(
+        '/rrhh/director-centro',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/director-centro', 'RRHH/DirectorCentro');
+        }
+    )->name('rrhh.directorCentro');
+    Route::post('get-requests-director-centro', [DirectorCentroController::class, 'getReqDirectorCentro'])->name('dirCentro.getReqDirectorCentro');
+    Route::post('director-approval', [DirectorCentroController::class, 'setDirectorApproval'])->name('dirCentro.setDirectorApproval');
+    Route::post('director-denial', [DirectorCentroController::class, 'setDirectorDenial'])->name('dirCentro.setDirectorDenial');
+
+    Route::get(
+        '/rrhh/sub-direccion-medica',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/sub-direccion-medica', 'RRHH/SubDirectorMedico');
+        }
+    )->name('rrhh.subDireccionMedica');
+    Route::post('get-requests-sub-director-medico', [SubDirectorMedicoController::class, 'getReqSubDirMedico'])->name('subDirMedico.getReqSubDirMedico');
+    Route::post('medical-management-approval', [SubDirectorMedicoController::class, 'setMedicalManagementApproval'])->name('subDirMedico.setMedicalManagementApproval');
+    Route::post('medical-management-denial', [SubDirectorMedicoController::class, 'setMedicalManagementDenial'])->name('subDirMedico.setMedicalManagementDenial');
+
+
+    Route::get(
+        '/rrhh/gerente-general',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/gerente-general', 'RRHH/GerenteGeneral');
+        }
+    )->name('rrhh.gerenteGeneral');
+    Route::post('get-requests-gerente-general', [GerenteGeneralController::class, 'getReqGerenteGeneral'])->name('gerGeneral.getReqGerenteGeneral');
+    Route::post('general-management-approval', [GerenteGeneralController::class, 'setGeneralManagementApproval'])->name('gerGeneral.setGeneralManagementApproval');
+    Route::post('general-management-denial', [GerenteGeneralController::class, 'setGeneralManagementDenial'])->name('gerGeneral.setGeneralManagementDenial');
+
 });

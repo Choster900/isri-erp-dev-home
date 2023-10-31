@@ -25,7 +25,7 @@ import html2pdf from 'html2pdf.js'
                 </div>
             </div>
         </div>
-        <ProcessModal v-else maxWidth='5xl' :show="viewPermission012I" @close="$emit('cerrar-modal')">
+        <ProcessModal v-else maxWidth='5xl' :show="viewPermission012" @close="$emit('cerrar-modal')">
             <div v-if="!showDenialOptions && validPermit" class="flex justify-center items-center h-full mt-1">
                 <div v-if="showButtons" class="px-2">
                     <GeneralButton color="bg-green-600 hover:bg-green-700" text="Aprobar" icon="check"
@@ -112,7 +112,8 @@ import html2pdf from 'html2pdf.js'
                         <p class="text-[13px] font-medium text-red-500">PERMISO ELIMINADO.</p>
                     </div>
                 </div>
-                <div class="w-[68%] max-h-[550px] overflow-y-auto">
+                <div class="w-[68%] max-h-[550px] overflow-y-auto"
+                    :class="showDenialOptions ? 'max-h-[550px] overflow-y-auto' : ''">
                     <div v-if="showDenialOptions" class="mb-4 md:mr-4 md:mb-0 basis-full mx-4"
                         style="border: none; background-color: transparent;">
                         <label class="block mb-2 text-xs text-black" for="descripcion">
@@ -128,53 +129,64 @@ import html2pdf from 'html2pdf.js'
                         <GeneralButton color="bg-red-700 hover:bg-red-800" text="Denegar" icon="delete" class=""
                             @click="rejectPermission()" />
                     </div>
-                    <div class="flex flex-col justify-start h-full mx-2 ">
-                        <div class="flex flex-col text-center mt-4 relative " id="encabezado">
+                    <!-- Permission preview -->
+                    <div class="flex flex-col justify-start h-full mx-2">
+                        <div class="flex flex-col text-center mt-4 relative" id="encabezado">
                             <!-- <span class="font-[Bembo] font-bold text-[15px] absolute top-[5px] right-[-150px]">F026</span> -->
                             <img src="../../../img/isri-gob.png" alt="Logo del instituto" class="w-[200px] mx-auto">
                             <h2 class="font-[Bembo] font-bold text-[13px]">DEPARTAMENTO DE RECURSOS HUMANOS</h2>
-                            <h2 class="font-[Bembo] font-bold text-[13px]">SOLICITUD DE PERMISOS</h2>
-                            <h2 class="font-[Bembo] font-bold text-[13px]">(Control Interno)</h2>
+                            <h2 class="font-[Bembo] font-bold text-[13px]">SOLICITUD DE LICENCIAS</h2>
                         </div>
-                        <!-- Second row -->
-                        <div class="flex w-full justify-between items-center mt-3 mb-2">
-                            <div class="flex w-full text-left">
-                                <div class="relative flex flex-row w-full">
-                                    <div class="flex justify-start w-[51%]">
-                                        <label for="" class="font-[MuseoSans] text-[13px]">
-                                            CENTRO DE ATENCIÓN, DEPARTAMENTO O SECCIÓN:
+
+                        <!-- First row -->
+                        <div class="flex w-full justify-end mb-2 mt-3">
+                            <div class="flex w-full justify-end text-right">
+                                <div class="relative flex flex-row w-[50%]">
+                                    <div class="flex justify-end w-[55%]">
+                                        <label for="" class="font-[MuseoSans] text-[13px] mr-2">
+                                            Fecha:
                                         </label>
                                     </div>
-                                    <div class="text-left w-[49%] text-[13px] font-bold border-b border-gray-700"
-                                        :class="centro1 ? '' : 'py-2'">
-                                        <p class="font-[MuseoSans] ml-3">{{ centro1 }}</p>
+                                    <div class="text-center w-[45%] text-[13px] font-bold border-b border-gray-700">
+                                        <p class="font-[MuseoSans]"> {{ moment(permissionToPrint.fecha_reg_permiso,
+                                            'YYYY-MM-DD HH: mm:ss').format('DD / MM / YYYY') }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Second row -->
+                        <div class="flex w-full justify-between items-center">
+                            <div class="flex w-full text-left">
+                                <div class="relative flex flex-row w-full">
+                                    <div class="flex justify-start w-full">
+                                        <label for="" class="font-[MuseoSans] text-[13px]">
+                                            Gerente Administrativo
+                                        </label>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <!-- Third row -->
-                        <div class="flex w-full justify-between items-center mb-2">
+                        <div class="flex w-full justify-between items-center">
                             <div class="flex w-full text-left">
                                 <div class="relative flex flex-row w-full">
-                                    <div class="text-left w-full text-[13px] font-bold border-b border-gray-700"
-                                        :class="centro2 ? '' : 'py-2'">
-                                        <p class="font-[MuseoSans] ml-3">{{ centro2 }}</p>
+                                    <div class="flex justify-start w-full">
+                                        <label for="" class="font-[MuseoSans] text-[13px]">
+                                            Instituto Salvadoreño de Rehabilitación Integral
+                                        </label>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <!-- Fourth row -->
-                        <div class="flex w-full justify-between items-center mb-2">
+                        <div class="flex w-full justify-between items-center">
                             <div class="flex w-full text-left">
                                 <div class="relative flex flex-row w-full">
-                                    <div class="flex justify-start w-[49%]">
+                                    <div class="flex justify-start w-full">
                                         <label for="" class="font-[MuseoSans] text-[13px]">
-                                            DENOMINACION PLAZA (Ley de salarios o contrato):
+                                            Presente.
                                         </label>
-                                    </div>
-                                    <div class="text-left w-[51%] text-[13px] font-bold border-b border-gray-700"
-                                        :class="role1 ? '' : 'py-2'">
-                                        <p class="font-[MuseoSans] ml-3">{{ role1 }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -182,63 +194,96 @@ import html2pdf from 'html2pdf.js'
                         <!-- Fifth row -->
                         <div class="flex w-full justify-between items-center mb-2">
                             <div class="flex w-full text-left">
-                                <div class="relative flex flex-row w-full">
-                                    <div class="text-left w-full text-[13px] font-bold border-b border-gray-700"
-                                        :class="role2 ? '' : 'py-2'">
-                                        <p class="font-[MuseoSans] ">{{ role2 }}</p>
+                                <div class="relative flex flex-row w-full ">
+                                    <div class="flex justify-start w-[42%]">
+                                        <label for="" class="font-[MuseoSans] text-[13px]">
+                                            Remito a usted solicitud de Licencia del Sr(a).
+                                        </label>
+                                    </div>
+                                    <div class="text-left w-[58%] text-[13px] font-bold border-b border-gray-700">
+                                        <p class="ml-1 font-[MuseoSans]">
+                                            {{ permissionToPrint.empleado ?
+                                                permissionToPrint.empleado.persona.pnombre_persona : '' }}
+                                            {{ permissionToPrint.empleado ?
+                                                permissionToPrint.empleado.persona.snombre_persona : '' }}
+                                            {{ permissionToPrint.empleado ?
+                                                permissionToPrint.empleado.persona.tnombre_persona : '' }}
+                                            {{ permissionToPrint.empleado ?
+                                                permissionToPrint.empleado.persona.papellido_persona : '' }}
+                                            {{ permissionToPrint.empleado ?
+                                                permissionToPrint.empleado.persona.sapellido_persona : '' }}
+                                            {{ permissionToPrint.empleado ?
+                                                permissionToPrint.empleado.persona.tapellido_persona : '' }}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <!-- Sixth row -->
-                        <div class="flex w-full justify-between items-center mb-2">
-                            <div class="flex w-full text-left">
-                                <div class="relative flex flex-row w-[21%]">
-                                    <div class="flex justify-start w-[50%]">
-                                        <label for="" class="font-[MuseoSans] text-[13px] mr-2">
-                                            CÓDIGO:
+                        <div class="flex w-full mb-2">
+                            <div class="flex w-full text-left ">
+                                <div class="relative flex flex-row w-[17%]">
+                                    <div class="flex justify-start w-[47%]">
+                                        <label for="" class="font-[MuseoSans] text-[13px]">
+                                            Código:
                                         </label>
                                     </div>
-                                    <div class="text-center w-[50%] text-[13px] font-bold border-b border-gray-700 mr-1">
-                                        <p class="font-[MuseoSans]">{{
-                                            permissionToPrint.empleado ? permissionToPrint.empleado.codigo_empleado : '' }}
+                                    <div class="text-center w-[53%] text-[13px] font-bold border-b border-gray-700">
+                                        <p class="font-[MuseoSans]">
+                                            {{ permissionToPrint.empleado ? permissionToPrint.empleado.codigo_empleado : ''
+                                            }}
                                         </p>
                                     </div>
                                 </div>
-                                <div class="relative flex flex-row w-[21%]">
-                                    <div class="flex justify-start w-[50%]">
+                                <div class="relative flex flex-row w-[18%] ">
+                                    <div class="flex justify-start w-[48%]">
                                         <label for="" class="font-[MuseoSans] text-[13px] ml-1">
-                                            PARTIDA:
+                                            Partida:
                                         </label>
                                     </div>
-                                    <div class="text-center w-[50%] text-[13px] font-bold border-b border-gray-700">
-                                        <p class="font-[MuseoSans]">{{
-                                            permissionToPrint.plaza_asignada ?
-                                            permissionToPrint.plaza_asignada.partida_plaza_asignada : '' }}
+                                    <div class="text-center w-[52%] text-[13px] font-bold border-b border-gray-700">
+                                        <p class="font-[MuseoSans]">
+                                            {{ permissionToPrint.empleado ?
+                                                permissionToPrint.plaza_asignada.partida_plaza_asignada : '' }}
                                         </p>
                                     </div>
                                 </div>
-                                <div class="relative flex flex-row w-[29%]">
-                                    <div class="flex justify-start w-[55%]">
-                                        <label for="" class="font-[MuseoSans] text-[13px] ml-2">
-                                            SUB PARTIDA:
+                                <div class="relative flex flex-row w-[21%] ">
+                                    <div class="flex justify-start w-[60%]">
+                                        <label for="" class="font-[MuseoSans] text-[13px] ml-1">
+                                            Sub Partida:
                                         </label>
                                     </div>
-                                    <div class="mr-1 text-center w-[45%] text-[13px] font-bold border-b border-gray-700">
-                                        <p class="font-[MuseoSans]">{{
-                                            permissionToPrint.plaza_asignada ?
-                                            permissionToPrint.plaza_asignada.subpartida_plaza_asignada : ''
-                                        }}</p>
+                                    <div class="text-center w-[40%] text-[13px] font-bold border-b border-gray-700">
+                                        <p class="font-[MuseoSans]">
+                                            {{ permissionToPrint.empleado ?
+                                                permissionToPrint.plaza_asignada.subpartida_plaza_asignada : '' }}
+                                        </p>
                                     </div>
                                 </div>
-                                <div class="relative flex flex-row w-[29%]">
-                                    <div class="flex justify-start w-[50%]">
-                                        <label for="" class="font-[MuseoSans] text-[13px] ml-3">
-                                            CONTRATO:
+                                <div class="relative flex flex-row w-[24%] ">
+                                    <div class="flex justify-start w-[24%]">
+                                        <label for="" class="font-[MuseoSans] text-[13px] ml-1">
+                                            NUP:
                                         </label>
                                     </div>
-                                    <div class="ml-1 text-center w-[50%] text-[13px] font-bold border-b border-gray-700">
-                                        <p class="font-[MuseoSans]">{{ contract }}</p>
+                                    <div class="text-center w-[76%] text-[13px] font-bold border-b border-gray-700">
+                                        <p class="font-[MuseoSans]">
+                                            {{ permissionToPrint.empleado ? permissionToPrint.empleado.nup_empleado : '' }}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="relative flex flex-row w-[20%]">
+                                    <div class="flex justify-start w-[40%]">
+                                        <label for="" class="font-[MuseoSans] text-[13px] ml-1">
+                                            Salario:
+                                        </label>
+                                    </div>
+                                    <div class="text-center w-[60%] text-[13px] font-bold border-b border-gray-700">
+                                        <p class="font-[MuseoSans]">
+                                            ${{ permissionToPrint.empleado ?
+                                                permissionToPrint.plaza_asignada.salario_plaza_asignada : '' }}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -246,11 +291,14 @@ import html2pdf from 'html2pdf.js'
                         <!-- Seventh row -->
                         <div class="flex w-full justify-between items-center mb-2">
                             <div class="flex w-full text-left">
-                                <div class="relative flex flex-row w-full">
-                                    <div class="flex justify-start w-full">
+                                <div class="relative flex flex-row w-full ">
+                                    <div class="flex justify-start w-[35%]">
                                         <label for="" class="font-[MuseoSans] text-[13px]">
-                                            MOTIVO:
+                                            Cargo (por Ley de Salario o Contrato):
                                         </label>
+                                    </div>
+                                    <div class="text-left w-[65%] text-[13px] font-bold border-b border-gray-700">
+                                        <p class="ml-1 font-[MuseoSans]">{{ role1 }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -258,29 +306,10 @@ import html2pdf from 'html2pdf.js'
                         <!-- Eighth row -->
                         <div class="flex w-full justify-between items-center mb-2">
                             <div class="flex w-full text-left">
-                                <div class="flex justify-start w-[10%]"></div>
-                                <div class="relative flex flex-row w-[30%]">
-                                    <div class="flex justify-start w-full"
-                                        :class="permissionToPrint.id_tipo_permiso === 3 || permissionToPrint.id_tipo_permiso === 3 ? 'font-bold' : ''">
-                                        <label for="" class="font-[MuseoSans] text-[12px]">
-                                            ENFERMEDAD
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="relative flex flex-row w-[30%]">
-                                    <div class="flex justify-start w-full"
-                                        :class="permissionToPrint.id_tipo_permiso === 1 || permissionToPrint.id_tipo_permiso === 2 ? 'font-bold' : ''">
-                                        <label for="" class="font-[MuseoSans] text-[12px]">
-                                            PERSONAL
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="relative flex flex-row w-[30%]"
-                                    :class="permissionToPrint.id_tipo_permiso === 5 ? 'font-bold' : ''">
-                                    <div class="flex justify-start w-full">
-                                        <label for="" class="font-[MuseoSans] text-[12px]">
-                                            OTROS
-                                        </label>
+                                <div class="relative flex flex-row w-full">
+                                    <div class="text-left w-full text-[13px] font-bold border-b border-gray-700"
+                                        :class="role2 ? '' : 'py-2'">
+                                        <p class="font-[MuseoSans]">{{ role2 }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -288,112 +317,83 @@ import html2pdf from 'html2pdf.js'
                         <!-- Ninth row -->
                         <div class="flex w-full justify-between items-center mb-2">
                             <div class="flex w-full text-left">
-                                <div class="relative flex flex-row w-full">
-                                    <div class="flex justify-start w-[10%]"></div>
-                                    <div class="flex justify-start w-[30%]">
-                                        <div class="flex justify-start w-[70%]"
-                                            :class="permissionToPrint.id_tipo_permiso === 3 ? 'font-bold' : ''">
-                                            <label class="font-[MuseoSans] text-[12px]">
-                                                CON GOCE DE SUELDO
-                                            </label>
-                                        </div>
-                                        <div class="text-left w-[30%] text-[12px]">
-                                            <div class="w-6 h-4 border border-black mr-2">
-                                                <div v-if="permissionToPrint.id_tipo_permiso === 3"
-                                                    class="w-full h-full bg-black">
-                                                </div>
-                                            </div>
-                                        </div>
+                                <div class="relative flex flex-row w-full ">
+                                    <div class="flex justify-start w-[24%]">
+                                        <label for="" class="font-[MuseoSans] text-[13px]">
+                                            Centro o Departamento:
+                                        </label>
                                     </div>
-                                    <div class="flex justify-start w-[30%]">
-                                        <div class="flex justify-start w-[70%]"
-                                            :class="permissionToPrint.id_tipo_permiso === 1 ? 'font-bold' : ''">
-                                            <label class="font-[MuseoSans] text-[12px]">
-                                                CON GOCE DE SUELDO
-                                            </label>
-                                        </div>
-                                        <div class="text-left w-[30%] text-[12px]">
-                                            <div class="w-6 h-4 border border-black mr-2">
-                                                <div v-if="permissionToPrint.id_tipo_permiso === 1"
-                                                    class="w-full h-full bg-black">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="flex justify-start w-[30%]">
-                                        <div class="flex justify-start w-[70%]"
-                                            :class="permissionToPrint.id_tipo_permiso === 5 ? 'font-bold' : ''">
-                                            <label class="font-[MuseoSans] text-[12px]">
-                                                MISION OFICIAL
-                                            </label>
-                                        </div>
-                                        <div class="text-left w-[30%] text-[12px]">
-                                            <div class="w-6 h-4 border border-black mr-2">
-                                                <div v-if="permissionToPrint.id_tipo_permiso === 5"
-                                                    class="w-full h-full bg-black">
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div class="text-left w-[76%] text-[13px] font-bold border-b border-gray-700">
+                                        <p class="ml-1 font-[MuseoSans]">{{ centro1 }}</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <!-- Tenth row -->
-                        <div class="flex w-full justify-between items-center mb-3">
-                            <div class="flex w-full text-left">
-                                <div class="relative flex flex-row w-full">
-                                    <div class="flex justify-start w-[10%]"></div>
-                                    <div class="flex justify-start w-[30%]">
-                                        <div class="flex justify-start w-[70%]"
-                                            :class="permissionToPrint.id_tipo_permiso === 4 ? 'font-bold' : ''">
-                                            <label class="font-[MuseoSans] text-[12px]">
-                                                SIN GOCE DE SUELDO
-                                            </label>
-                                        </div>
-                                        <div class="text-left w-[30%] text-[12px]">
-                                            <div class="w-6 h-4 border border-black mr-2">
-                                                <div v-if="permissionToPrint.id_tipo_permiso === 4"
-                                                    class="w-full h-full bg-black">
-                                                </div>
-                                            </div>
-                                        </div>
+                        <div class="flex w-full justify-between items-center mb-4 mt-2">
+                            <div class="flex w-[65%] text-left">
+                                <div class="relative flex flex-row w-[55%] ">
+                                    <div class="flex justify-start w-[68%]">
+                                        <label for="" class="font-[MuseoSans] text-[13px]">
+                                            SOLICITA LICENCIA POR:
+                                        </label>
                                     </div>
-                                    <div class="flex justify-start w-[30%]">
-                                        <div class="flex justify-start w-[70%]"
-                                            :class="permissionToPrint.id_tipo_permiso === 2 ? 'font-bold' : ''">
-                                            <label class="font-[MuseoSans] text-[12px]">
-                                                SIN GOCE DE SUELDO
-                                            </label>
-                                        </div>
-                                        <div class="text-left w-[30%] text-[12px]">
-                                            <div class="w-6 h-4 border border-black mr-2">
-                                                <div v-if="permissionToPrint.id_tipo_permiso === 2"
-                                                    class="w-full h-full bg-black">
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div
+                                        class="mr-1 text-center justify-center w-[32%] text-[13px] border-b border-gray-700">
+                                        <p class="font-[MuseoSans] font-bold">{{ totalDays }}</p>
                                     </div>
-                                    <div class="flex justify-start w-[30%]"></div>
+                                </div>
+                                <div class="relative flex flex-row w-[45%]">
+                                    <div class="flex justify-start w-full">
+                                        <label for="" class="font-[MuseoSans] text-[13px] ml-1">
+                                            día(s) en concepto de:
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <!-- Eleventh -->
-                        <div class="flex w-full justify-between items-center mb-3">
+                        <!-- Eleventh row -->
+                        <div class="flex w-full justify-between items-center mb-2">
                             <div class="flex w-full text-left">
                                 <div class="relative flex flex-row w-full">
-                                    <div class="flex justify-start w-[12%]">
-                                        <label for="" class="font-[MuseoSans] text-[13px]">
-                                            Observación:
-                                        </label>
+                                    <div class="flex justify-start w-[25%]">
+                                        <div class="flex justify-start w-[60%]">
+                                            <label class="font-[MuseoSans] text-[13px]"
+                                                :class="typeOfPermission === 1 ? 'font-bold' : ''">
+                                                Enfermedad
+                                            </label>
+                                        </div>
+                                        <div class="text-left w-[40%] text-[13px] ">
+                                            <div class="w-5 h-5 border border-black mr-2">
+                                                <div v-if="typeOfPermission === 1" class="w-full h-full bg-black"></div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="text-left w-[88%] font-bold text-[13px] border-b border-gray-700">
-                                        <p class="font-[MuseoSans] ml-3">
-                                            {{
-                                                permissionToPrint.id_tipo_permiso != 6 && permissionToPrint.id_tipo_permiso != 5
-                                                ?
-                                                observation1 : ''
-                                            }}
-                                        </p>
+                                    <div class="flex justify-start w-[25%]">
+                                        <div class="flex justify-start w-[60%]">
+                                            <label class="font-[MuseoSans] text-[13px]"
+                                                :class="typeOfPermission === 2 ? 'font-bold' : ''">
+                                                Personal
+                                            </label>
+                                        </div>
+                                        <div class="text-left w-[40%] text-[13px] ">
+                                            <div class="w-5 h-5 border border-black mr-2">
+                                                <div v-if="typeOfPermission === 2" class="w-full h-full bg-black"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-start w-[50%]">
+                                        <div class="flex justify-start w-[80%]">
+                                            <label class="font-[MuseoSans] text-[13px]"
+                                                :class="typeOfPermission === 3 ? 'font-bold' : ''">
+                                                Misión Oficial
+                                            </label>
+                                        </div>
+                                        <div class="text-left w-[20%] text-[13px] ">
+                                            <div class="w-5 h-5 border border-black mr-2">
+                                                <div v-if="typeOfPermission === 3" class="w-full h-full bg-black"></div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -401,199 +401,157 @@ import html2pdf from 'html2pdf.js'
                         <!-- Twelfth row -->
                         <div class="flex w-full justify-between items-center mb-2">
                             <div class="flex w-full text-left">
-                                <div class="relative justify-center flex flex-row w-[38%] mx-auto">
-                                    <div class="flex w-full">
-                                        <label for=""
-                                            class="font-[MuseoSans] font-bold text-[12px] mx-auto underline underline-offset-2">
-                                            MISION OFICIAL
-                                        </label>
+                                <div class="relative flex flex-row w-full">
+                                    <div class="flex justify-start w-[25%]">
+                                        <div class="flex justify-start w-[60%]">
+                                            <label class="font-[MuseoSans] text-[13px]"
+                                                :class="typeOfPermission === 4 ? 'font-bold' : ''">
+                                                Maternidad
+                                            </label>
+                                        </div>
+                                        <div class="text-left w-[40%] text-[13px] ">
+                                            <div class="w-5 h-5 border border-black mr-2">
+                                                <div v-if="typeOfPermission === 4" class="w-full h-full bg-black"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-start w-[25%]">
+                                        <div class="flex justify-start w-[60%]">
+                                            <label class="font-[MuseoSans] text-[13px]"
+                                                :class="typeOfPermission === 5 ? 'font-bold' : ''">
+                                                Duelo
+                                            </label>
+                                        </div>
+                                        <div class="text-left w-[40%] text-[13px] ">
+                                            <div class="w-5 h-5 border border-black mr-2">
+                                                <div v-if="typeOfPermission === 5" class="w-full h-full bg-black"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-start w-[50%]">
+                                        <div class="flex justify-start w-[80%]">
+                                            <label class="font-[MuseoSans] text-[13px]"
+                                                :class="typeOfPermission === 6 ? 'font-bold' : ''">
+                                                Atención a parientes por enfermedad gravísima
+                                            </label>
+                                        </div>
+                                        <div class="text-left w-[20%] text-[13px] ">
+                                            <div class="w-5 h-5 border border-black mr-2">
+                                                <div v-if="typeOfPermission === 6" class="w-full h-full bg-black"></div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <!-- Thirteenth row -->
-                        <div class="flex w-full justify-start items-center mb-2">
-                            <div class="flex w-full text-left">
-                                <div class="relative flex flex-row w-[75%]">
-                                    <div class="flex justify-start w-[10%]">
-                                        <label for="" class="font-[MuseoSans] text-[12px]">
-                                            Destino:
-                                        </label>
-                                    </div>
-                                    <div class="text-left w-[90%] text-[12px] font-bold border-b border-gray-700">
-                                        <p class="font-[MuseoSans] ml-1">
-                                            {{ permissionToPrint.id_tipo_permiso === 5 ? destination1 : '' }}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="relative flex flex-row w-[25%]">
-                                    <div class="flex justify-start w-[40%]">
-                                        <label for="" class="font-[MuseoSans] text-[12px] ml-1">
-                                            Regresará:
-                                        </label>
-                                    </div>
-                                    <div class="flex flex-row text-left w-[60%] text-[13px] ">
-                                        <div class="flex justify-start w-[50%]">
-                                            <div class="flex justify-start w-[50%]">
-                                                <label class="font-[MuseoSans] text-[11px] ml-2">
-                                                    SI
-                                                </label>
-                                            </div>
-                                            <div class="text-left w-[50%] text-[11px]">
-                                                <div class="w-3 h-3 border border-black">
-                                                    <div v-if="permissionToPrint.retornar_empleado_permiso === 1"
-                                                        class="w-full h-full bg-black">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="flex justify-start w-[50%]">
-                                            <div class="flex justify-start w-[50%]">
-                                                <label class="font-[MuseoSans] text-[11px]">
-                                                    NO
-                                                </label>
-                                            </div>
-                                            <div class="text-left w-[50%] text-[11px]">
-                                                <div class="w-3 h-3 border border-black">
-                                                    <div v-if="permissionToPrint.retornar_empleado_permiso === 0"
-                                                        class="w-full h-full bg-black">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Fourteenth row -->
-                        <div class="flex w-full justify-start items-center mb-2">
+                        <div class="flex w-full justify-between items-center mb-2 mt-2">
                             <div class="flex w-full text-left">
                                 <div class="relative flex flex-row w-full">
-                                    <div class="flex justify-start w-[11%]">
-                                        <label for="" class="font-[MuseoSans] text-[12px]">
-                                            Descripción:
+                                    <div class="flex justify-start w-[17%]">
+                                        <label for="" class="font-[MuseoSans] text-[13px]">
+                                            OBSERVACIONES:
                                         </label>
                                     </div>
-                                    <div class="text-left w-[89%] text-[12px] font-bold border-b border-gray-700">
-                                        <p class="font-[MuseoSans] ml-1">
+                                    <div class="text-left w-[83%] font-bold text-[13px] border-b border-gray-700 ">
+                                        <p class="font-bold font-[MuseoSans] ml-1">
                                             {{
-                                                permissionToPrint.id_tipo_permiso == 5 ? observation1 : ''
+                                                observation1
                                             }}
                                         </p>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <!-- Fifteenth row -->
-                        <div class="flex w-full justify-between items-center mt-4 mb-2">
+                        <!-- Fourteenth row -->
+                        <div class="flex w-full justify-between items-center mb-2">
                             <div class="flex w-full text-left">
-                                <div class="relative flex flex-row w-[5%]">
-                                </div>
-                                <div class="relative flex flex-row w-[14%]">
-                                    <div class="flex justify-start w-full">
-                                        <label for="" class="font-[MuseoSans] text-[12px]">
-                                            FECHA:
-                                        </label>
+                                <div class="relative flex flex-row w-full">
+                                    <div class="flex justify-start w-[25%]">
                                     </div>
-                                </div>
-                                <div class="relative flex flex-row w-[32%]">
-                                    <div class="flex justify-start w-[40%]">
-                                        <label for="" class="font-[MuseoSans] text-[11px]">
-                                            DESDE
-                                        </label>
+                                    <div class="flex justify-start w-[25%]">
+                                        <div class="flex justify-start w-[60%]">
+                                            <label class="font-[MuseoSans] text-[13px]"
+                                                :class="salary === 1 ? 'font-bold' : ''">
+                                                CON GOCE
+                                            </label>
+                                        </div>
+                                        <div class="text-left w-[40%] text-[13px] ">
+                                            <div class="w-6 h-4 border border-black mr-2">
+                                                <div v-if="salary === 1" class="w-full h-full bg-black"></div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div
-                                        class="text-center w-[60%] text-[11px] font-bold border-b border-gray-700 mr-[40px]">
-                                        <p class="font-[MuseoSans]">
-                                            {{ permissionToPrint.fecha_inicio_permiso ?
-                                                formatDate(permissionToPrint.fecha_inicio_permiso)
-                                                :
-                                                '-------------' }}
-                                        </p>
+                                    <div class="flex justify-start w-[25%]">
+                                        <div class="flex justify-start w-[60%]">
+                                            <label class="font-[MuseoSans] text-[13px]"
+                                                :class="salary === 2 ? 'font-bold' : ''">
+                                                SIN GOCE
+                                            </label>
+                                        </div>
+                                        <div class="text-left w-[40%] text-[13px] ">
+                                            <div class="w-6 h-4 border border-black mr-2">
+                                                <div v-if="salary === 2" class="w-full h-full bg-black"></div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="relative flex flex-row w-[14%]">
-                                    <div class="flex justify-start w-full">
-                                        <label for="" class="font-[MuseoSans] text-[12px]">
-                                            HORA:
-                                        </label>
+                                    <div class="flex justify-start w-[25%]">
                                     </div>
-                                </div>
-                                <div class="relative flex flex-row w-[32%]">
-                                    <div class="flex justify-start w-[50%]">
-                                        <label for="" class="font-[MuseoSans] text-[11px]">
-                                            INICIO / SALIDA
-                                        </label>
-                                    </div>
-                                    <div class="text-center w-[50%] text-[11px] font-bold border-b border-gray-700">
-                                        <p class="font-[MuseoSans]">
-                                            {{ permissionToPrint.hora_entrada_permiso ?
-                                                formatHour(permissionToPrint.hora_entrada_permiso)
-                                                :
-                                                '-------------' }}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="relative flex flex-row w-[5%]">
                                 </div>
                             </div>
                         </div>
                         <!-- Fifteenth row -->
-                        <div class="flex w-full justify-between items-center mb-3">
+                        <div class="flex w-full justify-between items-center mb-2">
                             <div class="flex w-full text-left">
-                                <div class="relative flex flex-row w-[19%]">
-                                </div>
-                                <div class="relative flex flex-row w-[32%]">
-                                    <div class="flex justify-start w-[40%]">
-                                        <label for="" class="font-[MuseoSans] text-[11px]">
-                                            HASTA
+                                <div class="relative flex flex-row w-full">
+                                    <div class="flex justify-start w-full">
+                                        <label for="" class="font-[MuseoSans] text-[13px]">
+                                            En el periodo:
                                         </label>
                                     </div>
-                                    <div
-                                        class="text-center w-[60%] text-[11px] font-bold border-b border-gray-700 mr-[40px]">
-                                        <p class="font-[MuseoSans]">
-                                            {{ permissionToPrint.fecha_fin_permiso ?
-                                                formatDate(permissionToPrint.fecha_fin_permiso) :
-                                                '-------------' }}
-                                        </p>
-                                    </div>
                                 </div>
-                                <div class="relative flex flex-row w-[14%]"></div>
-                                <div class="relative flex flex-row w-[32%]">
-                                    <div class="flex justify-start w-[50%]">
-                                        <label for="" class="font-[MuseoSans] text-[11px]">
-                                            FIN / REGRESO
-                                        </label>
-                                    </div>
-                                    <div class="text-center w-[50%] text-[11px] font-bold border-b border-gray-700">
-                                        <p class="font-[MuseoSans]">
-                                            {{ permissionToPrint.hora_salida_permiso ?
-                                                formatHour(permissionToPrint.hora_salida_permiso) :
-                                                '-------------' }}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="relative flex flex-row w-[5%]"></div>
                             </div>
                         </div>
                         <!-- Sixteenth row -->
                         <div class="flex w-full justify-between items-center pb-4">
                             <div class="flex w-full text-left">
-                                <div class="relative justify-center flex flex-row w-[38%] mx-auto" id="container">
-                                    <div class="flex w-[60%]">
-                                        <label for="" class="font-[MuseoSans] text-[13px]">
-                                            TIEMPO UTILIZADO:
-                                        </label>
+                                <div class="relative flex flex-row w-full">
+                                    <div class="flex justify-start w-[20%]">
                                     </div>
-                                    <div
-                                        class="text-center w-[40%] text-[13px] font-bold border-b border-gray-700 mr-[40px]">
-                                        <p class="font-[MuseoSans]">
-                                            {{ timeUsed }}
-                                        </p>
+                                    <div class="flex justify-start w-[30%]">
+                                        <div class="flex justify-center w-[40%]">
+                                            <label class="font-[MuseoSans] text-[13px]">
+                                                Desde:
+                                            </label>
+                                        </div>
+                                        <div class="text-center w-[60%] font-bold text-[13px] border-b border-gray-700 ">
+                                            <p class="font-bold font-[MuseoSans] ml-1">
+                                                {{
+                                                    moment(permissionToPrint.fecha_inicio_permiso, 'YYYY-MM-DD').format('DD/MM/YYYY')
+                                                }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-start w-[30%]">
+                                        <div class="flex justify-center w-[40%]">
+                                            <label class="font-[MuseoSans] text-[13px]">
+                                                Hasta:
+                                            </label>
+                                        </div>
+                                        <div class="text-center w-[60%] font-bold text-[13px] border-b border-gray-700 ">
+                                            <p class="font-bold font-[MuseoSans] ml-1">
+                                                {{
+                                                    moment(permissionToPrint.fecha_fin_permiso, 'YYYY-MM-DD').format('DD/MM/YYYY')
+                                                }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-start w-[20%]">
                                     </div>
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -608,7 +566,7 @@ import ReciboIngresoMatricialVue from '@/pdf/Tesoreria/ReciboIngresoMatricial.vu
 import { createApp, h } from 'vue'
 export default {
     props: {
-        viewPermission012I: {
+        viewPermission012: {
             type: Boolean,
             default: false,
         },
@@ -623,20 +581,17 @@ export default {
     },
     data: function () {
         return {
-            contract: '49/2021',
             denialComment: '',
             messageError: '',
             showDenialOptions: false,
-            showButtons: true,
             isLoading: false,
+            showButtons: true,
             centro1: '',
             centro2: '',
             observation1: '',
             observation2: '',
             role1: '',
-            role2: '',
-            destination1: '',
-            destination2: ''
+            role2: ''
         }
     },
     methods: {
@@ -793,14 +748,6 @@ export default {
             }
             return this.stages[index].visible
         },
-        formatTime(time) {
-            if (!time) {
-                return '0'
-            } else {
-                const [hours, minutes] = time.split(':').map(Number);
-                return `${hours > 0 ? hours + ' H. ' : ''} ${minutes > 0 ? minutes + ' min.' : ''}`
-            }
-        },
         setGreenBg(index) {
             const green = [1, 2, 4, 6, 8];
             if (green.includes(this.stages[index].id_estado_etapa_permiso)) {
@@ -816,14 +763,6 @@ export default {
                 this.stages[index].visible = false
             }
         },
-        formatDate(date) {
-            // Parsea la fecha desde el backend
-            const fechaParseada = moment(date, 'YYYY-MM-DD');
-
-            // Formatea la fecha en el nuevo formato 'DD/MM/YYYY'
-            return fechaParseada.format('DD/MM/YYYY') ?? '-------------';
-        },
-
         printPdf() {
             let fecha = moment().format('DD-MM-YYYY');
             let name = 'RECIBO ' + this.receipt_to_print.numero_recibo_ingreso + ' - ' + fecha;
@@ -865,7 +804,7 @@ export default {
             //html2pdf().set(opt).from(html).output('dataurlnewwindow');
         },
         getCentro() {
-            let limiteCaracteres = 42;
+            let limiteCaracteres = 68;
             let string = this.permissionToPrint.plaza_asignada.dependencia.nombre_dependencia;
             if (string) {
                 if (string.length <= limiteCaracteres) {
@@ -879,7 +818,7 @@ export default {
             }
         },
         getObservation() {
-            let limiteCaracteres = 96;
+            let limiteCaracteres = 92;
             let string = this.permissionToPrint.comentarios_permiso;
             if (string) {
                 if (string.length <= limiteCaracteres) {
@@ -897,7 +836,7 @@ export default {
             this.role1 = '';
             this.role2 = '';
             if (role) {
-                const limiteCaracteres3 = 42;
+                const limiteCaracteres3 = 55;
                 if (role.length <= limiteCaracteres3) {
                     this.role1 = role;
                 } else {
@@ -905,20 +844,6 @@ export default {
                     const ultimoEspacio3 = textoTruncado3.lastIndexOf(' ');
                     this.role1 = textoTruncado3.slice(0, ultimoEspacio3);
                     this.role2 = role.slice(ultimoEspacio3 + 1);
-                }
-            }
-        },
-        getDestination() {
-            let limiteCaracteres = 79;
-            let string = this.permissionToPrint.destino_permiso;
-            if (string) {
-                if (string.length <= limiteCaracteres) {
-                    this.destination1 = string;
-                } else {
-                    let textoTruncado = string.slice(0, limiteCaracteres);
-                    let ultimoEspacio = textoTruncado.lastIndexOf(' ');
-                    this.destination1 = textoTruncado.slice(0, ultimoEspacio);
-                    this.destination2 = string.slice(ultimoEspacio + 1);
                 }
             }
         },
@@ -933,10 +858,10 @@ export default {
             const minutosFormateados = minutos.padStart(2, '0');
 
             return `${horaFormateada}:${minutosFormateados} ${amPm}`;
-        }
+        },
     },
     watch: {
-        viewPermission012I: function (value, oldValue) {
+        viewPermission012: function (value, oldValue) {
             if (value) {
                 this.showButtons = true
                 this.setApprobalRejectButtons(this.permissionToPrint)
@@ -950,7 +875,6 @@ export default {
                 this.getCentro()
                 this.getObservation()
                 this.getRole()
-                this.getDestination()
             }
         },
     },
@@ -962,41 +886,54 @@ export default {
                 return false
             }
         },
-        timeUsed: function () {
-            if (this.permissionToPrint.fecha_fin_permiso) {
-                const startDateFormated = moment(this.permissionToPrint.fecha_inicio_permiso, 'YYYY/MM/DD').toDate()
-                const endDateFormated = moment(this.permissionToPrint.fecha_fin_permiso, 'YYYY/MM/DD').toDate()
+        totalDays: function () {
+            const startDateFormated = moment(this.permissionToPrint.fecha_inicio_permiso, 'YYYY/MM/DD').toDate();
+            const endDateFormated = moment(this.permissionToPrint.fecha_fin_permiso, 'YYYY/MM/DD').toDate();
 
-                let currentDate = new Date(startDateFormated);
-                let daysDifference = 0;
+            let currentDate = new Date(startDateFormated);
+            let daysDifference = 0;
 
-                while (currentDate <= endDateFormated) {
-                    const dayOfWeek = currentDate.getDay(); // 0 (domingo) a 6 (sábado)
-                    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-                        daysDifference++;
-                    }
-                    currentDate.setDate(currentDate.getDate() + 1);
-                }
-                const resultInMinutes = daysDifference * 8 * 60
+            while (currentDate <= endDateFormated) {
+                daysDifference++;
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
 
-                const hours = Math.floor(resultInMinutes / 60);
-                const minutes = resultInMinutes % 60;
-                const formatResult = `${hours}:${minutes}`
-                return this.formatTime(formatResult)
-
-            } else {
-                if (this.permissionToPrint.hora_salida_permiso) {
-                    const [endHours, endMinutes] = this.permissionToPrint.hora_salida_permiso.split(':').map(Number);
-                    const [startHours, startMinutes] = this.permissionToPrint.hora_entrada_permiso.split(':').map(Number);
-                    const result = ((endHours * 60) + endMinutes) - ((startHours * 60) + startMinutes)
-
-                    const hours = Math.floor(result / 60);
-                    const minutes = result % 60;
-                    const formatResult = `${hours}:${minutes}`
-                    return this.formatTime(formatResult)
-                } else {
-                    return '0'
-                }
+            return daysDifference;
+        },
+        typeOfPermission: function () {
+            switch (this.permissionToPrint.id_tipo_permiso) {
+                case 1: // Personal con goce
+                case 2: // Personal sin goce
+                    return 2;
+                case 3: // Enfermedad con goce
+                case 4: // Enfermedad sin goce
+                    return 1;
+                case 5: // Mision oficial
+                    return 3;
+                case 6: // No marcacion
+                    return null;
+                default:
+                    console.error('Ha ocurrido un error');
+                    return null;
+            }
+        },
+        salary: function () {
+            switch (this.permissionToPrint.id_tipo_permiso) {
+                case 1: // Personal con goce
+                    return 1;
+                case 2: // Personal sin goce
+                    return 2;
+                case 3: // Enfermedad con goce
+                    return 1;
+                case 4: // Enfermedad sin goce
+                    return 2;
+                case 5: // Mision oficial
+                    return 1;
+                case 6: // No marcacion
+                    return null;
+                default:
+                    console.error('Ha ocurrido un error');
+                    return null;
             }
         },
     },
