@@ -53,4 +53,13 @@ class CategoriaRendimiento extends Model
     {
         return $this->HasMany(DetalleEvaluacionPersonal::class, 'id_cat_rendimiento', 'id_cat_rendimiento');
     }
+    /**
+     * Get all of the incidentes_evaluacion for the CategoriaRendimiento
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function incidentes_evaluacion(): HasMany
+    {
+        return $this->hasMany(IncidenteEvaluacion::class, 'id_cat_rendimiento', 'id_cat_rendimiento');
+    }
 }

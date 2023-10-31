@@ -17,8 +17,8 @@ import axios from 'axios';
 </script>
 
 <template>
-    <Head title="Proceso - Permisos" />
-    <AppLayoutVue nameSubModule="RRHH - Permisos">
+    <Head title="Proceso - Solicitudes Permiso" />
+    <AppLayoutVue nameSubModule="RRHH - Solicitudes Permiso">
         <div v-if="isLoading"
             class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
             <div role="status" class="flex items-center">
@@ -36,32 +36,27 @@ import axios from 'axios';
                 </div>
             </div>
         </div>
-        <div class="sm:flex sm:justify-end sm:items-center mb-2">
-            <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="addJobPermission()" v-if="permits.insertar == 1"
-                    color="bg-green-700  hover:bg-green-800" text="Agregar Permiso" icon="add" />
-            </div>
-        </div>
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
             <header class="px-5 py-4">
                 <div class="mb-4 md:flex flex-row justify-items-start">
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-                            <Multiselect v-model="tableData.length" @select="getJobPermissions()" :options="perPage"
+                            <Multiselect v-model="tableData.length" @select="getPermissionRequests()" :options="perPage"
                                 :searchable="true" placeholder="Cantidad a mostrar" />
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Permisos: <span class="text-slate-400 font-medium">{{
-                        tableData.total
-                    }}</span></h2>
+                    <h2 class="font-semibold text-slate-800 pt-1">Solicitudes permiso: <span
+                            class="text-slate-400 font-medium">{{
+                                tableData.total
+                            }}</span></h2>
                 </div>
             </header>
 
             <div class="overflow-x-auto">
                 <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
                     :inputsToValidate="inputsToValidate" @sort="sortBy" @datos-enviados="handleData($event)"
-                    @execute-search="getJobPermissions()">
+                    @execute-search="getPermissionRequests()">
                     <tbody class="text-sm divide-y divide-slate-200">
                         <tr v-for="permission in jobPermissions" :key="permission.id_permiso">
                             <td class="px-2 first:pl-5 last:pr-5">
@@ -71,14 +66,17 @@ import axios from 'axios';
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ permission.codigo_tipo_permiso }}
+                                    {{ permission.tipo_permiso.codigo_tipo_permiso }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ permission.pnombre_persona }} {{ permission.snombre_persona }}
-                                    {{ permission.tnombre_persona }} {{ permission.papellido_persona }}
-                                    {{ permission.sapellido_persona }} {{ permission.tapellido_persona }}
+                                    {{ permission.empleado.persona.pnombre_persona }} {{
+                                        permission.empleado.persona.snombre_persona }}
+                                    {{ permission.empleado.persona.tnombre_persona }} {{
+                                        permission.empleado.persona.papellido_persona }}
+                                    {{ permission.empleado.persona.sapellido_persona }} {{
+                                        permission.empleado.persona.tapellido_persona }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5">
@@ -93,16 +91,12 @@ import axios from 'axios';
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-center">
-                                    <span v-if="permission.id_estado_permiso === 1"
-                                        class="font-medium text-cyan-600">Creado</span>
-                                    <span v-else-if="permission.id_estado_permiso === 2"
-                                        class="font-medium text-blue-700">En proceso</span>
-                                    <span v-else-if="permission.id_estado_permiso === 3"
-                                        class="font-medium text-green-500">Aprobado</span>
-                                    <span v-else-if="permission.id_estado_permiso === 4"
+                                    <span v-if="checkApproval(permission) === 1"
+                                        class="font-medium text-orange-500">Pendiente</span>
+                                    <span v-else-if="checkApproval(permission) === 2"
                                         class="font-medium text-red-500">Denegado</span>
-                                    <span v-else-if="permission.id_estado_permiso === 5"
-                                        class="font-medium text-red-500">Eliminado</span>
+                                    <span v-else-if="checkApproval(permission) === 3"
+                                        class="font-medium text-green-500">Aprobado</span>
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
@@ -122,50 +116,6 @@ import axios from 'axios';
                                                 </span>
                                             </div>
                                             <div class="font-semibold">Ver</div>
-                                        </div>
-                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            v-if="permits.actualizar == 1 && permission.id_estado_permiso == 1"
-                                            @click="editJobPermission(permission)">
-                                            <div class="w-8 text-green-900">
-                                                <span class="text-xs">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 002.25-2.25V6a2.25 2.25 0 00-2.25-2.25H6A2.25 2.25 0 003.75 6v2.25A2.25 2.25 0 006 10.5zm0 9.75h2.25A2.25 2.25 0 0010.5 18v-2.25a2.25 2.25 0 00-2.25-2.25H6a2.25 2.25 0 00-2.25 2.25V18A2.25 2.25 0 006 20.25zm9.75-9.75H18a2.25 2.25 0 002.25-2.25V6A2.25 2.25 0 0018 3.75h-2.25A2.25 2.25 0 0013.5 6v2.25a2.25 2.25 0 002.25 2.25z" />
-                                                    </svg>
-                                                </span>
-                                            </div>
-                                            <div class="font-semibold">Editar</div>
-                                        </div>
-                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            v-if="permits.actualizar == 1 && permission.id_estado_permiso == 1"
-                                            @click="sendPermission(permission)">
-                                            <div class="w-8 text-blue-900">
-                                                <span class="text-xs">
-                                                    <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg"
-                                                        fill="none" stroke="currentColor" stroke-width="1.5">
-                                                        <path d="M20 4L3 11L10 14L13 21L20 4Z" stroke-linejoin="round" />
-                                                    </svg>
-                                                </span>
-                                            </div>
-                                            <div class="font-semibold">Enviar</div>
-                                        </div>
-                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            @click="deletePermission(permission)"
-                                            v-if="(permits.eliminar == 1 && permission.id_estado_permiso === 1)">
-                                            <div class="w-8 text-red-900">
-                                                <svg viewBox="0 0 24 24" fill="none" class="w-6 h-6"
-                                                    xmlns="http://www.w3.org/2000/svg">
-                                                    <path fill-rule="evenodd" clip-rule="evenodd"
-                                                        d="M17 5V4C17 2.89543 16.1046 2 15 2H9C7.89543 2 7 2.89543 7 4V5H4C3.44772 5 3 5.44772 3 6C3 6.55228 3.44772 7 4 7H5V18C5 19.6569 6.34315 21 8 21H16C17.6569 21 19 19.6569 19 18V7H20C20.5523 7 21 6.55228 21 6C21 5.44772 20.5523 5 20 5H17ZM15 4H9V5H15V4ZM17 7H7V18C7 18.5523 7.44772 19 8 19H16C16.5523 19 17 18.5523 17 18V7Z"
-                                                        fill="currentColor" />
-                                                    <path d="M9 9H11V17H9V9Z" fill="currentColor" />
-                                                    <path d="M13 9H15V17H13V9Z" fill="currentColor" />
-                                                </svg>
-                                            </div>
-                                            <div class="font-semibold">
-                                                Cancelar
-                                            </div>
                                         </div>
                                     </DropDownOptions>
                                 </div>
@@ -191,7 +141,7 @@ import axios from 'axios';
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
 
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="page != 1 ? getJobPermissions(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                        <a @click="page != 1 ? getPermissionRequests(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                   text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
@@ -200,7 +150,7 @@ import axios from 'axios';
                                 <span v-else-if="(link.label == 'Siguiente')"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="hasNext ? getJobPermissions(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                        <a @click="hasNext ? getPermissionRequests(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                   text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
@@ -208,7 +158,7 @@ import axios from 'axios';
                                 </span>
                                 <span class="cursor-pointer" v-else
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
-                                        class=" w-5" @click="getJobPermissions(link.url)">{{ link.label }}</span>
+                                        class=" w-5" @click="getPermissionRequests(link.url)">{{ link.label }}</span>
                                 </span>
                             </li>
                         </ul>
@@ -218,13 +168,11 @@ import axios from 'axios';
         </div>
 
         <ModalPermisosVue :showModalJobPermissions="showModalJobPermissions" :modalData="modalData" :permits="permits"
-            @cerrar-modal="showModalJobPermissions = false" @get-table="getJobPermissions(tableData.currentPage)" />
-        <PermisoFormato026Vue :viewPermission026="viewPermission026" :permissionToPrint="permissionToPrint" :limite="limite"
-            :stages="stages" :permits="permits" @cerrar-modal="viewPermission026 = false"
-            @get-table="getJobPermissions(tableData.currentPage)" />
-        <PermisoFormato012InternoVue :viewPermission012I="viewPermission012I" :permissionToPrint="permissionToPrint"
-            :stages="stages" :permits="permits" @cerrar-modal="viewPermission012I = false"
-            @get-table="getJobPermissions(tableData.currentPage)" />
+            @cerrar-modal="showModalJobPermissions = false" @get-table="getPermissionRequests(tableData.currentPage)" />
+        <PermisoFormato026Vue :viewPermission026="viewPermission026" :permissionToPrint="permissionToPrint" :limite="limite" :stages="stages"
+            :permits="permits" @cerrar-modal="viewPermission026 = false" @get-table="getPermissionRequests(tableData.currentPage)"/>
+        <PermisoFormato012InternoVue :viewPermission012I="viewPermission012I" :permissionToPrint="permissionToPrint" :stages="stages"
+            :permits="permits" @cerrar-modal="viewPermission012I = false" @get-table="getPermissionRequests(tableData.currentPage)"/>
         <PermisoFormato012Vue :viewPermission012="viewPermission012" :permissionToPrint="permissionToPrint" :stages="stages"
             :permits="permits" @cerrar-modal="viewPermission012 = false"
             @get-table="getPermissionRequests(tableData.currentPage)" />
@@ -243,7 +191,7 @@ import { jsPDF } from "jspdf";
 export default {
     created() {
         this.getPermissions(this)
-        this.getJobPermissions()
+        this.getPermissionRequests()
     },
     data() {
         let sortOrders = {};
@@ -256,10 +204,9 @@ export default {
             {
                 width: "10%", label: "Estado", name: "id_estado_permiso", type: "select",
                 options: [
-                    { value: "1", label: "Creado" },
-                    { value: "2", label: "Aprobado" },
-                    { value: "3", label: "Denegado" },
-                    { value: "4", label: "Eliminado" },
+                    { value: null, label: "Pendiente" },
+                    { value: "3", label: "Aprobado" },
+                    { value: "4", label: "Denegado" },
                 ]
             },
             { width: "10%", label: "Acciones", name: "Acciones" },
@@ -316,54 +263,19 @@ export default {
         }
     },
     methods: {
-        async sendPermission(permission) {
-            const res = await this.getPermissionDataById(permission);
-            const updatedPermission = res.permiso;
-            this.$swal.fire({
-                title: "Enviar permiso para aprobación.",
-                text: "Una vez enviado no podrás modificarlo. ¿Estas seguro?",
-                icon: "question",
-                iconHtml: "❓",
-                confirmButtonText: 'Si, enviar.',
-                confirmButtonColor: "#001b47",
-                cancelButtonText: "Cancelar",
-                showCancelButton: true,
-                showCloseButton: true
-            }).then(async (result) => {
-                if (result.isConfirmed) {
-                    const format = this.getFormatToPrint(updatedPermission);
-                    let id_tipo_flujo;
-                    if (format === 1 || format === 2) {
-                        id_tipo_flujo = updatedPermission.plaza_asignada.dependencia.dep_id_dependencia === 1 ? 1 : 3;
-                    } else if (format === 3) {
-                        id_tipo_flujo = updatedPermission.plaza_asignada.dependencia.dep_id_dependencia === 1 ? 2 : 4;
-                    }
-
-                    try {
-                        this.isLoading = true;  // Activar el estado de carga
-                        const response = await axios.post("/send-permission", {
-                            id: updatedPermission.id_permiso,
-                            tipo_flujo: id_tipo_flujo
-                        });
-                        this.$swal.fire({
-                            text: response.data.mensaje,
-                            icon: 'success',
-                            timer: 5000
-                        })
-                        this.getJobPermissions(this.tableData.currentPage);
-                        return response
-                    } catch (errors) {
-                        if (errors.response.data.logical_error) {
-                            this.showToast(toast.error, errors.response.data.logical_error);
-                            this.getJobPermissions(this.tableData.currentPage);
-                        } else {
-                            this.manageError(errors, this)
-                        }
-                    } finally {
-                        this.isLoading = false;  // Desactivar el estado de carga
+        checkApproval(permission) {
+            let stage = permission.etapa_permiso.find((element) => element.id_estado_etapa_permiso === 6 || element.id_estado_etapa_permiso === 7)
+            if (!stage) {
+                return 1 //Pending
+            } else {
+                if (stage.id_estado_etapa_permiso === 6) {
+                    return 3 //Approved
+                } else {
+                    if (stage.id_estado_etapa_permiso === 7) {
+                        return 2 //Rejected
                     }
                 }
-            })
+            }
         },
         async viewPermissionFormat(permission) {
             const res = await this.getPermissionDataById(permission);
@@ -546,18 +458,20 @@ export default {
             return -1; // Valor por defecto si ninguno de los casos anteriores se cumple
         },
         workDaysBetween(date1, date2) {
-            const startDateFormated = moment(date1, 'YYYY/MM/DD').toDate();
-            const endDateFormated = moment(date2, 'YYYY/MM/DD').toDate();
+            const startDateFormated = moment(date1, 'YYYY/MM/DD').toDate()
+            const endDateFormated = moment(date2, 'YYYY/MM/DD').toDate()
 
             let currentDate = new Date(startDateFormated);
             let daysDifference = 0;
 
             while (currentDate <= endDateFormated) {
-                daysDifference++;
+                const dayOfWeek = currentDate.getDay(); // 0 (domingo) a 6 (sábado)
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                    daysDifference++;
+                }
                 currentDate.setDate(currentDate.getDate() + 1);
             }
-
-            return daysDifference;
+            return daysDifference
         },
         generatePdf(html, opt, currentDateTime) {
             html2pdf().set(opt).from(html)
@@ -585,7 +499,7 @@ export default {
                 }
             } finally {
                 this.isLoading = false;  // Desactivar el estado de carga
-                this.getJobPermissions(this.tableData.currentPage)
+                this.getPermissionRequests(this.tableData.currentPage)
             }
         },
         showDate(startDate, endDate) {
@@ -600,17 +514,19 @@ export default {
                 return 'N/A'
             } else {
                 if (permission.fecha_fin_permiso) {
-                    const startDateFormated = moment(permission.fecha_inicio_permiso, 'YYYY/MM/DD').toDate();
-                    const endDateFormated = moment(permission.fecha_fin_permiso, 'YYYY/MM/DD').toDate();
+                    const startDateFormated = moment(permission.fecha_inicio_permiso, 'YYYY/MM/DD').toDate()
+                    const endDateFormated = moment(permission.fecha_fin_permiso, 'YYYY/MM/DD').toDate()
 
                     let currentDate = new Date(startDateFormated);
                     let daysDifference = 0;
 
                     while (currentDate <= endDateFormated) {
-                        daysDifference++;
+                        const dayOfWeek = currentDate.getDay(); // 0 (domingo) a 6 (sábado)
+                        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                            daysDifference++;
+                        }
                         currentDate.setDate(currentDate.getDate() + 1);
                     }
-
                     const resultInMinutes = daysDifference * 8 * 60
 
                     const hours = Math.floor(resultInMinutes / 60);
@@ -642,15 +558,11 @@ export default {
                 return `${hours > 0 ? hours + ' H. ' : ''} ${minutes > 0 ? minutes + ' min.' : ''}`
             }
         },
-        editJobPermission(permission) {
-            this.modalData = permission
-            this.showModalJobPermissions = true
-        },
         addJobPermission() {
             this.modalData = []
             this.showModalJobPermissions = true
         },
-        async getJobPermissions(url = "/job-permissions") {
+        async getPermissionRequests(url = "/get-requests-sub-director-medico") {
             this.tableData.draw++;
             this.tableData.currentPage = url
             this.tableData.execute = this.permits.ejecutar
@@ -664,6 +576,7 @@ export default {
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
                     this.jobPermissions = data.data.data;
+                    console.log(this.jobPermissions);
                     this.jobPermissions.length > 0 ? this.emptyObject = false : this.emptyObject = true
                 }
             }).catch((errors) => {
@@ -676,7 +589,7 @@ export default {
                 this.sortOrders[key] = this.sortOrders[key] * -1;
                 this.tableData.column = this.getIndex(this.columns, "name", key);
                 this.tableData.dir = this.sortOrders[key] === 1 ? "asc" : "desc";
-                this.getJobPermissions();
+                this.getPermissionRequests();
             }
         },
         getIndex(array, key, value) {
@@ -686,7 +599,7 @@ export default {
             this.tableData.search = myEventData;
             const data = Object.values(this.tableData.search);
             if (data.every(error => error === '')) {
-                this.getJobPermissions()
+                this.getPermissionRequests()
             }
         },
         getDependencieCode(jobPosition) {
@@ -698,7 +611,7 @@ export default {
         },
         deletePermission(permission) {
             this.$swal.fire({
-                title: 'Eliminar ' + permission.nombre_tipo_permiso,
+                title: 'Cancelar ' + permission.nombre_tipo_permiso,
                 text: "¿Estas seguro?",
                 icon: "question",
                 iconHtml: "❓",
@@ -712,7 +625,7 @@ export default {
                     this.isLoading = true;
                     axios.post("/delete-permission", {
                         id: permission.id_permiso,
-                        status: permission.id_estado_permiso
+                        execute: permits.ejecutar
                     })
                         .then((response) => {
                             this.$swal.fire({

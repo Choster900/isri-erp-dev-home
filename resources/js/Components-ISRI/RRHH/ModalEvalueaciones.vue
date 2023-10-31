@@ -18,13 +18,12 @@ import DocumentoAnalisisDesempeñoVue from './DocumentoAnalisisDesempeño.vue';
 
             <div class="flex flex-col md:flex-row md:space-y-0 max-h-screen ">
                 <div class="w-full md:w-2/6 bg-slate-200/40 p-4 border">
-                    <div
-                        class="max-h-[calc(100vh-90px)] overflow-y-auto col-span-full xl:col-span-6 bg-white shadow-lg  border border-slate-300 overflow-x-auto">
+                    <div class="col-span-full xl:col-span-6 bg-white shadow-lg  border border-slate-300 ">
                         <header class="px-5 py-4 border-b-4 border-indigo-500">
                             <h2 class="font-semibold text-slate-800">Crear una nueva evaluación +</h2>
                         </header>
                         <div class="p-3">
-                            <div class="max-h-[600px] ">
+                            <div class="">
                                 <div class="mb-4">
                                     <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Nombre del
                                         empleado</label>
@@ -44,8 +43,8 @@ import DocumentoAnalisisDesempeñoVue from './DocumentoAnalisisDesempeño.vue';
                                     </div>
                                     <span class="text-xs text-red-500">{{ errors.id_empleado }}</span>
                                 </div>
-                                <div class="-mx-3 flex flex-wrap">
-                                    <div class="w-full px-3 sm:w-1/3">
+                                <div class="-mx-3 flex flex-wrap mb-4">
+                                    <!--   <div class="w-full px-3 sm:w-1/3">
                                         <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Fecha </label>
                                         <div class="mb-4  md:mb-0">
                                             <flat-pickr placeholder="DD/MM/YYYY" v-model="fecha_evaluacion_personal"
@@ -53,8 +52,38 @@ import DocumentoAnalisisDesempeñoVue from './DocumentoAnalisisDesempeño.vue';
                                                 :config="config" />
                                             <span class="text-xs text-red-500">{{ errors.fecha_evaluacion_personal }}</span>
                                         </div>
+                                    </div> -->
+                                    <div class="w-full px-3 ">
+                                        <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Tipo de
+                                            evaluacion</label>
+                                        <select id="countries" v-model="id_evaluacion_rendimiento"
+                                            class="bg-gray-50 border text-xs border-gray-300 text-gray-900  rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full  h-8 ">
+                                            <option selected>Seleccione el tipo de evaluacion</option>
+                                            <option value="1">F22 V1.0</option>
+                                            <option value="2">F21 V1.0</option>
+                                            <option value="3">F23 V1.0</option>
+                                        </select>
+                                        <span class="text-xs text-red-500">{{ errors.id_evaluacion_rendimiento }}</span>
+
                                     </div>
-                                    <div class="w-full px-3 sm:w-1/2">
+                                </div>
+                                <div class="-mx-3 flex flex-wrap mb-4">
+                                    <div class="w-full px-3 ">
+                                        <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Periodo de
+                                            evaluacion</label>
+                                        <select id="countries" v-model="periodo_evaluacion_personal"
+                                            class="bg-gray-50 border text-xs border-gray-300 text-gray-900  rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full  h-8 ">
+                                            <option selected>Seleccione evaluacion rendimiento</option>
+                                            <option value="1">Primer periodo</option>
+                                            <option value="2">Segundo periodo</option>
+
+                                        </select>
+                                        <span class="text-xs text-red-500">{{ errors.periodo_evaluacion_personal }}</span>
+
+                                    </div>
+                                </div>
+                                <!-- <div class="-mx-3 flex flex-wrap">
+                                    <div class="w-full px-3">
                                         <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Periodo
                                             evaluación</label>
                                         <input type="text" name="lName" id="lName" placeholder="MES DIA-AÑO - MES DIA-AÑO"
@@ -62,7 +91,8 @@ import DocumentoAnalisisDesempeñoVue from './DocumentoAnalisisDesempeño.vue';
                                             class="w-[230px] text-xs  rounded-[5px] border h-7 border-slate-400 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none" />
                                         <span class="text-xs text-red-500">{{ errors.periodo_evaluacion_personal }}</span>
                                     </div>
-                                </div>
+                                </div> -->
+                                <span class="text-xs text-red-500">{{ errorPerido }}</span>
 
                                 <button @click="submitEvaluacionDocument()"
                                     class="bg-indigo-900 rounded-sm shadow text-center text-white text-base font-light w-full py-2 mt-5">Nueva
@@ -73,7 +103,7 @@ import DocumentoAnalisisDesempeñoVue from './DocumentoAnalisisDesempeño.vue';
                     <div
                         class="max-h-[calc(100vh-350px)] overflow-y-auto col-span-full xl:col-span-6 bg-white shadow-lg  border border-slate-300">
                         <div class="p-3">
-                            <div class="max-h-[600px] ">
+                            <div class="max-h-[250px] ">
                                 <table class="table-auto w-full">
                                     <tbody class="text-sm divide-y divide-slate-100">
                                         <tr>
@@ -146,14 +176,16 @@ import DocumentoAnalisisDesempeñoVue from './DocumentoAnalisisDesempeño.vue';
 
                     <!-- With Icons -->
                     <div class="mx-6 mt-2">
-                        <h2 class="text-xl text-slate-800 font-bold mb-6">Evaluación del desempeño para personal
-                            administrativo 📝</h2>
+                        <h2 class="flex gap-2 text-xl text-slate-800 font-bold mb-6">Evaluación del desempeño para personal
+                            administrativo
+                        </h2>
                         <!-- Start -->
                         <div class="mb-1 border-b border-slate-200">
                             <ul class="text-sm font-medium flex flex-nowrap -mx-4 sm:-mx-6 lg:-mx-8 ">
                                 <li
                                     class="pb-3 mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8">
-                                    <a class="text-indigo-500 whitespace-nowrap flex items-center" href="#0">
+                                    <a :class="toShow === 'DocumentoEvalacionVue' ? 'text-indigo-500' : 'text-slate-500 hover:text-slate-600'"
+                                        class=" whitespace-nowrap flex items-center cursor-pointer">
                                         <svg class="w-4 h-4 shrink-0 fill-current mr-2" viewBox=" 0 0 16 16">
                                             <path
                                                 d="M12.311 9.527c-1.161-.393-1.85-.825-2.143-1.175A3.991 3.991 0 0012 5V4c0-2.206-1.794-4-4-4S4 1.794 4 4v1c0 1.406.732 2.639 1.832 3.352-.292.35-.981.782-2.142 1.175A3.942 3.942 0 001 13.26V16h14v-2.74c0-1.69-1.081-3.19-2.689-3.733zM6 4c0-1.103.897-2 2-2s2 .897 2 2v1c0 1.103-.897 2-2 2s-2-.897-2-2V4zm7 10H3v-.74c0-.831.534-1.569 1.33-1.838 1.845-.624 3-1.436 3.452-2.422h.436c.452.986 1.607 1.798 3.453 2.422A1.943 1.943 0 0113 13.26V14z" />
@@ -163,13 +195,30 @@ import DocumentoAnalisisDesempeñoVue from './DocumentoAnalisisDesempeño.vue';
                                 </li>
                                 <li
                                     class="pb-3 mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8">
-                                    <a class="text-slate-500 hover:text-slate-600 whitespace-nowrap flex items-center"
-                                        href="#0">
-                                        <svg class="w-4 h-4 shrink-0 fill-current text-slate-400 mr-2" viewBox=" 0 0 16 16">
+                                    <a :class="toShow === 'DocumentoAnalisisDesempeñoVue' ? 'text-indigo-500' : 'text-slate-500 hover:text-slate-600'"
+                                        class="  whitespace-nowrap flex items-center cursor-pointer">
+                                        <svg class="w-4 h-4 shrink-0 fill-current  mr-2"
+                                            :class="toShow === 'DocumentoAnalisisDesempeñoVue' ? 'text-indigo-500' : 'text-slate-500 hover:text-slate-600'"
+                                            viewBox=" 0 0 16 16">
                                             <path
                                                 d="M14.3.3c.4-.4 1-.4 1.4 0 .4.4.4 1 0 1.4l-8 8c-.2.2-.4.3-.7.3-.3 0-.5-.1-.7-.3-.4-.4-.4-1 0-1.4l8-8zM15 7c.6 0 1 .4 1 1 0 4.4-3.6 8-8 8s-8-3.6-8-8 3.6-8 8-8c.6 0 1 .4 1 1s-.4 1-1 1C4.7 2 2 4.7 2 8s2.7 6 6 6 6-2.7 6-6c0-.6.4-1 1-1z" />
                                         </svg>
                                         <span @click="toShow = 'DocumentoAnalisisDesempeñoVue'">Análisis de Desempeño</span>
+                                    </a>
+                                </li>
+                                <li
+                                    class="pb-3 mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8">
+                                    <a :class="toShow === 'ImpresionDeDocumentos' ? 'text-indigo-500' : 'text-slate-500 hover:text-slate-600'"
+                                        class="  whitespace-nowrap flex items-center cursor-pointer">
+
+                                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
+                                            <path d="M7 8H21M7 12H21M7 16H21M3 8H3.01M3 12H3.01M3 16H3.01"
+                                                :stroke="toShow === 'ImpresionDeDocumentos' ? '#6366f1' : '#94a3b8'"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+
+                                        </svg>
+
+                                        <span class="ml-2" @click="toShow = 'ImpresionDeDocumentos'">Acciones</span>
                                     </a>
                                 </li>
                             </ul>
@@ -177,14 +226,10 @@ import DocumentoAnalisisDesempeñoVue from './DocumentoAnalisisDesempeño.vue';
                         <!-- End -->
                     </div>
 
-                    <DocumentoEvaluacionVue v-if="toShow === 'DocumentoEvalacionVue'" :contenidoEvaluacionRendimiento="contenidoEvaluacionRendimiento"
+                    <DocumentoEvaluacionVue :contenidoEvaluacionRendimiento="contenidoEvaluacionRendimiento"
                         :registroEvaluacionRendimientoPersonal="registroEvaluacionRendimientoPersonal"
                         :info-employee="registrosEvaluacionesRentimientoPersonal"
-                        @actualizar-table-data="$emit('cerrar-modal')" />
-
-
-                    <DocumentoAnalisisDesempeñoVue  v-if="toShow === 'DocumentoAnalisisDesempeñoVue'"/>
-
+                        @actualizar-table-data="$emit('cerrar-modal')" :showMe="toShow" />
                 </div>
             </div>
         </ProcessModal>
@@ -206,10 +251,12 @@ export default {
     },
     data() {
         return {
-            errors: {},
-            id_empleado: '',
+            errors: {},// Menaja los mensajes de rrores
+            id_empleado: '', // Guarda el id de empleado a evaluar
             fecha_evaluacion_personal: '',
+            errorPerido: null,
             periodo_evaluacion_personal: '',
+            id_evaluacion_rendimiento: '',
             searchTimeout: null, // Maneja tiempo de espera para empezar a buscar empleado
             registroEvaluacionRendimientoPersonal: [], // Almacena una evaluacion con su detalle para enviar al modal
             registrosEvaluacionesRentimientoPersonal: [],// Almacena todas las evaluaciones del empleado (Se envia para tomar la informacion del empleado)
@@ -234,7 +281,7 @@ export default {
                     },
                 },
             },
-            toShow: 'DocumentoEvalacionVue',
+            toShow: 'DocumentoEvalacionVue', // Esta variable maneja que parte de la evaluacion mostrar
         }
     },
     methods: {
@@ -270,51 +317,71 @@ export default {
          * @param {String} query // Almacena el nombre del empleado
          */
         async searchingUsers(query) {
-            // Nota: No funcionara si el empleado ya tiene evaluaciones asignadas
+            // Nota: No funcionará si el empleado ya tiene evaluaciones asignadas
             try {
-                this.isLoading = true
+                this.isLoading = true;
                 const response = await axios.post('/search-employees-for-evaluations', { data: query });
                 const newDataEmployees = response.data.map(item => {
+                    const nombreCompleto = [
+                        item.pnombre_persona,
+                        item.snombre_persona,
+                        item.tnombre_persona,
+                        item.papellido_persona,
+                        item.sapellido_persona,
+                        item.tapellido_persona
+                    ]
+                        .filter(Boolean) // Eliminar valores falsy (null, undefined, etc.)
+                        .join(' ');
+
                     return {
                         value: item.id_empleado,
-                        label: `${item.pnombre_persona} ${item.papellido_persona}`
+                        label: nombreCompleto
                     };
                 });
-                this.employeOptions = newDataEmployees
+                this.employeOptions = newDataEmployees;
             } catch (error) {
-                console.log('Error en la búsqueda:', error)
+                console.log('Error en la búsqueda:', error);
             } finally {
-                this.isLoading = false
+                this.isLoading = false;
             }
-
         },
+
         /**
          * Peticion async enviada al backed, reject la peticion si hay un error ( revisar consola )
          */
         createEvaluacionRequest() {
             return new Promise(async (resolve, reject) => {
                 try {
+                    const currentDate = moment();
+                    const currentYear = currentDate.format('YYYY');
+                    const periodo = this.periodo_evaluacion_personal == 1 ? `1-${currentYear}` : this.periodo_evaluacion_personal == 2 ? `2-${currentYear}` : '';
+
                     const resp = await axios.post('/create-new-evaluacion', {
                         id_empleado: this.id_empleado,
-                        fecha_evaluacion_personal: this.fecha_evaluacion_personal,
-                        periodo_evaluacion_personal: this.periodo_evaluacion_personal,
-                    })
-                    console.log(resp.data);
-                    this.registrosEvaluacionesRentimientoPersonal = resp.data
+                        periodo_evaluacion_personal: periodo,
+                        id_evaluacion_rendimiento: this.id_evaluacion_rendimiento,
+                    });
 
+                    console.log(resp.data);
+                    this.registrosEvaluacionesRentimientoPersonal = resp.data;
                     resolve(resp); // Resolvemos la promesa con la respuesta exitosa
                 } catch (error) {
                     console.log(error);
                     if (error.response.status === 422) {
-                        let data = error.response.data.errors
+                        let data = error.response.data.errors;
                         var myData = new Object();
                         for (const errorBack in data) {
-                            myData[errorBack] = data[errorBack][0]
+                            myData[errorBack] = data[errorBack][0];
                         }
-                        this.errors = myData
-                        console.table(myData);
+                        this.errors = myData;
+                        console.log(this.errors);
                         setTimeout(() => {
                             this.errors = [];
+                        }, 5000);
+                    } else if (error.response.status === 400) {
+                        this.errorPerido = error.response.data
+                        setTimeout(() => {
+                            this.errorPerido = ""
                         }, 5000);
                     }
                     reject(error); // Rechazamos la promesa en caso de excepción
@@ -355,7 +422,7 @@ export default {
                 if (this.evaluacionEmpleadoDBData != '') {
                     const optionsMultiselect = [{
                         value: this.evaluacionEmpleadoDBData.id_empleado,
-                        label: `${this.evaluacionEmpleadoDBData.persona.pnombre_persona} ${this.evaluacionEmpleadoDBData.persona.papellido_persona}`
+                        label: `${this.evaluacionEmpleadoDBData.persona.pnombre_persona || ''}  ${this.evaluacionEmpleadoDBData.persona.snombre_persona || ''} ${this.evaluacionEmpleadoDBData.persona.tnombre_persona || ''} ${this.evaluacionEmpleadoDBData.persona.papellido_persona || ''} ${this.evaluacionEmpleadoDBData.persona.sapellido_persona || ''} ${this.evaluacionEmpleadoDBData.persona.tapellido_persona || ''}`
                     }];
                     this.employeOptions = optionsMultiselect
                     this.id_empleado = this.evaluacionEmpleadoDBData.id_empleado
@@ -373,5 +440,6 @@ export default {
             }
         }
     }
+
 }
 </script>

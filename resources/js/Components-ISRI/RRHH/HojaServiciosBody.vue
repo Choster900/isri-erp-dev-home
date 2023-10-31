@@ -10,7 +10,7 @@ import html2pdf from 'html2pdf.js'
         :class="profileSidebarOpen ? 'translate-x-1/3' : 'translate-x-0'">
 
         <!-- Profile background -->
-        <div class="relative h-80">
+        <div class="relative h-60">
             <img class="object-cover h-full w-full "
                 src="../../../img/banerHojaDeServicio.jpg"
                 alt="Profile background" />

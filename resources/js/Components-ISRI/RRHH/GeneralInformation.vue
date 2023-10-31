@@ -72,7 +72,7 @@ import AccordionBasicVue from '@/Components-ISRI/AccordionBasic.vue';
                                         moreInformacionEmployee.id_genero == 1 ? 'FEMENINO' : 'MASCULINO' }}</div>
                                 </div>
                                 <div class="text-sm">
-                                    <h3 class="font-medium uppercase text-slate-800">Genero</h3>
+                                    <h3 class="font-medium uppercase text-slate-800">Dui</h3>
                                     <div class="uppercase font-semibold">{{ moreInformacionEmployee.dui_persona }}</div>
                                 </div>
                                 <div class="text-sm">
