@@ -680,7 +680,6 @@ export default {
             jefatura3: 'LICDA. KARLA GUADALUPE CASTANEDA DE ORELLANA',
             employee: 'MERCY LOURDES SANTAMARIA DE MARTINEZ',
             nup: '345832150015',
-            salary: '$800.00',
             plaza: 'JEFE DE UNIDAD DEL CONTROL Y RESGUARDO DEL ACTIVO FIJO INSTITUCIONAL'
         }
     },
@@ -736,20 +735,18 @@ export default {
             }
         },
         totalDays: function () {
-            const startDateFormated = moment(this.permission.fecha_inicio_permiso, 'YYYY/MM/DD').toDate()
-            const endDateFormated = moment(this.permission.fecha_fin_permiso, 'YYYY/MM/DD').toDate()
+            const startDateFormated = moment(this.permission.fecha_inicio_permiso, 'YYYY/MM/DD').toDate();
+            const endDateFormated = moment(this.permission.fecha_fin_permiso, 'YYYY/MM/DD').toDate();
 
             let currentDate = new Date(startDateFormated);
             let daysDifference = 0;
 
             while (currentDate <= endDateFormated) {
-                const dayOfWeek = currentDate.getDay(); // 0 (domingo) a 6 (sábado)
-                if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-                    daysDifference++;
-                }
+                daysDifference++;
                 currentDate.setDate(currentDate.getDate() + 1);
             }
-            return daysDifference
+
+            return daysDifference;
         }
     },
 }

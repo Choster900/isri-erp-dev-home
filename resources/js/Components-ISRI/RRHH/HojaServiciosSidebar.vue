@@ -8,11 +8,11 @@
             <!-- Group body -->
             <div class="px-5 py-4">
                 <!-- Search form -->
-                <form class="relative">
+                <form class="relative ">
                     <input v-model="userSearched" @input="handleInput"
                         class="form-input w-full pl-9 text-sm border-slate-300 focus:border-slate-300 rounded-md focus:ring-transparent"
                         type="search" placeholder="Buscar..." />
-                    <button class="absolute inset-0 right-auto group" type="submit" aria-label="Search">
+                    <button class="absolute inset-0 left-auto group" type="submit" aria-label="Search">
                         <svg class="w-4 h-4 shrink-0 fill-current text-slate-400 group-hover:text-slate-500 ml-3 mr-2"
                             viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
                             <path

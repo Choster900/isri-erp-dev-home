@@ -3,6 +3,7 @@ import "../css/app.css";
 import "../css/GlobalApp.css";
 import "./plugins/chart.js"
 import "./plugins/requestHelpers.js"
+import "../css/utility-patterns.css"
 import { createApp, h } from "vue";
 import { createInertiaApp } from "@inertiajs/vue3";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";

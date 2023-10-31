@@ -31,54 +31,28 @@ import moment from 'moment';
                                     <div class="mb-4 md:mr-2 md:mb-0 w-[90%]">
                                         <TextInput v-model="user_modal.password" id="personal-information"
                                             placeholder="Digite contraseña" :type="show_password ? 'text' : 'password'">
-
                                             <div class="cursor-pointer no-select absolute inset-y-0 right-0 flex items-center px-4 focus:outline-none"
                                                 @click="toggleShow">
-                                                <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none"
-                                                    v-if="show_password" class="mr-1" xmlns="http://www.w3.org/2000/svg">
-                                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round"
-                                                        stroke-linejoin="round">
-                                                    </g>
-                                                    <g id="SVGRepo_iconCarrier">
-                                                        <g id="style=doutone">
-                                                            <g id="eye-close">
-                                                                <path id="vector (Stroke)" fill-rule="evenodd"
-                                                                    clip-rule="evenodd"
-                                                                    d="M2.2827 9.27342C4.69287 5.94267 8.19606 3.96997 12 3.96997C13.3515 3.96997 14.6695 4.21968 15.9154 4.69366C16.3026 4.84093 16.497 5.27417 16.3497 5.66131C16.2025 6.04846 15.7692 6.24292 15.3821 6.09564C14.3024 5.68491 13.1649 5.46997 12 5.46997C8.74406 5.46997 5.66741 7.15436 3.49759 10.1532L3.49687 10.1542C3.15894 10.6197 2.96497 11.2866 2.96497 11.995C2.96497 12.7033 3.15894 13.3703 3.49687 13.8357L3.49759 13.8367C3.92863 14.4325 4.3957 14.9764 4.89269 15.4654C5.18793 15.7559 5.19175 16.2308 4.90122 16.526C4.61069 16.8213 4.13584 16.8251 3.8406 16.5346C3.28219 15.9851 2.76085 15.3774 2.28234 14.716C1.72077 13.942 1.46497 12.9478 1.46497 11.995C1.46497 11.0419 1.72088 10.0475 2.2827 9.27342ZM18.7729 7.18838C19.0534 6.88361 19.5279 6.86393 19.8327 7.14444C20.5154 7.77278 21.1469 8.48525 21.7176 9.27392C22.2792 10.0479 22.535 11.0421 22.535 11.995C22.535 12.948 22.279 13.9424 21.7172 14.7165C19.3071 18.0473 15.8039 20.02 12 20.02C10.5114 20.02 9.06377 19.717 7.70845 19.1455C7.32679 18.9846 7.14786 18.5447 7.30881 18.163C7.46976 17.7813 7.90964 17.6024 8.2913 17.7634C9.46746 18.2594 10.7172 18.52 12 18.52C15.2559 18.52 18.3325 16.8356 20.5023 13.8367L20.5031 13.8357C20.841 13.3703 21.035 12.7033 21.035 11.995C21.035 11.2866 20.841 10.6197 20.5031 10.1542L20.5023 10.1532C19.9883 9.44277 19.423 8.80602 18.8169 8.24813C18.5121 7.96762 18.4924 7.49316 18.7729 7.18838Z"
-                                                                    fill="#000000"></path>
-                                                                <path id="vector (Stroke)_2" fill-rule="evenodd"
-                                                                    clip-rule="evenodd"
-                                                                    d="M12 9.75C10.755 9.75 9.75 10.755 9.75 12C9.75 12.5484 9.94405 13.0481 10.2674 13.4375C10.532 13.7562 10.4881 14.229 10.1694 14.4936C9.85076 14.7582 9.37792 14.7144 9.11332 14.3957C8.57407 13.7462 8.25 12.9102 8.25 12C8.25 9.92657 9.92657 8.25 12 8.25C13.0215 8.25 13.9486 8.658 14.6243 9.31951C14.9203 9.60929 14.9253 10.0841 14.6355 10.3801C14.3457 10.6761 13.8709 10.6811 13.5749 10.3913C13.1691 9.99399 12.6147 9.75 12 9.75ZM15 11.25C15.4142 11.25 15.75 11.5858 15.75 12C15.75 14.0734 14.0734 15.75 12 15.75C11.5858 15.75 11.25 15.4142 11.25 15C11.25 14.5858 11.5858 14.25 12 14.25C13.245 14.25 14.25 13.245 14.25 12C14.25 11.5858 14.5858 11.25 15 11.25Z"
-                                                                    fill="#000000"></path>
-                                                                <path id="vector (Stroke)_3" fill-rule="evenodd"
-                                                                    clip-rule="evenodd"
-                                                                    d="M22.5533 2.19366C22.8329 2.49926 22.8119 2.97366 22.5063 3.25328L2.5063 21.5533C2.2007 21.8329 1.7263 21.8118 1.44668 21.5062C1.16706 21.2006 1.18812 20.7262 1.49371 20.4466L21.4937 2.14663C21.7993 1.86701 22.2737 1.88807 22.5533 2.19366Z"
-                                                                    fill="#000000"></path>
-                                                            </g>
-                                                        </g>
-                                                    </g>
+                                                <svg v-if="show_password" class="w-6 h-6" fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg">
+                                                    <path fill-rule="evenodd" clip-rule="evenodd"
+                                                        d="M2.28 9.27C4.69 5.94 8.2 3.97 12 3.97C13.35 3.97 14.67 4.22 15.92 4.69C16.3 4.84 16.5 5.27 16.35 5.66C16.2 6.05 15.77 6.24 15.38 6.1C14.3 5.68 13.16 5.47 12 5.47C8.74 5.47 5.67 7.15 3.5 10.15L3.5 10.15C3.16 10.62 2.97 11.29 2.97 12C2.97 12.7 3.16 13.37 3.5 13.84L3.5 13.84C3.93 14.43 4.4 14.98 4.89 15.47C5.19 15.76 5.19 16.23 4.9 16.53C4.61 16.82 4.14 16.82 3.84 16.53C3.28 15.99 2.76 15.38 2.28 14.72C1.72 13.94 1.46 12.95 1.46 12C1.46 11.04 1.72 10.05 2.28 9.27ZM18.77 7.19C19.05 6.88 19.53 6.86 19.83 7.14C20.52 7.77 21.15 8.49 21.72 9.27C22.28 10.05 22.53 11.04 22.53 12C22.53 12.95 22.28 13.94 21.72 14.72C19.31 18.05 15.8 20.02 12 20.02C10.51 20.02 9.06 19.72 7.71 19.15C7.33 18.98 7.15 18.54 7.31 18.16C7.47 17.78 7.91 17.6 8.29 17.76C9.47 18.26 10.72 18.52 12 18.52C15.26 18.52 18.33 16.84 20.5 13.84L20.5 13.84C20.84 13.37 21.03 12.7 21.03 12C21.03 11.29 20.84 10.62 20.5 10.15L20.5 10.15C19.99 9.44 19.42 8.81 18.82 8.25C18.51 7.97 18.49 7.49 18.77 7.19Z"
+                                                        fill="#000000"></path>
+                                                    <path fill-rule="evenodd" clip-rule="evenodd"
+                                                        d="M12 9.75C10.75 9.75 9.75 10.75 9.75 12C9.75 12.55 9.94 13.05 10.27 13.44C10.53 13.76 10.49 14.23 10.17 14.49C9.85 14.76 9.38 14.71 9.11 14.4C8.57 13.75 8.25 12.91 8.25 12C8.25 9.93 9.93 8.25 12 8.25C13.02 8.25 13.95 8.66 14.62 9.32C14.92 9.61 14.93 10.08 14.64 10.38C14.35 10.68 13.87 10.68 13.57 10.39C13.17 10 12.61 9.75 12 9.75ZM15 11.25C15.41 11.25 15.75 11.59 15.75 12C15.75 14.07 14.07 15.75 12 15.75C11.59 15.75 11.25 15.41 11.25 15C11.25 14.59 11.59 14.25 12 14.25C13.25 14.25 14.25 13.25 14.25 12C14.25 11.59 14.59 11.25 15 11.25Z"
+                                                        fill="#000000"></path>
+                                                    <path fill-rule="evenodd" clip-rule="evenodd"
+                                                        d="M22.55 2.19C22.83 2.5 22.81 2.97 22.51 3.25L2.51 21.55C2.2 21.83 1.73 21.81 1.45 21.51C1.17 21.2 1.19 20.73 1.49 20.45L21.49 2.15C21.8 1.87 22.27 1.89 22.55 2.19Z"
+                                                        fill="#000000"></path>
                                                 </svg>
-                                                <svg width="28px" height="28px" viewBox="-2.4 -2.4 28.80 28.80" fill="none"
-                                                    v-else xmlns="http://www.w3.org/2000/svg" stroke="#000000"
-                                                    stroke-width="0.00024000000000000003">
-                                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round"
-                                                        stroke-linejoin="round" stroke="#CCCCCC" stroke-width="0.624"></g>
-                                                    <g id="SVGRepo_iconCarrier">
-                                                        <g id="style=doutone">
-                                                            <g id="eye-open">
-                                                                <path id="vector (Stroke)" fill-rule="evenodd"
-                                                                    clip-rule="evenodd"
-                                                                    d="M12 9.75C10.755 9.75 9.75 10.755 9.75 12C9.75 13.245 10.755 14.25 12 14.25C13.245 14.25 14.25 13.245 14.25 12C14.25 10.755 13.245 9.75 12 9.75ZM8.25 12C8.25 9.92657 9.92657 8.25 12 8.25C14.0734 8.25 15.75 9.92657 15.75 12C15.75 14.0734 14.0734 15.75 12 15.75C9.92657 15.75 8.25 14.0734 8.25 12Z"
-                                                                    fill="#000000"></path>
-                                                                <path id="vector (Stroke)_2" fill-rule="evenodd"
-                                                                    clip-rule="evenodd"
-                                                                    d="M2.28282 9.27342C4.69299 5.94267 8.19618 3.96997 12.0001 3.96997C15.8042 3.96997 19.3075 5.94286 21.7177 9.27392C22.2793 10.0479 22.5351 11.0421 22.5351 11.995C22.5351 12.948 22.2792 13.9424 21.7174 14.7165C19.3072 18.0473 15.804 20.02 12.0001 20.02C8.19599 20.02 4.69264 18.0471 2.28246 14.716C1.7209 13.942 1.46509 12.9478 1.46509 11.995C1.46509 11.0419 1.721 10.0475 2.28282 9.27342ZM12.0001 5.46997C8.74418 5.46997 5.66753 7.15436 3.49771 10.1532L3.497 10.1542C3.15906 10.6197 2.96509 11.2866 2.96509 11.995C2.96509 12.7033 3.15906 13.3703 3.497 13.8357L3.49771 13.8367C5.66753 16.8356 8.74418 18.52 12.0001 18.52C15.256 18.52 18.3326 16.8356 20.5025 13.8367L20.5032 13.8357C20.8411 13.3703 21.0351 12.7033 21.0351 11.995C21.0351 11.2866 20.8411 10.6197 20.5032 10.1542L20.5025 10.1532C18.3326 7.15436 15.256 5.46997 12.0001 5.46997Z"
-                                                                    fill="#000000"></path>
-                                                            </g>
-                                                        </g>
-                                                    </g>
+                                                <svg v-else class="w-7 h-7" fill="none" xmlns="http://www.w3.org/2000/svg"
+                                                    stroke="#000000" stroke-width="0.00024000000000000003">
+                                                    <path fill-rule="evenodd" clip-rule="evenodd"
+                                                        d="M12 9.75C10.755 9.75 9.75 10.755 9.75 12C9.75 13.245 10.755 14.25 12 14.25C13.245 14.25 14.25 13.245 14.25 12C14.25 10.755 13.245 9.75 12 9.75ZM8.25 12C8.25 9.92657 9.92657 8.25 12 8.25C14.0734 8.25 15.75 9.92657 15.75 12C15.75 14.0734 14.0734 15.75 12 15.75C9.92657 15.75 8.25 14.0734 8.25 12Z"
+                                                        fill="#000000"></path>
+                                                    <path fill-rule="evenodd" clip-rule="evenodd"
+                                                        d="M2.28282 9.27342C4.69299 5.94267 8.19618 3.96997 12.0001 3.96997C15.8042 3.96997 19.3075 5.94286 21.7177 9.27392C22.2793 10.0479 22.5351 11.0421 22.5351 11.995C22.5351 12.948 22.2792 13.9424 21.7174 14.7165C19.3072 18.0473 15.804 20.02 12.0001 20.02C8.19599 20.02 4.69264 18.0471 2.28246 14.716C1.7209 13.942 1.46509 12.9478 1.46509 11.995C1.46509 11.0419 1.721 10.0475 2.28282 9.27342ZM12.0001 5.46997C8.74418 5.46997 5.66753 7.15436 3.49771 10.1532L3.497 10.1542C3.15906 10.6197 2.96509 11.2866 2.96509 11.995C2.96509 12.7033 3.15906 13.3703 3.497 13.8357L3.49771 13.8367C5.66753 16.8356 8.74418 18.52 12.0001 18.52C15.256 18.52 18.3326 16.8356 20.5025 13.8367L20.5032 13.8357C20.8411 13.3703 21.0351 12.7033 21.0351 11.995C21.0351 11.2866 20.8411 10.6197 20.5032 10.1542L20.5025 10.1532C18.3326 7.15436 15.256 5.46997 12.0001 5.46997Z"
+                                                        fill="#000000"></path>
                                                 </svg>
                                             </div>
                                             <LabelToInput icon="password" forLabel="personal-information" />
@@ -92,8 +66,13 @@ import moment from 'moment';
                                 <div
                                     class="w-full sm:max-w-sm md:max-w-sm lg:max-w-sm xl:max-w-sm mx-auto bg-gray-200 shadow-xl rounded-lg text-gray-900">
                                     <div class="rounded-t-lg h-24 bg-[#3c4557]"></div>
-                                    <div class="mx-auto w-32 h-32 -mt-16 rounded-full overflow-hidden bg-gray-200">
+                                    <div v-if="urlLastActivePhoto === 0"
+                                        class="mx-auto w-32 h-32 -mt-16 rounded-full overflow-hidden bg-gray-200">
                                         <img class="object-cover object-center h-32" src="../../../img/default-avatar2.jpg"
+                                            alt="Default Profile Photo">
+                                    </div>
+                                    <div v-else class="mx-auto w-32 h-32 -mt-16 rounded-full overflow-hidden bg-gray-200">
+                                        <img class="object-contain h-32 w-32" :src="urlLastActivePhoto"
                                             alt="Default Profile Photo">
                                     </div>
                                     <div v-if="user_modal.person_id !== ''" class="text-center mt-2">
@@ -142,28 +121,11 @@ import moment from 'moment';
                         </div>
                         <div class="flex justify-center mb-4">
                             <div class="flex items-center">
-                                <!-- <button
-                                    class="mr-4 btn-sm border-slate-200 hover:border-slate-300 text-slate-600 underline underline-offset-1"
-                                    @:disabled="is_loadig_roles" @click="new_item ? saveRol() : updateRol()"
-                                    :class="new_item ? 'text-green-600' : 'text-orange-600'">
-                                    {{ new_item ? 'AGREGAR' : 'ACTUALIZAR' }}
-                                </button>
-
-                                <button
-                                    class="ml-0 btn-sm border-slate-200 hover:border-slate-300 underline underline-offset-1"
-                                    @:disabled="is_loadig_roles" @click="new_item ? clean() : cancel()"
-                                    :class="new_item ? 'text-gray-600' : 'text-red-600'">
-                                    {{ new_item ? 'LIMPIAR' : 'CANCELAR' }}
-                                </button> -->
-
                                 <GeneralButton class="mr-1" color="bg-blue-500 hover:bg-blue-700"
                                     :icon="new_item ? 'add' : 'update'" :text="new_item ? 'Agregar' : 'Actualizar'"
                                     @click="new_item ? saveRol() : updateRol()" :disabled="is_loadig_roles" />
-                                <GeneralButton v-if="itemSelected" class="ml-1"
-                                    color="bg-red-500 hover:bg-red-700" icon="delete"
-                                    text="Cancelar" @click="cancel()"
-                                    :disabled="is_loadig_roles" />
-
+                                <GeneralButton v-if="itemSelected" class="ml-1" color="bg-red-500 hover:bg-red-700"
+                                    icon="delete" text="Cancelar" @click="cancel()" :disabled="is_loadig_roles" />
                             </div>
                         </div>
                         <div class="tabla-modal">
@@ -213,16 +175,13 @@ import moment from 'moment';
                                     <!-- you'll have to validate this if -->
                                     <tr v-if="user_modal.roles == ''">
                                         <td colspan="4" class="text-center p-2 font-light">
-                                            {{ modalData == '' ? 'Sin roles asignados' : 'Cargando...' }}
+                                            {{ isLoading  ? 'Cargando...' : 'Sin roles asignados' }}
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                         <div class="flex justify-center mt-5">
-                            <!-- <GeneralButton class="mr-1" v-if="modalData != '' && !itemSelected && !allDeleted"
-                                color="bg-orange-700  hover:bg-orange-800" text="Actualizar" icon="update"
-                                @click="updateUser()" /> -->
                             <GeneralButton class="mr-1" v-if="modalData == '' && !itemSelected"
                                 color="bg-green-700  hover:bg-green-800" text="Guardar" icon="add" @click="saveNewUser()" />
                             <GeneralButton class="ml-1" text="Cerrar" icon="delete" @click="$emit('cerrar-modal')" />
@@ -253,6 +212,7 @@ export default {
             show_password: false,
             new_item: true,
             found_user: false,
+            isLoading: false,
             user_modal: {
                 id: '',
                 dui: '',
@@ -275,35 +235,38 @@ export default {
             new_option: [],
             id_permiso_usuario: '',
             is_loadig_roles: false,
+            personData: []
         };
     },
     methods: {
         toggleShow() {
             this.show_password = !this.show_password;
         },
-        getRoles(id) {
+        async getRoles(id) {
             this.sistemas = []
             this.roles = []
             this.row.id_rol = ''
             this.row.id_sistema = ''
             this.new_item = true
-            axios.post("/systems", { id_usuario: id })
-                .then((response) => {
-                    this.user_modal.roles = response.data.userRoles
-                    this.sistemas = response.data.sistemas
-                    for (let i = 0; i < this.user_modal.roles.length; i++) {
-                        this.user_modal.roles[i].selected = false;
+            try {
+                this.isLoading = true;  // Activar el estado de carga
+                const response = await axios.post('/systems', { id_usuario: id });
+                this.user_modal.roles = response.data.userRoles
+                this.sistemas = response.data.sistemas
+                for (let i = 0; i < this.user_modal.roles.length; i++) {
+                    this.user_modal.roles[i].selected = false;
+                }
+            } catch (errors) {
+                if (errors.response.status === 422) {
+                    if (errors.response.data.logical_error) {
+                        this.showToast(toast.error, errors.response.data.logical_error);
                     }
-                })
-                .catch((errors) => {
-                    let msg = this.manageError(errors)
-                    this.$swal.fire({
-                        title: 'Operación cancelada',
-                        text: msg,
-                        icon: 'warning',
-                        timer: 5000
-                    })
-                })
+                } else {
+                    this.manageError(errors, this)
+                }
+            } finally {
+                this.isLoading = false;  // Desactivar el estado de carga
+            }
         },
         editRol(rol, index) {
             //Assign the vars depending the previous selection
@@ -546,6 +509,7 @@ export default {
                     }
                 })
                     .then((response) => {
+                        this.personData = response.data.persona
                         let persona = response.data.persona
                         let usuario = response.data.usuario
                         if (persona === "") {
@@ -735,6 +699,7 @@ export default {
                 this.sistemas = []
                 this.roles = []
                 this.new_option = []
+                this.personData = this.modalData
                 this.user_modal.id = this.modalData.id_usuario ?? ''
                 this.user_modal.dui = ''
                 this.user_modal.person_id = this.modalData.id_persona ?? ''
@@ -780,6 +745,26 @@ export default {
             } else {
                 return false
             }
+        },
+        urlLastActivePhoto() {
+            let personInfo = []
+            if (this.personData.id_usuario) {
+                personInfo = this.personData.persona
+            } else {
+                personInfo = this.personData
+            }
+
+            if (personInfo != '' && personInfo.fotos.length > 0) {
+                const filteredPhotos = personInfo.fotos.filter(foto => foto.estado_foto === 1);
+                if (filteredPhotos.length > 0) {
+                    return filteredPhotos[filteredPhotos.length - 1].url_foto
+                } else {
+                    return 0
+                }
+            } else {
+                return 0
+            }
+
         }
     }
 };

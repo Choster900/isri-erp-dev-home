@@ -1,157 +1,466 @@
+use GuzzleHttp\Promise\Promise;
 <script setup>
 import { jsPDF } from "jspdf";
 import html2pdf from 'html2pdf.js'
 import DocumentBlanck from '@/Components-ISRI/RRHH/DocumentoEvaluacionBlank.vue';
 import momentAlias from "moment";
+import { v4 as uuid, v4 } from "uuid";
 </script>
 <template>
-    <div class=" flex  justify-center  content-between">
-        <!-- <div class="px-2">
-            <GeneralButton :color="['bg-orange-700 hover:bg-orange-800']" text="Enviar evaluación" icon="update"
-                :disabled="contenidoEvaluacionRendimiento != '' && registroEvaluacionRendimientoPersonal != '' ? false : true"
-                styleDisabled="bg-orange-900/80 hover:bg-orange-900/80 cursor-not-allowed"
-                @click="contenidoEvaluacionRendimiento != '' && registroEvaluacionRendimientoPersonal != '' ? submitResponseRequest() : ''" />
+    <div v-if="registroEvaluacionRendimientoPersonal == ''" class="flex justify-center items-center">
+        <!--  <img src="../../../img/NoEvaluationYet.svg" alt="" class="h-[500px]"> -->
+        <div class="w-full h-[500px] px-1 text-selection-disable mb-20">
+            <div class="flex flex-col items-center justify-center h-full">
+                <img src="../../../img/NoEvaluationYet.svg" class="h-[400px] rounded-full mx-auto" alt="SVG Image"
+                    draggable="false">
+                <h1 class="font-medium text-center">Evalua al empleado dependiendo su desempeño</h1>
+                <p class="text-[9pt] text-center">Cuando selecciones y/o agreges evaluaciones apareceran en esta area.</p>
+            </div>
         </div>
-        <div class="px-2">
-            <GeneralButton :color="['bg-red-700 hover:bg-red-800']" text="Imprimir" icon="pdf"
-                :disabled="contenidoEvaluacionRendimiento != '' && registroEvaluacionRendimientoPersonal != '' && contenidoEvaluacionRendimiento.categorias_rendimiento.length == responsesWithScores.length ? false : true"
-                styleDisabled="bg-red-900/80 hover:bg-red-900/80 cursor-not-allowed"
-                @click="contenidoEvaluacionRendimiento != '' && registroEvaluacionRendimientoPersonal != '' ? printPdf() : ''" />
-        </div> -->
-
-
     </div>
 
-    <!-- <div class="mx-4 overflow-y-auto max-h-[calc(100vh-200px)] p-3 mb-4"
-        v-if="contenidoEvaluacionRendimiento != '' && registroEvaluacionRendimientoPersonal != ''"
-        :class="{ 'animate-slide-out-right': showErrorWhenValuesChanges, 'animate-slide-in-left': !showErrorWhenValuesChanges }"> -->
-    <div class="mx-4 overflow-y-auto max-h-[calc(100vh-200px)] p-3 mb-4"
-        v-if="contenidoEvaluacionRendimiento != '' && registroEvaluacionRendimientoPersonal != ''">
-        <table class="w-full">
-            <tbody>
-                <tr>
-                    <td class="border border-black" rowspan="4">
-                        <div class="w-44 px-1.5"><img src="../../../img/isri-gob.png" alt=""></div>
-                    </td>
-                    <td class="border border-black text-center font-medium uppercase" rowspan="2">Seguimiento de Desempeño
-                    </td>
-                    <td class="border border-black text-[8pt] font-semibold pr-3 px-1.5">FECHA : {{ momentAlias(
-                        registroEvaluacionRendimientoPersonal.fecha_evaluacion_personal).format('L') }}</td>
-                </tr>
-                <tr>
-                    <td class="border border-black text-[8pt] font-semibold   px-1.5">ID 00000-{{
-                        registroEvaluacionRendimientoPersonal.id_evaluacion_personal }}</td>
-                </tr>
-                <tr>
-                    <td class="border border-black text-center font-medium px-8" rowspan="2">DESEMPEÑO DE PERSONAL
-                        ADMINISTRATIVO</td>
-                    <td class="border border-black text-[8pt] font-semibold py-0.5 px-1.5">DEPENDENCIA:ADMON</td>
-                </tr>
-                <tr>
-                    <td class="border border-black text-[8pt] font-semibold  py-0.5 px-1.5">CODIGO: VERSION 1.0</td>
-                </tr>
-                <tr>
-                    <td class="border border-black bg-black h-5 text-white text-center text-[10pt] " colspan="3">
-                        ESPECIFICACIONES</td>
-                </tr>
-            </tbody>
-        </table>
-        <div class="flex items-center justify-center pt-4 gap-28">
-            <div class="flex   flex-row">
-                <label for="" class="flex items-center text-[7pt] font-semibold">EMPLEADO: </label>
-                <input type="text" :value="generateFullName(infoEmployee.persona)"
-                    class="text-left text-[9pt] w-56 text-sm font-medium capitalize h-5 border-x-0 border-t-0">
+    <template v-else>
+        <!-- Seccion de DocumentoEvalacionVue -->
+        <div :class="showMe == 'DocumentoEvalacionVue' ? '' : 'hidden'"
+            class="mx-4 overflow-y-auto max-h-[calc(100vh-200px)] p-3 mb-4">
+            <table class="w-full">
+                <tbody>
+                    <tr>
+                        <td class="border border-black" rowspan="4">
+                            <div class="w-44 px-1.5"><img src="../../../img/isri-gob.png" alt=""></div>
+                        </td>
+                        <td class="border border-black text-center font-medium uppercase" rowspan="2">Seguimiento de
+                            Desempeño
+                        </td>
+                        <td class="border border-black text-[8pt] font-semibold pr-3 px-1.5">FECHA : {{ momentAlias(
+                            registroEvaluacionRendimientoPersonal.fecha_evaluacion_personal).format('L') }}</td>
+                    </tr>
+                    <tr>
+                        <td class="border border-black text-[8pt] font-semibold   px-1.5">ID 00000-{{
+                            registroEvaluacionRendimientoPersonal.id_evaluacion_personal }}</td>
+                    </tr>
+                    <tr>
+                        <td class="border border-black text-center font-medium px-8" rowspan="2">DESEMPEÑO DE PERSONAL
+                            ADMINISTRATIVO</td>
+                        <td class="border border-black text-[8pt] font-semibold py-0.5 px-1.5">DEPENDENCIA:ADMON</td>
+                    </tr>
+                    <tr>
+                        <td class="border border-black text-[8pt] font-semibold  py-0.5 px-1.5">CODIGO: VERSION 1.0</td>
+                    </tr>
+                    <tr>
+                        <td class="border border-black bg-black h-5 text-white text-center text-[10pt] " colspan="3">
+                            ESPECIFICACIONES</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="flex items-center justify-center pt-4 gap-28">
+                <div class="flex   flex-row">
+                    <label for="" class="flex items-center text-[7pt] font-semibold">EMPLEADO: </label>
+                    <input type="text" :value="generateFullName(infoEmployee.persona)"
+                        class="text-left text-[9pt] w-56 text-sm font-medium capitalize h-5 border-x-0 border-t-0">
+                </div>
+                <div class="flex  flex-row">
+                    <label for="" class="flex items-center text-[7pt] font-semibold">PUESTO: </label>
+                    <input type="text" :value="infoEmployee.plazas_asignadas && infoEmployee.plazas_asignadas.filter((plaza) => plaza.estado_plaza_asignada == 1).map((plaza, index) => {
+                        return `${plaza.detalle_plaza.plaza.nombre_plaza}`
+                    }).join(',') || ''"
+                        class="text-left text-[9pt] w-52 text-sm font-medium capitalize h-5 border-x-0 border-t-0">
+                </div>
             </div>
-            <div class="flex  flex-row">
-                <label for="" class="flex items-center text-[7pt] font-semibold">PUESTO: </label>
-                <input type="text" :value="infoEmployee.plazas_asignadas && infoEmployee.plazas_asignadas.filter((plaza) => plaza.estado_plaza_asignada == 1).map((plaza, index) => {
-                    return `${plaza.detalle_plaza.plaza.nombre_plaza}`
-                }).join(',') || ''"
-                    class="text-left text-[9pt] w-52 text-sm font-medium capitalize h-5 border-x-0 border-t-0">
+            <div class="flex items-center justify-center pt-2 gap-10 pb-7">
+                <div class="flex   flex-row">
+                    <label for="" class="flex items-center text-[7pt] font-semibold">JEFE INME: </label>
+                    <input type="text" value="MIGUEL JOSUE TOBIAS RIVAS"
+                        class=" text-left text-[9pt]  text-sm font-medium capitalize  h-5 border-x-0 border-t-0">
+                </div>
+                <div class="flex   flex-row">
+                    <label for="" class="flex items-center text-[7pt] font-semibold">PUESTO : </label>
+                    <input type="text" value="COORDINADOR DEL AREA DE SISTEMAS DE INFORMACION"
+                        class=" text-left text-[9pt] w-56 text-sm font-medium capitalize  h-5 border-x-0 border-t-0">
+                </div>
+                <div class="flex  flex-row">
+                    <label for="" class="flex items-center text-[7pt] font-semibold">PUNTAJE TOTAL:</label>
+                    <input type="text"
+                        :value="responsesWithScores.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0)"
+                        class=" text-left text-[9pt] w-20 text-sm font-medium capitalize  h-5 border-x-0 border-t-0">
+                </div>
             </div>
-        </div>
-        <div class="flex items-center justify-center pt-2 gap-10 pb-7">
-            <div class="flex   flex-row">
-                <label for="" class="flex items-center text-[7pt] font-semibold">JEFE INME: </label>
-                <input type="text" value="MIGUEL JOSUE TOBIAS RIVAS"
-                    class=" text-left text-[9pt]  text-sm font-medium capitalize  h-5 border-x-0 border-t-0">
-            </div>
-            <div class="flex   flex-row">
-                <label for="" class="flex items-center text-[7pt] font-semibold">PUESTO : </label>
-                <input type="text" value="COORDINADOR DEL AREA DE SISTEMAS DE INFORMACION"
-                    class=" text-left text-[9pt] w-56 text-sm font-medium capitalize  h-5 border-x-0 border-t-0">
-            </div>
-            <div class="flex  flex-row">
-                <label for="" class="flex items-center text-[7pt] font-semibold">PUNTAJE TOTAL:</label>
-                <input type="text"
-                    :value="responsesWithScores.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0)"
-                    class=" text-left text-[9pt] w-20 text-sm font-medium capitalize  h-5 border-x-0 border-t-0">
-            </div>
-        </div>
-        <table class="pb-5" v-for="(data, i) in contenidoEvaluacionRendimiento.categorias_rendimiento" :key="i">
-            <tbody>
-                <tr>
-                    <td class="border border-black bg-black h-8
+            <table class="pb-5">
+                <tbody v-for="(data, i) in contenidoEvaluacionRendimiento.categorias_rendimiento" :key="i">
+                    <tr>
+                        <td class="border border-black bg-black h-8
                      text-[10pt] text-white text-center" colspan="2">
-                        <div class="flex justify-between items-center">
-                            <span class="mx-auto">{{ data.nombre_cat_rendimiento }}</span>
-                            <span class="text-end pr-8">
-                                PUNTOS: {{
-                                    (responsesWithScores.find(obj => obj.nombre_cat_rendimiento === data.nombre_cat_rendimiento)
-                                        || { puntaje_rubrica_rendimiento: 0 }).puntaje_rubrica_rendimiento
-                                }}
+                            <div class="flex justify-between items-center">
+                                <span class="mx-auto">{{ data.nombre_cat_rendimiento }}</span>
+                                <span class="text-end pr-8">
+                                    PUNTOS: {{
+                                        (responsesWithScores.find(obj => obj.nombre_cat_rendimiento ===
+                                            data.nombre_cat_rendimiento)
+                                            || { puntaje_rubrica_rendimiento: 0 }).puntaje_rubrica_rendimiento
+                                    }}
 
-                            </span>
+                                </span>
 
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="border border-black bg-slate-300/60" rowspan="2">
-                        <div class="w-40 p-1.5 text-[9pt] text-justify text-[#4f4f4f] font-medium">
-                            {{ data.descripcion_cat_rendimiento }}</div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="border border-black">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="border border-black bg-slate-300/60" rowspan="2">
+                            <div class="w-40 p-1.5 text-[9pt] text-justify text-[#4f4f4f] font-medium">
+                                {{ data.descripcion_cat_rendimiento }}</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="border border-black">
 
-                        <table class="" id="rubrica_rendimiento">
-                            <tr v-for="(rubrica, j) in data.rubricas_rendimiento" :key="j">
-                                <td :class="{ ' border-t-0 border-b': j == data.rubricas_rendimiento.lenght }"
-                                    class="text-[9pt] border-l-0 border-r border-t-0 border-b border-black text-justify px-2 font-medium">
-                                    {{ rubrica.descripcion_rubrica_rendimiento }}
-                                </td>
-                                <td
-                                    class="border-x-0  border-t-0 border-b  border-black justify-center text-center px-10 py-4">
-                                    <div class="container">
-                                        <label>
-                                            <input type="radio" @click="saveEvaluationResponses({
-                                                nombre_cat_rendimiento: data.nombre_cat_rendimiento,
-                                                id_rubrica_rendimiento: rubrica.id_rubrica_rendimiento,
-                                                id_cat_rendimiento: data.id_cat_rendimiento,
-                                                opcion_rubrica_rendimiento: rubrica.opcion_rubrica_rendimiento,
-                                                puntaje_rubrica_rendimiento: rubrica.puntaje_rubrica_rendimiento,
-                                            }, true)"
-                                                :checked="registroEvaluacionRendimientoPersonal.detalle_evaluaciones_personal &&
-                                                    registroEvaluacionRendimientoPersonal.detalle_evaluaciones_personal.length > i &&
-                                                    registroEvaluacionRendimientoPersonal.detalle_evaluaciones_personal[i].id_rubrica_rendimiento == rubrica.id_rubrica_rendimiento"
-                                                :name="data.nombre_cat_rendimiento">
-                                            <span class="text-xs justify-center text-center"
-                                                :title="`${rubrica.puntaje_rubrica_rendimiento} Puntos`">{{
-                                                    rubrica.opcion_rubrica_rendimiento }}</span>
-                                        </label>
+                            <table class="" id="rubrica_rendimiento">
+                                <tr v-for="(rubrica, j) in data.rubricas_rendimiento" :key="j">
+                                    <td :class="data.rubricas_rendimiento.length != j + 1 ? 'border-b' : ''"
+                                        class="text-[9pt] border-l-0 border-r border-t-0 border-black text-justify px-2 font-medium">
+                                        {{ rubrica.descripcion_rubrica_rendimiento }}
+                                    </td>
+                                    <td :class="data.rubricas_rendimiento.length != j + 1 ? 'border-b' : ''"
+                                        class="border-x-0  border-t-0  border-black justify-center text-center px-10 py-4">
+                                        <div class="container">
+                                            <label>
+                                                <input type="radio" @click="saveEvaluationResponses({
+                                                    nombre_cat_rendimiento: data.nombre_cat_rendimiento,
+                                                    id_rubrica_rendimiento: rubrica.id_rubrica_rendimiento,
+                                                    id_cat_rendimiento: data.id_cat_rendimiento,
+                                                    opcion_rubrica_rendimiento: rubrica.opcion_rubrica_rendimiento,
+                                                    puntaje_rubrica_rendimiento: rubrica.puntaje_rubrica_rendimiento,
+                                                }, true)"
+                                                    :checked="registroEvaluacionRendimientoPersonal.detalle_evaluaciones_personal &&
+                                                        registroEvaluacionRendimientoPersonal.detalle_evaluaciones_personal.length > i &&
+                                                        registroEvaluacionRendimientoPersonal.detalle_evaluaciones_personal[i].id_rubrica_rendimiento == rubrica.id_rubrica_rendimiento"
+                                                    :name="data.nombre_cat_rendimiento">
+                                                <span class="text-xs justify-center text-center"
+                                                    :title="`${rubrica.puntaje_rubrica_rendimiento} Puntos`">{{
+                                                        rubrica.opcion_rubrica_rendimiento }}</span>
+                                            </label>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="pb-5" v-for="i in 2" :key="i">
+                <template v-if="registroEvaluacionRendimientoPersonal == ''">
+                    <tbody>
+                        <tr>
+                            <td class="border border-black bg-black h-10 text-[10pt] text-white text-center" colspan="2">
+                                <div class="flex justify-between items-center">
+                                    <span class="mx-auto">NOMBRE CATEGORIA</span>
+                                    <span class="text-end pr-8">PUNTOS</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="border border-black bg-slate-300/60" rowspan="2">
+                                <div class="w-40 p-1.5 text-[9pt] text-justify text-[#4f4f4f] font-medium"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="border border-black">
+                                <table class="" id="rubrica_rendimiento">
+                                    <tr v-for="j in 2" :key="j">
+                                        <td :class="2 != j ? 'border-b' : ''"
+                                            class=" border-l-0 border-r border-t-0 border-black  w-[490px]">
+                                        </td>
+                                        <td :class="2 != j ? 'border-b' : ''"
+                                            class="border-x-0  border-t-0 border-black justify-center text-center px-10 py-4">
+                                            <div class="container">
+                                                <label>
+                                                    <input type="radio" disabled>
+                                                    <span class="text-xs justify-center text-center"> </span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </template>
+
+            </table>
+
+            <div class="flex flex-col justify-between md:flex-row gap-10">
+
+                <!-- Primera tabla -->
+                <div class="w-full md:w-1/2 overflow-x-auto">
+                    <table class="w-full">
+                        <tr class="text-center">
+                            <th class="py-2" colspan="5">
+                                <h1 class="text-sm font-bold ">TABLA DE VALORACIÓN</h1>
+                            </th>
+                        </tr>
+                        <tr class="text-xs text-center bg-gray-200">
+                            <th class="border border-black">FACTOR</th>
+                            <th class="border border-black">A</th>
+                            <th class="border border-black">B</th>
+                            <th class="border border-black">C</th>
+                            <th class="border border-black">D</th>
+                        </tr>
+                        <tr class="text-center text-[8pt]"
+                            v-for="(data, i) in contenidoEvaluacionRendimiento.categorias_rendimiento" :key="i">
+                            <td class="border border-black text-start px-2">
+                                {{ i + 1 }} - {{ data.nombre_cat_rendimiento }}
+                            </td>
+                            <td v-for="(rubrica, j) in data.rubricas_rendimiento" :key="j"
+                                class="border border-black w-7 text-[8pt]"
+                                :class="registroEvaluacionRendimientoPersonal.detalle_evaluaciones_personal &&
+                                    registroEvaluacionRendimientoPersonal.detalle_evaluaciones_personal.length > i &&
+                                    registroEvaluacionRendimientoPersonal.detalle_evaluaciones_personal[i].id_rubrica_rendimiento == rubrica.id_rubrica_rendimiento ? 'bg-red-600/90 text-slate-300' : ''">
+                                {{ rubrica.puntaje_rubrica_rendimiento }}
+                            </td>
+                        </tr>
+
+                        <tr class="text-center text-[8pt]" v-for="i in 6" :key="i"
+                            v-if="!contenidoEvaluacionRendimiento.categorias_rendimiento">
+                            <td class="border border-black text-start px-2">-</td>
+                            <td class="border border-black w-7 text-[8pt]">0</td>
+                            <td class="border border-black w-7 text-[8pt]">0</td>
+                            <td class="border border-black w-7 text-[8pt]">0</td>
+                            <td class="border border-black w-7 text-[8pt]">0</td>
+                        </tr>
+
+                    </table>
+                </div>
+
+                <!-- Segunda tabla -->
+                <div class="w-full md:w-1/3 mt-6 md:mt-0 overflow-x-auto">
+                    <table class="w-full">
+                        <tr class="text-start">
+                            <th class="py-2" colspan="2">
+                                <h1 class="text-sm font-bold">CALIFICACIÓN POR PUNTOS Y POR RANGOS</h1>
+                            </th>
+                        </tr>
+                        <tr class="text-start text-[8pt]">
+                            <td class="border border-black"
+                                :class="responsesWithScores.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0) >= 73 ? 'bg-slate-400' : ''">
+                                Excelente
+                            </td>
+                            <td class="border border-black">
+                                De 73 a 84 puntos
+                            </td>
+                        </tr>
+                        <tr class="text-start text-[8pt]">
+                            <td class="border border-black"
+                                :class="responsesWithScores.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0) > 56 && responsesWithScores.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0) < 56 ? 'bg-slate-400' : ''">
+
+                                Muy Bueno
+                            </td>
+                            <td class="border border-black">
+                                De 56 a 72 puntos
+                            </td>
+                        </tr>
+                        <tr class="text-start text-[8pt]">
+                            <td class="border border-black"
+                                :class="responsesWithScores.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0) > 28 && responsesWithScores.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0) < 55 ? 'bg-slate-400' : ''">
+
+                                Bueno
+                            </td>
+                            <td class="border border-black">
+                                De 28 a 55 puntos
+                            </td>
+                        </tr>
+                        <tr class="text-start text-[8pt]">
+                            <td class="border border-black"
+                                :class="responsesWithScores.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0) <= 27 ? 'bg-slate-400' : ''">
+
+                                Insatisfactorio
+                            </td>
+                            <td class="border border-black">
+                                De 0 a 27 puntos
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seccion de analicis de DocumentoAnalisisDesempeñoVue -->
+        <div :class="showMe == 'DocumentoAnalisisDesempeñoVue' ? '' : 'hidden'"
+            class="mx-4 overflow-y-auto max-h-[calc(85vh-100px)] p-3 mb-4 ">
+
+
+            <!-- Template events (secciones de eventos) -->
+            <div v-if="incidentesEvaluaciones.filter(Array => !Array.isDelete).length > 0">
+                <div class="xl:pl-48 xl:-translate-x-16 mb-2">
+                    <ul class="flex flex-wrap -m-1">
+                        <li class="m-1">
+                            <a @click="pushToIncidentes" :href="`#evento-${(incidentesEvaluaciones.length - 1)}`"
+                                class="inline-flex items-center justify-center text-sm font-medium leading-5 rounded-full px-3 py-1 border border-transparent shadow-sm bg-indigo-500 text-white duration-150 ease-in-out">
+                                <svg class="w-3 h-3 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
+                                    <path
+                                        d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z">
+                                    </path>
+                                </svg>
+                                <span class="ml-2">Evento</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <div v-for="(data, i) in incidentesEvaluaciones" :key="i">
+                        <article class="pt-2 pr-4" v-if="!data.isDelete" :id="`evento-${i}`">
+                            <div class="xl:flex">
+                                <div class="w-32 shrink-0">
+                                    <div class="text-xs font-semibold uppercase text-slate-400 pt-2"> {{
+                                        momentAlias(data.fecha_reg_incidente_evaluacion).format('MMM D, YYYY')
+                                    }} </div>
+
+                                </div>
+                                <div class="grow pb-2 border-b border-slate-200">
+                                    <header>
+                                        <div class="flex justify-between">
+                                            <h2 class="text-lg text-slate-800 font-bold  w-full" v-if="!data.editFactor">{{
+                                                categoriaRendimientoObject.find(i => i.value ==
+                                                    data.id_cat_rendimiento).label }}</h2>
+                                            <div class="relative flex h-8  flex-row-reverse w-1/2  mb-3" v-else>
+                                                <Multiselect v-model="incidentesEvaluaciones[i].id_cat_rendimiento"
+                                                    @select="incidentesEvaluaciones[i].editFactor = false"
+                                                    placeholder="seleccione" :classes="{
+                                                        placeholder: 'flex items-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-black rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ',
+                                                        noOptions: 'py-2 px-3 text-gray-600 bg-white text-left text-[8pt]',
+                                                        optionsContainer: 'custom-options-container absolute z-50'
+                                                    }" :options="categoriaRendimientoObject" :searchable="true"
+                                                    noOptionsText="sin opciones" noResultsText="sin resultado" />
+                                            </div>
+                                            <button v-if="!data.editFactor"
+                                                @click="incidentesEvaluaciones[i].editFactor = true"
+                                                class=" border-slate-200 hover:border-slate-300">
+                                                <svg class="w-4 h-4 fill-current text-slate-500 shrink-0"
+                                                    viewBox="0 0 16 16">
+                                                    <path
+                                                        d="M11.7.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM4.6 14H2v-2.6l6-6L10.6 8l-6 6zM12 6.6L9.4 4 11 2.4 13.6 5 12 6.6z">
+                                                    </path>
+                                                </svg>
+                                            </button>
+                                            <button class=" border-slate-200 hover:border-slate-300  " v-else
+                                                @click="incidentesEvaluaciones[i].editFactor = false">
+                                                <svg class="w-4 h-4 fill-current text-indigo-500 shrink-0"
+                                                    viewBox="0 0 16 16">
+                                                    <path
+                                                        d="M14.3 2.3L5 11.6 1.7 8.3c-.4-.4-1-.4-1.4 0-.4.4-.4 1 0 1.4l4 4c.2.2.4.3.7.3.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4-.4-.4-1-.4-1.4 0z">
+                                                    </path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                        <div class="flex flex-nowrap items-center space-x-2 mb-1">
+                                            <div class="flex items-center">
+                                                <select class="text-[9pt] py-0.5 h-7 rounded-md"
+                                                    v-model="incidentesEvaluaciones[i].resultado_incidente_evaluacion"
+                                                    :class="errosModel[`dataIncidenteEvaluacion.${i}.resultado_incidente_evaluacion`] ? 'bg-red-300' : ''">
+                                                    <option value="-" selected> - </option>
+                                                    <option value="0">F</option>
+                                                    <option value="1">D</option>
+                                                </select>
+                                            </div>
+                                            <div class="text-slate-400">·</div>
+                                            <div>
+                                                <div class="text-xs inline-flex font-medium   rounded-full text-center px-2.5 py-1"
+                                                    :class="data.resultado_incidente_evaluacion == 0 ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'">
+                                                    {{ data.resultado_incidente_evaluacion == 0 ?
+                                                        'Incidentes Favorables' :
+                                                        'Incidentes Desfavorables' }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </header>
+                                    <div class="space-y-">
+                                        <div class="flex justify-between">
+                                            <p class="text-sm" v-if="!data.editEvento">{{
+                                                data.comentario_incidente_evaluacion
+                                            }}</p>
+                                            <textarea id="message" rows="4"
+                                                v-model="incidentesEvaluaciones[i].comentario_incidente_evaluacion" v-else
+                                                class="block mr-4 p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 "
+                                                placeholder="Desripcion del evento"></textarea>
+
+                                            <button v-if="!data.editEvento"
+                                                @click="incidentesEvaluaciones[i].editEvento = true"
+                                                class="pl-4 mb-3 border-slate-200 hover:border-slate-300">
+                                                <svg class="w-4 h-4 fill-current text-slate-500 shrink-0"
+                                                    viewBox="0 0 16 16">
+                                                    <path
+                                                        d="M11.7.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM4.6 14H2v-2.6l6-6L10.6 8l-6 6zM12 6.6L9.4 4 11 2.4 13.6 5 12 6.6z">
+                                                    </path>
+                                                </svg>
+                                            </button>
+
+                                            <button class=" border-slate-200 hover:border-slate-300" v-else
+                                                @click="incidentesEvaluaciones[i].editEvento = false">
+                                                <svg class="w-4 h-4 fill-current text-indigo-500 shrink-0"
+                                                    viewBox="0 0 16 16">
+                                                    <path
+                                                        d="M14.3 2.3L5 11.6 1.7 8.3c-.4-.4-1-.4-1.4 0-.4.4-.4 1 0 1.4l4 4c.2.2.4.3.7.3.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4-.4-.4-1-.4-1.4 0z">
+                                                    </path>
+                                                </svg>
+                                            </button>
+
+                                        </div>
+                                        <ul class="flex flex-wrap justify-end pr-4">
+                                            <li
+                                                class="flex items-center after:block after:content-['·'] last:after:content-[''] after:text-sm after:text-slate-400 after:px-2">
+                                                <a @click="delteIncident(data.id)"
+                                                    class="text-sm font-medium text-red-500 hover:text-red-600"
+                                                    href="#0">Eliminar el evento</a>
+                                            </li>
+                                        </ul>
                                     </div>
-                                </td>
-                            </tr>
+                                </div>
+                            </div>
+                        </article>
 
+                    </div>
+                    <div class="flex flex-row pt-28 items-center">
+                        <label for="" class="text-[10pt] font-semibold uppercase pr-2">Observaciones referentes al
+                            analisis de desempeño:</label>
+                        <textarea v-model="observacion_incidente_personal"
+                            placeholder="Escribe las observaciones de forma breve y concisa"
+                            class="text-sm font-medium resize-none border border-gray-300 rounded w-full h-24 py-2 px-3"></textarea>
+                        <!-- {{ registroEvaluacionRendimientoPersonal }} -->
+                    </div>
+                </div>
 
-                        </table>
-                    </td>
+            </div>
 
-                </tr>
+            <div v-else>
+                <div class="max-w-2xl m-auto mt-16">
+                    <div class="text-center px-4">
+                        <div
+                            class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-t from-slate-200 to-slate-100 mb-4">
+                            <svg class="w-5 h-6 fill-current" viewBox="0 0 20 24">
+                                <path class="text-slate-500" d="M10 10.562l9-5-8.514-4.73a1 1 0 00-.972 0L1 5.562l9 5z">
+                                </path>
+                                <path class="text-slate-300" d="M9 12.294l-9-5v10.412a1 1 0 00.514.874L9 23.294v-11z">
+                                </path>
+                                <path class="text-slate-400"
+                                    d="M11 12.294v11l8.486-4.714a1 1 0 00.514-.874V7.295l-9 4.999z"></path>
+                            </svg>
+                        </div>
+                        <h2 class="text-2xl text-slate-800 font-bold mb-4">No hay eventos disponibles</h2>
+                        <p class="text-sm text-gray-700 mb-6">
+                            Actualmente no hay eventos en el sistema. Si deseas agregar uno, ¡no dudes en
+                            hacerlo! Los eventos pasados se muestran aquí para tu referencia.
+                        </p>
 
-            </tbody>
-        </table>
+                        <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" @click="pushToIncidentes">
+                            <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
+                                <path
+                                    d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z">
+                                </path>
+                            </svg>
+                            <span class="ml-2">Agregar evento</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
 
         <div class="flex flex-col md:flex-row gap-10">
 
@@ -186,70 +495,65 @@ import momentAlias from "moment";
                 </table>
             </div>
 
-            <!-- Segunda tabla -->
-            <div class="w-full md:w-1/3 mt-6 md:mt-0 overflow-x-auto">
-                <table class="w-full">
-                    <tr class="text-start">
-                        <th class="py-2" colspan="2">
-                            <h1 class="text-sm font-bold">CALIFICACIÓN POR PUNTOS Y POR RANGOS</h1>
-                        </th>
-                    </tr>
-                    <tr class="text-start text-[8pt]">
-                        <td class="border border-black"
-                            :class="responsesWithScores.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0) > 73 ? 'bg-slate-400' : ''">
-                            Excelente
-                        </td>
-                        <td class="border border-black">
-                            De 73 a 84 puntos
-                        </td>
-                    </tr>
-                    <tr class="text-start text-[8pt]">
-                        <td class="border border-black"
-                            :class="responsesWithScores.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0) > 56 && responsesWithScores.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0) < 56 ? 'bg-slate-400' : ''">
-
-                            Muy Bueno
-                        </td>
-                        <td class="border border-black">
-                            De 56 a 72 puntos
-                        </td>
-                    </tr>
-                    <tr class="text-start text-[8pt]">
-                        <td class="border border-black"
-                            :class="responsesWithScores.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0) > 28 && responsesWithScores.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0) < 55 ? 'bg-slate-400' : ''">
-
-                            Bueno
-                        </td>
-                        <td class="border border-black">
-                            De 28 a 55 puntos
-                        </td>
-                    </tr>
-                    <tr class="text-start text-[8pt]">
-                        <td class="border border-black"
-                            :class="responsesWithScores.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0) < 27 ? 'bg-slate-400' : ''">
-
-                            Insatisfactorio
-                        </td>
-                        <td class="border border-black">
-                            De 0 a 27 puntos
-                        </td>
-                    </tr>
-                </table>
-            </div>
-
         </div>
 
+        <!-- Nueva seccion Comming soon -->
 
-    </div>
+        <div :class="showMe == 'ImpresionDeDocumentos' ? '' : 'hidden'"
+            class="mx-4 overflow-y-auto max-h-[calc(100vh-100px)] p-3 mb-4">
+            <div class="flex justify-start space-x-4">
+
+                <div @click="contenidoEvaluacionRendimiento != '' && registroEvaluacionRendimientoPersonal != '' ? printPdf() : ''"
+                    class="border h-64 w-48 rounded-lg hover:bg-slate-100 cursor-pointer hover:border-2 hover:border-black/50">
+                    <img src="../../../img/Documents-amico.svg" class="px-4" alt="">
+                    <div class="px-4">
+                        <h1 class="font-medium text-center text-xs">Descarga el documento</h1>
+                        <p class="text-[8pt] text-center">La información se verá reflejada en el documento cuando guardes
+                            los datos.</p>
+
+                    </div>
+                </div>
+                <div @click="submitResponseRequest()"
+                    class="border h-64 w-48 rounded-lg hover:bg-slate-100 cursor-pointer hover:border-2 hover:border-black/50">
+                    <img src="../../../img/update.svg" class="px-4" alt="">
+                    <div class="px-4">
+                        <h1 class="font-medium text-center text-xs">Enviar evaluacion</h1>
+                        <p class="text-[8pt] text-center">La información se verá reflejada en el documento cuando guardes
+                            los datos.</p>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
 </template>
 
 <script>
 import { createApp, h } from 'vue'
 import EvaluacionPdfpVue from '@/pdf/RRHH/EvaluacionPdf.vue';
-import moment, { isMoment } from 'moment';
-
 export default {
-    props: ["contenidoEvaluacionRendimiento", "registroEvaluacionRendimientoPersonal", "infoEmployee"],
-
+    props: {
+        contenidoEvaluacionRendimiento: {
+            type: Object,
+            default: () => ({}) // Valor por defecto: un objeto vacío
+        },
+        registroEvaluacionRendimientoPersonal: {
+            type: Object,
+            default: () => ({}) // Valor por defecto: un objeto vacío
+        },
+        ObservacionIncidente: {
+            type: String,
+            default: null // Valor por defecto: un objeto vacío
+        },
+        infoEmployee: {
+            type: Object,
+            default: () => ({}) // Valor por defecto: un objeto vacío
+        },
+        showMe: {
+            type: Boolean,
+            default: false // Valor por defecto: false
+        }
+    },
     data() {
         return {
             evaluacionData: [],
@@ -258,9 +562,39 @@ export default {
             showErrorWhenValuesChanges: true,
             registroEvaluacion: [],
             contenidoEvaluacion: [],
+            incidentesEvaluaciones: [],
+            errosModel: {},
+            optionsFactor: [],
+            observacion_incidente_personal: null,
         }
     },
+    computed: {
+        categoriaRendimientoObject() {
+            return this.contenidoEvaluacionRendimiento.categorias_rendimiento.map(item => ({
+                value: item.id_cat_rendimiento,
+                label: item.nombre_cat_rendimiento
+            }));
+        }
+    },
+
     methods: {
+        pushToIncidentes() {
+            this.incidentesEvaluaciones.push({
+                id: v4(),
+                id_incidente_evaluacion: '',
+                fecha_reg_incidente_evaluacion: momentAlias().format('YYYY-MM-DD'),
+                id_cat_rendimiento: '',
+                resultado_incidente_evaluacion: '',
+                comentario_incidente_evaluacion: '',
+                editFactor: true,
+                editEvento: true,
+                isDelete: false,
+            })
+        },
+        delteIncident(row) {
+            const index = this.incidentesEvaluaciones.findIndex(i => i.id == row)
+            this.incidentesEvaluaciones[index].isDelete = true
+        },
         printPdf(dataQuedan) {
             // Opciones de configuración para generar el PDF
             // let fecha = moment().format('DD-MM-YYYY');
@@ -282,6 +616,7 @@ export default {
             const app = createApp(EvaluacionPdfpVue, {
                 contenidoEvaluacionRendimiento: this.contenidoEvaluacionRendimiento,
                 registroEvaluacionRendimientoPersonal: this.registroEvaluacionRendimientoPersonal,
+                incidentesEvaluaciones: this.incidentesEvaluaciones,
                 promedio: this.responsesWithScores.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0),
                 empleado: this.generateFullName(this.infoEmployee.persona),
                 puesto: this.infoEmployee.plazas_asignadas && this.infoEmployee.plazas_asignadas.filter((plaza) => plaza.estado_plaza_asignada == 1).map((plaza, index) => {
@@ -378,7 +713,9 @@ export default {
             return new Promise(async (resolve, reject) => {
                 try {
                     const resp = await axios.post('/save-response', {
+                        dataIncidenteEvaluacion: this.incidentesEvaluaciones,
                         data: this.responsesWithScoresDataSend,
+                        observacion_incidente_personal: this.observacion_incidente_personal,
                         id_evaluacion_personal: this.registroEvaluacion.id_evaluacion_personal,
                         puntaje_evaluacion_personal: this.responsesWithScores.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0),
                     });
@@ -386,7 +723,27 @@ export default {
                     this.$emit("actualizar-table-data");
                     resolve(resp); // Resolvemos la promesa con la respuesta exitosa
                 } catch (error) {
-                    console.log('Error en el envio:', error)
+
+                    if (error.response.status === 422) {
+                        let data = error.response.data.errors
+                        var myData = new Object();
+                        for (const errorBack in data) {
+                            myData[errorBack] = data[errorBack][0]
+                        }
+                        this.errosModel = myData
+                        console.log(myData);
+                        setTimeout(() => {
+                            this.errosModel = [];
+                        }, 5000);
+                    } else {
+                        // Mostrar mensaje de error genérico si faltan datos
+                        toast.error("Al parecer te hacen falta datos por ingresar", {
+                            autoClose: 5000,
+                            position: "top-right",
+                            transition: "zoom",
+                            toastBackgroundColor: "white",
+                        });
+                    }
                     reject(error); // Rechazamos la promesa en caso de excepción
                 }
             });
@@ -424,31 +781,40 @@ export default {
                 console.log(data);
                 this.saveEvaluationResponses(data);
             });
+        },
+        mapperIncidents() {
+            const incidentesEvaluation = this.registroEvaluacion.incidentes_evaluacion;
 
-
-        }
-
-
-
-    },
-    watch: {
-        /*         registroEvaluacionRendimientoPersonal() {
-        
-                    //   alert("bruh")
-                }, */
-        dataEvaluacion() {
-            // this.evaluacionData = this.dataEvaluacion
-            //  console.log(this.evaluacionData.categorias_rendimiento);
-            //  this.responsesWithScores = []
+            if (!incidentesEvaluation) {
+                // Maneja el caso en el que alguna de las variables sea undefined
+                return;
+            }
+            this.incidentesEvaluaciones = []
+            incidentesEvaluation.forEach(element => {
+                this.incidentesEvaluaciones.push({
+                    id: v4(),
+                    id_incidente_evaluacion: element.id_incidente_evaluacion,
+                    id_cat_rendimiento: element.id_cat_rendimiento,
+                    fecha_reg_incidente_evaluacion: element.fecha_reg_incidente_evaluacion,
+                    resultado_incidente_evaluacion: element.resultado_incidente_evaluacion,
+                    comentario_incidente_evaluacion: element.comentario_incidente_evaluacion,
+                    editFactor: false,
+                    editEvento: false,
+                    isDelete: false,
+                })
+            });
 
         },
+    },
+    watch: {
         /**
          * Ejecuta accion cuando este detecta un cambio
          * @param {Object} newVal -- Nuevo valor de contenido evaluacion
          */
         contenidoEvaluacionRendimiento(newVal) {
             this.responsesWithScores = []
-
+            this.incidentesEvaluaciones = []
+            this.observacion_incidente_personal = this.registroEvaluacionRendimientoPersonal.observacion_incidente_personal
             // Activa la animación estableciendo showErrorWhenValuesChanges en true
             this.showErrorWhenValuesChanges = true;
             // Establece un temporizador para desactivar la animación después de un breve período de tiempo (por ejemplo, 1 segundo)
@@ -461,6 +827,7 @@ export default {
             // console.log(this.contenidoEvaluacionRendimiento);
 
             this.mapperResponse()
+            this.mapperIncidents()
 
 
 
@@ -558,5 +925,23 @@ export default {
 
 .animate-slide-in-left {
     animation: slideInLeft 0.5s ease both;
+}
+
+/* Estilos para la barra de desplazamiento en Webkit (Chrome, Safari) */
+::-webkit-scrollbar {
+    width: 10px;
+    /* Ancho de la barra de desplazamiento */
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #c1c2c5;
+    /* Color de la manija de desplazamiento */
+    border-radius: 5px;
+    /* Radio de la manija de desplazamiento */
+}
+
+::-webkit-scrollbar-track {
+    background-color: #f3f4f6;
+    /* Color del fondo de la barra de desplazamiento */
 }
 </style>

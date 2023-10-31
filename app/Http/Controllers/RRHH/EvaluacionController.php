@@ -4,11 +4,13 @@ namespace App\Http\Controllers\RRHH;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RRHH\EvaluacionRequest;
+use App\Http\Requests\RRHH\EvaluacionRespuestasRequest;
 use App\Models\CategoriaRendimiento;
 use App\Models\DetalleEvaluacionPersonal;
 use App\Models\Empleado;
 use App\Models\EvaluacionPersonal;
 use App\Models\EvaluacionRendimiento;
+use App\Models\IncidenteEvaluacion;
 use App\Models\Persona;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -53,35 +55,38 @@ class EvaluacionController extends Controller
                     return $query->orderBy("fecha_reg_evaluacion_personal", "desc");
                 },
                 "evaluaciones_personal.detalle_evaluaciones_personal",
+                "evaluaciones_personal.incidentes_evaluacion",
                 "plazas_asignadas.detalle_plaza.plaza",
                 "plazas_asignadas.dependencia"
             ])->whereHas("evaluaciones_personal")->orderBy($columns[$column], $dir);
 
         if ($data) {
             $query->where('id_empleado', 'like', '%' . $data["id_empleado"] . '%')
-                ->where('codigo_empleado', 'like', '%' . $data['codigo_empleado'] . '%')
-                ->where('email_institucional_empleado', 'like', '%' . $data['email_institucional_empleado'] . '%')
-                ->whereHas(
-                    'persona',
-                    function ($query) use ($data) {
-                        $searchNombres = $data["collecNombre"];
-                        $query->where(function ($query) use ($searchNombres) {
-                            $query->where('pnombre_persona', 'like', '%' . $searchNombres . '%')
-                                ->orWhere('snombre_persona', 'like', '%' . $searchNombres . '%')
-                                ->orWhere('tapellido_persona', 'like', '%' . $searchNombres . '%');
-                        });
+                ->where('codigo_empleado', 'like', '%' . $data['codigo_empleado'] . '%');
 
-                        $searchApellidos = $data["collecApellido"];
-                        $query->where(function ($query) use ($searchApellidos) {
-                            $query->where('papellido_persona', 'like', '%' . $searchApellidos . '%')
-                                ->orWhere('sapellido_persona', 'like', '%' . $searchApellidos . '%')
-                                ->orWhere('tapellido_persona', 'like', '%' . $searchApellidos . '%');
-                        });
-                    }
-                );
+            if (isset($data['email_institucional_empleado'])) {
+                $query->where('email_institucional_empleado', 'like', '%' . $data['email_institucional_empleado'] . '%');
+            }
+            $query->whereHas(
+                'persona',
+                function ($query) use ($data) {
+                    $searchNombres = $data["collecNombre"];
+                    $query->where(function ($query) use ($searchNombres) {
+                        $query->where('pnombre_persona', 'like', '%' . $searchNombres . '%')
+                            ->orWhere('snombre_persona', 'like', '%' . $searchNombres . '%')
+                            ->orWhere('tapellido_persona', 'like', '%' . $searchNombres . '%');
+                    });
+
+                    $searchApellidos = $data["collecApellido"];
+                    $query->where(function ($query) use ($searchApellidos) {
+                        $query->where('papellido_persona', 'like', '%' . $searchApellidos . '%')
+                            ->orWhere('sapellido_persona', 'like', '%' . $searchApellidos . '%')
+                            ->orWhere('tapellido_persona', 'like', '%' . $searchApellidos . '%');
+                    });
+                }
+            );
         }
         $acuerdos = $query->paginate($length)->onEachSide(1);
-
         return [
             'data' => $acuerdos,
             'draw' => $request->input('draw'),
@@ -107,17 +112,26 @@ class EvaluacionController extends Controller
         $result = $query->get();
         return $result;
     }
-    
+
     function createNewEvaluation(EvaluacionRequest $request)
     {
 
         try {
             DB::beginTransaction();
 
+            // Verificar si el periodo ya existe
+            $periodoExiste = EvaluacionPersonal::where('periodo_evaluacion_personal', $request->periodo_evaluacion_personal)
+                ->where('id_empleado', $request->id_empleado)
+                ->exists();
+
+            if ($periodoExiste) {
+                return response()->json('El periodo de evaluación ya existe para este empleado', 400);
+            }
+
             $evaluacionData = [
                 'id_empleado'                   => $request->id_empleado,
-                'id_evaluacion_rendimiento'     => 1,
-                'fecha_evaluacion_personal'     => $request->fecha_evaluacion_personal,
+                'id_evaluacion_rendimiento'     => $request->id_evaluacion_rendimiento,
+                'fecha_evaluacion_personal'     => Carbon::now(),
                 'periodo_evaluacion_personal'   => $request->periodo_evaluacion_personal,
                 'puntaje_evaluacion_personal'   => 0,
                 'fecha_reg_evaluacion_personal' => Carbon::now(),
@@ -131,6 +145,7 @@ class EvaluacionController extends Controller
                     return $query->orderBy("fecha_reg_evaluacion_personal", "desc");
                 },
                 "evaluaciones_personal.detalle_evaluaciones_personal",
+                "evaluaciones_personal.incidentes_evaluacion",
                 "plazas_asignadas.detalle_plaza.plaza",
                 "plazas_asignadas.dependencia"
             ])->whereHas("evaluaciones_personal")->find($request->id_empleado);
@@ -151,7 +166,7 @@ class EvaluacionController extends Controller
 
     // Guardamos la respuesta que se ha seleccionado en la evaluacion
 
-    function saveResponseInEvaluation(Request $request)
+    function saveResponseInEvaluation(EvaluacionRespuestasRequest $request)
     {
         try {
             // Buscar la evaluación personal
@@ -166,7 +181,13 @@ class EvaluacionController extends Controller
             DB::beginTransaction();
 
             try {
+
+                EvaluacionPersonal::where("id_evaluacion_personal", $request->id_evaluacion_personal)->update([
+                    'observacion_incidente_personal'          => $request->observacion_incidente_personal
+                ]);
+
                 // Iterar sobre las respuestas
+
                 foreach ($request->data as $value) {
                     $data = [
                         'id_evaluacion_personal'       => $request->id_evaluacion_personal,
@@ -202,9 +223,48 @@ class EvaluacionController extends Controller
                     'fecha_mod_evaluacion_personal' => Carbon::now(),
                 ]);
 
+
+                $data1 = [];
+                //INSERTANDO EN LA TABLA DE INCIDENTE EVALUACION
+                foreach ($request->dataIncidenteEvaluacion as $key => $value) {
+
+                    $data = [
+                        'id_evaluacion_personal'          => $request->id_evaluacion_personal,
+                        'id_cat_rendimiento'              => $value['id_cat_rendimiento'],
+                        'resultado_incidente_evaluacion'  => $value['resultado_incidente_evaluacion'],
+                        'comentario_incidente_evaluacion' => $value['comentario_incidente_evaluacion'],
+                        'estado_incidente_evaluacion'     => 1,
+                        'fecha_reg_incidente_evaluacion'  =>  $value['fecha_reg_incidente_evaluacion'],
+                        'usuario_incidente_evaluacion'    => $request->user()->nick_usuario,
+                        'ip_incidente_evaluacion'         => $request->ip(),
+                    ];
+
+
+                    // Condiciones de búsqueda
+                    $conditions = [
+                        'id_incidente_evaluacion' => $value['id_incidente_evaluacion'],
+                        'id_evaluacion_personal'  => $request->id_evaluacion_personal,
+                    ];
+
+                    $existingResponse = IncidenteEvaluacion::where($conditions)->first();
+
+                    if ($existingResponse) {
+                        // Si existe, añadir la fecha de modificación
+                        $data['fecha_mod_incidente_evaluacion'] = Carbon::now();
+                    } else {
+                        // Si no existe, añadir la fecha de creación
+                        $data['fecha_reg_incidente_evaluacion'] = Carbon::now();
+                    }
+
+                    if ($value["isDelete"] && !empty($value["id_cat_rendimiento"])) {
+                        IncidenteEvaluacion::destroy($value["id_incidente_evaluacion"]);
+                    } else if (!$value["isDelete"]) {
+                        IncidenteEvaluacion::updateOrInsert($conditions, $data);
+                    }
+                }
+
                 // Commit de la transacción
                 DB::commit();
-
                 // Respuesta exitosa
                 return response()->json(['message' => 'Respuestas guardadas exitosamente'], 200);
             } catch (\Exception $e) {
