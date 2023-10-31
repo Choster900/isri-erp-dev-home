@@ -462,6 +462,38 @@ import { v4 as uuid, v4 } from "uuid";
 
             </div>
 
+        <div class="flex flex-col md:flex-row gap-10">
+
+            <!-- Primera tabla -->
+            <div class="w-full md:w-1/2 overflow-x-auto">
+                <table class="w-full">
+                    <tr class="text-center">
+                        <th class="py-2" colspan="5">
+                            <h1 class="text-sm font-bold ">TABLA DE VALORACIÓN</h1>
+                        </th>
+                    </tr>
+                    <tr class="text-xs text-center bg-gray-200">
+                        <th class="border border-black">FACTOR</th>
+                        <th class="border border-black">A</th>
+                        <th class="border border-black">B</th>
+                        <th class="border border-black">C</th>
+                        <th class="border border-black">D</th>
+                    </tr>
+                    <tr class="text-center text-[8pt]"
+                        v-for="(data, i) in contenidoEvaluacionRendimiento.categorias_rendimiento" :key="i">
+                        <td class="border border-black text-start px-2">
+                            {{ i + 1 }} - {{ data.nombre_cat_rendimiento }}
+                        </td>
+                        <td v-for="(rubrica, j) in data.rubricas_rendimiento" :key="j"
+                            class="border border-black w-7 text-[8pt]"
+                            :class="registroEvaluacionRendimientoPersonal.detalle_evaluaciones_personal &&
+                                registroEvaluacionRendimientoPersonal.detalle_evaluaciones_personal.length > i &&
+                                registroEvaluacionRendimientoPersonal.detalle_evaluaciones_personal[i].id_rubrica_rendimiento == rubrica.id_rubrica_rendimiento ? 'bg-red-600/90 text-slate-300' : ''">
+                            {{ rubrica.puntaje_rubrica_rendimiento }}
+                        </td>
+                    </tr>
+                </table>
+            </div>
 
         </div>
 

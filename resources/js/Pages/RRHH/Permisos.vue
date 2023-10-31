@@ -164,7 +164,7 @@ import axios from 'axios';
                                                 </svg>
                                             </div>
                                             <div class="font-semibold">
-                                                Eliminar
+                                                Cancelar
                                             </div>
                                         </div>
                                     </DropDownOptions>
