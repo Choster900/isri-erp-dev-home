@@ -18,6 +18,7 @@ class Permiso extends Model
         'id_plaza_asignada',
         'id_motivo_permiso',
         'id_tipo_permiso',
+        'id_tipo_flujo_control',
         'id_estado_permiso',
         'fecha_inicio_permiso',
         'fecha_fin_permiso',
@@ -49,5 +50,9 @@ class Permiso extends Model
     public function motivo_permiso()
     {
         return $this->belongsTo('App\Models\MotivoPermiso','id_motivo_permiso','id_motivo_permiso');
+    }
+    public function etapa_permiso()
+    {
+        return $this->hasMany(EtapaPermiso::class,'id_permiso','id_permiso');
     }
 }
