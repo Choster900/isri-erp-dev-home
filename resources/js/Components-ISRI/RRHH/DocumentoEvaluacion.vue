@@ -2,7 +2,6 @@ use GuzzleHttp\Promise\Promise;
 <script setup>
 import { jsPDF } from "jspdf";
 import html2pdf from 'html2pdf.js'
-import DocumentBlanck from '@/Components-ISRI/RRHH/DocumentoEvaluacionBlank.vue';
 import momentAlias from "moment";
 import { v4 as uuid, v4 } from "uuid";
 </script>
