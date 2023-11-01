@@ -6,6 +6,7 @@ use App\Http\Controllers\RRHH\BeneficiarioController;
 use App\Http\Controllers\RRHH\DirectorCentroController;
 use App\Http\Controllers\RRHH\EmpleadoController;
 use App\Http\Controllers\RRHH\EvaluacionController;
+use App\Http\Controllers\RRHH\ExpedienteController;
 use App\Http\Controllers\RRHH\GerenteGeneralController;
 use App\Http\Controllers\RRHH\HojaServicioController;
 use App\Http\Controllers\RRHH\JefeInmediatoController;
@@ -148,5 +149,13 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('get-requests-gerente-general', [GerenteGeneralController::class, 'getReqGerenteGeneral'])->name('gerGeneral.getReqGerenteGeneral');
     Route::post('general-management-approval', [GerenteGeneralController::class, 'setGeneralManagementApproval'])->name('gerGeneral.setGeneralManagementApproval');
     Route::post('general-management-denial', [GerenteGeneralController::class, 'setGeneralManagementDenial'])->name('gerGeneral.setGeneralManagementDenial');
+
+    Route::get(
+        '/rrhh/expedientes',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/expedientes', 'RRHH/Expedientes');
+        }
+    )->name('rrhh.expedientes');
+    Route::post('expedientes', [ExpedienteController::class, 'getEmployeeExpediente'])->name('expediente.getEmployeeExpediente');
 
 });
