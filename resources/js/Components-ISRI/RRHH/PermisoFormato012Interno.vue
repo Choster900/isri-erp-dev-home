@@ -1,10 +1,9 @@
 <script setup>
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
-import moment from 'moment';
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
-import { jsPDF } from "jspdf";
-import html2pdf from 'html2pdf.js'
+import moment from 'moment';
+
 </script>
 <template>
     <div class="m-1.5 p-10">
@@ -603,9 +602,10 @@ import html2pdf from 'html2pdf.js'
 </template>
 
 <script>
-import IncomeReceiptPDF from '@/pdf/Tesoreria/IncomeReceiptPDF.vue';
-import ReciboIngresoMatricialVue from '@/pdf/Tesoreria/ReciboIngresoMatricial.vue';
+import PermisoF012ControlInternoPDFVue from '@/pdf/RRHH/PermisoF012ControlInternoPDF.vue';
 import { createApp, h } from 'vue'
+import html2pdf from 'html2pdf.js'
+import { jsPDF } from "jspdf";
 export default {
     props: {
         viewPermission012I: {
@@ -933,6 +933,58 @@ export default {
             const minutosFormateados = minutos.padStart(2, '0');
 
             return `${horaFormateada}:${minutosFormateados} ${amPm}`;
+        },
+        printPermission() {
+            const s1Name = this.getName(this.stages[0])
+            const s2Name = this.getName(this.stages[1])
+            const s3Name = this.getName(this.stages[2])
+            const permission = this.permissionToPrint
+            const currentDateTime = moment().format('DD/MM/YYYY, HH:mm:ss');
+            const name = 'PERMISO ' + permission.tipo_permiso.codigo_tipo_permiso + ' - ' + permission.empleado.codigo_empleado;
+            const opt = {
+                margin: 0.2,
+                filename: name,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 3, useCORS: true },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+            };
+
+            const fechaParseada = moment(permission.fecha_inicio_permiso);
+
+            const app = createApp(PermisoF012ControlInternoPDFVue, {
+                permission,
+                centro1: this.centro1,
+                centro2: this.centro2,
+                observation1: this.observation1,
+                observation2: this.observation2,
+                dia: fechaParseada.format('DD'),
+                mes: fechaParseada.format('MMMM').toUpperCase(),
+                anio: fechaParseada.format('YYYY'),
+                limite: this.limite,
+                s1Name,
+                s2Name,
+                s3Name
+            });
+            const div = document.createElement('div');
+            const pdfPrint = app.mount(div);
+            const html = div.outerHTML;
+
+            html2pdf().set(opt).from(html)
+                .toPdf().get('pdf').then(function (pdf) {
+                    pdf.setFontSize(10);
+                    const date_text = 'SIGI - Generado: ' + currentDateTime;
+                    const textWidth = pdf.getStringUnitWidth(date_text) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
+                    pdf.text(pdf.internal.pageSize.getWidth() - textWidth - 0.2, pdf.internal.pageSize.getHeight() - 0.4, date_text);
+                })
+                .save()
+                .catch(err => console.log(err));
+        },
+        getName(stage) {
+            const persona = stage.empleado.persona;
+            const nombres = [persona.pnombre_persona, persona.snombre_persona, persona.tnombre_persona].filter(Boolean).join(' ');
+            const apellidos = [persona.papellido_persona, persona.sapellido_persona, persona.tapellido_persona].filter(Boolean).join(' ');
+
+            return stage.empleado.titulo_profesional.codigo_titulo_profesional + ' ' + nombres + ' ' + apellidos;
         }
     },
     watch: {

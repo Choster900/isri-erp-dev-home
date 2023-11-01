@@ -645,6 +645,18 @@ export default {
         role2: {
             type: String,
             default: ''
+        },
+        s1Name: {
+            type: String,
+            default: ''
+        },
+        s2Name: {
+            type: String,
+            default: ''
+        },
+        s3Name: {
+            type: String,
+            default: ''
         }
     },
     data: function () {
