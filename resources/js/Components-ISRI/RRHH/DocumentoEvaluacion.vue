@@ -204,7 +204,7 @@ import { v4 as uuid, v4 } from "uuid";
                             <th class="border border-black">C</th>
                             <th class="border border-black">D</th>
                         </tr>
-                        <tr class="text-center text-[8pt]"
+                        <tr class="text-center text-[8pt]" 
                             v-for="(data, i) in contenidoEvaluacionRendimiento.categorias_rendimiento" :key="i">
                             <td class="border border-black text-start px-2">
                                 {{ i + 1 }} - {{ data.nombre_cat_rendimiento }}
