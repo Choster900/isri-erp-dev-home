@@ -680,7 +680,6 @@ export default {
             jefatura3: 'LICDA. KARLA GUADALUPE CASTANEDA DE ORELLANA',
             employee: 'MERCY LOURDES SANTAMARIA DE MARTINEZ',
             nup: '345832150015',
-            salary: '$800.00',
             plaza: 'JEFE DE UNIDAD DEL CONTROL Y RESGUARDO DEL ACTIVO FIJO INSTITUCIONAL'
         }
     },

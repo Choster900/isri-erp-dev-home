@@ -33,7 +33,8 @@ import moment from 'moment';
                                             placeholder="Digite contraseña" :type="show_password ? 'text' : 'password'">
                                             <div class="cursor-pointer no-select absolute inset-y-0 right-0 flex items-center px-4 focus:outline-none"
                                                 @click="toggleShow">
-                                                <svg v-if="show_password" class="w-6 h-6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <svg v-if="show_password" class="w-6 h-6" fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg">
                                                     <path fill-rule="evenodd" clip-rule="evenodd"
                                                         d="M2.28 9.27C4.69 5.94 8.2 3.97 12 3.97C13.35 3.97 14.67 4.22 15.92 4.69C16.3 4.84 16.5 5.27 16.35 5.66C16.2 6.05 15.77 6.24 15.38 6.1C14.3 5.68 13.16 5.47 12 5.47C8.74 5.47 5.67 7.15 3.5 10.15L3.5 10.15C3.16 10.62 2.97 11.29 2.97 12C2.97 12.7 3.16 13.37 3.5 13.84L3.5 13.84C3.93 14.43 4.4 14.98 4.89 15.47C5.19 15.76 5.19 16.23 4.9 16.53C4.61 16.82 4.14 16.82 3.84 16.53C3.28 15.99 2.76 15.38 2.28 14.72C1.72 13.94 1.46 12.95 1.46 12C1.46 11.04 1.72 10.05 2.28 9.27ZM18.77 7.19C19.05 6.88 19.53 6.86 19.83 7.14C20.52 7.77 21.15 8.49 21.72 9.27C22.28 10.05 22.53 11.04 22.53 12C22.53 12.95 22.28 13.94 21.72 14.72C19.31 18.05 15.8 20.02 12 20.02C10.51 20.02 9.06 19.72 7.71 19.15C7.33 18.98 7.15 18.54 7.31 18.16C7.47 17.78 7.91 17.6 8.29 17.76C9.47 18.26 10.72 18.52 12 18.52C15.26 18.52 18.33 16.84 20.5 13.84L20.5 13.84C20.84 13.37 21.03 12.7 21.03 12C21.03 11.29 20.84 10.62 20.5 10.15L20.5 10.15C19.99 9.44 19.42 8.81 18.82 8.25C18.51 7.97 18.49 7.49 18.77 7.19Z"
                                                         fill="#000000"></path>
@@ -174,7 +175,7 @@ import moment from 'moment';
                                     <!-- you'll have to validate this if -->
                                     <tr v-if="user_modal.roles == ''">
                                         <td colspan="4" class="text-center p-2 font-light">
-                                            {{ modalData == '' ? 'Sin roles asignados' : 'Cargando...' }}
+                                            {{ isLoading  ? 'Cargando...' : 'Sin roles asignados' }}
                                         </td>
                                     </tr>
                                 </tbody>
@@ -211,6 +212,7 @@ export default {
             show_password: false,
             new_item: true,
             found_user: false,
+            isLoading: false,
             user_modal: {
                 id: '',
                 dui: '',
@@ -240,29 +242,31 @@ export default {
         toggleShow() {
             this.show_password = !this.show_password;
         },
-        getRoles(id) {
+        async getRoles(id) {
             this.sistemas = []
             this.roles = []
             this.row.id_rol = ''
             this.row.id_sistema = ''
             this.new_item = true
-            axios.post("/systems", { id_usuario: id })
-                .then((response) => {
-                    this.user_modal.roles = response.data.userRoles
-                    this.sistemas = response.data.sistemas
-                    for (let i = 0; i < this.user_modal.roles.length; i++) {
-                        this.user_modal.roles[i].selected = false;
+            try {
+                this.isLoading = true;  // Activar el estado de carga
+                const response = await axios.post('/systems', { id_usuario: id });
+                this.user_modal.roles = response.data.userRoles
+                this.sistemas = response.data.sistemas
+                for (let i = 0; i < this.user_modal.roles.length; i++) {
+                    this.user_modal.roles[i].selected = false;
+                }
+            } catch (errors) {
+                if (errors.response.status === 422) {
+                    if (errors.response.data.logical_error) {
+                        this.showToast(toast.error, errors.response.data.logical_error);
                     }
-                })
-                .catch((errors) => {
-                    let msg = this.manageError(errors)
-                    this.$swal.fire({
-                        title: 'Operación cancelada',
-                        text: msg,
-                        icon: 'warning',
-                        timer: 5000
-                    })
-                })
+                } else {
+                    this.manageError(errors, this)
+                }
+            } finally {
+                this.isLoading = false;  // Desactivar el estado de carga
+            }
         },
         editRol(rol, index) {
             //Assign the vars depending the previous selection

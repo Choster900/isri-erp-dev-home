@@ -3,11 +3,15 @@
 use App\Http\Controllers\RRHH\AcuerdoController;
 use App\Http\Controllers\RRHH\DetallePlazaController;
 use App\Http\Controllers\RRHH\BeneficiarioController;
+use App\Http\Controllers\RRHH\DirectorCentroController;
 use App\Http\Controllers\RRHH\EmpleadoController;
 use App\Http\Controllers\RRHH\EvaluacionController;
 use App\Http\Controllers\RRHH\ExpedienteController;
 use App\Http\Controllers\RRHH\HojaServicioController;
+use App\Http\Controllers\RRHH\JefeInmediatoController;
 use App\Http\Controllers\RRHH\PermisoController;
+use App\Http\Controllers\RRHH\SolicitudPermisoController;
+use App\Http\Controllers\RRHH\SubDirectorMedicoController;
 use App\Models\EvaluacionRendimiento;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -88,6 +92,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('update-employee-permission', [PermisoController::class, 'updateEmployeePermission'])->name('permiso.updateEmployeePermission');
     Route::post('get-permission-info-by-id', [PermisoController::class, 'getPermissionInfoById'])->name('permiso.getPermissionInfoById');
     Route::post('delete-permission', [PermisoController::class, 'deletePermission'])->name('permiso.deletePermission');
+    Route::post('send-permission', [PermisoController::class, 'sendPermission'])->name('solicPermiso.sendPermission');
 
 
     Route::get(
@@ -110,5 +115,6 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('rrhh.expedientes');
     Route::post('expedientes', [ExpedienteController::class, 'getEmployeeExpediente'])->name('expediente.getEmployeeExpediente');
+
 
 });

@@ -251,7 +251,7 @@ import moment from 'moment';
                                 </label>
                                 <textarea v-model="permission.observation" id="description" name="description"
                                     class="resize-none w-full h-9 overflow-y-auto peer text-xs font-semibold rounded-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
-                                    @input="validateInput('observation', limit = 94)">
+                                    @input="validateInput('observation', limit = 90)">
                                 </textarea>
                                 <InputError v-for="(item, index) in errors.description" :key="index" class="mt-2"
                                     :message="item" />
@@ -286,7 +286,7 @@ import moment from 'moment';
                             <div class="mb-3 md:flex flex-row justify-items-start mx-4 items-center">
                                 <div class="mb-4 md:mr-2 md:mb-0 basis-2/3">
                                     <TextInput id="destination" v-model="permission.destination" type="text"
-                                        placeholder="Destino" @update:modelValue="validateInput('destination', 100)">
+                                        placeholder="Destino" @update:modelValue="validateInput('destination', 79)">
                                         <LabelToInput icon="standard" forLabel="destination" />
                                     </TextInput>
                                     <InputError v-for="(item, index) in errors.destination" :key="index" class="mt-2"
@@ -319,7 +319,7 @@ import moment from 'moment';
                                 </label>
                                 <textarea v-model="permission.observation" id="description" name="description"
                                     class="resize-none w-full h-12 overflow-y-auto peer text-xs font-semibold rounded-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
-                                    @input="validateInput('observation', limit = 250)">
+                                    @input="validateInput('observation', limit = 100)">
                                 </textarea>
                                 <InputError v-for="(item, index) in errors.description" :key="index" class="mt-2"
                                     :message="item" />
