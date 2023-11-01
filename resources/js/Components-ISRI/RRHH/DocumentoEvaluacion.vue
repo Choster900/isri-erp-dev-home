@@ -2,7 +2,6 @@ use GuzzleHttp\Promise\Promise;
 <script setup>
 import { jsPDF } from "jspdf";
 import html2pdf from 'html2pdf.js'
-import DocumentBlanck from '@/Components-ISRI/RRHH/DocumentoEvaluacionBlank.vue';
 import momentAlias from "moment";
 import { v4 as uuid, v4 } from "uuid";
 </script>
@@ -194,7 +193,7 @@ import { v4 as uuid, v4 } from "uuid";
                     <table class="w-full">
                         <tr class="text-center">
                             <th class="py-2" colspan="5">
-                                <h1 class="text-sm font-bold ">TABLA DE VALORACIÓN</h1>
+                                <h1 class="text-sm font-bold ">TABLA DE VALORACIÓN 2</h1>
                             </th>
                         </tr>
                         <tr class="text-xs text-center bg-gray-200">
@@ -204,7 +203,7 @@ import { v4 as uuid, v4 } from "uuid";
                             <th class="border border-black">C</th>
                             <th class="border border-black">D</th>
                         </tr>
-                        <tr class="text-center text-[8pt]"
+                        <tr class="text-center text-[8pt]" 
                             v-for="(data, i) in contenidoEvaluacionRendimiento.categorias_rendimiento" :key="i">
                             <td class="border border-black text-start px-2">
                                 {{ i + 1 }} - {{ data.nombre_cat_rendimiento }}
@@ -218,14 +217,16 @@ import { v4 as uuid, v4 } from "uuid";
                             </td>
                         </tr>
 
-                        <tr class="text-center text-[8pt]" v-for="i in 6" :key="i"
-                            v-if="!contenidoEvaluacionRendimiento.categorias_rendimiento">
-                            <td class="border border-black text-start px-2">-</td>
-                            <td class="border border-black w-7 text-[8pt]">0</td>
-                            <td class="border border-black w-7 text-[8pt]">0</td>
-                            <td class="border border-black w-7 text-[8pt]">0</td>
-                            <td class="border border-black w-7 text-[8pt]">0</td>
-                        </tr>
+                        <template v-for="i in 6" :key="i">
+                            <tr class="text-center text-[8pt]"
+                                v-if="!contenidoEvaluacionRendimiento.categorias_rendimiento">
+                                <td class="border border-black text-start px-2">-</td>
+                                <td class="border border-black w-7 text-[8pt]">0</td>
+                                <td class="border border-black w-7 text-[8pt]">0</td>
+                                <td class="border border-black w-7 text-[8pt]">0</td>
+                                <td class="border border-black w-7 text-[8pt]">0</td>
+                            </tr>
+                        </template>
 
                     </table>
                 </div>
@@ -462,11 +463,8 @@ import { v4 as uuid, v4 } from "uuid";
 
             </div>
 
-
         </div>
-
-        <!-- Nueva seccion Comming soon -->
-
+        <!-- Secciones de botones -->
         <div :class="showMe == 'ImpresionDeDocumentos' ? '' : 'hidden'"
             class="mx-4 overflow-y-auto max-h-[calc(100vh-100px)] p-3 mb-4">
             <div class="flex justify-start space-x-4">

@@ -63,7 +63,7 @@ input[type="search"]::-webkit-search-results-decoration {
 .form-select,
 .form-checkbox,
 .form-radio {
-    @apply text-sm text-slate-800 bg-white border;
+    @apply text-xs text-slate-800 bg-white border;
 }
 
 .form-input,
@@ -98,6 +98,9 @@ input[type="search"]::-webkit-search-results-decoration {
 /* Chrome, Safari and Opera */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+.form-select{
+    line-height: 0.7rem;
 }
 
 .no-scrollbar {
