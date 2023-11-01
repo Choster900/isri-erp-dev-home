@@ -204,7 +204,7 @@ import { v4 as uuid, v4 } from "uuid";
                             <th class="border border-black">C</th>
                             <th class="border border-black">D</th>
                         </tr>
-                        <tr class="text-center text-[8pt]"
+                        <tr class="text-center text-[8pt]" 
                             v-for="(data, i) in contenidoEvaluacionRendimiento.categorias_rendimiento" :key="i">
                             <td class="border border-black text-start px-2">
                                 {{ i + 1 }} - {{ data.nombre_cat_rendimiento }}
@@ -218,14 +218,16 @@ import { v4 as uuid, v4 } from "uuid";
                             </td>
                         </tr>
 
-                        <tr class="text-center text-[8pt]" v-for="i in 6" :key="i"
-                            v-if="!contenidoEvaluacionRendimiento.categorias_rendimiento">
-                            <td class="border border-black text-start px-2">-</td>
-                            <td class="border border-black w-7 text-[8pt]">0</td>
-                            <td class="border border-black w-7 text-[8pt]">0</td>
-                            <td class="border border-black w-7 text-[8pt]">0</td>
-                            <td class="border border-black w-7 text-[8pt]">0</td>
-                        </tr>
+                        <template v-for="i in 6" :key="i">
+                            <tr class="text-center text-[8pt]"
+                                v-if="!contenidoEvaluacionRendimiento.categorias_rendimiento">
+                                <td class="border border-black text-start px-2">-</td>
+                                <td class="border border-black w-7 text-[8pt]">0</td>
+                                <td class="border border-black w-7 text-[8pt]">0</td>
+                                <td class="border border-black w-7 text-[8pt]">0</td>
+                                <td class="border border-black w-7 text-[8pt]">0</td>
+                            </tr>
+                        </template>
 
                     </table>
                 </div>
@@ -462,6 +464,7 @@ import { v4 as uuid, v4 } from "uuid";
 
             </div>
 
+        </div>
         <div class="flex flex-col md:flex-row gap-10">
 
             <!-- Primera tabla -->

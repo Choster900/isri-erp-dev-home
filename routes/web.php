@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\IndexController;
+use Illuminate\Support\Facades\File;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,6 +29,17 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::get('dashboard/{id}', [IndexController::class, 'getMenus'])->name('index.getMenus');
     Route::get('password/create', [IndexController::class, 'createCambiarContraseña'])->name('index.createCambiarContraseña');
     Route::put('password/reset', [IndexController::class, 'cambiarContraseña'])->name('index.cambiarContraseña');
+
+    Route::get('/resources/{filename}', function ($filename) {
+        $path = resource_path('img/' . $filename);
+    
+        if (File::exists($path)) {
+            return response()->file($path);
+        }
+    
+        return response()->json(['message' => 'Imagen no encontrada'], 404);
+    })->where('filename', '.*');
+
 });
 
 
