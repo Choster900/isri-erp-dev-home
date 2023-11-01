@@ -40,7 +40,7 @@ class EtapaPermiso extends Model
         return $this->belongsTo(PersonaEtapa::class,'id_persona_etapa','id_persona_etapa');
     }
 
-    public function estado_etapa_permiso()
+    public function estado_etapa_permiso_rel()
     {
         return $this->belongsTo(EstadoEtapaPermiso::class,'id_estado_etapa_permiso','id_estado_etapa_permiso');
     }

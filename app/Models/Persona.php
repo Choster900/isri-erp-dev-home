@@ -109,4 +109,13 @@ class Persona extends Model
     {
         return $this->belongsTo(Municipio::class, 'id_municipio', 'id_municipio');
     }
+    /**
+     * Get all of the archivos_anexos for the Persona
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function archivos_anexos(): HasMany
+    {
+        return $this->hasMany(ArchivoAnexo::class, 'id_persona', 'id_persona');
+    }
 }
