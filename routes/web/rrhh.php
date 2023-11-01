@@ -5,6 +5,7 @@ use App\Http\Controllers\RRHH\DetallePlazaController;
 use App\Http\Controllers\RRHH\BeneficiarioController;
 use App\Http\Controllers\RRHH\EmpleadoController;
 use App\Http\Controllers\RRHH\EvaluacionController;
+use App\Http\Controllers\RRHH\ExpedienteController;
 use App\Http\Controllers\RRHH\HojaServicioController;
 use App\Http\Controllers\RRHH\PermisoController;
 use App\Models\EvaluacionRendimiento;
@@ -102,5 +103,12 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('save-response', [EvaluacionController::class, 'saveResponseInEvaluation'])->name('evaluaciones.save-response');
     Route::post('get-by-id', [EvaluacionController::class, 'getEvaluationById'])->name('evaluaciones.get-by-id');
 
+    Route::get(
+        '/rrhh/expedientes',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/expedientes', 'RRHH/Expedientes');
+        }
+    )->name('rrhh.expedientes');
+    Route::post('expedientes', [ExpedienteController::class, 'getEmployeeExpediente'])->name('expediente.getEmployeeExpediente');
 
 });
