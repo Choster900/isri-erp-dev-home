@@ -7,7 +7,6 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
 import AccordionBasicVue from '../AccordionBasic.vue';
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue';
 import DocumentoEvaluacionVue from './DocumentoEvaluacion.vue';
-import DocumentoAnalisisDesempeñoVue from './DocumentoAnalisisDesempeño.vue';
 
 </script>
 
