@@ -26,6 +26,6 @@ class TipoArchivoAnexo extends Model
      */
     public function archivos_anexos(): HasMany
     {
-        return $this->hasMany(Comment::class, 'foreign_key', 'local_key');
+        return $this->hasMany(ArchivoAnexo::class, 'id_tipo_archivo_anexo', 'id_tipo_archivo_anexo');
     }
 }
