@@ -1,10 +1,9 @@
 <script setup>
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
-import moment from 'moment';
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
-import { jsPDF } from "jspdf";
-import html2pdf from 'html2pdf.js'
+import moment from 'moment';
+
 </script>
 <template>
     <div class="m-1.5 p-10">
@@ -26,7 +25,7 @@ import html2pdf from 'html2pdf.js'
             </div>
         </div>
         <ProcessModal v-else maxWidth='5xl' :show="viewPermission026" @close="$emit('cerrar-modal')">
-            <div v-if="!showDenialOptions && validPermit" class="flex justify-center items-center h-full mt-1">
+            <div v-if="!showDenialOptions" class="flex justify-center items-center h-full mt-1">
                 <div v-if="showButtons" class="px-2">
                     <GeneralButton color="bg-green-600 hover:bg-green-700" text="Aprobar" icon="check"
                         @click="approvePermission()" />
@@ -35,9 +34,10 @@ import html2pdf from 'html2pdf.js'
                     <GeneralButton color="bg-orange-600 hover:bg-orange-700" text="Denegar" icon="pdf"
                         @click="showDenialOptions = true" />
                 </div>
-                <div class="px-2">
-                    <GeneralButton color="bg-red-600 hover:bg-red-700" text="PDF" icon="pdf" @click="printPdf()" />
+                <div v-else-if="permissionToPrint.id_estado_permiso === 3" class="px-2">
+                    <GeneralButton color="bg-red-600 hover:bg-red-700" text="PDF" icon="pdf" @click="printPermission()" />
                 </div>
+                <div v-else class="py-3"></div>
             </div>
             <div v-else class="py-3"></div>
 
@@ -82,7 +82,7 @@ import html2pdf from 'html2pdf.js'
                                     <div class="w-full mb-1">
                                         <p class="text-[13px] text-gray-600 mb-0.5">Estado</p>
                                         <p class="text-[13px] font-medium text-navy-700 dark:text-white">
-                                            {{ stage.estado_etapa_permiso.nombre_estado_etapa_permiso }}
+                                            {{ stage.estado_etapa_permiso_rel.nombre_estado_etapa_permiso }}
                                         </p>
                                     </div>
                                     <div class="w-full mb-1">
@@ -189,6 +189,8 @@ import html2pdf from 'html2pdf.js'
                                     <div class="text-left w-[90%] text-[13px] font-bold border-b border-gray-700">
                                         <p class="font-[MuseoSans] ml-3">
                                             {{ permissionToPrint.empleado ?
+                                                permissionToPrint.empleado.titulo_profesional.codigo_titulo_profesional : '' }}
+                                            {{ permissionToPrint.empleado ?
                                                 permissionToPrint.empleado.persona.pnombre_persona : '' }}
                                             {{ permissionToPrint.empleado ?
                                                 permissionToPrint.empleado.persona.snombre_persona : '' }}
@@ -285,7 +287,8 @@ import html2pdf from 'html2pdf.js'
                             </div>
                         </div>
 
-                        <div v-if="limite > 0" class="flex w-full justify-between items-center mb-4 mt-4">
+                        <div v-if="permissionToPrint.id_estado_permiso != 4 && permissionToPrint.id_estado_permiso != 5"
+                            class="flex w-full justify-between items-center mb-4 mt-4">
                             <div class="flex w-full text-left">
                                 <div class="relative flex flex-row w-full">
                                     <div class="flex justify-start w-[90%]">
@@ -345,9 +348,10 @@ import html2pdf from 'html2pdf.js'
 </template>
 
 <script>
-import IncomeReceiptPDF from '@/pdf/Tesoreria/IncomeReceiptPDF.vue';
-import ReciboIngresoMatricialVue from '@/pdf/Tesoreria/ReciboIngresoMatricial.vue';
+import PermisoF026PDFVue from '@/pdf/RRHH/PermisoF026PDF.vue';
 import { createApp, h } from 'vue'
+import html2pdf from 'html2pdf.js'
+import { jsPDF } from "jspdf";
 export default {
     props: {
         viewPermission026: {
@@ -619,7 +623,6 @@ export default {
                 }
             }
         },
-
         formatHour(time) {
             const [hora, minutos] = time.split(':');
             const hora12 = (parseInt(hora) % 12).toString();
@@ -631,6 +634,57 @@ export default {
             const minutosFormateados = minutos.padStart(2, '0');
 
             return `${horaFormateada}:${minutosFormateados} ${amPm}`;
+        },
+        printPermission() {
+            const lastStage = this.stages.find((element) => element.estado_etapa_permiso === 0)
+            const supervisor = this.getSupervisorName(lastStage)
+            console.log(supervisor);
+            const permission = this.permissionToPrint
+            const currentDateTime = moment().format('DD/MM/YYYY, HH:mm:ss');
+            const name = 'PERMISO ' + permission.tipo_permiso.codigo_tipo_permiso + ' - ' + permission.empleado.codigo_empleado;
+            const opt = {
+                margin: 0.2,
+                filename: name,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 3, useCORS: true },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+            };
+
+            const fechaParseada = moment(permission.fecha_inicio_permiso);
+
+            const app = createApp(
+                PermisoF026PDFVue, {
+                permission,
+                centro1: this.centro1,
+                centro2: this.centro2,
+                observation1: this.observation1,
+                observation2: this.observation2,
+                dia: fechaParseada.format('DD'),
+                mes: fechaParseada.format('MMMM').toUpperCase(),
+                anio: fechaParseada.format('YYYY'),
+                limite: this.limite,
+                supervisor
+            });
+            const div = document.createElement('div');
+            const pdfPrint = app.mount(div);
+            const html = div.outerHTML;
+
+            html2pdf().set(opt).from(html)
+                .toPdf().get('pdf').then(function (pdf) {
+                    pdf.setFontSize(10);
+                    const date_text = 'SIGI - Generado: ' + currentDateTime;
+                    const textWidth = pdf.getStringUnitWidth(date_text) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
+                    pdf.text(pdf.internal.pageSize.getWidth() - textWidth - 0.2, pdf.internal.pageSize.getHeight() - 0.4, date_text);
+                })
+                .save()
+                .catch(err => console.log(err));
+        },
+        getSupervisorName(stage) {
+            const persona = stage.empleado.persona;
+            const nombres = [persona.pnombre_persona, persona.snombre_persona, persona.tnombre_persona].filter(Boolean).join(' ');
+            const apellidos = [persona.papellido_persona, persona.sapellido_persona, persona.tapellido_persona].filter(Boolean).join(' ');
+
+            return stage.empleado.titulo_profesional.codigo_titulo_profesional +' '+ nombres + ' ' + apellidos;
         }
     },
     watch: {
@@ -652,7 +706,7 @@ export default {
     },
     computed: {
         validPermit() {
-            if (this.permissionToPrint.id_estado_permiso === 2) {
+            if (this.permissionToPrint.id_estado_permiso === 2) { //En proceso
                 return true
             } else {
                 return false

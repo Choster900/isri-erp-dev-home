@@ -552,7 +552,7 @@ import axios from "axios";
                                 <div class="text-[12px]">ANTERIOR</div>
                             </button>
                         </div>
-                        <div v-if="correct_dui" class="w-1/2">
+                        <div v-if="correct_dui">
                             <button v-if="validateButton"
                                 class="ml-1 flex items-center bg-blue-600 hover:bg-blue-700 text-white pl-3 pr-2 py-1.5 text-center mb-2 rounded"
                                 @click="goToNextPage(current_page)">
