@@ -1,10 +1,9 @@
 <script setup>
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
-import moment from 'moment';
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
-import { jsPDF } from "jspdf";
-import html2pdf from 'html2pdf.js'
+import moment from 'moment';
+
 </script>
 <template>
     <div class="m-1.5 p-10">
@@ -26,7 +25,7 @@ import html2pdf from 'html2pdf.js'
             </div>
         </div>
         <ProcessModal v-else maxWidth='5xl' :show="viewPermission012" @close="$emit('cerrar-modal')">
-            <div v-if="!showDenialOptions && validPermit" class="flex justify-center items-center h-full mt-1">
+            <div v-if="!showDenialOptions" class="flex justify-center items-center h-full mt-1">
                 <div v-if="showButtons" class="px-2">
                     <GeneralButton color="bg-green-600 hover:bg-green-700" text="Aprobar" icon="check"
                         @click="approvePermission()" />
@@ -35,9 +34,10 @@ import html2pdf from 'html2pdf.js'
                     <GeneralButton color="bg-orange-600 hover:bg-orange-700" text="Denegar" icon="pdf"
                         @click="showDenialOptions = true" />
                 </div>
-                <div class="px-2">
+                <div v-else-if="permissionToPrint.id_estado_permiso === 3" class="px-2">
                     <GeneralButton color="bg-red-600 hover:bg-red-700" text="PDF" icon="pdf" @click="printPdf()" />
                 </div>
+                <div v-else class="py-3"></div>
             </div>
             <div v-else class="py-3"></div>
 
@@ -527,7 +527,8 @@ import html2pdf from 'html2pdf.js'
                                         <div class="text-center w-[60%] font-bold text-[13px] border-b border-gray-700 ">
                                             <p class="font-bold font-[MuseoSans] ml-1">
                                                 {{
-                                                    moment(permissionToPrint.fecha_inicio_permiso, 'YYYY-MM-DD').format('DD/MM/YYYY')
+                                                    moment(permissionToPrint.fecha_inicio_permiso,
+                                                        'YYYY-MM-DD').format('DD/MM/YYYY')
                                                 }}
                                             </p>
                                         </div>
@@ -541,7 +542,8 @@ import html2pdf from 'html2pdf.js'
                                         <div class="text-center w-[60%] font-bold text-[13px] border-b border-gray-700 ">
                                             <p class="font-bold font-[MuseoSans] ml-1">
                                                 {{
-                                                    moment(permissionToPrint.fecha_fin_permiso, 'YYYY-MM-DD').format('DD/MM/YYYY')
+                                                    moment(permissionToPrint.fecha_fin_permiso,
+                                                        'YYYY-MM-DD').format('DD/MM/YYYY')
                                                 }}
                                             </p>
                                         </div>
@@ -561,9 +563,10 @@ import html2pdf from 'html2pdf.js'
 </template>
 
 <script>
-import IncomeReceiptPDF from '@/pdf/Tesoreria/IncomeReceiptPDF.vue';
-import ReciboIngresoMatricialVue from '@/pdf/Tesoreria/ReciboIngresoMatricial.vue';
+import PermisoF012PDF from '@/pdf/RRHH/PermisoF012PDF.vue';
 import { createApp, h } from 'vue'
+import html2pdf from 'html2pdf.js'
+import { jsPDF } from "jspdf";
 export default {
     props: {
         viewPermission012: {
@@ -764,44 +767,40 @@ export default {
             }
         },
         printPdf() {
-            let fecha = moment().format('DD-MM-YYYY');
-            let name = 'RECIBO ' + this.receipt_to_print.numero_recibo_ingreso + ' - ' + fecha;
+            const permission = this.permissionToPrint
+            const currentDateTime = moment().format('DD/MM/YYYY, HH:mm:ss');
+            const name = 'PERMISO ' + permission.tipo_permiso.codigo_tipo_permiso + ' - ' + permission.empleado.codigo_empleado;
             const opt = {
-                margin: 0,
+                margin: 0.2,
                 filename: name,
-                //pagebreak: {mode:'css',before:'#pagebreak'},
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 3, useCORS: true },
-                //jsPDF: { unit: 'cm', format: [13.95,21.5], orientation: 'landscape' }
-                jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
             };
 
-            const limiteCaracteres = 70;
-            if (this.receipt_to_print.monto_letras.length <= limiteCaracteres) {
-                this.letras1 = this.receipt_to_print.monto_letras;
-                this.letras2 = ''
-            } else {
-                let textoTruncado = this.receipt_to_print.monto_letras.slice(0, limiteCaracteres);
-                let ultimoEspacio = textoTruncado.lastIndexOf(' ');
-                this.letras1 = textoTruncado.slice(0, ultimoEspacio);
-                this.letras2 = this.receipt_to_print.monto_letras.slice(ultimoEspacio + 1);
-            }
-
-            const app = createApp(ReciboIngresoMatricialVue, {
-                receipt_to_print: this.receipt_to_print,
-                formatedAmount: this.receipt_to_print.monto_recibo_ingreso,
-                empleado: this.empleado,
-                nombre_cuenta: this.nombre_cuenta,
-                fecha_recibo: this.fecha_recibo,
-                letras1: this.letras1,
-                letras2: this.letras2
+            const app = createApp(PermisoF012PDF, {
+                permission,
+                centro1: this.centro1,
+                centro2: this.centro2,
+                observation1: this.observation1,
+                observation2: this.observation2,
+                role1: this.role1,
+                role2: this.role2,
+                stages: this.stages
             });
             const div = document.createElement('div');
             const pdfPrint = app.mount(div);
             const html = div.outerHTML;
 
-            html2pdf().set(opt).from(html).save();
-            //html2pdf().set(opt).from(html).output('dataurlnewwindow');
+            html2pdf().set(opt).from(html)
+                .toPdf().get('pdf').then(function (pdf) {
+                    pdf.setFontSize(10);
+                    const date_text = 'SIGI - Generado: ' + currentDateTime;
+                    const textWidth = pdf.getStringUnitWidth(date_text) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
+                    pdf.text(pdf.internal.pageSize.getWidth() - textWidth - 0.2, pdf.internal.pageSize.getHeight() - 0.4, date_text);
+                })
+                .save()
+                .catch(err => console.log(err));
         },
         getCentro() {
             let limiteCaracteres = 68;
@@ -848,16 +847,23 @@ export default {
             }
         },
         formatHour(time) {
-            const [hora, minutos] = time.split(':');
-            const hora12 = (parseInt(hora) % 12).toString();
-            const amPm = parseInt(hora) < 12 ? 'AM' : 'PM';
+            let [hora, minutos] = time.split(':');
+            let amPm = parseInt(hora) < 12 ? 'AM' : 'PM';
 
-            // Añade un 0 delante si la hora tiene un solo dígito
-            const horaFormateada = hora12.padStart(2, '0');
+            // Si la hora es 12, cambia 'AM' a 'PM' y ajusta la hora a 12
+            if (parseInt(hora) === 12) {
+                amPm = 'MD';
+            } else if (parseInt(hora) === 0) {
+                // Si la hora es 00, ajusta la hora a 12
+                hora = '12';
+            } else {
+                hora = (parseInt(hora) % 12).toString();
+            }
+
             // Añade un 0 delante si los minutos tienen un solo dígito
-            const minutosFormateados = minutos.padStart(2, '0');
+            minutos = minutos.padStart(2, '0');
 
-            return `${horaFormateada}:${minutosFormateados} ${amPm}`;
+            return `${hora}:${minutos} ${amPm}`;
         },
     },
     watch: {

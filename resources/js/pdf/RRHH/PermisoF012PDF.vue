@@ -174,7 +174,7 @@ import moment from 'moment';
                         <div class="relative flex flex-row w-full ml-[1cm] mr-[1cm]">
                             <div class="text-left w-full text-[14px] font-bold border-b border-gray-700"
                                 :class="role2 ? '' : 'py-2'">
-                                <p class="mb-[5px] font-[MuseoSans] ml-3">{{ role2 }}</p>
+                                <p class="mb-[5px] font-[MuseoSans]">{{ role2 }}</p>
                             </div>
                         </div>
                     </div>
@@ -471,18 +471,12 @@ import moment from 'moment';
                         <div class="relative flex flex-row w-full">
                             <div class="text-center w-[50%] text-[13px] font-bold ml-[1cm]">
                                 <p class="font-[MuseoSans] mx-auto">
-                                    {{ permission.empleado.titulo_profesional.codigo_titulo_profesional }}
-                                    {{ permission.empleado.persona.pnombre_persona }}
-                                    {{ permission.empleado.persona.snombre_persona }}
-                                    {{ permission.empleado.persona.tnombre_persona }}
-                                    {{ permission.empleado.persona.papellido_persona }}
-                                    {{ permission.empleado.persona.sapellido_persona }}
-                                    {{ permission.empleado.persona.tapellido_persona }}
+                                    {{ getName(stages[0]) }}
                                 </p>
                             </div>
                             <div class="text-center w-[50%] text-[13px] font-bold mr-[1cm]">
                                 <p class="font-[MuseoSans] mx-auto">
-                                    {{ jefatura1 }}
+                                    {{ permission.id_tipo_flujo_control === 4 ? getName(stages[2]) : getName(stages[1]) }}
                                 </p>
                             </div>
                         </div>
@@ -507,14 +501,15 @@ import moment from 'moment';
                 </div>
                 <!-- Nineteenth row -->
                 <div class="flex w-full justify-between items-center mt-[30px]">
-                    <div class="flex w-full text-left">
-                        <div class="relative flex flex-row w-full">
-                            <div class="flex justify-start w-[50%] ml-[1cm]">
+                    <div class="flex w-full text-center">
+                        <div class="relative flex flex-row w-full mr-[1cm] ml-[1cm]">
+                            <div v-if="permission.id_tipo_flujo_control === 4" class="flex justify-start w-[50%]">
                                 <label for="" class="font-[MuseoSans] text-[13px] mx-auto mt-[-2px]">
                                     VISTO BUENO:
                                 </label>
                             </div>
-                            <div class="flex justify-start w-[50%] mr-[1cm]">
+                            <div class="flex justify-center"
+                            :class="permission.id_tipo_flujo_control === 4 ? 'w-[50%]' : 'w-full'">
                                 <label for="" class="font-[MuseoSans] text-[13px] mx-auto mt-[-2px]">
                                     AUTORIZADO:
                                 </label>
@@ -525,8 +520,8 @@ import moment from 'moment';
                 <!-- Seventeenth row -->
                 <div class="flex w-full justify-between items-center mt-6">
                     <div class="flex w-full text-left">
-                        <div class="relative flex flex-row w-full">
-                            <div class="flex justify-start w-[50%]  ml-[1cm]">
+                        <div class="relative flex flex-row w-full  ml-[1cm] mr-[1cm]">
+                            <div v-if="permission.id_tipo_flujo_control === 4" class="flex justify-start w-[50%]">
                                 <div class="flex justify-start w-[60%]  mx-auto">
                                     <div class="flex justify-start w-[8%]">
                                         <label for="" class="font-[MuseoSans] text-[13px] mb-1 mt-[-2px]">
@@ -538,8 +533,10 @@ import moment from 'moment';
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex justify-start w-[50%]  mr-[1cm]">
-                                <div class="flex justify-start w-[60%]  mx-auto">
+                            <div class="flex justify-start"
+                            :class="permission.id_tipo_flujo_control === 4 ? 'w-[50%]' : 'w-full'">
+                                <div class="flex justify-start mx-auto"
+                                :class="permission.id_tipo_flujo_control === 4 ? 'w-[60%]' : 'w-[30%]'">
                                     <div class="flex justify-start w-[8%]">
                                         <label for="" class="font-[MuseoSans] text-[13px] mb-1 mt-[-2px]">
                                             F.
@@ -556,15 +553,16 @@ import moment from 'moment';
                 <!-- Eighteenth row -->
                 <div class="flex w-full justify-between items-center">
                     <div class="flex w-full text-left">
-                        <div class="relative flex flex-row w-full">
-                            <div class="text-center w-[50%] text-[13px] font-bold ml-[1cm]">
+                        <div class="relative flex flex-row w-full mr-[1cm] ml-[1cm]">
+                            <div v-if="permission.id_tipo_flujo_control === 4" class="text-center w-[50%] text-[13px] font-bold">
                                 <p class="font-[MuseoSans] mx-auto">
-                                    {{ jefatura2 }}
+                                    {{ permission.id_tipo_flujo_control === 4 ? getName(stages[3]) : '' }}
                                 </p>
                             </div>
-                            <div class="text-center w-[50%] text-[13px] font-bold mr-[1cm]">
+                            <div class="text-center text-[13px] font-bold"
+                            :class="permission.id_tipo_flujo_control === 4 ? 'w-[50%]' : 'w-full'">
                                 <p class="font-[MuseoSans] mx-auto">
-                                    {{ jefatura3 }}
+                                    {{ permission.id_tipo_flujo_control === 4 ? getName(stages[4]) : getName(stages[2]) }}
                                 </p>
                             </div>
                         </div>
@@ -573,13 +571,14 @@ import moment from 'moment';
                 <!-- Nineteenth row -->
                 <div class="flex w-full justify-between items-center">
                     <div class="flex w-full text-left">
-                        <div class="relative flex flex-row w-full">
-                            <div class="flex justify-start w-[50%] ml-[1cm]">
+                        <div class="relative flex flex-row w-full mr-[1cm] ml-[1cm]" >
+                            <div v-if="permission.id_tipo_flujo_control === 4" class="flex justify-start w-[50%] ">
                                 <label for="" class="font-[MuseoSans] text-[13px] mx-auto mt-[-2px]">
                                     Gerente Médico y de Servicios de Rehabilitación
                                 </label>
                             </div>
-                            <div class="flex justify-start w-[50%] mr-[1cm]">
+                            <div class="flex justify-start"
+                            :class="permission.id_tipo_flujo_control === 4 ? 'w-[50%]' : 'w-full'">
                                 <label for="" class="font-[MuseoSans] text-[13px] mx-auto mt-[-2px]">
                                     Gerente Administrativo
                                 </label>
@@ -646,6 +645,10 @@ export default {
             type: Array,
             default: [],
         },
+        stages: {
+            type: Array,
+            default: [],
+        },
         centro1: {
             type: String,
             default: ''
@@ -685,14 +688,30 @@ export default {
     },
     methods: {
         formatHour(time) {
-            const [hora, minutos] = time.split(':');
-            const hora12 = (parseInt(hora) % 12).toString();
-            const amPm = parseInt(hora) < 12 ? 'AM' : 'PM';
-            // Añade un 0 delante si la hora tiene un solo dígito
-            const horaFormateada = hora12.padStart(2, '0');
+            let [hora, minutos] = time.split(':');
+            let amPm = parseInt(hora) < 12 ? 'AM' : 'PM';
+
+            // Si la hora es 12, cambia 'AM' a 'PM' y ajusta la hora a 12
+            if (parseInt(hora) === 12) {
+                amPm = 'MD';
+            } else if (parseInt(hora) === 0) {
+                // Si la hora es 00, ajusta la hora a 12
+                hora = '12';
+            } else {
+                hora = (parseInt(hora) % 12).toString();
+            }
+
             // Añade un 0 delante si los minutos tienen un solo dígito
-            const minutosFormateados = minutos.padStart(2, '0');
-            return `${horaFormateada}:${minutosFormateados} ${amPm}`;
+            minutos = minutos.padStart(2, '0');
+
+            return `${hora}:${minutos} ${amPm}`;
+        },
+        getName(stage) {
+            const persona = stage.empleado.persona;
+            const nombres = [persona.pnombre_persona, persona.snombre_persona, persona.tnombre_persona].filter(Boolean).join(' ');
+            const apellidos = [persona.papellido_persona, persona.sapellido_persona, persona.tapellido_persona].filter(Boolean).join(' ');
+
+            return stage.empleado.titulo_profesional.codigo_titulo_profesional + ' ' + nombres + ' ' + apellidos;
         }
     },
     watch: {

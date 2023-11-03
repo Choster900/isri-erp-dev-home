@@ -29,7 +29,6 @@ class SubDirectorMedicoController extends Controller
 
         $user = $request->user();
         $id_persona = $user->persona->id_persona;
-        $depency = Dependencia::where('id_persona', $id_persona)->first();
 
         $range = range(2, 10);
 
@@ -58,8 +57,17 @@ class SubDirectorMedicoController extends Controller
                 $query->where('estado_etapa_permiso', 1)
                     ->where('id_persona_etapa', 3)
                     ->where('id_estado_etapa_permiso', 4);
-            })
-            ->orderBy('id_permiso', 'desc');
+            });
+
+            if ($column == -1) {
+                $query->orderByRaw('(
+                    SELECT id_etapa_permiso
+                    FROM etapa_permiso
+                    WHERE etapa_permiso.id_permiso = permiso.id_permiso
+                    ORDER BY id_etapa_permiso DESC
+                    LIMIT 1
+                ) DESC');
+            }
 
 
         $permissions = $query->paginate($length)->onEachSide(1);
