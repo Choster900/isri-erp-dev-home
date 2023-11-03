@@ -25,7 +25,7 @@ import moment from 'moment';
             </div>
         </div>
         <ProcessModal v-else maxWidth='5xl' :show="viewPermission012I" @close="$emit('cerrar-modal')">
-            <div v-if="!showDenialOptions && validPermit" class="flex justify-center items-center h-full mt-1">
+            <div v-if="!showDenialOptions" class="flex justify-center items-center h-full mt-1">
                 <div v-if="showButtons" class="px-2">
                     <GeneralButton color="bg-green-600 hover:bg-green-700" text="Aprobar" icon="check"
                         @click="approvePermission()" />
@@ -34,9 +34,10 @@ import moment from 'moment';
                     <GeneralButton color="bg-orange-600 hover:bg-orange-700" text="Denegar" icon="pdf"
                         @click="showDenialOptions = true" />
                 </div>
-                <div class="px-2">
-                    <GeneralButton color="bg-red-600 hover:bg-red-700" text="PDF" icon="pdf" @click="printPdf()" />
+                <div v-else-if="permissionToPrint.id_estado_permiso === 3" class="px-2">
+                    <GeneralButton color="bg-red-600 hover:bg-red-700" text="PDF" icon="pdf" @click="printPermission()" />
                 </div>
+                <div v-else class="py-3"></div>
             </div>
             <div v-else class="py-3"></div>
 
@@ -157,7 +158,7 @@ import moment from 'moment';
                                 <div class="relative flex flex-row w-full">
                                     <div class="text-left w-full text-[13px] font-bold border-b border-gray-700"
                                         :class="centro2 ? '' : 'py-2'">
-                                        <p class="font-[MuseoSans] ml-3">{{ centro2 }}</p>
+                                        <p class="font-[MuseoSans]">{{ centro2 }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -823,10 +824,8 @@ export default {
             // Formatea la fecha en el nuevo formato 'DD/MM/YYYY'
             return fechaParseada.format('DD/MM/YYYY') ?? '-------------';
         },
-
         printPdf() {
-            let fecha = moment().format('DD-MM-YYYY');
-            let name = 'RECIBO ' + this.receipt_to_print.numero_recibo_ingreso + ' - ' + fecha;
+            const name = 'PERMISO ' + permission.tipo_permiso.codigo_tipo_permiso + ' - ' + permission.empleado.codigo_empleado;
             const opt = {
                 margin: 0,
                 filename: name,
@@ -897,7 +896,7 @@ export default {
             this.role1 = '';
             this.role2 = '';
             if (role) {
-                const limiteCaracteres3 = 42;
+                const limiteCaracteres3 = 44;
                 if (role.length <= limiteCaracteres3) {
                     this.role1 = role;
                 } else {
@@ -923,21 +922,25 @@ export default {
             }
         },
         formatHour(time) {
-            const [hora, minutos] = time.split(':');
-            const hora12 = (parseInt(hora) % 12).toString();
-            const amPm = parseInt(hora) < 12 ? 'AM' : 'PM';
+            let [hora, minutos] = time.split(':');
+            let amPm = parseInt(hora) < 12 ? 'AM' : 'PM';
 
-            // Añade un 0 delante si la hora tiene un solo dígito
-            const horaFormateada = hora12.padStart(2, '0');
+            // Si la hora es 12, cambia 'AM' a 'PM' y ajusta la hora a 12
+            if (parseInt(hora) === 12) {
+                amPm = 'MD';
+            } else if (parseInt(hora) === 0) {
+                // Si la hora es 00, ajusta la hora a 12
+                hora = '12';
+            } else {
+                hora = (parseInt(hora) % 12).toString();
+            }
+
             // Añade un 0 delante si los minutos tienen un solo dígito
-            const minutosFormateados = minutos.padStart(2, '0');
+            minutos = minutos.padStart(2, '0');
 
-            return `${horaFormateada}:${minutosFormateados} ${amPm}`;
+            return `${hora}:${minutos} ${amPm}`;
         },
         printPermission() {
-            const s1Name = this.getName(this.stages[0])
-            const s2Name = this.getName(this.stages[1])
-            const s3Name = this.getName(this.stages[2])
             const permission = this.permissionToPrint
             const currentDateTime = moment().format('DD/MM/YYYY, HH:mm:ss');
             const name = 'PERMISO ' + permission.tipo_permiso.codigo_tipo_permiso + ' - ' + permission.empleado.codigo_empleado;
@@ -949,7 +952,20 @@ export default {
                 jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
             };
 
-            const fechaParseada = moment(permission.fecha_inicio_permiso);
+            const role = this.permissionToPrint.plaza_asignada.detalle_plaza.plaza.nombre_plaza;
+            let r1 = ''
+            let r2 = ''
+            if (role) {
+                const limiteCaracteres3 = 50;
+                if (role.length <= limiteCaracteres3) {
+                    r1 = role;
+                } else {
+                    const textoTruncado3 = role.slice(0, limiteCaracteres3);
+                    const ultimoEspacio3 = textoTruncado3.lastIndexOf(' ');
+                    r1 = textoTruncado3.slice(0, ultimoEspacio3);
+                    r2 = role.slice(ultimoEspacio3 + 1);
+                }
+            }
 
             const app = createApp(PermisoF012ControlInternoPDFVue, {
                 permission,
@@ -957,13 +973,9 @@ export default {
                 centro2: this.centro2,
                 observation1: this.observation1,
                 observation2: this.observation2,
-                dia: fechaParseada.format('DD'),
-                mes: fechaParseada.format('MMMM').toUpperCase(),
-                anio: fechaParseada.format('YYYY'),
-                limite: this.limite,
-                s1Name,
-                s2Name,
-                s3Name
+                role1: r1,
+                role2: r2,
+                stages: this.stages
             });
             const div = document.createElement('div');
             const pdfPrint = app.mount(div);
@@ -979,13 +991,7 @@ export default {
                 .save()
                 .catch(err => console.log(err));
         },
-        getName(stage) {
-            const persona = stage.empleado.persona;
-            const nombres = [persona.pnombre_persona, persona.snombre_persona, persona.tnombre_persona].filter(Boolean).join(' ');
-            const apellidos = [persona.papellido_persona, persona.sapellido_persona, persona.tapellido_persona].filter(Boolean).join(' ');
 
-            return stage.empleado.titulo_profesional.codigo_titulo_profesional + ' ' + nombres + ' ' + apellidos;
-        }
     },
     watch: {
         viewPermission012I: function (value, oldValue) {

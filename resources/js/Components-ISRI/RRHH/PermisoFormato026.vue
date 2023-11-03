@@ -624,21 +624,27 @@ export default {
             }
         },
         formatHour(time) {
-            const [hora, minutos] = time.split(':');
-            const hora12 = (parseInt(hora) % 12).toString();
-            const amPm = parseInt(hora) < 12 ? 'AM' : 'PM';
+            let [hora, minutos] = time.split(':');
+            let amPm = parseInt(hora) < 12 ? 'AM' : 'PM';
 
-            // Añade un 0 delante si la hora tiene un solo dígito
-            const horaFormateada = hora12.padStart(2, '0');
+            // Si la hora es 12, cambia 'AM' a 'PM' y ajusta la hora a 12
+            if (parseInt(hora) === 12) {
+                amPm = 'MD';
+            } else if (parseInt(hora) === 0) {
+                // Si la hora es 00, ajusta la hora a 12
+                hora = '12';
+            } else {
+                hora = (parseInt(hora) % 12).toString();
+            }
+
             // Añade un 0 delante si los minutos tienen un solo dígito
-            const minutosFormateados = minutos.padStart(2, '0');
+            minutos = minutos.padStart(2, '0');
 
-            return `${horaFormateada}:${minutosFormateados} ${amPm}`;
+            return `${hora}:${minutos} ${amPm}`;
         },
         printPermission() {
             const lastStage = this.stages.find((element) => element.estado_etapa_permiso === 0)
             const supervisor = this.getSupervisorName(lastStage)
-            console.log(supervisor);
             const permission = this.permissionToPrint
             const currentDateTime = moment().format('DD/MM/YYYY, HH:mm:ss');
             const name = 'PERMISO ' + permission.tipo_permiso.codigo_tipo_permiso + ' - ' + permission.empleado.codigo_empleado;
@@ -684,7 +690,7 @@ export default {
             const nombres = [persona.pnombre_persona, persona.snombre_persona, persona.tnombre_persona].filter(Boolean).join(' ');
             const apellidos = [persona.papellido_persona, persona.sapellido_persona, persona.tapellido_persona].filter(Boolean).join(' ');
 
-            return stage.empleado.titulo_profesional.codigo_titulo_profesional +' '+ nombres + ' ' + apellidos;
+            return stage.empleado.titulo_profesional.codigo_titulo_profesional + ' ' + nombres + ' ' + apellidos;
         }
     },
     watch: {

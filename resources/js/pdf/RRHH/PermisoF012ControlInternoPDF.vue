@@ -47,7 +47,7 @@ import moment from 'moment';
                         <div class="relative flex flex-row w-full ml-[1cm] mr-[1cm]">
                             <div class="text-left w-full text-[13px] font-bold border-b border-gray-700"
                                 :class="centro2 ? '' : 'py-2'">
-                                <p class="mb-[5px] font-[MuseoSans] ml-3">{{ centro2 }}</p>
+                                <p class="mb-[5px] font-[MuseoSans]">{{ centro2 }}</p>
                             </div>
                         </div>
                     </div>
@@ -74,7 +74,7 @@ import moment from 'moment';
                         <div class="relative flex flex-row w-full ml-[1cm] mr-[1cm]">
                             <div class="text-left w-full text-[13px] font-bold border-b border-gray-700"
                                 :class="role2 ? '' : 'py-2'">
-                                <p class="mb-[5px] font-[MuseoSans] ml-3">{{ role2 }}</p>
+                                <p class="mb-[5px] font-[MuseoSans]">{{ role2 }}</p>
                             </div>
                         </div>
                     </div>
@@ -486,18 +486,12 @@ import moment from 'moment';
                         <div class="relative flex flex-row w-full">
                             <div class="text-center w-[50%] text-[13px] font-bold ml-[1cm]">
                                 <p class="font-[MuseoSans] mx-auto">
-                                    {{ permission.empleado.titulo_profesional.codigo_titulo_profesional }}
-                                    {{ permission.empleado.persona.pnombre_persona }}
-                                    {{ permission.empleado.persona.snombre_persona }}
-                                    {{ permission.empleado.persona.tnombre_persona }}
-                                    {{ permission.empleado.persona.papellido_persona }}
-                                    {{ permission.empleado.persona.sapellido_persona }}
-                                    {{ permission.empleado.persona.tapellido_persona }}
+                                    {{ getName(stages[0]) }}
                                 </p>
                             </div>
                             <div class="text-center w-[50%] text-[13px] font-bold mr-[1cm]">
                                 <p class="font-[MuseoSans] mx-auto">
-                                    {{ jefatura2 }}
+                                    {{ getName(stages[1]) }}
                                 </p>
                             </div>
                         </div>
@@ -521,7 +515,7 @@ import moment from 'moment';
                     </div>
                 </div>
                 <!-- twentieth row -->
-                <div class="flex w-full justify-between items-center mt-3">
+                <div v-if="stages.length === 3" class="flex w-full justify-between items-center mt-3">
                     <div class="flex w-full text-left">
                         <div class="relative flex flex-row w-full mr-[1cm] ml-[1cm]">
                             <div class="text-center w-[50%] text-[13px] mx-auto">
@@ -540,19 +534,19 @@ import moment from 'moment';
                     </div>
                 </div>
                 <!-- Twenty-first row -->
-                <div class="flex w-full justify-between items-center">
+                <div v-if="stages.length === 3" class="flex w-full justify-between items-center">
                     <div class="flex w-full text-left">
                         <div class="relative flex flex-row w-full mr-[1cm] ml-[1cm]">
                             <div class="text-center w-[50%] text-[13px] font-bold mx-auto">
                                 <p class="font-[MuseoSans]">
-                                    {{ jefatura3 }}
+                                    {{ getName(stages[2]) }}
                                 </p>
                             </div>
                         </div>
                     </div>
                 </div>
                 <!-- Twenty-second row -->
-                <div class="flex w-full justify-between items-center">
+                <div v-if="stages.length === 3" class="flex w-full justify-between items-center">
                     <div class="flex w-full text-left">
                         <div class="relative flex flex-row w-full">
                             <div class="flex justify-center w-[50%] mx-auto">
@@ -622,6 +616,10 @@ export default {
             type: Array,
             default: [],
         },
+        stages: {
+            type: Array,
+            default: [],
+        },
         centro1: {
             type: String,
             default: ''
@@ -646,18 +644,6 @@ export default {
             type: String,
             default: ''
         },
-        s1Name: {
-            type: String,
-            default: ''
-        },
-        s2Name: {
-            type: String,
-            default: ''
-        },
-        s3Name: {
-            type: String,
-            default: ''
-        }
     },
     data: function () {
         return {
@@ -705,6 +691,13 @@ export default {
             minutos = minutos.padStart(2, '0');
 
             return `${hora}:${minutos} ${amPm}`;
+        },
+        getName(stage) {
+            const persona = stage.empleado.persona;
+            const nombres = [persona.pnombre_persona, persona.snombre_persona, persona.tnombre_persona].filter(Boolean).join(' ');
+            const apellidos = [persona.papellido_persona, persona.sapellido_persona, persona.tapellido_persona].filter(Boolean).join(' ');
+
+            return stage.empleado.titulo_profesional.codigo_titulo_profesional + ' ' + nombres + ' ' + apellidos;
         }
     },
     watch: {

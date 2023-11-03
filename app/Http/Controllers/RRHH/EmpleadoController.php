@@ -76,12 +76,9 @@ class EmpleadoController extends Controller
                 ->whereHas(
                     'persona',
                     function ($query) use ($search_value) {
-                        $query->where('pnombre_persona', 'like', '%' . $search_value["nombre_persona"] . '%')
-                            ->orWhere('snombre_persona', 'like', '%' . $search_value["nombre_persona"] . '%')
-                            ->orWhere('tnombre_persona', 'like', '%' . $search_value["nombre_persona"] . '%')
-                            ->orWhere('papellido_persona', 'like', '%' . $search_value["nombre_persona"] . '%')
-                            ->orWhere('sapellido_persona', 'like', '%' . $search_value["nombre_persona"] . '%')
-                            ->orWhere('tapellido_persona', 'like', '%' . $search_value["nombre_persona"] . '%');
+                        if($search_value["nombre_persona"]!=''){
+                            $query->whereRaw("MATCH(pnombre_persona, snombre_persona, tnombre_persona, papellido_persona, sapellido_persona, tapellido_persona) AGAINST(?)", $search_value["nombre_persona"]);
+                        }
                     }
                 );
         }
