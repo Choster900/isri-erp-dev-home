@@ -29,7 +29,6 @@ class GerenteGeneralController extends Controller
 
         $user = $request->user();
         $id_persona = $user->persona->id_persona;
-        $depency = Dependencia::where('id_persona', $id_persona)->first();
 
         $query = Permiso::select('*')
             ->with([
@@ -53,7 +52,7 @@ class GerenteGeneralController extends Controller
                     ->where('id_persona_etapa', 4)
                     ->where('id_estado_etapa_permiso', 6);
             })
-            ->where('id_tipo_flujo_control',4);
+            ->where('id_tipo_flujo_control', 4);
 
         $query2 = Permiso::select('*')
             ->with([
@@ -76,10 +75,9 @@ class GerenteGeneralController extends Controller
                     ->where('id_persona_etapa', 2)
                     ->where('id_estado_etapa_permiso', 2);
             })
-            ->whereIn('id_tipo_flujo_control',[1,2]);
+            ->whereIn('id_tipo_flujo_control', [1, 2]);
 
         $combinedQuery = $query->union($query2);
-
 
         $permissions = $combinedQuery->paginate($length)->onEachSide(1);
         return ['data' => $permissions, 'draw' => $request->input('draw')];

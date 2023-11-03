@@ -255,7 +255,7 @@ export default {
                 draw: 0,
                 length: 5,
                 search: "",
-                column: 0,
+                column: -1,
                 dir: "desc",
                 total: "",
                 execute: ''
