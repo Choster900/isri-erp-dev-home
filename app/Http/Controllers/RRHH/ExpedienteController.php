@@ -4,11 +4,12 @@ namespace App\Http\Controllers\RRHH;
 
 use App\Http\Controllers\Controller;
 use App\Models\Persona;
+use App\Models\TipoArchivoAnexo;
 use Illuminate\Http\Request;
 
 class ExpedienteController extends Controller
 {
-    //
+    //Controller for Anexos 
 
     function getEmployeeExpediente(Request $request)
     {
@@ -36,9 +37,8 @@ class ExpedienteController extends Controller
         $data = $request->input('search');
 
         // Construir la consulta base con las relaciones
-        $query = Persona::select('*')->with(["familiar", "familiar.parentesco",])->whereHas("familiar", function ($query) {
-            $query->where("estado_familiar", 1);
-        })->where("estado_persona", 1)->orderBy($columns[$column], $dir);
+        $query = Persona::select('*')->with(["archivos_anexos"])->whereHas("archivos_anexos")
+        ->where("estado_persona", 1)->orderBy($columns[$column], $dir);
 
         if ($data) {
             $query->where('id_persona', 'like', '%' . $data["id_persona"] . '%');
@@ -76,9 +76,5 @@ class ExpedienteController extends Controller
             'data' => $beneficiarios,
             'draw' => $request->input('draw'),
         ];
-    }
-    function getAllAnexos()
-    {
-        
     }
 }
