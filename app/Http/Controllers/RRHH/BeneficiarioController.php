@@ -60,20 +60,29 @@ class BeneficiarioController extends Controller
 
         if ($data) {
             $query->where('id_persona', 'like', '%' . $data["id_persona"] . '%');
-
-            $searchNombres = $data["collecNombre"];
-            $query->where(function ($query) use ($searchNombres) {
+            
+            /* $query->where(function ($query) use ($searchNombres) {
                 $query->where('pnombre_persona', 'like', '%' . $searchNombres . '%')
                     ->orWhere('snombre_persona', 'like', '%' . $searchNombres . '%')
-                    ->orWhere('tapellido_persona', 'like', '%' . $searchNombres . '%');
-            });
+                    ->orWhere('tnombre_persona', 'like', '%' . $searchNombres . '%');
+            }); */
 
-            $searchApellidos = $data["collecApellido"];
+            /*   $searchApellidos = $data["collecApellido"];
             $query->where(function ($query) use ($searchApellidos) {
                 $query->where('papellido_persona', 'like', '%' . $searchApellidos . '%')
                     ->orWhere('sapellido_persona', 'like', '%' . $searchApellidos . '%')
                     ->orWhere('tapellido_persona', 'like', '%' . $searchApellidos . '%');
-            });
+            }); */
+
+            $searchNombres = $data["collecNombre"];
+            if (isset($searchNombres)) {
+                $query->whereRaw("MATCH ( pnombre_persona, snombre_persona, tnombre_persona ) AGAINST ( '" . $searchNombres . "')");
+            }
+
+            $searchApellidos = $data["collecApellido"];
+            if (isset($searchApellidos)) {
+                $query->whereRaw("MATCH ( papellido_persona, sapellido_persona, tapellido_persona ) AGAINST ( '" . $searchApellidos . "')");
+            }
 
             $query->whereHas('familiar', function ($query) use ($data) {
                 $query->where('nombre_familiar', 'like', '%' . $data["nombre_familiar"] . '%');

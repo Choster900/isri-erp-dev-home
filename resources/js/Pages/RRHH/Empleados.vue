@@ -45,7 +45,7 @@ import axios from 'axios';
                 <datatable :columns="columns" :sortKey="sortKey" :inputsToValidate="inputsToValidate" :sortOrders="sortOrders" @sort="sortBy"
                     :searchButton="true" @datos-enviados="handleData($event)" @execute-search="getEmployees()">
                     <tbody class="text-sm divide-y divide-slate-200">
-                        <tr v-for="employee in employees" :key="employee.id_empleado">
+                        <tr v-for="employee in employees" :key="employee.id_empleado"  class="content-body">
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">{{ employee.id_empleado }}</div>
                             </td>
