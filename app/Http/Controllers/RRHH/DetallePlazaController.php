@@ -78,12 +78,7 @@ class DetallePlazaController extends Controller
                         $query->whereHas(
                             'plaza_asignada_activa.empleado.persona',
                             function ($query) use ($search_value) {
-                                $query->where('pnombre_persona', 'like', '%' . $search_value["nombre_empleado"] . '%')
-                                    ->orWhere('snombre_persona', 'like', '%' . $search_value["nombre_empleado"] . '%')
-                                    ->orWhere('tnombre_persona', 'like', '%' . $search_value["nombre_empleado"] . '%')
-                                    ->orWhere('papellido_persona', 'like', '%' . $search_value["nombre_empleado"] . '%')
-                                    ->orWhere('sapellido_persona', 'like', '%' . $search_value["nombre_empleado"] . '%')
-                                    ->orWhere('tapellido_persona', 'like', '%' . $search_value["nombre_empleado"] . '%');
+                                $query->whereRaw("MATCH(pnombre_persona, snombre_persona, tnombre_persona, papellido_persona, sapellido_persona, tapellido_persona) AGAINST(?)", $search_value["nombre_empleado"]);
                             }
                         );
                     }

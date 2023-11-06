@@ -169,11 +169,12 @@ import axios from 'axios';
 
         <ModalPermisosVue :showModalJobPermissions="showModalJobPermissions" :modalData="modalData" :permits="permits"
             @cerrar-modal="showModalJobPermissions = false" @get-table="getPermissionRequests(tableData.currentPage)" />
-        <PermisoFormato026Vue :viewPermission026="viewPermission026" :permissionToPrint="permissionToPrint" :limite="limite" :stages="stages"
-            :permits="permits" @cerrar-modal="viewPermission026 = false" @get-table="getPermissionRequests(tableData.currentPage)"/>
+        <PermisoFormato026Vue :viewPermission026="viewPermission026" :permissionToPrint="permissionToPrint" :limite="limite"
+            :stages="stages" :permits="permits" @cerrar-modal="viewPermission026 = false"
+            @get-table="getPermissionRequests(tableData.currentPage)" />
         <PermisoFormato012InternoVue :viewPermission012I="viewPermission012I" :permissionToPrint="permissionToPrint"
             :permits="permits" @cerrar-modal="viewPermission012I = false" :stages="stages"
-            @get-table="getPermissionRequests(tableData.currentPage)"/>
+            @get-table="getPermissionRequests(tableData.currentPage)" />
         <PermisoFormato012Vue :viewPermission012="viewPermission012" :permissionToPrint="permissionToPrint" :stages="stages"
             :permits="permits" @cerrar-modal="viewPermission012 = false"
             @get-table="getPermissionRequests(tableData.currentPage)" />
@@ -256,7 +257,7 @@ export default {
                 draw: 0,
                 length: 5,
                 search: "",
-                column: 0,
+                column: -1,
                 dir: "desc",
                 total: "",
                 execute: ''
@@ -577,7 +578,16 @@ export default {
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
                     this.jobPermissions = data.data.data;
-                    console.log(this.jobPermissions);
+
+                    //Ordenar permisos de acuerdo a su ultima etapa registrada
+                    if (this.tableData.column === -1 && this.jobPermissions.length > 0) {
+                        const permisosConEtapaMaxima = this.jobPermissions.map((permiso) => {
+                            const etapaMaxima = permiso.etapa_permiso.reduce((max, etapa) => (etapa.id_etapa_permiso > max ? etapa.id_etapa_permiso : max), 0);
+                            return { ...permiso, etapa_maxima: etapaMaxima };
+                        });
+                        this.jobPermissions = permisosConEtapaMaxima.sort((a, b) => b.etapa_maxima - a.etapa_maxima);
+                    }
+
                     this.jobPermissions.length > 0 ? this.emptyObject = false : this.emptyObject = true
                 }
             }).catch((errors) => {

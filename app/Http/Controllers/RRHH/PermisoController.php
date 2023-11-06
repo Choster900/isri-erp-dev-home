@@ -424,8 +424,10 @@ class PermisoController extends Controller
             } else {
                 $fechaPermiso = Carbon::parse($permiso->fecha_inicio_permiso)->format('m');
                 //Get the permission stages
-                $permissionStages = EtapaPermiso::with('empleado.persona','persona_etapa','estado_etapa_permiso')
-                    ->where('id_permiso',$permiso->id_permiso)->get();
+                $permissionStages = EtapaPermiso::with('empleado.persona','persona_etapa','estado_etapa_permiso_rel','empleado.titulo_profesional')
+                    ->where('id_permiso',$permiso->id_permiso)
+                    ->orderBy('id_etapa_permiso','asc')
+                    ->get();
                 //Special validation for no entry or exit marking
                 $cantidadPermisos = DB::table('permiso')
                     ->where('id_tipo_permiso', 6)

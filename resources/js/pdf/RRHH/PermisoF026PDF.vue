@@ -76,6 +76,7 @@ import moment from 'moment';
                             </div>
                             <div class="text-left w-[90%] text-[14px] font-bold border-b border-gray-700">
                                 <p class="mb-[5px] font-[MuseoSans] ml-3">
+                                    {{ permission.empleado.titulo_profesional.codigo_titulo_profesional }}
                                     {{ permission.empleado.persona.pnombre_persona }}
                                     {{ permission.empleado.persona.snombre_persona }}
                                     {{ permission.empleado.persona.tnombre_persona }}
@@ -255,7 +256,7 @@ import moment from 'moment';
                         <div class="relative flex flex-row w-full ml-[1cm] mr-[1cm]">
                             <div class="text-left w-full text-[14px] border-b border-gray-700"
                                 :class="observation1 ? '' : 'py-2'">
-                                <p class="mb-[5px] font-bold font-[MuseoSans] ml-3">{{ observation1 }}</p>
+                                <p class="mb-[5px] font-bold font-[MuseoSans]">{{ observation1 }}</p>
                             </div>
                         </div>
                     </div>
@@ -266,7 +267,7 @@ import moment from 'moment';
                         <div class="relative flex flex-row w-full ml-[1cm] mr-[1cm]">
                             <div class="text-left w-full text-[14px] border-b border-gray-700"
                                 :class="observation2 ? '' : 'py-2'">
-                                <p class="font-bold mb-[5px] font-[MuseoSans] ml-3">{{ observation2 }}</p>
+                                <p class="font-bold mb-[5px] font-[MuseoSans]">{{ observation2 }}</p>
                             </div>
                         </div>
                     </div>
@@ -282,7 +283,11 @@ import moment from 'moment';
                                     </label>
                                 </div>
                                 <div class="text-left w-[95%] font-bold text-[14px] border-b border-gray-700">
-                                    <p class="mb-[5px] font-[MuseoSans] ml-3">{{ jefatura }}</p>
+                                    <p class="mb-[5px] font-[MuseoSans] ml-3">
+                                        {{
+                                            supervisor
+                                        }}
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -345,6 +350,10 @@ export default {
             type: String,
             default: ''
         },
+        supervisor: {
+            type: String,
+            default: ''
+        }
     },
     data: function () {
         return {
@@ -359,17 +368,24 @@ export default {
     },
     methods: {
         formatHour(time) {
-            const [hora, minutos] = time.split(':');
-            const hora12 = (parseInt(hora) % 12).toString();
-            const amPm = parseInt(hora) < 12 ? 'AM' : 'PM';
+            let [hora, minutos] = time.split(':');
+            let amPm = parseInt(hora) < 12 ? 'AM' : 'PM';
 
-            // Añade un 0 delante si la hora tiene un solo dígito
-            const horaFormateada = hora12.padStart(2, '0');
+            // Si la hora es 12, cambia 'AM' a 'PM' y ajusta la hora a 12
+            if (parseInt(hora) === 12) {
+                amPm = 'MD';
+            } else if (parseInt(hora) === 0) {
+                // Si la hora es 00, ajusta la hora a 12
+                hora = '12';
+            } else {
+                hora = (parseInt(hora) % 12).toString();
+            }
+
             // Añade un 0 delante si los minutos tienen un solo dígito
-            const minutosFormateados = minutos.padStart(2, '0');
+            minutos = minutos.padStart(2, '0');
 
-            return `${horaFormateada}:${minutosFormateados} ${amPm}`;
-        }
+            return `${hora}:${minutos} ${amPm}`;
+        },
     },
     watch: {
     },

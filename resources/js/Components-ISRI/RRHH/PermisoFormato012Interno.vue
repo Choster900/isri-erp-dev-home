@@ -1,10 +1,9 @@
 <script setup>
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
-import moment from 'moment';
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
-import { jsPDF } from "jspdf";
-import html2pdf from 'html2pdf.js'
+import moment from 'moment';
+
 </script>
 <template>
     <div class="m-1.5 p-10">
@@ -26,7 +25,7 @@ import html2pdf from 'html2pdf.js'
             </div>
         </div>
         <ProcessModal v-else maxWidth='5xl' :show="viewPermission012I" @close="$emit('cerrar-modal')">
-            <div v-if="!showDenialOptions && validPermit" class="flex justify-center items-center h-full mt-1">
+            <div v-if="!showDenialOptions" class="flex justify-center items-center h-full mt-1">
                 <div v-if="showButtons" class="px-2">
                     <GeneralButton color="bg-green-600 hover:bg-green-700" text="Aprobar" icon="check"
                         @click="approvePermission()" />
@@ -35,9 +34,10 @@ import html2pdf from 'html2pdf.js'
                     <GeneralButton color="bg-orange-600 hover:bg-orange-700" text="Denegar" icon="pdf"
                         @click="showDenialOptions = true" />
                 </div>
-                <div class="px-2">
-                    <GeneralButton color="bg-red-600 hover:bg-red-700" text="PDF" icon="pdf" @click="printPdf()" />
+                <div v-else-if="permissionToPrint.id_estado_permiso === 3" class="px-2">
+                    <GeneralButton color="bg-red-600 hover:bg-red-700" text="PDF" icon="pdf" @click="printPermission()" />
                 </div>
+                <div v-else class="py-3"></div>
             </div>
             <div v-else class="py-3"></div>
 
@@ -158,7 +158,7 @@ import html2pdf from 'html2pdf.js'
                                 <div class="relative flex flex-row w-full">
                                     <div class="text-left w-full text-[13px] font-bold border-b border-gray-700"
                                         :class="centro2 ? '' : 'py-2'">
-                                        <p class="font-[MuseoSans] ml-3">{{ centro2 }}</p>
+                                        <p class="font-[MuseoSans]">{{ centro2 }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -603,9 +603,10 @@ import html2pdf from 'html2pdf.js'
 </template>
 
 <script>
-import IncomeReceiptPDF from '@/pdf/Tesoreria/IncomeReceiptPDF.vue';
-import ReciboIngresoMatricialVue from '@/pdf/Tesoreria/ReciboIngresoMatricial.vue';
+import PermisoF012ControlInternoPDFVue from '@/pdf/RRHH/PermisoF012ControlInternoPDF.vue';
 import { createApp, h } from 'vue'
+import html2pdf from 'html2pdf.js'
+import { jsPDF } from "jspdf";
 export default {
     props: {
         viewPermission012I: {
@@ -823,10 +824,8 @@ export default {
             // Formatea la fecha en el nuevo formato 'DD/MM/YYYY'
             return fechaParseada.format('DD/MM/YYYY') ?? '-------------';
         },
-
         printPdf() {
-            let fecha = moment().format('DD-MM-YYYY');
-            let name = 'RECIBO ' + this.receipt_to_print.numero_recibo_ingreso + ' - ' + fecha;
+            const name = 'PERMISO ' + permission.tipo_permiso.codigo_tipo_permiso + ' - ' + permission.empleado.codigo_empleado;
             const opt = {
                 margin: 0,
                 filename: name,
@@ -897,7 +896,7 @@ export default {
             this.role1 = '';
             this.role2 = '';
             if (role) {
-                const limiteCaracteres3 = 42;
+                const limiteCaracteres3 = 44;
                 if (role.length <= limiteCaracteres3) {
                     this.role1 = role;
                 } else {
@@ -923,17 +922,76 @@ export default {
             }
         },
         formatHour(time) {
-            const [hora, minutos] = time.split(':');
-            const hora12 = (parseInt(hora) % 12).toString();
-            const amPm = parseInt(hora) < 12 ? 'AM' : 'PM';
+            let [hora, minutos] = time.split(':');
+            let amPm = parseInt(hora) < 12 ? 'AM' : 'PM';
 
-            // Añade un 0 delante si la hora tiene un solo dígito
-            const horaFormateada = hora12.padStart(2, '0');
+            // Si la hora es 12, cambia 'AM' a 'PM' y ajusta la hora a 12
+            if (parseInt(hora) === 12) {
+                amPm = 'MD';
+            } else if (parseInt(hora) === 0) {
+                // Si la hora es 00, ajusta la hora a 12
+                hora = '12';
+            } else {
+                hora = (parseInt(hora) % 12).toString();
+            }
+
             // Añade un 0 delante si los minutos tienen un solo dígito
-            const minutosFormateados = minutos.padStart(2, '0');
+            minutos = minutos.padStart(2, '0');
 
-            return `${horaFormateada}:${minutosFormateados} ${amPm}`;
-        }
+            return `${hora}:${minutos} ${amPm}`;
+        },
+        printPermission() {
+            const permission = this.permissionToPrint
+            const currentDateTime = moment().format('DD/MM/YYYY, HH:mm:ss');
+            const name = 'PERMISO ' + permission.tipo_permiso.codigo_tipo_permiso + ' - ' + permission.empleado.codigo_empleado;
+            const opt = {
+                margin: 0.2,
+                filename: name,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 3, useCORS: true },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+            };
+
+            const role = this.permissionToPrint.plaza_asignada.detalle_plaza.plaza.nombre_plaza;
+            let r1 = ''
+            let r2 = ''
+            if (role) {
+                const limiteCaracteres3 = 50;
+                if (role.length <= limiteCaracteres3) {
+                    r1 = role;
+                } else {
+                    const textoTruncado3 = role.slice(0, limiteCaracteres3);
+                    const ultimoEspacio3 = textoTruncado3.lastIndexOf(' ');
+                    r1 = textoTruncado3.slice(0, ultimoEspacio3);
+                    r2 = role.slice(ultimoEspacio3 + 1);
+                }
+            }
+
+            const app = createApp(PermisoF012ControlInternoPDFVue, {
+                permission,
+                centro1: this.centro1,
+                centro2: this.centro2,
+                observation1: this.observation1,
+                observation2: this.observation2,
+                role1: r1,
+                role2: r2,
+                stages: this.stages
+            });
+            const div = document.createElement('div');
+            const pdfPrint = app.mount(div);
+            const html = div.outerHTML;
+
+            html2pdf().set(opt).from(html)
+                .toPdf().get('pdf').then(function (pdf) {
+                    pdf.setFontSize(10);
+                    const date_text = 'SIGI - Generado: ' + currentDateTime;
+                    const textWidth = pdf.getStringUnitWidth(date_text) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
+                    pdf.text(pdf.internal.pageSize.getWidth() - textWidth - 0.2, pdf.internal.pageSize.getHeight() - 0.4, date_text);
+                })
+                .save()
+                .catch(err => console.log(err));
+        },
+
     },
     watch: {
         viewPermission012I: function (value, oldValue) {

@@ -49,8 +49,17 @@ class JefeInmediatoController extends Controller
                 $query->where('estado_etapa_permiso', 1)
                     ->where('id_persona_etapa', 1)
                     ->where('id_estado_etapa_permiso', 1);
-            })
-            ->orderBy('id_permiso', 'desc');
+            });
+
+            if ($column == -1) {
+                $query->orderByRaw('(
+                    SELECT id_etapa_permiso
+                    FROM etapa_permiso
+                    WHERE etapa_permiso.id_permiso = permiso.id_permiso
+                    ORDER BY id_etapa_permiso DESC
+                    LIMIT 1
+                ) DESC');
+            }
 
 
         $permissions = $query->paginate($length)->onEachSide(1);
