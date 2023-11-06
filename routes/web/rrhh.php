@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Administracion\PersonaController;
 use App\Http\Controllers\RRHH\AcuerdoController;
 use App\Http\Controllers\RRHH\DetallePlazaController;
 use App\Http\Controllers\RRHH\BeneficiarioController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\RRHH\PermisoController;
 use App\Http\Controllers\RRHH\SolicitudPermisoController;
 use App\Http\Controllers\RRHH\SubDirectorMedicoController;
 use App\Models\EvaluacionRendimiento;
+use App\Models\TipoArchivoAnexo;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -157,5 +159,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('rrhh.expedientes');
     Route::post('expedientes', [ExpedienteController::class, 'getEmployeeExpediente'])->name('expediente.getEmployeeExpediente');
+    Route::get('getAllTipoArchivoAnexos', function () {return TipoArchivoAnexo::all();});
+    Route::post('getPersonaByName', [PersonaController::class, 'getPersonByCompleteName'])->name('expediente.getExpediente');
 
 });
