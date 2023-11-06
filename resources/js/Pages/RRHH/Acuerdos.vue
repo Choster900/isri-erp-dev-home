@@ -111,7 +111,7 @@ import TooltipVue from "@/Components-ISRI/Tooltip.vue";
                     </tbody>
                     <tbody v-if="empty_object && !isLoadinRequest">
                         <tr>
-                            <td colspan="4" class="text-center">
+                            <td colspan="6" class="text-center">
                                 <img src="../../../img/NoData.gif" alt="" class="w-60 h-60 mx-auto">
                                 <h1 class="font-medium text-xl mt-4">No se encontraron resultados!</h1>
                                 <p class="text-sm text-gray-600 mt-2 pb-10">Parece que no hay registros disponibles en este
