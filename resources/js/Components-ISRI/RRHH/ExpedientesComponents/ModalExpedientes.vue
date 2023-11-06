@@ -33,8 +33,8 @@
                                 </li>
                             </ul>
                         </div>
-                        <div class="py-3" id="filter-section">
-                            <div class="flex space-x-3" :class="{ 'hidden': sectionView != 'mainSection' }">
+                        <div class="py-3" id="filter-section" :class="{ 'hidden': sectionView != 'mainSection' }">
+                            <div class="flex space-x-3">
                                 <search-icon />
                                 <order-square-icon class="cursor-pointer" @click="viewList = !viewList"
                                     :modeListSelected="viewList" />
@@ -59,62 +59,69 @@
                             </div>
                         </div>
                     </div>
-                    <!--  {{ process.env.BASE_URL }} -->
                     <div id="mainSection" class="mb-4 px-4 grid "
                         :class="{ 'hidden': sectionView != 'mainSection', 'grid-cols-1': viewList, 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4': !viewList, 'gap-5': !viewList, 'gap-2': viewList }">
                         <div class="border border-gray-200 bg-white rounded-md shadow-lg cursor-pointer hover:bg-slate-100"
-                            :class="{ 'flex': viewList }" v-for="(tipo, i) in tiposArchivos" :key="i"
+                            :class="{ 'flex': viewList }" v-for="(tipoArchivo, i) in objTipoArchivoAnexo" :key="i"
                             @click="sectionView = 'anexoSection'">
                             <div class="" :class="viewList ? 'px-1 ' : 'w- py-2 px-5'">
 
-                                <img :src="`/resources/imagenesTipoAnexos/${tipo.img_tipo_archivo_anexo}`" alt="" class="w-">
+                                <img :src="`/resources/imagenesTipoAnexos/${tipoArchivo.img_tipo_archivo_anexo}`" alt=""
+                                    class="w-">
                             </div>
                             <div class="px-5 py-4">
                                 <h1 class="font-semibold text-sm " :class="viewList ? ' ' : 'pb-2'">{{
-                                    tipo.nombre_tipo_archivo_anexo }}</h1>
+                                    tipoArchivo.nombre_tipo_archivo_anexo }}</h1>
                                 <span class="text-xs block">Modificado: hace 1 dia</span>
                                 <span class="text-xs block">Total anexos: 7</span>
                             </div>
                         </div>
-
                     </div>
 
-                    <add-expediente :class="{ 'hidden': sectionView != 'addSection' }" />
+                    <add-expediente v-if="objTipoArchivoAnexo != ''" :class="{ 'hidden': sectionView != 'addSection' }" class="pt-1"
+                        :opcionPersona="opcionPersona" :tipoArchivoAnexo="objTipoArchivoAnexo" :persona="persona" />
+
                     <list-expedientes :class="{ 'hidden': sectionView != 'anexoSection' }" />
                 </div>
 
 
-                <side-info-file class=""
-                    :class="{ 'hidden': sectionView != 'anexoSection', 'w-1/3': sectionView == 'anexoSection' }"></side-info-file>
+                <side-info-file
+                    :class="{ 'hidden': sectionView != 'anexoSection', 'w-1/3': sectionView == 'anexoSection' }" />
             </div>
         </Modal>
     </div>
 </template>
 <script>
 import Modal from "@/Components-ISRI/AllModal/Modal.vue";
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import SearchIcon from './Icons/searchIcon.vue';
 import OrderSquareIcon from './Icons/orderSquareIcon.vue';
 import OrderListIcon from './Icons/orderListIcon.vue';
 import AddExpediente from './AddExpediente.vue';
 import ListExpedientes from './ListExpedientes.vue';
 import SideInfoFile from './SideInfoFile.vue';
+import { useTipoArchivoAnexo } from "@/Composables/RRHH/Expediente/useTipoArchivoAnexo";
 export default {
+    name: 'ModalExpedientes',
     components: { Modal, SearchIcon, OrderSquareIcon, OrderListIcon, AddExpediente, ListExpedientes, SideInfoFile },
     props: {
-
         showModal: {
             type: Boolean,
             default: false,
         },
-        dataExpedientesPersona: {
+        persona: {
             type: Object,
             default: () => { },
         },
     },
-    setup() {
+    setup(props) {
         const viewList = ref(false)// Controla en como se ven la vista
-        const sectionView = ref("mainSection")
+        const sectionView = ref("addSection") // Maneja la seccion que queremos ver
+
+        const opcionPersona = computed(() => {
+            return props.persona ? [{ value: props.persona.id_persona, label: props.persona.pnombre_persona }] : [];
+        });
+
         const tiposArchivos = ref([
             {
                 "id_tipo_archivo_anexo": 1,
@@ -205,12 +212,14 @@ export default {
             }
         ])
 
-        onMounted(() => {
-        })
+        const { objTipoArchivoAnexo } = useTipoArchivoAnexo()
+
         return {
             tiposArchivos,
             viewList,
             sectionView,
+            objTipoArchivoAnexo,
+            opcionPersona,
         }
     }
 }
