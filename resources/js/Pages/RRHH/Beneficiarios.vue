@@ -40,7 +40,7 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
                 <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
                     @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getBeneficiarios()">
                     <tbody class="text-sm divide-y divide-slate-200">
-                        <tr v-for="beneficiario in beneficiarios" :key="beneficiario.id_persona">
+                        <tr v-for="beneficiario in beneficiarios" :key="beneficiario.id_persona" class="content-body">
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center ">{{ beneficiario.id_persona }}</div>
                             </td>
@@ -48,7 +48,7 @@ import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
                                 <div class="font-medium text-slate-800 text-center">
                                     {{ `${beneficiario.pnombre_persona ? beneficiario.pnombre_persona : ''}
                                                                         ${beneficiario.snombre_persona ? beneficiario.snombre_persona : ''}
-                                                                        ${beneficiario.tapellido_persona ? beneficiario.tapellido_persona : ''}` }}
+                                                                        ${beneficiario.tnombre_persona ? beneficiario.tnombre_persona : ''}` }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">

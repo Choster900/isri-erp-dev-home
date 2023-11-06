@@ -27,29 +27,29 @@
                 <Datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
                     @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getPeople()">
                     <tbody class="text-sm divide-y divide-slate-200" v-if="!isLoadinRequest">
-                        <tr v-for="beneficiario in persona" :key="beneficiario.id_persona">
+                        <tr v-for="persona in persona" :key="persona.id_persona" class="content-body">
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center ">{{ beneficiario.id_persona }}</div>
+                                <div class="font-medium text-slate-800 text-center ">{{ persona.id_persona }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ `${beneficiario.pnombre_persona ? beneficiario.pnombre_persona : ''}
-                                                                        ${beneficiario.snombre_persona ? beneficiario.snombre_persona : ''}
-                                                                        ${beneficiario.tapellido_persona ? beneficiario.tapellido_persona : ''}` }}
+                                    {{ `${persona.pnombre_persona ? persona.pnombre_persona : ''}
+                                                                        ${persona.snombre_persona ? persona.snombre_persona : ''}
+                                                                        ${persona.tapellido_persona ? persona.tapellido_persona : ''}` }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ `${beneficiario.papellido_persona ? beneficiario.papellido_persona : ''}
-                                                                        ${beneficiario.sapellido_persona ? beneficiario.sapellido_persona : ''}
-                                                                        ${beneficiario.tapellido_persona ? beneficiario.tapellido_persona : ''}` }}
+                                    {{ `${persona.papellido_persona ? persona.papellido_persona : ''}
+                                                                        ${persona.sapellido_persona ? persona.sapellido_persona : ''}
+                                                                        ${persona.tapellido_persona ? persona.tapellido_persona : ''}` }}
                                 </div>
                             </td>
                             <td class="first:pl-5 last:pr-5">
                                 <div class="space-x-1">
                                     <DropDownOptions>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            @click.stop="dataBeneficiariosToSendModal = beneficiario; showModal = !showModal">
+                                            @click.stop="dataPersona = persona; showModal = !showModal">
                                             <div class="w-8 text-blue-900">
                                                 <span class="text-xs">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -141,7 +141,7 @@
             </div>
         </div>
 
-        <ModalExpedientes :showModal="showModal" @cerrar-modal="showModal = false" />
+        <ModalExpedientes :showModal="showModal" @cerrar-modal="showModal = false" :persona="dataPersona" />
 
     </AppLayoutVue>
 </template>
@@ -151,11 +151,13 @@ import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";;
 import ModalExpedientes from '@/Components-ISRI/RRHH/ExpedientesComponents/ModalExpedientes.vue';
-import { useDatatable } from '@/Composables/RRHH/Expedientes/useDatatable'
+import { useDatatable } from '@/Composables/RRHH/Expediente/useDatatable'
+import { ref, watch } from 'vue';
 export default {
     components: { Head, AppLayoutVue, Datatable, ModalExpedientes },
-
     setup() {
+        const dataPersona = ref(null)
+
         const {
             persona,
             getPeople, columns,
@@ -165,6 +167,12 @@ export default {
             handleData, isLoadinRequest,
             showModal, emptyObject } = useDatatable()
 
+        watch(showModal, (newData, oldData) => {
+            if (!showModal.value) {
+                dataPersona.value = ''
+            }
+        })
+
         return {
             persona, getPeople,
             columns, tableData,
@@ -172,6 +180,7 @@ export default {
             sortKey, sortOrders,
             sortBy, handleData,
             isLoadinRequest, showModal,
+            dataPersona,
             emptyObject
         }
     }

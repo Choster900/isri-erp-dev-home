@@ -38,19 +38,24 @@ import TooltipVue from "@/Components-ISRI/Tooltip.vue";
             <div class="overflow-x-auto">
                 <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
                     @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getAcuerdos()">
-                    <tbody class="text-sm divide-y divide-slate-200">
-                        <tr v-for="(acuerdos, i) in acuerdos" :key="i">
+                    <tbody class="text-sm divide-y divide-slate-200" v-if="!isLoadinRequest">
+                        <tr v-for="(acuerdos, i) in acuerdos" :key="i"  class="content-body">
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center ">{{ acuerdos.id_empleado }}</div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{ acuerdos.persona.dui_persona }}
+                                </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center ">{{ acuerdos.codigo_empleado }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">
-                                    {{ `${acuerdos.persona.pnombre_persona ? acuerdos.persona.pnombre_persona : ''}
+                                <div class="font-medium text-slate-800 text-center" v-if="acuerdos.persona">
+                                    {{ `${acuerdos.persona ? acuerdos.persona.pnombre_persona : ''}
                                                                         ${acuerdos.persona.snombre_persona ? acuerdos.persona.snombre_persona : ''}
-                                                                        ${acuerdos.persona.tapellido_persona ? acuerdos.persona.tapellido_persona : ''}` }}
+                                                                        ${acuerdos.persona.tnombre_persona ? acuerdos.persona.tnombre_persona : ''}` }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
@@ -61,25 +66,14 @@ import TooltipVue from "@/Components-ISRI/Tooltip.vue";
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">
-                                    {{ acuerdos.email_institucional_empleado }}
-                                </div>
-                            </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center flex justify-center gap-2">
                                     <span>{{ acuerdos.acuerdo_laboral.length }}</span>
-
-
-
                                     <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                                         class="w-5 h-5">
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                             d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" />
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z" />
                                     </svg>
-
-
-
                                 </div>
                             </td>
                             <td class="first:pl-5 last:pr-5">
@@ -105,14 +99,28 @@ import TooltipVue from "@/Components-ISRI/Tooltip.vue";
                             </td>
                         </tr>
                     </tbody>
+                    <tbody v-else>
+                        <tr>
+                            <td colspan="6" class="text-center">
+                                <img src="../../../img/IsSearching.gif" alt="" class="w-60 h-60 mx-auto">
+                                <h1 class="font-medium text-xl mt-4">Cargando!!!</h1>
+                                <p class="text-sm text-gray-600 mt-2 pb-10">Por favor espera un momento mientras se carga la
+                                    información.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody v-if="empty_object && !isLoadinRequest">
+                        <tr>
+                            <td colspan="4" class="text-center">
+                                <img src="../../../img/NoData.gif" alt="" class="w-60 h-60 mx-auto">
+                                <h1 class="font-medium text-xl mt-4">No se encontraron resultados!</h1>
+                                <p class="text-sm text-gray-600 mt-2 pb-10">Parece que no hay registros disponibles en este
+                                    momento.</p>
+                            </td>
+                        </tr>
+                    </tbody>
                 </datatable>
-
             </div>
-            <div v-if="empty_object" class="flex text-center py-2">
-                <p class="text-red-500 font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se
-                    encontraron registros.</p>
-            </div>
-
         </div>
 
         <div v-if="!empty_object" class="px-6 py-4 bg-white shadow-lg rounded-sm border-slate-200 relative">
@@ -152,9 +160,9 @@ import TooltipVue from "@/Components-ISRI/Tooltip.vue";
                                         </a>
                                     </div>
                                 </span>
-                                <span class="cursor-pointer" v-else
-                                    :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
-                                        class=" w-5" @click="getAcuerdos(link.url)">{{ link.label }}</span>
+                                <span class="cursor-pointer mt-2" @click="getAcuerdos(link.url)" v-else
+                                    :class="(link.active ? 'inline-flex items-center justify-center  rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
+                                        class=" w-5 ">{{ link.label }}</span>
                                 </span>
                             </li>
                         </ul>
@@ -176,11 +184,11 @@ export default {
     data() {
         let sortOrders = {};
         let columns = [
-            { width: "10%", label: "ID", name: "id_persona", type: "text" },
+            { width: "10%", label: "ID", name: "id_empleado", type: "text" },
+            { width: "20%", label: "DUI", name: "dui_persona", type: "text" },
             { width: "10%", label: "Codigo", name: "codigo_empleado", type: "text" },
             { width: "20%", label: "Nombres", name: "collecNombre", type: "text" },
             { width: "20%", label: "Apellidos", name: "collecApellido", type: "text" },
-            { width: "20%", label: "Correo institucional", name: "email_institucional_empleado", type: "text" },
             { width: "20%", label: "Acuerdos", name: "numAcuerdos", type: "text" },
             { width: "1%", label: "", name: "Acciones" },
         ];
@@ -201,6 +209,7 @@ export default {
             links: [],
             lastUrl: "/beneficiarios",
             columns: columns,
+            isLoadinRequest: false,
             sortKey: "id_persona",
             sortOrders: sortOrders,
             perPage: ["10", "20", "30"],
@@ -227,6 +236,7 @@ export default {
         async getAcuerdos(url = "/acuerdos") {
             this.lastUrl = url;
             this.tableData.draw++;
+            this.isLoadinRequest = true;
             await axios.post(url, this.tableData).then((response) => {
                 let data = response.data;
                 if (this.tableData.draw == data.draw) {
@@ -234,26 +244,12 @@ export default {
                     this.pagination.total = data.data.total;
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
-
-                    // Como eloquent no me filtra los familiares que estan desactivados si no que me trae todos por igual
-                    /* const filteredData = data.data.data.map((obj) => {
-                        // Tenemos que hacer esto
-                        const filteredFamiliar = obj.familiar.filter(
-                            (familiar) => familiar.estado_familiar === 1
-                        );
-                        return { ...obj, familiar: filteredFamiliar };
-                    }); */
-
-                    //  console.log(filteredData);
-
                     this.acuerdos = data.data.data;
                     let dataForSelect = JSON.parse(JSON.stringify(data.dataForSelect));
                     this.dataForSelect = dataForSelect
                     this.stateModal = false
                     this.acuerdos.length > 0 ? this.empty_object = false : this.empty_object = true
-
-
-
+                    this.isLoadinRequest = false;
                 }
             }).catch((errors) => {
 

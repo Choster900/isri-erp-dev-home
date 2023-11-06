@@ -12,28 +12,28 @@ class PersonaController extends Controller
 {
     public function getPersona(Request $request)
     {
-        $columns = ['id_persona','dui_persona','pnombre_persona','fecha_nac_persona','estado_persona',];
+        $columns = ['id_persona', 'dui_persona', 'pnombre_persona', 'fecha_nac_persona', 'estado_persona',];
         $length = $request->input('length');
         $column = $request->input('column'); //Index
         $dir = $request->input('dir');
         $search_value = $request->input('search');
-        
+
         $query = Persona::select('*')
             ->orderBy($columns[$column], $dir);
 
         if ($search_value) {
             $query->where([
-                ['id_persona','like','%'.$search_value['id_persona'].'%'],
-                ['dui_persona','like','%'.$search_value['dui_persona'].'%'],
-                ['fecha_nac_persona','like','%'.$search_value['fecha_nac_persona'].'%'],
-                ['estado_persona','like','%'.$search_value['estado_persona'].'%'],
-                [function ($query) use ($search_value){
-                    $query->where('pnombre_persona', 'like','%' . $search_value['nombre_persona'] . '%')
-                        ->orWhere('snombre_persona', 'like','%' . $search_value['nombre_persona'] . '%')
-                        ->orWhere('tnombre_persona', 'like','%' . $search_value['nombre_persona'] . '%')
-                        ->orWhere('papellido_persona', 'like','%' . $search_value['nombre_persona'] . '%')
-                        ->orWhere('sapellido_persona', 'like','%' . $search_value['nombre_persona'] . '%')
-                        ->orWhere('tapellido_persona', 'like','%' . $search_value['nombre_persona'] . '%');
+                ['id_persona', 'like', '%' . $search_value['id_persona'] . '%'],
+                ['dui_persona', 'like', '%' . $search_value['dui_persona'] . '%'],
+                ['fecha_nac_persona', 'like', '%' . $search_value['fecha_nac_persona'] . '%'],
+                ['estado_persona', 'like', '%' . $search_value['estado_persona'] . '%'],
+                [function ($query) use ($search_value) {
+                    $query->where('pnombre_persona', 'like', '%' . $search_value['nombre_persona'] . '%')
+                        ->orWhere('snombre_persona', 'like', '%' . $search_value['nombre_persona'] . '%')
+                        ->orWhere('tnombre_persona', 'like', '%' . $search_value['nombre_persona'] . '%')
+                        ->orWhere('papellido_persona', 'like', '%' . $search_value['nombre_persona'] . '%')
+                        ->orWhere('sapellido_persona', 'like', '%' . $search_value['nombre_persona'] . '%')
+                        ->orWhere('tapellido_persona', 'like', '%' . $search_value['nombre_persona'] . '%');
                 }],
             ]);
         }
@@ -150,6 +150,35 @@ class PersonaController extends Controller
             'estado_persona' => $v_infoPersona["estado_persona"] != 1 ? 1 : 0, //si es diferente de 1 ingresamos 1 => Activo de lo contrario 0 =>inactivo
         ]);
         return $v_infoPersona["estado_persona"];
+    }
 
+    // Traer las personas por nombre
+
+    function getPersonByCompleteName(Request $request)
+    {
+        $query = Persona::query();
+
+        if (!empty($request->nombre)) {
+            $query->orWhere(function ($query) use ($request) {
+                $query->whereRaw("MATCH ( pnombre_persona,
+                 snombre_persona,
+                  tnombre_persona, 
+                  papellido_persona,
+                   sapellido_persona,
+                    tapellido_persona )
+                     AGAINST ( '" . $request->nombre . "')");
+            });
+        }
+
+        $results = $query->get();
+
+        $formattedResults = $results->map(function ($item) {
+            return [
+                'value' => $item->id_persona,
+                'label' => $item->pnombre_persona . ' ' . ($item->snombre_persona ?? '') . ' ' . ($item->tnombre_persona ?? ''),
+            ];
+        });
+
+        return response()->json($formattedResults);
     }
 }
