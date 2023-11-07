@@ -4,6 +4,7 @@ namespace App\Http\Controllers\RRHH;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\RRHH\PlazaAsignadaRequest;
 use App\Http\Requests\RRHH\EmpleadoRequest;
 use App\Models\Banco;
 use App\Models\Dependencia;
@@ -12,6 +13,7 @@ use App\Models\Empleado;
 use App\Models\EstadoCivil;
 use App\Models\Foto;
 use App\Models\Genero;
+use App\Models\MotivoDesvinculoLaboral;
 use App\Models\NivelEducativo;
 use App\Models\Persona;
 use App\Models\PlazaAsignada;
@@ -76,7 +78,7 @@ class EmpleadoController extends Controller
                 ->whereHas(
                     'persona',
                     function ($query) use ($search_value) {
-                        if($search_value["nombre_persona"]!=''){
+                        if ($search_value["nombre_persona"] != '') {
                             $query->whereRaw("MATCH(pnombre_persona, snombre_persona, tnombre_persona, papellido_persona, sapellido_persona, tapellido_persona) AGAINST(?)", $search_value["nombre_persona"]);
                         }
                     }
@@ -437,8 +439,7 @@ class EmpleadoController extends Controller
         //Get the job positions by employee
         $empleado = Empleado::with([
             'plazas_asignadas' => function ($query) {
-                $query->where('estado_plaza_asignada', 1)
-                    ->with(['dependencia.parent_dependency', 'detalle_plaza', 'detalle_plaza.plaza', 'detalle_plaza.tipo_contrato']);
+                $query->with(['dependencia.parent_dependency', 'detalle_plaza', 'detalle_plaza.plaza', 'detalle_plaza.tipo_contrato', 'motivo_desvinculo_laboral']);
             }
         ])->find($request->id_empleado);
         //Get selects information
@@ -462,63 +463,186 @@ class EmpleadoController extends Controller
             ->whereIn('detalle_plaza.id_estado_plaza', [1, 2])
             ->where('detalle_plaza.estado_det_plaza', 1)
             ->get();
+        $reasonsForDissociate = MotivoDesvinculoLaboral::select('id_motivo_desvinculo_laboral as value', 'nombre_motivo_desvinculo_laboral as label')
+            ->where('estado_motivo_desvinculo_laboral', 1)
+            ->get();
         //We return the data to the view
         return response()->json([
             'jobPositions'          => $empleado,
             'dependencies'          => $dependencies,
-            'jobPositionsToSelect'  => $jobPositionsToSelect
+            'jobPositionsToSelect'  => $jobPositionsToSelect,
+            'reasonsForDissociate'  => $reasonsForDissociate
         ]);
     }
-    public function storeJobPosition(Request $request)
+    public function storeJobPosition(PlazaAsignadaRequest $request)
     {
-        $upperSalaryLimit = $request->upperSalaryLimit;
-        $lowerSalaryLimit = $request->lowerSalaryLimit;
-        // Define custom error messages
+        $jobPosition = $request->jobPosition;
+
+        DB::beginTransaction();
+        try {
+            $new_assigned_job_position = new PlazaAsignada([
+                'id_empleado'                   => $request->employeeId,
+                'id_lt'                         => $jobPosition['workAreaId'],
+                'id_dependencia'                => $jobPosition['dependencyId'],
+                'id_det_plaza'                  => $jobPosition['jobPositionId'],
+                'salario_plaza_asignada'        => $jobPosition['salary'],
+                'partida_plaza_asignada'        => $jobPosition['account'],
+                'subpartida_plaza_asignada'     => $jobPosition['subaccount'],
+                'fecha_plaza_asignada'          => $jobPosition['dateOfHired'],
+                'estado_plaza_asignada'         => 1,
+                'fecha_reg_plaza_asignada'      => Carbon::now(),
+                'usuario_plaza_asignada'        => $request->user()->nick_usuario,
+                'ip_plaza_asignada'             => $request->ip(),
+            ]);
+            $new_assigned_job_position->save();
+
+            $job_position_det = DetallePlaza::find($jobPosition['jobPositionId']);
+            $job_position_det->update([
+                'id_estado_plaza'           => 3,
+                'fecha_mod_plaza_asignada'  => Carbon::now(),
+                'usuario_plaza_asignada'    => $request->user()->nick_usuario,
+                'ip_plaza_asignada'         => $request->ip(),
+            ]);
+
+            DB::commit(); // Confirma las operaciones en la base de datos
+            return response()->json([
+                'mensaje'          => "Puesto asignado con exito.",
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+            return response()->json([
+                'logical_error' => 'Ha ocurrido un error con sus datos.',
+                'error' => $e,
+            ], 422);
+        }
+    }
+    public function updateJobPosition(PlazaAsignadaRequest $request)
+    {
+        $jobPosition = $request->jobPosition;
+        $plazaAsignadaDB = PlazaAsignada::find($jobPosition['id']);
+
+        DB::beginTransaction();
+        try {
+            if ($plazaAsignadaDB->id_det_plaza != $jobPosition['jobPositionId']) {
+                $oldRole = DetallePlaza::find($plazaAsignadaDB->id_det_plaza);
+                $oldRole->update([
+                    'id_estado_plaza'      => 1,
+                    'fecha_mod_det_plaza'  => Carbon::now(),
+                    'usuario_det_plaza'    => $request->user()->nick_usuario,
+                    'ip_det_plaza'         => $request->ip(),
+                ]);
+                $newRole = DetallePlaza::find($jobPosition['jobPositionId']);
+                $newRole->update([
+                    'id_estado_plaza'      => 3,
+                    'fecha_mod_det_plaza'  => Carbon::now(),
+                    'usuario_det_plaza'    => $request->user()->nick_usuario,
+                    'ip_det_plaza'         => $request->ip(),
+                ]);
+            }
+            $plazaAsignadaDB->update([
+                'id_empleado'                   => $request->employeeId,
+                'id_lt'                         => $jobPosition['workAreaId'],
+                'id_dependencia'                => $jobPosition['dependencyId'],
+                'id_det_plaza'                  => $jobPosition['jobPositionId'],
+                'salario_plaza_asignada'        => $jobPosition['salary'],
+                'partida_plaza_asignada'        => $jobPosition['account'],
+                'subpartida_plaza_asignada'     => $jobPosition['subaccount'],
+                'fecha_plaza_asignada'          => $jobPosition['dateOfHired'],
+                'estado_plaza_asignada'         => 1,
+                'fecha_mod_plaza_asignada'      => Carbon::now(),
+                'usuario_plaza_asignada'        => $request->user()->nick_usuario,
+                'ip_plaza_asignada'             => $request->ip(),
+            ]);
+
+            DB::commit(); // Confirma las operaciones en la base de datos
+            return response()->json([
+                'mensaje'          => "Puesto actualizado con exito.",
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+            return response()->json([
+                'logical_error' => 'Ha ocurrido un error con sus datos.',
+                'error' => $e,
+            ], 422);
+        }
+    }
+    public function getAvailableJobPositions(Request $request)
+    {
+        $jobPositionsToSelect = DetallePlaza::selectRaw("detalle_plaza.id_det_plaza as value, concat(detalle_plaza.codigo_det_plaza,' - ',plaza.nombre_plaza,' - ',tipo_contrato.codigo_tipo_contrato) as label, plaza.salario_base_plaza, plaza.salario_tope_plaza, linea_trabajo.id_lt")
+            ->join('plaza', 'detalle_plaza.id_plaza', '=', 'plaza.id_plaza')
+            ->join('tipo_contrato', 'detalle_plaza.id_tipo_contrato', '=', 'tipo_contrato.id_tipo_contrato')
+            ->join('actividad_institucional', 'detalle_plaza.id_actividad_institucional', '=', 'actividad_institucional.id_actividad_institucional')
+            ->join('linea_trabajo', 'actividad_institucional.id_lt', '=', 'linea_trabajo.id_lt')
+            ->whereIn('detalle_plaza.id_estado_plaza', [1, 2])
+            ->where('detalle_plaza.estado_det_plaza', 1);
+
+        $idsPuesto = $request->rolesExtraToInclude; //id de plazas asignadas que ya posee el empleado
+        if ($request->rolesExtraToInclude != '') {
+            $jobPositionsToSelect->orWhere(function ($query) use ($idsPuesto) {
+                $query->where('detalle_plaza.id_estado_plaza', 3)
+                    ->whereIn('detalle_plaza.id_det_plaza', $idsPuesto);
+            });
+        }
+
+        $jobPositionsToSelect = $jobPositionsToSelect->get();
+
+        return response()->json([
+            'jobPositionsToSelect' => $jobPositionsToSelect,
+        ]);
+    }
+    public function desactiveJobPosition(Request $request)
+    {
+        $jobPosition = $request->jobPosition;
+        $plaza = PlazaAsignada::find($jobPosition['id']);
+        $fechaInicio = $plaza->fecha_plaza_asignada;
+
         $customMessages = [
-            'jobPosition.dependencyId.required'     => 'Debe seleccionar la dependencia.',
-            'jobPosition.jobPositionId.required'    => 'Debe seleccionar la plaza.',
-            'jobPosition.salary.required'           => 'Debe escribir el salario.',
-            'jobPosition.account.required'          => 'Debe escribir el numero de partida.',
-            'jobPosition.subaccount.required'       => 'Debe escribir el numero de subpartida.',
-            'jobPosition.dateOfHired.required'      => 'Debe seleccionar la fecha de contratación.',
-            'jobPosition.salary.between'            => 'El salario debe estar entre :min y :max.',
+            'jobPosition.idDissociate.required' => 'Debe seleccionar el motivo.',
+            'jobPosition.dateOfDissociate.required' => 'Debe agregar la fecha de finalización.',
+            'jobPosition.dateOfDissociate' => 'La fecha de desvinculacion no puede ser menor que la fecha de nombramiento.'
         ];
 
-        // Validate the request data with custom error messages
+        // Define a custom validation rule
+        Validator::extend('date_after_start', function ($attribute, $value, $parameters) use ($fechaInicio) {
+            $dateOfDissociate = \Carbon\Carbon::parse($value);
+            return $dateOfDissociate->gte($fechaInicio);
+        });
+
+        // Validate the request data with custom error messages and custom rule
         $validatedData = Validator::make($request->all(), [
-            'jobPosition.dependencyId'      => 'required',
-            'jobPosition.jobPositionId'     => 'required',
-            'jobPosition.salary'            => ['required', 'numeric', 'between:' . $lowerSalaryLimit . ',' . $upperSalaryLimit],
-            'jobPosition.account'           => 'required',
-            'jobPosition.subaccount'        => 'required',
-            'jobPosition.dateOfHired'       => 'required',
+            'jobPosition.idDissociate' => 'required',
+            'jobPosition.dateOfDissociate' => 'required|date|date_after_start',
         ], $customMessages)->validate();
 
-        $jobPosition = $request->jobPosition;
-        $new_assigned_job_position = new PlazaAsignada([
-            'id_empleado'                   => $request->employeeId,
-            'id_lt'                         => $jobPosition['workAreaId'],
-            'id_dependencia'                => $jobPosition['dependencyId'],
-            'id_det_plaza'                  => $jobPosition['jobPositionId'],
-            'salario_plaza_asignada'        => $jobPosition['salary'],
-            'partida_plaza_asignada'        => $jobPosition['account'],
-            'subpartida_plaza_asignada'     => $jobPosition['subaccount'],
-            'fecha_plaza_asignada'          => $jobPosition['dateOfHired'],
-            'estado_plaza_asignada'         => 1,
-            'fecha_reg_plaza_asignada'      => Carbon::now(),
-            'usuario_plaza_asignada'        => $request->user()->nick_usuario,
-            'ip_plaza_asignada'             => $request->ip(),
-        ]);
-        $new_assigned_job_position->save();
+        DB::beginTransaction();
+        try {
+            $plaza->update([
+                'id_motivo_desvinculo_laboral'  => $jobPosition['idDissociate'],
+                'fecha_renuncia_plaza_asignada' => $jobPosition['dateOfDissociate'],
+                'estado_plaza_asignada'         => 0,
+                'fecha_mod_plaza_asignada'      => Carbon::now(),
+                'usuario_plaza_asignada'        => $request->user()->nick_usuario,
+                'ip_plaza_asignada'             => $request->ip(),
+            ]);
 
-        $job_position_det = DetallePlaza::find($jobPosition['jobPositionId']);
-        $job_position_det->update([
-            'id_estado_plaza'           => 3,
-            'fecha_mod_plaza_asignada'  => Carbon::now(),
-            'usuario_plaza_asignada'    => $request->user()->nick_usuario,
-            'ip_plaza_asignada'         => $request->ip(),
-        ]);
+            $detPlaza = DetallePlaza::find($plaza->id_det_plaza);
+            $detPlaza->update([
+                'id_estado_plaza'          => 1,
+                'fecha_mod_det_plaza'      => Carbon::now(),
+                'usuario_det_plaza'        => $request->user()->nick_usuario,
+                'ip_det_plaza'             => $request->ip(),
+            ]);
 
-        return response()->json(['message' => 'Plaza guardada con éxito.']);
+            DB::commit(); // Confirma las operaciones en la base de datos
+            return response()->json([
+                'mensaje'          => "Puesto inhabilitado con exito.",
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+            return response()->json([
+                'logical_error' => 'Ha ocurrido un error con sus datos.',
+                'error' => $e,
+            ], 422);
+        }
     }
 }

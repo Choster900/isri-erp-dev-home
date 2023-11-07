@@ -49,7 +49,11 @@ const props = defineProps({
     disabled: {
         type: Boolean,
         default: false
-    }
+    },
+    addClass: {
+        type: String,
+        default: '', // Por defecto, no se agregan clases adicionales.
+    },
 });
 
 defineEmits(['update:modelValue']);
@@ -74,7 +78,7 @@ defineExpose({ focus: () => input.value.focus() });
     <div class="relative flex h-8 w-full flex-row-reverse overflow-clip "
         style="border: none; background-color: transparent;">
         <input :id="id" :min="min" :max="max" :placeholder="showPlaceholder ? placeholder : ''" :type="type" :readOnly="readOnly" :disabled="disabled"
-            class="peer w-full text-xs font-medium  rounded-r-md border border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300  focus:outline-none"
+        :class="['peer w-full text-xs font-medium rounded-r-md border border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300  focus:outline-none ', addClass]"
             :value="modelValue" @input="$emit('update:modelValue', $event.target.value)" ref="input" />
         <slot />
     </div>

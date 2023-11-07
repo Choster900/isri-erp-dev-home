@@ -30,10 +30,13 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get('get-selects-options-employee', [EmpleadoController::class, 'getSelectOptionsEmployee'])->name('empleado.getSelectOptionsEmployee');
     Route::post('store-employee', [EmpleadoController::class, 'storeEmployee'])->name('empleado.storeEmployee');
     Route::post('update-employee', [EmpleadoController::class, 'updateEmployee'])->name('empleado.updateEmployee');
-
+    //Manage photos and assigned roles 
     Route::post('upload-employee-photo', [EmpleadoController::class, 'uploadEmployeePhoto'])->name('empleado.uploadEmployeePhoto');
-    Route::get('get-job-positios-by-employee', [EmpleadoController::class, 'getJobPositionsByEmployee'])->name('empleado.getJobPositionsByEmployee');
+    Route::get('get-job-positions-by-employee', [EmpleadoController::class, 'getJobPositionsByEmployee'])->name('empleado.getJobPositionsByEmployee');
     Route::post('store-job-position', [EmpleadoController::class, 'storeJobPosition'])->name('empleado.storeJobPosition');
+    Route::post('update-job-position', [EmpleadoController::class, 'updateJobPosition'])->name('empleado.updateJobPosition');
+    Route::post('get-available-job-positions', [EmpleadoController::class, 'getAvailableJobPositions'])->name('empleado.getAvailableJobPositions');
+    Route::post('desactive-job-position', [EmpleadoController::class, 'desactiveJobPosition'])->name('empleado.desactiveJobPosition');
 
     Route::get(
         '/rrhh/det-plazas',
