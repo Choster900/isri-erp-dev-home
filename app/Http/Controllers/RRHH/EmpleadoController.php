@@ -160,7 +160,7 @@ class EmpleadoController extends Controller
             ->leftJoin('dependencia as dep', 'dependencia.dep_id_dependencia', '=', 'dep.id_dependencia')
             ->where('dependencia.id_dependencia', '!=', 1)
             ->get();
-        $job_positions = DetallePlaza::selectRaw("detalle_plaza.id_det_plaza as value, concat(detalle_plaza.codigo_det_plaza,' - ',plaza.nombre_plaza,' - ',tipo_contrato.codigo_tipo_contrato)  as label, plaza.salario_base_plaza, plaza.salario_tope_plaza, linea_trabajo.id_lt")
+        $job_positions = DetallePlaza::selectRaw("detalle_plaza.id_det_plaza as value, concat(detalle_plaza.id_puesto_sirhi_det_plaza,' - ',plaza.nombre_plaza,' - ',tipo_contrato.codigo_tipo_contrato)  as label, plaza.salario_base_plaza, plaza.salario_tope_plaza, linea_trabajo.id_lt")
             ->join('plaza', 'detalle_plaza.id_plaza', '=', 'plaza.id_plaza')
             ->join('tipo_contrato', 'detalle_plaza.id_tipo_contrato', '=', 'tipo_contrato.id_tipo_contrato')
             ->join('actividad_institucional', 'detalle_plaza.id_actividad_institucional', '=', 'actividad_institucional.id_actividad_institucional')
@@ -455,7 +455,7 @@ class EmpleadoController extends Controller
             ->where('dependencia.id_dependencia', '!=', 1)
             ->get();
 
-        $jobPositionsToSelect = DetallePlaza::selectRaw("detalle_plaza.id_det_plaza as value, concat(detalle_plaza.codigo_det_plaza,' - ',plaza.nombre_plaza,' - ',tipo_contrato.codigo_tipo_contrato)  as label, plaza.salario_base_plaza, plaza.salario_tope_plaza, linea_trabajo.id_lt")
+        $jobPositionsToSelect = DetallePlaza::selectRaw("detalle_plaza.id_det_plaza as value, concat(detalle_plaza.id_puesto_sirhi_det_plaza,' - ',plaza.nombre_plaza,' - ',tipo_contrato.codigo_tipo_contrato)  as label, plaza.salario_base_plaza, plaza.salario_tope_plaza, linea_trabajo.id_lt")
             ->join('plaza', 'detalle_plaza.id_plaza', '=', 'plaza.id_plaza')
             ->join('tipo_contrato', 'detalle_plaza.id_tipo_contrato', '=', 'tipo_contrato.id_tipo_contrato')
             ->join('actividad_institucional', 'detalle_plaza.id_actividad_institucional', '=', 'actividad_institucional.id_actividad_institucional')
@@ -568,7 +568,7 @@ class EmpleadoController extends Controller
     }
     public function getAvailableJobPositions(Request $request)
     {
-        $jobPositionsToSelect = DetallePlaza::selectRaw("detalle_plaza.id_det_plaza as value, concat(detalle_plaza.codigo_det_plaza,' - ',plaza.nombre_plaza,' - ',tipo_contrato.codigo_tipo_contrato) as label, plaza.salario_base_plaza, plaza.salario_tope_plaza, linea_trabajo.id_lt")
+        $jobPositionsToSelect = DetallePlaza::selectRaw("detalle_plaza.id_det_plaza as value, concat(detalle_plaza.id_puesto_sirhi_det_plaza,' - ',plaza.nombre_plaza,' - ',tipo_contrato.codigo_tipo_contrato) as label, plaza.salario_base_plaza, plaza.salario_tope_plaza, linea_trabajo.id_lt")
             ->join('plaza', 'detalle_plaza.id_plaza', '=', 'plaza.id_plaza')
             ->join('tipo_contrato', 'detalle_plaza.id_tipo_contrato', '=', 'tipo_contrato.id_tipo_contrato')
             ->join('actividad_institucional', 'detalle_plaza.id_actividad_institucional', '=', 'actividad_institucional.id_actividad_institucional')

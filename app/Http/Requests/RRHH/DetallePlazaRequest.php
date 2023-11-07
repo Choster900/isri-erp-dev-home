@@ -24,7 +24,7 @@ class DetallePlazaRequest extends FormRequest
      */
     public function rules()
     {
-        $rules["codigo_det_plaza"] = ['required',Rule::unique('detalle_plaza','codigo_det_plaza')->ignore($this->input('id_det_plaza'), 'id_det_plaza')];
+        $rules["id_puesto_sirhi_det_plaza"] = ['required',Rule::unique('detalle_plaza','id_puesto_sirhi_det_plaza')->ignore($this->input('id_det_plaza'), 'id_det_plaza')];
         $rules["actividad_institucional.linea_trabajo.id_lt"] = ['required'];
         $rules["id_proy_financiado"] = ['required'];
         $rules["id_actividad_institucional"] = ['required'];
@@ -37,8 +37,8 @@ class DetallePlazaRequest extends FormRequest
 
     public function messages()
     {
-        $messages["codigo_det_plaza"] = "Este codigo ya pertenece a un puesto.";
-        $messages["codigo_det_plaza.required"] = "Debe escribir el codigo para el puesto.";
+        $messages["id_puesto_sirhi_det_plaza"] = "Este codigo ya pertenece a un puesto.";
+        $messages["id_puesto_sirhi_det_plaza.required"] = "Debe escribir el codigo para el puesto.";
         $messages["id_actividad_institucional.required"] = "Debe seleccionar actividad institucional.";
         $messages["actividad_institucional.linea_trabajo.id_lt.required"] = "Debe seleccionar linea de trabajo.";
         $messages["id_proy_financiado.required"] = "Debe seleccionar fuente de financiamiento.";
