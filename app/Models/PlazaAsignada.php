@@ -18,10 +18,12 @@ class PlazaAsignada extends Model
         'id_lt',
         'id_dependencia',
         'id_det_plaza',
+        'id_motivo_desvinculo_laboral',
         'salario_plaza_asignada',
         'partida_plaza_asignada',
         'subpartida_plaza_asignada',
         'fecha_plaza_asignada',
+        'fecha_renuncia_plaza_asignada',
         'estado_plaza_asignada',
         'fecha_reg_plaza_asignada',
         'fecha_mod_plaza_asignada',
@@ -40,5 +42,9 @@ class PlazaAsignada extends Model
     public function dependencia()
     {
         return $this->belongsTo(Dependencia::class,'id_dependencia','id_dependencia');
+    }
+    public function motivo_desvinculo_laboral()
+    {
+        return $this->belongsTo(MotivoDesvinculoLaboral::class,'id_motivo_desvinculo_laboral','id_motivo_desvinculo_laboral');
     }
 }
