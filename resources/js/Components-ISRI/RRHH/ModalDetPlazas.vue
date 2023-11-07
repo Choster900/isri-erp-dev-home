@@ -95,12 +95,12 @@ import axios from "axios";
                         </div>
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                             <label class="block mb-2 text-xs font-light text-gray-600">
-                                Plaza <span class="text-red-600 font-extrabold">*</span>
+                                Puesto <span class="text-red-600 font-extrabold">*</span>
                             </label>
                             <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                                 <Multiselect v-model="jobPositionDet.id_plaza" :options="selectOptions.jobPositions"
                                     :searchable="true" :placeholder="isLoading ? 'Cargando...' : 'Seleccione plaza'"
-                                    :disabled="isLoading || modalData != ''" />
+                                    :disabled="isLoading" />
                                 <LabelToInput icon="list" />
                             </div>
                             <InputError v-for="(item, index) in errors.id_plaza" :key="index" class="mt-2"
@@ -124,16 +124,12 @@ import axios from "axios";
                                 :message="item" />
                         </div>
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                            <label class="block mb-2 text-xs font-light text-gray-600">
-                                Estado puesto <span class="text-red-600 font-extrabold">*</span>
-                            </label>
-                            <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
-                                <Multiselect v-model="jobPositionDet.id_estado_plaza" :options="statusOptions"
-                                    :searchable="true" :placeholder="isLoading ? 'Cargando...' : 'Seleccione estado'"
-                                    :disabled="true" />
-                                <LabelToInput icon="list" />
-                            </div>
-                            <InputError v-for="(item, index) in errors.id_estado_plaza" :key="index" class="mt-2"
+                            <TextInput id="codigo-puesto" v-model="jobPositionDet.codigo_det_plaza" type="text"
+                                placeholder="Codigo puesto" addClass="font-semibold"
+                                @update:modelValue="validateJobPositionName('codigo_det_plaza', 8)">
+                                <LabelToInput icon="objects" forLabel="codigo-puesto" />
+                            </TextInput>
+                            <InputError v-for="(item, index) in errors.codigo_det_plaza" :key="index" class="mt-2"
                                 :message="item" />
                         </div>
                     </div>
@@ -194,12 +190,19 @@ export default {
                 id_proy_financiado: '',
                 id_tipo_contrato: '',
                 plaza_asignada_activa: null,
-                codigo_det_plaza:''
+                codigo_det_plaza: ''
             },
         };
     },
     methods: {
-        storeJobPositionDet() {
+        //Function to validate data entry
+        validateJobPositionName(field, limit) {
+            // Limit the length of the input
+            if (this.jobPositionDet[field].length > limit) {
+                this.jobPositionDet[field] = this.jobPositionDet[field].substring(0, limit);
+            }
+        },
+        async storeJobPositionDet() {
             this.$swal
                 .fire({
                     title: '¿Está seguro de guardar el nuevo concepto de ingreso?',
@@ -211,20 +214,25 @@ export default {
                     showCancelButton: true,
                     showCloseButton: true
                 })
-                .then((result) => {
+                .then(async (result) => {
                     if (result.isConfirmed) {
                         let url = '/store-job-position-det'
                         this.saveJobPositionDet(url)
                     }
                 });
         },
-        saveJobPositionDet(url) {
-            axios.post(url, this.jobPositionDet)
+        async saveJobPositionDet(url) {
+            this.isLoading = true
+            await axios.post(url, this.jobPositionDet)
                 .then((response) => {
-                    this.handleSuccessResponse(response.data.mensaje)
+                    this.handleSuccessResponse(response.data.message);
                 })
                 .catch((errors) => {
-                    this.handleErrorResponse(errors)
+                    this.handleErrorResponse(errors);
+                })
+                .finally(() => {
+                    // Desactiva el loader aquí, ya sea que la solicitud haya tenido éxito o haya fallado
+                    this.isLoading = false;
                 });
         },
         handleSuccessResponse(message) {
@@ -243,11 +251,11 @@ export default {
                     this.errors = errors.response.data.errors;
                 }
             } else {
-                this.manageError(errors,this)
+                this.manageError(errors, this)
                 this.$emit("cerrar-modal");
             }
         },
-        updateJobPositionDet() {
+        async updateJobPositionDet() {
             this.$swal
                 .fire({
                     title: '¿Está seguro de actualizar la plaza?',
@@ -259,7 +267,7 @@ export default {
                     showCancelButton: true,
                     showCloseButton: true
                 })
-                .then((result) => {
+                .then(async (result) => {
                     if (result.isConfirmed) {
                         let url = '/update-job-position-det'
                         this.saveJobPositionDet(url)
@@ -292,7 +300,7 @@ export default {
                     this.jobPositionDet.id_estado_plaza = 1
                 }
             } catch (errors) {
-                this.manageError(errors,this)
+                this.manageError(errors, this)
             } finally {
                 this.isLoading = false;  // Desactivar el estado de carga
             }
