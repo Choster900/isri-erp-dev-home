@@ -42,10 +42,11 @@ import axios from 'axios';
             </header>
 
             <div class="overflow-x-auto">
-                <datatable :columns="columns" :sortKey="sortKey" :inputsToValidate="inputsToValidate" :sortOrders="sortOrders" @sort="sortBy"
-                    :searchButton="true" @datos-enviados="handleData($event)" @execute-search="getEmployees()">
+                <datatable :columns="columns" :sortKey="sortKey" :inputsToValidate="inputsToValidate"
+                    :sortOrders="sortOrders" @sort="sortBy" :searchButton="true" @datos-enviados="handleData($event)"
+                    @execute-search="getEmployees()">
                     <tbody class="text-sm divide-y divide-slate-200">
-                        <tr v-for="employee in employees" :key="employee.id_empleado"  class="content-body">
+                        <tr v-for="employee in employees" :key="employee.id_empleado" class="content-body">
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">{{ employee.id_empleado }}</div>
                             </td>
@@ -126,8 +127,7 @@ import axios from 'axios';
                                             <div class="font-semibold">Fotografia</div>
                                         </div>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            v-if="permits.actualizar == 1 && employee.estado_empleado == 1"
-                                            @click="manageJobPositions(employee)">
+                                            v-if="permits.actualizar == 1" @click="manageJobPositions(employee)">
                                             <div class="w-8 text-teal-700">
                                                 <span class="text-xs">
                                                     <svg width="25px" height="25px" viewBox="0 0 512 512" class="ml-0.5"
@@ -140,36 +140,22 @@ import axios from 'axios';
                                             </div>
                                             <div class="font-semibold">Plaza</div>
                                         </div>
-                                        <!-- <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            @click="changeStatusEmployee(employee)" v-if="permits.eliminar == 1">
-                                            <div class="w-8 text-red-900"><span class="text-xs">
-                                                    <svg :fill="employee.estado_empleado == 1 ? '#991B1B' : '#166534'"
-                                                        version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
-                                                        width="20px" height="20px"
-                                                        xmlns:xlink="http://www.w3.org/1999/xlink"
-                                                        viewBox="0 0 97.994 97.994" xml:space="preserve"
-                                                        :stroke="employee.estado_empleado == 1 ? '#991B1B' : '#166534'">
-                                                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round"
-                                                            stroke-linejoin="round"></g>
-                                                        <g id="SVGRepo_iconCarrier">
-                                                            <g>
-                                                                <g>
-                                                                    <path
-                                                                        d="M97.155,9.939c-0.582-0.416-1.341-0.49-1.991-0.193l-10.848,4.935C74.08,5.29,60.815,0.118,46.966,0.118 c-15.632,0-30.602,6.666-41.07,18.289c-0.359,0.399-0.543,0.926-0.51,1.461c0.033,0.536,0.28,1.036,0.686,1.388l11.301,9.801 c0.818,0.711,2.055,0.639,2.787-0.162c6.866-7.512,16.636-11.821,26.806-11.821c6.135,0,12.229,1.584,17.622,4.583l-7.826,3.561 c-0.65,0.296-1.095,0.916-1.163,1.627c-0.069,0.711,0.247,1.405,0.828,1.82l34.329,24.52c0.346,0.246,0.753,0.373,1.163,0.373 c0.281,0,0.563-0.06,0.828-0.181c0.65-0.296,1.095-0.916,1.163-1.627l4.075-41.989C98.053,11.049,97.737,10.355,97.155,9.939z">
-                                                                    </path>
-                                                                    <path
-                                                                        d="M80.619,66.937c-0.819-0.709-2.055-0.639-2.787,0.162c-6.866,7.514-16.638,11.822-26.806,11.822 c-6.135,0-12.229-1.584-17.622-4.583l7.827-3.561c0.65-0.296,1.094-0.916,1.163-1.628c0.069-0.711-0.247-1.404-0.828-1.819 L7.237,42.811c-0.583-0.416-1.341-0.49-1.991-0.193c-0.65,0.296-1.094,0.916-1.163,1.627L0.009,86.233 c-0.069,0.712,0.247,1.406,0.828,1.822c0.583,0.416,1.341,0.488,1.991,0.192l10.848-4.935 c10.237,9.391,23.502,14.562,37.351,14.562c15.632,0,30.602-6.666,41.07-18.289c0.358-0.398,0.543-0.926,0.51-1.461 c-0.033-0.536-0.28-1.036-0.687-1.388L80.619,66.937z">
-                                                                    </path>
-                                                                </g>
-                                                            </g>
-                                                        </g>
+                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                            @click="inactiveEmployee(employee)" v-if="permits.eliminar == 1">
+                                            <div class="w-8 text-red-700">
+                                                <span class="text-xs">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                        class="h-5 w-5 ml-0.5" fill="currentColor">
+                                                        <path
+                                                            d="M13.6,23.9c-7.8,1-14.5-5.6-13.5-13.5c0.7-5.3,5-9.7,10.3-10.3c7.8-1,14.5,5.6,13.5,13.5C23.2,18.9,18.9,23.2,13.6,23.9z M13.7,2.1C6.9,1,1,6.9,2.1,13.7c0.7,4.1,4,7.5,8.2,8.2C17.1,23,23,17.1,21.9,10.3C21.2,6.2,17.8,2.8,13.7,2.1z" />
+                                                        <polyline points="5.6,4.2 19.8,18.3 18.4,19.8 4.2,5.6" />
                                                     </svg>
-                                                </span></div>
-                                            <div class="font-semibold">
-                                                {{ employee.estado_empleado ? 'Desactivar' : 'Activar' }}
+                                                </span>
                                             </div>
-                                        </div> -->
+                                            <div class="font-semibold">
+                                                {{ employee.estado_empleado ? 'Inhabilitar' : 'Activar' }}
+                                            </div>
+                                        </div>
                                     </DropDownOptions>
                                 </div>
                             </td>
@@ -228,7 +214,7 @@ import axios from 'axios';
         <ModalFotografiaVue :showModalFlag="showModalFlag" :modalData="modalData" @cerrar-modal="showModalFlag = false"
             @get-table="getEmployees(tableData.currentPage)" />
 
-        <ModalPlazasVue :showModalJobPosition="showModalJobPosition" :modalData="modalData"
+        <ModalPlazasVue v-if="showModalJobPosition" :showModalJobPosition="showModalJobPosition" :modalData="modalData"
             @cerrar-modal="showModalJobPosition = false" @get-table="getEmployees(tableData.currentPage)" />
 
     </AppLayoutVue>
@@ -382,10 +368,8 @@ export default {
                     this.employees = data.data.data;
                     this.hasNext = data.data.current_page !== data.data.last_page;
                     this.employees.length > 0 ? this.empty_object = false : this.empty_object = true
-                    console.log(this.employees);
                 }
             }).catch((errors) => {
-                console.log(errors);
                 this.manageError(errors, this)
             })
         },

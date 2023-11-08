@@ -18,7 +18,7 @@ class DetallePlazaController extends Controller
     public function getDetJobPositions(Request $request)
     {
         $columns = [
-            'codigo_det_plaza',
+            'id_puesto_sirhi_det_plaza',
             'nombre_plaza',
             'id_estado_plaza',
             'codigo_dependencia',
@@ -46,13 +46,13 @@ class DetallePlazaController extends Controller
                 $query->orderByRaw('(SELECT nombre_plaza FROM plaza WHERE plaza.id_plaza = detalle_plaza.id_plaza) ' . $dir);
             } else {
                 if ($column == 3) {
-                    $query->orderByRaw('(SELECT codigo_dependencia FROM dependencia WHERE dependencia.id_dependencia = (SELECT id_dependencia FROM plaza_asignada WHERE plaza_asignada.id_det_plaza = detalle_plaza.id_det_plaza) ) ' . $dir);
+                    $query->orderByRaw('(SELECT codigo_dependencia FROM dependencia WHERE dependencia.id_dependencia = (SELECT id_dependencia FROM plaza_asignada WHERE plaza_asignada.id_det_plaza = detalle_plaza.id_det_plaza AND plaza_asignada.estado_plaza_asignada = 1) ) ' . $dir);
                 } else {
                     if ($column == 4) {
                         $query->orderByRaw('
                         (SELECT pnombre_persona FROM persona WHERE persona.id_persona = 
                             (SELECT id_persona FROM empleado WHERE empleado.id_empleado = 
-                                (SELECT id_empleado FROM plaza_asignada WHERE plaza_asignada.id_det_plaza = detalle_plaza.id_det_plaza)
+                                (SELECT id_empleado FROM plaza_asignada WHERE plaza_asignada.id_det_plaza = detalle_plaza.id_det_plaza AND plaza_asignada.estado_plaza_asignada = 1)
                                     ) ) ' . $dir);
                     } else {
                         $query->orderBy($columns[$column], $dir);
@@ -62,7 +62,7 @@ class DetallePlazaController extends Controller
         }
 
         if ($search_value) {
-            $query->where('codigo_det_plaza', 'like', '%' . $search_value['codigo_det_plaza'] . '%')
+            $query->where('id_puesto_sirhi_det_plaza', 'like', '%' . $search_value['id_puesto_sirhi_det_plaza'] . '%')
                 ->where('estado_det_plaza', 'like', '%' . $search_value['estado_det_plaza'] . '%')
                 ->where('id_estado_plaza', 'like', '%' . $search_value["id_estado_plaza"] . '%')
                 ->where(function ($query) use ($search_value) {
@@ -123,29 +123,13 @@ class DetallePlazaController extends Controller
 
     public function storeJobPositionDet(DetallePlazaRequest $request)
     {
-        // Find the latest job_position_det record related to the given id_job_position
-        $latestJobPositionDet = DetallePlaza::where('id_plaza', $request->id_plaza)
-            ->latest('codigo_det_plaza')
-            ->first();
-        // Initialize the correlative code as 1 if no previous job_position_det is found
-        $correlative = 1;
-        // If a previous job_position_det exists, extract and increment the correlative part
-        if ($latestJobPositionDet) {
-            $latestCorrelative = (int)substr($latestJobPositionDet->codigo_det_plaza, -4);
-            $correlative = $latestCorrelative + 1;
-        }
-        // Format the correlative code with leading zeros (4 digits)
-        $formattedCorrelative = str_pad($correlative, 4, '0', STR_PAD_LEFT);
-        // Combine the id_job_position and formatted correlative to get the final code
-        $JobPositionDetCode = $request->id_plaza . '-' . $formattedCorrelative;
-
         $jobPositionDet = new DetallePlaza([
             'id_proy_financiado'            => $request->id_proy_financiado,
             'id_tipo_contrato'              => $request->id_tipo_contrato,
             'id_actividad_institucional'    => $request->id_actividad_institucional,
             'id_plaza'                      => $request->id_plaza,
             'id_estado_plaza'               => $request->id_estado_plaza,
-            'codigo_det_plaza'              => $JobPositionDetCode,
+            'id_puesto_sirhi_det_plaza'              => $request->id_puesto_sirhi_det_plaza,
             'estado_det_plaza'              => 1,
             'fecha_reg_det_plaza'           => Carbon::now(),
             'usuario_det_plaza'             => $request->user()->nick_usuario,
@@ -153,7 +137,7 @@ class DetallePlazaController extends Controller
         ]);
         $jobPositionDet->save();
 
-        return response()->json(['mensaje' => 'Plaza guardada con exito']);
+        return response()->json(['message' => 'Plaza guardada con exito.']);
     }
 
     public function updateJobPositionDet(DetallePlazaRequest $request)
@@ -163,17 +147,18 @@ class DetallePlazaController extends Controller
             return response()->json(['logical_error' => 'Error, la plaza seleccionada ha sida desactivada por otro usuario.'], 422);
         } else {
             $data = [
-                'id_proy_financiado' => $request->id_proy_financiado,
-                'id_tipo_contrato' => $request->id_tipo_contrato,
-                'id_actividad_institucional' => $request->id_actividad_institucional,
-                'id_plaza' => $request->id_plaza,
-                'fecha_mod_det_plaza' => Carbon::now(),
-                'usuario_det_plaza' => $request->user()->nick_usuario,
-                'ip_det_plaza' => $request->ip(),
+                'id_proy_financiado'            => $request->id_proy_financiado,
+                'id_tipo_contrato'              => $request->id_tipo_contrato,
+                'id_actividad_institucional'    => $request->id_actividad_institucional,
+                'id_plaza'                      => $request->id_plaza,
+                'id_puesto_sirhi_det_plaza'              => $request->id_puesto_sirhi_det_plaza,
+                'fecha_mod_det_plaza'           => Carbon::now(),
+                'usuario_det_plaza'             => $request->user()->nick_usuario,
+                'ip_det_plaza'                  => $request->ip(),
             ];
             $jobPositionDet->update($data);
 
-            return response()->json(['mensaje' => 'Plaza actualizada con éxito']);
+            return response()->json(['message' => 'Plaza actualizada con éxito.']);
         }
     }
 
@@ -188,7 +173,7 @@ class DetallePlazaController extends Controller
                     'usuario_det_plaza' => $request->user()->nick_usuario,
                     'ip_det_plaza' => $request->ip(),
                 ]);
-                return ['mensaje' => 'Plaza codigo ' . $servicio->codigo_det_plaza . ' ha sido desactivada con exito'];
+                return ['mensaje' => 'Plaza codigo ' . $servicio->id_puesto_sirhi_det_plaza . ' ha sido desactivada con exito'];
             } else {
                 return ['mensaje' => 'La plaza seleccionada ya ha sido activada por otro usuario'];
             }
@@ -201,7 +186,7 @@ class DetallePlazaController extends Controller
                         'usuario_det_plaza' => $request->user()->nick_usuario,
                         'ip_det_plaza' => $request->ip(),
                     ]);
-                    return ['mensaje' => 'Plaza codigo ' . $servicio->codigo_det_plaza . ' ha sido activada con exito'];
+                    return ['mensaje' => 'Plaza codigo ' . $servicio->id_puesto_sirhi_det_plaza . ' ha sido activada con exito'];
                 } else {
                     return ['mensaje' => 'La plaza seleccionada ya ha sido desactivada por otro usuario'];
                 }

@@ -47,7 +47,7 @@ import axios from 'axios';
                         <tr v-for="position in jobPositions" :key="position.id_det_plaza">
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 flex items-center justify-center min-h-[50px]">
-                                    {{ position.codigo_det_plaza }}
+                                    {{ position.id_puesto_sirhi_det_plaza }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5">
@@ -208,7 +208,7 @@ export default {
     data() {
         let sortOrders = {};
         let columns = [
-            { width: "10%", label: "Codigo", name: "codigo_det_plaza", type: "text" },
+            { width: "10%", label: "Codigo", name: "id_puesto_sirhi_det_plaza", type: "text" },
             { width: "25%", label: "Nombre", name: "nombre_plaza", type: "text" },
             {
                 width: "12%", label: "Estado Puesto", name: "id_estado_plaza", type: "select",
@@ -230,7 +230,7 @@ export default {
             { width: "10%", label: "Acciones", name: "Acciones" },
         ];
         columns.forEach((column) => {
-            if (column.name === 'codigo_det_plaza')
+            if (column.name === 'id_puesto_sirhi_det_plaza')
                 sortOrders[column.name] = 1;
             else
                 sortOrders[column.name] = -1;
@@ -252,7 +252,7 @@ export default {
             //Until here 
             links: [],
             columns: columns,
-            sortKey: "codigo_det_plaza",
+            sortKey: "id_puesto_sirhi_det_plaza",
             sortOrders: sortOrders,
             perPage: ["10", "20", "30"],
             tableData: {
@@ -351,7 +351,7 @@ export default {
             let msg
             position.estado_det_plaza == 1 ? msg = "Desactivar" : msg = "Activar"
             this.$swal.fire({
-                title: msg + ' plaza codigo: <br>' + position.codigo_det_plaza + '.',
+                title: msg + ' plaza codigo: <br>' + position.id_puesto_sirhi_det_plaza + '.',
                 text: "¿Estas seguro?",
                 icon: "question",
                 iconHtml: "❓",
