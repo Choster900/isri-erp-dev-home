@@ -46,7 +46,7 @@ import axios from 'axios';
                 <datatable :columns="columns" :sortKey="sortKey" :inputsToValidate="inputsToValidate"
                     :sortOrders="sortOrders" @sort="sortBy" :searchButton="true" @datos-enviados="handleData($event)"
                     @execute-search="getEmployees()">
-                    <tbody class="text-sm divide-y divide-slate-200">
+                    <tbody class="text-sm divide-y divide-slate-200" v-if="!isLoadinRequest">
                         <tr v-for="employee in employees" :key="employee.id_empleado" class="content-body">
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">{{ employee.id_empleado }}</div>
@@ -177,6 +177,26 @@ import axios from 'axios';
                             </td>
                         </tr>
                     </tbody>
+                    <tbody v-else>
+                        <tr>
+                            <td colspan="6" class="text-center">
+                                <img src="../../../img/IsSearching.gif" alt="" class="w-60 h-60 mx-auto">
+                                <h1 class="font-medium text-xl mt-4">Cargando!!!</h1>
+                                <p class="text-sm text-gray-600 mt-2 pb-10">Por favor espera un momento mientras se carga la
+                                    información.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody v-if="empty_object && !isLoadinRequest">
+                        <tr>
+                            <td colspan="6" class="text-center">
+                                <img src="../../../img/NoData.gif" alt="" class="w-60 h-60 mx-auto">
+                                <h1 class="font-medium text-xl mt-4">No se encontraron resultados!</h1>
+                                <p class="text-sm text-gray-600 mt-2 pb-10">Parece que no hay registros disponibles en este
+                                    momento.</p>
+                            </td>
+                        </tr>
+                    </tbody>
                 </datatable>
 
             </div>
@@ -213,9 +233,9 @@ import axios from 'axios';
                                         </a>
                                     </div>
                                 </span>
-                                <span class="cursor-pointer" v-else
+                                <span class="cursor-pointer mt-2" v-else @click="getEmployees(link.url)"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
-                                        class=" w-5" @click="getEmployees(link.url)">{{ link.label }}</span>
+                                        class=" w-5">{{ link.label }}</span>
                                 </span>
                             </li>
                         </ul>
@@ -275,6 +295,7 @@ export default {
             show_modal_employee: false, //Create and edit employee
             showEmpTermination: false, //Manage employee termination
             empty_object: false,
+            isLoadinRequest: false,
             //Data for datatable
             employees: [],
             //Data for modal
@@ -382,6 +403,7 @@ export default {
         async getEmployees(url = "/employees") {
             this.tableData.draw++;
             this.tableData.currentPage = url
+            this.isLoadinRequest = true
             await axios.post(url, this.tableData).then((response) => {
                 let data = response.data;
                 if (this.tableData.draw == data.draw) {
@@ -393,6 +415,8 @@ export default {
                     this.employees = data.data.data;
                     this.hasNext = data.data.current_page !== data.data.last_page;
                     this.employees.length > 0 ? this.empty_object = false : this.empty_object = true
+                    this.isLoadinRequest = false
+
                 }
             }).catch((errors) => {
                 this.manageError(errors, this)

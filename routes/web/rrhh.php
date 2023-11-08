@@ -7,7 +7,7 @@ use App\Http\Controllers\RRHH\BeneficiarioController;
 use App\Http\Controllers\RRHH\DirectorCentroController;
 use App\Http\Controllers\RRHH\EmpleadoController;
 use App\Http\Controllers\RRHH\EvaluacionController;
-use App\Http\Controllers\RRHH\ExpedienteController;
+use App\Http\Controllers\RRHH\ArchivoAnexoController;
 use App\Http\Controllers\RRHH\GerenteGeneralController;
 use App\Http\Controllers\RRHH\HojaServicioController;
 use App\Http\Controllers\RRHH\JefeInmediatoController;
@@ -165,8 +165,9 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/expedientes', 'RRHH/Expedientes');
         }
     )->name('rrhh.expedientes');
-    Route::post('expedientes', [ExpedienteController::class, 'getEmployeeExpediente'])->name('expediente.getEmployeeExpediente');
+    Route::post('expedientes', [ArchivoAnexoController::class, 'getEmployeeExpediente'])->name('expediente.getEmployeeExpediente');
     Route::get('getAllTipoArchivoAnexos', function () {return TipoArchivoAnexo::all();});
     Route::post('getPersonaByName', [PersonaController::class, 'getPersonByCompleteName'])->name('expediente.getExpediente');
+    Route::post('createArchivoAnexo', [ArchivoAnexoController::class, 'createArchivoAnexo'])->name('expediente.createArchivoAnexo');
 
 });
