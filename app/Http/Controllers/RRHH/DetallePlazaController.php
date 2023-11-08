@@ -62,7 +62,7 @@ class DetallePlazaController extends Controller
         }
 
         if ($search_value) {
-            $query->where('id_puesto_sirhi_det_plaza', 'like', '%' . $search_value['id_puesto_sirhi_det_plaza'] . '%')
+            $query->whereRaw('IFNULL(id_puesto_sirhi_det_plaza, "") like ?', '%' . $search_value['id_puesto_sirhi_det_plaza'] . '%')
                 ->where('estado_det_plaza', 'like', '%' . $search_value['estado_det_plaza'] . '%')
                 ->where('id_estado_plaza', 'like', '%' . $search_value["id_estado_plaza"] . '%')
                 ->where(function ($query) use ($search_value) {
@@ -70,17 +70,25 @@ class DetallePlazaController extends Controller
                         $query->where('nombre_plaza', 'like', '%' . $search_value["nombre_plaza"] . '%');
                     });
                     if ($search_value["codigo_dependencia"]) {
-                        $query->whereHas('plazas_asignadas.dependencia', function ($query) use ($search_value) {
-                            $query->where('codigo_dependencia', 'like', '%' . $search_value["codigo_dependencia"] . '%');
-                        });
+                        if ($search_value['codigo_dependencia'] == 'N/Asign.' || $search_value['codigo_dependencia'] == 'N/A') {
+                            $query->whereIn('id_estado_plaza', [1, 2]);
+                        } else {
+                            $query->whereHas('plazas_asignadas.dependencia', function ($query) use ($search_value) {
+                                $query->where('codigo_dependencia', 'like', '%' . $search_value["codigo_dependencia"] . '%');
+                            });
+                        }
                     }
                     if ($search_value["nombre_empleado"]) {
-                        $query->whereHas(
-                            'plaza_asignada_activa.empleado.persona',
-                            function ($query) use ($search_value) {
-                                $query->whereRaw("MATCH(pnombre_persona, snombre_persona, tnombre_persona, papellido_persona, sapellido_persona, tapellido_persona) AGAINST(?)", $search_value["nombre_empleado"]);
-                            }
-                        );
+                        if ($search_value['nombre_empleado'] == 'N/Asign.' || $search_value['nombre_empleado'] == 'N/A') {
+                            $query->whereIn('id_estado_plaza', [1, 2]);
+                        } else {
+                            $query->whereHas(
+                                'plaza_asignada_activa.empleado.persona',
+                                function ($query) use ($search_value) {
+                                    $query->whereRaw("MATCH(pnombre_persona, snombre_persona, tnombre_persona, papellido_persona, sapellido_persona, tapellido_persona) AGAINST(?)", $search_value["nombre_empleado"]);
+                                }
+                            );
+                        }
                     }
                 });
         }

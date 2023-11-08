@@ -5,6 +5,7 @@ import Datatable from "@/Components-ISRI/Datatable.vue";
 import ModalEmployeesVue from '@/Components-ISRI/RRHH/ModalEmployees.vue';
 import ModalFotografiaVue from '@/Components-ISRI/RRHH/ModalFotografia.vue';
 import ModalPlazasVue from '@/Components-ISRI/RRHH/ModalPlazas.vue';
+import ModalDesvinculacionEmpleadoVue from '@/Components-ISRI/RRHH/ModalDesvinculacionEmpleado.vue';
 import moment from 'moment';
 
 import { toast } from 'vue3-toastify';
@@ -128,7 +129,7 @@ import axios from 'axios';
                                         </div>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                                             v-if="permits.actualizar == 1" @click="manageJobPositions(employee)">
-                                            <div class="w-8 text-teal-700">
+                                            <div class="w-8 text-cyan-600">
                                                 <span class="text-xs">
                                                     <svg width="25px" height="25px" viewBox="0 0 512 512" class="ml-0.5"
                                                         xmlns="http://www.w3.org/2000/svg" fill="currentColor"
@@ -141,8 +142,8 @@ import axios from 'axios';
                                             <div class="font-semibold">Plaza</div>
                                         </div>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            @click="inactiveEmployee(employee)" v-if="permits.eliminar == 1">
-                                            <div class="w-8 text-red-700">
+                                            @click="manageEmpTermination(employee)" v-if="permits.eliminar == 1">
+                                            <div v-if="employee.estado_empleado" class="w-8 text-red-700">
                                                 <span class="text-xs">
                                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
                                                         class="h-5 w-5 ml-0.5" fill="currentColor">
@@ -151,6 +152,21 @@ import axios from 'axios';
                                                         <polyline points="5.6,4.2 19.8,18.3 18.4,19.8 4.2,5.6" />
                                                     </svg>
                                                 </span>
+                                            </div>
+                                            <div v-else class="w-8 text-green-800">
+                                                <svg fill="currentColor" class="ml-0.5 w-5 h-5" viewBox="0 0 16 16"
+                                                    xmlns="http://www.w3.org/2000/svg" stroke="currentColor">
+                                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round"
+                                                        stroke-linejoin="round"></g>
+                                                    <g id="SVGRepo_iconCarrier">
+                                                        <g>
+                                                            <path
+                                                                d="M15,6V1.76l-1.7,1.7A7,7,0,1,0,14.92,9H13.51a5.63,5.63,0,1,1-1.2-4.55L10.76,6Z">
+                                                            </path>
+                                                        </g>
+                                                    </g>
+                                                </svg>
                                             </div>
                                             <div class="font-semibold">
                                                 {{ employee.estado_empleado ? 'Inhabilitar' : 'Activar' }}
@@ -217,6 +233,10 @@ import axios from 'axios';
         <ModalPlazasVue v-if="showModalJobPosition" :showModalJobPosition="showModalJobPosition" :modalData="modalData"
             @cerrar-modal="showModalJobPosition = false" @get-table="getEmployees(tableData.currentPage)" />
 
+        <ModalDesvinculacionEmpleadoVue v-if="showEmpTermination" :showEmpTermination="showEmpTermination"
+            :modalData="modalData" @cerrar-modal="showEmpTermination = false"
+            @get-table="getEmployees(tableData.currentPage)" />
+
     </AppLayoutVue>
 </template>
 
@@ -250,13 +270,14 @@ export default {
                 sortOrders[column.name] = -1;
         });
         return {
-            showModalJobPosition: false,
-            showModalFlag: false,
+            showModalJobPosition: false, //Plaza
+            showModalFlag: false, //Fotografia
+            show_modal_employee: false, //Create and edit employee
+            showEmpTermination: false, //Manage employee termination
             empty_object: false,
             //Data for datatable
             employees: [],
             //Data for modal
-            show_modal_employee: false,
             modalData: [],
             inputsToValidate: [
                 { inputName: 'id_empleado', number: true, limit: 4 },
@@ -287,6 +308,10 @@ export default {
         }
     },
     methods: {
+        manageEmpTermination(employee) {
+            this.showEmpTermination = true
+            this.modalData = employee
+        },
         manageJobPositions(employee) {
             this.showModalJobPosition = true
             this.modalData = employee
@@ -425,8 +450,7 @@ export default {
 }
 </script>
 
-<style>
-.td-data-table {
+<style>.td-data-table {
     max-width: 100px;
     white-space: nowrap;
     height: 50px;
@@ -435,5 +459,4 @@ export default {
 .ellipsis {
     overflow: hidden;
     text-overflow: ellipsis;
-}
-</style>
+}</style>

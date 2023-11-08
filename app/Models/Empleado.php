@@ -68,4 +68,9 @@ class Empleado extends Model
     {
         return $this->hasMany(EvaluacionPersonal::class, 'id_empleado', 'id_empleado');
     }
+
+    public function periodos_laboral()
+    {
+        return $this->hasMany(PeriodoLaboral::class, 'id_empleado', 'id_empleado');
+    }
 }

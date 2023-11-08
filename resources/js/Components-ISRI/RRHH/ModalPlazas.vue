@@ -106,8 +106,7 @@ import moment from 'moment';
                                             <p class="text-base font-medium text-navy-700 dark:text-white">
                                                 {{ formattedDependency(jobPosition.dependencia) }}
                                             </p>
-                                            <button
-                                                v-if="jobPosition.estado_plaza_asignada === 1 && activeRoles.length > 1"
+                                            <button v-if="jobPosition.estado_plaza_asignada === 1 && activeRoles.length > 1"
                                                 class="mt-1 text-red-500 absolute top-0 right-0 mr-2 cursor-pointer"
                                                 title="Inhabilitar puesto." @click="setSpecificRole(index)">
                                                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
@@ -119,8 +118,7 @@ import moment from 'moment';
                                                     <path d="M13 9H15V17H13V9Z" fill="currentColor" />
                                                 </svg>
                                             </button>
-                                            <button
-                                                v-if="jobPosition.estado_plaza_asignada === 1"
+                                            <button v-if="jobPosition.estado_plaza_asignada === 1"
                                                 title="Modificar información del puesto."
                                                 class="mt-1 text-yellow-600 absolute top-0 right-0 cursor-pointer"
                                                 :class="activeRoles.length > 1 ? 'mr-9' : 'mr-2'"
@@ -610,8 +608,12 @@ export default {
         },
         handleErrorResponse(errors) {
             if (errors.response.status === 422) {
-                this.errors = errors.response.data.errors;
-                this.showToast(toast.warning, "Tienes algunos errores por favor verifica tus datos.");
+                if (errors.response.data.logical_error) {
+                    this.showToast(toast.error, errors.response.data.logical_error);
+                } else {
+                    this.errors = errors.response.data.errors;
+                    this.showToast(toast.warning, "Tienes algunos errores por favor verifica tus datos.");
+                }
             } else {
                 this.manageError(errors, this)
             }
