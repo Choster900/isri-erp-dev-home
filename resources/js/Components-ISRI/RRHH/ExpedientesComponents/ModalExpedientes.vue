@@ -76,11 +76,12 @@
                     </div>
 
                     <list-expedientes :class="{ 'hidden': sectionView != 'anexoSection' }" v-if="persona"
-                        :dataExpedientesPersona="persona.archivos_anexos" :tipoArchivoSelected="tipoSelected" />
+                        @redirect-for-modify="getInformacion" :dataExpedientesPersona="persona.archivos_anexos"
+                        :tipoArchivoSelected="tipoSelected" />
 
                     <add-expediente v-if="objTipoArchivoAnexo != ''" :class="{ 'hidden': sectionView != 'addSection' }"
                         class="pt-1" :opcionPersona="opcionPersona" :tipoArchivoAnexo="objTipoArchivoAnexo"
-                        :persona="persona" />
+                        :persona="persona" :objectFileUpdate="objectBringsForUpdate" />
                 </div>
 
 
@@ -92,9 +93,9 @@
 </template>
 <script>
 import SideInfoFile from './SideInfoFile.vue';
-import { computed, onMounted, ref, toRefs } from 'vue';
 import SearchIcon from './Icons/searchIcon.vue';
 import AddExpediente from './AddExpediente.vue';
+import { computed, ref, toRefs, watch } from 'vue';
 import ListExpedientes from './ListExpedientes.vue';
 import OrderListIcon from './Icons/orderListIcon.vue';
 import Modal from "@/Components-ISRI/AllModal/Modal.vue";
@@ -117,15 +118,24 @@ export default {
         const viewList = ref(false)// Controla en como se ven la vista
         const sectionView = ref("mainSection") // Maneja la seccion que queremos ver
         const tipoSelected = ref(null) // Controla el tipo seleccionado para filtrar la informacion de expedientes
-        const { persona } = toRefs(props); // Obteniendo la prop de persona
-
+        const { persona, showModal } = toRefs(props); // Obteniendo la prop de persona
+        const objectBringsForUpdate = ref({}) //Objeto que contendra la informacion del archivo para actualizar
         const opcionPersona = computed(() => {
             return persona.value ? [{ value: persona.value.id_persona, label: persona.value.pnombre_persona }] : [];
         });
 
+        watch(showModal, () => {
+            !showModal.value ? tipoSelected.value = null : ''
+            sectionView.value = "mainSection"
+        })
         // Objeto que retorna la lista de tipo de dato
         const { objTipoArchivoAnexo } = useTipoArchivoAnexo()
 
+        const getInformacion = (object) => {
+            console.log(object); 
+            sectionView.value = "addSection"
+
+        }
         return {
             persona,
             viewList,
@@ -133,6 +143,7 @@ export default {
             tipoSelected,
             opcionPersona,
             objTipoArchivoAnexo,
+            getInformacion,
         }
     }
 }
