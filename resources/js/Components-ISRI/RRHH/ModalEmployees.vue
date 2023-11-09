@@ -527,8 +527,8 @@ import axios from "axios";
                     <!-- buttons -->
                     <div class="flex items-center ml-1 mt-2">
                         <div class="flex" :class="correct_dui ? 'justify-end w-1/2' : 'justify-center w-full'">
-                            <GeneralButton v-if="current_page == 1 && correct_dui" class="mr-1" text="Cancelar" icon="delete"
-                                @click="$emit('cerrar-modal')" />
+                            <GeneralButton v-if="current_page == 1 && correct_dui" class="mr-1" text="Cancelar"
+                                icon="delete" @click="$emit('cerrar-modal')" />
 
                             <button v-if="current_page != 1"
                                 class="mr-1 flex items-center bg-gray-600 hover:bg-gray-700 text-white pl-2 pr-3 py-1.5 text-center mb-2 rounded"
@@ -983,6 +983,7 @@ export default {
                 })
                     .then((result) => {
                         if (result.isConfirmed) {
+                            this.is_loading = true
                             axios
                                 .post("/store-employee", this.employee)
                                 .then((response) => {
@@ -997,6 +998,9 @@ export default {
                                         this.manageError(errors, this)
                                         this.$emit("cerrar-modal");
                                     }
+                                })
+                                .finally(() => {
+                                    this.is_loading = false
                                 });
                         }
                     });
@@ -1004,7 +1008,7 @@ export default {
                 this.showErrorAlert()
             }
         },
-        updateEmployee() {
+        async updateEmployee() {
             if (this.validatePage3()) {
                 this.$swal.fire({
                     title: '¿Está seguro de actualizar empleado?',
@@ -1016,8 +1020,9 @@ export default {
                     showCancelButton: true,
                     showCloseButton: true
                 })
-                    .then((result) => {
+                    .then(async (result) => {
                         if (result.isConfirmed) {
+                            this.is_loading = true
                             axios
                                 .post("/update-employee", this.employee)
                                 .then((response) => {
@@ -1043,6 +1048,9 @@ export default {
                                         this.manageError(errors, this)
                                         this.$emit("cerrar-modal");
                                     }
+                                })
+                                .finally(() => {
+                                    this.is_loading = false
                                 });
                         }
                     });
