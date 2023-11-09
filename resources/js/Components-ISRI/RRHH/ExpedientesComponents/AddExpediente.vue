@@ -40,7 +40,7 @@
                                 la información</button>
                         </div>
                     </div>
-
+                  
                     <div class="max-w-2xl mx-auto">
                         <textarea id="description" rows="4" v-model="descripcionArchivoAnexo"
                             class="block p-2.5 w-full text-xs text-gray-900  rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 "
@@ -97,7 +97,7 @@ import SideInfo from './SideInfoPersona.vue';
 import { computed, onMounted, ref, watch } from 'vue';
 import { usePersona } from '@/Composables/RRHH/Persona/usePersona';
 import { useFileHandling } from '@/Composables/RRHH/Expediente/useFileHandling'
-import { useArchivoAnexo } from '@/Composables/RRHH/Expediente/useArchivoAnexo';
+import { useArchivoAnexo } from '@/Composables/RRHH/Expediente/useArchivoAnexo'
 export default {
     name: 'AddExpediente',
     components: { SideInfo },
@@ -105,6 +105,7 @@ export default {
         tipoArchivoAnexo: { type: Object, default: () => { }, },
         persona: { type: Object, default: () => { }, },
         opcionPersona: { type: Object, default: () => { } },
+        objectFileUpdate: { type: Object, default: () => { } },
     },
     setup(props) {
 

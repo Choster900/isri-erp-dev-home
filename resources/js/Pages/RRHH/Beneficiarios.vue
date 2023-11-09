@@ -1,9 +1,9 @@
 <script setup>
 import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
-import Datatable from "@/Components-ISRI/Datatable.vue";;
+import Datatable from "@/Components-ISRI/Datatable.vue";
 import axios from 'axios';
-import ModalBeneficiarios from '@/Components-ISRI/RRHH/ModalBeneficiarios.vue';
+import ModalBeneficiarios from '@/Components-ISRI/RRHH/BeneficiariosComponents/ModalBeneficiarios.vue';
 
 </script>
 

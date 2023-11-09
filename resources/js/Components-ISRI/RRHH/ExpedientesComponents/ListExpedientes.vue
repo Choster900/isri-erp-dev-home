@@ -30,11 +30,18 @@
                         dia</span>
                 </div>
                 <div class="absolute top-0 right-0 px-1 ">
-                    <svg class="w-8 h-8 fill-current" viewBox="0 0 32 32">
-                        <circle cx="16" cy="16" r="2"></circle>
-                        <circle cx="10" cy="16" r="2"></circle>
-                        <circle cx="22" cy="16" r="2"></circle>
-                    </svg>
+                    <DropdownHelp>
+                        <li>
+                            <div class="font-medium text-sm text-indigo-500 hover:text-indigo-600 flex items-center py-1 px-3"
+                                @click="$emit('redirect-for-modify', { data: anexo })">
+                                <svg class="w-3 h-3 fill-current text-indigo-300 shrink-0 mr-2" viewBox="0 0 12 12">
+                                    <path
+                                        d="M10.5 0h-9A1.5 1.5 0 000 1.5v9A1.5 1.5 0 001.5 12h9a1.5 1.5 0 001.5-1.5v-9A1.5 1.5 0 0010.5 0zM10 7L8.207 5.207l-3 3-1.414-1.414 3-3L5 2h5v5z" />
+                                </svg>
+                                <span>Modificar</span>
+                            </div>
+                        </li>
+                    </DropdownHelp>
                 </div>
             </div>
         </div>
@@ -48,8 +55,11 @@ import { computed, ref, toRefs, watch } from 'vue'
 import OrderListIcon from './Icons/orderListIcon.vue'
 import OrderSquareIcon from './Icons/orderSquareIcon.vue'
 import SearchIcon from './Icons/searchIcon.vue'
+import DropdownHelp from '@/Components-ISRI/ComponentsToForms/DropdownHelp.vue';
+
 export default {
-    components: { SearchIcon, OrderSquareIcon, OrderListIcon, OrderListIcon, OrderSquareIcon },
+    emits: ['redirect-for-modify'],
+    components: { SearchIcon, OrderSquareIcon, OrderListIcon, OrderListIcon, OrderSquareIcon, DropdownHelp },
     props: {
         showModal: { type: Boolean, default: false, },
         dataExpedientesPersona: { type: Object, default: () => { }, },
