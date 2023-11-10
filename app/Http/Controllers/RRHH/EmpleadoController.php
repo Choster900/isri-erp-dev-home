@@ -322,6 +322,7 @@ class EmpleadoController extends Controller
                 'salario_plaza_asignada'        => $request->salary,
                 'partida_plaza_asignada'        => $request->account,
                 'subpartida_plaza_asignada'     => $request->subaccount,
+                'contrato_plaza_asignada'       => $request->contract,
                 //This is the same date when the employee was hired, we don't ask for it in the form
                 'fecha_plaza_asignada'          => $request->fecha_contratacion_empleado,
                 'estado_plaza_asignada'         => 1,
@@ -542,6 +543,7 @@ class EmpleadoController extends Controller
                 'partida_plaza_asignada'        => $jobPosition['account'],
                 'subpartida_plaza_asignada'     => $jobPosition['subaccount'],
                 'fecha_plaza_asignada'          => $jobPosition['dateOfHired'],
+                'contrato_plaza_asignada'       => $jobPosition['contrato_plaza'],
                 'estado_plaza_asignada'         => 1,
                 'fecha_reg_plaza_asignada'      => Carbon::now(),
                 'usuario_plaza_asignada'        => $request->user()->nick_usuario,
@@ -601,6 +603,7 @@ class EmpleadoController extends Controller
                 'partida_plaza_asignada'        => $jobPosition['account'],
                 'subpartida_plaza_asignada'     => $jobPosition['subaccount'],
                 'fecha_plaza_asignada'          => $jobPosition['dateOfHired'],
+                'contrato_plaza_asignada'       => $jobPosition['contrato_plaza'],
                 'estado_plaza_asignada'         => 1,
                 'fecha_mod_plaza_asignada'      => Carbon::now(),
                 'usuario_plaza_asignada'        => $request->user()->nick_usuario,
@@ -893,6 +896,7 @@ class EmpleadoController extends Controller
                 'salario_plaza_asignada'        => $request->salary,
                 'partida_plaza_asignada'        => $request->account,
                 'subpartida_plaza_asignada'     => $request->subaccount,
+                'contrato_plaza_asignada'       => $request->contract,
                 //This is the same date when the employee was hired, we don't ask for it in the form
                 'fecha_plaza_asignada'          => $request->fecha_contratacion_empleado,
                 'estado_plaza_asignada'         => 1,

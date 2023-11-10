@@ -76,7 +76,14 @@ import moment from 'moment';
                                             alt="Default Profile Photo">
                                     </div>
                                     <div v-if="user_modal.person_id !== ''" class="text-center mt-2">
-                                        <h2 class="font-semibold">{{ user_modal.name }}</h2>
+                                        <h2 class="font-semibold">
+                                            {{ modalData.pnombre_persona }}
+                                            {{ modalData.snombre_persona }}
+                                            {{ modalData.tnombre_persona }}
+                                            {{ modalData.papellido_persona }}
+                                            {{ modalData.sapellido_persona }}
+                                            {{ modalData.tapellido_persona }}
+                                        </h2>
                                         <p class="text-gray-700">{{ user_modal.nick_usuario }}</p>
                                         <p class="text-gray-700">{{ formatBirthDate }}</p>
                                         <p class="text-gray-700">{{ user_modal.address }}</p>
@@ -175,7 +182,7 @@ import moment from 'moment';
                                     <!-- you'll have to validate this if -->
                                     <tr v-if="user_modal.roles == ''">
                                         <td colspan="4" class="text-center p-2 font-light">
-                                            {{ isLoading  ? 'Cargando...' : 'Sin roles asignados' }}
+                                            {{ isLoading ? 'Cargando...' : 'Sin roles asignados' }}
                                         </td>
                                     </tr>
                                 </tbody>
@@ -515,31 +522,23 @@ export default {
                         if (persona === "") {
                             this.found_user = false
                             this.user_modal.person_id = ''
-                            this.$swal.fire({
-                                title: 'Persona no encontrada',
-                                text: 'Este DUI no se encuentra en nuestros registros.',
-                                icon: 'warning',
-                                timer: 5000
-                            })
+                            this.showToast(toast.warning, 'Este DUI no se encuentra en nuestros registros.');
                         } else {
-                            if (usuario === "") {
-                                this.found_user = true
-                                this.user_modal.name = persona.nombre_persona
-                                this.user_modal.person_id = persona.id_persona
-                                this.user_modal.birth_date = persona.fecha_nac_persona
-                                this.user_modal.address = persona.nombre_municipio
-                                this.user_modal.phone_number = persona.telefono_persona
+                            if (persona.empleado && persona.empleado.id_estado_empleado === 2) {
+                                this.showToast(toast.warning, 'No puedes crear un usuario para un empleado inactivo.');
                             } else {
-                                this.found_user = false
-                                this.user_modal.person_id = ''
-                                let status;
-                                usuario.estado_usuario == 1 ? status = 'Activo' : status = 'Inactivo'
-                                this.$swal.fire({
-                                    title: 'Persona ya posee usuario.',
-                                    html: '<br>Nombre: ' + persona.nombre_persona + '<br>Usuario : ' + usuario.nick_usuario + ' <br> Estado : ' + status,
-                                    icon: 'warning',
-                                    timer: 5000
-                                })
+                                if (usuario === "") {
+                                    this.found_user = true
+                                    this.user_modal.name = persona.nombre_persona
+                                    this.user_modal.person_id = persona.id_persona
+                                    this.user_modal.birth_date = persona.fecha_nac_persona
+                                    this.user_modal.address = persona.nombre_municipio
+                                    this.user_modal.phone_number = persona.telefono_persona
+                                } else {
+                                    this.found_user = false
+                                    this.user_modal.person_id = ''
+                                    this.showToast(toast.info, 'Esta persona ya posee usuario: ' + usuario.nick_usuario);
+                                }
                             }
                         }
                     })

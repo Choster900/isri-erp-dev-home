@@ -395,7 +395,7 @@ import axios from "axios";
                                 <div class="relative flex">
                                     <LabelToInput icon="date" />
                                     <flat-pickr
-                                        :disabled="employee.id_empleado == '' || employee.estado_empleado === 0 ? false : true"
+                                        :disabled="employee.id_empleado == '' || employee.id_estado_empleado === 2 ? false : true"
                                         class="peer font-semibold text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none w-full"
                                         :config="config" v-model="employee.fecha_contratacion_empleado"
                                         :placeholder="'Seleccione fecha'" />
@@ -506,8 +506,8 @@ import axios from "axios";
                         </div>
                         <!-- End first row Page4 -->
                         <!-- Second row Page4 -->
-                        <div class="mb-10 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
+                        <div class="mb-5 md:flex flex-row justify-items-start">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="salary" v-model="employee.salary" type="text"
                                     :placeholder="selectedJobPosition ? 'Salario ($' + lower_salary_limit + ' - $' + upper_salary_limit + ')' : 'Salario (Seleccione plaza)'"
                                     :disabled="!selectedJobPosition"
@@ -516,23 +516,37 @@ import axios from "axios";
                                 </TextInput>
                                 <InputError class="mt-2" :message="errors.salary" />
                             </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
-                                <TextInput id="account" v-model="employee.account" type="text" placeholder="Partida"
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                                <TextInput id="contrato_plaza" v-model="employee.contract" type="text"
+                                    placeholder="Numero contrato"
+                                    @update:modelValue="validateEmployeeInputs('contract', 10, false, false)"
+                                    :required="false">
+                                    <LabelToInput icon="standard" forLabel="contrato_plaza" />
+                                </TextInput>
+                                <InputError v-for="(item, index) in errors['jobPosition.contract']" :key="index"
+                                    class="mt-2" :message="item" />
+                            </div>
+                        </div>
+                        <!-- End second row Page4 -->
+                        <!-- Third row Page4 -->
+                        <div class="mb-10 md:flex flex-row justify-items-start">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                                <TextInput id="account" v-model="employee.account" type="text" placeholder="Numero partida"
                                     @update:modelValue="validateEmployeeInputs('account', 3, true, false)">
                                     <LabelToInput icon="standard" forLabel="account" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errors.account" />
                             </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="subaccount" v-model="employee.subaccount" type="text"
-                                    placeholder="Subpartida"
+                                    placeholder="Numero subpartida"
                                     @update:modelValue="validateEmployeeInputs('subaccount', 3, true, false)">
                                     <LabelToInput icon="standard" forLabel="subaccount" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errors.subaccount" />
                             </div>
                         </div>
-                        <!-- End second row Page4 -->
+                        <!-- End third row Page4 -->
                     </div>
 
                     <!-- buttons -->
@@ -586,7 +600,8 @@ import axios from "axios";
                                     </g>
                                 </svg>
                             </button>
-                            <GeneralButton v-if="modalData != '' && current_page === 3 && modalData.id_estado_empleado === 1"
+                            <GeneralButton
+                                v-if="modalData != '' && current_page === 3 && modalData.id_estado_empleado === 1"
                                 @click="updateEmployee()" color="bg-orange-700 hover:bg-orange-800" text="Actualizar"
                                 icon="update" class="ml-1" />
                             <GeneralButton v-if="modalData != '' && current_page === 4" @click="reactiveEmployee()"
@@ -632,7 +647,7 @@ export default {
             //errors:[],
             employee: {
                 id_empleado: '',
-                id_estado_empleado:'',
+                id_estado_empleado: '',
                 id_tipo_pension: '',
                 isss_empleado: '',
                 nup_empleado: '',
@@ -651,6 +666,7 @@ export default {
                 salary: '',
                 account: '',
                 subaccount: '',
+                contract: '',
                 //Until here
                 persona: {
                     id_persona: '',

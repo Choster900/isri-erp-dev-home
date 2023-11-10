@@ -3,10 +3,31 @@ import { Head } from "@inertiajs/vue3";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import ModalAdminUserVue from '@/Components-ISRI/Administracion/ModalAdminUser.vue';
 import ModalChangePasswordVue from '@/Components-ISRI/Administracion/ModalChangePassword.vue';
+import { toast } from "vue3-toastify";
+
 </script>
 <template>
     <Head title="Administracion" />
     <AppLayoutVue nameSubModule="Administracion - Usuarios">
+
+        <div v-if="isLoading"
+            class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
+            <div role="status" class="flex items-center">
+                <svg aria-hidden="true" class="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-800"
+                    viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                        fill="currentColor" />
+                    <path
+                        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                        fill="currentFill" />
+                </svg>
+                <div class="bg-gray-200 rounded-lg p-1 font-semibold">
+                    <span class="text-blue-800">CARGANDO...</span>
+                </div>
+            </div>
+        </div>
+
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
                 <GeneralButton v-if="permits.insertar == 1" @click="createNewUser()"
@@ -142,6 +163,27 @@ import ModalChangePasswordVue from '@/Components-ISRI/Administracion/ModalChange
                                             </div>
                                             <div class="font-semibold">Contraseña</div>
                                         </div>
+                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                            v-if="permits.actualizar == 1 && showHomologar(user) && user.estado_usuario === 1"
+                                            @click="standarizeUserName(user)">
+                                            <div class="w-8 text-cyan-600  rounded-full">
+                                                <span class="text-xs">
+                                                    <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none"
+                                                        xmlns="http://www.w3.org/2000/svg" stroke="currentColor">
+                                                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round"
+                                                            stroke-linejoin="round"></g>
+                                                        <g id="SVGRepo_iconCarrier">
+                                                            <path
+                                                                d="M11 14C7.13401 14 4 17.134 4 21H10.5M18.5 20.2361C17.9692 20.7111 17.2684 21 16.5 21C14.8431 21 13.5 19.6569 13.5 18C13.5 16.3431 14.8431 15 16.5 15C17.8062 15 18.9175 15.8348 19.3293 17M20 14.5V17.5H17M15 7C15 9.20914 13.2091 11 11 11C8.79086 11 7 9.20914 7 7C7 4.79086 8.79086 3 11 3C13.2091 3 15 4.79086 15 7Z"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"></path>
+                                                        </g>
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                            <div class="font-semibold">Homologar</div>
+                                        </div>
                                     </DropDownOptions>
                                 </div>
                             </td>
@@ -231,7 +273,7 @@ export default {
         return {
             show: false,
             systems: [],
-
+            isLoading: false,
             empty_object: false,
             permits: [],
             modalData: []
@@ -276,6 +318,45 @@ export default {
         };
     },
     methods: {
+        async standarizeUserName(user) {
+            this.$swal.fire({
+                title: '¿Está seguro de homologar nombre de usuario con el carnet del empleado?',
+                icon: 'question',
+                iconHtml: '❓',
+                confirmButtonText: 'Si, homologar',
+                confirmButtonColor: '#141368',
+                cancelButtonText: 'Cancelar',
+                showCancelButton: true,
+                showCloseButton: true
+            })
+                .then(async (result) => {
+                    if (result.isConfirmed) {
+                        this.isLoading = true;
+                        await axios.post('/standarize-username', { id: user.id_usuario })
+                            .then((response) => {
+                                this.showToast(toast.success, response.data.mensaje);
+                                this.getUsers(this.tableData.currentPage)
+                            })
+                            .catch((errors) => {
+                                this.manageError(errors, this)
+                            })
+                            .finally(() => {
+                                this.isLoading = false;
+                            });
+                    }
+                });
+        },
+        showHomologar(user) {
+            if (user.persona.empleado) {
+                if (user.nick_usuario != user.persona.empleado.codigo_empleado) {
+                    return true
+                } else {
+                    return false
+                }
+            } else {
+                return false
+            }
+        },
         createNewUser() {
             this.show = true
             this.modalData = []
@@ -289,7 +370,6 @@ export default {
             this.modalData.id_sistema = ""
             this.modalData.roles = ""
         },
-
         getSelectsCreateUser() {
             axios.get("/get-selects-create-user")
                 .then((response) => {
@@ -299,7 +379,6 @@ export default {
                     this.manageError(errors, this)
                 })
         },
-
         closeVars() {
             this.showModal = false
             this.modalVar = false
@@ -391,6 +470,8 @@ export default {
             }
         }
     },
+    computed: {
+    }
 };
 </script>
 <style>
@@ -403,4 +484,5 @@ export default {
 .ellipsis {
     overflow: hidden;
     text-overflow: ellipsis;
-}</style>
+}
+</style>
