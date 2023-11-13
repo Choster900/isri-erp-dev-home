@@ -21,6 +21,7 @@ class Empleado extends Model
         'id_banco',
         'id_titulo_profesional',
         'codigo_empleado',
+        'id_estado_empleado',
         'nup_empleado',
         'isss_empleado',
         'cuenta_banco_empleado',
@@ -61,11 +62,16 @@ class Empleado extends Model
 
     public function permisos()
     {
-        return $this->hasMany('App\Models\Permisos','id_empleado','id_empleado');
+        return $this->hasMany('App\Models\Permiso','id_empleado','id_empleado');
     }
 
     public function evaluaciones_personal(): HasMany
     {
         return $this->hasMany(EvaluacionPersonal::class, 'id_empleado', 'id_empleado');
+    }
+
+    public function periodos_laboral()
+    {
+        return $this->hasMany(PeriodoLaboral::class, 'id_empleado', 'id_empleado');
     }
 }

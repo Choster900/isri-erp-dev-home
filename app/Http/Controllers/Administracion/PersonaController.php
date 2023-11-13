@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Persona;
 use Illuminate\Http\Request;
 use App\Http\Requests\PersonaRequest;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class PersonaController extends Controller
@@ -103,6 +104,7 @@ class PersonaController extends Controller
                 'id_profesion'           => $request->input("id_profesion"),
                 'id_nivel_educativo'     => $request->input("id_nivel_educativo"),
                 'estado_persona'         => 1,
+                'fecha_reg_persona'      => Carbon::now(),
             ]);
             DB::commit();
             return $v_persona;
@@ -134,6 +136,7 @@ class PersonaController extends Controller
                 'id_municipio'           => $request->input("id_municipio"),
                 'id_profesion'           => $request->input("id_profesion"),
                 'id_nivel_educativo'     => $request->input("id_nivel_educativo"),
+                'fecha_mod_persona'      => Carbon::now(),
             ]);
             DB::commit();
             return $v_persona;

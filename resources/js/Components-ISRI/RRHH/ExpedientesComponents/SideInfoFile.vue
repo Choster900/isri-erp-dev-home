@@ -1,6 +1,5 @@
 <template>
-    <div class="bg-slate-100 flex flex-col items-center">
-
+    <div class="bg-slate-100 flex flex-col items-center pb-10">
         <div class="mr-auto">
             <h1 class="flex py-4 px-5 gap-2 font-medium">
                 <svg class="w-5 h-5" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="#000000">
@@ -20,7 +19,8 @@
 
         <hr class="my-1 mx-7 border-t border-slate-300">
         <div class="flex justify-center">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/PDF_file_icon.svg/1200px-PDF_file_icon.svg.png" alt="" class="px-24 py-8">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/PDF_file_icon.svg/1200px-PDF_file_icon.svg.png"
+                alt="" class="px-24 py-8">
 
         </div>
         <h1 class="px-8 font-semibold">Senior Client Engineer (React & React Native).pdf</h1>

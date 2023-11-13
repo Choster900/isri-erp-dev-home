@@ -1,26 +1,23 @@
 import axios from "axios";
-import { ref } from "vue";
-import _ from "lodash";
 
 export const usePersona = () => {
-    const isLoadingEmployee = ref(false);
-
+    // Función para obtener personas por nombre
     const getPeopleByName = async (nombreToSearch) => {
-        //console.log(user.value.userId);
-
         try {
-            const resp = await axios.post("/getPersonaByName", {
+            // endpoint getPersonaByName se encuentra en PersonaController => nombre del metodo getPersonByCompleteName
+            const response = await axios.post("/getPersonaByName", {
                 nombre: nombreToSearch,
             });
 
-            return resp.data;
+            // Devuelve los datos de la respuesta
+            return response.data;
         } catch (error) {
-            //   handleError(error);
-            console.error(error);
-            //reject(error);
+            // Manejo de errores
+            console.error("Error al obtener personas por nombre:", error);
+            throw error; // Lanza el error para que pueda ser manejado por el componente que utiliza este composable
         }
     };
-
+    // Devuelve la función para ser utilizada por el componente
     return {
         getPeopleByName,
     };

@@ -27,6 +27,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('get-dui', [UserController::class, 'getDui'])->name('user.getDui');
     Route::post('save-user', [UserController::class, 'saveUser'])->name('user.saveUser');
     Route::get('get-selects-create-user', [UserController::class, 'getSelectsCreateUser'])->name('user.getSelectsCreateUser');
+    Route::post('standarize-username', [UserController::class, 'standarizeUsername'])->name('user.standarizeUsername');
 
     //Manage Roles
     Route::get(
