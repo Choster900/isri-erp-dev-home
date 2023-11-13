@@ -20,6 +20,7 @@ class DetallePlaza extends Model
         'id_plaza',
         'id_estado_plaza',
         'codigo_det_plaza',
+        'id_puesto_sirhi_det_plaza',
         'estado_det_plaza',
         'fecha_reg_det_plaza',
         'fecha_mod_det_plaza',

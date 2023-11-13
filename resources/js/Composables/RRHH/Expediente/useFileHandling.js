@@ -4,6 +4,7 @@ export const useFileHandling = () => {
     const fileInput = ref(null);
     const urlArchivoAnexo = ref(null);
     const nameArchivoAnexo = ref(null);
+    const file = ref(null);
     const openFileInput = () => {
         fileInput.value.click();
     };
@@ -11,7 +12,7 @@ export const useFileHandling = () => {
     const handleFileChange = () => {
         const selectedFile = fileInput.value.files[0];
         console.log(selectedFile);
-        nameArchivoAnexo.value = selectedFile.name
+        nameArchivoAnexo.value = selectedFile.name;
         if (selectedFile) {
             const fileType = selectedFile.type;
             if (fileType.includes("image")) {
@@ -31,7 +32,7 @@ export const useFileHandling = () => {
     const handleDrop = (event) => {
         event.preventDefault();
         const selectedFile = event.dataTransfer.files[0];
-        nameArchivoAnexo.value = selectedFile.name
+        nameArchivoAnexo.value = selectedFile.name;
         if (selectedFile) {
             const fileType = selectedFile.type;
             if (fileType.includes("image")) {
@@ -47,29 +48,33 @@ export const useFileHandling = () => {
 
     const setImageData = (selectedFile) => {
         urlArchivoAnexo.value = URL.createObjectURL(selectedFile);
+        file.value = selectedFile;
         console.log("Imagen seleccionada:", selectedFile.name);
     };
 
     const setPdfData = (selectedFile) => {
         urlArchivoAnexo.value = URL.createObjectURL(selectedFile);
+        file.value = selectedFile;
         console.log("PDF seleccionado:", selectedFile.name);
     };
 
     const deleteFile = () => {
+        file.value = null;
         fileInput.value = null;
         urlArchivoAnexo.value = null;
         nameArchivoAnexo.value = null;
         console.log("Archivo eliminado.");
-    }
+    };
 
     return {
+        file,
         fileInput,
-        urlArchivoAnexo,
         handleDrop,
+        deleteFile,
         openFileInput,
         handleDragOver,
+        urlArchivoAnexo,
         handleFileChange,
         nameArchivoAnexo,
-        deleteFile,
     };
 };

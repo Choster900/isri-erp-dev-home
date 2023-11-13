@@ -41,7 +41,7 @@ import axios from "axios";
                                 Codigo puesto:
                             </span>
                             <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
-                                {{ jobPositionDet.codigo_det_plaza }}
+                                {{ jobPositionDet.id_puesto_sirhi_det_plaza }}
                             </span>
                         </div>
                     </div>
@@ -124,12 +124,12 @@ import axios from "axios";
                                 :message="item" />
                         </div>
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                            <TextInput id="codigo-puesto" v-model="jobPositionDet.codigo_det_plaza" type="text"
-                                placeholder="Codigo puesto" addClass="font-semibold"
-                                @update:modelValue="validateJobPositionName('codigo_det_plaza', 8)">
+                            <TextInput id="codigo-puesto" v-model="jobPositionDet.id_puesto_sirhi_det_plaza" type="text"
+                                placeholder="Codigo SIRHI" addClass="font-semibold"
+                                @update:modelValue="validateJobPositionName('id_puesto_sirhi_det_plaza', 8)">
                                 <LabelToInput icon="objects" forLabel="codigo-puesto" />
                             </TextInput>
-                            <InputError v-for="(item, index) in errors.codigo_det_plaza" :key="index" class="mt-2"
+                            <InputError v-for="(item, index) in errors.id_puesto_sirhi_det_plaza" :key="index" class="mt-2"
                                 :message="item" />
                         </div>
                     </div>
@@ -190,7 +190,7 @@ export default {
                 id_proy_financiado: '',
                 id_tipo_contrato: '',
                 plaza_asignada_activa: null,
-                codigo_det_plaza: ''
+                id_puesto_sirhi_det_plaza: ''
             },
         };
     },
@@ -325,7 +325,7 @@ export default {
             this.jobPositionDet.id_tipo_contrato = ''
             this.jobPositionDet.id_actividad_institucional = ''
             this.jobPositionDet.plaza_asignada_activa = null
-            this.jobPositionDet.codigo_det_plaza = ''
+            this.jobPositionDet.id_puesto_sirhi_det_plaza = ''
         }
     },
     watch: {

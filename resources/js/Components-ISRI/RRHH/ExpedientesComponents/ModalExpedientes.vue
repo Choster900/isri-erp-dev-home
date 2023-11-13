@@ -1,10 +1,7 @@
 <template>
     <div class="m-1.5">
         <Modal :show="showModal" @close="$emit('cerrar-modal')" modal-title="Expedientes del usuario" maxWidth="5xl">
-
             <div class=" space-x-4" :class="{ 'flex': sectionView == 'anexoSection' }">
-
-
                 <div class="px-5 py-4 " :class="{ 'w-3/4': sectionView == 'anexoSection' }">
                     <div class="px-4">
                         <div :class="{ 'hidden': sectionView != 'mainSection' }">
@@ -63,25 +60,28 @@
                         :class="{ 'hidden': sectionView != 'mainSection', 'grid-cols-1': viewList, 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4': !viewList, 'gap-5': !viewList, 'gap-2': viewList }">
                         <div class="border border-gray-200 bg-white rounded-md shadow-lg cursor-pointer hover:bg-slate-100"
                             :class="{ 'flex': viewList }" v-for="(tipoArchivo, i) in objTipoArchivoAnexo" :key="i"
-                            @click="sectionView = 'anexoSection'">
+                            @click="sectionView = 'anexoSection'; tipoSelected = tipoArchivo.id_tipo_archivo_anexo">
                             <div class="" :class="viewList ? 'px-1 ' : 'w- py-2 px-5'">
 
                                 <img :src="`/resources/imagenesTipoAnexos/${tipoArchivo.img_tipo_archivo_anexo}`" alt=""
-                                    class="w-">
+                                    class=" h-10" :class="{ 'h-20 ': viewList }">
                             </div>
-                            <div class="px-5 py-4">
-                                <h1 class="font-semibold text-sm " :class="viewList ? ' ' : 'pb-2'">{{
-                                    tipoArchivo.nombre_tipo_archivo_anexo }}</h1>
+                            <div class="px-5 py-2">
+                                <h1 class="font-semibold text-sm " :class="viewList ? ' ' : 'pb-2'">
+                                    {{ tipoArchivo.nombre_tipo_archivo_anexo }}</h1>
                                 <span class="text-xs block">Modificado: hace 1 dia</span>
                                 <span class="text-xs block">Total anexos: 7</span>
                             </div>
                         </div>
                     </div>
 
-                    <add-expediente v-if="objTipoArchivoAnexo != ''" :class="{ 'hidden': sectionView != 'addSection' }" class="pt-1"
-                        :opcionPersona="opcionPersona" :tipoArchivoAnexo="objTipoArchivoAnexo" :persona="persona" />
+                    <list-expedientes :class="{ 'hidden': sectionView != 'anexoSection' }" v-if="persona"
+                        @redirect-for-modify="getInformacion" :dataExpedientesPersona="persona.archivos_anexos"
+                        :tipoArchivoSelected="tipoSelected" />
 
-                    <list-expedientes :class="{ 'hidden': sectionView != 'anexoSection' }" />
+                    <add-expediente v-if="objTipoArchivoAnexo != ''" :class="{ 'hidden': sectionView != 'addSection' }"
+                        class="pt-1" :opcionPersona="opcionPersona" :tipoArchivoAnexo="objTipoArchivoAnexo"
+                        :persona="persona" :objectFileUpdate="objectBringsForUpdate" />
                 </div>
 
 
@@ -92,14 +92,14 @@
     </div>
 </template>
 <script>
-import Modal from "@/Components-ISRI/AllModal/Modal.vue";
-import { computed, onMounted, ref } from 'vue';
-import SearchIcon from './Icons/searchIcon.vue';
-import OrderSquareIcon from './Icons/orderSquareIcon.vue';
-import OrderListIcon from './Icons/orderListIcon.vue';
-import AddExpediente from './AddExpediente.vue';
-import ListExpedientes from './ListExpedientes.vue';
 import SideInfoFile from './SideInfoFile.vue';
+import SearchIcon from './Icons/searchIcon.vue';
+import AddExpediente from './AddExpediente.vue';
+import { computed, ref, toRefs, watch } from 'vue';
+import ListExpedientes from './ListExpedientes.vue';
+import OrderListIcon from './Icons/orderListIcon.vue';
+import Modal from "@/Components-ISRI/AllModal/Modal.vue";
+import OrderSquareIcon from './Icons/orderSquareIcon.vue';
 import { useTipoArchivoAnexo } from "@/Composables/RRHH/Expediente/useTipoArchivoAnexo";
 export default {
     name: 'ModalExpedientes',
@@ -116,110 +116,34 @@ export default {
     },
     setup(props) {
         const viewList = ref(false)// Controla en como se ven la vista
-        const sectionView = ref("addSection") // Maneja la seccion que queremos ver
-
+        const sectionView = ref("mainSection") // Maneja la seccion que queremos ver
+        const tipoSelected = ref(null) // Controla el tipo seleccionado para filtrar la informacion de expedientes
+        const { persona, showModal } = toRefs(props); // Obteniendo la prop de persona
+        const objectBringsForUpdate = ref({}) //Objeto que contendra la informacion del archivo para actualizar
         const opcionPersona = computed(() => {
-            return props.persona ? [{ value: props.persona.id_persona, label: props.persona.pnombre_persona }] : [];
+            return persona.value ? [{ value: persona.value.id_persona, label: persona.value.pnombre_persona }] : [];
         });
 
-        const tiposArchivos = ref([
-            {
-                "id_tipo_archivo_anexo": 1,
-                "nombre_tipo_archivo_anexo": "ACUERDO",
-                "laboral_tipo_archivo_anexo": false,
-                "estado_tipo_archivo_anexo": "Activo",
-                "img_tipo_archivo_anexo": "Business deal-amico.svg"
-            },
-            {
-                "id_tipo_archivo_anexo": 2,
-                "nombre_tipo_archivo_anexo": "AMONESTACION",
-                "laboral_tipo_archivo_anexo": false,
-                "estado_tipo_archivo_anexo": "Activo",
-                "img_tipo_archivo_anexo": "amonestacion.svg"
-
-            },
-            {
-                "id_tipo_archivo_anexo": 3,
-                "nombre_tipo_archivo_anexo": "CERTIFICACION DE JUNTA DE VIG",
-                "laboral_tipo_archivo_anexo": true,
-                "estado_tipo_archivo_anexo": "Activo"
-            },
-            {
-                "id_tipo_archivo_anexo": 4,
-                "nombre_tipo_archivo_anexo": "CERTIFICACION DE NOTAS",
-                "laboral_tipo_archivo_anexo": true,
-                "estado_tipo_archivo_anexo": "Activo"
-            },
-            {
-                "id_tipo_archivo_anexo": 5,
-                "nombre_tipo_archivo_anexo": "CERTIFICACION DE TITULO",
-                "laboral_tipo_archivo_anexo": true,
-                "estado_tipo_archivo_anexo": "Activo"
-            },
-            {
-                "id_tipo_archivo_anexo": 6,
-                "nombre_tipo_archivo_anexo": "CURRICULUM VITAE",
-                "laboral_tipo_archivo_anexo": false,
-                "estado_tipo_archivo_anexo": "Activo"
-            },
-            {
-                "id_tipo_archivo_anexo": 7,
-                "nombre_tipo_archivo_anexo": "DIPLOMA",
-                "laboral_tipo_archivo_anexo": true,
-                "estado_tipo_archivo_anexo": "Activo"
-            },
-            {
-                "id_tipo_archivo_anexo": 8,
-                "nombre_tipo_archivo_anexo": "EXAMEN MEDICO",
-                "laboral_tipo_archivo_anexo": true,
-                "estado_tipo_archivo_anexo": "Activo"
-            },
-            {
-                "id_tipo_archivo_anexo": 9,
-                "nombre_tipo_archivo_anexo": "EXPEDIENTE LABORAL",
-                "laboral_tipo_archivo_anexo": true,
-                "estado_tipo_archivo_anexo": "Activo"
-            },
-            {
-                "id_tipo_archivo_anexo": 10,
-                "nombre_tipo_archivo_anexo": "LICENCIA DE CONDUCIR",
-                "laboral_tipo_archivo_anexo": false,
-                "estado_tipo_archivo_anexo": "Activo"
-            },
-            {
-                "id_tipo_archivo_anexo": 11,
-                "nombre_tipo_archivo_anexo": "PARTIDA DE NACIMIENTO",
-                "laboral_tipo_archivo_anexo": false,
-                "estado_tipo_archivo_anexo": "Activo"
-            },
-            {
-                "id_tipo_archivo_anexo": 12,
-                "nombre_tipo_archivo_anexo": "PERMISO",
-                "laboral_tipo_archivo_anexo": false,
-                "estado_tipo_archivo_anexo": "Activo"
-            },
-            {
-                "id_tipo_archivo_anexo": 13,
-                "nombre_tipo_archivo_anexo": "SOLVENCIA PNC",
-                "laboral_tipo_archivo_anexo": false,
-                "estado_tipo_archivo_anexo": "Activo"
-            },
-            {
-                "id_tipo_archivo_anexo": 14,
-                "nombre_tipo_archivo_anexo": "TITULO",
-                "laboral_tipo_archivo_anexo": true,
-                "estado_tipo_archivo_anexo": "Activo"
-            }
-        ])
-
+        watch(showModal, () => {
+            !showModal.value ? tipoSelected.value = null : ''
+            sectionView.value = "mainSection"
+        })
+        // Objeto que retorna la lista de tipo de dato
         const { objTipoArchivoAnexo } = useTipoArchivoAnexo()
 
+        const getInformacion = (object) => {
+            console.log(object); 
+            sectionView.value = "addSection"
+
+        }
         return {
-            tiposArchivos,
+            persona,
             viewList,
             sectionView,
-            objTipoArchivoAnexo,
+            tipoSelected,
             opcionPersona,
+            objTipoArchivoAnexo,
+            getInformacion,
         }
     }
 }

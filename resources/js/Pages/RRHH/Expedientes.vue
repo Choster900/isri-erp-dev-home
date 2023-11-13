@@ -174,14 +174,14 @@ export default {
         })
 
         return {
+            emptyObject,
+            dataPersona,
+            perPage, links,
             persona, getPeople,
             columns, tableData,
-            perPage, links,
-            sortKey, sortOrders,
             sortBy, handleData,
+            sortKey, sortOrders,
             isLoadinRequest, showModal,
-            dataPersona,
-            emptyObject
         }
     }
 }
