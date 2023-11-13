@@ -41,20 +41,33 @@ class AcuerdoController extends Controller
         $data = $request->input('search');
 
         // Construir la consulta base con las relaciones
-        $query = Empleado::select('*')->with(["acuerdo_laboral.tipo_acuerdo_laboral","persona"])->whereHas("acuerdo_laboral", function ($query) {
-            $query->where("estado_acuerdo_laboral", 1);
-        })->where("estado_empleado", 1)->orderBy($columns[$column], $dir);
+        $query = Empleado::select('*')
+            ->with([
+                "acuerdo_laboral" => function ($query) {
+                    $query->where('estado_acuerdo_laboral', 1);
+                },
+                "acuerdo_laboral.tipo_acuerdo_laboral",
+                "persona"
+            ])
+            ->whereHas("acuerdo_laboral", function ($query) {
+                $query->where("estado_acuerdo_laboral", 1);
+            })->where("estado_empleado", 1)->orderBy($columns[$column], $dir);
 
         if ($data) {
             $query->where('id_empleado', 'like', '%' . $data["id_empleado"] . '%');
+            $searchNombres = $data["collecNombre"];
+            $searchApellidos = $data["collecApellido"];
+            $duiPersona = $data["dui_persona"];
+            $query->whereHas('persona', function ($query) use ($searchNombres, $searchApellidos,$duiPersona) {
+                $query->where(function ($query) use ($searchNombres, $searchApellidos,$duiPersona) {
+                    $query->whereRaw("MATCH ( pnombre_persona, snombre_persona, tnombre_persona ) AGAINST ( '" . $searchNombres . "')")
+                        /* ->orWhere('dui_persona', 'like', '%' . $duiPersona . '%') */
+                        ->orWhereRaw("MATCH ( papellido_persona, sapellido_persona, tapellido_persona ) AGAINST ( '" . $searchApellidos . "')");
+                });
+            });
         }
         $acuerdos = $query->paginate($length)->onEachSide(1);
-
-        $tipo_acuerdo_laboral = DB::table('tipo_acuerdo_laboral')
-            ->select(
-                'id_tipo_acuerdo_laboral as value',
-                'nombre_tipo_acuerdo_laboral  as label',
-            )->get();
+        $tipo_acuerdo_laboral = DB::table('tipo_acuerdo_laboral')->select('id_tipo_acuerdo_laboral as value', 'nombre_tipo_acuerdo_laboral  as label','color_tipo_acuerdo_laboral  as color')->get("");
 
 
         return [
@@ -69,7 +82,7 @@ class AcuerdoController extends Controller
 
     public function searchEmployeByNameOrId(Request $request)
     {
-        if ($request["by"] == 'name') {
+        if ($request["by"] == 'name') { //FIXME: CHECK THIS QUERY
             return Empleado::select(
                 'empleado.id_empleado as value',
                 DB::raw("CONCAT_WS(' ', pnombre_persona, snombre_persona, tnombre_persona, papellido_persona, sapellido_persona, tapellido_persona) AS label"),
@@ -139,7 +152,7 @@ class AcuerdoController extends Controller
         $deals = [];
         try {
             DB::beginTransaction();
-            foreach ($request->deals as $key => $value) {
+           /*  foreach ($request->deals as $key => $value) {
                 if (!$value["isDelete"]) {
                     $deal = [
                         'id_tipo_acuerdo_laboral' => $value["id_tipo_acuerdo_laboral"],
@@ -148,8 +161,35 @@ class AcuerdoController extends Controller
                         'oficio_acuerdo_laboral' => $value["oficio_acuerdo_laboral"],
                         'comentario_acuerdo_laboral'  =>  $value["comentario_acuerdo_laboral"],
                         'estado_acuerdo_laboral' => 1,
-                        'fecha_inicio_acuerdo_laboral' =>  explode("to", $value["fecha_inicio_fecha_fin_acuerdo_laboral"])[0],
-                        'fecha_fin_acuerdo_laboral' => explode("to", $value["fecha_inicio_fecha_fin_acuerdo_laboral"])[1],
+                        'fecha_inicio_acuerdo_laboral' => strpos($value["fecha_inicio_fecha_fin_acuerdo_laboral"], "to") != '' ? explode("to", $value["fecha_inicio_fecha_fin_acuerdo_laboral"])[0] : $value["fecha_inicio_fecha_fin_acuerdo_laboral"],
+                        'fecha_fin_acuerdo_laboral' => strpos($value["fecha_inicio_fecha_fin_acuerdo_laboral"], "to") != '' ? explode("to", $value["fecha_inicio_fecha_fin_acuerdo_laboral"])[1] : $value["fecha_inicio_fecha_fin_acuerdo_laboral"],
+                        'fecha_reg_acuerdo_laboral' => Carbon::now(),
+                        'usuario_acuerdo_laboral' => $request->user()->nick_usuario,
+                        'ip_acuerdo_laboral' => $request->ip(),
+                    ];
+                    $deals[] = $deal;
+                }
+            } */
+            foreach ($request->deals as $key => $value) {
+                if (!$value["isDelete"]) {
+                    if ($value["fecha_inicio_fecha_fin_acuerdo_laboral"] !== "null to null") {
+                        $fechas = explode(" to ", $value["fecha_inicio_fecha_fin_acuerdo_laboral"]);
+                        $fecha_inicio = $fechas[0];
+                        $fecha_fin = $fechas[1];
+                    } else {
+                        $fecha_inicio = null;
+                        $fecha_fin = null;
+                    }
+                    
+                    $deal = [
+                        'id_tipo_acuerdo_laboral' => $value["id_tipo_acuerdo_laboral"],
+                        'id_empleado' => $request->id_empleado,
+                        'fecha_acuerdo_laboral' => $value["fecha_acuerdo_laboral"],
+                        'oficio_acuerdo_laboral' => $value["oficio_acuerdo_laboral"],
+                        'comentario_acuerdo_laboral'  =>  $value["comentario_acuerdo_laboral"],
+                        'estado_acuerdo_laboral' => 1,
+                        'fecha_inicio_acuerdo_laboral' => $fecha_inicio,
+                        'fecha_fin_acuerdo_laboral' => $fecha_fin,
                         'fecha_reg_acuerdo_laboral' => Carbon::now(),
                         'usuario_acuerdo_laboral' => $request->user()->nick_usuario,
                         'ip_acuerdo_laboral' => $request->ip(),
@@ -157,6 +197,7 @@ class AcuerdoController extends Controller
                     $deals[] = $deal;
                 }
             }
+            
             AcuerdoLaboral::insert($deals);
             DB::commit();
             return true;
@@ -180,12 +221,18 @@ class AcuerdoController extends Controller
                         'oficio_acuerdo_laboral' => $value["oficio_acuerdo_laboral"],
                         'comentario_acuerdo_laboral'  =>  $value["comentario_acuerdo_laboral"],
                         'estado_acuerdo_laboral' => 1,
-                        'fecha_inicio_acuerdo_laboral' => strpos($value["fecha_inicio_fecha_fin_acuerdo_laboral"], "to") != '' ? explode("to", $value["fecha_inicio_fecha_fin_acuerdo_laboral"])[0] : $value["fecha_inicio_fecha_fin_acuerdo_laboral"],
-                        'fecha_fin_acuerdo_laboral' => strpos($value["fecha_inicio_fecha_fin_acuerdo_laboral"], "to") != '' ? explode("to", $value["fecha_inicio_fecha_fin_acuerdo_laboral"])[1] : $value["fecha_inicio_fecha_fin_acuerdo_laboral"],
                         'usuario_acuerdo_laboral' => $request->user()->nick_usuario,
                         'ip_acuerdo_laboral' => $request->ip(),
                     ];
-
+            
+                    if ($value["fecha_inicio_fecha_fin_acuerdo_laboral"] != "null to null") {
+                        $fechas = explode(" to ", $value["fecha_inicio_fecha_fin_acuerdo_laboral"]);
+                        $fecha_inicio = $fechas[0];
+                        $fecha_fin = $fechas[1];
+                        $deal['fecha_inicio_acuerdo_laboral'] = $fecha_inicio;
+                        $deal['fecha_fin_acuerdo_laboral'] = $fecha_fin;
+                    }
+            
                     if ($value["id_acuerdo_laboral"] == '') {
                         $deal['fecha_reg_acuerdo_laboral'] = Carbon::now();
                         AcuerdoLaboral::create($deal);
@@ -197,6 +244,7 @@ class AcuerdoController extends Controller
                     AcuerdoLaboral::where("id_acuerdo_laboral", $value["id_acuerdo_laboral"])->update(['estado_acuerdo_laboral' => 0]);
                 }
             }
+            
 
             DB::commit();
             return true;

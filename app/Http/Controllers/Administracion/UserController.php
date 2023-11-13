@@ -44,6 +44,7 @@ class UserController extends Controller
             'persona.telefono_persona'
         )
             ->with('roles')
+            ->with('persona.fotos')
             ->join('persona', function ($join) {
                 $join->on('usuario.id_persona', '=', 'persona.id_persona');
             })
@@ -221,6 +222,7 @@ class UserController extends Controller
             ->join('municipio', function ($join) {
                 $join->on('persona.id_municipio', '=', 'municipio.id_municipio');
             })
+            ->with('fotos')
             ->where('dui_persona', '=', $request->input('dui'))
             ->first();
         if ($person) {

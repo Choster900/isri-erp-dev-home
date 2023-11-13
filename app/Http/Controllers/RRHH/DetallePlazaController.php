@@ -78,12 +78,7 @@ class DetallePlazaController extends Controller
                         $query->whereHas(
                             'plaza_asignada_activa.empleado.persona',
                             function ($query) use ($search_value) {
-                                $query->where('pnombre_persona', 'like', '%' . $search_value["nombre_empleado"] . '%')
-                                    ->orWhere('snombre_persona', 'like', '%' . $search_value["nombre_empleado"] . '%')
-                                    ->orWhere('tnombre_persona', 'like', '%' . $search_value["nombre_empleado"] . '%')
-                                    ->orWhere('papellido_persona', 'like', '%' . $search_value["nombre_empleado"] . '%')
-                                    ->orWhere('sapellido_persona', 'like', '%' . $search_value["nombre_empleado"] . '%')
-                                    ->orWhere('tapellido_persona', 'like', '%' . $search_value["nombre_empleado"] . '%');
+                                $query->whereRaw("MATCH(pnombre_persona, snombre_persona, tnombre_persona, papellido_persona, sapellido_persona, tapellido_persona) AGAINST(?)", $search_value["nombre_empleado"]);
                             }
                         );
                     }
@@ -128,29 +123,13 @@ class DetallePlazaController extends Controller
 
     public function storeJobPositionDet(DetallePlazaRequest $request)
     {
-        // Find the latest job_position_det record related to the given id_job_position
-        $latestJobPositionDet = DetallePlaza::where('id_plaza', $request->id_plaza)
-            ->latest('codigo_det_plaza')
-            ->first();
-        // Initialize the correlative code as 1 if no previous job_position_det is found
-        $correlative = 1;
-        // If a previous job_position_det exists, extract and increment the correlative part
-        if ($latestJobPositionDet) {
-            $latestCorrelative = (int)substr($latestJobPositionDet->codigo_det_plaza, -4);
-            $correlative = $latestCorrelative + 1;
-        }
-        // Format the correlative code with leading zeros (4 digits)
-        $formattedCorrelative = str_pad($correlative, 4, '0', STR_PAD_LEFT);
-        // Combine the id_job_position and formatted correlative to get the final code
-        $JobPositionDetCode = $request->id_plaza . '-' . $formattedCorrelative;
-
         $jobPositionDet = new DetallePlaza([
             'id_proy_financiado'            => $request->id_proy_financiado,
             'id_tipo_contrato'              => $request->id_tipo_contrato,
             'id_actividad_institucional'    => $request->id_actividad_institucional,
             'id_plaza'                      => $request->id_plaza,
             'id_estado_plaza'               => $request->id_estado_plaza,
-            'codigo_det_plaza'              => $JobPositionDetCode,
+            'codigo_det_plaza'              => $request->codigo_det_plaza,
             'estado_det_plaza'              => 1,
             'fecha_reg_det_plaza'           => Carbon::now(),
             'usuario_det_plaza'             => $request->user()->nick_usuario,
@@ -158,7 +137,7 @@ class DetallePlazaController extends Controller
         ]);
         $jobPositionDet->save();
 
-        return response()->json(['mensaje' => 'Plaza guardada con exito']);
+        return response()->json(['mensaje' => 'Plaza guardada con exito.']);
     }
 
     public function updateJobPositionDet(DetallePlazaRequest $request)
@@ -168,17 +147,18 @@ class DetallePlazaController extends Controller
             return response()->json(['logical_error' => 'Error, la plaza seleccionada ha sida desactivada por otro usuario.'], 422);
         } else {
             $data = [
-                'id_proy_financiado' => $request->id_proy_financiado,
-                'id_tipo_contrato' => $request->id_tipo_contrato,
-                'id_actividad_institucional' => $request->id_actividad_institucional,
-                'id_plaza' => $request->id_plaza,
-                'fecha_mod_det_plaza' => Carbon::now(),
-                'usuario_det_plaza' => $request->user()->nick_usuario,
-                'ip_det_plaza' => $request->ip(),
+                'id_proy_financiado'            => $request->id_proy_financiado,
+                'id_tipo_contrato'              => $request->id_tipo_contrato,
+                'id_actividad_institucional'    => $request->id_actividad_institucional,
+                'id_plaza'                      => $request->id_plaza,
+                'codigo_det_plaza'              => $request->codigo_det_plaza,
+                'fecha_mod_det_plaza'           => Carbon::now(),
+                'usuario_det_plaza'             => $request->user()->nick_usuario,
+                'ip_det_plaza'                  => $request->ip(),
             ];
             $jobPositionDet->update($data);
 
-            return response()->json(['mensaje' => 'Plaza actualizada con éxito']);
+            return response()->json(['mensaje' => 'Plaza actualizada con éxito.']);
         }
     }
 

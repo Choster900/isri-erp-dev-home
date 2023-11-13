@@ -15,7 +15,7 @@ import axios from 'axios';
 </script>
 
 <template>
-    <Head title="RRHH - Gestion Empleados" />
+    <Head title="Proceso - Empleados" />
     <AppLayoutVue nameSubModule="RRHH - Empleados">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
@@ -42,10 +42,10 @@ import axios from 'axios';
             </header>
 
             <div class="overflow-x-auto">
-                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy"
+                <datatable :columns="columns" :sortKey="sortKey" :inputsToValidate="inputsToValidate" :sortOrders="sortOrders" @sort="sortBy"
                     :searchButton="true" @datos-enviados="handleData($event)" @execute-search="getEmployees()">
                     <tbody class="text-sm divide-y divide-slate-200">
-                        <tr v-for="employee in employees" :key="employee.id_empleado">
+                        <tr v-for="employee in employees" :key="employee.id_empleado"  class="content-body">
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">{{ employee.id_empleado }}</div>
                             </td>
@@ -69,9 +69,10 @@ import axios from 'axios';
                                 }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div :class="showDependencies(employee.plazas_asignadas) == 'N/Asign.' ? 'text-red-600' : ''" 
-                                class="font-medium text-center {{ showDependencies(employee.plazas_asignadas) === 'N/Asign.' ? 'text-red-500' : 'text-slate-800' }} ">{{
-                                    showDependencies(employee.plazas_asignadas) }}</div>
+                                <div :class="showDependencies(employee.plazas_asignadas) == 'N/Asign.' ? 'text-red-600' : ''"
+                                    class="font-medium text-center">
+                                    {{ showDependencies(employee.plazas_asignadas) }}
+                                </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
@@ -127,7 +128,7 @@ import axios from 'axios';
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                                             v-if="permits.actualizar == 1 && employee.estado_empleado == 1"
                                             @click="manageJobPositions(employee)">
-                                            <div class="w-8 text-yellow-600">
+                                            <div class="w-8 text-teal-700">
                                                 <span class="text-xs">
                                                     <svg width="25px" height="25px" viewBox="0 0 512 512" class="ml-0.5"
                                                         xmlns="http://www.w3.org/2000/svg" fill="currentColor"
@@ -264,16 +265,20 @@ export default {
         });
         return {
             showModalJobPosition: false,
-
             showModalFlag: false,
-
             empty_object: false,
             //Data for datatable
             employees: [],
             //Data for modal
             show_modal_employee: false,
             modalData: [],
-
+            inputsToValidate: [
+                { inputName: 'id_empleado', number: true, limit: 4 },
+                { inputName: 'codigo_empleado', number: false, limit: 5 },
+                { inputName: 'nombre_persona', number: false, limit: 20 },
+                { inputName: 'dui_persona', number: false, limit: 10 },
+                { inputName: 'dependencia', number: false, limit: 5 },
+            ],
             hasNext: false,
             page: '',
 
@@ -377,6 +382,7 @@ export default {
                     this.employees = data.data.data;
                     this.hasNext = data.data.current_page !== data.data.last_page;
                     this.employees.length > 0 ? this.empty_object = false : this.empty_object = true
+                    console.log(this.employees);
                 }
             }).catch((errors) => {
                 console.log(errors);
@@ -402,21 +408,33 @@ export default {
                 this.getEmployees()
             }
         },
-        showDependencies(arrayDependencies) {
-            let dependencies = ''
-            arrayDependencies.forEach((value, index) => {
-                if (value.estado_plaza_asignada == 1) {
-                    if (dependencies == '') {
-                        dependencies = dependencies + value.dependencia.codigo_dependencia
-                    } else {
-                        dependencies = dependencies + ", " + value.dependencia.codigo_dependencia
-                    }
-                }
-            })
-            dependencies == "" ? dependencies = "N/Asign." : dependencies
-            return dependencies
-        }
+        showDependencies(plazasAsignadas) {
+            // Crear un objeto para mantener un recuento de las dependencias
+            const dependencyCounts = {};
 
+            // Iterar sobre las plazas asignadas y contar las dependencias
+            plazasAsignadas.forEach(value => {
+                const dependency = value.dependencia.parent_dependency || value.dependencia;
+                const codigoDependencia = dependency.codigo_dependencia;
+
+                if (dependencyCounts[codigoDependencia]) {
+                    // Incrementar el recuento si la dependencia ya existe en el objeto
+                    dependencyCounts[codigoDependencia]++;
+                } else {
+                    // Inicializar el recuento si es la primera vez que se encuentra la dependencia
+                    dependencyCounts[codigoDependencia] = 1;
+                }
+            });
+
+            // Crear una matriz de dependencias formateadas con el recuento (si es mayor que 1)
+            const formattedDependencies = Object.keys(dependencyCounts).map(codigoDependencia => {
+                const count = dependencyCounts[codigoDependencia];
+                return count > 1 ? `${codigoDependencia}(${count})` : codigoDependencia;
+            });
+
+            // Unir las dependencias formateadas en una cadena separada por comas
+            return formattedDependencies.join(', ') || 'N/Asign.';
+        }
     },
     computed: {
     }

@@ -1,18 +1,19 @@
+<script setup>
+import moment from 'moment';
+</script>
 <template>
-    <!-- Event 1 -->
     <li class="relative pb-4 last-of-type:pb-0">
         <div class="pl-6  mb-2">
             <div @click="hiddenInformation = !hiddenInformation"
-                class="flex w-full justify-between text-xs font-medium uppercase cursor-pointer text-slate-800  mb-0.5 hover:fill-indigo-500 hover:text-indigo-500">
-                <div class="justify-start text-base">RRHH-161-2023</div>
-                <div class="justify-end  ">
+                class="flex w-full justify-between text-xs font-semibold uppercase cursor-pointer text-slate-800  mb-0.5 hover:fill-indigo-500 hover:text-indigo-500">
+                <div class="justify-start text-base">{{ deal.oficio_acuerdo_laboral }} <span class="text-[8pt]">{{ moment(deal.fecha_acuerdo_laboral).format('l')  }}</span></div>
+                <div class="justify-end">
                     <svg class="octicon octicon-fold" viewBox="0 0 16 16" version="1.1" v-if="hiddenInformation" width="16"
                         height="16" aria-hidden="true">
                         <path
                             d="M10.896 2H8.75V.75a.75.75 0 0 0-1.5 0V2H5.104a.25.25 0 0 0-.177.427l2.896 2.896a.25.25 0 0 0 .354 0l2.896-2.896A.25.25 0 0 0 10.896 2ZM8.75 15.25a.75.75 0 0 1-1.5 0V14H5.104a.25.25 0 0 1-.177-.427l2.896-2.896a.25.25 0 0 1 .354 0l2.896 2.896a.25.25 0 0 1-.177.427H8.75v1.25Zm-6.5-6.5a.75.75 0 0 0 0-1.5h-.5a.75.75 0 0 0 0 1.5h.5ZM6 8a.75.75 0 0 1-.75.75h-.5a.75.75 0 0 1 0-1.5h.5A.75.75 0 0 1 6 8Zm2.25.75a.75.75 0 0 0 0-1.5h-.5a.75.75 0 0 0 0 1.5h.5ZM12 8a.75.75 0 0 1-.75.75h-.5a.75.75 0 0 1 0-1.5h.5A.75.75 0 0 1 12 8Zm2.25.75a.75.75 0 0 0 0-1.5h-.5a.75.75 0 0 0 0 1.5h.5Z">
                         </path>
                     </svg>
-
                     <svg v-else class="octicon octicon-unfold " viewBox="0 0 16 16" version="1.1" width="16" height="16"
                         aria-hidden="true">
                         <path
@@ -22,13 +23,9 @@
                 </div>
             </div>
             <div class="text-sm mb-2" v-show="!hiddenInformation">
-                <a class="font-medium text-slate-800">
-                    <span class="font-normal ">Acuerdo Laboral -</span>
-                    Lorem ipsum dolor sit amet consectetur
-                    adipisicing elit. Cumque quibusdam optio beatae alias fugit impedit,
-                    perspiciatis dolor explicabo et, sint nihil ipsum libero mollitia
-                    molestiae repellat eligendi voluptatum vel omnis!
-                    <p class="font-normal pt-3 italic">20/2/2023 - 21/2/2023</p>
+                <a class="font-normal text-slate-800">
+                    <span class="font-medium ">{{ deal.tipo_acuerdo_laboral.nombre_tipo_acuerdo_laboral }}-</span> {{ deal.comentario_acuerdo_laboral }}
+                    <p class="font-normal pt-1 italic">{{ `${moment(deal.fecha_inicio_acuerdo_laboral).format('l')} - ${moment(deal.fecha_fin_acuerdo_laboral).format('l')}` }}</p>
                 </a>
             </div>
         </div>
@@ -44,6 +41,12 @@
 
 <script>
 export default {
+    props: {
+        deal: {
+            required: true,
+            default: []
+        }
+    },
     data() {
         return {
             hiddenInformation: false,
@@ -51,5 +54,3 @@ export default {
     },
 }
 </script>
-
-<style></style>

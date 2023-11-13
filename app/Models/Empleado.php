@@ -39,6 +39,11 @@ class Empleado extends Model
         return $this->hasOne('App\Models\Persona','id_persona','id_persona');
     }
 
+    public function titulo_profesional()
+    {
+        return $this->hasOne('App\Models\TituloProfesional','id_titulo_profesional','id_titulo_profesional');
+    }
+
     public function plazas_asignadas()
     {
         return $this->hasMany(PlazaAsignada::class,'id_empleado','id_empleado');
@@ -52,5 +57,15 @@ class Empleado extends Model
     public function acuerdo_laboral(): HasMany
     {
         return $this->hasMany(AcuerdoLaboral::class, 'id_empleado', 'id_empleado');
+    }
+
+    public function permisos()
+    {
+        return $this->hasMany('App\Models\Permisos','id_empleado','id_empleado');
+    }
+
+    public function evaluaciones_personal(): HasMany
+    {
+        return $this->hasMany(EvaluacionPersonal::class, 'id_empleado', 'id_empleado');
     }
 }

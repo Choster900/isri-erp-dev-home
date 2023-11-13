@@ -40,12 +40,13 @@ import axios from "axios";
                     <!-- Search dui -->
                     <div v-if="!correct_dui" class="flex justify-center">
                         <div class="flex flex-col items-center w-full">
-                            <input id="dui" type="text" class="p-1 mb-2 w-[75%] rounded-lg text-center" placeholder="Ingresa DUI"
-                                v-model="employee.persona.dui_persona" @keyup.enter="searchDui()" @input="typeDUI()">
-                            <div class="flex justify-center">
-                                <button
-                                    class="ml-1.5 btn-sm border-slate-200 hover:border-slate-300 text-slate-600 underline underline-offset-1"
-                                    @click="searchDui()">Buscar</button>
+                            <input id="dui" type="text" class="p-1 mb-2 w-[75%] rounded-lg text-center"
+                                placeholder="Ingresa DUI" v-model="employee.persona.dui_persona" @keyup.enter="searchDui()"
+                                @input="typeDUI()">
+                            <div class="flex items-center">
+                                <GeneralButton class="mr-1" text="Cerrar" icon="delete" @click="$emit('cerrar-modal')" />
+                                <GeneralButton class="ml-1" color="bg-blue-600 hover:bg-blue-700" text="Buscar"
+                                    icon="search" @click="searchDui()" />
                             </div>
                         </div>
                     </div>
@@ -123,8 +124,8 @@ import axios from "axios";
                                     @update:modelValue="validatePersonInputs('dui_persona', 10, false, false, false, true)">
                                     <LabelToInput icon="personalInformation" forLabel="DUI" />
                                 </TextInput>
-                                <InputError v-for="(item, index) in backend_errors['persona.dui_persona']" :key="index" class="mt-2"
-                                    :message="item" />
+                                <InputError v-for="(item, index) in backend_errors['persona.dui_persona']" :key="index"
+                                    class="mt-2" :message="item" />
                                 <InputError class="mt-2" :message="errors.persona.dui_persona" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
@@ -354,11 +355,11 @@ import axios from "axios";
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="nup_empleado" v-model="employee.nup_empleado" type="text" placeholder="NUP"
-                                    @update:modelValue="validateEmployeeInputs('nup_empleado', 20, true, false)">
+                                    @update:modelValue="validateEmployeeInputs('nup_empleado', 10, true, false)">
                                     <LabelToInput icon="standard" forLabel="nup_empleado" />
                                 </TextInput>
-                                <InputError v-for="(item, index) in backend_errors['nup_empleado']" :key="index" class="mt-2"
-                                    :message="item" />
+                                <InputError v-for="(item, index) in backend_errors['nup_empleado']" :key="index"
+                                    class="mt-2" :message="item" />
                                 <InputError class="mt-2" :message="errors.nup_empleado" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
@@ -367,8 +368,8 @@ import axios from "axios";
                                     @update:modelValue="validateEmployeeInputs('isss_empleado', 20, true, false)">
                                     <LabelToInput icon="standard" forLabel="isss-empleado" />
                                 </TextInput>
-                                <InputError v-for="(item, index) in backend_errors['isss_empleado']" :key="index" class="mt-2"
-                                    :message="item" />
+                                <InputError v-for="(item, index) in backend_errors['isss_empleado']" :key="index"
+                                    class="mt-2" :message="item" />
                                 <InputError class="mt-2" :message="errors.isss_empleado" />
                             </div>
                         </div>
@@ -506,7 +507,7 @@ import axios from "axios";
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
                                 <TextInput id="account" v-model="employee.account" type="text" placeholder="Partida"
-                                    @update:modelValue="validateEmployeeInputs('account', 6, true, false)">
+                                    @update:modelValue="validateEmployeeInputs('account', 3, true, false)">
                                     <LabelToInput icon="standard" forLabel="account" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errors.account" />
@@ -514,7 +515,7 @@ import axios from "axios";
                             <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
                                 <TextInput id="subaccount" v-model="employee.subaccount" type="text"
                                     placeholder="Subpartida"
-                                    @update:modelValue="validateEmployeeInputs('subaccount', 6, true, false)">
+                                    @update:modelValue="validateEmployeeInputs('subaccount', 3, true, false)">
                                     <LabelToInput icon="standard" forLabel="subaccount" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errors.subaccount" />
@@ -526,7 +527,7 @@ import axios from "axios";
                     <!-- buttons -->
                     <div class="flex items-center ml-1 mt-2">
                         <div class="flex" :class="correct_dui ? 'justify-end w-1/2' : 'justify-center w-full'">
-                            <GeneralButton v-if="current_page == 1" class="mr-1" text="Cancelar" icon="delete"
+                            <GeneralButton v-if="current_page == 1 && correct_dui" class="mr-1" text="Cancelar" icon="delete"
                                 @click="$emit('cerrar-modal')" />
 
                             <button v-if="current_page != 1"
@@ -551,7 +552,7 @@ import axios from "axios";
                                 <div class="text-[12px]">ANTERIOR</div>
                             </button>
                         </div>
-                        <div v-if="correct_dui" class="w-1/2">
+                        <div v-if="correct_dui">
                             <button v-if="validateButton"
                                 class="ml-1 flex items-center bg-blue-600 hover:bg-blue-700 text-white pl-3 pr-2 py-1.5 text-center mb-2 rounded"
                                 @click="goToNextPage(current_page)">
@@ -783,7 +784,7 @@ export default {
                         if (errors.response.data.logical_error) {
                             this.showToast(toast.error, errors.response.data.logical_error);
                         } else {
-                            this.manageError(errors,this)
+                            this.manageError(errors, this)
                         }
                     })
             }
@@ -963,7 +964,7 @@ export default {
                 this.select_options.dependencies = response.data.dependencies
                 this.select_options.job_positions = response.data.job_positions
             } catch (errors) {
-                this.manageError(errors,this)
+                this.manageError(errors, this)
             } finally {
                 this.is_loading = false;  // Desactivar el estado de carga
             }
@@ -993,7 +994,7 @@ export default {
                                     if (errors.response.status === 422) {
                                         this.showToast(toast.warning, "Tienes algunos errores por favor verifica tus datos.");
                                     } else {
-                                        this.manageError(errors,this)
+                                        this.manageError(errors, this)
                                         this.$emit("cerrar-modal");
                                     }
                                 });
@@ -1033,13 +1034,13 @@ export default {
                                             this.$emit("cerrar-modal");
                                         } else {
                                             this.backend_errors = errors.response.data.errors
-                                            if(this.backend_errors['persona.dui_persona']){
-                                                this.current_page=1
+                                            if (this.backend_errors['persona.dui_persona']) {
+                                                this.current_page = 1
                                             }
                                             this.showToast(toast.warning, "Tienes algunos errores por favor verifica tus datos.");
                                         }
                                     } else {
-                                        this.manageError(errors,this)
+                                        this.manageError(errors, this)
                                         this.$emit("cerrar-modal");
                                     }
                                 });

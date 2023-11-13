@@ -14,7 +14,7 @@ use Inertia\Inertia;
 class BeneficiarioController extends Controller
 {
     function getDataFromBeneficiarios(Request $request)
-    {//La tabla familiar tiene diferentes usos uno de ellos es guardar los beneficiarios del seguro del empleado
+    { //La tabla familiar tiene diferentes usos uno de ellos es guardar los beneficiarios del seguro del empleado
         $columns = [
             'id_persona',
             'id_empleado',
@@ -60,20 +60,29 @@ class BeneficiarioController extends Controller
 
         if ($data) {
             $query->where('id_persona', 'like', '%' . $data["id_persona"] . '%');
-
-            $searchNombres = $data["collecNombre"];
-            $query->where(function ($query) use ($searchNombres) {
+            
+            /* $query->where(function ($query) use ($searchNombres) {
                 $query->where('pnombre_persona', 'like', '%' . $searchNombres . '%')
                     ->orWhere('snombre_persona', 'like', '%' . $searchNombres . '%')
-                    ->orWhere('tapellido_persona', 'like', '%' . $searchNombres . '%');
-            });
+                    ->orWhere('tnombre_persona', 'like', '%' . $searchNombres . '%');
+            }); */
 
-            $searchApellidos = $data["collecApellido"];
+            /*   $searchApellidos = $data["collecApellido"];
             $query->where(function ($query) use ($searchApellidos) {
                 $query->where('papellido_persona', 'like', '%' . $searchApellidos . '%')
                     ->orWhere('sapellido_persona', 'like', '%' . $searchApellidos . '%')
                     ->orWhere('tapellido_persona', 'like', '%' . $searchApellidos . '%');
-            });
+            }); */
+
+            $searchNombres = $data["collecNombre"];
+            if (isset($searchNombres)) {
+                $query->whereRaw("MATCH ( pnombre_persona, snombre_persona, tnombre_persona ) AGAINST ( '" . $searchNombres . "')");
+            }
+
+            $searchApellidos = $data["collecApellido"];
+            if (isset($searchApellidos)) {
+                $query->whereRaw("MATCH ( papellido_persona, sapellido_persona, tapellido_persona ) AGAINST ( '" . $searchApellidos . "')");
+            }
 
             $query->whereHas('familiar', function ($query) use ($data) {
                 $query->where('nombre_familiar', 'like', '%' . $data["nombre_familiar"] . '%');
@@ -86,7 +95,6 @@ class BeneficiarioController extends Controller
             $query->whereHas('familiar', function ($query) use ($data) {
                 $query->where('porcentaje_familiar', 'like', '%' . $data["porcentaje_familiar"] . '%');
             });
-
         }
 
         $beneficiarios = $query->paginate($length)->onEachSide(1);
@@ -128,11 +136,11 @@ class BeneficiarioController extends Controller
                         ->orWhere('sapellido_persona', 'like', '%' . $request['query'] . '%')
                         ->orWhere('tapellido_persona', 'like', '%' . $request['query'] . '%');
                 })->where('estado_persona', 1)->where(function ($query) {
-                $query->doesntHave('familiar')
-                    ->orWhereHas('familiar', function ($query) {
-                        $query->where('estado_familiar', 0);
-                    });
-            })
+                    $query->doesntHave('familiar')
+                        ->orWhereHas('familiar', function ($query) {
+                            $query->where('estado_familiar', 0);
+                        });
+                })
                 ->get();
         } else {
             return Persona::select(
@@ -160,7 +168,6 @@ class BeneficiarioController extends Controller
                 ->where('estado_persona', 1)
                 ->where("id_persona", $request['query'])->get();
         }
-
     }
 
     function addRelatives(BeneficiariosRequest $request)
@@ -168,7 +175,7 @@ class BeneficiarioController extends Controller
         $relativesData = [];
         try {
             DB::beginTransaction();
-            foreach ( $request->dataRow as $key => $value ) {
+            foreach ($request->dataRow as $key => $value) {
                 if (!$value["isDelete"]) {
                     $relatives = [
                         'id_parentesco'        => $value["id_parentesco"],
@@ -193,14 +200,13 @@ class BeneficiarioController extends Controller
             DB::rollback();
             return response()->json($th->getMessage(), 500);
         }
-
     }
     function updateRelatives(BeneficiariosRequest $request)
     {
         try {
             DB::beginTransaction();
 
-            foreach ( $request->dataRow as $value ) {
+            foreach ($request->dataRow as $value) {
                 if (!$value["isDelete"]) {
                     $relatives = [
                         'id_parentesco'        => $value["id_parentesco"],
@@ -232,5 +238,4 @@ class BeneficiarioController extends Controller
             return response()->json($th->getMessage(), 500);
         }
     }
-
 }

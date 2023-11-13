@@ -49,7 +49,11 @@ class Persona extends Model
 
     public function empleado()
     {
-        return $this->hasOne(Empleado::class, 'id_persona', 'id_persona');
+        return $this->hasOne('App\Models\Empleado', 'id_persona', 'id_persona');
+    }
+    public function usuario()
+    {
+        return $this->hasOne('App\Models\User', 'id_usuario', 'id_persona');
     }
     public function residencias()
     {
@@ -57,7 +61,7 @@ class Persona extends Model
     }
     public function fotos()
     {
-        return $this->hasMany('App\Models\Foto', 'id_persona', 'id_persona');
+        return $this->hasMany(Foto::class, 'id_persona', 'id_persona');
     }
     /**
      * Get all of the familiares for the Persona
@@ -104,5 +108,14 @@ class Persona extends Model
     public function municipio(): BelongsTo
     {
         return $this->belongsTo(Municipio::class, 'id_municipio', 'id_municipio');
+    }
+    /**
+     * Get all of the archivos_anexos for the Persona
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function archivos_anexos(): HasMany
+    {
+        return $this->hasMany(ArchivoAnexo::class, 'id_persona', 'id_persona');
     }
 }

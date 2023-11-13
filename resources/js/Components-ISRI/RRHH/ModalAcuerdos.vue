@@ -45,7 +45,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                         </label>
                                         <div class="relative font-medium  flex h-8 w-full flex-row-reverse">
                                             <Multiselect v-model="dataForm.deal.id_tipo_acuerdo_laboral"
-                                                @select="dataForm.deal.nombre_tipo_acuerdo_laboral = JSON.parse(JSON.stringify(dataForSelect.tipo_acuerdo_laboral.find((index) => index.value == dataForm.deal.id_tipo_acuerdo_laboral))).label"
+                                                @select="dataForm.deal.nombre_tipo_acuerdo_laboral = JSON.parse(JSON.stringify(dataForSelect.tipo_acuerdo_laboral.find((index) => index.value == dataForm.deal.id_tipo_acuerdo_laboral))).label, dataForm.deal.color_tipo_acuerdo_laboral = JSON.parse(JSON.stringify(dataForSelect.tipo_acuerdo_laboral.find((index) => index.value == dataForm.deal.id_tipo_acuerdo_laboral))).color"
                                                 :clearOnSearch="true" :searchable="true"
                                                 :options="dataForSelect.tipo_acuerdo_laboral"
                                                 noResultsText="<p class='text-xs'>Registro no encontrado<p>"
@@ -75,6 +75,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                             <span class="text-red-600 font-extrabold">*</span>
                                         </label>
                                         <div class="relative flex">
+                                            <!--   {{ dataForm.deal }} -->
                                             <LabelToInput icon="date" />
                                             <flat-pickr v-model="dataForm.deal.fecha_inicio_fecha_fin_acuerdo_laboral"
                                                 class="peer text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 f focus:outline-none w-full"
@@ -186,14 +187,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                                             <div class="flex flex-wrap items-center -m-1.5 mx-3 mb-1 gap-1">
                                                                 <span class="inline-flex font-medium">&#8226;{{
                                                                     moment(deal.fecha_acuerdo_laboral).format('L') }}</span>
-                                                                <div :class="[
-                                                                    deal.id_tipo_acuerdo_laboral == 1 ? 'bg-indigo-100 text-indigo-600 ' :
-                                                                        deal.id_tipo_acuerdo_laboral == 2 ? 'bg-sky-100 text-sky-600' :
-                                                                            deal.id_tipo_acuerdo_laboral == 3 ? 'bg-emerald-100 text-emerald-600' :
-                                                                                deal.id_tipo_acuerdo_laboral == 4 ? 'bg-amber-100 text-amber-600' :
-                                                                                    deal.id_tipo_acuerdo_laboral == 5 ? 'bg-rose-100 text-rose-600' :
-                                                                                        deal.id_tipo_acuerdo_laboral == 6 ? 'bg-slate-700 text-slate-100 ' : 'bg-slate-100 text-slate-500',
-                                                                ]"
+                                                                <div :class="deal.color_tipo_acuerdo_laboral"
                                                                     class="inline-flex font-medium  rounded-full text-center px-1.5 py-.5">
                                                                     {{ deal.nombre_tipo_acuerdo_laboral }}
                                                                 </div>
@@ -376,6 +370,7 @@ export default {
                     id_acuerdo_laboral: '',
                     id_tipo_acuerdo_laboral: '',
                     nombre_tipo_acuerdo_laboral: '',
+                    color_tipo_acuerdo_laboral: '',
                     fecha_acuerdo_laboral: '',
                     oficio_acuerdo_laboral: '',
                     comentario_acuerdo_laboral: '',
@@ -402,7 +397,6 @@ export default {
                 deal.id_tipo_acuerdo_laboral !== '' &&
                 (deal.fecha_acuerdo_laboral !== '' && deal.fecha_acuerdo_laboral !== null) &&
                 deal.oficio_acuerdo_laboral !== '' &&
-                (deal.fecha_inicio_fecha_fin_acuerdo_laboral !== '' && deal.fecha_inicio_fecha_fin_acuerdo_laboral !== null) &&
                 deal.comentario_acuerdo_laboral !== ''
             );
         },
@@ -494,6 +488,7 @@ export default {
 
 
         sendInformationWhenIsClicked(data) {
+            console.log(data);
             // Verificar si algún acuerdo ya está en estado de edición
             const isAnyDealEditing = this.dataDeals.some((deal) => deal.isEditingDeal);
             // Si algún acuerdo ya está en edición, no se ejecuta la función
@@ -569,7 +564,7 @@ export default {
                     this.year = this.listYears[this.listYears.length - 1]
                     this.filterDealsByYear()
                     this.resetForm()
-                    
+
                 }
             });
         },
@@ -775,13 +770,14 @@ export default {
                     }]
                     this.dataForm.id_empleado = this.dataAcuerdos.id_empleado
 
-
+                    console.log(this.dataAcuerdos.acuerdo_laboral);
                     this.dataAcuerdos.acuerdo_laboral.forEach((obj, index) => {
                         //this.dataDeals.push({
                         this.copyDataDeals.unshift({
                             indexDeal: this.generateShortUniqueId(),
                             id_acuerdo_laboral: obj.id_acuerdo_laboral,
                             id_tipo_acuerdo_laboral: obj.tipo_acuerdo_laboral["id_tipo_acuerdo_laboral"],
+                            color_tipo_acuerdo_laboral: obj.tipo_acuerdo_laboral["color_tipo_acuerdo_laboral"],
                             nombre_tipo_acuerdo_laboral: obj.tipo_acuerdo_laboral["nombre_tipo_acuerdo_laboral"],
                             fecha_acuerdo_laboral: obj.fecha_acuerdo_laboral,
                             oficio_acuerdo_laboral: obj.oficio_acuerdo_laboral,
@@ -817,7 +813,7 @@ export default {
 </script>
 
 
-<style>
+<style scoped>
 /* Estilos del scrollbar para navegadores WebKit (Chrome y Safari) */
 /* Cambia los colores y dimensiones según tu preferencia */
 div::-webkit-scrollbar {
