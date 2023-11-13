@@ -36,7 +36,7 @@ import ModalEvalueacionesVue from '@/Components-ISRI/RRHH/ModalEvalueaciones.vue
             <div class="overflow-x-auto">
                 <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
                     @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getEvaluaciones()">
-                    <tbody class="text-sm divide-y divide-slate-200">
+                    <tbody class="text-sm divide-y divide-slate-200" v-if="!isLoadinRequest">
                         <tr v-for="(evaluacion, i) in evaluaciones" :key="i">
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center ">{{ evaluacion.id_empleado }}</div>
@@ -87,17 +87,37 @@ import ModalEvalueacionesVue from '@/Components-ISRI/RRHH/ModalEvalueaciones.vue
                             </td>
                         </tr>
                     </tbody>
+                    <tbody v-else>
+                        <tr>
+                            <td colspan="6" class="text-center">
+                                <img src="../../../img/IsSearching.gif" alt="" class="w-60 h-60 mx-auto">
+                                <h1 class="font-medium text-xl mt-4">Cargando!!!</h1>
+                                <p class="text-sm text-gray-600 mt-2 pb-10">Por favor espera un momento mientras se carga la
+                                    información.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody v-if="empty_object && !isLoadinRequest">
+                        <tr>
+                            <td colspan="6" class="text-center">
+                                <img src="../../../img/NoData.gif" alt="" class="w-60 h-60 mx-auto">
+                                <h1 class="font-medium text-xl mt-4">No se encontraron resultados!</h1>
+                                <p class="text-sm text-gray-600 mt-2 pb-10">Parece que no hay registros disponibles en este
+                                    momento.</p>
+                            </td>
+                        </tr>
+                    </tbody>
                 </datatable>
 
             </div>
-            <div v-if="emptyObject" class="flex text-center py-2">
+            <div v-if="empty_object" class="flex text-center py-2">
                 <p class="text-red-500 font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se
                     encontraron registros.</p>
             </div>
 
         </div>
 
-        <div v-if="!emptyObject" class="px-6 py-4 bg-white shadow-lg rounded-sm border-slate-200 relative">
+        <div v-if="!empty_object" class="px-6 py-4 bg-white shadow-lg rounded-sm border-slate-200 relative">
             <div>
                 <nav class="flex justify-between" role="navigation" aria-label="Navigation">
                     <div class="grow text-center">
@@ -134,9 +154,9 @@ import ModalEvalueacionesVue from '@/Components-ISRI/RRHH/ModalEvalueaciones.vue
                                         </a>
                                     </div>
                                 </span>
-                                <span class="cursor-pointer" v-else
+                                <span class="cursor-pointer mt-2" v-else @click="getEvaluaciones(link.url)"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
-                                        class=" w-5" @click="getEvaluaciones(link.url)">{{ link.label }}</span>
+                                        class=" w-5" >{{ link.label }}</span>
                                 </span>
                             </li>
                         </ul>
@@ -173,11 +193,12 @@ export default {
                 sortOrders[column.name] = -1;
         });
         return {
-            emptyObject: false,
+            empty_object: false,
             permits: [],
             evaluaciones: [],
             dataEvaluacionToSendModal: [],
             showModalEvaluacion: false,
+            isLoadinRequest:false,
             links: [],
             lastUrl: "/evaluaciones",
             columns: columns,
@@ -205,9 +226,9 @@ export default {
     },
     methods: {
         async getEvaluaciones(url = "/evaluaciones") {
-            console.log("a");
             this.lastUrl = url;
             this.tableData.draw++;
+            this.isLoadinRequest = true;
             await axios.post(url, this.tableData).then((response) => {
                 let data = response.data;
                 if (this.tableData.draw == data.draw) {
@@ -216,7 +237,8 @@ export default {
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
                     this.evaluaciones = response.data.data.data;
-                    this.evaluaciones.length > 0 ? this.emptyObject = false : this.emptyObject = true
+                    this.evaluaciones.length > 0 ? this.empty_object = false : this.empty_object = true
+                    this.isLoadinRequest = false;
 
                 }
             }).catch((errors) => {

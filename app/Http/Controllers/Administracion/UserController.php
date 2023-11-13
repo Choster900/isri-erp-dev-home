@@ -9,6 +9,7 @@ use App\Models\Sistema;
 use App\Models\PermisoUsuario;
 use App\Models\Persona;
 use App\Http\Controllers\Controller;
+use App\Models\Empleado;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
@@ -45,6 +46,7 @@ class UserController extends Controller
         )
             ->with('roles')
             ->with('persona.fotos')
+            ->with('persona.empleado')
             ->join('persona', function ($join) {
                 $join->on('usuario.id_persona', '=', 'persona.id_persona');
             })
@@ -222,7 +224,7 @@ class UserController extends Controller
             ->join('municipio', function ($join) {
                 $join->on('persona.id_municipio', '=', 'municipio.id_municipio');
             })
-            ->with('fotos')
+            ->with(['fotos', 'empleado'])
             ->where('dui_persona', '=', $request->input('dui'))
             ->first();
         if ($person) {
@@ -250,36 +252,54 @@ class UserController extends Controller
             $count++;
         }
 
-        $new_user = new User([
-            'id_persona' => $request->person_id,
-            'nick_usuario' => $username,
-            'password_usuario' => Hash::make($request->password),
-            'estado_usuario' => 1,
-            'fecha_reg_usuario' => Carbon::now(),
-            'usuario_usuario' => $request->user()->nick_usuario,
-            'ip_usuario' => $request->ip(),
-        ]);
-        $new_user->save();
-
-        $person->update([
-            'id_usuario' => $new_user->id_usuario,
-            'fecha_mod_persona' => Carbon::now(),
-            'usuario_persona' => $request->user()->nick_usuario,
-            'ip_persona' => $request->ip(),
-        ]);
-
-        foreach ($request->roles as $rol) {
-            $new_user_permission = new PermisoUsuario([
-                'id_rol' => $rol['id_rol'],
-                'id_usuario' => $new_user->id_usuario,
-                'estado_permiso_usuario' => 1,
-                'fecha_reg_permiso_usuario' => Carbon::now(),
-                'usuario_permiso_usuario' => $request->user()->nick_usuario,
-                'ip_permiso_usuario' => $request->ip(),
-            ]);
-            $new_user_permission->save();
+        $empleado = Empleado::where('id_persona', $person->id_persona)->first();
+        if ($empleado) {
+            $username = $empleado->codigo_empleado;
         }
-        return ['mensaje' => 'Guardado usuario ' . $new_user->nick_usuario . ' con exito.'];
+
+        DB::beginTransaction();
+        try {
+            $new_user = new User([
+                'id_persona' => $request->person_id,
+                'nick_usuario' => $username,
+                'password_usuario' => Hash::make($request->password),
+                'estado_usuario' => 1,
+                'fecha_reg_usuario' => Carbon::now(),
+                'usuario_usuario' => $request->user()->nick_usuario,
+                'ip_usuario' => $request->ip(),
+            ]);
+            $new_user->save();
+
+            $person->update([
+                'id_usuario' => $new_user->id_usuario,
+                'fecha_mod_persona' => Carbon::now(),
+                'usuario_persona' => $request->user()->nick_usuario,
+                'ip_persona' => $request->ip(),
+            ]);
+
+            foreach ($request->roles as $rol) {
+                $new_user_permission = new PermisoUsuario([
+                    'id_rol' => $rol['id_rol'],
+                    'id_usuario' => $new_user->id_usuario,
+                    'estado_permiso_usuario' => 1,
+                    'fecha_reg_permiso_usuario' => Carbon::now(),
+                    'usuario_permiso_usuario' => $request->user()->nick_usuario,
+                    'ip_permiso_usuario' => $request->ip(),
+                ]);
+                $new_user_permission->save();
+            }
+
+            DB::commit(); // Confirma las operaciones en la base de datos
+            return response()->json([
+                'mensaje'          => "Guardado usuario ' . $new_user->nick_usuario . ' con exito.",
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+            return response()->json([
+                'logical_error' => 'Ha ocurrido un error con sus datos.',
+                'error' => $e,
+            ], 422);
+        }
     }
 
     public function changePasswordUser(Request $request)
@@ -291,5 +311,29 @@ class UserController extends Controller
         $user->usuario_usuario = $request->user()->nick_usuario;
         $user->update();
         return ['mensaje' => 'Contraseña actualizada con exito'];
+    }
+
+    public function standarizeUsername(Request $request)
+    {
+        $user = User::with('persona.empleado')->find($request->id);
+        DB::beginTransaction();
+        try {
+            $user->update([
+                'nick_usuario'          => $user->persona->empleado->codigo_empleado,
+                'fecha_mod_usuario'     => Carbon::now(),
+                'usuario_usuario'       => $request->user()->nick_usuario,
+                'ip_usuario'            => $request->ip(),
+            ]);
+            DB::commit(); // Confirma las operaciones en la base de datos
+            return response()->json([
+                'mensaje'          => "Accion exitosa, nuevo nombre de usuario: " . $user->nick_usuario,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+            return response()->json([
+                'logical_error' => 'Ha ocurrido un error con sus datos.',
+                'error' => $e,
+            ], 422);
+        }
     }
 }

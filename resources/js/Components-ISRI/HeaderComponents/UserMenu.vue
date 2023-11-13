@@ -17,7 +17,7 @@
                 <span class="truncate ml-2 text-sm font-medium group-hover:text-slate-800">
                     {{ $page.props.auth.user.nick_usuario }}
                 </span>
-                 <svg class="w-3 h-3 shrink-0 ml-1 fill-current text-slate-400" viewBox="0 0 12 12">
+                <svg class="w-3 h-3 shrink-0 ml-1 fill-current text-slate-400" viewBox="0 0 12 12">
                     <path d="M5.9 11.4L.5 6l1.4-1.4 4 4 4-4L11.3 6z"></path>
                 </svg>
                 <!-- <lord-icon src="https://cdn.lordicon.com/hwuyodym.json" trigger="hover" colors="primary:#121331"
@@ -49,7 +49,7 @@
                     <li>
                         <DropdownLink :href="route('logout')" method="post" as="button"
                             class="font-bold text-sm text-indigo-500 flex items-center py-1 px-3  hover:text-indigo-700">
-                            Logout
+                            Cerrar Sesión
                         </DropdownLink>
                     </li>
 
@@ -103,10 +103,21 @@ export default {
         }
     },
     created() {
-        let name = (this.$page.props.auth.user.nick_usuario).split(".")
-        const primerasLetras = name.map(nombre => nombre.charAt(0));
-        const letrasUnidas = primerasLetras.join('');
-        this.dynamicUsername = letrasUnidas
+        let name = (this.$page.props.auth.user.nick_usuario).split(".");
+
+        let firstTwoLetters;
+
+        if (name.length > 1) {
+            // Si hay un punto en el nombre, concatena las primeras letras después del punto
+            const primerasLetras = name.map(nombre => nombre.charAt(0));
+            firstTwoLetters = primerasLetras.join('');
+        } else {
+            // Si no hay un punto en el nombre, toma las dos primeras letras directamente
+            firstTwoLetters = name[0].substr(0, 2);
+        }
+
+        this.dynamicUsername = firstTwoLetters;
+
     },
 
 }

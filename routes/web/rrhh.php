@@ -7,7 +7,7 @@ use App\Http\Controllers\RRHH\BeneficiarioController;
 use App\Http\Controllers\RRHH\DirectorCentroController;
 use App\Http\Controllers\RRHH\EmpleadoController;
 use App\Http\Controllers\RRHH\EvaluacionController;
-use App\Http\Controllers\RRHH\ExpedienteController;
+use App\Http\Controllers\RRHH\ArchivoAnexoController;
 use App\Http\Controllers\RRHH\GerenteGeneralController;
 use App\Http\Controllers\RRHH\HojaServicioController;
 use App\Http\Controllers\RRHH\JefeInmediatoController;
@@ -32,13 +32,18 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get('get-selects-options-employee', [EmpleadoController::class, 'getSelectOptionsEmployee'])->name('empleado.getSelectOptionsEmployee');
     Route::post('store-employee', [EmpleadoController::class, 'storeEmployee'])->name('empleado.storeEmployee');
     Route::post('update-employee', [EmpleadoController::class, 'updateEmployee'])->name('empleado.updateEmployee');
-    //Manage photos and assigned roles 
+    //Manage photos
     Route::post('upload-employee-photo', [EmpleadoController::class, 'uploadEmployeePhoto'])->name('empleado.uploadEmployeePhoto');
+    //Manage job positions per employee
     Route::get('get-job-positions-by-employee', [EmpleadoController::class, 'getJobPositionsByEmployee'])->name('empleado.getJobPositionsByEmployee');
     Route::post('store-job-position', [EmpleadoController::class, 'storeJobPosition'])->name('empleado.storeJobPosition');
     Route::post('update-job-position', [EmpleadoController::class, 'updateJobPosition'])->name('empleado.updateJobPosition');
     Route::post('get-available-job-positions', [EmpleadoController::class, 'getAvailableJobPositions'])->name('empleado.getAvailableJobPositions');
     Route::post('desactive-job-position', [EmpleadoController::class, 'desactiveJobPosition'])->name('empleado.desactiveJobPosition');
+    //Manage the employment termination.
+    Route::get('get-data-emp-termination', [EmpleadoController::class, 'getDataEmpTermination'])->name('empleado.getDataEmpTermination');
+    Route::post('desactive-employee', [EmpleadoController::class, 'desactiveEmployee'])->name('empleado.desactiveEmployee');
+    Route::post('enable-employee', [EmpleadoController::class, 'enableEmployee'])->name('empleado.enableEmployee');
 
     Route::get(
         '/rrhh/det-plazas',
@@ -161,8 +166,9 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/expedientes', 'RRHH/Expedientes');
         }
     )->name('rrhh.expedientes');
-    Route::post('expedientes', [ExpedienteController::class, 'getEmployeeExpediente'])->name('expediente.getEmployeeExpediente');
+    Route::post('expedientes', [ArchivoAnexoController::class, 'getEmployeeExpediente'])->name('expediente.getEmployeeExpediente');
     Route::get('getAllTipoArchivoAnexos', function () {return TipoArchivoAnexo::all();});
     Route::post('getPersonaByName', [PersonaController::class, 'getPersonByCompleteName'])->name('expediente.getExpediente');
+    Route::post('createArchivoAnexo', [ArchivoAnexoController::class, 'createArchivoAnexo'])->name('expediente.createArchivoAnexo');
 
 });

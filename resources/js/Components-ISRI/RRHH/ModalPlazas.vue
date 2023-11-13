@@ -39,7 +39,7 @@ import moment from 'moment';
                             <p class="text-base font-medium text-navy-700 underline underline-offset-2">
                                 {{ getEmployeeName }}
                             </p>
-                            <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
+                            <div v-if="employee.id_estado_empleado === 1" class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
                                 <GeneralButton color="bg-green-700  hover:bg-green-800" text="Agregar" icon="add"
                                     @click="showInputsForNewRole()" />
                             </div>
@@ -53,7 +53,7 @@ import moment from 'moment';
 
                         <div v-if="jobPositions.length > 0"
                             class="justify-center space-between flex text-center items-center py-3 border-b border-t border-slate-300 mt-3 mb-1 flex-row bg-gray-100">
-                            <div class="mx-4 flex cursor-pointer justify-center"
+                            <div class="mx-4 flex cursor-pointer justify-center" title="Muestra puestos vigentes."
                                 :class="activeSelected ? 'text-green-500 hover:text-green-700 border-b-2 border-green-500 hover:border-green-700' : 'text-green-400 hover:text-green-600'"
                                 @click="activeSelected = true">
                                 <p class="pl-3">VIGENTES</p>
@@ -69,7 +69,7 @@ import moment from 'moment';
                                     </svg>
                                 </div>
                             </div>
-                            <div class="mx-4 cursor-pointer flex"
+                            <div class="mx-4 cursor-pointer flex" title="Muestra puestos inhabilitados."
                                 :class="!activeSelected ? 'border-b-2 border-red-500 hover:border-red-700 text-red-500 hover:text-red-700' : 'text-red-400 hover:text-red-600'"
                                 @click="activeSelected = false">
                                 <p class="pl-3">INHABILITADOS</p>
@@ -106,33 +106,39 @@ import moment from 'moment';
                                             <p class="text-base font-medium text-navy-700 dark:text-white">
                                                 {{ formattedDependency(jobPosition.dependencia) }}
                                             </p>
-                                            <svg v-if="!jobPosition.id_motivo_desvinculo_laboral && activeRoles.length > 1"
-                                                viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
-                                                class="w-6 h-6 mt-1 text-red-500 absolute top-0 right-0 mr-2 cursor-pointer"
-                                                @click="setSpecificRole(index)">
-                                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                                    d="M17 5V4C17 2.89543 16.1046 2 15 2H9C7.89543 2 7 2.89543 7 4V5H4C3.44772 5 3 5.44772 3 6C3 6.55228 3.44772 7 4 7H5V18C5 19.6569 6.34315 21 8 21H16C17.6569 21 19 19.6569 19 18V7H20C20.5523 7 21 6.55228 21 6C21 5.44772 20.5523 5 20 5H17ZM15 4H9V5H15V4ZM17 7H7V18C7 18.5523 7.44772 19 8 19H16C16.5523 19 17 18.5523 17 18V7Z"
-                                                    fill="currentColor" />
-                                                <path d="M9 9H11V17H9V9Z" fill="currentColor" />
-                                                <path d="M13 9H15V17H13V9Z" fill="currentColor" />
-                                            </svg>
-                                            <svg v-if="!jobPosition.id_motivo_desvinculo_laboral && activeRoles.length > 1"
-                                                width="24px" height="24px" viewBox="0 0 1024 1024"
-                                                xmlns="http://www.w3.org/2000/svg" fill="currentColor" stroke="currentColor"
-                                                class="mt-1 text-yellow-600 absolute top-0 right-0 mr-9 cursor-pointer"
+                                            <button v-if="jobPosition.estado_plaza_asignada === 1 && activeRoles.length > 1"
+                                                class="mt-1 text-red-500 absolute top-0 right-0 mr-2 cursor-pointer"
+                                                title="Inhabilitar puesto." @click="setSpecificRole(index)">
+                                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                                                    class="w-6 h-6">
+                                                    <path fill-rule="evenodd" clip-rule="evenodd"
+                                                        d="M17 5V4C17 2.89543 16.1046 2 15 2H9C7.89543 2 7 2.89543 7 4V5H4C3.44772 5 3 5.44772 3 6C3 6.55228 3.44772 7 4 7H5V18C5 19.6569 6.34315 21 8 21H16C17.6569 21 19 19.6569 19 18V7H20C20.5523 7 21 6.55228 21 6C21 5.44772 20.5523 5 20 5H17ZM15 4H9V5H15V4ZM17 7H7V18C7 18.5523 7.44772 19 8 19H16C16.5523 19 17 18.5523 17 18V7Z"
+                                                        fill="currentColor" />
+                                                    <path d="M9 9H11V17H9V9Z" fill="currentColor" />
+                                                    <path d="M13 9H15V17H13V9Z" fill="currentColor" />
+                                                </svg>
+                                            </button>
+                                            <button v-if="jobPosition.estado_plaza_asignada === 1"
+                                                title="Modificar información del puesto."
+                                                class="mt-1 text-yellow-600 absolute top-0 right-0 cursor-pointer"
+                                                :class="activeRoles.length > 1 ? 'mr-9' : 'mr-2'"
                                                 @click="editRoleAssigned(jobPosition)">
-                                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round"
-                                                    stroke-linejoin="round"></g>
-                                                <g id="SVGRepo_iconCarrier">
-                                                    <path fill="currentColor"
-                                                        d="M832 512a32 32 0 1 1 64 0v352a32 32 0 0 1-32 32H160a32 32 0 0 1-32-32V160a32 32 0 0 1 32-32h352a32 32 0 0 1 0 64H192v640h640V512z">
-                                                    </path>
-                                                    <path fill="currentColor"
-                                                        d="m469.952 554.24 52.8-7.552L847.104 222.4a32 32 0 1 0-45.248-45.248L477.44 501.44l-7.552 52.8zm422.4-422.4a96 96 0 0 1 0 135.808l-331.84 331.84a32 32 0 0 1-18.112 9.088L436.8 623.68a32 32 0 0 1-36.224-36.224l15.104-105.6a32 32 0 0 1 9.024-18.112l331.904-331.84a96 96 0 0 1 135.744 0z">
-                                                    </path>
-                                                </g>
-                                            </svg>
+                                                <svg width="24px" height="24px" viewBox="0 0 1024 1024"
+                                                    xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                                                    stroke="currentColor">
+                                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round"
+                                                        stroke-linejoin="round"></g>
+                                                    <g id="SVGRepo_iconCarrier">
+                                                        <path fill="currentColor"
+                                                            d="M832 512a32 32 0 1 1 64 0v352a32 32 0 0 1-32 32H160a32 32 0 0 1-32-32V160a32 32 0 0 1 32-32h352a32 32 0 0 1 0 64H192v640h640V512z">
+                                                        </path>
+                                                        <path fill="currentColor"
+                                                            d="m469.952 554.24 52.8-7.552L847.104 222.4a32 32 0 1 0-45.248-45.248L477.44 501.44l-7.552 52.8zm422.4-422.4a96 96 0 0 1 0 135.808l-331.84 331.84a32 32 0 0 1-18.112 9.088L436.8 623.68a32 32 0 0 1-36.224-36.224l15.104-105.6a32 32 0 0 1 9.024-18.112l331.904-331.84a96 96 0 0 1 135.744 0z">
+                                                        </path>
+                                                    </g>
+                                                </svg>
+                                            </button>
                                         </div>
                                         <!-- Plaza - Codigo -->
                                         <div class="flex flex-col space-y-1 md:flex-row md:space-x-2">
@@ -143,9 +149,9 @@ import moment from 'moment';
                                                 </p>
                                             </div>
                                             <div class="w-full md:w-[15%]">
-                                                <p class="text-sm text-gray-600">Codigo</p>
+                                                <p class="text-sm text-gray-600">ID SIRHI</p>
                                                 <p class="text-base font-medium text-navy-700 dark:text-white">
-                                                    {{ jobPosition.detalle_plaza.codigo_det_plaza }}
+                                                    {{ jobPosition.detalle_plaza.id_puesto_sirhi_det_plaza }}
                                                 </p>
                                             </div>
                                         </div>
@@ -236,7 +242,7 @@ import moment from 'moment';
                                     </label>
                                     <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
                                         <Multiselect placeholder="Seleccione Plaza" v-model="jobPosition.jobPositionId"
-                                            :options="jobPositionsToSelect" :searchable="true"
+                                            :options="jobPositionsToSelect" :searchable="true" :disabled="edit"
                                             @change="setSalaryLimits($event)" />
                                         <LabelToInput icon="list" />
                                     </div>
@@ -271,7 +277,15 @@ import moment from 'moment';
                                 </div>
                             </div>
                             <div class="mb-10 md:flex flex-row justify-items-start">
-                                <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                                <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
+                                    <TextInput id="contrato_plaza" v-model="jobPosition.contrato_plaza" type="text" placeholder="Numero contrato"
+                                        @update:modelValue="validateEmployeeInputs('contrato_plaza', 10, false, false)" :required="false">
+                                        <LabelToInput icon="standard" forLabel="contrato_plaza" />
+                                    </TextInput>
+                                    <InputError v-for="(item, index) in errors['jobPosition.contrato_plaza']" :key="index"
+                                        class="mt-2" :message="item" />
+                                </div>
+                                <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                     <TextInput id="account" v-model="jobPosition.account" type="text" placeholder="Partida"
                                         @update:modelValue="validateEmployeeInputs('account', 3, true, false)">
                                         <LabelToInput icon="standard" forLabel="account" />
@@ -279,7 +293,7 @@ import moment from 'moment';
                                     <InputError v-for="(item, index) in errors['jobPosition.account']" :key="index"
                                         class="mt-2" :message="item" />
                                 </div>
-                                <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                                <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                     <TextInput id="subaccount" v-model="jobPosition.subaccount" type="text"
                                         placeholder="Subpartida"
                                         @update:modelValue="validateEmployeeInputs('subaccount', 3, true, false)">
@@ -328,9 +342,9 @@ import moment from 'moment';
                                             </p>
                                         </div>
                                         <div class="w-full md:w-[15%]">
-                                            <p class="text-sm text-gray-600">Codigo</p>
+                                            <p class="text-sm text-gray-600">ID SIRHI</p>
                                             <p class="text-base font-medium text-navy-700 dark:text-white">
-                                                {{ activeRoles[indexToDelete].detalle_plaza.codigo_det_plaza }}
+                                                {{ activeRoles[indexToDelete].detalle_plaza.id_puesto_sirhi_det_plaza }}
                                             </p>
                                         </div>
                                     </div>
@@ -414,7 +428,9 @@ export default {
             default: []
         }
     },
-    created() { },
+    created() {
+        this.setInitialInformation()
+    },
     data: function (data) {
         return {
             activeRoles: [],
@@ -445,7 +461,8 @@ export default {
                 workAreaId: '',
                 dateOfHired: '',
                 idDissociate: '',
-                dateOfDissociate: ''
+                dateOfDissociate: '',
+                contrato_plaza:''
             },
             config: {
                 altInput: true,
@@ -469,6 +486,17 @@ export default {
         };
     },
     methods: {
+        setInitialInformation() {
+            this.showJobPositions = true
+            this.loadingCount = 0 //Conteo para el loader
+            this.errors = []
+            this.activeSelected = true
+            this.edit = false
+            this.deleting = false
+            this.indexToDelete = ''
+            this.employee = JSON.parse(JSON.stringify(this.modalData));
+            this.getJobPositions()
+        },
         validateEmployeeInputs(field, limit, number, amount) {
             if (this.jobPosition[field].length > limit) {
                 this.jobPosition[field] = this.jobPosition[field].substring(0, limit);
@@ -589,8 +617,12 @@ export default {
         },
         handleErrorResponse(errors) {
             if (errors.response.status === 422) {
-                this.errors = errors.response.data.errors;
-                this.showToast(toast.warning, "Tienes algunos errores por favor verifica tus datos.");
+                if (errors.response.data.logical_error) {
+                    this.showToast(toast.error, errors.response.data.logical_error);
+                } else {
+                    this.errors = errors.response.data.errors;
+                    this.showToast(toast.warning, "Tienes algunos errores por favor verifica tus datos.");
+                }
             } else {
                 this.manageError(errors, this)
             }
@@ -620,6 +652,7 @@ export default {
                 this.jobPosition.salary = role.salario_plaza_asignada
                 this.jobPosition.account = role.partida_plaza_asignada
                 this.jobPosition.subaccount = role.subpartida_plaza_asignada
+                this.jobPosition.contrato_plaza = role.contrato_plaza_asignada
                 this.jobPosition.id = role.id_plaza_asignada
                 this.setSalaryLimits(role.id_det_plaza)
                 this.errors = []
@@ -695,19 +728,6 @@ export default {
         }
     },
     watch: {
-        showModalJobPosition: function (value, oldValue) {
-            if (value) {
-                this.showJobPositions = true
-                this.loadingCount = 0 //Conteo para el loader
-                this.errors = []
-                this.activeSelected = true
-                this.edit = false
-                this.deleting = false
-                this.indexToDelete = ''
-                this.employee = JSON.parse(JSON.stringify(this.modalData));
-                this.getJobPositions()
-            }
-        },
     },
     computed: {
         getEmployeeName: function () {

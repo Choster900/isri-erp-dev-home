@@ -61,7 +61,7 @@ import axios from "axios";
                             </div>
                             <div class="md:w-1/2 md:text-right">
                                 <span class="font-semibold text-slate-800 text-[14px]">
-                                    Pagina 1 de {{ modalData == '' ? '4' : '3' }}
+                                    Pagina 1 de {{ (modalData == '' || modalData.id_estado_empleado === 2) ? '4' : '3' }}
                                 </span>
                             </div>
                         </div>
@@ -212,7 +212,7 @@ import axios from "axios";
                             </div>
                             <div class="md:w-1/2 md:text-right">
                                 <span class="font-semibold text-slate-800 text-[14px]">
-                                    Pagina 2 de {{ modalData == '' ? '4' : '3' }}
+                                    Pagina 2 de {{ (modalData == '' || modalData.id_estado_empleado === 2) ? '4' : '3' }}
                                 </span>
                             </div>
                         </div>
@@ -336,7 +336,7 @@ import axios from "axios";
                             </div>
                             <div class="md:w-1/2 md:text-right">
                                 <span class="font-semibold text-slate-800 text-[14px]">
-                                    Pagina 3 de {{ modalData == '' ? '4' : '3' }}
+                                    Pagina 3 de {{ (modalData == '' || modalData.id_estado_empleado === 2) ? '4' : '3' }}
                                 </span>
                             </div>
                         </div>
@@ -355,7 +355,7 @@ import axios from "axios";
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="nup_empleado" v-model="employee.nup_empleado" type="text" placeholder="NUP"
-                                    @update:modelValue="validateEmployeeInputs('nup_empleado', 10, true, false)">
+                                    @update:modelValue="validateEmployeeInputs('nup_empleado', 20, true, false)">
                                     <LabelToInput icon="standard" forLabel="nup_empleado" />
                                 </TextInput>
                                 <InputError v-for="(item, index) in backend_errors['nup_empleado']" :key="index"
@@ -376,7 +376,7 @@ import axios from "axios";
                         <!-- End first row Page3 -->
                         <!-- Second row Page3 -->
                         <div class="mb-5 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Titulo profesional <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -388,18 +388,29 @@ import axios from "axios";
                                 </div>
                                 <InputError class="mt-2" :message="errors.id_titulo_profesional" />
                             </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600" for="fecha_nacimiento">
                                     Fecha de contratacion <span class="text-red-600 font-extrabold">*</span>
                                 </label>
                                 <div class="relative flex">
                                     <LabelToInput icon="date" />
-                                    <flat-pickr :disabled="employee.id_empleado == '' ? false : true"
+                                    <flat-pickr
+                                        :disabled="employee.id_empleado == '' || employee.id_estado_empleado === 2 ? false : true"
                                         class="peer font-semibold text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none w-full"
                                         :config="config" v-model="employee.fecha_contratacion_empleado"
                                         :placeholder="'Seleccione fecha'" />
                                 </div>
                                 <InputError class="mt-2" :message="errors.fecha_contratacion_empleado" />
+                            </div>
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
+                                <TextInput id="codigo_empleado" v-model="employee.codigo_empleado" type="text"
+                                    placeholder="Id empleado SIRHI"
+                                    @update:modelValue="validateEmployeeInputs('codigo_empleado', 10, false, false)">
+                                    <LabelToInput icon="standard" forLabel="codigo_empleado" />
+                                </TextInput>
+                                <InputError v-for="(item, index) in backend_errors['codigo_empleado']" :key="index"
+                                    class="mt-2" :message="item" />
+                                <InputError class="mt-2" :message="errors.codigo_empleado" />
                             </div>
                         </div>
                         <!-- End second row Page3 -->
@@ -495,8 +506,8 @@ import axios from "axios";
                         </div>
                         <!-- End first row Page4 -->
                         <!-- Second row Page4 -->
-                        <div class="mb-10 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
+                        <div class="mb-5 md:flex flex-row justify-items-start">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="salary" v-model="employee.salary" type="text"
                                     :placeholder="selectedJobPosition ? 'Salario ($' + lower_salary_limit + ' - $' + upper_salary_limit + ')' : 'Salario (Seleccione plaza)'"
                                     :disabled="!selectedJobPosition"
@@ -505,30 +516,44 @@ import axios from "axios";
                                 </TextInput>
                                 <InputError class="mt-2" :message="errors.salary" />
                             </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
-                                <TextInput id="account" v-model="employee.account" type="text" placeholder="Partida"
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                                <TextInput id="contrato_plaza" v-model="employee.contract" type="text"
+                                    placeholder="Numero contrato"
+                                    @update:modelValue="validateEmployeeInputs('contract', 10, false, false)"
+                                    :required="false">
+                                    <LabelToInput icon="standard" forLabel="contrato_plaza" />
+                                </TextInput>
+                                <InputError v-for="(item, index) in errors['jobPosition.contract']" :key="index"
+                                    class="mt-2" :message="item" />
+                            </div>
+                        </div>
+                        <!-- End second row Page4 -->
+                        <!-- Third row Page4 -->
+                        <div class="mb-10 md:flex flex-row justify-items-start">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                                <TextInput id="account" v-model="employee.account" type="text" placeholder="Numero partida"
                                     @update:modelValue="validateEmployeeInputs('account', 3, true, false)">
                                     <LabelToInput icon="standard" forLabel="account" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errors.account" />
                             </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 w-1/3">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="subaccount" v-model="employee.subaccount" type="text"
-                                    placeholder="Subpartida"
+                                    placeholder="Numero subpartida"
                                     @update:modelValue="validateEmployeeInputs('subaccount', 3, true, false)">
                                     <LabelToInput icon="standard" forLabel="subaccount" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errors.subaccount" />
                             </div>
                         </div>
-                        <!-- End second row Page4 -->
+                        <!-- End third row Page4 -->
                     </div>
 
                     <!-- buttons -->
                     <div class="flex items-center ml-1 mt-2">
                         <div class="flex" :class="correct_dui ? 'justify-end w-1/2' : 'justify-center w-full'">
-                            <GeneralButton v-if="current_page == 1 && correct_dui" class="mr-1" text="Cancelar" icon="delete"
-                                @click="$emit('cerrar-modal')" />
+                            <GeneralButton v-if="current_page == 1 && correct_dui" class="mr-1" text="Cancelar"
+                                icon="delete" @click="$emit('cerrar-modal')" />
 
                             <button v-if="current_page != 1"
                                 class="mr-1 flex items-center bg-gray-600 hover:bg-gray-700 text-white pl-2 pr-3 py-1.5 text-center mb-2 rounded"
@@ -575,8 +600,12 @@ import axios from "axios";
                                     </g>
                                 </svg>
                             </button>
-                            <GeneralButton v-if="modalData != '' && current_page === 3" @click="updateEmployee()"
-                                color="bg-orange-700 hover:bg-orange-800" text="Actualizar" icon="update" class="ml-1" />
+                            <GeneralButton
+                                v-if="modalData != '' && current_page === 3 && modalData.id_estado_empleado === 1"
+                                @click="updateEmployee()" color="bg-orange-700 hover:bg-orange-800" text="Actualizar"
+                                icon="update" class="ml-1" />
+                            <GeneralButton v-if="modalData != '' && current_page === 4" @click="reactiveEmployee()"
+                                color="bg-green-700 hover:bg-green-800" text="Reactivar" icon="add" class="ml-1" />
                             <GeneralButton v-if="current_page === 4 && modalData == ''" @click="storeNewEmployee()"
                                 color="bg-green-700 hover:bg-green-800" text="Guardar" icon="add" class="ml-1" />
                         </div>
@@ -618,15 +647,18 @@ export default {
             //errors:[],
             employee: {
                 id_empleado: '',
+                id_estado_empleado: '',
                 id_tipo_pension: '',
                 isss_empleado: '',
                 nup_empleado: '',
+                codigo_empleado: '',
                 id_titulo_profesional: '',
                 fecha_contratacion_empleado: '',
                 email_institucional_empleado: '',
                 email_alternativo_empleado: '',
                 id_banco: '',
                 cuenta_banco_empleado: '',
+                estado_empleado: '',
                 //Fields for 'PlazaAsignada'
                 dependency_id: '',
                 work_area_id: '',
@@ -634,6 +666,7 @@ export default {
                 salary: '',
                 account: '',
                 subaccount: '',
+                contract: '',
                 //Until here
                 persona: {
                     id_persona: '',
@@ -878,6 +911,7 @@ export default {
                 isss_empleado: 'numero isss',
                 id_titulo_profesional: 'titulo profesional',
                 fecha_contratacion_empleado: 'fecha contratacion',
+                codigo_empleado: 'codigo SIRHI'
             };
 
             const requiredFieldsEmployee = [
@@ -885,7 +919,8 @@ export default {
                 'nup_empleado',
                 'isss_empleado',
                 'id_titulo_profesional',
-                'fecha_contratacion_empleado'
+                'fecha_contratacion_empleado',
+                'codigo_empleado'
             ];
 
             let has_errors_page3 = false;
@@ -969,7 +1004,7 @@ export default {
                 this.is_loading = false;  // Desactivar el estado de carga
             }
         },
-        storeNewEmployee() {
+        async storeNewEmployee() {
             if (this.validatePage4()) {
                 this.$swal.fire({
                     title: '¿Está seguro de guardar el empleado?',
@@ -981,9 +1016,10 @@ export default {
                     showCancelButton: true,
                     showCloseButton: true
                 })
-                    .then((result) => {
+                    .then(async (result) => {
                         if (result.isConfirmed) {
-                            axios
+                            this.is_loading = true
+                            await axios
                                 .post("/store-employee", this.employee)
                                 .then((response) => {
                                     this.showToast(toast.success, response.data.mensaje);
@@ -992,11 +1028,22 @@ export default {
                                 })
                                 .catch((errors) => {
                                     if (errors.response.status === 422) {
+                                        this.backend_errors = errors.response.data.errors
+                                        if (this.backend_errors['persona.dui_persona']) {
+                                            this.current_page = 1
+                                        } else {
+                                            if (this.backend_errors['codigo_empleado'] || this.backend_errors['nup_empleado'] || this.backend_errors['isss_empleado']) {
+                                                this.current_page = 3
+                                            }
+                                        }
                                         this.showToast(toast.warning, "Tienes algunos errores por favor verifica tus datos.");
                                     } else {
                                         this.manageError(errors, this)
                                         this.$emit("cerrar-modal");
                                     }
+                                })
+                                .finally(() => {
+                                    this.is_loading = false
                                 });
                         }
                     });
@@ -1004,7 +1051,7 @@ export default {
                 this.showErrorAlert()
             }
         },
-        updateEmployee() {
+        async updateEmployee() {
             if (this.validatePage3()) {
                 this.$swal.fire({
                     title: '¿Está seguro de actualizar empleado?',
@@ -1016,8 +1063,9 @@ export default {
                     showCancelButton: true,
                     showCloseButton: true
                 })
-                    .then((result) => {
+                    .then(async (result) => {
                         if (result.isConfirmed) {
+                            this.is_loading = true
                             axios
                                 .post("/update-employee", this.employee)
                                 .then((response) => {
@@ -1034,6 +1082,7 @@ export default {
                                             this.$emit("cerrar-modal");
                                         } else {
                                             this.backend_errors = errors.response.data.errors
+                                            console.log(this.backend_errors);
                                             if (this.backend_errors['persona.dui_persona']) {
                                                 this.current_page = 1
                                             }
@@ -1043,6 +1092,56 @@ export default {
                                         this.manageError(errors, this)
                                         this.$emit("cerrar-modal");
                                     }
+                                })
+                                .finally(() => {
+                                    this.is_loading = false
+                                });
+                        }
+                    });
+            } else {
+                this.showErrorAlert()
+            }
+        },
+        async reactiveEmployee() {
+            if (this.validatePage4()) {
+                this.$swal.fire({
+                    title: '¿Está seguro de reactivar el empleado?',
+                    icon: 'question',
+                    iconHtml: '❓',
+                    confirmButtonText: 'Si, reactivar.',
+                    confirmButtonColor: '#141368',
+                    cancelButtonText: 'Cancelar',
+                    showCancelButton: true,
+                    showCloseButton: true
+                })
+                    .then(async (result) => {
+                        if (result.isConfirmed) {
+                            this.is_loading = true
+                            await axios
+                                .post("/enable-employee", this.employee)
+                                .then((response) => {
+                                    this.showToast(toast.success, response.data.mensaje);
+                                    this.$emit("get-table");
+                                    this.$emit("cerrar-modal");
+                                })
+                                .catch((errors) => {
+                                    if (errors.response.status === 422) {
+                                        this.backend_errors = errors.response.data.errors
+                                        if (this.backend_errors['persona.dui_persona']) {
+                                            this.current_page = 1
+                                        } else {
+                                            if (this.backend_errors['codigo_empleado'] || this.backend_errors['nup_empleado'] || this.backend_errors['isss_empleado']) {
+                                                this.current_page = 3
+                                            }
+                                        }
+                                        this.showToast(toast.warning, "Tienes algunos errores por favor verifica tus datos.");
+                                    } else {
+                                        this.manageError(errors, this)
+                                        this.$emit("cerrar-modal");
+                                    }
+                                })
+                                .finally(() => {
+                                    this.is_loading = false
                                 });
                         }
                     });
@@ -1094,6 +1193,9 @@ export default {
                 if (this.modalData != '') {
                     this.correct_dui = true
                     this.employee = JSON.parse(JSON.stringify(this.modalData));
+                    if (this.employee.id_estado_empleado === 2) {
+                        this.employee.fecha_contratacion_empleado = ''
+                    }
                 } else {
                     this.correct_dui = false
                     this.recursivelySetEmptyStrings(this.employee);
@@ -1105,7 +1207,7 @@ export default {
     computed: {
         validateButton() {
             if (this.current_page === 3) {
-                if (this.modalData == '') {
+                if (this.modalData == '' || (this.modalData != '' && this.employee.id_estado_empleado === 2)) {
                     return true
                 } else {
                     return false
