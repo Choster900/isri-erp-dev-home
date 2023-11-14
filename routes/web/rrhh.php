@@ -43,6 +43,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     //Manage the employment termination.
     Route::get('get-data-emp-termination', [EmpleadoController::class, 'getDataEmpTermination'])->name('empleado.getDataEmpTermination');
     Route::post('desactive-employee', [EmpleadoController::class, 'desactiveEmployee'])->name('empleado.desactiveEmployee');
+    Route::post('enable-employee', [EmpleadoController::class, 'enableEmployee'])->name('empleado.enableEmployee');
 
     Route::get(
         '/rrhh/det-plazas',

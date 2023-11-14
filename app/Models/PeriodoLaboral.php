@@ -16,6 +16,7 @@ class PeriodoLaboral extends Model
     protected $fillable = [
         'id_motivo_desvinculo_laboral',
         'id_empleado',
+        'observacion_periodo_laboral',
         'fecha_contratacion_periodo_laboral',
         'fecha_desvinculo_periodo_laboral',
         'estado_periodo_laboral',

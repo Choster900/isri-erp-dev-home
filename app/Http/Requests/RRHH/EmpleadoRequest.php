@@ -29,6 +29,7 @@ class EmpleadoRequest extends FormRequest
         ->ignore($this->input('persona.id_persona'), 'id_persona')];
         $rules["nup_empleado"] = [Rule::unique('empleado','nup_empleado')->ignore($this->input('id_empleado'), 'id_empleado')];
         $rules["isss_empleado"] = [Rule::unique('empleado','isss_empleado')->ignore($this->input('id_empleado'), 'id_empleado')];
+        $rules["codigo_empleado"] = [Rule::unique('empleado','codigo_empleado')->ignore($this->input('id_empleado'), 'id_empleado')];
 
         return $rules;
     }
@@ -38,6 +39,7 @@ class EmpleadoRequest extends FormRequest
         $messages["persona.dui_persona.required"] = "El numero de dui es requerido";
         $messages["nup_empleado"] = "Este numero nup ya fue registrado";
         $messages["isss_empleado"] = "Este numero isss ya fue registrado";
+        $messages["codigo_empleado"] = "Este codigo ya fue registrado.";
         return $messages;
     }
 }

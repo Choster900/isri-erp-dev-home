@@ -19,6 +19,7 @@ class PlazaAsignada extends Model
         'id_dependencia',
         'id_det_plaza',
         'id_motivo_desvinculo_laboral',
+        'contrato_plaza_asignada',
         'salario_plaza_asignada',
         'partida_plaza_asignada',
         'subpartida_plaza_asignada',

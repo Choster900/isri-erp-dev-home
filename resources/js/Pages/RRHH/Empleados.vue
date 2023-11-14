@@ -78,7 +78,7 @@ import axios from 'axios';
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
-                                    <div v-if="(employee.estado_empleado == 1)"
+                                    <div v-if="(employee.id_estado_empleado == 1)"
                                         class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
                                         Activo
                                     </div>
@@ -92,7 +92,7 @@ import axios from 'axios';
                                 <div class="space-x-1 text-center">
                                     <DropDownOptions>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            v-if="permits.actualizar == 1 && employee.estado_empleado == 1"
+                                            v-if="permits.actualizar == 1 && employee.id_estado_empleado == 1"
                                             @click="editEmployee(employee)">
                                             <div class="w-8 text-green-900">
                                                 <span class="text-xs">
@@ -106,7 +106,7 @@ import axios from 'axios';
                                             <div class="font-semibold">Editar</div>
                                         </div>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            v-if="permits.actualizar == 1 && employee.estado_empleado == 1"
+                                            v-if="permits.actualizar == 1 && employee.id_estado_empleado == 1"
                                             @click="manageFiles(employee)">
                                             <div class="w-8 text-blue-900">
                                                 <span class="text-xs">
@@ -143,7 +143,7 @@ import axios from 'axios';
                                         </div>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                                             @click="manageEmpTermination(employee)" v-if="permits.eliminar == 1">
-                                            <div v-if="employee.estado_empleado" class="w-8 text-red-700">
+                                            <div v-if="employee.id_estado_empleado === 1" class="w-8 text-red-700">
                                                 <span class="text-xs">
                                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
                                                         class="h-5 w-5 ml-0.5" fill="currentColor">
@@ -169,7 +169,7 @@ import axios from 'axios';
                                                 </svg>
                                             </div>
                                             <div class="font-semibold">
-                                                {{ employee.estado_empleado ? 'Inhabilitar' : 'Activar' }}
+                                                {{ employee.id_estado_empleado === 1 ? 'Inhabilitar' : 'Activar' }}
                                             </div>
                                         </div>
                                     </DropDownOptions>
@@ -330,7 +330,7 @@ export default {
     },
     methods: {
         manageEmpTermination(employee) {
-            this.showEmpTermination = true
+            employee.id_estado_empleado === 1 ? this.showEmpTermination = true : this.show_modal_employee = true
             this.modalData = employee
         },
         manageJobPositions(employee) {

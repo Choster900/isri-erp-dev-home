@@ -39,7 +39,7 @@ import moment from 'moment';
                             <p class="text-base font-medium text-navy-700 underline underline-offset-2">
                                 {{ getEmployeeName }}
                             </p>
-                            <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
+                            <div v-if="employee.id_estado_empleado === 1" class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
                                 <GeneralButton color="bg-green-700  hover:bg-green-800" text="Agregar" icon="add"
                                     @click="showInputsForNewRole()" />
                             </div>
@@ -277,7 +277,15 @@ import moment from 'moment';
                                 </div>
                             </div>
                             <div class="mb-10 md:flex flex-row justify-items-start">
-                                <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                                <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
+                                    <TextInput id="contrato_plaza" v-model="jobPosition.contrato_plaza" type="text" placeholder="Numero contrato"
+                                        @update:modelValue="validateEmployeeInputs('contrato_plaza', 10, false, false)" :required="false">
+                                        <LabelToInput icon="standard" forLabel="contrato_plaza" />
+                                    </TextInput>
+                                    <InputError v-for="(item, index) in errors['jobPosition.contrato_plaza']" :key="index"
+                                        class="mt-2" :message="item" />
+                                </div>
+                                <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                     <TextInput id="account" v-model="jobPosition.account" type="text" placeholder="Partida"
                                         @update:modelValue="validateEmployeeInputs('account', 3, true, false)">
                                         <LabelToInput icon="standard" forLabel="account" />
@@ -285,7 +293,7 @@ import moment from 'moment';
                                     <InputError v-for="(item, index) in errors['jobPosition.account']" :key="index"
                                         class="mt-2" :message="item" />
                                 </div>
-                                <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                                <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                     <TextInput id="subaccount" v-model="jobPosition.subaccount" type="text"
                                         placeholder="Subpartida"
                                         @update:modelValue="validateEmployeeInputs('subaccount', 3, true, false)">
@@ -453,7 +461,8 @@ export default {
                 workAreaId: '',
                 dateOfHired: '',
                 idDissociate: '',
-                dateOfDissociate: ''
+                dateOfDissociate: '',
+                contrato_plaza:''
             },
             config: {
                 altInput: true,
@@ -643,6 +652,7 @@ export default {
                 this.jobPosition.salary = role.salario_plaza_asignada
                 this.jobPosition.account = role.partida_plaza_asignada
                 this.jobPosition.subaccount = role.subpartida_plaza_asignada
+                this.jobPosition.contrato_plaza = role.contrato_plaza_asignada
                 this.jobPosition.id = role.id_plaza_asignada
                 this.setSalaryLimits(role.id_det_plaza)
                 this.errors = []

@@ -48,7 +48,8 @@ import moment from 'moment';
                         </div>
                         <div class="w-[85%] rounded-r-lg">
                             <h2 class="text-orange-500 text-center font-semibold">¡Aviso!</h2>
-                            <p class="mx-2 mb-1 font-semibold">Estas a punto de desvincular al empleado del ISRI, ten en cuenta que este proceso generaría
+                            <p class="mx-2 mb-1 font-semibold">Estas a punto de desvincular al empleado del ISRI, ten en
+                                cuenta que este proceso generaría
                                 la desvinculación con el puesto (o los puestos), que tenga asociados.
                             </p>
                         </div>
@@ -132,6 +133,33 @@ import moment from 'moment';
                                 :message="item" />
                         </div>
                     </div>
+                    <div class="mx-6 mt-4 md:flex flex-row justify-items-start">
+                        <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
+                            <label class="block mb-5 text-xs font-light text-gray-600">
+                                Recibio compensación <span class="text-red-600 font-extrabold">*</span>
+                            </label>
+                            <label for="checbox1" class="text-sm font-bold text-gray-700 ml-4 mr-1">SI
+                            </label>
+                            <checkbox v-model="emp.financialCompensationY" :checked="emp.financialCompensationY"
+                                class="mr-3" ref="check1" id="checbox1" @click="setFinancialCompensation(true)" />
+                            <label for="checbox2" class="text-sm font-bold text-gray-700 ml-4 mr-1">NO
+                            </label>
+                            <checkbox v-model="emp.financialCompensationN" :checked="emp.financialCompensationN"
+                                class="mr-3" ref="check2" id="checbox2" @click="setFinancialCompensation(false)" />
+                            <InputError v-for="(item, index) in errors.fncCompensation" :key="index" class="mt-7"
+                                :message="item" />
+                        </div>
+                        <div class="mb-4 md:mr-0 md:mb-0 basis-3/4">
+                            <label class="block mb-2 text-xs font-light text-gray-600">
+                                Comentarios <span class="text-red-600 font-extrabold">*</span>
+                            </label>
+                            <textarea v-model="emp.observation" id="observation" name="observation"
+                                class="resize-none w-full h-12 overflow-y-auto peer text-xs font-semibold rounded-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none">
+                            </textarea>
+                            <InputError v-for="(item, index) in errors.observation" :key="index" class="mt-2"
+                                :message="item" />
+                        </div>
+                    </div>
 
                     <div class="flex justify-center mt-4 pb-4">
                         <GeneralButton class="mr-1" color="bg-red-700 hover:bg-red-800" text="Inhabilitar" icon="delete"
@@ -169,7 +197,10 @@ export default {
             emp: {
                 id: '',
                 idDissociate: '',
-                dateOfDissociate: ''
+                dateOfDissociate: '',
+                fncCompensation: '',
+                financialCompensationY: false,
+                financialCompensationN: false,
             },
             config: {
                 altInput: true,
@@ -272,6 +303,17 @@ export default {
                             });
                     }
                 });
+        },
+        setFinancialCompensation(value) {
+            if (value) {
+                this.emp.financialCompensationY ? this.emp.financialCompensationY = false : this.emp.financialCompensationY = true
+                this.emp.financialCompensationN = false
+                this.emp.fncCompensation = this.emp.financialCompensationY ? 1 : ''
+            } else {
+                this.emp.financialCompensationN ? this.emp.financialCompensationN = false : this.emp.financialCompensationN = true
+                this.emp.financialCompensationY = false
+                this.emp.fncCompensation = this.emp.financialCompensationN ? 0 : ''
+            }
         }
     },
     watch: {
