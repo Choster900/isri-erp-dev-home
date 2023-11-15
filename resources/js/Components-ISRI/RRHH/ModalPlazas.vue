@@ -103,7 +103,7 @@ import moment from 'moment';
                                         <!-- Dependencia -->
                                         <div class="w-full">
                                             <p class="text-sm text-gray-600">Dependencia</p>
-                                            <p class="text-base font-medium text-navy-700 dark:text-white">
+                                            <p class="text-base font-medium text-navy-700 ">
                                                 {{ formattedDependency(jobPosition.dependencia) }}
                                             </p>
                                             <button v-if="jobPosition.estado_plaza_asignada === 1 && activeRoles.length > 1"
@@ -144,13 +144,13 @@ import moment from 'moment';
                                         <div class="flex flex-col space-y-1 md:flex-row md:space-x-2">
                                             <div class="w-full md:w-[85%]">
                                                 <p class="text-sm text-gray-600">Plaza</p>
-                                                <p class="text-base font-medium text-navy-700 dark:text-white">
+                                                <p class="text-base font-medium text-navy-700 ">
                                                     {{ jobPosition.detalle_plaza.plaza.nombre_plaza }}
                                                 </p>
                                             </div>
                                             <div class="w-full md:w-[15%]">
                                                 <p class="text-sm text-gray-600">ID SIRHI</p>
-                                                <p class="text-base font-medium text-navy-700 dark:text-white">
+                                                <p class="text-base font-medium text-navy-700 ">
                                                     {{ jobPosition.detalle_plaza.id_puesto_sirhi_det_plaza }}
                                                 </p>
                                             </div>
@@ -159,19 +159,19 @@ import moment from 'moment';
                                         <div class="flex flex-col space-y-1 md:flex-row md:space-x-2">
                                             <div class="w-full md:w-[50%]">
                                                 <p class="text-sm text-gray-600">Tipo Contratación</p>
-                                                <p class="text-base font-medium text-navy-700 dark:text-white">
+                                                <p class="text-base font-medium text-navy-700 ">
                                                     {{ jobPosition.detalle_plaza.tipo_contrato.nombre_tipo_contrato }}
                                                 </p>
                                             </div>
                                             <div class="w-full md:w-[35%]">
                                                 <p class="text-sm text-gray-600">Fecha Nombramiento</p>
-                                                <p class="text-base font-medium text-navy-700 dark:text-white">
+                                                <p class="text-base font-medium text-navy-700 ">
                                                     {{ moment(jobPosition.fecha_plaza_asignada).format('DD/MM/YYYY') }}
                                                 </p>
                                             </div>
                                             <div class="w-full md:w-[15%]">
                                                 <p class="text-sm text-gray-600">Salario</p>
-                                                <p class="text-base font-medium text-navy-700 dark:text-white">
+                                                <p class="text-base font-medium text-navy-700 ">
                                                     ${{ jobPosition.salario_plaza_asignada }}
                                                 </p>
                                             </div>
@@ -181,7 +181,7 @@ import moment from 'moment';
                                             class="flex flex-col space-y-1 md:flex-row md:space-x-2">
                                             <div class="w-full md:w-[49%]">
                                                 <p class="text-sm text-gray-600">Motivo Desvinculación</p>
-                                                <p class="text-base font-medium text-red-600 dark:text-white">
+                                                <p class="text-base font-medium text-red-600 ">
                                                     {{
                                                         jobPosition.motivo_desvinculo_laboral.nombre_motivo_desvinculo_laboral
                                                     }}
@@ -189,7 +189,7 @@ import moment from 'moment';
                                             </div>
                                             <div class="w-full md:w-[51%]">
                                                 <p class="text-sm text-gray-600">Fecha Desvinculación</p>
-                                                <p class="text-base font-medium text-red-600 dark:text-white">
+                                                <p class="text-base font-medium text-red-600 ">
                                                     {{
                                                         moment(jobPosition.fecha_renuncia_plaza_asignada).format('DD/MM/YYYY')
                                                     }}
@@ -329,7 +329,7 @@ import moment from 'moment';
                                     <!-- Dependencia -->
                                     <div class="w-full">
                                         <p class="text-sm text-gray-600">Dependencia</p>
-                                        <p class="text-base font-medium text-navy-700 dark:text-white">
+                                        <p class="text-base font-medium text-navy-700 ">
                                             {{ formattedDependency(activeRoles[indexToDelete].dependencia) }}
                                         </p>
                                     </div>
@@ -337,13 +337,13 @@ import moment from 'moment';
                                     <div class="flex flex-col space-y-1 md:flex-row md:space-x-2">
                                         <div class="w-full md:w-[85%]">
                                             <p class="text-sm text-gray-600">Plaza</p>
-                                            <p class="text-base font-medium text-navy-700 dark:text-white">
+                                            <p class="text-base font-medium text-navy-700 ">
                                                 {{ activeRoles[indexToDelete].detalle_plaza.plaza.nombre_plaza }}
                                             </p>
                                         </div>
                                         <div class="w-full md:w-[15%]">
                                             <p class="text-sm text-gray-600">ID SIRHI</p>
-                                            <p class="text-base font-medium text-navy-700 dark:text-white">
+                                            <p class="text-base font-medium text-navy-700">
                                                 {{ activeRoles[indexToDelete].detalle_plaza.id_puesto_sirhi_det_plaza }}
                                             </p>
                                         </div>
@@ -352,7 +352,7 @@ import moment from 'moment';
                                     <div class="flex flex-col space-y-1 md:flex-row md:space-x-2">
                                         <div class="w-full md:w-[50%]">
                                             <p class="text-sm text-gray-600">Tipo Contratación</p>
-                                            <p class="text-base font-medium text-navy-700 dark:text-white">
+                                            <p class="text-base font-medium text-navy-700 ">
                                                 {{
                                                     activeRoles[indexToDelete].detalle_plaza.tipo_contrato.nombre_tipo_contrato
                                                 }}
@@ -360,7 +360,7 @@ import moment from 'moment';
                                         </div>
                                         <div class="w-full md:w-[35%]">
                                             <p class="text-sm text-gray-600">Fecha Nombramiento</p>
-                                            <p class="text-base font-medium text-navy-700 dark:text-white">
+                                            <p class="text-base font-medium text-navy-700 ">
                                                 {{
                                                     moment(activeRoles[indexToDelete].fecha_plaza_asignada).format('DD/MM/YYYY')
                                                 }}
@@ -368,7 +368,7 @@ import moment from 'moment';
                                         </div>
                                         <div class="w-full md:w-[15%]">
                                             <p class="text-sm text-gray-600">Salario</p>
-                                            <p class="text-base font-medium text-navy-700 dark:text-white">
+                                            <p class="text-base font-medium text-navy-700 ">
                                                 ${{ activeRoles[indexToDelete].salario_plaza_asignada }}
                                             </p>
                                         </div>
