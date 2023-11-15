@@ -329,37 +329,37 @@ export default {
         },
 
 
-         async printPdf() {
-             let fecha = moment().format('DD-MM-YYYY');
-             let name = 'CERTIFICADO DE SEGURO COLECTIVO DE VIDA';
-             const opt = {
-                 margin: 0.1,
-                 filename: name,
-                 image: { type: 'jpeg', quality: 0.98 },
-                 html2canvas: { scale: 2, useCORS: true },
-                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-             };
- 
-             // Crear una instancia de la aplicación Vue para generar el componente quedanPDFVue
-             const app = createApp(CertificadoSeguroColectivoDeVida);
- 
-             // Crear un elemento div y montar la instancia de la aplicación en él
-             const div = document.createElement('div');
-             const pdfPrint = app.mount(div);
-             const html = div.outerHTML;
-             const self = this;
+        async printPdf() {
+            let fecha = moment().format('DD-MM-YYYY');
+            let name = 'CERTIFICADO DE SEGURO COLECTIVO DE VIDA';
+            const opt = {
+                margin: 0.1,
+                filename: name,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
+            };
 
-             // Generar y guardar el PDF utilizando html2pdf
-             await html2pdf().set(opt).from(html).toPdf().get('pdf').then(function (pdf) {
-                 
-                 //window.open(pdf.output('bloburl'), '_blank');
-                 self.dataUrlPdf = pdf.output('bloburl')
+            // Crear una instancia de la aplicación Vue para generar el componente quedanPDFVue
+            const app = createApp(CertificadoSeguroColectivoDeVida);
+
+            // Crear un elemento div y montar la instancia de la aplicación en él
+            const div = document.createElement('div');
+            const pdfPrint = app.mount(div);
+            const html = div.outerHTML;
+            const self = this;
+
+            // Generar y guardar el PDF utilizando html2pdf
+            await html2pdf().set(opt).from(html).toPdf().get('pdf').then(function (pdf) {
+
+                //window.open(pdf.output('bloburl'), '_blank');
+                self.dataUrlPdf = pdf.output('bloburl')
                 window.open(URL.createObjectURL(pdf.output('blob')), '_blank');
- 
-             });
-             console.log(this.dataUrlPdf);
- 
-         },
+
+            });
+            console.log(this.dataUrlPdf);
+
+        },
 
         personaWasSelected(id_persona) {
             let persona = JSON.parse(JSON.stringify(this.personaOptions.find((index) => index.value == id_persona)));
@@ -568,9 +568,10 @@ export default {
             if (this.dataSent.dataRow[rowIndex].porcentaje_familiar > 100) {
                 this.dataSent.dataRow[rowIndex].porcentaje_familiar = 100;
             }
+            const allData = this.dataSent.dataRow.filter((obj) => obj.isDelete === false)
 
             // Calcular la suma total de los porcentajes
-            this.totalPorcentajeAsignado = this.dataSent.dataRow.reduce((suma, obj) => suma + parseFloat(obj.porcentaje_familiar), 0);
+            this.totalPorcentajeAsignado = allData.reduce((suma, obj) => suma + parseFloat(obj.porcentaje_familiar), 0);
             if (this.totalPorcentajeAsignado > 100) {
                 // Calcular el excedente
                 const ajuste = parseInt(this.totalPorcentajeAsignado) - 100;
@@ -588,16 +589,22 @@ export default {
                     }
                 });
             }
-            this.totalPorcentajeAsignado = this.dataSent.dataRow.reduce((suma, obj) => suma + parseFloat(obj.porcentaje_familiar), 0);
+            this.totalPorcentajeAsignado = allData.reduce((suma, obj) => suma + parseFloat(obj.porcentaje_familiar), 0);
             console.log(this.totalPorcentajeAsignado);
         },
 
 
         increaseOrDecreaseDesignacionDePorcentajes(rowIndex, operation) {
+            const allData = this.dataSent.dataRow.filter((obj) => obj.isDelete === false)
+            this.totalPorcentajeAsignado = allData.reduce((suma, obj) => suma + parseFloat(obj.porcentaje_familiar), 0);
+
+            console.log("PORCENTAJE FILA " + rowIndex + " ANTES DE OPERAR", this.dataSent.dataRow[rowIndex].porcentaje_familiar);
             switch (operation) {
                 case "suma":
                     if (this.totalPorcentajeAsignado < 100) {
-                        this.dataSent.dataRow[rowIndex].porcentaje_familiar = (this.dataSent.dataRow[rowIndex].porcentaje_familiar + 1)
+                        console.log("ASIGNACION DE POCENTAJE A FILA " + rowIndex + ": ", parseInt(this.dataSent.dataRow[rowIndex].porcentaje_familiar) + 1);
+                        this.dataSent.dataRow[rowIndex].porcentaje_familiar = parseInt(this.dataSent.dataRow[rowIndex].porcentaje_familiar) + 1
+                        console.log("PORCENTAJE FILA " + rowIndex + " DESPUES DE SUMAR", this.dataSent.dataRow[rowIndex].porcentaje_familiar);
 
                     }
                     else {
@@ -610,13 +617,15 @@ export default {
                     }
                     break;
                 case "resta":
-                    this.dataSent.dataRow[rowIndex].porcentaje_familiar = (this.dataSent.dataRow[rowIndex].porcentaje_familiar - 1)
+                    this.dataSent.dataRow[rowIndex].porcentaje_familiar = parseInt(this.dataSent.dataRow[rowIndex].porcentaje_familiar) - 1
+                    console.log("PORCENTAJE FILA " + rowIndex + " DESPUES DE RESTAR", this.dataSent.dataRow[rowIndex].porcentaje_familiar);
+
                     break;
                 default:
                     break;
             }
-            this.totalPorcentajeAsignado = this.dataSent.dataRow.reduce((suma, obj) => suma + parseFloat(obj.porcentaje_familiar), 0);
-            if (this.totalPorcentajeAsignado > 100) {
+            this.totalPorcentajeAsignado = allData.reduce((suma, obj) => suma + parseFloat(obj.porcentaje_familiar), 0);
+            /* if (this.totalPorcentajeAsignado > 100) {
                 // Calcular el excedente
                 const ajuste = parseInt(this.totalPorcentajeAsignado) - 100;
 
@@ -632,9 +641,9 @@ export default {
                         }
                     }
                 });
-            }
-            this.totalPorcentajeAsignado = this.dataSent.dataRow.reduce((suma, obj) => suma + parseFloat(obj.porcentaje_familiar), 0);
-            console.log(this.totalPorcentajeAsignado);
+            } */
+            //console.log("SUMA TOTAL DE PORCENTAJE: ", this.dataSent.dataRow.reduce((suma, obj) => suma + parseFloat(obj.porcentaje_familiar), 0));
+            //this.totalPorcentajeAsignado = this.dataSent.dataRow.reduce((suma, obj) => suma + parseFloat(obj.porcentaje_familiar), 0);
         },
         setInfoBeneficiarios(info) {
             console.log(info.familiar.reduce((suma, obj) => suma + parseFloat(obj.porcentaje_familiar), 0));
