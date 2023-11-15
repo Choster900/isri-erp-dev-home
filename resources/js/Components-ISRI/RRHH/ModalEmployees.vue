@@ -405,7 +405,7 @@ import axios from "axios";
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="codigo_empleado" v-model="employee.codigo_empleado" type="text"
                                     placeholder="Id empleado SIRHI"
-                                    @update:modelValue="validateEmployeeInputs('codigo_empleado', 10, false, false)">
+                                    @update:modelValue="validateEmployeeInputs('codigo_empleado', 6, false, false)">
                                     <LabelToInput icon="standard" forLabel="codigo_empleado" />
                                 </TextInput>
                                 <InputError v-for="(item, index) in backend_errors['codigo_empleado']" :key="index"
@@ -432,16 +432,52 @@ import axios from "axios";
                             </div>
                         </div>
                         <!-- End third row Page3 -->
+                        <!-- Retirement details -->
+                        <div class="mb-3 md:flex flex-row justify-start">
+                            <div class="text-center">
+                                <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
+                                    Informacion de jubilación
+                                </span>
+                            </div>
+                        </div>
+                        <!-- Fourth row Page3 -->
+                        <div class="md:flex flex-row justify-items-start">
+                            <div class="mb-5 md:mr-2 md:mb-0 basis-1/2 justify-center text-center">
+                                <label class="block mb-2 text-xs font-light text-gray-600">
+                                    Empleado jubilado
+                                </label>
+                                <label for="checbox1" class="text-sm font-bold text-gray-700 ml-4 mr-1">SI
+                                </label>
+                                <checkbox v-model="retirementY" :checked="retirementY" class="mr-3" ref="check1"
+                                    id="checbox1" @click="setRetirementValue(true)" />
+                                <label for="checbox2" class="text-sm font-bold text-gray-700 ml-4 mr-1">NO
+                                </label>
+                                <checkbox v-model="retirementN" :checked="retirementN" class="mr-3" ref="check2"
+                                    id="checbox2" @click="setRetirementValue(false)" />
+                                <InputError v-for="(item, index) in errors.pensionado_empleado" :key="index" class="mt-2"
+                                    :message="item" />
+                            </div>
+                            <div class="mb-5 md:mr-2 md:mb-0 basis-1/2">
+                                <TextInput id="bank-account" v-model="employee.numero_pension_empleado" type="text"
+                                    placeholder="Numero pensionado" :required="false"
+                                    @update:modelValue="validateEmployeeInputs('numero_pension_empleado', 15, false, false)">
+                                    <LabelToInput icon="standard" forLabel="bank-account" />
+                                </TextInput>
+                                <InputError v-for="(item, index) in errors.numero_pension_empleado" :key="index"
+                                    class="mt-2" :message="item" />
+                            </div>
+                        </div>
+                        <!-- End fourth row Page3 -->
                         <!-- Bank details -->
-                        <div class="mb-4 md:flex flex-row justify-start">
+                        <div class="mb-3 md:flex flex-row justify-start">
                             <div class="text-center">
                                 <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
                                     Informacion bancaria
                                 </span>
                             </div>
                         </div>
-                        <!-- Fourth row Page3 -->
-                        <div class="mb-20 md:flex flex-row justify-items-start">
+                        <!-- Fifth row Page3 -->
+                        <div class="mb-4 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Banco
@@ -460,7 +496,7 @@ import axios from "axios";
                                 </TextInput>
                             </div>
                         </div>
-                        <!-- End fourth row Page3 -->
+                        <!-- End fifth row Page3 -->
                     </div>
 
                     <!-- Page 4: All employee information -->
@@ -631,6 +667,8 @@ export default {
     created() { },
     data: function (data) {
         return {
+            retirementY: false,
+            retirementN: false,
             is_loading: false,
             selectedJobPosition: false,
             lower_salary_limit: '',
@@ -659,6 +697,8 @@ export default {
                 id_banco: '',
                 cuenta_banco_empleado: '',
                 estado_empleado: '',
+                pensionado_empleado: '',
+                numero_pension_empleado: '',
                 //Fields for 'PlazaAsignada'
                 dependency_id: '',
                 work_area_id: '',
@@ -730,6 +770,17 @@ export default {
         };
     },
     methods: {
+        setRetirementValue(value) {
+            if (value) {
+                this.retirementY ? this.retirementY = false : this.retirementY = true
+                this.retirementN = false
+                this.employee.pensionado_empleado = this.retirementY ? 1 : ''
+            } else {
+                this.retirementN ? this.retirementN = false : this.retirementN = true
+                this.retirementY = false
+                this.employee.pensionado_empleado = this.retirementN ? 0 : ''
+            }
+        },
         //Function to validate data entry
         validatePersonInputs(field, limit, text, upper_case, phone_number, dui, full_name) {
             // Limit the length of the input
@@ -780,6 +831,10 @@ export default {
                 if (!regex.test(this.employee[field])) {
                     this.employee[field] = this.employee[field].match(regex) || x.substring(0, x.length - 1)
                 }
+            }
+            if (field === 'codigo_empleado') {
+                this.employee[field] = this.employee[field].toUpperCase();
+                this.employee[field] = this.employee[field].replace(/[^a-zA-Z0-9]/g, '');
             }
         },
         typeDUI() {
@@ -987,7 +1042,22 @@ export default {
         async getSelectsEmployeeModal() {
             try {
                 this.is_loading = true;  // Activar el estado de carga
-                const response = await axios.get("/get-selects-options-employee");
+                const response = await axios.get("/get-selects-options-employee", {
+                    params: {
+                        id: this.modalData.id_empleado ?? ''
+                    }
+                });
+                if (this.modalData != '') {
+                    this.employee = response.data.employee
+                    if (this.employee.id_estado_empleado === 2) {
+                        if (this.employee.periodos_laboral[0].motivo_desvinculo_laboral.recontratar_motivo_desvinculo_laboral === 0) {
+                            this.showToast(toast.error, 'No puedes activar este empleado, porque su salida fue por ' + this.employee.periodos_laboral[0].motivo_desvinculo_laboral.nombre_motivo_desvinculo_laboral + '.');
+                            this.$emit('cerrar-modal')
+                        } else {
+                            this.employee.fecha_contratacion_empleado = ''
+                        }
+                    }
+                }
                 this.select_options.marital_status = response.data.marital_status
                 this.select_options.municipality = response.data.municipality
                 this.select_options.gender = response.data.gender
@@ -1189,18 +1259,13 @@ export default {
                 this.current_page = 1
                 this.backend_errors = []
                 this.recursivelySetEmptyStrings(this.errors);
-                this.loadOptions()
-                if (this.modalData != '') {
-                    this.correct_dui = true
-                    this.employee = JSON.parse(JSON.stringify(this.modalData));
-                    if (this.employee.id_estado_empleado === 2) {
-                        this.employee.fecha_contratacion_empleado = ''
-                    }
-                } else {
+                if (this.modalData.length === 0) {
                     this.correct_dui = false
                     this.recursivelySetEmptyStrings(this.employee);
+                } else {
+                    this.correct_dui = true
                 }
-
+                this.loadOptions()
             }
         },
     },
