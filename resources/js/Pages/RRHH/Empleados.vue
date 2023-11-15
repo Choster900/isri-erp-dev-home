@@ -349,57 +349,6 @@ export default {
             this.modalData = []
             this.show_modal_employee = true
         },
-        changeStatusEmployee(employee) {
-            let msg
-            employee.estado_empleado == 1 ? msg = "Desactivar" : msg = "Activar"
-            this.$swal.fire({
-                title: msg + ' empleado codigo: ' + employee.codigo_empleado + '.',
-                text: "¿Estas seguro?",
-                icon: "question",
-                iconHtml: "❓",
-                confirmButtonText: 'Si, ' + msg,
-                confirmButtonColor: "#001b47",
-                cancelButtonText: "Cancelar",
-                showCancelButton: true,
-                showCloseButton: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    axios.post("/change-state-acq-doc", {
-                        id: employee.id_empleado,
-                        status: employee.estado_empleado
-                    })
-                        .then((response) => {
-                            this.$swal.fire({
-                                text: response.data.mensaje,
-                                icon: 'success',
-                                timer: 5000
-                            })
-                            this.getEmployees(this.tableData.currentPage);
-                        })
-                        .catch((errors) => {
-                            if (errors.response.data.logical_error) {
-                                toast.error(
-                                    errors.response.data.logical_error,
-                                    {
-                                        autoClose: 5000,
-                                        position: "top-right",
-                                        transition: "zoom",
-                                        toastBackgroundColor: "white",
-                                    }
-                                );
-                            } else {
-                                let msg = this.manageError(errors)
-                                this.$swal.fire({
-                                    title: 'Operación cancelada',
-                                    text: msg,
-                                    icon: 'warning',
-                                    timer: 5000
-                                })
-                            }
-                        })
-                }
-            })
-        },
         async getEmployees(url = "/employees") {
             this.tableData.draw++;
             this.tableData.currentPage = url
