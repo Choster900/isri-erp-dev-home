@@ -16,5 +16,6 @@ class MotivoDesvinculoLaboral extends Model
     protected $fillable = [
         'nombre_motivo_desvinculo_laboral',
         'estado_motivo_desvinculo_laboral',
+        'recontratar_motivo_desvinculo_laboral'
     ];
 }

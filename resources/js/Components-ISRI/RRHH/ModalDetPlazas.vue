@@ -126,7 +126,7 @@ import axios from "axios";
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                             <TextInput id="codigo-puesto" v-model="jobPositionDet.id_puesto_sirhi_det_plaza" type="text"
                                 placeholder="Codigo SIRHI" addClass="font-semibold"
-                                @update:modelValue="validateJobPositionName('id_puesto_sirhi_det_plaza', 8)">
+                                @update:modelValue="validateJobPositionName('id_puesto_sirhi_det_plaza', 4, true)">
                                 <LabelToInput icon="objects" forLabel="codigo-puesto" />
                             </TextInput>
                             <InputError v-for="(item, index) in errors.id_puesto_sirhi_det_plaza" :key="index" class="mt-2"
@@ -196,10 +196,13 @@ export default {
     },
     methods: {
         //Function to validate data entry
-        validateJobPositionName(field, limit) {
+        validateJobPositionName(field, limit, number = false) {
             // Limit the length of the input
             if (this.jobPositionDet[field].length > limit) {
                 this.jobPositionDet[field] = this.jobPositionDet[field].substring(0, limit);
+            }
+            if (number) {
+                this.jobPositionDet[field] = this.jobPositionDet[field].replace(/[^0-9]/g, '');
             }
         },
         async storeJobPositionDet() {
