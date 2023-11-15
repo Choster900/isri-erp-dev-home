@@ -5,7 +5,14 @@ import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import axios from "axios";
 import moment from 'moment';
-
+import { jsPDF } from "jspdf";
+import html2pdf from 'html2pdf.js'
+/* import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+import { toPng, toSvg } from 'html-to-image';
+pdfMake.vfs = pdfFonts.pdfMake.vfs; */
+/* import VueHtml2pdf from 'vue-html2pdf'
+ */
 </script>
 
 <template>
@@ -228,10 +235,17 @@ import moment from 'moment';
                     </div>
                 </div>
             </div>
+
+            <button @click="printPdf()">IMPRIMIR</button>
+           <!--  {{ dataUrlPdf }}-->
+          <!--   <embed :src="dataUrlPdf" type="application/pdf" width="550" height="400"
+                class="rounded-lg border border-gray-300 shadow-md shadow-black">  -->
         </Modal>
     </div>
 </template>
 <script>
+import { createApp, h } from 'vue'
+import CertificadoSeguroColectivoDeVida from '@/pdf/RRHH/CertificadoSeguroColectivoDeVida.vue';
 export default {
     props: {
         showModal: {
@@ -277,6 +291,7 @@ export default {
         loading: false,
         isLoadingToSearch: false,
         errosModel: [],
+        dataUrlPdf: null,
         dataToShow: {
             createdAt: '',
             updatedAt: '',
@@ -312,6 +327,40 @@ export default {
                 }
             }
         },
+
+
+         async printPdf() {
+             let fecha = moment().format('DD-MM-YYYY');
+             let name = 'CERTIFICADO DE SEGURO COLECTIVO DE VIDA';
+             const opt = {
+                 margin: 0.1,
+                 filename: name,
+                 image: { type: 'jpeg', quality: 0.98 },
+                 html2canvas: { scale: 2, useCORS: true },
+                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
+             };
+ 
+             // Crear una instancia de la aplicación Vue para generar el componente quedanPDFVue
+             const app = createApp(CertificadoSeguroColectivoDeVida);
+ 
+             // Crear un elemento div y montar la instancia de la aplicación en él
+             const div = document.createElement('div');
+             const pdfPrint = app.mount(div);
+             const html = div.outerHTML;
+             const self = this;
+
+             // Generar y guardar el PDF utilizando html2pdf
+             await html2pdf().set(opt).from(html).toPdf().get('pdf').then(function (pdf) {
+                 
+                 //window.open(pdf.output('bloburl'), '_blank');
+                 self.dataUrlPdf = pdf.output('bloburl')
+                window.open(URL.createObjectURL(pdf.output('blob')), '_blank');
+ 
+             });
+             console.log(this.dataUrlPdf);
+ 
+         },
+
         personaWasSelected(id_persona) {
             let persona = JSON.parse(JSON.stringify(this.personaOptions.find((index) => index.value == id_persona)));
             console.log(persona);
