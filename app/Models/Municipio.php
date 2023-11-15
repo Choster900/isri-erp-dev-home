@@ -37,4 +37,14 @@ class Municipio extends Model
     {
         return $this->hasMany(Persona::class, 'id_municipio', 'id_municipio');
     }
+    
+    /**
+     * Get all of the residencia for the Municipio
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function residencia(): HasMany
+    {
+        return $this->hasMany(Residencia::class, 'id_municipio', 'id_municipio');
+    }
 }

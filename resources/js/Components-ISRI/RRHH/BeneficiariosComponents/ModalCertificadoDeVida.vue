@@ -5,15 +5,19 @@ import { jsPDF } from "jspdf";
 import html2pdf from 'html2pdf.js'
 </script>
 <template>
-    <ProcessModal maxWidth="3xl" :show="showModal" @close="$emit('cerrar-modal')" :center="true">
+    <ProcessModal maxWidth="3xl" :show="showModal" @close="$emit('cerrar-modal')">
         <svg class="h-7 w-7 absolute top-0 right-0 mt-2 cursor-pointer" viewBox="0 0 25 25" @click="$emit('cerrar-modal')">
             <path fill="currentColor"
                 d="M7.95 6.536l4.242-4.243a1 1 0 111.415 1.414L9.364 7.95l4.243 4.242a1 1 0 11-1.415 1.415L7.95 9.364l-4.243 4.243a1 1 0 01-1.414-1.415L6.536 7.95 2.293 3.707a1 1 0 011.414-1.414L7.95 6.536z" />
         </svg>
+
         <div class="my-7 mx-4">
             <!-- <div class="flex justify-center">
                 <GeneralButton :color="'bg-red-700 hover:bg-red-800'" text="Imprimir" icon="pdf" @click="printPdf()" />
             </div> -->
+            <!--  <pre>
+                {{ beneficiarios }}
+            </pre> -->
             <table border="0" cellpadding="0" cellspacing="0" class="border-2 border-black sheet0 ">
                 <col class="col0">
                 <col class="col1">
@@ -36,21 +40,12 @@ import html2pdf from 'html2pdf.js'
                                     &nbsp; V I D A
                                 </div>
 
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" @click="printPdf"
-                                    stroke="currentColor" class="w-5 h-5 ml-2 stroke-slate-400 hover:stroke-slate-500 cursor-pointer">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                    @click="printPdf" stroke="currentColor"
+                                    class="w-5 h-5 ml-2 stroke-slate-400 hover:stroke-slate-500 cursor-pointer">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z" />
                                 </svg>
-
-
-
-                                <!--  <svg @click="printPdf" class="w-5 h-5 ml-2 cursor-pointer" viewBox="0 0 24 24" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg" stroke="#636363">
-                                    <path
-                                        d="M16 18V15H8V18M16 18V21H8V18M16 18H20V9H16M8 18H4V9H8M8 9H16M8 9V4C8 3.44772 8.44772 3 9 3H15C15.5523 3 16 3.44772 16 4V9"
-                                        stroke="#ababab" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                    </path>
-                                </svg> -->
                             </div>
                         </td>
 
@@ -66,45 +61,80 @@ import html2pdf from 'html2pdf.js'
                         <td class="text-[8pt] font-semibold pl-2" colspan="8"> I&#41; DATOS GENERALES</td>
                     </tr>
                     <tr>
-                        <td class="border border-black text-[8pt] pl-2 py-1.5" colspan="6">
+                        <td class="border border-black text-[8pt] pl-2 pt-1.5" colspan="6">
                             <div class="relative " style="top: -6px;">
                                 1&#41; Nombre del asegurado según DUI
                             </div>
+                            <div class="relative pl-4 text-[7pt]" style="top: -7px;" v-if="beneficiarios != ''">
+                                {{ `${beneficiarios.pnombre_persona || ''}` }}
+                                {{ `${beneficiarios.snombre_persona || ''}` }}
+                                {{ `${beneficiarios.tnombre_persona || ''}` }}
+                                {{ `${beneficiarios.papellido_persona || ''}` }}
+                                {{ `${beneficiarios.sapellido_persona || ''}` }}
+                                {{ `${beneficiarios.tapellido_persona || ''}` }}
+                            </div>
                         </td>
-                        <td class="border border-black text-[8pt] pl-2 py-1.5" colspan="2">
+                        <td class="border border-black text-[8pt] pl-2 pt-1.5" colspan="2">
                             <div class="relative " style="top: -6px;">
                                 2&#41; Número del DUI
+                            </div>
+                            <div class="relative pl-4 text-[7pt]" style="top: -7px;">
+                                {{ beneficiarios.dui_persona }}
                             </div>
                         </td>
                     </tr>
 
                     <tr>
-                        <td class="border border-black text-[8pt] pl-2 py-1.5" colspan="2">
+                        <td class="border border-black text-[8pt] pl-2 pt-1.5" colspan="2">
                             <div class="relative " style="top: -6px;">
                                 3&#41; Lugar y fecha de Nacimiento:
                             </div>
-
+                            <div class="relative pl-4 text-[6pt]" style="top: -7px;" v-if="beneficiarios != ''">
+                                {{ beneficiarios.municipio.nombre_municipio || '' }}
+                                {{ beneficiarios.municipio.departamento.nombre_departamento || '' }},
+                                {{ moment(beneficiarios.fecha_nac_persona).format('D-MMM-YY') || '' }}
+                            </div>
                         </td>
-                        <td class="border border-black text-[8pt] pl-2 py-1.5" colspan="2">
+                        <td class="border border-black text-[8pt] pl-2 pt-1.5" colspan="2">
                             <div class="relative " style="top: -6px;">
                                 4&#41; Cargo:
                             </div>
+                            <div class="relative  text-[6pt]" style="top: -7px;" v-if="beneficiarios != ''">
+                               <!--  {{ beneficiarios.empleado.plazas_asignadas.
+                                    filter((plaza) => plaza.estado_plaza_asignada == 1).map((plaza, index) => {
+                                        return `${plaza.detalle_plaza.plaza.nombre_plaza}`
+                                    }).join(", ")
+                                }} -->
+                                <!-- <pre>
+                                    {{ beneficiarios.empleado.plazas_asignadas[0].detalle_plaza.plaza.nombre_plaza }}
+                                </pre> -->
+                                {{ beneficiarios.empleado.plazas_asignadas[0].detalle_plaza.plaza.nombre_plaza }}
+                            </div>
                         </td>
-                        <td class="border border-black text-[8pt] pl-2 py-1.5" colspan="4">
+                        <td class="border border-black text-[8pt] pl-2 pt-1.5" colspan="4">
                             <div class="relative " style="top: -6px;">
                                 5&#41; Dirección del Asegurado:
+                            </div>
+                            <div class="relative pl-4 text-[6pt]" style="top: -7px;" v-if="beneficiarios != ''">
+                                {{ beneficiarios.residencias.find(index => index.estado_residencia == 1).direccion_residencia }}
                             </div>
                         </td>
                     </tr>
                     <tr class="row5">
-                        <td class="border border-black text-[8pt] pl-2 py-1.5" colspan="4">
+                        <td class="border border-black text-[8pt] pl-2 pt-1.5" colspan="4">
                             <div class="relative " style="top: -6px;">
                                 6&#41; Unidad Primaria en que labora
                             </div>
+                            <div class="relative pl-4 text-[7pt]" style="top: -7px;">
+                                MINISTERIO DE SALUD Y ASISTENCIA SOCIAL
+                            </div>
                         </td>
-                        <td class="border border-black text-[8pt] pl-2 py-1.5" colspan="4">
+                        <td class="border border-black text-[8pt] pl-2 pt-1.5" colspan="4">
                             <div class="relative " style="top: -6px;">
                                 7&#41; Unidad Secundaria
+                            </div>
+                            <div class="relative pl-4 text-[7pt]" style="top: -7px;">
+                                INSTITUTO SALVADOREÑO DE REHABILITACION INTEGRAL
                             </div>
                         </td>
 
@@ -120,10 +150,18 @@ import html2pdf from 'html2pdf.js'
                         <td class="border border-black text-[8pt] text-center">%</td>
 
                     </tr>
-                    <tr v-for="i in 6" :key="i">
-                        <td class="border border-black text-[8pt] pl-2" colspan="5">{{ i }}</td>
-                        <td class="border border-black text-[8pt]" colspan="2"></td>
-                        <td class="border border-black text-[8pt]"></td>
+                    <tr v-for="i in 6" :key="i" v-if="beneficiarios != ''">
+                        <td v-if="beneficiarios.familiar[i - 1]" class="border border-black text-[8pt] pl-2" colspan="5">{{
+                            i }}.{{ beneficiarios.familiar[i - 1].nombre_familiar }}</td>
+                        <td v-else class="border border-black text-[8pt] pl-2" colspan="5">{{ i }}.</td>
+
+                        <td v-if="beneficiarios.familiar[i - 1]" class="border border-black text-[8pt] text-center"
+                            colspan="2">{{ beneficiarios.familiar[i - 1].parentesco.nombre_parentesco }}</td>
+                        <td v-else class="border border-black text-[8pt] text-center" colspan="2"></td>
+
+                        <td v-if="beneficiarios.familiar[i - 1]" class="border border-black text-[8pt] text-center">{{
+                            beneficiarios.familiar[i - 1].porcentaje_familiar }}</td>
+                        <td v-else class="border border-black text-[8pt] text-center"></td>
                     </tr>
                     <tr class="row9">
                         <td class="text-[8pt] font-semibold pl-2 " colspan="8"> III&#41; AUTORIZACIÓN</td>
@@ -136,7 +174,8 @@ import html2pdf from 'html2pdf.js'
                     </tr>
                     <tr>
                         <td class="py-5 border border-black"> </td>
-                        <td class="py-5 border border-black" colspan="2"> </td>
+                        <td class=" text-center border border-black  text-[8pt]" colspan="2"> SAN SALVADOR <br>{{
+                            moment().format('D-MMM-YY') }}</td>
                         <td class="py-5 border border-black" colspan="3"> </td>
                         <td class="py-5 border border-black" colspan="2"> </td>
                     </tr>
@@ -147,18 +186,26 @@ import html2pdf from 'html2pdf.js'
 </template>
 
 <script>
-import { createApp, h } from 'vue'
+import { createApp, h, watch } from 'vue'
 import CertificadoSeguroColectivoDeVida from '@/pdf/RRHH/CertificadoSeguroColectivoDeVida.vue';
+
 export default {
     props: {
         showModal: {
             type: Boolean,
             default: false,
         },
+        dataBeneficiarios: {
+            type: Object,
+            default: [],
+        },
     },
-
+    data: () => ({
+        beneficiarios: [],
+    }),
     methods: {
         printPdf() {
+            console.log();
             // Opciones de configuración para generar el PDF
             const opt = {
                 margin: [0.03, 0, 0, 1.45], //top, left, buttom, right,
@@ -169,7 +216,9 @@ export default {
             };
 
             // Crear una instancia de la aplicación Vue para generar el componente quedanPDFVue
-            const app = createApp(CertificadoSeguroColectivoDeVida);
+            const app = createApp(CertificadoSeguroColectivoDeVida, {
+                beneficiarios: this.beneficiarios
+            });
 
             // Crear un elemento div y montar la instancia de la aplicación en él
             const div = document.createElement('div');
@@ -179,7 +228,22 @@ export default {
             // Generar y guardar el PDF utilizando html2pdf
             html2pdf().set(opt).from(html).save();
         },
-    }
+    },
+    watch: {
+        showModal: function (value, oldValue) {
+            if (value) {
+                if (this.dataBeneficiarios != '') {
+
+                    this.beneficiarios = this.dataBeneficiarios
+                } else {
+                    this.beneficiarios = []
+                }
+            } else {
+
+            }
+
+        },
+    },
 }
 </script>
 <style>

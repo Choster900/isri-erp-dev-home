@@ -118,7 +118,7 @@ import ModalCertificadoDeVida from '@/Components-ISRI/RRHH/BeneficiariosComponen
                                             <div class="font-semibold">VER</div>
                                         </div>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            @click.stop=" showModalCertificado = !showModalCertificado">
+                                            @click.stop="dataBeneficiariosToSendModal = beneficiario; showModalCertificado = !showModalCertificado">
                                             <div class="w-8 text-blue-900">
                                                 <span class="text-xs">
                                                     <svg class="w-6 h-6" viewBox="0 0 24.00 24.00" fill="none"
@@ -136,7 +136,8 @@ import ModalCertificadoDeVida from '@/Components-ISRI/RRHH/BeneficiariosComponen
                                                     </svg>
                                                 </span>
                                             </div>
-                                            <div class="font-semibold text-xs pl-2">Certificado de seguro coletivo de vida</div>
+                                            <div class="font-semibold text-xs pl-2">Certificado de seguro coletivo de vida
+                                            </div>
                                         </div>
                                     </DropDownOptions>
                                 </div>
@@ -225,7 +226,8 @@ import ModalCertificadoDeVida from '@/Components-ISRI/RRHH/BeneficiariosComponen
             @cerrar-modal="showModalBeneficiario = false"
             @actualizar-table-data="getBeneficiarios(lastUrl); showModalBeneficiario = false" />
 
-        <ModalCertificadoDeVida :showModal="showModalCertificado" @cerrar-modal="showModalCertificado = false"/>
+        <ModalCertificadoDeVida :showModal="showModalCertificado" @cerrar-modal="showModalCertificado = false"
+            :data-beneficiarios="dataBeneficiariosToSendModal" />
     </AppLayoutVue>
 </template>
 
