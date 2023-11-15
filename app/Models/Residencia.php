@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Residencia extends Model
 {
@@ -28,5 +29,14 @@ class Residencia extends Model
     public function persona()
     {
         return $this->belongsTo('App\Models\Persona','id_persona','id_persona');
+    }
+    /**
+     * Get the municipios that owns the Residencia
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function municipios(): BelongsTo
+    {
+        return $this->belongsTo(Municipio::class, 'id_municipio', 'id_municipio');
     }
 }

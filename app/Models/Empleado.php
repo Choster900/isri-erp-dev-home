@@ -21,6 +21,8 @@ class Empleado extends Model
         'id_banco',
         'id_titulo_profesional',
         'codigo_empleado',
+        'pensionado_empleado',
+        'numero_pension_empleado',
         'id_estado_empleado',
         'nup_empleado',
         'isss_empleado',

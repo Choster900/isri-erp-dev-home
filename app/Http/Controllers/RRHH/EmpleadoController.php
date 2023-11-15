@@ -177,6 +177,24 @@ class EmpleadoController extends Controller
             ->where('detalle_plaza.estado_det_plaza', 1)
             ->get();
 
+        $employee = Empleado::with([
+            'persona.residencias' => function ($query) {
+                $query->where('estado_residencia', 1)
+                    ->orderBy('fecha_reg_residencia', 'desc');
+            },
+            'plazas_asignadas' => function ($query) {
+                $query->join('dependencia', 'plaza_asignada.id_dependencia', '=', 'dependencia.id_dependencia')
+                    ->where('estado_plaza_asignada', 1)
+                    ->orderBy('dependencia.codigo_dependencia');
+            },
+            'plazas_asignadas.dependencia.parent_dependency',
+            'persona.fotos',
+            'periodos_laboral' => function ($query) {
+                $query->where('estado_periodo_laboral', 1);
+            },
+            'periodos_laboral.motivo_desvinculo_laboral'
+        ])->find($request->id);
+
         return [
             "marital_status"      => $marital_status,
             "gender"              => $gender,
@@ -187,20 +205,13 @@ class EmpleadoController extends Controller
             'bank'                => $bank,
             'professional_title'  => $professional_title,
             'dependencies'        => $dependencies,
-            'job_positions'       => $job_positions
+            'job_positions'       => $job_positions,
+            'employee'            => $employee
         ];
     }
 
     public function storeEmployee(EmpleadoRequest $request)
     {
-        // $first_two_characters = substr($request->persona['papellido_persona'], 0, 2);
-        // $last_employee_code = Empleado::where('codigo_empleado', 'like', $first_two_characters . '%')
-        //     ->orderByDesc('codigo_empleado')
-        //     ->first();
-        // $last_correlative = $last_employee_code ? intval(substr($last_employee_code->codigo_empleado, 2)) : 0;
-        // $correlative = str_pad($last_correlative + 1, 3, '0', STR_PAD_LEFT);
-        // $employee_code = strtoupper($first_two_characters) . $correlative;
-
         $personId = $request->persona['id_persona'] ?? '';
         $person = $personId ? Persona::find($personId) : new Persona();
 
@@ -282,6 +293,8 @@ class EmpleadoController extends Controller
                 'codigo_empleado'               => $request->codigo_empleado,
                 'nup_empleado'                  => $request->nup_empleado,
                 'isss_empleado'                 => $request->isss_empleado,
+                'pensionado_empleado'           => $request->pensionado_empleado,
+                'numero_pension_empleado'       => $request->numero_pension_empleado,
                 'id_estado_empleado'            => 1,
                 'cuenta_banco_empleado'         => $request->cuenta_banco_empleado,
                 'fecha_contratacion_empleado'   => $request->fecha_contratacion_empleado,
@@ -411,6 +424,8 @@ class EmpleadoController extends Controller
                 'id_titulo_profesional'         => $request->id_titulo_profesional,
                 'nup_empleado'                  => $request->nup_empleado,
                 'isss_empleado'                 => $request->isss_empleado,
+                'pensionado_empleado'           => $request->pensionado_empleado,
+                'numero_pension_empleado'       => $request->numero_pension_empleado,
                 'codigo_empleado'               => $request->codigo_empleado,
                 'cuenta_banco_empleado'         => $request->cuenta_banco_empleado,
                 'email_institucional_empleado'  => $request->email_institucional_empleado,
@@ -438,7 +453,6 @@ class EmpleadoController extends Controller
         $files = $request->file;
         $code = $request->code;
         $id_person = $request->id_person;
-        $count = 1;
 
         foreach ($files as $f) {
             if ($f['id'] == '') {
@@ -447,15 +461,15 @@ class EmpleadoController extends Controller
                 $extension = $file->getClientOriginalExtension();
 
                 // Generate the date and time string
-                $dateTimeString = now()->format('Ymd_His');
+                $dateTimeString = now()->format('Ymd_His_u');
 
                 // Create the unique file name by combining original file name and date-time
-                $uniqueFileName = $code . '_' . $count . '_' . $dateTimeString . '.' . $extension;
+                $uniqueFileName = $code . '_' . $dateTimeString . '.' . $extension;
 
                 // Store the uploaded file using the unique file name
-                $path = $file->storeAs('rrhh', $uniqueFileName, 'public');
+                $path = $file->storeAs('fotos', $uniqueFileName, 'public');
 
-                $imageUrl = Storage::url('rrhh/' . $uniqueFileName);
+                $imageUrl = Storage::url('fotos/' . $uniqueFileName);
 
                 $photo = new Foto([
                     'url_foto'                 => $imageUrl,
@@ -466,7 +480,6 @@ class EmpleadoController extends Controller
                     'ip_foto'                  => $request->ip(),
                 ]);
                 $photo->save();
-                $count++;
             } else {
                 if ($f['id'] != '' && $f['deleted'] == 'true') {
                     $img = Foto::find($f['id']);
@@ -825,115 +838,122 @@ class EmpleadoController extends Controller
         $residence = Residencia::find($request->persona['residencias'][0]['id_residencia']);
         $employee = Empleado::find($request->id_empleado);
 
-        $hasChanged = ($residence->id_municipio != $request->persona['residencias'][0]['id_municipio'])
-            || ($residence->direccion_residencia != $request->persona['residencias'][0]['direccion_residencia']);
+        $periodo = PeriodoLaboral::with('motivo_desvinculo_laboral')->where('id_empleado', $employee->id_empleado)->where('estado_periodo_laboral', 1)->first();
+        if ($periodo->motivo_desvinculo_laboral->recontratar_motivo_desvinculo_laboral == 1) {
+            $hasChanged = ($residence->id_municipio != $request->persona['residencias'][0]['id_municipio'])
+                || ($residence->direccion_residencia != $request->persona['residencias'][0]['direccion_residencia']);
 
-        DB::beginTransaction();
-        try {
-            $person->update([
-                'id_genero'                     => $request->persona['id_genero'],
-                'id_estado_civil'               => $request->persona['id_estado_civil'],
-                'id_nivel_educativo'            => $request->persona['id_nivel_educativo'],
-                'id_municipio'                  => $request->persona['id_municipio'],
-                'id_profesion'                  => $request->persona['id_profesion'],
-                'pnombre_persona'               => $request->persona['pnombre_persona'],
-                'snombre_persona'               => $request->persona['snombre_persona'],
-                'tnombre_persona'               => $request->persona['tnombre_persona'],
-                'papellido_persona'             => $request->persona['papellido_persona'],
-                'sapellido_persona'             => $request->persona['sapellido_persona'],
-                'tapellido_persona'             => $request->persona['tapellido_persona'],
-                'telefono_persona'              => $request->persona['telefono_persona'],
-                'dui_persona'                   => $request->persona['dui_persona'],
-                'email_persona'                 => $request->persona['email_persona'],
-                'nombre_conyuge_persona'        => $request->persona['nombre_conyuge_persona'],
-                'nombre_madre_persona'          => $request->persona['nombre_madre_persona'],
-                'nombre_padre_persona'          => $request->persona['nombre_padre_persona'],
-                'fecha_nac_persona'             => $request->persona['fecha_nac_persona'],
-                'fecha_mod_persona'             => Carbon::now(),
-                'usuario_persona'               => $request->user()->nick_usuario,
-                'ip_persona'                    => $request->ip(),
-            ]);
-
-            if ($hasChanged) {
-                $newResidence = new Residencia([
-                    'id_persona' => $person->id_persona,
-                    'id_municipio' => $request->persona['residencias'][0]['id_municipio'],
-                    'direccion_residencia' => $request->persona['residencias'][0]['direccion_residencia'],
-                    'estado_residencia' => 1,
-                    'fecha_reg_residencia' => Carbon::now(),
-                    'usuario_residencia' => $request->user()->nick_usuario,
-                    'ip_residencia' => $request->ip(),
+            DB::beginTransaction();
+            try {
+                $person->update([
+                    'id_genero'                     => $request->persona['id_genero'],
+                    'id_estado_civil'               => $request->persona['id_estado_civil'],
+                    'id_nivel_educativo'            => $request->persona['id_nivel_educativo'],
+                    'id_municipio'                  => $request->persona['id_municipio'],
+                    'id_profesion'                  => $request->persona['id_profesion'],
+                    'pnombre_persona'               => $request->persona['pnombre_persona'],
+                    'snombre_persona'               => $request->persona['snombre_persona'],
+                    'tnombre_persona'               => $request->persona['tnombre_persona'],
+                    'papellido_persona'             => $request->persona['papellido_persona'],
+                    'sapellido_persona'             => $request->persona['sapellido_persona'],
+                    'tapellido_persona'             => $request->persona['tapellido_persona'],
+                    'telefono_persona'              => $request->persona['telefono_persona'],
+                    'dui_persona'                   => $request->persona['dui_persona'],
+                    'email_persona'                 => $request->persona['email_persona'],
+                    'nombre_conyuge_persona'        => $request->persona['nombre_conyuge_persona'],
+                    'nombre_madre_persona'          => $request->persona['nombre_madre_persona'],
+                    'nombre_padre_persona'          => $request->persona['nombre_padre_persona'],
+                    'fecha_nac_persona'             => $request->persona['fecha_nac_persona'],
+                    'fecha_mod_persona'             => Carbon::now(),
+                    'usuario_persona'               => $request->user()->nick_usuario,
+                    'ip_persona'                    => $request->ip(),
                 ]);
-                $newResidence->save();
 
-                $residence->estado_residencia = 0;
-                $residence->update();
+                if ($hasChanged) {
+                    $newResidence = new Residencia([
+                        'id_persona' => $person->id_persona,
+                        'id_municipio' => $request->persona['residencias'][0]['id_municipio'],
+                        'direccion_residencia' => $request->persona['residencias'][0]['direccion_residencia'],
+                        'estado_residencia' => 1,
+                        'fecha_reg_residencia' => Carbon::now(),
+                        'usuario_residencia' => $request->user()->nick_usuario,
+                        'ip_residencia' => $request->ip(),
+                    ]);
+                    $newResidence->save();
+
+                    $residence->estado_residencia = 0;
+                    $residence->update();
+                }
+
+                $employee->update([
+                    'id_tipo_pension'               => $request->id_tipo_pension,
+                    'id_banco'                      => $request->id_banco,
+                    'id_titulo_profesional'         => $request->id_titulo_profesional,
+                    'nup_empleado'                  => $request->nup_empleado,
+                    'isss_empleado'                 => $request->isss_empleado,
+                    'fecha_contratacion_empleado'   => $request->fecha_contratacion_empleado,
+                    'codigo_empleado'               => $request->codigo_empleado,
+                    'id_estado_empleado'            => 1,
+                    'cuenta_banco_empleado'         => $request->cuenta_banco_empleado,
+                    'email_institucional_empleado'  => $request->email_institucional_empleado,
+                    'email_alternativo_empleado'    => $request->email_alternativo_empleado,
+                    'fecha_mod_empleado'            => Carbon::now(),
+                    'usuario_empleado'              => $request->user()->nick_usuario,
+                    'ip_empleado'                   => $request->ip(),
+                ]);
+
+                //Assign the job for the new employee
+                $new_assigned_job_position = new PlazaAsignada([
+                    'id_empleado'                   => $employee->id_empleado,
+                    'id_lt'                         => $request->work_area_id,
+                    'id_dependencia'                => $request->dependency_id,
+                    'id_det_plaza'                  => $request->job_position_id,
+                    'salario_plaza_asignada'        => $request->salary,
+                    'partida_plaza_asignada'        => $request->account,
+                    'subpartida_plaza_asignada'     => $request->subaccount,
+                    'contrato_plaza_asignada'       => $request->contract,
+                    //This is the same date when the employee was hired, we don't ask for it in the form
+                    'fecha_plaza_asignada'          => $request->fecha_contratacion_empleado,
+                    'estado_plaza_asignada'         => 1,
+                    'fecha_reg_plaza_asignada'      => Carbon::now(),
+                    'usuario_plaza_asignada'        => $request->user()->nick_usuario,
+                    'ip_plaza_asignada'             => $request->ip(),
+                ]);
+                $new_assigned_job_position->save();
+
+                PeriodoLaboral::where('id_empleado', $employee->id_empleado)->where('estado_periodo_laboral', 1)
+                    ->update([
+                        'estado_periodo_laboral'     => 0,
+                        'fecha_mod_periodo_laboral'  => Carbon::now(),
+                        'usuario_periodo_laboral'    => $request->user()->nick_usuario,
+                        'ip_periodo_laboral'         => $request->ip(),
+                    ]);
+
+                //Create a new work period for the new employee
+                $workPeriod = new PeriodoLaboral([
+                    'id_empleado'                           => $employee->id_empleado,
+                    'fecha_contratacion_periodo_laboral'    => $request->fecha_contratacion_empleado,
+                    'estado_periodo_laboral'                => 1,
+                    'fecha_reg_periodo_laboral'             => Carbon::now(),
+                    'usuario_periodo_laboral'               => $request->user()->nick_usuario,
+                    'ip_periodo_laboral'                    => $request->ip(),
+                ]);
+                $workPeriod->save();
+
+                DB::commit(); // Confirma las operaciones en la base de datos
+                return response()->json([
+                    'mensaje'          => "Empleado actualizado con éxito.",
+                ]);
+            } catch (\Exception $e) {
+                DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+                return response()->json([
+                    'logical_error' => 'Ha ocurrido un error con sus datos.',
+                    'error' => $e,
+                ], 422);
             }
-
-            $employee->update([
-                'id_tipo_pension'               => $request->id_tipo_pension,
-                'id_banco'                      => $request->id_banco,
-                'id_titulo_profesional'         => $request->id_titulo_profesional,
-                'nup_empleado'                  => $request->nup_empleado,
-                'isss_empleado'                 => $request->isss_empleado,
-                'fecha_contratacion_empleado'   => $request->fecha_contratacion_empleado,
-                'codigo_empleado'               => $request->codigo_empleado,
-                'id_estado_empleado'            => 1,
-                'cuenta_banco_empleado'         => $request->cuenta_banco_empleado,
-                'email_institucional_empleado'  => $request->email_institucional_empleado,
-                'email_alternativo_empleado'    => $request->email_alternativo_empleado,
-                'fecha_mod_empleado'            => Carbon::now(),
-                'usuario_empleado'              => $request->user()->nick_usuario,
-                'ip_empleado'                   => $request->ip(),
-            ]);
-
-            //Assign the job for the new employee
-            $new_assigned_job_position = new PlazaAsignada([
-                'id_empleado'                   => $employee->id_empleado,
-                'id_lt'                         => $request->work_area_id,
-                'id_dependencia'                => $request->dependency_id,
-                'id_det_plaza'                  => $request->job_position_id,
-                'salario_plaza_asignada'        => $request->salary,
-                'partida_plaza_asignada'        => $request->account,
-                'subpartida_plaza_asignada'     => $request->subaccount,
-                'contrato_plaza_asignada'       => $request->contract,
-                //This is the same date when the employee was hired, we don't ask for it in the form
-                'fecha_plaza_asignada'          => $request->fecha_contratacion_empleado,
-                'estado_plaza_asignada'         => 1,
-                'fecha_reg_plaza_asignada'      => Carbon::now(),
-                'usuario_plaza_asignada'        => $request->user()->nick_usuario,
-                'ip_plaza_asignada'             => $request->ip(),
-            ]);
-            $new_assigned_job_position->save();
-
-            PeriodoLaboral::where('id_empleado', $employee->id_empleado)->where('estado_periodo_laboral', 1)
-                ->update([
-                    'estado_periodo_laboral'     => 0,
-                    'fecha_mod_periodo_laboral'  => Carbon::now(),
-                    'usuario_periodo_laboral'    => $request->user()->nick_usuario,
-                    'ip_periodo_laboral'         => $request->ip(),
-                ]);
-
-            //Create a new work period for the new employee
-            $workPeriod = new PeriodoLaboral([
-                'id_empleado'                           => $employee->id_empleado,
-                'fecha_contratacion_periodo_laboral'    => $request->fecha_contratacion_empleado,
-                'estado_periodo_laboral'                => 1,
-                'fecha_reg_periodo_laboral'             => Carbon::now(),
-                'usuario_periodo_laboral'               => $request->user()->nick_usuario,
-                'ip_periodo_laboral'                    => $request->ip(),
-            ]);
-            $workPeriod->save();
-
-            DB::commit(); // Confirma las operaciones en la base de datos
+        }else{
             return response()->json([
-                'mensaje'          => "Empleado actualizado con éxito.",
-            ]);
-        } catch (\Exception $e) {
-            DB::rollBack(); // En caso de error, revierte las operaciones anteriores
-            return response()->json([
-                'logical_error' => 'Ha ocurrido un error con sus datos.',
-                'error' => $e,
+                'logical_error' => 'No puedes activar este empleado, ya que su salida fue por '+$periodo->motivo_desvinculo_laboral->nombre_motivo_desvinculo_laboral+'.',
             ], 422);
         }
     }

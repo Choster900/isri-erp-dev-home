@@ -54,7 +54,7 @@ class BeneficiarioController extends Controller
         $data = $request->input('search');
 
         // Construir la consulta base con las relaciones
-        $query = Persona::select('*')->with(["familiar", "familiar.parentesco",])->whereHas("familiar", function ($query) {
+        $query = Persona::select('*')->with(["familiar", "familiar.parentesco","municipio.departamento.pais","residencias","empleado.plazas_asignadas.detalle_plaza.plaza"])->whereHas("familiar", function ($query) {
             $query->where("estado_familiar", 1);
         })->where("estado_persona", 1)->orderBy($columns[$column], $dir);
 
