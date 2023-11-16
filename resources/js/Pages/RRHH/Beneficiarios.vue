@@ -30,7 +30,7 @@ import ModalCertificadoDeVida from '@/Components-ISRI/RRHH/BeneficiariosComponen
                         </div>
                     </div>
                     <h2 class="font-semibold text-slate-800 pt-1">Empleados: <span class="text-slate-400 font-medium">{{
-                        beneficiarios.length
+                         tableData.total
                     }}</span></h2>
                 </div>
             </header>
@@ -223,7 +223,7 @@ import ModalCertificadoDeVida from '@/Components-ISRI/RRHH/BeneficiariosComponen
         </div>
 
         <ModalBeneficiarios :showModal="showModalBeneficiario" :data-beneficiarios="dataBeneficiariosToSendModal"
-            @cerrar-modal="showModalBeneficiario = false"
+            @cerrar-modal="showModalBeneficiario = false" :data-for-select="optionsParentescos"
             @actualizar-table-data="getBeneficiarios(lastUrl); showModalBeneficiario = false" />
 
         <ModalCertificadoDeVida :showModal="showModalCertificado" @cerrar-modal="showModalCertificado = false"
@@ -280,6 +280,7 @@ export default {
             permits: [],
             stateModal: false,
             beneficiarios: [],
+            optionsParentescos: [],
             dataBeneficiariosToSendModal: [],
             showModalBeneficiario: false,
             showModalCertificado: false,
@@ -318,24 +319,19 @@ export default {
                 let data = response.data;
                 if (this.tableData.draw == data.draw) {
                     this.links = data.data.links;
+                    this.tableData.total = data.data.total;
                     this.pagination.total = data.data.total;
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
-
-                    // Como eloquent no me filtra los familiares que estan desactivados si no que me trae todos por igual
-                    const filteredData = data.data.data.map((obj) => {
-                        // Tenemos que hacer esto
-                        const filteredFamiliar = obj.familiar.filter(
-                            (familiar) => familiar.estado_familiar === 1
-                        );
-                        return { ...obj, familiar: filteredFamiliar };
-                    });
+                   
                     this.isLoadinRequest = false;
-                    this.beneficiarios = filteredData;
+                    this.beneficiarios = data.data.data;
+                    this.optionsParentescos = data.dataForSelect.parentesco
                     this.stateModal = false
                     this.beneficiarios.length > 0 ? this.empty_object = false : this.empty_object = true
 
-
+                    //console.log(data.data.data);
+                    console.log(this.optionsParentescos);
 
                 }
             }).catch((errors) => {

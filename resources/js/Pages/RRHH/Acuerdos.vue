@@ -30,7 +30,7 @@ import TooltipVue from "@/Components-ISRI/Tooltip.vue";
                         </div>
                     </div>
                     <h2 class="font-semibold text-slate-800 pt-1">Empleados: <span class="text-slate-400 font-medium">{{
-                        acuerdos.length
+                         tableData.total
                     }}</span></h2>
                 </div>
             </header>
@@ -237,6 +237,7 @@ export default {
                 if (this.tableData.draw == data.draw) {
                     this.links = data.data.links;
                     this.pagination.total = data.data.total;
+                    this.tableData.total = data.data.total;
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
                     this.acuerdos = data.data.data;

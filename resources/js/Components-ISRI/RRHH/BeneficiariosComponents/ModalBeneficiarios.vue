@@ -159,37 +159,31 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs; */
                                 </svg>
                             </div>
                             <div class="md:mr-2 md:mb-0 basis-1/2">
+                                <!--  {{ row.id_parentesco }} -->
                                 <h5 class="text-sm font-medium" :class="row.nombre_familiar == '' ? 'py-2' : ''"
-                                    v-if="!row.onEdit">{{
-                                        row.nombre_familiar }} - {{ row.nombre_parentesco }}</h5>
-
+                                    v-if="!row.onEdit">{{ row.nombre_familiar }} - {{ row.nombre_parentesco }}</h5>
                                 <div v-else class="flex items-center gap-1">
                                     <div>
-                                        <input v-model="row.nombre_familiar" type="text" :class="row.onEdit ? '' : ''" maxlength="35"
-                                            class="rounded w-52 h-7 text-xs font-medium" placeholder="Nombre del familiar"
+                                        <input v-model="row.nombre_familiar" type="text" :class="row.onEdit ? '' : ''"
+                                            maxlength="35" class="rounded w-52 h-7 text-xs font-medium"
+                                            placeholder="Nombre del familiar"
                                             @input="row.nombre_familiar = row.nombre_familiar.toUpperCase()">
                                     </div>
                                     <div class="mb-4 md:mr-2 md:mb-0 basis-full">
                                         <div class="relative w-40 flex h-7 flex-row-reverse">
-                                            <Multiselect :options="optionsParentesco" v-model="row.id_parentesco"
+                                            <Multiselect :options="dataForSelect" v-model="row.id_parentesco"
                                                 @select="(selected) => selectParentesco(selected, rowIndex)"
                                                 @deselect="row.nombre_parentesco = ''" @clear="row.nombre_parentesco = ''"
                                                 :searchable="true" noOptionsText="<p class='text-xs'>sin requerimientos<p>"
                                                 :classes="{
                                                     container: 'relative mx-auto w-full flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none',
-                                                }
-                                                    " noResultsText="<p class='text-xs'>requerimiento no encontrado<p>"
+                                                }" noResultsText="<p class='text-xs'>requerimiento no encontrado<p>"
                                                 placeholder="Parentesco" />
                                         </div>
-
-
                                     </div>
-
                                 </div>
                                 <div class="flex items-center gap-3">
-
                                     <InputError class="mt-2" :message="errosModel[`dataRow.${rowIndex}.nombre_familiar`]" />
-
                                     <InputError class="mt-2" :message="errosModel[`dataRow.${rowIndex}.id_parentesco`]" />
                                 </div>
                                 <h5 class="text-sm ">0 al 100 %</h5>
@@ -259,31 +253,13 @@ export default {
             type: Object,
             default: [],
         },
+        dataForSelect: {
+            type: Object,
+            default: [],
+        },
     },
     data: () => ({
         personaOptions: [],
-        optionsParentesco: [
-            { value: '1', label: 'MADRE', unico_parentesco: 1 },
-            { value: '2', label: 'PADRE', unico_parentesco: 1 },
-            { value: '3', label: 'ABUELO/A', unico_parentesco: 0 },
-            { value: '4', label: 'BISABUELO/A', unico_parentesco: 0 },
-            { value: '5', label: 'HERMANO/A', unico_parentesco: 0 },
-            { value: '6', label: 'CONYUGE', unico_parentesco: 0 },
-            { value: '7', label: 'HIJO/A', unico_parentesco: 0 },
-            { value: '8', label: 'NIETO/A', unico_parentesco: 0 },
-            { value: '9', label: 'BISNIETO/A', unico_parentesco: 0 },
-            { value: '10', label: 'TIO/A', unico_parentesco: 0 },
-            { value: '11', label: 'PRIMO/A', unico_parentesco: 0 },
-            { value: '12', label: 'SOBRINO/A', unico_parentesco: 0 },
-            { value: '13', label: 'SUEGRO/A', unico_parentesco: 0 },
-            { value: '14', label: 'NUERA', unico_parentesco: 0 },
-            { value: '15', label: 'YERNO', unico_parentesco: 0 },
-            { value: '16', label: 'CUÑADO/A', unico_parentesco: 0 },
-            { value: '17', label: 'PADRASTRO', unico_parentesco: 0 },
-            { value: '18', label: 'MADASTRA', unico_parentesco: 0 },
-            { value: '19', label: 'HIJASTRO/A', unico_parentesco: 0 },
-            { value: '20', label: 'AMIGO/A', unico_parentesco: 0 },
-        ],
         dataSent: {
             id_persona: '',
             dataRow: [],
@@ -740,7 +716,7 @@ export default {
                     this.dataSent.id_persona = newDataBeneficiarios.id_persona
                     this.opcionPersona = opcionPersona.value;
                     this.setInfoBeneficiarios(newDataBeneficiarios)
-                    this.setInformtionPersona(newDataBeneficiarios )
+                    this.setInformtionPersona(newDataBeneficiarios)
                     newDataBeneficiarios.familiar.forEach((obj, index) => {
                         this.dataSent.dataRow.push({
                             id_familiar: obj.id_familiar,
