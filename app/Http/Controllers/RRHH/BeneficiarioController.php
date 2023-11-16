@@ -54,13 +54,13 @@ class BeneficiarioController extends Controller
         $data = $request->input('search');
 
         // Construir la consulta base con las relaciones
-        $query = Persona::select('*')->with(["familiar", "familiar.parentesco","municipio.departamento.pais","residencias","empleado.plazas_asignadas.detalle_plaza.plaza"])->whereHas("familiar", function ($query) {
+        $query = Persona::select('*')->with(["familiar", "profesion", "estado_civil", "nivel_educativo", "genero", "familiar.parentesco", "municipio.departamento.pais", "residencias", "empleado.plazas_asignadas.detalle_plaza.plaza"])->whereHas("familiar", function ($query) {
             $query->where("estado_familiar", 1);
         })->where("estado_persona", 1)->orderBy($columns[$column], $dir);
 
         if ($data) {
             $query->where('id_persona', 'like', '%' . $data["id_persona"] . '%');
-            
+
             /* $query->where(function ($query) use ($searchNombres) {
                 $query->where('pnombre_persona', 'like', '%' . $searchNombres . '%')
                     ->orWhere('snombre_persona', 'like', '%' . $searchNombres . '%')
@@ -104,7 +104,44 @@ class BeneficiarioController extends Controller
             'draw' => $request->input('draw'),
         ];
     }
-    public function searchPeopleByNameOrId(Request $request)
+
+    function searchPeopleByNameOrId(Request $request)
+    {
+        $query = Persona::query();
+
+        if (!empty($request->nombre)) {
+
+            $query->join('profesion', 'profesion.id_profesion', '=', 'persona.id_profesion')
+                ->join('nivel_educativo', 'nivel_educativo.id_nivel_educativo', '=', 'persona.id_nivel_educativo')
+                ->join('genero', 'genero.id_genero', '=', 'persona.id_genero')
+                ->join('estado_civil', 'estado_civil.id_estado_civil', '=', 'persona.id_estado_civil')
+                ->join('municipio', 'municipio.id_municipio', '=', 'persona.id_municipio')
+                ->join('departamento', 'departamento.id_departamento', '=', 'municipio.id_departamento')
+                ->join('pais', 'pais.id_pais', '=', 'departamento.id_pais')->where('estado_persona', 0)->where(function ($query) {
+                    $query->doesntHave('familiar')
+                        ->orWhereHas('familiar', function ($query) {
+                            $query->where('estado_familiar', 0);
+                        });
+                })->where(function ($query) use ($request) {
+                    $query->whereRaw("MATCH ( pnombre_persona,snombre_persona,tnombre_persona, papellido_persona,sapellido_persona,tapellido_persona ) AGAINST ( '" . $request->nombre . "')");
+                });
+        }
+
+        $results = $query->get();
+
+        $formattedResults = $results->map(function ($item) {
+            $objectData = [
+                'value' => $item->id_persona,
+                'label' => $item->pnombre_persona . ' ' . ($item->snombre_persona ?? '') . ' ' . ($item->tnombre_persona ?? '') . '' . $item->papellido_persona . ' ' . ($item->sapellido_persona ?? '') . ' ' . ($item->tapellido_persona ?? ''),
+                'ALL'   => $item
+            ];
+
+            return $objectData;
+        });
+
+        return response()->json($formattedResults);
+    }
+    /* public function searchPeopleByNameOrId(Request $request)
     {
         if ($request["by"] == 'name') {
             return Persona::select(
@@ -168,7 +205,7 @@ class BeneficiarioController extends Controller
                 ->where('estado_persona', 1)
                 ->where("id_persona", $request['query'])->get();
         }
-    }
+    } */
 
     function addRelatives(BeneficiariosRequest $request)
     {

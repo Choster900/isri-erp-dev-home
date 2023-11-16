@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Genero extends Model
 {
@@ -21,4 +22,13 @@ class Genero extends Model
         //'usuario_genero',
         //'ip_genero',
     ];
+    /**
+     * Get all of the persona for the genero
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function persona(): HasMany
+    {
+        return $this->hasMany(Persona::class, 'id_genero', 'id_genero');
+    }
 }

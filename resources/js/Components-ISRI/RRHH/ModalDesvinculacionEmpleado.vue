@@ -67,7 +67,7 @@ import moment from 'moment';
                         class="rounded-lg leading-none px-5 py-2 border hover:bg-red-100 border-gray-400 mx-6 mt-2 shadow-lg hover:shadow-xl">
                         <div class="w-full mb-1">
                             <p class="text-sm text-gray-600">Nombre empleado</p>
-                            <p class="text-base font-medium text-navy-700 dark:text-white">
+                            <p class="text-base font-medium text-navy-700 ">
                                 {{ employee.persona.pnombre_persona }}
                                 {{ employee.persona.snombre_persona }}
                                 {{ employee.persona.tnombre_persona }}
@@ -79,19 +79,19 @@ import moment from 'moment';
                         <div class="flex flex-col space-y-1 md:flex-row md:space-x-2 mb-1">
                             <div class="w-full md:w-[30%]">
                                 <p class="text-sm text-gray-600">Fecha contratación</p>
-                                <p class="text-base font-medium text-navy-700 dark:text-white">
+                                <p class="text-base font-medium text-navy-700 ">
                                     {{ moment(employee.fecha_contratacion_empleado).format('DD/MM/YYYY') }}
                                 </p>
                             </div>
                             <div class="w-full md:w-[30%]">
                                 <p class="text-sm text-gray-600">Codigo empleado</p>
-                                <p class="text-base font-medium text-navy-700 dark:text-white">
+                                <p class="text-base font-medium text-navy-700 ">
                                     {{ employee.codigo_empleado }}
                                 </p>
                             </div>
                             <div class="w-full md:w-[40%]">
                                 <p class="text-sm text-gray-600">Dependencia(s)</p>
-                                <p class="text-base font-medium text-navy-700 dark:text-white">
+                                <p class="text-base font-medium text-navy-700 ">
                                     {{ showDependencies(employee.plazas_asignadas) }}
                                 </p>
                             </div>

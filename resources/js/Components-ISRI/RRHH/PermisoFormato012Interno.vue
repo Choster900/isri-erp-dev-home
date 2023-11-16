@@ -53,7 +53,7 @@ import moment from 'moment';
                                 <!-- header -->
                                 <div class="w-full">
                                     <div class="w-full flex justify-between cursor-pointer" @click="setTarget(index)">
-                                        <p class="text-[13px] font-medium text-navy-700 dark:text-white mb-0.5">ETAPA
+                                        <p class="text-[13px] font-medium text-navy-700  mb-0.5">ETAPA
                                             {{ stage.persona_etapa.persona_etapa }}</p>
                                         <svg class="w-4 h-4 mr-1 transform origin-center transition-transform" fill="none"
                                             stroke="#000000" viewBox="0 0 24 24"
@@ -70,7 +70,7 @@ import moment from 'moment';
                                     </div>
                                     <div class="w-full mb-1">
                                         <p class="text-[13px] text-gray-600 mb-0.5">Empleado</p>
-                                        <p class="text-[13px] font-medium text-navy-700 dark:text-white">
+                                        <p class="text-[13px] font-medium text-navy-700 ">
                                             {{ stage.empleado.persona.pnombre_persona }}
                                             {{ stage.empleado.persona.snombre_persona }}
                                             {{ stage.empleado.persona.tnombre_persona }}
@@ -81,19 +81,19 @@ import moment from 'moment';
                                     </div>
                                     <div class="w-full mb-1">
                                         <p class="text-[13px] text-gray-600 mb-0.5">Estado</p>
-                                        <p class="text-[13px] font-medium text-navy-700 dark:text-white">
+                                        <p class="text-[13px] font-medium text-navy-700 ">
                                             {{ stage.estado_etapa_permiso.nombre_estado_etapa_permiso }}
                                         </p>
                                     </div>
                                     <div class="w-full mb-1">
                                         <p class="text-[13px] text-gray-600 mb-0.5">Fecha y hora</p>
-                                        <p class="text-[13px] font-medium text-navy-700 dark:text-white">
+                                        <p class="text-[13px] font-medium text-navy-700 ">
                                             {{ moment(stage.fecha_reg_etapa_permiso).format('DD/MM/YYYY HH:mm:ss') }}
                                         </p>
                                     </div>
                                     <div v-if="stage.observacion_etapa_permiso" class="w-full mb-1">
                                         <p class="text-[13px] text-gray-600 mb-0.5">Observaciones</p>
-                                        <p class="text-[13px] font-medium text-navy-700 dark:text-white">
+                                        <p class="text-[13px] font-medium text-navy-700 ">
                                             {{ stage.observacion_etapa_permiso }}
                                         </p>
                                     </div>
