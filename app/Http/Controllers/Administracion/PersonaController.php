@@ -179,6 +179,8 @@ class PersonaController extends Controller
             return [
                 'value' => $item->id_persona,
                 'label' => $item->pnombre_persona . ' ' . ($item->snombre_persona ?? '') . ' ' . ($item->tnombre_persona ?? ''),
+                'allDataPersonas' => $item
+                /* 'disabled' => true */
             ];
         });
 
