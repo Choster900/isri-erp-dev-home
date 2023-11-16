@@ -194,14 +194,14 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs; */
                                 </div>
                                 <h5 class="text-sm ">0 al 100 %</h5>
                                 <div class="flex items-center gap-3" style="width: 445px;">
-                                    <span class="text-2xl cursor-pointer"
+                                    <span class="text-2xl cursor-pointer text-selection-disable"
                                         @click="increaseOrDecreaseDesignacionDePorcentajes(rowIndex, 'resta')">-</span>
                                     <input @input="calcularDesignacionDePorcentajes(rowIndex)"
                                         v-model="row.porcentaje_familiar"
                                         class="cursor-grabbing	 rounded-lg overflow-hidden appearance-none bg-gray-400 h-3 w-full"
                                         type="range" min="0" max="100" step="1" />
-                                    <span class="text-sm font-medium ml-2">{{ row.porcentaje_familiar }}%</span>
-                                    <span class="text-2xl cursor-pointer"
+                                    <span class="text-sm font-medium ml-2 ">{{ row.porcentaje_familiar }}%</span>
+                                    <span class="text-2xl cursor-pointer text-selection-disable"
                                         @click="increaseOrDecreaseDesignacionDePorcentajes(rowIndex, 'suma')">+</span>
                                 </div>
                                 <InputError class="mt-2" :message="errosModel[`dataRow.${rowIndex}.porcentaje_familiar`]" />
