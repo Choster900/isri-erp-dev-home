@@ -243,6 +243,11 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs; */
                     </div>
                 </div>
             </div>
+
+            <button @click="printPdf()">IMPRIMIR</button>
+           <!--  {{ dataUrlPdf }}-->
+          <!--   <embed :src="dataUrlPdf" type="application/pdf" width="550" height="400"
+                class="rounded-lg border border-gray-300 shadow-md shadow-black">  -->
         </Modal>
     </div>
 </template>
