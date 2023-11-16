@@ -31,7 +31,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs; */
                         <label class="text-xs text-gray-500 font-normal uppercase">Fecha de creacion</label>
                         <p class="text-xs text-black font-semibold">{{
                             dataToShow.createdAt === null || dataToShow.createdAt == '' ?
-                            '00/00/0000' :
+                            'DD/MM/YYYY' :
                             moment(dataToShow.createdAt).calendar()
 
                         }}</p>
