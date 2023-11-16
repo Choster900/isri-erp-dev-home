@@ -39,7 +39,7 @@ import TooltipVue from "@/Components-ISRI/Tooltip.vue";
                 <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
                     @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getAcuerdos()">
                     <tbody class="text-sm divide-y divide-slate-200" v-if="!isLoadinRequest">
-                        <tr v-for="(acuerdos, i) in acuerdos" :key="i"  class="content-body">
+                        <tr v-for="(acuerdos, i) in acuerdos" :key="i" class="content-body">
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center ">{{ acuerdos.id_empleado }}</div>
                             </td>
@@ -66,14 +66,9 @@ import TooltipVue from "@/Components-ISRI/Tooltip.vue";
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center flex justify-center gap-2">
-                                    <span>{{ acuerdos.acuerdo_laboral.length }}</span>
-                                    <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                        class="w-5 h-5">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z" />
-                                    </svg>
+                                <div class="font-medium text-slate-800 text-center flex justify-end gap-2">
+                                    <span class="mx-2">{{ acuerdos.acuerdo_laboral.length }}</span>
+                                    <svg class="mx-2 w-6 h-6" viewBox="0 0 64 64" id="fill" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><rect height="58" style="fill:#cfcfd9" width="46" x="9" y="3"></rect><rect height="50" style="fill:#d9dae2" width="38" x="13" y="7"></rect><path d="M13,7H51a0,0,0,0,1,0,0V19A38,38,0,0,1,13,57h0a0,0,0,0,1,0,0V7A0,0,0,0,1,13,7Z" style="fill:#e5e6eb"></path><path d="M32,21a4,4,0,0,1-4-4,3.952,3.952,0,0,1,.492-1.911L26.863,8.575,28.8,8.091l1.731,6.926a1,1,0,0,1-.157.824,2,2,0,1,0,3.244,0,1,1,0,0,1-.157-.824L35.28,7.758l1.94.484-1.712,6.847A3.952,3.952,0,0,1,36,17,4,4,0,0,1,32,21Z" style="fill:#fff"></path><rect height="4" style="fill:#027de5" width="10" x="35" y="48"></rect><rect height="2" style="fill:#027de5" width="7" x="22" y="27"></rect><rect height="2" style="fill:#027de5" width="2" x="31" y="27"></rect><rect height="2" style="fill:#027de5" width="9" x="35" y="27"></rect><rect height="8" style="fill:#027de5" width="8" x="39" y="14"></rect><rect height="2" style="fill:#027de5" width="25" x="19" y="32"></rect><rect height="2" style="fill:#027de5" width="25" x="19" y="37"></rect><rect height="2" style="fill:#027de5" width="13" x="19" y="42"></rect><rect height="6" style="fill:#444" width="14" x="25" y="3"></rect><path d="M55,2H9A1,1,0,0,0,8,3V61a1,1,0,0,0,1,1H55a1,1,0,0,0,1-1V3A1,1,0,0,0,55,2ZM25,10h2.219l1.273,5.089A3.952,3.952,0,0,0,28,17a4,4,0,0,0,8,0,3.952,3.952,0,0,0-.492-1.911L36.781,10H39a1,1,0,0,0,1-1V8H50V56H14V8H24V9A1,1,0,0,0,25,10Zm8.622,5.841a2,2,0,1,1-3.244,0,1,1,0,0,0,.157-.824L29.281,10h5.438l-1.254,5.017A1,1,0,0,0,33.622,15.841ZM38,8H26V4H38ZM54,60H10V4H24V6H13a1,1,0,0,0-1,1V57a1,1,0,0,0,1,1H51a1,1,0,0,0,1-1V7a1,1,0,0,0-1-1H40V4H54Z"></path></g></svg>
                                 </div>
                             </td>
                             <td class="first:pl-5 last:pr-5">
@@ -185,15 +180,15 @@ export default {
         let sortOrders = {};
         let columns = [
             { width: "10%", label: "ID", name: "id_empleado", type: "text" },
-            { width: "20%", label: "DUI", name: "dui_persona", type: "text" },
+            { width: "10%", label: "DUI", name: "dui_persona", type: "text" },
             { width: "10%", label: "Codigo", name: "codigo_empleado", type: "text" },
             { width: "20%", label: "Nombres", name: "collecNombre", type: "text" },
             { width: "20%", label: "Apellidos", name: "collecApellido", type: "text" },
-            { width: "20%", label: "Acuerdos", name: "numAcuerdos", type: "text" },
+            { width: "5%", label: "Acuerdos", name: "numAcuerdos", type: "text", visible: false },
             { width: "1%", label: "", name: "Acciones" },
         ];
         columns.forEach((column) => {
-            if (column.name === 'id_persona')
+            if (column.name === 'id_empleado')
                 sortOrders[column.name] = 1;
             else
                 sortOrders[column.name] = -1;
@@ -210,7 +205,7 @@ export default {
             lastUrl: "/beneficiarios",
             columns: columns,
             isLoadinRequest: false,
-            sortKey: "id_persona",
+            sortKey: "id_empleado",
             sortOrders: sortOrders,
             perPage: ["10", "20", "30"],
             tableData: {

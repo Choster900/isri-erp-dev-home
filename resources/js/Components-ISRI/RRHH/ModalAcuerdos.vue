@@ -1,7 +1,6 @@
 <script setup>
 import { toast } from 'vue3-toastify'; // Importar el módulo toast de vue3-toastify
 import 'vue3-toastify/dist/index.css'; // Importar los estilos de vue3-toastify
-import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'; // Importar el componente ProcessModal
 import TooltipVue from '../Tooltip.vue';
 import moment from 'moment';
 import Modal from "@/Components-ISRI/AllModal/Modal.vue";
@@ -24,15 +23,25 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                             Empleado <span class="text-red-600 font-extrabold">*</span>
                                         </label>
                                         <div class="relative font-medium  flex h-8 w-full flex-row-reverse">
-                                            <Multiselect v-model="dataForm.id_empleado"
-                                                @search-change="handleSearch({ by: 'name', query: $event })"
-                                                :clearOnSearch="true"
-                                                placeholder="FILTRAR POR APELLIDO (SI NO APARECE ES POSIBLE QUE YA TENGA REGISTROS)"
-                                                :filter-results="false" :min-chars="10" :resolve-on-load="true"
-                                                :searchable="true" :options="employeOptions"
-                                                noOptionsText="<p class='text-xs'>Sin registros<p>" :classes="{
-                                                    placeholder: 'flex items-center h-full absolute text-[9px] left-0 top-0 pointer-events-none bg-transparent leading-snug pl-2 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+
+                                            <Multiselect v-if="dataAcuerdos == ''" v-model="dataForm.id_empleado" :filter-results="false"
+                                                placeholder="Busca empleados por nombres" :resolve-on-load="false"
+                                                :delay="1500" :searchable="true" :clear-on-search="true" :min-chars="5"
+                                                :classes="{
+                                                    container: 'relative mx-auto w-full flex items-center justify-end border border-gray-300 cursor-pointer  rounded-tr-md rounded-br-md bg-white text-xs leading-snug outline-none',
+                                                    placeholder: 'flex items-center h-full absolute text-[11px] left-0 top-0 pointer-events-none bg-transparent leading-snug pl-2 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                                }"
+                                                noOptionsText="<p class='text-xs'>Obtenga los datos escribiendo un nombre<p>"
+                                                :options="async function (query) {
+                                                    return await getPeopleByName(query)
                                                 }" />
+                                            <Multiselect v-else v-model="dataForm.id_empleado" :filter-results="false"
+                                                :disabled="true" :resolve-on-load="false" :delay="1000" :searchable="true"
+                                                :clear-on-search="true" :min-chars="5" :classes="{
+                                                    container: 'relative mx-auto w-full flex items-center justify-end  cursor-pointer  rounded-tr-md rounded-br-md bg-white text-base leading-snug outline-none',
+                                                    containerDisabled: 'cursor-not-allowed bg-gray-100 text-black/80 border',
+                                                    placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                                }" :options="employeOptions" />
 
                                             <LabelToInput icon="personalInformation" />
                                         </div>
@@ -75,7 +84,6 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                             <span class="text-red-600 font-extrabold">*</span>
                                         </label>
                                         <div class="relative flex">
-                                            <!--   {{ dataForm.deal }} -->
                                             <LabelToInput icon="date" />
                                             <flat-pickr v-model="dataForm.deal.fecha_inicio_fecha_fin_acuerdo_laboral"
                                                 class="peer text-xs cursor-pointer rounded-r-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 f focus:outline-none w-full"
@@ -89,6 +97,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                     <div class="mb-1 md:mr-2 md:mb-0 basis-full">
                                         <TextInput id="oficio-acuerdo" type="text" placeholder="Numero de referencia"
                                             v-model="dataForm.deal.oficio_acuerdo_laboral"
+                                            :maxlength="40"
                                             @update:modelValue="dataForm.deal.oficio_acuerdo_laboral = dataForm.deal.oficio_acuerdo_laboral.toUpperCase()">
                                             <LabelToInput icon="standard" forLabel="primer-nombre" />
                                         </TextInput>
@@ -101,7 +110,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                         Descripción
                                         <span class="text-red-600 font-extrabold">*</span>
                                     </label>
-                                    <textarea id="descripcion" name="descripcion" style="overflow-x: hidden;"
+                                    <textarea id="descripcion" name="descripcion" style="overflow-x: hidden;" 
                                         v-model="dataForm.deal.comentario_acuerdo_laboral"
                                         class="resize-none w-full h-24 overflow-y-auto peer text-xs font-normal rounded-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-none focus:outline-none"></textarea>
 
@@ -649,26 +658,19 @@ export default {
 
         },
 
-
-        async handleSearch(query) {
-            if (query !== '') {
-                try {
-                    if (query.by === 'name' && query.query.length >= 5) {
-                        this.isLoadingToSearch = true
-                        const response = await axios.post('/search-employe', query);
-                        this.employeOptions = response.data;
-                    } else if (query.by === 'id') {
-                        this.loading = true;
-                        const response = await axios.post('/search-employe', query);
-                        this.employeOptions = response.data
-                        this.dataForm.id_empleado = this.employeOptions[0].value
-                    }
-                } catch (error) {
-                    console.log('Error en la búsqueda:', error)
-                } finally {
-                    this.isLoadingToSearch = false
-                    this.loading = false
-                }
+        async getPeopleByName(nombreToSearch) {
+            try {
+                // endpoint getPersonaByName se encuentra en PersonaController => nombre del metodo getPersonByCompleteName
+                const response = await axios.post("/search-employe", {
+                    nombre: nombreToSearch,
+                });
+                console.log(response.data);
+                // Devuelve los datos de la respuesta
+                return response.data;
+            } catch (error) {
+                // Manejo de errores
+                console.error("Error al obtener personas por nombre:", error);
+                throw error; // Lanza el error para que pueda ser manejado por el componente que utiliza este composable
             }
         },
 
