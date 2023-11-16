@@ -117,7 +117,7 @@ class BeneficiarioController extends Controller
                 ->join('estado_civil', 'estado_civil.id_estado_civil', '=', 'persona.id_estado_civil')
                 ->join('municipio', 'municipio.id_municipio', '=', 'persona.id_municipio')
                 ->join('departamento', 'departamento.id_departamento', '=', 'municipio.id_departamento')
-                ->join('pais', 'pais.id_pais', '=', 'departamento.id_pais')->where('estado_persona', 0)->where(function ($query) {
+                ->join('pais', 'pais.id_pais', '=', 'departamento.id_pais')->where('estado_persona', 1)->where(function ($query) {
                     $query->doesntHave('familiar')
                         ->orWhereHas('familiar', function ($query) {
                             $query->where('estado_familiar', 0);
