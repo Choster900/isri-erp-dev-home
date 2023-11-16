@@ -14,7 +14,7 @@ import ModalCertificadoDeVida from '@/Components-ISRI/RRHH/BeneficiariosComponen
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
                 <GeneralButton @click="dataBeneficiariosToSendModal = []; showModalBeneficiario = !showModalBeneficiario"
-                    color="bg-green-700  hover:bg-green-800" text="Agregar Empleado" icon="add" />
+                    color="bg-green-700  hover:bg-green-800" text="Agregar Beneficiarios" icon="add" />
             </div>
         </div>
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">

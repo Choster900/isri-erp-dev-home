@@ -96,23 +96,31 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs; */
                 <div class=" mt-10 md:flex flex-row justify-items-start">
                     <div class=" md:mr-2 md:mb-0 basis-full">
                         <div class="mb-2 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-full">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-full ">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Empleado/a <span class="text-red-600 font-extrabold">*</span>
                                 </label>
-
-
                                 <div class="relative font-medium  flex h-8 w-full flex-row-reverse">
-                                    <Multiselect v-model="dataSent.id_persona"
-                                        @search-change="handleSearch({ by: 'name', query: $event })" :clearOnSearch="true"
-                                        @select="personaWasSelected($event)" @deselect=" deleteInfoBeneficiarios(false)"
-                                        @clear=" deleteInfoBeneficiarios(false)"
-                                        placeholder="FILTRAR POR APELLIDO (SI NO APARECE ES POSIBLE QUE YA TENGA REGISTROS)"
-                                        :filter-results="false" :min-chars="10" :resolve-on-load="true" :searchable="true"
-                                        :options="personaOptions" noOptionsText="<p class='text-xs'>Sin registros<p>"
-                                        :classes="{
-                                            placeholder: 'flex items-center h-full absolute text-[8pt] left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                    <Multiselect v-if="dataBeneficiarios == ''" v-model="dataSent.id_persona"
+                                        @select="personaWasSelected($event)" :filter-results="false"
+                                        :resolve-on-load="false" :delay="1500" :searchable="true" :clear-on-search="true"
+                                        :min-chars="5" placeholder="Busqueda de usuario..." :classes="{
+                                            container: 'relative mx-auto w-full flex items-center justify-end border border-gray-300 cursor-pointer  rounded-tr-md rounded-br-md bg-white text-base leading-snug outline-none',
+                                            placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                        }"
+                                        noOptionsText="<p class='text-xs'>Obtenga los datos escribiendo un nombre<p>"
+                                        :options="async function (query) {
+                                            return await getPeopleByName(query)
                                         }" />
+                                    <Multiselect v-else v-model="dataSent.id_persona" :filter-results="false"
+                                        :disabled="true" :resolve-on-load="false" :delay="1000" :searchable="true"
+                                        :clear-on-search="true" :min-chars="5" placeholder="Busqueda de usuario..."
+                                        :classes="{
+                                            container: 'relative mx-auto w-full flex items-center justify-end  cursor-pointer  rounded-tr-md rounded-br-md bg-white text-base leading-snug outline-none',
+                                            containerDisabled: 'cursor-not-allowed bg-gray-500/80 text-white',
+                                            placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                        }" :options="opcionPersona" />
+
                                     <LabelToInput icon="list" />
                                 </div>
                                 <InputError class="mt-2" :message="errosModel.id_persona" />
@@ -157,7 +165,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs; */
 
                                 <div v-else class="flex items-center gap-1">
                                     <div>
-                                        <input v-model="row.nombre_familiar" type="text" :class="row.onEdit ? '' : ''"
+                                        <input v-model="row.nombre_familiar" type="text" :class="row.onEdit ? '' : ''" maxlength="35"
                                             class="rounded w-52 h-7 text-xs font-medium" placeholder="Nombre del familiar"
                                             @input="row.nombre_familiar = row.nombre_familiar.toUpperCase()">
                                     </div>
@@ -239,7 +247,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs; */
     </div>
 </template>
 <script>
-import { createApp, h } from 'vue'
+import { computed, createApp, h } from 'vue'
 import CertificadoSeguroColectivoDeVida from '@/pdf/RRHH/CertificadoSeguroColectivoDeVida.vue';
 export default {
     props: {
@@ -286,6 +294,8 @@ export default {
         loading: false,
         isLoadingToSearch: false,
         errosModel: [],
+        opcionPersona: [],
+        selectedValue: '',
         dataUrlPdf: null,
         dataToShow: {
             createdAt: '',
@@ -301,25 +311,42 @@ export default {
         },
     }),
     methods: {
-        async handleSearch(query) {
-            if (query !== '') {
-                try {
-                    if (query.by === 'name' && query.query.length >= 5) {
-                        this.isLoadingToSearch = true;
-                        const response = await axios.post('/search-people', query);
-                        this.personaOptions = response.data;
-                    } else if (query.by === 'id') {
-                        this.loading = true;
-                        const response = await axios.post('/search-people', query);
-                        this.personaOptions = response.data;
-                        this.personaWasSelected(query.query);
-                    }
-                } catch (error) {
-                    console.log('Error en la búsqueda:', error);
-                } finally {
-                    this.isLoadingToSearch = false;
-                    this.loading = false;
-                }
+        /*  async handleSearch(query) {
+             if (query !== '') {
+                 try {
+                     if (query.by === 'name' && query.query.length >= 5) {
+                         this.isLoadingToSearch = true;
+                         const response = await axios.post('/search-people', query);
+                         this.personaOptions = response.data;
+                     } else if (query.by === 'id') {
+                         this.loading = true;
+                         const response = await axios.post('/search-people', query);
+                         this.personaOptions = response.data;
+                         this.personaWasSelected(query.query);
+                     }
+                 } catch (error) {
+                     console.log('Error en la búsqueda:', error);
+                 } finally {
+                     this.isLoadingToSearch = false;
+                     this.loading = false;
+                 }
+             }
+         }, */
+
+        async getPeopleByName(nombreToSearch) {
+            try {
+                // endpoint getPersonaByName se encuentra en PersonaController => nombre del metodo getPersonByCompleteName
+                const response = await axios.post("/search-people", {
+                    nombre: nombreToSearch,
+                });
+                console.log(response.data);
+                this.personaOptions = response.data;
+                // Devuelve los datos de la respuesta
+                return response.data;
+            } catch (error) {
+                // Manejo de errores
+                console.error("Error al obtener personas por nombre:", error);
+                throw error; // Lanza el error para que pueda ser manejado por el componente que utiliza este composable
             }
         },
 
@@ -357,19 +384,35 @@ export default {
         },
 
         personaWasSelected(id_persona) {
+            console.log(this.personaOptions);
             let persona = JSON.parse(JSON.stringify(this.personaOptions.find((index) => index.value == id_persona)));
             console.log(persona);
-            this.dataToShow.createdAt = persona.fecha_reg_persona
-            this.dataToShow.updatedAt = persona.fecha_mod_persona
-            this.dataToShow.bornPlace = persona.localidad
-            this.dataToShow.birthDay = persona.fecha_nac_persona
-            this.dataToShow.civilStatus = persona.nombre_estado_civil
-            this.dataToShow.gender = persona.nombre_genero
-            this.dataToShow.levelEducation = persona.nombre_nivel_educativo
-            this.dataToShow.profesion = persona.nombre_profesion_rnpn
+            this.dataToShow.createdAt = persona.ALL.fecha_reg_persona
+            this.dataToShow.updatedAt = persona.ALL.fecha_mod_persona
+            this.dataToShow.bornPlace = `${persona.ALL.nombre_pais}, ${persona.ALL.nombre_departamento}, ${persona.ALL.nombre_municipio}`
+            this.dataToShow.birthDay = persona.ALL.fecha_nac_persona
+            this.dataToShow.civilStatus = persona.ALL.nombre_estado_civil
+            this.dataToShow.gender = persona.ALL.nombre_genero
+            this.dataToShow.levelEducation = persona.ALL.nombre_nivel_educativo
+            this.dataToShow.profesion = persona.ALL.nombre_profesion_rnpn
             this.dataToShow.dui_persona = persona.dui_persona
             this.dataToShow.name = persona.label
         },
+
+        setInformtionPersona(persona) {
+            console.log(persona);
+            this.dataToShow.createdAt = persona.fecha_reg_persona
+            this.dataToShow.updatedAt = persona.fecha_mod_persona
+            this.dataToShow.bornPlace = `${persona.municipio.departamento.pais.nombre_pais}, ${persona.municipio.departamento.nombre_departamento}, ${persona.municipio.nombre_municipio}`
+            this.dataToShow.birthDay = persona.fecha_nac_persona
+            this.dataToShow.civilStatus = persona.estado_civil.nombre_estado_civil
+            this.dataToShow.gender = persona.genero.nombre_genero
+            this.dataToShow.levelEducation = persona.nivel_educativo.nombre_nivel_educativo
+            this.dataToShow.profesion = persona.profesion.nombre_profesion_rnpn
+            this.dataToShow.dui_persona = persona.dui_persona
+            this.dataToShow.name = `${persona.pnombre_persona || ''} ${persona.snombre_persona || ''} ${persona.tnombre_persona || ''} ${persona.papellido_persona || ''} ${persona.sapellido_persona || ''} ${persona.tapellido_persona || ''} `
+        },
+
 
         areAllPercentagesAboveOne() {
             // Traemos los registros que no hallan sido eliminados
@@ -623,7 +666,7 @@ export default {
             /* if (this.totalPorcentajeAsignado > 100) {
                 // Calcular el excedente
                 const ajuste = parseInt(this.totalPorcentajeAsignado) - 100;
-
+        
                 // Ajustar los porcentajes de las filas diferentes a la actual
                 this.dataSent.dataRow.forEach((obj, index) => {
                     if (index !== rowIndex) {
@@ -641,7 +684,7 @@ export default {
             //this.totalPorcentajeAsignado = this.dataSent.dataRow.reduce((suma, obj) => suma + parseFloat(obj.porcentaje_familiar), 0);
         },
         setInfoBeneficiarios(info) {
-            console.log(info.familiar.reduce((suma, obj) => suma + parseFloat(obj.porcentaje_familiar), 0));
+            //console.log(info.familiar.reduce((suma, obj) => suma + parseFloat(obj.porcentaje_familiar), 0));
             this.dataSent.id_persona = info.id_persona
             this.totalPorcentajeAsignado = info.familiar.reduce((suma, obj) => suma + parseFloat(obj.porcentaje_familiar), 0);
         },
@@ -687,8 +730,17 @@ export default {
             if (this.showModal) {
                 if (this.dataBeneficiarios != '') {
                     const newDataBeneficiarios = JSON.parse(JSON.stringify(this.dataBeneficiarios));
-                    this.handleSearch({ by: 'id', query: newDataBeneficiarios.id_persona })
+                    this.personaOptions = this.dataBeneficiarios
+                    const opcionPersona = computed(() => {
+                        return newDataBeneficiarios ? [{
+                            value: newDataBeneficiarios.id_persona,
+                            label: `${newDataBeneficiarios.pnombre_persona || ''} ${newDataBeneficiarios.snombre_persona || ''} ${newDataBeneficiarios.tnombre_persona || ''} ${newDataBeneficiarios.papellido_persona || ''} ${newDataBeneficiarios.sapellido_persona || ''} ${newDataBeneficiarios.tapellido_persona || ''} `
+                        }] : [];
+                    });
+                    this.dataSent.id_persona = newDataBeneficiarios.id_persona
+                    this.opcionPersona = opcionPersona.value;
                     this.setInfoBeneficiarios(newDataBeneficiarios)
+                    this.setInformtionPersona(newDataBeneficiarios )
                     newDataBeneficiarios.familiar.forEach((obj, index) => {
                         this.dataSent.dataRow.push({
                             id_familiar: obj.id_familiar,
