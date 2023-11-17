@@ -2,6 +2,7 @@
 import { Head } from "@inertiajs/vue3";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import ModalAdminUserVue from '@/Components-ISRI/Administracion/ModalAdminUser.vue';
+import ModalUserVue from '@/Components-ISRI/Administracion/ModalUser.vue';
 import ModalChangePasswordVue from '@/Components-ISRI/Administracion/ModalChangePassword.vue';
 import { toast } from "vue3-toastify";
 
@@ -239,6 +240,10 @@ import { toast } from "vue3-toastify";
 
         <ModalAdminUserVue :show="show" @cerrar-modal="show = !show" :modalData="modalData"
             @update-table="getUpdateTable()" />
+
+        <ModalUserVue v-if="showAdminUser" :showAdminUser="showAdminUser" @cerrar-modal="showAdminUser = !showAdminUser" 
+        :userId="userId" @update-table="getUsers(tableData.currentPage)" />
+        
     </AppLayoutVue>
 </template>
 <script>
@@ -276,8 +281,11 @@ export default {
             isLoading: false,
             empty_object: false,
             permits: [],
-            modalData: []
-            ,
+            modalData: [],
+            //New
+            showAdminUser: false,
+            userId: '',
+
             modalDataCreate: {
                 dui: '',
                 nombre_persona: '',
@@ -358,8 +366,10 @@ export default {
             }
         },
         createNewUser() {
-            this.show = true
-            this.modalData = []
+            // this.show = true
+            // this.modalData = []
+            this.showAdminUser = true
+            this.userId = ''
         },
         changePasswordUser(user) {
             this.modalData = user
@@ -430,8 +440,10 @@ export default {
             })
         },
         editUser(user) {
-            this.show = true;
-            this.modalData = user;
+            // this.show = true;
+            // this.modalData = user;
+            this.showAdminUser = true
+            this.userId = user.id_usuario
         },
         async getUsers(url = "/users") {
             this.tableData.draw++;

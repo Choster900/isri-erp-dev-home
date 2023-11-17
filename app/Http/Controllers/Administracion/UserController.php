@@ -220,7 +220,7 @@ class UserController extends Controller
     //Methods to create a new user
     public function getDui(Request $request)
     {
-        $person = Persona::select(DB::raw('CONCAT(pnombre_persona," ",IFNULL(snombre_persona,"")," ",IFNULL(tnombre_persona,"")," ",papellido_persona," ",IFNULL(sapellido_persona,"")," ",IFNULL(tapellido_persona,"")) AS nombre_persona'), 'id_persona', 'fecha_nac_persona', 'telefono_persona', 'nombre_municipio')
+        $person = Persona::select('*')
             ->join('municipio', function ($join) {
                 $join->on('persona.id_municipio', '=', 'municipio.id_municipio');
             })
@@ -313,6 +313,7 @@ class UserController extends Controller
         return ['mensaje' => 'Contraseña actualizada con exito'];
     }
 
+    //NEW METHODS
     public function standarizeUsername(Request $request)
     {
         $user = User::with('persona.empleado')->find($request->id);
@@ -327,6 +328,103 @@ class UserController extends Controller
             DB::commit(); // Confirma las operaciones en la base de datos
             return response()->json([
                 'mensaje'          => "Accion exitosa, nuevo nombre de usuario: " . $user->nick_usuario,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+            return response()->json([
+                'logical_error' => 'Ha ocurrido un error con sus datos.',
+                'error' => $e,
+            ], 422);
+        }
+    }
+    public function getSelectsAdminUser()
+    {
+        $systems = Sistema::select('id_sistema as value', 'nombre_sistema as label')
+            ->where('estado_sistema', '=', 1)
+            ->has('roles')
+            ->orderBy('nombre_sistema')
+            ->get();
+        $roles = Rol::select('id_rol as value', 'nombre_rol as label', 'id_sistema')
+            ->where('estado_rol', '=', 1)
+            ->has('menus')
+            ->orderBy('nombre_rol')
+            ->get();
+        return [
+            'systems' => $systems,
+            'roles'   => $roles
+        ];
+    }
+    public function getUserInfo($id)
+    {
+        $allUserInfo = Persona::with([
+            'usuario',
+            'fotos',
+            'usuario.roles.sistema',
+            'residencias.municipio',
+            'residencias'  => function ($query) {
+                $query->where('estado_residencia', 1);
+            }
+        ])
+            ->where('id_usuario', $id)
+            ->first();
+
+        $result = $this->getSelectsAdminUser();
+
+        return [
+            'allUserInfo' => $allUserInfo,
+            'systems'     => $result['systems'],
+            'roles'       => $result['roles'],
+        ];
+    }
+
+    public function saveChangesAdminUser(Request $request)
+    {
+        $userId = $request->userId;
+        DB::beginTransaction();
+        try {
+            if ($userId) {
+                $usuario = User::find($request->userId);
+                foreach ($request->roles as $rol) {
+                    $permisoUserToValidate = PermisoUsuario::with([
+                        'rol' => function ($query) use($rol) {
+                            $query->where('id_sistema', $rol['systemId']);
+                        }
+                        ])
+                    ->where('estado_permiso_usuario', 1)
+                    ->first();
+                    if (!$permisoUserToValidate->rol) {
+                        $userPermission = PermisoUsuario::find($rol['accessId']);
+                        if ($userPermission) {
+                            $userPermission->update([
+                                'id_rol'                        => $rol['rolId'],
+                                'estado_permiso_usuario'        => $rol['deletedVw'] ? 0 : 1,
+                                'fecha_mod_permiso_usuario'     => Carbon::now(),
+                                'usuario_permiso_usuario'       => $request->user()->nick_usuario,
+                                'ip_permiso_usuario'            => $request->ip(),
+                            ]);
+                        } else {
+                            $newUserPermission = new PermisoUsuario([
+                                'id_rol'                        => $rol['rolId'],
+                                'id_usuario'                    => $userId,
+                                'estado_permiso_usuario'        => 1,
+                                'fecha_reg_permiso_usuario'     => Carbon::now(),
+                                'usuario_permiso_usuario'       => $request->user()->nick_usuario,
+                                'ip_permiso_usuario'            => $request->ip(),
+                            ]);
+                            $newUserPermission->save();
+                        }
+                        $usuario->update([
+                            'fecha_mod_usuario'     => Carbon::now(),
+                            'usuario_usuario'       => $request->user()->nick_usuario,
+                            'ip_permiso_usuario'    => $request->ip(),
+                        ]);
+                    }
+                }
+            } else {
+            }
+            DB::commit(); // Confirma las operaciones en la base de datos
+            return response()->json([
+                'message'          => "Roles actualizados.",
             ]);
         } catch (\Exception $e) {
             DB::rollBack(); // En caso de error, revierte las operaciones anteriores

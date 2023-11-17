@@ -53,7 +53,7 @@ class Persona extends Model
     }
     public function usuario()
     {
-        return $this->hasOne('App\Models\User', 'id_usuario', 'id_persona');
+        return $this->hasOne('App\Models\User', 'id_persona', 'id_persona');
     }
     public function residencias()
     {

@@ -27,7 +27,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('get-dui', [UserController::class, 'getDui'])->name('user.getDui');
     Route::post('save-user', [UserController::class, 'saveUser'])->name('user.saveUser');
     Route::get('get-selects-create-user', [UserController::class, 'getSelectsCreateUser'])->name('user.getSelectsCreateUser');
+
+    //New Methods
     Route::post('standarize-username', [UserController::class, 'standarizeUsername'])->name('user.standarizeUsername');
+    Route::get('get-selects-admin-user', [UserController::class, 'getSelectsAdminUser'])->name('user.getSelectsAdminUser');
+    Route::get('get-user-info/{id}', [UserController::class, 'getUserInfo'])->name('user.getUserInfo');
+    Route::post('save-changes-admin-user', [UserController::class, 'saveChangesAdminUser'])->name('user.saveChangesAdminUser');
 
     //Manage Roles
     Route::get(
