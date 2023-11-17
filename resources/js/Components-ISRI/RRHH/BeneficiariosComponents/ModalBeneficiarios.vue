@@ -116,8 +116,8 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs; */
                                         :disabled="true" :resolve-on-load="false" :delay="1000" :searchable="true"
                                         :clear-on-search="true" :min-chars="5" placeholder="Busqueda de usuario..."
                                         :classes="{
-                                            container: 'relative mx-auto w-full flex items-center justify-end  cursor-pointer  rounded-tr-md rounded-br-md bg-white text-base leading-snug outline-none',
-                                            containerDisabled: 'cursor-not-allowed bg-gray-500/80 text-white',
+                                            container: 'relative mx-auto w-full flex items-center justify-end  cursor-pointer  rounded-tr-md rounded-br-md  text-base leading-snug outline-none',
+                                            containerDisabled: 'cursor-not-allowed bg-gray-100 text-black/80',
                                             placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
                                         }" :options="opcionPersona" />
 

@@ -38,8 +38,8 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                             <Multiselect v-else v-model="dataForm.id_empleado" :filter-results="false"
                                                 :disabled="true" :resolve-on-load="false" :delay="1000" :searchable="true"
                                                 :clear-on-search="true" :min-chars="5" :classes="{
-                                                    container: 'relative mx-auto w-full flex items-center justify-end  cursor-pointer  rounded-tr-md rounded-br-md bg-white text-base leading-snug outline-none',
-                                                    containerDisabled: 'cursor-not-allowed bg-gray-100 text-black/80 border',
+                                                    container: 'relative mx-auto w-full flex items-center justify-end  cursor-pointer  rounded-tr-md rounded-br-md bg-gray-100 text-base leading-snug outline-none',
+                                                    containerDisabled: 'cursor-not-allowed  text-black/80 border',
                                                     placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
                                                 }" :options="employeOptions" />
 
