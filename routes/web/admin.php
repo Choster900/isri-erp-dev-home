@@ -19,7 +19,6 @@ Route::group(['middleware' => ['auth']], function () {
     //Urls to create and update Users
     Route::post('change-state-user', [UserController::class, 'changeStateUser'])->name('user.changeStateUser');
     Route::post('change-password-user', [UserController::class, 'changePasswordUser'])->name('user.changePasswordUser');
-    Route::post('systems', [UserController::class, 'getSystems'])->name('user.getSystems');
     Route::post('roles-per-system', [UserController::class, 'getRolesPerSystem'])->name('user.getRolesPerSystem');
     Route::get('get-dui', [UserController::class, 'getDui'])->name('user.getDui');
     Route::post('save-user', [UserController::class, 'saveUser'])->name('user.saveUser');

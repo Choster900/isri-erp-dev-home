@@ -107,38 +107,6 @@ class UserController extends Controller
             }
         }
     }
-
-
-    public function getSystems(Request $request)
-    {
-        $id = $request->input('id_usuario');
-        $user = User::find($id);
-        $sistemas = Sistema::get();
-        foreach ($user->roles as $rol) {
-            if ($rol->pivot->estado_permiso_usuario == 1) {
-                $array_id_sistema[] = $rol->sistema->id_sistema;
-            }
-        }
-        if (isset($array_id_sistema)) {
-            foreach ($sistemas as $sistema) {
-                if (!(in_array($sistema->id_sistema, $array_id_sistema))) {
-                    $array_sistemas['value'] = $sistema->id_sistema;
-                    $array_sistemas['label'] = $sistema->nombre_sistema;
-                    $array_sis[] = $array_sistemas;
-                }
-            }
-            if (!(isset($array_sis))) {
-                $array_sis = [];
-            }
-        } else {
-            foreach ($sistemas as $sistema) {
-                $array_sistemas['value'] = $sistema->id_sistema;
-                $array_sistemas['label'] = $sistema->nombre_sistema;
-                $array_sis[] = $array_sistemas;
-            }
-        }
-        return ['userRoles' => $user->roles->load('sistema'), 'sistemas' => $array_sis, 'nombre_usuario' => $user->nick_usuario];
-    }
     public function getRolesPerSystem(Request $request)
     {
         $id_sistema = $request->input('id_sistema');
@@ -152,7 +120,6 @@ class UserController extends Controller
         }
         return ['roles' => $array_roles];
     }
-
     //Methods to create a new user
     public function getDui(Request $request)
     {

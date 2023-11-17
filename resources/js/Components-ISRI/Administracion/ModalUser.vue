@@ -33,7 +33,7 @@ import moment from 'moment';
                 </div>
 
                 <div v-else class="flex" :class="!foundUser ? ' justify-center' : 'flex-col md:flex-row'">
-                    <div class="border-r border-gray-600 pr-2" :class="foundUser ? 'md:w-[40%]' : 'md:w-[75%]'">
+                    <div :class="foundUser ? 'md:w-[40%] border-r border-gray-600 pr-2' : 'md:w-[75%]'">
                         <div class="flex flex-col">
                             <div v-if="userId == '' && !foundUser" class="flex flex-col items-center">
                                 <input id="dui" type="text" class="p-1 mb-2 w-[75%] rounded-lg" placeholder="Ingresa DUI"
