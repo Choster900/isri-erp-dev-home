@@ -108,18 +108,6 @@ class UserController extends Controller
         }
     }
 
-    //New method
-    public function getSelectsCreateUser()
-    {
-        $systems = Sistema::select('id_sistema as value', 'nombre_sistema as label')
-            ->where('estado_sistema', '=', 1)
-            ->has('roles')
-            ->orderBy('nombre_sistema')
-            ->get();
-        return ['systems' => $systems];
-    }
-    //until here
-
 
     public function getSystems(Request $request)
     {
@@ -163,58 +151,6 @@ class UserController extends Controller
             }
         }
         return ['roles' => $array_roles];
-    }
-
-    public function saveRol(Request $request)
-    {
-        $id_usuario = $request->input('id_usuario');
-        $id_rol = $request->input('id_rol');
-        $rol = Rol::find($id_rol);
-        $permiso_user = PermisoUsuario::where('id_usuario', '=', $id_usuario)->where('id_rol', '=', $id_rol)->first();
-        if ($permiso_user) {
-            $permiso_user->estado_permiso_usuario = 1;
-            $permiso_user->ip_permiso_usuario = $request->ip();
-            $permiso_user->fecha_mod_permiso_usuario = Carbon::now();
-            $permiso_user->usuario_permiso_usuario = $request->user()->nick_usuario;
-            $permiso_user->update();
-        } else {
-            $new_permiso_user = new PermisoUsuario();
-            $new_permiso_user->id_rol = $id_rol;
-            $new_permiso_user->id_usuario = $id_usuario;
-            $new_permiso_user->estado_permiso_usuario = 1;
-            $new_permiso_user->ip_permiso_usuario = $request->ip();
-            $new_permiso_user->fecha_reg_permiso_usuario = Carbon::now();
-            $new_permiso_user->usuario_permiso_usuario = $request->user()->nick_usuario;
-            $new_permiso_user->save();
-        }
-        return ['mensaje' => 'Guardado rol ' . $rol->nombre_rol . ' con exito'];
-    }
-    public function desactiveRol(Request $request)
-    {
-        $id_usuario = $request->input('id_usuario');
-        $id_rol = $request->input('id_rol');
-        $rol = Rol::find($id_rol);
-        $permiso_user = PermisoUsuario::where('id_usuario', '=', $id_usuario)->where('id_rol', '=', $id_rol)->first();
-        $permiso_user->estado_permiso_usuario = 0;
-        $permiso_user->ip_permiso_usuario = $request->ip();
-        $permiso_user->fecha_mod_permiso_usuario = Carbon::now();
-        $permiso_user->usuario_permiso_usuario = $request->user()->nick_usuario;
-        $permiso_user->update();
-        return ['mensaje' => 'Desactivado rol ' . $rol->nombre_rol . ' con exito'];
-    }
-
-    public function updateRol(Request $request)
-    {
-        $id_permiso_usuario = $request->input('permiso_usuario');
-        $id_rol = $request->input('id_rol');
-        $rol = Rol::find($id_rol);
-        $permiso_user = PermisoUsuario::find($id_permiso_usuario);
-        $permiso_user->id_rol = $id_rol;
-        $permiso_user->ip_permiso_usuario = $request->ip();
-        $permiso_user->fecha_mod_permiso_usuario = Carbon::now();
-        $permiso_user->usuario_permiso_usuario = $request->user()->nick_usuario;
-        $permiso_user->update();
-        return ['mensaje' => 'Nuevo rol asignado ' . $rol->nombre_rol . ' con exito'];
     }
 
     //Methods to create a new user

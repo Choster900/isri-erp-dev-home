@@ -21,12 +21,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('change-password-user', [UserController::class, 'changePasswordUser'])->name('user.changePasswordUser');
     Route::post('systems', [UserController::class, 'getSystems'])->name('user.getSystems');
     Route::post('roles-per-system', [UserController::class, 'getRolesPerSystem'])->name('user.getRolesPerSystem');
-    Route::post('save-rol', [UserController::class, 'saveRol'])->name('user.saveRol');
-    Route::post('desactive-rol', [UserController::class, 'desactiveRol'])->name('user.desactiveRol');
-    Route::post('update-rol', [UserController::class, 'updateRol'])->name('user.updateRol');
     Route::get('get-dui', [UserController::class, 'getDui'])->name('user.getDui');
     Route::post('save-user', [UserController::class, 'saveUser'])->name('user.saveUser');
-    Route::get('get-selects-create-user', [UserController::class, 'getSelectsCreateUser'])->name('user.getSelectsCreateUser');
 
     //New Methods
     Route::post('standarize-username', [UserController::class, 'standarizeUsername'])->name('user.standarizeUsername');
