@@ -16,31 +16,34 @@
                     class="px-2 first:pl-5 last:pr-5 py-3 whitespace-nowrap"
                     :style="!searchButton ? 'width:' + column.width + ';' + 'cursor:pointer;' : 'width:' + column.width + ';'">
 
-                    <div v-if="column.type != 'select'">
-                        <input :type="column.type" class="tabla text-xs font-normal w-full " @input="sendData($event)"
-                            @keyup.enter="$emit('execute-search')" value="" :id="column.name" ref="myInput"
-                            v-if="column.name != 'Acciones'">
-                        <div v-if="column.name == 'Acciones' && searchButton" class="flex justify-center">
-                            <button @click="$emit('execute-search')" title="Filtrar por criterios de busqueda">
-                                <svg height="28" width="28" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                                    <path
-                                        d="M332.998,291.918c52.2-71.895,45.941-173.338-18.834-238.123c-71.736-71.728-188.468-71.728-260.195,0c-71.746,71.745-71.746,188.458,0,260.204c64.775,64.775,166.218,71.034,238.104,18.844l14.222,14.203l40.916-40.916L332.998,291.918z M278.488,278.333c-52.144,52.134-136.699,52.144-188.852,0c-52.152-52.153-52.152-136.717,0-188.861c52.154-52.144,136.708-52.144,188.852,0C330.64,141.616,330.64,226.18,278.488,278.333z" />
-                                    <path
-                                        d="M109.303,119.216c-27.078,34.788-29.324,82.646-6.756,119.614c2.142,3.489,6.709,4.603,10.208,2.46c3.49-2.142,4.594-6.709,2.462-10.198c-19.387-31.7-17.45-72.962,5.782-102.771c2.526-3.228,1.946-7.898-1.292-10.405C116.48,115.399,111.811,115.979,109.303,119.216z" />
-                                    <path
-                                        d="M501.499,438.591L363.341,315.178l-47.98,47.98l123.403,138.168c12.548,16.234,35.144,13.848,55.447-6.456C514.505,474.576,517.743,451.138,501.499,438.591z" />
-                                </svg>
-                            </button>
+                    <template v-if="column.visible !== undefined ? column.visible : true">
+                        <div v-if="column.type != 'select'">
+                            <input :type="column.type" class="tabla text-xs font-normal w-full " @input="sendData($event)"
+                                @keyup.enter="$emit('execute-search')" value="" :id="column.name" ref="myInput"
+                                v-if="column.name != 'Acciones'">
+                            <div v-if="column.name == 'Acciones' && searchButton" class="flex justify-center">
+                                <button @click="$emit('execute-search')" title="Filtrar por criterios de busqueda">
+                                    <svg height="28" width="28" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                        <path
+                                            d="M332.998,291.918c52.2-71.895,45.941-173.338-18.834-238.123c-71.736-71.728-188.468-71.728-260.195,0c-71.746,71.745-71.746,188.458,0,260.204c64.775,64.775,166.218,71.034,238.104,18.844l14.222,14.203l40.916-40.916L332.998,291.918z M278.488,278.333c-52.144,52.134-136.699,52.144-188.852,0c-52.152-52.153-52.152-136.717,0-188.861c52.154-52.144,136.708-52.144,188.852,0C330.64,141.616,330.64,226.18,278.488,278.333z" />
+                                        <path
+                                            d="M109.303,119.216c-27.078,34.788-29.324,82.646-6.756,119.614c2.142,3.489,6.709,4.603,10.208,2.46c3.49-2.142,4.594-6.709,2.462-10.198c-19.387-31.7-17.45-72.962,5.782-102.771c2.526-3.228,1.946-7.898-1.292-10.405C116.48,115.399,111.811,115.979,109.303,119.216z" />
+                                        <path
+                                            d="M501.499,438.591L363.341,315.178l-47.98,47.98l123.403,138.168c12.548,16.234,35.144,13.848,55.447-6.456C514.505,474.576,517.743,451.138,501.499,438.591z" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    <div v-else>
-                        <select @change="sendData($event)" :id="column.name" ref="myInput" class="appearance-none"
-                            style="appearance: none; -webkit-appearance: none; -moz-appearance: none;">
-                            <option value=""></option>
-                            <option v-for="(option, i) in column.options " :key="i" :value="option.value">{{ option.label }}
-                            </option>
-                        </select>
-                    </div>
+                        <div v-else>
+                            <select @change="sendData($event)" :id="column.name" ref="myInput" class="appearance-none"
+                                style="appearance: none; -webkit-appearance: none; -moz-appearance: none;">
+                                <option value=""></option>
+                                <option v-for="(option, i) in column.options " :key="i" :value="option.value">{{
+                                    option.label }}
+                                </option>
+                            </select>
+                        </div>
+                    </template>
 
                 </th>
             </tr>

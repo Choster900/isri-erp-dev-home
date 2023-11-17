@@ -55,6 +55,15 @@ class Persona extends Model
     {
         return $this->hasOne('App\Models\User', 'id_persona', 'id_persona');
     }
+    /**
+     * Get the genero that owns the Persona
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function genero(): BelongsTo
+    {
+        return $this->belongsTo(Genero::class, 'id_genero', 'id_genero');
+    }
     public function residencias()
     {
         return $this->hasMany('App\Models\Residencia', 'id_persona', 'id_persona');

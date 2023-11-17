@@ -31,7 +31,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs; */
                         <label class="text-xs text-gray-500 font-normal uppercase">Fecha de creacion</label>
                         <p class="text-xs text-black font-semibold">{{
                             dataToShow.createdAt === null || dataToShow.createdAt == '' ?
-                            '00/00/0000' :
+                            'DD/MM/YYYY' :
                             moment(dataToShow.createdAt).calendar()
 
                         }}</p>
@@ -96,23 +96,31 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs; */
                 <div class=" mt-10 md:flex flex-row justify-items-start">
                     <div class=" md:mr-2 md:mb-0 basis-full">
                         <div class="mb-2 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-full">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-full ">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Empleado/a <span class="text-red-600 font-extrabold">*</span>
                                 </label>
-
-
                                 <div class="relative font-medium  flex h-8 w-full flex-row-reverse">
-                                    <Multiselect v-model="dataSent.id_persona"
-                                        @search-change="handleSearch({ by: 'name', query: $event })" :clearOnSearch="true"
-                                        @select="personaWasSelected($event)" @deselect=" deleteInfoBeneficiarios(false)"
-                                        @clear=" deleteInfoBeneficiarios(false)"
-                                        placeholder="FILTRAR POR APELLIDO (SI NO APARECE ES POSIBLE QUE YA TENGA REGISTROS)"
-                                        :filter-results="false" :min-chars="10" :resolve-on-load="true" :searchable="true"
-                                        :options="personaOptions" noOptionsText="<p class='text-xs'>Sin registros<p>"
-                                        :classes="{
-                                            placeholder: 'flex items-center h-full absolute text-[8pt] left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                    <Multiselect v-if="dataBeneficiarios == ''" v-model="dataSent.id_persona"
+                                        @select="personaWasSelected($event)" :filter-results="false"
+                                        :resolve-on-load="false" :delay="1500" :searchable="true" :clear-on-search="true"
+                                        :min-chars="5" placeholder="Busqueda de usuario..." :classes="{
+                                            container: 'relative mx-auto w-full flex items-center justify-end border border-gray-300 cursor-pointer  rounded-tr-md rounded-br-md bg-white text-base leading-snug outline-none',
+                                            placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                        }"
+                                        noOptionsText="<p class='text-xs'>Obtenga los datos escribiendo un nombre<p>"
+                                        :options="async function (query) {
+                                            return await getPeopleByName(query)
                                         }" />
+                                    <Multiselect v-else v-model="dataSent.id_persona" :filter-results="false"
+                                        :disabled="true" :resolve-on-load="false" :delay="1000" :searchable="true"
+                                        :clear-on-search="true" :min-chars="5" placeholder="Busqueda de usuario..."
+                                        :classes="{
+                                            container: 'relative mx-auto w-full flex items-center justify-end  cursor-pointer  rounded-tr-md rounded-br-md  text-base leading-snug outline-none',
+                                            containerDisabled: 'cursor-not-allowed bg-gray-100 text-black/80',
+                                            placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                        }" :options="opcionPersona" />
+
                                     <LabelToInput icon="list" />
                                 </div>
                                 <InputError class="mt-2" :message="errosModel.id_persona" />
@@ -151,49 +159,43 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs; */
                                 </svg>
                             </div>
                             <div class="md:mr-2 md:mb-0 basis-1/2">
+                                <!--  {{ row.id_parentesco }} -->
                                 <h5 class="text-sm font-medium" :class="row.nombre_familiar == '' ? 'py-2' : ''"
-                                    v-if="!row.onEdit">{{
-                                        row.nombre_familiar }} - {{ row.nombre_parentesco }}</h5>
-
+                                    v-if="!row.onEdit">{{ row.nombre_familiar }} - {{ row.nombre_parentesco }}</h5>
                                 <div v-else class="flex items-center gap-1">
                                     <div>
                                         <input v-model="row.nombre_familiar" type="text" :class="row.onEdit ? '' : ''"
-                                            class="rounded w-52 h-7 text-xs font-medium" placeholder="Nombre del familiar"
+                                            maxlength="35" class="rounded w-52 h-7 text-xs font-medium"
+                                            placeholder="Nombre del familiar"
                                             @input="row.nombre_familiar = row.nombre_familiar.toUpperCase()">
                                     </div>
                                     <div class="mb-4 md:mr-2 md:mb-0 basis-full">
                                         <div class="relative w-40 flex h-7 flex-row-reverse">
-                                            <Multiselect :options="optionsParentesco" v-model="row.id_parentesco"
+                                            <Multiselect :options="dataForSelect" v-model="row.id_parentesco"
                                                 @select="(selected) => selectParentesco(selected, rowIndex)"
                                                 @deselect="row.nombre_parentesco = ''" @clear="row.nombre_parentesco = ''"
                                                 :searchable="true" noOptionsText="<p class='text-xs'>sin requerimientos<p>"
                                                 :classes="{
                                                     container: 'relative mx-auto w-full flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none',
-                                                }
-                                                    " noResultsText="<p class='text-xs'>requerimiento no encontrado<p>"
+                                                }" noResultsText="<p class='text-xs'>requerimiento no encontrado<p>"
                                                 placeholder="Parentesco" />
                                         </div>
-
-
                                     </div>
-
                                 </div>
                                 <div class="flex items-center gap-3">
-
                                     <InputError class="mt-2" :message="errosModel[`dataRow.${rowIndex}.nombre_familiar`]" />
-
                                     <InputError class="mt-2" :message="errosModel[`dataRow.${rowIndex}.id_parentesco`]" />
                                 </div>
                                 <h5 class="text-sm ">0 al 100 %</h5>
                                 <div class="flex items-center gap-3" style="width: 445px;">
-                                    <span class="text-2xl cursor-pointer"
+                                    <span class="text-2xl cursor-pointer text-selection-disable"
                                         @click="increaseOrDecreaseDesignacionDePorcentajes(rowIndex, 'resta')">-</span>
                                     <input @input="calcularDesignacionDePorcentajes(rowIndex)"
                                         v-model="row.porcentaje_familiar"
                                         class="cursor-grabbing	 rounded-lg overflow-hidden appearance-none bg-gray-400 h-3 w-full"
                                         type="range" min="0" max="100" step="1" />
-                                    <span class="text-sm font-medium ml-2">{{ row.porcentaje_familiar }}%</span>
-                                    <span class="text-2xl cursor-pointer"
+                                    <span class="text-sm font-medium ml-2 ">{{ row.porcentaje_familiar }}%</span>
+                                    <span class="text-2xl cursor-pointer text-selection-disable"
                                         @click="increaseOrDecreaseDesignacionDePorcentajes(rowIndex, 'suma')">+</span>
                                 </div>
                                 <InputError class="mt-2" :message="errosModel[`dataRow.${rowIndex}.porcentaje_familiar`]" />
@@ -235,16 +237,11 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs; */
                     </div>
                 </div>
             </div>
-
-            <button @click="printPdf()">IMPRIMIR</button>
-           <!--  {{ dataUrlPdf }}-->
-          <!--   <embed :src="dataUrlPdf" type="application/pdf" width="550" height="400"
-                class="rounded-lg border border-gray-300 shadow-md shadow-black">  -->
         </Modal>
     </div>
 </template>
 <script>
-import { createApp, h } from 'vue'
+import { computed, createApp, h } from 'vue'
 import CertificadoSeguroColectivoDeVida from '@/pdf/RRHH/CertificadoSeguroColectivoDeVida.vue';
 export default {
     props: {
@@ -256,31 +253,13 @@ export default {
             type: Object,
             default: [],
         },
+        dataForSelect: {
+            type: Object,
+            default: [],
+        },
     },
     data: () => ({
         personaOptions: [],
-        optionsParentesco: [
-            { value: '1', label: 'MADRE', unico_parentesco: 1 },
-            { value: '2', label: 'PADRE', unico_parentesco: 1 },
-            { value: '3', label: 'ABUELO/A', unico_parentesco: 0 },
-            { value: '4', label: 'BISABUELO/A', unico_parentesco: 0 },
-            { value: '5', label: 'HERMANO/A', unico_parentesco: 0 },
-            { value: '6', label: 'CONYUGE', unico_parentesco: 0 },
-            { value: '7', label: 'HIJO/A', unico_parentesco: 0 },
-            { value: '8', label: 'NIETO/A', unico_parentesco: 0 },
-            { value: '9', label: 'BISNIETO/A', unico_parentesco: 0 },
-            { value: '10', label: 'TIO/A', unico_parentesco: 0 },
-            { value: '11', label: 'PRIMO/A', unico_parentesco: 0 },
-            { value: '12', label: 'SOBRINO/A', unico_parentesco: 0 },
-            { value: '13', label: 'SUEGRO/A', unico_parentesco: 0 },
-            { value: '14', label: 'NUERA', unico_parentesco: 0 },
-            { value: '15', label: 'YERNO', unico_parentesco: 0 },
-            { value: '16', label: 'CUÑADO/A', unico_parentesco: 0 },
-            { value: '17', label: 'PADRASTRO', unico_parentesco: 0 },
-            { value: '18', label: 'MADASTRA', unico_parentesco: 0 },
-            { value: '19', label: 'HIJASTRO/A', unico_parentesco: 0 },
-            { value: '20', label: 'AMIGO/A', unico_parentesco: 0 },
-        ],
         dataSent: {
             id_persona: '',
             dataRow: [],
@@ -291,6 +270,8 @@ export default {
         loading: false,
         isLoadingToSearch: false,
         errosModel: [],
+        opcionPersona: [],
+        selectedValue: '',
         dataUrlPdf: null,
         dataToShow: {
             createdAt: '',
@@ -306,25 +287,42 @@ export default {
         },
     }),
     methods: {
-        async handleSearch(query) {
-            if (query !== '') {
-                try {
-                    if (query.by === 'name' && query.query.length >= 5) {
-                        this.isLoadingToSearch = true;
-                        const response = await axios.post('/search-people', query);
-                        this.personaOptions = response.data;
-                    } else if (query.by === 'id') {
-                        this.loading = true;
-                        const response = await axios.post('/search-people', query);
-                        this.personaOptions = response.data;
-                        this.personaWasSelected(query.query);
-                    }
-                } catch (error) {
-                    console.log('Error en la búsqueda:', error);
-                } finally {
-                    this.isLoadingToSearch = false;
-                    this.loading = false;
-                }
+        /*  async handleSearch(query) {
+             if (query !== '') {
+                 try {
+                     if (query.by === 'name' && query.query.length >= 5) {
+                         this.isLoadingToSearch = true;
+                         const response = await axios.post('/search-people', query);
+                         this.personaOptions = response.data;
+                     } else if (query.by === 'id') {
+                         this.loading = true;
+                         const response = await axios.post('/search-people', query);
+                         this.personaOptions = response.data;
+                         this.personaWasSelected(query.query);
+                     }
+                 } catch (error) {
+                     console.log('Error en la búsqueda:', error);
+                 } finally {
+                     this.isLoadingToSearch = false;
+                     this.loading = false;
+                 }
+             }
+         }, */
+
+        async getPeopleByName(nombreToSearch) {
+            try {
+                // endpoint getPersonaByName se encuentra en PersonaController => nombre del metodo getPersonByCompleteName
+                const response = await axios.post("/search-people", {
+                    nombre: nombreToSearch,
+                });
+                console.log(response.data);
+                this.personaOptions = response.data;
+                // Devuelve los datos de la respuesta
+                return response.data;
+            } catch (error) {
+                // Manejo de errores
+                console.error("Error al obtener personas por nombre:", error);
+                throw error; // Lanza el error para que pueda ser manejado por el componente que utiliza este composable
             }
         },
 
@@ -362,19 +360,35 @@ export default {
         },
 
         personaWasSelected(id_persona) {
+            console.log(this.personaOptions);
             let persona = JSON.parse(JSON.stringify(this.personaOptions.find((index) => index.value == id_persona)));
             console.log(persona);
-            this.dataToShow.createdAt = persona.fecha_reg_persona
-            this.dataToShow.updatedAt = persona.fecha_mod_persona
-            this.dataToShow.bornPlace = persona.localidad
-            this.dataToShow.birthDay = persona.fecha_nac_persona
-            this.dataToShow.civilStatus = persona.nombre_estado_civil
-            this.dataToShow.gender = persona.nombre_genero
-            this.dataToShow.levelEducation = persona.nombre_nivel_educativo
-            this.dataToShow.profesion = persona.nombre_profesion_rnpn
+            this.dataToShow.createdAt = persona.ALL.fecha_reg_persona
+            this.dataToShow.updatedAt = persona.ALL.fecha_mod_persona
+            this.dataToShow.bornPlace = `${persona.ALL.nombre_pais}, ${persona.ALL.nombre_departamento}, ${persona.ALL.nombre_municipio}`
+            this.dataToShow.birthDay = persona.ALL.fecha_nac_persona
+            this.dataToShow.civilStatus = persona.ALL.nombre_estado_civil
+            this.dataToShow.gender = persona.ALL.nombre_genero
+            this.dataToShow.levelEducation = persona.ALL.nombre_nivel_educativo
+            this.dataToShow.profesion = persona.ALL.nombre_profesion_rnpn
             this.dataToShow.dui_persona = persona.dui_persona
             this.dataToShow.name = persona.label
         },
+
+        setInformtionPersona(persona) {
+            console.log(persona);
+            this.dataToShow.createdAt = persona.fecha_reg_persona
+            this.dataToShow.updatedAt = persona.fecha_mod_persona
+            this.dataToShow.bornPlace = `${persona.municipio.departamento.pais.nombre_pais}, ${persona.municipio.departamento.nombre_departamento}, ${persona.municipio.nombre_municipio}`
+            this.dataToShow.birthDay = persona.fecha_nac_persona
+            this.dataToShow.civilStatus = persona.estado_civil.nombre_estado_civil
+            this.dataToShow.gender = persona.genero.nombre_genero
+            this.dataToShow.levelEducation = persona.nivel_educativo.nombre_nivel_educativo
+            this.dataToShow.profesion = persona.profesion.nombre_profesion_rnpn
+            this.dataToShow.dui_persona = persona.dui_persona
+            this.dataToShow.name = `${persona.pnombre_persona || ''} ${persona.snombre_persona || ''} ${persona.tnombre_persona || ''} ${persona.papellido_persona || ''} ${persona.sapellido_persona || ''} ${persona.tapellido_persona || ''} `
+        },
+
 
         areAllPercentagesAboveOne() {
             // Traemos los registros que no hallan sido eliminados
@@ -628,7 +642,7 @@ export default {
             /* if (this.totalPorcentajeAsignado > 100) {
                 // Calcular el excedente
                 const ajuste = parseInt(this.totalPorcentajeAsignado) - 100;
-
+        
                 // Ajustar los porcentajes de las filas diferentes a la actual
                 this.dataSent.dataRow.forEach((obj, index) => {
                     if (index !== rowIndex) {
@@ -646,7 +660,7 @@ export default {
             //this.totalPorcentajeAsignado = this.dataSent.dataRow.reduce((suma, obj) => suma + parseFloat(obj.porcentaje_familiar), 0);
         },
         setInfoBeneficiarios(info) {
-            console.log(info.familiar.reduce((suma, obj) => suma + parseFloat(obj.porcentaje_familiar), 0));
+            //console.log(info.familiar.reduce((suma, obj) => suma + parseFloat(obj.porcentaje_familiar), 0));
             this.dataSent.id_persona = info.id_persona
             this.totalPorcentajeAsignado = info.familiar.reduce((suma, obj) => suma + parseFloat(obj.porcentaje_familiar), 0);
         },
@@ -692,8 +706,17 @@ export default {
             if (this.showModal) {
                 if (this.dataBeneficiarios != '') {
                     const newDataBeneficiarios = JSON.parse(JSON.stringify(this.dataBeneficiarios));
-                    this.handleSearch({ by: 'id', query: newDataBeneficiarios.id_persona })
+                    this.personaOptions = this.dataBeneficiarios
+                    const opcionPersona = computed(() => {
+                        return newDataBeneficiarios ? [{
+                            value: newDataBeneficiarios.id_persona,
+                            label: `${newDataBeneficiarios.pnombre_persona || ''} ${newDataBeneficiarios.snombre_persona || ''} ${newDataBeneficiarios.tnombre_persona || ''} ${newDataBeneficiarios.papellido_persona || ''} ${newDataBeneficiarios.sapellido_persona || ''} ${newDataBeneficiarios.tapellido_persona || ''} `
+                        }] : [];
+                    });
+                    this.dataSent.id_persona = newDataBeneficiarios.id_persona
+                    this.opcionPersona = opcionPersona.value;
                     this.setInfoBeneficiarios(newDataBeneficiarios)
+                    this.setInformtionPersona(newDataBeneficiarios)
                     newDataBeneficiarios.familiar.forEach((obj, index) => {
                         this.dataSent.dataRow.push({
                             id_familiar: obj.id_familiar,

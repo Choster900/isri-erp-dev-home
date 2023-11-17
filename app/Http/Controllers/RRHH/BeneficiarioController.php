@@ -16,36 +16,36 @@ class BeneficiarioController extends Controller
     function getDataFromBeneficiarios(Request $request)
     { //La tabla familiar tiene diferentes usos uno de ellos es guardar los beneficiarios del seguro del empleado
         $columns = [
+            'id_genero',
             'id_persona',
-            'id_empleado',
-            'id_nivel_educativo',
-            'id_profesion',
             'id_usuario',
+            'ip_persona',
+            'id_empleado',
+            'dui_persona',
+            'id_profesion',
             'id_municipio',
             'id_aspirante',
-            'id_genero',
+            'peso_persona',
+            'email_persona',
+            'estado_persona',
             'id_estado_civil',
-            'dui_persona',
             'pnombre_persona',
             'snombre_persona',
             'tnombre_persona',
+            'usuario_persona',
+            'telefono_persona',
+            'estatura_persona',
             'papellido_persona',
             'sapellido_persona',
             'tapellido_persona',
             'fecha_nac_persona',
+            'fecha_reg_persona',
+            'fecha_mod_persona',
+            'id_nivel_educativo',
+            'observacion_persona',
             'nombre_madre_persona',
             'nombre_padre_persona',
             'nombre_conyuge_persona',
-            'telefono_persona',
-            'email_persona',
-            'peso_persona',
-            'estatura_persona',
-            'observacion_persona',
-            'estado_persona',
-            'fecha_reg_persona',
-            'fecha_mod_persona',
-            'usuario_persona',
-            'ip_persona',
         ];
 
         $length = $request->input('length');
@@ -54,25 +54,24 @@ class BeneficiarioController extends Controller
         $data = $request->input('search');
 
         // Construir la consulta base con las relaciones
-        $query = Persona::select('*')->with(["familiar", "familiar.parentesco","municipio.departamento.pais","residencias","empleado.plazas_asignadas.detalle_plaza.plaza"])->whereHas("familiar", function ($query) {
+        $query = Persona::select('*')->with([
+            "genero",
+            "familiar" => function($query){
+                $query->where('estado_familiar', 1);
+            },
+            "profesion",
+            "residencias",
+            "estado_civil",
+            "nivel_educativo",
+            "familiar.parentesco",
+            "municipio.departamento.pais",
+            "empleado.plazas_asignadas.detalle_plaza.plaza",
+        ])->whereHas("familiar", function ($query) {
             $query->where("estado_familiar", 1);
         })->where("estado_persona", 1)->orderBy($columns[$column], $dir);
 
         if ($data) {
             $query->where('id_persona', 'like', '%' . $data["id_persona"] . '%');
-            
-            /* $query->where(function ($query) use ($searchNombres) {
-                $query->where('pnombre_persona', 'like', '%' . $searchNombres . '%')
-                    ->orWhere('snombre_persona', 'like', '%' . $searchNombres . '%')
-                    ->orWhere('tnombre_persona', 'like', '%' . $searchNombres . '%');
-            }); */
-
-            /*   $searchApellidos = $data["collecApellido"];
-            $query->where(function ($query) use ($searchApellidos) {
-                $query->where('papellido_persona', 'like', '%' . $searchApellidos . '%')
-                    ->orWhere('sapellido_persona', 'like', '%' . $searchApellidos . '%')
-                    ->orWhere('tapellido_persona', 'like', '%' . $searchApellidos . '%');
-            }); */
 
             $searchNombres = $data["collecNombre"];
             if (isset($searchNombres)) {
@@ -98,13 +97,54 @@ class BeneficiarioController extends Controller
         }
 
         $beneficiarios = $query->paginate($length)->onEachSide(1);
+        $parentesco = DB::table('parentesco')->select('id_parentesco as value', 'nombre_parentesco  as label')->get();
 
         return [
             'data' => $beneficiarios,
+            'dataForSelect' => [
+                'parentesco' => $parentesco
+            ],
             'draw' => $request->input('draw'),
         ];
     }
-    public function searchPeopleByNameOrId(Request $request)
+
+    function searchPeopleByNameOrId(Request $request)
+    {
+        $query = Persona::query();
+
+        if (!empty($request->nombre)) {
+
+            $query->join('profesion', 'profesion.id_profesion', '=', 'persona.id_profesion')
+                ->join('nivel_educativo', 'nivel_educativo.id_nivel_educativo', '=', 'persona.id_nivel_educativo')
+                ->join('genero', 'genero.id_genero', '=', 'persona.id_genero')
+                ->join('estado_civil', 'estado_civil.id_estado_civil', '=', 'persona.id_estado_civil')
+                ->join('municipio', 'municipio.id_municipio', '=', 'persona.id_municipio')
+                ->join('departamento', 'departamento.id_departamento', '=', 'municipio.id_departamento')
+                ->join('pais', 'pais.id_pais', '=', 'departamento.id_pais')->where('estado_persona', 1)->where(function ($query) {
+                    $query->doesntHave('familiar')
+                        ->orWhereHas('familiar', function ($query) {
+                            $query->where('estado_familiar', 0);
+                        });
+                })->where(function ($query) use ($request) {
+                    $query->whereRaw("MATCH ( pnombre_persona,snombre_persona,tnombre_persona, papellido_persona,sapellido_persona,tapellido_persona ) AGAINST ( '" . $request->nombre . "')");
+                });
+        }
+
+        $results = $query->get();
+
+        $formattedResults = $results->map(function ($item) {
+            $objectData = [
+                'value' => $item->id_persona,
+                'label' => $item->pnombre_persona . ' ' . ($item->snombre_persona ?? '') . ' ' . ($item->tnombre_persona ?? '') . '' . $item->papellido_persona . ' ' . ($item->sapellido_persona ?? '') . ' ' . ($item->tapellido_persona ?? ''),
+                'ALL'   => $item
+            ];
+
+            return $objectData;
+        });
+
+        return response()->json($formattedResults);
+    }
+    /* public function searchPeopleByNameOrId(Request $request)
     {
         if ($request["by"] == 'name') {
             return Persona::select(
@@ -168,7 +208,7 @@ class BeneficiarioController extends Controller
                 ->where('estado_persona', 1)
                 ->where("id_persona", $request['query'])->get();
         }
-    }
+    } */
 
     function addRelatives(BeneficiariosRequest $request)
     {
