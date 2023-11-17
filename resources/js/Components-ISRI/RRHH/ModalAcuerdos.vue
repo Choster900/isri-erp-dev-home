@@ -24,10 +24,10 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                         </label>
                                         <div class="relative font-medium  flex h-8 w-full flex-row-reverse">
 
-                                            <Multiselect v-if="dataAcuerdos == ''" v-model="dataForm.id_empleado" :filter-results="false"
-                                                placeholder="Busca empleados por nombres" :resolve-on-load="false"
-                                                :delay="1500" :searchable="true" :clear-on-search="true" :min-chars="5"
-                                                :classes="{
+                                            <Multiselect v-if="dataAcuerdos == ''" v-model="dataForm.id_empleado"
+                                                :filter-results="false" placeholder="Busca empleados por nombres"
+                                                :resolve-on-load="false" :delay="1500" :searchable="true"
+                                                :clear-on-search="true" :min-chars="5" :classes="{
                                                     container: 'relative mx-auto w-full flex items-center justify-end border border-gray-300 cursor-pointer  rounded-tr-md rounded-br-md bg-white text-xs leading-snug outline-none',
                                                     placeholder: 'flex items-center h-full absolute text-[11px] left-0 top-0 pointer-events-none bg-transparent leading-snug pl-2 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
                                                 }"
@@ -96,8 +96,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                 <div class="mb-4 md:flex flex-row justify-items-start">
                                     <div class="mb-1 md:mr-2 md:mb-0 basis-full">
                                         <TextInput id="oficio-acuerdo" type="text" placeholder="Numero de referencia"
-                                            v-model="dataForm.deal.oficio_acuerdo_laboral"
-                                            :maxlength="40"
+                                            v-model="dataForm.deal.oficio_acuerdo_laboral" :maxlength="40"
                                             @update:modelValue="dataForm.deal.oficio_acuerdo_laboral = dataForm.deal.oficio_acuerdo_laboral.toUpperCase()">
                                             <LabelToInput icon="standard" forLabel="primer-nombre" />
                                         </TextInput>
@@ -110,7 +109,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                         Descripción
                                         <span class="text-red-600 font-extrabold">*</span>
                                     </label>
-                                    <textarea id="descripcion" name="descripcion" style="overflow-x: hidden;" 
+                                    <textarea id="descripcion" name="descripcion" style="overflow-x: hidden;"
                                         v-model="dataForm.deal.comentario_acuerdo_laboral"
                                         class="resize-none w-full h-24 overflow-y-auto peer text-xs font-normal rounded-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-none focus:outline-none"></textarea>
 
@@ -765,7 +764,7 @@ export default {
             if (this.showModal) {
                 if (this.dataAcuerdos != '') {
 
-                    let nombreEmpleado = `${this.dataAcuerdos.codigo_empleado} - ${this.dataAcuerdos.persona.pnombre_persona} ${this.dataAcuerdos.persona.snombre_persona} ${this.dataAcuerdos.persona.tnombre_persona || ''} ${this.dataAcuerdos.persona.papellido_persona} ${this.dataAcuerdos.persona.sapellido_persona} ${this.dataAcuerdos.persona.tapellido_persona || ''}`
+                    let nombreEmpleado = `${this.dataAcuerdos.codigo_empleado || ''} - ${this.dataAcuerdos.persona.pnombre_persona || ''} ${this.dataAcuerdos.persona.snombre_persona || ''} ${this.dataAcuerdos.persona.tnombre_persona || ''} ${this.dataAcuerdos.persona.papellido_persona || ''} ${this.dataAcuerdos.persona.sapellido_persona || ''} ${this.dataAcuerdos.persona.tapellido_persona || ''}`
                     this.employeOptions = [{
                         value: this.dataAcuerdos.id_empleado,
                         label: nombreEmpleado
