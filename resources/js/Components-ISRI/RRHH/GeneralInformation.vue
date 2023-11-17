@@ -40,14 +40,14 @@ import AccordionBasicVue from '@/Components-ISRI/AccordionBasic.vue';
                                                         </button>
                                                     </li>
                                                     <li class="m-1">
-                                                        <DropDownOptions position="right-up">
+                                                    <!--     <DropDownOptions position="right-up">
                                                             <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                                                 <div class="font-semibold text-xs">
                                                                     
                                                                     Lorem ipsum dolor, sit amet consectetur adipisicing elit. Molestias perspiciatis dolores consequatur aliquam distinctio. Vitae, magni dicta! Nostrum fuga aut, libero, alias architecto commodi nam iusto sunt perspiciatis qui ex.
                                                                 </div>
                                                             </div>
-                                                        </DropDownOptions>
+                                                        </DropDownOptions> -->
                                                     </li>
                                                 </ul>
                                             </div>
