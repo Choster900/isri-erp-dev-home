@@ -216,16 +216,15 @@ export default {
         },
         printPdf(dataQuedan) {
             // Opciones de configuración para generar el PDF
-            let fecha = moment().format('DD-MM-YYYY');
-            let name = 'HOJA DE SERVICIO'// Nombre del pdf
+            let name = `HOJA DE SERVICIO-${this.userData.empleado.codigo_empleado}`// Nombre del pdf
             // Propiedades del pdf
             const opt = {
-                //margin: 0.5, DEJANDO EL MARGEN POR DEFAUL
+                margin: [0, 0, 0, 0], //top, left, buttom, right,
                 filename: name,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, useCORS: true },
-                // pagebreak: { mode: 'avoid-all', before: '#page2el' },
                 pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
             };
 
             // Crear una instancia de la aplicación Vue para generar el componente quedanPDFVue
