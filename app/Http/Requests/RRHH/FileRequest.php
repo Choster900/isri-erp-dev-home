@@ -24,14 +24,14 @@ class FileRequest extends FormRequest
     public function rules()
     {
         return [
-            "fileArchivoAnexo" => 'required|mimes:jpg,png,jpeg|max:2000' 
+            "fileArchivoAnexo" => 'mimes:jpg,png,jpeg,pdf|max:2000'
         ];
     }
 
     public function messages()
     {
         return [
-            "image.required" => "Tiene que seleccionar una archivo",
+           // "image.required" => "Tiene que seleccionar una archivo",
             "image.mimes" => "La imagen no es del formato adecuado",
             "image.max" => "La imagen no debe execer los 2MB",
         ];
