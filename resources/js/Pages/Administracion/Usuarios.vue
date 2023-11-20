@@ -2,6 +2,7 @@
 import { Head } from "@inertiajs/vue3";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import ModalAdminUserVue from '@/Components-ISRI/Administracion/ModalAdminUser.vue';
+import ModalUserVue from '@/Components-ISRI/Administracion/ModalUser.vue';
 import ModalChangePasswordVue from '@/Components-ISRI/Administracion/ModalChangePassword.vue';
 import { toast } from "vue3-toastify";
 
@@ -89,7 +90,7 @@ import { toast } from "vue3-toastify";
                                 <div class="space-x-1 text-center">
                                     <DropDownOptions>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            v-if="permits.actualizar == 1 && user.estado_usuario == 1"
+                                            v-if="permits.actualizar == 1"
                                             @click="editUser(user)">
                                             <div class="w-8 text-green-900">
                                                 <span class="text-xs">
@@ -237,8 +238,12 @@ import { toast } from "vue3-toastify";
             @cerrar-modal="showModalChangePassword = !showModalChangePassword"
             @abrir-modal="showModalChangePassword = true" />
 
-        <ModalAdminUserVue :show="show" @cerrar-modal="show = !show" :modalData="modalData"
-            @update-table="getUpdateTable()" />
+        <!-- <ModalAdminUserVue :show="show" @cerrar-modal="show = !show" :modalData="modalData"
+            @update-table="getUpdateTable()" /> -->
+
+        <ModalUserVue v-if="showAdminUser" :showAdminUser="showAdminUser" @cerrar-modal="showAdminUser = !showAdminUser" 
+        :userId="userId" @update-table="getUsers(tableData.currentPage)" />
+        
     </AppLayoutVue>
 </template>
 <script>
@@ -246,7 +251,7 @@ export default {
     created() {
         this.getUsers()
         this.getPermissions(this)
-        this.getSelectsCreateUser()
+        //this.getSelectsCreateUser()
     },
     data: function (data) {
         let sortOrders = {};
@@ -276,8 +281,11 @@ export default {
             isLoading: false,
             empty_object: false,
             permits: [],
-            modalData: []
-            ,
+            modalData: [],
+            //New
+            showAdminUser: false,
+            userId: '',
+
             modalDataCreate: {
                 dui: '',
                 nombre_persona: '',
@@ -358,8 +366,10 @@ export default {
             }
         },
         createNewUser() {
-            this.show = true
-            this.modalData = []
+            // this.show = true
+            // this.modalData = []
+            this.showAdminUser = true
+            this.userId = ''
         },
         changePasswordUser(user) {
             this.modalData = user
@@ -370,15 +380,15 @@ export default {
             this.modalData.id_sistema = ""
             this.modalData.roles = ""
         },
-        getSelectsCreateUser() {
-            axios.get("/get-selects-create-user")
-                .then((response) => {
-                    this.systems = response.data.systems
-                })
-                .catch((errors) => {
-                    this.manageError(errors, this)
-                })
-        },
+        // getSelectsCreateUser() {
+        //     axios.get("/get-selects-create-user")
+        //         .then((response) => {
+        //             this.systems = response.data.systems
+        //         })
+        //         .catch((errors) => {
+        //             this.manageError(errors, this)
+        //         })
+        // },
         closeVars() {
             this.showModal = false
             this.modalVar = false
@@ -430,8 +440,10 @@ export default {
             })
         },
         editUser(user) {
-            this.show = true;
-            this.modalData = user;
+            // this.show = true;
+            // this.modalData = user;
+            this.showAdminUser = true
+            this.userId = user.id_usuario
         },
         async getUsers(url = "/users") {
             this.tableData.draw++;

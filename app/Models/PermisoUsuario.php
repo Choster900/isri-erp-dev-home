@@ -24,5 +24,8 @@ class PermisoUsuario extends Pivot
         'ip_permiso_usuario',
     ];
 
-
+    public function rol()
+    {
+        return $this->belongsTo(Rol::class, 'id_rol', 'id_rol');
+    }
 }
