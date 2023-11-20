@@ -244,8 +244,8 @@ import axios from 'axios';
             </div>
         </div>
 
-        <!-- <ModalEmployeesVue :show_modal_employee="show_modal_employee" :modalData="modalData"
-            @cerrar-modal="show_modal_employee = false" @get-table="getEmployees(tableData.currentPage)" /> -->
+        <ModalEmployeesVue :show_modal_employee="show_modal_employee" :modalData="modalData"
+            @cerrar-modal="show_modal_employee = false" @get-table="getEmployees(tableData.currentPage)" />
 
         <ModalFotografiaVue :showModalFlag="showModalFlag" :modalData="modalData" @cerrar-modal="showModalFlag = false"
             @get-table="getEmployees(tableData.currentPage)" />

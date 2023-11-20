@@ -1,5 +1,5 @@
 <script setup>
-import ModalBasicVue from "@/Components-ISRI/AllModal/ModalBasic.vue";
+import Modal from "@/Components-ISRI/AllModal/Modal.vue";
 import InputError from "@/Components/InputError.vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
@@ -9,12 +9,12 @@ import moment from 'moment';
 
 <template>
     <div class="m-1.5">
-        <ModalBasicVue :modalOpen="showAdminUser" @close-modal="$emit('cerrar-modal')"
-            :title="userId == '' ? 'Creación de usuario.' : 'Administracion de usuario.'"
-            :maxWidth="foundUser ? '4xl' : 'xl'">
+        <Modal :show="showAdminUser" @close="$emit('cerrar-modal')"
+            :modal-title="userId == '' ? 'Creación de usuario.' : 'Administracion de usuario.'"
+            :maxWidth="foundUser ? '4xl' : 'lg'">
             <div class="px-2 py-4">
 
-                <div v-if="isLoading && foundUser" class="flex items-center justify-center h-[100px]">
+                <div v-if="isLoading" class="flex items-center justify-center h-[100px]">
                     <div role="status" class="flex items-center">
                         <svg aria-hidden="true"
                             class="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-800"
@@ -33,7 +33,7 @@ import moment from 'moment';
                 </div>
 
                 <div v-else class="flex" :class="!foundUser ? ' justify-center' : 'flex-col md:flex-row'">
-                    <div :class="foundUser ? 'md:w-[40%] border-r border-gray-600 pr-2' : 'md:w-[75%]'">
+                    <div :class="foundUser ? 'md:w-[40%] border-r border-gray-600 pr-2' : 'md:w-[80%]'">
                         <div class="flex flex-col">
                             <div v-if="userId == '' && !foundUser" class="flex flex-col items-center">
                                 <input id="dui" type="text" class="p-1 mb-2 w-[75%] rounded-lg" placeholder="Ingresa DUI"
@@ -154,7 +154,8 @@ import moment from 'moment';
                                         </div>
                                         <LabelToInput icon="password" forLabel="personal-information" />
                                     </TextInput>
-                                    <InputError class="mt-2" :message="errors.password" />
+                                    <InputError v-for="(item, index) in errors.password" :key="index" class="mt-2"
+                                        :message="item" />
                                 </div>
                             </div>
                             <div v-else
@@ -183,10 +184,10 @@ import moment from 'moment';
                                     </div>
                                     <div class="md:w-[40%]">
                                         <p class="text-sm text-gray-600">Ultima modificación</p>
-                                        <p class="text-base font-medium text-navy-700 ">
-                                            {{ moment(allUserInfo.usuario.fecha_mod_usuario).format('DD/MM/YYYY') ?? 'N/A'
-                                            }}
-                                        </p>
+                                        <p class="text-base font-medium text-navy-700 "> {{
+                                            allUserInfo.usuario.fecha_mod_usuario ?
+                                            moment(allUserInfo.usuario.fecha_mod_usuario).format('DD/MM/YYYY') :
+                                            moment(allUserInfo.usuario.fecha_reg_usuario).format('DD/MM/YYYY') }} </p>
                                     </div>
                                     <div class="md:w-[40%]">
                                         <p class="text-sm text-gray-600">Usuario ejecuto acción</p>
@@ -210,7 +211,7 @@ import moment from 'moment';
                                 <thead class="bg-[#1F3558] text-white">
                                     <tr class="w-full">
                                         <th class="rounded-tl-lg w-[5%]">#</th>
-                                        <th class="w-[35%]">SISTEM</th>
+                                        <th class="w-[35%]">SISTEMA</th>
                                         <th class="w-[40%]">ROL</th>
                                         <th class="rounded-tr-lg w-[15%]">ACCIONES</th>
                                     </tr>
@@ -249,9 +250,13 @@ import moment from 'moment';
                                     </template>
                                 </tbody>
                             </table>
-                            <div class="flex justify-center mt-5">
-                                <GeneralButton class="mr-1" color="bg-green-700  hover:bg-green-800" text="Guardar cambios"
-                                    icon="check" @click="saveChanges()" />
+                            <div class="flex justify-center mt-3 text-center" v-if="userRolesFilter.length <= 0">
+                                <p class="font-semibold text-red-500 text-[14px]">SIN ROLES ASIGNADOS</p>
+                            </div>
+                            <div v-else class="flex justify-center mt-5">
+                                <GeneralButton v-if="showEditButton" class="mr-1" color="bg-green-700  hover:bg-green-800"
+                                    text="Guardar cambios" icon="check"
+                                    @click="this.userId ? saveChanges() : saveNewUser()" />
                                 <GeneralButton class="ml-1" text="Cerrar" icon="delete" @click="$emit('cerrar-modal')" />
                             </div>
                         </div>
@@ -291,7 +296,7 @@ import moment from 'moment';
                                 <div class="flex items-center">
                                     <GeneralButton class="mr-1" color="bg-gray-600 hover:bg-gray-700" icon="delete"
                                         text="Cancelar" @click="cancel()" />
-                                    <GeneralButton class="ml-1"
+                                    <GeneralButton v-if="showEditButton" class="ml-1"
                                         :color="edit ? 'bg-orange-700 hover:bg-orange-800' : 'bg-green-700 hover:bg-green-800'"
                                         :icon="!edit ? 'add' : 'update'" :text="!edit ? 'Asignar' : 'Actualizar'"
                                         @click="!edit ? saveRol() : updateRol()" />
@@ -301,7 +306,7 @@ import moment from 'moment';
                     </div>
                 </div>
             </div>
-        </ModalBasicVue>
+        </Modal>
     </div>
 </template>
 
@@ -323,13 +328,13 @@ export default {
     data: function (data) {
         return {
             errors: [],
+            password: '',
             foundUser: false,
             isLoading: false,
             hoverSelected: 1,
             showPassword: false,
             edit: false,
             dui: '',
-            person: [],
             allUserInfo: [],
             systems: [],
             roles: [],
@@ -447,6 +452,7 @@ export default {
                             this.userRoles[rolIndex].deletedVw = false
                             this.noEdit()
                             this.hoverSelected = 2
+                            this.showToast(toast.warning, "Rol modificado temporalmente con exito.")
                         }
                     });
             } else {
@@ -487,6 +493,7 @@ export default {
                                 this.noEdit()
                                 this.hoverSelected = 2
                             }
+                            this.showToast(toast.success, "Rol agregado temporalmente con exito.")
                         }
                     });
             } else {
@@ -537,8 +544,28 @@ export default {
             this.activeSystemOption(rol.systemId)
         },
         deleteRol(rolId, index) {
-            this.activeSystemOption(rolId)
-            this.userRoles[index].deletedVw = true
+            this.$swal
+                .fire({
+                    title: '¿Está seguro de eliminar el rol temporalmente? La acción se ejecutara al guardar cambios.',
+                    icon: 'question',
+                    iconHtml: '❓',
+                    confirmButtonText: 'Si, Eliminar.',
+                    confirmButtonColor: '#DC2626',
+                    cancelButtonText: 'Cancelar',
+                    showCancelButton: true,
+                    showCloseButton: true
+                })
+                .then((result) => {
+                    if (result.isConfirmed) {
+                        this.activeSystemOption(rolId)
+                        if (this.userRoles[index].accessId) {
+                            this.userRoles[index].deletedVw = true
+                        } else {
+                            this.userRoles.splice(index, 1);
+                        }
+                        this.showToast(toast.warning, "Rol eliminado temporalmente con exito.")
+                    }
+                });
         },
         cancel() {
             this.hoverSelected = 2
@@ -561,19 +588,15 @@ export default {
             var x = this.dui.replace(/\D/g, '').match(/(\d{0,8})(\d{0,1})/);
             this.dui = !x[2] ? x[1] : '' + x[1] + '-' + x[2] + (x[4] ? '-' + x[4] : '');
         },
-        async getSelects() {
-            this.isLoading = true;
-            await axios.get("/get-selects-admin-user")
+        getSelects() {
+            axios.get("/get-selects-admin-user")
                 .then((response) => {
                     this.systems = response.data.systems
                     this.roles = response.data.roles
-                    this.setSystemsOptions()
+                    this.userId ? this.setSystemsOptions() : ''
                 })
                 .catch((errors) => {
                     this.manageError(errors, this)
-                })
-                .finally(() => {
-                    this.isLoading = false;
                 });
         },
         async getUserInfo() {
@@ -583,7 +606,6 @@ export default {
                     this.allUserInfo = response.data.allUserInfo
                     this.systems = response.data.systems
                     this.roles = response.data.roles
-                    console.log(this.allUserInfo);
                     this.setSystemsOptions()
                     this.setRolesValue(this.allUserInfo.usuario.roles)
                 })
@@ -598,25 +620,66 @@ export default {
             this.showPassword = !this.showPassword;
         },
         //To create a new user
-        searchDui() {
-            axios.get('/get-dui', {
+        async searchDui() {
+            this.isLoading = true
+            await axios.get('/get-dui', {
                 params: {
                     dui: this.dui
                 }
             })
                 .then((response) => {
-                    this.person = response.data.persona
-                    this.foundUser = true
+                    this.allUserInfo = response.data.persona
+                    if (this.allUserInfo.usuario) {
+                        this.showToast(toast.info, "Esta persona ya posee usuario. Nombre de usuario: " + this.allUserInfo.usuario.nick_usuario);
+                        this.foundUser = false
+                    } else {
+                        this.foundUser = true
+                    }
                 })
                 .catch((errors) => {
                     if (errors.response.status === 422) {
-                        this.errors = errors.response.data.errors;
-                        this.showToast(toast.warning, "Tienes algunos errores por favor verifica tus datos.");
+                        if (errors.response.data.logical_error) {
+                            this.showToast(toast.error, errors.response.data.logical_error);
+                        } else {
+                            this.showToast(toast.warning, "Tienes algunos errores por favor verifica tus datos.");
+                        }
                     } else {
                         this.manageError(errors, this)
                     }
                 })
+                .finally(() => {
+                    this.isLoading = false;
+                });
         },
+        async saveNewUser() {
+            this.isLoading = true
+            await axios.post('/save-new-user', {
+                personId: this.allUserInfo.id_persona,
+                password: this.password,
+                userRoles: this.userRoles
+            })
+                .then((response) => {
+                    this.showToast(toast.success, response.data.message);
+                    this.$emit('update-table')
+                    this.$emit('cerrar-modal')
+                })
+                .catch((errors) => {
+                    if (errors.response.status === 422) {
+                        this.hoverSelected = 1
+                        if (errors.response.data.logical_error) {
+                            this.showToast(toast.error, errors.response.data.logical_error);
+                        } else {
+                            this.errors = errors.response.data.errors;
+                            this.showToast(toast.warning, "Tienes algunos errores por favor verifica tus datos.");
+                        }
+                    } else {
+                        this.manageError(errors, this)
+                    }
+                })
+                .finally(() => {
+                    this.isLoading = false;
+                });
+        }
     },
     watch: {
     },
@@ -645,6 +708,17 @@ export default {
         },
         userRolesFilter() {
             return this.userRoles.filter(rol => rol.deletedVw != true)
+        },
+        showEditButton() {
+            if (this.userId) {
+                if (this.allUserInfo.usuario.estado_usuario === 1) {
+                    return true
+                } else {
+                    return false
+                }
+            } else {
+                return true
+            }
         }
     }
 };

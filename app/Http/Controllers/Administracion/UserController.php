@@ -13,6 +13,7 @@ use App\Models\Empleado;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -123,22 +124,40 @@ class UserController extends Controller
     //Methods to create a new user
     public function getDui(Request $request)
     {
-        $person = Persona::select('*')
-            ->join('municipio', function ($join) {
-                $join->on('persona.id_municipio', '=', 'municipio.id_municipio');
-            })
-            ->with(['fotos', 'empleado'])
-            ->where('dui_persona', '=', $request->input('dui'))
-            ->first();
-        if ($person) {
-            $user = User::where('id_persona', '=', $person->id_persona)->first();
-            if (!$user) {
-                $user = '';
+        $dui = $request->dui;
+        $correct_dui = false;
+        if ((bool) preg_match('/(^\d{8})-(\d$)/', $dui) === true) {
+            [$digits, $digit_veri] = explode('-', $dui);
+            $sum = 0;
+            for ($i = 0, $l = strlen($digits); $i < $l; $i++) {
+                $sum += (9 - $i) * (int) $digits[$i];
+            }
+            if ((int) $digit_veri === ((10 - ($sum % 10)) % 10)) {
+                $correct_dui = true;
             }
         } else {
-            $user = '';
+            $correct_dui = false;
         }
-        return ['persona' => $person ? $person : '', 'usuario' => $user];
+
+        if ($correct_dui) {
+            $person = Persona::with([
+                'usuario',
+                'fotos',
+                'usuario.roles.sistema',
+                'residencias.municipio',
+                'residencias'  => function ($query) {
+                    $query->where('estado_residencia', 1);
+                }
+            ])
+                ->where('dui_persona', '=', $request->input('dui'))
+                ->first();
+            return ['persona' => $person];
+        } else {
+            return response()->json([
+                'logical_error' =>
+                'Error, el numero de dui no existe.'
+            ], 422);
+        }
     }
     public function saveUser(Request $request)
     {
@@ -289,12 +308,12 @@ class UserController extends Controller
                 $usuario = User::find($request->userId);
                 foreach ($request->roles as $rol) {
                     $permisoUserToValidate = PermisoUsuario::with([
-                        'rol' => function ($query) use($rol) {
+                        'rol' => function ($query) use ($rol) {
                             $query->where('id_sistema', $rol['systemId']);
                         }
-                        ])
-                    ->where('estado_permiso_usuario', 1)
-                    ->first();
+                    ])
+                        ->where('estado_permiso_usuario', 1)
+                        ->first();
                     if (!$permisoUserToValidate->rol) {
                         $userPermission = PermisoUsuario::find($rol['accessId']);
                         if ($userPermission) {
@@ -328,6 +347,77 @@ class UserController extends Controller
             DB::commit(); // Confirma las operaciones en la base de datos
             return response()->json([
                 'message'          => "Roles actualizados.",
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+            return response()->json([
+                'logical_error' => 'Ha ocurrido un error con sus datos.',
+                'error' => $e,
+            ], 422);
+        }
+    }
+    public function saveNewUser(Request $request){
+        $customMessages = [
+            'password.required' => 'Debe digitar la contraseña.',
+        ];
+        // Validate the request data with custom error messages
+        $validatedData = Validator::make($request->all(), [
+            'password' => 'required',
+        ], $customMessages)->validate();
+
+        $person = Persona::find($request->personId);
+        $first_name = $person->pnombre_persona;
+        $last_name = $person->papellido_persona;
+
+        $username = strtolower($first_name . '.' . $last_name);
+
+        $count = 2;
+        while (User::where('nick_usuario', $username)->exists()) {
+            // If the username already exists, append a number to make it unique
+            $username = strtolower($first_name . '.' . $last_name . $count);
+            $count++;
+        }
+
+        $empleado = Empleado::where('id_persona', $person->id_persona)->first();
+        if ($empleado) {
+            $username = $empleado->codigo_empleado;
+        }
+
+        DB::beginTransaction();
+        try {
+            $newUser = new User([
+                'id_persona'                        => $request->personId,
+                'nick_usuario'                      => $username,
+                'password_usuario'                  => Hash::make($request->password),
+                'estado_usuario'                    => 1,
+                'fecha_reg_usuario'                 => Carbon::now(),
+                'usuario_usuario'                   => $request->user()->nick_usuario,
+                'ip_usuario'                        => $request->ip(),
+            ]);
+            $newUser->save();
+
+            $person->update([
+                'id_usuario'                        => $newUser->id_usuario,
+                'fecha_mod_persona'                 => Carbon::now(),
+                'usuario_persona'                   => $request->user()->nick_usuario,
+                'ip_persona'                        => $request->ip(),
+            ]);
+
+            foreach ($request->userRoles as $rol) {
+                $newUserPermission = new PermisoUsuario([
+                    'id_rol'                        => $rol['rolId'],
+                    'id_usuario'                    => $newUser->id_usuario,
+                    'estado_permiso_usuario'        => 1,
+                    'fecha_reg_permiso_usuario'     => Carbon::now(),
+                    'usuario_permiso_usuario'       => $request->user()->nick_usuario,
+                    'ip_permiso_usuario'            => $request->ip(),
+                ]);
+                $newUserPermission->save();
+            }
+
+            DB::commit(); // Confirma las operaciones en la base de datos
+            return response()->json([
+                'message'          => "Guardado usuario " . $newUser->nick_usuario . " con exito.",
             ]);
         } catch (\Exception $e) {
             DB::rollBack(); // En caso de error, revierte las operaciones anteriores

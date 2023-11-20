@@ -28,6 +28,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('get-selects-admin-user', [UserController::class, 'getSelectsAdminUser'])->name('user.getSelectsAdminUser');
     Route::get('get-user-info/{id}', [UserController::class, 'getUserInfo'])->name('user.getUserInfo');
     Route::post('save-changes-admin-user', [UserController::class, 'saveChangesAdminUser'])->name('user.saveChangesAdminUser');
+    Route::post('save-new-user', [UserController::class, 'saveNewUser'])->name('user.saveNewUser');
 
     //Manage Roles
     Route::get(
