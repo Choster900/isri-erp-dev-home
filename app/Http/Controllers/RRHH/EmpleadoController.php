@@ -530,6 +530,7 @@ class EmpleadoController extends Controller
             ->get();
         $reasonsForDissociate = MotivoDesvinculoLaboral::select('id_motivo_desvinculo_laboral as value', 'nombre_motivo_desvinculo_laboral as label')
             ->where('estado_motivo_desvinculo_laboral', 1)
+            ->where('nombre_motivo_desvinculo_laboral','<>','JUBILACION')
             ->get();
         //We return the data to the view
         return response()->json([
