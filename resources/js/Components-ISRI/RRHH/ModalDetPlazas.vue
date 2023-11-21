@@ -125,7 +125,7 @@ import axios from "axios";
                         </div>
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                             <TextInput id="codigo-puesto" v-model="jobPositionDet.id_puesto_sirhi_det_plaza" type="text"
-                                placeholder="Codigo SIRHI" addClass="font-semibold"
+                                placeholder="Codigo puesto" addClass="font-semibold"
                                 @update:modelValue="validateJobPositionName('id_puesto_sirhi_det_plaza', 4, true)">
                                 <LabelToInput icon="objects" forLabel="codigo-puesto" />
                             </TextInput>

@@ -149,7 +149,7 @@ import moment from 'moment';
                                                 </p>
                                             </div>
                                             <div class="w-full md:w-[15%]">
-                                                <p class="text-sm text-gray-600">ID SIRHI</p>
+                                                <p class="text-sm text-gray-600">Codigo</p>
                                                 <p class="text-base font-medium text-navy-700 ">
                                                     {{ jobPosition.detalle_plaza.id_puesto_sirhi_det_plaza }}
                                                 </p>
@@ -342,7 +342,7 @@ import moment from 'moment';
                                             </p>
                                         </div>
                                         <div class="w-full md:w-[15%]">
-                                            <p class="text-sm text-gray-600">ID SIRHI</p>
+                                            <p class="text-sm text-gray-600">Codigo</p>
                                             <p class="text-base font-medium text-navy-700">
                                                 {{ activeRoles[indexToDelete].detalle_plaza.id_puesto_sirhi_det_plaza }}
                                             </p>
