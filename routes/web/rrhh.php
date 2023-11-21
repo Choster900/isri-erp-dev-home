@@ -171,4 +171,10 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('getPersonaByName', [PersonaController::class, 'getPersonByCompleteName'])->name('expediente.getExpediente');
     Route::post('createArchivoAnexo', [ArchivoAnexoController::class, 'createArchivoAnexo'])->name('expediente.createArchivoAnexo');
 
+    Route::get(
+        '/rrhh/dependencias',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/dependencias', 'RRHH/Dependencias');
+        }
+    )->name('rrhh.dependencias');
 });

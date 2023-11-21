@@ -294,7 +294,6 @@ class EmpleadoController extends Controller
                 'nup_empleado'                  => $request->nup_empleado,
                 'isss_empleado'                 => $request->isss_empleado,
                 'pensionado_empleado'           => $request->pensionado_empleado,
-                'numero_pension_empleado'       => $request->numero_pension_empleado,
                 'id_estado_empleado'            => 1,
                 'cuenta_banco_empleado'         => $request->cuenta_banco_empleado,
                 'fecha_contratacion_empleado'   => $request->fecha_contratacion_empleado,
@@ -425,7 +424,6 @@ class EmpleadoController extends Controller
                 'nup_empleado'                  => $request->nup_empleado,
                 'isss_empleado'                 => $request->isss_empleado,
                 'pensionado_empleado'           => $request->pensionado_empleado,
-                'numero_pension_empleado'       => $request->numero_pension_empleado,
                 'codigo_empleado'               => $request->codigo_empleado,
                 'cuenta_banco_empleado'         => $request->cuenta_banco_empleado,
                 'email_institucional_empleado'  => $request->email_institucional_empleado,
@@ -532,6 +530,7 @@ class EmpleadoController extends Controller
             ->get();
         $reasonsForDissociate = MotivoDesvinculoLaboral::select('id_motivo_desvinculo_laboral as value', 'nombre_motivo_desvinculo_laboral as label')
             ->where('estado_motivo_desvinculo_laboral', 1)
+            ->where('nombre_motivo_desvinculo_laboral','<>','JUBILACION')
             ->get();
         //We return the data to the view
         return response()->json([
