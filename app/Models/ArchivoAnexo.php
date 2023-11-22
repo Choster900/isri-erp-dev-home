@@ -16,14 +16,18 @@ class ArchivoAnexo extends Model
     protected $fillable = [
         'id_persona',
         'id_tipo_mime',
+        'id_archivo_anexo',
         'ip_archivo_anexo',
         'url_archivo_anexo',
+        'peso_archivo_anexo',
         'nombre_archivo_anexo',
+        'estado_archivo_anexo',
         'id_tipo_archivo_anexo',
         'usuario_archivo_anexo',
         'fecha_reg_archivo_anexo',
         'fecha_mod_archivo_anexo',
         'descripcion_archivo_anexo',
+        
     ];
     /**
      * Get the tipo_archivo_anexo that owns the ArchivoAnexo
@@ -32,7 +36,7 @@ class ArchivoAnexo extends Model
      */
     public function tipo_archivo_anexo(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'id_tipo_archivo_anexo', 'id_tipo_archivo_anexo');
+        return $this->belongsTo(TipoArchivoAnexo::class, 'id_tipo_archivo_anexo', 'id_tipo_archivo_anexo');
     }
     /**
      * Get the tipo_mine that owns the ArchivoAnexo

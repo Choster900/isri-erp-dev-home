@@ -23,19 +23,15 @@
                 alt="" class="px-24 py-8">
 
         </div>
-        <h1 class="px-8 font-semibold">Senior Client Engineer (React & React Native).pdf</h1>
+        <h1 class="px-8 font-semibold">{{ anexoInformation.nombre_archivo_anexo }}</h1>
         <div class="mr-auto">
             <span class="px-8 text-sm text-slate-500">10Mb || 100KB</span>
         </div>
         <hr class="my-3 mx-7 border-t border-slate-300">
-
         <div class="mr-auto">
             <h1 class="px-8 text-xs font-semibold">Descripcion del archivo</h1>
         </div>
-        <span class="mx-8 text-justify text-xs text-slate-500">Lorem ipsum dolor sit amet consectetur adipisicing elit.
-            Molestiae quae
-            voluptatum accusamus minus soluta accusantium cumque sint fugit eius magni ratione eos, ab in itaque qui
-            suscipit officiis dolor! Blanditiis?</span>
+        <span class="mx-8 text-justify text-xs text-slate-500">{{ anexoInformation.descripcion_archivo_anexo }}</span>
 
         <div class="  pt-3 w-full px-8">
             <button
@@ -53,7 +49,7 @@
 
 <script>
 export default {
-
+    props:['anexoInformation']
 }
 </script>
 

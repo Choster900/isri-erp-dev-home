@@ -15,6 +15,7 @@ use App\Http\Controllers\RRHH\PermisoController;
 use App\Http\Controllers\RRHH\SolicitudPermisoController;
 use App\Http\Controllers\RRHH\SubDirectorMedicoController;
 use App\Models\EvaluacionRendimiento;
+use App\Models\Persona;
 use App\Models\TipoArchivoAnexo;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -170,5 +171,22 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get('getAllTipoArchivoAnexos', function () {return TipoArchivoAnexo::all();});
     Route::post('getPersonaByName', [PersonaController::class, 'getPersonByCompleteName'])->name('expediente.getExpediente');
     Route::post('createArchivoAnexo', [ArchivoAnexoController::class, 'createArchivoAnexo'])->name('expediente.createArchivoAnexo');
+    Route::post('modifiedArchivoAnexo', [ArchivoAnexoController::class, 'modifiedArchivoAnexo'])->name('expediente.modifiedArchivoAnexo');
+    Route::post('getArchivosAnexosByUser', function (Request $request) {
+        // Obtén el valor de 'persona' desde la solicitud
+        $persona = $request->input('id_persona');
+    
+        // Realiza la consulta utilizando el valor obtenido
+        $result = Persona::select('*')->with([
+            "archivo_anexo.tipo_archivo_anexo",
+        ])->whereHas("archivo_anexo")
+            ->where("estado_persona", 1)
+            ->where("id_persona", $persona)
+            ->first();
+    
+        // Devuelve el resultado de la consulta
+        return $result;
+    })->name('expediente.getArchivosAnexosByUser');
+   
 
 });

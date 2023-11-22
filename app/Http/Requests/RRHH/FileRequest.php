@@ -23,17 +23,23 @@ class FileRequest extends FormRequest
      */
     public function rules()
     {
+        $fileArchivoAnexo = $this->input('fileArchivoAnexo');
+
         return [
-            "fileArchivoAnexo" => 'mimes:jpg,png,jpeg,pdf|max:2000'
+            "fileArchivoAnexo" => ['required', empty($fileArchivoAnexo) ? 'mimes:jpg,png,jpeg,pdf' : '', 'max:2000'],
+            "idTipoArchivoAnexo" => ['required'/* ,'mimes:jpg,png,jpeg,pdf','max:2000' */],
+            "idPersona" => ['required'/* ,'mimes:jpg,png,jpeg,pdf','max:2000' */]
         ];
     }
 
     public function messages()
     {
         return [
-           // "image.required" => "Tiene que seleccionar una archivo",
-            "image.mimes" => "La imagen no es del formato adecuado",
-            "image.max" => "La imagen no debe execer los 2MB",
+            "fileArchivoAnexo.required" => "Tiene que seleccionar una archivo",
+            "fileArchivoAnexo.mimes" => "La imagen no es del formato adecuado",
+            "fileArchivoAnexo.max" => "La imagen no debe execer los 2MB",
+            "idTipoArchivoAnexo.required" => "El tipo de anexo para esta registro es requerido",
+            "idPersona.required" => "La persona para este registro es un dato requerido",
         ];
     }
 }
