@@ -344,7 +344,7 @@ import axios from "axios";
                         <div class="mb-5 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
-                                    Tipo pension <span class="text-red-600 font-extrabold">*</span>
+                                    Afiliado a <span class="text-red-600 font-extrabold">*</span>
                                 </label>
                                 <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
                                     <Multiselect placeholder="Seleccione tipo" v-model="employee.id_tipo_pension"
@@ -390,7 +390,7 @@ import axios from "axios";
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <label class="block mb-2 text-xs font-light text-gray-600" for="fecha_nacimiento">
-                                    Fecha de contratacion <span class="text-red-600 font-extrabold">*</span>
+                                    Fecha de nombramiento <span class="text-red-600 font-extrabold">*</span>
                                 </label>
                                 <div class="relative flex">
                                     <LabelToInput icon="date" />
@@ -404,7 +404,7 @@ import axios from "axios";
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="codigo_empleado" v-model="employee.codigo_empleado" type="text"
-                                    placeholder="Id empleado SIRHI"
+                                    placeholder="NR SIRH"
                                     @update:modelValue="validateEmployeeInputs('codigo_empleado', 6, false, false)">
                                     <LabelToInput icon="standard" forLabel="codigo_empleado" />
                                 </TextInput>
@@ -432,19 +432,11 @@ import axios from "axios";
                             </div>
                         </div>
                         <!-- End third row Page3 -->
-                        <!-- Retirement details -->
-                        <div class="mb-3 md:flex flex-row justify-start">
-                            <div class="text-center">
-                                <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
-                                    Informacion de jubilación
-                                </span>
-                            </div>
-                        </div>
                         <!-- Fourth row Page3 -->
-                        <div class="md:flex flex-row justify-items-start">
+                        <div class="md:flex flex-row justify-items-start mb-2">
                             <div class="mb-5 md:mr-2 md:mb-0 basis-1/2 justify-center text-center">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
-                                    Empleado jubilado
+                                    Empleado pensionado
                                 </label>
                                 <label for="checbox1" class="text-sm font-bold text-gray-700 ml-4 mr-1">SI
                                 </label>
@@ -456,15 +448,6 @@ import axios from "axios";
                                     id="checbox2" @click="setRetirementValue(false)" />
                                 <InputError v-for="(item, index) in errors.pensionado_empleado" :key="index" class="mt-2"
                                     :message="item" />
-                            </div>
-                            <div class="mb-5 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="bank-account" v-model="employee.numero_pension_empleado" type="text"
-                                    placeholder="Numero pensionado" :required="false"
-                                    @update:modelValue="validateEmployeeInputs('numero_pension_empleado', 15, false, false)">
-                                    <LabelToInput icon="standard" forLabel="bank-account" />
-                                </TextInput>
-                                <InputError v-for="(item, index) in errors.numero_pension_empleado" :key="index"
-                                    class="mt-2" :message="item" />
                             </div>
                         </div>
                         <!-- End fourth row Page3 -->
@@ -698,7 +681,6 @@ export default {
                 cuenta_banco_empleado: '',
                 estado_empleado: '',
                 pensionado_empleado: '',
-                numero_pension_empleado: '',
                 //Fields for 'PlazaAsignada'
                 dependency_id: '',
                 work_area_id: '',

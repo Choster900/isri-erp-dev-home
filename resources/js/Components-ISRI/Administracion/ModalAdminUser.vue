@@ -77,12 +77,12 @@ import moment from 'moment';
                                     </div>
                                     <div v-if="user_modal.person_id !== ''" class="text-center mt-2">
                                         <h2 class="font-semibold">
-                                            {{ modalData.pnombre_persona }}
-                                            {{ modalData.snombre_persona }}
-                                            {{ modalData.tnombre_persona }}
-                                            {{ modalData.papellido_persona }}
-                                            {{ modalData.sapellido_persona }}
-                                            {{ modalData.tapellido_persona }}
+                                            {{ user_modal.name }}
+                                            <!-- {{ user_modal.snombre_persona }}
+                                            {{ user_modal.tnombre_persona }}
+                                            {{ user_modal.papellido_persona }}
+                                            {{ user_modal.sapellido_persona }}
+                                            {{ user_modal.tapellido_persona }} -->
                                         </h2>
                                         <p class="text-gray-700">{{ user_modal.nick_usuario }}</p>
                                         <p class="text-gray-700">{{ formatBirthDate }}</p>

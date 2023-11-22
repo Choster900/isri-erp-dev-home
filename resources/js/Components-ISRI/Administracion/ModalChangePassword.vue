@@ -113,7 +113,7 @@ export default {
       this.show_password = !this.show_password;
     },
     saveNewPassword() {
-      if (this.user.password == "") {
+      if (!this.user.password) {
         this.$swal.fire({
           title: 'Información incompleta',
           text: "Debes escribir la nueva contraseña",

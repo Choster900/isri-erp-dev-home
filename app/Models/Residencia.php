@@ -35,7 +35,7 @@ class Residencia extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function municipios(): BelongsTo
+    public function municipio(): BelongsTo
     {
         return $this->belongsTo(Municipio::class, 'id_municipio', 'id_municipio');
     }

@@ -189,4 +189,10 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     })->name('expediente.getArchivosAnexosByUser');
    
 
+    Route::get(
+        '/rrhh/dependencias',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/dependencias', 'RRHH/Dependencias');
+        }
+    )->name('rrhh.dependencias');
 });

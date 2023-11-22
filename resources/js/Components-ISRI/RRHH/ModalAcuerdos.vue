@@ -109,7 +109,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                         Descripción
                                         <span class="text-red-600 font-extrabold">*</span>
                                     </label>
-                                    <textarea id="descripcion" name="descripcion" style="overflow-x: hidden;"
+                                    <textarea id="descripcion" name="descripcion" style="overflow-x: hidden;" 
                                         v-model="dataForm.deal.comentario_acuerdo_laboral"
                                         class="resize-none w-full h-24 overflow-y-auto peer text-xs font-normal rounded-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-none focus:outline-none"></textarea>
 
