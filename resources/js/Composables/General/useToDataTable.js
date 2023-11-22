@@ -1,7 +1,9 @@
 import axios from "axios";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, inject } from "vue";
+import { useHandleError } from "@/Composables/General/useHandleError.js";
 
 export const useToDataTable = (columns, requestUrl, columnToSort, dir) => {
+    const swal = inject("$swal");
     const sortOrders = ref([]);
     const isLoadinRequest = ref(false);
     const emptyObject = ref(null);
@@ -13,7 +15,7 @@ export const useToDataTable = (columns, requestUrl, columnToSort, dir) => {
         if (column.name === columnToSort) sortOrders.value[column.name] = 1;
         else sortOrders.value[column.name] = -1;
     });
-    const sortKey = columnToSort;
+    const sortKey = ref(columnToSort);
     const perPage = ref(["10", "20", "30"]);
     const tableData = ref({
         draw: 0,
@@ -36,14 +38,15 @@ export const useToDataTable = (columns, requestUrl, columnToSort, dir) => {
 
             if (tableData.value.draw === data.draw) {
                 dataToShow.value = data.data.data;
-                tableData.total = data.data.total;
+                tableData.value.total = data.data.total;
                 links.value = data.data.links;
                 links.value[0].label = "Anterior";
                 links.value[links.value.length - 1].label = "Siguiente";
             }
-
-            emptyObject.value = persona.value.length === 0;
-        } catch (error) { //pending
+            emptyObject.value = dataToShow.value.length === 0;
+        } catch (error) {
+            const { title, text, icon } = useHandleError(error);
+            swal({ title: title, text: text, icon: icon, timer: 5000 });
         } finally {
             isLoadinRequest.value = false;
         }
@@ -67,7 +70,7 @@ export const useToDataTable = (columns, requestUrl, columnToSort, dir) => {
         tableData.value.search = myEventData;
         const data = Object.values(myEventData);
         if (data.every((error) => error === "")) {
-            this.getJobPositions();
+            getDataToShow();
         }
     };
 
