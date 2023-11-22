@@ -50,4 +50,9 @@ class Dependencia extends Model
         return $this->hasMany('App\Models\Dependencia', 'dep_id_dependencia', 'id_dependencia');
     }
 
+    public function jefatura()
+    {
+        return $this->belongsTo('App\Models\Persona', 'id_persona', 'id_persona');
+    }
+
 }

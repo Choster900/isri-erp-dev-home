@@ -5,13 +5,16 @@ export const useFileHandling = () => {
     const urlArchivoAnexo = ref(null);
     const nameArchivoAnexo = ref(null);
     const file = ref(null);
+    const tipoMine = ref(null);
+    const sizeArchivo = ref(null);
     const openFileInput = () => {
         fileInput.value.click();
     };
 
     const handleFileChange = () => {
         const selectedFile = fileInput.value.files[0];
-        console.log(selectedFile);
+        tipoMine.value = selectedFile.type
+        sizeArchivo.value = selectedFile.size
         nameArchivoAnexo.value = selectedFile.name;
         if (selectedFile) {
             const fileType = selectedFile.type;
@@ -74,6 +77,8 @@ export const useFileHandling = () => {
         openFileInput,
         handleDragOver,
         urlArchivoAnexo,
+        tipoMine,
+        sizeArchivo,
         handleFileChange,
         nameArchivoAnexo,
     };

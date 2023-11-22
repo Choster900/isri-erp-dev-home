@@ -141,7 +141,8 @@
             </div>
         </div>
 
-        <ModalExpedientes :showModal="showModal" @cerrar-modal="showModal = false" :persona="dataPersona" />
+        <ModalExpedientes :showModal="showModal" @cerrar-modal="showModal = false"
+            @actualizar-data="showModal = false, getPeople" :persona="dataPersona" />
 
     </AppLayoutVue>
 </template>
