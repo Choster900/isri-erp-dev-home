@@ -7,6 +7,7 @@ use App\Http\Requests\RRHH\FileRequest;
 use App\Models\ArchivoAnexo;
 use App\Models\Persona;
 use App\Models\TipoArchivoAnexo;
+use App\Models\TipoMine;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -41,9 +42,13 @@ class ArchivoAnexoController extends Controller
         $dir = $request->input('dir');
         $data = $request->input('search');
 
+
         // Construir la consulta base con las relaciones
-        $query = Persona::select('*')->with(["archivos_anexos"])->whereHas("archivos_anexos")
-            ->where("estado_persona", 1)->orderBy($columns[$column], $dir);
+        $query = Persona::select('*')->with([
+            "archivo_anexo.tipo_archivo_anexo",
+            ])->whereHas("archivo_anexo")
+            ->where("estado_persona", 1)->orderBy
+            ($columns[$column], $dir);
 
         if ($data) {
             $query->where('id_persona', 'like', '%' . $data["id_persona"] . '%');
@@ -94,24 +99,31 @@ class ArchivoAnexoController extends Controller
         try {
             // Begin a database transaction
             DB::beginTransaction();
+            $imageUrl = null;
+            $name = 'TEST';
 
-            // Retrieve the uploaded file
-            $file = $request->file("fileArchivoAnexo");
+            if ($request->hasFile("fileArchivoAnexo")) {
 
-            // Get the original file name
-            $name = $file->getClientOriginalName();
+                // Retrieve the uploaded file
+                $file = $request->file("fileArchivoAnexo");
 
-            // Store the file in the 'anexos' directory within the 'public' disk
-            $path = $file->storeAs('anexos', $name, 'public');
+                // Get the original file name
+                $name = $file->getClientOriginalName();
 
-            // Generate a URL for the stored file
-            $imageUrl = Storage::url('anexos/' . $name);
+                // Store the file in the 'anexos' directory within the 'public' disk
+                $path = $file->storeAs('anexos', $name, 'public');
+
+                // Generate a URL for the stored file
+                $imageUrl = Storage::url('anexos/' . $name);
+            }
+            //$idTipoMime = TipoMine::where('extension_tipo_mime', $request->idTipoMine)->value('id_tipo_mime');
 
             // Create a new ArchivoAnexo record in the database
             $response = ArchivoAnexo::create([
                 'url_archivo_anexo' => $imageUrl,
                 'nombre_archivo_anexo' => $name,
                 'id_persona' => $request->idPersona,
+                'estado_archivo_anexo' => 1,
                 'ip_archivo_anexo' => $request->ip(),
                 'fecha_reg_archivo_anexo' => Carbon::now(),
                 'id_tipo_archivo_anexo' => $request->idTipoArchivoAnexo,
@@ -134,4 +146,58 @@ class ArchivoAnexoController extends Controller
         }
     }
 
+
+    function modifiedArchivoAnexo(FileRequest $request)
+    {
+        try {
+            // Begin a database transaction
+            DB::beginTransaction();
+
+            // Check if a file is present in the request
+            if ($request->hasFile("fileArchivoAnexo")) {
+                // Retrieve the uploaded file
+                $file = $request->file("fileArchivoAnexo");
+
+                // Get the original file name
+                $name = $file->getClientOriginalName();
+
+                // Store the file in the 'anexos' directory within the 'public' disk
+                $path = $file->storeAs('anexos', $name, 'public');
+
+                // Generate a URL for the stored file
+                $imageUrl = Storage::url('anexos/' . $name);
+            } else {
+                // No new file uploaded, retain existing file information
+                $existingArchivoAnexo = ArchivoAnexo::find($request->idArchivoAnexo);
+                $name = $existingArchivoAnexo->nombre_archivo_anexo;
+                $imageUrl = $existingArchivoAnexo->url_archivo_anexo;
+            }
+
+            // Create a new ArchivoAnexo record in the database
+            $response = ArchivoAnexo::where("id_archivo_anexo", $request->idArchivoAnexo)->update([
+                'url_archivo_anexo' => $imageUrl,
+                'nombre_archivo_anexo' => $name,
+                'id_persona' => $request->idPersona,
+                'estado_archivo_anexo' => 1,
+                'ip_archivo_anexo' => $request->ip(),
+                'fecha_mod_archivo_anexo' => Carbon::now(),
+                'id_tipo_archivo_anexo' => $request->idTipoArchivoAnexo,
+                'usuario_archivo_anexo' => $request->user()->nick_usuario,
+                'descripcion_archivo_anexo' => $request->descripcionArchivoAnexo,
+                'id_tipo_mime' => 1, // todo: temporarily set to a default value
+            ]);
+
+            // Commit the transaction
+            DB::commit();
+
+            // Return the updated ArchivoAnexo
+            return $response;
+        } catch (\Throwable $th) {
+            // An error occurred, rollback the transaction
+            DB::rollback();
+
+            // Return an error response
+            return response()->json($th->getMessage(), 500);
+        }
+    }
 }

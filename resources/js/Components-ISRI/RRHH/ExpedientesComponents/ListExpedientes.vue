@@ -14,26 +14,27 @@
                 </select>
             </div>
         </div>
-        <div id="mainSection" class="mb-4  grid " v-if="listAnexos"
+        <div id="mainSection" class="mb-4  grid " v-if="dataExpedientesPersona"
             :class="{ 'grid-cols-1': viewList, 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3': !viewList, 'gap-5': !viewList, 'gap-2': viewList }">
             <div class="relative border border-gray-200 bg-white rounded-md shadow-lg cursor-pointer hover:bg-slate-100 text-center"
-                :class="{ 'flex': viewList }" v-for="(anexo, i) in listAnexos" :key="i">
+                :class="{ 'flex': viewList }" v-for="(anexo, i) in dataExpedientesPersona" :key="i" @click="$emit('sent-preview-information', anexo)">
                 <div class="flex justify-center" :class="viewList ? 'px-1 ' : ' py-2 px-5'">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/PDF_file_icon.svg/1200px-PDF_file_icon.svg.png"
                         alt="" class="h-20">
                 </div>
                 <div class="px-5 py-4">
-                    <h1 class="font-semibold text-sm " :class="{ 'pb-2': !viewList, 'text-start': viewList }">{{
-                        anexo.nombre_archivo_anexo }}
+                    <h1 class="font-semibold text-sm " :class="{ 'pb-2': !viewList, 'text-start': viewList }">
+                        {{ anexo.nombre_archivo_anexo }}
                     </h1>
-                    <span class="text-xs block text-slate-500 " :class="{ 'text-start': viewList }">Agregado: hace 1
-                        dia</span>
+                    <span class="text-xs block text-slate-500 " :class="{ 'text-start': viewList }">
+                        Agregado: hace 1 dia
+                    </span>
                 </div>
                 <div class="absolute top-0 right-0 px-1 ">
                     <DropdownHelp>
                         <li>
                             <div class="font-medium text-sm text-indigo-500 hover:text-indigo-600 flex items-center py-1 px-3"
-                                @click="$emit('redirect-for-modify', { data: anexo })">
+                                @click="$emit('redirect-for-modify', anexo)">
                                 <svg class="w-3 h-3 fill-current text-indigo-300 shrink-0 mr-2" viewBox="0 0 12 12">
                                     <path
                                         d="M10.5 0h-9A1.5 1.5 0 000 1.5v9A1.5 1.5 0 001.5 12h9a1.5 1.5 0 001.5-1.5v-9A1.5 1.5 0 0010.5 0zM10 7L8.207 5.207l-3 3-1.414-1.414 3-3L5 2h5v5z" />
@@ -58,25 +59,25 @@ import SearchIcon from './Icons/searchIcon.vue'
 import DropdownHelp from '@/Components-ISRI/ComponentsToForms/DropdownHelp.vue';
 
 export default {
-    emits: ['redirect-for-modify'],
+    emits: ['redirect-for-modify','sent-preview-information'],
     components: { SearchIcon, OrderSquareIcon, OrderListIcon, OrderListIcon, OrderSquareIcon, DropdownHelp },
     props: {
-        showModal: { type: Boolean, default: false, },
         dataExpedientesPersona: { type: Object, default: () => { }, },
         tipoArchivoSelected: { type: Object, default: () => { } },
     },
-    setup(props) {
+    setup(props,{ emit  }) {
         const viewList = ref(false)// Controla en como se ven la vista
         const { dataExpedientesPersona, tipoArchivoSelected } = toRefs(props);
         const listAnexos = ref(null)
 
-        watch(tipoArchivoSelected, (newTipoArchivo) => {
-            listAnexos.value = dataExpedientesPersona.value.filter(index => index.id_tipo_archivo_anexo === newTipoArchivo);
+        watch(dataExpedientesPersona, (newTipoArchivo) => {
+            emit('sent-preview-information',dataExpedientesPersona.value[0]) // <-- type check / auto-completion
         })
 
         return {
             viewList,
             listAnexos,
+            dataExpedientesPersona,
         }
     }
 }

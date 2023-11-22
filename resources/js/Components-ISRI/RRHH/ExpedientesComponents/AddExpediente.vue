@@ -3,7 +3,8 @@
         <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 border rounded-lg bg-slate-100 p-3">
             <!-- <div class="w-full md:w-3/4"> -->
             <div class="w-full md:w-3/5">
-                <template v-if="!nameArchivoAnexo">
+
+                <template v-if="!nameArchivoAnexo || !objectAnexoFileForUpdate">
                     <div class="flex py-4 gap-2">
                         <span class="text-xs font-medium block text-slate-500/70">Adjunta un archivo</span>
                         <span class="text-xs font-medium block pb-3">Selecciona el archivo o arrástralo aquí</span>
@@ -21,8 +22,8 @@
                         class="rounded-lg border shadow-md shadow-black">
                     <embed v-else :src="urlArchivoAnexo" type="application/pdf" width="550" height="400"
                         class="rounded-lg border border-gray-300 shadow-md shadow-black">
-
                 </template>
+
                 <div class="p-4 bg-slate-200 rounded-lg mt-4">
                     <div class="flex  justify-between py-2 ">
                         <div class="flex items-center gap-2">
@@ -35,12 +36,17 @@
                             <div class="font-medium text-base ">Detalles del anexo</div>
                         </div>
                         <div class="flex items-center">
-                            <button @click="createArchivoAnexoRequest"
+                            <button @click="createArchivoAnexoRequest(selectedValue)"
+                                v-if="actionInProgress == 'add'"
                                 class="border border-green-900 bg-green-800 rounded-lg  text-center  text-white-900 text-white text-xs font-semibold w-full py-1 px-2">Enviar
+                                la información</button>
+
+                            <button @click="updateArchivoAnexoRequest" v-else
+                                class="border border-orange-900 bg-orange-800 rounded-lg  text-center  text-white-900 text-white text-xs font-semibold w-full py-1 px-2">Modificar
                                 la información</button>
                         </div>
                     </div>
-                  
+
                     <div class="max-w-2xl mx-auto">
                         <textarea id="description" rows="4" v-model="descripcionArchivoAnexo"
                             class="block p-2.5 w-full text-xs text-gray-900  rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 "
@@ -94,21 +100,24 @@
 
 <script>
 import SideInfo from './SideInfoPersona.vue';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, toRefs, watch } from 'vue';
 import { usePersona } from '@/Composables/RRHH/Persona/usePersona';
 import { useFileHandling } from '@/Composables/RRHH/Expediente/useFileHandling'
 import { useArchivoAnexo } from '@/Composables/RRHH/Expediente/useArchivoAnexo'
+
 export default {
     name: 'AddExpediente',
+    emits: ["refresh-information","cerrar-modal"],
     components: { SideInfo },
     props: {
-        tipoArchivoAnexo: { type: Object, default: () => { }, },
         persona: { type: Object, default: () => { }, },
         opcionPersona: { type: Object, default: () => { } },
-        objectFileUpdate: { type: Object, default: () => { } },
+        actionInProgress: { type: Object, default: () => { } },
+        tipoArchivoAnexo: { type: Object, default: () => { }, },
+        objectAnexoFileForUpdate: { type: Object, default: () => { } },
     },
-    setup(props) {
-
+    setup(props,context) {
+        const { objectAnexoFileForUpdate, actionInProgress } = toRefs(props);
         /**
          * Propiedad computada que genera un objeto con un array para obtener el id y el nombre de la persona seleccionada 
          * Esto se usa cuando estamos editando y queremos setear el id de la persona actual
@@ -137,14 +146,66 @@ export default {
         });
 
         // Composable para manejar los eventos de los archivos
-        const { file, fileInput, handleDrop, deleteFile, openFileInput, urlArchivoAnexo, handleDragOver, handleFileChange, nameArchivoAnexo } = useFileHandling();
-
+        const { file, fileInput, handleDrop, deleteFile, openFileInput, urlArchivoAnexo, handleDragOver, handleFileChange, nameArchivoAnexo, sizeArchivo, tipoMine } = useFileHandling();
         // Composable usePersona => getPeopleByName() retorna el objeto con las personas buscada en multiselect
         const { getPeopleByName } = usePersona();
+        // Composable useArchivoAnexo 
+        const { idPersona, idTipoMine, sizeArchivoAnexo, idArchivoAnexo, idTipoArchivoAnexo, fileArchivoAnexo, nombreArchivoAnexo, descripcionArchivoAnexo, createArchivoAnexoRequest, updateArchivoAnexoRequest } = useArchivoAnexo(context);
 
-        const { idPersona, idTipoMine, idArchivoAnexo, idTipoArchivoAnexo, fileArchivoAnexo, nombreArchivoAnexo, descripcionArchivoAnexo, createArchivoAnexoRequest, } = useArchivoAnexo();
 
-        watch(file, () => fileArchivoAnexo.value = file.value) // Verficia que se seleccione una archivo para asignarlo a fileArchivoAnexo
+        watch(file, () => {
+            idTipoMine.value = tipoMine.value
+            fileArchivoAnexo.value = file.value
+            sizeArchivoAnexo.value = sizeArchivo.value
+        }) // Verficia que se seleccione una archivo para asignarlo a fileArchivoAnexo
+
+        const triggetData = () => {
+            const { descripcion_archivo_anexo, id_tipo_archivo_anexo, url_archivo_anexo, nombre_archivo_anexo, id_archivo_anexo } = objectAnexoFileForUpdate.value;
+            descripcionArchivoAnexo.value = descripcion_archivo_anexo;
+            idArchivoAnexo.value = id_archivo_anexo;
+            idTipoArchivoAnexo.value = id_tipo_archivo_anexo;
+            urlArchivoAnexo.value = url_archivo_anexo;
+            nameArchivoAnexo.value = nombre_archivo_anexo;
+        };
+
+        const clearData = () => {
+            descripcionArchivoAnexo.value = ''
+            idTipoArchivoAnexo.value = ''
+            urlArchivoAnexo.value = ''
+            idTipoMine.value = ''
+            sizeArchivoAnexo.value = ''
+            nameArchivoAnexo.value = ''
+        }
+
+
+        watch(actionInProgress, (newValue, oldValue) => {
+            if (newValue === 'edit') {
+                let objectAnexoFileWatched = false; // Variable de control
+                watch(objectAnexoFileForUpdate, (newObject, oldObject) => {
+                    if (!objectsAreEqual(newObject, oldObject)) {
+                        triggetData();
+                    }
+                    objectAnexoFileWatched = true; // Marcamos que el watch ya se ejecutó
+                });
+                if (!objectAnexoFileWatched) {
+                    triggetData();
+                }
+            } else {
+                clearData();
+            }
+        });
+
+        /**
+         * 
+         * @param {Object} obj1 Objeto de comparacion1
+         * @param {Object} obj2 Objeto de comparacion2
+         */
+        const objectsAreEqual = (obj1, obj2) => {
+            // Implementa una lógica personalizada para comparar objetos
+            // Aquí, por ejemplo, se convierten a cadenas JSON para la comparación
+            return JSON.stringify(obj1) === JSON.stringify(obj2);
+        }
+
 
         return {
             file,
@@ -167,6 +228,9 @@ export default {
             opcionesTipoArchivo,
             descripcionArchivoAnexo,
             createArchivoAnexoRequest,
+            updateArchivoAnexoRequest,
+            actionInProgress,
+
         };
     }
 }
