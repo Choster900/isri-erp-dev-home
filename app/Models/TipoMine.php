@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class TipoMine extends Model
 {
     use HasFactory;
-    protected $table = 'tipo_mine';
+    protected $table = 'tipo_mime';
     protected $primaryKey = 'id_tipo_mime';
     public $timestamps = false;
     protected $fillable = [

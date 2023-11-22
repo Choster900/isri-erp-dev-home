@@ -123,7 +123,7 @@ class Persona extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function archivos_anexos(): HasMany
+    public function archivo_anexo(): HasMany
     {
         return $this->hasMany(ArchivoAnexo::class, 'id_persona', 'id_persona');
     }
