@@ -55,7 +55,7 @@ const props = defineProps({
         default: '', // Por defecto, no se agregan clases adicionales.
     },
     maxlength: {
-        type: Number,
+        type: String,
         default: '',
     },
 });

@@ -4,7 +4,7 @@
     <AppLayoutVue nameSubModule="RRHH - Dependencias">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="addDependency()" v-if="permits.insertar == 1"
+                <GeneralButton @click="showModalDependencies = true; dependencyId = 0" v-if="permits.insertar == 1"
                     color="bg-green-700  hover:bg-green-800" text="Agregar Dependencia" icon="add" />
             </div>
         </div>
@@ -51,10 +51,10 @@
                                     {{ dependencia.jefatura ? dependencia.jefatura.tnombre_persona : '' }}
                                     {{ dependencia.jefatura ? dependencia.jefatura.papellido_persona : '' }}
                                     {{ dependencia.jefatura ? dependencia.jefatura.sapellido_persona : '' }}
-                                    {{ dependencia.jefatura ? dependencia.jefatura.tapellido_persona : '' }} 
+                                    {{ dependencia.jefatura ? dependencia.jefatura.tapellido_persona : '' }}
                                 </div>
                                 <div v-else class="font-medium text-red-500 text-center">
-                                    N/Asign
+                                    N/Asign.
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
@@ -71,7 +71,22 @@
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="space-x-1 text-center">
-
+                                    <DropDownOptions>
+                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                            v-if="permits.actualizar == 1 && dependencia.estado_dependencia == 1"
+                                            @click="editDependency(dependencia)">
+                                            <div class="w-8 text-green-900">
+                                                <span class="text-xs">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 002.25-2.25V6a2.25 2.25 0 00-2.25-2.25H6A2.25 2.25 0 003.75 6v2.25A2.25 2.25 0 006 10.5zm0 9.75h2.25A2.25 2.25 0 0010.5 18v-2.25a2.25 2.25 0 00-2.25-2.25H6a2.25 2.25 0 00-2.25 2.25V18A2.25 2.25 0 006 20.25zm9.75-9.75H18a2.25 2.25 0 002.25-2.25V6A2.25 2.25 0 0018 3.75h-2.25A2.25 2.25 0 0013.5 6v2.25a2.25 2.25 0 002.25 2.25z" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                            <div class="font-semibold">Editar</div>
+                                        </div>
+                                    </DropDownOptions>
                                 </div>
                             </td>
                         </tr>
@@ -137,7 +152,8 @@
             </div>
         </div>
 
-
+        <modal-dependencias-vue v-if="showModalDependencies" :showModalDependencies="showModalDependencies" :dependencyId="dependencyId"
+            @cerrar-modal="showModalDependencies = false" @get-table="getDataToShow(tableData.currentPage)" />
 
     </AppLayoutVue>
 </template>
@@ -146,6 +162,7 @@
 import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
+import ModalDependenciasVue from '@/Components-ISRI/RRHH/ModalDependencias.vue';
 import moment from 'moment';
 import axios from 'axios';
 
@@ -158,7 +175,7 @@ import { ref, onMounted, toRefs } from 'vue';
 
 
 export default {
-    components: { Head, AppLayoutVue, Datatable },
+    components: { Head, AppLayoutVue, Datatable, ModalDependenciasVue },
     props: {
         menu: {
             type: Object,
@@ -166,6 +183,7 @@ export default {
         },
     },
     setup(props) {
+        let dependencyId = ref(0)
         const { menu } = toRefs(props);
         const columns = [
             { width: "8%", label: "ID", name: "id_dependencia", type: "text" },
@@ -195,19 +213,22 @@ export default {
             getDataToShow, handleData, sortBy,
         } = useToDataTable(columns, requestUrl, columntToSort, dir)
 
+        let showModalDependencies = ref(false)
+
         const permits = usePermissions(menu.value, window.location.pathname);
 
-        onMounted(() => {
-            
-        })
+        const editDependency = (dep) => {
+            showModalDependencies.value = true
+            dependencyId.value = dep.id_dependencia
+        }
 
         return {
             permits, dataToShow, tableData,
             perPage, links, sortKey,
-            sortOrders, sortBy,
+            sortOrders, sortBy, dependencyId,
             handleData, isLoadinRequest,
-            getDataToShow,
-            emptyObject, columns
+            getDataToShow, editDependency,
+            emptyObject, columns, showModalDependencies
         };
     }
 }

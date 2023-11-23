@@ -5,6 +5,7 @@ namespace App\Http\Controllers\RRHH;
 use App\Http\Controllers\Controller;
 use App\Models\Dependencia;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DependenciaController extends Controller
 {
@@ -21,7 +22,7 @@ class DependenciaController extends Controller
             ->with([
                 'jefatura'
             ])
-            ->where('jerarquia_organizacion_dependencia','<>',null);
+            ->where('jerarquia_organizacion_dependencia', '<>', null);
 
         if ($column == 3) {
             $query->orderByRaw('(SELECT pnombre_persona FROM persona WHERE persona.id_persona = dependencia.id_persona) ' . $dir);
@@ -49,5 +50,65 @@ class DependenciaController extends Controller
 
         $dependencies = $query->paginate($length)->onEachSide(1);
         return ['data' => $dependencies, 'draw' => $request->input('draw')];
+    }
+
+    //Obtiene unicamente los centros
+    public function getCentrosAtencion(Request $request)
+    {
+        $dependencies = Dependencia::with('jefatura')->where('dep_id_dependencia', null)->get();
+        return response()->json([
+            'dependencies' => $dependencies
+        ]);
+    }
+
+    public function getInfoModalDependencias(Request $request, $id)
+    {
+        $dependency =  Dependencia::with('jefatura')->find($id);
+        $dependencies = DB::table('dependencia')
+            ->selectRaw("
+                dependencia.id_dependencia as value,
+                CASE
+                    WHEN dependencia.dep_id_dependencia IS NOT NULL THEN CONCAT(dep.codigo_dependencia, ' - ', dependencia.nombre_dependencia,' (',dependencia.codigo_dependencia,')')
+                    ELSE CONCAT(dependencia.codigo_dependencia, ' - ', dependencia.nombre_dependencia)
+                END as label,
+                dependencia.id_dependencia,
+                dependencia.dep_id_dependencia as depPadre
+            ")
+            ->leftJoin('dependencia as dep', 'dependencia.dep_id_dependencia', '=', 'dep.id_dependencia')
+            ->where('dependencia.id_dependencia', '!=', 11) //Todos excepto presidencia
+            ->get();
+
+        return response()->json([
+            'dependency'      => $dependency ?? [],
+            'dependencies'    => $dependencies ?? []
+        ]);
+    }
+
+    public function searchEmployee(Request $request)
+    {
+        $search = $request->busqueda;
+        if ($search != '') {
+            $empleados = DB::table('empleado as e')
+                ->selectRaw('
+                    CONCAT_WS(" ", 
+                    COALESCE(p.pnombre_persona, ""), 
+                    COALESCE(p.snombre_persona, ""), 
+                    COALESCE(p.tnombre_persona, ""), 
+                    COALESCE(p.papellido_persona, ""), 
+                    COALESCE(p.sapellido_persona, ""), 
+                    COALESCE(p.tapellido_persona, "")
+                ) AS label,
+                e.id_empleado as value')
+                ->join('persona as p', 'e.id_persona', '=', 'p.id_persona')
+                ->where(function ($query) use ($search) {
+                    $query->whereRaw("MATCH(p.pnombre_persona, p.snombre_persona, p.tnombre_persona, p.papellido_persona, p.sapellido_persona, p.tapellido_persona) AGAINST(?)", $search);
+                })
+                ->get();
+        }
+        return response()->json(
+            [
+                'employees'          => $search != '' ? $empleados : [],
+            ]
+        );
     }
 }
