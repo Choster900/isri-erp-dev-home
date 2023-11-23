@@ -57,7 +57,15 @@
                             </div>
                         </div>
                     </div>
-                    <div id="mainSection" class="mb-4 px-4 grid "
+
+                    <div v-if="!persona" class="py-10 text-center" :class="{ 'hidden': sectionView != 'mainSection'}">
+                        <img src="../../../../img/bannerAnexos.svg" alt="" class="h-[350px] mx-auto">
+                        <h1 class="font-medium mt-6 text-lg">Añade documentos a las personas desde este panel</h1>
+                        <p class="mt-2 text-sm">Los documentos que añadas a una persona por primera vez se mostrarán en la
+                            tabla principal.</p>
+                    </div>
+
+                    <div id="mainSection" class="mb-4 px-4 grid " v-else
                         :class="{ 'hidden': sectionView != 'mainSection', 'grid-cols-1': viewList, 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4': !viewList, 'gap-5': !viewList, 'gap-2': viewList }">
                         <div class="border border-gray-200 bg-white rounded-md shadow-lg cursor-pointer hover:bg-slate-100"
                             :class="{ 'flex': viewList }" v-for="(tipoArchivo, i) in objTipoArchivoAnexo" :key="i"
@@ -89,7 +97,7 @@
                 </div>
 
 
-                <side-info-file :anexo-information="objectBringsForShowInSideInfo"
+                <side-info-file :anexo-information="objectBringsForShowInSideInfo" v-if="persona"
                     :class="{ 'hidden': sectionView != 'anexoSection', 'w-1/3': sectionView == 'anexoSection' }" />
             </div>
         </Modal>
@@ -163,7 +171,13 @@ export default {
         }
 
         const getAnexoFielForShowInSideInfo = (object) => {
-            objectBringsForShowInSideInfo.value = object
+            console.log(object);
+            if (object) {
+                objectBringsForShowInSideInfo.value = object
+            }else{
+                objectBringsForShowInSideInfo.value = ''
+
+            }
         }
         return {
             persona,

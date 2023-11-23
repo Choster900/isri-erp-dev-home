@@ -20,21 +20,36 @@ class ArchivoAnexoController extends Controller
     function getEmployeeExpediente(Request $request)
     {
         $columns = [
-            'id_persona', 'id_empleado',
-            'id_aspirante', 'id_genero',
-            'id_usuario', 'id_municipio',
-            'usuario_persona', 'ip_persona',
-            'id_estado_civil', 'dui_persona',
-            'peso_persona', 'estatura_persona',
-            'telefono_persona', 'email_persona',
-            'id_nivel_educativo', 'id_profesion',
-            'pnombre_persona', 'snombre_persona',
-            'tnombre_persona', 'papellido_persona',
-            'observacion_persona', 'estado_persona',
-            'sapellido_persona', 'tapellido_persona',
-            'fecha_reg_persona', 'fecha_mod_persona',
-            'fecha_nac_persona', 'nombre_madre_persona',
-            'nombre_padre_persona', 'nombre_conyuge_persona',
+            'id_persona',
+            'id_empleado',
+            'id_aspirante',
+            'id_genero',
+            'id_usuario',
+            'id_municipio',
+            'usuario_persona',
+            'ip_persona',
+            'id_estado_civil',
+            'dui_persona',
+            'peso_persona',
+            'estatura_persona',
+            'telefono_persona',
+            'email_persona',
+            'id_nivel_educativo',
+            'id_profesion',
+            'pnombre_persona',
+            'snombre_persona',
+            'tnombre_persona',
+            'papellido_persona',
+            'observacion_persona',
+            'estado_persona',
+            'sapellido_persona',
+            'tapellido_persona',
+            'fecha_reg_persona',
+            'fecha_mod_persona',
+            'fecha_nac_persona',
+            'nombre_madre_persona',
+            'nombre_padre_persona',
+            'nombre_conyuge_persona',
         ];
 
         $length = $request->input('length');
@@ -45,10 +60,20 @@ class ArchivoAnexoController extends Controller
 
         // Construir la consulta base con las relaciones
         $query = Persona::select('*')->with([
+            "archivo_anexo" => function ($query) {
+                $query->where('estado_archivo_anexo', 1);
+            },
             "archivo_anexo.tipo_archivo_anexo",
-            ])->whereHas("archivo_anexo")
-            ->where("estado_persona", 1)->orderBy
-            ($columns[$column], $dir);
+            "empleado",
+            "profesion",
+            "residencias",
+            "estado_civil",
+            "nivel_educativo",
+            "familiar.parentesco",
+            "municipio.departamento.pais",
+            "empleado.plazas_asignadas.detalle_plaza.plaza",
+        ])->whereHas("archivo_anexo")
+            ->where("estado_persona", 1)->orderBy($columns[$column], $dir);
 
         if ($data) {
             $query->where('id_persona', 'like', '%' . $data["id_persona"] . '%');
@@ -100,19 +125,15 @@ class ArchivoAnexoController extends Controller
             // Begin a database transaction
             DB::beginTransaction();
             $imageUrl = null;
-            $name = 'TEST';
+            $name = '';
 
             if ($request->hasFile("fileArchivoAnexo")) {
-
                 // Retrieve the uploaded file
                 $file = $request->file("fileArchivoAnexo");
-
                 // Get the original file name
                 $name = $file->getClientOriginalName();
-
                 // Store the file in the 'anexos' directory within the 'public' disk
-                $path = $file->storeAs('anexos', $name, 'public');
-
+                $file->storeAs('anexos', $name, 'public');
                 // Generate a URL for the stored file
                 $imageUrl = Storage::url('anexos/' . $name);
             }
@@ -120,18 +141,18 @@ class ArchivoAnexoController extends Controller
 
             // Create a new ArchivoAnexo record in the database
             $response = ArchivoAnexo::create([
-                'url_archivo_anexo' => $imageUrl,
-                'nombre_archivo_anexo' => $name,
-                'id_persona' => $request->idPersona,
-                'estado_archivo_anexo' => 1,
-                'ip_archivo_anexo' => $request->ip(),
-                'fecha_reg_archivo_anexo' => Carbon::now(),
-                'id_tipo_archivo_anexo' => $request->idTipoArchivoAnexo,
-                'usuario_archivo_anexo' => $request->user()->nick_usuario,
+                'estado_archivo_anexo'      => 1,
+                'nombre_archivo_anexo'      => $name,
+                'url_archivo_anexo'         => $imageUrl,
+                'id_persona'                => $request->idPersona,
+                'ip_archivo_anexo'          => $request->ip(),
+                'id_tipo_mime'              => $request->idTipoMine,
+                'fecha_reg_archivo_anexo'   => Carbon::now(),
+                'peso_archivo_anexo'        => $request->sizeArchivoAnexo,
+                'id_tipo_archivo_anexo'     => $request->idTipoArchivoAnexo,
+                'usuario_archivo_anexo'     => $request->user()->nick_usuario,
                 'descripcion_archivo_anexo' => $request->descripcionArchivoAnexo,
-                'id_tipo_mime' => 1, // todo: temporarily set to a default value
             ]);
-
             // Commit the transaction
             DB::commit();
 
@@ -166,25 +187,31 @@ class ArchivoAnexoController extends Controller
 
                 // Generate a URL for the stored file
                 $imageUrl = Storage::url('anexos/' . $name);
+
+                $sizeFile = $request->sizeArchivoAnexo;
+                $tipoMine = $request->idTipoMine;
             } else {
                 // No new file uploaded, retain existing file information
                 $existingArchivoAnexo = ArchivoAnexo::find($request->idArchivoAnexo);
                 $name = $existingArchivoAnexo->nombre_archivo_anexo;
+                $sizeFile = $existingArchivoAnexo->peso_archivo_anexo;
+                $tipoMine = $existingArchivoAnexo->id_tipo_mime;
                 $imageUrl = $existingArchivoAnexo->url_archivo_anexo;
             }
 
             // Create a new ArchivoAnexo record in the database
             $response = ArchivoAnexo::where("id_archivo_anexo", $request->idArchivoAnexo)->update([
-                'url_archivo_anexo' => $imageUrl,
-                'nombre_archivo_anexo' => $name,
-                'id_persona' => $request->idPersona,
-                'estado_archivo_anexo' => 1,
-                'ip_archivo_anexo' => $request->ip(),
-                'fecha_mod_archivo_anexo' => Carbon::now(),
-                'id_tipo_archivo_anexo' => $request->idTipoArchivoAnexo,
-                'usuario_archivo_anexo' => $request->user()->nick_usuario,
+                'estado_archivo_anexo'      => 1,
+                'id_tipo_mime'              => $tipoMine,
+                'nombre_archivo_anexo'      => $name,
+                'url_archivo_anexo'         => $imageUrl,
+                'peso_archivo_anexo'        => $sizeFile,
+                'id_persona'                => $request->idPersona,
+                'ip_archivo_anexo'          => $request->ip(),
+                'fecha_mod_archivo_anexo'   => Carbon::now(),
+                'id_tipo_archivo_anexo'     => $request->idTipoArchivoAnexo,
+                'usuario_archivo_anexo'     => $request->user()->nick_usuario,
                 'descripcion_archivo_anexo' => $request->descripcionArchivoAnexo,
-                'id_tipo_mime' => 1, // todo: temporarily set to a default value
             ]);
 
             // Commit the transaction
@@ -199,5 +226,10 @@ class ArchivoAnexoController extends Controller
             // Return an error response
             return response()->json($th->getMessage(), 500);
         }
+    }
+
+    public function update(Request $request) //Metodo utilizado al momento de seleccionar proveedor y hacer los calculos 
+    { //se hacen esta peticion por que al no existir el quedan no existen registos previos de la base de datos y no podemos ver a que provedor pertenece
+        return ArchivoAnexo::where("id_quedan", $request->idArchivoAnexo)->update(["estado_archivo_anexo" => 0, "fecha_mod_archivo_anexo" => Carbon::now()]);
     }
 }

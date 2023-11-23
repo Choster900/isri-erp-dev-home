@@ -14,10 +14,18 @@
                 </select>
             </div>
         </div>
+        <div class="text-center" v-if="dataExpedientesPersona == ''">
+            <img src="../../../../img/emptyAnexos.svg" alt="" class="h-[350px] mx-auto">
+            <h1 class="font-medium mt-6 text-lg">No hay documentos en esta sección de anexos</h1>
+            <p class="mt-2 text-sm">Para visualizar documentos en esta área, primero agrega un documento aquí o modifica uno
+                existente y muévelo a esta sección.</p>
+        </div>
+
         <div id="mainSection" class="mb-4  grid " v-if="dataExpedientesPersona"
             :class="{ 'grid-cols-1': viewList, 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3': !viewList, 'gap-5': !viewList, 'gap-2': viewList }">
             <div class="relative border border-gray-200 bg-white rounded-md shadow-lg cursor-pointer hover:bg-slate-100 text-center"
-                :class="{ 'flex': viewList }" v-for="(anexo, i) in dataExpedientesPersona" :key="i" @click="$emit('sent-preview-information', anexo)">
+                :class="{ 'flex': viewList }" v-for="(anexo, i) in dataExpedientesPersona" :key="i"
+                @click="$emit('sent-preview-information', anexo)">
                 <div class="flex justify-center" :class="viewList ? 'px-1 ' : ' py-2 px-5'">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/PDF_file_icon.svg/1200px-PDF_file_icon.svg.png"
                         alt="" class="h-20">
@@ -59,19 +67,21 @@ import SearchIcon from './Icons/searchIcon.vue'
 import DropdownHelp from '@/Components-ISRI/ComponentsToForms/DropdownHelp.vue';
 
 export default {
-    emits: ['redirect-for-modify','sent-preview-information'],
+    emits: ['redirect-for-modify', 'sent-preview-information'],
     components: { SearchIcon, OrderSquareIcon, OrderListIcon, OrderListIcon, OrderSquareIcon, DropdownHelp },
     props: {
         dataExpedientesPersona: { type: Object, default: () => { }, },
         tipoArchivoSelected: { type: Object, default: () => { } },
     },
-    setup(props,{ emit  }) {
+    setup(props, { emit }) {
         const viewList = ref(false)// Controla en como se ven la vista
         const { dataExpedientesPersona, tipoArchivoSelected } = toRefs(props);
         const listAnexos = ref(null)
 
         watch(dataExpedientesPersona, (newTipoArchivo) => {
-            emit('sent-preview-information',dataExpedientesPersona.value[0]) // <-- type check / auto-completion
+            if (newTipoArchivo != '' || newTipoArchivo != null) {
+                emit('sent-preview-information', dataExpedientesPersona.value[0]) // <-- type check / auto-completion
+            }
         })
 
         return {
