@@ -9,7 +9,6 @@ export const useArchivoAnexo = (context) => {
     const sizeArchivoAnexo = ref(null);
     const idArchivoAnexo = ref(null);
     const fileArchivoAnexo = ref("");
-    const sizeArchivoAnexo = ref(null);
     const idTipoArchivoAnexo = ref('');
     const nombreArchivoAnexo = ref(null);
     const descripcionArchivoAnexo = ref(null);

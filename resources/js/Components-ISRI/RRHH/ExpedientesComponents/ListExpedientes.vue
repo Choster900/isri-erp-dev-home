@@ -14,6 +14,13 @@
                 </select>
             </div>
         </div>
+        <div class="text-center" v-if="dataExpedientesPersona == ''">
+            <img src="../../../../img/emptyAnexos.svg" alt="" class="h-[350px] mx-auto">
+            <h1 class="font-medium mt-6 text-lg">No hay documentos en esta sección de anexos</h1>
+            <p class="mt-2 text-sm">Para visualizar documentos en esta área, primero agrega un documento aquí o modifica uno
+                existente y muévelo a esta sección.</p>
+        </div>
+
         <div id="mainSection" class="mb-4  grid " v-if="dataExpedientesPersona"
             :class="{ 'grid-cols-1': viewList, 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3': !viewList, 'gap-5': !viewList, 'gap-2': viewList }">
             <div class="relative border border-gray-200 bg-white rounded-md shadow-lg cursor-pointer hover:bg-slate-100 text-center"
