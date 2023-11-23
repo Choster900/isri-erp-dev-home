@@ -8,6 +8,7 @@ use App\Http\Controllers\RRHH\DirectorCentroController;
 use App\Http\Controllers\RRHH\EmpleadoController;
 use App\Http\Controllers\RRHH\EvaluacionController;
 use App\Http\Controllers\RRHH\ArchivoAnexoController;
+use App\Http\Controllers\RRHH\DependenciaController;
 use App\Http\Controllers\RRHH\GerenteGeneralController;
 use App\Http\Controllers\RRHH\HojaServicioController;
 use App\Http\Controllers\RRHH\JefeInmediatoController;
@@ -214,4 +215,5 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/dependencias', 'RRHH/Dependencias');
         }
     )->name('rrhh.dependencias');
+    Route::post('dependencias', [DependenciaController::class, 'getDependencias'])->name('dependencia.getDependencias');
 });

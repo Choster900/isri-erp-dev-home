@@ -1,22 +1,140 @@
 
 <template>
-    <Head title="Proceso - Empleados" />
-    <AppLayoutVue nameSubModule="RRHH - Empleados">
+    <Head title="Catalogo - Dependencias" />
+    <AppLayoutVue nameSubModule="RRHH - Dependencias">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <!-- <GeneralButton @click="addEmployee()" v-if="permits.insertar == 1" color="bg-green-700  hover:bg-green-800"
-                    text="Agregar Empleado" icon="add" /> -->
+                <GeneralButton @click="addDependency()" v-if="permits.insertar == 1"
+                    color="bg-green-700  hover:bg-green-800" text="Agregar Dependencia" icon="add" />
             </div>
         </div>
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
 
+            <header class="px-5 py-4">
+                <div class="mb-4 md:flex flex-row justify-items-start">
+                    <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
+                        <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
+                            <Multiselect v-model="tableData.length" @select="getDataToShow()" :options="perPage"
+                                :searchable="true" placeholder="Cantidad a mostrar" />
+                            <LabelToInput icon="list2" />
+                        </div>
+                    </div>
+                    <h2 class="font-semibold text-slate-800 pt-1">Dependencias: <span class="text-slate-400 font-medium">{{
+                        tableData.total
+                    }}</span></h2>
+                </div>
+            </header>
             <div class="overflow-x-auto">
+                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
+                    @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getDataToShow()">
+                    <tbody v-if="!isLoadinRequest" class="text-sm divide-y divide-slate-200">
+                        <tr v-for="dependencia in dataToShow" :key="dependencia.id_dependencia">
+                            <td class="px-2 first:pl-5 last:pr-5">
+                                <div class="font-medium text-slate-800 flex items-center justify-center min-h-[50px]">
+                                    {{ dependencia.id_dependencia }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5">
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{ dependencia.nombre_dependencia }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{ dependencia.codigo_dependencia }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div v-if="dependencia.jefatura" class="font-medium text-slate-800 text-center">
+                                    {{ dependencia.jefatura ? dependencia.jefatura.pnombre_persona : '' }}
+                                    {{ dependencia.jefatura ? dependencia.jefatura.snombre_persona : '' }}
+                                    {{ dependencia.jefatura ? dependencia.jefatura.tnombre_persona : '' }}
+                                    {{ dependencia.jefatura ? dependencia.jefatura.papellido_persona : '' }}
+                                    {{ dependencia.jefatura ? dependencia.jefatura.sapellido_persona : '' }}
+                                    {{ dependencia.jefatura ? dependencia.jefatura.tapellido_persona : '' }} 
+                                </div>
+                                <div v-else class="font-medium text-red-500 text-center">
+                                    N/Asign
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800 text-center">
+                                    <div v-if="(dependencia.estado_dependencia == 1)"
+                                        class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
+                                        Activo
+                                    </div>
+                                    <div v-else
+                                        class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-rose-100 text-rose-600">
+                                        Inactivo
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="space-x-1 text-center">
 
-                <p class="text-center text-[14px]"> AQUI INICIA</p>
-                <pre>{{ dependencies }}</pre>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody v-else>
+                        <tr>
+                            <td colspan="6" class="text-center">
+                                <img src="../../../img/IsSearching.gif" alt="" class="w-60 h-60 mx-auto">
+                                <h1 class="font-medium text-xl mt-4">Cargando!!!</h1>
+                                <p class="text-sm text-gray-600 mt-2 pb-10">Por favor espera un momento mientras se carga la
+                                    información.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody v-if="emptyObject && !isLoadinRequest">
+                        <tr>
+                            <td colspan="6" class="text-center">
+                                <img src="../../../img/NoData.gif" alt="" class="w-60 h-60 mx-auto">
+                                <h1 class="font-medium text-xl mt-4">No se encontraron resultados!</h1>
+                                <p class="text-sm text-gray-600 mt-2 pb-10">Parece que no hay registros disponibles en este
+                                    momento.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </datatable>
+
             </div>
 
+        </div>
+        <div v-if="!emptyObject" class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
+            <div>
+                <nav class="flex justify-between" role="navigation" aria-label="Navigation">
+                    <div class="grow text-center">
+                        <ul class="inline-flex text-sm font-medium -space-x-px">
+                            <li v-for="link in links" :key="link.label">
+                                <span v-if="(link.label == 'Anterior')"
+                                    :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
 
+                                    <div class="flex-1 text-right ml-2">
+                                        <a @click="link.url ? getDataToShow(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                  text-indigo-500">
+                                            &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
+                                        </a>
+                                    </div>
+                                </span>
+                                <span v-else-if="(link.label == 'Siguiente')"
+                                    :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
+                                    <div class="flex-1 text-right ml-2">
+                                        <a @click="link.url ? getDataToShow(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                  text-indigo-500">
+                                            <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
+                                        </a>
+                                    </div>
+                                </span>
+                                <span class="cursor-pointer mt-2" v-else @click="link.url ? getDataToShow(link.url) : ''"
+                                    :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
+                                        class=" w-5">{{ link.label }}</span>
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
         </div>
 
 
@@ -43,18 +161,16 @@ export default {
     components: { Head, AppLayoutVue, Datatable },
     props: {
         menu: {
-            type: Array,
-            default: []
+            type: Object,
+            default: {}
         },
     },
     setup(props) {
         const { menu } = toRefs(props);
-        //Datatable options
-        const dependencies = []
         const columns = [
-            { width: "10%", label: "ID", name: "id_dependencia", type: "text" },
+            { width: "8%", label: "ID", name: "id_dependencia", type: "text" },
             { width: "30%", label: "Nombre", name: "nombre_dependencia", type: "text" },
-            { width: "10%", label: "Codigo", name: "codigo_dependencia", type: "text" },
+            { width: "12%", label: "Codigo", name: "codigo_dependencia", type: "text" },
             { width: "30%", label: "Jefatura", name: "jefatura", type: "text" },
             {
                 width: "10%", label: "Estado", name: "estado_dependencia", type: "select",
@@ -73,21 +189,25 @@ export default {
             dataToShow,
             tableData, perPage,
             links, sortKey,
-            sortOrders, 
+            sortOrders,
             isLoadinRequest,
             emptyObject,
             getDataToShow, handleData, sortBy,
-        } = useToDataTable(columns,requestUrl,columntToSort,dir)
+        } = useToDataTable(columns, requestUrl, columntToSort, dir)
 
         const permits = usePermissions(menu.value, window.location.pathname);
 
+        onMounted(() => {
+            
+        })
+
         return {
-            permits, dependencies,
-            dataToShow, tableData, 
+            permits, dataToShow, tableData,
             perPage, links, sortKey,
             sortOrders, sortBy,
             handleData, isLoadinRequest,
-            emptyObject 
+            getDataToShow,
+            emptyObject, columns
         };
     }
 }
