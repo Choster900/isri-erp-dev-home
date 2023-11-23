@@ -16,6 +16,7 @@
                         <input type="file" ref="fileInput" accept=".pdf,.jpeg,.jpg,.png" style="display: none;"
                             @change="handleFileChange">
                     </div>
+                    <InputError class="mt-2" :message="errorsData.fileArchivoAnexo" />
                 </template>
                 <template v-if="nameArchivoAnexo">
                     <img v-if="/.(jpg|jpeg|png)$/.test(nameArchivoAnexo)" :src="urlArchivoAnexo" alt=""
@@ -36,12 +37,11 @@
                             <div class="font-medium text-base ">Detalles del anexo</div>
                         </div>
                         <div class="flex items-center">
-                            <button @click="createArchivoAnexoRequest(selectedValue)"
-                                v-if="actionInProgress == 'add'"
+                            <button @click="createArchivoAnexo(selectedValue)" v-if="actionInProgress == 'add'"
                                 class="border border-green-900 bg-green-800 rounded-lg  text-center  text-white-900 text-white text-xs font-semibold w-full py-1 px-2">Enviar
                                 la información</button>
 
-                            <button @click="updateArchivoAnexoRequest" v-else
+                            <button @click="updateArchivoAnexo" v-else
                                 class="border border-orange-900 bg-orange-800 rounded-lg  text-center  text-white-900 text-white text-xs font-semibold w-full py-1 px-2">Modificar
                                 la información</button>
                         </div>
@@ -51,46 +51,53 @@
                         <textarea id="description" rows="4" v-model="descripcionArchivoAnexo"
                             class="block p-2.5 w-full text-xs text-gray-900  rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 "
                             placeholder="Descripción del archivo..."></textarea>
-                        <p class="mt-5 text-xs pb-4">This textarea bar component is part of a larger, open-source library of
-                            Tailwind CSS components. Learn more by going to the official .</p>
+
+                        <p class="mt-5 text-xs pb-4">Puedes poner un breve resumen o descripcion del archivo que estas por agregar.</p>
                     </div>
 
-                    <div class="flex gap-4">
-                        <div class="relative flex h-8 w-full flex-row-reverse">
-                            <Multiselect v-if="!opcionPersona || opcionPersona == ''" v-model="idPersona"
-                                :filter-results="false" :resolve-on-load="false" :delay="1000" :searchable="true"
-                                :clear-on-search="true" :min-chars="5" placeholder="Busqueda de usuario..." :classes="{
-                                    placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                }" noOptionsText="<p class='text-xs'>Sin Personas<p>"
-                                noResultsText="<p class='text-xs'>Sin resultados de personas <p>" :options="async function (query) {
-                                    return await getPeopleByName(query)
-                                }" />
-
-                            <Multiselect v-else v-model="selectedValue" :filter-results="false" :disabled="true"
-                                :resolve-on-load="false" :delay="1000" :searchable="true" :clear-on-search="true"
-                                :min-chars="5" placeholder="Busqueda de usuario..." :classes="{
-                                    containerDisabled: 'cursor-not-allowed bg-gray-500 text-white',
-                                    placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                }" noOptionsText="<p class='text-xs'>Sin Personas<p>"
-                                noResultsText="<p class='text-xs'>Sin resultados de personas <p>"
-                                :options="opcionPersona" />
+                    <div class="mb-1 md:flex flex-row justify-items-start">
+                        <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                            <div class="relative flex h-8 w-full flex-row-reverse">
+                                <Multiselect v-if="!opcionPersona || opcionPersona == ''" v-model="idPersona"
+                                    @select="getPersonasById($event)" :filter-results="false" :resolve-on-load="false"
+                                    :delay="1000" :searchable="true" :clear-on-search="true" :min-chars="5"
+                                    placeholder="Busqueda de usuario..." :classes="{
+                                        placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                    }" noOptionsText="<p class='text-xs'>Sin Personas<p>"
+                                    noResultsText="<p class='text-xs'>Sin resultados de personas <p>" :options="async function (query) {
+                                        return await getPeopleByName(query)
+                                    }" />
+                                <Multiselect v-else v-model="selectedValue" :filter-results="false" :disabled="true"
+                                    :resolve-on-load="false" :delay="1000" :searchable="true" :clear-on-search="true"
+                                    :min-chars="5" placeholder="Busqueda de usuario..." :classes="{
+                                        containerDisabled: 'cursor-not-allowed bg-gray-500 text-white',
+                                        placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                    }" noOptionsText="<p class='text-xs'>Sin Personas<p>"
+                                    noResultsText="<p class='text-xs'>Sin resultados de personas <p>"
+                                    :options="opcionPersona" />
+                            </div>
+                            <InputError class="mt-2 px-2" :message="errorsData.idPersona" />
                         </div>
-                        <div class="relative flex h-8 w-full flex-row-reverse">
-                            <Multiselect @deselect="null" @clear="null" @select="null" v-model="idTipoArchivoAnexo"
-                                placeholder="Seleccione el tipo de anexo..." :classes="{
-                                    containerDisabled: 'cursor-not-allowed bg-gray-200 ',
-                                    placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                }
-                                    " noOptionsText="<p class='text-xs'>sin contratos<p>"
-                                noResultsText="<p class='text-xs'>contrato no encontrados<p>" :options="opcionesTipoArchivo"
-                                :searchable="true" />
+                        <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                            <div class="relative flex h-8 w-full flex-row-reverse">
+                                <Multiselect @deselect="idTipoArchivoAnexo = ''" v-model="idTipoArchivoAnexo"
+                                    placeholder="Seleccione el tipo de anexo..." :classes="{
+                                        containerDisabled: 'cursor-not-allowed bg-gray-200 ',
+                                        placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                    }
+                                        " noOptionsText="<p class='text-xs'>sin contratos<p>"
+                                    noResultsText="<p class='text-xs'>contrato no encontrados<p>"
+                                    :options="opcionesTipoArchivo" :searchable="true" />
+
+                            </div>
+                            <InputError class="mt-2 px-2" :message="errorsData.idTipoArchivoAnexo" />
                         </div>
                     </div>
-
                 </div>
             </div>
             <div class="w-full md:w-2/5">
-                <SideInfo :fileName="nameArchivoAnexo" @delete-file="deleteFile" />
+                <SideInfo :fileName="nameArchivoAnexo" @delete-file="delteArchivoAnexo(idArchivoAnexo)"
+                    :persona="objectPersona" :isLoading="isLoadingRequestPersona" :ableToEdit="selectedValue" />
             </div>
         </div>
 
@@ -100,24 +107,41 @@
 
 <script>
 import SideInfo from './SideInfoPersona.vue';
-import { computed, onMounted, ref, toRefs, watch } from 'vue';
+import { computed, onMounted, ref, toRefs, watch, watchEffect } from 'vue';
 import { usePersona } from '@/Composables/RRHH/Persona/usePersona';
 import { useFileHandling } from '@/Composables/RRHH/Expediente/useFileHandling'
 import { useArchivoAnexo } from '@/Composables/RRHH/Expediente/useArchivoAnexo'
 
 export default {
-    name: 'AddExpediente',
-    emits: ["refresh-information","cerrar-modal"],
-    components: { SideInfo },
     props: {
-        persona: { type: Object, default: () => { }, },
+        persona: {
+            type: Object,
+            default: () => { },
+        },
         opcionPersona: { type: Object, default: () => { } },
         actionInProgress: { type: Object, default: () => { } },
         tipoArchivoAnexo: { type: Object, default: () => { }, },
         objectAnexoFileForUpdate: { type: Object, default: () => { } },
     },
-    setup(props,context) {
-        const { objectAnexoFileForUpdate, actionInProgress } = toRefs(props);
+    name: 'AddExpediente',
+    emits: ["refresh-information", "cerrar-modal"],
+    components: { SideInfo },
+
+    setup(props, context) {
+        const { objectAnexoFileForUpdate, actionInProgress, persona } = toRefs(props);
+        // Composable para manejar los eventos de los archivos
+        const { file, fileInput, handleDrop, deleteFile, openFileInput, urlArchivoAnexo, handleDragOver, handleFileChange, nameArchivoAnexo, sizeArchivo, tipoMine } = useFileHandling();
+        // Composable usePersona => getPeopleByName() retorna el objeto con las personas buscada en multiselect
+        const { getPeopleByName } = usePersona();
+        // Composable useArchivoAnexo 
+        const { idPersona, idTipoMine, sizeArchivoAnexo, idArchivoAnexo, idTipoArchivoAnexo, fileArchivoAnexo, nombreArchivoAnexo, descripcionArchivoAnexo, createArchivoAnexo, updateArchivoAnexo, errorsData, delteArchivoAnexoRequest, delteArchivoAnexo, getPersonasById, dataArrayPersona, isLoadingRequestPersona } = useArchivoAnexo(context);
+
+        const objectPersona = ref(null)
+
+        watch(persona, () => {
+            objectPersona.value = persona.value
+        })
+
         /**
          * Propiedad computada que genera un objeto con un array para obtener el id y el nombre de la persona seleccionada 
          * Esto se usa cuando estamos editando y queremos setear el id de la persona actual
@@ -145,20 +169,17 @@ export default {
             });
         });
 
-        // Composable para manejar los eventos de los archivos
-        const { file, fileInput, handleDrop, deleteFile, openFileInput, urlArchivoAnexo, handleDragOver, handleFileChange, nameArchivoAnexo, sizeArchivo, tipoMine } = useFileHandling();
-        // Composable usePersona => getPeopleByName() retorna el objeto con las personas buscada en multiselect
-        const { getPeopleByName } = usePersona();
-        // Composable useArchivoAnexo 
-        const { idPersona, idTipoMine, sizeArchivoAnexo, idArchivoAnexo, idTipoArchivoAnexo, fileArchivoAnexo, nombreArchivoAnexo, descripcionArchivoAnexo, createArchivoAnexoRequest, updateArchivoAnexoRequest } = useArchivoAnexo(context);
-
 
         watch(file, () => {
-            idTipoMine.value = tipoMine.value
+            idTipoMine.value = tipoMine.value == 'application/pdf' ? '1' : '2';
             fileArchivoAnexo.value = file.value
             sizeArchivoAnexo.value = sizeArchivo.value
         }) // Verficia que se seleccione una archivo para asignarlo a fileArchivoAnexo
 
+        watch(dataArrayPersona, async () => {
+            objectPersona.value = dataArrayPersona.value
+            console.log(objectPersona.value);
+        })
         const triggetData = () => {
             const { descripcion_archivo_anexo, id_tipo_archivo_anexo, url_archivo_anexo, nombre_archivo_anexo, id_archivo_anexo } = objectAnexoFileForUpdate.value;
             descripcionArchivoAnexo.value = descripcion_archivo_anexo;
@@ -208,8 +229,11 @@ export default {
 
 
         return {
+            //persona,
+            objectPersona,
             file,
             fileInput,
+            dataArrayPersona,
             idPersona,
             handleDrop,
             deleteFile,
@@ -217,20 +241,24 @@ export default {
             selectedValue,
             openFileInput,
             handleDragOver,
+            delteArchivoAnexoRequest,
+            delteArchivoAnexo,
             idArchivoAnexo,
             getPeopleByName,
             urlArchivoAnexo,
             nameArchivoAnexo,
             handleFileChange,
+            getPersonasById,
             fileArchivoAnexo,
             nombreArchivoAnexo,
+            createArchivoAnexo,
             idTipoArchivoAnexo,
             opcionesTipoArchivo,
             descripcionArchivoAnexo,
-            createArchivoAnexoRequest,
-            updateArchivoAnexoRequest,
+            isLoadingRequestPersona,
+            updateArchivoAnexo,
             actionInProgress,
-
+            errorsData,
         };
     }
 }

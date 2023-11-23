@@ -24,11 +24,12 @@ class FileRequest extends FormRequest
     public function rules()
     {
         $fileArchivoAnexo = $this->input('fileArchivoAnexo');
+        $idArchivoAnexo = $this->input('idArchivoAnexo');
 
         return [
-            "fileArchivoAnexo" => ['required', empty($fileArchivoAnexo) ? 'mimes:jpg,png,jpeg,pdf' : '', 'max:2000'],
-            "idTipoArchivoAnexo" => ['required'/* ,'mimes:jpg,png,jpeg,pdf','max:2000' */],
-            "idPersona" => ['required'/* ,'mimes:jpg,png,jpeg,pdf','max:2000' */]
+            "idTipoArchivoAnexo" => ['required'],
+            "idPersona" => ['required'],
+            "fileArchivoAnexo" => [empty($idArchivoAnexo) ? 'required' : '', !empty($fileArchivoAnexo) ? 'mimes:jpg,png,jpeg,pdf' : '',/* 'max:2000' */],
         ];
     }
 

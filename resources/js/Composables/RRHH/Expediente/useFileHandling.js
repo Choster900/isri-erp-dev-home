@@ -1,7 +1,7 @@
 import { ref } from "vue";
 
 export const useFileHandling = () => {
-    const fileInput = ref(null);
+    const fileInput = ref('');
     const urlArchivoAnexo = ref(null);
     const nameArchivoAnexo = ref(null);
     const file = ref(null);
