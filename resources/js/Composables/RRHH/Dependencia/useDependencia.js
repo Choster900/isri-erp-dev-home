@@ -1,17 +1,25 @@
 import { ref, inject } from "vue";
 import axios from "axios";
 import { useHandleError } from "@/Composables/General/useHandleError.js";
-import _ from 'lodash';
+import _ from "lodash";
 
 export const useDependencia = () => {
     const swal = inject("$swal");
     const isLoadingRequest = ref(false);
-    const isLoadingEmployee = ref(false)
-    const employees = ref([])
-    const mainCenters = ref([])
+    const isLoadingEmployee = ref(false);
+    const employees = ref([]);
+    const mainCenters = ref([]);
     const baseOptions = ref([]);
+    const errors = ref({
+        depName: "",
+        personId: "",
+        parentId: "",
+        code: "",
+    })
+    //const errors = ref([])
     const depInfo = ref({
         id: "",
+        jerarquia: "",
         personId: "",
         parentId: "",
         depName: "",
@@ -20,7 +28,6 @@ export const useDependencia = () => {
         phoneNumber: "",
         address: "",
     });
-
 
     const getCentrosAtencion = async () => {
         try {
@@ -62,24 +69,23 @@ export const useDependencia = () => {
         }
     };
 
-    
     const asyncFindEmployee = _.debounce(async (query) => {
         try {
             isLoadingEmployee.value = true;
-            const response = await axios.post("/search-employee", { busqueda: query });
+            const response = await axios.post("/search-employee", {
+                busqueda: query,
+            });
             employees.value = response.data.employees;
         } catch (errors) {
-            employees.value = []
+            employees.value = [];
             console.log(errors);
         } finally {
             isLoadingEmployee.value = false;
         }
-    }, 350)
+    }, 350);
 
     const fetchData = async (depId) => {
-        const { data, isError } = await getInfoForModalDependencias(
-            depId
-        );
+        const { data, isError } = await getInfoForModalDependencias(depId);
         if (!isError) {
             mainCenters.value = data.dependencies;
 
@@ -111,8 +117,11 @@ export const useDependencia = () => {
 
                 Object.assign(depInfo.value, {
                     id: data.dependency.id_dependencia,
+                    jerarquia:
+                        data.dependency.jerarquia_organizacion_dependencia ?? 0,
                     personId: data.dependency.id_persona,
-                    parentId: data.dependency.dep_id_dependencia ?? 1,
+                    parentId:
+                        data.dependency.jerarquia_organizacion_dependencia ?? 1,
                     depName: data.dependency.nombre_dependencia,
                     email: data.dependency.email_dependencia,
                     code: data.dependency.codigo_dependencia,
@@ -121,6 +130,68 @@ export const useDependencia = () => {
                 });
             }
         }
+    };
+
+    const storeDependency = async (dependency,url) => {
+        swal({
+            title: "¿Está seguro de guardar la nueva dependencia?",
+            icon: "question",
+            iconHtml: "❓",
+            confirmButtonText: "Si, Guardar",
+            confirmButtonColor: "#141368",
+            cancelButtonText: "Cancelar",
+            showCancelButton: true,
+            showCloseButton: true,
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                saveDependency(dependency, url);
+            }
+        });
+    };
+    const updateDependency = (dependency) => {
+        swal({
+            title: "¿Está seguro de actualizar la dependencia?",
+            icon: "question",
+            iconHtml: "❓",
+            confirmButtonText: "Si, Actualizar",
+            confirmButtonColor: "#141368",
+            cancelButtonText: "Cancelar",
+            showCancelButton: true,
+            showCloseButton: true,
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                let url = "/update-dependency";
+                saveDependency(dependency, url);
+            }
+        });
+    };
+
+    const saveDependency = async (dependency, url) => {
+        isLoadingRequest.value = true
+        await axios
+            .post(url, dependency)
+            .then((response) => {
+                swal({
+                    title: "Accion realizada",
+                    text: response.data.message,
+                    icon: "success",
+                    timer: 5000,
+                });
+            })
+            .catch((error) => {
+                // const err = error.response.data.errors
+                // Object.assign(errors.value, {
+                //     depName: err.depName ?? '',
+                //     personId: err.personId ?? '',
+                //     parentId: err.parentId ?? '',
+                //     code: err.code ?? ''
+                // });
+                errors.value = error.response.data.errors
+                showErrorMessage(errors)
+            })
+            .finally(() => {
+                isLoadingRequest.value = false
+            });
     };
 
     const showErrorMessage = (error) => {
@@ -132,6 +203,8 @@ export const useDependencia = () => {
         getCentrosAtencion,
         getInfoForModalDependencias,
         fetchData,
+        storeDependency,
+        updateDependency,
         asyncFindEmployee,
         isLoadingRequest,
         isLoadingEmployee,
@@ -139,5 +212,6 @@ export const useDependencia = () => {
         baseOptions,
         depInfo,
         mainCenters,
+        errors
     };
 };

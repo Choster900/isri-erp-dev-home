@@ -29,6 +29,8 @@
                             <TextInput id="nombre" v-model="depInfo.depName" type="text" placeholder="Nombre dependencia">
                                 <LabelToInput icon="standard" forLabel="nombre" />
                             </TextInput>
+                            <InputError v-for="(item, index) in errors.depName" :key="index" class="mt-2"
+                                :message="item" />
                         </div>
                     </div>
 
@@ -41,11 +43,13 @@
                             <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
                                 <Multiselect placeholder="Digite nombre empleado" v-model="depInfo.personId"
                                     :options="load && depInfo.id ? baseOptions : employees" :searchable="true"
-                                    :loading="isLoadingEmployee" :internal-search="false" :options-limit="3"
-                                    @search-change="handleSearchChange" :clear-on-search="true"
+                                    :loading="isLoadingEmployee" :internal-search="false"
+                                    @search-change="handleSearchChange" :clear-on-search="true" 
                                     :noResultsText="'Sin resultados'" :noOptionsText="'Sin resultados'" />
                                 <LabelToInput icon="list" />
                             </div>
+                            <InputError v-for="(item, index) in errors.personId" :key="index" class="mt-2"
+                                :message="item" />
                         </div>
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                             <label class="block mb-2 text-xs font-light text-gray-600">
@@ -53,9 +57,11 @@
                             </label>
                             <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                                 <Multiselect v-model="depInfo.parentId" :options="mainCenters" :searchable="true"
-                                    placeholder="Seleccione centro" />
+                                    placeholder="Seleccione centro" :disabled="depInfo.jerarquia === 0" />
                                 <LabelToInput icon="list" />
                             </div>
+                            <InputError v-for="(item, index) in errors.parentId" :key="index" class="mt-2"
+                                :message="item" />
                         </div>
                     </div>
 
@@ -66,18 +72,18 @@
                             <TextInput id="code" v-model="depInfo.code" type="text" placeholder="Codigo">
                                 <LabelToInput icon="standard" forLabel="code" />
                             </TextInput>
-                            <!-- <InputError v-for="(item, index) in errors.id_puesto_sirhi_det_plaza" :key="index" class="mt-2"
-                                :message="item" /> -->
+                            <InputError v-for="(item, index) in errors.code" :key="index" class="mt-2"
+                                :message="item" />
                         </div>
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                            <TextInput id="phone" v-model="depInfo.phoneNumber" type="text" placeholder="Telefono">
+                            <TextInput id="phone" v-model="depInfo.phoneNumber" type="text" placeholder="Telefono" :required="false">
                                 <LabelToInput icon="objects" forLabel="phone" />
                             </TextInput>
                             <!-- <InputError v-for="(item, index) in errors.id_puesto_sirhi_det_plaza" :key="index" class="mt-2"
                                 :message="item" /> -->
                         </div>
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                            <TextInput id="email" v-model="depInfo.email" type="text" placeholder="Email">
+                            <TextInput id="email" v-model="depInfo.email" type="text" placeholder="Email" :required="false">
                                 <LabelToInput icon="email" forLabel="email" />
                             </TextInput>
                             <!-- <InputError v-for="(item, index) in errors.id_puesto_sirhi_det_plaza" :key="index" class="mt-2"
@@ -87,24 +93,23 @@
 
                     <div class="mb-4 md:flex flex-row justify-items-start">
                         <div class="mb-4 md:mr-2 md:mb-0 basis-full">
-                            <TextInput id="direccion" v-model="depInfo.address" type="text" placeholder="Direccion">
+                            <TextInput id="direccion" v-model="depInfo.address" type="text" placeholder="Direccion" :required="false">
                                 <LabelToInput icon="standard" forLabel="direccion" />
                             </TextInput>
                         </div>
                     </div>
 
-                    <pre>{{ depInfo }}</pre>
 
                     <!-- Buttons -->
-                    <!-- <div class="mt-4 mb-4 md:flex flex-row justify-center">
-                        <GeneralButton v-if="modalData != ''" @click="updateJobPositionDet()"
+                    <div class="mt-4 mb-4 md:flex flex-row justify-center">
+                        <GeneralButton v-if="depInfo.id != ''" @click="updateDependency()"
                             color="bg-orange-700  hover:bg-orange-800" text="Actualizar" icon="update" />
-                        <GeneralButton v-else @click="storeJobPositionDet()" color="bg-green-700  hover:bg-green-800"
+                        <GeneralButton v-else @click="save()" color="bg-green-700  hover:bg-green-800"
                             text="Agregar" icon="add" />
                         <div class="mb-4 md:mr-2 md:mb-0 px-1">
                             <GeneralButton text="Cancelar" icon="add" @click="$emit('cerrar-modal')" />
                         </div>
-                    </div> -->
+                    </div>
 
                 </div>
             </div>
@@ -133,7 +138,7 @@ export default {
             default: 0
         }
     },
-    setup(props) {
+    setup(props, { emit }) {
         const load = ref(true)
         
         const { dependencyId } = toRefs(props)
@@ -145,8 +150,11 @@ export default {
             isLoadingEmployee,
             employees,
             asyncFindEmployee,
+            errors,
             getInfoForModalDependencias,
-            fetchData
+            fetchData,
+            storeDependency,
+            updateDependency
          } = useDependencia();
 
         const handleSearchChange = async (query) => {
@@ -154,6 +162,14 @@ export default {
             if (query != '') {
                 await asyncFindEmployee(query);
             }
+        }
+
+        const save = async () => {
+            await storeDependency(depInfo,'/store-dependency')
+            // if(!err){
+            //     emit('cerrar-modal')
+            //     emit('get-table')
+            // }
         }
 
         onMounted(
@@ -170,8 +186,12 @@ export default {
             employees,
             baseOptions,
             load,
+            errors,
             handleSearchChange,
             getInfoForModalDependencias,
+            storeDependency,
+            updateDependency,
+            save
         };
     },
 };

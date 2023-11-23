@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\RRHH;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\RRHH\DependenciaRequest;
 use App\Models\Dependencia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -22,7 +23,7 @@ class DependenciaController extends Controller
             ->with([
                 'jefatura'
             ])
-            ->where('jerarquia_organizacion_dependencia', '<>', null);
+            ->where('id_dependencia', '<>', 1);
 
         if ($column == 3) {
             $query->orderByRaw('(SELECT pnombre_persona FROM persona WHERE persona.id_persona = dependencia.id_persona) ' . $dir);
@@ -75,7 +76,7 @@ class DependenciaController extends Controller
                 dependencia.dep_id_dependencia as depPadre
             ")
             ->leftJoin('dependencia as dep', 'dependencia.dep_id_dependencia', '=', 'dep.id_dependencia')
-            ->where('dependencia.id_dependencia', '!=', 11) //Todos excepto presidencia
+            //->where('dependencia.id_dependencia', '!=', 11) //Todos excepto presidencia
             ->get();
 
         return response()->json([
@@ -110,5 +111,11 @@ class DependenciaController extends Controller
                 'employees'          => $search != '' ? $empleados : [],
             ]
         );
+    }
+
+    public function storeDependency(DependenciaRequest $request){
+        return response()->json([
+            'message' => 'exitooooo'
+        ]);
     }
 }
