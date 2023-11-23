@@ -6,6 +6,7 @@ export const useArchivoAnexo = (context) => {
     const errorsData = ref([]);
     const idPersona = ref("");
     const idTipoMine = ref(null);
+    const sizeArchivoAnexo = ref(null);
     const idArchivoAnexo = ref(null);
     const fileArchivoAnexo = ref("");
     const sizeArchivoAnexo = ref(null);
