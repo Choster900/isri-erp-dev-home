@@ -24,22 +24,23 @@ class FileRequest extends FormRequest
     public function rules()
     {
         $fileArchivoAnexo = $this->input('fileArchivoAnexo');
+        $idArchivoAnexo = $this->input('idArchivoAnexo');
 
         return [
-            "fileArchivoAnexo" => ['required', empty($fileArchivoAnexo) ? 'mimes:jpg,png,jpeg,pdf' : '', 'max:2000'],
-            "idTipoArchivoAnexo" => ['required'/* ,'mimes:jpg,png,jpeg,pdf','max:2000' */],
-            "idPersona" => ['required'/* ,'mimes:jpg,png,jpeg,pdf','max:2000' */]
+            "idTipoArchivoAnexo" => ['required'],
+            "idPersona" => ['required'],
+            "fileArchivoAnexo" => [empty($idArchivoAnexo) ? 'required' : '', !empty($fileArchivoAnexo) ? 'mimes:jpg,png,jpeg,pdf' : '',/* 'max:2000' */],
         ];
     }
 
     public function messages()
     {
         return [
-            "fileArchivoAnexo.required" => "Tiene que seleccionar una archivo",
-            "fileArchivoAnexo.mimes" => "La imagen no es del formato adecuado",
-            "fileArchivoAnexo.max" => "La imagen no debe execer los 2MB",
-            "idTipoArchivoAnexo.required" => "El tipo de anexo para esta registro es requerido",
-            "idPersona.required" => "La persona para este registro es un dato requerido",
+            "fileArchivoAnexo.required" => "Por favor, seleccione un archivo.",
+            "fileArchivoAnexo.mimes" => "El formato del archivo no es válido. Por favor, use formatos como JPG, PNG, JPEG o PDF.",
+            //"fileArchivoAnexo.max" => "El tamaño del archivo no debe exceder los 2MB.",
+            "idTipoArchivoAnexo.required" => "El tipo de anexo para este registro es requerido.",
+            "idPersona.required" => "La persona para este registro es un dato requerido.",
         ];
     }
 }
