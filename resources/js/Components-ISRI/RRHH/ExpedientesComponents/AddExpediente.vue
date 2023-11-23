@@ -151,6 +151,7 @@ export default {
                 idPersona.value = props.opcionPersona[0].value
                 return props.opcionPersona != '' ? props.opcionPersona[0].value : null;
             } else {
+                idPersona.value = '';
                 return props.value;
             }
         });

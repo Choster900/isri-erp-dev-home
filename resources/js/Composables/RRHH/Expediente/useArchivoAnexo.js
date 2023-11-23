@@ -9,7 +9,7 @@ export const useArchivoAnexo = (context) => {
     const idArchivoAnexo = ref(null);
     const fileArchivoAnexo = ref("");
     const sizeArchivoAnexo = ref(null);
-    const idTipoArchivoAnexo = ref(null);
+    const idTipoArchivoAnexo = ref('');
     const nombreArchivoAnexo = ref(null);
     const descripcionArchivoAnexo = ref(null);
     const dataArrayPersona = ref(null);

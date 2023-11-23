@@ -36,11 +36,11 @@ class FileRequest extends FormRequest
     public function messages()
     {
         return [
-            "fileArchivoAnexo.required" => "Tiene que seleccionar una archivo",
-            "fileArchivoAnexo.mimes" => "La imagen no es del formato adecuado",
-            "fileArchivoAnexo.max" => "La imagen no debe execer los 2MB",
-            "idTipoArchivoAnexo.required" => "El tipo de anexo para esta registro es requerido",
-            "idPersona.required" => "La persona para este registro es un dato requerido",
+            "fileArchivoAnexo.required" => "Por favor, seleccione un archivo.",
+            "fileArchivoAnexo.mimes" => "El formato del archivo no es válido. Por favor, use formatos como JPG, PNG, JPEG o PDF.",
+            //"fileArchivoAnexo.max" => "El tamaño del archivo no debe exceder los 2MB.",
+            "idTipoArchivoAnexo.required" => "El tipo de anexo para este registro es requerido.",
+            "idPersona.required" => "La persona para este registro es un dato requerido.",
         ];
     }
 }
