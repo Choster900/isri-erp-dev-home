@@ -142,7 +142,7 @@
         </div>
 
         <ModalExpedientes :showModal="showModal" @cerrar-modal="showModal = false"
-            @actualizar-data="showModal = false, getPeople" :persona="dataPersona" />
+            @actualizar-data="getPeople(lastUrl); showModal = false" :persona="dataPersona" />
 
     </AppLayoutVue>
 </template>
@@ -165,7 +165,7 @@ export default {
             tableData, perPage,
             links, sortKey,
             sortOrders, sortBy,
-            handleData, isLoadinRequest,
+            handleData, isLoadinRequest, lastUrl,
             showModal, emptyObject } = useDatatable()
 
         watch(showModal, (newData, oldData) => {
@@ -177,6 +177,7 @@ export default {
         return {
             emptyObject,
             dataPersona,
+            lastUrl,
             perPage, links,
             persona, getPeople,
             columns, tableData,

@@ -172,13 +172,13 @@ class PersonaController extends Controller
                      AGAINST ( '" . $request->nombre . "')");
             });
         }
-
+        $query->doesntHave("archivo_anexo");
         $results = $query->get();
 
         $formattedResults = $results->map(function ($item) {
             return [
                 'value' => $item->id_persona,
-                'label' => $item->pnombre_persona . ' ' . ($item->snombre_persona ?? '') . ' ' . ($item->tnombre_persona ?? ''),
+                'label' => $item->pnombre_persona . ' ' . ($item->snombre_persona ?? '') . ' ' . ($item->tnombre_persona ?? ''). ' ' . ($item->papellido_persona ?? ''). ' ' . ($item->sapellido_persona ?? ''). ' ' . ($item->tapellido_persona ?? ''),
                 'allDataPersonas' => $item
                 /* 'disabled' => true */
             ];

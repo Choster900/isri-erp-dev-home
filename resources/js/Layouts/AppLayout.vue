@@ -10,8 +10,8 @@ import { Head } from "@inertiajs/vue3";
         <Sidebar :propToChangeStateSidebar="changeState" />
         <div class="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden h-full">
             <HeaderVue @OpenOrCloseModal="changeState = !changeState" :nameSubModule="nameSubModule" />
-
-            <main class="bg-gray-100/50 flex-1">                <div class=" w-full max-w-9xl mx-auto" :class="autoPadding ? 'px-4 sm:px-6 lg:px-8 py-6' : ''">
+            <main class="bg-gray-100/50 flex-1">
+                <div class=" w-full max-w-9xl mx-auto" :class="autoPadding ? 'px-4 sm:px-6 lg:px-8 py-6' : ''">
                     <slot />
                 </div>
             </main>

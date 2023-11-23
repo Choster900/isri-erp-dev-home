@@ -16,7 +16,7 @@
                 </svg> Informacion del archivo
             </h1>
         </div>
-
+     <!--    {{ anexoInformation }} -->
         <hr class="my-1 mx-7 border-t border-slate-300">
         <div class="flex justify-center">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/PDF_file_icon.svg/1200px-PDF_file_icon.svg.png"
@@ -49,7 +49,7 @@
 
 <script>
 export default {
-    props:['anexoInformation']
+    props: ['anexoInformation']
 }
 </script>
 
