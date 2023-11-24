@@ -5,6 +5,7 @@ namespace App\Http\Controllers\RRHH;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RRHH\DependenciaRequest;
 use App\Models\Dependencia;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -114,8 +115,68 @@ class DependenciaController extends Controller
     }
 
     public function storeDependency(DependenciaRequest $request){
-        return response()->json([
-            'message' => 'exitooooo'
-        ]);
+        DB::beginTransaction();
+        try {
+            $dependency = new Dependencia([
+                'dep_id_dependencia'                        => $request->parentId,
+                'id_tipo_dependencia'                       => 2,
+                'id_persona'                                => $request->personId,
+                'jerarquia_organizacion_dependencia'        => $request->parentId,
+                'nombre_dependencia'                        => $request->depName,
+                'codigo_dependencia'                        => $request->code,
+                'telefono_dependencia'                      => $request->phoneNumber,
+                'email_dependencia'                         => $request->email,
+                'direccion_dependencia'                     => $request->address,
+                'estado_dependencia'                        => 1,
+                'fecha_reg_dependencia'                     => Carbon::now(),
+                'usuario_dependencia'                       => $request->user()->nick_usuario,
+                'ip_dependencia'                            => $request->ip(),
+            ]);
+            $dependency->save();
+
+            DB::commit(); // Confirma las operaciones en la base de datos
+            return response()->json([
+                'message'          => "Dependencia creada con éxito.",
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+            return response()->json([
+                'logical_error' => 'Ha ocurrido un error con sus datos.',
+                'error' => $e,
+            ], 422);
+        }
+    }
+
+    public function updateDependency(DependenciaRequest $request){
+        $dependency = Dependencia::find($request->id);
+
+        DB::beginTransaction();
+        try {
+            $dependency->update([
+                'dep_id_dependencia'                        => $request->parentId,
+                //'id_tipo_dependencia'                       => 2, we don't manage the dependency type
+                'id_persona'                                => $request->personId,
+                'jerarquia_organizacion_dependencia'        => $request->parentId,
+                'nombre_dependencia'                        => $request->depName,
+                'codigo_dependencia'                        => $request->code,
+                'telefono_dependencia'                      => $request->phoneNumber,
+                'email_dependencia'                         => $request->email,
+                'direccion_dependencia'                     => $request->address,
+                'fecha_mod_dependencia'                     => Carbon::now(),
+                'usuario_dependencia'                       => $request->user()->nick_usuario,
+                'ip_dependencia'                            => $request->ip(),
+            ]);
+
+            DB::commit(); // Confirma las operaciones en la base de datos
+            return response()->json([
+                'message'          => "Dependencia actualizada con éxito.",
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+            return response()->json([
+                'logical_error' => 'Ha ocurrido un error con sus datos.',
+                'error' => $e,
+            ], 422);
+        }
     }
 }

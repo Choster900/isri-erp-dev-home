@@ -65,8 +65,6 @@
                         </div>
                     </div>
 
-
-
                     <div class="mb-4 md:flex flex-row justify-items-start">
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                             <TextInput id="code" v-model="depInfo.code" type="text" placeholder="Codigo">
@@ -79,15 +77,11 @@
                             <TextInput id="phone" v-model="depInfo.phoneNumber" type="text" placeholder="Telefono" :required="false">
                                 <LabelToInput icon="objects" forLabel="phone" />
                             </TextInput>
-                            <!-- <InputError v-for="(item, index) in errors.id_puesto_sirhi_det_plaza" :key="index" class="mt-2"
-                                :message="item" /> -->
                         </div>
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                             <TextInput id="email" v-model="depInfo.email" type="text" placeholder="Email" :required="false">
                                 <LabelToInput icon="email" forLabel="email" />
                             </TextInput>
-                            <!-- <InputError v-for="(item, index) in errors.id_puesto_sirhi_det_plaza" :key="index" class="mt-2"
-                                :message="item" /> -->
                         </div>
                     </div>
 
@@ -99,10 +93,9 @@
                         </div>
                     </div>
 
-
                     <!-- Buttons -->
                     <div class="mt-4 mb-4 md:flex flex-row justify-center">
-                        <GeneralButton v-if="depInfo.id != ''" @click="updateDependency()"
+                        <GeneralButton v-if="depInfo.id != ''" @click="update()"
                             color="bg-orange-700  hover:bg-orange-800" text="Actualizar" icon="update" />
                         <GeneralButton v-else @click="save()" color="bg-green-700  hover:bg-green-800"
                             text="Agregar" icon="add" />
@@ -138,7 +131,8 @@ export default {
             default: 0
         }
     },
-    setup(props, { emit }) {
+    emits: ["cerrar-modal", "get-table"],
+    setup(props, context) {
         const load = ref(true)
         
         const { dependencyId } = toRefs(props)
@@ -155,7 +149,7 @@ export default {
             fetchData,
             storeDependency,
             updateDependency
-         } = useDependencia();
+         } = useDependencia(context);
 
         const handleSearchChange = async (query) => {
             load.value = false
@@ -165,11 +159,11 @@ export default {
         }
 
         const save = async () => {
-            await storeDependency(depInfo,'/store-dependency')
-            // if(!err){
-            //     emit('cerrar-modal')
-            //     emit('get-table')
-            // }
+            await storeDependency(depInfo.value,'/store-dependency')
+        }
+
+        const update = async () => {
+            await updateDependency(depInfo.value,'/update-dependency')
         }
 
         onMounted(
@@ -191,7 +185,8 @@ export default {
             getInfoForModalDependencias,
             storeDependency,
             updateDependency,
-            save
+            save,
+            update
         };
     },
 };

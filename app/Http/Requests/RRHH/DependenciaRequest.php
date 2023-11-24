@@ -3,6 +3,7 @@
 namespace App\Http\Requests\RRHH;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class DependenciaRequest extends FormRequest
 {
@@ -26,13 +27,14 @@ class DependenciaRequest extends FormRequest
         $rules["depName"] = ['required'];
         $rules["personId"] = ['required'];
         $rules["parentId"] = ['required'];
-        $rules["code"] = ['required'];
+        $rules["code"] = ['required',Rule::unique('dependencia','codigo_dependencia')->ignore($this->input('id'), 'id_dependencia')];
 
         return $rules;
     }
 
     public function messages()
     {
+        $messages["code"] = "Este codigo pertenece a otra dependencia.";
         $messages["depName.required"] = "Debe escribir el nombre de la dependencia.";
         $messages["personId.required"] = "Debe seleccionar la persona a cargo";
         $messages["parentId.required"] = "Debe seleccionar la dependencia jerarquica.";

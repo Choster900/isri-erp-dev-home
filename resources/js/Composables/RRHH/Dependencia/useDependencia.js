@@ -1,9 +1,11 @@
 import { ref, inject } from "vue";
 import axios from "axios";
 import { useHandleError } from "@/Composables/General/useHandleError.js";
+import { useShowToast } from "@/Composables/General/useShowToast.js";
+import { toast } from "vue3-toastify";
 import _ from "lodash";
 
-export const useDependencia = () => {
+export const useDependencia = (context) => {
     const swal = inject("$swal");
     const isLoadingRequest = ref(false);
     const isLoadingEmployee = ref(false);
@@ -15,10 +17,11 @@ export const useDependencia = () => {
         personId: "",
         parentId: "",
         code: "",
-    })
+    });
     //const errors = ref([])
     const depInfo = ref({
         id: "",
+        type: "",
         jerarquia: "",
         personId: "",
         parentId: "",
@@ -117,6 +120,7 @@ export const useDependencia = () => {
 
                 Object.assign(depInfo.value, {
                     id: data.dependency.id_dependencia,
+                    type: data.dependency.id_tipo_dependencia,
                     jerarquia:
                         data.dependency.jerarquia_organizacion_dependencia ?? 0,
                     personId: data.dependency.id_persona,
@@ -132,7 +136,7 @@ export const useDependencia = () => {
         }
     };
 
-    const storeDependency = async (dependency,url) => {
+    const storeDependency = async (dependency, url) => {
         swal({
             title: "¿Está seguro de guardar la nueva dependencia?",
             icon: "question",
@@ -148,7 +152,7 @@ export const useDependencia = () => {
             }
         });
     };
-    const updateDependency = (dependency) => {
+    const updateDependency = async (dependency,url) => {
         swal({
             title: "¿Está seguro de actualizar la dependencia?",
             icon: "question",
@@ -160,37 +164,23 @@ export const useDependencia = () => {
             showCloseButton: true,
         }).then(async (result) => {
             if (result.isConfirmed) {
-                let url = "/update-dependency";
                 saveDependency(dependency, url);
             }
         });
     };
 
     const saveDependency = async (dependency, url) => {
-        isLoadingRequest.value = true
+        isLoadingRequest.value = true;
         await axios
             .post(url, dependency)
             .then((response) => {
-                swal({
-                    title: "Accion realizada",
-                    text: response.data.message,
-                    icon: "success",
-                    timer: 5000,
-                });
+                handleSuccessResponse(response)
             })
             .catch((error) => {
-                // const err = error.response.data.errors
-                // Object.assign(errors.value, {
-                //     depName: err.depName ?? '',
-                //     personId: err.personId ?? '',
-                //     parentId: err.parentId ?? '',
-                //     code: err.code ?? ''
-                // });
-                errors.value = error.response.data.errors
-                showErrorMessage(errors)
+                handleErrorResponse(error)
             })
             .finally(() => {
-                isLoadingRequest.value = false
+                isLoadingRequest.value = false;
             });
     };
 
@@ -198,6 +188,28 @@ export const useDependencia = () => {
         const { title, text, icon } = useHandleError(error);
         swal({ title: title, text: text, icon: icon, timer: 5000 });
     };
+
+    const handleErrorResponse = (err) => {
+        if (err.response.status === 422) {
+            useShowToast(
+                toast.warning,
+                "Tienes algunos errores, por favor verifica los datos enviados."
+            );
+            errors.value = err.response.data.errors;
+        } else {
+            showErrorMessage(err);
+            context.emit("cerrar-modal")
+        }
+    };
+
+    const handleSuccessResponse = (response) => {
+        useShowToast(
+            toast.success,
+            response.data.message
+        );
+        context.emit("cerrar-modal")
+        context.emit("get-table")
+    }   
 
     return {
         getCentrosAtencion,
@@ -212,6 +224,6 @@ export const useDependencia = () => {
         baseOptions,
         depInfo,
         mainCenters,
-        errors
+        errors,
     };
 };

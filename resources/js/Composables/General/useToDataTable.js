@@ -9,7 +9,6 @@ export const useToDataTable = (columns, requestUrl, columnToSort, dir) => {
     const emptyObject = ref(null);
     const dataToShow = ref([]);
     const links = ref([]);
-    const lastUrl = ref(requestUrl);
 
     columns.forEach((column) => {
         if (column.name === columnToSort) sortOrders.value[column.name] = 1;
@@ -30,8 +29,8 @@ export const useToDataTable = (columns, requestUrl, columnToSort, dir) => {
     const getDataToShow = async (url = requestUrl) => {
         try {
             isLoadinRequest.value = true;
-            lastUrl.value = url;
             tableData.value.draw++;
+            tableData.value.currentPage = url
 
             const response = await axios.post(url, tableData.value);
             const data = response.data;
@@ -45,6 +44,7 @@ export const useToDataTable = (columns, requestUrl, columnToSort, dir) => {
             }
             emptyObject.value = dataToShow.value.length === 0;
         } catch (error) {
+            console.log(error);
             const { title, text, icon } = useHandleError(error);
             swal({ title: title, text: text, icon: icon, timer: 5000 });
         } finally {
@@ -85,7 +85,6 @@ export const useToDataTable = (columns, requestUrl, columnToSort, dir) => {
         emptyObject,
         dataToShow,
         links,
-        lastUrl,
         perPage,
         isLoadinRequest,
         sortBy,

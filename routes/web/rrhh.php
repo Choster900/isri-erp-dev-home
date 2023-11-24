@@ -222,4 +222,5 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get('get-info-modal-dependencias/{id}', [DependenciaController::class, 'getInfoModalDependencias'])->name('dependencia.getInfoModalDependencias');
     Route::post('search-employee', [DependenciaController::class, 'searchEmployee'])->name('dependencia.searchEmployee');
     Route::post('store-dependency', [DependenciaController::class, 'storeDependency'])->name('dependencia.storeDependency');
+    Route::post('update-dependency', [DependenciaController::class, 'updateDependency'])->name('dependencia.updateDependency');
 });
