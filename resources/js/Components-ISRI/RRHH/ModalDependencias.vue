@@ -113,11 +113,9 @@
 <script>
 import Modal from "@/Components-ISRI/AllModal/Modal.vue";
 import InputError from "@/Components/InputError.vue";
-import { toast } from "vue3-toastify";
 import { useDependencia } from '@/Composables/RRHH/Dependencia/useDependencia.js';
 import { ref, toRefs, onMounted, } from 'vue';
 import "vue3-toastify/dist/index.css";
-import axios from "axios";
 
 export default {
     components: { Modal, InputError },
@@ -168,7 +166,7 @@ export default {
 
         onMounted(
             async () => {
-                await fetchData(dependencyId.value ?? '')
+                await fetchData(dependencyId.value)
             }
         )
 

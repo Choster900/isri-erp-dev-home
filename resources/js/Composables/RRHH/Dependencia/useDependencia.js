@@ -18,7 +18,6 @@ export const useDependencia = (context) => {
         parentId: "",
         code: "",
     });
-    //const errors = ref([])
     const depInfo = ref({
         id: "",
         type: "",
@@ -31,6 +30,7 @@ export const useDependencia = (context) => {
         phoneNumber: "",
         address: "",
     });
+    const depToShow = ref({})
 
     const getCentrosAtencion = async () => {
         try {
@@ -91,6 +91,7 @@ export const useDependencia = (context) => {
         const { data, isError } = await getInfoForModalDependencias(depId);
         if (!isError) {
             mainCenters.value = data.dependencies;
+            depToShow.value = data.dependency
 
             //Set the employee name
             if (data.dependency != "") {
@@ -225,5 +226,6 @@ export const useDependencia = (context) => {
         depInfo,
         mainCenters,
         errors,
+        depToShow
     };
 };

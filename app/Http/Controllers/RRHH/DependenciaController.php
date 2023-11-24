@@ -65,7 +65,19 @@ class DependenciaController extends Controller
 
     public function getInfoModalDependencias(Request $request, $id)
     {
-        $dependency =  Dependencia::with('jefatura')->find($id);
+        $dependency =  Dependencia::with([
+            'jefatura',
+            'dependencias_inferiores'=> function ($query) {
+                $query->withCount(['plazas_asignadas as count_plazas' => function ($q) {
+                    $q->where('estado_plaza_asignada', 1);
+                }]);
+            },
+            'dependencias_inferiores.jefatura',
+            'dependencia_superior.jefatura',
+            'centro_atencion'
+        ])
+            ->find($id);
+
         $dependencies = DB::table('dependencia')
             ->selectRaw("
                 dependencia.id_dependencia as value,
@@ -105,6 +117,7 @@ class DependenciaController extends Controller
                 ->where(function ($query) use ($search) {
                     $query->whereRaw("MATCH(p.pnombre_persona, p.snombre_persona, p.tnombre_persona, p.papellido_persona, p.sapellido_persona, p.tapellido_persona) AGAINST(?)", $search);
                 })
+                ->where('e.id_estado_empleado', 1)
                 ->get();
         }
         return response()->json(
@@ -114,11 +127,13 @@ class DependenciaController extends Controller
         );
     }
 
-    public function storeDependency(DependenciaRequest $request){
+    public function storeDependency(DependenciaRequest $request)
+    {
+        $depPadre = Dependencia::find($request->parentId);
         DB::beginTransaction();
         try {
             $dependency = new Dependencia([
-                'dep_id_dependencia'                        => $request->parentId,
+                'dep_id_dependencia'                        => $depPadre->dep_id_dependencia ? $depPadre->dep_id_dependencia : $depPadre->id_dependencia,
                 'id_tipo_dependencia'                       => 2,
                 'id_persona'                                => $request->personId,
                 'jerarquia_organizacion_dependencia'        => $request->parentId,
@@ -147,13 +162,15 @@ class DependenciaController extends Controller
         }
     }
 
-    public function updateDependency(DependenciaRequest $request){
+    public function updateDependency(DependenciaRequest $request)
+    {
         $dependency = Dependencia::find($request->id);
+        $depPadre = Dependencia::find($request->parentId);
 
         DB::beginTransaction();
         try {
             $dependency->update([
-                'dep_id_dependencia'                        => $request->parentId,
+                'dep_id_dependencia'                        => $depPadre->dep_id_dependencia ? $depPadre->dep_id_dependencia : $depPadre->id_dependencia,
                 //'id_tipo_dependencia'                       => 2, we don't manage the dependency type
                 'id_persona'                                => $request->personId,
                 'jerarquia_organizacion_dependencia'        => $request->parentId,
