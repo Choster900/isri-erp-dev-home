@@ -4,7 +4,7 @@
     <AppLayoutVue nameSubModule="RRHH - Dependencias">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="addDependency()" v-if="permits.insertar == 1"
+                <GeneralButton @click="showModalDependencies = true; dependencyId = 0" v-if="permits.insertar == 1"
                     color="bg-green-700  hover:bg-green-800" text="Agregar Dependencia" icon="add" />
             </div>
         </div>
@@ -51,10 +51,10 @@
                                     {{ dependencia.jefatura ? dependencia.jefatura.tnombre_persona : '' }}
                                     {{ dependencia.jefatura ? dependencia.jefatura.papellido_persona : '' }}
                                     {{ dependencia.jefatura ? dependencia.jefatura.sapellido_persona : '' }}
-                                    {{ dependencia.jefatura ? dependencia.jefatura.tapellido_persona : '' }} 
+                                    {{ dependencia.jefatura ? dependencia.jefatura.tapellido_persona : '' }}
                                 </div>
                                 <div v-else class="font-medium text-red-500 text-center">
-                                    N/Asign
+                                    N/Asign.
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
@@ -71,7 +71,38 @@
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="space-x-1 text-center">
-
+                                    <DropDownOptions>
+                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                            v-if="dependencia.estado_dependencia == 1"
+                                            @click="showModalDetail = true; dependencyId = dependencia.id_dependencia">
+                                            <div class="w-8 text-blue-900">
+                                                <span class="text-xs">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                            <div class="font-semibold">Ver</div>
+                                        </div>
+                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                            v-if="permits.actualizar == 1 && dependencia.estado_dependencia == 1"
+                                            @click="showModalDependencies = true; dependencyId = dependencia.id_dependencia">
+                                            <div class="w-8 text-green-900">
+                                                <span class="text-xs">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 002.25-2.25V6a2.25 2.25 0 00-2.25-2.25H6A2.25 2.25 0 003.75 6v2.25A2.25 2.25 0 006 10.5zm0 9.75h2.25A2.25 2.25 0 0010.5 18v-2.25a2.25 2.25 0 00-2.25-2.25H6a2.25 2.25 0 00-2.25 2.25V18A2.25 2.25 0 006 20.25zm9.75-9.75H18a2.25 2.25 0 002.25-2.25V6A2.25 2.25 0 0018 3.75h-2.25A2.25 2.25 0 0013.5 6v2.25a2.25 2.25 0 002.25 2.25z" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                            <div class="font-semibold">Editar</div>
+                                        </div>
+                                    </DropDownOptions>
                                 </div>
                             </td>
                         </tr>
@@ -137,7 +168,13 @@
             </div>
         </div>
 
+        <modal-dependencias-vue v-if="showModalDependencies" :showModalDependencies="showModalDependencies"
+            :dependencyId="dependencyId" @cerrar-modal="showModalDependencies = false"
+            @get-table="getDataToShow(tableData.currentPage)" />
 
+        <modal-show-dependencia-vue v-if="showModalDetail" :showModalDetail="showModalDetail"
+            :dependencyId="dependencyId" @cerrar-modal="showModalDetail = false"
+            @get-table="getDataToShow(tableData.currentPage)" />
 
     </AppLayoutVue>
 </template>
@@ -146,19 +183,20 @@
 import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
-import moment from 'moment';
-import axios from 'axios';
+import ModalDependenciasVue from '@/Components-ISRI/RRHH/ModalDependencias.vue';
+import ModalShowDependenciaVue from '@/Components-ISRI/RRHH/ModalShowDependencia.vue';
+
 
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 
 import { usePermissions } from '@/Composables/General/usePermissions.js';
 import { useToDataTable } from '@/Composables/General/useToDataTable.js';
-import { ref, onMounted, toRefs } from 'vue';
+import { ref, toRefs } from 'vue';
 
 
 export default {
-    components: { Head, AppLayoutVue, Datatable },
+    components: { Head, AppLayoutVue, Datatable, ModalDependenciasVue, ModalShowDependenciaVue },
     props: {
         menu: {
             type: Object,
@@ -167,6 +205,11 @@ export default {
     },
     setup(props) {
         const { menu } = toRefs(props);
+        const permits = usePermissions(menu.value, window.location.pathname);
+
+        const dependencyId = ref(0)
+        const showModalDependencies = ref(false)
+        const showModalDetail = ref(false)
         const columns = [
             { width: "8%", label: "ID", name: "id_dependencia", type: "text" },
             { width: "30%", label: "Nombre", name: "nombre_dependencia", type: "text" },
@@ -184,7 +227,6 @@ export default {
         const requestUrl = "/dependencias"
         const columntToSort = "id_dependencia"
         const dir = 'desc'
-
         const {
             dataToShow,
             tableData, perPage,
@@ -195,19 +237,13 @@ export default {
             getDataToShow, handleData, sortBy,
         } = useToDataTable(columns, requestUrl, columntToSort, dir)
 
-        const permits = usePermissions(menu.value, window.location.pathname);
-
-        onMounted(() => {
-            
-        })
-
         return {
             permits, dataToShow, tableData,
             perPage, links, sortKey,
-            sortOrders, sortBy,
+            sortOrders, sortBy, dependencyId,
             handleData, isLoadinRequest,
-            getDataToShow,
-            emptyObject, columns
+            getDataToShow, showModalDetail,
+            emptyObject, columns, showModalDependencies
         };
     }
 }
