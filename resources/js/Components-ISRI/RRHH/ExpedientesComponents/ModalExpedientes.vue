@@ -23,7 +23,8 @@
                                     </svg>
                                 </li>
                                 <li class="flex items-center " :class="{ 'hidden': sectionView != 'addSection' }">
-                                    <button class="text-slate-500 hover:text-indigo-500">Agregar</button>
+                                    <button class="text-slate-500 hover:text-indigo-500">{{ actionInProgress == 'edit' ?
+                                        'Editar' : 'Agregar' }}</button>
                                 </li>
                                 <li class="flex items-center " :class="{ 'hidden': sectionView != 'anexoSection' }">
                                     <button class="text-slate-500 hover:text-indigo-500">Amonestacion</button>
@@ -32,17 +33,16 @@
                         </div>
                         <div class="py-3" id="filter-section" :class="{ 'hidden': sectionView != 'mainSection' }">
                             <div class="flex space-x-3">
-                                <search-icon />
+                                <search-icon @update:onSearch="filterTipoAnexoByName" />
                                 <order-square-icon class="cursor-pointer" @click="viewList = !viewList"
                                     :modeListSelected="viewList" />
                                 <order-list-icon class="cursor-pointer" @click="viewList = !viewList"
                                     :modeListSelected="viewList" />
                                 <div class="h-6 border border-slate-400/50"></div>
-                                <select id="country" class="form-select h-8" placeholder="Seleccione ">
-                                    <option> </option>
-                                    <option>All</option>
-                                    <option>Only with content</option>
-                                    <option>Last modified</option>
+                                <select id="country" class="form-select h-8" placeholder="Seleccione"
+                                    @input="filterTipoAnexoInSelect($event.target.value)">
+                                    <option value="1">All</option>
+                                    <option value="2">Only with content</option>
                                 </select>
 
                                 <button class="btn-xs bg-indigo-500 hover:bg-indigo-600 text-white"
@@ -58,28 +58,33 @@
                         </div>
                     </div>
 
-                    <div v-if="!persona" class="py-10 text-center" :class="{ 'hidden': sectionView != 'mainSection'}">
+                    <div v-if="!persona" class="py-10 text-center" :class="{ 'hidden': sectionView != 'mainSection' }">
                         <img src="../../../../img/bannerAnexos.svg" alt="" class="h-[350px] mx-auto">
                         <h1 class="font-medium mt-6 text-lg">Añade documentos a las personas desde este panel</h1>
-                        <p class="mt-2 text-sm">Los documentos que añadas a una persona por primera vez se mostrarán en la
+                        <p class="mt-2 text-sm">Los documentos que añadas a una persona por primera vez se mostrarán en
+                            la
                             tabla principal.</p>
                     </div>
 
-                    <div id="mainSection" class="mb-4 px-4 grid " v-else
-                        :class="{ 'hidden': sectionView != 'mainSection', 'grid-cols-1': viewList, 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4': !viewList, 'gap-5': !viewList, 'gap-2': viewList }">
-                        <div class="border border-gray-200 bg-white rounded-md shadow-lg cursor-pointer hover:bg-slate-100"
-                            :class="{ 'flex': viewList }" v-for="(tipoArchivo, i) in objTipoArchivoAnexo" :key="i"
-                            @click="sectionView = 'anexoSection'; datafilteredTypeAnexos = persona.archivo_anexo.filter(index => index.tipo_archivo_anexo.id_tipo_archivo_anexo === tipoArchivo.id_tipo_archivo_anexo);">
-                            <div class="" :class="viewList ? 'px-1 ' : 'w- py-2 px-5'">
+                    <div class="h-[500px] overflow-y-auto" :class="{ 'hidden': sectionView != 'mainSection' }" v-else>
+                        <div id="mainSection" class="mb-4 px-4 grid "
+                            :class="{ 'grid-cols-1': viewList, 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4': !viewList, 'gap-5': !viewList, 'gap-2': viewList }">
+                            <div class="border border-gray-200 bg-white rounded-md shadow-lg cursor-pointer hover:bg-slate-100"
+                                :class="{ 'flex': viewList }" v-for="(tipoArchivo, i) in objTipoArchivoAnexo" :key="i"
+                                @click="sectionView = 'anexoSection'; datafilteredTypeAnexos = persona.archivo_anexo.filter(index => index.tipo_archivo_anexo.id_tipo_archivo_anexo === tipoArchivo.id_tipo_archivo_anexo);">
+                                <div class="" :class="viewList ? 'px-1 ' : 'w- py-2 px-5'">
 
-                                <img :src="`/resources/imagenesTipoAnexos/${tipoArchivo.img_tipo_archivo_anexo}`" alt=""
-                                    class=" h-12" :class="{ 'h-20 ': viewList }">
-                            </div>
-                            <div class="px-5 py-2">
-                                <h1 class="font-semibold text-sm " :class="viewList ? ' ' : 'pb-2'">
-                                    {{ tipoArchivo.nombre_tipo_archivo_anexo }}</h1>
-                                <span class="text-xs block">Modificado: hace 1 dia</span>
-                                <span class="text-xs block">Total anexos: 7</span>
+                                    <img :src="`/resources/imagenesTipoAnexos/${tipoArchivo.img_tipo_archivo_anexo}`" alt=""
+                                        class=" h-12" :class="{ 'h-20 ': viewList }">
+                                </div>
+                                <div class="px-5 py-2">
+                                    <h1 class="font-semibold text-sm " :class="viewList ? ' ' : 'pb-2'" :title="tipoArchivo.nombre_tipo_archivo_anexo">
+                                        {{ $options.filters.truncate(tipoArchivo.nombre_tipo_archivo_anexo, 20, '...') }}
+                                    </h1>
+                                    <span class="text-xs block">Modificado: hace 1 dia</span>
+                                    <span class="text-xs block">Total anexos: {{ tipoArchivo.archivos_anexos.length
+                                    }}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -93,7 +98,7 @@
                         class="pt-1" :opcionPersona="opcionPersona" :tipoArchivoAnexo="objTipoArchivoAnexo"
                         :persona="persona" :objectAnexoFileForUpdate="objectBringsForUpdate"
                         :actionInProgress="actionInProgress" @cerrar-modal="actionWhenIsAdd"
-                        @refresh-information="actionWhenIsEdit" />
+                        @refresh-information="actionWhenIsEdit" :dataTest="dataTest" />
                 </div>
 
 
@@ -104,6 +109,7 @@
     </div>
 </template>
 <script>
+
 import SideInfoFile from './SideInfoFile.vue';
 import SearchIcon from './Icons/searchIcon.vue';
 import AddExpediente from './AddExpediente.vue';
@@ -113,7 +119,9 @@ import OrderListIcon from './Icons/orderListIcon.vue';
 import Modal from "@/Components-ISRI/AllModal/Modal.vue";
 import OrderSquareIcon from './Icons/orderSquareIcon.vue';
 import { useTipoArchivoAnexo } from "@/Composables/RRHH/Expediente/useTipoArchivoAnexo";
+import { truncateString } from '@/mixins/truncateString';
 export default {
+    mixins: [truncateString],
     name: 'ModalExpedientes',
     emits: ['cerrar-modal'],
     components: { Modal, SearchIcon, OrderSquareIcon, OrderListIcon, AddExpediente, ListExpedientes, SideInfoFile },
@@ -136,22 +144,27 @@ export default {
         const actionInProgress = ref(null) // Variable que manejara la accion del formulario de anexos, ya sea agregar o editar
         const objectBringsForShowInSideInfo = ref({}) // Objeto que almacenara la informacion de un anexo para enviarlo al sidebar information
         const datafilteredTypeAnexos = ref(null) // Este objeto se enviara a ListExpedientes para mostrarlo en las listas
+        const dataTest = ref(false)
         const opcionPersona = computed(() => {
             return persona.value ? [{ value: persona.value.id_persona, label: persona.value.pnombre_persona }] : [];
         });
 
-        watch(showModal, () => {
+        watch(showModal, (newVal) => {
+            dataTest.value = newVal ? false : true;
             !showModal.value ? tipoSelected.value = null : ''
             sectionView.value = "mainSection"
         })
 
         const actionWhenIsAdd = async () => {
+            dataTest.value = true
             sectionView.value = 'mainSection'
             emit('actualizar-data')
         }
         const actionWhenIsEdit = async () => {
+            dataTest.value = false
             try {
                 const resp = await axios.post("/getArchivosAnexosByUser", { id_persona: persona.value.id_persona });
+                dataTest.value = true
                 sectionView.value = 'mainSection'
                 tipoSelected.value = null
                 persona.value.archivo_anexo = resp.data.archivo_anexo
@@ -161,7 +174,7 @@ export default {
         }
 
         // Objeto que retorna la lista de tipo de dato
-        const { objTipoArchivoAnexo } = useTipoArchivoAnexo()
+        const { objTipoArchivoAnexo, filterTipoAnexoByName, filterTipoAnexoInSelect } = useTipoArchivoAnexo()
 
         const getInformationForRedirectToEdit = (object) => {
             actionInProgress.value = 'edit'
@@ -174,15 +187,19 @@ export default {
             console.log(object);
             if (object) {
                 objectBringsForShowInSideInfo.value = object
-            }else{
+            } else {
                 objectBringsForShowInSideInfo.value = ''
 
             }
         }
+
         return {
+            filterTipoAnexoInSelect,
             persona,
             viewList,
+            dataTest,
             sectionView,
+            filterTipoAnexoByName,
             tipoSelected,
             opcionPersona,
             objTipoArchivoAnexo,

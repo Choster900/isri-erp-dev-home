@@ -1,21 +1,23 @@
 <template>
-    <svg class="h-6 w-6" viewBox="-5.04 -5.04 34.08 34.08" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#000000">
-        <g id="SVGRepo_bgCarrier" stroke-width="0">
-            <rect x="-5.04" y="-5.04" width="34.08" height="34.08" rx="17.04" fill="#dce0e5" strokewidth="0"></rect>
-        </g>
-        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-        <g id="SVGRepo_iconCarrier">
-            <path
-                d="M15.7955 15.8111L21 21M18 10.5C18 14.6421 14.6421 18 10.5 18C6.35786 18 3 14.6421 3 10.5C3 6.35786 6.35786 3 10.5 3C14.6421 3 18 6.35786 18 10.5Z"
-                stroke="#404245" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-            </path>
-        </g>
-    </svg>
+    <div class="relative">
+        <input id="form-search" class="form-input h-8 w-full pl-9" type="search" @input="$emit('update:onSearch', $event.target.value)">
+        <button class="absolute inset-0 right-auto group" aria-label="Search">
+            <svg class="w-4 h-4 shrink-0 fill-current text-slate-400 group-hover:text-slate-500 ml-3 mr-2"
+                viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M7 14c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7zM7 2C4.243 2 2 4.243 2 7s2.243 5 5 5 5-2.243 5-5-2.243-5-5-5z">
+                </path>
+                <path
+                    d="M15.707 14.293L13.314 11.9a8.019 8.019 0 01-1.414 1.414l2.393 2.393a.997.997 0 001.414 0 .999.999 0 000-1.414z">
+                </path>
+            </svg>
+        </button>
+    </div>
 </template>
 
 <script>
 export default {
-
+    emits: ["update:onSearch"],
 }
 </script>
 

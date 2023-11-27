@@ -18,6 +18,7 @@ class TipoArchivoAnexo extends Model
         'laboral_tipo_archivo_anexo',
         'estado_tipo_archivo_anexo',
     ];
+   /*  public $appends = ['countAnexos']; //ESTO ES PARTE DEL WITH EN EL MODELO*/
 
     /**
      * Get all of the archivos_anexos for the TipoArchivoAnexo
@@ -28,4 +29,10 @@ class TipoArchivoAnexo extends Model
     {
         return $this->hasMany(ArchivoAnexo::class, 'id_tipo_archivo_anexo', 'id_tipo_archivo_anexo');
     }
+
+   /*  public function getCountAnexosAttribute()
+    {//ESTO ES COMO IN WITH PERO EN EL MODELO
+        # code...
+        return $this->archivos_anexos->count();
+    } */
 }
