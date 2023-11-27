@@ -256,7 +256,7 @@ import moment from 'moment';
                             <div v-else class="flex justify-center mt-5">
                                 <GeneralButton v-if="showEditButton" class="mr-1" color="bg-green-700  hover:bg-green-800"
                                     text="Guardar cambios" icon="check"
-                                    @click="this.userId ? saveChanges() : saveNewUser()" />
+                                    @click="userId ? saveChanges() : saveNewUser()" />
                                 <GeneralButton class="ml-1" text="Cerrar" icon="delete" @click="$emit('cerrar-modal')" />
                             </div>
                         </div>

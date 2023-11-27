@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\RRHH;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\RRHH\DependenciaRequest;
 use App\Models\Dependencia;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DependenciaController extends Controller
 {
@@ -21,7 +24,7 @@ class DependenciaController extends Controller
             ->with([
                 'jefatura'
             ])
-            ->where('jerarquia_organizacion_dependencia','<>',null);
+            ->where('id_dependencia', '<>', 1);
 
         if ($column == 3) {
             $query->orderByRaw('(SELECT pnombre_persona FROM persona WHERE persona.id_persona = dependencia.id_persona) ' . $dir);
@@ -49,5 +52,148 @@ class DependenciaController extends Controller
 
         $dependencies = $query->paginate($length)->onEachSide(1);
         return ['data' => $dependencies, 'draw' => $request->input('draw')];
+    }
+
+    //Obtiene unicamente los centros
+    public function getCentrosAtencion(Request $request)
+    {
+        $dependencies = Dependencia::with('jefatura')->where('dep_id_dependencia', null)->get();
+        return response()->json([
+            'dependencies' => $dependencies
+        ]);
+    }
+
+    public function getInfoModalDependencias(Request $request, $id)
+    {
+        $dependency =  Dependencia::with([
+            'jefatura',
+            'dependencias_inferiores'=> function ($query) {
+                $query->withCount(['plazas_asignadas as count_plazas' => function ($q) {
+                    $q->where('estado_plaza_asignada', 1);
+                }]);
+            },
+            'dependencias_inferiores.jefatura',
+            'dependencia_superior.jefatura',
+            'centro_atencion'
+        ])
+            ->find($id);
+
+        $dependencies = DB::table('dependencia')
+            ->selectRaw("
+                dependencia.id_dependencia as value,
+                CASE
+                    WHEN dependencia.dep_id_dependencia IS NOT NULL THEN CONCAT(dep.codigo_dependencia, ' - ', dependencia.nombre_dependencia,' (',dependencia.codigo_dependencia,')')
+                    ELSE CONCAT(dependencia.codigo_dependencia, ' - ', dependencia.nombre_dependencia)
+                END as label,
+                dependencia.id_dependencia,
+                dependencia.dep_id_dependencia as depPadre
+            ")
+            ->leftJoin('dependencia as dep', 'dependencia.dep_id_dependencia', '=', 'dep.id_dependencia')
+            //->where('dependencia.id_dependencia', '!=', 11) //Todos excepto presidencia
+            ->get();
+
+        return response()->json([
+            'dependency'      => $dependency ?? [],
+            'dependencies'    => $dependencies ?? []
+        ]);
+    }
+
+    public function searchEmployee(Request $request)
+    {
+        $search = $request->busqueda;
+        if ($search != '') {
+            $empleados = DB::table('empleado as e')
+                ->selectRaw('
+                    CONCAT_WS(" ", 
+                    COALESCE(p.pnombre_persona, ""), 
+                    COALESCE(p.snombre_persona, ""), 
+                    COALESCE(p.tnombre_persona, ""), 
+                    COALESCE(p.papellido_persona, ""), 
+                    COALESCE(p.sapellido_persona, ""), 
+                    COALESCE(p.tapellido_persona, "")
+                ) AS label,
+                e.id_empleado as value')
+                ->join('persona as p', 'e.id_persona', '=', 'p.id_persona')
+                ->where(function ($query) use ($search) {
+                    $query->whereRaw("MATCH(p.pnombre_persona, p.snombre_persona, p.tnombre_persona, p.papellido_persona, p.sapellido_persona, p.tapellido_persona) AGAINST(?)", $search);
+                })
+                ->where('e.id_estado_empleado', 1)
+                ->get();
+        }
+        return response()->json(
+            [
+                'employees'          => $search != '' ? $empleados : [],
+            ]
+        );
+    }
+
+    public function storeDependency(DependenciaRequest $request)
+    {
+        $depPadre = Dependencia::find($request->parentId);
+        DB::beginTransaction();
+        try {
+            $dependency = new Dependencia([
+                'dep_id_dependencia'                        => $depPadre->dep_id_dependencia ? $depPadre->dep_id_dependencia : $depPadre->id_dependencia,
+                'id_tipo_dependencia'                       => 2,
+                'id_persona'                                => $request->personId,
+                'jerarquia_organizacion_dependencia'        => $request->parentId,
+                'nombre_dependencia'                        => $request->depName,
+                'codigo_dependencia'                        => $request->code,
+                'telefono_dependencia'                      => $request->phoneNumber,
+                'email_dependencia'                         => $request->email,
+                'direccion_dependencia'                     => $request->address,
+                'estado_dependencia'                        => 1,
+                'fecha_reg_dependencia'                     => Carbon::now(),
+                'usuario_dependencia'                       => $request->user()->nick_usuario,
+                'ip_dependencia'                            => $request->ip(),
+            ]);
+            $dependency->save();
+
+            DB::commit(); // Confirma las operaciones en la base de datos
+            return response()->json([
+                'message'          => "Dependencia creada con éxito.",
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+            return response()->json([
+                'logical_error' => 'Ha ocurrido un error con sus datos.',
+                'error' => $e,
+            ], 422);
+        }
+    }
+
+    public function updateDependency(DependenciaRequest $request)
+    {
+        $dependency = Dependencia::find($request->id);
+        $depPadre = Dependencia::find($request->parentId);
+
+        DB::beginTransaction();
+        try {
+            $dependency->update([
+                'dep_id_dependencia'                        => $depPadre->dep_id_dependencia ? $depPadre->dep_id_dependencia : $depPadre->id_dependencia,
+                //'id_tipo_dependencia'                       => 2, we don't manage the dependency type
+                'id_persona'                                => $request->personId,
+                'jerarquia_organizacion_dependencia'        => $request->parentId,
+                'nombre_dependencia'                        => $request->depName,
+                'codigo_dependencia'                        => $request->code,
+                'telefono_dependencia'                      => $request->phoneNumber,
+                'email_dependencia'                         => $request->email,
+                'direccion_dependencia'                     => $request->address,
+                'fecha_mod_dependencia'                     => Carbon::now(),
+                'usuario_dependencia'                       => $request->user()->nick_usuario,
+                'ip_dependencia'                            => $request->ip(),
+            ]);
+
+            DB::commit(); // Confirma las operaciones en la base de datos
+            return response()->json([
+                'message'          => "Dependencia actualizada con éxito.",
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+            return response()->json([
+                'logical_error' => 'Ha ocurrido un error con sus datos.',
+                'error' => $e,
+            ], 422);
+        }
     }
 }
