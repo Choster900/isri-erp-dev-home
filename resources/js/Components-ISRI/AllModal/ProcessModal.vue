@@ -17,6 +17,10 @@ const props = defineProps({
     center: {
         type: Boolean,
         default:false
+    },
+    rounded: {
+        type: Boolean,
+        default: false
     }
 });
 
@@ -66,6 +70,11 @@ const maxWidthClass = computed(() => {
         '7xl': 'sm:max-w-7xl',
     }[props.maxWidth];
 });
+
+const isRounded = computed(() => {
+    const res = props.rounded ? ' rounded-lg' : ''
+    return res
+})
 </script>
 
 <template>
@@ -85,7 +94,7 @@ const maxWidthClass = computed(() => {
                     leave-from-class="opacity-100 translate-y-0" leave-to-class="opacity-0 translate-y-[-100%]">
                     <div v-show="show"
                         class="mb-6 bg-white rounded- overflow-hidden shadow-xl transform transition-all sm:w-full sm:mx-auto"
-                        :class="maxWidthClass">
+                        :class="maxWidthClass+isRounded">
                         <slot />
                     </div>
                 </transition>

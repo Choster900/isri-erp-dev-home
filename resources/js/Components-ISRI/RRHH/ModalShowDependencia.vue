@@ -18,17 +18,104 @@
                 </div>
             </div>
         </div>
-        <ProcessModal v-else :show="showModalDetail" @close="$emit('cerrar-modal')"
-            :modal-title="'Administracion dependencias. '" maxWidth="3xl">
+        <ProcessModal v-else :show="showModalDetail" @close="$emit('cerrar-modal')" :center="true" :rounded=true
+            :modal-title="'Administracion dependencias. '" maxWidth="2xl">
             <div class="px-5 py-4">
                 <div class="text-sm">
 
 
-
-
-                    <div class="p-5">
-                        <pre>{{ depToShow }}</pre>
+                    <div class="flex items-center justify-center bg-[#1F3558] py-1.5 rounded-t-lg">
+                        <svg class="text-white " width="22px" height="22px" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg" stroke="currentColor">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier">
+                                <path
+                                    d="M22 8.52V3.98C22 2.57 21.36 2 19.77 2H15.73C14.14 2 13.5 2.57 13.5 3.98V8.51C13.5 9.93 14.14 10.49 15.73 10.49H19.77C21.36 10.5 22 9.93 22 8.52ZM22 19.77V15.73C22 14.14 21.36 13.5 19.77 13.5H15.73C14.14 13.5 13.5 14.14 13.5 15.73V19.77C13.5 21.36 14.14 22 15.73 22H19.77C21.36 22 22 21.36 22 19.77ZM10.5 8.52V3.98C10.5 2.57 9.86 2 8.27 2H4.23C2.64 2 2 2.57 2 3.98V8.51C2 9.93 2.64 10.49 4.23 10.49H8.27C9.86 10.5 10.5 9.93 10.5 8.52ZM10.5 19.77V15.73C10.5 14.14 9.86 13.5 8.27 13.5H4.23C2.64 13.5 2 14.14 2 15.73V19.77C2 21.36 2.64 22 4.23 22H8.27C9.86 22 10.5 21.36 10.5 19.77Z"
+                                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                </path>
+                            </g>
+                        </svg>
+                        <h1 class="ml-2 text-white">{{ depToShow.nombre_dependencia }}</h1>
                     </div>
+                    <div class="flex w-full pb-4 border-b border-x border-gray-400 rounded-b-lg">
+                        <div class="mt-3 w-full mx-4 relative">
+                            <p class="text-gray-700 text-center text-[14px] font-semibold">INFORMACION GENERAL</p>
+                            <div class="mt-2 flex">
+                                <div class="w-[60%]">
+                                    <p class="text-gray-500 text-[14px]">Empleado a cargo</p>
+                                    <p class="text-navy-700 text-[13px]">
+                                        {{ depToShow.jefatura ? depToShow.jefatura.pnombre_persona : '' }}
+                                        {{ depToShow.jefatura ? depToShow.jefatura.snombre_persona : '' }}
+                                        {{ depToShow.jefatura ? depToShow.jefatura.tnombre_persona : '' }}
+                                        {{ depToShow.jefatura ? depToShow.jefatura.papellido_persona : '' }}
+                                        {{ depToShow.jefatura ? depToShow.jefatura.sapellido_persona : '' }}
+                                        {{ depToShow.jefatura ? depToShow.jefatura.tapellido_persona : '' }}
+                                    </p>
+                                </div>
+                                <div class="w-[40%]">
+                                    <p class="text-gray-500 text-[14px]">Centro</p>
+                                    <p class="text-navy-700 text-[13px]">
+                                        {{ depToShow.centro_atencion ?
+                                            depToShow.centro_atencion.codigo_dependencia : 'N/A' }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="mt-2 flex">
+                                <div class="w-[25%]">
+                                    <p class="text-gray-500 text-[14px]">Codigo</p>
+                                    <p class="text-navy-700 text-[13px]">
+                                        {{ depToShow.codigo_dependencia }}
+                                    </p>
+                                </div>
+                                <div class="w-[35%]">
+                                    <p class="text-gray-500 text-[14px]">Telefono</p>
+                                    <p class="text-navy-700 text-[13px]">
+                                        {{ depToShow.telefono_dependencia ?? 'Sin registro.' }}
+                                    </p>
+                                </div>
+                                <div class="w-[40%]">
+                                    <p class="text-gray-500 text-[14px]">Email</p>
+                                    <p class="text-navy-700 text-[13px]">
+                                        {{ depToShow.email_dependencia ?? 'Sin registro.' }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="mt-2 flex">
+                                <div class="w-full">
+                                    <p class="text-gray-500 text-[14px]">Direccion</p>
+                                    <p class="text-navy-700 text-[13px]">
+                                        {{ depToShow.direccion_dependencia ? depToShow.direccion_dependencia : 'Sin registro.' }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="mt-2 flex">
+                                <div class="w-full">
+                                    <p class="text-gray-500 text-[14px]">Dependencia jerarquica</p>
+                                    <p class="text-navy-700 text-[13px]">
+                                        {{ depToShow.dependencia_superior ? depToShow.dependencia_superior.nombre_dependencia + ' ('+depToShow.dependencia_superior.codigo_dependencia+')' : '' }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="mt-2 flex">
+                                <div class="w-[50%]">
+                                    <p class="text-gray-500 text-[14px]">Fecha de registro</p>
+                                    <p class="text-navy-700 text-[13px]">
+                                        {{ depToShow.fecha_reg_dependencia ? moment(depToShow.fecha_reg_dependencia).format('DD/MM/YYYY') : 'Sin registro' }}
+                                    </p>
+                                </div>
+                                <div class="w-[50%]">
+                                    <p class="text-gray-500 text-[14px]">Fecha ultima modificación</p>
+                                    <p class="text-navy-700 text-[13px]">
+                                        {{ depToShow.fecha_mod_dependencia ? moment(depToShow.fecha_mod_dependencia).format('DD/MM/YYYY') : 'Sin registro.' }}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+
+
 
 
 
@@ -45,6 +132,7 @@ import InputError from "@/Components/InputError.vue";
 import { useDependencia } from '@/Composables/RRHH/Dependencia/useDependencia.js';
 import { ref, toRefs, onMounted, } from 'vue';
 import "vue3-toastify/dist/index.css";
+import moment from 'moment';
 
 export default {
     components: { ProcessModal, InputError },
@@ -75,7 +163,8 @@ export default {
 
         return {
             isLoadingRequest,
-            depToShow
+            depToShow,
+            moment
         };
     },
 };
