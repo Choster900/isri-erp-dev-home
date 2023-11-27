@@ -32,7 +32,7 @@ class Dependencia extends Model
 
     public function plazas_asignadas()
     {
-        return $this->hasMany('App\Models\PlazaAsignada','id_dependencia','id_dependencia');
+        return $this->hasMany('App\Models\PlazaAsignada', 'id_dependencia', 'id_dependencia');
     }
 
     public function detalle_quedan()
@@ -44,15 +44,27 @@ class Dependencia extends Model
     {
         return $this->hasOne('App\Models\Dependencia', 'id_dependencia', 'dep_id_dependencia');
     }
-
+    //I must check this to know if it's still necessary
     public function children_dependencies()
     {
         return $this->hasMany('App\Models\Dependencia', 'dep_id_dependencia', 'id_dependencia');
     }
-
+    //I must check this to know if it's still necessary
     public function jefatura()
     {
         return $this->belongsTo('App\Models\Persona', 'id_persona', 'id_persona');
     }
-
+    
+    public function dependencias_inferiores()
+    {
+        return $this->hasMany('App\Models\Dependencia', 'jerarquia_organizacion_dependencia', 'id_dependencia');
+    }
+    public function dependencia_superior()
+    {
+        return $this->hasOne('App\Models\Dependencia', 'id_dependencia', 'jerarquia_organizacion_dependencia');
+    }
+    public function centro_atencion()
+    {
+        return $this->hasOne('App\Models\Dependencia', 'id_dependencia', 'dep_id_dependencia');
+    }
 }
