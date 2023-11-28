@@ -273,7 +273,7 @@ export default {
                 width: "10%", label: "Estado", name: "estado_empleado", type: "select",
                 options: [
                     { value: "1", label: "Activo" },
-                    { value: "0", label: "Inactivo" }
+                    { value: "2", label: "Inactivo" }
                 ]
             },
             { width: "5%", label: "Acciones", name: "Acciones" },
@@ -300,7 +300,7 @@ export default {
                 { inputName: 'codigo_empleado', number: false, limit: 5 },
                 { inputName: 'nombre_persona', number: false, limit: 20 },
                 { inputName: 'dui_persona', number: false, limit: 10 },
-                { inputName: 'dependencia', number: false, limit: 5 },
+                { inputName: 'dependencia', number: false, limit: 8},
             ],
 
             //Permissions

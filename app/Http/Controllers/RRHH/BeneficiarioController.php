@@ -56,7 +56,7 @@ class BeneficiarioController extends Controller
         // Construir la consulta base con las relaciones
         $query = Persona::select('*')->with([
             "genero",
-            "familiar" => function($query){
+            "familiar" => function ($query) {
                 $query->where('estado_familiar', 1);
             },
             "profesion",
@@ -88,7 +88,7 @@ class BeneficiarioController extends Controller
             });
 
             $query->whereHas('familiar', function ($query) use ($data) {
-                $query->where('id_parentesco', 'like', '%' . $data["id_parentesco"] . '%');
+                $query->where('id_parentesco', '=', $data["id_parentesco"]);
             });
 
             $query->whereHas('familiar', function ($query) use ($data) {

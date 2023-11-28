@@ -172,7 +172,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     )->name('rrhh.expedientes');
     Route::post('expedientes', [ArchivoAnexoController::class, 'getEmployeeExpediente'])->name('expediente.getEmployeeExpediente');
     Route::get('getAllTipoArchivoAnexos', function () {
-        return TipoArchivoAnexo::all();
+        return TipoArchivoAnexo::with('archivos_anexos')->get();
     });
     Route::post('getPersonaByName', [PersonaController::class, 'getPersonByCompleteName'])->name('expediente.getExpediente');
     Route::post('createArchivoAnexo', [ArchivoAnexoController::class, 'createArchivoAnexo'])->name('expediente.createArchivoAnexo');

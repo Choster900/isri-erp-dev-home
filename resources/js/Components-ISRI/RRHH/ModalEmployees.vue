@@ -134,12 +134,14 @@ import axios from "axios";
                                     @update:modelValue="validatePersonInputs('telefono_persona', 12, false, false, true, false)">
                                     <LabelToInput icon="personalInformation" forLabel="telefono" />
                                 </TextInput>
+                                <InputError class="mt-2" :message="errors.persona.telefono_persona" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="Correo" v-model="employee.persona.email_persona" type="email"
                                     placeholder="Correo electronico" :required="false">
                                     <LabelToInput icon="email" forLabel="Correo" />
                                 </TextInput>
+                                <InputError class="mt-2" :message="errors.persona.email_persona" />
                             </div>
                         </div>
                         <!-- End third row Page1 -->
@@ -422,6 +424,7 @@ import axios from "axios";
                                     @update:modelValue="validateEmployeeInputs('email_institucional_empleado', 90)">
                                     <LabelToInput icon="email" forLabel="email1" />
                                 </TextInput>
+                                <InputError class="mt-2" :message="errors.email_institucional_empleado" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="email2" v-model="employee.email_alternativo_empleado" :required="false"
@@ -429,6 +432,7 @@ import axios from "axios";
                                     @update:modelValue="validateEmployeeInputs('email_alternativo_empleado', 90)">
                                     <LabelToInput icon="email" forLabel="email2" />
                                 </TextInput>
+                                <InputError class="mt-2" :message="errors.email_alternativo_empleado" />
                             </div>
                         </div>
                         <!-- End third row Page3 -->
@@ -577,19 +581,18 @@ import axios from "axios";
                             <button v-if="current_page != 1"
                                 class="mr-1 flex items-center bg-gray-600 hover:bg-gray-700 text-white pl-2 pr-3 py-1.5 text-center mb-2 rounded"
                                 @click="goToPreviousPage()">
-                                <svg width="20px" height="20px" viewBox="-3 0 32 32" version="1.1"
-                                    xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                                    fill="#ffffff" stroke="#ffffff">
+                                <svg width="20" height="20" viewBox="-3 0 32 32" version="1.1" fill="#ffffff"
+                                    stroke="#ffffff">
                                     <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                                     <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
                                     <g id="SVGRepo_iconCarrier">
-                                        <g id="icomoon-ignore"> </g>
+                                        <g id="icomoon-ignore"></g>
                                         <path
                                             d="M13.114 2.887c-7.243 0-13.114 5.871-13.114 13.113s5.871 13.113 13.114 13.113c7.242 0 13.112-5.871 13.112-13.113s-5.87-13.113-13.112-13.113zM13.114 28.064c-6.653 0-12.065-5.412-12.065-12.064s5.412-12.063 12.065-12.063c6.652 0 12.063 5.412 12.063 12.063s-5.411 12.064-12.063 12.064z"
-                                            fill="#ffffff"> </path>
+                                            fill="#ffffff"></path>
                                         <path
                                             d="M12.318 10.363l-0.742-0.742-6.379 6.379 6.379 6.379 0.742-0.742-5.113-5.113h12.726v-1.049h-12.726z"
-                                            fill="#ffffff"> </path>
+                                            fill="#ffffff"></path>
                                     </g>
                                 </svg>
                                 <span class="ml-1 px-1 py-2.5 text-base text-gray-100 border-l-2 border-gray-100"></span>
@@ -603,19 +606,18 @@ import axios from "axios";
                                 <div class="text-[12px]">SIGUIENTE</div>
                                 <span
                                     class="ml-1 pl-1 pr-0 py-2.5 text-base text-gray-100 border-l-2 border-gray-100"></span>
-                                <svg width="20px" height="20px" viewBox="-3 0 32 32" version="1.1"
-                                    xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                                    fill="#ffffff" stroke="#ffffff">
+                                <svg width="20" height="20" viewBox="-3 0 32 32" version="1.1" fill="#ffffff"
+                                    stroke="#ffffff">
                                     <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                                     <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
                                     <g id="SVGRepo_iconCarrier">
-                                        <g id="icomoon-ignore"> </g>
+                                        <g id="icomoon-ignore"></g>
                                         <path
-                                            d="M13.11 29.113c7.243 0 13.113-5.871 13.113-13.113s-5.87-13.113-13.113-13.113c-7.242 0-13.113 5.871-13.113 13.113s5.871 13.113 13.113 13.113zM13.11 3.936c6.652 0 12.064 5.412 12.064 12.064s-5.412 12.064-12.064 12.064c-6.653 0-12.064-5.412-12.064-12.064s5.411-12.064 12.064-12.064z"
-                                            fill="#ffffff"> </path>
+                                            d="M13.11 29.113c7.243 0 13.113-5.871 13.113-13.113S20.353 2.9 13.11 2.9c-7.242 0-13.113 5.871-13.113 13.113s5.871 13.113 13.113 13.113zM13.11 3.936c6.652 0 12.064 5.412 12.064 12.064s-5.412 12.064-12.064 12.064c-6.653 0-12.064-5.412-12.064-12.064s5.411-12.064 12.064-12.064z"
+                                            fill="#ffffff"></path>
                                         <path
-                                            d="M13.906 21.637l0.742 0.742 6.378-6.379-6.378-6.379-0.742 0.742 5.112 5.112h-12.727v1.049h12.727z"
-                                            fill="#ffffff"> </path>
+                                            d="M13.906 21.637l0.742 0.742 6.378-6.379-6.378-6.379-0.742 0.742 5.112 5.112H6.111v1.049h12.727z"
+                                            fill="#ffffff"></path>
                                     </g>
                                 </svg>
                             </button>
@@ -870,6 +872,8 @@ export default {
                 id_estado_civil: 'estado civil',
                 id_nivel_educativo: 'nivel educativo',
                 id_profesion: 'profesion',
+                telefono_persona: 'telefono',
+                email_persona: 'correo'
             };
             const fieldsResidence = {
                 id_municipio: 'municipio residencia',
@@ -882,17 +886,37 @@ export default {
                     'dui_persona',
                     'id_genero',
                     'fecha_nac_persona',
-                    'id_municipio'
+                    'id_municipio',
+                    'telefono_persona',
+                    'email_persona'
                 ];
                 let has_errors_page1 = false;
                 requiredFieldsPage1.forEach(field => {
-                    if (this.employee['persona'][field]) {
-                        this.errors['persona'][field] = '';
+                    const fieldValue = this.employee['persona'][field];
+                    if (fieldValue) {
+                        if (field === 'telefono_persona' && fieldValue.length <= 8) {
+                            has_errors_page1 = true;
+                            this.errors['persona'][field] = `El campo ${fieldsPerson[field]} debe tener al menos 8 números.`;
+                        } else if (field === 'telefono_persona' && !['7', '6', '2'].includes(fieldValue.charAt(0))) {
+                            has_errors_page1 = true;
+                            this.errors['persona'][field] = `El campo ${fieldsPerson[field]} debe empezar con 2, 6 o 7.`;
+                        } else if (field === 'dui_persona' && fieldValue.length <= 9) {
+                            has_errors_page1 = true;
+                            this.errors['persona'][field] = `El campo ${fieldsPerson[field]} debe tener al menos 9 números.`;
+                        } else if (field === 'email_persona' && fieldValue !== '' && !this.validateEmail(fieldValue)) {
+                            has_errors_page1 = true;
+                            this.errors['persona'][field] = `El campo ${fieldsPerson[field]} no tiene un formato de correo electrónico válido.`;
+                        } else {
+                            this.errors['persona'][field] = '';
+                        }
+                    } else if (field !== 'email_persona' && field !== 'telefono_persona') {
+                        has_errors_page1 = true;
+                        this.errors['persona'][field] = `El campo ${fieldsPerson[field]} ${field === 'telefono_persona' ? 'debe tener al menos 8 números.' : field === 'email_persona' ? 'debe tener un formato de correo electrónico válido.' : 'es obligatorio.'}`;
                     } else {
-                        has_errors_page1 = true
-                        this.errors['persona'][field] = `El campo ${fieldsPerson[field]} es obligatorio.`;
+                        this.errors['persona'][field] = '';
                     }
                 });
+
                 if (!has_errors_page1) {
                     this.current_page++;
                 } else {
@@ -942,13 +966,16 @@ export default {
             }
         },
         validatePage3() {
+            console.log('holaa')
             const fieldsEmployee = {
                 id_tipo_pension: 'tipo pension',
                 nup_empleado: 'numero nup',
                 isss_empleado: 'numero isss',
                 id_titulo_profesional: 'titulo profesional',
                 fecha_contratacion_empleado: 'fecha contratacion',
-                codigo_empleado: 'codigo SIRHI'
+                codigo_empleado: 'codigo SIRHI',
+                email_institucional_empleado: 'correo institucional',
+                email_alternativo_empleado: 'correo alternativo'
             };
 
             const requiredFieldsEmployee = [
@@ -957,16 +984,26 @@ export default {
                 'isss_empleado',
                 'id_titulo_profesional',
                 'fecha_contratacion_empleado',
-                'codigo_empleado'
+                'codigo_empleado',
+                'email_institucional_empleado',
+                'email_alternativo_empleado'
             ];
 
             let has_errors_page3 = false;
             requiredFieldsEmployee.forEach(field => {
                 if (this.employee[field]) {
-                    this.errors[field] = '';
-                } else {
+                    const fieldValue = this.employee[field];
+                    if ((field === 'email_institucional_empleado' || field === 'email_alternativo_empleado') && !this.validateEmail(fieldValue)) {
+                        has_errors_page3 = true;
+                        this.errors[field] = `El campo ${fieldsEmployee[field]} no tiene un formato de correo electrónico válido.`;
+                    } else {
+                        this.errors[field] = '';
+                    }
+                } else if (field !== 'email_institucional_empleado' && field !== 'email_alternativo_empleado') {
                     has_errors_page3 = true
                     this.errors[field] = `El campo ${fieldsEmployee[field]} es obligatorio.`;
+                } else {
+                    this.errors[field] = '';
                 }
             });
             if (!has_errors_page3) {
@@ -1020,6 +1057,10 @@ export default {
         },
         goToPreviousPage() {
             this.current_page--
+        },
+        validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
         },
         async getSelectsEmployeeModal() {
             try {
