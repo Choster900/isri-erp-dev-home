@@ -72,12 +72,9 @@ class EmpleadoController extends Controller
         if ($search_value) {
             $query->where('id_empleado', 'like', '%' . $search_value['id_empleado'] . '%')
                 ->where('codigo_empleado', 'like', '%' . $search_value['codigo_empleado'] . '%')
-                ->where('estado_empleado', 'like', '%' . $search_value['estado_empleado'] . '%')
+                ->where('id_estado_empleado', 'like', '%' . $search_value['estado_empleado'] . '%')
                 ->whereHas('persona', function ($query) use ($search_value) {
                     $query->where('dui_persona', 'like', '%' . $search_value["dui_persona"] . '%');
-                })
-                ->whereHas('plazas_asignadas.dependencia', function ($query) use ($search_value) {
-                    $query->where('codigo_dependencia', 'like', '%' . $search_value["dependencia"] . '%');
                 })
                 ->whereHas(
                     'persona',
@@ -87,6 +84,28 @@ class EmpleadoController extends Controller
                         }
                     }
                 );
+            if ($search_value['dependencia']) {
+                if ($search_value['dependencia'] == 'N/Asign.') {
+                    $query->whereHas('plazas_asignadas', function ($query) use ($search_value) {
+                        $query->whereNotExists(function ($subQuery) {
+                            $subQuery->select(DB::raw(1))
+                                ->from('plaza_asignada')
+                                ->whereRaw('plaza_asignada.id_empleado = empleado.id_empleado')
+                                ->where('estado_plaza_asignada', 1);
+                        });
+                    });
+                } else {
+                    $query->whereHas('plazas_asignadas.dependencia', function ($query) use ($search_value) {
+                        $query->where('codigo_dependencia', 'like', '%' . $search_value["dependencia"] . '%')
+                        ->whereExists(function ($subQuery) {
+                            $subQuery->select(DB::raw(1))
+                                ->from('plaza_asignada')
+                                ->whereRaw('plaza_asignada.id_empleado = empleado.id_empleado')
+                                ->where('estado_plaza_asignada', 1);
+                        });
+                    });
+                }
+            }
         }
         $employees = $query->paginate($length)->onEachSide(1);
         return ['data' => $employees, 'draw' => $request->input('draw')];
@@ -530,7 +549,7 @@ class EmpleadoController extends Controller
             ->get();
         $reasonsForDissociate = MotivoDesvinculoLaboral::select('id_motivo_desvinculo_laboral as value', 'nombre_motivo_desvinculo_laboral as label')
             ->where('estado_motivo_desvinculo_laboral', 1)
-            ->where('nombre_motivo_desvinculo_laboral','<>','JUBILACION')
+            ->where('nombre_motivo_desvinculo_laboral', '<>', 'JUBILACION')
             ->get();
         //We return the data to the view
         return response()->json([
@@ -950,9 +969,9 @@ class EmpleadoController extends Controller
                     'error' => $e,
                 ], 422);
             }
-        }else{
+        } else {
             return response()->json([
-                'logical_error' => 'No puedes activar este empleado, ya que su salida fue por '+$periodo->motivo_desvinculo_laboral->nombre_motivo_desvinculo_laboral+'.',
+                'logical_error' => 'No puedes activar este empleado, ya que su salida fue por ' + $periodo->motivo_desvinculo_laboral->nombre_motivo_desvinculo_laboral + '.',
             ], 422);
         }
     }
