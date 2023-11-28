@@ -162,9 +162,9 @@ class AcuerdoController extends Controller
                         'estado_acuerdo_laboral' => 1,
                         'id_empleado' => $request->id_empleado,
                         'ip_acuerdo_laboral' => $request->ip(),
-                        'fecha_fin_acuerdo_laboral' => $fecha_fin,
+                        'fecha_fin_acuerdo_laboral' =>  $fecha_fin != '' ? $fecha_fin : null,
                         'fecha_reg_acuerdo_laboral' => Carbon::now(),
-                        'fecha_inicio_acuerdo_laboral' => $fecha_inicio,
+                        'fecha_inicio_acuerdo_laboral' => $fecha_inicio != '' ? $fecha_inicio : null,
                         'fecha_acuerdo_laboral' => $value["fecha_acuerdo_laboral"],
                         'usuario_acuerdo_laboral' => $request->user()->nick_usuario,
                         'oficio_acuerdo_laboral' => $value["oficio_acuerdo_laboral"],
@@ -206,8 +206,8 @@ class AcuerdoController extends Controller
                         $fechas = explode(" to ", $value["fecha_inicio_fecha_fin_acuerdo_laboral"]);
                         $fecha_inicio = $fechas[0];
                         $fecha_fin = isset($fechas[1]) ? $fechas[1] : $fechas[0];
-                        $deal['fecha_inicio_acuerdo_laboral'] = $fecha_inicio;
-                        $deal['fecha_fin_acuerdo_laboral'] = $fecha_fin;
+                        $deal['fecha_inicio_acuerdo_laboral'] = $fecha_inicio != '' ? $fecha_inicio : null;
+                        $deal['fecha_fin_acuerdo_laboral'] = $fecha_fin != '' ? $fecha_fin : null;
                     }
 
                     if ($value["id_acuerdo_laboral"] == '') {
@@ -224,17 +224,6 @@ class AcuerdoController extends Controller
 
 
             DB::commit();
-            /*  if ( $request->deals[0]["fecha_inicio_fecha_fin_acuerdo_laboral"] != "null to null") {
-                $fechas = explode(" to ",  $request->deals[0]["fecha_inicio_fecha_fin_acuerdo_laboral"]);
-                $fecha_inicio = $fechas[0];
-                $fecha_fin = isset($fechas[1]) ? $fechas[1] : $fechas[0];
-                $deal['fecha_inicio_acuerdo_laboral'] = $fecha_inicio;
-                $deal['fecha_fin_acuerdo_laboral'] = $fecha_fin;
-
-                $fechas = [$deal['fecha_inicio_acuerdo_laboral'],$deal['fecha_fin_acuerdo_laboral']];
-                return $fechas;
-            } */
-
             return true;
         } catch (\Throwable $th) {
             DB::rollback();
