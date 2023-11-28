@@ -30,7 +30,7 @@ import ModalCertificadoDeVida from '@/Components-ISRI/RRHH/BeneficiariosComponen
                         </div>
                     </div>
                     <h2 class="font-semibold text-slate-800 pt-1">Empleados: <span class="text-slate-400 font-medium">{{
-                         tableData.total
+                        tableData.total
                     }}</span></h2>
                 </div>
             </header>
@@ -244,26 +244,41 @@ export default {
             {
                 width: "10%", label: "Parentesco", name: "id_parentesco", type: "select",
                 options: [
-                    { value: '1', label: 'MADRE', unico_parentesco: 1 },
-                    { value: '2', label: 'PADRE', unico_parentesco: 1 },
-                    { value: '3', label: 'ABUELO/A', unico_parentesco: 0 },
-                    { value: '4', label: 'BISABUELO/A', unico_parentesco: 0 },
-                    { value: '5', label: 'HERMANO/A', unico_parentesco: 0 },
-                    { value: '6', label: 'CONYUGE', unico_parentesco: 0 },
-                    { value: '7', label: 'HIJO/A', unico_parentesco: 0 },
-                    { value: '8', label: 'NIETO/A', unico_parentesco: 0 },
-                    { value: '9', label: 'BISNIETO/A', unico_parentesco: 0 },
-                    { value: '10', label: 'TIO/A', unico_parentesco: 0 },
-                    { value: '11', label: 'PRIMO/A', unico_parentesco: 0 },
-                    { value: '12', label: 'SOBRINO/A', unico_parentesco: 0 },
-                    { value: '13', label: 'SUEGRO/A', unico_parentesco: 0 },
-                    { value: '14', label: 'NUERA', unico_parentesco: 0 },
-                    { value: '15', label: 'YERNO', unico_parentesco: 0 },
-                    { value: '16', label: 'CUÑADO/A', unico_parentesco: 0 },
-                    { value: '17', label: 'PADRASTRO', unico_parentesco: 0 },
-                    { value: '18', label: 'MADASTRA', unico_parentesco: 0 },
-                    { value: '19', label: 'HIJASTRO/A', unico_parentesco: 0 },
-                    { value: '20', label: 'AMIGO/A', unico_parentesco: 0 },
+                    { value: "1", label: "MADRE", "unico_parentesco": 1, "grado_parentesco": 1, "id_tipo_parentesco": 1, "estado_parentesco": 1 },
+                    { value: "2", label: "PADRE", "unico_parentesco": 1, "grado_parentesco": 1, "id_tipo_parentesco": 1, "estado_parentesco": 1 },
+                    { value: "3", label: "HIJA", "unico_parentesco": 0, "grado_parentesco": 1, "id_tipo_parentesco": 1, "estado_parentesco": 1 },
+                    { value: "4", label: "HIJO", "unico_parentesco": 0, "grado_parentesco": 1, "id_tipo_parentesco": 1, "estado_parentesco": 1 },
+                    { value: "5", label: "CONYUGE", "unico_parentesco": 1, "grado_parentesco": 1, "id_tipo_parentesco": 2, "estado_parentesco": 1 },
+                    { value: "6", label: "ABUELA", "unico_parentesco": 0, "grado_parentesco": 2, "id_tipo_parentesco": 1, "estado_parentesco": 1 },
+                    { value: "7", label: "ABUELO", "unico_parentesco": 0, "grado_parentesco": 2, "id_tipo_parentesco": 1, "estado_parentesco": 1 },
+                    { value: "8", label: "BISABUELA", "unico_parentesco": 0, "grado_parentesco": 3, "id_tipo_parentesco": 1, "estado_parentesco": 1 },
+                    { value: "9", label: "BISABUELO", "unico_parentesco": 0, "grado_parentesco": 3, "id_tipo_parentesco": 1, "estado_parentesco": 1 },
+                    { value: "10", label: "HERMANA", "unico_parentesco": 0, "grado_parentesco": 2, "id_tipo_parentesco": 1, "estado_parentesco": 1 },
+                    { value: "11", label: "HERMANO", "unico_parentesco": 0, "grado_parentesco": 2, "id_tipo_parentesco": 1, "estado_parentesco": 1 },
+                    { value: "12", label: "NIETA", "unico_parentesco": 0, "grado_parentesco": 2, "id_tipo_parentesco": 1, "estado_parentesco": 1 },
+                    { value: "13", label: "NIETO", "unico_parentesco": 0, "grado_parentesco": 2, "id_tipo_parentesco": 1, "estado_parentesco": 1 },
+                    { value: "14", label: "BISNIETA", "unico_parentesco": 0, "grado_parentesco": 4, "id_tipo_parentesco": 1, "estado_parentesco": 1 },
+                    { value: "15", label: "BISNIETO", "unico_parentesco": 0, "grado_parentesco": 4, "id_tipo_parentesco": 1, "estado_parentesco": 1 },
+                    { value: "16", label: "TIA", "unico_parentesco": 0, "grado_parentesco": 3, "id_tipo_parentesco": 1, "estado_parentesco": 1 },
+                    { value: "17", label: "TIO", "unico_parentesco": 0, "grado_parentesco": 3, "id_tipo_parentesco": 1, "estado_parentesco": 1 },
+                    { value: "18", label: "PRIMA", "unico_parentesco": 0, "grado_parentesco": 4, "id_tipo_parentesco": 1, "estado_parentesco": 1 },
+                    { value: "19", label: "PRIMO", "unico_parentesco": 0, "grado_parentesco": 4, "id_tipo_parentesco": 1, "estado_parentesco": 1 },
+                    { value: "20", label: "SOBRINA", "unico_parentesco": 0, "grado_parentesco": 3, "id_tipo_parentesco": 1, "estado_parentesco": 1 },
+                    { value: "21", label: "SOBRINO", "unico_parentesco": 0, "grado_parentesco": 3, "id_tipo_parentesco": 1, "estado_parentesco": 1 },
+                    { value: "22", label: "SUEGRA", "unico_parentesco": 0, "grado_parentesco": 1, "id_tipo_parentesco": 2, "estado_parentesco": 1 },
+                    { value: "23", label: "SUEGRO", "unico_parentesco": 0, "grado_parentesco": 1, "id_tipo_parentesco": 2, "estado_parentesco": 1 },
+                    { value: "24", label: "NUERA", "unico_parentesco": 0, "grado_parentesco": 2, "id_tipo_parentesco": 2, "estado_parentesco": 1 },
+                    { value: "25", label: "YERNO", "unico_parentesco": 0, "grado_parentesco": 2, "id_tipo_parentesco": 2, "estado_parentesco": 1 },
+                    { value: "26", label: "CUÑADA", "unico_parentesco": 0, "grado_parentesco": 2, "id_tipo_parentesco": 2, "estado_parentesco": 1 },
+                    { value: "27", label: "CUÑADO", "unico_parentesco": 0, "grado_parentesco": 2, "id_tipo_parentesco": 2, "estado_parentesco": 1 },
+                    { value: "28", label: "MADASTRA", "unico_parentesco": 0, "grado_parentesco": 0, "id_tipo_parentesco": 1, "estado_parentesco": 1 },
+                    { value: "29", label: "PADRASTRO", "unico_parentesco": 0, "grado_parentesco": 0, "id_tipo_parentesco": 1, "estado_parentesco": 1 },
+                    { value: "30", label: "HIJASTRA", "unico_parentesco": 0, "grado_parentesco": 1, "id_tipo_parentesco": 2, "estado_parentesco": 1 },
+                    { value: "31", label: "HIJASTRO", "unico_parentesco": 0, "grado_parentesco": 1, "id_tipo_parentesco": 2, "estado_parentesco": 1 },
+                    { value: "32", label: "AMIGA", "unico_parentesco": 0, "grado_parentesco": 0, "id_tipo_parentesco": 1, "estado_parentesco": 1 },
+                    { value: "33", label: "AMIGO", "unico_parentesco": 0, "grado_parentesco": 0, "id_tipo_parentesco": 1, "estado_parentesco": 1 },
+                    { value: "34", label: "COMADRE", "unico_parentesco": 0, "grado_parentesco": 0, "id_tipo_parentesco": 1, "estado_parentesco": 1 },
+                    { value: "35", label: "COMPADRE", "unico_parentesco": 0, "grado_parentesco": 0, "id_tipo_parentesco": 1, "estado_parentesco": 1 }
                 ]
             },
             { width: "35%", label: "Porcentaje", name: "porcentaje_familiar", type: "text" },
@@ -323,7 +338,7 @@ export default {
                     this.pagination.total = data.data.total;
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
-                   
+
                     this.isLoadinRequest = false;
                     this.beneficiarios = data.data.data;
                     this.optionsParentescos = data.dataForSelect.parentesco

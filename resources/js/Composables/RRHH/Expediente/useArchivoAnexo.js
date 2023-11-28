@@ -1,6 +1,7 @@
 import { ref } from "vue";
 import Swal from "sweetalert2";
 import { executeRequest } from "@/plugins/requestHelpers.js";
+import { useFileHandling } from "@/Composables/RRHH/Expediente/useFileHandling";
 
 export const useArchivoAnexo = (context) => {
     const errorsData = ref([]);
@@ -9,11 +10,20 @@ export const useArchivoAnexo = (context) => {
     const sizeArchivoAnexo = ref(null);
     const idArchivoAnexo = ref(null);
     const fileArchivoAnexo = ref("");
-    const idTipoArchivoAnexo = ref('');
+    const idTipoArchivoAnexo = ref("");
     const nombreArchivoAnexo = ref(null);
     const descripcionArchivoAnexo = ref(null);
     const dataArrayPersona = ref(null);
     const isLoadingRequestPersona = ref(false);
+    const fileHandling = useFileHandling();
+
+    function crealFormVar() {
+        descripcionArchivoAnexo.value = "";
+        idTipoMine.value = "";
+        sizeArchivoAnexo.value = "";
+        fileArchivoAnexo.value = "";
+        idTipoArchivoAnexo.value = "";
+    }
 
     const getPersonasById = async (idPer) => {
         isLoadingRequestPersona.value = true;
@@ -35,28 +45,30 @@ export const useArchivoAnexo = (context) => {
     const createArchivoAnexoRequest = (thereIsIdPersona) => {
         return new Promise(async (resolve, reject) => {
             try {
-                const formData = new FormData();
-                formData.append("idPersona", idPersona.value);
-                formData.append("idTipoMine", idTipoMine.value);
-                formData.append("sizeArchivoAnexo", sizeArchivoAnexo.value);
-                formData.append("idTipoArchivoAnexo", idTipoArchivoAnexo.value);
-                formData.append(
-                    "descripcionArchivoAnexo",
-                    descripcionArchivoAnexo.value
-                );
-                formData.append("fileArchivoAnexo", fileArchivoAnexo.value);
-
-                const resp = await axios.post("/createArchivoAnexo", formData, {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
+                const resp = await axios.post(
+                    "/createArchivoAnexo",
+                    {
+                        idPersona: idPersona.value,
+                        idTipoMine: idTipoMine.value,
+                        fileArchivoAnexo: fileArchivoAnexo.value,
+                        sizeArchivoAnexo: sizeArchivoAnexo.value,
+                        idTipoArchivoAnexo: idTipoArchivoAnexo.value,
+                        descripcionArchivoAnexo: descripcionArchivoAnexo.value,
                     },
-                });
+                    {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                        },
+                    }
+                );
 
                 if (thereIsIdPersona) {
                     context.emit("refresh-information");
                 } else {
                     context.emit("cerrar-modal");
                 }
+                crealFormVar();
+                fileHandling.deleteFile();
                 resolve(resp);
             } catch (error) {
                 if (error.response.status === 422) {
@@ -102,21 +114,17 @@ export const useArchivoAnexo = (context) => {
     const updateArchivoAnexoRequest = () => {
         return new Promise(async (resolve, reject) => {
             try {
-                const formData = new FormData();
-                formData.append("idPersona", idPersona.value);
-                formData.append("idTipoMine", idTipoMine.value);
-                formData.append("idArchivoAnexo", idArchivoAnexo.value);
-                formData.append("sizeArchivoAnexo", sizeArchivoAnexo.value);
-                formData.append("idTipoArchivoAnexo", idTipoArchivoAnexo.value);
-                formData.append(
-                    "descripcionArchivoAnexo",
-                    descripcionArchivoAnexo.value
-                );
-                formData.append("fileArchivoAnexo", fileArchivoAnexo.value);
-
                 const resp = await axios.post(
                     "/modifiedArchivoAnexo",
-                    formData,
+                    {
+                        idPersona: idPersona.value,
+                        idTipoMine: idTipoMine.value,
+                        idArchivoAnexo: idArchivoAnexo.value,
+                        sizeArchivoAnexo: sizeArchivoAnexo.value,
+                        idTipoArchivoAnexo: idTipoArchivoAnexo.value,
+                        descripcionArchivoAnexo: descripcionArchivoAnexo.value,
+                        fileArchivoAnexo: fileArchivoAnexo.value,
+                    },
                     {
                         headers: {
                             "Content-Type": "multipart/form-data",
@@ -124,6 +132,7 @@ export const useArchivoAnexo = (context) => {
                     }
                 );
                 context.emit("refresh-information");
+                crealFormVar();
                 resolve(resp);
             } catch (error) {
                 if (error.response.status === 422) {
