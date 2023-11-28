@@ -62,10 +62,11 @@ export const useFileHandling = () => {
     };
 
     const deleteFile = () => {
-        file.value = null;
-        fileInput.value = null;
-        urlArchivoAnexo.value = null;
-        nameArchivoAnexo.value = null;
+        console.log(file);
+        file.value = '';
+        fileInput.value = '';
+        urlArchivoAnexo.value = '';
+        nameArchivoAnexo.value = '';
         console.log("Archivo eliminado.");
     };
 

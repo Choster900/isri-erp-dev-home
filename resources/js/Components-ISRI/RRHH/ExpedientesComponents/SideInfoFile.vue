@@ -1,6 +1,6 @@
 <template>
-    <div class="bg-slate-100 flex flex-col items-center pb-10">
-        <div class="mr-auto">
+    <div class="bg-slate-100 flex flex-col items-center pb-10 h-[640px] overflow-y-auto">
+        <!--  <div class="mr-auto">
             <h1 class="flex py-4 px-5 gap-2 font-medium">
                 <svg class="w-5 h-5" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="#000000">
                     <path class="cls-1"
@@ -13,14 +13,16 @@
                     <path class="cls-2" d="M23,16H9a1,1,0,0,1,0-2H23a1,1,0,0,1,0,2Z"></path>
                     <path class="cls-2" d="M19,20H9a1,1,0,0,1,0-2H19a1,1,0,0,1,0,2Z"></path>
                     <path class="cls-1" d="M26,8H21a1,1,0,0,1-1-1V2a1,1,0,0,1,2,0V6h4a1,1,0,0,1,0,2Z"></path>
-                </svg> Informacion del archivo
+                </svg> 
             </h1>
-        </div>
-     <!--    {{ anexoInformation }} -->
-        <hr class="my-1 mx-7 border-t border-slate-300">
+        </div> -->
+        <!--    {{ anexoInformation }} -->
+        <hr class="my-1 mx-7 border-t border-slate-300 mb-10">
         <div class="flex justify-center">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/PDF_file_icon.svg/1200px-PDF_file_icon.svg.png"
-                alt="" class="px-24 py-8">
+                v-if="anexoInformation.id_tipo_mime == 1" alt="" class="h-32 pb-4">
+            <img src="https://icons-for-free.com/iconfiles/png/512/gallery+image+landscape+mobile+museum+open+line+icon-1320183049020185924.png"
+                v-else alt="" class="h-32 pb-4">
 
         </div>
         <h1 class="px-8 font-semibold">{{ anexoInformation.nombre_archivo_anexo }}</h1>
@@ -34,12 +36,12 @@
         <span class="mx-8 text-justify text-xs text-slate-500">{{ anexoInformation.descripcion_archivo_anexo }}</span>
 
         <div class="  pt-3 w-full px-8">
-            <button
+            <button @click="alerta"
                 class="border border-indigo-900 bg-indigo-800 hover:bg-indigo-900 rounded-lg  text-center  text-white-900 text-white text-xs font-semibold w-full py-1 px-2">
                 Descargar archivo</button>
         </div>
         <div class="  pt-3 w-full px-8">
-            <button
+            <button @click="alerta"
                 class="border border-red-900 bg-red-800 rounded-lg  hover:bg-red-900 text-center  text-white-900 text-white text-xs font-semibold w-full py-1 px-2">
                 Eliminar archivo</button>
         </div>
@@ -49,7 +51,16 @@
 
 <script>
 export default {
-    props: ['anexoInformation']
+    props: ['anexoInformation'],
+    setup() {
+        const alerta = (() => alert("Comming soon..."))
+        const alerta2 = (() => alert("Comming soon..."))
+
+
+        return {
+            alerta
+        }
+    }
 }
 </script>
 

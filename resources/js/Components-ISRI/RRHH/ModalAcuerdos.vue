@@ -109,7 +109,7 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                         Descripción
                                         <span class="text-red-600 font-extrabold">*</span>
                                     </label>
-                                    <textarea id="descripcion" name="descripcion" style="overflow-x: hidden;" 
+                                    <textarea id="descripcion" name="descripcion" style="overflow-x: hidden;"
                                         v-model="dataForm.deal.comentario_acuerdo_laboral"
                                         class="resize-none w-full h-24 overflow-y-auto peer text-xs font-normal rounded-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-none focus:outline-none"></textarea>
 
@@ -251,10 +251,8 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                     v-if="dataAcuerdos == ''" color="bg-green-700  hover:bg-green-800"
                                     text="Agregar todos los acuerdos" icon="add" />
 
-                                <GeneralButton
-                                    @click="[...copyDataDeals, ...newDataDeals].filter((i) => !i.isDelete) != '' ? updateDeals() : ''"
-                                    v-else color="bg-orange-700  hover:bg-orange-800" text="Editar todos los acuerdos"
-                                    icon="add" />
+                                <GeneralButton @click=" updateDeals()" v-else color="bg-orange-700  hover:bg-orange-800"
+                                    text="Editar todos los acuerdos" icon="add" />
                             </div>
                         </div>
                     </div>
@@ -496,7 +494,6 @@ export default {
 
 
         sendInformationWhenIsClicked(data) {
-            console.log(data);
             // Verificar si algún acuerdo ya está en estado de edición
             const isAnyDealEditing = this.dataDeals.some((deal) => deal.isEditingDeal);
             // Si algún acuerdo ya está en edición, no se ejecuta la función
@@ -635,7 +632,7 @@ export default {
         async updateDeals() {
 
             this.$swal.fire({
-                title: '<p class="text-[20pt] text-center">¿Esta seguro de editar los datos?</p>',
+                title: '<p class="text-[17pt] text-center">¿Está seguro de editar los datos? Todos los cambios que ha realizado se verán afectados.</p>',
                 icon: 'question',
                 iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
                 confirmButtonText: 'Si, Editar',
@@ -663,7 +660,6 @@ export default {
                 const response = await axios.post("/search-employe", {
                     nombre: nombreToSearch,
                 });
-                console.log(response.data);
                 // Devuelve los datos de la respuesta
                 return response.data;
             } catch (error) {
@@ -717,12 +713,10 @@ export default {
         getUniqueYears() {
             if (this.dataDeals != "") {
                 const uniqueYearsSet = new Set();
-
                 const dealFilterByYearAndNewDeals = [
                     ...this.copyDataDeals.filter((i) => !i.isDelete),
                     ...this.newDataDeals.filter((i) => !i.isDelete)
                 ];
-
                 // Iteramos sobre el arreglo dataDeals y agregamos los años al conjunto
                 dealFilterByYearAndNewDeals.forEach((obj, index) => {
                     // Extraemos el año de la fecha_acuerdo_laboral y lo agregamos al conjunto
@@ -737,6 +731,7 @@ export default {
             }
         },
         filterDealsByYear() {
+
             if (this.year !== '') {
                 const dealFilterByYearAndNewDeals = [
                     ...this.newDataDeals.filter((i) => moment(i.fecha_acuerdo_laboral).year() == this.year),
@@ -760,7 +755,7 @@ export default {
     },
     watch: {
         showModal() {
-            this.getCurrentYear();
+            /*     this.getCurrentYear(); */
             if (this.showModal) {
                 if (this.dataAcuerdos != '') {
 
@@ -771,7 +766,6 @@ export default {
                     }]
                     this.dataForm.id_empleado = this.dataAcuerdos.id_empleado
 
-                    console.log(this.dataAcuerdos.acuerdo_laboral);
                     this.dataAcuerdos.acuerdo_laboral.forEach((obj, index) => {
                         //this.dataDeals.push({
                         this.copyDataDeals.unshift({
@@ -788,6 +782,13 @@ export default {
                             isEditingDeal: false,
                         })
                     })
+
+                    // Supongamos que copyDataDeals es tu arreglo de objetos
+                    const fechas = this.copyDataDeals.map(item => moment(item.fecha_acuerdo_laboral));
+                    // Utilizamos reduce para encontrar la fecha más alta
+                    const fechaMasAlta = fechas.reduce((maxDate, currentDate) => (currentDate.isAfter(maxDate) ? currentDate : maxDate), moment(0));
+                    this.year = fechaMasAlta.format('YYYY')
+
                     this.filterDealsByYear()
                     this.getUniqueYears()
 

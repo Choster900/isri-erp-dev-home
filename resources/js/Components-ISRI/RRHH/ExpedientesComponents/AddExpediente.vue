@@ -2,7 +2,7 @@
     <div id="addSection" class="mb-4 px-4">
         <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 border rounded-lg bg-slate-100 p-3">
             <!-- <div class="w-full md:w-3/4"> -->
-            <div class="w-full md:w-3/5">
+            <div class="w-full md:w-8/12">
 
                 <template v-if="!nameArchivoAnexo || !objectAnexoFileForUpdate">
                     <div class="flex py-4 gap-2">
@@ -16,33 +16,40 @@
                         <input type="file" ref="fileInput" accept=".pdf,.jpeg,.jpg,.png" style="display: none;"
                             @change="handleFileChange">
                     </div>
-                    <InputError class="mt-2" :message="errorsData.fileArchivoAnexo" />
+
                 </template>
                 <template v-if="nameArchivoAnexo">
-                    <img v-if="/.(jpg|jpeg|png)$/.test(nameArchivoAnexo)" :src="urlArchivoAnexo" alt=""
-                        class="rounded-lg border shadow-md shadow-black">
-                    <embed v-else :src="urlArchivoAnexo" type="application/pdf" width="550" height="400"
-                        class="rounded-lg border border-gray-300 shadow-md shadow-black">
+                    <div class="relative">
+                        <img v-if="/.(jpg|jpeg|png)$/.test(nameArchivoAnexo)" :src="urlArchivoAnexo" alt=""
+                            class="rounded-lg border shadow-md shadow-black">
+                        <embed v-else :src="urlArchivoAnexo" type="application/pdf" width="550" height="400"
+                            class="rounded-lg border border-gray-300 shadow-md shadow-black">
+                    </div>
                 </template>
+                <InputError class="mt-2" :message="errorsData.fileArchivoAnexo" />
 
                 <div class="p-4 bg-slate-200 rounded-lg mt-4">
-                    <div class="flex  justify-between py-2 ">
-                        <div class="flex items-center gap-2">
+                    <div class="flex flex-col lg:flex-row justify-between py-2">
+                        <div class="flex items-center mb-2 lg:mb-0">
                             <svg class="w-5" viewBox="0 0 24 24" fill="none">
                                 <path
                                     d="M5 21V3.90002C5 3.90002 5.875 3 8.5 3C11.125 3 12.875 4.8 15.5 4.8C18.125 4.8 19 3.9 19 3.9V14.7C19 14.7 18.125 15.6 15.5 15.6C12.875 15.6 11.125 13.8 8.5 13.8C5.875 13.8 5 14.7 5 14.7"
                                     stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 </path>
                             </svg>
-                            <div class="font-medium text-base ">Detalles del anexo</div>
+                            <div class="font-medium text-base ml-2">Detalles del anexo</div>
                         </div>
-                        <div class="flex items-center">
-                            <button @click="createArchivoAnexo(selectedValue)" v-if="actionInProgress == 'add'"
-                                class="border border-green-900 bg-green-800 rounded-lg  text-center  text-white-900 text-white text-xs font-semibold w-full py-1 px-2">Enviar
+                        <div class="flex items-center space-y-2 lg:space-y-0 lg:space-x-2">
+                            <button @click="deleteFile" v-if="nameArchivoAnexo"
+                                class="border border-red-900 bg-red-800 rounded-lg text-white text-xs font-semibold py-1 px-2">Eliminar
+                                archivo</button>
+
+                            <button @click="createArchivoAnexo(selectedValue)" v-if="actionInProgress === 'add'"
+                                class="border border-green-900 bg-green-800 rounded-lg text-white text-xs font-semibold py-1 px-2">Enviar
                                 la información</button>
 
                             <button @click="updateArchivoAnexo" v-else
-                                class="border border-orange-900 bg-orange-800 rounded-lg  text-center  text-white-900 text-white text-xs font-semibold w-full py-1 px-2">Modificar
+                                class="border border-orange-900 bg-orange-800 rounded-lg text-white text-xs font-semibold py-1 px-2">Modificar
                                 la información</button>
                         </div>
                     </div>
@@ -52,7 +59,8 @@
                             class="block p-2.5 w-full text-xs text-gray-900  rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 "
                             placeholder="Descripción del archivo..."></textarea>
 
-                        <p class="mt-5 text-xs pb-4">Puedes poner un breve resumen o descripcion del archivo que estas por agregar.</p>
+                        <p class="mt-5 text-xs pb-4">Puedes poner un breve resumen o descripcion del archivo que estas por
+                            agregar.</p>
                     </div>
 
                     <div class="mb-1 md:flex flex-row justify-items-start">
@@ -84,8 +92,7 @@
                                     placeholder="Seleccione el tipo de anexo..." :classes="{
                                         containerDisabled: 'cursor-not-allowed bg-gray-200 ',
                                         placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                    }
-                                        " noOptionsText="<p class='text-xs'>sin contratos<p>"
+                                    }" noOptionsText="<p class='text-xs'>sin contratos<p>"
                                     noResultsText="<p class='text-xs'>contrato no encontrados<p>"
                                     :options="opcionesTipoArchivo" :searchable="true" />
 
@@ -95,9 +102,9 @@
                     </div>
                 </div>
             </div>
-            <div class="w-full md:w-2/5">
+            <div class="w-full md:w-4/12">
                 <SideInfo :fileName="nameArchivoAnexo" @delete-file="delteArchivoAnexo(idArchivoAnexo)"
-                    :persona="objectPersona" :isLoading="isLoadingRequestPersona" :ableToEdit="selectedValue" />
+                    :persona="objectPersona" :isLoading="isLoadingRequestPersona" :ableToEdit="idArchivoAnexo" />
             </div>
         </div>
 
@@ -107,10 +114,11 @@
 
 <script>
 import SideInfo from './SideInfoPersona.vue';
-import { computed, onMounted, ref, toRefs, watch, watchEffect } from 'vue';
+import { computed, onMounted, ref, toRefs, watch } from 'vue';
 import { usePersona } from '@/Composables/RRHH/Persona/usePersona';
 import { useFileHandling } from '@/Composables/RRHH/Expediente/useFileHandling'
 import { useArchivoAnexo } from '@/Composables/RRHH/Expediente/useArchivoAnexo'
+import DropdownHelp from '@/Components-ISRI/ComponentsToForms/DropdownHelp.vue';
 
 export default {
     props: {
@@ -122,13 +130,14 @@ export default {
         actionInProgress: { type: Object, default: () => { } },
         tipoArchivoAnexo: { type: Object, default: () => { }, },
         objectAnexoFileForUpdate: { type: Object, default: () => { } },
+        dataTest: { type: Object, default: () => { } },
     },
     name: 'AddExpediente',
     emits: ["refresh-information", "cerrar-modal"],
-    components: { SideInfo },
+    components: { SideInfo, DropdownHelp },
 
     setup(props, context) {
-        const { objectAnexoFileForUpdate, actionInProgress, persona } = toRefs(props);
+        const { objectAnexoFileForUpdate, actionInProgress, persona, dataTest } = toRefs(props);
         // Composable para manejar los eventos de los archivos
         const { file, fileInput, handleDrop, deleteFile, openFileInput, urlArchivoAnexo, handleDragOver, handleFileChange, nameArchivoAnexo, sizeArchivo, tipoMine } = useFileHandling();
         // Composable usePersona => getPeopleByName() retorna el objeto con las personas buscada en multiselect
@@ -140,6 +149,10 @@ export default {
 
         watch(persona, () => {
             objectPersona.value = persona.value
+        })
+
+        watch(dataTest, (val) => {
+            deleteFile()
         })
 
         /**
@@ -193,6 +206,7 @@ export default {
         const clearData = () => {
             descripcionArchivoAnexo.value = ''
             idTipoArchivoAnexo.value = ''
+            idArchivoAnexo.value = ''
             urlArchivoAnexo.value = ''
             idTipoMine.value = ''
             sizeArchivoAnexo.value = ''
