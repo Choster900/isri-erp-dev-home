@@ -717,7 +717,6 @@ export default {
                     ...this.copyDataDeals.filter((i) => !i.isDelete),
                     ...this.newDataDeals.filter((i) => !i.isDelete)
                 ];
-                /*     console.log("LOS AÑOS DEL MULTISELECT ",dealFilterByYearAndNewDeals); */
                 // Iteramos sobre el arreglo dataDeals y agregamos los años al conjunto
                 dealFilterByYearAndNewDeals.forEach((obj, index) => {
                     // Extraemos el año de la fecha_acuerdo_laboral y lo agregamos al conjunto
