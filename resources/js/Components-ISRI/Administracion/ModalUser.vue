@@ -85,14 +85,14 @@ import moment from 'moment';
                     <div v-if="foundUser" class="md:w-[60%]">
                         <div class="mx-auto w-[95%] flex mb-4">
                             <div @click="changeSelection(1)"
-                                class="cursor-pointer bg-gray-300 rounded-l-lg w-1/3 py-1.5 hover:text-blue-700 hover:bg-gray-400 text-[13px] text-center border-r border-gray-400"
-                                :class="hoverSelected === 1 ? 'text-white bg-[#3c4557]' : ''">INFORMACION</div>
+                                class="cursor-pointer bg-gray-300 rounded-l-lg w-1/3 py-1.5 hover:font-semibold hover:text-blue-700 hover:bg-gray-400 text-[13px] text-center border-r border-gray-400"
+                                :class="hoverSelected === 1 ? 'text-white bg-gray-700' : ''">INFORMACION</div>
                             <div @click="changeSelection(2)"
-                                class="cursor-pointer bg-gray-300 w-1/3 py-1.5 text-[13px] hover:text-blue-700 hover:bg-gray-400 text-center border-r border-gray-400"
-                                :class="hoverSelected === 2 ? 'text-white bg-[#3c4557]' : ''">ROLES</div>
+                                class="cursor-pointer bg-gray-300 w-1/3 py-1.5 text-[13px] hover:font-semibold hover:text-blue-700 hover:bg-gray-400 text-center border-r border-gray-400"
+                                :class="hoverSelected === 2 ? 'text-white bg-gray-700' : ''">ROLES</div>
                             <div @click="changeSelection(3)"
-                                class="cursor-pointer bg-gray-300 rounded-r-lg w-1/3 hover:text-blue-700 hover:bg-gray-400 py-1.5 text-[13px] text-center"
-                                :class="hoverSelected === 3 ? 'text-white bg-[#3c4557]' : ''">{{ edit ? 'MODIFICAR' :
+                                class="cursor-pointer bg-gray-300 rounded-r-lg w-1/3 hover:font-semibold hover:text-blue-700 hover:bg-gray-400 py-1.5 text-[13px] text-center"
+                                :class="hoverSelected === 3 ? 'text-white bg-gray-700' : ''">{{ edit ? 'MODIFICAR' :
                                     'AGREGAR' }}</div>
                         </div>
                         <div v-if="hoverSelected === 1" id="information">
