@@ -87,7 +87,7 @@
 
     <div class="flex items-center justify-center">
         <div class="text-[15pt] w-1/4 -mt-16 text-start font-bold">
-            Sombre el empleado
+            Sobre el empleado
         </div>
         <p class="w-1/2 text-[9.3pt] mb-1 text-justify">
 
