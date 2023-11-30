@@ -102,6 +102,29 @@
                                             </div>
                                             <div class="font-semibold">Editar</div>
                                         </div>
+                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                        @click="desactiveDependency(dependencia.id_dependencia, dependencia.estado_dependencia)"
+                                            v-if="permits.eliminar === 1">
+                                            <div class="w-8">
+                                                <span class="text-xs">
+                                                    <svg :fill="dependencia.estado_dependencia == 1 ? '#991B1B' : '#166534'"
+                                                        version="1.1" xmlns="http://www.w3.org/2000/svg" width="20px"
+                                                        height="20px" xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                        viewBox="0 0 97.994 97.994" xml:space="preserve"
+                                                        :stroke="dependencia.estado_dependencia == 1 ? '#991B1B' : '#166534'">
+                                                        <path
+                                                            d="M97.155,9.939c-0.582-0.416-1.341-0.49-1.991-0.193l-10.848,4.935C74.08,5.29,60.815,0.118,46.966,0.118c-15.632,0-30.602,6.666-41.07,18.289c-0.359,0.399-0.543,0.926-0.51,1.461c0.033,0.536,0.28,1.036,0.686,1.388l11.301,9.801c0.818,0.711,2.055,0.639,2.787-0.162c6.866-7.512,16.636-11.821,26.806-11.821c6.135,0,12.229,1.584,17.622,4.583l-7.826,3.561c-0.65,0.296-1.095,0.916-1.163,1.627c-0.069,0.711,0.247,1.405,0.828,1.82l34.329,24.52c0.346,0.246,0.753,0.373,1.163,0.373c0.281,0,0.563-0.06,0.828-0.181c0.65-0.296,1.095-0.916,1.163-1.627l4.075-41.989C98.053,11.049,97.737,10.355,97.155,9.939z">
+                                                        </path>
+                                                        <path
+                                                            d="M80.619,66.937c-0.819-0.709-2.055-0.639-2.787,0.162c-6.866,7.514-16.638,11.822-26.806,11.822c-6.135,0-12.229-1.584-17.622-4.583l7.827-3.561c0.65-0.296,1.094-0.916,1.163-1.628c0.069-0.711-0.247-1.404-0.828-1.819L7.237,42.811c-0.583-0.416-1.341-0.49-1.991-0.193c-0.65,0.296-1.094,0.916-1.163,1.627L0.009,86.233c-0.069,0.712,0.247,1.406,0.828,1.822c0.583,0.416,1.341,0.488,1.991,0.192l10.848-4.935c10.237,9.391,23.502,14.562,37.351,14.562c15.632,0,30.602-6.666,41.07-18.289c0.358-0.398,0.543-0.926,0.51-1.461c-0.033-0.536-0.28-1.036-0.687-1.388L80.619,66.937z">
+                                                        </path>
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                            <div class="font-semibold">
+                                                {{ dependencia.estado_dependencia ? 'Desactivar' : 'Activar' }}
+                                            </div>
+                                        </div>
                                     </DropDownOptions>
                                 </div>
                             </td>
@@ -172,9 +195,8 @@
             :dependencyId="dependencyId" @cerrar-modal="showModalDependencies = false"
             @get-table="getDataToShow(tableData.currentPage)" />
 
-        <modal-show-dependencia-vue v-if="showModalDetail" :showModalDetail="showModalDetail"
-            :dependencyId="dependencyId" @cerrar-modal="showModalDetail = false"
-            @get-table="getDataToShow(tableData.currentPage)" />
+        <modal-show-dependencia-vue v-if="showModalDetail" :showModalDetail="showModalDetail" :dependencyId="dependencyId"
+            @cerrar-modal="showModalDetail = false" @get-table="getDataToShow(tableData.currentPage)" />
 
     </AppLayoutVue>
 </template>
@@ -186,12 +208,12 @@ import Datatable from "@/Components-ISRI/Datatable.vue";
 import ModalDependenciasVue from '@/Components-ISRI/RRHH/ModalDependencias.vue';
 import ModalShowDependenciaVue from '@/Components-ISRI/RRHH/ModalShowDependencia.vue';
 
-
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 
 import { usePermissions } from '@/Composables/General/usePermissions.js';
 import { useToDataTable } from '@/Composables/General/useToDataTable.js';
+import { useDependencia } from '@/Composables/RRHH/Dependencia/useDependencia.js';
 import { ref, toRefs } from 'vue';
 
 
@@ -203,7 +225,7 @@ export default {
             default: {}
         },
     },
-    setup(props) {
+    setup(props, context) {
         const { menu } = toRefs(props);
         const permits = usePermissions(menu.value, window.location.pathname);
 
@@ -234,15 +256,19 @@ export default {
             sortOrders,
             isLoadinRequest,
             emptyObject,
-            getDataToShow, handleData, sortBy,
+            getDataToShow, handleData, sortBy
         } = useToDataTable(columns, requestUrl, columntToSort, dir)
+
+        const { 
+            desactiveDependency
+         } = useDependencia(context);
 
         return {
             permits, dataToShow, tableData,
             perPage, links, sortKey,
             sortOrders, sortBy, dependencyId,
             handleData, isLoadinRequest,
-            getDataToShow, showModalDetail,
+            getDataToShow, desactiveDependency, showModalDetail,
             emptyObject, columns, showModalDependencies
         };
     }

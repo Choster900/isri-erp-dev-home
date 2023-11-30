@@ -32,6 +32,49 @@ export const useDependencia = (context) => {
     });
     const depToShow = ref({})
 
+    const desactiveDependency = (depId, status) => {
+        const msg = status === 0 ? 'activar' : 'desactivar'
+        swal({
+            title: "¿Está seguro de " + msg + " la dependencia?",
+            icon: "question",
+            iconHtml: "❓",
+            confirmButtonText: "Si, " + msg,
+            confirmButtonColor: "#141368",
+            cancelButtonText: "Cancelar",
+            showCancelButton: true,
+            showCloseButton: true,
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    isLoadingRequest.value = true;
+                    const response = await axios.post("/change-status-dependency",{
+                        id : depId,
+                        status : status
+                    });
+                    useShowToast(
+                        toast.success,
+                        response.data.message
+                    );
+                    context.emit("get-table")
+                } catch (err) {
+                    if (err.response.status === 422) {
+                        if (err.response.data.logical_error) {
+                            useShowToast(
+                                toast.error,
+                                err.response.data.logical_error
+                            );
+                        }
+                    } else {
+                        showErrorMessage(err);
+                        getDataToShow()
+                    }
+                } finally {
+                    isLoadingRequest.value = false;
+                }
+            }
+        });
+    }
+
     const getCentrosAtencion = async () => {
         try {
             isLoadingRequest.value = true;
@@ -81,7 +124,6 @@ export const useDependencia = (context) => {
             employees.value = response.data.employees;
         } catch (errors) {
             employees.value = [];
-            console.log(errors);
         } finally {
             isLoadingEmployee.value = false;
         }
@@ -153,7 +195,7 @@ export const useDependencia = (context) => {
             }
         });
     };
-    const updateDependency = async (dependency,url) => {
+    const updateDependency = async (dependency, url) => {
         swal({
             title: "¿Está seguro de actualizar la dependencia?",
             icon: "question",
@@ -210,7 +252,7 @@ export const useDependencia = (context) => {
         );
         context.emit("cerrar-modal")
         context.emit("get-table")
-    }   
+    }
 
     return {
         getCentrosAtencion,
@@ -218,6 +260,7 @@ export const useDependencia = (context) => {
         fetchData,
         storeDependency,
         updateDependency,
+        desactiveDependency,
         asyncFindEmployee,
         isLoadingRequest,
         isLoadingEmployee,
