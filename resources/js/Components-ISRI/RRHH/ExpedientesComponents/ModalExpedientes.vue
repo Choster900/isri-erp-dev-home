@@ -39,11 +39,11 @@
                                 <order-list-icon class="cursor-pointer" @click="viewList = !viewList"
                                     :modeListSelected="viewList" />
                                 <div class="h-6 border border-slate-400/50"></div>
-                                <select id="country" class="form-select h-8" placeholder="Seleccione"
+                               <!--  <select id="country" class="form-select h-8" placeholder="Seleccione"
                                     @input="filterTipoAnexoInSelect($event.target.value)">
                                     <option value="1">All</option>
                                     <option value="2">Only with content</option>
-                                </select>
+                                </select> -->
 
                                 <button class="btn-xs bg-indigo-500 hover:bg-indigo-600 text-white"
                                     @click="sectionView = 'addSection'; actionInProgress = 'add'">
