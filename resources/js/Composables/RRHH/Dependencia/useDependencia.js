@@ -32,49 +32,6 @@ export const useDependencia = (context) => {
     });
     const depToShow = ref({})
 
-    const desactiveDependency = (depId, status) => {
-        const msg = status === 0 ? 'activar' : 'desactivar'
-        swal({
-            title: "¿Está seguro de " + msg + " la dependencia?",
-            icon: "question",
-            iconHtml: "❓",
-            confirmButtonText: "Si, " + msg,
-            confirmButtonColor: "#141368",
-            cancelButtonText: "Cancelar",
-            showCancelButton: true,
-            showCloseButton: true,
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                try {
-                    isLoadingRequest.value = true;
-                    const response = await axios.post("/change-status-dependency",{
-                        id : depId,
-                        status : status
-                    });
-                    useShowToast(
-                        toast.success,
-                        response.data.message
-                    );
-                    context.emit("get-table")
-                } catch (err) {
-                    if (err.response.status === 422) {
-                        if (err.response.data.logical_error) {
-                            useShowToast(
-                                toast.error,
-                                err.response.data.logical_error
-                            );
-                        }
-                    } else {
-                        showErrorMessage(err);
-                        getDataToShow()
-                    }
-                } finally {
-                    isLoadingRequest.value = false;
-                }
-            }
-        });
-    }
-
     const getCentrosAtencion = async () => {
         try {
             isLoadingRequest.value = true;
@@ -134,6 +91,13 @@ export const useDependencia = (context) => {
         if (!isError) {
             mainCenters.value = data.dependencies;
             depToShow.value = data.dependency
+
+            //Filtramos resultados para el select de dependencia superior
+            if (depToShow.value.jerarquia_organizacion_dependencia || depToShow.value.length <= 0) { 
+                mainCenters.value = mainCenters.value.filter((element) => {
+                    return element.value !== 1 && element.value !== depToShow.value.id_dependencia;
+                });
+            }
 
             //Set the employee name
             if (data.dependency != "") {
@@ -260,7 +224,6 @@ export const useDependencia = (context) => {
         fetchData,
         storeDependency,
         updateDependency,
-        desactiveDependency,
         asyncFindEmployee,
         isLoadingRequest,
         isLoadingEmployee,
