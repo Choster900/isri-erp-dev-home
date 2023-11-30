@@ -67,7 +67,7 @@ class DependenciaController extends Controller
     {
         $dependency =  Dependencia::with([
             'jefatura',
-            'dependencias_inferiores'=> function ($query) {
+            'dependencias_inferiores' => function ($query) {
                 $query->withCount(['plazas_asignadas as count_plazas' => function ($q) {
                     $q->where('estado_plaza_asignada', 1);
                 }]);
@@ -194,6 +194,67 @@ class DependenciaController extends Controller
                 'logical_error' => 'Ha ocurrido un error con sus datos.',
                 'error' => $e,
             ], 422);
+        }
+    }
+
+    public function changeStatusDependency(Request $request)
+    {
+        $dependency = Dependencia::find($request->id);
+        if ($dependency && $dependency->estado_dependencia != $request->status) {
+            return response()->json(['logical_error' => 'Error, otro usuario ha modificado la dependencia.',], 422);
+        } else {
+            DB::beginTransaction();
+            try {
+                if ($dependency->estado_dependencia == 1) {
+                    if ($dependency->id_dependencia == 11) {
+                        return response()->json(['logical_error' => 'Error, no puedes desactivar a presidencia.',], 422);
+                    } else {
+                        if ($dependency->plazas_asignadas()->where('estado_plaza_asignada', 1)->exists()) {
+                            return response()->json(['logical_error' => 'Error, esta dependencia tiene personal asignado, reasigna primero a todo el personal e intenta nuevamente.',], 422);
+                        } else {
+                            if ($dependency->dependencias_inferiores()->where('estado_dependencia', 1)->exists()) {
+                                $parentDep = Dependencia::find($dependency->jerarquia_organizacion_dependencia);
+                                if ($parentDep) {
+                                    foreach ($dependency->dependencias_inferiores as $dep) {
+                                        if ($dep->estado_dependencia == 1) {
+                                            $dep->update([
+                                                'jerarquia_organizacion_dependencia'        => $parentDep->id_dependencia,
+                                                'fecha_mod_dependencia'                     => Carbon::now(),
+                                                'usuario_dependencia'                       => $request->user()->nick_usuario,
+                                                'ip_dependencia'                            => $request->ip(),
+                                            ]);
+                                        }
+                                    }
+                                }
+                            } else {
+                                $dependency->update([
+                                    'estado_dependencia'                        => 0,
+                                    'fecha_mod_dependencia'                     => Carbon::now(),
+                                    'usuario_dependencia'                       => $request->user()->nick_usuario,
+                                    'ip_dependencia'                            => $request->ip(),
+                                ]);
+                            }
+                        }
+                    }
+                } else {
+                    $dependency->update([
+                        'estado_dependencia'                        => 1,
+                        'fecha_mod_dependencia'                     => Carbon::now(),
+                        'usuario_dependencia'                       => $request->user()->nick_usuario,
+                        'ip_dependencia'                            => $request->ip(),
+                    ]);
+                }
+                DB::commit(); // Confirma las operaciones en la base de datos
+                return response()->json([
+                    'message'          => "Acción ejecutada con éxito.",
+                ]);
+            } catch (\Exception $e) {
+                DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+                return response()->json([
+                    'logical_error' => 'Ha ocurrido un error con sus datos.',
+                    'error' => $e,
+                ], 422);
+            }
         }
     }
 }

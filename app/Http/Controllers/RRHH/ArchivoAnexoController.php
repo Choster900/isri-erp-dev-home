@@ -20,49 +20,47 @@ class ArchivoAnexoController extends Controller
     function getEmployeeExpediente(Request $request)
     {
         $columns = [
-            'id_persona',
-            'id_empleado',
-            'id_aspirante',
             'id_genero',
+            'id_persona',
             'id_usuario',
-            'id_municipio',
-            'usuario_persona',
             'ip_persona',
-            'id_estado_civil',
+            'id_empleado',
             'dui_persona',
+            'id_aspirante',
+            'id_municipio',
             'peso_persona',
-            'estatura_persona',
-            'telefono_persona',
-            'email_persona',
-            'id_nivel_educativo',
             'id_profesion',
+            'email_persona',
+            'estado_persona',
+            'usuario_persona',
+            'id_estado_civil',
             'pnombre_persona',
             'snombre_persona',
             'tnombre_persona',
+            'estatura_persona',
+            'telefono_persona',
             'papellido_persona',
-            'observacion_persona',
-            'estado_persona',
             'sapellido_persona',
             'tapellido_persona',
             'fecha_reg_persona',
             'fecha_mod_persona',
             'fecha_nac_persona',
+            'id_nivel_educativo',
+            'observacion_persona',
             'nombre_madre_persona',
             'nombre_padre_persona',
             'nombre_conyuge_persona',
         ];
 
-        $length = $request->input('length');
-        $column = $request->input('column');
         $dir = $request->input('dir');
         $data = $request->input('search');
+        $length = $request->input('length');
+        $column = $request->input('column');
 
 
         // Construir la consulta base con las relaciones
         $query = Persona::select('*')->with([
-            "archivo_anexo" => function ($query) {
-                $query->where('estado_archivo_anexo', 1);
-            },
+
             "archivo_anexo.tipo_archivo_anexo",
             "empleado",
             "profesion",
@@ -71,38 +69,38 @@ class ArchivoAnexoController extends Controller
             "nivel_educativo",
             "familiar.parentesco",
             "municipio.departamento.pais",
+            "archivo_anexo" => function ($query) {
+                $query->where('estado_archivo_anexo', 1);
+            },
             "empleado.plazas_asignadas.detalle_plaza.plaza",
         ])->whereHas("archivo_anexo")
             ->where("estado_persona", 1)->orderBy($columns[$column], $dir);
 
         if ($data) {
-            $query->where('id_persona', 'like', '%' . $data["id_persona"] . '%');
 
-            /*  $searchNombres = $data["collecNombre"];
-            $query->where(function ($query) use ($searchNombres) {
-                $query->where('pnombre_persona', 'like', '%' . $searchNombres . '%')
-                    ->orWhere('snombre_persona', 'like', '%' . $searchNombres . '%')
-                    ->orWhere('tapellido_persona', 'like', '%' . $searchNombres . '%');
-            });
+            if (isset($data['id_persona'])) {
+                $query->where('id_persona', 'like', '%' . $data["id_persona"] . '%');
+            }
+            if (isset($data['dui_persona'])) {
+                $query->where('dui_persona', 'like', '%' . $data["dui_persona"] . '%');
+            }
+
+            $searchNombres = $data["collecNombre"];
+            if (isset($searchNombres)) {
+                $query->whereRaw("MATCH ( pnombre_persona, snombre_persona, tnombre_persona ) AGAINST ( '" . $searchNombres . "')");
+            }
 
             $searchApellidos = $data["collecApellido"];
-            $query->where(function ($query) use ($searchApellidos) {
-                $query->where('papellido_persona', 'like', '%' . $searchApellidos . '%')
-                    ->orWhere('sapellido_persona', 'like', '%' . $searchApellidos . '%')
-                    ->orWhere('tapellido_persona', 'like', '%' . $searchApellidos . '%');
-            });
+            if (isset($searchApellidos)) {
+                $query->whereRaw("MATCH ( papellido_persona, sapellido_persona, tapellido_persona ) AGAINST ( '" . $searchApellidos . "')");
+            }
 
-            $query->whereHas('familiar', function ($query) use ($data) {
-                $query->where('nombre_familiar', 'like', '%' . $data["nombre_familiar"] . '%');
-            });
-
-            $query->whereHas('familiar', function ($query) use ($data) {
-                $query->where('id_parentesco', 'like', '%' . $data["id_parentesco"] . '%');
-            });
-
-            $query->whereHas('familiar', function ($query) use ($data) {
-                $query->where('porcentaje_familiar', 'like', '%' . $data["porcentaje_familiar"] . '%');
-            }); */
+            if (isset($data['nombre_profesion'])) {
+                $prefesion = $data["nombre_profesion"];
+                $query->whereHas('profesion', function ($query) use ($prefesion) {
+                    $query->where('nombre_profesion', 'like', '%' . $prefesion . '%');
+                });
+            }
         }
 
         $beneficiarios = $query->paginate($length)->onEachSide(1);
@@ -202,13 +200,13 @@ class ArchivoAnexoController extends Controller
             // Create a new ArchivoAnexo record in the database
             $response = ArchivoAnexo::where("id_archivo_anexo", $request->idArchivoAnexo)->update([
                 'estado_archivo_anexo'      => 1,
-                'id_tipo_mime'              => $tipoMine,
                 'nombre_archivo_anexo'      => $name,
+                'id_tipo_mime'              => $tipoMine,
                 'url_archivo_anexo'         => $imageUrl,
                 'peso_archivo_anexo'        => $sizeFile,
-                'id_persona'                => $request->idPersona,
-                'ip_archivo_anexo'          => $request->ip(),
                 'fecha_mod_archivo_anexo'   => Carbon::now(),
+                'ip_archivo_anexo'          => $request->ip(),
+                'id_persona'                => $request->idPersona,
                 'id_tipo_archivo_anexo'     => $request->idTipoArchivoAnexo,
                 'usuario_archivo_anexo'     => $request->user()->nick_usuario,
                 'descripcion_archivo_anexo' => $request->descripcionArchivoAnexo,

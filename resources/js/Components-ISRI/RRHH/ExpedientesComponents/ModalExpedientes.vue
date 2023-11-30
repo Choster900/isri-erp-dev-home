@@ -39,11 +39,11 @@
                                 <order-list-icon class="cursor-pointer" @click="viewList = !viewList"
                                     :modeListSelected="viewList" />
                                 <div class="h-6 border border-slate-400/50"></div>
-                                <select id="country" class="form-select h-8" placeholder="Seleccione"
+                                <!--  <select id="country" class="form-select h-8" placeholder="Seleccione"
                                     @input="filterTipoAnexoInSelect($event.target.value)">
                                     <option value="1">All</option>
                                     <option value="2">Only with content</option>
-                                </select>
+                                </select> -->
 
                                 <button class="btn-xs bg-indigo-500 hover:bg-indigo-600 text-white"
                                     @click="sectionView = 'addSection'; actionInProgress = 'add'">
@@ -78,7 +78,8 @@
                                         class=" h-12" :class="{ 'h-20 ': viewList }">
                                 </div>
                                 <div class="px-5 py-2">
-                                    <h1 class="font-semibold text-sm " :class="viewList ? ' ' : 'pb-2'" :title="tipoArchivo.nombre_tipo_archivo_anexo">
+                                    <h1 class="font-semibold text-sm " :class="viewList ? ' ' : 'pb-2'"
+                                        :title="tipoArchivo.nombre_tipo_archivo_anexo">
                                         {{ $options.filters.truncate(tipoArchivo.nombre_tipo_archivo_anexo, 20, '...') }}
                                     </h1>
                                     <span class="text-xs block">Modificado: hace 1 dia</span>
@@ -146,7 +147,7 @@ export default {
         const datafilteredTypeAnexos = ref(null) // Este objeto se enviara a ListExpedientes para mostrarlo en las listas
         const dataTest = ref(false)
         const opcionPersona = computed(() => {
-            return persona.value ? [{ value: persona.value.id_persona, label: persona.value.pnombre_persona }] : [];
+            return persona.value ? [{ value: persona.value.id_persona, label: `${persona.value.pnombre_persona || ''} ${persona.value.snombre_persona || ''} ${persona.value.tnombre_persona || ''} ${persona.value.papellido_persona || ''} ${persona.value.sapellido_persona || ''} ${persona.value.tapellido_persona || ''}` }] : [];
         });
 
         watch(showModal, (newVal) => {
