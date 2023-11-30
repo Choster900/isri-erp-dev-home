@@ -152,15 +152,6 @@ export default {
             updateDependency
         } = useDependencia(context);
 
-        const { validateInput } = useValidateInput();
-
-        const handleInputValidation = (val) => {
-            console.log(inp1);
-            //console.log( depInfo[field].value);
-            //const input = validateInput(text, validation);
-            //depInfo[field] = input
-        };
-
         const handleSearchChange = async (query) => {
             load.value = false
             if (query != '') {

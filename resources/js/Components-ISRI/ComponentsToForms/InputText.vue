@@ -128,7 +128,6 @@ export default {
                 }
             }
 
-            // Aplicar el filtro al número de teléfono
             if (validation.value.phoneNumber) {
                 const phoneNumber = $event.target.value.replace(/\D/g, '').match(/(\d{0,4})(\d{0,4})/);
                 $event.target.value = !phoneNumber[2] ? phoneNumber[1] : phoneNumber[1] + '-' + phoneNumber[2] + (phoneNumber[4] ? '-' + phoneNumber[4] : '');
