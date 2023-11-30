@@ -11,9 +11,7 @@ import html2pdf from 'html2pdf.js'
 
         <!-- Profile background -->
         <div class="relative h-60">
-            <img class="object-cover h-full w-full "
-                src="../../../img/banerHojaDeServicio.jpg"
-                alt="Profile background" />
+            <img class="object-cover h-full w-full " src="../../../img/banerHojaDeServicio.jpg" alt="Profile background" />
             <!-- Close button -->
             <button class="md:hidden absolute top-4 left-4 sm:left-6 text-white opacity-80 hover:opacity-100"
                 @click.stop="$emit('toggle-profilesidebar')" aria-controls="profile-sidebar"
@@ -35,7 +33,7 @@ import html2pdf from 'html2pdf.js'
                         <img class="rounded-full border-4 border-white scale-100"
                             :src="userData && userData.fotos && userData.fotos.length > 0 ? userData.fotos[userData['fotos'].length - 1].url_foto : 'https://img.freepik.com/free-icon/user_318-159711.jpg?w=2000'" />
                     </div>
-                    
+
                 </div>
             </div>
 
@@ -50,7 +48,7 @@ import html2pdf from 'html2pdf.js'
                             userData.sapellido_persona : ''} ${userData.tapellido_persona ? userData.tapellido_persona : ''}
                         `: '' }}</h1>
                     <div class="flex space-x-2 sm:mb-2 " title="Descargar hoja de servicios">
-                        <svg class="ml-2 h-7 w-7 cursor-pointer" @click="printPdf"  viewBox="0 0 24 24" fill="none"
+                        <svg class="ml-2 h-7 w-7 cursor-pointer" @click="printPdf" viewBox="0 0 24 24" fill="none"
                             xmlns="http://www.w3.org/2000/svg">
 
                             <path opacity="0.5" fill-rule="evenodd" clip-rule="evenodd"
@@ -182,7 +180,7 @@ import html2pdf from 'html2pdf.js'
 <script>
 import { toast } from 'vue3-toastify';
 import { createApp, h } from 'vue'
-import HojaServiciosPdfVue from '@/pdf/RRHH/HojaServiciosPdf.vue';
+import HojaServiciosPdfVue from '@/pdf/RRHH/HojaServiciosPdfCopy.vue';
 export default {
     props: {
         userData: {
@@ -220,6 +218,7 @@ export default {
             // Propiedades del pdf
             const opt = {
                 margin: [0, 0, 0, 0], //top, left, buttom, right,
+                // margin: [0.21, 0.11, 0.21, 0.11], //top, left, buttom, right,
                 filename: name,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, useCORS: true },
@@ -260,4 +259,5 @@ export default {
     width: 100%;
     height: 100%;
     object-fit: cover;
-}</style>
+}
+</style>
