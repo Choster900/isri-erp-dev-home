@@ -81,6 +81,7 @@ export const useTipoArchivoAnexo = () => {
             const filteredContracts = originalData.filter(
                 (index) => index.archivos_anexos.length > 0
             );
+            console.log(filteredContracts);
             objTipoArchivoAnexo.value = filteredContracts;
             // Activa el filtro en la selección
             isActiveFilterInSelection.value = true;

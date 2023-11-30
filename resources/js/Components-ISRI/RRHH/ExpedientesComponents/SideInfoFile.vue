@@ -34,7 +34,7 @@
             <h1 class="px-8 text-xs font-semibold">Descripcion del archivo</h1>
         </div>
         <span class="mx-8 text-justify text-xs text-slate-500">{{ anexoInformation.descripcion_archivo_anexo }}</span>
-
+<!-- 
         <div class="  pt-3 w-full px-8">
             <button @click="alerta"
                 class="border border-indigo-900 bg-indigo-800 hover:bg-indigo-900 rounded-lg  text-center  text-white-900 text-white text-xs font-semibold w-full py-1 px-2">
@@ -44,7 +44,7 @@
             <button @click="alerta"
                 class="border border-red-900 bg-red-800 rounded-lg  hover:bg-red-900 text-center  text-white-900 text-white text-xs font-semibold w-full py-1 px-2">
                 Eliminar archivo</button>
-        </div>
+        </div> -->
 
     </div>
 </template>
