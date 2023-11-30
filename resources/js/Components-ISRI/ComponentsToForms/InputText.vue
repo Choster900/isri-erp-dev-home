@@ -2,9 +2,9 @@
     <div>
         <label :for="id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ label }}</label>
         <div class="relative">
-            <div class="absolute inset-y-0 start-0 flex items-center pl-3.5 pointer-events-none">
+            <div class="absolute inset-y-0 start-0 flex items-center pl-2.5 pointer-events-none">
                 <template v-if="iconName === 'email'">
-                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                    <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 16">
                         <path
                             d="m10.036 8.278 9.258-7.79A1.979 1.979 0 0 0 18 0H2A1.987 1.987 0 0 0 .641.541l9.395 7.737Z" />
@@ -25,7 +25,7 @@
                     </svg>
                 </template>
                 <template v-if="iconName === 'oldPhone'">
-                    <svg class="w-4 h-4 text-gray-700 dark:text-gray-600" version="1.1" id="_x32_"
+                    <svg class="w-5 h-5 text-gray-700 dark:text-gray-600" version="1.1" id="_x32_"
                         xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512"
                         xml:space="preserve" fill="currentColor">
                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -41,7 +41,7 @@
                     </svg>
                 </template>
                 <template v-if="iconName === 'code'">
-                    <svg class="w-5 h-5 text-gray-700 dark:text-gray-600" viewBox="0 0 24 24" fill="none"
+                    <svg class="w-6 h-6 text-gray-700 dark:text-gray-600" viewBox="0 0 24 24" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                         <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
@@ -55,7 +55,62 @@
                         </g>
                     </svg>
                 </template>
-                <!-- Puedes agregar más bloques <template> para otros íconos -->
+                <template v-if="iconName === 'date'">
+                    <svg class="w-5 h-5 text-gray-700 dark:text-gray-600" viewBox="0 0 24 24" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                        <g id="SVGRepo_iconCarrier">
+                            <path
+                                d="M20 10V7C20 5.89543 19.1046 5 18 5H6C4.89543 5 4 5.89543 4 7V10M20 10V19C20 20.1046 19.1046 21 18 21H6C4.89543 21 4 20.1046 4 19V10M20 10H4M8 3V7M16 3V7"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+                            <rect x="6" y="12" width="3" height="3" rx="0.5" fill="currentColor"></rect>
+                            <rect x="10.5" y="12" width="3" height="3" rx="0.5" fill="currentColor"></rect>
+                            <rect x="15" y="12" width="3" height="3" rx="0.5" fill="currentColor"></rect>
+                        </g>
+                    </svg>
+                </template>
+                <template v-if="iconName === 'number'">
+                    <svg class="w-5 h-5 text-gray-700 dark:text-gray-600" viewBox="0 0 16 16"
+                        xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                        <g id="SVGRepo_iconCarrier">
+                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                d="M11 1v4h4v1h-4v4h4v1h-4v4h-1v-4H6v4H5v-4H1v-1h4V6H1V5h4V1h1v4h4V1h1zM6 6v4h4V6H6z">
+                            </path>
+                        </g>
+                    </svg>
+                </template>
+                <template v-if="iconName === 'money'">
+                    <svg class="w-5 h-5 text-gray-700 dark:text-gray-600" viewBox="0 0 24 24" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                        <g id="SVGRepo_iconCarrier">
+                            <path
+                                d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                                stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                            </path>
+                            <path
+                                d="M15 8H12M9 16H12M12 16H13C14.1046 16 15 15.1046 15 14V14C15 12.8954 14.1046 12 13 12H11C9.89543 12 9 11.1046 9 10V10C9 8.89543 9.89543 8 11 8H12M12 16V18M12 8V6"
+                                stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                            </path>
+                        </g>
+                    </svg>
+                </template>
+                <template v-if="iconName === 'personalInfo'">
+                    <svg class="w-6 h-6 text-gray-700 dark:text-gray-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                        <g id="SVGRepo_iconCarrier">
+                            <rect width="24" height="24" fill="white"></rect>
+                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                d="M2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12ZM11.9999 6C9.79077 6 7.99991 7.79086 7.99991 10C7.99991 12.2091 9.79077 14 11.9999 14C14.209 14 15.9999 12.2091 15.9999 10C15.9999 7.79086 14.209 6 11.9999 6ZM17.1115 15.9974C17.8693 16.4854 17.8323 17.5491 17.1422 18.1288C15.7517 19.2966 13.9581 20 12.0001 20C10.0551 20 8.27215 19.3059 6.88556 18.1518C6.18931 17.5723 6.15242 16.5032 6.91351 16.012C7.15044 15.8591 7.40846 15.7251 7.68849 15.6097C8.81516 15.1452 10.2542 15 12 15C13.7546 15 15.2018 15.1359 16.3314 15.5954C16.6136 15.7102 16.8734 15.8441 17.1115 15.9974Z"
+                                fill="currentColor"></path>
+                        </g>
+                    </svg>
+                </template>
             </div>
             <input :type="type" :id="id" :value="modelValue" :placeholder="placeholder" :class="inputClasses"
                 :validation="validation" @input="updateValue($event)" />

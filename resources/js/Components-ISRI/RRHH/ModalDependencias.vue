@@ -79,7 +79,7 @@
 
                         </div>
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                            <input-text label="Correo" iconName="email" id="email" v-model="depInfo.email" type="text" placeholder="Escriba correo dependencia"
+                            <input-text label="Correo" iconName="email" id="email" v-model="depInfo.email" type="text" placeholder="Correo dependencia"
                             :validation="{limit:35}">
                             </input-text>
                         </div>
@@ -87,7 +87,7 @@
 
                     <div class="mb-4 md:flex flex-row justify-items-start">
                         <div class="mb-4 md:mr-2 md:mb-0 basis-full">
-                            <input-text label="Direccion" iconName="address" id="address" v-model="depInfo.address" type="text" placeholder="Escriba dirección"
+                            <input-text label="Direccion" iconName="personalInfo" id="address" v-model="depInfo.address" type="text" placeholder="Escriba dirección"
                             :validation="{limit:100}">
                             </input-text>
                         </div>
@@ -137,6 +137,7 @@ export default {
         const inp1 = ref(null)
 
         const { dependencyId } = toRefs(props)
+
         const {
             isLoadingRequest,
             baseOptions,
@@ -189,7 +190,6 @@ export default {
             updateDependency,
             save,
             update,
-            handleInputValidation
         };
     },
 };
