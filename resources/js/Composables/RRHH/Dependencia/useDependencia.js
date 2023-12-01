@@ -135,6 +135,13 @@ export const useDependencia = (context) => {
             mainCenters.value = data.dependencies;
             depToShow.value = data.dependency
 
+            //Filtramos resultados para el select de dependencia superior
+            if (depToShow.value.jerarquia_organizacion_dependencia || depToShow.value.length <= 0) { 
+                mainCenters.value = mainCenters.value.filter((element) => {
+                    return element.value !== 1 && element.value !== depToShow.value.id_dependencia;
+                });
+            }
+
             //Set the employee name
             if (data.dependency != "") {
                 if (data.dependency.jefatura) {
