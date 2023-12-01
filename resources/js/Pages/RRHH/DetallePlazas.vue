@@ -15,8 +15,8 @@ import axios from 'axios';
 </script>
 
 <template>
-    <Head title="Catalogo - Plazas" />
-    <AppLayoutVue nameSubModule="RRHH - Plazas">
+    <Head title="Catalogo - Puestos" />
+    <AppLayoutVue nameSubModule="RRHH - Puestos">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
                 <GeneralButton @click="addJobPositionDet()" v-if="permits.insertar == 1"
@@ -43,7 +43,7 @@ import axios from 'axios';
             <div class="overflow-x-auto">
                 <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
                     @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getJobPositions()">
-                    <tbody class="text-sm divide-y divide-slate-200">
+                    <tbody class="text-sm divide-y divide-slate-200" v-if="!isLoadinRequest">
                         <tr v-for="position in jobPositions" :key="position.id_det_plaza">
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 flex items-center justify-center min-h-[50px]">
@@ -147,12 +147,28 @@ import axios from 'axios';
                             </td>
                         </tr>
                     </tbody>
+                    <tbody v-else>
+                        <tr>
+                            <td colspan="6" class="text-center">
+                                <img src="../../../img/IsSearching.gif" alt="" class="w-60 h-60 mx-auto">
+                                <h1 class="font-medium text-xl mt-4">Cargando!!!</h1>
+                                <p class="text-sm text-gray-600 mt-2 pb-10">Por favor espera un momento mientras se carga la
+                                    información.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody v-if="emptyObject && !isLoadinRequest">
+                        <tr>
+                            <td colspan="6" class="text-center">
+                                <img src="../../../img/NoData.gif" alt="" class="w-60 h-60 mx-auto">
+                                <h1 class="font-medium text-xl mt-4">No se encontraron resultados!</h1>
+                                <p class="text-sm text-gray-600 mt-2 pb-10">Parece que no hay registros disponibles en este
+                                    momento.</p>
+                            </td>
+                        </tr>
+                    </tbody>
                 </datatable>
 
-            </div>
-            <div v-if="emptyObject" class="flex text-center py-2">
-                <p class="font-semibold text-red-500 text-[16px]" style="margin: 0 auto; text-align: center;">No se
-                    encontraron registros.</p>
             </div>
         </div>
 
@@ -237,6 +253,7 @@ export default {
         });
         return {
             emptyObject: false,
+            isLoadinRequest: false,
             //Data for datatable
             jobPositions: [],
             //Data for modal
@@ -275,6 +292,7 @@ export default {
         async getJobPositions(url = "/det-job-positions") {
             this.tableData.draw++;
             this.tableData.currentPage = url
+            this.isLoadinRequest = true
             await axios.post(url, this.tableData).then((response) => {
                 let data = response.data;
                 if (this.tableData.draw == data.draw) {
@@ -284,6 +302,7 @@ export default {
                     this.links[this.links.length - 1].label = "Siguiente";
                     this.jobPositions = data.data.data;
                     this.jobPositions.length > 0 ? this.emptyObject = false : this.emptyObject = true
+                    this.isLoadinRequest = false
                 }
             }).catch((errors) => {
                 this.manageError(errors, this)

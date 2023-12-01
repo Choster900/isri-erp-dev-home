@@ -219,6 +219,23 @@ export const useDependencia = (context) => {
         });
     };
 
+    const changeBoss = async (dependency, url) => {
+        swal({
+            title: "¿Está seguro de actualizar el empleado asignado?",
+            icon: "question",
+            iconHtml: "❓",
+            confirmButtonText: "Si, Actualizar",
+            confirmButtonColor: "#141368",
+            cancelButtonText: "Cancelar",
+            showCancelButton: true,
+            showCloseButton: true,
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                saveDependency(dependency, url);
+            }
+        });
+    };
+
     const saveDependency = async (dependency, url) => {
         isLoadingRequest.value = true;
         await axios
@@ -268,6 +285,7 @@ export const useDependencia = (context) => {
         storeDependency,
         updateDependency,
         desactiveDependency,
+        changeBoss,
         asyncFindEmployee,
         isLoadingRequest,
         isLoadingEmployee,
