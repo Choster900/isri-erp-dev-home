@@ -44,7 +44,7 @@
                             <div class="mt-3 flex">
                                 <div class="w-[60%]">
                                     <p class="text-gray-500 text-[14px] flex items-center">
-                                        <svg  width="20px" height="20px" viewBox="0 0 20 20" version="1.1"
+                                        <svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1"
                                             xmlns="http://www.w3.org/2000/svg" fill="currentColor">
                                             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                                             <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round">
@@ -171,21 +171,17 @@
                             <div class="mt-3 flex">
                                 <div class="w-full">
                                     <p class="text-gray-500 text-[14px] flex items-center">
-                                        <svg class="text-gray-700" fill="#3B82F6" height="22px" width="22px"
-                                            version="1.1" id="XMLID_238_" xmlns="http://www.w3.org/2000/svg"
-                                            xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24"
-                                            xml:space="preserve">
+                                        <svg class="text-gray-700" height="22px" width="22px" viewBox="0 0 24 24"
+                                            fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                                             <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round">
                                             </g>
                                             <g id="SVGRepo_iconCarrier">
-                                                <g id="location">
-                                                    <g>
-                                                        <path
-                                                            d="M12,24l-0.7-0.6C11,23.1,3,16.5,3,9c0-5,4-9,9-9s9,4,9,9c0,7.5-8,14.1-8.3,14.4L12,24z M12,2C8.1,2,5,5.1,5,9 c0,5.4,5.1,10.5,7,12.3c1.9-1.8,7-6.9,7-12.3C19,5.1,15.8,2,12,2z M12,13c-2.2,0-4-1.8-4-4s1.8-4,4-4s4,1.8,4,4S14.2,13,12,13z M12,7c-1.1,0-2,0.9-2,2s0.9,2,2,2s2-0.9,2-2S13.1,7,12,7z">
-                                                        </path>
-                                                    </g>
-                                                </g>
+                                                <path
+                                                    d="M9 20L3 17V4L9 7M9 20L15 17M9 20V7M15 17L21 20V7L15 4M15 17V4M9 7L15 4"
+                                                    stroke="#3B82F6" stroke-width="2" stroke-linecap="round"
+                                                    stroke-linejoin="round">
+                                                </path>
                                             </g>
                                         </svg>
                                         <span class="ml-1.5">Dirección</span>
@@ -387,5 +383,4 @@ export default {
 .loader {
     border-top-color: #3498db;
     border-left-color: #3498db;
-}
-</style>
+}</style>

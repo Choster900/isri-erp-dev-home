@@ -22,23 +22,16 @@
             :modal-title="'Administracion dependencias. '" maxWidth="3xl">
             <div class="px-5 py-4">
                 <div class="text-sm">
-
-
+                    <!-- First row -->
                     <div class="mb-4 md:flex flex-row justify-items-start">
                         <div class="mb-4 md:mr-2 md:mb-0 basis-full">
                             <input-text :required="true" label="Nombre dependencia" id="nombre" v-model="depInfo.depName"
                                 type="text" placeholder="Nombre dependencia" :validation="{ limit: 85, upper: true }">
                             </input-text>
-                            <InputError v-for="(item, index) in errors.code" :key="index" class="mt-2" :message="item" />
-                            <!-- <TextInput id="nombre" v-model="depInfo.depName" type="text" placeholder="Nombre dependencia"
-                                @update:modelValue="handleInputValidation(value)" ref="inp1">
-                                <LabelToInput icon="standard" forLabel="nombre" />
-                            </TextInput>
-                            <InputError v-for="(item, index) in errors.depName" :key="index" class="mt-2" :message="item" /> -->
+                            <InputError v-for="(item, index) in errors.depName" :key="index" class="mt-2" :message="item" />
                         </div>
                     </div>
-
-                    <!-- First row -->
+                    <!-- Second row -->
                     <div class="mb-4 md:flex flex-row justify-items-start">
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                             <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Empleado a cargo
@@ -81,12 +74,12 @@
                                 :message="item" />
                         </div>
                     </div>
-
+                    <!-- Third row -->
                     <div class="mb-4 md:flex flex-row justify-items-start">
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                             <input-text :required="true" label="Código dependencia" iconName="code" id="code"
                                 v-model="depInfo.code" type="text" placeholder="Código dependencia"
-                                :validation="{ limit: 12, upper: true }">
+                                :validation="{ limit: 16, upper: true }">
                             </input-text>
                             <InputError v-for="(item, index) in errors.code" :key="index" class="mt-2" :message="item" />
                         </div>
@@ -94,7 +87,6 @@
                             <input-text label="Teléfono" iconName="oldPhone" id="phone" v-model="depInfo.phoneNumber"
                                 type="text" placeholder="Número de teléfono" :validation="{ limit: 9, phoneNumber: true }">
                             </input-text>
-
                         </div>
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                             <input-text label="Correo" iconName="email" id="email" v-model="depInfo.email" type="text"

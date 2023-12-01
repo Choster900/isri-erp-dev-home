@@ -5,7 +5,7 @@
         <div class="relative">
             <div class="absolute inset-y-0 start-0 flex items-center px-2 pointer-events-none border-r border-gray-300">
                 <template v-if="iconName === 'email'">
-                    <svg class="w-5 h-5 text-[#001c48] dark:text-gray-500" aria-hidden="true"
+                    <svg class="w-[22px] h-[22px] p-0.5 text-[#001c48] dark:text-gray-500" aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 16">
                         <path
                             d="m10.036 8.278 9.258-7.79A1.979 1.979 0 0 0 18 0H2A1.987 1.987 0 0 0 .641.541l9.395 7.737Z" />
@@ -26,7 +26,7 @@
                     </svg>
                 </template>
                 <template v-else-if="iconName === 'oldPhone'">
-                    <svg class="w-5 h-5 text-[#001c48] dark:text-gray-600" version="1.1" id="_x32_"
+                    <svg class="w-5 h-5 p-0.5 text-[#001c48] dark:text-gray-600" version="1.1" id="_x32_"
                         xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512"
                         xml:space="preserve" fill="currentColor">
                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -114,7 +114,7 @@
                     </svg>
                 </template>
                 <template v-else>
-                    <svg class="w-5 h-5 text-[#001c48] dark:text-gray-600" fill="currentColor" version="1.1" id="Icons"
+                    <svg class="w-5 h-5 p-0.5 text-[#001c48] dark:text-gray-600" fill="currentColor" version="1.1" id="Icons"
                         xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 32"
                         xml:space="preserve">
                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -218,7 +218,7 @@ export default {
         };
         // Dynamic classes for the input
         const inputClasses = [
-            'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 pl-10 font-semibold text-[13px]',
+            'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full pl-12 font-semibold text-[12px] placeholder-gray-400',
             'dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
         ];
 
