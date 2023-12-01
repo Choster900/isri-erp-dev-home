@@ -89,7 +89,7 @@ class DependenciaController extends Controller
                 dependencia.dep_id_dependencia as depPadre
             ")
             ->leftJoin('dependencia as dep', 'dependencia.dep_id_dependencia', '=', 'dep.id_dependencia')
-            //->where('dependencia.id_dependencia', '!=', 11) //Todos excepto presidencia
+            ->where('dependencia.estado_dependencia', 1) //Dependencias activas
             ->get();
 
         return response()->json([
@@ -206,8 +206,8 @@ class DependenciaController extends Controller
             DB::beginTransaction();
             try {
                 if ($dependency->estado_dependencia == 1) {
-                    if ($dependency->id_dependencia == 11) {
-                        return response()->json(['logical_error' => 'Error, no puedes desactivar a presidencia.',], 422);
+                    if ($dependency->jerarquia_organizacion_dependencia == null) {
+                        return response()->json(['logical_error' => 'Error, no puedes desactivar una dependencia sin jerarquia superior.',], 422);
                     } else {
                         if ($dependency->plazas_asignadas()->where('estado_plaza_asignada', 1)->exists()) {
                             return response()->json(['logical_error' => 'Error, esta dependencia tiene personal asignado, reasigna primero a todo el personal e intenta nuevamente.',], 422);
@@ -226,6 +226,12 @@ class DependenciaController extends Controller
                                         }
                                     }
                                 }
+                                $dependency->update([
+                                    'estado_dependencia'                        => 0,
+                                    'fecha_mod_dependencia'                     => Carbon::now(),
+                                    'usuario_dependencia'                       => $request->user()->nick_usuario,
+                                    'ip_dependencia'                            => $request->ip(),
+                                ]);
                             } else {
                                 $dependency->update([
                                     'estado_dependencia'                        => 0,

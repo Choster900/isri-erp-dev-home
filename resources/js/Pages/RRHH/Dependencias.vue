@@ -103,7 +103,7 @@
                                             <div class="font-semibold">Editar</div>
                                         </div>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                        @click="desactiveDependency(dependencia.id_dependencia, dependencia.estado_dependencia)"
+                                        @click="changeStatus(dependencia.id_dependencia, dependencia.estado_dependencia)"
                                             v-if="permits.eliminar === 1">
                                             <div class="w-8">
                                                 <span class="text-xs">
@@ -256,19 +256,19 @@ export default {
             sortOrders,
             isLoadinRequest,
             emptyObject,
-            getDataToShow, handleData, sortBy
+            getDataToShow, handleData, sortBy, changeStatusElement
         } = useToDataTable(columns, requestUrl, columntToSort, dir)
 
-        const { 
-            desactiveDependency
-         } = useDependencia(context);
+        const changeStatus = async (id,status) => {
+            await changeStatusElement(id,status,"/change-status-dependency")
+        }
 
         return {
             permits, dataToShow, tableData,
             perPage, links, sortKey,
             sortOrders, sortBy, dependencyId,
             handleData, isLoadinRequest,
-            getDataToShow, desactiveDependency, showModalDetail,
+            getDataToShow, changeStatus, showModalDetail,
             emptyObject, columns, showModalDependencies
         };
     }

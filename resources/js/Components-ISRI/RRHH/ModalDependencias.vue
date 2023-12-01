@@ -26,11 +26,11 @@
 
                     <div class="mb-4 md:flex flex-row justify-items-start">
                         <div class="mb-4 md:mr-2 md:mb-0 basis-full">
-                            <TextInput id="nombre" v-model="depInfo.depName" type="text" placeholder="Nombre dependencia">
-                                <LabelToInput icon="standard" forLabel="nombre" />
+                            <TextInput id="nombre" v-model="depInfo.depName" type="text" placeholder="Nombre dependencia"
+                            @update:modelValue="handleInputValidation(value)" ref="inp1">
+                                <LabelToInput icon="standard" forLabel="nombre"/>
                             </TextInput>
-                            <InputError v-for="(item, index) in errors.depName" :key="index" class="mt-2"
-                                :message="item" />
+                            <InputError v-for="(item, index) in errors.depName" :key="index" class="mt-2" :message="item" />
                         </div>
                     </div>
 
@@ -44,7 +44,7 @@
                                 <Multiselect placeholder="Digite nombre empleado" v-model="depInfo.personId"
                                     :options="load && depInfo.id ? baseOptions : employees" :searchable="true"
                                     :loading="isLoadingEmployee" :internal-search="false"
-                                    @search-change="handleSearchChange" :clear-on-search="true" 
+                                    @search-change="handleSearchChange" :clear-on-search="true"
                                     :noResultsText="'Sin resultados'" :noOptionsText="'Sin resultados'" />
                                 <LabelToInput icon="list" />
                             </div>
@@ -67,38 +67,38 @@
 
                     <div class="mb-4 md:flex flex-row justify-items-start">
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                            <TextInput id="code" v-model="depInfo.code" type="text" placeholder="Codigo">
-                                <LabelToInput icon="standard" forLabel="code" />
-                            </TextInput>
-                            <InputError v-for="(item, index) in errors.code" :key="index" class="mt-2"
-                                :message="item" />
+                            <input-text label="Código dependencia" iconName="code" id="code" v-model="depInfo.code" type="text" placeholder="Código dependencia"
+                            :validation="{limit:10}">
+                            </input-text>
+                            <InputError v-for="(item, index) in errors.code" :key="index" class="mt-2" :message="item" />
                         </div>
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                            <TextInput id="phone" v-model="depInfo.phoneNumber" type="text" placeholder="Telefono" :required="false">
-                                <LabelToInput icon="objects" forLabel="phone" />
-                            </TextInput>
+                            <input-text label="Teléfono" iconName="oldPhone" id="phone" v-model="depInfo.phoneNumber" type="text" placeholder="Número de teléfono"
+                            :validation="{limit:9,phoneNumber:true}">
+                            </input-text>
+
                         </div>
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                            <TextInput id="email" v-model="depInfo.email" type="text" placeholder="Email" :required="false">
-                                <LabelToInput icon="email" forLabel="email" />
-                            </TextInput>
+                            <input-text label="Correo" iconName="email" id="email" v-model="depInfo.email" type="text" placeholder="Correo dependencia"
+                            :validation="{limit:35}">
+                            </input-text>
                         </div>
                     </div>
 
                     <div class="mb-4 md:flex flex-row justify-items-start">
                         <div class="mb-4 md:mr-2 md:mb-0 basis-full">
-                            <TextInput id="direccion" v-model="depInfo.address" type="text" placeholder="Direccion" :required="false">
-                                <LabelToInput icon="standard" forLabel="direccion" />
-                            </TextInput>
+                            <input-text label="Direccion" iconName="personalInfo" id="address" v-model="depInfo.address" type="text" placeholder="Escriba dirección"
+                            :validation="{limit:100}">
+                            </input-text>
                         </div>
                     </div>
 
                     <!-- Buttons -->
                     <div class="mt-4 mb-4 md:flex flex-row justify-center">
-                        <GeneralButton v-if="depInfo.id != ''" @click="update()"
-                            color="bg-orange-700  hover:bg-orange-800" text="Actualizar" icon="update" />
-                        <GeneralButton v-else @click="save()" color="bg-green-700  hover:bg-green-800"
-                            text="Agregar" icon="add" />
+                        <GeneralButton v-if="depInfo.id != ''" @click="update()" color="bg-orange-700  hover:bg-orange-800"
+                            text="Actualizar" icon="update" />
+                        <GeneralButton v-else @click="save()" color="bg-green-700  hover:bg-green-800" text="Agregar"
+                            icon="add" />
                         <div class="mb-4 md:mr-2 md:mb-0 px-1">
                             <GeneralButton text="Cancelar" icon="add" @click="$emit('cerrar-modal')" />
                         </div>
@@ -113,12 +113,14 @@
 <script>
 import Modal from "@/Components-ISRI/AllModal/Modal.vue";
 import InputError from "@/Components/InputError.vue";
+import { useValidateInput } from "@/Composables/General/useValidateInput.js";
 import { useDependencia } from '@/Composables/RRHH/Dependencia/useDependencia.js';
 import { ref, toRefs, onMounted, } from 'vue';
+import InputText from "@/Components-ISRI/ComponentsToForms/InputText.vue";
 import "vue3-toastify/dist/index.css";
 
 export default {
-    components: { Modal, InputError },
+    components: { Modal, InputError, InputText },
     props: {
         showModalDependencies: {
             type: Boolean,
@@ -132,9 +134,11 @@ export default {
     emits: ["cerrar-modal", "get-table"],
     setup(props, context) {
         const load = ref(true)
-        
+        const inp1 = ref(null)
+
         const { dependencyId } = toRefs(props)
-        const { 
+
+        const {
             isLoadingRequest,
             baseOptions,
             mainCenters,
@@ -147,7 +151,7 @@ export default {
             fetchData,
             storeDependency,
             updateDependency
-         } = useDependencia(context);
+        } = useDependencia(context);
 
         const handleSearchChange = async (query) => {
             load.value = false
@@ -157,11 +161,11 @@ export default {
         }
 
         const save = async () => {
-            await storeDependency(depInfo.value,'/store-dependency')
+            await storeDependency(depInfo.value, '/store-dependency')
         }
 
         const update = async () => {
-            await updateDependency(depInfo.value,'/update-dependency')
+            await updateDependency(depInfo.value, '/update-dependency')
         }
 
         onMounted(
@@ -179,12 +183,13 @@ export default {
             baseOptions,
             load,
             errors,
+            inp1,
             handleSearchChange,
             getInfoForModalDependencias,
             storeDependency,
             updateDependency,
             save,
-            update
+            update,
         };
     },
 };
