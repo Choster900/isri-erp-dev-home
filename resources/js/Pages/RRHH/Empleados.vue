@@ -358,7 +358,6 @@ export default {
                     this.isLoadinRequest = false
                 }
             }).catch((errors) => {
-                console.log(errors);
                 this.manageError(errors, this)
             })
         },
