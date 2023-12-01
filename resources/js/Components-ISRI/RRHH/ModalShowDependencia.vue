@@ -39,7 +39,7 @@
                     <div class="flex w-full pb-4 border-b border-x border-gray-400 rounded-b-lg">
                         <div class="mt-3 w-full mx-4 relative">
                             <div class="w-full border-b border-gray-300">
-                                <p class="text-gray-700 text-center text-[14px] font-semibold">INFORMACION GENERAL</p>
+                                <p class="text-gray-700 text-center text-[14px] font-semibold  mb-2">INFORMACION GENERAL</p>
                             </div>
                             <div class="mt-3 flex">
                                 <div class="w-[60%]">

@@ -8,6 +8,7 @@ use App\Models\Dependencia;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class DependenciaController extends Controller
 {
@@ -261,6 +262,39 @@ class DependenciaController extends Controller
                     'error' => $e,
                 ], 422);
             }
+        }
+    }
+
+    public function changeDepBoss(Request $request){
+        $customMessages = [
+            'personId.required' => 'Debe seleccionar empleado a cargo.',
+        ];
+
+        // Validate the request data with custom error messages and custom rule
+        $validatedData = Validator::make($request->all(), [
+            'personId' => 'required',
+        ], $customMessages)->validate();
+
+        $dependency = Dependencia::find($request->id);
+        DB::beginTransaction();
+        try {
+            $dependency->update([
+                'id_persona'                                => $request->personId,
+                'fecha_mod_dependencia'                     => Carbon::now(),
+                'usuario_dependencia'                       => $request->user()->nick_usuario,
+                'ip_dependencia'                            => $request->ip(),
+            ]);
+
+            DB::commit(); // Confirma las operaciones en la base de datos
+            return response()->json([
+                'message'          => "Dependencia actualizada con éxito.",
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+            return response()->json([
+                'logical_error' => 'Ha ocurrido un error con sus datos.',
+                'error' => $e,
+            ], 422);
         }
     }
 }

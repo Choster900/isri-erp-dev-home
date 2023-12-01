@@ -103,7 +103,7 @@
                                             <div class="font-semibold">Editar</div>
                                         </div>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                        @click="changeStatus(dependencia.id_dependencia, dependencia.estado_dependencia)"
+                                            @click="changeStatus(dependencia.id_dependencia, dependencia.estado_dependencia)"
                                             v-if="permits.eliminar === 1">
                                             <div class="w-8">
                                                 <span class="text-xs">
@@ -123,6 +123,28 @@
                                             </div>
                                             <div class="font-semibold">
                                                 {{ dependencia.estado_dependencia ? 'Desactivar' : 'Activar' }}
+                                            </div>
+                                        </div>
+                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                            @click="showModalBoss = true; dependencyId = dependencia.id_dependencia" v-if="permits.ejecutar === 1">
+                                            <div class="w-8">
+                                                <span class="text-xs">
+                                                    <svg class="w-6 h-6 text-cyan-700" viewBox="0 0 24 24" fill="none"
+                                                        xmlns="http://www.w3.org/2000/svg">
+                                                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round"
+                                                            stroke-linejoin="round"></g>
+                                                        <g id="SVGRepo_iconCarrier">
+                                                            <path
+                                                                d="M4 17H20M20 17L16 13M20 17L16 21M20 7H4M4 7L8 3M4 7L8 11"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"></path>
+                                                        </g>
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                            <div class="font-semibold">
+                                                Jefatura
                                             </div>
                                         </div>
                                     </DropDownOptions>
@@ -198,6 +220,9 @@
         <modal-show-dependencia-vue v-if="showModalDetail" :showModalDetail="showModalDetail" :dependencyId="dependencyId"
             @cerrar-modal="showModalDetail = false" @get-table="getDataToShow(tableData.currentPage)" />
 
+        <modal-dep-jefatura-vue v-if="showModalBoss" :showModalBoss="showModalBoss" :dependencyId="dependencyId"
+            @cerrar-modal="showModalBoss = false" @get-table="getDataToShow(tableData.currentPage)" />
+
     </AppLayoutVue>
 </template>
 
@@ -207,18 +232,18 @@ import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import ModalDependenciasVue from '@/Components-ISRI/RRHH/ModalDependencias.vue';
 import ModalShowDependenciaVue from '@/Components-ISRI/RRHH/ModalShowDependencia.vue';
+import ModalDepJefaturaVue from '@/Components-ISRI/RRHH/ModalDepJefatura.vue';
 
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 
 import { usePermissions } from '@/Composables/General/usePermissions.js';
 import { useToDataTable } from '@/Composables/General/useToDataTable.js';
-import { useDependencia } from '@/Composables/RRHH/Dependencia/useDependencia.js';
 import { ref, toRefs } from 'vue';
 
 
 export default {
-    components: { Head, AppLayoutVue, Datatable, ModalDependenciasVue, ModalShowDependenciaVue },
+    components: { Head, AppLayoutVue, Datatable, ModalDependenciasVue, ModalShowDependenciaVue, ModalDepJefaturaVue },
     props: {
         menu: {
             type: Object,
@@ -232,6 +257,7 @@ export default {
         const dependencyId = ref(0)
         const showModalDependencies = ref(false)
         const showModalDetail = ref(false)
+        const showModalBoss = ref(false)
         const columns = [
             { width: "8%", label: "ID", name: "id_dependencia", type: "text" },
             { width: "30%", label: "Nombre", name: "nombre_dependencia", type: "text" },
@@ -259,8 +285,8 @@ export default {
             getDataToShow, handleData, sortBy, changeStatusElement
         } = useToDataTable(columns, requestUrl, columntToSort, dir)
 
-        const changeStatus = async (id,status) => {
-            await changeStatusElement(id,status,"/change-status-dependency")
+        const changeStatus = async (id, status) => {
+            await changeStatusElement(id, status, "/change-status-dependency")
         }
 
         return {
@@ -269,7 +295,7 @@ export default {
             sortOrders, sortBy, dependencyId,
             handleData, isLoadinRequest,
             getDataToShow, changeStatus, showModalDetail,
-            emptyObject, columns, showModalDependencies
+            emptyObject, columns, showModalDependencies, showModalBoss
         };
     }
 }

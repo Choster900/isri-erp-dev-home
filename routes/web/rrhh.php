@@ -224,4 +224,5 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('store-dependency', [DependenciaController::class, 'storeDependency'])->name('dependencia.storeDependency');
     Route::post('update-dependency', [DependenciaController::class, 'updateDependency'])->name('dependencia.updateDependency');
     Route::post('change-status-dependency', [DependenciaController::class, 'changeStatusDependency'])->name('dependencia.changeStatusDependency');
+    Route::post('change-dep-boss', [DependenciaController::class, 'changeDepBoss'])->name('dependencia.changeDepBoss');
 });

@@ -18,22 +18,13 @@
                 </div>
             </div>
         </div>
-        <Modal v-else :show="showModalDependencies" @close="$emit('cerrar-modal')"
-            :modal-title="'Administracion dependencias. '" maxWidth="3xl">
+        <Modal v-else :show="showModalBoss" @close="$emit('cerrar-modal')"
+            :modal-title="'Cambiar empleado a cargo. '" maxWidth="xl">
             <div class="px-5 py-4">
                 <div class="text-sm">
-                    <!-- First row -->
-                    <div class="mb-4 md:flex flex-row justify-items-start">
-                        <div class="mb-4 md:mr-2 md:mb-0 basis-full">
-                            <input-text :required="true" label="Nombre dependencia" id="nombre" v-model="depInfo.depName"
-                                type="text" placeholder="Nombre dependencia" :validation="{ limit: 85, upper: true }">
-                            </input-text>
-                            <InputError v-for="(item, index) in errors.depName" :key="index" class="mt-2" :message="item" />
-                        </div>
-                    </div>
                     <!-- Second row -->
-                    <div class="mb-4 md:flex flex-row justify-items-start">
-                        <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                    <div class="mb-4 md:flex flex-row justify-items-start py-4">
+                        <div class="mb-4 md:mr-2 md:mb-0 basis-full">
                             <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Empleado a cargo
                                 <span class="text-red-600 font-extrabold">*</span>
                             </label>
@@ -54,65 +45,12 @@
                             <InputError v-for="(item, index) in errors.personId" :key="index" class="mt-2"
                                 :message="item" />
                         </div>
-                        <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                            <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Dependencia
-                                jerarquica
-                                <span class="text-red-600 font-extrabold">*</span>
-                            </label>
-                            <div class="relative font-semibold flex h-10 w-full flex-row-reverse">
-                                <Multiselect v-model="depInfo.parentId" :options="mainCenters" :searchable="true"
-                                    placeholder="Seleccione centro" :disabled="depInfo.jerarquia === 0" />
-                                <div class="flex items-center px-2 pointer-events-none border rounded-l-md border-gray-300">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                        stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-[#001c48]">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                                    </svg>
-                                </div>
-                            </div>
-                            <InputError v-for="(item, index) in errors.parentId" :key="index" class="mt-2"
-                                :message="item" />
-                        </div>
-                    </div>
-                    <!-- Third row -->
-                    <div class="mb-4 md:flex flex-row justify-items-start">
-                        <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                            <input-text :required="true" label="Código dependencia" iconName="code" id="code"
-                                v-model="depInfo.code" type="text" placeholder="Código dependencia"
-                                :validation="{ limit: 16, upper: true }">
-                            </input-text>
-                            <InputError v-for="(item, index) in errors.code" :key="index" class="mt-2" :message="item" />
-                        </div>
-                        <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                            <input-text label="Teléfono" iconName="oldPhone" id="phone" v-model="depInfo.phoneNumber"
-                                type="text" placeholder="Número de teléfono" :validation="{ limit: 9, phoneNumber: true }">
-                            </input-text>
-                            <InputError v-for="(item, index) in errors.phoneNumber" :key="index" class="mt-2"
-                                :message="item" />
-                        </div>
-                        <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                            <input-text label="Correo" iconName="email" id="email" v-model="depInfo.email" type="text"
-                                placeholder="Correo dependencia" :validation="{ limit: 35 }">
-                            </input-text>
-                            <InputError v-for="(item, index) in errors.email" :key="index" class="mt-2"
-                                :message="item" />
-                        </div>
-                    </div>
-
-                    <div class="mb-4 md:flex flex-row justify-items-start">
-                        <div class="mb-4 md:mr-2 md:mb-0 basis-full">
-                            <input-text label="Direccion" iconName="address" id="address" v-model="depInfo.address"
-                                type="text" placeholder="Escriba dirección" :validation="{ limit: 100 }">
-                            </input-text>
-                        </div>
                     </div>
 
                     <!-- Buttons -->
                     <div class="mt-4 mb-4 md:flex flex-row justify-center">
-                        <GeneralButton v-if="depInfo.id != ''" @click="update()" color="bg-orange-700  hover:bg-orange-800"
+                        <GeneralButton v-if="depInfo.id != ''" @click="change()" color="bg-orange-700  hover:bg-orange-800"
                             text="Actualizar" icon="update" />
-                        <GeneralButton v-else @click="save()" color="bg-green-700  hover:bg-green-800" text="Agregar"
-                            icon="add" />
                         <div class="mb-4 md:mr-2 md:mb-0 px-1">
                             <GeneralButton text="Cancelar" icon="add" @click="$emit('cerrar-modal')" />
                         </div>
@@ -135,7 +73,7 @@ import "vue3-toastify/dist/index.css";
 export default {
     components: { Modal, InputError, InputText },
     props: {
-        showModalDependencies: {
+        showModalBoss: {
             type: Boolean,
             default: false
         },
@@ -154,7 +92,6 @@ export default {
         const {
             isLoadingRequest,
             baseOptions,
-            mainCenters,
             depInfo,
             isLoadingEmployee,
             employees,
@@ -162,8 +99,7 @@ export default {
             errors,
             getInfoForModalDependencias,
             fetchData,
-            storeDependency,
-            updateDependency
+            changeBoss
         } = useDependencia(context);
 
         const handleSearchChange = async (query) => {
@@ -173,12 +109,8 @@ export default {
             }
         }
 
-        const save = async () => {
-            await storeDependency(depInfo.value, '/store-dependency')
-        }
-
-        const update = async () => {
-            await updateDependency(depInfo.value, '/update-dependency')
+        const change = async () => {
+            await changeBoss(depInfo.value, '/change-dep-boss')
         }
 
         onMounted(
@@ -190,7 +122,6 @@ export default {
         return {
             isLoadingRequest,
             depInfo,
-            mainCenters,
             isLoadingEmployee,
             employees,
             baseOptions,
@@ -199,10 +130,7 @@ export default {
             urlToSearch,
             handleSearchChange,
             getInfoForModalDependencias,
-            storeDependency,
-            updateDependency,
-            save,
-            update,
+            change
         };
     },
 };
