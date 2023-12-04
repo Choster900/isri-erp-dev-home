@@ -12,6 +12,7 @@ use App\Models\EvaluacionPersonal;
 use App\Models\EvaluacionRendimiento;
 use App\Models\IncidenteEvaluacion;
 use App\Models\Persona;
+use App\Models\PlazaAsignada;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -23,23 +24,23 @@ class EvaluacionController extends Controller
     function getEvaluaciones(Request $request)
     {
         $columns = [
-            'id_empleado',
-            'id_persona',
-            'id_tipo_pension',
             'id_banco',
-            'id_titulo_profesional',
-            'codigo_empleado',
+            'id_persona',
+            'ip_empleado',
+            'id_empleado',
             'nup_empleado',
             'isss_empleado',
-            'cuenta_banco_empleado',
-            'fecha_contratacion_empleado',
-            'email_institucional_empleado',
-            'email_alternativo_empleado',
+            'id_tipo_pension',
+            'codigo_empleado',
             'estado_empleado',
+            'usuario_empleado',
             'fecha_reg_empleado',
             'fecha_mod_empleado',
-            'usuario_empleado',
-            'ip_empleado'
+            'id_titulo_profesional',
+            'cuenta_banco_empleado',
+            'email_alternativo_empleado',
+            'fecha_contratacion_empleado',
+            'email_institucional_empleado',
         ];
 
         $length = $request->input('length');
@@ -51,20 +52,20 @@ class EvaluacionController extends Controller
         $query = Empleado::select('*')
             ->with([
                 "persona",
+                "plazas_asignadas.dependencia",
+                "plazas_asignadas.detalle_plaza.plaza",
+                "evaluaciones_personal.incidentes_evaluacion",
+                "evaluaciones_personal.detalle_evaluaciones_personal",
                 "evaluaciones_personal" => function ($query) {
                     return $query->orderBy("fecha_reg_evaluacion_personal", "desc");
                 },
-                "evaluaciones_personal.detalle_evaluaciones_personal",
-                "evaluaciones_personal.incidentes_evaluacion",
-                "plazas_asignadas.detalle_plaza.plaza",
-                "plazas_asignadas.dependencia"
             ])->whereHas("evaluaciones_personal")->orderBy($columns[$column], $dir);
 
         if ($data) {
             $query->where('id_empleado', 'like', '%' . $data["id_empleado"] . '%')
                 ->where('codigo_empleado', 'like', '%' . $data['codigo_empleado'] . '%');
 
-            if (isset($data['email_institucional_empleado'])) {
+            /*  if (isset($data['email_institucional_empleado'])) {
                 $query->where('email_institucional_empleado', 'like', '%' . $data['email_institucional_empleado'] . '%');
             }
             $query->whereHas(
@@ -84,7 +85,7 @@ class EvaluacionController extends Controller
                             ->orWhere('tapellido_persona', 'like', '%' . $searchApellidos . '%');
                     });
                 }
-            );
+            ); */
         }
         $acuerdos = $query->paginate($length)->onEachSide(1);
         return [
@@ -95,22 +96,54 @@ class EvaluacionController extends Controller
     // Metodo de busqueda de usuarios
     function searchEmployeesForNewEvaluationRequest(Request $request)
     {
-        $searchQuery = $request->input('data');
-        $query = Persona::select("*")->with([
-            'empleado' => function ($query) {
-                $query->where('estado_empleado', 1); // Traemos los empleados que esten activos
-            },
-            'empleado.evaluaciones_personal',
-        ]);
-        if (!empty($searchQuery)) { // El filtrado
-            $query->where(function (Builder $query) use ($searchQuery) {
-                $query->whereRaw("MATCH (pnombre_persona, snombre_persona, tnombre_persona, papellido_persona, sapellido_persona, tapellido_persona) AGAINST (?)", [$searchQuery]);
+
+        $query = Persona::query();
+
+        if (!empty($request->nombre)) {
+            $query->with([
+                'empleado' => function ($query) {
+                    $query->where('estado_empleado', 1); // Traemos los empleados que esten activos
+                },
+                'empleado.evaluaciones_personal',
+            ]);
+            $query->orWhere(function ($query) use ($request) {
+                $query->whereRaw("MATCH ( pnombre_persona,
+                 snombre_persona,
+                  tnombre_persona, 
+                  papellido_persona,
+                   sapellido_persona,
+                    tapellido_persona )
+                     AGAINST ( '" . $request->nombre . "')");
             });
+            /* $query->whereHas("empleado") // Las personas que esten en la tabla de empleados
+                ->doesntHave("empleado.evaluaciones_personal"); // Los empleados que no tengan evaluaciones */
         }
-        $query->whereHas("empleado") // Las personas que esten en la tabla de empleados
-            ->doesntHave("empleado.evaluaciones_personal"); // Los empleados que no tengan evaluaciones
-        $result = $query->get();
-        return $result;
+        $results = $query->get();
+
+        $formattedResults = $results->map(function ($item) {
+            return [
+                'value' => $item->id_persona,
+                'label' => $item->pnombre_persona . ' ' . ($item->snombre_persona ?? '') . ' ' . ($item->tnombre_persona ?? '') . ' ' . ($item->papellido_persona ?? '') . ' ' . ($item->sapellido_persona ?? '') . ' ' . ($item->tapellido_persona ?? ''),
+                'allDataPersonas' => $item
+                /* 'disabled' => true */
+            ];
+        });
+
+        return response()->json($formattedResults);
+    }
+
+    function getPlazaAsignadaByUserAndDependencia(Request $request)
+    {
+        $plazas = PlazaAsignada::with([
+            'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos'
+        ])->where('id_empleado', $request->employeeId)->where('id_dependencia', $request->dependenciaId)->get();
+
+
+         $detallePlaza = $plazas->map(function ($item) {
+            return $item->detalle_plaza->plaza->tipo_plaza->evaluaciones_rendimientos;
+        });
+        
+        return $detallePlaza;
     }
 
     function createNewEvaluation(EvaluacionRequest $request)
