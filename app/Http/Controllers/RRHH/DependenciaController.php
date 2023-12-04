@@ -8,6 +8,7 @@ use App\Models\Dependencia;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class DependenciaController extends Controller
 {
@@ -89,7 +90,7 @@ class DependenciaController extends Controller
                 dependencia.dep_id_dependencia as depPadre
             ")
             ->leftJoin('dependencia as dep', 'dependencia.dep_id_dependencia', '=', 'dep.id_dependencia')
-            //->where('dependencia.id_dependencia', '!=', 11) //Todos excepto presidencia
+            ->where('dependencia.estado_dependencia', 1) //Dependencias activas
             ->get();
 
         return response()->json([
@@ -206,8 +207,8 @@ class DependenciaController extends Controller
             DB::beginTransaction();
             try {
                 if ($dependency->estado_dependencia == 1) {
-                    if ($dependency->id_dependencia == 11) {
-                        return response()->json(['logical_error' => 'Error, no puedes desactivar a presidencia.',], 422);
+                    if ($dependency->jerarquia_organizacion_dependencia == null) {
+                        return response()->json(['logical_error' => 'Error, no puedes desactivar una dependencia sin jerarquia superior.',], 422);
                     } else {
                         if ($dependency->plazas_asignadas()->where('estado_plaza_asignada', 1)->exists()) {
                             return response()->json(['logical_error' => 'Error, esta dependencia tiene personal asignado, reasigna primero a todo el personal e intenta nuevamente.',], 422);
@@ -226,6 +227,12 @@ class DependenciaController extends Controller
                                         }
                                     }
                                 }
+                                $dependency->update([
+                                    'estado_dependencia'                        => 0,
+                                    'fecha_mod_dependencia'                     => Carbon::now(),
+                                    'usuario_dependencia'                       => $request->user()->nick_usuario,
+                                    'ip_dependencia'                            => $request->ip(),
+                                ]);
                             } else {
                                 $dependency->update([
                                     'estado_dependencia'                        => 0,
@@ -255,6 +262,39 @@ class DependenciaController extends Controller
                     'error' => $e,
                 ], 422);
             }
+        }
+    }
+
+    public function changeDepBoss(Request $request){
+        $customMessages = [
+            'personId.required' => 'Debe seleccionar empleado a cargo.',
+        ];
+
+        // Validate the request data with custom error messages and custom rule
+        $validatedData = Validator::make($request->all(), [
+            'personId' => 'required',
+        ], $customMessages)->validate();
+
+        $dependency = Dependencia::find($request->id);
+        DB::beginTransaction();
+        try {
+            $dependency->update([
+                'id_persona'                                => $request->personId,
+                'fecha_mod_dependencia'                     => Carbon::now(),
+                'usuario_dependencia'                       => $request->user()->nick_usuario,
+                'ip_dependencia'                            => $request->ip(),
+            ]);
+
+            DB::commit(); // Confirma las operaciones en la base de datos
+            return response()->json([
+                'message'          => "Dependencia actualizada con éxito.",
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+            return response()->json([
+                'logical_error' => 'Ha ocurrido un error con sus datos.',
+                'error' => $e,
+            ], 422);
         }
     }
 }

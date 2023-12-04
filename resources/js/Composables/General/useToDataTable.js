@@ -1,6 +1,8 @@
 import axios from "axios";
 import { onMounted, ref, inject } from "vue";
 import { useHandleError } from "@/Composables/General/useHandleError.js";
+import { useShowToast } from "@/Composables/General/useShowToast.js";
+import { toast } from "vue3-toastify";
 
 export const useToDataTable = (columns, requestUrl, columnToSort, dir) => {
     const swal = inject("$swal");
@@ -26,6 +28,49 @@ export const useToDataTable = (columns, requestUrl, columnToSort, dir) => {
         search: {},
     });
 
+    
+    const changeStatusElement = async (elementId, status, url) => {
+        const msg = status === 0 ? 'activar' : 'desactivar'
+        swal({
+            title: "¿Está seguro de " + msg + " este registro?",
+            icon: "question",
+            iconHtml: "❓",
+            confirmButtonText: "Si, " + msg,
+            confirmButtonColor: "#141368",
+            cancelButtonText: "Cancelar",
+            showCancelButton: true,
+            showCloseButton: true,
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    isLoadinRequest.value = true;
+                    const response = await axios.post(url, {
+                        id: elementId,
+                        status: status
+                    });
+                    useShowToast(
+                        toast.success,
+                        response.data.message
+                    );
+                } catch (err) {
+                    if (err.response.status === 422) {
+                        if (err.response.data.logical_error) {
+                            useShowToast(
+                                toast.error,
+                                err.response.data.logical_error
+                            );
+                        }
+                    } else {
+                        showErrorMessage(err);
+                    }
+                } finally {
+                    isLoadinRequest.value = false;
+                    getDataToShow()
+                }
+            }
+        });
+    }
+
     const getDataToShow = async (url = requestUrl) => {
         try {
             isLoadinRequest.value = true;
@@ -44,7 +89,6 @@ export const useToDataTable = (columns, requestUrl, columnToSort, dir) => {
             }
             emptyObject.value = dataToShow.value.length === 0;
         } catch (error) {
-            console.log(error);
             const { title, text, icon } = useHandleError(error);
             swal({ title: title, text: text, icon: icon, timer: 5000 });
         } finally {
@@ -87,6 +131,7 @@ export const useToDataTable = (columns, requestUrl, columnToSort, dir) => {
         links,
         perPage,
         isLoadinRequest,
+        changeStatusElement,
         sortBy,
         getDataToShow,
         handleData,
