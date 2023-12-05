@@ -34,7 +34,7 @@ export default {
             required: true,
         },
         autoPadding: {//prop muestra estado del modal para abrir y cerrar
-            type: String,
+            type: Boolean,
             default: true,
         }
     }
