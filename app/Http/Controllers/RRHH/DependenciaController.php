@@ -56,15 +56,6 @@ class DependenciaController extends Controller
         return ['data' => $dependencies, 'draw' => $request->input('draw')];
     }
 
-    //Obtiene unicamente los centros
-    public function getCentrosAtencion(Request $request)
-    {
-        $dependencies = Dependencia::with('jefatura')->where('dep_id_dependencia', null)->get();
-        return response()->json([
-            'dependencies' => $dependencies
-        ]);
-    }
-
     public function getInfoModalDependencias(Request $request, $id)
     {
         $dependency =  Dependencia::with([
@@ -80,9 +71,10 @@ class DependenciaController extends Controller
         ])
             ->find($id);
 
-        $dependencies = Dependencia::selectRaw("id_dependencia as value, concat('(',codigo_dependencia,') - ',nombre_dependencia) as label, id_centro_atencion")->get();
-        
-        $mainCenters = CentroAtencion::selectRaw("id_centro_atencion as value, concat('(',codigo_centro_atencion,') - ', nombre_centro_atencion) as label")->get();
+        $dependencies = Dependencia::selectRaw("id_dependencia as value, concat(nombre_dependencia,' (',codigo_dependencia,')') as label, id_centro_atencion")
+        ->where('estado_dependencia', 1)->get();
+        $mainCenters = CentroAtencion::selectRaw("id_centro_atencion as value, concat(nombre_centro_atencion,' (',codigo_centro_atencion,' )') as label")
+        ->where('estado_centro_atencion', 1)->get();
 
         return response()->json([
             'dependency'      => $dependency ?? [],

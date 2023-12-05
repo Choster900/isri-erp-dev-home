@@ -55,7 +55,7 @@
                         </div>
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                             <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Dependencia
-                                jerarquica
+                                jerarquica <span class="text-red-600 font-extrabold">*</span>
                             </label>
                             <div class="relative font-semibold flex h-10 w-full flex-row-reverse">
                                 <Multiselect v-model="depInfo.parentId" :options="depFilter" :searchable="true"
@@ -68,6 +68,8 @@
                                     </svg>
                                 </div>
                             </div>
+                            <InputError v-for="(item, index) in errors.parentId" :key="index" class="mt-2"
+                                :message="item" />
                         </div>
                     </div>
                     <div class="mb-4 md:flex flex-row justify-items-start">

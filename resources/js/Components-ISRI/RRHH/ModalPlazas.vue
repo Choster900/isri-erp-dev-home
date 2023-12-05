@@ -226,17 +226,32 @@ import moment from 'moment';
                             <div class="mb-5 md:flex flex-row justify-items-start">
                                 <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                     <label class="block mb-2 text-xs font-light text-gray-600">
-                                        Dependencia <span class="text-red-600 font-extrabold">*</span>
+                                        Centro de atención <span class="text-red-600 font-extrabold">*</span>
+                                    </label>
+                                    <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
+                                        <Multiselect placeholder="Seleccione centro" v-model="jobPosition.parentId"
+                                            :options="mainCenters" :searchable="true" 
+                                            @change="jobPosition.dependencyId=''"/>
+                                        <LabelToInput icon="list" />
+                                    </div>
+                                    <InputError v-for="(item, index) in errors['jobPosition.parentId']" :key="index"
+                                        class="mt-2" :message="item" />
+                                </div>
+                                <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                                    <label class="block mb-2 text-xs font-light text-gray-600">
+                                        Dependencia jerárquica <span class="text-red-600 font-extrabold">*</span>
                                     </label>
                                     <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
                                         <Multiselect placeholder="Seleccione dependencia" v-model="jobPosition.dependencyId"
-                                            :options="dependencies" :searchable="true" />
+                                            :options="depsFilter" :searchable="true" :noOptionsText="'Lista vacía.'" />
                                         <LabelToInput icon="list" />
                                     </div>
                                     <InputError v-for="(item, index) in errors['jobPosition.dependencyId']" :key="index"
                                         class="mt-2" :message="item" />
                                 </div>
-                                <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                            </div>
+                            <div class="mb-5 md:flex flex-row justify-items-start">
+                                <div class="mb-4 md:mr-2 md:mb-0 basis-full">
                                     <label class="block mb-2 text-xs font-light text-gray-600">
                                         Plaza <span class="text-red-600 font-extrabold">*</span>
                                     </label>
@@ -443,6 +458,7 @@ export default {
             showJobPositions: true,
             jobPositionsToSelect: [],
             dependencies: [],
+            mainCenters: [],
             employee: [],
             reasonsForDissociate: [],
             isLoading: false,
@@ -454,6 +470,7 @@ export default {
             jobPosition: {
                 id: '',
                 dependencyId: '',
+                parentId: '',
                 jobPositionId: '',
                 salary: '',
                 account: '',
@@ -525,6 +542,7 @@ export default {
                     this.jobPositions = response.data.jobPositions.plazas_asignadas
                     this.jobPositionsToSelect = response.data.jobPositionsToSelect
                     this.dependencies = response.data.dependencies
+                    this.mainCenters = response.data.mainCenters
                     this.reasonsForDissociate = response.data.reasonsForDissociate
                     this.setStatusForRoles(this.jobPositions)
                 })
@@ -628,8 +646,8 @@ export default {
             }
         },
         formattedDependency(dependencie) {
-            const dependency = dependencie.parent_dependency || dependencie;
-            return dependency.codigo_dependencia + ' - ' + dependencie.nombre_dependencia;
+            const dependency = dependencie.centro_atencion || dependencie;
+            return dependency.codigo_centro_atencion + ' - ' + dependencie.nombre_dependencia;
         },
         cleanJobPositionInputs() {
             Object.keys(this.jobPosition).forEach(key => {
@@ -646,6 +664,7 @@ export default {
                     }
                 );
                 this.jobPositionsToSelect = response.data.jobPositionsToSelect
+                this.jobPosition.parentId = role.dependencia.id_centro_atencion
                 this.jobPosition.dependencyId = role.dependencia.id_dependencia
                 this.jobPosition.jobPositionId = role.id_det_plaza
                 this.jobPosition.dateOfHired = role.fecha_plaza_asignada
@@ -754,6 +773,12 @@ export default {
                 return '';
             }
         },
+        depsFilter() {
+            const result = this.dependencies.filter((element) => {
+                return element.id_centro_atencion === this.jobPosition.parentId
+            });
+            return result ?? [];
+        }
     },
 };
 </script>

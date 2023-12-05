@@ -244,8 +244,8 @@ export default {
 
             // Iterar sobre las plazas asignadas y contar las dependencias
             plazasAsignadas.forEach(value => {
-                const dependency = value.dependencia.parent_dependency || value.dependencia;
-                const codigoDependencia = dependency.codigo_dependencia;
+                const dependency = value.dependencia.centro_atencion;
+                const codigoDependencia = dependency.codigo_centro_atencion;
 
                 if (dependencyCounts[codigoDependencia]) {
                     // Incrementar el recuento si la dependencia ya existe en el objeto
