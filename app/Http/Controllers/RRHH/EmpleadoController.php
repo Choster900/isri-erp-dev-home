@@ -534,6 +534,7 @@ class EmpleadoController extends Controller
             ")
             ->leftJoin('dependencia as dep', 'dependencia.dep_id_dependencia', '=', 'dep.id_dependencia')
             ->where('dependencia.id_dependencia', '!=', 1)
+            ->where('dependencia.estado_dependencia', 1)
             ->get();
 
         $jobPositionsToSelect = DetallePlaza::selectRaw("detalle_plaza.id_det_plaza as value, 
