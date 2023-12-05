@@ -151,6 +151,7 @@
 <script>
 import Modal from "@/Components-ISRI/AllModal/Modal.vue";
 import InputError from "@/Components/InputError.vue";
+import { useValidateInput } from "@/Composables/General/useValidateInput.js";
 import { useDependencia } from '@/Composables/RRHH/Dependencia/useDependencia.js';
 import { ref, toRefs, onMounted, } from 'vue';
 import InputText from "@/Components-ISRI/ComponentsToForms/InputText.vue";
