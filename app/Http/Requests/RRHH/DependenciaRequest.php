@@ -26,7 +26,7 @@ class DependenciaRequest extends FormRequest
     {
         $rules["depName"] = ['required'];
         $rules["personId"] = ['required'];
-        $rules["parentId"] = ['required'];
+        $rules["centerId"] = ['required'];
         $rules["code"] = ['required',Rule::unique('dependencia','codigo_dependencia')->ignore($this->input('id'), 'id_dependencia')];
         $rules["email"] = ['nullable', 'email'];
         $rules["phoneNumber"] = ['nullable', 'min:9'];
@@ -39,7 +39,7 @@ class DependenciaRequest extends FormRequest
         $messages["code"] = "Este codigo pertenece a otra dependencia.";
         $messages["depName.required"] = "Debe escribir el nombre de la dependencia.";
         $messages["personId.required"] = "Debe seleccionar la persona a cargo";
-        $messages["parentId.required"] = "Debe seleccionar la dependencia jerarquica.";
+        $messages["centerId.required"] = "Debe seleccionar el centro.";
         $messages["code.required"] = "Debe escribir el codigo de la dependencia.";
         $messages["email.email"] = "El formato del email es inválido.";
         $messages["phoneNumber.min"] = "Este numero no contienen la cantidad minima de digitos.";

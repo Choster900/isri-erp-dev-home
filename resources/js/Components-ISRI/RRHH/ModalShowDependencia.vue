@@ -18,8 +18,7 @@
                 </div>
             </div>
         </div>
-        <ProcessModal v-else :show="showModalDetail" @close="$emit('cerrar-modal')" :center="true" :rounded=true
-            :modal-title="'Administracion dependencias. '" maxWidth="2xl">
+        <ProcessModal v-else :show="showModalDetail" @close="$emit('cerrar-modal')" :center="true" :rounded=true maxWidth="2xl">
             <div class="px-5 py-4">
                 <div class="text-sm">
                     <div class="flex items-center justify-center bg-[#1F3558] py-1.5 rounded-t-lg mt-4">
@@ -86,7 +85,7 @@
                                     </p>
                                     <p class="text-navy-700 text-[13px] font-semibold">
                                         {{ depToShow.centro_atencion ?
-                                            depToShow.centro_atencion.codigo_dependencia : 'N/A' }}
+                                            depToShow.centro_atencion.codigo_centro_atencion : 'N/A' }}
                                     </p>
                                 </div>
                             </div>
