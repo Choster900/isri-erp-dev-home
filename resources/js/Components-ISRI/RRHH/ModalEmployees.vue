@@ -505,15 +505,31 @@ import axios from "axios";
                         <div class="mb-5 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
-                                    Dependencia <span class="text-red-600 font-extrabold">*</span>
+                                    Centro de atención <span class="text-red-600 font-extrabold">*</span>
                                 </label>
                                 <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
-                                    <Multiselect placeholder="Seleccione dependencia" v-model="employee.dependency_id"
-                                        :options="select_options.dependencies" :searchable="true" />
+                                    <Multiselect placeholder="Seleccione centro" v-model="employee.parent_id"
+                                        :options="select_options.mainCenters" :searchable="true" 
+                                        @change="employee.dependency_id=''"/>
                                     <LabelToInput icon="list" />
                                 </div>
                                 <InputError class="mt-2" :message="errors.dependency_id" />
                             </div>
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                                <label class="block mb-2 text-xs font-light text-gray-600">
+                                    Dependencia jerárquica <span class="text-red-600 font-extrabold">*</span>
+                                </label>
+                                <div class="font-semibold relative flex h-8 w-full flex-row-reverse ">
+                                    <Multiselect placeholder="Seleccione dependencia" v-model="employee.dependency_id"
+                                        :options="depsFilter" :searchable="true" />
+                                    <LabelToInput icon="list" />
+                                </div>
+                                <InputError class="mt-2" :message="errors.parent_id" />
+                            </div>
+                        </div>
+                        <!-- End first row Page4 -->
+                        <!-- Second row Page4 -->
+                        <div class="mb-5 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Plaza <span class="text-red-600 font-extrabold">*</span>
@@ -526,10 +542,6 @@ import axios from "axios";
                                 </div>
                                 <InputError class="mt-2" :message="errors.job_position_id" />
                             </div>
-                        </div>
-                        <!-- End first row Page4 -->
-                        <!-- Second row Page4 -->
-                        <div class="mb-5 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <TextInput id="salary" v-model="employee.salary" type="text"
                                     :placeholder="selectedJobPosition ? 'Salario ($' + lower_salary_limit + ' - $' + upper_salary_limit + ')' : 'Salario (Seleccione plaza)'"
@@ -539,7 +551,27 @@ import axios from "axios";
                                 </TextInput>
                                 <InputError class="mt-2" :message="errors.salary" />
                             </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+
+                        </div>
+                        <!-- End second row Page4 -->
+                        <!-- Third row Page4 -->
+                        <div class="mb-10 md:flex flex-row justify-items-start">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
+                                <TextInput id="account" v-model="employee.account" type="text" placeholder="Numero partida"
+                                    @update:modelValue="validateEmployeeInputs('account', 3, true, false)">
+                                    <LabelToInput icon="standard" forLabel="account" />
+                                </TextInput>
+                                <InputError class="mt-2" :message="errors.account" />
+                            </div>
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
+                                <TextInput id="subaccount" v-model="employee.subaccount" type="text"
+                                    placeholder="Numero subpartida"
+                                    @update:modelValue="validateEmployeeInputs('subaccount', 3, true, false)">
+                                    <LabelToInput icon="standard" forLabel="subaccount" />
+                                </TextInput>
+                                <InputError class="mt-2" :message="errors.subaccount" />
+                            </div>
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="contrato_plaza" v-model="employee.contract" type="text"
                                     placeholder="Numero contrato"
                                     @update:modelValue="validateEmployeeInputs('contract', 10, false, false)"
@@ -548,25 +580,6 @@ import axios from "axios";
                                 </TextInput>
                                 <InputError v-for="(item, index) in errors['jobPosition.contract']" :key="index"
                                     class="mt-2" :message="item" />
-                            </div>
-                        </div>
-                        <!-- End second row Page4 -->
-                        <!-- Third row Page4 -->
-                        <div class="mb-10 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="account" v-model="employee.account" type="text" placeholder="Numero partida"
-                                    @update:modelValue="validateEmployeeInputs('account', 3, true, false)">
-                                    <LabelToInput icon="standard" forLabel="account" />
-                                </TextInput>
-                                <InputError class="mt-2" :message="errors.account" />
-                            </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="subaccount" v-model="employee.subaccount" type="text"
-                                    placeholder="Numero subpartida"
-                                    @update:modelValue="validateEmployeeInputs('subaccount', 3, true, false)">
-                                    <LabelToInput icon="standard" forLabel="subaccount" />
-                                </TextInput>
-                                <InputError class="mt-2" :message="errors.subaccount" />
                             </div>
                         </div>
                         <!-- End third row Page4 -->
@@ -684,6 +697,7 @@ export default {
                 estado_empleado: '',
                 pensionado_empleado: '',
                 //Fields for 'PlazaAsignada'
+                parent_id: '',
                 dependency_id: '',
                 work_area_id: '',
                 job_position_id: '',
@@ -730,7 +744,8 @@ export default {
                 bank: [],
                 professional_title: [],
                 dependencies: [],
-                job_positions: []
+                job_positions: [],
+                mainCenters: []
             },
             config: {
                 altInput: true,
@@ -1089,6 +1104,7 @@ export default {
                 this.select_options.bank = response.data.bank
                 this.select_options.professional_title = response.data.professional_title
                 this.select_options.pension_type = response.data.pension_type
+                this.select_options.mainCenters = response.data.mainCenters
                 this.select_options.dependencies = response.data.dependencies
                 this.select_options.job_positions = response.data.job_positions
             } catch (errors) {
@@ -1175,7 +1191,6 @@ export default {
                                             this.$emit("cerrar-modal");
                                         } else {
                                             this.backend_errors = errors.response.data.errors
-                                            console.log(this.backend_errors);
                                             if (this.backend_errors['persona.dui_persona']) {
                                                 this.current_page = 1
                                             }
@@ -1260,6 +1275,7 @@ export default {
             this.select_options.bank = []
             this.select_options.professional_title = []
             this.select_options.dependencies = []
+            this.select_options.mainCenters = []
             this.select_options.job_positions = []
             this.getSelectsEmployeeModal()
         },
@@ -1308,6 +1324,12 @@ export default {
                 }
             }
         },
+        depsFilter() {
+            const result = this.select_options.dependencies.filter((element) => {
+                return element.id_centro_atencion === this.employee.parent_id
+            });
+            return result ?? [];
+        }
     }
 };
 </script>
