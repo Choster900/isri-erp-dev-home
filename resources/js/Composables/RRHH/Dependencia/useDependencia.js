@@ -13,12 +13,7 @@ export const useDependencia = (context) => {
     const mainCenters = ref([]);
     const dependencies = ref([]);
     const baseOptions = ref([]);
-    const errors = ref({
-        depName: "",
-        personId: "",
-        centerId: "",
-        code: "",
-    });
+    const errors = ref([]);
     const depInfo = ref({
         id: "",
         type: "",
