@@ -96,7 +96,7 @@
 }
 /* OPCIONES DE MULTISELECT-  DEFINIENDO TAMAÑO */
 .multiselect-tag {
-    background: #243041;
+    /* background: #243041; */
     color: var(--ms-tag-color, #fff);
     font-size: 8pt;
 }

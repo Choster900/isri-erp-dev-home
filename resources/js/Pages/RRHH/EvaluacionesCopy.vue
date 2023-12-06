@@ -28,7 +28,7 @@
                     }}</span></h2> -->
                 </div>
             </header>
-            {{ evaluaciones }}
+            <!--     -->
             <div class="overflow-x-auto">
                 <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
                     @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getEvaluaciones()">

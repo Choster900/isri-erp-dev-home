@@ -7,7 +7,7 @@
             <div class="flex flex-col md:flex-row  ">
                 <div class="w-full md:w-2/6 bg-slate-200/40 p-3 border">
                     <div class="col-span-full xl:col-span-6 bg-white shadow-lg  border border-slate-300 ">
-                        <header class="px-5 py-4 border-b-4 border-indigo-500">
+                        <header class="px-5 py-2 border-b-4 border-indigo-500">
                             <h2 class="font-semibold text-slate-800">Crear una nueva evaluación +</h2>
                         </header>
                         <div class="p-3">
@@ -15,7 +15,7 @@
                             <div class="-mx-3 flex gap-1">
                                 <div class="mb-1 px-3  w-full">
                                     <label class="block text-gray-700 text-xs font-medium mb-1" for="name">Nombre del
-                                        empleado</label>
+                                        empleado <span class="text-red-600 font-extrabold">*</span></label>
                                     <div class="relative flex h-8 w-full flex-row-reverse ">
                                         <Multiselect v-model="idEmpleado" @select="getPlazasByEmployeeIdAndDependenciaId()"
                                             :filter-results="false" :resolve-on-load="false" :delay="1000"
@@ -31,8 +31,8 @@
                             </div>
                             <div class=" flex gap-1">
                                 <div class="mb-1 -ml-3 pl-3 w-7/12">
-                                    <label class="block text-gray-700 text-xs font-medium mb-1"
-                                        for="name">Dependencia</label>
+                                    <label class="block text-gray-700 text-xs font-medium mb-1" for="name">Dependencia <span
+                                            class="text-red-600 font-extrabold">*</span></label>
                                     <div class="relative flex h-8 w-full flex-row-reverse ">
                                         <Multiselect :searchable="true" v-model="idDependencia"
                                             @select="getPlazasByEmployeeIdAndDependenciaId()" :classes="{
@@ -43,27 +43,85 @@
                                     </div>
                                 </div>
                                 <div class="mb-1 -mr-3 pr-3 w-1/2">
-                                    <label class="block text-gray-700 text-xs font-medium mb-1"
-                                        for="name">Evaluacion</label>
+                                    <div class="flex gap-1">
+                                        <label class="block text-gray-700 text-xs font-medium mb-1" for="name">Evaluacion
+                                            <svg v-if="loadingEvaluacionRendimiento" aria-hidden="true" role="status"
+                                                class="inline mr-3 w-4 h-4 text-indigo-500 animate-spin"
+                                                viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path
+                                                    d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                                    fill="#E5E7EB"></path>
+                                                <path
+                                                    d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                                    fill="currentColor"></path>
+                                            </svg>
+
+
+                                        </label>
+                                        <Tooltip bg="dark" position="right" :key="weekIndex" class="-mt-1"
+                                            v-if="!showPlazasModal && evaluationsOptions.length < 2 && !loadingEvaluacionRendimiento">
+                                            <template v-slot:contenido>
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                    stroke-width="2.5" stroke="currentColor" class="inline mr-3 w-4 h-">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                                                </svg>
+                                            </template>
+                                            <template v-slot:message>
+                                                <div class="text-xs text-slate-200">
+                                                    <table class="min-w-full w-40 border border-white">
+                                                        <tr>
+                                                            <th class="py-0.5 text-[7.5pt] w-36 px-2 border-b">Nombre de la
+                                                                Plaza</th>
+                                                        </tr>
+                                                        <tr v-for="(plaza, index) in objectPlazas" :key="index">
+                                                            <td class="py-0.5 text-[7.5pt] w-36 px-2 border-b">{{
+                                                                plaza.label }}</td>
+                                                        </tr>
+
+                                                    </table>
+                                                </div>
+                                            </template>
+                                        </Tooltip>
+                                    </div>
                                     <div class="relative flex h-8 w-full flex-row-reverse ">
                                         <Multiselect :filter-results="false" :resolve-on-load="false" :delay="1000"
+                                            v-model="idEvaluacionRendimiento" :disabled="!showPlazasModal"
                                             :searchable="true" :clear-on-search="true" :min-chars="5" placeholder=""
                                             :classes="{
                                                 placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                            }" noOptionsText="<p class='text-xs'>Sin Personas<p>"
-                                            noResultsText="<p class='text-xs'>Sin resultados de personas <p>"
-                                            :options="[{ value: '1', label: 'F22 V1.0' }, { value: '2', label: 'F21 V1.0' }, { value: '3', label: 'F23 V1.0' }]" />
+                                            }" noOptionsText="<p class='text-xs'>Sin evaluaciones<p>"
+                                            noResultsText="<p class='text-xs'>Sin resultados de evaluaciones <p>"
+                                            :options="evaluationsOptions" />
                                     </div>
                                 </div>
                             </div>
+                            <InputError v-if="doesntExistResult" class="mt-1 px-2"
+                                message="No hay plazas disponibles para la dependencia seleccionada." />
 
+                            <div class="-mx-3 flex gap-1" v-if="showPlazasModal">
+                                <div class="mb-1 px-3  w-full">
+                                    <label class="block text-gray-700 text-xs font-medium mb-1" for="name">Todas las plazas
+                                        <span class="text-red-600 font-extrabold">*</span></label>
+                                    <Multiselect mode="tags" placeholder="Seleccione las plazas a evaluar"
+                                        :close-on-select="false" v-model="objectPlazas" @select="handleTagToSelect"
+                                        noOptionsText="<p class='text-xs'>No hay resultado de plaza<p>"
+                                        noResultsText="<p class='text-xs'>Vacio <p>" :classes="{
+                                            wrapper: 'relative mx-auto w-full flex items-center justify-end box-border cursor-pointer outline-none',
+                                            container: 'text-xs relative mx-auto w-full flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none',
+                                            placeholder: 'text-xs flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                        }"  :object="true" :options="plazaOptions" />
+                                </div>
+                            </div>
+                            <InputError v-if="existMoreThanOne" class="mt-1 px-2"
+                                message="La dependencia tiene múltiples tipos de plazas. Por favor, seleccione una evaluación y las plazas que desea evaluar." />
                             <div class="-mx-3 flex py-1">
                                 <div class="mb-1 px-3 w-full">
                                     <div class="mb-4 md:mr-0 md:mb-0 basis-1/2">
                                         <label class="block text-gray-700 text-xs font-medium mb-1" for="name">Fecha [Desde
-                                            - Hasta]</label>
+                                            - Hasta] <span class="text-red-600 font-extrabold">*</span></label>
                                         <div class="relative flex">
-                                            <flat-pickr
+                                            <flat-pickr v-model="fechaInicioFechafin"
                                                 class="text-xs cursor-pointer rounded-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none w-full"
                                                 :config="configSecondInput" :placeholder="'Seleccione Fecha Inicial'" />
                                         </div>
@@ -72,23 +130,25 @@
                             </div>
                             <div class="mx-0.5 mt-2">
                                 <label class="block text-gray-700 text-xs font-medium mb-1" for="name">
-                                    Tipo evaluacion
+                                    Tipo evaluacion <span class="text-red-600 font-extrabold">*</span>
                                 </label>
                                 <div class="flex flex-wrap items-center -m-3">
                                     <div class="m-3">
                                         <label class="flex items-center">
-                                            <input type="radio" name="radio-buttons" class="form-radio" checked="">
+                                            <input type="radio" name="radio-buttons" v-model="idTipoEvaluacion"
+                                                class="form-radio" checked="" value="1">
                                             <span class="text-sm ml-2 text-selection-disable">Desempeño</span></label>
                                     </div>
                                     <div class="m-3">
                                         <label class="flex items-center">
-                                            <input type="radio" name="radio-buttons" class="form-radio">
+                                            <input type="radio" name="radio-buttons" v-model="idTipoEvaluacion"
+                                                class="form-radio" value="2">
                                             <span class="text-sm ml-2 text-selection-disable">Periodo de
                                                 prueba</span></label>
                                     </div>
                                 </div>
                             </div>
-                            <button
+                            <button @click="createPersonalEvaluationRequest"
                                 class="bg-indigo-900 rounded-sm shadow text-center text-white text-sm font-light w-full py-1 mt-5">Crear
                                 una nueva evaluación</button>
 
@@ -96,7 +156,7 @@
                     </div>
 
                     <div
-                        class="h-[270px] overflow-y-auto col-span-full xl:col-span-6 bg-white shadow-lg  border border-slate-300">
+                        class="h-[290px] overflow-y-auto col-span-full xl:col-span-6 bg-white shadow-lg  border border-slate-300">
                         <div class="p-3">
                             <div class="max-h-[250px] ">
                                 <article class="pt-4 border-b border-slate-200" v-for="i in 3" :key="i">
@@ -156,11 +216,8 @@
 
                     <!-- With Icons -->
                     <div class="mx-6 mt-2">
-                        <h2 class="flex gap-2 text-xl text-slate-800 font-bold mb-6">Evaluación del desempeño para
-                            personal
-                            administrativo
-                        </h2>
-
+                        <h2 class="flex gap-2 text-xl text-slate-800 font-medium mb-6">Evaluación de Desempeño para Personal
+                            Administrativo</h2>
                         <div class="mb-1 border-b border-slate-200">
                             <ul class="text-sm font-medium flex flex-nowrap -mx-4 sm:-mx-6 lg:-mx-8 ">
                                 <li
@@ -212,6 +269,43 @@
                         :registroEvaluacionRendimientoPersonal="registroEvaluacionRendimientoPersonal"
                         :info-employee="registrosEvaluacionesRentimientoPersonal"
                         @actualizar-table-data="$emit('cerrar-modal')" :showMe="toShow" /> -->
+
+                    <!--  <ModalMorenThanOneTipo :showPlazasModal="showPlazasModal" @choose-another="showPlazasModal = false"
+                        :objectPlazas="objectPlazas" :objectEvaluaciones="objectEvaluaciones" /> -->
+
+                        <div class="m-1.5">
+                    <!-- Start -->
+                    <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" aria-controls="danger-modal" @click.stop="dangerModalOpen = true">Danger Modal</button>
+                    <ModalBlank id="danger-modal" :modalOpen="dangerModalOpen" @close-modal="dangerModalOpen = false">
+                      <div class="p-5 flex space-x-4">
+                        <!-- Icon -->
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-rose-100">
+                          <svg class="w-4 h-4 shrink-0 fill-current text-rose-500" viewBox="0 0 16 16">
+                            <path d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z" />
+                          </svg>
+                        </div>
+                        <!-- Content -->
+                        <div>
+                          <!-- Modal header -->
+                          <div class="mb-2">
+                            <div class="text-lg font-semibold text-slate-800">Delete 1 customer?</div>
+                          </div>
+                          <!-- Modal content -->
+                          <div class="text-sm mb-10">
+                            <div class="space-y-2">
+                              <p>Semper eget duis at tellus at urna condimentum mattis pellentesque lacus suspendisse faucibus interdum.</p>
+                            </div>
+                          </div>
+                          <!-- Modal footer -->
+                          <div class="flex flex-wrap justify-end space-x-2">
+                            <button class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600" @click.stop="dangerModalOpen = false">Cancel</button>
+                            <button class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">Yes, Delete it</button>
+                          </div>
+                        </div>
+                      </div>
+                    </ModalBlank>
+                    <!-- End -->
+                  </div>
                 </div>
             </div>
         </ProcessModal>
@@ -227,10 +321,14 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue';
 import DocumentoEvaluacion from '../DocumentoEvaluacion.vue';
 import { useEvaluacion } from '@/Composables/RRHH/Evaluaciones/useEvaluacion';
-import { ref, toRefs } from 'vue';
+import { onMounted, ref, toRefs } from 'vue';
 import AccordionBasic from '@/Components-ISRI/AccordionBasic.vue';
+import ModalMorenThanOneTipo from './ModalMorenThanOneTipo.vue';
+import ModalBlank from '@/Components-ISRI/AllModal/ModalBlank.vue';
+
 export default {
-    components: { Tooltip, moment, ProcessModal, Modal, DocumentoEvaluacion, AccordionBasic },
+    components: { Tooltip, moment,ModalBlank,
+         ProcessModal, Modal, DocumentoEvaluacion, AccordionBasic, ModalMorenThanOneTipo },
     emit: ["cerrar-modal"],
     props: {
         showModal: { type: Boolean, default: false, },
@@ -239,9 +337,8 @@ export default {
     setup(props) {
         const configSecondInput = ref({
             mode: 'range',
-            wrap: true, // set wrap to true only when using 'input-group'
+            wrap: true,
             altInput: true,
-            monthSelectorType: 'static',
             altFormat: 'M j, Y',
             dateFormat: "Y-m-d",
             disableMobile: "true",
@@ -259,22 +356,24 @@ export default {
             },
         })
         const { listDependencias } = toRefs(props)
-        const { handleEmployeeSearch, idEmpleado, getPlazasByEmployeeIdAndDependenciaId, idDependencia } = useEvaluacion();
+        const { handleEmployeeSearch, idEmpleado, objectPlazas, evaluationsOptions, existMoreThanOne, handleTagToSelect,
+            objectEvaluaciones, fechaInicioFechafin, getPlazasByEmployeeIdAndDependenciaId, plazaOptions, idTipoEvaluacion, showPlazasModal, createPersonalEvaluationRequest, loadingEvaluacionRendimiento, idDependencia, idEvaluacionRendimiento, doesntExistResult } = useEvaluacion();
         const activeIndex = ref(0);
         const activeContent = ref(0);
-
-
+        const dangerModalOpen = ref(false);
         return {
+            dangerModalOpen,
             listDependencias,
-            configSecondInput,
-            activeIndex, activeContent, getPlazasByEmployeeIdAndDependenciaId,
-            handleEmployeeSearch, idEmpleado, idDependencia
+            configSecondInput, idEvaluacionRendimiento, objectPlazas, existMoreThanOne, handleTagToSelect,
+            objectEvaluaciones, fechaInicioFechafin,
+            activeIndex, activeContent, getPlazasByEmployeeIdAndDependenciaId, plazaOptions, showPlazasModal, evaluationsOptions,
+            handleEmployeeSearch, idEmpleado, idDependencia, doesntExistResult, createPersonalEvaluationRequest, idTipoEvaluacion, loadingEvaluacionRendimiento
         }
     }
 
 }
 </script>
-<style scoped>
+<style >
 .accordion-content {
     overflow: hidden;
     transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
@@ -287,5 +386,59 @@ export default {
     /* Un valor suficientemente grande */
     /* Ajusta este valor según sea necesario */
     opacity: 1;
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+    background: #001b47;
+    border: none;
+    border-radius: 20px;
+    box-sizing: border-box;
+    color: inherit;
+    cursor: pointer;
+    appearance: none;
+    font-size: 12pt;
+    padding: 10px;
+    font-family: inherit;
+    font-weight: 300;
+    height: auto;
+    line-height: inherit;
+    margin: -1px 0 0 0;
+    outline: none;
+    padding: 0 0 0 0.5ch;
+    position: relative;
+    vertical-align: initial;
+    -webkit-box-sizing: border-box;
+
+    width: auto;
+}
+
+
+.flatpickr-current-month input.cur-year {
+    background: transparent;
+    box-sizing: border-box;
+    color: inherit;
+    cursor: text;
+    padding: 0 0 0 0.1ch;
+    margin: 0;
+    display: inline-block;
+    font-size: 12pt;
+    font-family: inherit;
+    font-weight: 300;
+    line-height: inherit;
+    height: auto;
+    border: 0;
+    border-radius: 0;
+    vertical-align: initial;
+    -webkit-appearance: textfield;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+:root {
+    --ms-tag-bg: #0d2141;
+    --ms-tag-font-weight: 300;
+    --ms-tag-color: #ffffff;
+    --ms-tag-font-size: 0.875rem;
+
 }
 </style>

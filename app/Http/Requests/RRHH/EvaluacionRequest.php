@@ -25,7 +25,6 @@ class EvaluacionRequest extends FormRequest
     {
         return [
             'id_empleado'                 => 'required',
-            //   'fecha_evaluacion_personal'   => 'required',
             'id_evaluacion_rendimiento'   => 'required',
             'periodo_evaluacion_personal' => 'required',
         ];
@@ -33,12 +32,12 @@ class EvaluacionRequest extends FormRequest
 
     public function messages()
     {
-        return [
+        /* return [
             'id_empleado.required'                 => 'Debe seleccionar empleado',
             // 'fecha_evaluacion_personal.required'   => 'Requerido',
             'id_evaluacion_rendimiento.required'   => 'El tipo de evaluacion es requerido',
             'periodo_evaluacion_personal.required' => 'Ingrese un perdiodo',
 
-        ];
+        ]; */
     }
 }
