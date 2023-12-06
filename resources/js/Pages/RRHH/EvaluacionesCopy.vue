@@ -1,7 +1,3 @@
-<!-- <script setup>
-
-</script>
- -->
 <template>
     <Head title="RRHH - Evaluacion del personal" />
     <AppLayoutVue nameSubModule="RRHH - Evaluacion del personal">

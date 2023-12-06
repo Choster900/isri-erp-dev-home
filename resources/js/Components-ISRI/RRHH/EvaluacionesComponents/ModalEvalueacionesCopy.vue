@@ -37,14 +37,15 @@
                                         <Multiselect :searchable="true" v-model="idDependencia"
                                             @select="getPlazasByEmployeeIdAndDependenciaId()" :classes="{
                                                 placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                            }" noOptionsText="<p class='text-xs'>Sin Personas<p>"
-                                            noResultsText="<p class='text-xs'>Sin resultados de personas <p>"
+                                            }" noOptionsText="<p class='text-xs'>Sin dependencias<p>"
+                                            noResultsText="<p class='text-xs'>Sin resultados de dependencias <p>"
                                             :options="listDependencias" />
                                     </div>
                                 </div>
                                 <div class="mb-1 -mr-3 pr-3 w-1/2">
                                     <div class="flex gap-1">
                                         <label class="block text-gray-700 text-xs font-medium mb-1" for="name">Evaluacion
+                                            <span class="text-red-600 font-extrabold">*</span>
                                             <svg v-if="loadingEvaluacionRendimiento" aria-hidden="true" role="status"
                                                 class="inline mr-3 w-4 h-4 text-indigo-500 animate-spin"
                                                 viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -104,13 +105,15 @@
                                     <label class="block text-gray-700 text-xs font-medium mb-1" for="name">Todas las plazas
                                         <span class="text-red-600 font-extrabold">*</span></label>
                                     <Multiselect mode="tags" placeholder="Seleccione las plazas a evaluar"
+                                        :disabled="idEvaluacionRendimiento == '' || idEvaluacionRendimiento == null"
                                         :close-on-select="false" v-model="objectPlazas" @select="handleTagToSelect"
                                         noOptionsText="<p class='text-xs'>No hay resultado de plaza<p>"
                                         noResultsText="<p class='text-xs'>Vacio <p>" :classes="{
+                                            containerDisabled: 'cursor-default bg-gray-100',
                                             wrapper: 'relative mx-auto w-full flex items-center justify-end box-border cursor-pointer outline-none',
                                             container: 'text-xs relative mx-auto w-full flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none',
                                             placeholder: 'text-xs flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                        }"  :object="true" :options="plazaOptions" />
+                                        }" :object="true" :options="plazaOptions" />
                                 </div>
                             </div>
                             <InputError v-if="existMoreThanOne" class="mt-1 px-2"
@@ -273,39 +276,35 @@
                     <!--  <ModalMorenThanOneTipo :showPlazasModal="showPlazasModal" @choose-another="showPlazasModal = false"
                         :objectPlazas="objectPlazas" :objectEvaluaciones="objectEvaluaciones" /> -->
 
-                        <div class="m-1.5">
-                    <!-- Start -->
-                    <button class="btn bg-indigo-500 hover:bg-indigo-600 text-white" aria-controls="danger-modal" @click.stop="dangerModalOpen = true">Danger Modal</button>
-                    <ModalBlank id="danger-modal" :modalOpen="dangerModalOpen" @close-modal="dangerModalOpen = false">
-                      <div class="p-5 flex space-x-4">
-                        <!-- Icon -->
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-rose-100">
-                          <svg class="w-4 h-4 shrink-0 fill-current text-rose-500" viewBox="0 0 16 16">
-                            <path d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z" />
-                          </svg>
-                        </div>
-                        <!-- Content -->
-                        <div>
-                          <!-- Modal header -->
-                          <div class="mb-2">
-                            <div class="text-lg font-semibold text-slate-800">Delete 1 customer?</div>
-                          </div>
-                          <!-- Modal content -->
-                          <div class="text-sm mb-10">
-                            <div class="space-y-2">
-                              <p>Semper eget duis at tellus at urna condimentum mattis pellentesque lacus suspendisse faucibus interdum.</p>
+
+                    <ModalBlank id="danger-modal" :modalOpen="showMessageAlert">
+                        <div class="p-5 flex space-x-4">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-orange-100">
+                                <svg class="w-4 h-4 shrink-0 fill-current text-orange-500" viewBox="0 0 16 16">
+                                    <path
+                                        d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z" />
+                                </svg>
                             </div>
-                          </div>
-                          <!-- Modal footer -->
-                          <div class="flex flex-wrap justify-end space-x-2">
-                            <button class="btn-sm border-slate-200 hover:border-slate-300 text-slate-600" @click.stop="dangerModalOpen = false">Cancel</button>
-                            <button class="btn-sm bg-rose-500 hover:bg-rose-600 text-white">Yes, Delete it</button>
-                          </div>
+                            <div>
+                                <div class="mb-2">
+                                    <div class="text-lg font-semibold text-slate-800">¿Agregar plaza para evaluar?</div>
+                                </div>
+                                <div class="text-sm">
+                                    <div class="space-y">
+                                        <p v-html="messageAlert"></p>
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap justify-end space-x-2">
+                                    <button @click="handleCancel"
+                                        class="btn-sm border border-slate-300 hover:border-slate-400 text-slate-600">Cancelar</button>
+                                    <button @click="handleAccept"
+                                        class="btn-sm border border-transparent bg-orange-500 hover:bg-orange-600 text-white">Sí,
+                                        evaluar</button>
+                                </div>
+                            </div>
                         </div>
-                      </div>
                     </ModalBlank>
-                    <!-- End -->
-                  </div>
+
                 </div>
             </div>
         </ProcessModal>
@@ -327,8 +326,10 @@ import ModalMorenThanOneTipo from './ModalMorenThanOneTipo.vue';
 import ModalBlank from '@/Components-ISRI/AllModal/ModalBlank.vue';
 
 export default {
-    components: { Tooltip, moment,ModalBlank,
-         ProcessModal, Modal, DocumentoEvaluacion, AccordionBasic, ModalMorenThanOneTipo },
+    components: {
+        Tooltip, moment, ModalBlank,
+        ProcessModal, Modal, DocumentoEvaluacion, AccordionBasic, ModalMorenThanOneTipo
+    },
     emit: ["cerrar-modal"],
     props: {
         showModal: { type: Boolean, default: false, },
@@ -356,15 +357,15 @@ export default {
             },
         })
         const { listDependencias } = toRefs(props)
-        const { handleEmployeeSearch, idEmpleado, objectPlazas, evaluationsOptions, existMoreThanOne, handleTagToSelect,
+        const { handleEmployeeSearch, idEmpleado, objectPlazas, evaluationsOptions, existMoreThanOne, handleTagToSelect, messageAlert, showMessageAlert, handleAccept, handleCancel,
             objectEvaluaciones, fechaInicioFechafin, getPlazasByEmployeeIdAndDependenciaId, plazaOptions, idTipoEvaluacion, showPlazasModal, createPersonalEvaluationRequest, loadingEvaluacionRendimiento, idDependencia, idEvaluacionRendimiento, doesntExistResult } = useEvaluacion();
         const activeIndex = ref(0);
         const activeContent = ref(0);
         const dangerModalOpen = ref(false);
         return {
-            dangerModalOpen,
-            listDependencias,
-            configSecondInput, idEvaluacionRendimiento, objectPlazas, existMoreThanOne, handleTagToSelect,
+            dangerModalOpen, showMessageAlert,
+            listDependencias, handleAccept, handleCancel,
+            configSecondInput, idEvaluacionRendimiento, objectPlazas, existMoreThanOne, handleTagToSelect, messageAlert,
             objectEvaluaciones, fechaInicioFechafin,
             activeIndex, activeContent, getPlazasByEmployeeIdAndDependenciaId, plazaOptions, showPlazasModal, evaluationsOptions,
             handleEmployeeSearch, idEmpleado, idDependencia, doesntExistResult, createPersonalEvaluationRequest, idTipoEvaluacion, loadingEvaluacionRendimiento

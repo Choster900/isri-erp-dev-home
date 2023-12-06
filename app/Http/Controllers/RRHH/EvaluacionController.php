@@ -170,10 +170,35 @@ class EvaluacionController extends Controller {
             })->doesntHave("plaza_evaluada")
             ->get();
 
+
+        // Obtener evaluaciones de rendimiento con información de tipo de plaza
+        $evaluacionRendimiento = $evaluacion->map(function ($item) {
+            $tipoPlaza = $item->detalle_plaza->plaza->tipo_plaza;
+            $evaluaciones = $tipoPlaza->evaluaciones_rendimientos->map(function ($evaluacion) use ($tipoPlaza) {
+                return [
+                    'id_evaluacion_rendimiento'        => $evaluacion->id_evaluacion_rendimiento,
+                    'codigo_evaluacion_rendimiento'    => $evaluacion->codigo_evaluacion_rendimiento,
+                    'nombre_evaluacion_rendimiento'    => $evaluacion->nombre_evaluacion_rendimiento,
+                    'version_evaluacion_rendimiento'   => $evaluacion->version_evaluacion_rendimiento,
+                    'estado_evaluacion_rendimiento'    => $evaluacion->estado_evaluacion_rendimiento,
+                    'fecha_reg_evaluacion_rendimiento' => $evaluacion->fecha_reg_evaluacion_rendimiento,
+                    'fecha_mod_evaluacion_rendimiento' => $evaluacion->fecha_mod_evaluacion_rendimiento,
+                    'usuario_evaluacion_rendimiento'   => $evaluacion->usuario_evaluacion_rendimiento,
+                    'ip_evaluacion_rendimiento'        => $evaluacion->ip_evaluacion_rendimiento,
+                    'tipo_plaza'                       => [
+                        'id_tipo_plaza'     => $tipoPlaza->id_tipo_plaza,
+                        'nombre_tipo_plaza' => $tipoPlaza->nombre_tipo_plaza,
+                    ],
+                ];
+            });
+
+            return $evaluaciones;
+        })->flatten(1)->unique('id_evaluacion_rendimiento');
+
         // Obtener evaluaciones de rendimiento sin repetir
-        $evaluacionRendimiento = $evaluacion->flatMap(function ($item) {
+        /* $evaluacionRendimiento = $evaluacion->flatMap(function ($item) {
             return $item->detalle_plaza->plaza->tipo_plaza->evaluaciones_rendimientos;
-        })->unique('id_tipo_plaza');
+        })->unique('id_tipo_plaza'); */
 
         $cantidadEvaluacionesRendimiento = $evaluacionRendimiento->count();
 
