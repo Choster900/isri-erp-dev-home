@@ -17,6 +17,7 @@ use App\Http\Controllers\RRHH\ReporteRRHHController;
 use App\Http\Controllers\RRHH\SolicitudPermisoController;
 use App\Http\Controllers\RRHH\SubDirectorMedicoController;
 use App\Models\ArchivoAnexo;
+use App\Models\Dependencia;
 use App\Models\EvaluacionRendimiento;
 use App\Models\Persona;
 use App\Models\TipoArchivoAnexo;
@@ -114,10 +115,15 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get(
         '/rrhh/evaluaciones',
         function (Request $request) {
-            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/evaluaciones', 'RRHH/Evaluaciones');
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/evaluaciones', 'RRHH/EvaluacionesCopy');
         }
     )->name('rrhh.evaluaciones');
     Route::post('evaluaciones', [EvaluacionController::class, 'getEvaluaciones'])->name('evaluaciones.getEvaluaciones');
+    Route::post('getAllPlazasByEmployeeIdAndDependenciaId', [EvaluacionController::class, 'getPlazaAsignadaByUserAndDependencia'])->name('evaluaciones.getPlazaAsignadaByUser');
+
+    Route::get('getAllDependencias', function () {
+        return Dependencia::where('dep_id_dependencia',null)->get();
+    })->name('expediente.deleteArchivoAnexoById');
     Route::post('search-employees-for-evaluations', [EvaluacionController::class, 'searchEmployeesForNewEvaluationRequest'])->name('evaluaciones.search-employees');
     Route::post('create-new-evaluacion', [EvaluacionController::class, 'createNewEvaluation'])->name('evaluaciones.new-evaluacion');
     Route::post('get-evaluacion', [EvaluacionController::class, 'getPersonalPerformanceEvaluationVersion'])->name('evaluaciones.get-evaluacion');

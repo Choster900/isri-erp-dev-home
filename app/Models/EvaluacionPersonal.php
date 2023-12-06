@@ -53,4 +53,13 @@ class EvaluacionPersonal extends Model
     {
         return $this->hasMany(IncidenteEvaluacion::class, 'id_evaluacion_personal', 'id_evaluacion_personal');
     }
+    /**
+     * Get all of the plaza_evaluada for the EvaluacionPersonal
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function plaza_evaluada(): HasMany
+    {
+        return $this->hasMany(PlazaEvaluada::class, 'id_evaluacion_personal', 'id_evaluacion_personal');
+    }
 }

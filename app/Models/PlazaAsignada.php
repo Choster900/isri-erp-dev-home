@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PlazaAsignada extends Model
 {
@@ -47,5 +48,14 @@ class PlazaAsignada extends Model
     public function motivo_desvinculo_laboral()
     {
         return $this->belongsTo(MotivoDesvinculoLaboral::class,'id_motivo_desvinculo_laboral','id_motivo_desvinculo_laboral');
+    }
+    /**
+     * Get all of the plazaEvaluada for the PlazaAsignada
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function plaza_evaluada(): HasMany
+    {
+        return $this->hasMany(PlazaEvaluada::class, 'id_plaza_asignada', 'id_plaza_asignada');
     }
 }
