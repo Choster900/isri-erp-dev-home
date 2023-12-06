@@ -56,6 +56,15 @@ class Persona extends Model
         return $this->hasOne('App\Models\User', 'id_persona', 'id_persona');
     }
     /**
+     * Get all of the dependencias for the Persona
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function dependencias(): HasMany
+    {
+        return $this->hasMany(Dependencia::class, 'id_persona', 'id_persona');
+    }
+    /**
      * Get the genero that owns the Persona
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

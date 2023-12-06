@@ -16,6 +16,7 @@ class Dependencia extends Model
     protected $fillable = [
         'dep_id_dependencia',
         'id_tipo_dependencia',
+        'dep_id_dependencia',
         'id_centro_atencion',
         'id_persona',
         'jerarquia_organizacion_dependencia',
