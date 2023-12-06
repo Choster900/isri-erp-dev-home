@@ -25,6 +25,7 @@ class PlazaAsignadaRequest extends FormRequest
     public function rules()
     {
         $rules["jobPosition.dependencyId"] = ['required'];
+        $rules["jobPosition.parentId"] = ['required'];
         $rules["jobPosition.jobPositionId"] = ['required'];
         $rules["jobPosition.salary"] = ['required', 'numeric', 'between:' . $this->lowerSalaryLimit . ',' . $this->upperSalaryLimit];
         $rules["jobPosition.account"] = ['required'];
@@ -36,7 +37,8 @@ class PlazaAsignadaRequest extends FormRequest
 
     public function messages()
     {
-        $messages["jobPosition.dependencyId.required"] = "Debe seleccionar la dependencia.";
+        $messages["jobPosition.parentId.required"] = "Debe seleccionar el centro.";
+        $messages["jobPosition.dependencyId.required"] = "Debe seleccionar la dependencia jerárquica.";
         $messages["jobPosition.jobPositionId.required"] = "Debe seleccionar el puesto de trabajo.";
         $messages["jobPosition.salary.required"] = "Debe escribir el salario.";
         $messages["jobPosition.account.required"] = "Debe escribir el numero de partida.";

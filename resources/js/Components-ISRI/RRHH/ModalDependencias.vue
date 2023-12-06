@@ -34,6 +34,44 @@
                     <!-- Second row -->
                     <div class="mb-4 md:flex flex-row justify-items-start">
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                            <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Centro de
+                                atención
+                                <span class="text-red-600 font-extrabold">*</span>
+                            </label>
+                            <div class="font-semibold relative flex h-10 w-full flex-row-reverse ">
+                                <Multiselect placeholder="Seleccione centro" v-model="depInfo.centerId"
+                                    :options="mainCenters" :searchable="true" :noResultsText="'Sin resultados'" :noOptionsText="'Sin resultados'" 
+                                    @change="depInfo.parentId = ''"/>
+                                <div class="flex items-center px-2 pointer-events-none border rounded-l-md border-gray-300">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-[#001c48]">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <InputError v-for="(item, index) in errors.centerId" :key="index" class="mt-2"
+                                :message="item" />
+                        </div>
+                        <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                            <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Dependencia
+                                jerarquica <span class="text-red-600 font-extrabold">*</span>
+                            </label>
+                            <div class="relative font-semibold flex h-10 w-full flex-row-reverse">
+                                <Multiselect v-model="depInfo.parentId" :options="depFilter" :searchable="true"
+                                    placeholder="Seleccione centro" :disabled="depInfo.jerarquia === 0" />
+                                <div class="flex items-center px-2 pointer-events-none border rounded-l-md border-gray-300">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-[#001c48]">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-4 md:flex flex-row justify-items-start">
+                        <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                             <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Empleado a cargo
                                 <span class="text-red-600 font-extrabold">*</span>
                             </label>
@@ -44,10 +82,16 @@
                                     @search-change="handleSearchChange" :clear-on-search="true"
                                     :noResultsText="'Sin resultados'" :noOptionsText="'Sin resultados'" />
                                 <div class="flex items-center px-2 pointer-events-none border rounded-l-md border-gray-300">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                        stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-[#001c48]">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                                    <svg class="w-5 h-5 text-[#001c48] dark:text-gray-600" viewBox="0 0 24 24" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                        <g id="SVGRepo_iconCarrier">
+                                            <rect width="24" height="24" fill="white"></rect>
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12ZM11.9999 6C9.79077 6 7.99991 7.79086 7.99991 10C7.99991 12.2091 9.79077 14 11.9999 14C14.209 14 15.9999 12.2091 15.9999 10C15.9999 7.79086 14.209 6 11.9999 6ZM17.1115 15.9974C17.8693 16.4854 17.8323 17.5491 17.1422 18.1288C15.7517 19.2966 13.9581 20 12.0001 20C10.0551 20 8.27215 19.3059 6.88556 18.1518C6.18931 17.5723 6.15242 16.5032 6.91351 16.012C7.15044 15.8591 7.40846 15.7251 7.68849 15.6097C8.81516 15.1452 10.2542 15 12 15C13.7546 15 15.2018 15.1359 16.3314 15.5954C16.6136 15.7102 16.8734 15.8441 17.1115 15.9974Z"
+                                                fill="currentColor"></path>
+                                        </g>
                                     </svg>
                                 </div>
                             </div>
@@ -55,46 +99,61 @@
                                 :message="item" />
                         </div>
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                            <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Dependencia
-                                jerarquica
+                            <input-text label="Correo" iconName="email" id="email" v-model="depInfo.email" type="text"
+                                placeholder="Correo dependencia" :validation="{ limit: 35 }">
+                            </input-text>
+                            <InputError v-for="(item, index) in errors.email" :key="index" class="mt-2" :message="item" />
+                        </div>
+                    </div>
+                    <div class="mb-4 md:flex flex-row justify-items-start">
+                        <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                            <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Empleado a cargo
                                 <span class="text-red-600 font-extrabold">*</span>
                             </label>
-                            <div class="relative font-semibold flex h-10 w-full flex-row-reverse">
-                                <Multiselect v-model="depInfo.parentId" :options="mainCenters" :searchable="true"
-                                    placeholder="Seleccione centro" :disabled="depInfo.jerarquia === 0" />
+                            <div class="font-semibold relative flex h-10 w-full flex-row-reverse ">
+                                <Multiselect placeholder="Digite nombre empleado" v-model="depInfo.personId"
+                                    :options="load && depInfo.id ? baseOptions : employees" :searchable="true"
+                                    :loading="isLoadingEmployee" :internal-search="false"
+                                    @search-change="handleSearchChange" :clear-on-search="true"
+                                    :noResultsText="'Sin resultados'" :noOptionsText="'Sin resultados'" />
                                 <div class="flex items-center px-2 pointer-events-none border rounded-l-md border-gray-300">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                        stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-[#001c48]">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                                    <svg class="w-5 h-5 text-[#001c48] dark:text-gray-600" viewBox="0 0 24 24" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                        <g id="SVGRepo_iconCarrier">
+                                            <rect width="24" height="24" fill="white"></rect>
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12ZM11.9999 6C9.79077 6 7.99991 7.79086 7.99991 10C7.99991 12.2091 9.79077 14 11.9999 14C14.209 14 15.9999 12.2091 15.9999 10C15.9999 7.79086 14.209 6 11.9999 6ZM17.1115 15.9974C17.8693 16.4854 17.8323 17.5491 17.1422 18.1288C15.7517 19.2966 13.9581 20 12.0001 20C10.0551 20 8.27215 19.3059 6.88556 18.1518C6.18931 17.5723 6.15242 16.5032 6.91351 16.012C7.15044 15.8591 7.40846 15.7251 7.68849 15.6097C8.81516 15.1452 10.2542 15 12 15C13.7546 15 15.2018 15.1359 16.3314 15.5954C16.6136 15.7102 16.8734 15.8441 17.1115 15.9974Z"
+                                                fill="currentColor"></path>
+                                        </g>
                                     </svg>
                                 </div>
                             </div>
-                            <InputError v-for="(item, index) in errors.parentId" :key="index" class="mt-2"
+                            <InputError v-for="(item, index) in errors.personId" :key="index" class="mt-2"
                                 :message="item" />
+                        </div>
+                        <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                            <input-text label="Correo" iconName="email" id="email" v-model="depInfo.email" type="text"
+                                placeholder="Correo dependencia" :validation="{ limit: 35 }">
+                            </input-text>
+                            <InputError v-for="(item, index) in errors.email" :key="index" class="mt-2" :message="item" />
                         </div>
                     </div>
                     <!-- Third row -->
                     <div class="mb-4 md:flex flex-row justify-items-start">
-                        <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
+                        <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                             <input-text :required="true" label="Código dependencia" iconName="code" id="code"
                                 v-model="depInfo.code" type="text" placeholder="Código dependencia"
                                 :validation="{ limit: 16, upper: true }">
                             </input-text>
                             <InputError v-for="(item, index) in errors.code" :key="index" class="mt-2" :message="item" />
                         </div>
-                        <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
+                        <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                             <input-text label="Teléfono" iconName="oldPhone" id="phone" v-model="depInfo.phoneNumber"
                                 type="text" placeholder="Número de teléfono" :validation="{ limit: 9, phoneNumber: true }">
                             </input-text>
                             <InputError v-for="(item, index) in errors.phoneNumber" :key="index" class="mt-2"
-                                :message="item" />
-                        </div>
-                        <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                            <input-text label="Correo" iconName="email" id="email" v-model="depInfo.email" type="text"
-                                placeholder="Correo dependencia" :validation="{ limit: 35 }">
-                            </input-text>
-                            <InputError v-for="(item, index) in errors.email" :key="index" class="mt-2"
                                 :message="item" />
                         </div>
                     </div>
@@ -161,6 +220,7 @@ export default {
             employees,
             asyncFindEmployee,
             errors,
+            depFilter,
             getInfoForModalDependencias,
             fetchData,
             storeDependency,
@@ -198,6 +258,7 @@ export default {
             load,
             errors,
             urlToSearch,
+            depFilter,
             handleSearchChange,
             getInfoForModalDependencias,
             storeDependency,

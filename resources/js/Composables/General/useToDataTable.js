@@ -8,6 +8,7 @@ export const useToDataTable = (columns, requestUrl, columnToSort, dir) => {
     const swal = inject("$swal");
     const sortOrders = ref([]);
     const isLoadinRequest = ref(false);
+    const isLoadingTop = ref(false);
     const emptyObject = ref(null);
     const dataToShow = ref([]);
     const links = ref([]);
@@ -42,8 +43,8 @@ export const useToDataTable = (columns, requestUrl, columnToSort, dir) => {
             showCloseButton: true,
         }).then(async (result) => {
             if (result.isConfirmed) {
+                isLoadingTop.value = true;
                 try {
-                    isLoadinRequest.value = true;
                     const response = await axios.post(url, {
                         id: elementId,
                         status: status
@@ -64,7 +65,7 @@ export const useToDataTable = (columns, requestUrl, columnToSort, dir) => {
                         showErrorMessage(err);
                     }
                 } finally {
-                    isLoadinRequest.value = false;
+                    isLoadingTop.value = false;
                     getDataToShow()
                 }
             }
@@ -131,6 +132,7 @@ export const useToDataTable = (columns, requestUrl, columnToSort, dir) => {
         links,
         perPage,
         isLoadinRequest,
+        isLoadingTop,
         changeStatusElement,
         sortBy,
         getDataToShow,

@@ -1,4 +1,4 @@
-import { ref, inject } from "vue";
+import { ref, inject, computed } from "vue";
 import axios from "axios";
 import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
@@ -11,17 +11,14 @@ export const useDependencia = (context) => {
     const isLoadingEmployee = ref(false);
     const employees = ref([]);
     const mainCenters = ref([]);
+    const dependencies = ref([]);
     const baseOptions = ref([]);
-    const errors = ref({
-        depName: "",
-        personId: "",
-        parentId: "",
-        code: "",
-    });
+    const errors = ref([]);
     const depInfo = ref({
         id: "",
         type: "",
         jerarquia: "",
+        centerId: "",
         personId: "",
         parentId: "",
         depName: "",
@@ -47,9 +44,9 @@ export const useDependencia = (context) => {
             if (result.isConfirmed) {
                 try {
                     isLoadingRequest.value = true;
-                    const response = await axios.post("/change-status-dependency",{
-                        id : depId,
-                        status : status
+                    const response = await axios.post("/change-status-dependency", {
+                        id: depId,
+                        status: status
                     });
                     useShowToast(
                         toast.success,
@@ -115,6 +112,15 @@ export const useDependencia = (context) => {
         }
     };
 
+    const depFilter = computed(() => {
+        const result = dependencies.value.filter((element) => {
+            return element.id_centro_atencion === depInfo.value.centerId
+            && element.value != depInfo.value.id; // Agregar el 'return'
+        });
+        return result ?? [];
+    });
+
+
     const asyncFindEmployee = _.debounce(async (query) => {
         try {
             isLoadingEmployee.value = true;
@@ -132,15 +138,9 @@ export const useDependencia = (context) => {
     const fetchData = async (depId) => {
         const { data, isError } = await getInfoForModalDependencias(depId);
         if (!isError) {
-            mainCenters.value = data.dependencies;
+            mainCenters.value = data.mainCenters;
             depToShow.value = data.dependency
-
-            //Filtramos resultados para el select de dependencia superior
-            if (depToShow.value.jerarquia_organizacion_dependencia || depToShow.value.length <= 0) { 
-                mainCenters.value = mainCenters.value.filter((element) => {
-                    return element.value !== 1 && element.value !== depToShow.value.id_dependencia;
-                });
-            }
+            dependencies.value = data.dependencies
 
             //Set the employee name
             if (data.dependency != "") {
@@ -176,6 +176,7 @@ export const useDependencia = (context) => {
                     personId: data.dependency.id_persona,
                     parentId:
                         data.dependency.jerarquia_organizacion_dependencia ?? 1,
+                    centerId: data.dependency.id_centro_atencion,
                     depName: data.dependency.nombre_dependencia,
                     email: data.dependency.email_dependencia,
                     code: data.dependency.codigo_dependencia,
@@ -294,6 +295,7 @@ export const useDependencia = (context) => {
         depInfo,
         mainCenters,
         errors,
-        depToShow
+        depToShow,
+        depFilter
     };
 };

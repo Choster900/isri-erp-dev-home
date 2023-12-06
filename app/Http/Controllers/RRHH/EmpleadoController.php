@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\RRHH\PlazaAsignadaRequest;
 use App\Http\Requests\RRHH\EmpleadoRequest;
 use App\Models\Banco;
+use App\Models\CentroAtencion;
 use App\Models\Dependencia;
 use App\Models\DetallePlaza;
 use App\Models\Empleado;
@@ -51,7 +52,8 @@ class EmpleadoController extends Controller
                         ->where('estado_plaza_asignada', 1)
                         ->orderBy('dependencia.codigo_dependencia');
                 },
-                'plazas_asignadas.dependencia.parent_dependency',
+                //'plazas_asignadas.dependencia.parent_dependency',
+                'plazas_asignadas.dependencia.centro_atencion',
                 'persona.fotos'
             ]);
 
@@ -97,12 +99,12 @@ class EmpleadoController extends Controller
                 } else {
                     $query->whereHas('plazas_asignadas.dependencia', function ($query) use ($search_value) {
                         $query->where('codigo_dependencia', 'like', '%' . $search_value["dependencia"] . '%')
-                        ->whereExists(function ($subQuery) {
-                            $subQuery->select(DB::raw(1))
-                                ->from('plaza_asignada')
-                                ->whereRaw('plaza_asignada.id_empleado = empleado.id_empleado')
-                                ->where('estado_plaza_asignada', 1);
-                        });
+                            ->whereExists(function ($subQuery) {
+                                $subQuery->select(DB::raw(1))
+                                    ->from('plaza_asignada')
+                                    ->whereRaw('plaza_asignada.id_empleado = empleado.id_empleado')
+                                    ->where('estado_plaza_asignada', 1);
+                            });
                     });
                 }
             }
@@ -172,17 +174,11 @@ class EmpleadoController extends Controller
         $professional_title = DB::table('titulo_profesional')
             ->select('id_titulo_profesional as value', 'nombre_titulo_profesional as label')
             ->get();
-        $dependencies = DB::table('dependencia')
-            ->selectRaw("
-                dependencia.id_dependencia as value,
-                CASE
-                    WHEN dependencia.dep_id_dependencia IS NOT NULL THEN CONCAT(dep.codigo_dependencia, ' - ', dependencia.nombre_dependencia,' (',dependencia.codigo_dependencia,')')
-                    ELSE CONCAT(dependencia.codigo_dependencia, ' - ', dependencia.nombre_dependencia)
-                END as label
-            ")
-            ->leftJoin('dependencia as dep', 'dependencia.dep_id_dependencia', '=', 'dep.id_dependencia')
-            ->where('dependencia.id_dependencia', '!=', 1)
-            ->get();
+        $dependencies = Dependencia::selectRaw("id_dependencia as value, concat(nombre_dependencia,' (',codigo_dependencia,')') as label, id_centro_atencion")
+        ->where('estado_dependencia', 1)->get();
+        $mainCenters = CentroAtencion::selectRaw("id_centro_atencion as value, concat(nombre_centro_atencion,' (',codigo_centro_atencion,' )') as label")
+            ->where('estado_centro_atencion', 1)->get();
+
         $job_positions = DetallePlaza::selectRaw("detalle_plaza.id_det_plaza as value, 
                 CASE WHEN detalle_plaza.id_puesto_sirhi_det_plaza IS NULL THEN CONCAT(plaza.nombre_plaza,' - ',tipo_contrato.codigo_tipo_contrato)
                 ELSE CONCAT(detalle_plaza.id_puesto_sirhi_det_plaza, '  - ', plaza.nombre_plaza, '  - ', tipo_contrato.codigo_tipo_contrato)
@@ -224,8 +220,9 @@ class EmpleadoController extends Controller
             'bank'                => $bank,
             'professional_title'  => $professional_title,
             'dependencies'        => $dependencies,
+            'mainCenters'         => $mainCenters,
             'job_positions'       => $job_positions,
-            'employee'            => $employee
+            'employee'            => $employee,
         ];
     }
 
@@ -348,6 +345,7 @@ class EmpleadoController extends Controller
             $new_assigned_job_position = new PlazaAsignada([
                 'id_empleado'                   => $new_employee->id_empleado,
                 'id_lt'                         => $request->work_area_id,
+                'id_centro_atencion'            => $request->parent_id,
                 'id_dependencia'                => $request->dependency_id,
                 'id_det_plaza'                  => $request->job_position_id,
                 'salario_plaza_asignada'        => $request->salary,
@@ -520,21 +518,14 @@ class EmpleadoController extends Controller
         //Get the job positions by employee
         $empleado = Empleado::with([
             'plazas_asignadas' => function ($query) {
-                $query->with(['dependencia.parent_dependency', 'detalle_plaza', 'detalle_plaza.plaza', 'detalle_plaza.tipo_contrato', 'motivo_desvinculo_laboral']);
+                $query->with(['dependencia.parent_dependency', 'dependencia.centro_atencion', 'detalle_plaza', 'detalle_plaza.plaza', 'detalle_plaza.tipo_contrato', 'motivo_desvinculo_laboral']);
             }
         ])->find($request->id_empleado);
         //Get selects information
-        $dependencies = DB::table('dependencia')
-            ->selectRaw("
-                dependencia.id_dependencia as value,
-                CASE
-                    WHEN dependencia.dep_id_dependencia IS NOT NULL THEN CONCAT(dep.codigo_dependencia, ' - ', dependencia.nombre_dependencia,' (',dependencia.codigo_dependencia,')')
-                    ELSE CONCAT(dependencia.codigo_dependencia, ' - ', dependencia.nombre_dependencia)
-                END as label
-            ")
-            ->leftJoin('dependencia as dep', 'dependencia.dep_id_dependencia', '=', 'dep.id_dependencia')
-            ->where('dependencia.id_dependencia', '!=', 1)
-            ->get();
+        $dependencies = Dependencia::selectRaw("id_dependencia as value, concat(nombre_dependencia,' (',codigo_dependencia,')') as label, id_centro_atencion")
+        ->where('estado_dependencia', 1)->get();
+        $mainCenters = CentroAtencion::selectRaw("id_centro_atencion as value, concat(nombre_centro_atencion,' (',codigo_centro_atencion,' )') as label")
+        ->where('estado_centro_atencion', 1)->get();
 
         $jobPositionsToSelect = DetallePlaza::selectRaw("detalle_plaza.id_det_plaza as value, 
         CASE WHEN detalle_plaza.id_puesto_sirhi_det_plaza IS NULL THEN CONCAT(plaza.nombre_plaza,' - ',tipo_contrato.codigo_tipo_contrato)
@@ -555,6 +546,7 @@ class EmpleadoController extends Controller
         return response()->json([
             'jobPositions'          => $empleado,
             'dependencies'          => $dependencies,
+            'mainCenters'           => $mainCenters,
             'jobPositionsToSelect'  => $jobPositionsToSelect,
             'reasonsForDissociate'  => $reasonsForDissociate
         ]);
@@ -568,6 +560,7 @@ class EmpleadoController extends Controller
             $new_assigned_job_position = new PlazaAsignada([
                 'id_empleado'                   => $request->employeeId,
                 'id_lt'                         => $jobPosition['workAreaId'],
+                'id_centro_atencion'            => $jobPosition['parentId'],
                 'id_dependencia'                => $jobPosition['dependencyId'],
                 'id_det_plaza'                  => $jobPosition['jobPositionId'],
                 'salario_plaza_asignada'        => $jobPosition['salary'],
@@ -629,6 +622,7 @@ class EmpleadoController extends Controller
                 'id_empleado'                   => $request->employeeId,
                 'id_lt'                         => $jobPosition['workAreaId'],
                 'id_dependencia'                => $jobPosition['dependencyId'],
+                'id_centro_atencion'            => $jobPosition['parentId'],
                 'id_det_plaza'                  => $jobPosition['jobPositionId'],
                 'salario_plaza_asignada'        => $jobPosition['salary'],
                 'partida_plaza_asignada'        => $jobPosition['account'],

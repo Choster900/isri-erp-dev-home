@@ -16,6 +16,7 @@ class Dependencia extends Model
     protected $fillable = [
         'dep_id_dependencia',
         'id_tipo_dependencia',
+        'id_centro_atencion',
         'id_persona',
         'jerarquia_organizacion_dependencia',
         'nombre_dependencia',
@@ -63,8 +64,12 @@ class Dependencia extends Model
     {
         return $this->hasOne('App\Models\Dependencia', 'id_dependencia', 'jerarquia_organizacion_dependencia');
     }
+    /**
+     * The function "centro_atencion" returns a relationship between the current model and the
+     * "CentroAtencion" model.
+     */
     public function centro_atencion()
     {
-        return $this->hasOne('App\Models\Dependencia', 'id_dependencia', 'dep_id_dependencia');
+        return $this->belongsTo('App\Models\CentroAtencion', 'id_centro_atencion', 'id_centro_atencion');
     }
 }

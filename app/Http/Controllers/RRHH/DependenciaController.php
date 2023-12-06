@@ -4,6 +4,7 @@ namespace App\Http\Controllers\RRHH;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RRHH\DependenciaRequest;
+use App\Models\CentroAtencion;
 use App\Models\Dependencia;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -55,15 +56,6 @@ class DependenciaController extends Controller
         return ['data' => $dependencies, 'draw' => $request->input('draw')];
     }
 
-    //Obtiene unicamente los centros
-    public function getCentrosAtencion(Request $request)
-    {
-        $dependencies = Dependencia::with('jefatura')->where('dep_id_dependencia', null)->get();
-        return response()->json([
-            'dependencies' => $dependencies
-        ]);
-    }
-
     public function getInfoModalDependencias(Request $request, $id)
     {
         $dependency =  Dependencia::with([
@@ -79,25 +71,18 @@ class DependenciaController extends Controller
         ])
             ->find($id);
 
-        $dependencies = DB::table('dependencia')
-            ->selectRaw("
-                dependencia.id_dependencia as value,
-                CASE
-                    WHEN dependencia.dep_id_dependencia IS NOT NULL THEN CONCAT(dep.codigo_dependencia, ' - ', dependencia.nombre_dependencia,' (',dependencia.codigo_dependencia,')')
-                    ELSE CONCAT(dependencia.codigo_dependencia, ' - ', dependencia.nombre_dependencia)
-                END as label,
-                dependencia.id_dependencia,
-                dependencia.dep_id_dependencia as depPadre
-            ")
-            ->leftJoin('dependencia as dep', 'dependencia.dep_id_dependencia', '=', 'dep.id_dependencia')
-            ->where('dependencia.estado_dependencia', 1) //Dependencias activas
-            ->get();
+        $dependencies = Dependencia::selectRaw("id_dependencia as value, concat(nombre_dependencia,' (',codigo_dependencia,')') as label, id_centro_atencion")
+        ->where('estado_dependencia', 1)->get();
+        $mainCenters = CentroAtencion::selectRaw("id_centro_atencion as value, concat(nombre_centro_atencion,' (',codigo_centro_atencion,' )') as label")
+        ->where('estado_centro_atencion', 1)->get();
 
         return response()->json([
             'dependency'      => $dependency ?? [],
-            'dependencies'    => $dependencies ?? []
+            'dependencies'    => $dependencies ?? [],
+            'mainCenters'     => $mainCenters ?? []
         ]);
     }
+
 
     public function searchEmployee(Request $request)
     {
@@ -121,6 +106,9 @@ class DependenciaController extends Controller
                 ->where('e.id_estado_empleado', 1)
                 ->get();
         }
+        /* The above code is returning a JSON response in PHP. It includes an array called 'employees'
+        which contains the value of the variable  if the variable  is not empty. If
+         is empty, the 'employees' array will be empty as well. */
         return response()->json(
             [
                 'employees'          => $search != '' ? $empleados : [],
@@ -130,11 +118,10 @@ class DependenciaController extends Controller
 
     public function storeDependency(DependenciaRequest $request)
     {
-        $depPadre = Dependencia::find($request->parentId);
         DB::beginTransaction();
         try {
             $dependency = new Dependencia([
-                'dep_id_dependencia'                        => $depPadre->dep_id_dependencia ? $depPadre->dep_id_dependencia : $depPadre->id_dependencia,
+                'id_centro_atencion'                        => $request->centerId,
                 'id_tipo_dependencia'                       => 2,
                 'id_persona'                                => $request->personId,
                 'jerarquia_organizacion_dependencia'        => $request->parentId,
@@ -166,12 +153,11 @@ class DependenciaController extends Controller
     public function updateDependency(DependenciaRequest $request)
     {
         $dependency = Dependencia::find($request->id);
-        $depPadre = Dependencia::find($request->parentId);
 
         DB::beginTransaction();
         try {
             $dependency->update([
-                'dep_id_dependencia'                        => $depPadre->dep_id_dependencia ? $depPadre->dep_id_dependencia : $depPadre->id_dependencia,
+                'id_centro_atencion'                        => $request->centerId,
                 //'id_tipo_dependencia'                       => 2, we don't manage the dependency type
                 'id_persona'                                => $request->personId,
                 'jerarquia_organizacion_dependencia'        => $request->parentId,

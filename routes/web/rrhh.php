@@ -13,6 +13,7 @@ use App\Http\Controllers\RRHH\GerenteGeneralController;
 use App\Http\Controllers\RRHH\HojaServicioController;
 use App\Http\Controllers\RRHH\JefeInmediatoController;
 use App\Http\Controllers\RRHH\PermisoController;
+use App\Http\Controllers\RRHH\ReporteRRHHController;
 use App\Http\Controllers\RRHH\SolicitudPermisoController;
 use App\Http\Controllers\RRHH\SubDirectorMedicoController;
 use App\Models\ArchivoAnexo;
@@ -218,11 +219,19 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('rrhh.dependencias');
     Route::post('dependencias', [DependenciaController::class, 'getDependencias'])->name('dependencia.getDependencias');
-    Route::get('get-centros-atencion', [DependenciaController::class, 'getCentrosAtencion'])->name('dependencia.getCentrosAtencion');
     Route::get('get-info-modal-dependencias/{id}', [DependenciaController::class, 'getInfoModalDependencias'])->name('dependencia.getInfoModalDependencias');
     Route::post('search-employee', [DependenciaController::class, 'searchEmployee'])->name('dependencia.searchEmployee');
     Route::post('store-dependency', [DependenciaController::class, 'storeDependency'])->name('dependencia.storeDependency');
     Route::post('update-dependency', [DependenciaController::class, 'updateDependency'])->name('dependencia.updateDependency');
     Route::post('change-status-dependency', [DependenciaController::class, 'changeStatusDependency'])->name('dependencia.changeStatusDependency');
     Route::post('change-dep-boss', [DependenciaController::class, 'changeDepBoss'])->name('dependencia.changeDepBoss');
+
+    Route::get(
+        '/rrhh/rep-empleados',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/rep-empleados', 'RRHH/ReporteEmpleados');
+        }
+    )->name('rrhh.repEmpleados');
+    Route::get('get-info-for-reports', [ReporteRRHHController::class, 'getInfoForReports'])->name('dependencia.getInfoForReports');
+    Route::post('get-report-employees-rrhh', [ReporteRRHHController::class, 'getReportEmployeesRRHH'])->name('dependencia.getReportEmployeesRRHH');
 });
