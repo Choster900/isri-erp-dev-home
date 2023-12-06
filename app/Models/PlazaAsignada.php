@@ -43,7 +43,12 @@ class PlazaAsignada extends Model
     {
         return $this->belongsTo('App\Models\Empleado', 'id_empleado', 'id_empleado');
     }
-    public function dependencia()
+    /**
+     * Get the centro_atencion that owns the PlazaAsignada
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function centro_atencion(): BelongsTo
     {
         return $this->belongsTo('App\Models\Dependencia', 'id_dependencia', 'id_dependencia');
     }
