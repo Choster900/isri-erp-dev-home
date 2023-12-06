@@ -38,7 +38,7 @@ class Dependencia extends Model
     }
 
     public function detalle_quedan()
-    { //(FOREING KEY, PRIMARY KEY)
+    {
         return $this->hasMany(DetalleQuedan::class, "id_quedan", "id_quedan");
     }
 
