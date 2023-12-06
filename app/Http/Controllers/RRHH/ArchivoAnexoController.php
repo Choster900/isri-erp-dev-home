@@ -124,16 +124,21 @@ class ArchivoAnexoController extends Controller
             DB::beginTransaction();
             $imageUrl = null;
             $name = '';
+            $person = Persona::with("empleado")->find($request->idPersona);
+            $codigo_empleado = $person->empleado->codigo_empleado;
 
             if ($request->hasFile("fileArchivoAnexo")) {
                 // Retrieve the uploaded file
                 $file = $request->file("fileArchivoAnexo");
                 // Get the original file name
                 $name = $file->getClientOriginalName();
+                // Create a ne for file url and save
+                $currentTimestamp = time();
+                $nameFile = $codigo_empleado . '_' . date('Y-m-d His', $currentTimestamp) . '.' . $file->getClientOriginalExtension();
                 // Store the file in the 'anexos' directory within the 'public' disk
-                $file->storeAs('anexos', $name, 'public');
+                $file->storeAs('anexos', $nameFile, 'public');
                 // Generate a URL for the stored file
-                $imageUrl = Storage::url('anexos/' . $name);
+                $imageUrl = Storage::url('anexos/' . $nameFile);
             }
             //$idTipoMime = TipoMine::where('extension_tipo_mime', $request->idTipoMine)->value('id_tipo_mime');
 
@@ -152,6 +157,8 @@ class ArchivoAnexoController extends Controller
                 'descripcion_archivo_anexo' => $request->descripcionArchivoAnexo,
             ]);
             // Commit the transaction
+            
+            
             DB::commit();
 
             // Return the created ArchivoAnexo
@@ -172,6 +179,8 @@ class ArchivoAnexoController extends Controller
             // Begin a database transaction
             DB::beginTransaction();
 
+            $person = Persona::with("empleado")->find($request->idPersona);
+            $codigo_empleado = $person->empleado->codigo_empleado;
             // Check if a file is present in the request
             if ($request->hasFile("fileArchivoAnexo")) {
                 // Retrieve the uploaded file
@@ -180,11 +189,14 @@ class ArchivoAnexoController extends Controller
                 // Get the original file name
                 $name = $file->getClientOriginalName();
 
+                // Create a ne for file url and save
+                $currentTimestamp = time();
+                $nameFile = $codigo_empleado . '_' . date('Y-m-d His', $currentTimestamp) . '.' . $file->getClientOriginalExtension();
                 // Store the file in the 'anexos' directory within the 'public' disk
-                $path = $file->storeAs('anexos', $name, 'public');
+                $path = $file->storeAs('anexos', $nameFile, 'public');
 
                 // Generate a URL for the stored file
-                $imageUrl = Storage::url('anexos/' . $name);
+                $imageUrl = Storage::url('anexos/' . $nameFile);
 
                 $sizeFile = $request->sizeArchivoAnexo;
                 $tipoMine = $request->idTipoMine;

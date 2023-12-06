@@ -16,6 +16,7 @@ class Dependencia extends Model
     protected $fillable = [
         'dep_id_dependencia',
         'id_tipo_dependencia',
+        'dep_id_dependencia',
         'id_centro_atencion',
         'id_persona',
         'jerarquia_organizacion_dependencia',
@@ -37,7 +38,7 @@ class Dependencia extends Model
     }
 
     public function detalle_quedan()
-    { //(FOREING KEY, PRIMARY KEY)
+    {
         return $this->hasMany(DetalleQuedan::class, "id_quedan", "id_quedan");
     }
 

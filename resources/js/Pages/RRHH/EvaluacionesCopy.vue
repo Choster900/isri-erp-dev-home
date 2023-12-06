@@ -1,11 +1,3 @@
-<script setup>
-import { Head } from "@inertiajs/vue3";
-import AppLayoutVue from "@/Layouts/AppLayout.vue";
-import Datatable from "@/Components-ISRI/Datatable.vue";;
-import axios from 'axios';
-//import ModalEvalueacionesVue from '@/Components-ISRI/RRHH/ModalEvaluaciones.vue';
-</script>
-
 <template>
     <Head title="RRHH - Evaluacion del personal" />
     <AppLayoutVue nameSubModule="RRHH - Evaluacion del personal">
@@ -27,12 +19,12 @@ import axios from 'axios';
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Empleados: <span class="text-slate-400 font-medium">{{
+                    <!--  <h2 class="font-semibold text-slate-800 pt-1">Empleados: <span class="text-slate-400 font-medium">{{
                         evaluaciones.length
-                    }}</span></h2>
+                    }}</span></h2> -->
                 </div>
             </header>
-
+            <!--     -->
             <div class="overflow-x-auto">
                 <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
                     @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getEvaluaciones()">
@@ -97,7 +89,7 @@ import axios from 'axios';
                             </td>
                         </tr>
                     </tbody>
-                    <tbody v-if="empty_object && !isLoadinRequest">
+                    <tbody v-if="emptyObject && !isLoadinRequest">
                         <tr>
                             <td colspan="6" class="text-center">
                                 <img src="../../../img/NoData.gif" alt="" class="w-60 h-60 mx-auto">
@@ -110,14 +102,10 @@ import axios from 'axios';
                 </datatable>
 
             </div>
-            <div v-if="empty_object" class="flex text-center py-2">
-                <p class="text-red-500 font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se
-                    encontraron registros.</p>
-            </div>
 
         </div>
 
-        <div v-if="!empty_object" class="px-6 py-4 bg-white shadow-lg rounded-sm border-slate-200 relative">
+        <div v-if="!emptyObject" class="px-6 py-4 bg-white shadow-lg rounded-sm border-slate-200 relative">
             <div>
                 <nav class="flex justify-between" role="navigation" aria-label="Navigation">
                     <div class="grow text-center">
@@ -156,7 +144,7 @@ import axios from 'axios';
                                 </span>
                                 <span class="cursor-pointer mt-2" v-else @click="getEvaluaciones(link.url)"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
-                                        class=" w-5" >{{ link.label }}</span>
+                                        class=" w-5">{{ link.label }}</span>
                                 </span>
                             </li>
                         </ul>
@@ -164,136 +152,64 @@ import axios from 'axios';
                 </nav>
             </div>
         </div>
-      <!--   <ModalEvalueacionesVue 
-            :showModal="showModalEvaluacion"
-            @cerrar-modal="showModalEvaluacion = false"
-            :evaluacionEmpleadoDBData="dataEvaluacionToSendModal"
-            @reload-table="getEvaluaciones(lastUrl)" 
-            /> -->
+        {{ listDependencias }}
+        <ModalEvalueacionesVue v-if="listDependencias != ''" :showModal="showModalEvaluacion" @cerrar-modal="showModalEvaluacion = false" :listDependencias="listDependencias" />
     </AppLayoutVue>
 </template>
 
 <script>
+import { useEvaluacion } from "@/Composables/RRHH/Evaluaciones/useDatatable"
+import { Head } from "@inertiajs/vue3";
+import AppLayoutVue from "@/Layouts/AppLayout.vue";
+import Datatable from "@/Components-ISRI/Datatable.vue";
+import ModalEvalueacionesVue from '@/Components-ISRI/RRHH/EvaluacionesComponents/ModalEvalueacionesCopy.vue';
 export default {
-
-    data() {
-        let sortOrders = {};
-        let columns = [
-            { width: "10%", label: "ID", name: "id_empleado", type: "text" },
-            { width: "10%", label: "Codigo", name: "codigo_empleado", type: "text" },
-            { width: "20%", label: "Nombres", name: "collecNombre", type: "text" },
-            { width: "20%", label: "Apellidos", name: "collecApellido", type: "text" },
-            { width: "20%", label: "Correo institucional", name: "email_institucional_empleado", type: "text" },
-            { width: "1%", label: "", name: "Acciones" },
-        ];
-        columns.forEach((column) => {
-            if (column.name === 'id_persona')
-                sortOrders[column.name] = 1;
-            else
-                sortOrders[column.name] = -1;
-        });
+    components: { Head, AppLayoutVue, Datatable, ModalEvalueacionesVue },
+    setup() {
+        const {
+            links,
+            sortBy,
+            columns,
+            sortKey,
+            permits,
+            evaluaciones,
+            lastUrl,
+            perPage,
+            tableData,
+            getEvaluaciones,
+            sortOrders,
+            pagination,
+            stateModal,
+            handleData,
+            emptyObject,
+            isLoadinRequest,
+            showModalEvaluacion,
+            dataBeneficiariosToSendModal,
+            listDependencias,
+        } = useEvaluacion()
         return {
-            empty_object: false,
-            permits: [],
-            evaluaciones: [],
-            dataEvaluacionToSendModal: [],
-            showModalEvaluacion: false,
-            isLoadinRequest:false,
-            links: [],
-            lastUrl: "/evaluaciones",
-            columns: columns,
-            sortKey: "id_persona",
-            sortOrders: sortOrders,
-            perPage: ["10", "20", "30"],
-            tableData: {
-                draw: 0,
-                length: 5,
-                column: 0,
-                dir: "desc",
-                search: {},
-            },
-            pagination: {
-                lastPage: "",
-                currentPage: "",
-                total: "",
-                lastPageUrl: "",
-                nextPageUrl: "",
-                prevPageUrl: "",
-                from: "",
-                to: "",
-            },
+            links,
+            sortBy,
+            columns,
+            sortKey,
+            permits,
+            evaluaciones,
+            lastUrl,
+            perPage,
+            tableData,
+            getEvaluaciones,
+            sortOrders,
+            pagination,
+            stateModal,
+            handleData,
+            listDependencias,
+            emptyObject,
+            isLoadinRequest,
+            showModalEvaluacion,
+            dataBeneficiariosToSendModal,
         }
-    },
-    methods: {
-        async getEvaluaciones(url = "/evaluaciones") {
-            this.lastUrl = url;
-            this.tableData.draw++;
-            this.isLoadinRequest = true;
-            await axios.post(url, this.tableData).then((response) => {
-                let data = response.data;
-                if (this.tableData.draw == data.draw) {
-                    this.links = data.data.links;
-                    this.pagination.total = data.data.total;
-                    this.links[0].label = "Anterior";
-                    this.links[this.links.length - 1].label = "Siguiente";
-                    this.evaluaciones = response.data.data.data;
-                    this.evaluaciones.length > 0 ? this.empty_object = false : this.empty_object = true
-                    this.isLoadinRequest = false;
+    }
 
-                }
-            }).catch((errors) => {
-
-            });
-        },
-        sortBy(key) {
-            if (key != "Acciones") {
-                this.sortKey = key;
-                this.sortOrders[key] = this.sortOrders[key] * -1;
-                this.tableData.column = this.getIndex(this.columns, "name", key);
-                this.tableData.dir = this.sortOrders[key] === 1 ? "asc" : "desc";
-                this.getEvaluaciones();
-            }
-        },
-        getIndex(array, key, value) {
-            return array.findIndex((i) => i[key] == value);
-        },
-
-        validarCamposVacios(objeto) {
-            for (var propiedad in objeto) {
-                if (objeto[propiedad] !== "") {
-                    return false;
-                }
-            }
-            return true;
-        },
-        handleData(myEventData) {
-            if (this.validarCamposVacios(myEventData)) {
-                this.tableData.search = {};
-                this.getEvaluaciones();
-            }
-            else {
-                this.tableData.search = myEventData;
-                //this.getSuppilers();
-            }
-        },
-        getPermits() {
-            var URLactual = window.location.pathname;
-            let data = this.$page.props.menu;
-            let menu = JSON.parse(JSON.stringify(data["urls"]));
-            menu.forEach((value, index) => {
-                value.submenu.forEach((value2, index2) => {
-                    if (value2.url === URLactual) {
-                        var array = { "insertar": value2.insertar, "actualizar": value2.actualizar, "eliminar": value2.eliminar, "ejecutar": value2.ejecutar };
-                        this.permits = array;
-                    }
-                });
-            });
-        },
-
-    },
-    created() {
-        this.getEvaluaciones()
-    },
 }
 </script>
 
