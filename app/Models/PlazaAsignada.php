@@ -19,6 +19,7 @@ class PlazaAsignada extends Model
         'id_empleado',
         'id_lt',
         'id_dependencia',
+        'id_centro_atencion',
         'id_det_plaza',
         'id_motivo_desvinculo_laboral',
         'contrato_plaza_asignada',
@@ -36,24 +37,24 @@ class PlazaAsignada extends Model
 
     public function detalle_plaza()
     {
-        return $this->belongsTo(DetallePlaza::class,'id_det_plaza','id_det_plaza');
+        return $this->belongsTo(DetallePlaza::class, 'id_det_plaza', 'id_det_plaza');
     }
     public function empleado()
     {
-        return $this->belongsTo('App\Models\Empleado','id_empleado','id_empleado');
+        return $this->belongsTo('App\Models\Empleado', 'id_empleado', 'id_empleado');
     }
-    /**
-     * Get the centro_atencion that owns the PlazaAsignada
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function centro_atencion(): BelongsTo
+    public function dependencia()
     {
-        return $this->belongsTo(CentroAtencion::class, 'foreign_key', 'other_key');
+        return $this->belongsTo('App\Models\Dependencia', 'id_dependencia', 'id_dependencia');
     }
+    public function centro_atencion()
+    {
+        return $this->belongsTo('App\Models\CentroAtencion', 'id_centro_atencion', 'id_centro_atencion');
+    }
+
     public function motivo_desvinculo_laboral()
     {
-        return $this->belongsTo(MotivoDesvinculoLaboral::class,'id_motivo_desvinculo_laboral','id_motivo_desvinculo_laboral');
+        return $this->belongsTo(MotivoDesvinculoLaboral::class, 'id_motivo_desvinculo_laboral', 'id_motivo_desvinculo_laboral');
     }
     /**
      * Get all of the plazaEvaluada for the PlazaAsignada
