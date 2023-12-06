@@ -3,9 +3,9 @@
         <label :for="id" class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">{{ label }}
             <span v-if="required" class="text-red-600 font-extrabold">*</span></label>
         <div class="relative">
-            <div class="absolute inset-y-0 start-0 flex items-center px-2 pointer-events-none border-r border-gray-300">
+            <div class="absolute inset-y-0 start-0 flex text-[#001c48] rounded-l-md items-center px-2 pointer-events-none border-r border-gray-300">
                 <template v-if="iconName === 'email'">
-                    <svg class="w-[22px] h-[22px] p-0.5 text-[#001c48] dark:text-gray-500" aria-hidden="true"
+                    <svg class="w-[22px] h-[22px] p-0.5 dark:text-gray-500" aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 16">
                         <path
                             d="m10.036 8.278 9.258-7.79A1.979 1.979 0 0 0 18 0H2A1.987 1.987 0 0 0 .641.541l9.395 7.737Z" />
@@ -14,7 +14,7 @@
                     </svg>
                 </template>
                 <template v-else-if="iconName === 'address'">
-                    <svg class="w-5 h-5 text-[#001c48] dark:text-gray-600" viewBox="0 0 24 24" fill="none"
+                    <svg class="w-5 h-5 dark:text-gray-600" viewBox="0 0 24 24" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                         <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
@@ -26,7 +26,7 @@
                     </svg>
                 </template>
                 <template v-else-if="iconName === 'oldPhone'">
-                    <svg class="w-5 h-5 p-0.5 text-[#001c48] dark:text-gray-600" version="1.1" id="_x32_"
+                    <svg class="w-5 h-5 p-0.5 dark:text-gray-600" version="1.1" id="_x32_"
                         xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512"
                         xml:space="preserve" fill="currentColor">
                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -42,7 +42,7 @@
                     </svg>
                 </template>
                 <template v-else-if="iconName === 'code'">
-                    <svg class="w-5 h-5 text-[#001c48] dark:text-gray-700" viewBox="0 0 24 24" fill="none"
+                    <svg class="w-5 h-5 dark:text-gray-700" viewBox="0 0 24 24" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                         <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
@@ -57,7 +57,7 @@
                     </svg>
                 </template>
                 <template v-else-if="iconName === 'date'">
-                    <svg class="w-5 h-5 text-[#001c48] dark:text-gray-600" viewBox="0 0 24 24" fill="none"
+                    <svg class="w-5 h-5 dark:text-gray-600" viewBox="0 0 24 24" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                         <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
@@ -72,7 +72,7 @@
                     </svg>
                 </template>
                 <template v-else-if="iconName === 'number'">
-                    <svg class="w-5 h-5 text-[#001c48] dark:text-gray-600" viewBox="0 0 16 16"
+                    <svg class="w-5 h-5 dark:text-gray-600" viewBox="0 0 16 16"
                         xmlns="http://www.w3.org/2000/svg" fill="currentColor">
                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                         <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
@@ -84,7 +84,7 @@
                     </svg>
                 </template>
                 <template v-else-if="iconName === 'money'">
-                    <svg class="w-5 h-5 text-[#001c48] dark:text-gray-600" viewBox="0 0 24 24" fill="none"
+                    <svg class="w-5 h-5 dark:text-gray-600" viewBox="0 0 24 24" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                         <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
@@ -101,7 +101,7 @@
                     </svg>
                 </template>
                 <template v-else-if="iconName === 'personalInfo'">
-                    <svg class="w-5 h-5 text-[#001c48] dark:text-gray-600" viewBox="0 0 24 24" fill="none"
+                    <svg class="w-5 h-5 dark:text-gray-600" viewBox="0 0 24 24" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                         <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
@@ -114,7 +114,7 @@
                     </svg>
                 </template>
                 <template v-else>
-                    <svg class="w-5 h-5 p-0.5 text-[#001c48] dark:text-gray-600" fill="currentColor" version="1.1" id="Icons"
+                    <svg class="w-5 h-5 p-0.5 dark:text-gray-600" fill="currentColor" version="1.1" id="Icons"
                         xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 32"
                         xml:space="preserve">
                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>

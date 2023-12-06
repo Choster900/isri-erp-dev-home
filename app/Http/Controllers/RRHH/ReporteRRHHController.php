@@ -4,28 +4,22 @@ namespace App\Http\Controllers\RRHH;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\CentroAtencion;
 use App\Models\Dependencia;
 use App\Models\Empleado;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class ReporteRRHHController extends Controller
 {
     public function getInfoForReports(Request $request)
     {
-        $dependencies = DB::table('dependencia')
-            ->selectRaw("
-                dependencia.id_dependencia as value,
-                CASE
-                    WHEN dependencia.dep_id_dependencia IS NOT NULL THEN CONCAT(dep.codigo_dependencia, ' - ', dependencia.nombre_dependencia,' (',dependencia.codigo_dependencia,')')
-                    ELSE CONCAT(dependencia.codigo_dependencia, ' - ', dependencia.nombre_dependencia)
-                END as label,
-                dependencia.id_dependencia,
-                dependencia.dep_id_dependencia as depPadre
-            ")
-            ->leftJoin('dependencia as dep', 'dependencia.dep_id_dependencia', '=', 'dep.id_dependencia')
-            ->where('dependencia.estado_dependencia', 1) //Dependencias activas
-            ->where('dependencia.id_dependencia', '!=', 11)
-            ->get();
+        $dependencies = Dependencia::selectRaw("id_dependencia as value, concat(nombre_dependencia,' (',codigo_dependencia,')') as label, id_centro_atencion")
+            ->where('estado_dependencia', 1)->get();
+        $mainCenters = CentroAtencion::selectRaw("id_centro_atencion as value, concat(nombre_centro_atencion,' (',codigo_centro_atencion,' )') as label")
+            ->where('estado_centro_atencion', 1)->get();
+        // Agregar el elemento al inicio de la colección
+        $mainCenters->prepend(['value' => 0, 'label' => 'TODOS LOS CENTROS']);
 
         $states = DB::table('estado_empleado')->selectRaw('id_estado_empleado as value, nombre_estado_empleado as label')->get();
         $typesOfContract = DB::table('tipo_contrato')->selectRaw('id_tipo_contrato as value, nombre_tipo_contrato as label')->get();
@@ -33,61 +27,87 @@ class ReporteRRHHController extends Controller
         return response()->json([
             'dependencies'          => $dependencies,
             'states'                => $states,
-            'typesOfContract'       => $typesOfContract
+            'typesOfContract'       => $typesOfContract,
+            'mainCenters'           => $mainCenters
         ]);
     }
     public function getReportEmployeesRRHH(Request $request)
     {
-        $dependencia = Dependencia::find($request->depId);
-        $fieldToSearch = '';
-        if ($dependencia->id_tipo_dependencia == 1) {
-            $fieldToSearch = 1; //Por campo dep_id_dependencia
-        } else {
-            if ($dependencia->id_tipo_dependencia == 2) {
-                $fieldToSearch = 2; //por id_dependencia
-            }
+        $customMessages = [
+            'parentId.required' => 'Debe seleccionar el centro de atención.',
+        ];
+        $validatedData = Validator::make($request->all(), [
+            'parentId' => 'required',
+        ], $customMessages)->validate();
+
+        $dependenciasIds = [];
+        if ($request->depId) {
+            $dependencia = Dependencia::find($request->depId);
+            $dependenciasIds = $dependencia->all_dependencias_inferiores()->pluck('id_dependencia')->prepend($request->depId);
         }
         $query = Empleado::with(
             [
-                // 'plazas_asignadas.dependencia',
-                // 'plazas_asignadas.detalle_plaza',
-                'plazas_asignadas' => function ($query) use ($request, $fieldToSearch) {
-                    $query->where('estado_plaza_asignada', $request->status)
-                        ->whereHas('dependencia', function ($query) use ($request, $fieldToSearch) {
-                            if ($fieldToSearch == 1) {
-                                $query->where('dep_id_dependencia', $request->depId);
-                            }
-                            if ($fieldToSearch == 2) {
-                                $query->where('id_dependencia', $request->depId);
-                            }
-                        })
-                        ->whereHas('detalle_plaza', function ($query) use ($request) {
+                'plazas_asignadas.dependencia',
+                'plazas_asignadas.detalle_plaza',
+                'plazas_asignadas' => function ($query) use ($request, $dependenciasIds) {
+                    //Filtramos si existe status desde la vista
+                    if ($request->status) {
+                        $query->where('estado_plaza_asignada', $request->status == 1 ? 1 : 0);
+                    }
+                    //Filtramos si existe tipo contratacion desde la vista
+                    if ($request->typeOfContract) {
+                        $query->whereHas('detalle_plaza', function ($query) use ($request) {
                             $query->where('id_tipo_contrato', $request->typeOfContract);
                         });
-                }
-            ]
-        )->where('id_estado_empleado', $request->status)
-            ->whereHas(
-                'plazas_asignadas.dependencia',
-                function ($query) use ($request, $fieldToSearch) {
-                    if ($fieldToSearch == 1) {
-                        $query->where('dep_id_dependencia', $request->depId);
-                    } else {
-                        if ($fieldToSearch == 2) {
-                            $query->where('id_dependencia', $request->depId);
-                        }
+                    }
+                    //Filtramos por centro o por dependencia
+                    if ($request->parentId != 0) { //Verificamos si la opcion es 'Todos los centros'
+                        $query->whereHas('dependencia', function ($query) use ($request, $dependenciasIds) {
+                            if ($request->depId) {
+                                $query->whereIn('id_dependencia', $dependenciasIds);
+                            } else {
+                                $query->where('id_centro_atencion', $request->parentId);
+                            }
+                        });
                     }
                 }
-            )
-            ->whereHas(
+            ]
+        );
+        //Filtramos por centro o por dependencia
+        if ($request->parentId != 0) { //Verificamos si la opcion es 'Todos los centros'
+            $query->whereHas(
+                'plazas_asignadas.dependencia',
+                function ($query) use ($request, $dependenciasIds) {
+                    if ($request->depId) {
+                        $query->whereIn('id_dependencia', $dependenciasIds);
+                    } else {
+                        $query->where('id_centro_atencion', $request->parentId);
+                    }
+                }
+            );
+        }
+        //Filtramos si existe status desde la vista
+        if ($request->status) {
+            $query->where('id_estado_empleado', $request->status)
+                ->whereHas(
+                    'plazas_asignadas',
+                    function ($query) use ($request) {
+                        $query->where('estado_plaza_asignada', $request->status == 1 ? 1 : 0);
+                    }
+                );
+        }
+        //Filtramos si existe tipo contratacion desde la vista
+        if ($request->typeOfContract) {
+            $query->whereHas(
                 'plazas_asignadas.detalle_plaza',
                 function ($query) use ($request) {
                     $query->where('id_tipo_contrato', $request->typeOfContract);
                 }
-            )
-            ->get();
+            );
+        }
+
         return response()->json([
-            'query'          => $query,
+            'query'          => $query->get(),
         ]);
     }
 }

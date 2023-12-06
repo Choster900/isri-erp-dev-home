@@ -56,7 +56,7 @@ class Dependencia extends Model
     {
         return $this->belongsTo('App\Models\Persona', 'id_persona', 'id_persona');
     }
-    
+
     public function dependencias_inferiores()
     {
         return $this->hasMany('App\Models\Dependencia', 'jerarquia_organizacion_dependencia', 'id_dependencia');
@@ -72,5 +72,9 @@ class Dependencia extends Model
     public function centro_atencion()
     {
         return $this->belongsTo('App\Models\CentroAtencion', 'id_centro_atencion', 'id_centro_atencion');
+    }
+    public function all_dependencias_inferiores()
+    {
+        return $this->dependencias_inferiores()->with('all_dependencias_inferiores');
     }
 }
