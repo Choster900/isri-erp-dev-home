@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CentroAtencion extends Model
 {
@@ -28,14 +29,12 @@ class CentroAtencion extends Model
     ];
 
     /**
-     * The function "dependencias" returns a collection of "Dependencia" models that are associated
-     * with a specific "id_centro_atencion" value.
-     * 
-     * @return a collection of "Dependencia" models that are associated with the current model
-     * instance. The association is based on the "id_centro_atencion" attribute of both models.
+     * Get all of the dependencias for the CentroAtencion
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function dependencias()
+    public function dependencias(): HasMany
     {
-        return $this->hasMany('App\Models\Dependencia', 'id_centro_atencion', 'id_centro_atencion');
-    }
+        return $this->hasMany(Dependencia::class, 'id_centro_atencion', 'id_centro_atencion');
+    }    
 }

@@ -119,9 +119,8 @@ export const useEvaluacion = () => {
     async function getAllDependencias() {
         try {
             const resp = await axios.get("/getAllDependencias");
-          //  console.log(resp);
             let list = resp.data.map((data) => {
-                return { value: data.id_dependencia, label: `${data.codigo_dependencia} - ${data.nombre_dependencia}` }
+                return { value: data.id_centro_atencion, label: `${data.codigo_centro_atencion} - ${data.nombre_centro_atencion}` }
                 
             });
             listDependencias.value = list

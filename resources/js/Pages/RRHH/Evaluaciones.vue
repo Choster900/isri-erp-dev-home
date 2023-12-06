@@ -3,7 +3,7 @@ import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";;
 import axios from 'axios';
-import ModalEvalueacionesVue from '@/Components-ISRI/RRHH/ModalEvalueaciones.vue';
+//import ModalEvalueacionesVue from '@/Components-ISRI/RRHH/ModalEvaluaciones.vue';
 </script>
 
 <template>
@@ -164,12 +164,12 @@ import ModalEvalueacionesVue from '@/Components-ISRI/RRHH/ModalEvalueaciones.vue
                 </nav>
             </div>
         </div>
-        <ModalEvalueacionesVue 
+      <!--   <ModalEvalueacionesVue 
             :showModal="showModalEvaluacion"
             @cerrar-modal="showModalEvaluacion = false"
             :evaluacionEmpleadoDBData="dataEvaluacionToSendModal"
             @reload-table="getEvaluaciones(lastUrl)" 
-            />
+            /> -->
     </AppLayoutVue>
 </template>
 

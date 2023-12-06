@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PlazaAsignada extends Model
@@ -41,9 +42,14 @@ class PlazaAsignada extends Model
     {
         return $this->belongsTo('App\Models\Empleado','id_empleado','id_empleado');
     }
-    public function dependencia()
+    /**
+     * Get the centro_atencion that owns the PlazaAsignada
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function centro_atencion(): BelongsTo
     {
-        return $this->belongsTo(Dependencia::class,'id_dependencia','id_dependencia');
+        return $this->belongsTo(CentroAtencion::class, 'foreign_key', 'other_key');
     }
     public function motivo_desvinculo_laboral()
     {

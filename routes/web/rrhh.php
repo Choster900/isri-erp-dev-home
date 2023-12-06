@@ -17,6 +17,7 @@ use App\Http\Controllers\RRHH\ReporteRRHHController;
 use App\Http\Controllers\RRHH\SolicitudPermisoController;
 use App\Http\Controllers\RRHH\SubDirectorMedicoController;
 use App\Models\ArchivoAnexo;
+use App\Models\CentroAtencion;
 use App\Models\Dependencia;
 use App\Models\EvaluacionRendimiento;
 use App\Models\Persona;
@@ -122,7 +123,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('getAllPlazasByEmployeeIdAndDependenciaId', [EvaluacionController::class, 'getPlazaAsignadaByUserAndDependencia'])->name('evaluaciones.getPlazaAsignadaByUser');
 
     Route::get('getAllDependencias', function () {
-        return Dependencia::where('dep_id_dependencia',null)->get();
+        return CentroAtencion::all();
     })->name('expediente.deleteArchivoAnexoById');
     Route::post('search-employees-for-evaluations', [EvaluacionController::class, 'searchEmployeesForNewEvaluationRequest'])->name('evaluaciones.search-employees');
     Route::post('create-new-evaluacion', [EvaluacionController::class, 'createNewEvaluation'])->name('evaluaciones.new-evaluacion');
