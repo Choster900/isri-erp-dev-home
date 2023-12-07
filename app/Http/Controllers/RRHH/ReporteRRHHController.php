@@ -117,10 +117,24 @@ class ReporteRRHHController extends Controller
                         $startDate = Carbon::parse($request->startDate)->startOfDay();
                         $endDate = Carbon::parse($request->endDate)->endOfDay();
 
-                        $query->whereBetween('fecha_plaza_asignada', [$startDate, $endDate]);
-                    } elseif ($request->startDate) {
+                        if($request->status == 2){
+                            $query->whereDate('fecha_plaza_asignada','>=',$startDate)
+                            ->whereDate('fecha_renuncia_plaza','<=',$endDate);
+                        }else{
+                            if($request->status == 1){
+                                $query->whereBetween('fecha_plaza_asignada', [$startDate, $endDate]);
+                            }
+                        }
+                    } else
+                    if ($request->startDate) {
                         $startDate = Carbon::parse($request->startDate)->startOfDay();
-                        $query->whereDate('fecha_plaza_asignada', '>=', $startDate);
+                        if($request->status == 2){
+                            $query->whereDate('fecha_renuncia_plaza', '>=', $startDate);
+                        }else{
+                            if($request->status == 1){
+                                $query->whereDate('fecha_plaza_asignada', '>=', $startDate);
+                            }
+                        }
                     }
                 }
             );
