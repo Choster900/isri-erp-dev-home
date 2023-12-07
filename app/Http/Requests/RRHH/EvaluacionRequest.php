@@ -24,20 +24,24 @@ class EvaluacionRequest extends FormRequest
     public function rules()
     {
         return [
-            'id_empleado'                 => 'required',
-            'id_evaluacion_rendimiento'   => 'required',
-            'periodo_evaluacion_personal' => 'required',
+            'idEmpleado'              => 'required',
+            'idDependencia'           => 'required',
+            'fechaInicioFechafin'     => 'required',
+            'idEvaluacionRendimiento' => 'required',
+            'idTipoEvaluacion'        => 'required',
+            'plazasAsignadas'         => 'required',
         ];
     }
 
     public function messages()
     {
-        /* return [
-            'id_empleado.required'                 => 'Debe seleccionar empleado',
-            // 'fecha_evaluacion_personal.required'   => 'Requerido',
-            'id_evaluacion_rendimiento.required'   => 'El tipo de evaluacion es requerido',
-            'periodo_evaluacion_personal.required' => 'Ingrese un perdiodo',
-
-        ]; */
+        return [
+            'idEmpleado.required'              => 'Debe seleccionar el empleado.',
+            'idDependencia.required'           => 'Debe seleccionar la dependencia.',
+            'fechaInicioFechafin.required'     => 'El rango de fechas es requerido.',
+            'idEvaluacionRendimiento.required' => 'Debe seleccionar una evaluacion.',
+            'idTipoEvaluacion.required'        => 'El tipo de evaluación es requerido.',
+            'plazasAsignadas.required'         => 'Debe seleccionar plazas para evaluar.',
+        ];
     }
 }

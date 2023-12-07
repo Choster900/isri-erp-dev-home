@@ -20,6 +20,7 @@ class PlazaAsignada extends Model
         'id_lt',
         'id_dependencia',
         'id_det_plaza',
+        'id_centro_atencion',
         'id_motivo_desvinculo_laboral',
         'contrato_plaza_asignada',
         'salario_plaza_asignada',
@@ -49,7 +50,7 @@ class PlazaAsignada extends Model
      */
     public function centro_atencion(): BelongsTo
     {
-        return $this->belongsTo(CentroAtencion::class, 'foreign_key', 'other_key');
+        return $this->belongsTo(CentroAtencion::class, 'id_centro_atencion', 'id_centro_atencion');
     }
     public function motivo_desvinculo_laboral()
     {

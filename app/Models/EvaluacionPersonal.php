@@ -17,10 +17,15 @@ class EvaluacionPersonal extends Model
 
     protected $fillable = [
         'id_evaluacion_rendimiento',
+        'id_periodo_evaluacion',
         'id_empleado',
+        'id_dependencia',
+        'id_tipo_evaluacion_personal',
         'fecha_evaluacion_personal',
         'puntaje_evaluacion_personal',
-        'periodo_evaluacion_personal',
+        'fecha_inicio_evaluacion_personal',
+        'fecha_fin_evaluacion_personal',
+        'observacion_incidente_personal',
         'fecha_reg_evaluacion_personal',
         'fecha_mod_evaluacion_personal',
         'usuario_evaluacion_personal',

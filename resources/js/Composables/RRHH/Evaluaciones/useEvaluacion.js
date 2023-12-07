@@ -2,11 +2,11 @@ import axios from "axios";
 import { ref } from "vue";
 
 export const useEvaluacion = () => {
-    const idEmpleado = ref(486);
+    const idEmpleado = ref(null);
     const idDependencia = ref("");
     const idEvaluacionRendimiento = ref("");
     const loadingEvaluacionRendimiento = ref("");
-    const idTipoEvaluacion = ref("");
+    const idTipoEvaluacion = ref(1);
     const fechaInicioFechafin = ref("");
 
     const doesntExistResult = ref(false);
@@ -22,6 +22,8 @@ export const useEvaluacion = () => {
     const messageAlert = ref("");
     const opcionAlertPressed = ref("");
     const globalOptionSelectePlaza = ref("");
+
+    const errorsData = ref([]);
 
     /**
      * Busca empleados por nombre para evaluaciones.
@@ -63,11 +65,27 @@ export const useEvaluacion = () => {
                 idDependencia: idDependencia.value,
                 idTipoEvaluacion: idTipoEvaluacion.value,
                 fechaInicioFechafin: fechaInicioFechafin.value,
+                plazasAsignadas: objectPlazas.value,
             });
 
             console.log(response.data);
             return response; // Devuelve la respuesta exitosa
         } catch (error) {
+
+            if (error.response.status === 422) {
+                let data = error.response.data.errors;
+                var myData = new Object();
+                for (const errorBack in data) {
+                    myData[errorBack] = data[errorBack][0];
+                }
+                errorsData.value = myData;
+                console.table(errorsData.value);
+                setTimeout(() => {
+                    errorsData.value = [];
+                }, 5000);
+            }
+            reject(error);
+
             console.error("Error en la creación de la evaluación personal:", error);
             throw new Error("Error en la creación de la evaluación personal");
         }
@@ -94,6 +112,7 @@ export const useEvaluacion = () => {
         } catch (error) {
             // Manejo de errores
             console.error(error);
+
         } finally {
             // Finalización y limpieza
             loadingEvaluacionRendimiento.value = false;
@@ -123,7 +142,7 @@ export const useEvaluacion = () => {
     const obtenerPlazasDesdeServidor = async () => {
         return await axios.post("/getAllPlazasByEmployeeIdAndDependenciaId", {
             employeeId: idEmpleado.value,
-            dependenciaId: idDependencia.value,
+            centroAtencionId: idDependencia.value,
         });
     };
 
@@ -141,7 +160,7 @@ export const useEvaluacion = () => {
                 procesarDosOtresEvaluaciones(resp.data);
             } else {
                 // Caso sin evaluaciones ni plazas asignadas
-                alert("No se encontraron evaluaciones ni plazas asignadas.");
+                //alert("No se encontraron evaluaciones ni plazas asignadas.");
                 doesntExistResult.value = true;
             }
         } else {
@@ -281,6 +300,7 @@ export const useEvaluacion = () => {
         objectEvaluaciones,
         idEmpleado,
         messageAlert,
+        errorsData,
         showMessageAlert,
         handleAccept,
         handleCancel,

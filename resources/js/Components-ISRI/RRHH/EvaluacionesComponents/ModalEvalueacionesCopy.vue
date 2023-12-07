@@ -11,7 +11,6 @@
                             <h2 class="font-semibold text-slate-800">Crear una nueva evaluación +</h2>
                         </header>
                         <div class="p-3">
-
                             <div class="-mx-3 flex gap-1">
                                 <div class="mb-1 px-3  w-full">
                                     <label class="block text-gray-700 text-xs font-medium mb-1" for="name">Nombre del
@@ -22,25 +21,28 @@
                                             :searchable="true" :clear-on-search="true" :min-chars="5"
                                             placeholder="Busqueda de empleado..." :classes="{
                                                 placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                            }" noOptionsText="<p class='text-xs'>Sin Personas<p>"
+                                            }" noOptionsText="<p class='text-xs'>Lista vacia<p>"
                                             noResultsText="<p class='text-xs'>Sin resultados de personas <p>" :options="async function (query) {
                                                 return await handleEmployeeSearch(query)
                                             }" />
                                     </div>
+                                    <InputError class="mt-2 px-2" :message="errorsData.idEmpleado" />
                                 </div>
                             </div>
                             <div class=" flex gap-1">
                                 <div class="mb-1 -ml-3 pl-3 w-7/12">
-                                    <label class="block text-gray-700 text-xs font-medium mb-1" for="name">Dependencia <span
-                                            class="text-red-600 font-extrabold">*</span></label>
+                                    <label class="block text-gray-700 text-xs font-medium mb-1" for="name">Centro de
+                                        atencion <span class="text-red-600 font-extrabold">*</span></label>
                                     <div class="relative flex h-8 w-full flex-row-reverse ">
-                                        <Multiselect :searchable="true" v-model="idDependencia"
+                                        <Multiselect :searchable="true" v-model="idDependencia" placeholder="Centros"
                                             @select="getPlazasByEmployeeIdAndDependenciaId()" :classes="{
                                                 placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
                                             }" noOptionsText="<p class='text-xs'>Sin dependencias<p>"
                                             noResultsText="<p class='text-xs'>Sin resultados de dependencias <p>"
                                             :options="listDependencias" />
                                     </div>
+                                    <InputError class="mt-2 px-2" :message="errorsData.idDependencia" />
+
                                 </div>
                                 <div class="mb-1 -mr-3 pr-3 w-1/2">
                                     <div class="flex gap-1">
@@ -79,7 +81,6 @@
                                                             <td class="py-0.5 text-[7.5pt] w-36 px-2 border-b">{{
                                                                 plaza.label }}</td>
                                                         </tr>
-
                                                     </table>
                                                 </div>
                                             </template>
@@ -88,18 +89,18 @@
                                     <div class="relative flex h-8 w-full flex-row-reverse ">
                                         <Multiselect :filter-results="false" :resolve-on-load="false" :delay="1000"
                                             v-model="idEvaluacionRendimiento" :disabled="!showPlazasModal"
-                                            :searchable="true" :clear-on-search="true" :min-chars="5" placeholder=""
-                                            :classes="{
+                                            :searchable="true" :clear-on-search="true" :min-chars="5"
+                                            placeholder="Evaluaciones" :classes="{
                                                 placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
                                             }" noOptionsText="<p class='text-xs'>Sin evaluaciones<p>"
                                             noResultsText="<p class='text-xs'>Sin resultados de evaluaciones <p>"
                                             :options="evaluationsOptions" />
                                     </div>
+                                    <InputError class="mt-2 px-2" :message="errorsData.idEvaluacionRendimiento" />
                                 </div>
                             </div>
                             <InputError v-if="doesntExistResult" class="mt-1 px-2"
                                 message="No hay plazas disponibles para la dependencia seleccionada." />
-
                             <div class="-mx-3 flex gap-1" v-if="showPlazasModal">
                                 <div class="mb-1 px-3  w-full">
                                     <label class="block text-gray-700 text-xs font-medium mb-1" for="name">Todas las plazas
@@ -115,7 +116,9 @@
                                             placeholder: 'text-xs flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
                                         }" :object="true" :options="plazaOptions" />
                                 </div>
+                                
                             </div>
+                            <InputError class="mt-2 px-2 border-b" :message="errorsData.plazasAsignadas" />
                             <InputError v-if="existMoreThanOne" class="mt-1 px-2"
                                 message="La dependencia tiene múltiples tipos de plazas. Por favor, seleccione una evaluación y las plazas que desea evaluar." />
                             <div class="-mx-3 flex py-1">
@@ -123,41 +126,61 @@
                                     <div class="mb-4 md:mr-0 md:mb-0 basis-1/2">
                                         <label class="block text-gray-700 text-xs font-medium mb-1" for="name">Fecha [Desde
                                             - Hasta] <span class="text-red-600 font-extrabold">*</span></label>
-                                        <div class="relative flex">
+                                        <div class="relative flex gap-1">
                                             <flat-pickr v-model="fechaInicioFechafin"
                                                 class="text-xs cursor-pointer rounded-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none w-full"
                                                 :config="configSecondInput" :placeholder="'Seleccione Fecha Inicial'" />
+
+                                            <Tooltip bg="dark" position="right" :key="weekIndex" class="">
+                                                <template v-slot:contenido>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                        @click="clearLock" title="Quitar bloqueos de fecha"
+                                                        stroke-width="1.5" stroke="currentColor"
+                                                        class="w-7 h-7 cursor-pointer">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                                                    </svg>
+                                                </template>
+                                                <template v-slot:message>
+                                                    <div class="text-xs text-slate-200 w-28 text-center">
+                                                        Limpiar bloqueos
+                                                    </div>
+                                                </template>
+                                            </Tooltip>
                                         </div>
+                                        <InputError class="mt-2 px-2" :message="errorsData.fechaInicioFechafin" />
+
                                     </div>
                                 </div>
                             </div>
                             <div class="mx-0.5 mt-2">
                                 <label class="block text-gray-700 text-xs font-medium mb-1" for="name">
-                                    Tipo evaluacion <span class="text-red-600 font-extrabold">*</span>
+                                    Tipo de evaluacion <span class="text-red-600 font-extrabold">*</span>
                                 </label>
                                 <div class="flex flex-wrap items-center -m-3">
                                     <div class="m-3">
                                         <label class="flex items-center">
                                             <input type="radio" name="radio-buttons" v-model="idTipoEvaluacion"
-                                                class="form-radio" checked="" value="1">
-                                            <span class="text-sm ml-2 text-selection-disable">Desempeño</span></label>
+                                                class="form-radio" checked="true" value="1">
+                                            <span class="text-sm ml-2 text-selection-disable">Desempeño</span>
+                                        </label>
                                     </div>
                                     <div class="m-3">
                                         <label class="flex items-center">
                                             <input type="radio" name="radio-buttons" v-model="idTipoEvaluacion"
                                                 class="form-radio" value="2">
-                                            <span class="text-sm ml-2 text-selection-disable">Periodo de
-                                                prueba</span></label>
+                                            <span class="text-sm ml-2 text-selection-disable">Periodo de prueba</span>
+                                        </label>
                                     </div>
                                 </div>
                             </div>
+                            <InputError class="mt-2 px-2" :message="errorsData.idTipoEvaluacion" />
+
                             <button @click="createPersonalEvaluationRequest"
                                 class="bg-indigo-900 rounded-sm shadow text-center text-white text-sm font-light w-full py-1 mt-5">Crear
                                 una nueva evaluación</button>
-
                         </div>
                     </div>
-
                     <div
                         class="h-[290px] overflow-y-auto col-span-full xl:col-span-6 bg-white shadow-lg  border border-slate-300">
                         <div class="p-3">
@@ -320,10 +343,11 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue';
 import DocumentoEvaluacion from '../DocumentoEvaluacion.vue';
 import { useEvaluacion } from '@/Composables/RRHH/Evaluaciones/useEvaluacion';
-import { onMounted, ref, toRefs } from 'vue';
+import { onMounted, ref, toRefs, watch } from 'vue';
 import AccordionBasic from '@/Components-ISRI/AccordionBasic.vue';
 import ModalMorenThanOneTipo from './ModalMorenThanOneTipo.vue';
 import ModalBlank from '@/Components-ISRI/AllModal/ModalBlank.vue';
+import { Spanish } from "flatpickr/dist/l10n/es.js"
 
 export default {
     components: {
@@ -336,18 +360,26 @@ export default {
         listDependencias: { type: Object, default: () => { }, },
     },
     setup(props) {
+        const selectedDates = ref([]);
+
         const configSecondInput = ref({
             mode: 'range',
             wrap: true,
             altInput: true,
+            minDate: '',
+            maxDate: '',
             altFormat: 'M j, Y',
-            dateFormat: "Y-m-d",
-            disableMobile: "true",
+            dateFormat: 'Y-m-d',
+            weekNumbers: true,
+            ordinal: function () {
+                return "º";
+            },
+            disableMobile: 'true',
             locale: {
-                rangeSeparator: " a ",
+                rangeSeparator: ' a ',
                 firstDayOfWeek: 1,
                 weekdays: {
-                    shorthand: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa'],
+                    shorthand: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
                     longhand: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
                 },
                 months: {
@@ -355,20 +387,76 @@ export default {
                     longhand: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
                 },
             },
-        })
+            onChange: function (selectedDates, dateStr, instance) {
+                // Si no se selecciona una segunda fecha, restablece las fechas permitidas
+                console.log(selectedDates.length);
+                if (selectedDates.length == 1) {
+                    /*  instance.set('minDate', null);
+                     instance.set('maxDate', null); */
+                    configSecondInput.value.minDate = '';
+                    configSecondInput.value.maxDate = '';
+                    /* alert("limpiamos") */
+                }
+
+                // Verifica en qué rango de fechas se encuentra la primera fecha seleccionada
+                if (selectedDates.length === 1) {
+                    const firstDate = selectedDates[0];
+                    const january1 = new Date(firstDate.getFullYear(), 0, 1);
+                    const june30 = new Date(firstDate.getFullYear(), 5, 30);
+                    const july1 = new Date(firstDate.getFullYear(), 6, 1);
+                    const december31 = new Date(firstDate.getFullYear(), 11, 31);
+
+                    if (firstDate >= january1 && firstDate <= june30) {
+                        // Si la fecha está entre enero 1 y junio 30
+                        instance.set('minDate', january1);
+                        instance.set('maxDate', june30);
+                    } else if (firstDate >= july1 && firstDate <= december31) {
+                        // Si la fecha está entre julio 1 y diciembre 31
+                        instance.set('minDate', july1);
+                        instance.set('maxDate', december31);
+                    }
+                }
+
+                // Maneja otros eventos o lógica según sea necesario
+                console.log({ selectedDates, dateStr, instance });
+            },
+
+        });
+        /*   watch(() => props.showModal, (newVal) => {
+              if (!newVal) {
+                  selectedDates.value = [];
+                  configSecondInput.value.minDate = '';
+                  configSecondInput.value.maxDate = '';
+              }
+          }); */
+        const clearLock = () => {
+            selectedDates.value = [];
+            configSecondInput.value.minDate = null;
+            configSecondInput.value.maxDate = null;
+            alert("limpios")
+        }
         const { listDependencias } = toRefs(props)
-        const { handleEmployeeSearch, idEmpleado, objectPlazas, evaluationsOptions, existMoreThanOne, handleTagToSelect, messageAlert, showMessageAlert, handleAccept, handleCancel,
-            objectEvaluaciones, fechaInicioFechafin, getPlazasByEmployeeIdAndDependenciaId, plazaOptions, idTipoEvaluacion, showPlazasModal, createPersonalEvaluationRequest, loadingEvaluacionRendimiento, idDependencia, idEvaluacionRendimiento, doesntExistResult } = useEvaluacion();
+        const {
+            handleEmployeeSearch, idEmpleado, objectPlazas,
+            evaluationsOptions, existMoreThanOne, handleTagToSelect,
+            messageAlert, showMessageAlert, handleAccept, handleCancel, errorsData,
+            objectEvaluaciones, fechaInicioFechafin, getPlazasByEmployeeIdAndDependenciaId,
+            plazaOptions, idTipoEvaluacion, showPlazasModal, createPersonalEvaluationRequest,
+            loadingEvaluacionRendimiento, idDependencia, idEvaluacionRendimiento, doesntExistResult } = useEvaluacion();
+
         const activeIndex = ref(0);
-        const activeContent = ref(0);
         const dangerModalOpen = ref(false);
+
         return {
-            dangerModalOpen, showMessageAlert,
-            listDependencias, handleAccept, handleCancel,
-            configSecondInput, idEvaluacionRendimiento, objectPlazas, existMoreThanOne, handleTagToSelect, messageAlert,
+            dangerModalOpen, showMessageAlert, clearLock,
+            listDependencias, handleAccept, handleCancel, errorsData,
+            selectedDates, configSecondInput, idEvaluacionRendimiento, objectPlazas,
+            existMoreThanOne, handleTagToSelect, messageAlert,
             objectEvaluaciones, fechaInicioFechafin,
-            activeIndex, activeContent, getPlazasByEmployeeIdAndDependenciaId, plazaOptions, showPlazasModal, evaluationsOptions,
-            handleEmployeeSearch, idEmpleado, idDependencia, doesntExistResult, createPersonalEvaluationRequest, idTipoEvaluacion, loadingEvaluacionRendimiento
+            activeIndex, getPlazasByEmployeeIdAndDependenciaId,
+            plazaOptions, showPlazasModal, evaluationsOptions,
+            handleEmployeeSearch, idEmpleado, idDependencia, doesntExistResult,
+            createPersonalEvaluationRequest, idTipoEvaluacion, loadingEvaluacionRendimiento
         }
     }
 
