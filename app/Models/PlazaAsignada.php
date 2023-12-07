@@ -44,14 +44,17 @@ class PlazaAsignada extends Model
         return $this->belongsTo('App\Models\Empleado', 'id_empleado', 'id_empleado');
     }
     /**
-     * Get the centro_atencion that owns the PlazaAsignada
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * The function "dependencia" returns a relationship between the current model and the
+     * "Dependencia" model.
      */
-    public function centro_atencion(): BelongsTo
+    public function dependencia()
     {
         return $this->belongsTo('App\Models\Dependencia', 'id_dependencia', 'id_dependencia');
     }
+    /**
+     * The function "centro_atencion" returns a relationship between the current model and the
+     * "CentroAtencion" model.
+     */
     public function centro_atencion()
     {
         return $this->belongsTo('App\Models\CentroAtencion', 'id_centro_atencion', 'id_centro_atencion');
