@@ -68,10 +68,10 @@
                 <div class="container mx-auto">
                     <div class="bg-white shadow-md rounded mt-2">
                         <div class="flex justify-between bg-teal-800 px-2 py-2 text-white">
-                            <div class="w-1/4">Nombre</div>
-                            <div class="w-1/4">Edad</div>
-                            <div class="w-1/4">Correo</div>
-                            <div class="w-1/4">País</div>
+                            <div class="w-1/4">ID</div>
+                            <div class="w-1/4">ESTADO</div>
+                            <div class="w-1/4">FECHA PLAZA</div>
+                            <div class="w-1/4">NIT</div>
                         </div>
                         <div v-for="(employee, index) in paginatedData" :key="index" :class="{
                             'bg-gray-200': index % 2 === 0,
@@ -79,9 +79,15 @@
                         }"
                             class="flex justify-between border-b border-gray-100 text-[14px] px-2 py-2 hover:bg-gray-300">
                             <div class="w-1/4 break-all">{{ employee.id_empleado }}</div>
-                            <div class="w-1/4 break-all">{{ employee.codigo_empleado }}</div>
-                            <div class="w-1/4 break-all">{{ employee.usuario_empleado }}</div>
+                            <div class="w-1/4 break-all">{{ employee.id_estado_empleado === 1 ? 1 : 0 }}</div>
+                            <div class="w-1/4 break-all">
+                                <p v-for="(plaza, index) in employee.plazas_asignadas" :key="index">
+                                {{ plaza.fecha_plaza_asignada }}</p>
+                            </div>
                             <div class="w-1/4 break-all">{{ employee.nit_empleado }}</div>
+                        </div>
+                        <div>
+
                         </div>
                     </div>
                 </div>
@@ -137,7 +143,7 @@
             </div>
             <div v-else-if="showModal" class="fixed inset-0 flex items-center justify-center z-50 mt-10 w-full">
                 <div class="fixed inset-0 bg-black opacity-60"></div>
-                <div class="bg-white rounded-lg z-10 modal-slide w-full max-w-xl max-h-full relative">
+                <div class="bg-white rounded-lg z-10 modal-slide w-full max-w-2xl max-h-full relative">
                     <!-- Botón "X" para cerrar el modal -->
                     <div class="bg-[#3c4557] rounded-t-lg">
                         <button @click="showModal = false"
@@ -220,6 +226,33 @@
                             </div>
                         </div>
                     </div>
+                    <div class="md:flex flex-row justify-items-start mb-4 mx-4">
+                        <div class="mb-5 md:mr-2 md:mb-0 basis-1/3 justify-center text-center">
+                            <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">
+                                ¿Filtro de fecha?
+                            </label>
+                            <label for="checbox1" class="text-sm font-medium text-gray-600 dark:text-white ml-4 mr-1">SI
+                            </label>
+                            <input type="checkbox" v-model="reportInfo.rangeY" id="checbox1"
+                                class="rounded mr-3 border-gray-500  text-emerald-500 shadow-sm"
+                                @click="reportInfo.rangeY ? reportInfo.rangeY = false : reportInfo.rangeY = true; rangeN = false" />
+                            <label for="checbox2" class="text-sm font-medium text-gray-600 dark:text-white ml-4 mr-1">NO
+                            </label>
+                            <input type="checkbox" v-model="rangeN" id="checbox2"
+                                class="rounded mr-3 border-gray-500  text-emerald-500 shadow-sm"
+                                @click="rangeN ? rangeN = false : rangeN = true; reportInfo.rangeY = false" />
+                        </div>
+                        <div v-show="reportInfo.rangeY" class="mb-5 md:mr-2 md:mb-0 basis-1/3 justify-start text-left">
+                            <date-time-picker-m v-model="reportInfo.startDate" label="Fecha inicio" />
+                            <InputError v-for="(item, index) in errors.startDate" :key="index" class="mt-2"
+                                :message="item" />
+                        </div>
+                        <div v-show="reportInfo.rangeY" class="mb-5 md:mr-2 md:mb-0 basis-1/3 justify-start text-left">
+                            <date-time-picker-m v-model="reportInfo.endDate" label="Fecha fin" />
+                            <InputError v-for="(item, index) in errors.endDate" :key="index" class="mt-2"
+                                :message="item" />
+                        </div>
+                    </div>
                     <div class="flex justify-center my-4">
                         <button @click="showModal = false"
                             class="block mt-4 bg-white border border-gray-600 hover:bg-gray-600 hover:text-white text-gray-600 font-semibold py-1 px-3 rounded">
@@ -248,6 +281,7 @@ import { jsPDF } from "jspdf";
 import { ref, toRefs, computed, onMounted } from 'vue';
 import { usePermissions } from '@/Composables/General/usePermissions.js';
 import { useReportesRRHH } from '@/Composables/RRHH/Reporte/useReportesRRHH.js';
+import DateTimePickerM from "@/Components-ISRI/ComponentsToForms/DateTimePickerM.vue";
 
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
@@ -255,7 +289,7 @@ import 'vue3-toastify/dist/index.css';
 import axios from 'axios';
 
 export default {
-    components: { Head, AppLayoutVue },
+    components: { Head, AppLayoutVue, DateTimePickerM },
     props: {
         menu: {
             type: Object,
@@ -266,6 +300,10 @@ export default {
         const { menu } = toRefs(props);
         const permits = usePermissions(menu.value, window.location.pathname);
 
+        const rangeN = ref(false)
+
+        const date = ref("")
+
         const currentPage = ref(1)
         const pageSize = ref(5)
 
@@ -273,115 +311,11 @@ export default {
             depId: '',
             parentId: '',
             status: '',
-            typeOfContract: ''
+            typeOfContract: '',
+            startDate: new Date(),
+            endDate: new Date(),
+            rangeY:false
         })
-
-        const personas = ref([{
-            nombre: 'Melvin',
-            edad: '29',
-            correo: 'jmelvin1994@gmail.com',
-            pais: 'El Salvador'
-        },
-        {
-            nombre: 'Ulises',
-            edad: '24',
-            correo: 'jmelvin1990@gmail.com',
-            pais: 'Guatemala'
-        },
-        {
-            nombre: 'Melvin2',
-            edad: '29',
-            correo: 'jmelvin1994@gmail.com',
-            pais: 'El Salvador'
-        },
-        {
-            nombre: 'Ulises2',
-            edad: '24',
-            correo: 'jmelvin1990@gmail.com',
-            pais: 'Guatemala'
-        },
-        {
-            nombre: 'Melvin3',
-            edad: '29',
-            correo: 'jmelvin1994@gmail.com',
-            pais: 'El Salvador'
-        },
-        {
-            nombre: 'Ulises3',
-            edad: '24',
-            correo: 'jmelvin1990@gmail.com',
-            pais: 'Guatemala'
-        },
-        {
-            nombre: 'Melvin4',
-            edad: '29',
-            correo: 'jmelvin1994@gmail.com',
-            pais: 'El Salvador'
-        },
-        {
-            nombre: 'Ulises4',
-            edad: '24',
-            correo: 'jmelvin1990@gmail.com',
-            pais: 'Guatemala'
-        },
-        {
-            nombre: 'Melvin5',
-            edad: '29',
-            correo: 'jmelvin1994@gmail.com',
-            pais: 'El Salvador'
-        },
-        {
-            nombre: 'Ulises5',
-            edad: '24',
-            correo: 'jmelvin1990@gmail.com',
-            pais: 'Guatemala'
-        },
-        {
-            nombre: 'Melvin6',
-            edad: '29',
-            correo: 'jmelvin1994@gmail.com',
-            pais: 'El Salvador'
-        },
-        {
-            nombre: 'Ulises6',
-            edad: '24',
-            correo: 'jmelvin1990@gmail.com',
-            pais: 'Guatemala'
-        },
-        {
-            nombre: 'Melvin7',
-            edad: '29',
-            correo: 'jmelvin1994@gmail.com',
-            pais: 'El Salvador'
-        },
-        {
-            nombre: 'Ulises7',
-            edad: '24',
-            correo: 'jmelvin1990@gmail.com',
-            pais: 'Guatemala'
-        },{
-            nombre: 'Melvin8',
-            edad: '29',
-            correo: 'jmelvin1994@gmail.com',
-            pais: 'El Salvador'
-        },
-        {
-            nombre: 'Ulises8',
-            edad: '24',
-            correo: 'jmelvin1990@gmail.com',
-            pais: 'Guatemala'
-        },{
-            nombre: 'Melvin9',
-            edad: '29',
-            correo: 'jmelvin1994@gmail.com',
-            pais: 'El Salvador'
-        },
-        {
-            nombre: 'Ulises9',
-            edad: '24',
-            correo: 'jmelvin1990@gmail.com',
-            pais: 'Guatemala'
-        }]);
 
         const {
             queryResult, getInfoForModal, depFilter, showModal, cleanObject,
@@ -409,6 +343,10 @@ export default {
             return pages;
         });
 
+        const formattedDate = computed(() => {
+            return moment(date.value).format('DD/MM/YYYY');
+        });
+
         const shouldShowEllipsisBefore = computed(() => pagesToShow.value[0] > 2);
         const shouldShowFirstPage = computed(() => pagesToShow.value[0] > 1);
 
@@ -429,11 +367,11 @@ export default {
         return {
             permits, queryResult, reportInfo,
             errors, cleanObject, getDataForReport,
-            depFilter, showModal, states,
+            depFilter, showModal, states, rangeN, date, formattedDate,
             typesOfContract, isLoadingRequest, mainCenters,
 
             shouldShowEllipsisBefore, currentPage, pageSize, changePage, totalPages, shouldShowLastPage,
-            shouldShowEllipsisAfter, pagesToShow, personas, paginatedData, shouldShowFirstPage
+            shouldShowEllipsisAfter, pagesToShow, paginatedData, shouldShowFirstPage
         };
     },
 }
