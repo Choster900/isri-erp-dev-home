@@ -17,10 +17,15 @@ class EvaluacionPersonal extends Model
 
     protected $fillable = [
         'id_evaluacion_rendimiento',
+        'id_periodo_evaluacion',
         'id_empleado',
+        'id_dependencia',
+        'id_tipo_evaluacion_personal',
         'fecha_evaluacion_personal',
         'puntaje_evaluacion_personal',
-        'periodo_evaluacion_personal',
+        'fecha_inicio_evaluacion_personal',
+        'fecha_fin_evaluacion_personal',
+        'observacion_incidente_personal',
         'fecha_reg_evaluacion_personal',
         'fecha_mod_evaluacion_personal',
         'usuario_evaluacion_personal',
@@ -61,5 +66,32 @@ class EvaluacionPersonal extends Model
     public function plaza_evaluada(): HasMany
     {
         return $this->hasMany(PlazaEvaluada::class, 'id_evaluacion_personal', 'id_evaluacion_personal');
+    }
+    /**
+     * Get the evaluacion_rendimiento that owns the EvaluacionPersonal
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function evaluacion_rendimiento(): BelongsTo
+    {
+        return $this->belongsTo(EvaluacionRendimiento::class, 'id_evaluacion_rendimiento', 'id_evaluacion_rendimiento');
+    }
+    /**
+     * Get the tipo_evaluacion that owns the EvaluacionPersonal
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function tipo_evaluacion(): BelongsTo
+    {
+        return $this->belongsTo(TipoEvaluacion::class, 'id_tipo_evaluacion_personal', 'id_tipo_evaluacion_personal');
+    }
+    /**
+     * Get the tipo_evaluacion that owns the EvaluacionPersonal
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function periodo_evaluacion(): BelongsTo
+    {
+        return $this->belongsTo(PeriodoEvaluacion::class, 'id_periodo_evaluacion', 'id_periodo_evaluacion');
     }
 }

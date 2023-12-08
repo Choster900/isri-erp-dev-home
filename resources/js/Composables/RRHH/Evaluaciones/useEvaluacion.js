@@ -4,9 +4,10 @@ import { ref } from "vue";
 export const useEvaluacion = () => {
     const idEmpleado = ref(486);
     const idDependencia = ref("");
+    const idCentroAtencion = ref("");
     const idEvaluacionRendimiento = ref("");
     const loadingEvaluacionRendimiento = ref("");
-    const idTipoEvaluacion = ref("");
+    const idTipoEvaluacion = ref(1);
     const fechaInicioFechafin = ref("");
 
     const doesntExistResult = ref(false);
@@ -22,6 +23,8 @@ export const useEvaluacion = () => {
     const messageAlert = ref("");
     const opcionAlertPressed = ref("");
     const globalOptionSelectePlaza = ref("");
+
+    const errorsData = ref([]);
 
     /**
      * Busca empleados por nombre para evaluaciones.
@@ -60,14 +63,30 @@ export const useEvaluacion = () => {
             const response = await axios.post("/create-new-evaluacion", {
                 idEvaluacionRendimiento: idEvaluacionRendimiento.value,
                 idEmpleado: idEmpleado.value,
-                idDependencia: idDependencia.value,
+                idCentroAtencion: idCentroAtencion.value,
                 idTipoEvaluacion: idTipoEvaluacion.value,
                 fechaInicioFechafin: fechaInicioFechafin.value,
+                plazasAsignadas: objectPlazas.value,
             });
 
             console.log(response.data);
             return response; // Devuelve la respuesta exitosa
         } catch (error) {
+
+            if (error.response.status === 422) {
+                let data = error.response.data.errors;
+                var myData = new Object();
+                for (const errorBack in data) {
+                    myData[errorBack] = data[errorBack][0];
+                }
+                errorsData.value = myData;
+                console.table(errorsData.value);
+                setTimeout(() => {
+                    errorsData.value = [];
+                }, 5000);
+            }
+            reject(error);
+
             console.error("Error en la creación de la evaluación personal:", error);
             throw new Error("Error en la creación de la evaluación personal");
         }
@@ -76,13 +95,13 @@ export const useEvaluacion = () => {
     /**
      * Realiza la búsqueda de plazas según el ID del empleado y el ID de la dependencia.
      */
-    const getPlazasByEmployeeIdAndDependenciaId = async () => {
+    const getPlazasByEmployeeIdAndCentroAtencionId = async () => {
         try {
             // Inicialización y limpieza de variables
             resetVariables();
 
             // Validar si falta información necesaria
-            if (!idEmpleado.value || !idDependencia.value) {
+            if (!idEmpleado.value || !idCentroAtencion.value || !idTipoEvaluacion.value || !fechaInicioFechafin.value) {
                 return;
             }
 
@@ -94,6 +113,7 @@ export const useEvaluacion = () => {
         } catch (error) {
             // Manejo de errores
             console.error(error);
+
         } finally {
             // Finalización y limpieza
             loadingEvaluacionRendimiento.value = false;
@@ -123,7 +143,9 @@ export const useEvaluacion = () => {
     const obtenerPlazasDesdeServidor = async () => {
         return await axios.post("/getAllPlazasByEmployeeIdAndDependenciaId", {
             employeeId: idEmpleado.value,
-            dependenciaId: idDependencia.value,
+            centroAtencionId: idCentroAtencion.value,
+            idTipoEvaluacion: idTipoEvaluacion.value,
+            fechaInicioFechafin: fechaInicioFechafin.value,
         });
     };
 
@@ -141,7 +163,7 @@ export const useEvaluacion = () => {
                 procesarDosOtresEvaluaciones(resp.data);
             } else {
                 // Caso sin evaluaciones ni plazas asignadas
-                alert("No se encontraron evaluaciones ni plazas asignadas.");
+                //alert("No se encontraron evaluaciones ni plazas asignadas.");
                 doesntExistResult.value = true;
             }
         } else {
@@ -164,7 +186,7 @@ export const useEvaluacion = () => {
             label: index.codigo_evaluacion_rendimiento,
         }));
         objectPlazas.value = data.plazasAsignadas.map((index) => ({
-            value: index.detalle_plaza.plaza.id_plaza,
+            value: index.id_plaza_asignada,
             label: index.detalle_plaza.plaza.nombre_plaza,
         }));
         idEvaluacionRendimiento.value =
@@ -186,7 +208,7 @@ export const useEvaluacion = () => {
             tipo_plaza: index.tipo_plaza,
         }));
         plazaOptions.value = data.plazasAsignadas.map((index) => ({
-            value: index.detalle_plaza.plaza.id_plaza,
+            value: index.id_plaza_asignada,
             label: index.detalle_plaza.plaza.nombre_plaza,
             id_tipo_plaza: index.detalle_plaza.plaza.tipo_plaza.id_tipo_plaza,
             nombre_tipo_plaza:
@@ -265,22 +287,24 @@ export const useEvaluacion = () => {
     return {
         handleEmployeeSearch,
         handleTagToSelect,
-        idDependencia,
+        idCentroAtencion,
         plazaOptions,
         idEvaluacionRendimiento,
         existMoreThanOne,
         loadingEvaluacionRendimiento,
-        getPlazasByEmployeeIdAndDependenciaId,
+        getPlazasByEmployeeIdAndCentroAtencionId,
         createPersonalEvaluationRequest,
         idTipoEvaluacion,
         doesntExistResult,
         evaluationsOptions,
         fechaInicioFechafin,
         showPlazasModal,
+        idDependencia,
         objectPlazas,
         objectEvaluaciones,
         idEmpleado,
         messageAlert,
+        errorsData,
         showMessageAlert,
         handleAccept,
         handleCancel,

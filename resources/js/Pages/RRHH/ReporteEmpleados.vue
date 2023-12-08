@@ -3,7 +3,7 @@
     <AppLayoutVue nameSubModule="RRHH - Reporte de Empleados" :autoPadding="false">
 
         <div class="py-3 w-full border-b border-slate-200 flex justify-center items-center">
-            <button @click="showModal = true; cleanObject(reportInfo)"
+            <button @click="openModal()"
                 class="bg-emerald-600 hover:bg-emerald-800 text-white text-[14px] font-bold py-2 px-3 rounded-full">
                 NUEVO REPORTE
             </button>
@@ -16,7 +16,8 @@
                     <p class="font-bembo text-center">ADMON - AREA DE DESARROLLO</p>
                     <p class="font-bembo text-center">REPORTE DE EMPLEADOS ACTIVOS</p>
                     <p class="font-bembo text-center">DEL
-                        <span class="font-semibold">1/12/2023</span> AL <span class="font-semibold">15/12/2023</span>
+                        <span class="font-semibold">{{ formatDate(reportInfo.startDate) }}</span> AL <span
+                            class="font-semibold">{{ formatDate(reportInfo.endDate) }}</span>
                     </p>
                 </div>
             </div>
@@ -81,8 +82,9 @@
                             <div class="w-1/4 break-all">{{ employee.id_empleado }}</div>
                             <div class="w-1/4 break-all">{{ employee.id_estado_empleado === 1 ? 1 : 0 }}</div>
                             <div class="w-1/4 break-all">
-                                <p v-for="(plaza, index) in employee.plazas_asignadas" :key="index">
-                                {{ plaza.fecha_plaza_asignada }}</p>
+                                <template v-for="(plaza, index) in employee.plazas_asignadas" :key="index">
+                                    <p>{{ plaza.fecha_plaza_asignada }} - {{ plaza.fecha_renuncia_plaza_asignada }}</p>
+                                </template>
                             </div>
                             <div class="w-1/4 break-all">{{ employee.nit_empleado }}</div>
                         </div>
@@ -122,28 +124,29 @@
             </div>
         </div>
 
-        <!-- Modal -->
-        <transition name="modal-fade">
-            <div v-if="isLoadingRequest"
-                class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
-                <div role="status" class="flex items-center">
-                    <svg aria-hidden="true" class="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-800"
-                        viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                            fill="currentColor" />
-                        <path
-                            d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                            fill="currentFill" />
-                    </svg>
-                    <div class="bg-gray-200 rounded-lg p-1 font-semibold">
-                        <span class="text-blue-800">CARGANDO...</span>
-                    </div>
+        <div v-if="isLoadingRequest"
+            class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
+            <div role="status" class="flex items-center">
+                <svg aria-hidden="true" class="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-800"
+                    viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                        fill="currentColor" />
+                    <path
+                        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                        fill="currentFill" />
+                </svg>
+                <div class="bg-gray-200 rounded-lg p-1 font-semibold">
+                    <span class="text-blue-800">CARGANDO...</span>
                 </div>
             </div>
-            <div v-else-if="showModal" class="fixed inset-0 flex items-center justify-center z-50 mt-10 w-full">
+        </div>
+
+        <!-- Modal -->
+        <transition v-else-if="showModal" name="modal-fade">
+            <div class="fixed inset-0 flex items-center justify-center z-50 mt-10 w-full overflow-y-auto">
                 <div class="fixed inset-0 bg-black opacity-60"></div>
-                <div class="bg-white rounded-lg z-10 modal-slide w-full max-w-2xl max-h-full relative">
+                <div class="bg-white rounded-lg z-10 modal-slide w-full max-w-2xl max-h-full relative sin-scroll">
                     <!-- Botón "X" para cerrar el modal -->
                     <div class="bg-[#3c4557] rounded-t-lg">
                         <button @click="showModal = false"
@@ -242,15 +245,34 @@
                                 class="rounded mr-3 border-gray-500  text-emerald-500 shadow-sm"
                                 @click="rangeN ? rangeN = false : rangeN = true; reportInfo.rangeY = false" />
                         </div>
-                        <div v-show="reportInfo.rangeY" class="mb-5 md:mr-2 md:mb-0 basis-1/3 justify-start text-left">
+                        <div v-if="reportInfo.rangeY" class="mb-5 md:mr-2 md:mb-0 basis-1/3 justify-start text-left">
                             <date-time-picker-m v-model="reportInfo.startDate" label="Fecha inicio" />
                             <InputError v-for="(item, index) in errors.startDate" :key="index" class="mt-2"
                                 :message="item" />
                         </div>
-                        <div v-show="reportInfo.rangeY" class="mb-5 md:mr-2 md:mb-0 basis-1/3 justify-start text-left">
+                        <div v-if="reportInfo.rangeY" class="mb-5 md:mr-2 md:mb-0 basis-1/3 justify-start text-left">
                             <date-time-picker-m v-model="reportInfo.endDate" label="Fecha fin" />
-                            <InputError v-for="(item, index) in errors.endDate" :key="index" class="mt-2"
-                                :message="item" />
+                            <InputError v-for="(item, index) in errors.endDate" :key="index" class="mt-2" :message="item" />
+                        </div>
+                    </div>
+                    <div v-if="reportInfo.startDate || reportInfo.endDate"
+                        class="flex border border-gray-400 rounded-lg mx-8">
+                        <div class="border-r border-gray-400 w-[15%] flex items-center justify-center py-2">
+                            <svg class="w-6 h-6 text-blue-700" fill="currentColor" viewBox="0 0 32 32" version="1.1"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                <g id="SVGRepo_iconCarrier">
+                                    <path
+                                        d="M18 23l-1-0v-8.938c0-0.011-0.003-0.021-0.003-0.031s0.003-0.020 0.003-0.031c0-0.552-0.448-1-1-1h-2c-0.552 0-1 0.448-1 1s0.448 1 1 1h1v8h-1c-0.552 0-1 0.448-1 1s0.448 1 1 1h4c0.552 0 1-0.448 1-1s-0.448-1-1-1zM16 11c1.105 0 2-0.896 2-2s-0.895-2-2-2-2 0.896-2 2 0.896 2 2 2zM16-0c-8.836 0-16 7.163-16 16s7.163 16 16 16c8.837 0 16-7.163 16-16s-7.163-16-16-16zM16 30.031c-7.72 0-14-6.312-14-14.032s6.28-14 14-14 14 6.28 14 14-6.28 14.032-14 14.032z">
+                                    </path>
+                                </g>
+                            </svg>
+                        </div>
+                        <div class="w-[85%] rounded-r-lg text-[13px]">
+                            <h2 class="text-slate-700 text-center font-semibold">Información</h2>
+                            <p class="mx-2 mb-1 font-semibold">{{ computedMessage }}
+                            </p>
                         </div>
                     </div>
                     <div class="flex justify-center my-4">
@@ -278,10 +300,13 @@ import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import moment from 'moment';
 import InputError from "@/Components/InputError.vue";
 import { jsPDF } from "jspdf";
-import { ref, toRefs, computed, onMounted } from 'vue';
+import { ref, toRefs, computed, onMounted, watch } from 'vue';
 import { usePermissions } from '@/Composables/General/usePermissions.js';
 import { useReportesRRHH } from '@/Composables/RRHH/Reporte/useReportesRRHH.js';
 import DateTimePickerM from "@/Components-ISRI/ComponentsToForms/DateTimePickerM.vue";
+
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
@@ -289,7 +314,7 @@ import 'vue3-toastify/dist/index.css';
 import axios from 'axios';
 
 export default {
-    components: { Head, AppLayoutVue, DateTimePickerM },
+    components: { Head, AppLayoutVue, DateTimePickerM, VueDatePicker },
     props: {
         menu: {
             type: Object,
@@ -302,19 +327,17 @@ export default {
 
         const rangeN = ref(false)
 
-        const date = ref("")
-
         const currentPage = ref(1)
-        const pageSize = ref(5)
+        const pageSize = ref(8)
 
         const reportInfo = ref({
             depId: '',
             parentId: '',
             status: '',
             typeOfContract: '',
-            startDate: new Date(),
-            endDate: new Date(),
-            rangeY:false
+            startDate: '',
+            endDate: '',
+            rangeY: false
         })
 
         const {
@@ -331,6 +354,24 @@ export default {
             return Math.ceil(queryResult.value.length / pageSize.value);
         });
 
+        const computedMessage = computed(() => {
+            if (reportInfo.value.rangeY) {
+                if (reportInfo.value.startDate && reportInfo.value.endDate) {
+                    return "Obtendrás un reporte de los empleados que cumplan con los criterios unicamente en el rango seleccionado."
+                } else {
+                    if (reportInfo.value.startDate) {
+                        return "Obtendrás un reporte con la información desde la fecha seleccionada hasta la fecha actual."
+                    } else {
+                        if (reportInfo.value.endDate) {
+                            return "Obtendrás un reporte desde que se tienen registros hasta la fecha final seleccionada."
+                        } else {
+                            return ""
+                        }
+                    }
+                }
+            }
+        })
+
         const pagesToShow = computed(() => {
             const showPages = 1; // Cantidad de páginas que quieres mostrar alrededor de la página actual
             const startPage = Math.max(1, currentPage.value - showPages);
@@ -343,9 +384,9 @@ export default {
             return pages;
         });
 
-        const formattedDate = computed(() => {
-            return moment(date.value).format('DD/MM/YYYY');
-        });
+        const formatDate = (date) => {
+            return moment(date).format('DD/MM/YYYY');
+        }
 
         const shouldShowEllipsisBefore = computed(() => pagesToShow.value[0] > 2);
         const shouldShowFirstPage = computed(() => pagesToShow.value[0] > 1);
@@ -360,15 +401,16 @@ export default {
             return queryResult.value.slice(startIndex, endIndex);
         });
 
-        onMounted(async () => {
+        const openModal = async () => {
             await getInfoForModal();
-        });
+            showModal.value = true
+        }
 
         return {
             permits, queryResult, reportInfo,
-            errors, cleanObject, getDataForReport,
-            depFilter, showModal, states, rangeN, date, formattedDate,
-            typesOfContract, isLoadingRequest, mainCenters,
+            errors, cleanObject, getDataForReport, 
+            depFilter, showModal, states, rangeN, formatDate,
+            typesOfContract, isLoadingRequest, mainCenters, openModal, computedMessage,
 
             shouldShowEllipsisBefore, currentPage, pageSize, changePage, totalPages, shouldShowLastPage,
             shouldShowEllipsisAfter, pagesToShow, paginatedData, shouldShowFirstPage
@@ -378,6 +420,22 @@ export default {
 </script>
 
 <style>
+.sin-scroll {
+    overflow: auto;
+}
+
+/* Estilos para ocultar la barra de desplazamiento en navegadores webkit */
+.sin-scroll::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+
+/* Estilos para Firefox */
+.sin-scroll {
+    scrollbar-width: none;
+    /* Firefox */
+}
+
 /* Definición de la transición */
 .modal-fade-enter-active,
 .modal-fade-leave-active {
