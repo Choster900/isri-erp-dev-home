@@ -2,12 +2,12 @@
     <label :for="id" class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">{{ label }}
         <span v-if="required" class="text-red-600 font-extrabold">*</span></label>
     <vue-date-picker v-model="modelValue" :enable-time-picker="enableTimePicker" :format="format" :placeholder="placeholder"
-        :locale="localeConfig" :day-names="dayNames" :disabled="disabled" @update:model-value="updateValue($event)">
+        :locale="localeConfig" :day-names="dayNames" :disabled="disabled" @update:model-value="$emit('update:modelValue', $event)">
     </vue-date-picker>
 </template>
 
 <script>
-import { ref, toRefs } from 'vue';
+import { ref, toRefs, onMounted, watch } from 'vue';
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 import { es } from 'date-fns/locale';
@@ -17,7 +17,7 @@ export default {
         VueDatePicker,
     },
     props: {
-        value: {
+        modelValue: {
             type: [String, Date],
             default: '',
         },
@@ -25,10 +25,10 @@ export default {
             type: Boolean,
             default: false,
         },
-        // format: {
-        //     type: String,
-        //     default: 'dd/MM/yyyy',
-        // },
+        format: {
+            type: String,
+            default: 'dd/MM/yyyy',
+        },
         placeholder: {
             type: String,
             default: 'Seleccione',
@@ -56,27 +56,11 @@ export default {
             ...es,
         };
 
-        const { value } = toRefs(props)
-        const modelValue = ref(value.value)
-
-        // Emitir el evento de actualización cuando cambie el valor
-        const updateValue = (newValue) => {
-            emit('update:modelValue', newValue);
-        };
-
-        const format = (date) => {
-            const day = date.getDate();
-            const month = date.getMonth() + 1;
-            const year = date.getFullYear();
-
-            return `${day}/${month}/${year}`;
-        }
+        const { modelValue } = toRefs(props)
 
         return {
             modelValue,
             localeConfig,
-            updateValue,
-            format
         };
     },
 };

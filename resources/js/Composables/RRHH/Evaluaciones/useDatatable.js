@@ -35,7 +35,7 @@ export const useEvaluacion = () => {
     const showModalEvaluacion = ref(false);
     const links = ref([]);
     const lastUrl = ref("/evaluaciones");
-    const listDependencias = ref(null); 
+    const listDependencias = ref(null);
     columns.forEach((column) => {
         if (column.name === "id_empleado") sortOrders.value[column.name] = 1;
         else sortOrders.value[column.name] = -1;
@@ -120,8 +120,8 @@ export const useEvaluacion = () => {
         try {
             const resp = await axios.get("/getAllDependencias");
             let list = resp.data.map((data) => {
-                return { value: data.id_centro_atencion, label: `${data.codigo_centro_atencion} - ${data.nombre_centro_atencion}` }
-                
+                return { value: data.id_centro_atencion, label: `${data.codigo_centro_atencion} - ${data.nombre_centro_atencion}`, dependencias: data.dependencias }
+
             });
             listDependencias.value = list
             console.log(listDependencias.value);

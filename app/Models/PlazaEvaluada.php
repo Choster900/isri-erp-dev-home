@@ -30,7 +30,7 @@ class PlazaEvaluada extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function plazas_asignadas(): BelongsTo
+    public function plaza_asignada(): BelongsTo
     {
         return $this->belongsTo(PlazaAsignada::class, 'id_plaza_asignada', 'id_plaza_asignada');
     }
@@ -39,7 +39,7 @@ class PlazaEvaluada extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function evaluaciones_personales(): BelongsTo
+    public function evaluacion_personal(): BelongsTo
     {
         return $this->belongsTo(EvaluacionPersonal::class, 'id_evaluacion_personal', 'id_evaluacion_personal');
     }
