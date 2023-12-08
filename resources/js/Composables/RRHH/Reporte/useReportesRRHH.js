@@ -1,11 +1,11 @@
-import { ref, inject } from "vue";
+import { ref, inject, computed } from "vue";
 import axios from "axios";
 import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
 import { toast } from "vue3-toastify";
 import _ from "lodash";
 
-export const useReportesRRHH = (context) => {
+export const useReportesRRHH = (reportInfo,context) => {
     const swal = inject("$swal");
     const isLoadingRequest = ref(false);
     const errors = ref([])
@@ -13,6 +13,7 @@ export const useReportesRRHH = (context) => {
 
     const queryResult = ref([])
     const dependencies = ref([])
+    const mainCenters = ref([])
     const states = ref([])
     const typesOfContract = ref([])
 
@@ -35,7 +36,7 @@ export const useReportesRRHH = (context) => {
                     queryResult.value = response.data.query
                     console.log(response);
                     showModal.value = false
-                } catch (error) {
+                } catch (err) {
                     if (err.response.status === 422) {
                         useShowToast(
                             toast.warning,
@@ -58,6 +59,7 @@ export const useReportesRRHH = (context) => {
         await axios.get("/get-info-for-reports")
             .then((response) => {
                 dependencies.value = response.data.dependencies
+                mainCenters.value = response.data.mainCenters
                 states.value = response.data.states
                 typesOfContract.value = response.data.typesOfContract
             })
@@ -78,6 +80,13 @@ export const useReportesRRHH = (context) => {
             });
     }
 
+    const depFilter = computed(() => {
+        const result = dependencies.value.filter((element) => {
+            return element.id_centro_atencion === reportInfo.value.parentId // Agregar el 'return'
+        });
+        return result ?? [];
+    });
+
     const cleanObject = (obj) => {
         for (const key in obj) {
             if (Object.prototype.hasOwnProperty.call(obj, key)) {
@@ -94,7 +103,8 @@ export const useReportesRRHH = (context) => {
     return {
         errors,
         queryResult,
-        dependencies,
+        depFilter,
+        mainCenters,
         showModal,
         states,
         typesOfContract,

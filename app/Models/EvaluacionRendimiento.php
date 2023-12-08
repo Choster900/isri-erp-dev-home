@@ -54,4 +54,13 @@ class EvaluacionRendimiento extends Model
     {
         return $this->belongsTo(TipoPlaza::class, 'id_tipo_plaza', 'id_tipo_plaza');
     }
+    /**
+     * Get all of the evaluaciones_personal for the EvaluacionRendimiento
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function evaluaciones_personal(): HasMany
+    {
+        return $this->hasMany(EvaluacionPersonal::class, 'id_evaluacion_rendimiento', 'id_evaluacion_rendimiento');
+    }
 }

@@ -67,4 +67,31 @@ class EvaluacionPersonal extends Model
     {
         return $this->hasMany(PlazaEvaluada::class, 'id_evaluacion_personal', 'id_evaluacion_personal');
     }
+    /**
+     * Get the evaluacion_rendimiento that owns the EvaluacionPersonal
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function evaluacion_rendimiento(): BelongsTo
+    {
+        return $this->belongsTo(EvaluacionRendimiento::class, 'id_evaluacion_rendimiento', 'id_evaluacion_rendimiento');
+    }
+    /**
+     * Get the tipo_evaluacion that owns the EvaluacionPersonal
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function tipo_evaluacion(): BelongsTo
+    {
+        return $this->belongsTo(TipoEvaluacion::class, 'id_tipo_evaluacion_personal', 'id_tipo_evaluacion_personal');
+    }
+    /**
+     * Get the tipo_evaluacion that owns the EvaluacionPersonal
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function periodo_evaluacion(): BelongsTo
+    {
+        return $this->belongsTo(PeriodoEvaluacion::class, 'id_periodo_evaluacion', 'id_periodo_evaluacion');
+    }
 }

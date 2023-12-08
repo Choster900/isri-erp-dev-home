@@ -25,7 +25,7 @@ class EvaluacionRequest extends FormRequest
     {
         return [
             'idEmpleado'              => 'required',
-            'idDependencia'           => 'required',
+            'idCentroAtencion'           => 'required',
             'fechaInicioFechafin'     => 'required',
             'idEvaluacionRendimiento' => 'required',
             'idTipoEvaluacion'        => 'required',
@@ -37,7 +37,7 @@ class EvaluacionRequest extends FormRequest
     {
         return [
             'idEmpleado.required'              => 'Debe seleccionar el empleado.',
-            'idDependencia.required'           => 'Debe seleccionar la dependencia.',
+            'idCentroAtencion.required'           => 'Debe seleccionar la dependencia.',
             'fechaInicioFechafin.required'     => 'El rango de fechas es requerido.',
             'idEvaluacionRendimiento.required' => 'Debe seleccionar una evaluacion.',
             'idTipoEvaluacion.required'        => 'El tipo de evaluación es requerido.',

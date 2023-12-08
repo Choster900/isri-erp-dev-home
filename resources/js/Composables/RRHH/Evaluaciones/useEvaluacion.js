@@ -2,8 +2,9 @@ import axios from "axios";
 import { ref } from "vue";
 
 export const useEvaluacion = () => {
-    const idEmpleado = ref(null);
+    const idEmpleado = ref(486);
     const idDependencia = ref("");
+    const idCentroAtencion = ref("");
     const idEvaluacionRendimiento = ref("");
     const loadingEvaluacionRendimiento = ref("");
     const idTipoEvaluacion = ref(1);
@@ -62,7 +63,7 @@ export const useEvaluacion = () => {
             const response = await axios.post("/create-new-evaluacion", {
                 idEvaluacionRendimiento: idEvaluacionRendimiento.value,
                 idEmpleado: idEmpleado.value,
-                idDependencia: idDependencia.value,
+                idCentroAtencion: idCentroAtencion.value,
                 idTipoEvaluacion: idTipoEvaluacion.value,
                 fechaInicioFechafin: fechaInicioFechafin.value,
                 plazasAsignadas: objectPlazas.value,
@@ -94,13 +95,13 @@ export const useEvaluacion = () => {
     /**
      * Realiza la búsqueda de plazas según el ID del empleado y el ID de la dependencia.
      */
-    const getPlazasByEmployeeIdAndDependenciaId = async () => {
+    const getPlazasByEmployeeIdAndCentroAtencionId = async () => {
         try {
             // Inicialización y limpieza de variables
             resetVariables();
 
             // Validar si falta información necesaria
-            if (!idEmpleado.value || !idDependencia.value) {
+            if (!idEmpleado.value || !idCentroAtencion.value || !idTipoEvaluacion.value || !fechaInicioFechafin.value) {
                 return;
             }
 
@@ -142,7 +143,9 @@ export const useEvaluacion = () => {
     const obtenerPlazasDesdeServidor = async () => {
         return await axios.post("/getAllPlazasByEmployeeIdAndDependenciaId", {
             employeeId: idEmpleado.value,
-            centroAtencionId: idDependencia.value,
+            centroAtencionId: idCentroAtencion.value,
+            idTipoEvaluacion: idTipoEvaluacion.value,
+            fechaInicioFechafin: fechaInicioFechafin.value,
         });
     };
 
@@ -183,7 +186,7 @@ export const useEvaluacion = () => {
             label: index.codigo_evaluacion_rendimiento,
         }));
         objectPlazas.value = data.plazasAsignadas.map((index) => ({
-            value: index.detalle_plaza.plaza.id_plaza,
+            value: index.id_plaza_asignada,
             label: index.detalle_plaza.plaza.nombre_plaza,
         }));
         idEvaluacionRendimiento.value =
@@ -205,7 +208,7 @@ export const useEvaluacion = () => {
             tipo_plaza: index.tipo_plaza,
         }));
         plazaOptions.value = data.plazasAsignadas.map((index) => ({
-            value: index.detalle_plaza.plaza.id_plaza,
+            value: index.id_plaza_asignada,
             label: index.detalle_plaza.plaza.nombre_plaza,
             id_tipo_plaza: index.detalle_plaza.plaza.tipo_plaza.id_tipo_plaza,
             nombre_tipo_plaza:
@@ -284,18 +287,19 @@ export const useEvaluacion = () => {
     return {
         handleEmployeeSearch,
         handleTagToSelect,
-        idDependencia,
+        idCentroAtencion,
         plazaOptions,
         idEvaluacionRendimiento,
         existMoreThanOne,
         loadingEvaluacionRendimiento,
-        getPlazasByEmployeeIdAndDependenciaId,
+        getPlazasByEmployeeIdAndCentroAtencionId,
         createPersonalEvaluationRequest,
         idTipoEvaluacion,
         doesntExistResult,
         evaluationsOptions,
         fechaInicioFechafin,
         showPlazasModal,
+        idDependencia,
         objectPlazas,
         objectEvaluaciones,
         idEmpleado,

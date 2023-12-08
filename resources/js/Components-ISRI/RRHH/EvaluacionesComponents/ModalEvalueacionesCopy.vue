@@ -11,15 +11,75 @@
                             <h2 class="font-semibold text-slate-800">Crear una nueva evaluación +</h2>
                         </header>
                         <div class="p-3">
+                            <div class="mx-0.5 mt-2 mb-2">
+                                <label class="block text-gray-700 text-xs font-medium mb-1" for="name">
+                                    Seleccione el tipo de evaluacion <span class="text-red-600 font-extrabold">*</span>
+                                </label>
+                                <div class="flex flex-wrap items-center -m-3">
+                                    <div class="m-3">
+                                        <label class="flex items-center">
+                                            <input type="radio" name="tipoEvaluacion" v-model="idTipoEvaluacion"
+                                                class="form-radio" checked="true" value="1"
+                                                @change="getPlazasByEmployeeIdAndCentroAtencionId(); fechaInicioFechafin = null">
+                                            <span class="text-xs ml-2 text-selection-disable">Desempeño</span>
+                                        </label>
+                                    </div>
+                                    <div class="m-3">
+                                        <label class="flex items-center">
+                                            <input type="radio" name="tipoEvaluacion" v-model="idTipoEvaluacion"
+                                                class="form-radio" value="2"
+                                                @change="getPlazasByEmployeeIdAndCentroAtencionId(); fechaInicioFechafin = null">
+                                            <span class=" text-xs ml-2 text-selection-disable">Periodo de prueba</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <InputError class="mt-2 px-2" :message="errorsData.idTipoEvaluacion" />
+                            <div class="-mx-3 flex">
+                                <div class="mb-1 px-3 w-full">
+                                    <div class="mb-4 md:mr-0 md:mb-0 basis-1/2">
+                                        <label class="block text-gray-700 text-xs font-medium mb-1" for="name">Fecha [Desde
+                                            - Hasta] <span class="text-red-600 font-extrabold">*</span></label>
+                                        <div class="relative flex gap-1">
+                                            <flat-pickr v-model="fechaInicioFechafin"
+                                                class="text-xs cursor-pointer rounded-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none w-full"
+                                                :config="configSecondInput" :placeholder="'Seleccione Fecha Inicial'" />
+
+                                            <Tooltip bg="dark" position="right" :key="weekIndex" class="mt-1.5">
+                                                <template v-slot:contenido>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                        @click="clearLock" title="Quitar bloqueos de fecha"
+                                                        stroke-width="1.5" stroke="currentColor"
+                                                        class="w-5 h-5 cursor-pointer">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                                                    </svg>
+                                                </template>
+                                                <template v-slot:message>
+                                                    <div class="text-xs text-slate-200 w-28 text-center">
+                                                        Limpiar bloqueos
+                                                    </div>
+                                                </template>
+                                            </Tooltip>
+                                        </div>
+                                        <InputError class="mt-2 px-2" :message="errorsData.fechaInicioFechafin" />
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+
                             <div class="-mx-3 flex gap-1">
                                 <div class="mb-1 px-3  w-full">
                                     <label class="block text-gray-700 text-xs font-medium mb-1" for="name">Nombre del
                                         empleado <span class="text-red-600 font-extrabold">*</span></label>
                                     <div class="relative flex h-8 w-full flex-row-reverse ">
-                                        <Multiselect v-model="idEmpleado" @select="getPlazasByEmployeeIdAndDependenciaId()"
-                                            :filter-results="false" :resolve-on-load="false" :delay="1000"
-                                            :searchable="true" :clear-on-search="true" :min-chars="5"
-                                            placeholder="Busqueda de empleado..." :classes="{
+                                        <Multiselect v-model="idEmpleado"
+                                            @select="getPlazasByEmployeeIdAndCentroAtencionId()" :filter-results="false"
+                                            :resolve-on-load="false" :delay="1000" :searchable="true"
+                                            :clear-on-search="true" :min-chars="5" placeholder="Busqueda de empleado..."
+                                            :classes="{
                                                 placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
                                             }" noOptionsText="<p class='text-xs'>Lista vacia<p>"
                                             noResultsText="<p class='text-xs'>Sin resultados de personas <p>" :options="async function (query) {
@@ -34,14 +94,14 @@
                                     <label class="block text-gray-700 text-xs font-medium mb-1" for="name">Centro de
                                         atencion <span class="text-red-600 font-extrabold">*</span></label>
                                     <div class="relative flex h-8 w-full flex-row-reverse ">
-                                        <Multiselect :searchable="true" v-model="idDependencia" placeholder="Centros"
-                                            @select="getPlazasByEmployeeIdAndDependenciaId()" :classes="{
+                                        <Multiselect :searchable="true" v-model="idCentroAtencion" placeholder="Centros"
+                                            @select="getPlazasByEmployeeIdAndCentroAtencionId()" :classes="{
                                                 placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
                                             }" noOptionsText="<p class='text-xs'>Sin dependencias<p>"
                                             noResultsText="<p class='text-xs'>Sin resultados de dependencias <p>"
                                             :options="listDependencias" />
                                     </div>
-                                    <InputError class="mt-2 px-2" :message="errorsData.idDependencia" />
+                                    <InputError class="mt-2 px-2" :message="errorsData.idCentroAtencion" />
 
                                 </div>
                                 <div class="mb-1 -mr-3 pr-3 w-1/2">
@@ -116,65 +176,12 @@
                                             placeholder: 'text-xs flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
                                         }" :object="true" :options="plazaOptions" />
                                 </div>
-                                
+
                             </div>
                             <InputError class="mt-2 px-2 border-b" :message="errorsData.plazasAsignadas" />
                             <InputError v-if="existMoreThanOne" class="mt-1 px-2"
                                 message="La dependencia tiene múltiples tipos de plazas. Por favor, seleccione una evaluación y las plazas que desea evaluar." />
-                            <div class="-mx-3 flex py-1">
-                                <div class="mb-1 px-3 w-full">
-                                    <div class="mb-4 md:mr-0 md:mb-0 basis-1/2">
-                                        <label class="block text-gray-700 text-xs font-medium mb-1" for="name">Fecha [Desde
-                                            - Hasta] <span class="text-red-600 font-extrabold">*</span></label>
-                                        <div class="relative flex gap-1">
-                                            <flat-pickr v-model="fechaInicioFechafin"
-                                                class="text-xs cursor-pointer rounded-md border h-8 border-slate-400 px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-[#001b47] focus:outline-none w-full"
-                                                :config="configSecondInput" :placeholder="'Seleccione Fecha Inicial'" />
 
-                                            <Tooltip bg="dark" position="right" :key="weekIndex" class="">
-                                                <template v-slot:contenido>
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                        @click="clearLock" title="Quitar bloqueos de fecha"
-                                                        stroke-width="1.5" stroke="currentColor"
-                                                        class="w-7 h-7 cursor-pointer">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-                                                    </svg>
-                                                </template>
-                                                <template v-slot:message>
-                                                    <div class="text-xs text-slate-200 w-28 text-center">
-                                                        Limpiar bloqueos
-                                                    </div>
-                                                </template>
-                                            </Tooltip>
-                                        </div>
-                                        <InputError class="mt-2 px-2" :message="errorsData.fechaInicioFechafin" />
-
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mx-0.5 mt-2">
-                                <label class="block text-gray-700 text-xs font-medium mb-1" for="name">
-                                    Tipo de evaluacion <span class="text-red-600 font-extrabold">*</span>
-                                </label>
-                                <div class="flex flex-wrap items-center -m-3">
-                                    <div class="m-3">
-                                        <label class="flex items-center">
-                                            <input type="radio" name="radio-buttons" v-model="idTipoEvaluacion"
-                                                class="form-radio" checked="true" value="1">
-                                            <span class="text-sm ml-2 text-selection-disable">Desempeño</span>
-                                        </label>
-                                    </div>
-                                    <div class="m-3">
-                                        <label class="flex items-center">
-                                            <input type="radio" name="radio-buttons" v-model="idTipoEvaluacion"
-                                                class="form-radio" value="2">
-                                            <span class="text-sm ml-2 text-selection-disable">Periodo de prueba</span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <InputError class="mt-2 px-2" :message="errorsData.idTipoEvaluacion" />
 
                             <button @click="createPersonalEvaluationRequest"
                                 class="bg-indigo-900 rounded-sm shadow text-center text-white text-sm font-light w-full py-1 mt-5">Crear
@@ -388,33 +395,38 @@ export default {
                 },
             },
             onChange: function (selectedDates, dateStr, instance) {
-                // Si no se selecciona una segunda fecha, restablece las fechas permitidas
-                console.log(selectedDates.length);
-                if (selectedDates.length == 1) {
-                    /*  instance.set('minDate', null);
-                     instance.set('maxDate', null); */
-                    configSecondInput.value.minDate = '';
-                    configSecondInput.value.maxDate = '';
-                    /* alert("limpiamos") */
-                }
+                console.log(idTipoEvaluacion.value);
+                if (idTipoEvaluacion.value == 1) {
 
-                // Verifica en qué rango de fechas se encuentra la primera fecha seleccionada
-                if (selectedDates.length === 1) {
-                    const firstDate = selectedDates[0];
-                    const january1 = new Date(firstDate.getFullYear(), 0, 1);
-                    const june30 = new Date(firstDate.getFullYear(), 5, 30);
-                    const july1 = new Date(firstDate.getFullYear(), 6, 1);
-                    const december31 = new Date(firstDate.getFullYear(), 11, 31);
 
-                    if (firstDate >= january1 && firstDate <= june30) {
-                        // Si la fecha está entre enero 1 y junio 30
-                        instance.set('minDate', january1);
-                        instance.set('maxDate', june30);
-                    } else if (firstDate >= july1 && firstDate <= december31) {
-                        // Si la fecha está entre julio 1 y diciembre 31
-                        instance.set('minDate', july1);
-                        instance.set('maxDate', december31);
+                    // Verifica en qué rango de fechas se encuentra la primera fecha seleccionada
+                    if (selectedDates.length === 1) {
+                        const firstDate = selectedDates[0];
+                        const january1 = new Date(firstDate.getFullYear(), 0, 1);
+                        const june30 = new Date(firstDate.getFullYear(), 5, 30);
+                        const july1 = new Date(firstDate.getFullYear(), 6, 1);
+                        const december31 = new Date(firstDate.getFullYear(), 11, 31);
+
+                        if (firstDate >= january1 && firstDate <= june30) {
+                            // Si la fecha está entre enero 1 y junio 30
+                            instance.set('minDate', january1);
+                            instance.set('maxDate', june30);
+                        } else if (firstDate >= july1 && firstDate <= december31) {
+                            // Si la fecha está entre julio 1 y diciembre 31
+                            instance.set('minDate', july1);
+                            instance.set('maxDate', december31);
+                        }
                     }
+                } else {
+
+                    const firstDate = selectedDates[0];
+                    const maxDate = new Date(
+                        firstDate.getFullYear(),
+                        firstDate.getMonth() + 3,
+                        firstDate.getDate()
+                    );
+                    instance.set('maxDate', maxDate);
+
                 }
 
                 // Maneja otros eventos o lógica según sea necesario
@@ -422,27 +434,21 @@ export default {
             },
 
         });
-        /*   watch(() => props.showModal, (newVal) => {
-              if (!newVal) {
-                  selectedDates.value = [];
-                  configSecondInput.value.minDate = '';
-                  configSecondInput.value.maxDate = '';
-              }
-          }); */
+
         const clearLock = () => {
             selectedDates.value = [];
             configSecondInput.value.minDate = null;
             configSecondInput.value.maxDate = null;
-            alert("limpios")
+            toast.info('Reinicio de filtros');
         }
         const { listDependencias } = toRefs(props)
         const {
             handleEmployeeSearch, idEmpleado, objectPlazas,
             evaluationsOptions, existMoreThanOne, handleTagToSelect,
             messageAlert, showMessageAlert, handleAccept, handleCancel, errorsData,
-            objectEvaluaciones, fechaInicioFechafin, getPlazasByEmployeeIdAndDependenciaId,
+            objectEvaluaciones, fechaInicioFechafin, getPlazasByEmployeeIdAndCentroAtencionId,
             plazaOptions, idTipoEvaluacion, showPlazasModal, createPersonalEvaluationRequest,
-            loadingEvaluacionRendimiento, idDependencia, idEvaluacionRendimiento, doesntExistResult } = useEvaluacion();
+            loadingEvaluacionRendimiento, idCentroAtencion, idEvaluacionRendimiento, doesntExistResult } = useEvaluacion();
 
         const activeIndex = ref(0);
         const dangerModalOpen = ref(false);
@@ -453,9 +459,9 @@ export default {
             selectedDates, configSecondInput, idEvaluacionRendimiento, objectPlazas,
             existMoreThanOne, handleTagToSelect, messageAlert,
             objectEvaluaciones, fechaInicioFechafin,
-            activeIndex, getPlazasByEmployeeIdAndDependenciaId,
+            activeIndex, getPlazasByEmployeeIdAndCentroAtencionId,
             plazaOptions, showPlazasModal, evaluationsOptions,
-            handleEmployeeSearch, idEmpleado, idDependencia, doesntExistResult,
+            handleEmployeeSearch, idEmpleado, idCentroAtencion, doesntExistResult,
             createPersonalEvaluationRequest, idTipoEvaluacion, loadingEvaluacionRendimiento
         }
     }
