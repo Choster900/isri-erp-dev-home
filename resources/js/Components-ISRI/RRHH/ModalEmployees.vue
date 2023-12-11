@@ -1087,6 +1087,7 @@ export default {
                 });
                 if (this.modalData != '') {
                     this.employee = response.data.employee
+                    this.setRetirementValue(this.employee.pensionado_empleado)
                     if (this.employee.id_estado_empleado === 2) {
                         if (this.employee.periodos_laboral[0].motivo_desvinculo_laboral.recontratar_motivo_desvinculo_laboral === 0) {
                             this.showToast(toast.error, 'No puedes activar este empleado, porque su salida fue por ' + this.employee.periodos_laboral[0].motivo_desvinculo_laboral.nombre_motivo_desvinculo_laboral + '.');
@@ -1297,6 +1298,8 @@ export default {
             if (value) {
                 this.current_page = 1
                 this.backend_errors = []
+                this.retirementN=false
+                this.retirementY=false
                 this.recursivelySetEmptyStrings(this.errors);
                 if (this.modalData.length === 0) {
                     this.correct_dui = false

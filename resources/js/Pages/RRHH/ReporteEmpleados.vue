@@ -9,15 +9,16 @@
             </button>
         </div>
         <!-- Tabla de reporte -->
-        <div> <!-- Titulo del reporte-->
+        <div v-if="load!=0"> <!-- Titulo del reporte-->
             <div class="rounded-md border-b border-slate-200 py-0.5">
                 <div class="mx-8 text-[14px]">
                     <p class="font-bembo text-center">INSTITUTO SALVADOREÑO DE REHABILITACION INTEGRAL</p>
-                    <p class="font-bembo text-center">ADMON - AREA DE DESARROLLO</p>
-                    <p class="font-bembo text-center">REPORTE DE EMPLEADOS ACTIVOS</p>
-                    <p class="font-bembo text-center">DEL
-                        <span class="font-semibold">{{ formatDate(reportInfo.startDate) }}</span> AL <span
-                            class="font-semibold">{{ formatDate(reportInfo.endDate) }}</span>
+                    <p class="font-bembo text-center">
+                        {{ computedDependencyInfo }}
+                    </p>
+                    <p class="font-bembo text-center">{{ computedTitle }}</p>
+                    <p class="font-bembo text-center">
+                        <span class="font-semibold">{{ computedDate }}</span>
                     </p>
                 </div>
             </div>
@@ -68,25 +69,25 @@
             <div class="mx-10 overflow-x-auto">
                 <div class="container mx-auto">
                     <div class="bg-white shadow-md rounded mt-2">
-                        <div class="flex justify-between bg-teal-800 px-2 py-2 text-white">
-                            <div class="w-1/4">ID</div>
-                            <div class="w-1/4">ESTADO</div>
-                            <div class="w-1/4">FECHA PLAZA</div>
-                            <div class="w-1/4">NIT</div>
+                        <div class="flex justify-between bg-teal-800 px-2 py-2 text-white text-[13px]">
+                            <div class="w-1/4 text-center">ID</div>
+                            <div class="w-1/4 text-center">ESTADO</div>
+                            <div class="w-1/4 text-center">FECHA PLAZA</div>
+                            <div class="w-1/4 text-center">NIT</div>
                         </div>
                         <div v-for="(employee, index) in paginatedData" :key="index" :class="{
                             'bg-gray-200': index % 2 === 0,
                             'bg-gray-100': index % 2 !== 0
                         }"
                             class="flex justify-between border-b border-gray-100 text-[14px] px-2 py-2 hover:bg-gray-300">
-                            <div class="w-1/4 break-all">{{ employee.id_empleado }}</div>
-                            <div class="w-1/4 break-all">{{ employee.id_estado_empleado === 1 ? 1 : 0 }}</div>
-                            <div class="w-1/4 break-all">
+                            <div class="w-1/4 text-center break-all">{{ employee.id_empleado }}</div>
+                            <div class="w-1/4 text-center break-all">{{ employee.id_estado_empleado === 1 ? 1 : 0 }}</div>
+                            <div class="w-1/4 text-center break-all">
                                 <template v-for="(plaza, index) in employee.plazas_asignadas" :key="index">
                                     <p>{{ plaza.fecha_plaza_asignada }} - {{ plaza.fecha_renuncia_plaza_asignada }}</p>
                                 </template>
                             </div>
-                            <div class="w-1/4 break-all">{{ employee.nit_empleado }}</div>
+                            <div class="w-1/4 text-center break-all">{{ employee.nit_empleado }}</div>
                         </div>
                         <div>
 
@@ -230,7 +231,7 @@
                         </div>
                     </div>
                     <div class="md:flex flex-row justify-items-start mb-4 mx-4">
-                        <div class="mb-5 md:mr-2 md:mb-0 basis-1/3 justify-center text-center">
+                        <div class="mb-5 md:mr-2 md:mb-0 basis-1/2 justify-center text-center">
                             <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">
                                 ¿Filtro de fecha?
                             </label>
@@ -245,34 +246,11 @@
                                 class="rounded mr-3 border-gray-500  text-emerald-500 shadow-sm"
                                 @click="rangeN ? rangeN = false : rangeN = true; reportInfo.rangeY = false" />
                         </div>
-                        <div v-if="reportInfo.rangeY" class="mb-5 md:mr-2 md:mb-0 basis-1/3 justify-start text-left">
-                            <date-time-picker-m v-model="reportInfo.startDate" label="Fecha inicio" />
+                        <div v-if="reportInfo.rangeY" class="mb-5 md:mr-2 md:mb-0 basis-1/2 justify-start text-left">
+                            <date-time-picker-m v-model="reportInfo.startDate"
+                                label="Registrados hasta:" />
                             <InputError v-for="(item, index) in errors.startDate" :key="index" class="mt-2"
                                 :message="item" />
-                        </div>
-                        <div v-if="reportInfo.rangeY" class="mb-5 md:mr-2 md:mb-0 basis-1/3 justify-start text-left">
-                            <date-time-picker-m v-model="reportInfo.endDate" label="Fecha fin" />
-                            <InputError v-for="(item, index) in errors.endDate" :key="index" class="mt-2" :message="item" />
-                        </div>
-                    </div>
-                    <div v-if="reportInfo.startDate || reportInfo.endDate"
-                        class="flex border border-gray-400 rounded-lg mx-8">
-                        <div class="border-r border-gray-400 w-[15%] flex items-center justify-center py-2">
-                            <svg class="w-6 h-6 text-blue-700" fill="currentColor" viewBox="0 0 32 32" version="1.1"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                                <g id="SVGRepo_iconCarrier">
-                                    <path
-                                        d="M18 23l-1-0v-8.938c0-0.011-0.003-0.021-0.003-0.031s0.003-0.020 0.003-0.031c0-0.552-0.448-1-1-1h-2c-0.552 0-1 0.448-1 1s0.448 1 1 1h1v8h-1c-0.552 0-1 0.448-1 1s0.448 1 1 1h4c0.552 0 1-0.448 1-1s-0.448-1-1-1zM16 11c1.105 0 2-0.896 2-2s-0.895-2-2-2-2 0.896-2 2 0.896 2 2 2zM16-0c-8.836 0-16 7.163-16 16s7.163 16 16 16c8.837 0 16-7.163 16-16s-7.163-16-16-16zM16 30.031c-7.72 0-14-6.312-14-14.032s6.28-14 14-14 14 6.28 14 14-6.28 14.032-14 14.032z">
-                                    </path>
-                                </g>
-                            </svg>
-                        </div>
-                        <div class="w-[85%] rounded-r-lg text-[13px]">
-                            <h2 class="text-slate-700 text-center font-semibold">Información</h2>
-                            <p class="mx-2 mb-1 font-semibold">{{ computedMessage }}
-                            </p>
                         </div>
                     </div>
                     <div class="flex justify-center my-4">
@@ -336,19 +314,57 @@ export default {
             status: '',
             typeOfContract: '',
             startDate: '',
-            endDate: '',
             rangeY: false
         })
 
         const {
             queryResult, getInfoForModal, depFilter, showModal, cleanObject,
             getDataForReport, states, typesOfContract, isLoadingRequest,
-            mainCenters, errors
+            mainCenters, errors, staticObject, load
         } = useReportesRRHH(reportInfo, context)
 
         const changePage = (page) => {
             currentPage.value = page
         }
+
+        const computedDependencyInfo = computed(() => {
+            const parentId = staticObject.value.parentId
+            const depId = staticObject.value.depId
+            const center = mainCenters.value.find((element) => element.value === parentId)
+            const dependency = depFilter.value.find((element) => element.value === depId)
+            if (parentId && !depId) {
+                return center.label
+            } else
+                if (parentId && depId) {
+                    return center.codigo_centro_atencion + " - " + dependency.label
+                }
+                else {
+                    return "TODOS LOS CENTROS"
+                }
+        })
+
+        const computedTitle = computed(() => {
+            const state = staticObject.value.status
+            const typeC = staticObject.value.typeOfContract
+            const selSt = states.value.find((e) => e.value === state)
+            const selType = typesOfContract.value.find((e) => e.value === typeC)
+            let st = ""
+            let typC = ""
+            if(state){
+                st = selSt.label+"S "
+            }
+            if(typeC){
+                typC = "POR "+selType.label
+            }
+
+            return "REPORTE DE EMPLEADOS "+st+typC
+        })
+
+        const computedDate = computed(() => {
+            const startD = staticObject.value.startDate
+            const date = startD ? moment(startD).format('DD/MM/YYYY') : moment().format('DD/MM/YYYY')
+            return "REGISTROS HASTA "+date
+        })
 
         const totalPages = computed(() => {
             return Math.ceil(queryResult.value.length / pageSize.value);
@@ -384,9 +400,6 @@ export default {
             return pages;
         });
 
-        const formatDate = (date) => {
-            return moment(date).format('DD/MM/YYYY');
-        }
 
         const shouldShowEllipsisBefore = computed(() => pagesToShow.value[0] > 2);
         const shouldShowFirstPage = computed(() => pagesToShow.value[0] > 1);
@@ -407,10 +420,10 @@ export default {
         }
 
         return {
-            permits, queryResult, reportInfo,
-            errors, cleanObject, getDataForReport, 
-            depFilter, showModal, states, rangeN, formatDate,
-            typesOfContract, isLoadingRequest, mainCenters, openModal, computedMessage,
+            permits, queryResult, reportInfo, computedDependencyInfo, computedTitle,
+            errors, cleanObject, getDataForReport, computedDate,
+            depFilter, showModal, states, rangeN, load,
+            typesOfContract, isLoadingRequest, mainCenters, openModal,
 
             shouldShowEllipsisBefore, currentPage, pageSize, changePage, totalPages, shouldShowLastPage,
             shouldShowEllipsisAfter, pagesToShow, paginatedData, shouldShowFirstPage
