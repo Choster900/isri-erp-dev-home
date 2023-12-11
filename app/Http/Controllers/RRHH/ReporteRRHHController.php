@@ -137,6 +137,24 @@ class ReporteRRHHController extends Controller
                 }
             );
         }
+        //Filtramos por fechas
+        if ($request->startDate || $request->endDate) {
+            $query->whereHas(
+                'plazas_asignadas',
+                function ($query) use ($request) {
+                    //Filtramos por fechas
+                    if ($request->startDate && $request->endDate) {
+                        $startDate = Carbon::parse($request->startDate)->startOfDay();
+                        $endDate = Carbon::parse($request->endDate)->endOfDay();
+
+                        $query->whereBetween('fecha_plaza_asignada', [$startDate, $endDate]);
+                    } elseif ($request->startDate) {
+                        $startDate = Carbon::parse($request->startDate)->startOfDay();
+                        $query->whereDate('fecha_plaza_asignada', '>=', $startDate);
+                    }
+                }
+            );
+        }
         //Filtramos si existe tipo contratacion desde la vista
         if ($request->typeOfContract) {
             $query->whereHas(
