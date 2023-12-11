@@ -10,12 +10,14 @@ export const useReportesRRHH = (reportInfo,context) => {
     const isLoadingRequest = ref(false);
     const errors = ref([])
     const showModal = ref(false)
+    const load = ref(0)
 
     const queryResult = ref([])
     const dependencies = ref([])
     const mainCenters = ref([])
     const states = ref([])
     const typesOfContract = ref([])
+    const staticObject = ref([])
 
     const getDataForReport = async (parameters) => {
         swal({
@@ -34,7 +36,8 @@ export const useReportesRRHH = (reportInfo,context) => {
                     isLoadingRequest.value = true;
                     const response = await axios.post('/get-report-employees-rrhh', parameters);
                     queryResult.value = response.data.query
-                    console.log(response);
+                    staticObject.value = JSON.parse(JSON.stringify(parameters));
+                    load.value++
                     showModal.value = false
                 } catch (err) {
                     if (err.response.status === 422) {
@@ -109,6 +112,8 @@ export const useReportesRRHH = (reportInfo,context) => {
         states,
         typesOfContract,
         isLoadingRequest,
+        staticObject,
+        load,
         getDataForReport,
         getInfoForModal,
         cleanObject
