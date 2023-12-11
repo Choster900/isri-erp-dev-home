@@ -2,7 +2,7 @@
     <label :for="id" class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">{{ label }}
         <span v-if="required" class="text-red-600 font-extrabold">*</span></label>
     <vue-date-picker v-model="modelValue" :enable-time-picker="enableTimePicker" :format="format" :placeholder="placeholder"
-        :locale="localeConfig" :day-names="dayNames" :disabled="disabled" @update:model-value="$emit('update:modelValue', $event)">
+        :locale="localeConfig" :day-names="dayNames" :teleport="teleport" :disabled="disabled" @update:model-value="$emit('update:modelValue', $event)">
     </vue-date-picker>
 </template>
 
@@ -24,6 +24,10 @@ export default {
         enableTimePicker: {
             type: Boolean,
             default: false,
+        },
+        teleport: {
+            type: Boolean,
+            default: true,
         },
         format: {
             type: String,

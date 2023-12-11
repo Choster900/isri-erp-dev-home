@@ -268,7 +268,7 @@ export default {
             { width: "10%", label: "Codigo", name: "codigo_empleado", type: "text" },
             { width: "30%", label: "Nombre", name: "nombre_persona", type: "text" },
             { width: "15%", label: "Dui", name: "dui_persona", type: "text" },
-            { width: "20%", label: "Dependencia", name: "dependencia", type: "text" },
+            { width: "20%", label: "Centro", name: "dependencia", type: "text" },
             {
                 width: "10%", label: "Estado", name: "estado_empleado", type: "select",
                 options: [

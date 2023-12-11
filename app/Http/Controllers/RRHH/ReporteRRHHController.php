@@ -15,9 +15,9 @@ class ReporteRRHHController extends Controller
 {
     public function getInfoForReports(Request $request)
     {
-        $dependencies = Dependencia::selectRaw("id_dependencia as value, concat(nombre_dependencia,' (',codigo_dependencia,')') as label, id_centro_atencion")
+        $dependencies = Dependencia::selectRaw("id_dependencia as value, concat(nombre_dependencia,' (',codigo_dependencia,')') as label, id_centro_atencion, codigo_dependencia")
             ->where('estado_dependencia', 1)->get();
-        $mainCenters = CentroAtencion::selectRaw("id_centro_atencion as value, concat(nombre_centro_atencion,' (',codigo_centro_atencion,' )') as label")
+        $mainCenters = CentroAtencion::selectRaw("id_centro_atencion as value, concat(nombre_centro_atencion,' (',codigo_centro_atencion,' )') as label, codigo_centro_atencion")
             ->where('estado_centro_atencion', 1)->get();
         // Agregar el elemento al inicio de la colección
         $mainCenters->prepend(['value' => 0, 'label' => 'TODOS LOS CENTROS']);
@@ -51,49 +51,49 @@ class ReporteRRHHController extends Controller
                 'plazas_asignadas.dependencia',
                 'plazas_asignadas.detalle_plaza',
                 'plazas_asignadas'
-                // => function ($query) use ($request, $dependenciasIds) {
-                //     //Filtramos si existe status desde la vista
-                //     if ($request->status) {
-                //         $query->where('estado_plaza_asignada', $request->status == 1 ? 1 : 0);
-                //     }
-                //     //Filtramos por fechas
-                //     if ($request->startDate && $request->endDate) {
-                //         $startDate = Carbon::parse($request->startDate)->startOfDay();
-                //         $endDate = Carbon::parse($request->endDate)->endOfDay();
-
-                //         if ($request->status == 2) {
-                //             $query->whereDate('fecha_plaza_asignada', '>=', $startDate)
-                //                 ->whereDate('fecha_renuncia_plaza_asignada', '<=', $endDate);
-                //         } else {
-                //             if ($request->status == 1) {
-                //                 $query->whereBetween('fecha_plaza_asignada', [$startDate, $endDate]);
-                //             }
-                //         }
-                //     } elseif ($request->startDate) {
-                //         $startDate = Carbon::parse($request->startDate)->startOfDay();
-                //         $query->whereDate('fecha_plaza_asignada', '>=', $startDate);
-                //     }
-                //     //Filtramos si existe tipo contratacion desde la vista
-                //     if ($request->typeOfContract) {
-                //         $query->whereHas('detalle_plaza', function ($query) use ($request) {
-                //             $query->where('id_tipo_contrato', $request->typeOfContract);
-                //         });
-                //     }
-                //     //Filtramos por centro o por dependencia
-                //     if ($request->parentId != 0) { //Verificamos si la opcion es 'Todos los centros'
-                //         $query->whereHas('dependencia', function ($query) use ($request, $dependenciasIds) {
-                //             if ($request->depId) {
-                //                 $query->whereIn('id_dependencia', $dependenciasIds);
-                //             } else {
-                //                 $query->where('id_centro_atencion', $request->parentId);
-                //             }
-                //         });
-                //     }
-                // }
+                => function ($query) use ($request, $dependenciasIds) {
+                    //Filtramos si existe status desde la vista
+                    if ($request->status) {
+                        if ($request->parentId != 0) {
+                            $query->where('estado_plaza_asignada', $request->status == 1 ? 1 : 0);
+                        }
+                    }
+                    //Filtramos por fechas
+                    if ($request->startDate) {
+                        $startDate = Carbon::parse($request->startDate)->endOfDay();
+                        if ($request->status == 2) { //Inactivo
+                            $query->whereDate('fecha_renuncia_plaza_asignada', '<=', $startDate);
+                        } else {
+                            if ($request->status == 1) { //Activo
+                                $query->whereDate('fecha_plaza_asignada', '<=', $startDate);
+                            } else {
+                                $query->whereDate('fecha_renuncia_plaza_asignada', '<=', $startDate)
+                                    ->orWhereDate('fecha_plaza_asignada', '<=', $startDate);
+                            }
+                        }
+                    }
+                    //Filtramos si existe tipo contratacion desde la vista
+                    if ($request->typeOfContract) {
+                        $query->whereHas('detalle_plaza', function ($query) use ($request) {
+                            $query->where('id_tipo_contrato', $request->typeOfContract);
+                        });
+                    }
+                    //Filtramos por centro o por dependencia
+                    if ($request->parentId != 0) { //Verificamos si la opcion es 'Todos los centros'
+                        $query->whereHas('dependencia', function ($query) use ($request, $dependenciasIds) {
+                            if ($request->depId) {
+                                $query->whereIn('id_dependencia', $dependenciasIds);
+                            } else {
+                                $query->where('id_centro_atencion', $request->parentId);
+                            }
+                        });
+                    }
+                }
             ]
         );
+
         //Filtramos por centro o por dependencia
-        if ($request->parentId != 0) { //Verificamos si la opcion es 'Todos los centros'
+        if ($request->parentId != 0) { //Verificamos si la opcion NO es 'Todos los centros'
             $query->whereHas(
                 'plazas_asignadas.dependencia',
                 function ($query) use ($request, $dependenciasIds) {
@@ -118,33 +118,20 @@ class ReporteRRHHController extends Controller
                 );
             }
         }
-        //Filtramos por fechas
-        if ($request->startDate || $request->endDate) {
+        //Filtramos por fecha
+        if ($request->startDate) {
             $query->whereHas(
                 'plazas_asignadas',
                 function ($query) use ($request) {
-                    //Filtramos por fechas
-                    if ($request->startDate && $request->endDate) {
-
-                        $startDate = Carbon::parse($request->startDate)->startOfDay();
-                        $endDate = Carbon::parse($request->endDate)->endOfDay();
-                        if ($request->status == 2) {
-                            $query->whereBetween('fecha_renuncia_plaza_asignada', [$startDate, $endDate]);
+                    $startDate = Carbon::parse($request->startDate)->endOfDay();
+                    if ($request->status == 2) { //Inactivo
+                        $query->whereDate('fecha_renuncia_plaza_asignada', '<=', $startDate);
+                    } else {
+                        if ($request->status == 1) { //Activo
+                            $query->whereDate('fecha_plaza_asignada', '<=', $startDate);
                         } else {
-                            if ($request->status == 1) {
-                                $query->whereBetween('fecha_plaza_asignada', [$startDate, $endDate]);
-                            } else {
-                                $query->whereBetween('fecha_plaza_asignada', [$startDate, $endDate])
-                                    ->orWhereBetween('fecha_renuncia_plaza_asignada', [$startDate, $endDate]);
-                            }
-                        }
-                    } else
-                    if ($request->startDate) {
-                        $startDate = Carbon::parse($request->startDate)->startOfDay();
-                        if ($request->status == 2) {
-                            $query->whereDate('fecha_renuncia_plaza_asignada', '>=', $startDate);
-                        } else {
-                            $query->whereDate('fecha_plaza_asignada', '>=', $startDate);
+                            $query->whereDate('fecha_renuncia_plaza_asignada', '<=', $startDate)
+                                ->orWhereDate('fecha_plaza_asignada', '<=', $startDate);
                         }
                     }
                 }
