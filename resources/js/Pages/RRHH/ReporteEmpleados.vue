@@ -283,13 +283,16 @@ import { usePermissions } from '@/Composables/General/usePermissions.js';
 import { useReportesRRHH } from '@/Composables/RRHH/Reporte/useReportesRRHH.js';
 import DateTimePickerM from "@/Components-ISRI/ComponentsToForms/DateTimePickerM.vue";
 
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
+
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 
 import axios from 'axios';
 
 export default {
-    components: { Head, AppLayoutVue, DateTimePickerM },
+    components: { Head, AppLayoutVue, DateTimePickerM, VueDatePicker },
     props: {
         menu: {
             type: Object,
@@ -303,7 +306,7 @@ export default {
         const rangeN = ref(false)
 
         const currentPage = ref(1)
-        const pageSize = ref(5)
+        const pageSize = ref(8)
 
         const reportInfo = ref({
             depId: '',
@@ -366,6 +369,24 @@ export default {
         const totalPages = computed(() => {
             return Math.ceil(queryResult.value.length / pageSize.value);
         });
+
+        const computedMessage = computed(() => {
+            if (reportInfo.value.rangeY) {
+                if (reportInfo.value.startDate && reportInfo.value.endDate) {
+                    return "Obtendrás un reporte de los empleados que cumplan con los criterios unicamente en el rango seleccionado."
+                } else {
+                    if (reportInfo.value.startDate) {
+                        return "Obtendrás un reporte con la información desde la fecha seleccionada hasta la fecha actual."
+                    } else {
+                        if (reportInfo.value.endDate) {
+                            return "Obtendrás un reporte desde que se tienen registros hasta la fecha final seleccionada."
+                        } else {
+                            return ""
+                        }
+                    }
+                }
+            }
+        })
 
         const pagesToShow = computed(() => {
             const showPages = 1; // Cantidad de páginas que quieres mostrar alrededor de la página actual
