@@ -9,7 +9,7 @@
             </button>
         </div>
         <!-- Tabla de reporte -->
-        <div v-if="load != 0 && queryResult.length > 0"> <!-- Titulo del reporte-->
+        <div v-if="load != 0 && queryResult.length > 0" > <!-- Titulo del reporte-->
             <div class="rounded-md border-b border-slate-200 py-0.5">
                 <div class="mx-8 text-[14px]">
                     <p class="font-bembo text-center">INSTITUTO SALVADOREÑO DE REHABILITACION INTEGRAL</p>
@@ -156,7 +156,7 @@
                 </button>
             </div>
         </div>
-        <div v-else class="mt-10">
+        <div v-else-if="load > 0" class="mt-10">
             <div class="flex border border-gray-400 rounded-lg mt-1 mx-[200px]">
                 <div class="border-r border-gray-400 w-[15%] flex items-center justify-center py-2">
                     <svg class="text-orange-400" fill="currentColor" width="48px" height="48px" viewBox="0 0 20 20"
@@ -303,7 +303,7 @@
                                 class="rounded mr-3 border-gray-500  text-emerald-500 shadow-sm"
                                 @click="rangeN ? rangeN = false : rangeN = true; reportInfo.rangeY = false" />
                         </div> -->
-                        <div v-if="reportInfo.rangeY" class="mb-5 md:mr-2 md:mb-0 basis-1/2 justify-start text-left">
+                        <div class="mb-5 md:mr-2 md:mb-0 basis-1/2 justify-start text-left">
                             <date-time-picker-m v-model="reportInfo.startDate" label="Registrados hasta:" />
                             <InputError v-for="(item, index) in errors.startDate" :key="index" class="mt-2"
                                 :message="item" />
