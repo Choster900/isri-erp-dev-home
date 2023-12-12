@@ -124,7 +124,7 @@ export const useEvaluacion = () => {
 
             });
             listDependencias.value = list
-            console.log(listDependencias.value);
+            //console.log(listDependencias.value);
         } catch (error) {
             console.error(error);
         }

@@ -1,12 +1,12 @@
 import axios from "axios";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
 export const useEvaluacion = () => {
-    const idEmpleado = ref(486);
+    const idEmpleado = ref(null);
     const idDependencia = ref("");
     const idCentroAtencion = ref("");
     const idEvaluacionRendimiento = ref("");
-    const loadingEvaluacionRendimiento = ref("");
+    const loadingEvaluacionRendimiento = ref(false);
     const idTipoEvaluacion = ref(1);
     const fechaInicioFechafin = ref("");
 
@@ -26,6 +26,10 @@ export const useEvaluacion = () => {
 
     const errorsData = ref([]);
 
+    const centrosPosibleOptionsData = ref([]);
+    const centrosPosibleOptionsDataCopy = ref([]);
+    const flagTrueOrFalse = ref(true);
+
     /**
      * Busca empleados por nombre para evaluaciones.
      *
@@ -42,6 +46,14 @@ export const useEvaluacion = () => {
                     nombre: nombreToSearch,
                 }
             );
+            // Mapeando los centros a los que las personas que coincidieron en la busqueda 
+            centrosPosibleOptionsData.value = response.data.map((item) => {
+                return item.allDataPersonas.empleado.plazas_asignadas
+            })
+            centrosPosibleOptionsDataCopy.value = response.data.map((item) => {
+                return item.allDataPersonas.empleado.plazas_asignadas
+            })
+            flagTrueOrFalse.value = true;
             // Devuelve los datos de la respuesta
             return response.data;
         } catch (error) {
@@ -99,7 +111,32 @@ export const useEvaluacion = () => {
         try {
             // Inicialización y limpieza de variables
             resetVariables();
-
+            //FIXME: Hay errores en este codigo pero funciona mas o menos 
+            const plazasAsignadas = [];
+            watch(idEmpleado, () => {
+                centrosPosibleOptionsData.value = centrosPosibleOptionsDataCopy.value;
+                flagTrueOrFalse.value = true;
+            })
+           
+            if (centrosPosibleOptionsData.value && Array.isArray(centrosPosibleOptionsData.value) && flagTrueOrFalse.value === true) {
+                centrosPosibleOptionsData.value.forEach(persona => {
+                    const empleado = persona;
+                    if (empleado && Array.isArray(empleado)) {
+                        empleado.forEach(element => {
+                            if (element && element.id_empleado === idEmpleado.value) {
+                                plazasAsignadas.push(element);
+                            }
+                        });
+                    }
+                });
+            }
+            if (plazasAsignadas.length === 1 && flagTrueOrFalse.value === true && centrosPosibleOptionsData.value.length > 0) {
+                idCentroAtencion.value = plazasAsignadas[0].id_centro_atencion
+                centrosPosibleOptionsData.value = null
+                flagTrueOrFalse.value = false;
+            }
+            //FIXME: Fin de errorres
+            
             // Validar si falta información necesaria
             if (!idEmpleado.value || !idCentroAtencion.value || !idTipoEvaluacion.value || !fechaInicioFechafin.value) {
                 return;
@@ -127,7 +164,6 @@ export const useEvaluacion = () => {
         objectEvaluaciones.value = null;
         plazaOptions.value = null;
         showPlazasModal.value = false;
-        loadingEvaluacionRendimiento.value = true;
         doesntExistResult.value = false;
         objectPlazas.value = null;
         evaluationsOptions.value = [];
@@ -141,6 +177,7 @@ export const useEvaluacion = () => {
      * @returns {Promise<object>} - Promesa que se resuelve con la respuesta del servidor.
      */
     const obtenerPlazasDesdeServidor = async () => {
+        loadingEvaluacionRendimiento.value = true;
         return await axios.post("/getAllPlazasByEmployeeIdAndDependenciaId", {
             employeeId: idEmpleado.value,
             centroAtencionId: idCentroAtencion.value,
@@ -283,6 +320,9 @@ export const useEvaluacion = () => {
         }
     };
 
+    const cleaningWhenInsert = () => {
+
+    };
 
     return {
         handleEmployeeSearch,

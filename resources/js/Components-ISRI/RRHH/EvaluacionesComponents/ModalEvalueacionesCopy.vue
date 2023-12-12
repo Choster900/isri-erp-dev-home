@@ -20,7 +20,7 @@
                                         <label class="flex items-center">
                                             <input type="radio" name="tipoEvaluacion" v-model="idTipoEvaluacion"
                                                 class="form-radio" checked="true" value="1"
-                                                @change="getPlazasByEmployeeIdAndCentroAtencionId(); fechaInicioFechafin = null">
+                                                @change=" getPlazasByEmployeeIdAndCentroAtencionId()">
                                             <span class="text-xs ml-2 text-selection-disable">Desempeño</span>
                                         </label>
                                     </div>
@@ -28,7 +28,7 @@
                                         <label class="flex items-center">
                                             <input type="radio" name="tipoEvaluacion" v-model="idTipoEvaluacion"
                                                 class="form-radio" value="2"
-                                                @change="getPlazasByEmployeeIdAndCentroAtencionId(); fechaInicioFechafin = null">
+                                                @change="  getPlazasByEmployeeIdAndCentroAtencionId()">
                                             <span class=" text-xs ml-2 text-selection-disable">Periodo de prueba</span>
                                         </label>
                                     </div>
@@ -67,15 +67,12 @@
                                     </div>
                                 </div>
                             </div>
-
-
-
                             <div class="-mx-3 flex gap-1">
                                 <div class="mb-1 px-3  w-full">
                                     <label class="block text-gray-700 text-xs font-medium mb-1" for="name">Nombre del
                                         empleado <span class="text-red-600 font-extrabold">*</span></label>
                                     <div class="relative flex h-8 w-full flex-row-reverse ">
-                                        <Multiselect v-model="idEmpleado"
+                                        <Multiselect v-model="idEmpleado" :disabled="loadingEvaluacionRendimiento"
                                             @select="getPlazasByEmployeeIdAndCentroAtencionId()" :filter-results="false"
                                             :resolve-on-load="false" :delay="1000" :searchable="true"
                                             :clear-on-search="true" :min-chars="5" placeholder="Busqueda de empleado..."
@@ -94,7 +91,7 @@
                                     <label class="block text-gray-700 text-xs font-medium mb-1" for="name">Centro de
                                         atencion <span class="text-red-600 font-extrabold">*</span></label>
                                     <div class="relative flex h-8 w-full flex-row-reverse ">
-                                        <Multiselect :searchable="true" v-model="idCentroAtencion" placeholder="Centros"
+                                        <Multiselect :searchable="true" v-model="idCentroAtencion" placeholder="Centros" :disabled="loadingEvaluacionRendimiento"
                                             @select="getPlazasByEmployeeIdAndCentroAtencionId()" :classes="{
                                                 placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
                                             }" noOptionsText="<p class='text-xs'>Sin dependencias<p>"
@@ -102,7 +99,6 @@
                                             :options="listDependencias" />
                                     </div>
                                     <InputError class="mt-2 px-2" :message="errorsData.idCentroAtencion" />
-
                                 </div>
                                 <div class="mb-1 -mr-3 pr-3 w-1/2">
                                     <div class="flex gap-1">
@@ -118,8 +114,6 @@
                                                     d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
                                                     fill="currentColor"></path>
                                             </svg>
-
-
                                         </label>
                                         <Tooltip bg="dark" position="right" :key="weekIndex" class="-mt-1"
                                             v-if="!showPlazasModal && evaluationsOptions.length < 2 && !loadingEvaluacionRendimiento">
@@ -178,7 +172,7 @@
                                 </div>
 
                             </div>
-                            <InputError class="mt-2 px-2 border-b" :message="errorsData.plazasAsignadas" />
+                            <InputError v-if="showPlazasModal" class="mt-2 px-2 border-b" :message="errorsData.plazasAsignadas" />
                             <InputError v-if="existMoreThanOne" class="mt-1 px-2"
                                 message="La dependencia tiene múltiples tipos de plazas. Por favor, seleccione una evaluación y las plazas que desea evaluar." />
 
@@ -395,7 +389,6 @@ export default {
                 },
             },
             onChange: function (selectedDates, dateStr, instance) {
-                console.log(idTipoEvaluacion.value);
                 if (idTipoEvaluacion.value == 1) {
 
 
@@ -430,7 +423,6 @@ export default {
                 }
 
                 // Maneja otros eventos o lógica según sea necesario
-                console.log({ selectedDates, dateStr, instance });
             },
 
         });
@@ -439,6 +431,7 @@ export default {
             selectedDates.value = [];
             configSecondInput.value.minDate = null;
             configSecondInput.value.maxDate = null;
+            fechaInicioFechafin.value = null;
             toast.info('Reinicio de filtros');
         }
         const { listDependencias } = toRefs(props)
