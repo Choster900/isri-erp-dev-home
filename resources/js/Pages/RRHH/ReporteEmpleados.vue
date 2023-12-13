@@ -99,13 +99,13 @@
                             </div>
                             <div class="w-[35%] text-center break-words overflow-wrap flex flex-col items-center">
                                 <template v-for="(plaza, index) in employee.plazas_asignadas" :key="index">
-                                    <p :class="index != 0 ? 'border-t border-slate-400 w-full' : ''">
+                                    <p :class="index != 0 ? 'border-t border-slate-400 w-full pt-2' : ''">
                                         {{
                                             plaza.detalle_plaza.plaza.nombre_plaza
                                         }}
                                     </p>
-                                    <p :class="index === 0 ? 'pb-2' : ''">
-                                        {{ ' (' +
+                                    <p :class="(index + 1) != employee.plazas_asignadas.length ? 'pb-2' : ''">
+                                        {{ plaza.dependencia.centro_atencion.codigo_centro_atencion +' - (' +
                                             formatDate(plaza.fecha_plaza_asignada) +
                                             (plaza.fecha_renuncia_plaza_asignada ? ' - ' +
                                                 formatDate(plaza.fecha_renuncia_plaza_asignada) + ')' :
@@ -128,7 +128,7 @@
                 </div>
             </div>
             <!-- Pagination -->
-            <div class="flex justify-center items-center mt-4 pb-4">
+            <div v-if="totalPages > 1" class="flex justify-center items-center mt-4 pb-4">
                 <button @click="currentPage > 1 ? currentPage-- : null" :disabled="currentPage === 1"
                     class="px-3 py-1 mr-2 rounded border focus:outline-none focus:ring transition text-teal-700 border-teal-700 hover:text-white hover:bg-teal-700 active:bg-teal-800 focus:ring-teal-400">
                     Anterior
@@ -288,21 +288,6 @@
                         </div>
                     </div>
                     <div class="md:flex flex-row justify-center mb-4 mx-4">
-                        <!-- <div class="mb-5 md:mr-2 md:mb-0 basis-1/2 justify-center text-center">
-                            <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">
-                                ¿Filtro de fecha?
-                            </label>
-                            <label for="checbox1" class="text-sm font-medium text-gray-600 dark:text-white ml-4 mr-1">SI
-                            </label>
-                            <input type="checkbox" v-model="reportInfo.rangeY" id="checbox1"
-                                class="rounded mr-3 border-gray-500  text-emerald-500 shadow-sm"
-                                @click="reportInfo.rangeY ? reportInfo.rangeY = false : reportInfo.rangeY = true; rangeN = false" />
-                            <label for="checbox2" class="text-sm font-medium text-gray-600 dark:text-white ml-4 mr-1">NO
-                            </label>
-                            <input type="checkbox" v-model="rangeN" id="checbox2"
-                                class="rounded mr-3 border-gray-500  text-emerald-500 shadow-sm"
-                                @click="rangeN ? rangeN = false : rangeN = true; reportInfo.rangeY = false" />
-                        </div> -->
                         <div class="mb-5 md:mr-2 md:mb-0 basis-1/2 justify-start text-left">
                             <date-time-picker-m v-model="reportInfo.startDate" label="Registrados hasta:" />
                             <InputError v-for="(item, index) in errors.startDate" :key="index" class="mt-2"

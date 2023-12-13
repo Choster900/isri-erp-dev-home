@@ -112,7 +112,7 @@ import axios from "axios";
                     <div class="mb-10 md:flex flex-row justify-items-start">
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                             <label class="block mb-2 text-xs font-light text-gray-600">
-                                Tipo contrato <span class="text-red-600 font-extrabold">*</span>
+                                Tipo contratación <span class="text-red-600 font-extrabold">*</span>
                             </label>
                             <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                                 <Multiselect v-model="jobPositionDet.id_tipo_contrato"
