@@ -81,9 +81,9 @@ class EvaluacionPersonal extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function tipo_evaluacion(): BelongsTo
+    public function tipo_evaluacion_personal(): BelongsTo
     {
-        return $this->belongsTo(TipoEvaluacion::class, 'id_tipo_evaluacion_personal', 'id_tipo_evaluacion_personal');
+        return $this->belongsTo(TipoEvaluacionPersonal::class, 'id_tipo_evaluacion_personal', 'id_tipo_evaluacion_personal');
     }
     /**
      * Get the tipo_evaluacion that owns the EvaluacionPersonal

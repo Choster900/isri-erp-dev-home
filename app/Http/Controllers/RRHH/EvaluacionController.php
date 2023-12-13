@@ -58,8 +58,12 @@ class EvaluacionController extends Controller
                 "plazas_asignadas.detalle_plaza.plaza",
                 "evaluaciones_personal.incidentes_evaluacion",
                 "evaluaciones_personal.detalle_evaluaciones_personal",
+                "evaluaciones_personal.plaza_evaluada.plaza_asignada.detalle_plaza.plaza",
+                "evaluaciones_personal.evaluacion_rendimiento",
+                "evaluaciones_personal.tipo_evaluacion_personal",
+                "evaluaciones_personal.periodo_evaluacion",
                 "evaluaciones_personal" => function ($query) {
-                    return $query->orderBy("fecha_reg_evaluacion_personal", "desc");
+                    return $query->orderBy("fecha_reg_evaluacion_personal", "asc");
                 },
             ])->whereHas("evaluaciones_personal")->orderBy($columns[$column], $dir);
 
@@ -266,9 +270,9 @@ class EvaluacionController extends Controller
 
         return [
             //Data que uso en el front
-            "plazasAsignadas"                  => $plazasAsignadas,
-            "evaluacionRendimiento"            => $evaluacionRendimiento,
-            'cantidadEvaluacionesRendimiento'  => $cantidadEvaluacionesRendimiento,
+            "plazasAsignadas"                 => $plazasAsignadas,
+            "evaluacionRendimiento"           => $evaluacionRendimiento,
+            'cantidadEvaluacionesRendimiento' => $cantidadEvaluacionesRendimiento,
         ];
     }
 
@@ -367,7 +371,23 @@ class EvaluacionController extends Controller
             }
             $response = PlazaEvaluada::insert($plazas);
 
+            $query = Empleado::with([
+                    "persona",
+                    "plazas_asignadas.centro_atencion",
+                    "plazas_asignadas.detalle_plaza.plaza",
+                    "evaluaciones_personal.periodo_evaluacion",
+                    "evaluaciones_personal.incidentes_evaluacion",
+                    "evaluaciones_personal.evaluacion_rendimiento",
+                    "evaluaciones_personal.tipo_evaluacion_personal",
+                    "evaluaciones_personal.detalle_evaluaciones_personal",
+                    "evaluaciones_personal" => function ($query) {
+                        return $query->orderBy("fecha_reg_evaluacion_personal", "asc");
+                    },
+                    "evaluaciones_personal.plaza_evaluada.plaza_asignada.detalle_plaza.plaza",
+                ])->whereHas("evaluaciones_personal")->find($request->idEmpleado);
+
             DB::commit();
+
 
             // Devolver el resultado
             return response()->json([
@@ -375,6 +395,7 @@ class EvaluacionController extends Controller
                 "mensaje_periodo"       => $mensaje_periodo,
                 "mensaje_debug"         => $mensaje_debug,
                 "evaluacionInsertedId"  => $evaluacionInsertedId,
+                "response"              => $query
             ]);
         } catch (\Throwable $th) {
             DB::rollback();

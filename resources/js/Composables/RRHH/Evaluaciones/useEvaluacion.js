@@ -1,6 +1,10 @@
 import axios from "axios";
-import { ref, watch } from "vue";
-
+import moment from "moment";
+import { computed, ref, watch } from "vue";
+/**
+ * 
+ * @returns data
+ */
 export const useEvaluacion = () => {
     const idEmpleado = ref(null);
     const idDependencia = ref("");
@@ -9,6 +13,7 @@ export const useEvaluacion = () => {
     const loadingEvaluacionRendimiento = ref(false);
     const idTipoEvaluacion = ref(1);
     const fechaInicioFechafin = ref("");
+    const activeIndex = ref(0);
 
     const doesntExistResult = ref(false);
     const existMoreThanOne = ref(false);
@@ -81,8 +86,11 @@ export const useEvaluacion = () => {
                 plazasAsignadas: objectPlazas.value,
             });
 
-            console.log(response.data);
-            return response; // Devuelve la respuesta exitosa
+            idCentroAtencion.value = null;
+            objectPlazas.value = null;
+            idEvaluacionRendimiento.value = null;
+            fechaInicioFechafin.value = null;
+            return response; // Devuelve la respuesta exitosa y limpiamos los datos
         } catch (error) {
 
             if (error.response.status === 422) {
@@ -331,6 +339,7 @@ export const useEvaluacion = () => {
         plazaOptions,
         idEvaluacionRendimiento,
         existMoreThanOne,
+        activeIndex,
         loadingEvaluacionRendimiento,
         getPlazasByEmployeeIdAndCentroAtencionId,
         createPersonalEvaluationRequest,
@@ -345,6 +354,7 @@ export const useEvaluacion = () => {
         idEmpleado,
         messageAlert,
         errorsData,
+        
         showMessageAlert,
         handleAccept,
         handleCancel,

@@ -3,7 +3,6 @@
     <div class="m-1.5">
         <!-- Componente del modal ProcessModal -->
         <ProcessModal maxWidth="6xl" :show="showModal" @close="$emit('cerrar-modal')">
-
             <div class="flex flex-col md:flex-row  ">
                 <div class="w-full md:w-2/6 bg-slate-200/40 p-3 border">
                     <div class="col-span-full xl:col-span-6 bg-white shadow-lg  border border-slate-300 ">
@@ -72,7 +71,8 @@
                                     <label class="block text-gray-700 text-xs font-medium mb-1" for="name">Nombre del
                                         empleado <span class="text-red-600 font-extrabold">*</span></label>
                                     <div class="relative flex h-8 w-full flex-row-reverse ">
-                                        <Multiselect v-model="idEmpleado" :disabled="loadingEvaluacionRendimiento"
+                                        <Multiselect v-if="!opcionEmpleado || opcionEmpleado == ''" v-model="idEmpleado"
+                                            :disabled="loadingEvaluacionRendimiento"
                                             @select="getPlazasByEmployeeIdAndCentroAtencionId()" :filter-results="false"
                                             :resolve-on-load="false" :delay="1000" :searchable="true"
                                             :clear-on-search="true" :min-chars="5" placeholder="Busqueda de empleado..."
@@ -82,6 +82,17 @@
                                             noResultsText="<p class='text-xs'>Sin resultados de personas <p>" :options="async function (query) {
                                                 return await handleEmployeeSearch(query)
                                             }" />
+
+                                        <Multiselect v-else v-model="selectedEmpleadoValue" :filter-results="false"
+                                            :disabled="true" :resolve-on-load="false" :delay="1000" :searchable="true"
+                                            :clear-on-search="true" :min-chars="5" placeholder="Busqueda de usuario..."
+                                            :classes="{
+                                                wrapper: 'relative text-xs cursor-not-allowed mx-auto w-full flex items-center justify-end box-border cursor-pointer outline-none',
+                                                containerDisabled: 'cursor-not-allowed bg-gray-200 text-text-slate-400',
+                                                placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                            }" noOptionsText="<p class='text-xs'>Sin Personas<p>"
+                                            noResultsText="<p class='text-xs'>Sin resultados de personas <p>"
+                                            :options="opcionEmpleado" />
                                     </div>
                                     <InputError class="mt-2 px-2" :message="errorsData.idEmpleado" />
                                 </div>
@@ -91,7 +102,8 @@
                                     <label class="block text-gray-700 text-xs font-medium mb-1" for="name">Centro de
                                         atencion <span class="text-red-600 font-extrabold">*</span></label>
                                     <div class="relative flex h-8 w-full flex-row-reverse ">
-                                        <Multiselect :searchable="true" v-model="idCentroAtencion" placeholder="Centros" :disabled="loadingEvaluacionRendimiento"
+                                        <Multiselect :searchable="true" v-model="idCentroAtencion" placeholder="Centros"
+                                            :disabled="loadingEvaluacionRendimiento"
                                             @select="getPlazasByEmployeeIdAndCentroAtencionId()" :classes="{
                                                 placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
                                             }" noOptionsText="<p class='text-xs'>Sin dependencias<p>"
@@ -172,21 +184,24 @@
                                 </div>
 
                             </div>
-                            <InputError v-if="showPlazasModal" class="mt-2 px-2 border-b" :message="errorsData.plazasAsignadas" />
+                            <InputError v-if="showPlazasModal" class="mt-2 px-2 border-b"
+                                :message="errorsData.plazasAsignadas" />
                             <InputError v-if="existMoreThanOne" class="mt-1 px-2"
                                 message="La dependencia tiene múltiples tipos de plazas. Por favor, seleccione una evaluación y las plazas que desea evaluar." />
 
 
-                            <button @click="createPersonalEvaluationRequest"
+                            <button @click="createEvaluationPersona"
                                 class="bg-indigo-900 rounded-sm shadow text-center text-white text-sm font-light w-full py-1 mt-5">Crear
                                 una nueva evaluación</button>
                         </div>
                     </div>
                     <div
-                        class="h-[290px] overflow-y-auto col-span-full xl:col-span-6 bg-white shadow-lg  border border-slate-300">
+                        class="h-[300px] overflow-y-auto col-span-full xl:col-span-6 bg-white shadow-lg  border border-slate-300">
                         <div class="p-3">
-                            <div class="max-h-[250px] ">
-                                <article class="pt-4 border-b border-slate-200" v-for="i in 3" :key="i">
+                            <div class="max-h-[300px] ">
+                                <article class="pt-4 border-b border-slate-200"
+                                    v-for="(año, i) in evaluacionesAgrupadasPorAño" :key="i">
+
                                     <header class="flex items-start mb-2 cursor-pointer"
                                         @click='activeIndex = activeIndex === i ? null : i'>
                                         <div class="mr-3">
@@ -201,24 +216,59 @@
                                         </div>
                                         <h3 class="text-sm text-selection-disable"
                                             :class="activeIndex === i ? 'text-slate-800 font-medium' : 'text-slate-400 font-medium'">
-                                            Evaluaciones
-                                            del año 2023</h3>
+                                            Evaluaciones del año {{ año.year }}</h3>
+
                                     </header>
                                     <div class="accordion-content" :class="i === activeIndex ? 'open' : ''">
                                         <div>
-                                            <div v-for="j in 6" :key="j"
+                                            <div v-for="(evaluacion, j) in año.evaluaciones" :key="j"
                                                 class="bg-slate-300/40 border-l-[4px] border-y-0 border-r-0 border-l-indigo-500 hover:bg-slate-300 cursor-pointer"
                                                 :class="j == 1 ? ' border-b border-b-slate-400' : ''">
                                                 <ul class="ml-10 list-circle py-2 ">
                                                     <li
-                                                        class="relative text-xs  before:w-[10px] before:h-[10px] before:border-[3px] before:border-indigo-500 before:rounded-full before:absolute before:-left-4 before:top-1">
-                                                        Puntuacion</li>
-                                                    <p class="font-medium text-xs"> 10 00</p>
+                                                        class="relative text-xs text-slate-500 before:w-[10px] before:h-[10px] before:border-[3px] before:border-indigo-500 before:rounded-full before:absolute before:-left-4 before:top-1">
+                                                        Puntuación</li>
+                                                    <p class="font-medium text-xs">{{
+                                                        evaluacion.puntaje_evaluacion_personal }}</p>
                                                     <li
-                                                        class="relative text-xs before:w-[10px] before:h-[10px] before:border-[3px] before:border-indigo-500 before:rounded-full before:absolute before:-left-4 before:top-1">
+                                                        class="relative text-xs text-slate-500 before:w-[10px] before:h-[10px] before:border-[3px] before:border-indigo-500 before:rounded-full before:absolute before:-left-4 before:top-1">
                                                         Fecha Evaluado</li>
-                                                    <p class="font-medium text-xs">ahora</p>
-
+                                                    <p class="font-medium text-xs uppercase">
+                                                        {{ moment(evaluacion.fecha_reg_evaluacion_personal).
+                                                            format('dddd, MMMM D, YYYY') }} -
+                                                        {{ moment(evaluacion.fecha_reg_evaluacion_personal).fromNow() }}
+                                                    </p>
+                                                    <li
+                                                        class="relative text-xs text-slate-500 before:w-[10px] before:h-[10px] before:border-[3px] before:border-indigo-500 before:rounded-full before:absolute before:-left-4 before:top-1">
+                                                        Plazas evaluadas</li>
+                                                    <p class="font-medium text-xs">
+                                                        <template v-for="(plaza, k) in evaluacion.plaza_evaluada" :key="k">
+                                                            {{ plaza.plaza_asignada.detalle_plaza.plaza.nombre_plaza }}
+                                                        </template>
+                                                    </p>
+                                                    <li
+                                                        class="relative text-xs text-slate-500 before:w-[10px] before:h-[10px] before:border-[3px] before:border-indigo-500 before:rounded-full before:absolute before:-left-4 before:top-1">
+                                                        Formato aplicado</li>
+                                                    <p class="font-medium text-xs">
+                                                        {{ evaluacion.evaluacion_rendimiento.codigo_evaluacion_rendimiento
+                                                        }}
+                                                        -
+                                                        {{ evaluacion.evaluacion_rendimiento.nombre_evaluacion_rendimiento
+                                                        }}
+                                                    </p>
+                                                    <li
+                                                        class="relative text-xs text-slate-500 before:w-[10px] before:h-[10px] before:border-[3px] before:border-indigo-500 before:rounded-full before:absolute before:-left-4 before:top-1">
+                                                        Periodo</li>
+                                                    <p class="font-medium text-xs">
+                                                        {{ evaluacion.periodo_evaluacion.nombre_periodo_evaluacion }} </p>
+                                                    <li
+                                                        class="relative text-xs text-slate-500 before:w-[10px] before:h-[10px] before:border-[3px] before:border-indigo-500 before:rounded-full before:absolute before:-left-4 before:top-1">
+                                                        Tipo evaluacion</li>
+                                                    <p class="font-medium text-xs">
+                                                        {{
+                                                            evaluacion.tipo_evaluacion_personal.nombre_tipo_evaluacion_personal
+                                                        }}
+                                                    </p>
                                                 </ul>
                                             </div>
                                         </div>
@@ -227,7 +277,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
                 <div class="justify-center w-full md:w-4/6">
                     <!-- Header evaluacion  -->
@@ -336,32 +385,66 @@
 </template>
 
 <script>
-import Tooltip from '@/Components-ISRI/Tooltip.vue';
+import moment from 'moment';
+import Swal from "sweetalert2";
 import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css';
-import moment from 'moment';
-import Modal from "@/Components-ISRI/AllModal/Modal.vue";
-import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue';
-import DocumentoEvaluacion from '../DocumentoEvaluacion.vue';
-import { useEvaluacion } from '@/Composables/RRHH/Evaluaciones/useEvaluacion';
-import { onMounted, ref, toRefs, watch } from 'vue';
-import AccordionBasic from '@/Components-ISRI/AccordionBasic.vue';
-import ModalMorenThanOneTipo from './ModalMorenThanOneTipo.vue';
-import ModalBlank from '@/Components-ISRI/AllModal/ModalBlank.vue';
 import { Spanish } from "flatpickr/dist/l10n/es.js"
-
+import Tooltip from '@/Components-ISRI/Tooltip.vue';
+import Modal from "@/Components-ISRI/AllModal/Modal.vue";
+import DocumentoEvaluacion from '../DocumentoEvaluacion.vue';
+import { executeRequest } from "@/plugins/requestHelpers.js";
+import ModalMorenThanOneTipo from './ModalMorenThanOneTipo.vue';
+import AccordionBasic from '@/Components-ISRI/AccordionBasic.vue';
+import ModalBlank from '@/Components-ISRI/AllModal/ModalBlank.vue';
+import { computed, onMounted, ref, toRef, toRefs, watch } from 'vue';
+import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue';
+import { useEvaluacion } from '@/Composables/RRHH/Evaluaciones/useEvaluacion';
 export default {
     components: {
-        Tooltip, moment, ModalBlank,
-        ProcessModal, Modal, DocumentoEvaluacion, AccordionBasic, ModalMorenThanOneTipo
+        Modal,
+        moment,
+        Tooltip,
+        ModalBlank,
+        ProcessModal,
+        AccordionBasic,
+        DocumentoEvaluacion,
+        ModalMorenThanOneTipo
     },
     emit: ["cerrar-modal"],
     props: {
-        showModal: { type: Boolean, default: false, },
-        listDependencias: { type: Object, default: () => { }, },
+        showModal: {
+            type: Boolean,
+            default: false,
+        },
+        listDependencias: {
+            type: Object,
+            default: () => { },
+
+        },
+        evaluacionPersonalProp: {
+            type: Object,
+            default: () => { },
+        },
     },
     setup(props) {
         const selectedDates = ref([]);
+        const dangerModalOpen = ref(false);
+        const evaluacionPersonal = ref(null);
+        const { evaluacionPersonalProp, listDependencias } = toRefs(props);
+        const {
+            idEmpleado, errorsData,
+            activeIndex, objectPlazas,
+            messageAlert, handleAccept,
+            handleCancel, plazaOptions,
+            showPlazasModal, existMoreThanOne,
+            showMessageAlert, idTipoEvaluacion,
+            idCentroAtencion, doesntExistResult,
+            handleTagToSelect, evaluationsOptions,
+            objectEvaluaciones, fechaInicioFechafin,
+            handleEmployeeSearch, idEvaluacionRendimiento,
+            loadingEvaluacionRendimiento, createPersonalEvaluationRequest, getPlazasByEmployeeIdAndCentroAtencionId,
+        } = useEvaluacion();
 
         const configSecondInput = ref({
             mode: 'range',
@@ -390,8 +473,6 @@ export default {
             },
             onChange: function (selectedDates, dateStr, instance) {
                 if (idTipoEvaluacion.value == 1) {
-
-
                     // Verifica en qué rango de fechas se encuentra la primera fecha seleccionada
                     if (selectedDates.length === 1) {
                         const firstDate = selectedDates[0];
@@ -411,7 +492,6 @@ export default {
                         }
                     }
                 } else {
-
                     const firstDate = selectedDates[0];
                     const maxDate = new Date(
                         firstDate.getFullYear(),
@@ -419,12 +499,77 @@ export default {
                         firstDate.getDate()
                     );
                     instance.set('maxDate', maxDate);
-
                 }
-
-                // Maneja otros eventos o lógica según sea necesario
             },
 
+        });
+
+
+        watch(evaluacionPersonalProp, (newValue, oldValue) => {
+            console.log({ newValue, oldValue });
+            if (newValue) {
+                evaluacionPersonal.value = newValue
+            }
+        })
+
+        /**
+         * Propiedad computada que genera un objeto con un array para obtener el id y el nombre de la persona seleccionada 
+         * Esto se usa cuando estamos editando y queremos setear el id de la persona actual
+         */
+        const selectedEmpleadoValue = computed(() => {
+            if (evaluacionPersonal.value &&
+                evaluacionPersonal.value.evaluaciones_personal &&
+                evaluacionPersonal.value.evaluaciones_personal.length > 0) {
+
+                idEmpleado.value = evaluacionPersonal.value.persona.id_persona
+                return evaluacionPersonal.value.persona.id_persona
+            } else {
+                idEmpleado.value = null
+                return null;
+            }
+        });
+
+        const opcionEmpleado = computed(() => {
+            let objectPersonaOption = [];
+            if (
+                evaluacionPersonal.value &&
+                evaluacionPersonal.value.evaluaciones_personal &&
+                evaluacionPersonal.value.evaluaciones_personal.length > 0
+            ) {
+
+                objectPersonaOption = evaluacionPersonal.value.persona ? [
+                    {
+                        value: evaluacionPersonal.value.persona.id_persona,
+                        label: `${evaluacionPersonal.value.persona.pnombre_persona || ''} ${evaluacionPersonal.value.persona.snombre_persona || ''} ${evaluacionPersonal.value.persona.tnombre_persona || ''}  ${evaluacionPersonal.value.persona.papellido_persona || ''}  ${evaluacionPersonal.value.persona.sapellido_persona || ''}  ${evaluacionPersonal.value.persona.tapellido_persona || ''}`
+                    }] : [];
+            }
+            return objectPersonaOption; // Corregir aquí: evaluacionPersonal.value.persona en lugar de evaluacionPersonal.persona
+        });
+
+
+        const evaluacionesAgrupadasPorAño = computed(() => {
+            const evaluacionesAgrupadas = {};
+            // Verificar si evaluacionPersonal tiene evaluaciones_personal y no está vacío
+            if (
+                evaluacionPersonal.value &&
+                evaluacionPersonal.value.evaluaciones_personal &&
+                evaluacionPersonal.value.evaluaciones_personal.length > 0
+            ) {
+                evaluacionPersonal.value.evaluaciones_personal.forEach(evaluacion => {
+                    const year = moment(evaluacion.fecha_inicio_evaluacion_personal).year();
+                    // Verificar si ya existe una entrada para ese año
+                    if (!evaluacionesAgrupadas[year]) {
+                        evaluacionesAgrupadas[year] = {
+                            year: year,
+                            evaluaciones: [],
+                        };
+                    }
+                    // Agregar la evaluación al arreglo correspondiente al año
+                    evaluacionesAgrupadas[year].evaluaciones.push(evaluacion);
+                    activeIndex.value = moment(evaluacionPersonal.value.evaluaciones_personal[0].fecha_inicio_evaluacion_personal).year().toString();
+                });
+            }
+            return evaluacionesAgrupadas;
         });
 
         const clearLock = () => {
@@ -434,28 +579,64 @@ export default {
             fechaInicioFechafin.value = null;
             toast.info('Reinicio de filtros');
         }
-        const { listDependencias } = toRefs(props)
-        const {
-            handleEmployeeSearch, idEmpleado, objectPlazas,
-            evaluationsOptions, existMoreThanOne, handleTagToSelect,
-            messageAlert, showMessageAlert, handleAccept, handleCancel, errorsData,
-            objectEvaluaciones, fechaInicioFechafin, getPlazasByEmployeeIdAndCentroAtencionId,
-            plazaOptions, idTipoEvaluacion, showPlazasModal, createPersonalEvaluationRequest,
-            loadingEvaluacionRendimiento, idCentroAtencion, idEvaluacionRendimiento, doesntExistResult } = useEvaluacion();
 
-        const activeIndex = ref(0);
-        const dangerModalOpen = ref(false);
-
+        const createEvaluationPersona = async () => {
+            const confirmed = await Swal.fire({
+                title: '<p class="text-[16pt] text-center">¿Esta seguro de agregar una nueva evaluacion?</p>',
+                icon: "question",
+                iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
+                confirmButtonText: "Si, Agregar",
+                confirmButtonColor: "#001b47",
+                cancelButtonText: "Cancelar",
+                showCancelButton: true,
+                showCloseButton: true,
+            });
+            if (confirmed.isConfirmed) {
+                let res = null;
+                res = await executeRequest(
+                    createPersonalEvaluationRequest(),
+                    "La evaluacion se ha creado"
+                );
+                evaluacionPersonal.value = res.data.response
+            }
+        };
         return {
-            dangerModalOpen, showMessageAlert, clearLock,
-            listDependencias, handleAccept, handleCancel, errorsData,
-            selectedDates, configSecondInput, idEvaluacionRendimiento, objectPlazas,
-            existMoreThanOne, handleTagToSelect, messageAlert,
-            objectEvaluaciones, fechaInicioFechafin,
-            activeIndex, getPlazasByEmployeeIdAndCentroAtencionId,
-            plazaOptions, showPlazasModal, evaluationsOptions,
-            handleEmployeeSearch, idEmpleado, idCentroAtencion, doesntExistResult,
-            createPersonalEvaluationRequest, idTipoEvaluacion, loadingEvaluacionRendimiento
+            moment,
+            clearLock,
+            errorsData,
+            activeIndex,
+            activeIndex,
+            handleAccept,
+            handleCancel,
+            objectPlazas,
+            messageAlert,
+            selectedEmpleadoValue,
+            plazaOptions,
+            selectedDates,
+            dangerModalOpen,
+            showPlazasModal,
+            showMessageAlert,
+            listDependencias,
+            existMoreThanOne,
+            idTipoEvaluacion,
+            configSecondInput,
+            handleTagToSelect,
+            doesntExistResult,
+            opcionEmpleado,
+            evaluacionPersonal,
+            objectEvaluaciones,
+            evaluacionPersonal,
+            evaluationsOptions,
+            fechaInicioFechafin,
+            handleEmployeeSearch,
+            createEvaluationPersona,
+            idEvaluacionRendimiento,
+            evaluacionesAgrupadasPorAño,
+            evaluacionesAgrupadasPorAño,
+            idEmpleado, idCentroAtencion,
+            loadingEvaluacionRendimiento,
+            createPersonalEvaluationRequest,
+            getPlazasByEmployeeIdAndCentroAtencionId,
         }
     }
 
@@ -470,7 +651,7 @@ export default {
 }
 
 .accordion-content.open {
-    max-height: 500px;
+    max-height: 999px;
     /* Un valor suficientemente grande */
     /* Ajusta este valor según sea necesario */
     opacity: 1;
