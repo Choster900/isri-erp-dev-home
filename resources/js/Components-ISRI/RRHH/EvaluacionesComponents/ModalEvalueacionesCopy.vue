@@ -33,10 +33,11 @@
                                     </div>
                                 </div>
                             </div>
-                            <InputError class="mt-2 px-2" :message="errorsData.idTipoEvaluacion" />
+                            <InputError class="mt-2 px-2"
+                                :message="errorsData && errorsData.idTipoEvaluacion ? errorsData.idTipoEvaluacion : ''" />
                             <div class="-mx-3 flex">
                                 <div class="mb-1 px-3 w-full">
-                                    <div class="mb-4 md:mr-0 md:mb-0 basis-1/2">
+                                    <div class="mb-1 md:mr-0 md:mb-0 basis-1/2">
                                         <label class="block text-gray-700 text-xs font-medium mb-1" for="name">Fecha [Desde
                                             - Hasta] <span class="text-red-600 font-extrabold">*</span></label>
                                         <div class="relative flex gap-1">
@@ -61,7 +62,7 @@
                                                 </template>
                                             </Tooltip>
                                         </div>
-                                        <InputError class="mt-2 px-2" :message="errorsData.fechaInicioFechafin" />
+                                        <InputError class="mt-2 px-2" :message= "errorsData && errorsData.fechaInicioFechafin ? errorsData.fechaInicioFechafin : ''"   />
 
                                     </div>
                                 </div>
@@ -94,7 +95,7 @@
                                             noResultsText="<p class='text-xs'>Sin resultados de personas <p>"
                                             :options="opcionEmpleado" />
                                     </div>
-                                    <InputError class="mt-2 px-2" :message="errorsData.idEmpleado" />
+                                    <InputError class="mt-2 px-2" :message="errorsData && errorsData.idEmpleado ? errorsData.idEmpleado : ''" />
                                 </div>
                             </div>
                             <div class=" flex gap-1">
@@ -110,7 +111,7 @@
                                             noResultsText="<p class='text-xs'>Sin resultados de dependencias <p>"
                                             :options="listDependencias" />
                                     </div>
-                                    <InputError class="mt-2 px-2" :message="errorsData.idCentroAtencion" />
+                                    <InputError class="mt-2 px-2" :message=" errorsData && errorsData.idCentroAtencion ? errorsData.idCentroAtencion : ''" />
                                 </div>
                                 <div class="mb-1 -mr-3 pr-3 w-1/2">
                                     <div class="flex gap-1">
@@ -162,7 +163,7 @@
                                             noResultsText="<p class='text-xs'>Sin resultados de evaluaciones <p>"
                                             :options="evaluationsOptions" />
                                     </div>
-                                    <InputError class="mt-2 px-2" :message="errorsData.idEvaluacionRendimiento" />
+                                    <InputError class="mt-2 px-2" :message="errorsData && errorsData.idEvaluacionRendimiento ? errorsData.idEvaluacionRendimiento : ''" />
                                 </div>
                             </div>
                             <InputError v-if="doesntExistResult" class="mt-1 px-2"
@@ -185,7 +186,7 @@
 
                             </div>
                             <InputError v-if="showPlazasModal" class="mt-2 px-2 border-b"
-                                :message="errorsData.plazasAsignadas" />
+                                :message="errorsData && errorsData.plazasAsignadas ? errorsData.plazasAsignadas : ''" />
                             <InputError v-if="existMoreThanOne" class="mt-1 px-2"
                                 message="La dependencia tiene múltiples tipos de plazas. Por favor, seleccione una evaluación y las plazas que desea evaluar." />
 
@@ -411,7 +412,7 @@ export default {
         DocumentoEvaluacion,
         ModalMorenThanOneTipo
     },
-    emit: ["cerrar-modal"],
+    emit: ["cerrar-modal", "actualizar-datatable"],
     props: {
         showModal: {
             type: Boolean,
@@ -427,11 +428,11 @@ export default {
             default: () => { },
         },
     },
-    setup(props) {
+    setup(props, { emit }) {
         const selectedDates = ref([]);
         const dangerModalOpen = ref(false);
         const evaluacionPersonal = ref(null);
-        const { evaluacionPersonalProp, listDependencias } = toRefs(props);
+        const { evaluacionPersonalProp, listDependencias, showModal } = toRefs(props);
         const {
             idEmpleado, errorsData,
             activeIndex, objectPlazas,
@@ -475,7 +476,7 @@ export default {
                 if (idTipoEvaluacion.value == 1) {
                     // Verifica en qué rango de fechas se encuentra la primera fecha seleccionada
                     if (selectedDates.length === 1) {
-                        const firstDate = selectedDates[0];
+                        /* const firstDate = selectedDates[0];
                         const january1 = new Date(firstDate.getFullYear(), 0, 1);
                         const june30 = new Date(firstDate.getFullYear(), 5, 30);
                         const july1 = new Date(firstDate.getFullYear(), 6, 1);
@@ -489,26 +490,42 @@ export default {
                             // Si la fecha está entre julio 1 y diciembre 31
                             instance.set('minDate', july1);
                             instance.set('maxDate', december31);
-                        }
+                        } */
+                    } else {
+                        getPlazasByEmployeeIdAndCentroAtencionId()
                     }
                 } else {
-                    const firstDate = selectedDates[0];
+                    /* const firstDate = selectedDates[0];
                     const maxDate = new Date(
                         firstDate.getFullYear(),
                         firstDate.getMonth() + 3,
                         firstDate.getDate()
                     );
-                    instance.set('maxDate', maxDate);
+                    instance.set('maxDate', maxDate); */
+                    getPlazasByEmployeeIdAndCentroAtencionId()
                 }
             },
 
         });
 
+        watch(showModal, (newValue, oldValue) => {
+            if (!newValue) {
+                idCentroAtencion.value = null;
+                idEmpleado.value = null;
+                objectPlazas.value = null;
+            }
+        })
 
         watch(evaluacionPersonalProp, (newValue, oldValue) => {
             console.log({ newValue, oldValue });
-            if (newValue) {
+            if (newValue != '') {
                 evaluacionPersonal.value = newValue
+
+                if (newValue.plazas_asignadas.length === 1) {
+                    idCentroAtencion.value = newValue.plazas_asignadas[0].id_centro_atencion
+                }
+            } else {
+                evaluacionPersonal.value = null;
             }
         })
 
@@ -542,8 +559,10 @@ export default {
                         value: evaluacionPersonal.value.persona.id_persona,
                         label: `${evaluacionPersonal.value.persona.pnombre_persona || ''} ${evaluacionPersonal.value.persona.snombre_persona || ''} ${evaluacionPersonal.value.persona.tnombre_persona || ''}  ${evaluacionPersonal.value.persona.papellido_persona || ''}  ${evaluacionPersonal.value.persona.sapellido_persona || ''}  ${evaluacionPersonal.value.persona.tapellido_persona || ''}`
                     }] : [];
+                return objectPersonaOption; // Corregir aquí: evaluacionPersonal.value.persona en lugar de evaluacionPersonal.persona
+            } else {
+                return null;
             }
-            return objectPersonaOption; // Corregir aquí: evaluacionPersonal.value.persona en lugar de evaluacionPersonal.persona
         });
 
 
@@ -598,6 +617,7 @@ export default {
                     "La evaluacion se ha creado"
                 );
                 evaluacionPersonal.value = res.data.response
+                emit("actualizar-datatable")
             }
         };
         return {

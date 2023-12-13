@@ -95,6 +95,7 @@ export const useEvaluacion = () => {
 
             if (error.response.status === 422) {
                 let data = error.response.data.errors;
+                console.log(data);
                 var myData = new Object();
                 for (const errorBack in data) {
                     myData[errorBack] = data[errorBack][0];
@@ -125,7 +126,7 @@ export const useEvaluacion = () => {
                 centrosPosibleOptionsData.value = centrosPosibleOptionsDataCopy.value;
                 flagTrueOrFalse.value = true;
             })
-           
+
             if (centrosPosibleOptionsData.value && Array.isArray(centrosPosibleOptionsData.value) && flagTrueOrFalse.value === true) {
                 centrosPosibleOptionsData.value.forEach(persona => {
                     const empleado = persona;
@@ -144,7 +145,7 @@ export const useEvaluacion = () => {
                 flagTrueOrFalse.value = false;
             }
             //FIXME: Fin de errorres
-            
+
             // Validar si falta información necesaria
             if (!idEmpleado.value || !idCentroAtencion.value || !idTipoEvaluacion.value || !fechaInicioFechafin.value) {
                 return;
@@ -185,13 +186,30 @@ export const useEvaluacion = () => {
      * @returns {Promise<object>} - Promesa que se resuelve con la respuesta del servidor.
      */
     const obtenerPlazasDesdeServidor = async () => {
-        loadingEvaluacionRendimiento.value = true;
-        return await axios.post("/getAllPlazasByEmployeeIdAndDependenciaId", {
-            employeeId: idEmpleado.value,
-            centroAtencionId: idCentroAtencion.value,
-            idTipoEvaluacion: idTipoEvaluacion.value,
-            fechaInicioFechafin: fechaInicioFechafin.value,
-        });
+        try {
+            loadingEvaluacionRendimiento.value = true;
+            errorsData.value = null;
+            return await axios.post("/getAllPlazasByEmployeeIdAndDependenciaId", {
+                employeeId: idEmpleado.value,
+                centroAtencionId: idCentroAtencion.value,
+                idTipoEvaluacion: idTipoEvaluacion.value,
+                fechaInicioFechafin: fechaInicioFechafin.value,
+            });
+        } catch (error) {
+            if (error.response.status === 422) {
+                console.log(error.response.data.mensaje_periodo);
+
+                errorsData.value = {
+                    fechaInicioFechafin: error.response.data.mensaje_periodo
+                };
+
+            }
+            reject(error);
+
+            console.error("Error en la creación de la evaluación personal:", error);
+            throw new Error("Error en la creación de la evaluación personal");
+        }
+
     };
 
     // Función para procesar la respuesta del servidor
@@ -354,7 +372,7 @@ export const useEvaluacion = () => {
         idEmpleado,
         messageAlert,
         errorsData,
-        
+
         showMessageAlert,
         handleAccept,
         handleCancel,

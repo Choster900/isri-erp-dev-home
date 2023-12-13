@@ -153,7 +153,7 @@
             </div>
         </div>
 
-        <ModalEvalueacionesVue v-if="listDependencias != ''" :evaluacionPersonalProp="objectEvaluacionPersonal"
+        <ModalEvalueacionesVue v-if="listDependencias != ''" :evaluacionPersonalProp="objectEvaluacionPersonal" @actualizar-datatable="getEvaluaciones"
          :showModal="showModalEvaluacion" @cerrar-modal="showModalEvaluacion = false" :listDependencias="listDependencias" />
     </AppLayoutVue>
 </template>

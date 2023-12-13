@@ -122,8 +122,8 @@ class EvaluacionController extends Controller
                     tapellido_persona )
                      AGAINST ( '" . $request->nombre . "')");
             });
-            /* $query->whereHas("empleado") // Las personas que esten en la tabla de empleados
-                ->doesntHave("empleado.evaluaciones_personal"); // Los empleados que no tengan evaluaciones */
+            $query->whereHas("empleado") // Las personas que esten en la tabla de empleados
+                ->doesntHave("empleado.evaluaciones_personal"); // Los empleados que no tengan evaluaciones
         }
         $results = $query->get();
 
@@ -157,17 +157,49 @@ class EvaluacionController extends Controller
                 $fechaInicioObj = Carbon::parse($fecha_inicio);
                 $fechaFinObj = Carbon::parse($fecha_fin);
             } catch (\Exception $e) {
-                return [
+                return response()->json([
                     "error"   => "Error al parsear las fechas.",
                     "mensaje" => $e->getMessage(),
-                ];
+                ], 422);
             }
             // Obtener el año de las fechas
             $anio = $fechaInicioObj->year;
 
-            // Determinar los límites del primer y segundo periodo en base al año
-            $limitePrimerPeriodo = Carbon::parse("{$anio}-06-30");
-            $limiteSegundoPeriodo = Carbon::parse("{$anio}-12-31");
+            if ($tipoEvaluacionId == 1) {
+                // Caso en que idTipoEvaluacion es igual a 1
+                $limitePrimerPeriodo = Carbon::parse("{$anio}-06-30");
+                $limiteSegundoPeriodo = Carbon::parse("{$anio}-12-31");
+            } else {
+                // Caso en que idTipoEvaluacion no es igual a 1
+                $limitePrimerPeriodo = $fechaInicioObj->copy();
+                $limiteSegundoPeriodo = $fechaInicioObj->copy()->addMonths(3);
+            }
+
+
+            // Determinar el periodo en base a las fechas
+            if ($fechaInicioObj->lte($limitePrimerPeriodo) && $fechaFinObj->lte($limitePrimerPeriodo)) {
+                $id_periodo_evaluacion = 1; // Primer periodo
+                $mensaje_periodo = 'Primer periodo';
+            } elseif ($fechaInicioObj->gte($limitePrimerPeriodo) && $fechaFinObj->lte($limiteSegundoPeriodo)) {
+                $id_periodo_evaluacion = 2; // Segundo periodo
+                $mensaje_periodo = 'Segundo periodo';
+            } else {
+                // Manejar el caso en que las fechas no se ajusten a ninguno de los periodos
+
+                if ($tipoEvaluacionId == 1) {
+
+                    return response()->json([
+                        "error" => "Las fechas no .",
+                        "mensaje_periodo" => 'Las evaluaciones de desempeño deben estar dentro del primer periodo (del 1 de enero al 30 de junio) o del segundo periodo (del 1 de julio al 31 de diciembre).',
+                    ], 422);
+                } else {
+
+                    return response()->json([
+                        "error" => "Las fechas no .",
+                        "mensaje_periodo" => 'Las evaluaciones de periodo de prueba deben tener un rango máximo de 3 meses.',
+                    ], 422);
+                }
+            }
 
             $mensaje_debug = [
                 "fechaInicio" => $fechaInicioObj->toDateString(),
@@ -175,10 +207,11 @@ class EvaluacionController extends Controller
                 "periodo"     => ($fechaInicioObj->lte($limitePrimerPeriodo) && $fechaFinObj->lte($limitePrimerPeriodo)) ? 'Primer periodo' : 'Segundo periodo',
             ];
         } else {
-            return [
-                "error"           => "No se proporcionaron fechas.",
+            // Caso en que no se proporcionaron fechas - Devolver error 422
+            return response()->json([
+                "error" => "No se proporcionaron fechas.",
                 "mensaje_periodo" => 'No se proporcionaron fechas',
-            ];
+            ], 422);
         }
 
         // Obtener evaluaciones
@@ -226,7 +259,6 @@ class EvaluacionController extends Controller
                 ])->where('id_empleado', $employeeId)->whereNotIn("id_plaza_asignada", $plazasDosOMasEvaluaciones)
                     ->where('id_centro_atencion', $idCentroAtencion)->get();
             }
-
         } else {
 
             if ($tipoEvaluacionId == 1) {
@@ -240,7 +272,6 @@ class EvaluacionController extends Controller
                 ])->where('id_empleado', $employeeId)->whereNotIn("id_plaza_asignada", $plazasDosOMasEvaluaciones)
                     ->where('id_centro_atencion', $idCentroAtencion)->get();
             }
-
         }
 
         // Obtener evaluaciones de rendimiento con información de tipo de plaza
@@ -273,6 +304,7 @@ class EvaluacionController extends Controller
             "plazasAsignadas"                 => $plazasAsignadas,
             "evaluacionRendimiento"           => $evaluacionRendimiento,
             'cantidadEvaluacionesRendimiento' => $cantidadEvaluacionesRendimiento,
+            "mensaje_debug" => $mensaje_debug
         ];
     }
 
@@ -357,7 +389,7 @@ class EvaluacionController extends Controller
             $evaluacionInsertedId = EvaluacionPersonal::insertGetId($evaluacionPersonalArray);
 
             $plazas = [];
-            foreach ( $request->plazasAsignadas as $key => $value ) {
+            foreach ($request->plazasAsignadas as $key => $value) {
                 $plazaEvaluada = [
                     'id_plaza_asignada'        => $value["value"],
                     'id_evaluacion_personal'   => $evaluacionInsertedId,
@@ -372,19 +404,19 @@ class EvaluacionController extends Controller
             $response = PlazaEvaluada::insert($plazas);
 
             $query = Empleado::with([
-                    "persona",
-                    "plazas_asignadas.centro_atencion",
-                    "plazas_asignadas.detalle_plaza.plaza",
-                    "evaluaciones_personal.periodo_evaluacion",
-                    "evaluaciones_personal.incidentes_evaluacion",
-                    "evaluaciones_personal.evaluacion_rendimiento",
-                    "evaluaciones_personal.tipo_evaluacion_personal",
-                    "evaluaciones_personal.detalle_evaluaciones_personal",
-                    "evaluaciones_personal" => function ($query) {
-                        return $query->orderBy("fecha_reg_evaluacion_personal", "asc");
-                    },
-                    "evaluaciones_personal.plaza_evaluada.plaza_asignada.detalle_plaza.plaza",
-                ])->whereHas("evaluaciones_personal")->find($request->idEmpleado);
+                "persona",
+                "plazas_asignadas.centro_atencion",
+                "plazas_asignadas.detalle_plaza.plaza",
+                "evaluaciones_personal.periodo_evaluacion",
+                "evaluaciones_personal.incidentes_evaluacion",
+                "evaluaciones_personal.evaluacion_rendimiento",
+                "evaluaciones_personal.tipo_evaluacion_personal",
+                "evaluaciones_personal.detalle_evaluaciones_personal",
+                "evaluaciones_personal" => function ($query) {
+                    return $query->orderBy("fecha_reg_evaluacion_personal", "asc");
+                },
+                "evaluaciones_personal.plaza_evaluada.plaza_asignada.detalle_plaza.plaza",
+            ])->whereHas("evaluaciones_personal")->find($request->idEmpleado);
 
             DB::commit();
 
@@ -439,7 +471,7 @@ class EvaluacionController extends Controller
 
                 // Iterar sobre las respuestas
 
-                foreach ( $request->data as $value ) {
+                foreach ($request->data as $value) {
                     $data = [
                         'id_evaluacion_personal'       => $request->id_evaluacion_personal,
                         'id_cat_rendimiento'           => $value['id_cat_rendimiento'],
@@ -477,7 +509,7 @@ class EvaluacionController extends Controller
 
                 $data1 = [];
                 //INSERTANDO EN LA TABLA DE INCIDENTE EVALUACION
-                foreach ( $request->dataIncidenteEvaluacion as $key => $value ) {
+                foreach ($request->dataIncidenteEvaluacion as $key => $value) {
 
                     $data = [
                         'id_evaluacion_personal'          => $request->id_evaluacion_personal,
