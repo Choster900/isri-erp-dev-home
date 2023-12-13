@@ -97,8 +97,8 @@ class EmpleadoController extends Controller
                         });
                     });
                 } else {
-                    $query->whereHas('plazas_asignadas.dependencia', function ($query) use ($search_value) {
-                        $query->where('codigo_dependencia', 'like', '%' . $search_value["dependencia"] . '%')
+                    $query->whereHas('plazas_asignadas.dependencia.centro_atencion', function ($query) use ($search_value) {
+                        $query->where('codigo_centro_atencion', 'like', '%' . $search_value["dependencia"] . '%')
                             ->whereExists(function ($subQuery) {
                                 $subQuery->select(DB::raw(1))
                                     ->from('plaza_asignada')

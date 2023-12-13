@@ -3,6 +3,7 @@ import { onMounted, ref } from "vue";
 
 export const useEvaluacion = () => {
     const sortOrders = ref({});
+    const objectEvaluacionPersonal = ref([]);
     const columns = [
         { width: "10%", label: "ID", name: "id_empleado", type: "text" },
         {
@@ -124,7 +125,7 @@ export const useEvaluacion = () => {
 
             });
             listDependencias.value = list
-            console.log(listDependencias.value);
+            //console.log(listDependencias.value);
         } catch (error) {
             console.error(error);
         }
@@ -139,6 +140,7 @@ export const useEvaluacion = () => {
         columns,
         sortKey,
         sortOrders,
+        objectEvaluacionPersonal,
         tableData,
         pagination,
         listDependencias,

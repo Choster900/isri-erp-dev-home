@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class TipoEvaluacion extends Model
+class TipoEvaluacionPersonal extends Model
 {
     use HasFactory;
-    protected $table = 'tipo_evaluacion';
+    protected $table = 'tipo_evaluacion_personal';
     protected $primaryKey = 'id_tipo_evaluacion_personal';
     public $timestamps = false;
 

@@ -74,4 +74,5 @@ class PlazaAsignada extends Model
     {
         return $this->hasMany(PlazaEvaluada::class, 'id_plaza_asignada', 'id_plaza_asignada');
     }
+    
 }
