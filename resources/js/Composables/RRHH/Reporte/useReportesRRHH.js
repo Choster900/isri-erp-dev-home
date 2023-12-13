@@ -37,6 +37,7 @@ export const useReportesRRHH = (reportInfo,context) => {
                     const response = await axios.post('/get-report-employees-rrhh', parameters);
                     queryResult.value = response.data.query
                     staticObject.value = JSON.parse(JSON.stringify(parameters));
+                    console.log(queryResult.value);
                     load.value++
                     showModal.value = false
                 } catch (err) {

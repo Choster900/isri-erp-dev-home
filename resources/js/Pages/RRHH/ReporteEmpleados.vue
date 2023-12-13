@@ -9,7 +9,7 @@
             </button>
         </div>
         <!-- Tabla de reporte -->
-        <div v-if="load!=0"> <!-- Titulo del reporte-->
+        <div v-if="load != 0 && queryResult.length > 0" > <!-- Titulo del reporte-->
             <div class="rounded-md border-b border-slate-200 py-0.5">
                 <div class="mx-8 text-[14px]">
                     <p class="font-bembo text-center">INSTITUTO SALVADOREÑO DE REHABILITACION INTEGRAL</p>
@@ -24,7 +24,7 @@
             </div>
             <!-- Table header -->
             <div class="text-[14px] mx-10 my-3 flex justify-between items-center">
-                <p class="text-orange-600 mr-8">EMPLEADOS <span class="text-gray-500">({{ queryResult.length }})</span></p>
+                <p class="text-orange-600 font-semibold mr-8">EMPLEADOS <span class="text-gray-500">({{ queryResult.length }})</span></p>
                 <div class="flex">
                     <div class="flex items-center cursor-pointer text-slate-700 hover:text-green-600">
                         <svg class="h-4 w-4 text-green-500" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
@@ -43,7 +43,7 @@
                                 </g>
                             </g>
                         </svg>
-                        <span class="ml-2 text-[13px]">EXPORTAR</span>
+                        <span class="ml-2 font-semibold text-[14px]">EXPORTAR</span>
                     </div>
                     <div class="flex ml-4 items-center cursor-pointer text-slate-700 hover:text-red-600">
                         <svg class="h-4 w-4 text-red-500" fill="currentColor" viewBox="0 0 1920 1920"
@@ -61,7 +61,7 @@
                                 </g>
                             </g>
                         </svg>
-                        <span class="ml-2 text-[13px] ">PDF</span>
+                        <span class="ml-2 text-[14px] font-semibold">PDF</span>
                     </div>
                 </div>
             </div>
@@ -70,33 +70,65 @@
                 <div class="container mx-auto">
                     <div class="bg-white shadow-md rounded mt-2">
                         <div class="flex justify-between bg-teal-800 px-2 py-2 text-white text-[13px]">
-                            <div class="w-1/4 text-center">ID</div>
-                            <div class="w-1/4 text-center">ESTADO</div>
-                            <div class="w-1/4 text-center">FECHA PLAZA</div>
-                            <div class="w-1/4 text-center">NIT</div>
+                            <div class="w-[8%] text-center">CODIGO</div>
+                            <div class="w-[32%] text-center">NOMBRE</div>
+                            <div class="w-[10%] text-center">DUI</div>
+                            <div class="w-[15%] text-center">PENSIONADO</div>
+                            <div class="w-[35%] text-center">PUESTO</div>
                         </div>
                         <div v-for="(employee, index) in paginatedData" :key="index" :class="{
                             'bg-gray-200': index % 2 === 0,
                             'bg-gray-100': index % 2 !== 0
                         }"
                             class="flex justify-between border-b border-gray-100 text-[14px] px-2 py-2 hover:bg-gray-300">
-                            <div class="w-1/4 text-center break-all">{{ employee.id_empleado }}</div>
-                            <div class="w-1/4 text-center break-all">{{ employee.id_estado_empleado === 1 ? 1 : 0 }}</div>
-                            <div class="w-1/4 text-center break-all">
+                            <div class="w-[8%] text-center break-words overflow-wrap flex items-center justify-center">{{
+                                employee.codigo_empleado }}</div>
+                            <div class="w-[32%] text-center break-words overflow-wrap flex items-center justify-center">
+                                {{ employee.persona.pnombre_persona }}
+                                {{ employee.persona.snombre_persona }}
+                                {{ employee.persona.tnombre_persona }}
+                                {{ employee.persona.papellido_persona }}
+                                {{ employee.persona.sapellido_persona }}
+                                {{ employee.persona.tapellido_persona }}
+                            </div>
+                            <div class="w-[10%] text-center break-words overflow-wrap flex items-center justify-center">
+                                {{ employee.persona.dui_persona }}
+                            </div>
+                            <div class="w-[15%] text-center break-words overflow-wrap flex items-center justify-center">
+                                {{ employee.pensionado_empleado === 1 ? 'SI' : 'NO' }}
+                            </div>
+                            <div class="w-[35%] text-center break-words overflow-wrap flex flex-col items-center">
                                 <template v-for="(plaza, index) in employee.plazas_asignadas" :key="index">
-                                    <p>{{ plaza.fecha_plaza_asignada }} - {{ plaza.fecha_renuncia_plaza_asignada }}</p>
+                                    <p :class="index != 0 ? 'border-t border-slate-400 w-full' : ''">
+                                        {{
+                                            plaza.detalle_plaza.plaza.nombre_plaza
+                                        }}
+                                    </p>
+                                    <p :class="index === 0 ? 'pb-2' : ''">
+                                        {{ ' (' +
+                                            formatDate(plaza.fecha_plaza_asignada) +
+                                            (plaza.fecha_renuncia_plaza_asignada ? ' - ' +
+                                                formatDate(plaza.fecha_renuncia_plaza_asignada) + ')' :
+                                                employee.id_estado_empleado === 1 ? ')' : ' - sin registro)') }}
+                                    </p>
                                 </template>
                             </div>
-                            <div class="w-1/4 text-center break-all">{{ employee.nit_empleado }}</div>
-                        </div>
-                        <div>
-
                         </div>
                     </div>
                 </div>
             </div>
+            <div v-if="(currentPage === totalPages)" class="mx-10 hover:bg-gray-300">
+                <div class="py-2">
+                    <div class="flex justify-between  px-2 py-2 text-black text-[15px]">
+                        <div class="w-[40%] font-semibold text-center">TOTAL Empleados : {{ queryResult.length }}</div>
+                        <div class="w-[5%] font-semibold text-center"></div>
+                        <div class="w-[35%] font-semibold text-center">Pensionado SI = {{ retirementY }} ; NO = {{ retirementN }}</div>
+                        <div class="w-[20%] font-semibold text-center"></div>
+                    </div>
+                </div>
+            </div>
             <!-- Pagination -->
-            <div class="flex justify-center items-center mt-4">
+            <div class="flex justify-center items-center mt-4 pb-4">
                 <button @click="currentPage > 1 ? currentPage-- : null" :disabled="currentPage === 1"
                     class="px-3 py-1 mr-2 rounded border focus:outline-none focus:ring transition text-teal-700 border-teal-700 hover:text-white hover:bg-teal-700 active:bg-teal-800 focus:ring-teal-400">
                     Anterior
@@ -122,6 +154,29 @@
                     class="px-3 py-1 rounded border focus:outline-none focus:ring transition text-teal-700 border-teal-700 hover:text-white hover:bg-teal-700 active:bg-teal-800 focus:ring-teal-400">
                     Siguiente
                 </button>
+            </div>
+        </div>
+        <div v-else-if="load > 0" class="mt-10">
+            <div class="flex border border-gray-400 rounded-lg mt-1 mx-[200px]">
+                <div class="border-r border-gray-400 w-[15%] flex items-center justify-center py-2">
+                    <svg class="text-orange-400" fill="currentColor" width="48px" height="48px" viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg" stroke="currentColor">
+                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                        <g id="SVGRepo_iconCarrier">
+                            <g>
+                                <path
+                                    d="M19.79,16.72,11.06,1.61A1.19,1.19,0,0,0,9,1.61L.2,16.81C-.27,17.64.12,19,1.05,19H19C19.92,19,20.26,17.55,19.79,16.72ZM11,17H9V15h2Zm0-4H9L8.76,5h2.45Z">
+                                </path>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+                <div class="w-[85%] rounded-r-lg">
+                    <h2 class="text-orange-500 text-center font-semibold">¡Sin resultados!</h2>
+                    <p class="mx-2 mb-1 font-semibold text-center">No existen resultados para los filtros seleccionados, intenta nuevamente.
+                    </p>
+                </div>
             </div>
         </div>
 
@@ -200,6 +255,7 @@
                     <div class="mb-4 md:flex flex-row justify-center mx-4">
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                             <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Estado empleados
+                                <span class="text-red-600 font-extrabold">*</span>
                             </label>
                             <div class="relative font-semibold flex h-10 w-full flex-row-reverse">
                                 <Multiselect v-model="reportInfo.status" :options="states" :searchable="true"
@@ -212,6 +268,7 @@
                                     </svg>
                                 </div>
                             </div>
+                            <InputError v-for="(item, index) in errors.status" :key="index" class="mt-2" :message="item" />
                         </div>
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                             <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Tipo
@@ -230,8 +287,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="md:flex flex-row justify-items-start mb-4 mx-4">
-                        <div class="mb-5 md:mr-2 md:mb-0 basis-1/2 justify-center text-center">
+                    <div class="md:flex flex-row justify-center mb-4 mx-4">
+                        <!-- <div class="mb-5 md:mr-2 md:mb-0 basis-1/2 justify-center text-center">
                             <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">
                                 ¿Filtro de fecha?
                             </label>
@@ -245,10 +302,9 @@
                             <input type="checkbox" v-model="rangeN" id="checbox2"
                                 class="rounded mr-3 border-gray-500  text-emerald-500 shadow-sm"
                                 @click="rangeN ? rangeN = false : rangeN = true; reportInfo.rangeY = false" />
-                        </div>
-                        <div v-if="reportInfo.rangeY" class="mb-5 md:mr-2 md:mb-0 basis-1/2 justify-start text-left">
-                            <date-time-picker-m v-model="reportInfo.startDate"
-                                label="Registrados hasta:" />
+                        </div> -->
+                        <div class="mb-5 md:mr-2 md:mb-0 basis-1/2 justify-start text-left">
+                            <date-time-picker-m v-model="reportInfo.startDate" label="Registrados hasta:" />
                             <InputError v-for="(item, index) in errors.startDate" :key="index" class="mt-2"
                                 :message="item" />
                         </div>
@@ -283,16 +339,13 @@ import { usePermissions } from '@/Composables/General/usePermissions.js';
 import { useReportesRRHH } from '@/Composables/RRHH/Reporte/useReportesRRHH.js';
 import DateTimePickerM from "@/Components-ISRI/ComponentsToForms/DateTimePickerM.vue";
 
-import VueDatePicker from '@vuepic/vue-datepicker';
-import '@vuepic/vue-datepicker/dist/main.css';
-
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 
 import axios from 'axios';
 
 export default {
-    components: { Head, AppLayoutVue, DateTimePickerM, VueDatePicker },
+    components: { Head, AppLayoutVue, DateTimePickerM },
     props: {
         menu: {
             type: Object,
@@ -306,7 +359,12 @@ export default {
         const rangeN = ref(false)
 
         const currentPage = ref(1)
-        const pageSize = ref(8)
+        const pageSize = ref(5)
+
+        const retirementY = ref(0)
+        const retirementN = ref(0)
+
+        const title = ref("")
 
         const reportInfo = ref({
             depId: '',
@@ -323,20 +381,48 @@ export default {
             mainCenters, errors, staticObject, load
         } = useReportesRRHH(reportInfo, context)
 
+        watch(
+            () => showModal.value,
+            (newValue, oldValue) => {
+                if (!newValue) {
+                    currentPage.value = 1
+                    retirementN.value = 0
+                    retirementY.value = 0
+                    calculateRetirement()
+                }
+            }
+        );
+
         const changePage = (page) => {
             currentPage.value = page
         }
+
+        const calculateRetirement = (() => {
+            if (queryResult.value.length > 0) {
+                queryResult.value.forEach((element) => {
+                    if (element.pensionado_empleado === 1) {
+                        retirementY.value++
+                    } else {
+                        retirementN.value++
+                    }
+                })
+            } else {
+                return 0
+            }
+        })
 
         const computedDependencyInfo = computed(() => {
             const parentId = staticObject.value.parentId
             const depId = staticObject.value.depId
             const center = mainCenters.value.find((element) => element.value === parentId)
             const dependency = depFilter.value.find((element) => element.value === depId)
+            title.value = dependency ? dependency.label : title.value
+
             if (parentId && !depId) {
                 return center.label
             } else
                 if (parentId && depId) {
-                    return center.codigo_centro_atencion + " - " + dependency.label
+                    return center.codigo_centro_atencion + " - " + title.value
                 }
                 else {
                     return "TODOS LOS CENTROS"
@@ -350,43 +436,30 @@ export default {
             const selType = typesOfContract.value.find((e) => e.value === typeC)
             let st = ""
             let typC = ""
-            if(state){
-                st = selSt.label+"S "
+            if (state) {
+                st = selSt.label + "S "
             }
-            if(typeC){
-                typC = "POR "+selType.label
+            if (typeC) {
+                typC = "POR " + selType.label
             }
 
-            return "REPORTE DE EMPLEADOS "+st+typC
+            return "REPORTE DE EMPLEADOS " + st + typC
         })
 
         const computedDate = computed(() => {
             const startD = staticObject.value.startDate
-            const date = startD ? moment(startD).format('DD/MM/YYYY') : moment().format('DD/MM/YYYY')
-            return "REGISTROS HASTA "+date
+            const date = startD ? formatDate(startD) : moment().format('DD/MM/YYYY')
+            return "REPORTE AL " + date
         })
+
+        const formatDate = (date) => {
+            const dateF = moment(date).format('DD/MM/YYYY')
+            return date ? dateF : ""
+        }
 
         const totalPages = computed(() => {
             return Math.ceil(queryResult.value.length / pageSize.value);
         });
-
-        const computedMessage = computed(() => {
-            if (reportInfo.value.rangeY) {
-                if (reportInfo.value.startDate && reportInfo.value.endDate) {
-                    return "Obtendrás un reporte de los empleados que cumplan con los criterios unicamente en el rango seleccionado."
-                } else {
-                    if (reportInfo.value.startDate) {
-                        return "Obtendrás un reporte con la información desde la fecha seleccionada hasta la fecha actual."
-                    } else {
-                        if (reportInfo.value.endDate) {
-                            return "Obtendrás un reporte desde que se tienen registros hasta la fecha final seleccionada."
-                        } else {
-                            return ""
-                        }
-                    }
-                }
-            }
-        })
 
         const pagesToShow = computed(() => {
             const showPages = 1; // Cantidad de páginas que quieres mostrar alrededor de la página actual
@@ -421,8 +494,8 @@ export default {
 
         return {
             permits, queryResult, reportInfo, computedDependencyInfo, computedTitle,
-            errors, cleanObject, getDataForReport, computedDate,
-            depFilter, showModal, states, rangeN, load,
+            errors, cleanObject, getDataForReport, computedDate, retirementN, retirementY,
+            depFilter, showModal, states, rangeN, load, formatDate,
             typesOfContract, isLoadingRequest, mainCenters, openModal,
 
             shouldShowEllipsisBefore, currentPage, pageSize, changePage, totalPages, shouldShowLastPage,
