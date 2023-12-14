@@ -62,7 +62,8 @@
                                                 </template>
                                             </Tooltip>
                                         </div>
-                                        <InputError class="mt-2 px-2" :message= "errorsData && errorsData.fechaInicioFechafin ? errorsData.fechaInicioFechafin : ''"   />
+                                        <InputError class="mt-2 px-2"
+                                            :message="errorsData && errorsData.fechaInicioFechafin ? errorsData.fechaInicioFechafin : ''" />
 
                                     </div>
                                 </div>
@@ -95,7 +96,8 @@
                                             noResultsText="<p class='text-xs'>Sin resultados de personas <p>"
                                             :options="opcionEmpleado" />
                                     </div>
-                                    <InputError class="mt-2 px-2" :message="errorsData && errorsData.idEmpleado ? errorsData.idEmpleado : ''" />
+                                    <InputError class="mt-2 px-2"
+                                        :message="errorsData && errorsData.idEmpleado ? errorsData.idEmpleado : ''" />
                                 </div>
                             </div>
                             <div class=" flex gap-1">
@@ -111,7 +113,8 @@
                                             noResultsText="<p class='text-xs'>Sin resultados de dependencias <p>"
                                             :options="listDependencias" />
                                     </div>
-                                    <InputError class="mt-2 px-2" :message=" errorsData && errorsData.idCentroAtencion ? errorsData.idCentroAtencion : ''" />
+                                    <InputError class="mt-2 px-2"
+                                        :message="errorsData && errorsData.idCentroAtencion ? errorsData.idCentroAtencion : ''" />
                                 </div>
                                 <div class="mb-1 -mr-3 pr-3 w-1/2">
                                     <div class="flex gap-1">
@@ -163,7 +166,8 @@
                                             noResultsText="<p class='text-xs'>Sin resultados de evaluaciones <p>"
                                             :options="evaluationsOptions" />
                                     </div>
-                                    <InputError class="mt-2 px-2" :message="errorsData && errorsData.idEvaluacionRendimiento ? errorsData.idEvaluacionRendimiento : ''" />
+                                    <InputError class="mt-2 px-2"
+                                        :message="errorsData && errorsData.idEvaluacionRendimiento ? errorsData.idEvaluacionRendimiento : ''" />
                                 </div>
                             </div>
                             <InputError v-if="doesntExistResult" class="mt-1 px-2"
@@ -223,6 +227,7 @@
                                     <div class="accordion-content" :class="i === activeIndex ? 'open' : ''">
                                         <div>
                                             <div v-for="(evaluacion, j) in año.evaluaciones" :key="j"
+                                                @click="obtenerCategoriaYRubricaRendimiento(evaluacion.evaluacion_rendimiento.id_evaluacion_rendimiento); evaluacionToPassDocumento = { data: evaluacion, allData: año.allContent }"
                                                 class="bg-slate-300/40 border-l-[4px] border-y-0 border-r-0 border-l-indigo-500 hover:bg-slate-300 cursor-pointer"
                                                 :class="j == 1 ? ' border-b border-b-slate-400' : ''">
                                                 <ul class="ml-10 list-circle py-2 ">
@@ -299,87 +304,51 @@
                             <ul class="text-sm font-medium flex flex-nowrap -mx-4 sm:-mx-6 lg:-mx-8 ">
                                 <li
                                     class="pb-3 mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8">
-                                    <a :class="toShow === 'DocumentoEvalacionVue' ? 'text-indigo-500' : 'text-slate-500 hover:text-slate-600'"
-                                        class=" whitespace-nowrap flex items-center cursor-pointer">
+                                    <a class=" whitespace-nowrap flex items-center cursor-pointer">
                                         <svg class="w-4 h-4 shrink-0 fill-current mr-2" viewBox=" 0 0 16 16">
                                             <path
                                                 d="M12.311 9.527c-1.161-.393-1.85-.825-2.143-1.175A3.991 3.991 0 0012 5V4c0-2.206-1.794-4-4-4S4 1.794 4 4v1c0 1.406.732 2.639 1.832 3.352-.292.35-.981.782-2.142 1.175A3.942 3.942 0 001 13.26V16h14v-2.74c0-1.69-1.081-3.19-2.689-3.733zM6 4c0-1.103.897-2 2-2s2 .897 2 2v1c0 1.103-.897 2-2 2s-2-.897-2-2V4zm7 10H3v-.74c0-.831.534-1.569 1.33-1.838 1.845-.624 3-1.436 3.452-2.422h.436c.452.986 1.607 1.798 3.453 2.422A1.943 1.943 0 0113 13.26V14z" />
                                         </svg>
-                                        <span @click="toShow = 'DocumentoEvalacionVue'">Medición de Competencias</span>
+                                        <span>Medición de Competencias</span>
                                     </a>
                                 </li>
-                                <li
-                                    class="pb-3 mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8">
-                                    <a :class="toShow === 'DocumentoAnalisisDesempeñoVue' ? 'text-indigo-500' : 'text-slate-500 hover:text-slate-600'"
-                                        class="  whitespace-nowrap flex items-center cursor-pointer">
-                                        <svg class="w-4 h-4 shrink-0 fill-current  mr-2"
-                                            :class="toShow === 'DocumentoAnalisisDesempeñoVue' ? 'text-indigo-500' : 'text-slate-500 hover:text-slate-600'"
-                                            viewBox=" 0 0 16 16">
-                                            <path
-                                                d="M14.3.3c.4-.4 1-.4 1.4 0 .4.4.4 1 0 1.4l-8 8c-.2.2-.4.3-.7.3-.3 0-.5-.1-.7-.3-.4-.4-.4-1 0-1.4l8-8zM15 7c.6 0 1 .4 1 1 0 4.4-3.6 8-8 8s-8-3.6-8-8 3.6-8 8-8c.6 0 1 .4 1 1s-.4 1-1 1C4.7 2 2 4.7 2 8s2.7 6 6 6 6-2.7 6-6c0-.6.4-1 1-1z" />
-                                        </svg>
-                                        <span @click="toShow = 'DocumentoAnalisisDesempeñoVue'">Análisis de
-                                            Desempeño</span>
-                                    </a>
-                                </li>
-                                <li
-                                    class="pb-3 mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8">
-                                    <a :class="toShow === 'ImpresionDeDocumentos' ? 'text-indigo-500' : 'text-slate-500 hover:text-slate-600'"
-                                        class="  whitespace-nowrap flex items-center cursor-pointer">
 
-                                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
-                                            <path d="M7 8H21M7 12H21M7 16H21M3 8H3.01M3 12H3.01M3 16H3.01"
-                                                :stroke="toShow === 'ImpresionDeDocumentos' ? '#6366f1' : '#94a3b8'"
-                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-
-                                        </svg>
-
-                                        <span class="ml-2" @click="toShow = 'ImpresionDeDocumentos'">Acciones</span>
-                                    </a>
-                                </li>
                             </ul>
                         </div>
 
                     </div>
-                    <!-- 
-                    <DocumentoEvaluacionVue :contenidoEvaluacionRendimiento="contenidoEvaluacionRendimiento"
-                        :registroEvaluacionRendimientoPersonal="registroEvaluacionRendimientoPersonal"
-                        :info-employee="registrosEvaluacionesRentimientoPersonal"
-                        @actualizar-table-data="$emit('cerrar-modal')" :showMe="toShow" /> -->
-
-                    <!--  <ModalMorenThanOneTipo :showPlazasModal="showPlazasModal" @choose-another="showPlazasModal = false"
-                        :objectPlazas="objectPlazas" :objectEvaluaciones="objectEvaluaciones" /> -->
-
-
-                    <ModalBlank id="danger-modal" :modalOpen="showMessageAlert">
-                        <div class="p-5 flex space-x-4">
-                            <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-orange-100">
-                                <svg class="w-4 h-4 shrink-0 fill-current text-orange-500" viewBox="0 0 16 16">
-                                    <path
-                                        d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z" />
-                                </svg>
-                            </div>
-                            <div>
-                                <div class="mb-2">
-                                    <div class="text-lg font-semibold text-slate-800">¿Agregar plaza para evaluar?</div>
-                                </div>
-                                <div class="text-sm">
-                                    <div class="space-y">
-                                        <p v-html="messageAlert"></p>
-                                    </div>
-                                </div>
-                                <div class="flex flex-wrap justify-end space-x-2">
-                                    <button @click="handleCancel"
-                                        class="btn-sm border border-slate-300 hover:border-slate-400 text-slate-600">Cancelar</button>
-                                    <button @click="handleAccept"
-                                        class="btn-sm border border-transparent bg-orange-500 hover:bg-orange-600 text-white">Sí,
-                                        evaluar</button>
-                                </div>
-                            </div>
-                        </div>
-                    </ModalBlank>
+                    <DocumentoEvaluacionCopy :isLoadingObtenerCategoriaYRubrica="isLoadingObtenerCategoriaYRubrica"
+                        :evaluacionPersonalProp="evaluacionToPassDocumento"
+                        :rubricaAndCategoriaByEvaluacion="rubricaAndCategoriaByEvaluacion" />
 
                 </div>
+                <ModalAlert id="danger-modal" :modalOpen="showMessageAlert">
+                    <div class="p-5 flex space-x-4">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-orange-100">
+                            <svg class="w-4 h-4 shrink-0 fill-current text-orange-500" viewBox="0 0 16 16">
+                                <path
+                                    d="M8 0C3.6 0 0 3.6 0 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8zm0 12c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-3H7V4h2v5z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="mb-2">
+                                <div class="text-lg font-semibold text-slate-800">¿Agregar plaza para evaluar?</div>
+                            </div>
+                            <div class="text-sm">
+                                <div class="space-y">
+                                    <p v-html="messageAlert"></p>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap justify-end space-x-2">
+                                <button @click="handleCancel"
+                                    class="btn-sm border border-slate-300 hover:border-slate-400 text-slate-600">Cancelar</button>
+                                <button @click="handleAccept"
+                                    class="btn-sm border border-transparent bg-orange-500 hover:bg-orange-600 text-white">Sí,
+                                    evaluar</button>
+                            </div>
+                        </div>
+                    </div>
+                </ModalAlert>
             </div>
         </ProcessModal>
     </div>
@@ -393,24 +362,26 @@ import 'vue3-toastify/dist/index.css';
 import { Spanish } from "flatpickr/dist/l10n/es.js"
 import Tooltip from '@/Components-ISRI/Tooltip.vue';
 import Modal from "@/Components-ISRI/AllModal/Modal.vue";
-import DocumentoEvaluacion from '../DocumentoEvaluacion.vue';
 import { executeRequest } from "@/plugins/requestHelpers.js";
 import ModalMorenThanOneTipo from './ModalMorenThanOneTipo.vue';
 import AccordionBasic from '@/Components-ISRI/AccordionBasic.vue';
-import ModalBlank from '@/Components-ISRI/AllModal/ModalBlank.vue';
+import ModalAlert from '@/Components-ISRI/AllModal/ModalAlert.vue';
+import DocumentoEvaluacionCopy from './DocumentoEvaluacionCopy.vue';
 import { computed, onMounted, ref, toRef, toRefs, watch } from 'vue';
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue';
 import { useEvaluacion } from '@/Composables/RRHH/Evaluaciones/useEvaluacion';
+import { useDocumentoEvaluacion } from '@/Composables/RRHH/Evaluaciones/useDocumentoEvaluacion';
 export default {
     components: {
         Modal,
         moment,
         Tooltip,
-        ModalBlank,
+        ModalAlert,
         ProcessModal,
         AccordionBasic,
-        DocumentoEvaluacion,
-        ModalMorenThanOneTipo
+        DocumentoEvaluacionCopy,
+        ModalMorenThanOneTipo,
+        DocumentoEvaluacionCopy
     },
     emit: ["cerrar-modal", "actualizar-datatable"],
     props: {
@@ -433,6 +404,7 @@ export default {
         const dangerModalOpen = ref(false);
         const evaluacionPersonal = ref(null);
         const { evaluacionPersonalProp, listDependencias, showModal } = toRefs(props);
+        const evaluacionToPassDocumento = ref(null);
         const {
             idEmpleado, errorsData,
             activeIndex, objectPlazas,
@@ -447,6 +419,9 @@ export default {
             loadingEvaluacionRendimiento, createPersonalEvaluationRequest, getPlazasByEmployeeIdAndCentroAtencionId,
         } = useEvaluacion();
 
+        const { obtenerCategoriaYRubricaRendimiento,
+            isLoadingObtenerCategoriaYRubrica,
+            rubricaAndCategoriaByEvaluacion, } = useDocumentoEvaluacion()
         const configSecondInput = ref({
             mode: 'range',
             wrap: true,
@@ -580,6 +555,7 @@ export default {
                     if (!evaluacionesAgrupadas[year]) {
                         evaluacionesAgrupadas[year] = {
                             year: year,
+                            allContent: evaluacionPersonal.value,
                             evaluaciones: [],
                         };
                     }
@@ -622,6 +598,7 @@ export default {
         };
         return {
             moment,
+            evaluacionToPassDocumento,
             clearLock,
             errorsData,
             activeIndex,
@@ -634,8 +611,11 @@ export default {
             plazaOptions,
             selectedDates,
             dangerModalOpen,
+            obtenerCategoriaYRubricaRendimiento,
             showPlazasModal,
             showMessageAlert,
+            isLoadingObtenerCategoriaYRubrica,
+            rubricaAndCategoriaByEvaluacion,
             listDependencias,
             existMoreThanOne,
             idTipoEvaluacion,

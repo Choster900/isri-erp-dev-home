@@ -239,6 +239,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/rep-empleados', 'RRHH/ReporteEmpleados');
         }
     )->name('rrhh.repEmpleados');
-    Route::get('get-info-for-reports', [ReporteRRHHController::class, 'getInfoForReports'])->name('dependencia.getInfoForReports');
-    Route::post('get-report-employees-rrhh', [ReporteRRHHController::class, 'getReportEmployeesRRHH'])->name('dependencia.getReportEmployeesRRHH');
+    Route::get('get-info-for-reports', [ReporteRRHHController::class, 'getInfoForReports'])->name('reporteRRHH.getInfoForReports');
+    Route::post('get-report-employees-rrhh', [ReporteRRHHController::class, 'getReportEmployeesRRHH'])->name('reporteRRHH.getReportEmployeesRRHH');
+    Route::post('create-excel-employees', [ReporteRRHHController::class, 'createExcelEmployees'])->name('reporteRRHH.createExcelEmployees');
 });

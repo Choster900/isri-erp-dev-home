@@ -136,4 +136,23 @@ class Persona extends Model
     {
         return $this->hasMany(ArchivoAnexo::class, 'id_persona', 'id_persona');
     }
+
+    public function getNombreCompletoAttribute()
+    {
+        $nombreCompleto = $this->papellido_persona;
+
+        $nombreCompleto = $this->sapellido_persona ? $nombreCompleto . ' '.$this->sapellido_persona : $nombreCompleto;
+
+        $nombreCompleto = $this->tapellido_persona ? $nombreCompleto . ' '.$this->tapellido_persona : $nombreCompleto;
+
+        $nombreCompleto .= ', '.$this->pnombre_persona;
+
+        $nombreCompleto = $this->snombre_persona ? $nombreCompleto . ' '.$this->snombre_persona : $nombreCompleto;
+
+        $nombreCompleto = $this->tnombre_persona ? $nombreCompleto . ' '.$this->tnombre_persona : $nombreCompleto;
+
+        return $nombreCompleto;
+    }
+
+    protected $appends = ['nombre_completo'];
 }
