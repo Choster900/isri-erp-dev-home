@@ -177,6 +177,7 @@ class EvaluacionController extends Controller
             }
 
 
+
             // Determinar el periodo en base a las fechas
             if ($fechaInicioObj->lte($limitePrimerPeriodo) && $fechaFinObj->lte($limitePrimerPeriodo)) {
                 $id_periodo_evaluacion = 1; // Primer periodo
@@ -222,6 +223,24 @@ class EvaluacionController extends Controller
             ->where("id_empleado", $employeeId)
             ->get();
 
+        // Obtén una colección de todos los id_plaza_asignada
+        $idPlazaAsignadaCollection = $objectEvaluationByPrueba->pluck('plaza_evaluada.*.plaza_asignada.id_plaza_asignada')->flatten();
+
+        $conteoPorPlazaAsignada = $idPlazaAsignadaCollection->countBy();
+
+        // Filtra las plazas asignadas que tienen un conteo de 2 o más
+        $plazasConDosOMasEvaluaciones = $conteoPorPlazaAsignada->filter(function ($conteo) {
+            return $conteo >= 2;
+        });
+
+        // Obtiene las claves (id_plaza_asignada) del arreglo filtrado
+        $plazasDosOMasEvaluaciones = $plazasConDosOMasEvaluaciones->keys()->toArray();
+
+
+        $plazasAsignadasPruebas = PlazaAsignada::with([
+            'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos'
+        ])->where('id_empleado', $employeeId)->whereNotIn("id_plaza_asignada", $plazasDosOMasEvaluaciones)
+            ->where('id_centro_atencion', $idCentroAtencion)->get();
 
         $objectEvaluationByPrueba = EvaluacionPersonal::with(["plaza_evaluada.plaza_asignada"])
             ->where("id_tipo_evaluacion_personal", $tipoEvaluacionId)
