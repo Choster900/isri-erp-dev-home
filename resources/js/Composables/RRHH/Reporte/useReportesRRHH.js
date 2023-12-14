@@ -3,9 +3,10 @@ import axios from "axios";
 import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
 import { toast } from "vue3-toastify";
+import moment from 'moment';
 import _ from "lodash";
 
-export const useReportesRRHH = (reportInfo,context) => {
+export const useReportesRRHH = (reportInfo, context) => {
     const swal = inject("$swal");
     const isLoadingRequest = ref(false);
     const errors = ref([])
@@ -25,7 +26,7 @@ export const useReportesRRHH = (reportInfo,context) => {
             icon: "question",
             iconHtml: "❓",
             confirmButtonText: "Si, generar.",
-            confirmButtonColor: "#141368",
+            confirmButtonColor: "#047857",
             cancelButtonText: "Cancelar",
             showCancelButton: true,
             showCloseButton: true,
@@ -37,7 +38,6 @@ export const useReportesRRHH = (reportInfo,context) => {
                     const response = await axios.post('/get-report-employees-rrhh', parameters);
                     queryResult.value = response.data.query
                     staticObject.value = JSON.parse(JSON.stringify(parameters));
-                    console.log(queryResult.value);
                     load.value++
                     showModal.value = false
                 } catch (err) {
@@ -68,16 +68,9 @@ export const useReportesRRHH = (reportInfo,context) => {
                 typesOfContract.value = response.data.typesOfContract
             })
             .catch((err) => {
-                if (err.response.status === 422) {
-                    useShowToast(
-                        toast.warning,
-                        "Tienes algunos errores, por favor verifica los datos enviados."
-                    );
-                    errors.value = err.response.data.errors;
-                } else {
-                    showErrorMessage(err);
-                    showModal.value = false
-                }
+                const { title, text, icon } = useHandleError(err);
+                swal({ title: title, text: text, icon: icon, timer: 5000 });
+                showModal.value = false
             })
             .finally(() => {
                 isLoadingRequest.value = false;
@@ -104,6 +97,11 @@ export const useReportesRRHH = (reportInfo,context) => {
         swal({ title: title, text: text, icon: icon, timer: 5000 });
     };
 
+    const formatDate = (date) => {
+        const dateF = moment(date).format('DD/MM/YYYY')
+        return date ? dateF : ""
+    }
+
     return {
         errors,
         queryResult,
@@ -117,6 +115,7 @@ export const useReportesRRHH = (reportInfo,context) => {
         load,
         getDataForReport,
         getInfoForModal,
-        cleanObject
+        cleanObject,
+        formatDate
     };
 };

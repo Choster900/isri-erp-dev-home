@@ -76,4 +76,9 @@ class Empleado extends Model
     {
         return $this->hasMany(PeriodoLaboral::class, 'id_empleado', 'id_empleado');
     }
+
+    public function tipo_pension()
+    {
+        return $this->hasOne('App\Models\TipoPension','id_tipo_pension','id_tipo_pension');
+    }
 }

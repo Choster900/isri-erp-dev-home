@@ -9,7 +9,7 @@ import axios from "axios";
 <template>
     <div class="m-1.5">
         <Modal :show="showModalIncome"  @close="$emit('cerrar-modal')" :modal-title="'Concepto de ingresos. '"
-            maxWidth="3xl">
+            maxWidth="2xl">
             <div class="px-5 py-4">
                 <div class="text-sm">
 
