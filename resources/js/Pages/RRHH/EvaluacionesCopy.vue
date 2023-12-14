@@ -3,7 +3,7 @@
     <AppLayoutVue nameSubModule="RRHH - Evaluacion del personal">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="dataEvaluacionToSendModal = []; showModalEvaluacion = !showModalEvaluacion"
+                <GeneralButton @click="objectEvaluacionPersonal = []; showModalEvaluacion = !showModalEvaluacion"
                     color="bg-green-700  hover:bg-green-800" text="Agregar Acuerdos" icon="add" />
             </div>
         </div>
@@ -60,7 +60,7 @@
                                 <div class="space-x-1">
                                     <DropDownOptions>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            @click.stop="dataEvaluacionToSendModal = evaluacion; showModalEvaluacion = !showModalEvaluacion">
+                                            @click.stop="objectEvaluacionPersonal = evaluacion; showModalEvaluacion = !showModalEvaluacion">
                                             <div class="w-8 text-blue-900">
                                                 <span class="text-xs">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -152,8 +152,9 @@
                 </nav>
             </div>
         </div>
-        {{ listDependencias }}
-        <ModalEvalueacionesVue v-if="listDependencias != ''" :showModal="showModalEvaluacion" @cerrar-modal="showModalEvaluacion = false" :listDependencias="listDependencias" />
+
+        <ModalEvalueacionesVue v-if="listDependencias != ''" :evaluacionPersonalProp="objectEvaluacionPersonal" @actualizar-datatable="getEvaluaciones"
+         :showModal="showModalEvaluacion" @cerrar-modal="showModalEvaluacion = false" :listDependencias="listDependencias" />
     </AppLayoutVue>
 </template>
 
@@ -180,6 +181,7 @@ export default {
             sortOrders,
             pagination,
             stateModal,
+            objectEvaluacionPersonal,
             handleData,
             emptyObject,
             isLoadinRequest,
@@ -199,6 +201,7 @@ export default {
             tableData,
             getEvaluaciones,
             sortOrders,
+            objectEvaluacionPersonal,
             pagination,
             stateModal,
             handleData,
