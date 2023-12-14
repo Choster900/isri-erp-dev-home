@@ -8,7 +8,7 @@ import axios from "axios";
 
 <template>
     <div class="m-1.5">
-        <Modal :show="show_modal_receipt" :modal-title="'Administración de recibos de ingreso. '" maxWidth="4xl"
+        <Modal :show="show_modal_receipt" :modal-title="'Administración de recibos de ingreso. '" maxWidth="3xl"
             @close="$emit('cerrar-modal')">
             <div class="px-5 py-8">
                 <div class="space-y-2">
