@@ -56,8 +56,13 @@ class ReporteRRHHController extends Controller
                 'plazas_asignadas.dependencia.centro_atencion',
                 'plazas_asignadas.detalle_plaza.plaza',
                 'plazas_asignadas.detalle_plaza.tipo_contrato',
-                'persona',
+                'persona.genero',
+                'persona.profesion',
+                'persona.nivel_educativo',
+                'persona.estado_civil',
                 'tipo_pension',
+                'persona.residencias.municipio.departamento',
+                'persona.municipio',
                 'persona.residencias' => function ($query) {
                     $query->where('estado_residencia', 1);
                 },
@@ -174,10 +179,15 @@ class ReporteRRHHController extends Controller
 
                 $period = ' (' . $startDate . $fechaRenuncia . $estadoEmpleado . ')';
 
+                $sirh = $plaza['detalle_plaza']['id_puesto_sirhi_det_plaza'] ?
+                    'SIRH = ' . $plaza['detalle_plaza']['id_puesto_sirhi_det_plaza'].' -- '
+                    : '';
+
                 $textRun = $richText->createTextRun(
-                    $plaza['dependencia']['centro_atencion']['codigo_centro_atencion'] . ' - ' . $plaza['detalle_plaza']['plaza']['nombre_plaza']
-                        . ' - ' . $plaza['detalle_plaza']['tipo_contrato']['nombre_tipo_contrato']
-                        . ' - ' . $period
+                    $plaza['dependencia']['centro_atencion']['codigo_centro_atencion'] . ' -- ' .
+                        $sirh . $plaza['detalle_plaza']['plaza']['nombre_plaza']
+                        . ' -- ' . $plaza['detalle_plaza']['tipo_contrato']['nombre_tipo_contrato']
+                        . ' -- ' . $period
                 );
 
                 // Agregar salto de línea si no es el último elemento
@@ -186,35 +196,62 @@ class ReporteRRHHController extends Controller
                 }
             }
             $direccion = '';
+            $depTo = '';
+            $municipio = '';
             foreach ($empleado['persona']['residencias'] as $index => $dir) {
-                $direccion = $index === 0 ? $dir['direccion_residencia'] : "";
+                if ($index == 0) {
+                    $direccion = $dir['direccion_residencia'];
+                    $depTo = $dir['municipio']['departamento']['nombre_departamento'];
+                    $municipio = $dir['municipio']['nombre_municipio'];
+                }
             }
+
+            $fechaNacimiento = Carbon::createFromFormat('Y-m-d', $empleado['persona']['fecha_nac_persona']);
+            $edad = $fechaNacimiento->diffInYears(Carbon::now());
+
             $selectedItem = [
-                'codigo_empleado' => $empleado['codigo_empleado'],
-                'nombre'          => $empleado['persona']['nombre_completo'],
-                'puesto'          => $richText,
-                'dui'             => $empleado['persona']['dui_persona'],
-                'direccion'       => $direccion,
-                'pensionado'      => $empleado['pensionado_empleado']==1 ? 'SI' :  'NO',
-                'telefono'        => $empleado['persona']['telefono_persona'] ?? "",
-                'afiliado'        => $empleado['tipo_pension'] ? $empleado['tipo_pension']['codigo_tipo_pension'] : "",
-                'nup'             => $empleado['nup_empleado'] ?? "",
-                'isss'            => $empleado['isss_empleado'] ?? "",
+                'codigo_empleado'   => $empleado['codigo_empleado'],
+                'nombre'            => $empleado['persona']['nombre_completo'],
+                'puesto'            => $richText,
+                'dui'               => $empleado['persona']['dui_persona'],
+                'departamento'      => $depTo,
+                'municipio'         => $municipio,
+                'direccion'         => $direccion,
+                'genero'            => $empleado['persona']['genero']['nombre_genero'],
+                'fecha_nac'         => Carbon::createFromFormat('Y-m-d', $empleado['persona']['fecha_nac_persona'])->format('d/m/Y'),
+                'edad'              => $edad,
+                'mun_nac'           => $empleado['persona']['municipio']['nombre_municipio'],
+                'profesion'         => $empleado['persona']['profesion']['nombre_profesion'],
+                'nivel'             => $empleado['persona']['nivel_educativo']['nombre_nivel_educativo'],
+                'civil'             => $empleado['persona']['estado_civil']['nombre_estado_civil'],
+                'pensionado'        => $empleado['pensionado_empleado'] == 1 ? 'SI' :  'NO',
+                'e_personal'        => $empleado['persona']['email_persona'] ?? '',
+                'e_laboral'         => $empleado['email_institucional_empleado'] ?? '',
+                'telefono'          => $empleado['persona']['telefono_persona'] ?? "",
+                'afiliado'          => $empleado['tipo_pension'] ? $empleado['tipo_pension']['codigo_tipo_pension'] : "",
+                'nup'               => $empleado['nup_empleado'] ?? '',
+                'isss'              => $empleado['isss_empleado'] ?? '',
             ];
 
             $selectedData[] = $selectedItem;
         }
-        array_unshift($selectedData, array('CODIGO', 'NOMBRE', 'PUESTO', 'DUI', 'DIRECCION', 'PENSIONADO', 'TELEFONO', 'AFILIADO A', 'NUP', 'ISSS'));
+        //Fields to show
+        array_unshift($selectedData, array(
+            'CODIGO', 'NOMBRE', 'PUESTO', 'DUI', 'DEPARTAMENTO RESIDENCIA', 'MUNICIPIO RESIDENCIA', 'DIRECCION',
+            'GENERO', 'FECHA NACIMIENTO', 'EDAD', 'MUNICIPIO NACIMIENTO', 'PROFESION',
+            'NIVEL EDUCATIVO', 'ESTADO CIVIL', 'PENSIONADO', 'CORREO PERSONAL', 'CORREO INSTITUCIONAL',
+            'TELEFONO', 'AFILIADO A', 'NUP', 'ISSS'
+        ));
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Combina las celdas 
-        $sheet->mergeCells('A1:J1');
-        $sheet->mergeCells('A2:J2');
-        $sheet->mergeCells('A3:J3');
-        $sheet->mergeCells('A4:J4');
-        // Definimos encabezado
+        // Merge cells
+        $sheet->mergeCells('A1:U1');
+        $sheet->mergeCells('A2:U2');
+        $sheet->mergeCells('A3:U3');
+        $sheet->mergeCells('A4:U4');
+        // Set up the header
         $sheet->setCellValue('A1', 'INSTITUTO SALVADOREÑO DE REHABILITACION INTEGRAL - ISRI');
         $sheet->setCellValue('A2', $request->title);
         $sheet->setCellValue('A3', $request->location);
@@ -228,7 +265,7 @@ class ReporteRRHHController extends Controller
 
         $sheet->getStyle('5')->getFont()->setBold(true);
 
-        $columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+        $columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U'];
         foreach ($columns as $column) {
             $sheet->getColumnDimension($column)->setAutoSize(true);
         }
@@ -243,8 +280,8 @@ class ReporteRRHHController extends Controller
         }
 
         $lastRow = $sheet->getHighestDataRow(); // obtiene el número de la última fila con datos
-        $sheet->setCellValue('B' . ($lastRow + 1), 'TOTAL Empleados: '.$total);
-        $sheet->setCellValue('C' . ($lastRow + 1), 'Pensionado : SI = '.$retirementY.' NO = '.$retirementN);
+        $sheet->setCellValue('B' . ($lastRow + 1), 'TOTAL Empleados: ' . $total);
+        $sheet->setCellValue('C' . ($lastRow + 1), 'Pensionado : SI = ' . $retirementY . ' NO = ' . $retirementN);
 
         $sheet->getStyle('B' . ($lastRow + 1))->getFont()->setBold(true)->setSize(13);
         $sheet->getStyle('C' . ($lastRow + 1))->getFont()->setBold(true)->setSize(13);
