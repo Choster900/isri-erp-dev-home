@@ -9,7 +9,7 @@
             </button>
         </div>
         <!-- Tabla de reporte -->
-        <div v-if="load != 0 && queryResult.length > 0" > <!-- Titulo del reporte-->
+        <div v-if="load != 0 && queryResult.length > 0"> <!-- Titulo del reporte-->
             <div class="rounded-md border-b border-slate-200 py-0.5">
                 <div class="mx-8 text-[14px]">
                     <p class="font-bembo text-center">INSTITUTO SALVADOREÑO DE REHABILITACION INTEGRAL</p>
@@ -24,9 +24,11 @@
             </div>
             <!-- Table header -->
             <div class="text-[14px] mx-10 my-3 flex justify-between items-center">
-                <p class="text-orange-600 font-semibold mr-8">EMPLEADOS <span class="text-gray-500">({{ queryResult.length }})</span></p>
+                <p class="text-orange-600 font-semibold mr-8">EMPLEADOS <span class="text-gray-500">({{ queryResult.length
+                }})</span></p>
                 <div class="flex">
-                    <div class="flex items-center cursor-pointer text-slate-700 hover:text-green-600">
+                    <div @click="exportExcel(queryResult, computedDependencyInfo, computedTitle, computedDate)"
+                        class="flex items-center cursor-pointer text-slate-700 hover:text-green-600">
                         <svg class="h-4 w-4 text-green-500" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
                             xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 26 26" xml:space="preserve"
                             fill="#000000">
@@ -84,12 +86,13 @@
                             <div class="w-[8%] text-center break-words overflow-wrap flex items-center justify-center">{{
                                 employee.codigo_empleado }}</div>
                             <div class="w-[32%] text-center break-words overflow-wrap flex items-center justify-center">
-                                {{ employee.persona.pnombre_persona }}
-                                {{ employee.persona.snombre_persona }}
-                                {{ employee.persona.tnombre_persona }}
                                 {{ employee.persona.papellido_persona }}
                                 {{ employee.persona.sapellido_persona }}
                                 {{ employee.persona.tapellido_persona }}
+                                ,
+                                {{ employee.persona.pnombre_persona }}
+                                {{ employee.persona.snombre_persona }}
+                                {{ employee.persona.tnombre_persona }}
                             </div>
                             <div class="w-[10%] text-center break-words overflow-wrap flex items-center justify-center">
                                 {{ employee.persona.dui_persona }}
@@ -105,7 +108,7 @@
                                         }}
                                     </p>
                                     <p :class="(index + 1) != employee.plazas_asignadas.length ? 'pb-2' : ''">
-                                        {{ plaza.dependencia.centro_atencion.codigo_centro_atencion +' - (' +
+                                        {{ plaza.dependencia.centro_atencion.codigo_centro_atencion + ' - (' +
                                             formatDate(plaza.fecha_plaza_asignada) +
                                             (plaza.fecha_renuncia_plaza_asignada ? ' - ' +
                                                 formatDate(plaza.fecha_renuncia_plaza_asignada) + ')' :
@@ -122,7 +125,8 @@
                     <div class="flex justify-between  px-2 py-2 text-black text-[15px]">
                         <div class="w-[40%] font-semibold text-center">TOTAL Empleados : {{ queryResult.length }}</div>
                         <div class="w-[5%] font-semibold text-center"></div>
-                        <div class="w-[35%] font-semibold text-center">Pensionado SI = {{ retirementY }} ; NO = {{ retirementN }}</div>
+                        <div class="w-[35%] font-semibold text-center">Pensionado SI = {{ retirementY }} ; NO = {{
+                            retirementN }}</div>
                         <div class="w-[20%] font-semibold text-center"></div>
                     </div>
                 </div>
@@ -174,13 +178,14 @@
                 </div>
                 <div class="w-[85%] rounded-r-lg">
                     <h2 class="text-orange-500 text-center font-semibold">¡Sin resultados!</h2>
-                    <p class="mx-2 mb-1 font-semibold text-center">No existen resultados para los filtros seleccionados, intenta nuevamente.
+                    <p class="mx-2 mb-1 font-semibold text-center">No existen resultados para los filtros seleccionados,
+                        intenta nuevamente.
                     </p>
                 </div>
             </div>
         </div>
 
-        <div v-if="isLoadingRequest"
+        <div v-if="isLoadingRequest || isLoadingExport"
             class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
             <div role="status" class="flex items-center">
                 <svg aria-hidden="true" class="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-800"
@@ -322,6 +327,7 @@ import { jsPDF } from "jspdf";
 import { ref, toRefs, computed, onMounted, watch } from 'vue';
 import { usePermissions } from '@/Composables/General/usePermissions.js';
 import { useReportesRRHH } from '@/Composables/RRHH/Reporte/useReportesRRHH.js';
+import { useReporteEmpleado } from '@/Composables/RRHH/Reporte/useReporteEmpleado.js';
 import DateTimePickerM from "@/Components-ISRI/ComponentsToForms/DateTimePickerM.vue";
 
 import { toast } from 'vue3-toastify';
@@ -340,8 +346,6 @@ export default {
     setup(props, context) {
         const { menu } = toRefs(props);
         const permits = usePermissions(menu.value, window.location.pathname);
-
-        const rangeN = ref(false)
 
         const currentPage = ref(1)
         const pageSize = ref(5)
@@ -363,8 +367,12 @@ export default {
         const {
             queryResult, getInfoForModal, depFilter, showModal, cleanObject,
             getDataForReport, states, typesOfContract, isLoadingRequest,
-            mainCenters, errors, staticObject, load
+            mainCenters, errors, staticObject, load, formatDate
         } = useReportesRRHH(reportInfo, context)
+
+        const {
+            exportExcel, isLoadingExport
+        } = useReporteEmpleado(context)
 
         watch(
             () => showModal.value,
@@ -378,10 +386,6 @@ export default {
             }
         );
 
-        const changePage = (page) => {
-            currentPage.value = page
-        }
-
         const calculateRetirement = (() => {
             if (queryResult.value.length > 0) {
                 queryResult.value.forEach((element) => {
@@ -394,6 +398,43 @@ export default {
             } else {
                 return 0
             }
+        })
+
+        //Functions to manage pagination
+        const changePage = (page) => {
+            currentPage.value = page
+        }
+        const totalPages = computed(() => {
+            return Math.ceil(queryResult.value.length / pageSize.value);
+        });
+        const pagesToShow = computed(() => {
+            const showPages = 1; // Cantidad de páginas que quieres mostrar alrededor de la página actual
+            const startPage = Math.max(1, currentPage.value - showPages);
+            const endPage = Math.min(totalPages.value, currentPage.value + showPages);
+            const pages = [];
+            for (let i = startPage; i <= endPage; i++) {
+                pages.push(i);
+            }
+            return pages;
+        });
+
+        const shouldShowEllipsisBefore = computed(() => pagesToShow.value[0] > 2);
+        const shouldShowFirstPage = computed(() => pagesToShow.value[0] > 1);
+
+        const shouldShowEllipsisAfter = computed(() => pagesToShow.value[pagesToShow.value.length - 1] < totalPages.value - 1);
+        const shouldShowLastPage = computed(() => pagesToShow.value[pagesToShow.value.length - 1] < totalPages.value);
+
+        const paginatedData = computed(() => {
+            const startIndex = (currentPage.value - 1) * pageSize.value;
+            const endIndex = currentPage.value * pageSize.value;
+            return queryResult.value.slice(startIndex, endIndex);
+        });
+
+        //Methods to set report header
+        const computedDate = computed(() => {
+            const startD = staticObject.value.startDate
+            const date = startD ? formatDate(startD) : moment().format('DD/MM/YYYY')
+            return "REPORTE AL " + date
         })
 
         const computedDependencyInfo = computed(() => {
@@ -431,47 +472,6 @@ export default {
             return "REPORTE DE EMPLEADOS " + st + typC
         })
 
-        const computedDate = computed(() => {
-            const startD = staticObject.value.startDate
-            const date = startD ? formatDate(startD) : moment().format('DD/MM/YYYY')
-            return "REPORTE AL " + date
-        })
-
-        const formatDate = (date) => {
-            const dateF = moment(date).format('DD/MM/YYYY')
-            return date ? dateF : ""
-        }
-
-        const totalPages = computed(() => {
-            return Math.ceil(queryResult.value.length / pageSize.value);
-        });
-
-        const pagesToShow = computed(() => {
-            const showPages = 1; // Cantidad de páginas que quieres mostrar alrededor de la página actual
-            const startPage = Math.max(1, currentPage.value - showPages);
-            const endPage = Math.min(totalPages.value, currentPage.value + showPages);
-
-            const pages = [];
-            for (let i = startPage; i <= endPage; i++) {
-                pages.push(i);
-            }
-            return pages;
-        });
-
-
-        const shouldShowEllipsisBefore = computed(() => pagesToShow.value[0] > 2);
-        const shouldShowFirstPage = computed(() => pagesToShow.value[0] > 1);
-
-        const shouldShowEllipsisAfter = computed(() => pagesToShow.value[pagesToShow.value.length - 1] < totalPages.value - 1);
-        const shouldShowLastPage = computed(() => pagesToShow.value[pagesToShow.value.length - 1] < totalPages.value);
-
-
-        const paginatedData = computed(() => {
-            const startIndex = (currentPage.value - 1) * pageSize.value;
-            const endIndex = currentPage.value * pageSize.value;
-            return queryResult.value.slice(startIndex, endIndex);
-        });
-
         const openModal = async () => {
             await getInfoForModal();
             showModal.value = true
@@ -480,8 +480,10 @@ export default {
         return {
             permits, queryResult, reportInfo, computedDependencyInfo, computedTitle,
             errors, cleanObject, getDataForReport, computedDate, retirementN, retirementY,
-            depFilter, showModal, states, rangeN, load, formatDate,
+            depFilter, showModal, states, load, formatDate,
             typesOfContract, isLoadingRequest, mainCenters, openModal,
+
+            exportExcel, isLoadingExport,
 
             shouldShowEllipsisBefore, currentPage, pageSize, changePage, totalPages, shouldShowLastPage,
             shouldShowEllipsisAfter, pagesToShow, paginatedData, shouldShowFirstPage
@@ -527,5 +529,4 @@ export default {
 .modal-slide-leave-to {
     transform: translateY(20px);
     /* Ajusta según tu necesidad */
-}
-</style>
+}</style>

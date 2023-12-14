@@ -9,7 +9,7 @@ import axios from "axios";
 <template>
     <div class="m-1.5">
         <Modal :show="show_modal_acq_doc" @close="$emit('cerrar-modal')" :closeOutSide="false"
-            modal-title="Administración de Documentos de Adquisicion." maxWidth="4xl">
+            modal-title="Administración de Documentos de Adquisicion." maxWidth="3xl">
             <div class="px-5 py-4">
                 <div class="text-sm">
                     <!-- Page 1 -->

@@ -10,6 +10,9 @@ use App\Models\Empleado;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReporteRRHHController extends Controller
 {
@@ -52,7 +55,12 @@ class ReporteRRHHController extends Controller
             [
                 'plazas_asignadas.dependencia.centro_atencion',
                 'plazas_asignadas.detalle_plaza.plaza',
+                'plazas_asignadas.detalle_plaza.tipo_contrato',
                 'persona',
+                'tipo_pension',
+                'persona.residencias' => function ($query) {
+                    $query->where('estado_residencia', 1);
+                },
                 'periodos_laboral' => function ($query) {
                     $query->where('estado_periodo_laboral', 1); //Solo un periodo laboral debe estar activo
                 },
@@ -96,7 +104,7 @@ class ReporteRRHHController extends Controller
             ]
         );
 
-        if($request->status){
+        if ($request->status) {
             $query->where('id_estado_empleado', $request->status);
         }
 
@@ -141,5 +149,119 @@ class ReporteRRHHController extends Controller
         return response()->json([
             'query'          => $query->get(),
         ]);
+    }
+    public function createExcelEmployees(Request $request)
+    {
+        $query = $request->queryResult; // Suponiendo que $queryResult es tu array con relaciones
+        $total = count($query);
+
+        $retirementY = 0;
+        $retirementN = 0;
+        $selectedData = [];
+        foreach ($query as $empleado) {
+            $richText = new \PhpOffice\PhpSpreadsheet\RichText\RichText(); // Crear un objeto RichText
+
+            $empleado['pensionado_empleado'] == 1 ? $retirementY++ : $retirementN++;
+
+            $plazasCount = count($empleado['plazas_asignadas']);
+            foreach ($empleado['plazas_asignadas'] as $index => $plaza) {
+
+                $endDate = !empty($plaza['fecha_renuncia_plaza_asignada']) ? Carbon::createFromFormat('Y-m-d', $plaza['fecha_renuncia_plaza_asignada'])->format('d/m/Y') : "";
+                $startDate = Carbon::createFromFormat('Y-m-d', $plaza['fecha_plaza_asignada'])->format('d/m/Y');
+
+                $fechaRenuncia = !empty($plaza['fecha_renuncia_plaza_asignada']) ? ' - ' . $endDate : '';
+                $estadoEmpleado = $empleado['id_estado_empleado'] == 1 ? '' : (empty($plaza['fecha_renuncia_plaza_asignada']) ? ' - sin registro' : '');
+
+                $period = ' (' . $startDate . $fechaRenuncia . $estadoEmpleado . ')';
+
+                $textRun = $richText->createTextRun(
+                    $plaza['dependencia']['centro_atencion']['codigo_centro_atencion'] . ' - ' . $plaza['detalle_plaza']['plaza']['nombre_plaza']
+                        . ' - ' . $plaza['detalle_plaza']['tipo_contrato']['nombre_tipo_contrato']
+                        . ' - ' . $period
+                );
+
+                // Agregar salto de línea si no es el último elemento
+                if ($index !== $plazasCount - 1) {
+                    $richText->createText("\n");
+                }
+            }
+            $direccion = '';
+            foreach ($empleado['persona']['residencias'] as $index => $dir) {
+                $direccion = $index === 0 ? $dir['direccion_residencia'] : "";
+            }
+            $selectedItem = [
+                'codigo_empleado' => $empleado['codigo_empleado'],
+                'nombre'          => $empleado['persona']['nombre_completo'],
+                'puesto'          => $richText,
+                'dui'             => $empleado['persona']['dui_persona'],
+                'direccion'       => $direccion,
+                'pensionado'      => $empleado['pensionado_empleado']==1 ? 'SI' :  'NO',
+                'telefono'        => $empleado['persona']['telefono_persona'] ?? "",
+                'afiliado'        => $empleado['tipo_pension'] ? $empleado['tipo_pension']['codigo_tipo_pension'] : "",
+                'nup'             => $empleado['nup_empleado'] ?? "",
+                'isss'            => $empleado['isss_empleado'] ?? "",
+            ];
+
+            $selectedData[] = $selectedItem;
+        }
+        array_unshift($selectedData, array('CODIGO', 'NOMBRE', 'PUESTO', 'DUI', 'DIRECCION', 'PENSIONADO', 'TELEFONO', 'AFILIADO A', 'NUP', 'ISSS'));
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Combina las celdas 
+        $sheet->mergeCells('A1:J1');
+        $sheet->mergeCells('A2:J2');
+        $sheet->mergeCells('A3:J3');
+        $sheet->mergeCells('A4:J4');
+        // Definimos encabezado
+        $sheet->setCellValue('A1', 'INSTITUTO SALVADOREÑO DE REHABILITACION INTEGRAL - ISRI');
+        $sheet->setCellValue('A2', $request->title);
+        $sheet->setCellValue('A3', $request->location);
+        $sheet->setCellValue('A4', $request->date);
+        $sheet->getStyle('A1:A4')->getFont()->setSize(14);
+
+        // Aplica el formato de centrado y negrita al texto
+        $style = $sheet->getStyle('A1:A4');
+        $style->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $style->getFont()->setBold(true);
+
+        $sheet->getStyle('5')->getFont()->setBold(true);
+
+        $columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+        foreach ($columns as $column) {
+            $sheet->getColumnDimension($column)->setAutoSize(true);
+        }
+
+        $sheet->fromArray($selectedData, NULL, 'A5');
+
+        // Recorrer todas las celdas y establecer el formato como texto
+        foreach ($sheet->getRowIterator() as $row) {
+            foreach ($row->getCellIterator() as $cell) {
+                $cell->setValueExplicit($cell->getValue(), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+            }
+        }
+
+        $lastRow = $sheet->getHighestDataRow(); // obtiene el número de la última fila con datos
+        $sheet->setCellValue('B' . ($lastRow + 1), 'TOTAL Empleados: '.$total);
+        $sheet->setCellValue('C' . ($lastRow + 1), 'Pensionado : SI = '.$retirementY.' NO = '.$retirementN);
+
+        $sheet->getStyle('B' . ($lastRow + 1))->getFont()->setBold(true)->setSize(13);
+        $sheet->getStyle('C' . ($lastRow + 1))->getFont()->setBold(true)->setSize(13);
+
+        // Centrar texto en las celdas con los totales
+        $sheet->getStyle('B' . ($lastRow + 1) . ':C' . ($lastRow + 1))
+            ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        $writer = new Xlsx($spreadsheet);
+
+        $current_date = Carbon::now()->format('d_m_Y');
+        $filename = 'RPT_EMPLEADOS_' . $current_date . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer->save('php://output');
     }
 }
