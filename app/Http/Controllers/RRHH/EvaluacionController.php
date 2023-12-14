@@ -51,13 +51,14 @@ class EvaluacionController extends Controller
         $data = $request->input('search');
 
         // Construir la consulta base con las relaciones
-        $query = Empleado::select('*')
-            ->with([
+        $query = Empleado::
+            with([
                 "persona",
-                "plazas_asignadas.centro_atencion",
+                "plazas_asignadas.centro_atencion.dependencias",
                 "plazas_asignadas.detalle_plaza.plaza",
                 "evaluaciones_personal.incidentes_evaluacion",
-                "evaluaciones_personal.detalle_evaluaciones_personal",
+                "evaluaciones_personal.detalle_evaluaciones_personal.categoria_rendimiento.evaluacion_rendimiento.tablas_rendimiento",
+                "evaluaciones_personal.detalle_evaluaciones_personal.rubrica_rendimiento",
                 "evaluaciones_personal.plaza_evaluada.plaza_asignada.detalle_plaza.plaza",
                 "evaluaciones_personal.evaluacion_rendimiento",
                 "evaluaciones_personal.tipo_evaluacion_personal",
@@ -405,17 +406,18 @@ class EvaluacionController extends Controller
 
             $query = Empleado::with([
                 "persona",
-                "plazas_asignadas.centro_atencion",
+                "plazas_asignadas.centro_atencion.dependencias",
                 "plazas_asignadas.detalle_plaza.plaza",
-                "evaluaciones_personal.periodo_evaluacion",
                 "evaluaciones_personal.incidentes_evaluacion",
+                "evaluaciones_personal.detalle_evaluaciones_personal.categoria_rendimiento.evaluacion_rendimiento.tablas_rendimiento",
+                "evaluaciones_personal.detalle_evaluaciones_personal.rubrica_rendimiento",
+                "evaluaciones_personal.plaza_evaluada.plaza_asignada.detalle_plaza.plaza",
                 "evaluaciones_personal.evaluacion_rendimiento",
                 "evaluaciones_personal.tipo_evaluacion_personal",
-                "evaluaciones_personal.detalle_evaluaciones_personal",
+                "evaluaciones_personal.periodo_evaluacion",
                 "evaluaciones_personal" => function ($query) {
                     return $query->orderBy("fecha_reg_evaluacion_personal", "asc");
                 },
-                "evaluaciones_personal.plaza_evaluada.plaza_asignada.detalle_plaza.plaza",
             ])->whereHas("evaluaciones_personal")->find($request->idEmpleado);
 
             DB::commit();
@@ -443,7 +445,7 @@ class EvaluacionController extends Controller
     {
         $query = EvaluacionRendimiento::select("*")->with([
             "categorias_rendimiento.rubricas_rendimiento"
-        ])->where("id_evaluacion_rendimiento", $request->id_evaluacion_rendimiento)->first();
+        ])->where("id_evaluacion_rendimiento", $request->idEvaluacionRendimiento)->first();
         return $query;
     }
 
