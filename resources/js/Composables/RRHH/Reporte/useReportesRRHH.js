@@ -24,12 +24,13 @@ export const useReportesRRHH = (reportInfo, context) => {
         swal({
             title: "¿Está seguro de generar este reporte?",
             icon: "question",
-            iconHtml: "❓",
+            //iconHtml: "❓",
             confirmButtonText: "Si, generar.",
             confirmButtonColor: "#047857",
             cancelButtonText: "Cancelar",
             showCancelButton: true,
             showCloseButton: true,
+            iconColor: "green"
         }).then(async (result) => {
             if (result.isConfirmed) {
                 cleanObject(errors.value)
