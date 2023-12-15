@@ -72,7 +72,7 @@ class JefeInmediatoController extends Controller
         $idRol = $request->id_rol;
         $user = $request->user();
 
-        if ($idRol == 15) {
+        if ($idRol == 14) {
             DB::beginTransaction();
             try {
                 $permissionStage = new EtapaPermiso([
@@ -124,7 +124,7 @@ class JefeInmediatoController extends Controller
         $idRol = $request->id_rol;
         $user = $request->user();
 
-        if ($idRol == 15) {
+        if ($idRol == 14) {
             DB::beginTransaction();
             try {
                 $permissionStage = new EtapaPermiso([

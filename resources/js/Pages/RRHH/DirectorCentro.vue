@@ -173,7 +173,7 @@ import axios from 'axios';
             :permits="permits" @cerrar-modal="viewPermission026 = false" @get-table="getPermissionRequests(tableData.currentPage)"/>
         <PermisoFormato012InternoVue :viewPermission012I="viewPermission012I" :permissionToPrint="permissionToPrint" :stages="stages"
             :permits="permits" @cerrar-modal="viewPermission012I = false" @get-table="getPermissionRequests(tableData.currentPage)"/>
-        <PermisoFormato012Vue :viewPermission012="viewPermission012" :permissionToPrint="permissionToPrint" :stages="stages"
+        <PermisoFormato012Vue v-if="viewPermission012" :viewPermission012="viewPermission012" :permissionToPrint="permissionToPrint" :stages="stages"
             :permits="permits" @cerrar-modal="viewPermission012 = false"
             @get-table="getPermissionRequests(tableData.currentPage)" />
 

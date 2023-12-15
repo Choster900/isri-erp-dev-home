@@ -175,7 +175,7 @@ import axios from 'axios';
         <PermisoFormato012InternoVue :viewPermission012I="viewPermission012I" :permissionToPrint="permissionToPrint"
             :stages="stages" :permits="permits" @cerrar-modal="viewPermission012I = false"
             @get-table="getPermissionRequests(tableData.currentPage)" />
-        <PermisoFormato012Vue :viewPermission012="viewPermission012" :permissionToPrint="permissionToPrint" :stages="stages"
+        <PermisoFormato012Vue v-if="viewPermission012" :viewPermission012="viewPermission012" :permissionToPrint="permissionToPrint" :stages="stages"
             :permits="permits" @cerrar-modal="viewPermission012 = false"
             @get-table="getPermissionRequests(tableData.currentPage)" />
 
@@ -267,7 +267,7 @@ export default {
     methods: {
         checkApproval(permission) {
             const idRol = this.$page.props.menu.id_rol
-            if (idRol === 15) { //Jefe inmediato
+            if (idRol === 14) { //Jefe inmediato
                 if (permission.etapa_permiso[1]) {
                     if (permission.etapa_permiso[1].id_estado_etapa_permiso === 2) {
                         return 3 //Approved
@@ -282,7 +282,7 @@ export default {
                     return 1
                 }
             }
-            if (idRol === 16) { //Director de centro
+            if (idRol === 15) { //Director de centro
                 if (permission.etapa_permiso[1]) {
                     if (permission.etapa_permiso[1].id_estado_etapa_permiso === 4) {
                         return 3 //Approved
@@ -297,7 +297,7 @@ export default {
                     return 1
                 }
             }
-            if (idRol === 17) { //Direccion/Subdireccion Medica
+            if (idRol === 16) { //Direccion/Subdireccion Medica
                 if (permission.etapa_permiso[1]) {
                     if (permission.etapa_permiso[1].id_estado_etapa_permiso === 6) {
                         return 3 //Approved
@@ -312,7 +312,7 @@ export default {
                     return 1
                 }
             }
-            if (idRol === 18) { //Gerente General
+            if (idRol === 17) { //Gerente General
                 if (permission.etapa_permiso[1]) {
                     if (permission.etapa_permiso[1].id_estado_etapa_permiso === 8) {
                         return 3 //Approved
@@ -627,6 +627,7 @@ export default {
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
                     this.jobPermissions = data.data.data;
+                    //console.log(this.jobPermissions);
                     this.jobPermissions.length > 0 ? this.emptyObject = false : this.emptyObject = true
                 }
             }).catch((errors) => {

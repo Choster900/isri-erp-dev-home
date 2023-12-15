@@ -82,7 +82,7 @@ import moment from 'moment';
                                     <div class="w-full mb-1">
                                         <p class="text-[13px] text-gray-600 mb-0.5">Estado</p>
                                         <p class="text-[13px] font-medium text-navy-700 ">
-                                            {{ stage.estado_etapa_permiso.nombre_estado_etapa_permiso }}
+                                            {{ stage.estado_etapa_permiso_rel.nombre_estado_etapa_permiso }}
                                         </p>
                                     </div>
                                     <div class="w-full mb-1">
@@ -599,29 +599,31 @@ export default {
     },
     methods: {
         setApprobalRejectButtons(permission) {
+            console.log('holaaa');
+            console.log(permission.etapa_permiso);
             if (permission) {
                 const rolId = this.$page.props.menu.id_rol
-                const range = [15, 16, 17, 18]
+                const range = [14, 15, 16, 17]
                 if (range.includes(rolId)) {
-                    if (rolId === 15) {
+                    if (rolId === 14) {
                         let stage = permission.etapa_permiso.find((element) => element.id_estado_etapa_permiso === 2 || element.id_estado_etapa_permiso === 3)
                         if (stage) {
                             this.showButtons = false
                         }
                     }
-                    if (rolId === 16) {
+                    if (rolId === 15) {
                         let stage = permission.etapa_permiso.find((element) => element.id_estado_etapa_permiso === 4 || element.id_estado_etapa_permiso === 5)
                         if (stage) {
                             this.showButtons = false
                         }
                     }
-                    if (rolId === 17) {
+                    if (rolId === 16) {
                         let stage = permission.etapa_permiso.find((element) => element.id_estado_etapa_permiso === 6 || element.id_estado_etapa_permiso === 7)
                         if (stage) {
                             this.showButtons = false
                         }
                     }
-                    if (rolId === 18) {
+                    if (rolId === 17) {
                         let stage = permission.etapa_permiso.find((element) => element.id_estado_etapa_permiso === 8 || element.id_estado_etapa_permiso === 9)
                         if (stage) {
                             this.showButtons = false
@@ -644,10 +646,10 @@ export default {
                 const idRol = this.$page.props.menu.id_rol;
 
                 const urlMap = {
-                    15: '/supervisor-denial',
-                    16: '/director-denial',
-                    17: '/medical-management-denial',
-                    18: '/general-management-denial'
+                    14: '/supervisor-denial',
+                    15: '/director-denial',
+                    16: '/medical-management-denial',
+                    17: '/general-management-denial'
                 };
 
                 const url = urlMap[idRol] || '';
@@ -698,10 +700,10 @@ export default {
             const idRol = this.$page.props.menu.id_rol;
 
             const urlMap = {
-                15: '/supervisor-approval',
-                16: '/director-approval',
-                17: '/medical-management-approval',
-                18: '/general-management-approval'
+                14: '/supervisor-approval',
+                15: '/director-approval',
+                16: '/medical-management-approval',
+                17: '/general-management-approval'
             };
 
             const url = urlMap[idRol] || '';
