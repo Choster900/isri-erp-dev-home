@@ -611,7 +611,7 @@ export default {
     props: {
         viewPermission012I: {
             type: Boolean,
-            default: false,
+            default: true,
         },
         permissionToPrint: {
             type: Array,
@@ -620,6 +620,10 @@ export default {
         stages: {
             type: Array,
             default: []
+        },
+        showOptions: {
+            type: Boolean,
+            default: true,
         }
     },
     data: function () {
@@ -642,11 +646,13 @@ export default {
     },
     methods: {
         setApprobalRejectButtons(permission) {
-            if (permission) {
+            console.log(permission);
+            if (this.showOptions && permission.id_estado_permiso != 3 && permission.id_estado_permiso != 4) {
                 const rolId = this.$page.props.menu.id_rol
                 const range = [14, 15, 16, 17]
                 if (range.includes(rolId)) {
-                    if (rolId === 14) {
+                    //Jefe inmediato
+                    if (rolId === 14 ) {
                         let stage = permission.etapa_permiso.find((element) => element.id_estado_etapa_permiso === 2 || element.id_estado_etapa_permiso === 3)
                         if (stage) {
                             this.showButtons = false
@@ -674,7 +680,7 @@ export default {
                     this.showButtons = false
                 }
             } else {
-                this.showButtons = true
+                this.showButtons = false
             }
         },
         async rejectPermission() {
@@ -1029,10 +1035,7 @@ export default {
                 let daysDifference = 0;
 
                 while (currentDate <= endDateFormated) {
-                    const dayOfWeek = currentDate.getDay(); // 0 (domingo) a 6 (sábado)
-                    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-                        daysDifference++;
-                    }
+                    daysDifference++;
                     currentDate.setDate(currentDate.getDate() + 1);
                 }
                 const resultInMinutes = daysDifference * 8 * 60

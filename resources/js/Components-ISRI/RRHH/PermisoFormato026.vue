@@ -369,6 +369,10 @@ export default {
         stages: {
             type: Array,
             default: []
+        },
+        showOptions: {
+            type: Boolean,
+            default: true,
         }
     },
     data: function () {
@@ -386,29 +390,29 @@ export default {
     },
     methods: {
         setApprobalRejectButtons(permission) {
-            if (permission) {
+            if (this.showOptions && permission.id_estado_permiso != 3 && permission.id_estado_permiso != 4) {
                 const rolId = this.$page.props.menu.id_rol
-                const range = [15, 16, 17, 18]
+                const range = [14, 15, 16, 17]
                 if (range.includes(rolId)) {
-                    if (rolId === 15) {
+                    if (rolId === 14) {
                         let stage = permission.etapa_permiso.find((element) => element.id_estado_etapa_permiso === 2 || element.id_estado_etapa_permiso === 3)
                         if (stage) {
                             this.showButtons = false
                         }
                     }
-                    if (rolId === 16) {
+                    if (rolId === 15) {
                         let stage = permission.etapa_permiso.find((element) => element.id_estado_etapa_permiso === 4 || element.id_estado_etapa_permiso === 5)
                         if (stage) {
                             this.showButtons = false
                         }
                     }
-                    if (rolId === 17) {
+                    if (rolId === 16) {
                         let stage = permission.etapa_permiso.find((element) => element.id_estado_etapa_permiso === 6 || element.id_estado_etapa_permiso === 7)
                         if (stage) {
                             this.showButtons = false
                         }
                     }
-                    if (rolId === 18) {
+                    if (rolId === 17) {
                         let stage = permission.etapa_permiso.find((element) => element.id_estado_etapa_permiso === 8 || element.id_estado_etapa_permiso === 9)
                         if (stage) {
                             this.showButtons = false
@@ -418,7 +422,7 @@ export default {
                     this.showButtons = false
                 }
             } else {
-                this.showButtons = true
+                this.showButtons = false
             }
         },
         async rejectPermission() {
@@ -431,10 +435,10 @@ export default {
                 const idRol = this.$page.props.menu.id_rol;
 
                 const urlMap = {
-                    15: '/supervisor-denial',
-                    16: '/director-denial',
-                    17: '/medical-management-denial',
-                    18: '/general-management-denial'
+                    14: '/supervisor-denial',
+                    15: '/director-denial',
+                    16: '/medical-management-denial',
+                    17: '/general-management-denial'
                 };
 
                 const url = urlMap[idRol] || '';
@@ -484,10 +488,10 @@ export default {
             const idRol = this.$page.props.menu.id_rol;
 
             const urlMap = {
-                15: '/supervisor-approval',
-                16: '/director-approval',
-                17: '/medical-management-approval',
-                18: '/general-management-approval'
+                14: '/supervisor-approval',
+                15: '/director-approval',
+                16: '/medical-management-approval',
+                17: '/general-management-approval'
             };
 
             const url = urlMap[idRol] || '';
@@ -552,46 +556,6 @@ export default {
                 this.stages[index].visible = false
             }
         },
-        printPdf() {
-            let fecha = moment().format('DD-MM-YYYY');
-            let name = 'RECIBO ' + this.receipt_to_print.numero_recibo_ingreso + ' - ' + fecha;
-            const opt = {
-                margin: 0,
-                filename: name,
-                //pagebreak: {mode:'css',before:'#pagebreak'},
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 3, useCORS: true },
-                //jsPDF: { unit: 'cm', format: [13.95,21.5], orientation: 'landscape' }
-                jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' },
-            };
-
-            const limiteCaracteres = 70;
-            if (this.receipt_to_print.monto_letras.length <= limiteCaracteres) {
-                this.letras1 = this.receipt_to_print.monto_letras;
-                this.letras2 = ''
-            } else {
-                let textoTruncado = this.receipt_to_print.monto_letras.slice(0, limiteCaracteres);
-                let ultimoEspacio = textoTruncado.lastIndexOf(' ');
-                this.letras1 = textoTruncado.slice(0, ultimoEspacio);
-                this.letras2 = this.receipt_to_print.monto_letras.slice(ultimoEspacio + 1);
-            }
-
-            const app = createApp(ReciboIngresoMatricialVue, {
-                receipt_to_print: this.receipt_to_print,
-                formatedAmount: this.receipt_to_print.monto_recibo_ingreso,
-                empleado: this.empleado,
-                nombre_cuenta: this.nombre_cuenta,
-                fecha_recibo: this.fecha_recibo,
-                letras1: this.letras1,
-                letras2: this.letras2
-            });
-            const div = document.createElement('div');
-            const pdfPrint = app.mount(div);
-            const html = div.outerHTML;
-
-            html2pdf().set(opt).from(html).save();
-            //html2pdf().set(opt).from(html).output('dataurlnewwindow');
-        },
         getCentro() {
             let limiteCaracteres = 40;
             let string = this.permissionToPrint.plaza_asignada.dependencia.nombre_dependencia;
@@ -643,7 +607,7 @@ export default {
             return `${hora}:${minutos} ${amPm}`;
         },
         printPermission() {
-            const lastStage = this.stages.find((element) => element.estado_etapa_permiso === 0)
+            const lastStage = this.stages[this.stages.length - 1]
             const supervisor = this.getSupervisorName(lastStage)
             const permission = this.permissionToPrint
             const currentDateTime = moment().format('DD/MM/YYYY, HH:mm:ss');

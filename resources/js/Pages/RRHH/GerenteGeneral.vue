@@ -175,9 +175,9 @@ import axios from 'axios';
         <PermisoFormato012InternoVue :viewPermission012I="viewPermission012I" :permissionToPrint="permissionToPrint"
             :permits="permits" @cerrar-modal="viewPermission012I = false" :stages="stages"
             @get-table="getPermissionRequests(tableData.currentPage)" />
-        <PermisoFormato012Vue :viewPermission012="viewPermission012" :permissionToPrint="permissionToPrint" :stages="stages"
-            :permits="permits" @cerrar-modal="viewPermission012 = false"
-            @get-table="getPermissionRequests(tableData.currentPage)" />
+        <PermisoFormato012Vue v-if="viewPermission012" :viewPermission012="viewPermission012"
+            :permissionToPrint="permissionToPrint" :stages="stages" :permits="permits"
+            @cerrar-modal="viewPermission012 = false" @get-table="getPermissionRequests(tableData.currentPage)" />
 
     </AppLayoutVue>
 </template>
@@ -523,10 +523,7 @@ export default {
                     let daysDifference = 0;
 
                     while (currentDate <= endDateFormated) {
-                        const dayOfWeek = currentDate.getDay(); // 0 (domingo) a 6 (sábado)
-                        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-                            daysDifference++;
-                        }
+                        daysDifference++;
                         currentDate.setDate(currentDate.getDate() + 1);
                     }
                     const resultInMinutes = daysDifference * 8 * 60

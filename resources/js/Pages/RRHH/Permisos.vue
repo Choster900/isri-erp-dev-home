@@ -220,13 +220,13 @@ import axios from 'axios';
         <ModalPermisosVue :showModalJobPermissions="showModalJobPermissions" :modalData="modalData" :permits="permits"
             @cerrar-modal="showModalJobPermissions = false" @get-table="getJobPermissions(tableData.currentPage)" />
         <PermisoFormato026Vue :viewPermission026="viewPermission026" :permissionToPrint="permissionToPrint" :limite="limite"
-            :stages="stages" :permits="permits" @cerrar-modal="viewPermission026 = false"
+            :stages="stages" :permits="permits" @cerrar-modal="viewPermission026 = false" :showOptions="false"
             @get-table="getJobPermissions(tableData.currentPage)" />
         <PermisoFormato012InternoVue :viewPermission012I="viewPermission012I" :permissionToPrint="permissionToPrint"
-            :stages="stages" :permits="permits" @cerrar-modal="viewPermission012I = false"
+            :stages="stages" :permits="permits" @cerrar-modal="viewPermission012I = false" :showOptions="false"
             @get-table="getJobPermissions(tableData.currentPage)" />
-        <PermisoFormato012Vue :viewPermission012="viewPermission012" :permissionToPrint="permissionToPrint" :stages="stages"
-            :permits="permits" @cerrar-modal="viewPermission012 = false"
+        <PermisoFormato012Vue v-if="viewPermission012" :viewPermission012="viewPermission012" :permissionToPrint="permissionToPrint" :stages="stages"
+            :permits="permits" @cerrar-modal="viewPermission012 = false" :showOptions="false"
             @get-table="getPermissionRequests(tableData.currentPage)" />
 
     </AppLayoutVue>
@@ -370,6 +370,7 @@ export default {
             const updatedPermission = res.permiso;
             this.stages = res.etapas
             this.permissionToPrint = updatedPermission
+            console.log(this.stages);
             const format = this.getFormatToPrint(updatedPermission);
             switch (format) {
                 //No marcacion

@@ -34,6 +34,10 @@ class PermisoController extends Controller
             ->pluck('id_dependencia')
             ->toArray();
 
+        //
+        //Ver la forma de limitar para que no pueda ver ni crear permisos de jefes de dependencia  
+        //
+        
         $length = $request->length;
         $column = $request->column; //Index
         $dir = $request->dir;
@@ -434,7 +438,7 @@ class PermisoController extends Controller
                     ->whereIn('id_estado_permiso', [1, 2, 3]) // Check if id_estado_permiso is 1 or 2
                     ->where('id_empleado', $permiso->id_empleado)
                     ->whereMonth('fecha_inicio_permiso', $fechaPermiso)
-                    ->where('fecha_inicio_permiso', '<=', $permiso->fecha_inicio_permiso)
+                    //->where('fecha_inicio_permiso', '<=', $permiso->fecha_inicio_permiso)
                     ->count();
                 return response()->json([
                     'permiso' => $permiso,
@@ -459,8 +463,10 @@ class PermisoController extends Controller
                 $permissionStage = new EtapaPermiso([
                     'id_empleado'                   => $permiso->empleado->persona->id_persona,
                     'id_permiso'                    => $permiso->id_permiso,
-                    'id_estado_etapa_permiso'       => $id_rol == 15 ? 2 : ($id_rol == 16 ? 4 : 1),
-                    'id_persona_etapa'              => $id_rol == 15 ? 2 : ($id_rol == 16 ? 3 : 1),
+                    'id_estado_etapa_permiso'       => 1,
+                    'id_persona_etapa'              => 1,
+                    // 'id_estado_etapa_permiso'       => $id_rol == 14 ? 2 : ($id_rol == 15 ? 4 : 1),
+                    // 'id_persona_etapa'              => $id_rol == 14 ? 2 : ($id_rol == 15 ? 3 : 1),
                     'fecha_reg_etapa_permiso'       => Carbon::now(),
                     'usuario_etapa_permiso'         => $request->user()->nick_usuario,
                     'ip_etapa_permiso'              => $request->ip(),

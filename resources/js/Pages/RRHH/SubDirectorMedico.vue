@@ -169,13 +169,15 @@ import axios from 'axios';
 
         <ModalPermisosVue :showModalJobPermissions="showModalJobPermissions" :modalData="modalData" :permits="permits"
             @cerrar-modal="showModalJobPermissions = false" @get-table="getPermissionRequests(tableData.currentPage)" />
-        <PermisoFormato026Vue :viewPermission026="viewPermission026" :permissionToPrint="permissionToPrint" :limite="limite" :stages="stages"
-            :permits="permits" @cerrar-modal="viewPermission026 = false" @get-table="getPermissionRequests(tableData.currentPage)"/>
-        <PermisoFormato012InternoVue :viewPermission012I="viewPermission012I" :permissionToPrint="permissionToPrint" :stages="stages"
-            :permits="permits" @cerrar-modal="viewPermission012I = false" @get-table="getPermissionRequests(tableData.currentPage)"/>
-        <PermisoFormato012Vue :viewPermission012="viewPermission012" :permissionToPrint="permissionToPrint" :stages="stages"
-            :permits="permits" @cerrar-modal="viewPermission012 = false"
+        <PermisoFormato026Vue :viewPermission026="viewPermission026" :permissionToPrint="permissionToPrint" :limite="limite"
+            :stages="stages" :permits="permits" @cerrar-modal="viewPermission026 = false"
             @get-table="getPermissionRequests(tableData.currentPage)" />
+        <PermisoFormato012InternoVue :viewPermission012I="viewPermission012I" :permissionToPrint="permissionToPrint"
+            :stages="stages" :permits="permits" @cerrar-modal="viewPermission012I = false"
+            @get-table="getPermissionRequests(tableData.currentPage)" />
+        <PermisoFormato012Vue v-if="viewPermission012" :viewPermission012="viewPermission012"
+            :permissionToPrint="permissionToPrint" :stages="stages" :permits="permits"
+            @cerrar-modal="viewPermission012 = false" @get-table="getPermissionRequests(tableData.currentPage)" />
 
     </AppLayoutVue>
 </template>
@@ -521,10 +523,7 @@ export default {
                     let daysDifference = 0;
 
                     while (currentDate <= endDateFormated) {
-                        const dayOfWeek = currentDate.getDay(); // 0 (domingo) a 6 (sábado)
-                        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-                            daysDifference++;
-                        }
+                        daysDifference++;
                         currentDate.setDate(currentDate.getDate() + 1);
                     }
                     const resultInMinutes = daysDifference * 8 * 60

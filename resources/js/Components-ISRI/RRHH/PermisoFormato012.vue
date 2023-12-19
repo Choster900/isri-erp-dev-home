@@ -566,7 +566,7 @@ import moment from 'moment';
 import PermisoF012PDF from '@/pdf/RRHH/PermisoF012PDF.vue';
 import { createApp, h } from 'vue'
 import html2pdf from 'html2pdf.js'
-import { jsPDF } from "jspdf";
+//import { jsPDF } from "jspdf";
 export default {
     props: {
         viewPermission012: {
@@ -580,7 +580,14 @@ export default {
         stages: {
             type: Array,
             default: []
+        },
+        showOptions: {
+            type: Boolean,
+            default: true,
         }
+    },
+    created() {
+        this.setInitialInformation()
     },
     data: function () {
         return {
@@ -598,10 +605,21 @@ export default {
         }
     },
     methods: {
+        setInitialInformation() {
+            this.showButtons = true
+            this.setApprobalRejectButtons(this.permissionToPrint)
+            this.showDenialOptions = false
+            this.messageError = ''
+            this.centro1 = ''
+            this.centro2 = ''
+            this.observation1 = ''
+            this.observation2 = ''
+            this.getCentro()
+            this.getObservation()
+            this.getRole()
+        },
         setApprobalRejectButtons(permission) {
-            console.log('holaaa');
-            console.log(permission.etapa_permiso);
-            if (permission) {
+            if (this.showOptions && permission.id_estado_permiso != 3 && permission.id_estado_permiso != 4) {
                 const rolId = this.$page.props.menu.id_rol
                 const range = [14, 15, 16, 17]
                 if (range.includes(rolId)) {
@@ -633,7 +651,7 @@ export default {
                     this.showButtons = false
                 }
             } else {
-                this.showButtons = true
+                this.showButtons = false
             }
         },
         async rejectPermission() {
@@ -869,22 +887,21 @@ export default {
         },
     },
     watch: {
-        viewPermission012: function (value, oldValue) {
-            if (value) {
-                this.showButtons = true
-                this.setApprobalRejectButtons(this.permissionToPrint)
-                this.showDenialOptions = false
-                this.messageError = ''
-
-                this.centro1 = ''
-                this.centro2 = ''
-                this.observation1 = ''
-                this.observation2 = ''
-                this.getCentro()
-                this.getObservation()
-                this.getRole()
-            }
-        },
+        // viewPermission012: function (value, oldValue) {
+        //     if (value) {
+        //         this.showButtons = true
+        //         this.setApprobalRejectButtons(this.permissionToPrint)
+        //         this.showDenialOptions = false
+        //         this.messageError = ''
+        //         this.centro1 = ''
+        //         this.centro2 = ''
+        //         this.observation1 = ''
+        //         this.observation2 = ''
+        //         this.getCentro()
+        //         this.getObservation()
+        //         this.getRole()
+        //     }
+        // },
     },
     computed: {
         validPermit() {
