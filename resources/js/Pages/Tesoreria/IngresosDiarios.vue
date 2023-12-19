@@ -52,7 +52,6 @@ import axios from 'axios';
 <script>
 import DailyIncomeReportPDF from '@/pdf/Tesoreria/DailyIncomeReportPDF.vue';
 import { createApp, h } from 'vue'
-import Datatable from '@/Components-ISRI/Datatable.vue';
 export default {
     created() {
         this.getPermissions(this)
@@ -113,7 +112,6 @@ export default {
             date = moment(this.report_data.start_date).locale('es').format('dddd D [de] MMMM [de] YYYY').toUpperCase();
             await axios.post("/get-daily-income-report",this.report_data)
                 .then((response) => {
-                    console.log(response.data.numeros_recibo);
                     this.errors = []
                     this.daily_income_report = response.data.daily_income_report
                     this.receipt_numbers = response.data.numeros_recibo

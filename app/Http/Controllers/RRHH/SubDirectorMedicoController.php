@@ -80,7 +80,7 @@ class SubDirectorMedicoController extends Controller
         $idRol = $request->id_rol;
         $user = $request->user();
 
-        if ($idRol == 17) {
+        if ($idRol == 16) {
             DB::beginTransaction();
             try {
                 $permissionStage = new EtapaPermiso([
@@ -132,7 +132,7 @@ class SubDirectorMedicoController extends Controller
         $idRol = $request->id_rol;
         $user = $request->user();
 
-        if ($idRol == 17) {
+        if ($idRol == 16) {
             DB::beginTransaction();
             try {
                 $permissionStage = new EtapaPermiso([

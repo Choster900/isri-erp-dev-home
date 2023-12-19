@@ -89,7 +89,7 @@ class GerenteGeneralController extends Controller
         $idRol = $request->id_rol;
         $user = $request->user();
 
-        if ($idRol == 18) {
+        if ($idRol == 17) {
             DB::beginTransaction();
             try {
                 $permissionStage = new EtapaPermiso([
@@ -136,7 +136,7 @@ class GerenteGeneralController extends Controller
         $idRol = $request->id_rol;
         $user = $request->user();
 
-        if ($idRol == 18) {
+        if ($idRol == 17) {
             DB::beginTransaction();
             try {
                 $permissionStage = new EtapaPermiso([
