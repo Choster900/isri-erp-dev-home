@@ -222,7 +222,7 @@ class PermisoController extends Controller
     public function storeEmployeePermission(PermisoRequest $request)
     {
         $isValidTime = true;
-        if ($request->typeOfPermissionId == 6) {
+        if ($request->typeOfPermissionId == 6) { //No marcacion
             $fechaPermiso = Carbon::parse($request->startDate)->format('Y-m-d');
             $mesPermiso = Carbon::createFromFormat('Y-m-d', $fechaPermiso)->format('m');
             $mesNombre = Carbon::createFromFormat('m', $mesPermiso)->locale('es_ES')->monthName;
@@ -240,7 +240,7 @@ class PermisoController extends Controller
                 ], 422);
             }
         } else {
-            if ($request->typeOfPermissionId != 5) {
+            if ($request->typeOfPermissionId != 5) { //Si no es Mision oficial
                 $dateTimeField = ($request->periodOfTime == 1) ? 'time' : 'date';
                 $isValidTime = $this->validateTime(
                     ($request->periodOfTime == 1) ? $request->startTime : $request->startDate,
@@ -271,7 +271,7 @@ class PermisoController extends Controller
                 'comentarios_permiso'         => $request->observation,
                 'hora_entrada_permiso'        => $startTimeFormatted,
                 'hora_salida_permiso'         => $endTimeFormatted,
-                'retornar_empleado_permiso'   => ($request->typeOfPermissionId == 5 && $request->periodOfTime == 2) ? $request->comingBack : null,
+                'retornar_empleado_permiso'   => ($request->typeOfPermissionId == 5 && $request->periodOfTime == 1) ? $request->comingBack : null,
                 'estado_permiso'              => 1,
                 'fecha_reg_permiso'           => Carbon::now(),
                 'usuario_permiso'             => $request->user()->nick_usuario,
@@ -390,7 +390,7 @@ class PermisoController extends Controller
                     'comentarios_permiso'         => $request->observation,
                     'hora_entrada_permiso'        => $startTimeFormatted,
                     'hora_salida_permiso'         => $endTimeFormatted,
-                    'retornar_empleado_permiso'   => $request->typeOfPermissionId == 5 ? $request->comingBack : null,
+                    'retornar_empleado_permiso'   => ($request->typeOfPermissionId == 5 && $request->periodOfTime == 1) ? $request->comingBack : null,
                     'estado_permiso'              => 1,
                     'fecha_mod_permiso'           => Carbon::now(),
                     'usuario_permiso'             => $request->user()->nick_usuario,

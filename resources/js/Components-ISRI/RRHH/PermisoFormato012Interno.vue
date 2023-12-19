@@ -238,7 +238,8 @@ import moment from 'moment';
                                         </label>
                                     </div>
                                     <div class="ml-1 text-center w-[50%] text-[13px] font-bold border-b border-gray-700">
-                                        <p class="font-[MuseoSans]">{{ contract }}</p>
+                                        <p class="font-[MuseoSans]">{{
+                                            permissionToPrint.plaza_asignada.contrato_plaza_asignada ?? '' }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -626,9 +627,11 @@ export default {
             default: true,
         }
     },
+    created() {
+        this.setInitialInformation()
+    },
     data: function () {
         return {
-            contract: '49/2021',
             denialComment: '',
             messageError: '',
             showDenialOptions: false,
@@ -645,6 +648,21 @@ export default {
         }
     },
     methods: {
+        setInitialInformation() {
+            this.showButtons = true
+            this.setApprobalRejectButtons(this.permissionToPrint)
+            this.showDenialOptions = false
+            this.messageError = ''
+
+            this.centro1 = ''
+            this.centro2 = ''
+            this.observation1 = ''
+            this.observation2 = ''
+            this.getCentro()
+            this.getObservation()
+            this.getRole()
+            this.getDestination()
+        },
         setApprobalRejectButtons(permission) {
             console.log(permission);
             if (this.showOptions && permission.id_estado_permiso != 3 && permission.id_estado_permiso != 4) {
@@ -652,7 +670,7 @@ export default {
                 const range = [14, 15, 16, 17]
                 if (range.includes(rolId)) {
                     //Jefe inmediato
-                    if (rolId === 14 ) {
+                    if (rolId === 14) {
                         let stage = permission.etapa_permiso.find((element) => element.id_estado_etapa_permiso === 2 || element.id_estado_etapa_permiso === 3)
                         if (stage) {
                             this.showButtons = false
@@ -1000,23 +1018,23 @@ export default {
 
     },
     watch: {
-        viewPermission012I: function (value, oldValue) {
-            if (value) {
-                this.showButtons = true
-                this.setApprobalRejectButtons(this.permissionToPrint)
-                this.showDenialOptions = false
-                this.messageError = ''
+        // viewPermission012I: function (value, oldValue) {
+        //     if (value) {
+        //         this.showButtons = true
+        //         this.setApprobalRejectButtons(this.permissionToPrint)
+        //         this.showDenialOptions = false
+        //         this.messageError = ''
 
-                this.centro1 = ''
-                this.centro2 = ''
-                this.observation1 = ''
-                this.observation2 = ''
-                this.getCentro()
-                this.getObservation()
-                this.getRole()
-                this.getDestination()
-            }
-        },
+        //         this.centro1 = ''
+        //         this.centro2 = ''
+        //         this.observation1 = ''
+        //         this.observation2 = ''
+        //         this.getCentro()
+        //         this.getObservation()
+        //         this.getRole()
+        //         this.getDestination()
+        //     }
+        // },
     },
     computed: {
         validPermit() {

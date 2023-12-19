@@ -222,7 +222,7 @@ import axios from 'axios';
         <PermisoFormato026Vue :viewPermission026="viewPermission026" :permissionToPrint="permissionToPrint" :limite="limite"
             :stages="stages" :permits="permits" @cerrar-modal="viewPermission026 = false" :showOptions="false"
             @get-table="getJobPermissions(tableData.currentPage)" />
-        <PermisoFormato012InternoVue :viewPermission012I="viewPermission012I" :permissionToPrint="permissionToPrint"
+        <PermisoFormato012InternoVue v-if="viewPermission012I" :viewPermission012I="viewPermission012I" :permissionToPrint="permissionToPrint"
             :stages="stages" :permits="permits" @cerrar-modal="viewPermission012I = false" :showOptions="false"
             @get-table="getJobPermissions(tableData.currentPage)" />
         <PermisoFormato012Vue v-if="viewPermission012" :viewPermission012="viewPermission012" :permissionToPrint="permissionToPrint" :stages="stages"
