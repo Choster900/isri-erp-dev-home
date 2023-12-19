@@ -29,7 +29,7 @@ class DirectorCentroController extends Controller
 
         $user = $request->user();
         $id_persona = $user->persona->id_persona;
-        $depency = Dependencia::where('id_persona', $id_persona)->first();
+        $idDependencies = Dependencia::where('id_persona', $id_persona)->pluck('id_dependencia')->toArray();
 
         $query = Permiso::select('*')
             ->with([
@@ -45,8 +45,8 @@ class DirectorCentroController extends Controller
                 //         ->where('id_estado_etapa_permiso', 2);
                 // }
             ])
-            ->whereHas('plaza_asignada.dependencia', function ($query) use ($depency) {
-                $query->where('dep_id_dependencia', $depency->id_dependencia);
+            ->whereHas('plaza_asignada.dependencia', function ($query) use ($idDependencies) {
+                $query->whereIn('jerarquia_organizacion_dependencia', $idDependencies);
             })
             ->whereHas('empleado.persona', function ($query) use ($id_persona) {
                 $query->where('id_persona', '!=', $id_persona);
@@ -78,7 +78,7 @@ class DirectorCentroController extends Controller
         $idRol = $request->id_rol;
         $user = $request->user();
 
-        if ($idRol == 16) {
+        if ($idRol == 15) {
             DB::beginTransaction();
             try {
                 $permissionStage = new EtapaPermiso([
@@ -130,7 +130,7 @@ class DirectorCentroController extends Controller
         $idRol = $request->id_rol;
         $user = $request->user();
 
-        if ($idRol == 16) {
+        if ($idRol == 15) {
             DB::beginTransaction();
             try {
                 $permissionStage = new EtapaPermiso([

@@ -47,7 +47,7 @@
                         </svg>
                         <span class="ml-2 font-semibold text-[14px]">EXPORTAR</span>
                     </div>
-                    <div class="flex ml-4 items-center cursor-pointer text-slate-700 hover:text-red-600">
+                    <div @click="generatePDF(queryResult, computedDependencyInfo, computedTitle, computedDate)" class="flex ml-4 items-center cursor-pointer text-slate-700 hover:text-red-600">
                         <svg class="h-4 w-4 text-red-500" fill="currentColor" viewBox="0 0 1920 1920"
                             xmlns="http://www.w3.org/2000/svg">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -371,7 +371,7 @@ export default {
         } = useReportesRRHH(reportInfo, context)
 
         const {
-            exportExcel, isLoadingExport
+            exportExcel, generatePDF, isLoadingExport
         } = useReporteEmpleado(context)
 
         watch(
@@ -483,7 +483,7 @@ export default {
             depFilter, showModal, states, load, formatDate,
             typesOfContract, isLoadingRequest, mainCenters, openModal,
 
-            exportExcel, isLoadingExport,
+            exportExcel, generatePDF, isLoadingExport,
 
             shouldShowEllipsisBefore, currentPage, pageSize, changePage, totalPages, shouldShowLastPage,
             shouldShowEllipsisAfter, pagesToShow, paginatedData, shouldShowFirstPage
