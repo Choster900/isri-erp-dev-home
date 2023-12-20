@@ -227,7 +227,7 @@ class EvaluacionController extends Controller
             ->where("id_empleado", $employeeId)
             ->get();
 
-  
+
         $objectEvaluationByPrueba = EvaluacionPersonal::with(["plaza_evaluada.plaza_asignada"])
             ->where("id_tipo_evaluacion_personal", $tipoEvaluacionId)
             ->where("id_empleado", $employeeId)
@@ -412,11 +412,16 @@ class EvaluacionController extends Controller
             $query = Empleado::with([
                 "persona",
                 "plazas_asignadas.centro_atencion.dependencias",
+                "plazas_asignadas.dependencia.jefatura.empleado.plazas_asignadas.detalle_plaza.plaza",
                 "plazas_asignadas.detalle_plaza.plaza",
                 "evaluaciones_personal.incidentes_evaluacion",
                 "evaluaciones_personal.detalle_evaluaciones_personal.categoria_rendimiento.evaluacion_rendimiento.tablas_rendimiento",
                 "evaluaciones_personal.detalle_evaluaciones_personal.rubrica_rendimiento",
                 "evaluaciones_personal.plaza_evaluada.plaza_asignada.detalle_plaza.plaza",
+                "evaluaciones_personal.plaza_evaluada.plaza_asignada.centro_atencion",
+                "evaluaciones_personal.plaza_evaluada.plaza_asignada.dependencia.jefatura.empleado.plazas_asignadas.detalle_plaza.plaza",
+                "evaluaciones_personal.plaza_evaluada.plaza_asignada.dependencia.jefatura.empleado.plazas_asignadas.centro_atencion",
+                "evaluaciones_personal.plaza_evaluada.plaza_asignada.dependencia.jefatura.empleado.plazas_asignadas.dependencia",
                 "evaluaciones_personal.evaluacion_rendimiento",
                 "evaluaciones_personal.tipo_evaluacion_personal",
                 "evaluaciones_personal.periodo_evaluacion",
