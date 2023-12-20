@@ -191,7 +191,7 @@ import axios from 'axios';
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
 
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="page != 1 ? getJobPermissions(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                        <a @click="link.url ? getJobPermissions(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                   text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
@@ -200,7 +200,7 @@ import axios from 'axios';
                                 <span v-else-if="(link.label == 'Siguiente')"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="hasNext ? getJobPermissions(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                        <a @click="link.url ? getJobPermissions(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                   text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
@@ -208,7 +208,7 @@ import axios from 'axios';
                                 </span>
                                 <span class="cursor-pointer" v-else
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
-                                        class=" w-5" @click="getJobPermissions(link.url)">{{ link.label }}</span>
+                                        class=" w-5" @click="link.url ? getJobPermissions(link.url) : ''">{{ link.label }}</span>
                                 </span>
                             </li>
                         </ul>
@@ -233,13 +233,6 @@ import axios from 'axios';
 </template>
 
 <script>
-import PermisoF026PDFVue from '@/pdf/RRHH/PermisoF026PDF.vue';
-import PermisoF012ControlInternoPDFVue from '@/pdf/RRHH/PermisoF012ControlInternoPDF.vue';
-import PermisoF012PDFVue from '@/pdf/RRHH/PermisoF012PDF.vue';
-import { createApp, h } from 'vue'
-import html2pdf from 'html2pdf.js'
-import { jsPDF } from "jspdf";
-
 export default {
     created() {
         this.getPermissions(this)
@@ -291,12 +284,6 @@ export default {
             showModalJobPermissions: false,
             modalData: [],
             permits: [],
-            budget_accounts: [],
-            dependencies: [],
-            financing_sources: [],
-            //vars to validate pages
-            hasNext: false,
-            page: '',
             //Until here 
             links: [],
             columns: columns,
@@ -370,7 +357,6 @@ export default {
             const updatedPermission = res.permiso;
             this.stages = res.etapas
             this.permissionToPrint = updatedPermission
-            console.log(this.stages);
             const format = this.getFormatToPrint(updatedPermission);
             switch (format) {
                 //No marcacion
@@ -389,133 +375,6 @@ export default {
                 default:
                     console.log('Another action');
             }
-        },
-        async printPermission(permission) {
-            const res = await this.getPermissionDataById(permission);
-            const updatedPermission = res.permiso;
-            const currentDateTime = moment().format('DD/MM/YYYY, HH:mm:ss');
-            const name = 'PERMISO ' + permission.codigo_tipo_permiso + ' - ' + permission.codigo_empleado;
-            const opt = {
-                margin: 0.2,
-                filename: name,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 3, useCORS: true },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-            };
-
-            const format = this.getFormatToPrint(updatedPermission);
-
-            const { centro1, centro2 } = this.getCentro(updatedPermission, format);
-            const { observation1, observation2 } = this.getObservation(updatedPermission, format);
-            const { role1, role2 } = this.getRole(updatedPermission, format);
-
-            let app; // Declaración de app fuera del switch
-
-            switch (format) {
-                //No marcacion
-                case 1:
-                    const fechaParseada = moment(updatedPermission.fecha_inicio_permiso);
-                    app = createApp(PermisoF026PDFVue, {
-                        permission: updatedPermission,
-                        centro1,
-                        centro2,
-                        observation1,
-                        observation2,
-                        dia: fechaParseada.format('DD'),
-                        mes: fechaParseada.format('MMMM').toUpperCase(),
-                        anio: fechaParseada.format('YYYY'),
-                        limite: res.limite
-                    });
-                    break;
-                //F012 Control interno
-                case 2:
-                    app = createApp(PermisoF012ControlInternoPDFVue, {
-                        permission: updatedPermission,
-                        centro1,
-                        centro2,
-                        observation1,
-                        observation2,
-                        role1,
-                        role2
-                    });
-                    break;
-                //F012
-                case 3:
-                    app = createApp(PermisoF012PDFVue, {
-                        permission: updatedPermission,
-                        centro1,
-                        centro2,
-                        observation1,
-                        observation2,
-                        role1,
-                        role2
-                    });
-                    break;
-
-                default:
-                    console.log('Another action');
-            }
-
-            if (app) {
-                const html = this.getHtml(app);
-                this.generatePdf(html, opt, currentDateTime);
-            }
-        },
-        getCentro(updatedPermission, format) {
-            const limiteCaracteres1 = format === 1 ? 40 : format === 2 ? 48 : 65;
-            const centerName = updatedPermission.plaza_asignada.dependencia.nombre_dependencia;
-            let centro1 = '';
-            let centro2 = '';
-            if (centerName) {
-                if (centerName.length <= limiteCaracteres1) {
-                    centro1 = centerName;
-                } else {
-                    const textoTruncado1 = centerName.slice(0, limiteCaracteres1);
-                    const ultimoEspacio1 = textoTruncado1.lastIndexOf(' ');
-                    centro1 = textoTruncado1.slice(0, ultimoEspacio1);
-                    centro2 = centerName.slice(ultimoEspacio1 + 1);
-                }
-            }
-            return { centro1, centro2 };
-        },
-        getObservation(updatedPermission, format) {
-            const observation = updatedPermission.comentarios_permiso;
-            let observation1 = '';
-            let observation2 = '';
-            if (observation) {
-                let limiteCaracteres2 = format === 1 ? 105 : format === 2 ? 110 : 94;
-                if (observation.length <= limiteCaracteres2) {
-                    observation1 = observation;
-                } else {
-                    const textoTruncado2 = observation.slice(0, limiteCaracteres2);
-                    const ultimoEspacio2 = textoTruncado2.lastIndexOf(' ');
-                    observation1 = textoTruncado2.slice(0, ultimoEspacio2);
-                    observation2 = observation.slice(ultimoEspacio2 + 1);
-                }
-            }
-            return { observation1, observation2 };
-        },
-        getRole(updatedPermission, format) {
-            const role = updatedPermission.plaza_asignada.detalle_plaza.plaza.nombre_plaza;
-            let role1 = '';
-            let role2 = '';
-            if (role) {
-                const limiteCaracteres3 = format === 2 ? 52 : format === 3 ? 60 : 40;
-                if (role.length <= limiteCaracteres3) {
-                    role1 = role;
-                } else {
-                    const textoTruncado3 = role.slice(0, limiteCaracteres3);
-                    const ultimoEspacio3 = textoTruncado3.lastIndexOf(' ');
-                    role1 = textoTruncado3.slice(0, ultimoEspacio3);
-                    role2 = role.slice(ultimoEspacio3 + 1);
-                }
-            }
-            return { role1, role2 };
-        },
-        getHtml(app) {
-            const div = document.createElement('div');
-            const pdfPrint = app.mount(div);
-            return div.outerHTML;
         },
         getFormatToPrint(permission) {
             //Personal con goce 
@@ -559,17 +418,6 @@ export default {
             }
 
             return daysDifference;
-        },
-        generatePdf(html, opt, currentDateTime) {
-            html2pdf().set(opt).from(html)
-                .toPdf().get('pdf').then(function (pdf) {
-                    pdf.setFontSize(10);
-                    const date_text = 'SIGI - Generado: ' + currentDateTime;
-                    const textWidth = pdf.getStringUnitWidth(date_text) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
-                    pdf.text(pdf.internal.pageSize.getWidth() - textWidth - 0.2, pdf.internal.pageSize.getHeight() - 0.4, date_text);
-                })
-                .save()
-                .catch(err => console.log(err));
         },
         async getPermissionDataById(permiso) {
             try {
@@ -658,8 +506,6 @@ export default {
             await axios.post(url, this.tableData).then((response) => {
                 let data = response.data;
                 if (this.tableData.draw == data.draw) {
-                    this.page = data.data.current_page
-                    this.hasNext = data.data.current_page !== data.data.last_page;
                     this.links = data.data.links;
                     this.tableData.total = data.data.total;
                     this.links[0].label = "Anterior";
@@ -688,13 +534,6 @@ export default {
             const data = Object.values(this.tableData.search);
             if (data.every(error => error === '')) {
                 this.getJobPermissions()
-            }
-        },
-        getDependencieCode(jobPosition) {
-            if (jobPosition.plaza_asignada_activa) {
-                return jobPosition.plaza_asignada_activa.dependencia.codigo_dependencia
-            } else {
-                return 'N/Asign.'
             }
         },
         deletePermission(permission) {
@@ -737,7 +576,6 @@ export default {
                 }
             })
         }
-
     },
     computed: {
     }

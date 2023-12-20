@@ -607,7 +607,6 @@ import moment from 'moment';
 import PermisoF012ControlInternoPDFVue from '@/pdf/RRHH/PermisoF012ControlInternoPDF.vue';
 import { createApp, h } from 'vue'
 import html2pdf from 'html2pdf.js'
-import { jsPDF } from "jspdf";
 export default {
     props: {
         viewPermission012I: {
@@ -760,7 +759,6 @@ export default {
                 })
             }
         },
-        //Falta hacer la aprobacion desde jefe inmediato
         async approvePermission() {
             const idRol = this.$page.props.menu.id_rol;
 
@@ -847,45 +845,6 @@ export default {
 
             // Formatea la fecha en el nuevo formato 'DD/MM/YYYY'
             return fechaParseada.format('DD/MM/YYYY') ?? '-------------';
-        },
-        printPdf() {
-            const name = 'PERMISO ' + permission.tipo_permiso.codigo_tipo_permiso + ' - ' + permission.empleado.codigo_empleado;
-            const opt = {
-                margin: 0,
-                filename: name,
-                //pagebreak: {mode:'css',before:'#pagebreak'},
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 3, useCORS: true },
-                //jsPDF: { unit: 'cm', format: [13.95,21.5], orientation: 'landscape' }
-                jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' },
-            };
-
-            const limiteCaracteres = 70;
-            if (this.receipt_to_print.monto_letras.length <= limiteCaracteres) {
-                this.letras1 = this.receipt_to_print.monto_letras;
-                this.letras2 = ''
-            } else {
-                let textoTruncado = this.receipt_to_print.monto_letras.slice(0, limiteCaracteres);
-                let ultimoEspacio = textoTruncado.lastIndexOf(' ');
-                this.letras1 = textoTruncado.slice(0, ultimoEspacio);
-                this.letras2 = this.receipt_to_print.monto_letras.slice(ultimoEspacio + 1);
-            }
-
-            const app = createApp(ReciboIngresoMatricialVue, {
-                receipt_to_print: this.receipt_to_print,
-                formatedAmount: this.receipt_to_print.monto_recibo_ingreso,
-                empleado: this.empleado,
-                nombre_cuenta: this.nombre_cuenta,
-                fecha_recibo: this.fecha_recibo,
-                letras1: this.letras1,
-                letras2: this.letras2
-            });
-            const div = document.createElement('div');
-            const pdfPrint = app.mount(div);
-            const html = div.outerHTML;
-
-            html2pdf().set(opt).from(html).save();
-            //html2pdf().set(opt).from(html).output('dataurlnewwindow');
         },
         getCentro() {
             let limiteCaracteres = 42;
@@ -1018,32 +977,8 @@ export default {
 
     },
     watch: {
-        // viewPermission012I: function (value, oldValue) {
-        //     if (value) {
-        //         this.showButtons = true
-        //         this.setApprobalRejectButtons(this.permissionToPrint)
-        //         this.showDenialOptions = false
-        //         this.messageError = ''
-
-        //         this.centro1 = ''
-        //         this.centro2 = ''
-        //         this.observation1 = ''
-        //         this.observation2 = ''
-        //         this.getCentro()
-        //         this.getObservation()
-        //         this.getRole()
-        //         this.getDestination()
-        //     }
-        // },
     },
     computed: {
-        validPermit() {
-            if (this.permissionToPrint.id_estado_permiso === 2) {
-                return true
-            } else {
-                return false
-            }
-        },
         timeUsed: function () {
             if (this.permissionToPrint.fecha_fin_permiso) {
                 const startDateFormated = moment(this.permissionToPrint.fecha_inicio_permiso, 'YYYY/MM/DD').toDate()

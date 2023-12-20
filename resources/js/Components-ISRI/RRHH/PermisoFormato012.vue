@@ -566,7 +566,6 @@ import moment from 'moment';
 import PermisoF012PDF from '@/pdf/RRHH/PermisoF012PDF.vue';
 import { createApp, h } from 'vue'
 import html2pdf from 'html2pdf.js'
-//import { jsPDF } from "jspdf";
 export default {
     props: {
         viewPermission012: {
@@ -866,51 +865,10 @@ export default {
                 }
             }
         },
-        formatHour(time) {
-            let [hora, minutos] = time.split(':');
-            let amPm = parseInt(hora) < 12 ? 'AM' : 'PM';
-
-            // Si la hora es 12, cambia 'AM' a 'PM' y ajusta la hora a 12
-            if (parseInt(hora) === 12) {
-                amPm = 'MD';
-            } else if (parseInt(hora) === 0) {
-                // Si la hora es 00, ajusta la hora a 12
-                hora = '12';
-            } else {
-                hora = (parseInt(hora) % 12).toString();
-            }
-
-            // Añade un 0 delante si los minutos tienen un solo dígito
-            minutos = minutos.padStart(2, '0');
-
-            return `${hora}:${minutos} ${amPm}`;
-        },
     },
     watch: {
-        // viewPermission012: function (value, oldValue) {
-        //     if (value) {
-        //         this.showButtons = true
-        //         this.setApprobalRejectButtons(this.permissionToPrint)
-        //         this.showDenialOptions = false
-        //         this.messageError = ''
-        //         this.centro1 = ''
-        //         this.centro2 = ''
-        //         this.observation1 = ''
-        //         this.observation2 = ''
-        //         this.getCentro()
-        //         this.getObservation()
-        //         this.getRole()
-        //     }
-        // },
     },
     computed: {
-        validPermit() {
-            if (this.permissionToPrint.id_estado_permiso === 2) {
-                return true
-            } else {
-                return false
-            }
-        },
         totalDays: function () {
             const startDateFormated = moment(this.permissionToPrint.fecha_inicio_permiso, 'YYYY/MM/DD').toDate();
             const endDateFormated = moment(this.permissionToPrint.fecha_fin_permiso, 'YYYY/MM/DD').toDate();

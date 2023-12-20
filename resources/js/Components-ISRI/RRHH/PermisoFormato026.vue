@@ -351,7 +351,6 @@ import moment from 'moment';
 import PermisoF026PDFVue from '@/pdf/RRHH/PermisoF026PDF.vue';
 import { createApp, h } from 'vue'
 import html2pdf from 'html2pdf.js'
-import { jsPDF } from "jspdf";
 export default {
     props: {
         viewPermission026: {
@@ -675,13 +674,6 @@ export default {
         },
     },
     computed: {
-        validPermit() {
-            if (this.permissionToPrint.id_estado_permiso === 2) { //En proceso
-                return true
-            } else {
-                return false
-            }
-        },
     },
 }
 </script>

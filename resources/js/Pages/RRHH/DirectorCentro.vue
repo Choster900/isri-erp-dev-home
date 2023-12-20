@@ -141,7 +141,7 @@ import axios from 'axios';
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
 
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="page != 1 ? getPermissionRequests(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                        <a @click="link.url ? getPermissionRequests(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                   text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
@@ -150,7 +150,7 @@ import axios from 'axios';
                                 <span v-else-if="(link.label == 'Siguiente')"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="hasNext ? getPermissionRequests(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                        <a @click="link.url ? getPermissionRequests(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                   text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
@@ -158,7 +158,8 @@ import axios from 'axios';
                                 </span>
                                 <span class="cursor-pointer" v-else
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
-                                        class=" w-5" @click="getPermissionRequests(link.url)">{{ link.label }}</span>
+                                        class=" w-5" @click="link.url ? getPermissionRequests(link.url) : ''">{{ link.label
+                                        }}</span>
                                 </span>
                             </li>
                         </ul>
@@ -172,9 +173,9 @@ import axios from 'axios';
         <PermisoFormato026Vue :viewPermission026="viewPermission026" :permissionToPrint="permissionToPrint" :limite="limite"
             :stages="stages" :permits="permits" @cerrar-modal="viewPermission026 = false"
             @get-table="getPermissionRequests(tableData.currentPage)" />
-        <PermisoFormato012InternoVue v-if="viewPermission012I" :viewPermission012I="viewPermission012I" :permissionToPrint="permissionToPrint"
-            :stages="stages" :permits="permits" @cerrar-modal="viewPermission012I = false"
-            @get-table="getPermissionRequests(tableData.currentPage)" />
+        <PermisoFormato012InternoVue v-if="viewPermission012I" :viewPermission012I="viewPermission012I"
+            :permissionToPrint="permissionToPrint" :stages="stages" :permits="permits"
+            @cerrar-modal="viewPermission012I = false" @get-table="getPermissionRequests(tableData.currentPage)" />
         <PermisoFormato012Vue v-if="viewPermission012" :viewPermission012="viewPermission012"
             :permissionToPrint="permissionToPrint" :stages="stages" :permits="permits"
             @cerrar-modal="viewPermission012 = false" @get-table="getPermissionRequests(tableData.currentPage)" />
@@ -183,12 +184,6 @@ import axios from 'axios';
 </template>
 
 <script>
-import PermisoF026PDFVue from '@/pdf/RRHH/PermisoF026PDF.vue';
-import PermisoF012ControlInternoPDFVue from '@/pdf/RRHH/PermisoF012ControlInternoPDF.vue';
-import PermisoF012PDFVue from '@/pdf/RRHH/PermisoF012PDF.vue';
-import { createApp, h } from 'vue'
-import html2pdf from 'html2pdf.js'
-import { jsPDF } from "jspdf";
 
 export default {
     created() {
@@ -240,9 +235,6 @@ export default {
             showModalJobPermissions: false,
             modalData: [],
             permits: [],
-            //vars to validate pages
-            hasNext: false,
-            page: '',
             //Until here 
             links: [],
             columns: columns,
@@ -424,14 +416,11 @@ export default {
             await axios.post(url, this.tableData).then((response) => {
                 let data = response.data;
                 if (this.tableData.draw == data.draw) {
-                    this.page = data.data.current_page
-                    this.hasNext = data.data.current_page !== data.data.last_page;
                     this.links = data.data.links;
                     this.tableData.total = data.data.total;
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
                     this.jobPermissions = data.data.data;
-                    console.log(this.jobPermissions);
                     this.jobPermissions.length > 0 ? this.emptyObject = false : this.emptyObject = true
                 }
             }).catch((errors) => {
