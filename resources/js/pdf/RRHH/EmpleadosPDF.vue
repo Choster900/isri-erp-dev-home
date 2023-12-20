@@ -18,9 +18,9 @@
                         <div class="w-[35%] text-center">PUESTO</div>
                     </div>
                     <div v-for="(employee, index) in queryResult" :key="index" :class="{
-                        'bg-gray-400': index % 2 === 0,
-                        'bg-gray-300': index % 2 !== 0,
-                        'custom-break': index === 0,
+                        'bg-gray-200': index % 2 === 0,
+                        'bg-gray-100': index % 2 !== 0,
+                        //'custom-break': index === 0,
                     }" class="flex justify-between border-b border-gray-100 text-[14px] px-2 py-2 hover:bg-gray-300">
                         <div class="w-[8%] text-center break-words overflow-wrap flex items-center justify-center">{{
                             employee.codigo_empleado }}</div>

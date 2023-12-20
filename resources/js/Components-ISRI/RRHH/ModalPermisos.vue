@@ -108,7 +108,8 @@ import moment from 'moment';
                     <div class="flex border-t border-gray-400">
                         <div class="flex-1 text-center p-0.5">
                             <span>Permiso creado:</span> <span class="font-semibold">
-                                {{ permission.registrationDate ? moment(permission.registrationDate).format('DD/MM/YYYY') : moment().format('DD-MM-YYYY') }}</span>
+                                {{ permission.registrationDate ? moment(permission.registrationDate).format('DD/MM/YYYY') :
+                                    moment().format('DD-MM-YYYY') }}</span>
                         </div>
                     </div>
                 </div>
@@ -292,24 +293,24 @@ import moment from 'moment';
                                     <InputError v-for="(item, index) in errors.destination" :key="index" class="mt-2"
                                         :message="item" />
                                 </div>
-                                <div class="mb-4 md:mr-2 md:mb-0 basis-1/3 grid grid-cols-2 items-center md:self-center">
-                                    <label for="regresara" class="text-right mr-4 block text-xs text-black">Regresará
-                                        <span v-if="permission.periodOfTime == 1"
-                                            class="text-red-600 font-extrabold">*</span></label>
-                                    <div class="mt-1">
-                                        <label class="inline-flex items-center">
-                                            <span class="mr-2 text-xs">Si</span>
-                                            <input type="radio" class="form-radio" v-model="permission.comingBack"
-                                                :value="1" name="returnOption">
+                                <div v-if="permission.periodOfTime == 1" class="mb-4 md:mr-2 md:mb-0 basis-1/3 items-center md:self-center">
+                                    <div class="mb-5 md:mr-2 md:mb-0 basis-1/2 justify-center text-center">
+                                        <label class="block mb-2 text-xs font-light text-gray-600">
+                                            Regresará <span v-if="permission.periodOfTime == 1"
+                                                class="text-red-600 font-extrabold">*</span>
                                         </label>
-                                        <label class="inline-flex items-center ml-2">
-                                            <span class="mr-2 text-xs">No</span>
-                                            <input type="radio" class="form-radio" v-model="permission.comingBack"
-                                                :value="0" name="returnOption">
+                                        <label for="checbox1" class="text-sm font-bold text-gray-700 ml-4 mr-1">SI
                                         </label>
+                                        <checkbox v-model="retirementY" :checked="retirementY" class="mr-3" ref="check1"
+                                            id="checbox1" @click="setRetirementValue(true)" />
+                                        <label for="checbox2" class="text-sm font-bold text-gray-700 ml-4 mr-1">NO
+                                        </label>
+                                        <checkbox v-model="retirementN" :checked="retirementN" class="mr-3" ref="check2"
+                                            id="checbox2" @click="setRetirementValue(false)" />
+
+                                        <InputError v-for="(item, index) in errors.comingBack" :key="index" class="mt-2"
+                                            :message="item" />
                                     </div>
-                                    <InputError v-for="(item, index) in errors.comingBack" :key="index" class="mt-2"
-                                        :message="item" />
                                 </div>
                             </div>
                             <div class="mb-4 md:mr-4 md:mb-0 basis-full mx-4"
@@ -415,6 +416,8 @@ export default {
     created() { },
     data: function (data) {
         return {
+            retirementY: false,
+            retirementN: false,
             expanded: false,
             expandedDetails: true,
             expandedClockingIn: false,
@@ -486,6 +489,17 @@ export default {
         };
     },
     methods: {
+        setRetirementValue(value) {
+            if (value) {
+                this.retirementY ? this.retirementY = false : this.retirementY = true
+                this.retirementN = false
+                this.permission.comingBack = this.retirementY ? 1 : ''
+            } else {
+                this.retirementN ? this.retirementN = false : this.retirementN = true
+                this.retirementY = false
+                this.permission.comingBack = this.retirementN ? 0 : ''
+            }
+        },
         validateInput(field, limit) {
             if (this.permission[field].length > limit) {
                 this.permission[field] = this.permission[field].substring(0, limit);
@@ -812,7 +826,7 @@ export default {
                 this.permission.permissionReasonId = this.modalData.id_motivo_permiso ? this.modalData.id_motivo_permiso : ''
                 this.permission.observation = this.modalData.comentarios_permiso ? this.modalData.comentarios_permiso : ''
                 this.permission.destination = this.modalData.destino_permiso ? this.modalData.destino_permiso : ''
-                this.permission.comingBack = this.modalData.retornar_empleado_permiso
+                this.modalData.retornar_empleado_permiso != null ? this.setRetirementValue(this.modalData.retornar_empleado_permiso) : ''
                 this.permission.registrationDate = this.modalData.fecha_reg_permiso ?? ''
             }
         },
@@ -894,6 +908,10 @@ export default {
                 Object.keys(this.permission).forEach(key => {
                     this.permission[key] = '';
                 });
+                //Vars to manage "Regresará" input
+                this.retirementN=false
+                this.retirementY=false
+
                 this.errors = []
                 this.loads = 0
                 this.getPermissionData()

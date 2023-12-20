@@ -251,6 +251,7 @@ export const useEvaluacion = () => {
         objectPlazas.value = data.plazasAsignadas.map((index) => ({
             value: index.id_plaza_asignada,
             label: index.detalle_plaza.plaza.nombre_plaza,
+            dependencia:index.dependencia,
         }));
         idEvaluacionRendimiento.value =
             data.evaluacionRendimiento[0].id_evaluacion_rendimiento;

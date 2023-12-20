@@ -142,15 +142,25 @@
                                             </template>
                                             <template v-slot:message>
                                                 <div class="text-xs text-slate-200">
-                                                    <table class="min-w-full w-40 border border-white">
+                                                    <table class="min-w-full w-40 border border-white"
+                                                    v-if="objectPlazas && objectPlazas.length > 0">
                                                         <tr>
                                                             <th class="py-0.5 text-[7.5pt] w-36 px-2 border-b">Nombre de la
                                                                 Plaza</th>
                                                         </tr>
                                                         <tr v-for="(plaza, index) in objectPlazas" :key="index">
-                                                            <td class="py-0.5 text-[7.5pt] w-36 px-2 border-b">{{
-                                                                plaza.label }}</td>
+                                                            <td class="py-0.5 text-[7.5pt] w-36 px-2 border-b">
+                                                                {{ plaza.label }} -
+                                                                {{ plaza.dependencia["nombre_dependencia"] }}
+                                                            </td>
                                                         </tr>
+                                                    </table>
+                                                    <table class="min-w-full w-40 border border-white" v-else>
+                                                        <tr>
+                                                            <th class="py-0.5 text-[7.5pt] w-36 px-2 border-b">Sin plazas
+                                                            </th>
+                                                        </tr>
+
                                                     </table>
                                                 </div>
                                             </template>
@@ -539,6 +549,7 @@ export default {
                 return null;
             }
         });
+
 
 
         const evaluacionesAgrupadasPorAño = computed(() => {

@@ -46,15 +46,16 @@ class SubDirectorMedicoController extends Controller
                 //         ->where('id_estado_etapa_permiso', 4);
                 // }
             ])
+            ->where('id_tipo_flujo_control',4)
             ->whereHas('plaza_asignada.dependencia', function ($query) use ($range) {
-                $query->whereIn('dep_id_dependencia', $range)
-                    ->orWhereIn('id_dependencia', $range);
+                $query->whereIn('id_centro_atencion', $range);
+                    //->orWhereIn('id_dependencia', $range);
             })
             ->whereHas('empleado.persona', function ($query) use ($id_persona) {
                 $query->where('id_persona', '!=', $id_persona);
             })
             ->whereHas('etapa_permiso', function ($query) {
-                $query->where('estado_etapa_permiso', 1)
+                $query
                     ->where('id_persona_etapa', 3)
                     ->where('id_estado_etapa_permiso', 4);
             });
@@ -83,6 +84,15 @@ class SubDirectorMedicoController extends Controller
         if ($idRol == 16) {
             DB::beginTransaction();
             try {
+                //Desactivamos la etapa anterior
+                $oldStage = EtapaPermiso::where('id_permiso', $permiso->id_permiso)
+                    ->where('estado_etapa_permiso', 1)
+                    ->first();
+                if ($oldStage) {
+                    $oldStage->estado_etapa_permiso = 0;
+                    $oldStage->update();
+                }
+
                 $permissionStage = new EtapaPermiso([
                     'id_empleado'                   => $user->persona->empleado->id_empleado,
                     'id_permiso'                    => $permiso->id_permiso,
@@ -95,6 +105,7 @@ class SubDirectorMedicoController extends Controller
                 ]);
                 $permissionStage->save();
 
+                //Se finaliza el flujo del permiso si se trata de permisos cortos de centro
                 if ($permiso->id_tipo_flujo_control == 3) {
                     $data = [
                         'id_estado_permiso'           => 3,
@@ -103,9 +114,9 @@ class SubDirectorMedicoController extends Controller
                         'ip_permiso'                  => $request->ip(),
                     ];
                     $permiso->update($data);
-
-                    $permissionStage->estado_etapa_permiso = 0;
-                    $permissionStage->update();
+                    //Se desactiva la ultima etapa
+                    // $permissionStage->estado_etapa_permiso = 0;
+                    // $permissionStage->update();
                 }
 
                 DB::commit(); // Confirma las operaciones en la base de datos
@@ -135,6 +146,15 @@ class SubDirectorMedicoController extends Controller
         if ($idRol == 16) {
             DB::beginTransaction();
             try {
+                //Desactivamos la etapa anterior
+                $oldStage = EtapaPermiso::where('id_permiso', $permiso->id_permiso)
+                    ->where('estado_etapa_permiso', 1)
+                    ->first();
+                if ($oldStage) {
+                    $oldStage->estado_etapa_permiso = 0;
+                    $oldStage->update();
+                }
+                
                 $permissionStage = new EtapaPermiso([
                     'id_empleado'                   => $user->persona->empleado->id_empleado,
                     'id_permiso'                    => $permiso->id_permiso,
@@ -144,7 +164,7 @@ class SubDirectorMedicoController extends Controller
                     'fecha_reg_etapa_permiso'       => Carbon::now(),
                     'usuario_etapa_permiso'         => $request->user()->nick_usuario,
                     'ip_etapa_permiso'              => $request->ip(),
-                    'estado_etapa_permiso'          => 0,
+                    'estado_etapa_permiso'          => 1,
                 ]);
                 $permissionStage->save();
 
