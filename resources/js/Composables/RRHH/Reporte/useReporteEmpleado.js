@@ -91,9 +91,10 @@ export const useReporteEmpleado = (context) => {
 
                     html2pdf()
                         .set({
-                            margin: [0.2, 0.2, 0.6, 0.2],
-                            //pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
-                            filename: 'RPT-INGRESO-DIARIO-' + fecha,
+                            //margin: [0.2, 0.2, 0.6, 0.2],
+                            margin: [0.2, 0.2, 0.7, 0.2],
+                            pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+                            filename: 'RPT-EMPLEADOS-' + fecha,
                             image: {
                                 type: 'jpeg',
                                 quality: 0.98
