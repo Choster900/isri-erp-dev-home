@@ -29,7 +29,31 @@ class JefeInmediatoController extends Controller
 
         $user = $request->user();
         $id_persona = $user->persona->id_persona;
-        $depency = Dependencia::where('id_persona', $id_persona)->first();
+
+        $idsEmpleados = [];
+
+        //Obtiene los empleados destacados en las dependencias en las cual es jefe
+        $deps = Dependencia::with('plazas_asignadas.empleado')->where('id_persona', $id_persona)
+        ->where('estado_dependencia', 1)->get();
+        foreach($deps as $dep){
+            foreach($dep->plazas_asignadas as $plaza){
+                if($plaza->estado_plaza_asignada == 1){
+                    $idsEmpleados[] = $plaza->empleado->id_empleado;
+                }
+            }
+        }
+        
+        //Obtiene los jefes de las dependencias hijas
+        $depIds = Dependencia::where('id_persona', $id_persona)
+            ->where('estado_dependencia', 1)
+            ->pluck('id_dependencia')
+            ->toArray();
+        $dependencies = Dependencia::with('jefatura.empleado')->whereIn('jerarquia_organizacion_dependencia', $depIds)->get();
+        foreach ($dependencies as $dep) {
+            if ($dep->jefatura && $dep->estado_dependencia == 1) {
+                $idsEmpleados[] = $dep->jefatura->empleado->id_empleado;
+            }
+        }
 
         $query = Permiso::select('*')
             ->with([
@@ -39,31 +63,29 @@ class JefeInmediatoController extends Controller
                 'plaza_asignada.dependencia',
                 'etapa_permiso'
             ])
-            ->whereHas('plaza_asignada.dependencia', function ($query) use ($user) {
-                $query->where('id_persona', $user->persona->id_persona);
-            })
             ->whereHas('empleado.persona', function ($query) use ($id_persona) {
                 $query->where('id_persona', '!=', $id_persona);
             })
             ->whereHas('etapa_permiso', function ($query) {
-                $query->where('estado_etapa_permiso', 1)
+                $query
                     ->where('id_persona_etapa', 1)
                     ->where('id_estado_etapa_permiso', 1);
-            });
+            })
+            ->whereIn('id_empleado',$idsEmpleados);
 
-            if ($column == -1) {
-                $query->orderByRaw('(
+        if ($column == -1) {
+            $query->orderByRaw('(
                     SELECT id_etapa_permiso
                     FROM etapa_permiso
                     WHERE etapa_permiso.id_permiso = permiso.id_permiso
                     ORDER BY id_etapa_permiso DESC
                     LIMIT 1
                 ) DESC');
-            }
+        }
 
 
         $permissions = $query->paginate($length)->onEachSide(1);
-        return ['data' => $permissions, 'draw' => $request->input('draw')];
+        return ['data' => $permissions, 'draw' => $request->input('draw'), 'res' => $dependencies, 'emp'=>$idsEmpleados] ;
     }
 
     public function setSupervisorApproval(Request $request)
@@ -72,9 +94,18 @@ class JefeInmediatoController extends Controller
         $idRol = $request->id_rol;
         $user = $request->user();
 
-        if ($idRol == 15) {
+        if ($idRol == 14) {
             DB::beginTransaction();
             try {
+                //Desactivamos la etapa anterior
+                $oldStage = EtapaPermiso::where('id_permiso', $permiso->id_permiso)
+                    ->where('estado_etapa_permiso', 1)
+                    ->first();
+                if ($oldStage) {
+                    $oldStage->estado_etapa_permiso = 0;
+                    $oldStage->update();
+                }
+
                 $permissionStage = new EtapaPermiso([
                     'id_empleado'                   => $user->persona->empleado->id_empleado,
                     'id_permiso'                    => $permiso->id_permiso,
@@ -87,6 +118,7 @@ class JefeInmediatoController extends Controller
                 ]);
                 $permissionStage->save();
 
+                //Si es el flujo corto de admon se le cambia el estado al permiso
                 if ($permiso->id_tipo_flujo_control == 1) {
                     $data = [
                         'id_estado_permiso'           => 3,
@@ -95,9 +127,9 @@ class JefeInmediatoController extends Controller
                         'ip_permiso'                  => $request->ip(),
                     ];
                     $permiso->update($data);
-
-                    $permissionStage->estado_etapa_permiso = 0;
-                    $permissionStage->update();
+                    //Se desactiva la etapa ya que el flujo ha finalizado
+                    // $permissionStage->estado_etapa_permiso = 0;
+                    // $permissionStage->update();
                 }
 
                 DB::commit(); // Confirma las operaciones en la base de datos
@@ -124,7 +156,7 @@ class JefeInmediatoController extends Controller
         $idRol = $request->id_rol;
         $user = $request->user();
 
-        if ($idRol == 15) {
+        if ($idRol == 14) {
             DB::beginTransaction();
             try {
                 $permissionStage = new EtapaPermiso([
@@ -136,9 +168,18 @@ class JefeInmediatoController extends Controller
                     'fecha_reg_etapa_permiso'       => Carbon::now(),
                     'usuario_etapa_permiso'         => $request->user()->nick_usuario,
                     'ip_etapa_permiso'              => $request->ip(),
-                    'estado_etapa_permiso'          => 0,
+                    'estado_etapa_permiso'          => 1,
                 ]);
                 $permissionStage->save();
+
+                //Desactivamos la etapa anterior
+                // $oldStage = EtapaPermiso::where('id_permiso', $permiso->id_permiso)
+                //     ->where('estado_etapa_permiso', 1)
+                //     ->first();
+                // if ($oldStage) {
+                //     $oldStage->estado_etapa_permiso = 0;
+                //     $oldStage->update();
+                // }
 
                 $data = [
                     'id_estado_permiso'           => 4,

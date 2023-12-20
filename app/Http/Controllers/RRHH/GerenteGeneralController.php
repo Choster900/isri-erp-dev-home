@@ -48,7 +48,7 @@ class GerenteGeneralController extends Controller
                 $query->where('id_persona', '!=', $id_persona);
             })
             ->whereHas('etapa_permiso', function ($query) {
-                $query->where('estado_etapa_permiso', 1)
+                $query
                     ->where('id_persona_etapa', 4)
                     ->where('id_estado_etapa_permiso', 6);
             })
@@ -65,17 +65,17 @@ class GerenteGeneralController extends Controller
                 }
             ])
             ->whereHas('plaza_asignada.dependencia', function ($query) {
-                $query->where('dep_id_dependencia', 1);
+                $query->where('id_centro_atencion', 1);
             })
             ->whereHas('empleado.persona', function ($query) use ($id_persona) {
                 $query->where('id_persona', '!=', $id_persona);
             })
             ->whereHas('etapa_permiso', function ($query) {
-                $query->where('estado_etapa_permiso', 1)
+                $query
                     ->where('id_persona_etapa', 2)
                     ->where('id_estado_etapa_permiso', 2);
             })
-            ->whereIn('id_tipo_flujo_control', [1, 2]);
+            ->where('id_tipo_flujo_control', 2);
 
         $combinedQuery = $query->union($query2);
 
@@ -89,9 +89,18 @@ class GerenteGeneralController extends Controller
         $idRol = $request->id_rol;
         $user = $request->user();
 
-        if ($idRol == 18) {
+        if ($idRol == 17) {
             DB::beginTransaction();
             try {
+                //Desactivamos la etapa anterior
+                $oldStage = EtapaPermiso::where('id_permiso', $permiso->id_permiso)
+                    ->where('estado_etapa_permiso', 1)
+                    ->first();
+                if ($oldStage) {
+                    $oldStage->estado_etapa_permiso = 0;
+                    $oldStage->update();
+                }
+                
                 $permissionStage = new EtapaPermiso([
                     'id_empleado'                   => $user->persona->empleado->id_empleado,
                     'id_permiso'                    => $permiso->id_permiso,
@@ -100,7 +109,7 @@ class GerenteGeneralController extends Controller
                     'fecha_reg_etapa_permiso'       => Carbon::now(),
                     'usuario_etapa_permiso'         => $request->user()->nick_usuario,
                     'ip_etapa_permiso'              => $request->ip(),
-                    'estado_etapa_permiso'          => 0,
+                    'estado_etapa_permiso'          => 1,
                 ]);
                 $permissionStage->save();
 
@@ -136,9 +145,18 @@ class GerenteGeneralController extends Controller
         $idRol = $request->id_rol;
         $user = $request->user();
 
-        if ($idRol == 18) {
+        if ($idRol == 17) {
             DB::beginTransaction();
             try {
+                //Desactivamos la etapa anterior
+                $oldStage = EtapaPermiso::where('id_permiso', $permiso->id_permiso)
+                    ->where('estado_etapa_permiso', 1)
+                    ->first();
+                if ($oldStage) {
+                    $oldStage->estado_etapa_permiso = 0;
+                    $oldStage->update();
+                }
+                
                 $permissionStage = new EtapaPermiso([
                     'id_empleado'                   => $user->persona->empleado->id_empleado,
                     'id_permiso'                    => $permiso->id_permiso,
@@ -148,7 +166,7 @@ class GerenteGeneralController extends Controller
                     'fecha_reg_etapa_permiso'       => Carbon::now(),
                     'usuario_etapa_permiso'         => $request->user()->nick_usuario,
                     'ip_etapa_permiso'              => $request->ip(),
-                    'estado_etapa_permiso'          => 0,
+                    'estado_etapa_permiso'          => 1,
                 ]);
                 $permissionStage->save();
 

@@ -82,7 +82,7 @@ import moment from 'moment';
                                     <div class="w-full mb-1">
                                         <p class="text-[13px] text-gray-600 mb-0.5">Estado</p>
                                         <p class="text-[13px] font-medium text-navy-700 ">
-                                            {{ stage.estado_etapa_permiso.nombre_estado_etapa_permiso }}
+                                            {{ stage.estado_etapa_permiso_rel.nombre_estado_etapa_permiso }}
                                         </p>
                                     </div>
                                     <div class="w-full mb-1">
@@ -238,7 +238,8 @@ import moment from 'moment';
                                         </label>
                                     </div>
                                     <div class="ml-1 text-center w-[50%] text-[13px] font-bold border-b border-gray-700">
-                                        <p class="font-[MuseoSans]">{{ contract }}</p>
+                                        <p class="font-[MuseoSans]">{{
+                                            permissionToPrint.plaza_asignada.contrato_plaza_asignada ?? '' }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -606,12 +607,11 @@ import moment from 'moment';
 import PermisoF012ControlInternoPDFVue from '@/pdf/RRHH/PermisoF012ControlInternoPDF.vue';
 import { createApp, h } from 'vue'
 import html2pdf from 'html2pdf.js'
-import { jsPDF } from "jspdf";
 export default {
     props: {
         viewPermission012I: {
             type: Boolean,
-            default: false,
+            default: true,
         },
         permissionToPrint: {
             type: Array,
@@ -620,11 +620,17 @@ export default {
         stages: {
             type: Array,
             default: []
+        },
+        showOptions: {
+            type: Boolean,
+            default: true,
         }
+    },
+    created() {
+        this.setInitialInformation()
     },
     data: function () {
         return {
-            contract: '49/2021',
             denialComment: '',
             messageError: '',
             showDenialOptions: false,
@@ -641,30 +647,47 @@ export default {
         }
     },
     methods: {
+        setInitialInformation() {
+            this.showButtons = true
+            this.setApprobalRejectButtons(this.permissionToPrint)
+            this.showDenialOptions = false
+            this.messageError = ''
+
+            this.centro1 = ''
+            this.centro2 = ''
+            this.observation1 = ''
+            this.observation2 = ''
+            this.getCentro()
+            this.getObservation()
+            this.getRole()
+            this.getDestination()
+        },
         setApprobalRejectButtons(permission) {
-            if (permission) {
+            console.log(permission);
+            if (this.showOptions && permission.id_estado_permiso != 3 && permission.id_estado_permiso != 4) {
                 const rolId = this.$page.props.menu.id_rol
-                const range = [15, 16, 17, 18]
+                const range = [14, 15, 16, 17]
                 if (range.includes(rolId)) {
-                    if (rolId === 15) {
+                    //Jefe inmediato
+                    if (rolId === 14) {
                         let stage = permission.etapa_permiso.find((element) => element.id_estado_etapa_permiso === 2 || element.id_estado_etapa_permiso === 3)
                         if (stage) {
                             this.showButtons = false
                         }
                     }
-                    if (rolId === 16) {
+                    if (rolId === 15) {
                         let stage = permission.etapa_permiso.find((element) => element.id_estado_etapa_permiso === 4 || element.id_estado_etapa_permiso === 5)
                         if (stage) {
                             this.showButtons = false
                         }
                     }
-                    if (rolId === 17) {
+                    if (rolId === 16) {
                         let stage = permission.etapa_permiso.find((element) => element.id_estado_etapa_permiso === 6 || element.id_estado_etapa_permiso === 7)
                         if (stage) {
                             this.showButtons = false
                         }
                     }
-                    if (rolId === 18) {
+                    if (rolId === 17) {
                         let stage = permission.etapa_permiso.find((element) => element.id_estado_etapa_permiso === 8 || element.id_estado_etapa_permiso === 9)
                         if (stage) {
                             this.showButtons = false
@@ -674,7 +697,7 @@ export default {
                     this.showButtons = false
                 }
             } else {
-                this.showButtons = true
+                this.showButtons = false
             }
         },
         async rejectPermission() {
@@ -687,10 +710,10 @@ export default {
                 const idRol = this.$page.props.menu.id_rol;
 
                 const urlMap = {
-                    15: '/supervisor-denial',
-                    16: '/director-denial',
-                    17: '/medical-management-denial',
-                    18: '/general-management-denial'
+                    14: '/supervisor-denial',
+                    15: '/director-denial',
+                    16: '/medical-management-denial',
+                    17: '/general-management-denial'
                 };
 
                 const url = urlMap[idRol] || '';
@@ -736,15 +759,14 @@ export default {
                 })
             }
         },
-        //Falta hacer la aprobacion desde jefe inmediato
         async approvePermission() {
             const idRol = this.$page.props.menu.id_rol;
 
             const urlMap = {
-                15: '/supervisor-approval',
-                16: '/director-approval',
-                17: '/medical-management-approval',
-                18: '/general-management-approval'
+                14: '/supervisor-approval',
+                15: '/director-approval',
+                16: '/medical-management-approval',
+                17: '/general-management-approval'
             };
 
             const url = urlMap[idRol] || '';
@@ -823,45 +845,6 @@ export default {
 
             // Formatea la fecha en el nuevo formato 'DD/MM/YYYY'
             return fechaParseada.format('DD/MM/YYYY') ?? '-------------';
-        },
-        printPdf() {
-            const name = 'PERMISO ' + permission.tipo_permiso.codigo_tipo_permiso + ' - ' + permission.empleado.codigo_empleado;
-            const opt = {
-                margin: 0,
-                filename: name,
-                //pagebreak: {mode:'css',before:'#pagebreak'},
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 3, useCORS: true },
-                //jsPDF: { unit: 'cm', format: [13.95,21.5], orientation: 'landscape' }
-                jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' },
-            };
-
-            const limiteCaracteres = 70;
-            if (this.receipt_to_print.monto_letras.length <= limiteCaracteres) {
-                this.letras1 = this.receipt_to_print.monto_letras;
-                this.letras2 = ''
-            } else {
-                let textoTruncado = this.receipt_to_print.monto_letras.slice(0, limiteCaracteres);
-                let ultimoEspacio = textoTruncado.lastIndexOf(' ');
-                this.letras1 = textoTruncado.slice(0, ultimoEspacio);
-                this.letras2 = this.receipt_to_print.monto_letras.slice(ultimoEspacio + 1);
-            }
-
-            const app = createApp(ReciboIngresoMatricialVue, {
-                receipt_to_print: this.receipt_to_print,
-                formatedAmount: this.receipt_to_print.monto_recibo_ingreso,
-                empleado: this.empleado,
-                nombre_cuenta: this.nombre_cuenta,
-                fecha_recibo: this.fecha_recibo,
-                letras1: this.letras1,
-                letras2: this.letras2
-            });
-            const div = document.createElement('div');
-            const pdfPrint = app.mount(div);
-            const html = div.outerHTML;
-
-            html2pdf().set(opt).from(html).save();
-            //html2pdf().set(opt).from(html).output('dataurlnewwindow');
         },
         getCentro() {
             let limiteCaracteres = 42;
@@ -994,32 +977,8 @@ export default {
 
     },
     watch: {
-        viewPermission012I: function (value, oldValue) {
-            if (value) {
-                this.showButtons = true
-                this.setApprobalRejectButtons(this.permissionToPrint)
-                this.showDenialOptions = false
-                this.messageError = ''
-
-                this.centro1 = ''
-                this.centro2 = ''
-                this.observation1 = ''
-                this.observation2 = ''
-                this.getCentro()
-                this.getObservation()
-                this.getRole()
-                this.getDestination()
-            }
-        },
     },
     computed: {
-        validPermit() {
-            if (this.permissionToPrint.id_estado_permiso === 2) {
-                return true
-            } else {
-                return false
-            }
-        },
         timeUsed: function () {
             if (this.permissionToPrint.fecha_fin_permiso) {
                 const startDateFormated = moment(this.permissionToPrint.fecha_inicio_permiso, 'YYYY/MM/DD').toDate()
@@ -1029,10 +988,7 @@ export default {
                 let daysDifference = 0;
 
                 while (currentDate <= endDateFormated) {
-                    const dayOfWeek = currentDate.getDay(); // 0 (domingo) a 6 (sábado)
-                    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-                        daysDifference++;
-                    }
+                    daysDifference++;
                     currentDate.setDate(currentDate.getDate() + 1);
                 }
                 const resultInMinutes = daysDifference * 8 * 60

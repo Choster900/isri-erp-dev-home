@@ -82,7 +82,7 @@ import moment from 'moment';
                                     <div class="w-full mb-1">
                                         <p class="text-[13px] text-gray-600 mb-0.5">Estado</p>
                                         <p class="text-[13px] font-medium text-navy-700 ">
-                                            {{ stage.estado_etapa_permiso.nombre_estado_etapa_permiso }}
+                                            {{ stage.estado_etapa_permiso_rel.nombre_estado_etapa_permiso }}
                                         </p>
                                     </div>
                                     <div class="w-full mb-1">
@@ -566,7 +566,6 @@ import moment from 'moment';
 import PermisoF012PDF from '@/pdf/RRHH/PermisoF012PDF.vue';
 import { createApp, h } from 'vue'
 import html2pdf from 'html2pdf.js'
-import { jsPDF } from "jspdf";
 export default {
     props: {
         viewPermission012: {
@@ -580,7 +579,14 @@ export default {
         stages: {
             type: Array,
             default: []
+        },
+        showOptions: {
+            type: Boolean,
+            default: true,
         }
+    },
+    created() {
+        this.setInitialInformation()
     },
     data: function () {
         return {
@@ -598,30 +604,43 @@ export default {
         }
     },
     methods: {
+        setInitialInformation() {
+            this.showButtons = true
+            this.setApprobalRejectButtons(this.permissionToPrint)
+            this.showDenialOptions = false
+            this.messageError = ''
+            this.centro1 = ''
+            this.centro2 = ''
+            this.observation1 = ''
+            this.observation2 = ''
+            this.getCentro()
+            this.getObservation()
+            this.getRole()
+        },
         setApprobalRejectButtons(permission) {
-            if (permission) {
+            if (this.showOptions && permission.id_estado_permiso != 3 && permission.id_estado_permiso != 4) {
                 const rolId = this.$page.props.menu.id_rol
-                const range = [15, 16, 17, 18]
+                const range = [14, 15, 16, 17]
                 if (range.includes(rolId)) {
-                    if (rolId === 15) {
+                    if (rolId === 14) {
                         let stage = permission.etapa_permiso.find((element) => element.id_estado_etapa_permiso === 2 || element.id_estado_etapa_permiso === 3)
                         if (stage) {
                             this.showButtons = false
                         }
                     }
-                    if (rolId === 16) {
+                    if (rolId === 15) {
                         let stage = permission.etapa_permiso.find((element) => element.id_estado_etapa_permiso === 4 || element.id_estado_etapa_permiso === 5)
                         if (stage) {
                             this.showButtons = false
                         }
                     }
-                    if (rolId === 17) {
+                    if (rolId === 16) {
                         let stage = permission.etapa_permiso.find((element) => element.id_estado_etapa_permiso === 6 || element.id_estado_etapa_permiso === 7)
                         if (stage) {
                             this.showButtons = false
                         }
                     }
-                    if (rolId === 18) {
+                    if (rolId === 17) {
                         let stage = permission.etapa_permiso.find((element) => element.id_estado_etapa_permiso === 8 || element.id_estado_etapa_permiso === 9)
                         if (stage) {
                             this.showButtons = false
@@ -631,7 +650,7 @@ export default {
                     this.showButtons = false
                 }
             } else {
-                this.showButtons = true
+                this.showButtons = false
             }
         },
         async rejectPermission() {
@@ -644,10 +663,10 @@ export default {
                 const idRol = this.$page.props.menu.id_rol;
 
                 const urlMap = {
-                    15: '/supervisor-denial',
-                    16: '/director-denial',
-                    17: '/medical-management-denial',
-                    18: '/general-management-denial'
+                    14: '/supervisor-denial',
+                    15: '/director-denial',
+                    16: '/medical-management-denial',
+                    17: '/general-management-denial'
                 };
 
                 const url = urlMap[idRol] || '';
@@ -698,10 +717,10 @@ export default {
             const idRol = this.$page.props.menu.id_rol;
 
             const urlMap = {
-                15: '/supervisor-approval',
-                16: '/director-approval',
-                17: '/medical-management-approval',
-                18: '/general-management-approval'
+                14: '/supervisor-approval',
+                15: '/director-approval',
+                16: '/medical-management-approval',
+                17: '/general-management-approval'
             };
 
             const url = urlMap[idRol] || '';
@@ -846,52 +865,10 @@ export default {
                 }
             }
         },
-        formatHour(time) {
-            let [hora, minutos] = time.split(':');
-            let amPm = parseInt(hora) < 12 ? 'AM' : 'PM';
-
-            // Si la hora es 12, cambia 'AM' a 'PM' y ajusta la hora a 12
-            if (parseInt(hora) === 12) {
-                amPm = 'MD';
-            } else if (parseInt(hora) === 0) {
-                // Si la hora es 00, ajusta la hora a 12
-                hora = '12';
-            } else {
-                hora = (parseInt(hora) % 12).toString();
-            }
-
-            // Añade un 0 delante si los minutos tienen un solo dígito
-            minutos = minutos.padStart(2, '0');
-
-            return `${hora}:${minutos} ${amPm}`;
-        },
     },
     watch: {
-        viewPermission012: function (value, oldValue) {
-            if (value) {
-                this.showButtons = true
-                this.setApprobalRejectButtons(this.permissionToPrint)
-                this.showDenialOptions = false
-                this.messageError = ''
-
-                this.centro1 = ''
-                this.centro2 = ''
-                this.observation1 = ''
-                this.observation2 = ''
-                this.getCentro()
-                this.getObservation()
-                this.getRole()
-            }
-        },
     },
     computed: {
-        validPermit() {
-            if (this.permissionToPrint.id_estado_permiso === 2) {
-                return true
-            } else {
-                return false
-            }
-        },
         totalDays: function () {
             const startDateFormated = moment(this.permissionToPrint.fecha_inicio_permiso, 'YYYY/MM/DD').toDate();
             const endDateFormated = moment(this.permissionToPrint.fecha_fin_permiso, 'YYYY/MM/DD').toDate();
