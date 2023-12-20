@@ -51,22 +51,26 @@ class EvaluacionController extends Controller
         $data = $request->input('search');
 
         // Construir la consulta base con las relaciones
-        $query = Empleado::
-            with([
-                "persona",
-                "plazas_asignadas.centro_atencion.dependencias",
-                "plazas_asignadas.detalle_plaza.plaza",
-                "evaluaciones_personal.incidentes_evaluacion",
-                "evaluaciones_personal.detalle_evaluaciones_personal.categoria_rendimiento.evaluacion_rendimiento.tablas_rendimiento",
-                "evaluaciones_personal.detalle_evaluaciones_personal.rubrica_rendimiento",
-                "evaluaciones_personal.plaza_evaluada.plaza_asignada.detalle_plaza.plaza",
-                "evaluaciones_personal.evaluacion_rendimiento",
-                "evaluaciones_personal.tipo_evaluacion_personal",
-                "evaluaciones_personal.periodo_evaluacion",
-                "evaluaciones_personal" => function ($query) {
-                    return $query->orderBy("fecha_reg_evaluacion_personal", "asc");
-                },
-            ])->whereHas("evaluaciones_personal")->orderBy($columns[$column], $dir);
+        $query = Empleado::with([
+            "persona",
+            "plazas_asignadas.centro_atencion.dependencias",
+            "plazas_asignadas.dependencia.jefatura.empleado.plazas_asignadas.detalle_plaza.plaza",
+            "plazas_asignadas.detalle_plaza.plaza",
+            "evaluaciones_personal.incidentes_evaluacion",
+            "evaluaciones_personal.detalle_evaluaciones_personal.categoria_rendimiento.evaluacion_rendimiento.tablas_rendimiento",
+            "evaluaciones_personal.detalle_evaluaciones_personal.rubrica_rendimiento",
+            "evaluaciones_personal.plaza_evaluada.plaza_asignada.detalle_plaza.plaza",
+            "evaluaciones_personal.plaza_evaluada.plaza_asignada.centro_atencion",
+            "evaluaciones_personal.plaza_evaluada.plaza_asignada.dependencia.jefatura.empleado.plazas_asignadas.detalle_plaza.plaza",
+            "evaluaciones_personal.plaza_evaluada.plaza_asignada.dependencia.jefatura.empleado.plazas_asignadas.centro_atencion",
+            "evaluaciones_personal.plaza_evaluada.plaza_asignada.dependencia.jefatura.empleado.plazas_asignadas.dependencia",
+            "evaluaciones_personal.evaluacion_rendimiento",
+            "evaluaciones_personal.tipo_evaluacion_personal",
+            "evaluaciones_personal.periodo_evaluacion",
+            "evaluaciones_personal" => function ($query) {
+                return $query->orderBy("fecha_reg_evaluacion_personal", "asc");
+            },
+        ])->whereHas("evaluaciones_personal")->orderBy($columns[$column], $dir);
 
         if ($data) {
             $query->where('id_empleado', 'like', '%' . $data["id_empleado"] . '%')
@@ -223,24 +227,6 @@ class EvaluacionController extends Controller
             ->where("id_empleado", $employeeId)
             ->get();
 
-        // Obtén una colección de todos los id_plaza_asignada
-        $idPlazaAsignadaCollection = $objectEvaluationByPrueba->pluck('plaza_evaluada.*.plaza_asignada.id_plaza_asignada')->flatten();
-
-        $conteoPorPlazaAsignada = $idPlazaAsignadaCollection->countBy();
-
-        // Filtra las plazas asignadas que tienen un conteo de 2 o más
-        $plazasConDosOMasEvaluaciones = $conteoPorPlazaAsignada->filter(function ($conteo) {
-            return $conteo >= 2;
-        });
-
-        // Obtiene las claves (id_plaza_asignada) del arreglo filtrado
-        $plazasDosOMasEvaluaciones = $plazasConDosOMasEvaluaciones->keys()->toArray();
-
-
-        $plazasAsignadasPruebas = PlazaAsignada::with([
-            'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos'
-        ])->where('id_empleado', $employeeId)->whereNotIn("id_plaza_asignada", $plazasDosOMasEvaluaciones)
-            ->where('id_centro_atencion', $idCentroAtencion)->get();
 
         $objectEvaluationByPrueba = EvaluacionPersonal::with(["plaza_evaluada.plaza_asignada"])
             ->where("id_tipo_evaluacion_personal", $tipoEvaluacionId)
@@ -271,11 +257,15 @@ class EvaluacionController extends Controller
 
             if ($tipoEvaluacionId == 1) {
                 $plazasAsignadas = PlazaAsignada::with([
-                    'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos'
+                    'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos',
+                    'centro_atencion',
+                    'dependencia',
                 ])->where('id_empleado', $employeeId)->where('id_centro_atencion', $idCentroAtencion)->get();
             } else {
                 $plazasAsignadas = PlazaAsignada::with([
-                    'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos'
+                    'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos',
+                    'centro_atencion',
+                    'dependencia',
                 ])->where('id_empleado', $employeeId)->whereNotIn("id_plaza_asignada", $plazasDosOMasEvaluaciones)
                     ->where('id_centro_atencion', $idCentroAtencion)->get();
             }
@@ -284,11 +274,15 @@ class EvaluacionController extends Controller
             if ($tipoEvaluacionId == 1) {
                 # code...
                 $plazasAsignadas = PlazaAsignada::with([
-                    'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos'
+                    'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos',
+                    'centro_atencion',
+                    'dependencia',
                 ])->where('id_empleado', $employeeId)->where('id_centro_atencion', $idCentroAtencion)->doesntHave("plaza_evaluada")->get();
             } else {
                 $plazasAsignadas = PlazaAsignada::with([
-                    'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos'
+                    'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos',
+                    'centro_atencion',
+                    'dependencia',
                 ])->where('id_empleado', $employeeId)->whereNotIn("id_plaza_asignada", $plazasDosOMasEvaluaciones)
                     ->where('id_centro_atencion', $idCentroAtencion)->get();
             }
@@ -426,11 +420,16 @@ class EvaluacionController extends Controller
             $query = Empleado::with([
                 "persona",
                 "plazas_asignadas.centro_atencion.dependencias",
+                "plazas_asignadas.dependencia.jefatura.empleado.plazas_asignadas.detalle_plaza.plaza",
                 "plazas_asignadas.detalle_plaza.plaza",
                 "evaluaciones_personal.incidentes_evaluacion",
                 "evaluaciones_personal.detalle_evaluaciones_personal.categoria_rendimiento.evaluacion_rendimiento.tablas_rendimiento",
                 "evaluaciones_personal.detalle_evaluaciones_personal.rubrica_rendimiento",
                 "evaluaciones_personal.plaza_evaluada.plaza_asignada.detalle_plaza.plaza",
+                "evaluaciones_personal.plaza_evaluada.plaza_asignada.centro_atencion",
+                "evaluaciones_personal.plaza_evaluada.plaza_asignada.dependencia.jefatura.empleado.plazas_asignadas.detalle_plaza.plaza",
+                "evaluaciones_personal.plaza_evaluada.plaza_asignada.dependencia.jefatura.empleado.plazas_asignadas.centro_atencion",
+                "evaluaciones_personal.plaza_evaluada.plaza_asignada.dependencia.jefatura.empleado.plazas_asignadas.dependencia",
                 "evaluaciones_personal.evaluacion_rendimiento",
                 "evaluaciones_personal.tipo_evaluacion_personal",
                 "evaluaciones_personal.periodo_evaluacion",
@@ -470,7 +469,65 @@ class EvaluacionController extends Controller
 
     // Guardamos la respuesta que se ha seleccionado en la evaluacion
 
+    /**
+     * Guarda las respuestas en una evaluación personal.
+     *
+     * @param EvaluacionRespuestasRequest $request
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Request
+     */
     function saveResponseInEvaluation(EvaluacionRespuestasRequest $request)
+    {
+        try {
+            // Inicia una transacción de base de datos
+            DB::beginTransaction();
+
+            // Itera sobre las respuestas de rendimiento en la solicitud
+            foreach ($request->responseRendimiento as $key => $value) {
+                // Construye un arreglo con los detalles de la evaluación personal
+                $detalleEvaluacionPersonal = [
+                    'id_evaluacion_personal'       => $request->idEvaluacionPersonal,
+                    'id_cat_rendimiento'           => $value["id_cat_rendimiento"],
+                    'id_rubrica_rendimiento'       => $value["id_rubrica_rendimiento"],
+                    'usuario_detalle_eva_personal' => $request->user()->nick_usuario,
+                    'ip_detalle_eva_personal'      => $request->ip(),
+                ];
+
+                // Condiciones de búsqueda para verificar si ya existe una respuesta para esta categoría
+                $conditions = [
+                    'id_evaluacion_personal' => $request->idEvaluacionPersonal,
+                    'id_cat_rendimiento'     => $value["id_cat_rendimiento"],
+                ];
+                // Verificar si ya existe una respuesta para esta categoría
+                $existingResponse = DetalleEvaluacionPersonal::where($conditions)->first();
+
+                // Verificar si ya existe una respuesta para esta categoría
+                if ($existingResponse) {
+                    // Si existe, añadir la fecha de modificación
+                    $detalleEvaluacionPersonal['fecha_mod_detalle_eva_personal'] = Carbon::now();
+                } else {
+                    // Si no existe, añadir la fecha de creación
+                    $detalleEvaluacionPersonal['fecha_reg_detalle_eva_personal'] = Carbon::now();
+                }
+
+                // Actualizar o insertar el registro
+                DetalleEvaluacionPersonal::updateOrInsert($conditions, $detalleEvaluacionPersonal);
+            }
+
+            // Confirmar la transacción
+            DB::commit();
+
+            // Retornar la solicitud como confirmación (puedes ajustar esto según tus necesidades)
+            return response()->json(['message' => 'Respuestas guardadas exitosamente'], 200);
+        } catch (\Exception $e) {
+            // En caso de error, revertir la transacción y manejar la excepción
+            DB::rollBack();
+
+            // Manejar el caso de que no se encuentre la evaluación personal o de rendimiento
+            return response()->json(['error' => 'Evaluación no encontrada', "realError" =>  $e], 404);
+        }
+    }
+
+    /* function saveResponseInEvaluation(EvaluacionRespuestasRequest $request)
     {
         try {
             // Buscar la evaluación personal
@@ -580,7 +637,7 @@ class EvaluacionController extends Controller
             // Manejar el caso de que no se encuentre la evaluación personal o de rendimiento
             return response()->json(['error' => 'Evaluación no encontrada'], 404);
         }
-    }
+    } */
 
 
     function getEvaluationById(Request $request)

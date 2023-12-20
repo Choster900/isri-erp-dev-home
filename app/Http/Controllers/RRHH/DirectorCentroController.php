@@ -52,20 +52,20 @@ class DirectorCentroController extends Controller
                 $query->where('id_persona', '!=', $id_persona);
             })
             ->whereHas('etapa_permiso', function ($query) {
-                $query->where('estado_etapa_permiso', 1)
+                $query
                     ->where('id_persona_etapa', 2)
                     ->where('id_estado_etapa_permiso', 2);
             });
 
-            if ($column == -1) {
-                $query->orderByRaw('(
+        if ($column == -1) {
+            $query->orderByRaw('(
                     SELECT id_etapa_permiso
                     FROM etapa_permiso
                     WHERE etapa_permiso.id_permiso = permiso.id_permiso
                     ORDER BY id_etapa_permiso DESC
                     LIMIT 1
                 ) DESC');
-            }
+        }
 
 
         $permissions = $query->paginate($length)->onEachSide(1);
@@ -93,6 +93,16 @@ class DirectorCentroController extends Controller
                 ]);
                 $permissionStage->save();
 
+                //Desactivamos la etapa anterior
+                $oldStage = EtapaPermiso::where('id_permiso', $permiso->id_permiso)
+                    ->where('estado_etapa_permiso', 1)
+                    ->first();
+                if ($oldStage) {
+                    $oldStage->estado_etapa_permiso = 0;
+                    $oldStage->update();
+                }
+
+                //Se finaliza el flujo del permiso si se trata de permisos cortos de centro
                 if ($permiso->id_tipo_flujo_control == 3) {
                     $data = [
                         'id_estado_permiso'           => 3,
@@ -101,9 +111,9 @@ class DirectorCentroController extends Controller
                         'ip_permiso'                  => $request->ip(),
                     ];
                     $permiso->update($data);
-
-                    $permissionStage->estado_etapa_permiso = 0;
-                    $permissionStage->update();
+                    //Se desactiva la ultima etapa
+                    // $permissionStage->estado_etapa_permiso = 0;
+                    // $permissionStage->update();
                 }
 
                 DB::commit(); // Confirma las operaciones en la base de datos
@@ -133,6 +143,15 @@ class DirectorCentroController extends Controller
         if ($idRol == 15) {
             DB::beginTransaction();
             try {
+                //Desactivamos la etapa anterior
+                $oldStage = EtapaPermiso::where('id_permiso', $permiso->id_permiso)
+                    ->where('estado_etapa_permiso', 1)
+                    ->first();
+                if ($oldStage) {
+                    $oldStage->estado_etapa_permiso = 0;
+                    $oldStage->update();
+                }
+
                 $permissionStage = new EtapaPermiso([
                     'id_empleado'                   => $user->persona->empleado->id_empleado,
                     'id_permiso'                    => $permiso->id_permiso,
@@ -142,7 +161,7 @@ class DirectorCentroController extends Controller
                     'fecha_reg_etapa_permiso'       => Carbon::now(),
                     'usuario_etapa_permiso'         => $request->user()->nick_usuario,
                     'ip_etapa_permiso'              => $request->ip(),
-                    'estado_etapa_permiso'          => 0,
+                    'estado_etapa_permiso'          => 1,
                 ]);
                 $permissionStage->save();
 

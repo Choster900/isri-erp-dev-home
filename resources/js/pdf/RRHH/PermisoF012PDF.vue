@@ -378,7 +378,7 @@ import moment from 'moment';
                     </div>
                 </div>
 
-                <div class="flex w-full justify-between items-center">
+                <div class="flex w-full justify-between items-center mb-[40px]">
                     <div class="flex w-full text-left">
                         <div class="relative flex flex-row w-full ml-[1cm] mr-[1cm] ">
                             <div class="flex justify-start w-[20%]">
@@ -416,176 +416,129 @@ import moment from 'moment';
                         </div>
                     </div>
                 </div>
-
-                <!-- Nineteenth row -->
-                <div class="flex w-full justify-between items-center mt-[40px]">
-                    <div class="flex w-full text-left">
-                        <div class="relative flex flex-row w-full">
-                            <div class="flex justify-start w-[50%] ml-[1cm]">
-                                <label for="" class="font-[MuseoSans] text-[13px] mx-auto mt-[-2px]">
-                                    
+                <!-- First column for signatures. -->
+                <div class="flex justify-between w-full items-center mb-2">
+                    <div class="flex flex-row w-full">
+                        <div class="flex w-1/2 flex-col ml-[1cm]">
+                            <div class="w-full flex items-center justify-center mb-6">
+                                <label for="" class="font-MuseoSans  text-[13px]">
+                                    Empleado:
                                 </label>
                             </div>
-                            <div class="flex justify-start w-[50%] mr-[1cm]">
-                                <label for="" class="font-[MuseoSans] text-[13px] mx-auto mt-[-2px]">
-                                    APROBADO:
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Seventeenth row -->
-                <div class="flex w-full justify-between items-center mt-6">
-                    <div class="flex w-full text-left">
-                        <div class="relative flex flex-row w-full">
-                            <div class="flex justify-start w-[50%]  ml-[1cm]">
-                                <div class="flex justify-start w-[60%]  mx-auto">
-                                    <div class="flex justify-start w-[8%]">
-                                        <label for="" class="font-[MuseoSans] text-[13px] mb-1 mt-[-2px]">
-                                            F.
-                                        </label>
-                                    </div>
-                                    <div class="text-left w-[92%] font-bold text-[13px] border-b border-gray-700">
-                                        <p class="mb-[5px] font-[MuseoSans]">{{ }}</p>
-                                    </div>
+                            <div class="w-[60%] mx-auto flex">
+                                <div class="flex justify-start w-[8%]">
+                                    <label for="" class="font-[MuseoSans] text-[13px] mb-1 mt-[-2px]">
+                                        F.
+                                    </label>
+                                </div>
+                                <div class="text-left w-[92%] font-bold text-[13px] border-b border-gray-700">
+                                    <p class="mb-[5px] font-[MuseoSans]">{{ }}</p>
                                 </div>
                             </div>
-                            <div class="flex justify-start w-[50%]  mr-[1cm]">
-                                <div class="flex justify-start w-[60%]  mx-auto">
-                                    <div class="flex justify-start w-[8%]">
-                                        <label for="" class="font-[MuseoSans] text-[13px] mb-1 mt-[-2px]">
-                                            F.
-                                        </label>
-                                    </div>
-                                    <div class="text-left w-[92%] font-bold text-[13px] border-b border-gray-700">
-                                        <p class="mb-[5px] font-[MuseoSans]">{{ }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Eighteenth row -->
-                <div class="flex w-full justify-between items-center">
-                    <div class="flex w-full text-left">
-                        <div class="relative flex flex-row w-full">
-                            <div class="text-center w-[50%] text-[13px] font-bold ml-[1cm]">
+                            <div class="w-full text-center font-bold text-[13px]">
                                 <p class="font-[MuseoSans] mx-auto">
                                     {{ getName(stages[0]) }}
                                 </p>
                             </div>
-                            <div class="text-center w-[50%] text-[13px] font-bold mr-[1cm]">
+                            <div class="w-full text-center text-[13px]">
                                 <p class="font-[MuseoSans] mx-auto">
-                                    {{ permission.id_tipo_flujo_control === 4 ? getName(stages[2]) : getName(stages[1]) }}
+                                    {{ getLabel(stages[0].persona_etapa.persona_etapa) }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex w-1/2 justify-center flex-col mr-[1cm]">
+                            <div class="w-full flex items-center justify-center mb-6">
+                                <label for="" class="font-MuseoSans  text-[13px]">
+                                    APROBADO:
+                                </label>
+                            </div>
+                            <div class="w-[60%] mx-auto flex">
+                                <div class="flex justify-start w-[8%]">
+                                    <label for="" class="font-[MuseoSans] text-[13px] mb-1 mt-[-2px]">
+                                        F.
+                                    </label>
+                                </div>
+                                <div class="text-left w-[92%] font-bold text-[13px] border-b border-gray-700">
+                                    <p class="mb-[5px] font-[MuseoSans]">{{ }}</p>
+                                </div>
+                            </div>
+                            <div class="w-full text-center font-bold text-[13px]">
+                                <p class="font-[MuseoSans] mx-auto">
+                                    {{ getName(stages[1]) }}
+                                </p>
+                            </div>
+                            <div class="w-full text-center text-[13px]">
+                                <p class="font-[MuseoSans] mx-auto">
+                                    {{ getLabel(stages[1].persona_etapa.persona_etapa) }}
                                 </p>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- Nineteenth row -->
-                <div class="flex w-full justify-between items-center">
-                    <div class="flex w-full text-left">
-                        <div class="relative flex flex-row w-full">
-                            <div class="flex justify-start w-[50%] ml-[1cm]">
-                                <label for="" class="font-[MuseoSans] text-[13px] mx-auto mt-[-2px]">
-                                    Solicitante
-                                </label>
-                            </div>
-                            <div class="flex justify-start w-[50%] mr-[1cm]">
-                                <label for="" class="font-[MuseoSans] text-[13px] mx-auto mt-[-2px]">
-                                    Director y/o Jefe Departamento / Unidad
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Nineteenth row -->
-                <div class="flex w-full justify-between items-center mt-[30px]">
-                    <div class="flex w-full text-center">
-                        <div class="relative flex flex-row w-full mr-[1cm] ml-[1cm]">
-                            <div v-if="permission.id_tipo_flujo_control === 4" class="flex justify-start w-[50%]">
-                                <label for="" class="font-[MuseoSans] text-[13px] mx-auto mt-[-2px]">
+
+                <!-- Second column for signatures. -->
+                <div v-if="stages.length >= 3" class="flex justify-between w-full items-center mb-4">
+                    <div class="flex flex-row w-full items-center justify-center">
+                        <div v-if="stages.length >= 4" class="flex w-1/2 flex-col ml-[1cm]">
+                            <div class="w-full flex items-center justify-center mb-6">
+                                <label for="" class="font-MuseoSans  text-[13px]">
                                     VISTO BUENO:
                                 </label>
                             </div>
-                            <div class="flex justify-center"
-                            :class="permission.id_tipo_flujo_control === 4 ? 'w-[50%]' : 'w-full'">
-                                <label for="" class="font-[MuseoSans] text-[13px] mx-auto mt-[-2px]">
+                            <div class="w-[60%] mx-auto flex">
+                                <div class="flex justify-start w-[8%]">
+                                    <label for="" class="font-[MuseoSans] text-[13px] mb-1 mt-[-2px]">
+                                        F.
+                                    </label>
+                                </div>
+                                <div class="text-left w-[92%] font-bold text-[13px] border-b border-gray-700">
+                                    <p class="mb-[5px] font-[MuseoSans]">{{ }}</p>
+                                </div>
+                            </div>
+                            <div class="w-full text-center font-bold text-[13px]">
+                                <p class="font-[MuseoSans] mx-auto">
+                                    {{ stages.length >= 5 ? getName(stages[3]) : getName(stages[2]) }}
+                                </p>
+                            </div>
+                            <div class="w-full text-center text-[13px]">
+                                <p class="font-[MuseoSans] mx-auto">
+                                    {{ stages.length >= 5 ?
+                                        getLabel(stages[3].persona_etapa.persona_etapa) :
+                                        getLabel(stages[2].persona_etapa.persona_etapa) }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex w-1/2 justify-center flex-col mr-[1cm]">
+                            <div class="w-full flex items-center justify-center mb-6">
+                                <label for="" class="font-MuseoSans  text-[13px]">
                                     AUTORIZADO:
                                 </label>
                             </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Seventeenth row -->
-                <div class="flex w-full justify-between items-center mt-6">
-                    <div class="flex w-full text-left">
-                        <div class="relative flex flex-row w-full  ml-[1cm] mr-[1cm]">
-                            <div v-if="permission.id_tipo_flujo_control === 4" class="flex justify-start w-[50%]">
-                                <div class="flex justify-start w-[60%]  mx-auto">
-                                    <div class="flex justify-start w-[8%]">
-                                        <label for="" class="font-[MuseoSans] text-[13px] mb-1 mt-[-2px]">
-                                            F.
-                                        </label>
-                                    </div>
-                                    <div class="text-left w-[92%] font-bold text-[13px] border-b border-gray-700">
-                                        <p class="mb-[5px] font-[MuseoSans]">{{ }}</p>
-                                    </div>
+                            <div class="w-[60%] mx-auto flex">
+                                <div class="flex justify-start w-[8%]">
+                                    <label for="" class="font-[MuseoSans] text-[13px] mb-1 mt-[-2px]">
+                                        F.
+                                    </label>
+                                </div>
+                                <div class="text-left w-[92%] font-bold text-[13px] border-b border-gray-700">
+                                    <p class="mb-[5px] font-[MuseoSans]">{{ }}</p>
                                 </div>
                             </div>
-                            <div class="flex justify-start"
-                            :class="permission.id_tipo_flujo_control === 4 ? 'w-[50%]' : 'w-full'">
-                                <div class="flex justify-start mx-auto"
-                                :class="permission.id_tipo_flujo_control === 4 ? 'w-[60%]' : 'w-[30%]'">
-                                    <div class="flex justify-start w-[8%]">
-                                        <label for="" class="font-[MuseoSans] text-[13px] mb-1 mt-[-2px]">
-                                            F.
-                                        </label>
-                                    </div>
-                                    <div class="text-left w-[92%] font-bold text-[13px] border-b border-gray-700">
-                                        <p class="mb-[5px] font-[MuseoSans]">{{ }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Eighteenth row -->
-                <div class="flex w-full justify-between items-center">
-                    <div class="flex w-full text-left">
-                        <div class="relative flex flex-row w-full mr-[1cm] ml-[1cm]">
-                            <div v-if="permission.id_tipo_flujo_control === 4" class="text-center w-[50%] text-[13px] font-bold">
+                            <div class="w-full text-center font-bold text-[13px]">
                                 <p class="font-[MuseoSans] mx-auto">
-                                    {{ permission.id_tipo_flujo_control === 4 ? getName(stages[3]) : '' }}
+                                    {{ getName(stages[stages.length - 1]) }}
                                 </p>
                             </div>
-                            <div class="text-center text-[13px] font-bold"
-                            :class="permission.id_tipo_flujo_control === 4 ? 'w-[50%]' : 'w-full'">
+                            <div class="w-full text-center text-[13px]">
                                 <p class="font-[MuseoSans] mx-auto">
-                                    {{ permission.id_tipo_flujo_control === 4 ? getName(stages[4]) : getName(stages[2]) }}
+                                    {{ getLabel(stages[stages.length - 1].persona_etapa.persona_etapa) }}
                                 </p>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- Nineteenth row -->
-                <div class="flex w-full justify-between items-center">
-                    <div class="flex w-full text-left">
-                        <div class="relative flex flex-row w-full mr-[1cm] ml-[1cm]" >
-                            <div v-if="permission.id_tipo_flujo_control === 4" class="flex justify-start w-[50%] ">
-                                <label for="" class="font-[MuseoSans] text-[13px] mx-auto mt-[-2px]">
-                                    Gerente Médico y de Servicios de Rehabilitación
-                                </label>
-                            </div>
-                            <div class="flex justify-start"
-                            :class="permission.id_tipo_flujo_control === 4 ? 'w-[50%]' : 'w-full'">
-                                <label for="" class="font-[MuseoSans] text-[13px] mx-auto mt-[-2px]">
-                                    Gerente Administrativo
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
+
                 <!-- Footer rows -->
                 <div class="flex w-full justify-start items-center mt-4">
                     <div class="flex w-full text-left">
@@ -687,6 +640,12 @@ export default {
         }
     },
     methods: {
+        getLabel(text) {
+            //const text = stage.persona_etapa.persona_etapa;
+            const lowerTxt = text.toLowerCase();
+            const formattedText = lowerTxt.charAt(0).toUpperCase() + lowerTxt.slice(1);
+            return formattedText+'.';
+        },
         formatHour(time) {
             let [hora, minutos] = time.split(':');
             let amPm = parseInt(hora) < 12 ? 'AM' : 'PM';

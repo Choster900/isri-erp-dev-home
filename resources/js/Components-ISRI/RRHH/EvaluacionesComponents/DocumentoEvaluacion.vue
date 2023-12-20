@@ -93,9 +93,7 @@ import { v4 as uuid, v4 } from "uuid";
                                 <span class="mx-auto">{{ data.nombre_cat_rendimiento }}</span>
                                 <span class="text-end pr-8">
                                     PUNTOS: {{
-                                        (responsesWithScores.find(obj => obj.nombre_cat_rendimiento ===
-                                            data.nombre_cat_rendimiento)
-                                            || { puntaje_rubrica_rendimiento: 0 }).puntaje_rubrica_rendimiento
+                                        (responsesWithScores.find(obj => obj.nombre_cat_rendimiento ===data.nombre_cat_rendimiento)|| { puntaje_rubrica_rendimiento: 0 }).puntaje_rubrica_rendimiento
                                     }}
 
                                 </span>

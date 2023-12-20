@@ -33,7 +33,7 @@ class PermisoRequest extends FormRequest
             'destination' => 'required_if:typeOfPermissionId,5',
             'comingBack' => [
                 function ($attribute, $value, $fail) {
-                    if ($value!=0 && $value!=1 && $this->input('periodOfTime') == 1 && $this->input('typeOfPermissionId') == 5) {
+                    if ($value == "" && $this->input('periodOfTime') == 1 && $this->input('typeOfPermissionId') == 5) {
                         $fail('Debe seleccionar.');
                     }
                 },
