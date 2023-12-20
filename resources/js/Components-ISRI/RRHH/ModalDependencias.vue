@@ -172,7 +172,6 @@ export default {
     emits: ["cerrar-modal", "get-table"],
     setup(props, context) {
         const load = ref(true)
-        const urlToSearch = ref('/search-employee')
 
         const { dependencyId } = toRefs(props)
 
@@ -222,7 +221,6 @@ export default {
             baseOptions,
             load,
             errors,
-            urlToSearch,
             depFilter,
             handleSearchChange,
             getInfoForModalDependencias,
