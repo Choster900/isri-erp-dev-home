@@ -257,11 +257,15 @@ class EvaluacionController extends Controller
 
             if ($tipoEvaluacionId == 1) {
                 $plazasAsignadas = PlazaAsignada::with([
-                    'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos'
+                    'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos',
+                    'centro_atencion',
+                    'dependencia',
                 ])->where('id_empleado', $employeeId)->where('id_centro_atencion', $idCentroAtencion)->get();
             } else {
                 $plazasAsignadas = PlazaAsignada::with([
-                    'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos'
+                    'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos',
+                    'centro_atencion',
+                    'dependencia',
                 ])->where('id_empleado', $employeeId)->whereNotIn("id_plaza_asignada", $plazasDosOMasEvaluaciones)
                     ->where('id_centro_atencion', $idCentroAtencion)->get();
             }
@@ -270,11 +274,15 @@ class EvaluacionController extends Controller
             if ($tipoEvaluacionId == 1) {
                 # code...
                 $plazasAsignadas = PlazaAsignada::with([
-                    'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos'
+                    'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos',
+                    'centro_atencion',
+                    'dependencia',
                 ])->where('id_empleado', $employeeId)->where('id_centro_atencion', $idCentroAtencion)->doesntHave("plaza_evaluada")->get();
             } else {
                 $plazasAsignadas = PlazaAsignada::with([
-                    'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos'
+                    'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos',
+                    'centro_atencion',
+                    'dependencia',
                 ])->where('id_empleado', $employeeId)->whereNotIn("id_plaza_asignada", $plazasDosOMasEvaluaciones)
                     ->where('id_centro_atencion', $idCentroAtencion)->get();
             }

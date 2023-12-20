@@ -34,7 +34,7 @@
                     </tr>
                     <tr>
                         <td class="border border-black text-[7pt] font-semibold  py-0.5 px-1.5">
-                            CODIGO: F21 V1.0
+                            CODIGO: {{ evaluacionPersonalProp.data.evaluacion_rendimiento.codigo_evaluacion_rendimiento }}
                         </td>
                     </tr>
                     <tr>
@@ -118,7 +118,7 @@
                                         return plaza.plaza_asignada.detalle_plaza.plaza.salario_base_plaza;
                                     }).join('-') || ''"
                                     class="w-16 text-left text-[7pt] text-sm font-medium capitalize h-5 border-x-0 border-t-0"
-                                    v-if="evaluacionPersonalProp.data.plaza_evaluada.length === 1">
+                                   >
                             </template>
                             <template v-slot:message>
                                 <div class="w-full  mt-6 md:mt-0 overflow-x-auto">
@@ -227,7 +227,7 @@
                             class="w-36 text-left text-[7pt] text-sm font-medium capitalize h-5 border-x-0 border-t-0">
                     </div>
                 </div>
-                <div class="flex items-center justify-between pt-2 gap-2 pb-7">
+                <div class="flex items-center justify-between pt-2 gap-2 pb-4">
                     <div class="flex items-center">
                         <label for="" class="text-[7pt] font-semibold mr-2">JEFE INME:</label>
 
