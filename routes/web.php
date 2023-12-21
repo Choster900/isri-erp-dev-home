@@ -56,3 +56,4 @@ require __DIR__ . '/web/rrhh.php';
 require __DIR__ . '/web/af.php';
 require __DIR__ . '/web/pr.php';
 require __DIR__ . '/web/ts.php';
+require __DIR__ . '/web/jrd.php';
