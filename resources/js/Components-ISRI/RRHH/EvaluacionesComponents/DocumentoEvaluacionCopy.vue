@@ -1,8 +1,7 @@
 
 <template>
     <div class="mx-4 overflow-y-auto h-[550px] py-3 px-2 mb-4 ">
-        <div v-if="rubricaAndCategoriaByEvaluacion && !isLoadingObtenerCategoriaYRubrica">
-
+        <div v-if="rubricaAndCategoriaByEvaluacion && !isLoadingObtenerCategoriaYRubrica && evaluacionPersonalProp">
             <table class="w-full">
                 <tbody>
                     <tr>
@@ -44,7 +43,6 @@
                     </tr>
                 </tbody>
             </table>
-
             <div id="especificaciones">
                 <div class="flex items-center justify-between pt-4 gap-2">
                     <div class="flex items-center">
@@ -117,8 +115,7 @@
                                     .map((plaza, index) => {
                                         return plaza.plaza_asignada.detalle_plaza.plaza.salario_base_plaza;
                                     }).join('-') || ''"
-                                    class="w-16 text-left text-[7pt] text-sm font-medium capitalize h-5 border-x-0 border-t-0"
-                                   >
+                                    class="w-16 text-left text-[7pt] text-sm font-medium capitalize h-5 border-x-0 border-t-0">
                             </template>
                             <template v-slot:message>
                                 <div class="w-full  mt-6 md:mt-0 overflow-x-auto">
@@ -192,7 +189,7 @@
                                     <table class="w-full">
                                         <tr class="text-start">
                                             <th class="py-2" colspan="2">
-                                                <h1 class="text-sm font-medium text-white">Información de salario
+                                                <h1 class="text-sm font-medium text-white">Información de UNIDAD
                                                 </h1>
                                             </th>
                                         </tr>
@@ -207,8 +204,9 @@
                                                                 class="text-white">
                                                                 {{
                                                                     data.plaza_asignada.centro_atencion.nombre_centro_atencion
-                                                                }} - {{ data.plaza_asignada.dependencia.nombre_dependencia
-}}
+                                                                }}
+                                                                -
+                                                                {{ data.plaza_asignada.dependencia.nombre_dependencia }}
                                                             </p>
                                                         </li>
                                                     </ul>
@@ -257,7 +255,7 @@
                                     <table class="w-full">
                                         <tr class="text-start">
                                             <th class="py-2" colspan="2">
-                                                <h1 class="text-sm font-medium text-white">Información de salario
+                                                <h1 class="text-sm font-medium text-white">Información de JEFATURA
                                                 </h1>
                                             </th>
                                         </tr>
@@ -329,7 +327,7 @@
                                     <table class="w-full">
                                         <tr class="text-start">
                                             <th class="py-2" colspan="2">
-                                                <h1 class="text-sm font-medium text-white">Información de salario
+                                                <h1 class="text-sm font-medium text-white">Información de PUESTO DE JEFATURA
                                                 </h1>
                                             </th>
                                         </tr>
@@ -458,9 +456,9 @@
                     </table>
                 </div>
             </div>
-            <button @click="sendResponsesEvaluation">
-                ENVIAR
-            </button>
+            <button @click="guardarYEnviarEvaluacion"
+                class="bg-indigo-900 rounded-sm shadow text-center text-white text-sm font-light w-full py-1 mt-5">
+                TERMINAR EVALUACIÓN (Los datos se guardaran entonces)</button>
         </div>
     </div>
 </template>
@@ -470,6 +468,10 @@ import { useDocumentoEvaluacion } from '@/Composables/RRHH/Evaluaciones/useDocum
 import { ref, toRefs, watch } from 'vue';
 import Tooltip from '@/Components-ISRI/Tooltip.vue';
 import moment from 'moment';
+import Swal from "sweetalert2";
+import { toast } from 'vue3-toastify'
+import { executeRequest } from "@/plugins/requestHelpers.js";
+import 'vue3-toastify/dist/index.css';
 export default {
     components: { Tooltip },
     props: {
@@ -487,7 +489,7 @@ export default {
         },
     },
     setup(props) {
-        const { evaluacionPersonalProp } = toRefs(props)
+        const { evaluacionPersonalProp, rubricaAndCategoriaByEvaluacion } = toRefs(props)
         const { separarTexto, evaluacionPersonal, saveResponseWhenIsClickedCheckbox, optionsSelected, sendResponsesEvaluation, ranges, isScoreInRange } = useDocumentoEvaluacion();
         watch(evaluacionPersonalProp, (newValue, oldValue) => {
             if (newValue) {
@@ -501,11 +503,37 @@ export default {
                         puntaje_rubrica_rendimiento: element.rubrica_rendimiento.puntaje_rubrica_rendimiento
                     })
                 });
-                console.log(optionsSelected.value);
             }
         })
 
+        const guardarYEnviarEvaluacion = async () => {
+            const confirmed = await Swal.fire({
+                title: '<p class="text-[16pt] text-center">¿Esta seguro de enviar la evaluacion?</p>',
+                icon: "question",
+                iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
+                confirmButtonText: "Si, Agregar",
+                confirmButtonColor: "#001b47",
+                cancelButtonText: "Cancelar",
+                showCancelButton: true,
+                showCloseButton: true,
+            });
+            if (confirmed.isConfirmed) {
 
+                if (rubricaAndCategoriaByEvaluacion.value.categorias_rendimiento.length == optionsSelected.value.length) {
+                    let res = null;
+                    res = await executeRequest(
+                        sendResponsesEvaluation(),
+                        "La evaluacion se ha enviado"
+                    );
+                    console.log("HACEMOS ALGO DESPUES");
+                } else {
+                    alert("alerta ");
+
+                }
+                console.log(rubricaAndCategoriaByEvaluacion.value.categorias_rendimiento.length);
+                console.log(optionsSelected.value.length);
+            }
+        };
 
 
 
@@ -514,6 +542,7 @@ export default {
             optionsSelected,
             moment,
             optionsSelected,
+            guardarYEnviarEvaluacion,
             isScoreInRange,
             ranges,
             saveResponseWhenIsClickedCheckbox,

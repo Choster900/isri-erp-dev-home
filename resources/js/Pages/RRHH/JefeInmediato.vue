@@ -466,6 +466,7 @@ export default {
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
                     this.jobPermissions = data.data.data;
+                    //console.log(this.jobPermissions);
                     this.jobPermissions.length > 0 ? this.emptyObject = false : this.emptyObject = true
                 }
             }).catch((errors) => {

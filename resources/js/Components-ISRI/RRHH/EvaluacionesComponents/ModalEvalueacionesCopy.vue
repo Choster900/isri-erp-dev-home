@@ -143,7 +143,7 @@
                                             <template v-slot:message>
                                                 <div class="text-xs text-slate-200">
                                                     <table class="min-w-full w-40 border border-white"
-                                                    v-if="objectPlazas && objectPlazas.length > 0">
+                                                        v-if="objectPlazas && objectPlazas.length > 0">
                                                         <tr>
                                                             <th class="py-0.5 text-[7.5pt] w-36 px-2 border-b">Nombre de la
                                                                 Plaza</th>
@@ -258,10 +258,11 @@
                                                         class="relative text-xs text-slate-500 before:w-[10px] before:h-[10px] before:border-[3px] before:border-indigo-500 before:rounded-full before:absolute before:-left-4 before:top-1">
                                                         Plazas evaluadas</li>
                                                     <p class="font-medium text-xs">
-                                                        <template v-for="(plaza, k) in evaluacion.plaza_evaluada" :key="k">
-                                                            {{ plaza.plaza_asignada.detalle_plaza.plaza.nombre_plaza }}
-                                                        </template>
+                                                        {{ evaluacion.plaza_evaluada.map(plaza =>
+                                                            plaza.plaza_asignada.detalle_plaza.plaza.nombre_plaza).join(' - ')
+                                                        }}
                                                     </p>
+
                                                     <li
                                                         class="relative text-xs text-slate-500 before:w-[10px] before:h-[10px] before:border-[3px] before:border-indigo-500 before:rounded-full before:absolute before:-left-4 before:top-1">
                                                         Formato aplicado</li>
@@ -498,6 +499,8 @@ export default {
                 idCentroAtencion.value = null;
                 idEmpleado.value = null;
                 objectPlazas.value = null;
+                evaluacionToPassDocumento.value = null;
+                rubricaAndCategoriaByEvaluacion.value = [];
             }
         })
 
