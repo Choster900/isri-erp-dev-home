@@ -103,6 +103,7 @@ export const useDependencia = (context) => {
             };
         } catch (error) {
             showErrorMessage(error);
+            context.emit("cerrar-modal")
             return {
                 data: [],
                 isError: true,
