@@ -63,7 +63,8 @@ import axios from 'axios';
                     :inputsToValidate="inputsToValidate" @sort="sortBy" @datos-enviados="handleData($event)"
                     @execute-search="getJobPermissions()">
                     <tbody class="text-sm divide-y divide-slate-200">
-                        <tr v-for="permission in jobPermissions" :key="permission.id_permiso">
+                        <tr v-for="permission in jobPermissions" :key="permission.id_permiso"
+                        class="hover:bg-gray-200">
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 flex items-center justify-center min-h-[50px]">
                                     {{ permission.id_permiso }}

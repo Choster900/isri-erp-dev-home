@@ -7,7 +7,7 @@ import { Head } from "@inertiajs/vue3";
 
 <template>
     <div class="flex h-screen overflow-hidden">
-        <Sidebar :propToChangeStateSidebar="changeState" />
+        <Sidebar :propToChangeStateSidebar="changeState" :color="$page.props.menu.sistema === 'Juridico' ? ' bg-[#343a40] ' : ''"/>
         <div class="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden h-full">
             <HeaderVue @OpenOrCloseModal="changeState = !changeState" :nameSubModule="nameSubModule" />
             <main class="bg-gray-100/50 flex-1">
@@ -36,7 +36,7 @@ export default {
         autoPadding: {//prop muestra estado del modal para abrir y cerrar
             type: Boolean,
             default: true,
-        }
+        },
     }
 }
 </script>

@@ -5,15 +5,17 @@ import DropdownLink from '@/Components/DropdownLink.vue';
 
 </script>
 <template>
-
-    <div id="sidebar" :class="classToSidebar"
-        class="sidebar-style-isri flex flex-col absolute z-40 left-0 top-0 lg:static lg:left-auto lg:top-auto lg:translate-x-0 h-screen overflow-y-scroll shadow-2xl no-scrollbar w-64 lg:w-20 lg:sidebar-expanded:!w-64 2xl:!w-64 shrink-0 bg-[#001c48] p-4 transition-all duration-200 ease-in-out -translate-x-64">
+    <div id="sidebar" :class="{
+        'lg:overflow-y-auto': stateFromSidebar,
+        [color !== '' ? color : 'bg-[#001c48]']: true
+    }"
+        class="sidebar-style-isri flex flex-col absolute z-40 left-0 top-0 lg:static lg:left-auto lg:top-auto lg:translate-x-0 h-screen overflow-y-scroll shadow-2xl no-scrollbar w-64 lg:w-20 lg:sidebar-expanded:!w-64 2xl:!w-64 shrink-0 p-4 transition-all duration-200 ease-in-out -translate-x-64">
         <!-- Sidebar header -->
         <div class="flex justify-center mb-10 pr-3 sm:px-2">
             <!-- Close button -->
             <button @click="propToChangeStateSidebar = !propToChangeStateSidebar"
-                class="lg:hidden text-slate-500 hover:text-slate-400" aria-controls="sidebar"
-                aria-expanded="false"><span class="sr-only">Close sidebar</span>
+                class="lg:hidden text-slate-500 hover:text-slate-400" aria-controls="sidebar" aria-expanded="false"><span
+                    class="sr-only">Close sidebar</span>
                 <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M10.7 18.7l1.4-1.4L7.8 13H20v-2H7.8l4.3-4.3-1.4-1.4L4 12z"></path>
                 </svg>
@@ -24,7 +26,7 @@ import DropdownLink from '@/Components/DropdownLink.vue';
                 <img style="width:200px" src="../../img/logoSidebar.png" alt="GOBIERNO DE EL SALVADOR">
             </DropdownLink>
         </div>
-        <MenuSidebarVue :stateFromSidebarProp="stateFromSidebar" @emitToShowModalFromMenu="changeStateFromSidebar" />
+        <MenuSidebarVue :color="color" :stateFromSidebarProp="stateFromSidebar" @emitToShowModalFromMenu="changeStateFromSidebar" />
         <!-- Expand / collapse button -->
         <div class="pt-3 hidden lg:inline-flex 2xl:hidden justify-end mt-auto">
             <div class="px-3 py-2">
@@ -32,8 +34,8 @@ import DropdownLink from '@/Components/DropdownLink.vue';
                     <span class="sr-only">Expand / collapse sidebar</span>
                     <svg class="w-6 h-6 fill-current" :class="stateFromSidebar ? 'rotate-180' : 'rotate-360'"
                         viewBox="0 0 24 24">
-                        <path class="text-slate-400"
-                            d="M19.586 11l-5-5L16 4.586 23.414 12 16 19.414 14.586 18l5-5H7v-2z"></path>
+                        <path class="text-slate-400" d="M19.586 11l-5-5L16 4.586 23.414 12 16 19.414 14.586 18l5-5H7v-2z">
+                        </path>
                         <path class="text-slate-600" d="M3 23H1V1h2z"></path>
                     </svg>
                 </button>
@@ -44,7 +46,7 @@ import DropdownLink from '@/Components/DropdownLink.vue';
 
 <script>
 export default {
-    props: ["propToChangeStateSidebar"],
+    props: ["propToChangeStateSidebar", "color"],
     data: function () {
         return {
             classToSidebar: "lg:overflow-y-auto ",

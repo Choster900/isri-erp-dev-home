@@ -44,7 +44,7 @@ import axios from 'axios';
                 <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
                     @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getJobPositions()">
                     <tbody class="text-sm divide-y divide-slate-200" v-if="!isLoadinRequest">
-                        <tr v-for="position in jobPositions" :key="position.id_det_plaza">
+                        <tr v-for="position in jobPositions" :key="position.id_det_plaza" class="hover:bg-gray-200">
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 flex items-center justify-center min-h-[50px]">
                                     {{ position.id_puesto_sirhi_det_plaza }}
