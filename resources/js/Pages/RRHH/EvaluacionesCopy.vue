@@ -153,8 +153,9 @@
             </div>
         </div>
 
-        <ModalEvalueacionesVue v-if="listDependencias != ''" :evaluacionPersonalProp="objectEvaluacionPersonal" @actualizar-datatable="getEvaluaciones"
-         :showModal="showModalEvaluacion" @cerrar-modal="showModalEvaluacion = false" :listDependencias="listDependencias" />
+        <ModalEvalueacionesVue v-if="listDependencias != ''" :evaluacionPersonalProp="objectEvaluacionPersonal"
+            @actualizar-datatable="getEvaluaciones" :showModal="showModalEvaluacion"
+            @cerrar-modal="showModalEvaluacion = false; objectEvaluacionPersonal = []" :listDependencias="listDependencias" />
     </AppLayoutVue>
 </template>
 

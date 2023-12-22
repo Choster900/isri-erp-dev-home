@@ -81,4 +81,15 @@ class Empleado extends Model
     {
         return $this->hasOne('App\Models\TipoPension','id_tipo_pension','id_tipo_pension');
     }
+
+    /**
+     * The function "dependencias" returns a collection of "Dependencia" models that are associated
+     * with the current model through the "id_centro_atencion" foreign key.
+     * 
+     * @return HasMany a HasMany relationship with the Dependencia model.
+     */
+    public function finiquitos_empleado(): HasMany
+    {
+        return $this->hasMany(FiniquitoLaboral::class, 'id_empleado', 'id_empleado');
+    }
 }
