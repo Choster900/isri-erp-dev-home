@@ -43,6 +43,7 @@
                     </tr>
                 </tbody>
             </table>
+
             <div id="especificaciones">
                 <div class="flex items-center justify-between pt-4 gap-2">
                     <div class="flex items-center">
