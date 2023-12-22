@@ -49,7 +49,7 @@
                         <label for="" class="text-[7pt] font-semibold mr-2">EMPLEADO:</label>
                         <input type="text"
                             :value="`${evaluacionPersonalProp.allData.persona.pnombre_persona || ''} ${evaluacionPersonalProp.allData.persona.snombre_persona || ''} ${evaluacionPersonalProp.allData.persona.tnombre_persona || ''} ${evaluacionPersonalProp.allData.persona.papellido_persona || ''} ${evaluacionPersonalProp.allData.persona.sapellido_persona || ''} ${evaluacionPersonalProp.allData.persona.tapellido_persona || ''}`"
-                            class="w-56 text-[7pt] text-sm font-medium capitalize h-5 border-x-0 border-t-0">
+                            class="w-44 text-[7pt]  font-medium capitalize h-5 border-x-0 border-t-0">
                     </div>
                     <div class="flex items-center">
                         <label for="" class="text-[7pt] font-semibold mr-2">PUESTO:</label>
@@ -58,7 +58,7 @@
                             .map((plaza, index) => {
                                 return plaza.plaza_asignada.detalle_plaza.plaza.nombre_plaza;
                             }).join('-') || ''"
-                            class="w-64 text-left text-[7pt] text-sm font-medium capitalize h-5 border-x-0 border-t-0"
+                            class="w-72 text-left text-[7pt]  font-medium capitalize h-5 border-x-0 border-t-0"
                             v-if="evaluacionPersonalProp.data.plaza_evaluada.length === 1">
 
                         <Tooltip bg="dark" position="left" :key="weekIndex" v-else>
@@ -67,14 +67,14 @@
                                     .map((plaza, index) => {
                                         return plaza.plaza_asignada.detalle_plaza.plaza.nombre_plaza;
                                     }).join('-') || ''"
-                                    class="w-64 text-left text-[7pt] text-sm font-medium capitalize h-5 border-x-0 border-t-0">
+                                    class="w-72 text-left text-[7pt]  font-medium capitalize h-5 border-x-0 border-t-0">
                             </template>
                             <template v-slot:message>
                                 <div class="w-full  mt-6 md:mt-0 overflow-x-auto">
                                     <table class="w-full">
                                         <tr class="text-start">
                                             <th class="py-2" colspan="2">
-                                                <h1 class="text-sm font-medium text-white">Información de Plazas Asignadas
+                                                <h1 class=" font-medium text-white text-sm">Información de Plazas Asignadas
                                                 </h1>
                                             </th>
                                         </tr>
@@ -106,7 +106,7 @@
                             .map((plaza, index) => {
                                 return plaza.plaza_asignada.detalle_plaza.plaza.salario_base_plaza;
                             }).join('-') || ''"
-                            class="w-16 text-left text-[7pt] text-sm font-medium capitalize h-5 border-x-0 border-t-0"
+                            class="w-16 text-left text-[7pt]  font-medium capitalize h-5 border-x-0 border-t-0"
                             v-if="evaluacionPersonalProp.data.plaza_evaluada.length === 1">
 
                         <Tooltip bg="dark" position="left" :key="weekIndex" v-else>
@@ -115,14 +115,14 @@
                                     .map((plaza, index) => {
                                         return plaza.plaza_asignada.detalle_plaza.plaza.salario_base_plaza;
                                     }).join('-') || ''"
-                                    class="w-16 text-left text-[7pt] text-sm font-medium capitalize h-5 border-x-0 border-t-0">
+                                    class="w-16 text-left text-[7pt]  font-medium capitalize h-5 border-x-0 border-t-0">
                             </template>
                             <template v-slot:message>
                                 <div class="w-full  mt-6 md:mt-0 overflow-x-auto">
                                     <table class="w-full">
                                         <tr class="text-start">
                                             <th class="py-2" colspan="2">
-                                                <h1 class="text-sm font-medium text-white">Información de salario
+                                                <h1 class=" font-medium text-white text-sm">Información de salario
                                                 </h1>
                                             </th>
                                         </tr>
@@ -166,7 +166,7 @@
                                     .map((plaza, index) => {
                                         return plaza.plaza_asignada.centro_atencion.nombre_centro_atencion;
                                     }).join('-') || ''}`"
-                            class="w-32 text-left text-[7pt] text-sm font-medium capitalize h-5 border-x-0 border-t-0"
+                            class="w-32 text-left text-[7pt]  font-medium capitalize h-5 border-x-0 border-t-0"
                             v-if="evaluacionPersonalProp.data.plaza_evaluada.length === 1">
 
                         <Tooltip bg="dark" position="left" :key="weekIndex" v-else>
@@ -182,14 +182,14 @@
                                             .map((plaza, index) => {
                                                 return plaza.plaza_asignada.centro_atencion.nombre_centro_atencion;
                                             }).join('-') || ''}`"
-                                    class="w-32 text-left text-[7pt] text-sm font-medium capitalize h-5 border-x-0 border-t-0">
+                                    class="w-32 text-left text-[7pt]  font-medium capitalize h-5 border-x-0 border-t-0">
                             </template>
                             <template v-slot:message>
                                 <div class="w-full  mt-6 md:mt-0 overflow-x-auto">
                                     <table class="w-full">
                                         <tr class="text-start">
                                             <th class="py-2" colspan="2">
-                                                <h1 class="text-sm font-medium text-white">Información de UNIDAD
+                                                <h1 class=" font-medium text-white text-sm">Información de UNIDAD
                                                 </h1>
                                             </th>
                                         </tr>
@@ -222,7 +222,7 @@
                         <label for="" class="text-[7pt] font-semibold mr-2">PERIODO COMPRENDIDO:</label>
                         <input type="text"
                             :value="evaluacionPersonalProp.data.periodo_evaluacion.id_periodo_evaluacion == 1 ? `ENERO A JUNIO ${moment(evaluacionPersonalProp.data.fecha_evaluacion_personal).format('YYYY')}` : `JULIO A DICIEMBRE ${moment(evaluacionPersonalProp.data.fecha_evaluacion_personal).format('YYYY')}`"
-                            class="w-36 text-left text-[7pt] text-sm font-medium capitalize h-5 border-x-0 border-t-0">
+                            class="w-36 text-left text-[7pt]  font-medium capitalize h-5 border-x-0 border-t-0">
                     </div>
                 </div>
                 <div class="flex items-center justify-between pt-2 gap-2 pb-4">
@@ -235,7 +235,7 @@
                                 .map((plaza, index) => {
                                     return `${plaza.plaza_asignada.dependencia.jefatura?.pnombre_persona || ''} ${plaza.plaza_asignada.dependencia.jefatura?.snombre_persona || ''} ${plaza.plaza_asignada.dependencia.jefatura?.tnombre_persona || ''} ${plaza.plaza_asignada.dependencia.jefatura?.papellido_persona || ''} ${plaza.plaza_asignada.dependencia.jefatura?.sapellido_persona || ''} ${plaza.plaza_asignada.dependencia.jefatura?.tapellido_persona || ''}`;
                                 }).join('-') || ''"
-                            class="w-40 text-left text-[7pt] text-sm font-medium capitalize h-5 border-x-0 border-t-0"
+                            class="w-40 text-left text-[7pt]  font-medium capitalize h-5 border-x-0 border-t-0"
                             v-if="evaluacionPersonalProp.data.plaza_evaluada.length === 1">
 
                         <Tooltip bg="dark" position="right" :key="weekIndex" v-else>
@@ -248,14 +248,14 @@
                                         .map((plaza, index) => {
                                             return `${plaza.plaza_asignada.dependencia.jefatura?.pnombre_persona || ''} ${plaza.plaza_asignada.dependencia.jefatura?.snombre_persona || ''} ${plaza.plaza_asignada.dependencia.jefatura?.tnombre_persona || ''} ${plaza.plaza_asignada.dependencia.jefatura?.papellido_persona || ''} ${plaza.plaza_asignada.dependencia.jefatura?.sapellido_persona || ''} ${plaza.plaza_asignada.dependencia.jefatura?.tapellido_persona || ''}`;
                                         }).join('-') || ''"
-                                    class="w-40 text-left text-[7pt] text-sm font-medium capitalize h-5 border-x-0 border-t-0">
+                                    class="w-40 text-left text-[7pt]  font-medium capitalize h-5 border-x-0 border-t-0">
                             </template>
                             <template v-slot:message>
                                 <div class="w-full  mt-6 md:mt-0 overflow-x-auto">
                                     <table class="w-full">
                                         <tr class="text-start">
                                             <th class="py-2" colspan="2">
-                                                <h1 class="text-sm font-medium text-white">Información de JEFATURA
+                                                <h1 class=" font-medium text-white text-sm">Información de JEFATURA
                                                 </h1>
                                             </th>
                                         </tr>
@@ -307,7 +307,7 @@
                                         return plaza.detalle_plaza.plaza.nombre_plaza
                                     })
                                 }).join('-') || ''"
-                            class="w-72 text-left text-[7pt] text-sm font-medium capitalize h-5 border-x-0 border-t-0"
+                            class="w-72 text-left text-[7pt]  font-medium capitalize h-5 border-x-0 border-t-0"
                             v-if="evaluacionPersonalProp.data.plaza_evaluada.length === 1">
 
                         <Tooltip bg="dark" position="left" :key="weekIndex" v-else>
@@ -320,14 +320,14 @@
                                                 return plaza.detalle_plaza.plaza.nombre_plaza
                                             })
                                         }).join('-') || ''"
-                                    class="w-72 text-left text-[7pt] text-sm font-medium capitalize h-5 border-x-0 border-t-0">
+                                    class="w-72 text-left text-[7pt]  font-medium capitalize h-5 border-x-0 border-t-0">
                             </template>
                             <template v-slot:message>
                                 <div class="w-full  mt-6 md:mt-0 overflow-x-auto">
                                     <table class="w-full">
                                         <tr class="text-start">
                                             <th class="py-2" colspan="2">
-                                                <h1 class="text-sm font-medium text-white">Información de PUESTO DE JEFATURA
+                                                <h1 class=" font-medium text-white text-sm">Información de PUESTO DE JEFATURA
                                                 </h1>
                                             </th>
                                         </tr>
@@ -361,7 +361,7 @@
                         <label for="" class="text-[7pt] font-semibold mr-2">PUNTAJE TOTAL:</label>
                         <input type="text"
                             :value="optionsSelected.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0)"
-                            class="w-12 text-left text-[9pt] text-sm font-medium capitalize h-5 border-x-0 border-t-0">
+                            class="w-12 text-left text-[9pt]  font-medium capitalize h-5 border-x-0 border-t-0">
                     </div>
                 </div>
             </div>

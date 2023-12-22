@@ -18,14 +18,17 @@
         @vite(['resources/js/app.js', "resources/js/Pages/{$page['component']}.vue"])
         @inertiaHead
     </head>
-    <body class="font-sans antialiased">
+    <body c
+    lass="font-sans antialiased">
+        {{-- Comment this code for take of snow --}}
+        <script defer src="https://app.embed.im/snow.js"></script>
         @inertia
     </body>
-    <!--       
+    <!--
                   _
               .__(.)< (MEOW)
-               \___)   
+               \___)
            ~~~~~~~~~~~~~~~~~~
        -->
-   
+
 </html>
