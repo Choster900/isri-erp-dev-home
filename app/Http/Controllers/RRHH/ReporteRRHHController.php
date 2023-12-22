@@ -20,7 +20,7 @@ class ReporteRRHHController extends Controller
     {
         $dependencies = Dependencia::selectRaw("id_dependencia as value, concat(nombre_dependencia,' (',codigo_dependencia,')') as label, id_centro_atencion, codigo_dependencia")
             ->where('estado_dependencia', 1)->get();
-        $mainCenters = CentroAtencion::selectRaw("id_centro_atencion as value, concat(nombre_centro_atencion,' (',codigo_centro_atencion,' )') as label, codigo_centro_atencion")
+        $mainCenters = CentroAtencion::selectRaw("id_centro_atencion as value, concat(nombre_centro_atencion,' (',codigo_centro_atencion,')') as label, codigo_centro_atencion")
             ->where('estado_centro_atencion', 1)->get();
         // Agregar el elemento al inicio de la colección
         $mainCenters->prepend(['value' => 0, 'label' => 'TODOS LOS CENTROS']);

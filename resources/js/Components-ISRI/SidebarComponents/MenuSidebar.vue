@@ -8,7 +8,7 @@
                 <span v-else class="lg:sidebar-expanded:block 2xl:block">Modulos</span>
             </h3>
             <ul class="mt-3">
-                <ModulesVue v-for="(datos, j) in $page.props.menu.urls" :key="j" :modulo="datos"
+                <ModulesVue :color="color" v-for="(datos, j) in $page.props.menu.urls" :key="j" :modulo="datos"
                     :StateFromModal="stateFromSidebarProp"
                     @emitToShowSidebarFromModules="this.$emit('emitToShowModalFromMenu')" />
             </ul>
@@ -19,7 +19,7 @@
 <script>
 import ModulesVue from "./Modules.vue";
 export default {
-    props: ["stateFromSidebarProp"],
+    props: ["stateFromSidebarProp","color"],
     components: { ModulesVue },
 };
 </script>

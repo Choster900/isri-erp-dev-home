@@ -9,7 +9,6 @@ import MenuSidebarVue from '@/Components-ISRI/SidebarComponents/MenuSidebar.vue'
     <header class="sticky top-0 bg-white border-b border-slate-200 z-30">
         <div class="px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16 -mb-px">
-
                 <!-- Header: Left side -->
                 <div class="flex">
                     <!-- Hamburger button -->

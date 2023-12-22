@@ -104,46 +104,52 @@ class EvaluacionController extends Controller
             'draw' => $request->input('draw'),
         ];
     }
-    // Metodo de busqueda de usuarios
+
     function searchEmployeesForNewEvaluationRequest(Request $request)
     {
+        $idPersona = $request->user()->id_persona;
 
-        $query = Persona::query();
-
-        if (!empty($request->nombre)) {
-            $query->with([
-                'empleado' => function ($query) {
-                    $query->where('estado_empleado', 1); // Traemos los empleados que esten activos
-                },
-                'empleado.evaluaciones_personal',
-                'empleado.plazas_asignadas'
-            ]);
-            $query->orWhere(function ($query) use ($request) {
-                $query->whereRaw("MATCH ( pnombre_persona,
-                 snombre_persona,
-                  tnombre_persona, 
-                  papellido_persona,
-                   sapellido_persona,
-                    tapellido_persona )
-                     AGAINST ( '" . $request->nombre . "')");
-            });
-            $query->whereHas("empleado") // Las personas que esten en la tabla de empleados
-                ->doesntHave("empleado.evaluaciones_personal"); // Los empleados que no tengan evaluaciones
-        }
-        $results = $query->get();
+        $results = Persona::with([
+            'empleado' => function ($query) {
+                $query->where('estado_empleado', 1); // Empleados activos
+            },
+            'empleado.evaluaciones_personal',
+            'empleado.plazas_asignadas' => function ($query) use ($idPersona) {
+                $query->whereHas('dependencia', function ($query) use ($idPersona) {
+                    $query->where('id_persona', $idPersona);
+                });
+            },
+            'dependencias' // Agrega cualquier otra relación que necesites
+        ])
+            ->whereHas('empleado', function ($query) use ($idPersona) {
+                $query->where('estado_empleado', 1)
+                    ->whereHas('plazas_asignadas', function ($query) use ($idPersona) {
+                        $query->whereHas('dependencia', function ($query) use ($idPersona) {
+                            $query->where('id_persona', $idPersona);
+                        });
+                    });
+            })
+            ->where(function ($query) use ($request) {
+                $query->whereRaw(
+                    "MATCH ( pnombre_persona, snombre_persona, tnombre_persona, papellido_persona, sapellido_persona, tapellido_persona ) AGAINST ( '" . $request->nombre . "')"
+                );
+            })
+            ->whereDoesntHave('empleado.evaluaciones_personal')
+            ->get();
 
         $formattedResults = $results->map(function ($item) {
             return [
                 'value'           => $item->id_persona,
                 'label'           => $item->pnombre_persona . ' ' . ($item->snombre_persona ?? '') . ' ' . ($item->tnombre_persona ?? '') . ' ' . ($item->papellido_persona ?? '') . ' ' . ($item->sapellido_persona ?? '') . ' ' . ($item->tapellido_persona ?? ''),
                 'allDataPersonas' => $item
-                /* 'disabled' => true */
             ];
         });
 
         return response()->json($formattedResults);
     }
 
+
+  
 
     function getPlazaAsignadaByUserAndDependencia(Request $request)
     {
@@ -195,13 +201,13 @@ class EvaluacionController extends Controller
                 if ($tipoEvaluacionId == 1) {
 
                     return response()->json([
-                        "error" => "Las fechas no .",
+                        "error"           => "Las fechas no .",
                         "mensaje_periodo" => 'Las evaluaciones de desempeño deben estar dentro del primer periodo (del 1 de enero al 30 de junio) o del segundo periodo (del 1 de julio al 31 de diciembre).',
                     ], 422);
                 } else {
 
                     return response()->json([
-                        "error" => "Las fechas no .",
+                        "error"           => "Las fechas no .",
                         "mensaje_periodo" => 'Las evaluaciones de periodo de prueba deben tener un rango máximo de 3 meses.',
                     ], 422);
                 }
@@ -215,7 +221,7 @@ class EvaluacionController extends Controller
         } else {
             // Caso en que no se proporcionaron fechas - Devolver error 422
             return response()->json([
-                "error" => "No se proporcionaron fechas.",
+                "error"           => "No se proporcionaron fechas.",
                 "mensaje_periodo" => 'No se proporcionaron fechas',
             ], 422);
         }
@@ -318,7 +324,7 @@ class EvaluacionController extends Controller
             "plazasAsignadas"                 => $plazasAsignadas,
             "evaluacionRendimiento"           => $evaluacionRendimiento,
             'cantidadEvaluacionesRendimiento' => $cantidadEvaluacionesRendimiento,
-            "mensaje_debug" => $mensaje_debug
+            "mensaje_debug"                   => $mensaje_debug
         ];
     }
 
@@ -513,6 +519,16 @@ class EvaluacionController extends Controller
                 DetalleEvaluacionPersonal::updateOrInsert($conditions, $detalleEvaluacionPersonal);
             }
 
+            $collection = collect($request->responseRendimiento);
+            $totalPuntajes = $collection->sum('puntaje_rubrica_rendimiento');
+
+            EvaluacionPersonal::where("id_evaluacion_personal", $request->idEvaluacionPersonal)->update([
+                'puntaje_evaluacion_personal'   => $totalPuntajes,
+                'fecha_mod_evaluacion_personal' => Carbon::now(),
+            ]);
+
+
+
             // Confirmar la transacción
             DB::commit();
 
@@ -523,7 +539,7 @@ class EvaluacionController extends Controller
             DB::rollBack();
 
             // Manejar el caso de que no se encuentre la evaluación personal o de rendimiento
-            return response()->json(['error' => 'Evaluación no encontrada', "realError" =>  $e], 404);
+            return response()->json(['error' => 'Evaluación no encontrada', "realError" => $e], 404);
         }
     }
 

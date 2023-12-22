@@ -1,6 +1,7 @@
 <template>
     <table class="table-auto w-full editor_listing_table ">
-        <thead class="text-xs font-semibold uppercase  text-white bg-[#001c48] border-t border-b border-slate-200">
+        <thead class="text-xs font-semibold uppercase  text-white border-t border-b border-slate-200"
+        :class="$page.props.menu.sistema === 'Juridico' ? 'bg-[#3c4557]' : 'bg-[#001c48]'">
             <tr>
                 <th v-for="column in columns" :key="column.name" @click="$emit('sort', column.name)"
                     :class="sortKey === column.name ? (sortOrders[column.name] > 0 ? 'sorting_asc' : 'sorting_desc') : 'sorting'"
@@ -36,7 +37,8 @@
                         </div>
                         <div v-else>
                             <select @change="sendData($event)" :id="column.name" ref="myInput" class="appearance-none"
-                                style="appearance: none; -webkit-appearance: none; -moz-appearance: none;">
+                                style="appearance: none; -webkit-appearance: none; -moz-appearance: none;"
+                                :style = "staticSelect ? 'width: 100px;' : 'width: 100%;'">
                                 <option value=""></option>
                                 <option v-for="(option, i) in column.options " :key="i" :value="option.value">{{
                                     option.label }}
@@ -74,6 +76,10 @@ export default {
         inputsToValidate: {
             type: Array,
             default: []
+        },
+        staticSelect: {
+            type: Boolean,
+            defeault: true
         }
     },
     data: function () {
@@ -140,7 +146,6 @@ input.tabla[type="date"] {
 }
 
 select {
-    width: 100px;
     height: 28px;
     line-height: 28px;
     border-radius: 30px;

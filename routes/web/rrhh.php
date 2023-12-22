@@ -122,9 +122,14 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('evaluaciones', [EvaluacionController::class, 'getEvaluaciones'])->name('evaluaciones.getEvaluaciones');
     Route::post('getAllPlazasByEmployeeIdAndDependenciaId', [EvaluacionController::class, 'getPlazaAsignadaByUserAndDependencia'])->name('evaluaciones.getPlazaAsignadaByUser');
 
-    Route::get('getAllDependencias', function () {
-        return CentroAtencion::with("dependencias")->get();
-    })->name('expediente.deleteArchivoAnexoById');
+    Route::get('getAllDependencias', function (Request $request) {
+        $idPersona = $request->user()->id_persona;
+        return CentroAtencion::whereHas('dependencias', function ($query) use ($idPersona) {
+            $query->where('id_persona', $idPersona);
+        })->get();
+    })->name('evaluaciones.getAllDependencias');
+
+
     Route::post('search-employees-for-evaluations', [EvaluacionController::class, 'searchEmployeesForNewEvaluationRequest'])->name('evaluaciones.search-employees');
     Route::post('create-new-evaluacion', [EvaluacionController::class, 'createNewEvaluation'])->name('evaluaciones.new-evaluacion');
     Route::post('get-evaluacion', [EvaluacionController::class, 'getPersonalPerformanceEvaluationVersion'])->name('evaluaciones.get-evaluacion');

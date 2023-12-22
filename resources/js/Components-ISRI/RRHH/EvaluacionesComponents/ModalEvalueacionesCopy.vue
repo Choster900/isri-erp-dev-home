@@ -3,6 +3,7 @@
     <div class="m-1.5">
         <!-- Componente del modal ProcessModal -->
         <ProcessModal maxWidth="6xl" :show="showModal" @close="$emit('cerrar-modal')">
+
             <div class="flex flex-col md:flex-row  ">
                 <div class="w-full md:w-2/6 bg-slate-200/40 p-3 border">
                     <div class="col-span-full xl:col-span-6 bg-white shadow-lg  border border-slate-300 ">
@@ -36,6 +37,7 @@
                             <InputError class="mt-2 px-2"
                                 :message="errorsData && errorsData.idTipoEvaluacion ? errorsData.idTipoEvaluacion : ''" />
                             <div class="-mx-3 flex">
+
                                 <div class="mb-1 px-3 w-full">
                                     <div class="mb-1 md:mr-0 md:mb-0 basis-1/2">
                                         <label class="block text-gray-700 text-xs font-medium mb-1" for="name">Fecha [Desde
@@ -143,7 +145,7 @@
                                             <template v-slot:message>
                                                 <div class="text-xs text-slate-200">
                                                     <table class="min-w-full w-40 border border-white"
-                                                    v-if="objectPlazas && objectPlazas.length > 0">
+                                                        v-if="objectPlazas && objectPlazas.length > 0">
                                                         <tr>
                                                             <th class="py-0.5 text-[7.5pt] w-36 px-2 border-b">Nombre de la
                                                                 Plaza</th>
@@ -168,7 +170,7 @@
                                     </div>
                                     <div class="relative flex h-8 w-full flex-row-reverse ">
                                         <Multiselect :filter-results="false" :resolve-on-load="false" :delay="1000"
-                                            v-model="idEvaluacionRendimiento" :disabled="!showPlazasModal"
+                                            v-model="idEvaluacionRendimiento" :disabled="!showPlazasModal" @clear="objectPlazas = []"
                                             :searchable="true" :clear-on-search="true" :min-chars="5"
                                             placeholder="Evaluaciones" :classes="{
                                                 placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
@@ -191,6 +193,8 @@
                                         :close-on-select="false" v-model="objectPlazas" @select="handleTagToSelect"
                                         noOptionsText="<p class='text-xs'>No hay resultado de plaza<p>"
                                         noResultsText="<p class='text-xs'>Vacio <p>" :classes="{
+                                            tags: 'flex-grow flex-shrink flex flex-wrap items-center mt-1 pl-2 min-w-0 rtl:pl-0 rtl:pr-2',
+                                            tag: 'bg-[#0d2141] text-white text-[0.675rem] font-[300px] py-0.5 pl-2 rounded mr-1 mb-1 flex items-center  min-w-0 rtl:pl-0 rtl:pr-2 rtl:mr-0 rtl:ml-1',
                                             containerDisabled: 'cursor-default bg-gray-100',
                                             wrapper: 'relative mx-auto w-full flex items-center justify-end box-border cursor-pointer outline-none',
                                             container: 'text-xs relative mx-auto w-full flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none',
@@ -258,10 +262,11 @@
                                                         class="relative text-xs text-slate-500 before:w-[10px] before:h-[10px] before:border-[3px] before:border-indigo-500 before:rounded-full before:absolute before:-left-4 before:top-1">
                                                         Plazas evaluadas</li>
                                                     <p class="font-medium text-xs">
-                                                        <template v-for="(plaza, k) in evaluacion.plaza_evaluada" :key="k">
-                                                            {{ plaza.plaza_asignada.detalle_plaza.plaza.nombre_plaza }}
-                                                        </template>
+                                                        {{ evaluacion.plaza_evaluada.map(plaza =>
+                                                            plaza.plaza_asignada.detalle_plaza.plaza.nombre_plaza).join(' - ')
+                                                        }}
                                                     </p>
+
                                                     <li
                                                         class="relative text-xs text-slate-500 before:w-[10px] before:h-[10px] before:border-[3px] before:border-indigo-500 before:rounded-full before:absolute before:-left-4 before:top-1">
                                                         Formato aplicado</li>
@@ -327,11 +332,14 @@
                         </div>
 
                     </div>
+
                     <DocumentoEvaluacionCopy :isLoadingObtenerCategoriaYRubrica="isLoadingObtenerCategoriaYRubrica"
                         :evaluacionPersonalProp="evaluacionToPassDocumento"
                         :rubricaAndCategoriaByEvaluacion="rubricaAndCategoriaByEvaluacion" />
 
                 </div>
+
+
                 <ModalAlert id="danger-modal" :modalOpen="showMessageAlert">
                     <div class="p-5 flex space-x-4">
                         <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-orange-100">
@@ -410,94 +418,39 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const selectedDates = ref([]);
-        const dangerModalOpen = ref(false);
-        const evaluacionPersonal = ref(null);
         const { evaluacionPersonalProp, listDependencias, showModal } = toRefs(props);
-        const evaluacionToPassDocumento = ref(null);
         const {
             idEmpleado, errorsData,
-            activeIndex, objectPlazas,
             messageAlert, handleAccept,
             handleCancel, plazaOptions,
-            showPlazasModal, existMoreThanOne,
-            showMessageAlert, idTipoEvaluacion,
-            idCentroAtencion, doesntExistResult,
             handleTagToSelect, evaluationsOptions,
             objectEvaluaciones, fechaInicioFechafin,
-            handleEmployeeSearch, idEvaluacionRendimiento,
-            loadingEvaluacionRendimiento, createPersonalEvaluationRequest, getPlazasByEmployeeIdAndCentroAtencionId,
+            showPlazasModal, existMoreThanOne, clearLock,
+            showMessageAlert, idTipoEvaluacion, selectedEmpleadoValue,
+            handleEmployeeSearch, idEvaluacionRendimiento, opcionEmpleado,
+            idCentroAtencion, doesntExistResult, evaluacionesAgrupadasPorAño,
+            activeIndex, objectPlazas, evaluacionPersonal, evaluacionToPassDocumento,
+            loadingEvaluacionRendimiento, createPersonalEvaluationRequest, getPlazasByEmployeeIdAndCentroAtencionId, configSecondInput,
         } = useEvaluacion();
 
-        const { obtenerCategoriaYRubricaRendimiento,
+        const {
+            rubricaAndCategoriaByEvaluacion,
             isLoadingObtenerCategoriaYRubrica,
-            rubricaAndCategoriaByEvaluacion, } = useDocumentoEvaluacion()
-        const configSecondInput = ref({
-            mode: 'range',
-            wrap: true,
-            altInput: true,
-            minDate: '',
-            maxDate: '',
-            altFormat: 'M j, Y',
-            dateFormat: 'Y-m-d',
-            weekNumbers: true,
-            ordinal: function () {
-                return "º";
-            },
-            disableMobile: 'true',
-            locale: {
-                rangeSeparator: ' a ',
-                firstDayOfWeek: 1,
-                weekdays: {
-                    shorthand: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
-                    longhand: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
-                },
-                months: {
-                    shorthand: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-                    longhand: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-                },
-            },
-            onChange: function (selectedDates, dateStr, instance) {
-                if (idTipoEvaluacion.value == 1) {
-                    // Verifica en qué rango de fechas se encuentra la primera fecha seleccionada
-                    if (selectedDates.length === 1) {
-                        /* const firstDate = selectedDates[0];
-                        const january1 = new Date(firstDate.getFullYear(), 0, 1);
-                        const june30 = new Date(firstDate.getFullYear(), 5, 30);
-                        const july1 = new Date(firstDate.getFullYear(), 6, 1);
-                        const december31 = new Date(firstDate.getFullYear(), 11, 31);
-
-                        if (firstDate >= january1 && firstDate <= june30) {
-                            // Si la fecha está entre enero 1 y junio 30
-                            instance.set('minDate', january1);
-                            instance.set('maxDate', june30);
-                        } else if (firstDate >= july1 && firstDate <= december31) {
-                            // Si la fecha está entre julio 1 y diciembre 31
-                            instance.set('minDate', july1);
-                            instance.set('maxDate', december31);
-                        } */
-                    } else {
-                        getPlazasByEmployeeIdAndCentroAtencionId()
-                    }
-                } else {
-                    /* const firstDate = selectedDates[0];
-                    const maxDate = new Date(
-                        firstDate.getFullYear(),
-                        firstDate.getMonth() + 3,
-                        firstDate.getDate()
-                    );
-                    instance.set('maxDate', maxDate); */
-                    getPlazasByEmployeeIdAndCentroAtencionId()
-                }
-            },
-
-        });
+            obtenerCategoriaYRubricaRendimiento,
+        } = useDocumentoEvaluacion()
 
         watch(showModal, (newValue, oldValue) => {
             if (!newValue) {
-                idCentroAtencion.value = null;
                 idEmpleado.value = null;
                 objectPlazas.value = null;
+                idCentroAtencion.value = null;
+                evaluacionToPassDocumento.value = null;
+                rubricaAndCategoriaByEvaluacion.value = [];
+                plazaOptions.value = [];
+                showPlazasModal.value = false;
+                evaluationsOptions.value = []
+                idEvaluacionRendimiento.value = null;
+                fechaInicioFechafin.value = null;
             }
         })
 
@@ -513,78 +466,6 @@ export default {
                 evaluacionPersonal.value = null;
             }
         })
-
-        /**
-         * Propiedad computada que genera un objeto con un array para obtener el id y el nombre de la persona seleccionada 
-         * Esto se usa cuando estamos editando y queremos setear el id de la persona actual
-         */
-        const selectedEmpleadoValue = computed(() => {
-            if (evaluacionPersonal.value &&
-                evaluacionPersonal.value.evaluaciones_personal &&
-                evaluacionPersonal.value.evaluaciones_personal.length > 0) {
-
-                idEmpleado.value = evaluacionPersonal.value.persona.id_persona
-                return evaluacionPersonal.value.persona.id_persona
-            } else {
-                idEmpleado.value = null
-                return null;
-            }
-        });
-
-        const opcionEmpleado = computed(() => {
-            let objectPersonaOption = [];
-            if (
-                evaluacionPersonal.value &&
-                evaluacionPersonal.value.evaluaciones_personal &&
-                evaluacionPersonal.value.evaluaciones_personal.length > 0
-            ) {
-
-                objectPersonaOption = evaluacionPersonal.value.persona ? [
-                    {
-                        value: evaluacionPersonal.value.persona.id_persona,
-                        label: `${evaluacionPersonal.value.persona.pnombre_persona || ''} ${evaluacionPersonal.value.persona.snombre_persona || ''} ${evaluacionPersonal.value.persona.tnombre_persona || ''}  ${evaluacionPersonal.value.persona.papellido_persona || ''}  ${evaluacionPersonal.value.persona.sapellido_persona || ''}  ${evaluacionPersonal.value.persona.tapellido_persona || ''}`
-                    }] : [];
-                return objectPersonaOption; // Corregir aquí: evaluacionPersonal.value.persona en lugar de evaluacionPersonal.persona
-            } else {
-                return null;
-            }
-        });
-
-
-
-        const evaluacionesAgrupadasPorAño = computed(() => {
-            const evaluacionesAgrupadas = {};
-            // Verificar si evaluacionPersonal tiene evaluaciones_personal y no está vacío
-            if (
-                evaluacionPersonal.value &&
-                evaluacionPersonal.value.evaluaciones_personal &&
-                evaluacionPersonal.value.evaluaciones_personal.length > 0
-            ) {
-                evaluacionPersonal.value.evaluaciones_personal.forEach(evaluacion => {
-                    const year = moment(evaluacion.fecha_inicio_evaluacion_personal).year();
-                    // Verificar si ya existe una entrada para ese año
-                    if (!evaluacionesAgrupadas[year]) {
-                        evaluacionesAgrupadas[year] = {
-                            year: year,
-                            allContent: evaluacionPersonal.value,
-                            evaluaciones: [],
-                        };
-                    }
-                    // Agregar la evaluación al arreglo correspondiente al año
-                    evaluacionesAgrupadas[year].evaluaciones.push(evaluacion);
-                    activeIndex.value = moment(evaluacionPersonal.value.evaluaciones_personal[0].fecha_inicio_evaluacion_personal).year().toString();
-                });
-            }
-            return evaluacionesAgrupadas;
-        });
-
-        const clearLock = () => {
-            selectedDates.value = [];
-            configSecondInput.value.minDate = null;
-            configSecondInput.value.maxDate = null;
-            fechaInicioFechafin.value = null;
-            toast.info('Reinicio de filtros');
-        }
 
         const createEvaluationPersona = async () => {
             const confirmed = await Swal.fire({
@@ -607,47 +488,33 @@ export default {
                 emit("actualizar-datatable")
             }
         };
+
         return {
             moment,
-            evaluacionToPassDocumento,
-            clearLock,
             errorsData,
-            activeIndex,
-            activeIndex,
-            handleAccept,
-            handleCancel,
             objectPlazas,
-            messageAlert,
-            selectedEmpleadoValue,
             plazaOptions,
-            selectedDates,
-            dangerModalOpen,
-            obtenerCategoriaYRubricaRendimiento,
-            showPlazasModal,
-            showMessageAlert,
-            isLoadingObtenerCategoriaYRubrica,
-            rubricaAndCategoriaByEvaluacion,
-            listDependencias,
-            existMoreThanOne,
-            idTipoEvaluacion,
-            configSecondInput,
-            handleTagToSelect,
-            doesntExistResult,
             opcionEmpleado,
+            showMessageAlert,
+            listDependencias,
+            configSecondInput,
             evaluacionPersonal,
-            objectEvaluaciones,
-            evaluacionPersonal,
-            evaluationsOptions,
-            fechaInicioFechafin,
             handleEmployeeSearch,
-            createEvaluationPersona,
-            idEvaluacionRendimiento,
+            activeIndex, activeIndex,
+            handleAccept, handleCancel,
             evaluacionesAgrupadasPorAño,
-            evaluacionesAgrupadasPorAño,
-            idEmpleado, idCentroAtencion,
-            loadingEvaluacionRendimiento,
-            createPersonalEvaluationRequest,
+            existMoreThanOne, idTipoEvaluacion,
+            messageAlert, selectedEmpleadoValue,
+            evaluacionToPassDocumento, clearLock,
+            handleTagToSelect, doesntExistResult,
+            evaluacionPersonal, objectEvaluaciones,
+            evaluationsOptions, fechaInicioFechafin,
             getPlazasByEmployeeIdAndCentroAtencionId,
+            createEvaluationPersona, idEvaluacionRendimiento,
+            obtenerCategoriaYRubricaRendimiento, showPlazasModal,
+            evaluacionesAgrupadasPorAño, idEmpleado, idCentroAtencion,
+            loadingEvaluacionRendimiento, createPersonalEvaluationRequest,
+            isLoadingObtenerCategoriaYRubrica, rubricaAndCategoriaByEvaluacion,
         }
     }
 

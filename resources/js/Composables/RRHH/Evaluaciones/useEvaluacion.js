@@ -2,7 +2,7 @@ import axios from "axios";
 import moment from "moment";
 import { computed, ref, watch } from "vue";
 /**
- * 
+ *
  * @returns data
  */
 export const useEvaluacion = () => {
@@ -35,6 +35,10 @@ export const useEvaluacion = () => {
     const centrosPosibleOptionsDataCopy = ref([]);
     const flagTrueOrFalse = ref(true);
 
+    const evaluacionPersonal = ref(null);
+    const evaluacionToPassDocumento = ref(null);
+
+    const optionToShowIntoDocument = ref(null);
     /**
      * Busca empleados por nombre para evaluaciones.
      *
@@ -51,7 +55,7 @@ export const useEvaluacion = () => {
                     nombre: nombreToSearch,
                 }
             );
-            // Mapeando los centros a los que las personas que coincidieron en la busqueda 
+            // Mapeando los centros a los que las personas que coincidieron en la busqueda
             centrosPosibleOptionsData.value = response.data.map((item) => {
                 return item.allDataPersonas.empleado.plazas_asignadas
             })
@@ -120,7 +124,7 @@ export const useEvaluacion = () => {
         try {
             // Inicialización y limpieza de variables
             resetVariables();
-            //FIXME: Hay errores en este codigo pero funciona mas o menos 
+            //FIXME: Hay errores en este codigo pero funciona mas o menos
             const plazasAsignadas = [];
             watch(idEmpleado, () => {
                 centrosPosibleOptionsData.value = centrosPosibleOptionsDataCopy.value;
@@ -251,7 +255,7 @@ export const useEvaluacion = () => {
         objectPlazas.value = data.plazasAsignadas.map((index) => ({
             value: index.id_plaza_asignada,
             label: index.detalle_plaza.plaza.nombre_plaza,
-            dependencia:index.dependencia,
+            dependencia: index.dependencia,
         }));
         idEvaluacionRendimiento.value =
             data.evaluacionRendimiento[0].id_evaluacion_rendimiento;
@@ -347,13 +351,145 @@ export const useEvaluacion = () => {
         }
     };
 
-    const cleaningWhenInsert = () => {
+    const configSecondInput = ref({
+        mode: 'range',
+        wrap: true,
+        altInput: true,
+        minDate: '',
+        maxDate: '',
+        altFormat: 'M j, Y',
+        dateFormat: 'Y-m-d',
+        weekNumbers: true,
+        ordinal: function () {
+            return "º";
+        },
+        disableMobile: 'true',
+        locale: {
+            rangeSeparator: ' a ',
+            firstDayOfWeek: 1,
+            weekdays: {
+                shorthand: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'],
+                longhand: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+            },
+            months: {
+                shorthand: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+                longhand: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+            },
+        },
+        onChange: function (selectedDates, dateStr, instance) {
+            if (idTipoEvaluacion.value == 1) {
+                // Verifica en qué rango de fechas se encuentra la primera fecha seleccionada
+                if (selectedDates.length === 1) {
+                    /* const firstDate = selectedDates[0];
+                    const january1 = new Date(firstDate.getFullYear(), 0, 1);
+                    const june30 = new Date(firstDate.getFullYear(), 5, 30);
+                    const july1 = new Date(firstDate.getFullYear(), 6, 1);
+                    const december31 = new Date(firstDate.getFullYear(), 11, 31);
 
-    };
+                    if (firstDate >= january1 && firstDate <= june30) {
+                        // Si la fecha está entre enero 1 y junio 30
+                        instance.set('minDate', january1);
+                        instance.set('maxDate', june30);
+                    } else if (firstDate >= july1 && firstDate <= december31) {
+                        // Si la fecha está entre julio 1 y diciembre 31
+                        instance.set('minDate', july1);
+                        instance.set('maxDate', december31);
+                    } */
+                } else {
+                    getPlazasByEmployeeIdAndCentroAtencionId()
+                }
+            } else {
+                /* const firstDate = selectedDates[0];
+                const maxDate = new Date(
+                    firstDate.getFullYear(),
+                    firstDate.getMonth() + 3,
+                    firstDate.getDate()
+                );
+                instance.set('maxDate', maxDate); */
+                getPlazasByEmployeeIdAndCentroAtencionId()
+            }
+        },
+
+    });
+
+    /**
+         * Propiedad computada que genera un objeto con un array para obtener el id y el nombre de la persona seleccionada
+         * Esto se usa cuando estamos editando y queremos setear el id de la persona actual
+         */
+    const selectedEmpleadoValue = computed(() => {
+        if (evaluacionPersonal.value &&
+            evaluacionPersonal.value.evaluaciones_personal &&
+            evaluacionPersonal.value.evaluaciones_personal.length > 0) {
+
+            idEmpleado.value = evaluacionPersonal.value.persona.id_persona
+            return evaluacionPersonal.value.persona.id_persona
+        } else {
+            idEmpleado.value = null
+            return null;
+        }
+    });
+    const opcionEmpleado = computed(() => {
+        let objectPersonaOption = [];
+        if (
+            evaluacionPersonal.value &&
+            evaluacionPersonal.value.evaluaciones_personal &&
+            evaluacionPersonal.value.evaluaciones_personal.length > 0
+        ) {
+
+            objectPersonaOption = evaluacionPersonal.value.persona ? [
+                {
+                    value: evaluacionPersonal.value.persona.id_persona,
+                    label: `${evaluacionPersonal.value.persona.pnombre_persona || ''} ${evaluacionPersonal.value.persona.snombre_persona || ''} ${evaluacionPersonal.value.persona.tnombre_persona || ''}  ${evaluacionPersonal.value.persona.papellido_persona || ''}  ${evaluacionPersonal.value.persona.sapellido_persona || ''}  ${evaluacionPersonal.value.persona.tapellido_persona || ''}`
+                }] : [];
+            return objectPersonaOption; // Corregir aquí: evaluacionPersonal.value.persona en lugar de evaluacionPersonal.persona
+        } else {
+            return null;
+        }
+    });
+
+
+    const evaluacionesAgrupadasPorAño = computed(() => {
+        const evaluacionesAgrupadas = {};
+        // Verificar si evaluacionPersonal tiene evaluaciones_personal y no está vacío
+        if (
+            evaluacionPersonal.value &&
+            evaluacionPersonal.value.evaluaciones_personal &&
+            evaluacionPersonal.value.evaluaciones_personal.length > 0
+        ) {
+            evaluacionPersonal.value.evaluaciones_personal.forEach(evaluacion => {
+                const year = moment(evaluacion.fecha_inicio_evaluacion_personal).year();
+                // Verificar si ya existe una entrada para ese año
+                if (!evaluacionesAgrupadas[year]) {
+                    evaluacionesAgrupadas[year] = {
+                        year: year,
+                        allContent: evaluacionPersonal.value,
+                        evaluaciones: [],
+                    };
+                }
+                // Agregar la evaluación al arreglo correspondiente al año
+                evaluacionesAgrupadas[year].evaluaciones.push(evaluacion);
+                activeIndex.value = moment(evaluacionPersonal.value.evaluaciones_personal[0].fecha_inicio_evaluacion_personal).year().toString();
+            });
+        }
+        return evaluacionesAgrupadas;
+    });
+    const clearLock = () => {
+        selectedDates.value = [];
+        configSecondInput.value.minDate = null;
+        configSecondInput.value.maxDate = null;
+        fechaInicioFechafin.value = null;
+        toast.info('Reinicio de filtros');
+    }
+
 
     return {
+        opcionEmpleado,
         handleEmployeeSearch,
+        configSecondInput,
         handleTagToSelect,
+        evaluacionPersonal,
+        selectedEmpleadoValue,
+        evaluacionesAgrupadasPorAño,
         idCentroAtencion,
         plazaOptions,
         idEvaluacionRendimiento,
@@ -361,6 +497,7 @@ export const useEvaluacion = () => {
         activeIndex,
         loadingEvaluacionRendimiento,
         getPlazasByEmployeeIdAndCentroAtencionId,
+        optionToShowIntoDocument,
         createPersonalEvaluationRequest,
         idTipoEvaluacion,
         doesntExistResult,
@@ -373,7 +510,7 @@ export const useEvaluacion = () => {
         idEmpleado,
         messageAlert,
         errorsData,
-
+        evaluacionToPassDocumento,
         showMessageAlert,
         handleAccept,
         handleCancel,
