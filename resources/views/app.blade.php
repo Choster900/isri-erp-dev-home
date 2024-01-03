@@ -20,8 +20,8 @@
     </head>
     <body c
     lass="font-sans antialiased">
-        {{-- Comment this code for take of snow --}}
-        <script defer src="https://app.embed.im/snow.js"></script>
+        {{-- comment code to remove snow--}}
+        {{-- <script defer src="https://app.embed.im/snow.js"></script> --}}
         @inertia
     </body>
     <!--
