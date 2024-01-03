@@ -41,10 +41,12 @@
                 </div>
             </header>
             <div class="overflow-x-auto">
-                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true" :staticSelect="false"
-                    @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getDataToShow()">
+                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
+                    :staticSelect="false" @sort="sortBy" @datos-enviados="handleData($event)"
+                    @execute-search="getDataToShow()">
                     <tbody v-if="!isLoadinRequest" class="text-sm divide-y divide-slate-200">
-                        <tr v-for="ejercicio_fiscal in dataToShow" :key="ejercicio_fiscal.id_ejercicio_fiscal" class="hover:bg-gray-200">
+                        <tr v-for="ejercicio_fiscal in dataToShow" :key="ejercicio_fiscal.id_ejercicio_fiscal"
+                            class="hover:bg-gray-200">
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 flex items-center justify-center min-h-[50px]">
                                     {{ ejercicio_fiscal.id_ejercicio_fiscal }}
@@ -75,7 +77,14 @@
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="space-x-1 text-center">
                                     <DropDownOptions>
-
+                                        <div @click="showModalSettlement = true; settlementId = ejercicio_fiscal.id_ejercicio_fiscal" v-if="permits.actualizar == 1" class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
+                                            <div class="text-orange-800 w-[22px] h-[22px] mr-2">
+                                                <span class="text-xs ">
+                                                    <icon-m :iconName="'editM'"></icon-m>
+                                                </span>
+                                            </div>
+                                            <div class="font-semibold">Editar</div>
+                                        </div>
                                     </DropDownOptions>
                                 </div>
                             </td>
@@ -142,6 +151,10 @@
             </div>
         </div>
 
+        <modal-finiquitos-vue v-if="showModalSettlement" :showModalSettlement="showModalSettlement"
+            :settlementId="settlementId" @cerrar-modal="showModalSettlement = false"
+            @get-table="getDataToShow(tableData.currentPage)" />
+
     </AppLayoutVue>
 </template>
 
@@ -149,10 +162,14 @@
 import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
+import ModalFiniquitosVue from '@/Components-ISRI/Juridico/ModalFiniquitos.vue';
+import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
+
 import moment from 'moment';
 import { ref, toRefs, computed, onMounted, watch } from 'vue';
 import { usePermissions } from '@/Composables/General/usePermissions.js';
 import { useToDataTable } from '@/Composables/General/useToDataTable.js';
+
 
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
@@ -160,7 +177,7 @@ import 'vue3-toastify/dist/index.css';
 import axios from 'axios';
 
 export default {
-    components: { Head, AppLayoutVue, Datatable },
+    components: { Head, AppLayoutVue, Datatable, IconM, ModalFiniquitosVue },
     props: {
         menu: {
             type: Object,
@@ -248,5 +265,4 @@ export default {
 .modal-slide-leave-to {
     transform: translateY(20px);
     /* Ajusta según tu necesidad */
-}
-</style>
+}</style>

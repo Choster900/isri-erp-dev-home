@@ -12,4 +12,5 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('jrd.finiquitos');
     Route::post('finiquitos', [FiniquitoController::class, 'getFiniquitos'])->name('finiquito.getFiniquitos');
+    Route::get('get-info-modal-finiquitos/{id}', [FiniquitoController::class, 'getInfoModalFiniquitos'])->name('finiquito.getInfoModalFiniquitos');
 });
