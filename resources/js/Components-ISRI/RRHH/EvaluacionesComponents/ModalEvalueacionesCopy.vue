@@ -170,9 +170,9 @@
                                     </div>
                                     <div class="relative flex h-8 w-full flex-row-reverse ">
                                         <Multiselect :filter-results="false" :resolve-on-load="false" :delay="1000"
-                                            v-model="idEvaluacionRendimiento" :disabled="!showPlazasModal" @clear="objectPlazas = []"
-                                            :searchable="true" :clear-on-search="true" :min-chars="5"
-                                            placeholder="Evaluaciones" :classes="{
+                                            v-model="idEvaluacionRendimiento" :disabled="!showPlazasModal"
+                                            @clear="objectPlazas = []" :searchable="true" :clear-on-search="true"
+                                            :min-chars="5" placeholder="Evaluaciones" :classes="{
                                                 placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
                                             }" noOptionsText="<p class='text-xs'>Sin evaluaciones<p>"
                                             noResultsText="<p class='text-xs'>Sin resultados de evaluaciones <p>"
@@ -319,12 +319,28 @@
                             <ul class="text-sm font-medium flex flex-nowrap -mx-4 sm:-mx-6 lg:-mx-8 ">
                                 <li
                                     class="pb-3 mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8">
-                                    <a class=" whitespace-nowrap flex items-center cursor-pointer">
+                                    <a :class="headerOptions === 'DocumentoEvalacionVue' ? 'text-indigo-500' : 'text-slate-500 hover:text-slate-600'"
+                                        class=" whitespace-nowrap flex items-center cursor-pointer">
                                         <svg class="w-4 h-4 shrink-0 fill-current mr-2" viewBox=" 0 0 16 16">
                                             <path
                                                 d="M12.311 9.527c-1.161-.393-1.85-.825-2.143-1.175A3.991 3.991 0 0012 5V4c0-2.206-1.794-4-4-4S4 1.794 4 4v1c0 1.406.732 2.639 1.832 3.352-.292.35-.981.782-2.142 1.175A3.942 3.942 0 001 13.26V16h14v-2.74c0-1.69-1.081-3.19-2.689-3.733zM6 4c0-1.103.897-2 2-2s2 .897 2 2v1c0 1.103-.897 2-2 2s-2-.897-2-2V4zm7 10H3v-.74c0-.831.534-1.569 1.33-1.838 1.845-.624 3-1.436 3.452-2.422h.436c.452.986 1.607 1.798 3.453 2.422A1.943 1.943 0 0113 13.26V14z" />
                                         </svg>
-                                        <span>Medición de Competencias</span>
+                                        <span @click="headerOptions = 'DocumentoEvalacionVue'">Medición de
+                                            Competencias</span>
+                                    </a>
+                                </li>
+                                <li
+                                    class="pb-3 mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8">
+                                    <a :class="headerOptions === 'DocumentoAnalisisDesempeñoVue' ? 'text-indigo-500' : 'text-slate-500 hover:text-slate-600'"
+                                        class="  whitespace-nowrap flex items-center cursor-pointer">
+                                        <svg class="w-4 h-4 shrink-0 fill-current  mr-2"
+                                            :class="headerOptions === 'DocumentoAnalisisDesempeñoVue' ? 'text-indigo-500' : 'text-slate-500 hover:text-slate-600'"
+                                            viewBox=" 0 0 16 16">
+                                            <path
+                                                d="M14.3.3c.4-.4 1-.4 1.4 0 .4.4.4 1 0 1.4l-8 8c-.2.2-.4.3-.7.3-.3 0-.5-.1-.7-.3-.4-.4-.4-1 0-1.4l8-8zM15 7c.6 0 1 .4 1 1 0 4.4-3.6 8-8 8s-8-3.6-8-8 3.6-8 8-8c.6 0 1 .4 1 1s-.4 1-1 1C4.7 2 2 4.7 2 8s2.7 6 6 6 6-2.7 6-6c0-.6.4-1 1-1z" />
+                                        </svg>
+                                        <span @click="headerOptions = 'DocumentoAnalisisDesempeñoVue'">Análisis de
+                                            Desempeño</span>
                                     </a>
                                 </li>
 
@@ -333,10 +349,16 @@
 
                     </div>
 
-                    <DocumentoEvaluacionCopy :isLoadingObtenerCategoriaYRubrica="isLoadingObtenerCategoriaYRubrica"
+                    <DocumentoEvaluacionCopy :class="headerOptions === 'DocumentoEvalacionVue' ? '' : 'hidden'"
+                        :isLoadingObtenerCategoriaYRubrica="isLoadingObtenerCategoriaYRubrica"
                         :evaluacionPersonalProp="evaluacionToPassDocumento"
                         :rubricaAndCategoriaByEvaluacion="rubricaAndCategoriaByEvaluacion" />
 
+
+                    <doc-analisis-des :class="headerOptions === 'DocumentoAnalisisDesempeñoVue' ? '' : 'hidden'"
+                        :isLoadingObtenerCategoriaYRubrica="isLoadingObtenerCategoriaYRubrica"
+                        :evaluacionPersonalProp="evaluacionToPassDocumento"
+                        :rubricaAndCategoriaByEvaluacion="rubricaAndCategoriaByEvaluacion"></doc-analisis-des>
                 </div>
 
 
@@ -389,6 +411,7 @@ import { computed, onMounted, ref, toRef, toRefs, watch } from 'vue';
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue';
 import { useEvaluacion } from '@/Composables/RRHH/Evaluaciones/useEvaluacion';
 import { useDocumentoEvaluacion } from '@/Composables/RRHH/Evaluaciones/useDocumentoEvaluacion';
+import DocAnalisisDes from './DocAnalisisDes.vue';
 export default {
     components: {
         Modal,
@@ -399,7 +422,7 @@ export default {
         AccordionBasic,
         DocumentoEvaluacionCopy,
         ModalMorenThanOneTipo,
-        DocumentoEvaluacionCopy
+        DocAnalisisDes,
     },
     emit: ["cerrar-modal", "actualizar-datatable"],
     props: {
@@ -422,7 +445,7 @@ export default {
         const {
             idEmpleado, errorsData,
             messageAlert, handleAccept,
-            handleCancel, plazaOptions,
+            handleCancel, plazaOptions, headerOptions,
             handleTagToSelect, evaluationsOptions,
             objectEvaluaciones, fechaInicioFechafin,
             showPlazasModal, existMoreThanOne, clearLock,
@@ -502,7 +525,7 @@ export default {
             handleEmployeeSearch,
             activeIndex, activeIndex,
             handleAccept, handleCancel,
-            evaluacionesAgrupadasPorAño,
+            evaluacionesAgrupadasPorAño, headerOptions,
             existMoreThanOne, idTipoEvaluacion,
             messageAlert, selectedEmpleadoValue,
             evaluacionToPassDocumento, clearLock,
@@ -587,5 +610,4 @@ export default {
     --ms-tag-color: #ffffff;
     --ms-tag-font-size: 0.875rem;
 
-}
-</style>
+}</style>
