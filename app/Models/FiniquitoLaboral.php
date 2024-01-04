@@ -38,4 +38,15 @@ class FiniquitoLaboral extends Model
     {
         return $this->belongsTo(Empleado::class, 'id_empleado', 'id_empleado');
     }
+
+    /**
+     * The function "persona" returns a BelongsTo relationship between the current model and the
+     * Persona model, using the "id_persona" column as the foreign key.
+     * 
+     * @return BelongsTo a BelongsTo relationship.
+     */
+    public function persona() : BelongsTo
+    {
+        return $this->belongsTo(Persona::class, 'id_persona', 'id_persona');
+    }
 }

@@ -133,7 +133,7 @@
                                 </span>
                                 <span v-else-if="(link.label == 'Siguiente')"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-[#29303C] shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-[#152c50] border border-transparent')">
-                                    <div class="flex-1 text-right ml-2">
+                                    <div class="flex-1 text-right">
                                         <a @click="link.url ? getDataToShow(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                         text-[#3c4557]">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
