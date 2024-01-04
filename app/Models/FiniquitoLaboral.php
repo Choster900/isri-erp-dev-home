@@ -22,6 +22,7 @@ class FiniquitoLaboral extends Model
         'monto_finiquito_laboral',
         'fecha_firma_finiquito_laboral',
         'hora_firma_finiquito_laboral',
+        'firmado_finiquito_laboral',
         'fecha_reg_finiquito_laboral',
         'fecha_mod_finiquito_laboral',
         'usuario_finiquito_laboral',
