@@ -39,6 +39,7 @@ export const useEvaluacion = () => {
     const evaluacionToPassDocumento = ref(null);
 
     const optionToShowIntoDocument = ref(null);
+    const headerOptions = ref("DocumentoEvalacionVue");
     /**
      * Busca empleados por nombre para evaluaciones.
      *
@@ -513,6 +514,7 @@ export const useEvaluacion = () => {
         evaluacionToPassDocumento,
         showMessageAlert,
         handleAccept,
+        headerOptions,
         handleCancel,
     };
 };
