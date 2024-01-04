@@ -8,6 +8,7 @@ use App\Models\Empleado;
 use App\Models\FiniquitoLaboral;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class FiniquitoController extends Controller
 {
@@ -40,10 +41,11 @@ class FiniquitoController extends Controller
             if ($id != 0) {
                 $query = EjercicioFiscal::with([
                     'estado_ejercicio_fiscal',
-                    'finiquitos_ejercicio_fiscal.empleado.plazas_asignadas' => function ($query) {
-                        $query->orderBy('fecha_plaza_asignada', 'asc'); // Ordenar etapas por 'id_etapa_permiso' de manera ascendente
-                    },
-                    'finiquitos_ejercicio_fiscal.empleado.plazas_asignadas.centro_atencion'
+                    // 'finiquitos_ejercicio_fiscal.empleado.plazas_asignadas' => function ($query) {
+                    //     $query->orderBy('fecha_plaza_asignada', 'asc'); // Ordenar etapas por 'id_etapa_permiso' de manera ascendente
+                    // },
+                    'finiquitos_ejercicio_fiscal.empleado.primer_centro_atencion',
+                    'finiquitos_ejercicio_fiscal.persona'
                 ])->find($id);
 
                 return response()->json([
@@ -75,5 +77,36 @@ class FiniquitoController extends Controller
         // ])->whereHas('finiquitos_empleado', function ($query) use ($id) {
         //     $query->where('id_ejercicio_fiscal', $id);
         // })->has('plazas_asignadas', '>', 1)->get();
+    }
+
+    public function searchPersonJrd(Request $request)
+    {
+        $search = $request->busqueda;
+        if ($search != '') {
+            $persons = DB::table('persona')
+                ->selectRaw('
+                    CONCAT_WS(" ", 
+                    COALESCE(pnombre_persona, ""), 
+                    COALESCE(snombre_persona, ""), 
+                    COALESCE(tnombre_persona, ""), 
+                    COALESCE(papellido_persona, ""), 
+                    COALESCE(sapellido_persona, ""), 
+                    COALESCE(tapellido_persona, "")
+                ) AS label,
+                id_persona as value')
+                ->where(function ($query) use ($search) {
+                    $query->whereRaw("MATCH(pnombre_persona, snombre_persona, tnombre_persona, papellido_persona, sapellido_persona, tapellido_persona) AGAINST(?)", $search);
+                })
+                ->where('estado_persona', 1)
+                ->get();
+        }
+        /* The above code is returning a JSON response in PHP. It includes an array called 'employees'
+        which contains the value of the variable  if the variable  is not empty. If
+         is empty, the 'employees' array will be empty as well. */
+        return response()->json(
+            [
+                'persons'          => $search != '' ? $persons : [],
+            ]
+        );
     }
 }

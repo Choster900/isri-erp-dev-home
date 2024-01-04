@@ -17,9 +17,102 @@
                 </div>
             </div>
         </div>
-        <ProcessModal v-else maxWidth='3xl' :show="showModalSettlement" @close="$emit('cerrar-modal')">
-
-            <p class="text-center py-5 mx-auto">HOLAAAAAAAAA</p>
+        <ProcessModal v-else maxWidth='4xl' :show="showModalSettlement" @close="$emit('cerrar-modal')">
+            <div class="justify-end flex mx-4 mt-4">
+                <button @click="recalculate = !recalculate"
+                    class="bg-cyan-600 hover:bg-cyan-800 text-white text-[14px] font-semiBold py-2 px-3 rounded-md">
+                    RECALCULAR FINIQUITO
+                </button>
+            </div>
+            <div v-if="recalculate" class="py-7 mt-5">
+                <div class="mb-4 md:flex flex-row justify-items-start mx-4">
+                    <div class="mb-4 md:mr-2 md:mb-0 basis-2/3">
+                        <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Notario
+                            Encargado<span class="text-red-600 font-extrabold">*</span>
+                        </label>
+                        <div class="relative font-semibold flex h-10 w-full flex-row-reverse">
+                            <Multiselect placeholder="Digite nombre persona" v-model="personId"
+                                :options="allFiniquitos.finiquitos_ejercicio_fiscal.length > 0 && load ? baseOption : persons"
+                                :searchable="true" :loading="isLoadingPerson" :internal-search="false"
+                                @search-change="handleSearchChange" :clear-on-search="true"
+                                :noResultsText="'Sin resultados'" :noOptionsText="'Sin resultados'" />
+                            <div class="flex items-center px-2 pointer-events-none border rounded-l-md border-gray-300">
+                                <icon-m :iconName="'personInfoMulti'"></icon-m>
+                            </div>
+                        </div>
+                        <!-- <InputError v-for="(item, index) in errors.parentId" :key="index" class="mt-2"
+                                :message="item" /> -->
+                    </div>
+                    <div class="mb-4 md:mr-0 md:mb-0 basis-1/3">
+                        <input-text label="Monto de finiquito" iconName="money" id="amount" v-model="amount"
+                            :required="true" type="text" placeholder="Monto" :validation="{ limit: 8, amount: true }">
+                        </input-text>
+                        <!-- <InputError v-for="(item, index) in errors.amount" :key="index" class="mt-2"
+                                :message="item" /> -->
+                    </div>
+                </div>
+                <div class="mx-4 overflow-x-auto">
+                    <div class="bg-white shadow-md rounded mt-2">
+                        <div class="flex justify-between bg-teal-800 px-2 py-2 text-white text-[13px]">
+                            <div class="w-[20%] text-center">CENTRO</div>
+                            <div class="w-[20%] text-center">FECHA*</div>
+                            <div class="w-[20%] text-center">HORA INICIO*</div>
+                            <div class="w-[20%] text-center">HORA FIN*</div>
+                            <div class="w-[20%] text-center">INTERVALO*</div>
+                        </div>
+                        <div v-for="(center, index) in centros" :key="index"
+                            class="flex justify-between border-b border-gray-100 text-[14px] px-2 py-2 hover:bg-gray-300">
+                            <div class="w-[20%] text-center break-words overflow-wrap flex items-center justify-center">
+                                {{
+                                    `${center.center + '(' + center.finiquitos.length + ')'}`
+                                }}
+                            </div>
+                            <div class="w-[20%] text-center break-words overflow-wrap flex items-center justify-center">
+                                <div class="md:mr-0 md:mb-0 basis-full">
+                                    <input-text  iconName="money" id="amount" v-model="amount"
+                                         type="text" placeholder="Monto"
+                                        :validation="{ limit: 8, amount: true }">
+                                    </input-text>
+                                    <!-- <InputError v-for="(item, index) in errors.amount" :key="index" class="mt-2"
+                                :message="item" /> -->
+                                </div>
+                            </div>
+                            <div class="w-[20%] text-center break-words overflow-wrap flex items-center justify-center">
+                                <div class="md:mr-0 md:mb-0 basis-full">
+                                    <input-text iconName="money" id="amount" v-model="amount" type="text" placeholder="Monto"
+                                        :validation="{ limit: 8, amount: true }">
+                                    </input-text>
+                                    <!-- <InputError v-for="(item, index) in errors.amount" :key="index" class="mt-2"
+                                :message="item" /> -->
+                                </div>
+                            </div>
+                            <div class="w-[20%] text-center break-words overflow-wrap flex items-center justify-center">
+                                <div class="md:mr-0 md:mb-0 basis-full">
+                                    <input-text iconName="money" id="amount" v-model="amount" type="text" placeholder="Monto"
+                                        :validation="{ limit: 8, amount: true }">
+                                    </input-text>
+                                    <!-- <InputError v-for="(item, index) in errors.amount" :key="index" class="mt-2"
+                                :message="item" /> -->
+                                </div>
+                            </div>
+                            <div class="w-[20%] text-center break-words overflow-wrap flex items-center justify-center">
+                                <div class="md:mr-0 md:mb-0 basis-full">
+                                    <input-text iconName="money" id="amount" v-model="amount"
+                                         type="text" placeholder="Monto"
+                                        :validation="{ limit: 8, amount: true }">
+                                    </input-text>
+                                    <!-- <InputError v-for="(item, index) in errors.amount" :key="index" class="mt-2"
+                                :message="item" /> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div v-else class="py-7 mt-5">
+                <p class="text-center mx-auto"> Page2</p>
+                <p class="text-center mx-auto">2222222222222</p>
+            </div>
         </ProcessModal>
     </div>
 </template>
@@ -30,11 +123,13 @@ import InputError from "@/Components/InputError.vue";
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
+import InputText from "@/Components-ISRI/ComponentsToForms/InputText.vue";
+import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
 import { ref, toRefs, onMounted, } from 'vue';
 
 export default {
     emits: ["cerrar-modal", "get-table"],
-    components: { ProcessModal, InputError },
+    components: { ProcessModal, InputError, InputText, IconM },
     props: {
         showModalSettlement: {
             type: Boolean,
@@ -47,12 +142,22 @@ export default {
     },
     setup(props, context) {
         const { settlementId } = toRefs(props)
+        const recalculate = ref(false)
+        const load = ref(true)
 
         const {
-            isLoadingRequest,
-            getInfoForModalFiniquitos,
+            isLoadingRequest, centros, personId, allFiniquitos, amount,
+            baseOption, isLoadingPerson, persons,
+            getInfoForModalFiniquitos, asyncFindPerson,
         } = useFiniquitos(context);
-        
+
+        const handleSearchChange = async (query) => {
+            load.value = false
+            if (query != '') {
+                await asyncFindPerson(query);
+            }
+        }
+
         onMounted(
             async () => {
                 await getInfoForModalFiniquitos(settlementId.value)
@@ -60,8 +165,9 @@ export default {
         )
 
         return {
-            settlementId, isLoadingRequest,
-            getInfoForModalFiniquitos
+            settlementId, isLoadingRequest, recalculate, centros, personId, allFiniquitos, amount,
+            baseOption, isLoadingPerson, persons, load,
+            getInfoForModalFiniquitos, handleSearchChange
         }
     }
 }

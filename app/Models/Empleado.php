@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Empleado extends Model
 {
     use HasFactory;
-    
+
     protected $table = 'empleado';
     protected $primaryKey = 'id_empleado';
     public $timestamps = false;
@@ -39,17 +39,28 @@ class Empleado extends Model
 
     public function persona()
     {
-        return $this->hasOne('App\Models\Persona','id_persona','id_persona');
+        return $this->hasOne('App\Models\Persona', 'id_persona', 'id_persona');
     }
 
     public function titulo_profesional()
     {
-        return $this->hasOne('App\Models\TituloProfesional','id_titulo_profesional','id_titulo_profesional');
+        return $this->hasOne('App\Models\TituloProfesional', 'id_titulo_profesional', 'id_titulo_profesional');
     }
 
     public function plazas_asignadas()
     {
-        return $this->hasMany(PlazaAsignada::class,'id_empleado','id_empleado');
+        return $this->hasMany(PlazaAsignada::class, 'id_empleado', 'id_empleado');
+    }
+
+    /**
+     * The function "primer_centro_atencion" returns the "Centro Atencion" where the employee
+     * was registered first.
+     */
+    public function primer_centro_atencion()
+    {
+        return $this->hasOne(PlazaAsignada::class, 'id_empleado', 'id_empleado')
+            ->with('centro_atencion')
+            ->orderBy('fecha_reg_plaza_asignada','ASC');
     }
 
     /**
@@ -64,7 +75,7 @@ class Empleado extends Model
 
     public function permisos()
     {
-        return $this->hasMany('App\Models\Permiso','id_empleado','id_empleado');
+        return $this->hasMany('App\Models\Permiso', 'id_empleado', 'id_empleado');
     }
 
     public function evaluaciones_personal(): HasMany
@@ -79,14 +90,14 @@ class Empleado extends Model
 
     public function tipo_pension()
     {
-        return $this->hasOne('App\Models\TipoPension','id_tipo_pension','id_tipo_pension');
+        return $this->hasOne('App\Models\TipoPension', 'id_tipo_pension', 'id_tipo_pension');
     }
 
     /**
-     * The function "dependencias" returns a collection of "Dependencia" models that are associated
-     * with the current model through the "id_centro_atencion" foreign key.
+     * The function "finiquitos_empleado" returns a collection of "FiniquitoLaboral" models associated
+     * with a specific employee.
      * 
-     * @return HasMany a HasMany relationship with the Dependencia model.
+     * @return HasMany a HasMany relationship.
      */
     public function finiquitos_empleado(): HasMany
     {
