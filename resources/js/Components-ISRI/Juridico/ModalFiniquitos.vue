@@ -124,13 +124,8 @@ export default {
             type: Boolean,
             default: false,
         },
-        settlementId: {
-            type: Number,
-            default: 0,
-        }
     },
     setup(props, context) {
-        const { settlementId } = toRefs(props)
 
         const {
             isLoadingRequest, centros, personId, amount,

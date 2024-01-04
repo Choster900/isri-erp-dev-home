@@ -20,7 +20,7 @@
         </div>
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="showModalSettlement = true; settlementId = 0" v-if="permits.insertar == 1"
+                <GeneralButton @click="showModalSettlement = true" v-if="permits.insertar == 1"
                     color="bg-green-700  hover:bg-green-800" text="Crear Finiquito" icon="add" />
             </div>
         </div>
@@ -203,7 +203,6 @@ export default {
         const { menu } = toRefs(props);
         const permits = usePermissions(menu.value, window.location.pathname);
 
-        const settlementId = ref(0)
         const showModalSettlement = ref(false)
         const columns = [
             { width: "10%", label: "ID", name: "id_empleado", type: "text" },
@@ -236,7 +235,7 @@ export default {
         } = useToDataTable(columns, requestUrl, columntToSort, dir)
 
         return {
-            permits, dataToShow, showModalSettlement, tableData, perPage, settlementId,
+            permits, dataToShow, showModalSettlement, tableData, perPage,
             links, sortKey, sortOrders, isLoadinRequest, isLoadingTop, emptyObject, columns,
             getDataToShow, handleData, sortBy, changeStatusElement
         };

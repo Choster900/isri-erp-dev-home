@@ -17,7 +17,7 @@ export const useFiniquitos = (context) => {
     const persons = ref([]);
     const isLoadingPerson = ref(false);
 
-    const getInfoForModalFiniquitos = async (settlementId) => {
+    const getInfoForModalFiniquitos = async () => {
         try {
             isLoadingRequest.value = true;
             const response = await axios.get(
