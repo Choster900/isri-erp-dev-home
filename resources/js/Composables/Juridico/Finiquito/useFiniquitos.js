@@ -24,7 +24,7 @@ export const useFiniquitos = (context) => {
                 `/get-info-modal-finiquitos`
             );
             empleados.value = response.data.empleados
-            console.log(empleados.value);
+            //console.log(empleados.value);
             setModalValues(empleados.value)
         } catch (err) {
             console.log(err);

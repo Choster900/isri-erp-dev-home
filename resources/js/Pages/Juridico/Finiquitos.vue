@@ -45,8 +45,7 @@
                     :staticSelect="false" @sort="sortBy" @datos-enviados="handleData($event)"
                     @execute-search="getDataToShow()">
                     <tbody v-if="!isLoadinRequest" class="text-sm divide-y divide-slate-200">
-                        <tr v-for="finiquito in dataToShow" :key="finiquito.id_finiquito_laboral"
-                            class="hover:bg-gray-200">
+                        <tr v-for="finiquito in dataToShow" :key="finiquito.id_finiquito_laboral" class="hover:bg-gray-200">
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 flex items-center justify-center min-h-[50px]">
                                     {{ finiquito.empleado.id_empleado }}
@@ -167,8 +166,7 @@
         </div>
 
         <modal-finiquitos-vue v-if="showModalSettlement" :showModalSettlement="showModalSettlement"
-            :settlementId="settlementId" @cerrar-modal="showModalSettlement = false"
-            @get-table="getDataToShow(tableData.currentPage)" />
+            @cerrar-modal="showModalSettlement = false" @get-table="getDataToShow(tableData.currentPage)" />
 
     </AppLayoutVue>
 </template>
@@ -280,4 +278,5 @@ export default {
 .modal-slide-leave-to {
     transform: translateY(20px);
     /* Ajusta según tu necesidad */
-}</style>
+}
+</style>

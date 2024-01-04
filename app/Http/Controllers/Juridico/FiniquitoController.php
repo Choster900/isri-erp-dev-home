@@ -47,10 +47,9 @@ class FiniquitoController extends Controller
                         ->orderBy('fecha_reg_plaza_asignada','ASC'); 
                     },
                     'plazas_asignadas.centro_atencion' 
-                    //test
-                    => function ($empleados) {
-                        $empleados->where('id_centro_atencion', 2);
-                    }
+                    // => function ($empleados) {
+                    //     $empleados->where('id_centro_atencion', 2);
+                    // }
                 ])->where('id_estado_empleado', 1);
                     // ->whereHas('primer_centro_atencion', function ($empleados) {
                     //     $empleados->where('id_centro_atencion', 2);

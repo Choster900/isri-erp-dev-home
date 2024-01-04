@@ -126,7 +126,6 @@ export default {
         },
     },
     setup(props, context) {
-
         const {
             isLoadingRequest, centros, personId, amount,
             isLoadingPerson, persons,
@@ -141,12 +140,12 @@ export default {
 
         onMounted(
             async () => {
-                await getInfoForModalFiniquitos(settlementId.value)
+                await getInfoForModalFiniquitos()
             }
         )
 
         return {
-            settlementId, isLoadingRequest, centros, personId, amount,
+            isLoadingRequest, centros, personId, amount,
             isLoadingPerson, persons,
             getInfoForModalFiniquitos, handleSearchChange
         }
