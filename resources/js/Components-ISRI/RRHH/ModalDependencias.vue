@@ -59,7 +59,7 @@
                             </label>
                             <div class="relative font-semibold flex h-10 w-full flex-row-reverse">
                                 <Multiselect v-model="depInfo.parentId" :options="depFilter" :searchable="true"
-                                    placeholder="Seleccione centro" :disabled="depInfo.jerarquia === 0" />
+                                    placeholder="Seleccione dependencia" :disabled="depInfo.jerarquia === 0" />
                                 <div class="flex items-center px-2 pointer-events-none border rounded-l-md border-gray-300">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-[#001c48]">
