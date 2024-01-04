@@ -79,7 +79,7 @@
                                             :disabled="loadingEvaluacionRendimiento"
                                             @select="getPlazasByEmployeeIdAndCentroAtencionId()" :filter-results="false"
                                             :resolve-on-load="false" :delay="1000" :searchable="true"
-                                            :clear-on-search="true" :min-chars="5" placeholder="Busqueda de empleado..."
+                                            :clear-on-search="true" :min-chars="1" placeholder="Busqueda de empleado..."
                                             :classes="{
                                                 placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
                                             }" noOptionsText="<p class='text-xs'>Lista vacia<p>"
@@ -89,7 +89,7 @@
 
                                         <Multiselect v-else v-model="selectedEmpleadoValue" :filter-results="false"
                                             :disabled="true" :resolve-on-load="false" :delay="1000" :searchable="true"
-                                            :clear-on-search="true" :min-chars="5" placeholder="Busqueda de usuario..."
+                                            :clear-on-search="true" :min-chars="1" placeholder="Busqueda de usuario..."
                                             :classes="{
                                                 wrapper: 'relative text-xs cursor-not-allowed mx-auto w-full flex items-center justify-end box-border cursor-pointer outline-none',
                                                 containerDisabled: 'cursor-not-allowed bg-gray-200 text-text-slate-400',
