@@ -1,9 +1,19 @@
 <template>
     <label :for="id" class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">{{ label }}
         <span v-if="required" class="text-red-600 font-extrabold">*</span></label>
-    <vue-date-picker v-model="modelValue" :enable-time-picker="enableTimePicker" :format="format" 
-        :no-today="noToday" :placeholder="placeholder" :disabled="disabled" :teleport="teleport"
-        :locale="localeConfig" :day-names="dayNames"  @update:model-value="$emit('update:modelValue', $event)">
+    <vue-date-picker :config="config" v-model="modelValue" time-picker :placeholder="placeholder" :teleport="teleport"
+        :disabled="disabled" @update:model-value="$emit('update:modelValue', $event)">
+        <template #input-icon>
+            <svg class="ml-[10px] w-auto h-[17px] relative text-gray-500" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                <g id="SVGRepo_iconCarrier">
+                    <path
+                        d="M12 7V12H15M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                </g>
+            </svg>
+        </template>
     </vue-date-picker>
 </template>
 
@@ -22,21 +32,13 @@ export default {
             type: [String, Date],
             default: '',
         },
-        enableTimePicker: {
-            type: Boolean,
-            default: false,
-        },
-        noToday: {
-            type: Boolean,
-            default: false,
-        },
         teleport: {
             type: Boolean,
             default: true,
         },
-        format: {
-            type: String,
-            default: 'dd/MM/yyyy',
+        height: {
+            type: Number,
+            default: 0,
         },
         placeholder: {
             type: String,
@@ -54,10 +56,6 @@ export default {
             type: Boolean,
             default: false
         },
-        dayNames: {
-            type: Array,
-            default: () => ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa', 'Do'],
-        },
     },
     emits: ["update:modelValue"],
     setup(props, { emit }) {
@@ -65,11 +63,16 @@ export default {
             ...es,
         };
 
-        const { modelValue } = toRefs(props)
+        const { modelValue, height } = toRefs(props)
+
+        const config = {
+            modeHeight: height.value,
+        }
 
         return {
             modelValue,
             localeConfig,
+            config
         };
     },
 };
@@ -103,5 +106,4 @@ export default {
     --dp-primary-color: #10B981;
     --dp-cell-size: 25px;
     --dp-font-size: 0.8rem;
-}
-</style>
+}</style>

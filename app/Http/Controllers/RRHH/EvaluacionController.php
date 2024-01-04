@@ -108,6 +108,30 @@ class EvaluacionController extends Controller
     function searchEmployeesForNewEvaluationRequest(Request $request)
     {
         $idPersona = $request->user()->id_persona;
+        $nombre = $request->nombre;
+
+        $depIds = Dependencia::where('id_persona', $idPersona)
+            ->where('estado_dependencia', 1)
+            ->pluck('id_dependencia')
+            ->toArray();
+
+        $dependencies = Dependencia::with(['jefatura.empleado.plazas_asignadas'])
+            ->whereIn('dep_id_dependencia', $depIds)
+            ->whereHas('jefatura', function ($query) use ($nombre) {
+                $query->where(function ($query) use ($nombre) {
+                    $query->whereRaw(
+                        "MATCH ( pnombre_persona, snombre_persona, tnombre_persona, papellido_persona, sapellido_persona, tapellido_persona ) AGAINST ( ?)",
+                        [$nombre]
+                    );
+                });
+            })->get();
+
+        $personasJefeByDependencia = array();
+        foreach ($dependencies as $dep) {
+            if ($dep->jefatura && $dep->estado_dependencia == 1) {
+                $personasJefeByDependencia[] = $dep->jefatura;
+            }
+        }
 
         $results = Persona::with([
             'empleado' => function ($query) {
@@ -119,7 +143,6 @@ class EvaluacionController extends Controller
                     $query->where('id_persona', $idPersona);
                 });
             },
-            'dependencias' // Agrega cualquier otra relación que necesites
         ])
             ->whereHas('empleado', function ($query) use ($idPersona) {
                 $query->where('estado_empleado', 1)
@@ -137,11 +160,15 @@ class EvaluacionController extends Controller
             ->whereDoesntHave('empleado.evaluaciones_personal')
             ->get();
 
-        $formattedResults = $results->map(function ($item) {
+        $mergedResults = collect($personasJefeByDependencia)->merge($results)->unique('id_persona');
+
+        $formattedResults = $mergedResults->map(function ($item) use ($mergedResults) {
             return [
                 'value'           => $item->id_persona,
-                'label'           => $item->pnombre_persona . ' ' . ($item->snombre_persona ?? '') . ' ' . ($item->tnombre_persona ?? '') . ' ' . ($item->papellido_persona ?? '') . ' ' . ($item->sapellido_persona ?? '') . ' ' . ($item->tapellido_persona ?? ''),
-                'allDataPersonas' => $item
+                'label'           => $item->nombre_completo,
+                'allDataPersonas' => $item,
+                "mergedResults" => $mergedResults,
+
             ];
         });
 
@@ -149,7 +176,7 @@ class EvaluacionController extends Controller
     }
 
 
-  
+
 
     function getPlazaAsignadaByUserAndDependencia(Request $request)
     {

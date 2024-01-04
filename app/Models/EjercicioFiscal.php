@@ -17,6 +17,7 @@ class EjercicioFiscal extends Model
 
     protected $fillable = [
         'id_estado_ef',
+        'id_estado_finiquito',
         'ejercicio_fiscal',
         'fecha_reg_ejercicio_fiscal',
         'fecha_mod_ejercicio_fiscal',

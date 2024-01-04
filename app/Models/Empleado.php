@@ -60,7 +60,8 @@ class Empleado extends Model
     {
         return $this->hasOne(PlazaAsignada::class, 'id_empleado', 'id_empleado')
             ->with('centro_atencion')
-            ->orderBy('fecha_reg_plaza_asignada','ASC');
+            ->where('estado_plaza_asignada', 1)
+            ->orderBy('fecha_plaza_asignada', 'ASC');
     }
 
     /**
