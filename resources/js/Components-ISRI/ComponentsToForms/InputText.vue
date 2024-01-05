@@ -3,7 +3,8 @@
         <label :for="id" class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">{{ label }}
             <span v-if="required" class="text-red-600 font-extrabold">*</span></label>
         <div class="relative">
-            <div class="absolute inset-y-0 start-0 flex text-[#001c48] rounded-l-md items-center px-2 pointer-events-none border-r border-gray-300">
+            <div class="absolute inset-y-0 start-0 flex rounded-l-md items-center px-2 pointer-events-none border-r border-gray-300"
+            :class="addClasses">
                 <template v-if="iconName === 'email'">
                     <svg class="w-[22px] h-[22px] p-0.5 dark:text-gray-500" aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 16">
@@ -72,7 +73,7 @@
                     </svg>
                 </template>
                 <template v-else-if="iconName === 'number'">
-                    <svg class="w-5 h-5 dark:text-gray-600" viewBox="0 0 16 16"
+                    <svg class="w-4 h-4 dark:text-gray-600" viewBox="0 0 16 16"
                         xmlns="http://www.w3.org/2000/svg" fill="currentColor">
                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                         <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
@@ -151,6 +152,10 @@ export default {
         required: {
             type: Boolean,
             default: false
+        },
+        addClasses: {
+            type: String,
+            default: 'text-[#001c48]'
         },
         type: {
             type: String,

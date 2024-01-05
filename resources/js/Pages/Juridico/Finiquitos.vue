@@ -20,7 +20,7 @@
         </div>
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="showModalSettlement = true; settlementId = 0" v-if="permits.insertar == 1"
+                <GeneralButton @click="showModalSettlement = true" v-if="permits.insertar == 1"
                     color="bg-green-700  hover:bg-green-800" text="Crear Finiquito" icon="add" />
             </div>
         </div>
@@ -45,38 +45,52 @@
                     :staticSelect="false" @sort="sortBy" @datos-enviados="handleData($event)"
                     @execute-search="getDataToShow()">
                     <tbody v-if="!isLoadinRequest" class="text-sm divide-y divide-slate-200">
-                        <tr v-for="ejercicio_fiscal in dataToShow" :key="ejercicio_fiscal.id_ejercicio_fiscal"
-                            class="hover:bg-gray-200">
+                        <tr v-for="finiquito in dataToShow" :key="finiquito.id_finiquito_laboral" class="hover:bg-gray-200">
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 flex items-center justify-center min-h-[50px]">
-                                    {{ ejercicio_fiscal.id_ejercicio_fiscal }}
+                                    {{ finiquito.empleado.id_empleado }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ ejercicio_fiscal.ejercicio_fiscal }}
+                                    {{ finiquito.empleado.persona.pnombre_persona }}
+                                    {{ finiquito.empleado.persona.snombre_persona }}
+                                    {{ finiquito.empleado.persona.tnombre_persona }}
+                                    {{ finiquito.empleado.persona.papellido_persona }}
+                                    {{ finiquito.empleado.persona.sapellido_persona }}
+                                    {{ finiquito.empleado.persona.tapellido_persona }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ ejercicio_fiscal.monto_liq_ejercicio_fiscal }}
+                                    {{ finiquito.fecha_firma_finiquito_laboral }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
-                                    <div v-if="(ejercicio_fiscal.id_estado_ef == 1)"
+                                    {{ finiquito.hora_firma_finiquito_laboral }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800 text-center">
+                                    ${{ finiquito.monto_finiquito_laboral }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800 text-center">
+                                    <div v-if="(finiquito.firmado_finiquito_laboral == 1)"
                                         class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
-                                        Vigente
+                                        Firmado
                                     </div>
-                                    <div v-else-if="(ejercicio_fiscal.id_estado_ef == 3)"
-                                        class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-blue-100 text-blue-500">
-                                        Histórico
+                                    <div v-else-if="(finiquito.firmado_finiquito_laboral == 0)"
+                                        class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-red-100 text-red-500">
+                                        No firmado
                                     </div>
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="space-x-1 text-center">
-                                    <DropDownOptions>
+                                    <!-- <DropDownOptions>
                                         <div @click="showModalSettlement = true; settlementId = ejercicio_fiscal.id_ejercicio_fiscal" v-if="permits.actualizar == 1" class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-orange-800 w-[22px] h-[22px] mr-2">
                                                 <span class="text-xs ">
@@ -85,7 +99,7 @@
                                             </div>
                                             <div class="font-semibold">Editar</div>
                                         </div>
-                                    </DropDownOptions>
+                                    </DropDownOptions> -->
                                 </div>
                             </td>
                         </tr>
@@ -122,27 +136,27 @@
                         <ul class="inline-flex text-sm font-medium -space-x-px">
                             <li v-for="link in links" :key="link.label">
                                 <span v-if="(link.label == 'Anterior')"
-                                    :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-[#29303C] shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-[#152c50] border border-transparent')">
+                                    :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-[#29303C] shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
 
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="link.url ? getDataToShow(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                        <a @click="link.url ? getDataToShow(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer hover:text-indigo-500
                                   text-[#3c4557]">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
                                     </div>
                                 </span>
                                 <span v-else-if="(link.label == 'Siguiente')"
-                                    :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-[#29303C] shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-[#152c50] border border-transparent')">
+                                    :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-[#29303C] shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                                     <div class="flex-1 text-right">
-                                        <a @click="link.url ? getDataToShow(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                        <a @click="link.url ? getDataToShow(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer hover:text-indigo-500
                                         text-[#3c4557]">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
                                     </div>
                                 </span>
                                 <span class="cursor-pointer mt-2" v-else @click="link.url ? getDataToShow(link.url) : ''"
-                                    :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-[#29303C] text-[#29303C] shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
-                                        class=" w-5">{{ link.label }}</span>
+                                    :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-[#29303C] text-[#29303C] shadow-sm hover:text-indigo-500 hover:border-indigo-500' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
+                                        class="min-w-[20px]">{{ link.label }}</span>
                                 </span>
                             </li>
                         </ul>
@@ -152,8 +166,7 @@
         </div>
 
         <modal-finiquitos-vue v-if="showModalSettlement" :showModalSettlement="showModalSettlement"
-            :settlementId="settlementId" @cerrar-modal="showModalSettlement = false"
-            @get-table="getDataToShow(tableData.currentPage)" />
+            @cerrar-modal="showModalSettlement = false" @get-table="getDataToShow(tableData.currentPage)" />
 
     </AppLayoutVue>
 </template>
@@ -188,18 +201,18 @@ export default {
         const { menu } = toRefs(props);
         const permits = usePermissions(menu.value, window.location.pathname);
 
-        const settlementId = ref(0)
         const showModalSettlement = ref(false)
         const columns = [
-            { width: "20%", label: "ID", name: "id_ejercicio", type: "text" },
-            { width: "25%", label: "Año", name: "ejercicio_fiscal", type: "text" },
-            { width: "30%", label: "Monto", name: "monto_ejercicio", type: "text" },
+            { width: "10%", label: "ID", name: "id_empleado", type: "text" },
+            { width: "30%", label: "Nombre", name: "nombre_empleado", type: "text" },
+            { width: "12%", label: "Fecha firma", name: "fecha_firma", type: "text" },
+            { width: "12%", label: "Hora firma", name: "hora_firma", type: "text" },
+            { width: "13%", label: "monto", name: "monto", type: "text" },
             {
-                width: "15%", label: "Estado", name: "estado_ejercicio", type: "select",
+                width: "13%", label: "Estado", name: "estado_finiquito", type: "select",
                 options: [
-                    { value: "1", label: "Vigente" },
-                    //{ value: "2", label: "Proximo" },
-                    { value: "3", label: "Historico" }
+                    { value: "1", label: "Firmado" },
+                    { value: "0", label: "No Firmado" }
                 ]
             },
             { width: "10%", label: "Acciones", name: "Acciones" },
@@ -220,7 +233,7 @@ export default {
         } = useToDataTable(columns, requestUrl, columntToSort, dir)
 
         return {
-            permits, dataToShow, showModalSettlement, tableData, perPage, settlementId,
+            permits, dataToShow, showModalSettlement, tableData, perPage,
             links, sortKey, sortOrders, isLoadinRequest, isLoadingTop, emptyObject, columns,
             getDataToShow, handleData, sortBy, changeStatusElement
         };
@@ -265,4 +278,5 @@ export default {
 .modal-slide-leave-to {
     transform: translateY(20px);
     /* Ajusta según tu necesidad */
-}</style>
+}
+</style>

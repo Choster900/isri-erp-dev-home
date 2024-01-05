@@ -14,54 +14,46 @@ class FiniquitoController extends Controller
 {
     public function getFiniquitos(Request $request)
     {
-        $columns = ['id_ejercicio', 'ejercicio_fiscal', 'monto_ejercicio', 'estado_ejercicio'];
+        $columns = ['id_empleado', 'nombre_empleado', 'fecha_firma', 'hora_firma', 'monto', 'estado_finiquito'];
 
         $length = $request->length;
         $column = $request->column; //Index
         $dir = $request->dir;
         $search_value = $request->search;
 
-        $query = EjercicioFiscal::select('*')
+        $query = FiniquitoLaboral::select('*')
             ->with([
-                'estado_ejercicio_fiscal',
-                'finiquitos_ejercicio_fiscal'
-            ])
-            ->where('id_estado_ef', '!=', 2)
-            ->whereHas('finiquitos_ejercicio_fiscal');
+                'empleado.persona',
+            ]);
 
         $data = $query->paginate($length)->onEachSide(1);
         return ['data' => $data, 'draw' => $request->input('draw')];
     }
 
-    public function getInfoModalFiniquitos(Request $request, $id)
+    public function getInfoModalFiniquitos(Request $request)
     {
         $year = Carbon::now()->year;
-        $ejercicio = EjercicioFiscal::where('ejercicio_fiscal', '2024')->first();
+        $ejercicio = EjercicioFiscal::where('ejercicio_fiscal', $year)->first();
         if ($ejercicio) {
-            if ($id != 0) {
-                $query = EjercicioFiscal::with([
-                    'estado_ejercicio_fiscal',
-                    // 'finiquitos_ejercicio_fiscal.empleado.plazas_asignadas' => function ($query) {
-                    //     $query->orderBy('fecha_plaza_asignada', 'asc'); // Ordenar etapas por 'id_etapa_permiso' de manera ascendente
-                    // },
-                    'finiquitos_ejercicio_fiscal.empleado.primer_centro_atencion',
-                    'finiquitos_ejercicio_fiscal.persona'
-                ])->find($id);
+            $finiquitos = FiniquitoLaboral::where('id_ejercicio_fiscal', $ejercicio->id_ejercicio_fiscal)->get();
+            if ($finiquitos->count() >= 1) {
+                return response()->json([
+                    'logical_error' => 'El finiquito ya fue generado para el presente año.',
+                ], 422);
+            } else {
+                $empleados = Empleado::with([
+                    'plazas_asignadas' => function ($query) {
+                        $query->where('estado_plaza_asignada', 1)
+                        ->orderBy('fecha_reg_plaza_asignada','ASC'); 
+                    },
+                    'plazas_asignadas.centro_atencion' 
+                ])
+                ->where('id_estado_empleado', 1)
+                ->where('id_empleado','>',933);
 
                 return response()->json([
-                    'ejercicio' => $query
+                    'empleados' => $empleados->get()
                 ]);
-            } else {
-                $finiquitos = FiniquitoLaboral::where('id_ejercicio_fiscal', $ejercicio->id_ejercicio_fiscal)->get();
-                if ($finiquitos->count() >= 1) {
-                    return response()->json([
-                        'logical_error' => 'El finiquito ya fue generado para el presente año.',
-                    ], 422);
-                } else {
-                    return response()->json([
-                        'logical_error' => 'Ahora si.',
-                    ], 422);
-                }
             }
         } else {
             return response()->json([
