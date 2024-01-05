@@ -5,6 +5,7 @@ namespace App\Http\Controllers\RRHH;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RRHH\EvaluacionRequest;
 use App\Http\Requests\RRHH\EvaluacionRespuestasRequest;
+use App\Http\Requests\RRHH\IncidentesRequest;
 use App\Models\CategoriaRendimiento;
 use App\Models\Dependencia;
 use App\Models\DetalleEvaluacionPersonal;
@@ -18,7 +19,7 @@ use App\Models\PlazaEvaluada;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Validator;
 
 class EvaluacionController extends Controller
 {
@@ -139,6 +140,7 @@ class EvaluacionController extends Controller
             },
             'empleado.evaluaciones_personal',
             'empleado.plazas_asignadas' => function ($query) use ($idPersona) {
+                $query->where('estado_plaza_asignada', 1);
                 $query->whereHas('dependencia', function ($query) use ($idPersona) {
                     $query->where('id_persona', $idPersona);
                 });
@@ -147,6 +149,7 @@ class EvaluacionController extends Controller
             ->whereHas('empleado', function ($query) use ($idPersona) {
                 $query->where('estado_empleado', 1)
                     ->whereHas('plazas_asignadas', function ($query) use ($idPersona) {
+                        $query->where('estado_plaza_asignada', 1);
                         $query->whereHas('dependencia', function ($query) use ($idPersona) {
                             $query->where('id_persona', $idPersona);
                         });
@@ -569,6 +572,74 @@ class EvaluacionController extends Controller
             return response()->json(['error' => 'Evaluación no encontrada', "realError" => $e], 404);
         }
     }
+
+    function saveIncidentesEvaluacion(Request $request)
+    {
+        DB::beginTransaction();
+
+        // Reglas de validación
+        $rules = [
+            'idCategoriaRendimiento'         => 'required',
+            'resultadoIncidenteEvaluacion'   => 'required',
+            'comentarioIncidenteEvaluacion'  => 'required',
+            'idEvaluacionPersonal'            => 'required',
+        ];
+
+        // Mensajes de error personalizados
+        $messages = [
+            'required' => 'El campo :attribute es obligatorio.',
+        ];
+
+        // Validar los datos de entrada
+        $validator = Validator::make($request->dataIndiceEvaluacion, $rules, $messages);
+
+        // Comprobar si la validación falla
+        if ($validator->fails()) {
+            // Enviar respuesta con mensajes de error
+            return response()->json(['error' => $validator->errors()->first()], 400);
+        }
+
+        // Datos a ingresar o actualizar
+        $data = [
+            'id_cat_rendimiento'              => $request->dataIndiceEvaluacion['idCategoriaRendimiento'],
+            'resultado_incidente_evaluacion'  => $request->dataIndiceEvaluacion['resultadoIncidenteEvaluacion'],
+            'comentario_incidente_evaluacion' => $request->dataIndiceEvaluacion['comentarioIncidenteEvaluacion'],
+            'estado_incidente_evaluacion'     => 1,
+            'usuario_incidente_evaluacion'    => $request->user()->nick_usuario,
+            'ip_incidente_evaluacion'         => $request->ip(),
+            'id_evaluacion_personal'  => $request->dataIndiceEvaluacion['idEvaluacionPersonal'],
+        ];
+
+        // Condiciones de búsqueda
+        $conditions = [
+            'id_incidente_evaluacion' => (int) $request->dataIndiceEvaluacion['idIncidenteEvaluacion'],
+            'id_evaluacion_personal'  => $request->dataIndiceEvaluacion['idEvaluacionPersonal'],
+        ];
+
+        // Verificar si ya existe un registro
+        $existingResponse = IncidenteEvaluacion::where($conditions)->first();
+
+        // Determinar si es una actualización o inserción
+        if ($existingResponse) {
+            // Si existe, añadir la fecha de modificación
+            $data['fecha_mod_incidente_evaluacion'] = Carbon::now();
+            // Actualizar el registro existente
+            IncidenteEvaluacion::where($conditions)->update($data);
+        } else {
+            // Si no existe, añadir la fecha de creación
+            $data['fecha_reg_incidente_evaluacion'] = Carbon::now();
+            // Insertar un nuevo registro y obtener el ID
+            $insertedId = IncidenteEvaluacion::insertGetId($data);
+        }
+
+        // Confirmar la transacción
+        DB::commit();
+
+        // Respuesta exitosa con el ID del registro insertado (si es una inserción)
+        return response()->json(['message' => 'Respuestas guardadas exitosamente', 'inserted_id' => $insertedId ?? null], 200);
+    }
+
+
 
     /* function saveResponseInEvaluation(EvaluacionRespuestasRequest $request)
     {

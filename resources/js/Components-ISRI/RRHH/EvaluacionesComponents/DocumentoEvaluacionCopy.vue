@@ -496,7 +496,6 @@ export default {
             if (newValue) {
                 optionsSelected.value = []
                 evaluacionPersonal.value = newValue.data
-                console.log(evaluacionPersonal.value);
                 evaluacionPersonal.value.detalle_evaluaciones_personal.forEach(element => {
                     optionsSelected.value.push({
                         id_cat_rendimiento: element.categoria_rendimiento.id_cat_rendimiento,
@@ -512,7 +511,7 @@ export default {
                 title: '<p class="text-[16pt] text-center">¿Esta seguro de enviar la evaluacion?</p>',
                 icon: "question",
                 iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
-                confirmButtonText: "Si, Agregar",
+                confirmButtonText: "Si, Enviar",
                 confirmButtonColor: "#001b47",
                 cancelButtonText: "Cancelar",
                 showCancelButton: true,
@@ -531,8 +530,6 @@ export default {
                     alert("alerta ");
 
                 }
-                console.log(rubricaAndCategoriaByEvaluacion.value.categorias_rendimiento.length);
-                console.log(optionsSelected.value.length);
             }
         };
 
