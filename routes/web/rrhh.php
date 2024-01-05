@@ -135,6 +135,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('get-evaluacion', [EvaluacionController::class, 'getPersonalPerformanceEvaluationVersion'])->name('evaluaciones.get-evaluacion');
     Route::post('save-evaluation-responses', [EvaluacionController::class, 'saveResponseInEvaluation'])->name('evaluaciones.save-response');
     Route::post('get-by-id', [EvaluacionController::class, 'getEvaluationById'])->name('evaluaciones.get-by-id');
+    Route::post('save-incidentes', [EvaluacionController::class, 'saveIncidentesEvaluacion'])->name('save-incident');
 
     Route::get(
         '/rrhh/jefe-inmediato',
