@@ -224,7 +224,7 @@
                             class="w-36 text-left text-[7pt]  font-medium capitalize h-5 border-x-0 border-t-0">
                     </div>
                 </div>
-                <div class="flex items-center justify-between pt-2 gap-2 pb-4">
+                <div class="flex items-center justify-start pt-2 gap-2 pb-4">
                     <div class="flex items-center">
                         <label for="" class="text-[7pt] font-semibold mr-2">JEFE INME:</label>
 
@@ -357,17 +357,11 @@
                         </Tooltip>
                     </div>
 
-                    <div class="flex items-center">
-                        <label for="" class="text-[7pt] font-semibold mr-2">PUNTAJE TOTAL:</label>
-                        <input type="text"
-                            :value="optionsSelected.reduce((score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento), 0)"
-                            class="w-12 text-left text-[9pt]  font-medium capitalize h-5 border-x-0 border-t-0">
-                    </div>
                 </div>
             </div>
 
-            <button type="button"
-                style="float: right;margin-right:-4px;margin-top:3px; font-size: 30px; padding: 0 10px; border: 0; background-color: transparent;">
+            <button @click="addDataIndiceEvaluacion"
+                style="float: right;margin-right:-4px;margin-top:0.1px; font-size: 30px; padding: 0 10px; border: 0; background-color: transparent;">
                 <span type="button" data-toggle="tooltip" data-placement="right">
                     +
                 </span>
@@ -382,46 +376,46 @@
                         <th class="w-52">COMENTARIO</th>
                     </tr>
                 </thead>
-                <tbody v-for="i in 3" :key="i">
-                    <tr class="*:border *:text-xs *:text-center *:align-middle *:border-slate-400 *:h-24 *:text-slate-600 ">
-                        <td class="w-24">1</td>
-                        <td class="w-32">28/2/2024</td>
+                <tbody v-for="(incidente, i) in dataIndiceEvaluacion" :key="i">
+                    <tr @contextmenu.prevent="deleteRow(incidente.idIncidenteEvaluacion)" v-if="!incidente.isDeleted"
+                        class="*:border *:text-xs *:text-center *:align-middle *:border-slate-400 *:h-24 *:text-slate-600 ">
+                        <td class="w-24">{{ i + 1 }}</td>
+                        <td class="w-32">{{ incidente.fechaRegIncidenteEvaluacion }}</td>
                         <td class="w-40">
                             <div class="relative flex h-8 w-full ">
 
-                                <Multiselect :filter-results="false" :resolve-on-load="false" :delay="1000"
-                                    :searchable="true" :clear-on-search="true" :min-chars="1" placeholder="Categorias"
-                                    :classes="{
+                                <Multiselect :filter-results="true" v-model="incidente.idCategoriaRendimiento"
+                                    :searchable="true" :clear-on-search="true" placeholder="Categorias" :classes="{
                                         wrapper: 'relative text-xs cursor-not-allowed mx-auto w-full flex items-center justify-end box-border cursor-pointer outline-none',
                                         containerDisabled: 'cursor-not-allowed bg-gray-200 text-text-slate-400',
                                         placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                    }" noOptionsText="<p class='text-xs'>Sin Personas<p>"
-                                    noResultsText="<p class='text-xs'>Sin resultados de personas <p>" :options="[]" />
+                                    }" noOptionsText="<p class='text-xs'>Sin resultados<p>"
+                                    noResultsText="<p class='text-xs'>Sin resultados  <p>"
+                                    :options="opcionesCategoriaRendimiento" />
                             </div>
                         </td>
                         <td class="w-28">
                             <div class="relative flex h-8 w-full ">
-
-                                <Multiselect :filter-results="false" :resolve-on-load="false" :delay="1000"
-                                    :searchable="true" :clear-on-search="true" :min-chars="1" placeholder="Tipos" :classes="{
+                                <Multiselect :filter-results="true" v-model="incidente.resultadoIncidenteEvaluacion"
+                                    :searchable="true" :clear-on-search="true" placeholder="Tipos" :classes="{
                                         wrapper: 'relative text-xs cursor-not-allowed mx-auto w-full flex items-center justify-end box-border cursor-pointer outline-none',
-                                        containerDisabled: 'cursor-not-allowed bg-gray-200 text-text-slate-400',
+                                        containerDisabled: 'cursor-not-allowed bg-gray-200 text-slate-400',
                                         placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                    }" noOptionsText="<p class='text-xs'>Sin Personas<p>"
-                                    noResultsText="<p class='text-xs'>Sin resultados de personas <p>" :options="[]" />
+                                    }" noOptionsText="<p class='text-xs'>Sin resultados<p>"
+                                    noResultsText="<p class='text-xs'>Sin resultados  <p>"
+                                    :options="[{ value: 0, label: 'F - favorable' }, { value: 1, label: 'D - desfavorable' }]" />
                             </div>
-                        </td>
-                        <td class="w-52" contenteditable="true">
 
                         </td>
+                        <td class="w-52" contenteditable="true"
+                            @input="incidente.comentarioIncidenteEvaluacion = $event.target.innerText"> {{
+                                incidente.comentarioIncidenteEvaluacion }}</td>
                     </tr>
                 </tbody>
             </table>
-            <button class="bg-indigo-900 rounded-sm shadow text-center text-white text-sm font-light w-full py-1 mt-5">
+            <button @click="guardarYEnviarIncidentes"
+                class="bg-indigo-900 rounded-sm shadow text-center text-white text-sm font-light w-full py-1 mt-5">
                 TERMINAR ANALISIS DE DESEMPEÑO (Los datos se guardaran entonces)</button>
-            <!-- <pre>
-                {{ rubricaAndCategoriaByEvaluacion }}
-            </pre> -->
         </div>
     </div>
 </template>
@@ -435,6 +429,8 @@ import Swal from "sweetalert2";
 import { toast } from 'vue3-toastify'
 import { executeRequest } from "@/plugins/requestHelpers.js";
 import 'vue3-toastify/dist/index.css';
+import { useAnalisisDes } from '@/Composables/RRHH/Evaluaciones/useAnalisisDes'
+
 export default {
     components: { Tooltip },
     props: {
@@ -453,19 +449,71 @@ export default {
     },
     setup(props) {
         const { evaluacionPersonalProp, rubricaAndCategoriaByEvaluacion } = toRefs(props)
-        const { separarTexto, evaluacionPersonal, saveResponseWhenIsClickedCheckbox, optionsSelected, sendResponsesEvaluation, ranges, isScoreInRange } = useDocumentoEvaluacion();
+        const { separarTexto } = useDocumentoEvaluacion();
+        const { opcionesCategoriaRendimiento, objectCat, dataIndiceEvaluacion, addDataIndiceEvaluacion, deleteRow, saveIncidentesEvaluacionesRequest } = useAnalisisDes(evaluacionPersonalProp)
+
+        watch(rubricaAndCategoriaByEvaluacion, (newValue, oldValue) => {
+            if (newValue != '') {
+                objectCat.value = newValue.categorias_rendimiento
+            } else {
+                objectCat.value = null;
+            }
+        })
+
+        watch(evaluacionPersonalProp, (newValue, oldValue) => {
+            if (newValue !== null && typeof newValue === 'object' && 'data' in newValue) {
+                const { incidentes_evaluacion } = newValue.data;
+                dataIndiceEvaluacion.value = []
+
+                incidentes_evaluacion.forEach(element => {
+                    dataIndiceEvaluacion.value.push({
+                        idEvaluacionPersonal: evaluacionPersonalProp.value.data.id_evaluacion_personal,
+                        idCategoriaRendimiento: element.id_cat_rendimiento,
+                        resultadoIncidenteEvaluacion: element.resultado_incidente_evaluacion,
+                        comentarioIncidenteEvaluacion: element.comentario_incidente_evaluacion,
+                        fechaRegIncidenteEvaluacion: element.fecha_reg_incidente_evaluacion,
+                        idIncidenteEvaluacion: element.id_incidente_evaluacion,
+                        isDeleted: false,
+                    })
+
+                });
+            }
+        });
+
+
+        const guardarYEnviarIncidentes = async () => {
+            const confirmed = await Swal.fire({
+                title: '<p class="text-[16pt] text-center">¿Esta seguro de enviar los incidentes?</p>',
+                icon: "question",
+                iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
+                confirmButtonText: "Si, enviar",
+                confirmButtonColor: "#001b47",
+                cancelButtonText: "Cancelar",
+                showCancelButton: true,
+                showCloseButton: true,
+            });
+            if (confirmed.isConfirmed) {
+
+                executeRequest(
+                    saveIncidentesEvaluacionesRequest(),
+                    "La evaluacion se ha enviado"
+                );
+
+            }
+        };
 
         return {
+            deleteRow,
             separarTexto,
-            optionsSelected,
+            opcionesCategoriaRendimiento,
+            objectCat,
+            guardarYEnviarIncidentes,
+            addDataIndiceEvaluacion,
+            dataIndiceEvaluacion,
+            saveIncidentesEvaluacionesRequest,
+
             moment,
-            optionsSelected,
             Tooltip,
-            isScoreInRange,
-            ranges,
-            saveResponseWhenIsClickedCheckbox,
-            evaluacionPersonal,
-            sendResponsesEvaluation,
         }
     }
 }
