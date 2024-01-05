@@ -65,7 +65,7 @@ export const useFiniquitos = (context) => {
                 centros.value[indiceCentro].empleados.push(empleado);
             }
         });
-        //console.log(centros.value);
+        console.log(centros.value);
     };
 
     const asyncFindPerson = _.debounce(async (query) => {
