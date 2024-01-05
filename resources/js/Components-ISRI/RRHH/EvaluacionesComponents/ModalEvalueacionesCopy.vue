@@ -174,6 +174,8 @@
                                             @clear="objectPlazas = []" :searchable="true" :clear-on-search="true"
                                             :min-chars="5" placeholder="Evaluaciones" :classes="{
                                                 placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                                caret: 'bg-multiselect-caret bg-center bg-no-repeat w-2.5 h-4 py-px box-content mr-3.5 relative z-10 opacity-40 flex-shrink-0 flex-grow-0 transition-transform transform pointer-events-none rtl:mr-0 rtl:ml-3.5',
+
                                             }" noOptionsText="<p class='text-xs'>Sin evaluaciones<p>"
                                             noResultsText="<p class='text-xs'>Sin resultados de evaluaciones <p>"
                                             :options="evaluationsOptions" />
@@ -201,7 +203,6 @@
                                             placeholder: 'text-xs flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
                                         }" :object="true" :options="plazaOptions" />
                                 </div>
-
                             </div>
                             <InputError v-if="showPlazasModal" class="mt-2 px-2 border-b"
                                 :message="errorsData && errorsData.plazasAsignadas ? errorsData.plazasAsignadas : ''" />

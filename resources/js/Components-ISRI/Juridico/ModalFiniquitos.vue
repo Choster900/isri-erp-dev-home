@@ -19,7 +19,8 @@
         </div>
         <ProcessModal v-else maxWidth='4xl' :show="showModalSettlement" @close="$emit('cerrar-modal')">
             <div class="justify-end flex mx-4 mt-4">
-                <button class="bg-cyan-600 hover:bg-cyan-800 text-white text-[14px] font-semiBold py-2 px-3 rounded-md">
+                <button @click="storeFiniquitos(finiquito)"
+                class="bg-cyan-600 hover:bg-cyan-800 text-white text-[14px] font-semiBold py-2 px-3 rounded-md">
                     PROGRAMAR FINIQUITOS
                 </button>
             </div>
@@ -30,10 +31,14 @@
                             Encargado<span class="text-red-600 font-extrabold">*</span>
                         </label>
                         <div class="relative font-semibold flex h-10 w-full flex-row-reverse">
-                            <Multiselect placeholder="Escriba para buscar persona" v-model="personId" :options="persons"
+                            <Multiselect placeholder="Escriba para buscar persona" v-model="finiquito.personId" :options="persons"
                                 :searchable="true" :loading="isLoadingPerson" :internal-search="false"
                                 @search-change="handleSearchChange" :clear-on-search="true"
-                                :noResultsText="'Sin resultados'" :noOptionsText="'Sin resultados'" />
+                                :noResultsText="'Sin resultados'" :noOptionsText="'Sin resultados'"
+                                :classes="{
+                                    optionSelected: 'text-white bg-teal-800',
+                                    optionSelectedPointed: 'text-white bg-teal-800 opacity-90',}" 
+                                />
                             <div class="flex items-center px-2 pointer-events-none border rounded-l-md border-gray-300">
                                 <icon-m :iconName="'personInfoMulti'"></icon-m>
                             </div>
@@ -42,7 +47,7 @@
                                 :message="item" /> -->
                     </div>
                     <div class="mb-4 md:mr-0 md:mb-0 basis-1/3">
-                        <input-text label="Monto de finiquito" iconName="money" id="amount" v-model="amount"
+                        <input-text label="Monto de finiquito" iconName="money" id="amount" v-model="finiquito.amount"
                             :required="true" type="text" placeholder="Monto" :validation="{ limit: 8, amount: true }">
                         </input-text>
                         <!-- <InputError v-for="(item, index) in errors.amount" :key="index" class="mt-2"
@@ -58,7 +63,7 @@
                             <div class="w-[20%] text-center">HORA FIN*</div>
                             <div class="w-[20%] text-center">INTERVALO*</div>
                         </div>
-                        <div v-for="(center, index) in centros" :key="index"
+                        <div v-for="(center, index) in finiquito.centros" :key="index"
                             class="flex justify-between border-b border-gray-100 text-[14px] px-2 py-2 hover:bg-gray-300">
                             <div class="w-[20%] text-center break-words overflow-wrap flex items-center justify-center">
                                 {{
@@ -128,9 +133,9 @@ export default {
     },
     setup(props, context) {
         const {
-            isLoadingRequest, centros, personId, amount,
+            isLoadingRequest, finiquito, personId, amount,
             isLoadingPerson, persons,
-            getInfoForModalFiniquitos, asyncFindPerson,
+            getInfoForModalFiniquitos, asyncFindPerson, storeFiniquitos
         } = useFiniquitos(context);
 
         const handleSearchChange = async (query) => {
@@ -146,9 +151,8 @@ export default {
         )
 
         return {
-            isLoadingRequest, centros, personId, amount,
-            isLoadingPerson, persons,
-            getInfoForModalFiniquitos, handleSearchChange
+            isLoadingRequest, finiquito, isLoadingPerson, persons,
+            getInfoForModalFiniquitos, handleSearchChange, storeFiniquitos
         }
     }
 }
