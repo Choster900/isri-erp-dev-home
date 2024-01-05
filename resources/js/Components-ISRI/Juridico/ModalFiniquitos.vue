@@ -89,7 +89,8 @@
                             <div class="w-[20%] text-center break-words overflow-wrap flex items-center justify-center">
                                 <div class="md:mr-2 md:mb-0 basis-full">
                                     <input-text iconName="number" id="amount" v-model="center.interval" type="text"
-                                        placeholder="Minutos" :validation="{ limit: 2, number: true }">
+                                        placeholder="Minutos" :validation="{ limit: 2, number: true }"
+                                        :addClasses="'text-gray-500'">
                                     </input-text>
                                     <!-- <InputError v-for="(item, index) in errors.amount" :key="index" class="mt-2"
                                 :message="item" /> -->
@@ -154,8 +155,8 @@ export default {
 </script>
 
 <style>
-.multiselect-option.is-selected {
+/* .multiselect-option.is-selected {
     background: var(--ms-option-bg-selected, #81146a);
     color: var(--ms-option-color-selected, #fff);
-}
+} */
 </style>
