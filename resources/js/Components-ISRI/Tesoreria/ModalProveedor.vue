@@ -353,29 +353,17 @@ export default {
                 this.supplier[field] = this.supplier[field].replace(/[^\d]/g, '').substring(0, 6);
             }
         },
-        updateSupplier() {
-            this.$swal.fire({
-                title: '¿Está seguro de actualizar el proveedor?',
-                icon: 'question',
-                iconHtml: '❓',
-                confirmButtonText: 'Si, Actualizar',
-                confirmButtonColor: '#141368',
-                cancelButtonText: 'Cancelar',
-                showCancelButton: true,
-                showCloseButton: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    axios.post('/update-supplier', this.supplier).then((response) => {
-                        toast.success("El registro se edito con exito", {
-                            autoClose: 5000,
-                            position: "top-right",
-                            transition: "zoom",
-                            toastBackgroundColor: "white",
-                        });
-                        this.$emit("reload-table")
+        updateSupplierRequest() {
+
+
+            return new Promise(async (resolve, reject) => {
+                try {
+                    const resp = await axios.post('/update-supplier', this.supplier)
+                    this.$emit("reload-table")
                         this.limpiarCampos()
-                    }).catch((errors) => {
-                        if (errors.response.status === 422) {
+                    resolve(resp); // Resolvemos la promesa con la respuesta exitosa
+                } catch (errors) {
+                    if (errors.response.status === 422) {
                             if (errors.response.data.logical_error) {
                                 toast.error(
                                     errors.response.data.logical_error,
@@ -393,12 +381,6 @@ export default {
                                     myData[errorBack] = data[errorBack][0]
                                 }
                                 this.errosModel = myData;
-                                toast.warning("Tienes algunos errores por favor verifica tus datos", {
-                                    autoClose: 5000,
-                                    position: "top-right",
-                                    transition: "zoom",
-                                    toastBackgroundColor: "white",
-                                });
                             }
                         } else {
                             let msg = this.manageError(errors);
@@ -409,58 +391,87 @@ export default {
                                 timer: 5000,
                             });
                         }
-                    });
+                    reject(Error); // Rechazamos la promesa en caso de excepción
+
                 }
-            })
+            });
         },
-        addSupplier() {
-            this.$swal.fire({
-                title: '¿Esta seguro de guardar los datos?',
+
+        async updateSupplier() {
+            // Mostrar confirmación al usuario
+            const confirmed = await this.$swal.fire({
+                title: '<p class="text-[20pt] text-center">¿Esta seguro de agregar el proveedor?</p>',
                 icon: 'question',
-                iconHtml: '❓',
-                confirmButtonText: 'Si, Guardar',
+                iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
+                confirmButtonText: 'Si, Editar',
                 confirmButtonColor: '#001b47',
                 cancelButtonText: 'Cancelar',
                 showCancelButton: true,
-                showCloseButton: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    axios.post('/add-supplier', this.supplier).then((response) => {
-                        toast.success("El registro se ha agregado correctamente", {
-                            autoClose: 5000,
-                            position: "top-right",
-                            transition: "zoom",
-                            toastBackgroundColor: "white",
-                        });
-                        this.$emit("reload-table")
-                        this.limpiarCampos()
-                    }).catch((Error) => {
-                        console.log(Error);
-                        if (Error.response.status === 422) {
-                            let data = Error.response.data.errors
-                            var myData = new Object();
-                            for (const errorBack in data) {
-                                myData[errorBack] = data[errorBack][0]
-                            }
-                            this.errosModel = myData;
-                            toast.warning("Tienes algunos errores por favor verifica tus datos", {
-                                autoClose: 9000,
-                                position: "top-right",
-                                transition: "zoom",
-                                toastBackgroundColor: "white",
-                            });
-                        } else {
-                            let msg = this.manageError(Error);
-                            this.$swal.fire({
-                                title: "Operación cancelada",
-                                text: msg,
-                                icon: "warning",
-                                timer: 5000,
-                            });
+                showCloseButton: true,
+            });
+
+            if (confirmed.isConfirmed) {
+                // Verificar si no hay posiciones duplicadas de números de acta
+                this.executeRequest(
+                    this.updateSupplierRequest(),
+                    '¡El proveedor se han actualizado correctamente!'
+                )
+
+            }
+        },
+
+        addSupplierRequest() {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    const resp = await axios.post('/add-supplier', this.supplier)
+                    this.$emit("reload-table")
+                    this.limpiarCampos()
+                    resolve(resp); // Resolvemos la promesa con la respuesta exitosa
+                } catch (Error) {
+                    console.log(Error);
+                    if (Error.response.status === 422) {
+                        let data = Error.response.data.errors
+                        var myData = new Object();
+                        for (const errorBack in data) {
+                            myData[errorBack] = data[errorBack][0]
                         }
-                    });
+                        this.errosModel = myData;
+                    } else {
+                        let msg = this.manageError(Error);
+                        this.$swal.fire({
+                            title: "Operación cancelada",
+                            text: msg,
+                            icon: "warning",
+                            timer: 5000,
+                        });
+                    }
+                    reject(Error); // Rechazamos la promesa en caso de excepción
+
                 }
-            })
+            });
+        },
+
+        async addSupplier() {
+            // Mostrar confirmación al usuario
+            const confirmed = await this.$swal.fire({
+                title: '<p class="text-[20pt] text-center">¿Esta seguro de agregar el proveedor?</p>',
+                icon: 'question',
+                iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
+                confirmButtonText: 'Si, Editar',
+                confirmButtonColor: '#001b47',
+                cancelButtonText: 'Cancelar',
+                showCancelButton: true,
+                showCloseButton: true,
+            });
+
+            if (confirmed.isConfirmed) {
+                // Verificar si no hay posiciones duplicadas de números de acta
+                this.executeRequest(
+                    this.addSupplierRequest(),
+                    'El proveedor se han guardado correctamente!'
+                )
+
+            }
         },
         evaluteValue(id_sujeto_retencion) {
             axios.post('/change-values-retencion/' + id_sujeto_retencion).then((response) => {
