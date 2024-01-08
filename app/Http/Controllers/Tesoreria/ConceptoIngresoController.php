@@ -37,10 +37,10 @@ class ConceptoIngresoController extends Controller
                 ['estado_concepto_ingreso', 'like', '%' . $search_value['estado_concepto_ingreso'] . '%'],
                 [function ($query) use ($search_value) {
                     if ($search_value['nombre_dependencia'] == 'N/A' || $search_value['nombre_dependencia'] == 'n/a') {
-                        $query->where('concepto_ingreso.id_dependencia', null);
+                        $query->where('concepto_ingreso.id_centro_atencion', null);
                     } else {
-                        $query->whereRaw('IFNULL(nombre_dependencia, "") like ?', '%' . $search_value['nombre_dependencia'] . '%')
-                            ->orWhereRaw('IFNULL(codigo_dependencia, "") like ?', '%' . $search_value['nombre_dependencia'] . '%');
+                        $query->whereRaw('IFNULL(nombre_centro_atencion, "") like ?', '%' . $search_value['nombre_dependencia'] . '%')
+                            ->orWhereRaw('IFNULL(codigo_centro_atencion, "") like ?', '%' . $search_value['nombre_dependencia'] . '%');
                     }
                 }],
             ]);
