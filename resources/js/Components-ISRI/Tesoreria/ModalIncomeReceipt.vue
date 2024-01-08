@@ -10,7 +10,7 @@ import axios from "axios";
     <div class="m-1.5">
         <Modal :show="show_modal_receipt" :modal-title="'Administración de recibos de ingreso. '" maxWidth="3xl"
             @close="$emit('cerrar-modal')">
-            <div class="px-5 py-8">
+            <div class="px-5 py-4">
                 <div class="space-y-2">
                     <div class="mb-2" id="app">
                         <div class="mb-2 md:flex flex-row justify-items-start">
@@ -125,8 +125,8 @@ import axios from "axios";
                         <!-- Table -->
                         <div class="mt-0 pb-6">
                             <div class="table-header">
-                                <div class="basis-2/3">Concepto</div>
-                                <div class="basis-1/3">Monto</div>
+                                <div class="basis-2/3 text-slate-800">Concepto</div>
+                                <div class="basis-1/3 text-slate-800">Monto</div>
                                 <div>
                                     <button :disabled="active_details.length > 6"
                                         class="text-green-500 hover:text-green-600 rounded-full" @click="addRow()">
@@ -191,7 +191,7 @@ import axios from "axios";
                     <div class="mt-4 mb-4 md:flex flex-row justify-center">
                         <GeneralButton v-if="modal_data != ''" @click="updateIncomeReceipt()"
                             color="bg-orange-700  hover:bg-orange-800" text="Actualizar" icon="update"
-                            :disabled="is_loading" />
+                            />
                         <GeneralButton v-else @click="saveIncomeReceipt()" color="bg-green-700  hover:bg-green-800"
                             text="Agregar" icon="add" :disabled="is_loading" />
                         <div class="mb-4 md:mr-2 md:mb-0 px-1">

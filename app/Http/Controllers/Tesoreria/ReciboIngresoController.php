@@ -132,9 +132,9 @@ class ReciboIngresoController extends Controller
 
     public function getSelectIncomeConcept(Request $request)
     {
-        $income_concept_select = ConceptoIngreso::selectRaw("concepto_ingreso.id_concepto_ingreso as value , concat(coalesce(concat(dependencia.codigo_dependencia,' - '), ''), concepto_ingreso.nombre_concepto_ingreso) as label, concepto_ingreso.estado_concepto_ingreso as estado")
-            ->leftJoin('dependencia', function ($join) {
-                $join->on('concepto_ingreso.id_dependencia', '=', 'dependencia.id_dependencia');
+        $income_concept_select = ConceptoIngreso::selectRaw("concepto_ingreso.id_concepto_ingreso as value , concat(coalesce(concat(centro_atencion.codigo_centro_atencion,' - '), ''), concepto_ingreso.nombre_concepto_ingreso) as label, concepto_ingreso.estado_concepto_ingreso as estado")
+            ->leftJoin('centro_atencion', function ($join) {
+                $join->on('concepto_ingreso.id_centro_atencion', '=', 'centro_atencion.id_centro_atencion');
             })
             //->where('concepto_ingreso.estado_concepto_ingreso', '=', 1)
             ->where('concepto_ingreso.id_proy_financiado', '=', $request->financing_source_id)

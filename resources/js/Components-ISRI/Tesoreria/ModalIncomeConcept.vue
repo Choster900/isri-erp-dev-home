@@ -32,7 +32,7 @@
                     <div class="mb-7 md:flex flex-row justify-items-start">
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                             <label class="block mb-2 text-xs font-light text-gray-600">
-                                Centro <span class="text-red-600 font-extrabold">*</span>
+                                Centro
                             </label>
                             <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                                 <Multiselect v-model="income_concept.dependency_id" :options="dependencies"

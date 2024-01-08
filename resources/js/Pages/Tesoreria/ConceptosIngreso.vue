@@ -94,7 +94,7 @@
                                             <div class="font-semibold">Editar</div>
                                         </div>
                                         <div @click="changeStatus(service.id_concepto_ingreso, service.estado_concepto_ingreso)"
-                                            v-if="permits.actualizar == 1"
+                                            v-if="permits.eliminar == 1"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="ml-0.5 mr-2 w-5 h-5"
                                                 :class="service.estado_concepto_ingreso == 1 ? 'text-red-800' : 'text-green-800'">
@@ -135,10 +135,6 @@
                     </tbody>
                 </datatable>
 
-            </div>
-            <div v-if="emptyObject" class="flex text-center py-2">
-                <p class="font-semibold text-red-500 text-[16px]" style="margin: 0 auto; text-align: center;">No se
-                    encontraron registros.</p>
             </div>
         </div>
 
@@ -215,7 +211,7 @@ export default {
         const showModalIncome = ref(false)
         const columns = [
             { width: "10%", label: "ID", name: "id_concepto_ingreso", type: "text" },
-            { width: "30%", label: "Dependencia", name: "nombre_dependencia", type: "text" },
+            { width: "30%", label: "Centro", name: "nombre_dependencia", type: "text" },
             { width: "30%", label: "Concepto Ingreso", name: "nombre_concepto_ingreso", type: "text" },
             { width: "10%", label: "Especifico", name: "id_ccta_presupuestal", type: "text" },
             {
