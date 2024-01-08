@@ -11,9 +11,7 @@ export const useFiniquitos = (context) => {
     const isLoadingRequest = ref(false);
     const errors = ref([]);
     const empleados = ref([])
-    const centros = ref([]);
-    const personId = ref("")
-    const amount = ref(0)
+    const finiquito = ref([])
     const persons = ref([]);
     const isLoadingPerson = ref(false);
 
@@ -41,31 +39,35 @@ export const useFiniquitos = (context) => {
     };
 
     const setModalValues = (empleados) => {
+        finiquito.value.personId = ""
+        finiquito.value.amount = 0
+        finiquito.value.centros = []
+
         empleados.forEach((empleado) => {
             const idCentro = empleado.plazas_asignadas[0].centro_atencion.id_centro_atencion;
             // Buscar el índice del centro correspondiente en 'centros'
-            const indiceCentro = centros.value.findIndex((centro) => centro.id === idCentro);
+            const indiceCentro = finiquito.value.centros.findIndex((centro) => centro.id === idCentro);
 
             if (indiceCentro === -1) {
                 const emp = {
                     ...empleado, // Copiar las propiedades del empleado
                 };
                 // Si el centro no existe en 'centros', se agrega con un nuevo arreglo de empleados
-                centros.value.push({
+                finiquito.value.centros.push({
                     id: idCentro,
                     center: empleado.plazas_asignadas[0].centro_atencion.codigo_centro_atencion,
                     date: '',
                     startTime: '',
                     endTime: '',
-                    interval : '',
+                    interval: '',
                     empleados: [emp],
                 });
             } else {
                 // Si el centro ya existe, se agrega el empleado al arreglo existente de empleados para ese centro
-                centros.value[indiceCentro].empleados.push(empleado);
+                finiquito.value.centros[indiceCentro].empleados.push(empleado);
             }
         });
-        console.log(centros.value);
+        //console.log(finiquito.value);
     };
 
     const asyncFindPerson = _.debounce(async (query) => {
@@ -82,14 +84,79 @@ export const useFiniquitos = (context) => {
         }
     }, 350);
 
+    const storeFiniquitos = async (finiq) => {
+        //console.log(finiq);
+        swal({
+            title: "¿Está seguro de generar el finiquito para todos los empleados?",
+            icon: "question",
+            iconHtml: "❓",
+            confirmButtonText: "Si, Guardar",
+            confirmButtonColor: "#115E59",
+            cancelButtonText: "Cancelar",
+            showCancelButton: true,
+            showCloseButton: true,
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                saveFiniquito(finiq, '/store-finiquitos');
+            }
+        });
+    };
+
+    const saveFiniquito = async (finiq, url) => {
+        //console.log(finiquitos);
+        isLoadingRequest.value = true;
+        await axios
+            .post(url, {
+                personId: finiq.personId,
+                amount: finiq.amount,
+                centers: finiq.centros
+            })
+            .then((response) => {
+                handleSuccessResponse(response)
+            })
+            .catch((error) => {
+                handleErrorResponse(error)
+            })
+            .finally(() => {
+                isLoadingRequest.value = false;
+            });
+    };
+
+    const handleErrorResponse = (err) => {
+        if (err.response.status === 422) {
+            if (err.response.data.logical_error) {
+                console.log(err.response);
+                useShowToast(toast.error, err.response.data.logical_error);
+
+            } else {
+                useShowToast(
+                    toast.warning,
+                    "Tienes algunos errores, por favor verifica los datos enviados."
+                );
+                errors.value = err.response.data.errors;
+            }
+        } else {
+            showErrorMessage(err);
+            context.emit("cerrar-modal")
+        }
+    };
+
+    const handleSuccessResponse = (response) => {
+        useShowToast(
+            toast.success,
+            response.data.message
+        );
+        context.emit("cerrar-modal")
+        context.emit("get-table")
+    }
+
     const showErrorMessage = (err) => {
         const { title, text, icon } = useHandleError(err);
         swal({ title: title, text: text, icon: icon, timer: 5000 });
     };
 
     return {
-        isLoadingRequest, centros, empleados, personId, amount,
-        isLoadingPerson, persons,
-        getInfoForModalFiniquitos, asyncFindPerson,
+        isLoadingRequest, finiquito, empleados, isLoadingPerson, persons,
+        getInfoForModalFiniquitos, asyncFindPerson, storeFiniquitos,
     };
 };

@@ -15,7 +15,6 @@ class FiniquitoLaboral extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'id_estado_ef',
         'id_empleado',
         'id_persona',
         'id_ejercicio_fiscal',
