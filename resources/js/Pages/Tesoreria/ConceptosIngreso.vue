@@ -1,25 +1,7 @@
-<script setup>
-import Modal from "@/Components/Modal.vue";
-import { Head } from "@inertiajs/vue3";
-import AppLayoutVue from "@/Layouts/AppLayout.vue";
-import Datatable from "@/Components-ISRI/Datatable.vue";
-import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
-import ModalIncomeConceptVue from '@/Components-ISRI/Tesoreria/ModalIncomeConcept.vue';
-import moment from 'moment';
-
-import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
-
-import { toast } from 'vue3-toastify';
-import 'vue3-toastify/dist/index.css';
-
-import axios from 'axios';
-
-</script>
-
 <template>
     <Head title="Catalogo - Conceptos" />
     <AppLayoutVue nameSubModule="Tesoreria - Conceptos de Ingreso">
-        <div v-if="isLoadinTop"
+        <div v-if="isLoadingTop"
             class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
             <div role="status" class="flex items-center">
                 <svg aria-hidden="true" class="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-800"
@@ -38,7 +20,7 @@ import axios from 'axios';
         </div>
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="addIncomeConcept()" v-if="permits.insertar == 1"
+                <GeneralButton @click="showModalIncome=true; incomeConceptId=0;" v-if="permits.insertar == 1"
                     color="bg-green-700  hover:bg-green-800" text="Agregar Concepto" icon="add" />
             </div>
         </div>
@@ -47,7 +29,7 @@ import axios from 'axios';
                 <div class="mb-4 md:flex flex-row justify-items-start">
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-                            <Multiselect v-model="tableData.length" @select="getIncomeConcept()" :options="perPage"
+                            <Multiselect v-model="tableData.length" @select="getDataToShow()" :options="perPage"
                                 :searchable="true" placeholder="Cantidad a mostrar" />
                             <LabelToInput icon="list2" />
                         </div>
@@ -61,9 +43,9 @@ import axios from 'axios';
 
             <div class="overflow-x-auto">
                 <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
-                    @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getIncomeConcept()">
+                    @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getDataToShow()">
                     <tbody class="text-sm divide-y divide-slate-200" v-if="!isLoadinRequest">
-                        <tr v-for="service in income_concept" :key="service.id_concepto_ingreso">
+                        <tr v-for="service in dataToShow" :key="service.id_concepto_ingreso">
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">{{ service.id_concepto_ingreso }}</div>
                             </td>
@@ -99,7 +81,7 @@ import axios from 'axios';
                                     <DropDownOptions>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                                             v-if="permits.actualizar == 1 && service.estado_concepto_ingreso == 1"
-                                            @click="editIncomeConcept(service)">
+                                            @click="showModalIncome=true; incomeConceptId=service.id_concepto_ingreso;">
                                             <div class="w-8 text-green-900">
                                                 <span class="text-xs">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -111,15 +93,15 @@ import axios from 'axios';
                                             </div>
                                             <div class="font-semibold">Editar</div>
                                         </div>
-                                        <div @click="changeStateIncomeConcept(service.id_concepto_ingreso, service.nombre_concepto_ingreso, service.estado_concepto_ingreso)"
+                                        <div @click="changeStatus(service.id_concepto_ingreso, service.estado_concepto_ingreso)"
                                             v-if="permits.actualizar == 1"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="ml-0.5 mr-2 w-5 h-5"
                                                 :class="service.estado_concepto_ingreso == 1 ? 'text-red-800' : 'text-green-800'">
                                                 <span class="text-xs ">
-                                                    <IconM
+                                                    <icon-m
                                                         :iconName="service.estado_concepto_ingreso == 1 ? 'desactivate' : 'activate'">
-                                                    </IconM>
+                                                    </icon-m>
                                                 </span>
                                             </div>
                                             <div class="font-semibold">
@@ -141,7 +123,7 @@ import axios from 'axios';
                             </td>
                         </tr>
                     </tbody>
-                    <tbody v-if="empty_object && !isLoadinRequest">
+                    <tbody v-if="emptyObject && !isLoadinRequest">
                         <tr>
                             <td colspan="6" class="text-center">
                                 <img src="../../../img/NoData.gif" alt="" class="w-60 h-60 mx-auto">
@@ -154,13 +136,13 @@ import axios from 'axios';
                 </datatable>
 
             </div>
-            <div v-if="empty_object" class="flex text-center py-2">
+            <div v-if="emptyObject" class="flex text-center py-2">
                 <p class="font-semibold text-red-500 text-[16px]" style="margin: 0 auto; text-align: center;">No se
                     encontraron registros.</p>
             </div>
         </div>
 
-        <div v-if="!empty_object" class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
+        <div v-if="!emptyObject" class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
             <div>
                 <nav class="flex justify-between" role="navigation" aria-label="Navigation">
                     <div class="grow text-center">
@@ -170,7 +152,7 @@ import axios from 'axios';
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
 
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="link.url ? getIncomeConcept(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                        <a @click="link.url ? getDataToShow(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                   text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
@@ -179,7 +161,7 @@ import axios from 'axios';
                                 <span v-else-if="(link.label == 'Siguiente')"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="link.url ? getIncomeConcept(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                        <a @click="link.url ? getDataToShow(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                   text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
@@ -187,7 +169,7 @@ import axios from 'axios';
                                 </span>
                                 <span class="cursor-pointer" v-else
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
-                                        class=" w-5" @click="getIncomeConcept(link.url)">{{ link.label }}</span>
+                                        class=" w-5" @click="getDataToShow(link.url)">{{ link.label }}</span>
                                 </span>
                             </li>
                         </ul>
@@ -196,23 +178,42 @@ import axios from 'axios';
             </div>
         </div>
 
-        <ModalIncomeConceptVue :showModalIncome="showModalIncome" :modalData="modalData"
+        <modal-income-concept-vue v-if="showModalIncome" :showModalIncome="showModalIncome" :incomeConceptId="incomeConceptId"
             :financing_sources="financing_sources" :budget_accounts="budget_accounts" :dependencies="dependencies"
-            @cerrar-modal="showModalIncome = false" @get-table="getIncomeConcept(tableData.currentPage)" />
+            @cerrar-modal="showModalIncome = false" @get-table="getDataToShow(tableData.currentPage)" />
 
     </AppLayoutVue>
 </template>
 
 <script>
+import { Head } from "@inertiajs/vue3";
+import AppLayoutVue from "@/Layouts/AppLayout.vue";
+import Datatable from "@/Components-ISRI/Datatable.vue";
+import ModalIncomeConceptVue from '@/Components-ISRI/Tesoreria/ModalIncomeConcept.vue';
+import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
+
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
+
+import { usePermissions } from '@/Composables/General/usePermissions.js';
+import { useToDataTable } from '@/Composables/General/useToDataTable.js';
+import { ref, toRefs } from 'vue';
+
 export default {
-    created() {
-        this.getIncomeConcept()
-        this.getPermissions(this)
-        this.getSelectsIncomeConcept()
+    components: { Head, AppLayoutVue, Datatable, ModalIncomeConceptVue, IconM },
+    props: {
+        menu: {
+            type: Object,
+            default: {}
+        },
     },
-    data() {
-        let sortOrders = {};
-        let columns = [
+    setup(props, context) {
+        const { menu } = toRefs(props);
+        const permits = usePermissions(menu.value, window.location.pathname);
+
+        const incomeConceptId = ref(0)
+        const showModalIncome = ref(false)
+        const columns = [
             { width: "10%", label: "ID", name: "id_concepto_ingreso", type: "text" },
             { width: "30%", label: "Dependencia", name: "nombre_dependencia", type: "text" },
             { width: "30%", label: "Concepto Ingreso", name: "nombre_concepto_ingreso", type: "text" },
@@ -225,171 +226,34 @@ export default {
                 ]
             },
             { width: "10%", label: "Acciones", name: "Acciones" },
+
         ];
-        columns.forEach((column) => {
-            if (column.name === 'id_concepto_ingreso')
-                sortOrders[column.name] = 1;
-            else
-                sortOrders[column.name] = -1;
-        });
+        const requestUrl = "/ingresos"
+        const columntToSort = "id_concepto_ingreso"
+        const dir = 'desc'
+        const {
+            dataToShow,
+            tableData, perPage,
+            links, sortKey,
+            sortOrders,
+            isLoadinRequest,
+            isLoadingTop,
+            emptyObject,
+            getDataToShow, handleData, sortBy, changeStatusElement
+        } = useToDataTable(columns, requestUrl, columntToSort, dir)
+
+        const changeStatus = async (id, status) => {
+            await changeStatusElement(id, status, "/change-state-income-concept")
+        }
+
         return {
-            empty_object: false,
-            //Data for datatable
-            income_concept: [],
-            //Data for modal
-            showModalIncome: false,
-            modalData: [],
-            isLoadinRequest: false,
-            isLoadinTop: false,
-            //Until here
-            permits: [],
-            budget_accounts: [],
-            dependencies: [],
-            financing_sources: [],
-            links: [],
-            columns: columns,
-            sortKey: "id_concepto_ingreso",
-            sortOrders: sortOrders,
-            perPage: ["10", "20", "30"],
-            tableData: {
-                currentPage: '',
-                draw: 0,
-                length: 5,
-                search: "",
-                column: 0,
-                dir: "desc",
-                total: ""
-            },
-        }
-    },
-    methods: {
-        editIncomeConcept(income_concept) {
-            this.modalData = income_concept
-            this.showModalIncome = true
-        },
-        addIncomeConcept() {
-            this.modalData = []
-            this.showModalIncome = true
-        },
-        getSelectsIncomeConcept() {
-            axios.get("/get-selects-income-concept")
-                .then((response) => {
-                    this.budget_accounts = response.data.budget_accounts
-                    this.dependencies = response.data.dependencies
-                    this.financing_sources = response.data.financing_sources
-                })
-                .catch((errors) => {
-                    this.manageError(errors, this)
-                    this.$emit("cerrar-modal");
-                });
-        },
-        async changeStateIncomeConcept(id_service, name_service, state_service) {
-            let msg
-            state_service == 1 ? msg = "Desactivar" : msg = "Activar"
-            this.$swal
-                .fire({
-                    title: msg + ' concepto de ingreso: ' + name_service + '.',
-                    text: "¿Estas seguro?",
-                    icon: "question",
-                    iconHtml: "❓",
-                    confirmButtonText: 'Si, ' + msg,
-                    confirmButtonColor: "#001b47",
-                    cancelButtonText: "Cancelar",
-                    showCancelButton: true,
-                    showCloseButton: true
-                })
-                .then(async (result) => {
-                    if (result.isConfirmed) {
-                        this.isLoadinTop = true
-                        await axios.post("/change-state-income-concept", {
-                            id_service: id_service,
-                            state_service: state_service
-                        })
-                            .then((response) => {
-                                this.showToast(toast.success, response.data.mensaje);
-                                this.getIncomeConcept(this.tableData.currentPage);
-                            })
-                            .catch((errors) => {
-                                this.manageError(errors, this)
-                            })
-                            .finally(() => {
-                                this.isLoadinTop = false;
-                            });
-                    }
-                });
-        },
-        // changeStateIncomeConcept(id_service, name_service, state_service) {
-        //     let msg
-        //     state_service == 1 ? msg = "Desactivar" : msg = "Activar"
-        //     this.$swal.fire({
-        //         title: msg + ' concepto de ingreso: ' + name_service + '.',
-        //         text: "¿Estas seguro?",
-        //         icon: "question",
-        //         iconHtml: "❓",
-        //         confirmButtonText: 'Si, ' + msg,
-        //         confirmButtonColor: "#001b47",
-        //         cancelButtonText: "Cancelar",
-        //         showCancelButton: true,
-        //         showCloseButton: true
-        //     }).then((result) => {
-        //         if (result.isConfirmed) {
-        //             axios.post("/change-state-income-concept", {
-        //                 id_service: id_service,
-        //                 state_service: state_service
-        //             })
-        //                 .then((response) => {
-        //                     toast.success(response.data.mensaje, {
-        //                         autoClose: 4000,
-        //                         position: "top-right",
-        //                         transition: "zoom",
-        //                         toastBackgroundColor: "white",
-        //                     });
-        //                     this.getIncomeConcept(this.tableData.currentPage);
-        //                 })
-        //                 .catch((errors) => {
-        //                     this.manageError(errors, this)
-        //                 })
-        //         }
-        //     })
-        // },
-        async getIncomeConcept(url = "/ingresos") {
-            this.tableData.draw++;
-            this.tableData.currentPage = url
-            this.isLoadinRequest = true
-            await axios.post(url, this.tableData).then((response) => {
-                let data = response.data;
-                if (this.tableData.draw == data.draw) {
-                    this.links = data.data.links;
-                    this.tableData.total = data.data.total;
-                    this.links[0].label = "Anterior";
-                    this.links[this.links.length - 1].label = "Siguiente";
-                    this.income_concept = data.data.data;
-                    this.income_concept.length > 0 ? this.empty_object = false : this.empty_object = true
-                    this.isLoadinRequest = false
-                }
-            }).catch((errors) => {
-                this.manageError(errors, this)
-            })
-        },
-        sortBy(key) {
-            if (key != "Acciones") {
-                this.sortKey = key;
-                this.sortOrders[key] = this.sortOrders[key] * -1;
-                this.tableData.column = this.getIndex(this.columns, "name", key);
-                this.tableData.dir = this.sortOrders[key] === 1 ? "asc" : "desc";
-                this.getIncomeConcept();
-            }
-        },
-        getIndex(array, key, value) {
-            return array.findIndex((i) => i[key] == value);
-        },
-        handleData(myEventData) {
-            this.tableData.search = myEventData;
-            const data = Object.values(myEventData);
-            if (data.every(error => error === '')) {
-                this.getIncomeConcept()
-            }
-        }
+            permits, dataToShow, tableData,
+            perPage, links, sortKey, isLoadingTop,
+            sortOrders, sortBy, incomeConceptId,
+            handleData, isLoadinRequest,
+            getDataToShow, changeStatus, showModalIncome,
+            emptyObject, columns, 
+        };
     }
 }
 </script>
