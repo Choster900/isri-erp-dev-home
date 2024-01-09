@@ -88,6 +88,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('save-income-concept', [ConceptoIngresoController::class, 'saveIncomeConcept'])->name('conceptoIngreso.saveIncomeConcept');
     Route::post('update-income-concept', [ConceptoIngresoController::class, 'updateIncomeConcept'])->name('conceptoIngreso.updateIncomeConcept');
 
+    //New route for Composition API
+    Route::get('get-info-modal-concepto-ingreso/{id}', [ConceptoIngresoController::class, 'getInfoModalConceptoIngreso'])->name('conceptoIngreso.getInfoModalConceptoIngreso');
+
     //Routes to manage income
     Route::get(
         '/ts/recibos-ingreso',

@@ -1,11 +1,3 @@
-<script setup>
-import Modal from "@/Components-ISRI/AllModal/Modal.vue";
-import InputError from "@/Components/InputError.vue";
-import { toast } from "vue3-toastify";
-import "vue3-toastify/dist/index.css";
-import axios from "axios";
-</script>
-
 <template>
     <div class="m-1.5">
         <div v-if="isLoadingRequest"
@@ -40,7 +32,7 @@ import axios from "axios";
                     <div class="mb-7 md:flex flex-row justify-items-start">
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                             <label class="block mb-2 text-xs font-light text-gray-600">
-                                Centro <span class="text-red-600 font-extrabold">*</span>
+                                Centro
                             </label>
                             <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                                 <Multiselect v-model="income_concept.dependency_id" :options="dependencies"
@@ -69,7 +61,7 @@ import axios from "axios";
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                             <TextInput id="name-income" v-model="income_concept.name" type="text"
                                 placeholder="Concepto de Ingreso"
-                                @update:modelValue="validateInput('name', limit = 145, upper = true)">
+                                @update:modelValue="handleValidation('name', {limit: 145, upper: true})">
                                 <LabelToInput icon="standard" forLabel="name-income" />
                             </TextInput>
                             <InputError v-for="(item, index) in errors.name" :key="index" class="mt-2" :message="item" />
@@ -93,7 +85,7 @@ import axios from "axios";
                         <div class="mb-4 md:mr-2 md:mb-0 basis-full">
                             <TextInput :required="false" id="detalle-concepto" v-model="income_concept.detail" type="text"
                                 placeholder="Detalle concepto ingreso"
-                                @update:modelValue="validateInput('detail', limit = 145)">
+                                @update:modelValue="handleValidation('detail', {limit : 145})">
                                 <LabelToInput icon="standard" forLabel="detalle-concepto" />
                             </TextInput>
                             <InputError v-for="(item, index) in errors.detail" :key="index" class="mt-2" :message="item" />
@@ -102,9 +94,9 @@ import axios from "axios";
 
                     <!-- Buttons -->
                     <div class="mt-4 mb-4 md:flex flex-row justify-center">
-                        <GeneralButton v-if="modalData != ''" @click="updateIncomeConcept()"
+                        <GeneralButton v-if="incomeConceptId > 0" @click="updateConceptoIngreso(income_concept)"
                             color="bg-orange-700  hover:bg-orange-800" text="Actualizar" icon="update" />
-                        <GeneralButton v-else @click="storeIncomeConcept()" color="bg-green-700  hover:bg-green-800"
+                        <GeneralButton v-else @click="storeConceptoIngreso(income_concept)" color="bg-green-700  hover:bg-green-800"
                             text="Agregar" icon="add" />
                         <div class="mb-4 md:mr-2 md:mb-0 px-1">
                             <GeneralButton text="Cancelar" icon="add" @click="$emit('cerrar-modal')" />
@@ -117,261 +109,61 @@ import axios from "axios";
 </template>
 
 <script>
+import { useConceptoIngreso } from '@/Composables/Tesoreria/ConceptoIngreso/useConceptoIngreso.js';
+import Modal from "@/Components-ISRI/AllModal/Modal.vue";
+import InputError from "@/Components/InputError.vue";
+import GeneralButton from "@/Components-ISRI/ComponentsToForms/GeneralButton.vue";
+import TextInput from "@/Components-ISRI/ComponentsToForms/TextInput.vue";
+import LabelToInput from "@/Components-ISRI/ComponentsToForms/LabelToInput.vue";
+
+import { ref, toRefs, onMounted, } from 'vue';
+
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
+import axios from "axios";
+import { useValidateInput } from '@/Composables/General/useValidateInput';
+
 export default {
+    components: { Modal, InputError, GeneralButton, TextInput, LabelToInput },
     props: {
-        modalData: {
-            type: Array,
-            default: [],
+        incomeConceptId: {
+            type: Number,
+            default: 0,
         },
         showModalIncome: {
             type: Boolean,
             default: false,
         },
-        budget_accounts: {
-            type: Array,
-            default: []
-        },
-        dependencies: {
-            type: Array,
-            default: []
-        },
-        financing_sources: {
-            type: Array,
-            default: []
-        },
     },
-    created() { },
-    data: function (data) {
+    setup(props, context) {
+
+        const { incomeConceptId } = toRefs(props);
+
+        const {
+            isLoadingRequest, income_concept, financing_sources,
+            dependencies, budget_accounts, errors,
+            getInfoForModalConceptosIngreso, storeConceptoIngreso, updateConceptoIngreso
+        } = useConceptoIngreso(context);
+
+        const {
+            validateInput
+        } = useValidateInput()
+
+        const handleValidation = (input, validation) => {
+            income_concept.value[input] = validateInput(income_concept.value[input],validation)
+        }
+
+        onMounted(
+            async () => {
+                await getInfoForModalConceptosIngreso(incomeConceptId.value)
+            }
+        )
+
         return {
-            errors: [],
-            environments: [],
-            isLoadingRequest: false,
-            income_concept: {
-                dependency_id: '',
-                budget_account_id: '',
-                financing_source_id: '',
-                name: '',
-                detail: ''
-            },
-        };
-    },
-    methods: {
-        //Function to validate data entry
-        validateInput(field, limit, upper_case) {
-            if (this.income_concept[field] && this.income_concept[field].length > limit) {
-                this.income_concept[field] = this.income_concept[field].substring(0, limit);
-            }
-            if (upper_case) {
-                this.toUpperCase(field)
-            }
-        },
-        toUpperCase(field) {
-            //Converts field to uppercase
-            this.income_concept[field] = this.income_concept[field].toUpperCase()
-        },
-        async storeIncomeConcept() {
-            this.$swal
-                .fire({
-                    title: '¿Está seguro de guardar el nuevo concepto de ingreso?',
-                    icon: 'question',
-                    iconHtml: '❓',
-                    confirmButtonText: 'Si, Guardar',
-                    confirmButtonColor: '#141368',
-                    cancelButtonText: 'Cancelar',
-                    showCancelButton: true,
-                    showCloseButton: true
-                })
-                .then(async (result) => {
-                    if (result.isConfirmed) {
-                        let url = '/save-income-concept'
-                        this.saveIncomeConcept(url)
-                    }
-                });
-        },
-        async updateIncomeConcept() {
-            this.$swal
-                .fire({
-                    title: '¿Está seguro de actualizar el concepto de ingreso?',
-                    icon: 'question',
-                    iconHtml: '❓',
-                    confirmButtonText: 'Si, Actualizar',
-                    confirmButtonColor: '#141368',
-                    cancelButtonText: 'Cancelar',
-                    showCancelButton: true,
-                    showCloseButton: true
-                })
-                .then(async (result) => {
-                    if (result.isConfirmed) {
-                        let url = '/update-income-concept'
-                        this.saveIncomeConcept(url)
-                    }
-                });
-        },
-        async saveIncomeConcept(url) {
-            this.isLoadingRequest = true
-            await axios.post(url, this.income_concept)
-                .then((response) => {
-                    this.handleSuccessResponse(response.data.message);
-                })
-                .catch((errors) => {
-                    this.handleErrorResponse(errors);
-                })
-                .finally(() => {
-                    // Desactiva el loader aquí, ya sea que la solicitud haya tenido éxito o haya fallado
-                    this.isLoadingRequest = false;
-                });
-        },
-        saveNewIncomeConcept() {
-            this.$swal
-                .fire({
-                    title: '¿Está seguro de guardar el nuevo concepto de ingreso?',
-                    icon: 'question',
-                    iconHtml: '❓',
-                    confirmButtonText: 'Si, Guardar',
-                    confirmButtonColor: '#141368',
-                    cancelButtonText: 'Cancelar',
-                    showCancelButton: true,
-                    showCloseButton: true
-                })
-                .then((result) => {
-                    if (result.isConfirmed) {
-                        axios
-                            .post("/save-income-concept", this.income_concept)
-                            .then((response) => {
-                                toast.success(response.data.mensaje, {
-                                    autoClose: 3000,
-                                    position: "top-right",
-                                    transition: "zoom",
-                                    toastBackgroundColor: "white",
-                                });
-                                this.$emit("get-table");
-                                this.$emit("cerrar-modal");
-                            })
-                            .catch((errors) => {
-                                if (errors.response.status === 422) {
-                                    toast.warning(
-                                        "Tienes algunos errores por favor verifica tus datos.",
-                                        {
-                                            autoClose: 5000,
-                                            position: "top-right",
-                                            transition: "zoom",
-                                            toastBackgroundColor: "white",
-                                        }
-                                    );
-                                    this.errors = errors.response.data.errors;
-                                } else {
-                                    let msg = this.manageError(errors);
-                                    this.$swal.fire({
-                                        title: "Operación cancelada",
-                                        text: msg,
-                                        icon: "warning",
-                                        timer: 5000,
-                                    });
-                                    this.$emit("cerrar-modal");
-                                }
-                            });
-                    }
-                });
-        },
-        updateIncomeConcept2() {
-            this.$swal
-                .fire({
-                    title: '¿Está seguro de actualizar el concepto de ingreso?',
-                    icon: 'question',
-                    iconHtml: '❓',
-                    confirmButtonText: 'Si, Actualizar',
-                    confirmButtonColor: '#141368',
-                    cancelButtonText: 'Cancelar',
-                    showCancelButton: true,
-                    showCloseButton: true
-                })
-                .then((result) => {
-                    if (result.isConfirmed) {
-                        axios
-                            .post("/update-income-concept", this.income_concept)
-                            .then((response) => {
-                                toast.success(response.data.mensaje, {
-                                    autoClose: 3000,
-                                    position: "top-right",
-                                    transition: "zoom",
-                                    toastBackgroundColor: "white",
-                                });
-                                this.$emit("get-table");
-                                this.$emit("cerrar-modal");
-                            })
-                            .catch((errors) => {
-                                if (errors.response.status === 422) {
-                                    if (errors.response.data.logical_error) {
-                                        toast.error(
-                                            errors.response.data.logical_error,
-                                            {
-                                                autoClose: 5000,
-                                                position: "top-right",
-                                                transition: "zoom",
-                                                toastBackgroundColor: "white",
-                                            }
-                                        );
-                                        this.$emit("get-table");
-                                        this.$emit("cerrar-modal");
-                                    } else {
-                                        toast.warning(
-                                            "Tienes algunos errores por favor verifica tus datos.",
-                                            {
-                                                autoClose: 5000,
-                                                position: "top-right",
-                                                transition: "zoom",
-                                                toastBackgroundColor: "white",
-                                            }
-                                        );
-                                        this.errors = errors.response.data.errors;
-                                    }
-                                } else {
-                                    let msg = this.manageError(errors);
-                                    this.$swal.fire({
-                                        title: "Operación cancelada",
-                                        text: msg,
-                                        icon: "warning",
-                                        timer: 5000,
-                                    });
-                                    this.$emit("cerrar-modal");
-                                }
-                            });
-                    }
-                });
-        },
-        handleSuccessResponse(message) {
-            this.showToast(toast.success, message);
-            this.$emit("get-table");
-            this.$emit("cerrar-modal");
-        },
-        handleErrorResponse(errors) {
-            if (errors.response.status === 422) {
-                if (errors.response.data.logical_error) {
-                    this.showToast(toast.error, errors.response.data.logical_error);
-                    this.$emit("get-table");
-                    this.$emit("cerrar-modal");
-                } else {
-                    this.showToast(toast.warning, "Tienes algunos errores por favor verifica tus datos.");
-                    this.errors = errors.response.data.errors;
-                }
-            } else {
-                this.manageError(errors, this)
-                this.$emit("cerrar-modal");
-            }
-        },
-    },
-    watch: {
-        showModalIncome: function (value, oldValue) {
-            if (value) {
-                this.errors = [];
-                this.income_concept.income_concept_id = this.modalData.id_concepto_ingreso;
-                this.income_concept.dependency_id = this.modalData.id_centro_atencion;
-                this.income_concept.budget_account_id = this.modalData.id_ccta_presupuestal;
-                this.income_concept.name = this.modalData.nombre_concepto_ingreso;
-                this.income_concept.financing_source_id = this.modalData.id_proy_financiado;
-                this.income_concept.detail = this.modalData.detalle_concepto_ingreso;
-            }
-        },
-    },
+            isLoadingRequest, income_concept, financing_sources, 
+            dependencies, budget_accounts, errors,
+            storeConceptoIngreso, updateConceptoIngreso, handleValidation
+        }
+    }
 };
 </script>
