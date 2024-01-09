@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DetalleQuedan extends Model
 {
@@ -13,7 +14,7 @@ class DetalleQuedan extends Model
     public $timestamps = false;
     protected $fillable = [
         'id_det_quedan',
-        'id_dependencia',
+        'id_centro_atencion',
         'id_quedan',
         'numero_acta_det_quedan',
         'numero_factura_det_quedan',
@@ -37,10 +38,14 @@ class DetalleQuedan extends Model
     {
         return $this->belongsTo(Quedan::class, "id_quedan", "id_quedan");
     }
-
-    public function dependencia()
+    /**
+     * Get the centro_atencion that owns the DetalleQuedan
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function centro_atencion(): BelongsTo
     {
-        return $this->belongsTo(Dependencia::class, "id_dependencia", "id_dependencia");
+        return $this->belongsTo(CentroAtencion::class, 'id_centro_atencion', 'id_centro_atencion');
     }
 
 

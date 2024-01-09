@@ -251,7 +251,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                         <th class="border-2 border-black text-sm px-2 text-gray-600 w-40">FACTURA</th>
                                         <th class="border-2 border-black text-sm px-2 text-gray-600" colspan="2">FECHA
                                             EMISION</th>
-                                        <th class="border-2 border-black text-sm px-3 text-gray-600">DEPENDENCIA</th>
+                                        <th class="border-2 border-black text-sm px-3 text-gray-600">CENTRO.ATENCION</th>
                                         <th class="border-2 border-black text-sm px-4 text-gray-600">NUMERO ACTA</th>
                                         <th class="border-2 border-black text-sm px-7 text-gray-600">MONTO</th>
                                         <th class="border-2 border-black text-sm px-7 text-gray-600">RETENCIONES</th>
@@ -292,19 +292,19 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                         </div>
 
                                                     </td>
-                                                    <td v-else-if="cellIndex == 'id_dependencia'"
+                                                    <td v-else-if="cellIndex == 'id_centro_atencion'"
                                                         class="border-2 border-black" :class="{
-                                                            'condition-select': rowsData[rowIndex]['id_dependencia'] == '',//validando si esta vacio
-                                                            'condition-error-select': errors[`detalle_quedan.${rowIndex}.id_dependencia`]//validando si tiene errores
+                                                            'condition-select': rowsData[rowIndex]['id_centro_atencion'] == '',//validando si esta vacio
+                                                            'condition-error-select': errors[`detalle_quedan.${rowIndex}.id_centro_atencion`]//validando si tiene errores
                                                         }
                                                             ">
                                                         <div class="relative flex h-8 w-full flex-row-reverse ">
-                                                            <Multiselect v-model="rowsData[rowIndex]['id_dependencia']"
-                                                                :title="errors[`detalle_quedan.${rowIndex}.id_dependencia`]"
+                                                            <Multiselect v-model="rowsData[rowIndex]['id_centro_atencion']"
+                                                                :title="errors[`detalle_quedan.${rowIndex}.id_centro_atencion`]"
                                                                 placeholder="seleccione" :classes="{
                                                                     placeholder: 'flex items-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-black rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ',
                                                                 }
-                                                                    " :options="dataForSelectInRow.dependencias"
+                                                                    " :options="dataForSelectInRow.centros"
                                                                 :searchable="true"
                                                                 :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                                 @select="onCellEdit(rowIndex, cellIndex, $event)" />
@@ -588,7 +588,7 @@ export default {
                 monto_isr_quedan: '',
                 monto_total_quedan: '',
                 monto_doc_adquisicion: '',
-                montoTotalDetalleDocumentoAdquisicion: '',//OBTIENE EL TOTAL UTILIZADO 
+                montoTotalDetalleDocumentoAdquisicion: '',//OBTIENE EL TOTAL UTILIZADO
                 monto_det_doc_adquisicion: '',//OBTIENE EL TOTAL DEL DETALLE QUE ESTA EN LA BASE
                 montoSuperador: false,
             },
@@ -746,7 +746,7 @@ export default {
             this.taxesByRow();
         },
 
-        // Calcula los impuestos por fila 
+        // Calcula los impuestos por fila
         taxesByRow() {
             // Filtrar los elementos que no se han eliminado
             const rowsData = this.rowsData.filter(element => element['isDelete'] === true);
@@ -795,7 +795,7 @@ export default {
                 // Tomando el iva del monto liquido que se divio antes por el porcentaje del proveedor que se ha seleccionado
                 const ivaByFila = liquido * this.dataForCalculate.iva;
 
-                // Validando si el proveedor tiene contrato o no  
+                // Validando si el proveedor tiene contrato o no
                 const totalFacturas = this.dataForCalculate.monto_doc_adquisicion;
                 const montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
                 if (this.documentoAdquisicion != "") {
@@ -949,7 +949,7 @@ export default {
                     id_det_quedan: '',
                     numero_factura_det_quedan: '',
                     fecha_factura_det_quedan: '',
-                    id_dependencia: '',
+                    id_centro_atencion: '',
                     numero_acta_det_quedan: '',
                     monto: { producto_factura_det_quedan: '', servicio_factura_det_quedan: '' },
                     retenciones: { iva: '0.00', renta: '0.00' },
@@ -977,7 +977,7 @@ export default {
             for (let i = 0; i < this.rowsData.length; i++) {
                 const row = this.rowsData[i];
                 const number = row["numero_acta_det_quedan"]; // Obtener el número de acta en la posición 4
-                const dependency = row["id_dependencia"]; // Obtener la dependencia en la posición 3
+                const dependency = row["id_centro_atencion"]; // Obtener la dependencia en la posición 3
 
                 // Verificar si la fila no está marcada como eliminada
                 if (row["isDelete"] !== false) {
@@ -1191,7 +1191,7 @@ export default {
                             id_det_quedan: value.id_det_quedan,
                             numero_factura_det_quedan: value.numero_factura_det_quedan,
                             fecha_factura_det_quedan: value.fecha_factura_det_quedan,
-                            id_dependencia: value.id_dependencia,
+                            id_centro_atencion: value.id_centro_atencion,//TODO: maybe this does not work
                             numero_acta_det_quedan: value.numero_acta_det_quedan,
                             monto: { producto_factura_det_quedan: value.producto_factura_det_quedan, servicio_factura_det_quedan: value.servicio_factura_det_quedan },
                             retenciones: { iva: value.iva_factura_det_quedan, renta: value.isr_factura_det_quedan },

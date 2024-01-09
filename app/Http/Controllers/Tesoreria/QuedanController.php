@@ -187,7 +187,9 @@ class QuedanController extends Controller
                     $new_detalle = [
                         'id_quedan'                          => $quedan,
                         'numero_factura_det_quedan'          => $value["numero_factura_det_quedan"],
-                        'id_dependencia'                     => $value["id_dependencia"],
+                        'fecha_factura_det_quedan'           => $value["fecha_factura_det_quedan"],
+                        'fecha_reg_det_quedan'               => Carbon::now(),
+                        'id_centro_atencion'                 => $value["id_centro_atencion"],
                         'numero_acta_det_quedan'             => $value["numero_acta_det_quedan"],
                         'producto_factura_det_quedan'        => $value["monto"]['producto_factura_det_quedan'],
                         'servicio_factura_det_quedan'        => $value["monto"]['servicio_factura_det_quedan'],
@@ -196,8 +198,6 @@ class QuedanController extends Controller
                         'ajuste_servicio_factura_det_quedan' => $value["reajuste"] ? $value["reajuste_monto"]['ajuste_servicio_factura_det_quedan'] : 0,
                         'iva_factura_det_quedan'             => $value["retenciones"]['iva'],
                         'isr_factura_det_quedan'             => $value["retenciones"]['renta'],
-                        'fecha_factura_det_quedan'           => $value["fecha_factura_det_quedan"],
-                        'fecha_reg_det_quedan'               => Carbon::now(),
                         'usuario_det_quedan'                 => $request->user()->nick_usuario,
                         'ip_det_quedan'                      => $request->ip(),
                     ];
@@ -255,7 +255,7 @@ class QuedanController extends Controller
                     // Actualizar un detalle de quedan existente
                     $new_detalle = array(
                         'numero_factura_det_quedan'          => $value["numero_factura_det_quedan"],
-                        'id_dependencia'                     => $value["id_dependencia"],
+                        'id_centro_atencion'                 => $value["id_centro_atencion"],
                         'numero_acta_det_quedan'             => $value["numero_acta_det_quedan"],
                         'producto_factura_det_quedan'        => $value["monto"]['producto_factura_det_quedan'],
                         'servicio_factura_det_quedan'        => $value["monto"]['servicio_factura_det_quedan'],
@@ -272,12 +272,12 @@ class QuedanController extends Controller
                     DetalleQuedan::where("id_det_quedan", $value["id_det_quedan"])->update($new_detalle);
                 }
                 if ($value["numberRow"] == 1 && $value["isDelete"] !== false) {
-                    //Al momento de editar puede que agrege filas entonces se valida que la fila sea nueva 
+                    //Al momento de editar puede que agrege filas entonces se valida que la fila sea nueva
                     // Agregar un nuevo detalle_quedan
                     $new_detalle = array(
                         'id_quedan'                          => $id_quedan,
                         'numero_factura_det_quedan'          => $value["numero_factura_det_quedan"],
-                        'id_dependencia'                     => $value["id_dependencia"],
+                        'id_centro_atencion'                 => $value["id_centro_atencion"],
                         'numero_acta_det_quedan'             => $value["numero_acta_det_quedan"],
                         'producto_factura_det_quedan'        => $value["monto"]['producto_factura_det_quedan'],
                         'servicio_factura_det_quedan'        => $value["monto"]['servicio_factura_det_quedan'],
@@ -310,11 +310,11 @@ class QuedanController extends Controller
     }
     public function getListForSelect()
     {
-        $v_Dependencias = DB::table('dependencia')
+        $centros = DB::table('centro_atencion')
             ->select(
-                'id_dependencia as value',
-                DB::raw("CONCAT(' - ',codigo_dependencia) AS label")
-            )->whereNull('dep_id_dependencia')->get();
+                'id_centro_atencion as value',
+                DB::raw("CONCAT(' - ',codigo_centro_atencion) AS label")
+            )->get();
 
         $tipoAdquisicion = DB::table('tipo_documento_adquisicion')
             ->select(
@@ -378,16 +378,16 @@ class QuedanController extends Controller
 
 
         return [
-            "dependencias"         => $v_Dependencias,
             "tipoAdquisicion"      => $tipoAdquisicion,
             "proveedor"            => $v_Proveedor,
+            "centros"              => $centros,
             "numeroRequerimiento"  => $v_Requerimiento,
             "prioridadPago"        => $v_Prioridad_pago,
             "proyectoFinanciado"   => $v_Proyecto_finanziado,
             "documentoAdquisicion" => $documentosAdquisicion,
         ];
     }
-    public function updateFechaRetencionIva(Request $request) //Metodo utilizado al momento de seleccionar proveedor y hacer los calculos 
+    public function updateFechaRetencionIva(Request $request) //Metodo utilizado al momento de seleccionar proveedor y hacer los calculos
     { //se hacen esta peticion por que al no existir el quedan no existen registos previos de la base de datos y no podemos ver a que provedor pertenece
         return Quedan::where("id_quedan", $request->id_quedan)->update(["fecha_retencion_iva_quedan" => Carbon::now()]);
     }

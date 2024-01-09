@@ -35,10 +35,10 @@ class QuedanRequest extends FormRequest
         collect($this->input('detalle_quedan', [])) // Convertir el arreglo en una colección
             ->each(function ($detalle, $key) use (&$rules) { // Iterar sobre cada detalle
                 if (!empty($detalle["isDelete"])) { // Validar si el campo 7 está lleno
-                    $rules["detalle_quedan.{$key}.id_dependencia"] = ['required'];
+                    $rules["detalle_quedan.{$key}.id_centro_atencion"] = ['required'];
                     $rules["detalle_quedan.{$key}.numero_acta_det_quedan"] = [
                         Rule::unique('detalle_quedan', 'numero_acta_det_quedan')->where(function ($query) use ($detalle) {
-                            return $query->where('id_dependencia', $detalle["id_dependencia"])->where('numero_acta_det_quedan', $detalle["numero_acta_det_quedan"]);
+                            return $query->where('id_centro_atencion', $detalle["id_centro_atencion"])->where('numero_acta_det_quedan', $detalle["numero_acta_det_quedan"]);
                         })->ignore($detalle["id_det_quedan"], 'id_det_quedan')
                     ];
                     $rules["detalle_quedan.{$key}.monto.producto_factura_det_quedan"] = ["required_without:detalle_quedan.{$key}.monto.servicio_factura_det_quedan"];
@@ -63,7 +63,7 @@ class QuedanRequest extends FormRequest
 
         foreach ($this->input('detalle_quedan', []) as $key => $value) {
             if ($this->input("detalle_quedan.{$key}.isDelete")) {
-                $messages["detalle_quedan.{$key}.id_dependencia.required"] = 'La dependencia es un dato requerido';
+                $messages["detalle_quedan.{$key}.id_centro_atencion.required"] = 'El centro es un dato requerido';
                 $messages["detalle_quedan.{$key}.justificacion_det_quedan.required"] = 'La justificacion del reajuste es requerido';
                 // Obtener el número de acta repetido
                 $repeatedNumeroActa = $this->input("detalle_quedan.{$key}.numero_acta_det_quedan");
