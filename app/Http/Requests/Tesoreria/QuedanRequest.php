@@ -36,6 +36,7 @@ class QuedanRequest extends FormRequest
             ->each(function ($detalle, $key) use (&$rules) { // Iterar sobre cada detalle
                 if (!empty($detalle["isDelete"])) { // Validar si el campo 7 está lleno
                     $rules["detalle_quedan.{$key}.id_centro_atencion"] = ['required'];
+                    $rules["detalle_quedan.{$key}.id_lt"] = ['required'];
                     $rules["detalle_quedan.{$key}.numero_acta_det_quedan"] = [
                         Rule::unique('detalle_quedan', 'numero_acta_det_quedan')->where(function ($query) use ($detalle) {
                             return $query->where('id_centro_atencion', $detalle["id_centro_atencion"])->where('numero_acta_det_quedan', $detalle["numero_acta_det_quedan"]);

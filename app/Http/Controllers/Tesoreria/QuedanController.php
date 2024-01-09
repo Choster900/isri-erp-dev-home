@@ -182,7 +182,7 @@ class QuedanController extends Controller
 
             // Insertar los registros de detalle_quedan
             $detalleData = [];
-            foreach ( $detalle_quedan as $key => $value ) {
+            foreach ($detalle_quedan as $key => $value) {
                 if ($value["isDelete"]) {
                     $new_detalle = [
                         'id_quedan'                          => $quedan,
@@ -190,6 +190,7 @@ class QuedanController extends Controller
                         'fecha_factura_det_quedan'           => $value["fecha_factura_det_quedan"],
                         'fecha_reg_det_quedan'               => Carbon::now(),
                         'id_centro_atencion'                 => $value["id_centro_atencion"],
+                        'id_lt'                 => $value["id_lt"],
                         'numero_acta_det_quedan'             => $value["numero_acta_det_quedan"],
                         'producto_factura_det_quedan'        => $value["monto"]['producto_factura_det_quedan'],
                         'servicio_factura_det_quedan'        => $value["monto"]['servicio_factura_det_quedan'],
@@ -249,13 +250,14 @@ class QuedanController extends Controller
                 'fecha_mod_quedan'              => Carbon::now(),
             ]);
 
-            foreach ( $detalle_quedan as $key => $value ) {
+            foreach ($detalle_quedan as $key => $value) {
 
                 if ($value["numberRow"] == '') {
                     // Actualizar un detalle de quedan existente
                     $new_detalle = array(
                         'numero_factura_det_quedan'          => $value["numero_factura_det_quedan"],
                         'id_centro_atencion'                 => $value["id_centro_atencion"],
+                        'id_lt'                 => $value["id_lt"],
                         'numero_acta_det_quedan'             => $value["numero_acta_det_quedan"],
                         'producto_factura_det_quedan'        => $value["monto"]['producto_factura_det_quedan'],
                         'servicio_factura_det_quedan'        => $value["monto"]['servicio_factura_det_quedan'],
@@ -278,6 +280,7 @@ class QuedanController extends Controller
                         'id_quedan'                          => $id_quedan,
                         'numero_factura_det_quedan'          => $value["numero_factura_det_quedan"],
                         'id_centro_atencion'                 => $value["id_centro_atencion"],
+                        'id_lt'                 => $value["id_lt"],
                         'numero_acta_det_quedan'             => $value["numero_acta_det_quedan"],
                         'producto_factura_det_quedan'        => $value["monto"]['producto_factura_det_quedan'],
                         'servicio_factura_det_quedan'        => $value["monto"]['servicio_factura_det_quedan'],
@@ -313,7 +316,13 @@ class QuedanController extends Controller
         $centros = DB::table('centro_atencion')
             ->select(
                 'id_centro_atencion as value',
-                DB::raw("CONCAT(' - ',codigo_centro_atencion) AS label")
+                DB::raw("CONCAT('',codigo_centro_atencion) AS label")
+            )->get();
+
+        $lineaTrabajo = DB::table('linea_trabajo')
+            ->select(
+                'id_lt as value',
+                DB::raw("CONCAT(codigo_up_lt,' - ',nombre_lt) AS label")
             )->get();
 
         $tipoAdquisicion = DB::table('tipo_documento_adquisicion')
@@ -381,6 +390,7 @@ class QuedanController extends Controller
             "tipoAdquisicion"      => $tipoAdquisicion,
             "proveedor"            => $v_Proveedor,
             "centros"              => $centros,
+            "lineaTrabajo" => $lineaTrabajo,
             "numeroRequerimiento"  => $v_Requerimiento,
             "prioridadPago"        => $v_Prioridad_pago,
             "proyectoFinanciado"   => $v_Proyecto_finanziado,
@@ -402,7 +412,7 @@ class QuedanController extends Controller
             // Filtrar proveedores con quedans no vacíos
             return $det->quedan->isNotEmpty();
         });
-        foreach ( $details as $detail ) {
+        foreach ($details as $detail) {
             // Mapear quedans con detalles para el proveedor actual
             $quedan_con_detalle = $detail->quedan->map(function ($quedan) {
                 return [

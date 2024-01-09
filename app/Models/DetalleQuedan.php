@@ -15,6 +15,7 @@ class DetalleQuedan extends Model
     protected $fillable = [
         'id_det_quedan',
         'id_centro_atencion',
+        'id_lt',
         'id_quedan',
         'numero_acta_det_quedan',
         'numero_factura_det_quedan',
