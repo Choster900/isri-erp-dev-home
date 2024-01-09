@@ -16,6 +16,7 @@ class ConceptoIngreso extends Model
     protected $fillable = [
         'id_ccta_presupuestal',
         'id_dependencia',
+        'id_centro_atencion',
         'id_proy_financiado',
         'nombre_concepto_ingreso',
         'detalle_concepto_ingreso',
@@ -44,5 +45,10 @@ class ConceptoIngreso extends Model
     public function detalles_recibo_ingreso()
     {
         return $this->hasMany('App\Models\DetalleReciboIngreso', 'id_concepto_ingreso', 'id_concepto_ingreso');
+    }
+
+    public function centro_atencion()
+    {
+        return $this->belongsTo(CentroAtencion::class, 'id_centro_atencion', 'id_centro_atencion');
     }
 }

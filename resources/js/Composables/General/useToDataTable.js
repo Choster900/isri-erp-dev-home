@@ -119,6 +119,11 @@ export const useToDataTable = (columns, requestUrl, columnToSort, dir) => {
         }
     };
 
+    const showErrorMessage = (err) => {
+        const { title, text, icon } = useHandleError(err);
+        swal({ title: title, text: text, icon: icon, timer: 5000 });
+    };
+
     onMounted(async () => {
         getDataToShow();
     });

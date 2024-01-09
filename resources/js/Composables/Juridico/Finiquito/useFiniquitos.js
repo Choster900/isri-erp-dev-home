@@ -87,11 +87,11 @@ export const useFiniquitos = (context) => {
     const storeFiniquitos = async (finiq) => {
         //console.log(finiq);
         swal({
-            title: "¿Está seguro de guardar los finiquitos para todos los empleados?",
+            title: "¿Está seguro de generar el finiquito para todos los empleados?",
             icon: "question",
             iconHtml: "❓",
             confirmButtonText: "Si, Guardar",
-            confirmButtonColor: "#141368",
+            confirmButtonColor: "#115E59",
             cancelButtonText: "Cancelar",
             showCancelButton: true,
             showCloseButton: true,

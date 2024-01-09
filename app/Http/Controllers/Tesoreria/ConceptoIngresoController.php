@@ -10,6 +10,8 @@ use App\Models\Dependencia;
 use App\Models\ProyectoFinanciado;
 use Carbon\Carbon;
 use App\Http\Requests\Tesoreria\IncomeConceptRequest;
+use App\Models\CentroAtencion;
+use Illuminate\Support\Facades\DB;
 
 class ConceptoIngresoController extends Controller
 {
@@ -23,8 +25,8 @@ class ConceptoIngresoController extends Controller
         $search_value = $request->search;
 
         $query = ConceptoIngreso::select('*')
-            ->leftJoin('dependencia', function ($join) {
-                $join->on('concepto_ingreso.id_dependencia', '=', 'dependencia.id_dependencia');
+            ->leftJoin('centro_atencion', function ($join) {
+                $join->on('concepto_ingreso.id_centro_atencion', '=', 'centro_atencion.id_centro_atencion');
             })
             ->orderBy($columns[$column], $dir);
         if ($search_value) {
@@ -35,10 +37,10 @@ class ConceptoIngresoController extends Controller
                 ['estado_concepto_ingreso', 'like', '%' . $search_value['estado_concepto_ingreso'] . '%'],
                 [function ($query) use ($search_value) {
                     if ($search_value['nombre_dependencia'] == 'N/A' || $search_value['nombre_dependencia'] == 'n/a') {
-                        $query->where('concepto_ingreso.id_dependencia',null);
+                        $query->where('concepto_ingreso.id_centro_atencion', null);
                     } else {
-                        $query->whereRaw('IFNULL(nombre_dependencia, "") like ?', '%' . $search_value['nombre_dependencia'] . '%')
-                            ->orWhereRaw('IFNULL(codigo_dependencia, "") like ?', '%' . $search_value['nombre_dependencia'] . '%');
+                        $query->whereRaw('IFNULL(nombre_centro_atencion, "") like ?', '%' . $search_value['nombre_dependencia'] . '%')
+                            ->orWhereRaw('IFNULL(codigo_centro_atencion, "") like ?', '%' . $search_value['nombre_dependencia'] . '%');
                     }
                 }],
             ]);
@@ -49,35 +51,62 @@ class ConceptoIngresoController extends Controller
 
     public function changeStateIncomeConcept(Request $request)
     {
-        $servicio = ConceptoIngreso::find($request->id_service);
+        $servicio = ConceptoIngreso::find($request->id);
         if ($servicio->estado_concepto_ingreso == 1) {
-            if ($request->state_service == 1) {
+            if ($request->status == 1) {
                 $servicio->update([
                     'estado_concepto_ingreso' => 0,
                     'fecha_mod_concepto_ingreso' => Carbon::now(),
                     'usuario_concepto_ingreso' => $request->user()->nick_usuario,
                     'ip_concepto_ingreso' => $request->ip(),
                 ]);
-                return ['mensaje' => 'Concepto de ingreso ' . $servicio->nombre_concepto_ingreso . ' ha sido desactivado con exito'];
+                return ['message' => 'Concepto de ingreso ' . $servicio->nombre_concepto_ingreso . ' ha sido desactivado con exito'];
             } else {
-                return ['mensaje' => 'El concepto de ingreso seleccionado ya ha sido activado por otro usuario'];
+                return ['message' => 'El concepto de ingreso seleccionado ya ha sido activado por otro usuario'];
             }
         } else {
             if ($servicio->estado_concepto_ingreso == 0) {
-                if ($request->state_service == 0) {
+                if ($request->status == 0) {
                     $servicio->update([
                         'estado_concepto_ingreso' => 1,
                         'fecha_mod_concepto_ingreso' => Carbon::now(),
                         'usuario_concepto_ingreso' => $request->user()->nick_usuario,
                         'ip_concepto_ingreso' => $request->ip(),
                     ]);
-                    return ['mensaje' => 'Concepto de ingreso ' . $servicio->nombre_concepto_ingreso . ' ha sido activado con exito'];
+                    return ['message' => 'Concepto de ingreso ' . $servicio->nombre_concepto_ingreso . ' ha sido activado con exito'];
                 } else {
-                    return ['mensaje' => 'El concepto de ingreso seleccionado ya ha sido desactivado por otro usuario'];
+                    return ['message' => 'El concepto de ingreso seleccionado ya ha sido desactivado por otro usuario'];
                 }
             }
         }
     }
+
+    //New method for composition API
+    public function getInfoModalConceptoIngreso(Request $request, $id)
+    {
+        $concept = ConceptoIngreso::with('centro_atencion')->find($id);
+        $budget_accounts = CuentaPresupuestal::selectRaw("id_ccta_presupuestal as value , concat(id_ccta_presupuestal, ' - ', nombre_ccta_presupuestal) as label")
+            ->where('tesoreria_ccta_presupuestal', '=', 1)
+            ->where('estado_ccta_presupuestal', '=', 1)
+            ->orderBy('nombre_ccta_presupuestal')
+            ->get();
+        $dependencies = CentroAtencion::selectRaw("id_centro_atencion as value , concat(codigo_centro_atencion, ' - ', nombre_centro_atencion) as label")
+            ->orderBy('nombre_centro_atencion')
+            ->get();
+        $financing_sources = ProyectoFinanciado::select('id_proy_financiado as value', 'nombre_proy_financiado as label')
+            ->where('estado_proy_financiado', '=', 1)
+            ->orderBy('nombre_proy_financiado')
+            ->get();
+
+        return response()->json([
+            'budget_accounts'           => $budget_accounts,
+            'dependencies'              => $dependencies,
+            'financing_sources'         => $financing_sources,
+            'concept'                   => $concept ?? []
+        ]);
+    }
+
+
     public function getSelectsIncomeConcept(Request $request)
     {
         $budget_accounts = CuentaPresupuestal::selectRaw("id_ccta_presupuestal as value , concat(id_ccta_presupuestal, ' - ', nombre_ccta_presupuestal) as label")
@@ -85,9 +114,13 @@ class ConceptoIngresoController extends Controller
             ->where('estado_ccta_presupuestal', '=', 1)
             ->orderBy('nombre_ccta_presupuestal')
             ->get();
-        $dependencies = Dependencia::selectRaw("id_dependencia as value , concat(codigo_dependencia, ' - ', nombre_dependencia) as label")
-            ->where('id_tipo_dependencia', '=', 1)
-            ->orderBy('nombre_dependencia')
+        //This was before.
+        // $dependencies = Dependencia::selectRaw("id_dependencia as value , concat(codigo_dependencia, ' - ', nombre_dependencia) as label")
+        //     ->where('id_tipo_dependencia', '=', 1)
+        //     ->orderBy('nombre_dependencia')
+        //     ->get();
+        $dependencies = CentroAtencion::selectRaw("id_centro_atencion as value , concat(codigo_centro_atencion, ' - ', nombre_centro_atencion) as label")
+            ->orderBy('nombre_centro_atencion')
             ->get();
         $financing_sources = ProyectoFinanciado::select('id_proy_financiado as value', 'nombre_proy_financiado as label')
             ->where('estado_proy_financiado', '=', 1)
@@ -99,18 +132,32 @@ class ConceptoIngresoController extends Controller
 
     public function saveIncomeConcept(IncomeConceptRequest $request)
     {
-        $new_income_concept = new ConceptoIngreso();
-        $new_income_concept->id_dependencia = $request->dependency_id;
-        $new_income_concept->id_ccta_presupuestal = $request->budget_account_id;
-        $new_income_concept->id_proy_financiado = $request->financing_source_id;
-        $new_income_concept->nombre_concepto_ingreso = $request->name;
-        $new_income_concept->detalle_concepto_ingreso = $request->detail;
-        $new_income_concept->estado_concepto_ingreso = 1;
-        $new_income_concept->fecha_reg_concepto_ingreso = Carbon::now();
-        $new_income_concept->usuario_concepto_ingreso = $request->user()->nick_usuario;
-        $new_income_concept->ip_concepto_ingreso = $request->ip();
-        $new_income_concept->save();
-        return ['mensaje' => 'Concepto de ingreso ' . $request->name . ' guardado con éxito.'];
+        DB::beginTransaction();
+        try {
+            $dependency = new ConceptoIngreso([
+                'id_centro_atencion'                        => $request->dependency_id,
+                'id_ccta_presupuestal'                      => $request->budget_account_id,
+                'id_proy_financiado'                        => $request->financing_source_id,
+                'nombre_concepto_ingreso'                   => $request->name,
+                'detalle_concepto_ingreso'                  => $request->detail,
+                'estado_concepto_ingreso'                   => 1,
+                'fecha_reg_concepto_ingreso'                => Carbon::now(),
+                'usuario_concepto_ingreso'                  => $request->user()->nick_usuario,
+                'ip_concepto_ingreso'                       => $request->ip(),
+            ]);
+            $dependency->save();
+
+            DB::commit(); // Confirma las operaciones en la base de datos
+            return response()->json([
+                'message'          => 'Concepto de ingreso guardado con éxito.',
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+            return response()->json([
+                'logical_error' => 'Ha ocurrido un error con sus datos.',
+                'error' => $th->getMessage(),
+            ], 422);
+        }
     }
     public function updateIncomeConcept(IncomeConceptRequest $request)
     {
@@ -118,16 +165,31 @@ class ConceptoIngresoController extends Controller
         if ($income_concept->estado_concepto_ingreso == 0) {
             return response()->json(['logical_error' => 'Error, el concepto de ingreso seleccionado ha sido desactivado por otro usuario.'], 422);
         } else {
-            $income_concept->id_dependencia = $request->dependency_id;
-            $income_concept->id_ccta_presupuestal = $request->budget_account_id;
-            $income_concept->id_proy_financiado = $request->financing_source_id;
-            $income_concept->nombre_concepto_ingreso = $request->name;
-            $income_concept->detalle_concepto_ingreso = $request->detail;
-            $income_concept->fecha_mod_concepto_ingreso = Carbon::now();
-            $income_concept->usuario_concepto_ingreso = $request->user()->nick_usuario;
-            $income_concept->ip_concepto_ingreso = $request->ip();
-            $income_concept->update();
-            return ['mensaje' => 'Concepto de ingreso ' . $request->name . ' actualizado con éxito.'];
+            DB::beginTransaction();
+            try {
+                $income_concept->update([
+                    'id_centro_atencion'                        => $request->dependency_id,
+                    'id_ccta_presupuestal'                      => $request->budget_account_id,
+                    'id_proy_financiado'                        => $request->financing_source_id,
+                    'nombre_concepto_ingreso'                   => $request->name,
+                    'detalle_concepto_ingreso'                  => $request->detail,
+                    'estado_concepto_ingreso'                   => 1,
+                    'fecha_mod_concepto_ingreso'                => Carbon::now(),
+                    'usuario_concepto_ingreso'                  => $request->user()->nick_usuario,
+                    'ip_concepto_ingreso'                       => $request->ip(),
+                ]);
+
+                DB::commit(); // Confirma las operaciones en la base de datos
+                return response()->json([
+                    'message'          => 'Concepto de ingreso actualizado con éxito.',
+                ]);
+            } catch (\Throwable $th) {
+                DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+                return response()->json([
+                    'logical_error' => 'Ha ocurrido un error con sus datos.',
+                    'error' => $th->getMessage(),
+                ], 422);
+            }
         }
     }
 }

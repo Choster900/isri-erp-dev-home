@@ -26,13 +26,15 @@
             </div>
         </div>
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
-            
+
             <header class="px-5 py-4">
                 <div class="mb-4 md:flex flex-row justify-items-start">
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
                             <Multiselect v-model="tableData.length" @select="getDataToShow()" :options="perPage"
-                                :searchable="true" placeholder="Cantidad a mostrar" />
+                                @deselect=" tableData.length = 5; getDataToShow()"
+                                @clear="tableData.length = 5; getDataToShow()" :searchable="true"
+                                placeholder="Cantidad a mostrar" />
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
@@ -143,7 +145,8 @@
                                             </div>
                                         </div>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            @click="showModalBoss = true; dependencyId = dependencia.id_dependencia" v-if="permits.ejecutar === 1 && dependencia.estado_dependencia == 1">
+                                            @click="showModalBoss = true; dependencyId = dependencia.id_dependencia"
+                                            v-if="permits.ejecutar === 1 && dependencia.estado_dependencia == 1">
                                             <div class="w-8">
                                                 <span class="text-xs">
                                                     <svg class="w-6 h-6 text-cyan-700" viewBox="0 0 24 24" fill="none"

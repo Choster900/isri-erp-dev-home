@@ -41,4 +41,12 @@ class DocumentoAdquisicion extends Model
     {
         return $this->hasManyThrough(DocumentoAdquisicion::class, TipoDocumentoAdquisicion::class);
     }
+    public function proveedor()
+    { 
+        return $this->belongsTo(Proveedor::class, "id_proveedor", "id_proveedor");
+    }
+    public function tipo_gestion_compra()
+    { 
+        return $this->belongsTo(TipoGestionCompra::class, "id_tipo_gestion_compra", "id_tipo_gestion_compra");
+    }
 }
