@@ -25,9 +25,10 @@ class IncomeConceptRequest extends FormRequest
     public function rules()
     {
         return [
+            //'dependency_id' => ['required'],
             'budget_account_id' => ['required'],
             'name' => ['required', Rule::unique('concepto_ingreso', 'nombre_concepto_ingreso')->where(function ($query) {
-                return $query->where('id_dependencia', $this->dependency_id);
+                return $query->where('id_centro_atencion', $this->dependency_id);
             })->ignore($this->income_concept_id, 'id_concepto_ingreso')],
             'financing_source_id' => ['required'],
         ];
@@ -35,6 +36,7 @@ class IncomeConceptRequest extends FormRequest
     public function messages()
     {
         return [
+            //'dependency_id.required' => 'Debe seleccionar centro de atención.',
             'budget_account_id.required' => 'Debe seleccionar el especifico presupuestario.',
             'name.required' => 'Debe escribir el nombre del concepto de ingreso.',
             'name.unique' => 'Este concepto de ingreso ya ha sido registrado para el centro seleccionado.',

@@ -157,7 +157,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                         <th class="border-2 border-black h-7 " colspan="1">
                                             <p class="px-[55px] text-sm text-gray-600">PROVEEDOR</p>
                                         </th>
-                                        <th class="border-2 border-black text-sm text-gray-600" colspan="6">
+                                        <th class="border-2 border-black text-sm text-gray-600" colspan="7">
                                             DATOS DEL QUEDAN
                                         </th>
                                     </tr>
@@ -175,7 +175,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                     @input="getInformationBySupplier($event, true)" />
                                             </div>
                                         </td>
-                                        <th class="border-2 border-black text-xs text-gray-600" colspan="3">
+                                        <th class="border-2 border-black text-xs text-gray-600" colspan="4">
                                             TIPO CONTRATACION
                                         </th>
                                         <th class="border-2 border-black text-xs text-gray-600">
@@ -195,7 +195,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                         <th class="border-2 border-black h-8 text-sm text-gray-600" colspan="1">
                                             CONTRATO
                                         </th>
-                                        <td class="border-2 border-black" colspan="3">
+                                        <td class="border-2 border-black" colspan="4">
                                             <input type="text" v-model="dataInputs.nombre_tipo_doc_adquisicion"
                                                 :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''" disabled
                                                 class="peer w-full text-sm bg-transparent text-center h-10 border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
@@ -241,7 +241,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                     :options="documentoAdquisicion" :searchable="true" />
                                             </div>
                                         </td>
-                                        <th class="border-2 border-black text-sm text-gray-600" colspan="6">
+                                        <th class="border-2 border-black text-sm text-gray-600" colspan="7">
                                             DETALLE QUEDAN
                                         </th>
                                     </tr>
@@ -249,15 +249,17 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 
                                     <tr>
                                         <th class="border-2 border-black text-sm px-2 text-gray-600 w-40">FACTURA</th>
-                                        <th class="border-2 border-black text-sm px-2 text-gray-600" colspan="2">FECHA
-                                            EMISION</th>
-                                        <th class="border-2 border-black text-sm px-3 text-gray-600">DEPENDENCIA</th>
+                                        <th class="border-2 border-black text-sm px-2 text-gray-600" colspan="2">FECHA EMISION</th>
+                                        <th class="border-2 border-black text-sm px-3 text-gray-600">CENTRO ATENCION</th>
+                                        <th class="border-2 border-black text-sm px-6 text-gray-600">LINEA TRABAJO</th>
                                         <th class="border-2 border-black text-sm px-4 text-gray-600">NUMERO ACTA</th>
                                         <th class="border-2 border-black text-sm px-7 text-gray-600">MONTO</th>
                                         <th class="border-2 border-black text-sm px-7 text-gray-600">RETENCIONES</th>
                                     </tr>
                                 </thead>
-
+                                <!-- <pre>
+                                    {{rowsData}}
+                                </pre> -->
                                 <tbody class="text-sm" id="content">
 
                                     <template v-for="(  row, rowIndex  ) in   rowsData  " :key="rowIndex">
@@ -292,19 +294,42 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                         </div>
 
                                                     </td>
-                                                    <td v-else-if="cellIndex == 'id_dependencia'"
+                                                    <td v-else-if="cellIndex == 'id_centro_atencion'"
                                                         class="border-2 border-black" :class="{
-                                                            'condition-select': rowsData[rowIndex]['id_dependencia'] == '',//validando si esta vacio
-                                                            'condition-error-select': errors[`detalle_quedan.${rowIndex}.id_dependencia`]//validando si tiene errores
+                                                            'condition-select': rowsData[rowIndex]['id_centro_atencion'] == '',//validando si esta vacio
+                                                            'condition-error-select': errors[`detalle_quedan.${rowIndex}.id_centro_atencion`]//validando si tiene errores
                                                         }
                                                             ">
                                                         <div class="relative flex h-8 w-full flex-row-reverse ">
-                                                            <Multiselect v-model="rowsData[rowIndex]['id_dependencia']"
-                                                                :title="errors[`detalle_quedan.${rowIndex}.id_dependencia`]"
+                                                            <Multiselect v-model="rowsData[rowIndex]['id_centro_atencion']"
+                                                                :title="errors[`detalle_quedan.${rowIndex}.id_centro_atencion`]"
                                                                 placeholder="seleccione" :classes="{
                                                                     placeholder: 'flex items-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-black rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ',
                                                                 }
-                                                                    " :options="dataForSelectInRow.dependencias"
+                                                                    " :options="dataForSelectInRow.centros"
+                                                                :searchable="true"
+                                                                :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
+                                                                @select="onCellEdit(rowIndex, cellIndex, $event)" />
+                                                        </div>
+                                                    </td>
+                                                    <td v-else-if="cellIndex == 'id_lt'"
+                                                        class="border-2 border-black" :class="{
+                                                            'condition-select': rowsData[rowIndex]['id_lt'] == '',//validando si esta vacio
+                                                            'condition-error-select': errors[`detalle_quedan.${rowIndex}.id_lt`]//validando si tiene errores
+                                                        }
+                                                            ">
+                                                        <div class="relative flex h-8 w-full flex-row-reverse ">
+                                                            <Multiselect v-model="rowsData[rowIndex]['id_lt']" 
+                                                                :title="errors[`detalle_quedan.${rowIndex}.id_lt`]"
+                                                                placeholder="seleccione" :classes="{
+                                                                    placeholder: 'flex items-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-black rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ',
+                                                                    option: 'flex items-center justify-start box-border text-left cursor-pointer text-[8pt] leading-snug py-2 px-3',
+                                                                    optionSelected: 'text-white bg-[#001c48]',
+                                                                    optionPointed: 'text-gray-800 bg-gray-100',
+                                                                    optionSelectedPointed: 'text-white bg-[#001c48]',
+
+                                                                }
+                                                                    " :options="dataForSelectInRow.lineaTrabajo"
                                                                 :searchable="true"
                                                                 :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
                                                                 @select="onCellEdit(rowIndex, cellIndex, $event)" />
@@ -467,7 +492,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                         <td class="border-2 border-black " colspan="1" rowspan="2" contenteditable="false">
                                             Descripción
                                         </td>
-                                        <td class="border-2 border-black max-w-[250px]" colspan="4" rowspan="2"
+                                        <td class="border-2 border-black max-w-[250px]" colspan="5" rowspan="2"
                                             :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true"
                                             @input="dataInputs.descripcion_quedan = $event.target.innerText"
                                             :class="dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''">
@@ -588,7 +613,7 @@ export default {
                 monto_isr_quedan: '',
                 monto_total_quedan: '',
                 monto_doc_adquisicion: '',
-                montoTotalDetalleDocumentoAdquisicion: '',//OBTIENE EL TOTAL UTILIZADO 
+                montoTotalDetalleDocumentoAdquisicion: '',//OBTIENE EL TOTAL UTILIZADO
                 monto_det_doc_adquisicion: '',//OBTIENE EL TOTAL DEL DETALLE QUE ESTA EN LA BASE
                 montoSuperador: false,
             },
@@ -746,7 +771,7 @@ export default {
             this.taxesByRow();
         },
 
-        // Calcula los impuestos por fila 
+        // Calcula los impuestos por fila
         taxesByRow() {
             // Filtrar los elementos que no se han eliminado
             const rowsData = this.rowsData.filter(element => element['isDelete'] === true);
@@ -795,7 +820,7 @@ export default {
                 // Tomando el iva del monto liquido que se divio antes por el porcentaje del proveedor que se ha seleccionado
                 const ivaByFila = liquido * this.dataForCalculate.iva;
 
-                // Validando si el proveedor tiene contrato o no  
+                // Validando si el proveedor tiene contrato o no
                 const totalFacturas = this.dataForCalculate.monto_doc_adquisicion;
                 const montoIsrQuedan = servicioMont * this.dataForCalculate.irs;
                 if (this.documentoAdquisicion != "") {
@@ -949,7 +974,8 @@ export default {
                     id_det_quedan: '',
                     numero_factura_det_quedan: '',
                     fecha_factura_det_quedan: '',
-                    id_dependencia: '',
+                    id_centro_atencion: '',
+                    id_lt: '',
                     numero_acta_det_quedan: '',
                     monto: { producto_factura_det_quedan: '', servicio_factura_det_quedan: '' },
                     retenciones: { iva: '0.00', renta: '0.00' },
@@ -977,7 +1003,7 @@ export default {
             for (let i = 0; i < this.rowsData.length; i++) {
                 const row = this.rowsData[i];
                 const number = row["numero_acta_det_quedan"]; // Obtener el número de acta en la posición 4
-                const dependency = row["id_dependencia"]; // Obtener la dependencia en la posición 3
+                const dependency = row["id_centro_atencion"]; // Obtener la dependencia en la posición 3
 
                 // Verificar si la fila no está marcada como eliminada
                 if (row["isDelete"] !== false) {
@@ -1191,7 +1217,8 @@ export default {
                             id_det_quedan: value.id_det_quedan,
                             numero_factura_det_quedan: value.numero_factura_det_quedan,
                             fecha_factura_det_quedan: value.fecha_factura_det_quedan,
-                            id_dependencia: value.id_dependencia,
+                            id_centro_atencion: value.id_centro_atencion,
+                            id_lt: value.id_lt,
                             numero_acta_det_quedan: value.numero_acta_det_quedan,
                             monto: { producto_factura_det_quedan: value.producto_factura_det_quedan, servicio_factura_det_quedan: value.servicio_factura_det_quedan },
                             retenciones: { iva: value.iva_factura_det_quedan, renta: value.isr_factura_det_quedan },

@@ -88,6 +88,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('save-income-concept', [ConceptoIngresoController::class, 'saveIncomeConcept'])->name('conceptoIngreso.saveIncomeConcept');
     Route::post('update-income-concept', [ConceptoIngresoController::class, 'updateIncomeConcept'])->name('conceptoIngreso.updateIncomeConcept');
 
+    //New route for Composition API
+    Route::get('get-info-modal-concepto-ingreso/{id}', [ConceptoIngresoController::class, 'getInfoModalConceptoIngreso'])->name('conceptoIngreso.getInfoModalConceptoIngreso');
+
     //Routes to manage income
     Route::get(
         '/ts/recibos-ingreso',
@@ -108,7 +111,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get(
         '/ts/doc-adquisicion',
         function (Request $request) {
-            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/ts/doc-adquisicion','Tesoreria/DocumentoAdquisicion');
+            return checkModuleAccessAndRedirect($request->user()->id_usuario,'/ts/doc-adquisicion','Tesoreria/DocAdquisicion');
         }
     )->name('ts.docAdquisicion');
     Route::post('doc-adquisicion', [DocumentoAdquisicionController::class, 'getDocAdquisicion'])->name('documentoAdquisicion.getDocAdquisicion');
@@ -116,6 +119,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('get-selects-acq-doc', [DocumentoAdquisicionController::class, 'getSelectsAcqDoc'])->name('documentoAdquisicion.getSelectsAcqDoc');
     Route::post('save-acq-doc', [DocumentoAdquisicionController::class, 'saveAcqDoc'])->name('documentoAdquisicion.saveAcqDoc');
     Route::post('update-acq-doc', [DocumentoAdquisicionController::class, 'updateAcqDoc'])->name('documentoAdquisicion.updateAcqDoc');
+
+    //New route for Composition API
+    Route::get('get-info-modal-doc-adquisicion/{id}', [DocumentoAdquisicionController::class, 'getInfoModalDocAdquisicion'])->name('documentoAdquisicion.getInfoModalDocAdquisicion');
 
 
     Route::get(

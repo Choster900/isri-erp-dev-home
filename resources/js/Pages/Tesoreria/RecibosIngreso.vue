@@ -7,6 +7,7 @@ import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
 import ModalIncomeReceiptVue from '@/Components-ISRI/Tesoreria/ModalIncomeReceipt.vue';
 import ModalReceiptFormatVue from '@/Components-ISRI/Tesoreria/ModalReceiptFormat.vue';
 import moment from 'moment';
+import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
 
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
@@ -104,37 +105,20 @@ import axios from 'axios';
                                             </div>
                                             <div class="font-semibold">Editar</div>
                                         </div>
-                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            @click="changeStateIncomeReceipt(receipt.id_recibo_ingreso, receipt.numero_recibo_ingreso, receipt.estado_recibo_ingreso)"
-                                            v-if="permits.eliminar == 1">
-                                            <div class="w-8 text-red-900">
-                                                <span class="text-xs">
-                                                    <svg :fill="receipt.estado_recibo_ingreso == 1 ? '#991B1B' : '#166534'"
-                                                        version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
-                                                        width="20px" height="20px"
-                                                        xmlns:xlink="http://www.w3.org/1999/xlink"
-                                                        viewBox="0 0 97.994 97.994" xml:space="preserve"
-                                                        :stroke="receipt.estado_recibo_ingreso == 1 ? '#991B1B' : '#166534'">
-                                                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round"
-                                                            stroke-linejoin="round"></g>
-                                                        <g id="SVGRepo_iconCarrier">
-                                                            <g>
-                                                                <g>
-                                                                    <path
-                                                                        d="M97.155,9.939c-0.582-0.416-1.341-0.49-1.991-0.193l-10.848,4.935C74.08,5.29,60.815,0.118,46.966,0.118 c-15.632,0-30.602,6.666-41.07,18.289c-0.359,0.399-0.543,0.926-0.51,1.461c0.033,0.536,0.28,1.036,0.686,1.388l11.301,9.801 c0.818,0.711,2.055,0.639,2.787-0.162c6.866-7.512,16.636-11.821,26.806-11.821c6.135,0,12.229,1.584,17.622,4.583l-7.826,3.561 c-0.65,0.296-1.095,0.916-1.163,1.627c-0.069,0.711,0.247,1.405,0.828,1.82l34.329,24.52c0.346,0.246,0.753,0.373,1.163,0.373 c0.281,0,0.563-0.06,0.828-0.181c0.65-0.296,1.095-0.916,1.163-1.627l4.075-41.989C98.053,11.049,97.737,10.355,97.155,9.939z">
-                                                                    </path>
-                                                                    <path
-                                                                        d="M80.619,66.937c-0.819-0.709-2.055-0.639-2.787,0.162c-6.866,7.514-16.638,11.822-26.806,11.822 c-6.135,0-12.229-1.584-17.622-4.583l7.827-3.561c0.65-0.296,1.094-0.916,1.163-1.628c0.069-0.711-0.247-1.404-0.828-1.819 L7.237,42.811c-0.583-0.416-1.341-0.49-1.991-0.193c-0.65,0.296-1.094,0.916-1.163,1.627L0.009,86.233 c-0.069,0.712,0.247,1.406,0.828,1.822c0.583,0.416,1.341,0.488,1.991,0.192l10.848-4.935 c10.237,9.391,23.502,14.562,37.351,14.562c15.632,0,30.602-6.666,41.07-18.289c0.358-0.398,0.543-0.926,0.51-1.461 c-0.033-0.536-0.28-1.036-0.687-1.388L80.619,66.937z">
-                                                                    </path>
-                                                                </g>
-                                                            </g>
-                                                        </g>
-                                                    </svg>
+
+                                        <div @click="changeStateIncomeReceipt(receipt.id_recibo_ingreso, receipt.numero_recibo_ingreso, receipt.estado_recibo_ingreso)"
+                                            v-if="permits.eliminar == 1"
+                                            class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
+                                            <div class="ml-0.5 mr-2 w-5 h-5"
+                                                :class="receipt.estado_recibo_ingreso == 1 ? 'text-red-800' : 'text-green-800'">
+                                                <span class="text-xs ">
+                                                    <icon-m
+                                                        :iconName="receipt.estado_recibo_ingreso == 1 ? 'desactivate' : 'activate'">
+                                                    </icon-m>
                                                 </span>
                                             </div>
                                             <div class="font-semibold">
-                                                {{ receipt.estado_recibo_ingreso ? 'Desactivar' : 'Activar' }}
+                                                {{ receipt.estado_recibo_ingreso == 1 ? 'Desactivar' : 'Activar' }}
                                             </div>
                                         </div>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
@@ -177,7 +161,7 @@ import axios from 'axios';
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
 
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="page!=1 ? getIncomeReceipts(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                        <a @click="page != 1 ? getIncomeReceipts(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                             text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
@@ -227,16 +211,16 @@ export default {
             { width: "6%", label: "Fecha", name: "fecha_recibo_ingreso", type: "date" },
             { width: "25%", label: "Cliente", name: "cliente_recibo_ingreso", type: "text" },
             { width: "25%", label: "Descripcion", name: "descripcion_recibo_ingreso", type: "text" },
-            { width: "5%", label: "Especifico", name: "id_ccta_presupuestal", type: "text" },
-            { width: "5%", label: "Monto", name: "monto_recibo_ingreso", type: "text" },
+            { width: "6%", label: "Especifico", name: "id_ccta_presupuestal", type: "text" },
+            { width: "9%", label: "Monto", name: "monto_recibo_ingreso", type: "text" },
             {
-                width: "5%", label: "Estado", name: "estado_recibo_ingreso", type: "select",
+                width: "10%", label: "Estado", name: "estado_recibo_ingreso", type: "select",
                 options: [
                     { value: "1", label: "Activo" },
                     { value: "0", label: "Inactivo" }
                 ]
             },
-            { width: "18%", label: "Acciones", name: "Acciones" },
+            { width: "7%", label: "Acciones", name: "Acciones" },
         ];
         columns.forEach((column) => {
             if (column.name === 'id_recibo_ingreso')
