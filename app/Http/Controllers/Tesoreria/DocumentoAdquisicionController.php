@@ -24,7 +24,7 @@ class DocumentoAdquisicionController extends Controller
         $search_value = $request->search;
 
         $query = DocumentoAdquisicion::select('*')
-            ->with('detalles.fuente_financiamiento','detalles.quedan')
+            ->with('detalles.fuente_financiamiento', 'detalles.quedan')
             ->join('tipo_gestion_compra', function ($join) {
                 $join->on('documento_adquisicion.id_tipo_gestion_compra', '=', 'tipo_gestion_compra.id_tipo_gestion_compra');
             })
@@ -232,5 +232,41 @@ class DocumentoAdquisicionController extends Controller
             }
             return ['mensaje' => 'Actualizado documento numero ' . $acq_doc->numero_doc_adquisicion . ' con éxito.'];
         }
+    }
+
+    //New method for composition API
+    public function getInfoModalDocAdquisicion(Request $request, $id)
+    {
+        $acqDoc = DocumentoAdquisicion::with([
+            'detalles.quedan', 'proveedor', 'tipo_gestion_compra',
+            'tipo_documento_adquisicion', 'detalles.fuente_financiamiento'
+        ])->find($id);
+
+        $doc_types = DB::table('tipo_documento_adquisicion')
+            ->select('id_tipo_doc_adquisicion as value', 'nombre_tipo_doc_adquisicion as label')
+            ->where('estado_tipo_doc_adquisicion', 1)
+            ->orderBy('nombre_tipo_doc_adquisicion')
+            ->get();
+        $management_types = DB::table('tipo_gestion_compra')
+            ->select('id_tipo_gestion_compra as value', 'nombre_tipo_gestion_compra as label')
+            ->where('estado_tipo_gestion_compra', '=', 1)
+            ->orderBy('nombre_tipo_gestion_compra')
+            ->get();
+        $financing_sources = ProyectoFinanciado::select('id_proy_financiado as value', 'nombre_proy_financiado as label', 'codigo_proy_financiado')
+            ->where('estado_proy_financiado', '=', 1)
+            ->orderBy('nombre_proy_financiado')
+            ->get();
+        $suppliers = Proveedor::select('id_proveedor as value', 'razon_social_proveedor as label')
+            ->where('estado_proveedor', '=', 1)
+            ->orderBy('razon_social_proveedor')
+            ->get();
+
+        return response()->json([
+            'doc_types'                     => $doc_types,
+            'management_types'              => $management_types,
+            'financing_sources'             => $financing_sources,
+            'suppliers'                     => $suppliers,
+            'acqDoc'                        => $acqDoc ?? []
+        ]);
     }
 }
