@@ -58,35 +58,35 @@ class DocumentoAdquisicionController extends Controller
     }
     public function changeStateAcqdoc(Request $request)
     {
-        $acq_doc = DocumentoAdquisicion::find($request->id_acq_doc);
+        $acq_doc = DocumentoAdquisicion::find($request->id);
         $has_assigned = $acq_doc->detalles()->whereHas('quedan')->exists();
         if ($has_assigned) {
             return response()->json(['logical_error' => 'Error, el documento seleccionado no puede ser desactivado porque ya tiene quedan asignados.'], 422);
         } else {
             if ($acq_doc->estado_doc_adquisicion == 1) {
-                if ($request->state_acq_doc == 1) {
+                if ($request->status == 1) {
                     $acq_doc->update([
                         'estado_doc_adquisicion' => 0,
                         'fecha_mod_doc_adquisicion' => Carbon::now(),
                         'usuario_doc_adquisicion' => $request->user()->nick_usuario,
                         'ip_doc_adquisicion' => $request->ip(),
                     ]);
-                    return ['mensaje' => 'Documento de aquisicion numero ' . $acq_doc->numero_doc_adquisicion . ' ha sido desactivado con exito'];
+                    return ['message' => 'Documento de aquisicion numero ' . $acq_doc->numero_doc_adquisicion . ' ha sido desactivado con exito'];
                 } else {
-                    return ['mensaje' => 'El documento de adquisicion seleccionado ya ha sido activado por otro usuario'];
+                    return ['message' => 'El documento de adquisicion seleccionado ya ha sido activado por otro usuario'];
                 }
             } else {
                 if ($acq_doc->estado_doc_adquisicion == 0) {
-                    if ($request->state_acq_doc == 0) {
+                    if ($request->status == 0) {
                         $acq_doc->update([
                             'estado_doc_adquisicion' => 1,
                             'fecha_mod_doc_adquisicion' => Carbon::now(),
                             'usuario_doc_adquisicion' => $request->user()->nick_usuario,
                             'ip_doc_adquisicion' => $request->ip(),
                         ]);
-                        return ['mensaje' => 'Documento de adquisicion numero ' . $acq_doc->numero_doc_adquisicion . ' ha sido activado con exito'];
+                        return ['message' => 'Documento de adquisicion numero ' . $acq_doc->numero_doc_adquisicion . ' ha sido activado con exito'];
                     } else {
-                        return ['mensaje' => 'El documento de adquisicion seleccionado ya ha sido desactivado por otro usuario'];
+                        return ['message' => 'El documento de adquisicion seleccionado ya ha sido desactivado por otro usuario'];
                     }
                 }
             }
@@ -119,45 +119,9 @@ class DocumentoAdquisicionController extends Controller
     }
     public function saveAcqDoc(DocumentoAdquisicionRequest $request)
     {
-        $new_acq_doc = new DocumentoAdquisicion([
-            'id_tipo_gestion_compra' => $request->management_type_id,
-            'id_tipo_doc_adquisicion' => $request->type_id,
-            'id_proveedor' => $request->supplier_id,
-            'monto_doc_adquisicion' => $request->total,
-            'numero_doc_adquisicion' => $request->number,
-            'numero_gestion_doc_adquisicion' => $request->management_number,
-            'numero_adjudicacion_doc_adquisicion' => $request->award_number,
-            'fecha_adjudicacion_doc_adquisicion' => $request->award_date,
-            'estado_doc_adquisicion' => 1,
-            'fecha_reg_doc_adquisicion' => Carbon::now(),
-            'usuario_doc_adquisicion' => $request->user()->nick_usuario,
-            'ip_doc_adquisicion' => $request->ip(),
-        ]);
-        $new_acq_doc->save();
-        foreach ($request->items as $detail) {
-            $new_item = new DetDocumentoAdquisicion([
-                'id_doc_adquisicion' => $new_acq_doc->id_doc_adquisicion,
-                'id_proy_financiado' => $detail['financing_source_id'],
-                'nombre_det_doc_adquisicion' => $detail['name'],
-                'monto_det_doc_adquisicion' => $detail['amount'],
-                'compromiso_ppto_det_doc_adquisicion' => $detail['commitment_number'],
-                'admon_det_doc_adquisicion' => $detail['contract_manager'],
-                'estado_det_doc_adquisicion' => 1,
-                'fecha_reg_det_doc_adquisicion' => Carbon::now(),
-                'usuario_det_doc_adquisicion' => $request->user()->nick_usuario,
-                'ip_det_doc_adquisicion' => $request->ip()
-            ]);
-            $new_item->save();
-        }
-        return ['mensaje' => 'Guardado documento numero ' . $new_acq_doc->numero_doc_adquisicion . ' con éxito'];
-    }
-    public function updateAcqDoc(DocumentoAdquisicionRequest $request)
-    {
-        $acq_doc = DocumentoAdquisicion::find($request->id);
-        if ($acq_doc->estado_doc_adquisicion == 0) {
-            return response()->json(['logical_error' => 'Error, el documento seleccionado ha sido desactivado por otro usuario.'], 422);
-        } else {
-            $acq_doc->update([
+        DB::beginTransaction();
+        try {
+            $new_acq_doc = new DocumentoAdquisicion([
                 'id_tipo_gestion_compra' => $request->management_type_id,
                 'id_tipo_doc_adquisicion' => $request->type_id,
                 'id_proveedor' => $request->supplier_id,
@@ -166,71 +130,242 @@ class DocumentoAdquisicionController extends Controller
                 'numero_gestion_doc_adquisicion' => $request->management_number,
                 'numero_adjudicacion_doc_adquisicion' => $request->award_number,
                 'fecha_adjudicacion_doc_adquisicion' => $request->award_date,
-                'fecha_mod_doc_adquisicion' => Carbon::now(),
+                'estado_doc_adquisicion' => 1,
+                'fecha_reg_doc_adquisicion' => Carbon::now(),
                 'usuario_doc_adquisicion' => $request->user()->nick_usuario,
                 'ip_doc_adquisicion' => $request->ip(),
             ]);
+            $new_acq_doc->save();
 
             foreach ($request->items as $detail) {
-                if ($detail['id'] != "" && $detail['deleted'] == false) {
-                    //Update item
-                    $item = DetDocumentoAdquisicion::find($detail['id']);
-                    $item->update([
-                        'id_proy_financiado' => $detail['financing_source_id'],
-                        'nombre_det_doc_adquisicion' => $detail['name'],
-                        'monto_det_doc_adquisicion' => $detail['amount'],
-                        'compromiso_ppto_det_doc_adquisicion' => $detail['commitment_number'],
-                        'admon_det_doc_adquisicion' => $detail['contract_manager'],
-                        'fecha_mod_det_doc_adquisicion' => Carbon::now(),
-                        'usuario_det_doc_adquisicion' => $request->user()->nick_usuario,
-                        'ip_det_doc_adquisicion' => $request->ip()
-                    ]);
-                }
+                $new_item = new DetDocumentoAdquisicion([
+                    'id_doc_adquisicion' => $new_acq_doc->id_doc_adquisicion,
+                    'id_proy_financiado' => $detail['financing_source_id'],
+                    'nombre_det_doc_adquisicion' => $detail['name'],
+                    'monto_det_doc_adquisicion' => $detail['amount'],
+                    'compromiso_ppto_det_doc_adquisicion' => $detail['commitment_number'],
+                    'admon_det_doc_adquisicion' => $detail['contract_manager'],
+                    'estado_det_doc_adquisicion' => 1,
+                    'fecha_reg_det_doc_adquisicion' => Carbon::now(),
+                    'usuario_det_doc_adquisicion' => $request->user()->nick_usuario,
+                    'ip_det_doc_adquisicion' => $request->ip()
+                ]);
+                $new_item->save();
+            }
 
-                if ($detail['id'] != "" && $detail['deleted'] == true) {
-                    $item = DetDocumentoAdquisicion::find($detail['id']);
-                    $item->update([
-                        'estado_det_doc_adquisicion' => 0,
-                        'fecha_mod_det_doc_adquisicion' => Carbon::now(),
-                        'usuario_det_doc_adquisicion' => $request->user()->nick_usuario,
-                        'ip_det_doc_adquisicion' => $request->ip()
-                    ]);
-                }
+            DB::commit(); // Confirma las operaciones en la base de datos
+            return response()->json([
+                'message'          => 'Guardado documento numero ' . $new_acq_doc->numero_doc_adquisicion . ' con éxito',
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+            return response()->json([
+                'logical_error' => 'Ha ocurrido un error con sus datos.',
+                'error' => $th->getMessage(),
+            ], 422);
+        }
 
-                if ($detail['id'] == "" && $detail['deleted'] == false) {
-                    $exist_item = DetDocumentoAdquisicion::where('id_doc_adquisicion', $request->id)
-                        ->where('compromiso_ppto_det_doc_adquisicion', $detail['commitment_number'])
-                        ->first();
-                    if ($exist_item) {
-                        $exist_item->update([
+        // $new_acq_doc = new DocumentoAdquisicion([
+        //     'id_tipo_gestion_compra' => $request->management_type_id,
+        //     'id_tipo_doc_adquisicion' => $request->type_id,
+        //     'id_proveedor' => $request->supplier_id,
+        //     'monto_doc_adquisicion' => $request->total,
+        //     'numero_doc_adquisicion' => $request->number,
+        //     'numero_gestion_doc_adquisicion' => $request->management_number,
+        //     'numero_adjudicacion_doc_adquisicion' => $request->award_number,
+        //     'fecha_adjudicacion_doc_adquisicion' => $request->award_date,
+        //     'estado_doc_adquisicion' => 1,
+        //     'fecha_reg_doc_adquisicion' => Carbon::now(),
+        //     'usuario_doc_adquisicion' => $request->user()->nick_usuario,
+        //     'ip_doc_adquisicion' => $request->ip(),
+        // ]);
+        // $new_acq_doc->save();
+        // foreach ($request->items as $detail) {
+        //     $new_item = new DetDocumentoAdquisicion([
+        //         'id_doc_adquisicion' => $new_acq_doc->id_doc_adquisicion,
+        //         'id_proy_financiado' => $detail['financing_source_id'],
+        //         'nombre_det_doc_adquisicion' => $detail['name'],
+        //         'monto_det_doc_adquisicion' => $detail['amount'],
+        //         'compromiso_ppto_det_doc_adquisicion' => $detail['commitment_number'],
+        //         'admon_det_doc_adquisicion' => $detail['contract_manager'],
+        //         'estado_det_doc_adquisicion' => 1,
+        //         'fecha_reg_det_doc_adquisicion' => Carbon::now(),
+        //         'usuario_det_doc_adquisicion' => $request->user()->nick_usuario,
+        //         'ip_det_doc_adquisicion' => $request->ip()
+        //     ]);
+        //     $new_item->save();
+        // }
+        // return ['message' => 'Guardado documento numero ' . $new_acq_doc->numero_doc_adquisicion . ' con éxito'];
+    }
+    public function updateAcqDoc(DocumentoAdquisicionRequest $request)
+    {
+        $acq_doc = DocumentoAdquisicion::find($request->id);
+        if ($acq_doc->estado_doc_adquisicion == 0) {
+            return response()->json(['logical_error' => 'Error, el documento seleccionado ha sido desactivado por otro usuario.'], 422);
+        } else {
+            DB::beginTransaction();
+            try {
+                $acq_doc->update([
+                    'id_tipo_gestion_compra' => $request->management_type_id,
+                    'id_tipo_doc_adquisicion' => $request->type_id,
+                    'id_proveedor' => $request->supplier_id,
+                    'monto_doc_adquisicion' => $request->total,
+                    'numero_doc_adquisicion' => $request->number,
+                    'numero_gestion_doc_adquisicion' => $request->management_number,
+                    'numero_adjudicacion_doc_adquisicion' => $request->award_number,
+                    'fecha_adjudicacion_doc_adquisicion' => $request->award_date,
+                    'fecha_mod_doc_adquisicion' => Carbon::now(),
+                    'usuario_doc_adquisicion' => $request->user()->nick_usuario,
+                    'ip_doc_adquisicion' => $request->ip(),
+                ]);
+
+                foreach ($request->items as $detail) {
+                    if ($detail['id'] != "" && $detail['deleted'] == false) {
+                        //Update item
+                        $item = DetDocumentoAdquisicion::find($detail['id']);
+                        $item->update([
                             'id_proy_financiado' => $detail['financing_source_id'],
                             'nombre_det_doc_adquisicion' => $detail['name'],
                             'monto_det_doc_adquisicion' => $detail['amount'],
                             'compromiso_ppto_det_doc_adquisicion' => $detail['commitment_number'],
                             'admon_det_doc_adquisicion' => $detail['contract_manager'],
-                            'estado_det_doc_adquisicion' => 1,
                             'fecha_mod_det_doc_adquisicion' => Carbon::now(),
                             'usuario_det_doc_adquisicion' => $request->user()->nick_usuario,
                             'ip_det_doc_adquisicion' => $request->ip()
                         ]);
-                    } else {
-                        $new_item = new DetDocumentoAdquisicion([
-                            'id_doc_adquisicion' => $request->id,
-                            'id_proy_financiado' => $detail['financing_source_id'],
-                            'nombre_det_doc_adquisicion' => $detail['name'],
-                            'monto_det_doc_adquisicion' => $detail['amount'],
-                            'compromiso_ppto_det_doc_adquisicion' => $detail['commitment_number'],
-                            'admon_det_doc_adquisicion' => $detail['contract_manager'],
-                            'estado_det_doc_adquisicion' => 1,
-                            'fecha_reg_det_doc_adquisicion' => Carbon::now(),
+                    }
+
+                    if ($detail['id'] != "" && $detail['deleted'] == true) {
+                        $item = DetDocumentoAdquisicion::find($detail['id']);
+                        $item->update([
+                            'estado_det_doc_adquisicion' => 0,
+                            'fecha_mod_det_doc_adquisicion' => Carbon::now(),
                             'usuario_det_doc_adquisicion' => $request->user()->nick_usuario,
                             'ip_det_doc_adquisicion' => $request->ip()
                         ]);
-                        $new_item->save();
+                    }
+
+                    if ($detail['id'] == "" && $detail['deleted'] == false) {
+                        $exist_item = DetDocumentoAdquisicion::where('id_doc_adquisicion', $request->id)
+                            ->where('compromiso_ppto_det_doc_adquisicion', $detail['commitment_number'])
+                            ->first();
+                        if ($exist_item) {
+                            $exist_item->update([
+                                'id_proy_financiado' => $detail['financing_source_id'],
+                                'nombre_det_doc_adquisicion' => $detail['name'],
+                                'monto_det_doc_adquisicion' => $detail['amount'],
+                                'compromiso_ppto_det_doc_adquisicion' => $detail['commitment_number'],
+                                'admon_det_doc_adquisicion' => $detail['contract_manager'],
+                                'estado_det_doc_adquisicion' => 1,
+                                'fecha_mod_det_doc_adquisicion' => Carbon::now(),
+                                'usuario_det_doc_adquisicion' => $request->user()->nick_usuario,
+                                'ip_det_doc_adquisicion' => $request->ip()
+                            ]);
+                        } else {
+                            $new_item = new DetDocumentoAdquisicion([
+                                'id_doc_adquisicion' => $request->id,
+                                'id_proy_financiado' => $detail['financing_source_id'],
+                                'nombre_det_doc_adquisicion' => $detail['name'],
+                                'monto_det_doc_adquisicion' => $detail['amount'],
+                                'compromiso_ppto_det_doc_adquisicion' => $detail['commitment_number'],
+                                'admon_det_doc_adquisicion' => $detail['contract_manager'],
+                                'estado_det_doc_adquisicion' => 1,
+                                'fecha_reg_det_doc_adquisicion' => Carbon::now(),
+                                'usuario_det_doc_adquisicion' => $request->user()->nick_usuario,
+                                'ip_det_doc_adquisicion' => $request->ip()
+                            ]);
+                            $new_item->save();
+                        }
                     }
                 }
+
+                DB::commit(); // Confirma las operaciones en la base de datos
+                return response()->json([
+                    'message'          => 'Actualizado documento numero ' . $acq_doc->numero_doc_adquisicion . ' con éxito.',
+                ]);
+            } catch (\Throwable $th) {
+                DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+                return response()->json([
+                    'logical_error' => 'Ha ocurrido un error con sus datos.',
+                    'error' => $th->getMessage(),
+                ], 422);
             }
-            return ['mensaje' => 'Actualizado documento numero ' . $acq_doc->numero_doc_adquisicion . ' con éxito.'];
+
+
+            // $acq_doc->update([
+            //     'id_tipo_gestion_compra' => $request->management_type_id,
+            //     'id_tipo_doc_adquisicion' => $request->type_id,
+            //     'id_proveedor' => $request->supplier_id,
+            //     'monto_doc_adquisicion' => $request->total,
+            //     'numero_doc_adquisicion' => $request->number,
+            //     'numero_gestion_doc_adquisicion' => $request->management_number,
+            //     'numero_adjudicacion_doc_adquisicion' => $request->award_number,
+            //     'fecha_adjudicacion_doc_adquisicion' => $request->award_date,
+            //     'fecha_mod_doc_adquisicion' => Carbon::now(),
+            //     'usuario_doc_adquisicion' => $request->user()->nick_usuario,
+            //     'ip_doc_adquisicion' => $request->ip(),
+            // ]);
+
+            // foreach ($request->items as $detail) {
+            //     if ($detail['id'] != "" && $detail['deleted'] == false) {
+            //         //Update item
+            //         $item = DetDocumentoAdquisicion::find($detail['id']);
+            //         $item->update([
+            //             'id_proy_financiado' => $detail['financing_source_id'],
+            //             'nombre_det_doc_adquisicion' => $detail['name'],
+            //             'monto_det_doc_adquisicion' => $detail['amount'],
+            //             'compromiso_ppto_det_doc_adquisicion' => $detail['commitment_number'],
+            //             'admon_det_doc_adquisicion' => $detail['contract_manager'],
+            //             'fecha_mod_det_doc_adquisicion' => Carbon::now(),
+            //             'usuario_det_doc_adquisicion' => $request->user()->nick_usuario,
+            //             'ip_det_doc_adquisicion' => $request->ip()
+            //         ]);
+            //     }
+
+            //     if ($detail['id'] != "" && $detail['deleted'] == true) {
+            //         $item = DetDocumentoAdquisicion::find($detail['id']);
+            //         $item->update([
+            //             'estado_det_doc_adquisicion' => 0,
+            //             'fecha_mod_det_doc_adquisicion' => Carbon::now(),
+            //             'usuario_det_doc_adquisicion' => $request->user()->nick_usuario,
+            //             'ip_det_doc_adquisicion' => $request->ip()
+            //         ]);
+            //     }
+
+            //     if ($detail['id'] == "" && $detail['deleted'] == false) {
+            //         $exist_item = DetDocumentoAdquisicion::where('id_doc_adquisicion', $request->id)
+            //             ->where('compromiso_ppto_det_doc_adquisicion', $detail['commitment_number'])
+            //             ->first();
+            //         if ($exist_item) {
+            //             $exist_item->update([
+            //                 'id_proy_financiado' => $detail['financing_source_id'],
+            //                 'nombre_det_doc_adquisicion' => $detail['name'],
+            //                 'monto_det_doc_adquisicion' => $detail['amount'],
+            //                 'compromiso_ppto_det_doc_adquisicion' => $detail['commitment_number'],
+            //                 'admon_det_doc_adquisicion' => $detail['contract_manager'],
+            //                 'estado_det_doc_adquisicion' => 1,
+            //                 'fecha_mod_det_doc_adquisicion' => Carbon::now(),
+            //                 'usuario_det_doc_adquisicion' => $request->user()->nick_usuario,
+            //                 'ip_det_doc_adquisicion' => $request->ip()
+            //             ]);
+            //         } else {
+            //             $new_item = new DetDocumentoAdquisicion([
+            //                 'id_doc_adquisicion' => $request->id,
+            //                 'id_proy_financiado' => $detail['financing_source_id'],
+            //                 'nombre_det_doc_adquisicion' => $detail['name'],
+            //                 'monto_det_doc_adquisicion' => $detail['amount'],
+            //                 'compromiso_ppto_det_doc_adquisicion' => $detail['commitment_number'],
+            //                 'admon_det_doc_adquisicion' => $detail['contract_manager'],
+            //                 'estado_det_doc_adquisicion' => 1,
+            //                 'fecha_reg_det_doc_adquisicion' => Carbon::now(),
+            //                 'usuario_det_doc_adquisicion' => $request->user()->nick_usuario,
+            //                 'ip_det_doc_adquisicion' => $request->ip()
+            //             ]);
+            //             $new_item->save();
+            //         }
+            //     }
+            // }
+            // return ['mensaje' => 'Actualizado documento numero ' . $acq_doc->numero_doc_adquisicion . ' con éxito.'];
         }
     }
 

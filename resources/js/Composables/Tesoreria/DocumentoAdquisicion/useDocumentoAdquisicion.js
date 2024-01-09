@@ -38,7 +38,7 @@ export const useDocumentoAdquisicion = (context) => {
             id: '',
             index: '',
             financing_source_id: '',
-            name_financing_source:'',
+            name_financing_source: '',
             commitment_number: '',
             amount: '',
             contract_manager: '',
@@ -75,6 +75,7 @@ export const useDocumentoAdquisicion = (context) => {
             );
             setModalValues(response.data)
         } catch (err) {
+            console.log(err);
             if (err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
                 context.emit("get-table");
@@ -102,13 +103,13 @@ export const useDocumentoAdquisicion = (context) => {
         acq_doc.value.award_number = data.acqDoc.numero_adjudicacion_doc_adquisicion ?? ""
         acq_doc.value.award_date = data.acqDoc.fecha_adjudicacion_doc_adquisicion ?? ""
         acq_doc.value.total = data.acqDoc.monto_doc_adquisicion ?? ""
-        if(data.acqDoc.detalles.length > 0){
+        if (data.acqDoc.detalles) {
             data.acqDoc.detalles.forEach((value, index) => {
                 var arrayInsert = {
                     id: value.id_det_doc_adquisicion,
                     index: index,
                     financing_source_id: value.id_proy_financiado,
-                    name_financing_source: value.fuente_financiamiento.nombre_proy_financiado,
+                    name_financing_source: value.fuente_financiamiento.codigo_proy_financiado,
                     commitment_number: value.compromiso_ppto_det_doc_adquisicion,
                     amount: value.monto_det_doc_adquisicion,
                     contract_manager: value.admon_det_doc_adquisicion,
@@ -119,46 +120,155 @@ export const useDocumentoAdquisicion = (context) => {
                 };
                 acq_doc.value.items.push(arrayInsert)
             })
-        }else{
+        } else {
             acq_doc.items = []
         }
     };
 
-    const storeDocumentoAdquisicion = async (doc) => {
-        swal({
-            title: '¿Está seguro de guardar el nuevo concepto de ingreso?',
-            icon: 'question',
-            iconHtml: '❓',
-            confirmButtonText: 'Si, Guardar',
-            confirmButtonColor: '#141368',
-            cancelButtonText: 'Cancelar',
-            showCancelButton: true,
-            showCloseButton: true
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                saveConceptoIngreso(doc, '/save-acq-doc');
+    const addItem = () => {
+        const fieldMappingsItem = {
+            financing_source_id: 'Fuente financiamiento',
+            commitment_number: 'Numero compromiso',
+            amount: 'Monto Compromiso',
+            name: 'Nombre item',
+        };
+        const requiredFields = [
+            'financing_source_id',
+            'commitment_number',
+            'amount',
+            'name',
+        ];
+        requiredFields.forEach(field => {
+            if (array_item.value[field]) {
+                item_errors.value[field] = '';
+            } else {
+                item_errors.value[field] = `El campo ${fieldMappingsItem[field]} es obligatorio.`;
             }
         });
+        const err = Object.values(item_errors.value);
+        if (err.every(error => error === '')) {
+            const { id, index, financing_source_id, commitment_number, amount, contract_manager, name, has_quedan } = array_item.value;
+            const parsedAmount = parseFloat(amount);
+            const formattedAmount = parsedAmount.toFixed(2);
+            const arrayInsert = {
+                id: id ? id : '',
+                index: index ? index : '',
+                financing_source_id: financing_source_id ? financing_source_id : '',
+                commitment_number: commitment_number ? commitment_number : '',
+                amount: formattedAmount ? formattedAmount : '',
+                contract_manager: contract_manager ? contract_manager : '',
+                name: name ? name : '',
+                has_quedan: has_quedan ? has_quedan : '',
+                selected: false,
+                deleted: false
+            };
+            if (acq_doc.value.items.some(item => item.commitment_number === commitment_number)) {
+                const index_to_compare = acq_doc.value.items.findIndex(item => item.commitment_number === commitment_number)
+                if (acq_doc.value.items[index_to_compare].selected) {
+                    Object.assign(acq_doc.value.items[index_to_compare], arrayInsert);
+                    cleanAndUpdateTotal()
+                } else {
+                    if (acq_doc.value.items[index_to_compare].deleted) {
+                        Object.assign(this.acq_doc.items[index_to_compare], arrayInsert);
+                        cleanAndUpdateTotal()
+                    } else {
+                        useShowToast(toast.warning, "El numero de compromiso " + commitment_number + " ya ha sido agregado.");
+                    }
+                }
+            } else {
+                if (acq_doc.value.items.some(item => item.id === id)) {
+                    Object.assign(acq_doc.value.items[index], arrayInsert)
+                } else {
+                    acq_doc.value.items.push(arrayInsert)
+                }
+                cleanAndUpdateTotal()
+            }
+        } else {
+            useShowToast(toast.warning, "Tienes algunos errores, por favor verifica los datos enviados.");
+        }
+    };
+
+    const cleanAndUpdateTotal = () => {
+        updateTotal()
+        new_item.value = true
+        // Empty the array
+        Object.keys(array_item.value).forEach(key => {
+            array_item.value[key] = '';
+        });
+    }
+
+    const updateTotal = () => {
+        var sum = 0;
+        for (var i = 0; i < acq_doc.value.items.length; i++) {
+            if (acq_doc.value.items[i].deleted == false) {
+                var amount = parseFloat(acq_doc.value.items[i].amount);
+                if (!isNaN(amount)) {
+                    sum += amount;
+                }
+            }
+        }
+        acq_doc.value.total = sum.toFixed(2);
+    }
+
+    const cleanArrayItem = () => {
+        item_errors.value = []
+        if (array_item.value.index != -1) {
+            if (acq_doc.value.items[array_item.value.index]) {
+                acq_doc.value.items[array_item.value.index].selected = false
+            }
+        }
+        // Empty the array
+        Object.keys(array_item.value).forEach(key => {
+            array_item.value[key] = '';
+        });
+        new_item.value = true
+    }
+
+    const storeDocumentoAdquisicion = async (doc) => {
+        const all_deleted = acq_doc.value.items.every(item => item.deleted === true);
+        if (all_deleted) {
+            useShowToast(toast.warning, "Debes agregar al menos un detalle al documento.");
+        } else {
+            swal({
+                title: '¿Está seguro de guardar el nuevo concepto de ingreso?',
+                icon: 'question',
+                iconHtml: '❓',
+                confirmButtonText: 'Si, Guardar',
+                confirmButtonColor: '#141368',
+                cancelButtonText: 'Cancelar',
+                showCancelButton: true,
+                showCloseButton: true
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    saveDocAdquisicion(doc, '/save-acq-doc');
+                }
+            });
+        }
     };
 
     const updateDocumentoAdquisicion = async (doc) => {
-        swal({
-            title: '¿Está seguro de actualizar el concepto de ingreso?',
-            icon: 'question',
-            iconHtml: '❓',
-            confirmButtonText: 'Si, Actualizar',
-            confirmButtonColor: '#141368',
-            cancelButtonText: 'Cancelar',
-            showCancelButton: true,
-            showCloseButton: true
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                saveConceptoIngreso(doc, '/update-acq-doc');
-            }
-        });
+        const all_deleted = acq_doc.value.items.every(item => item.deleted === true);
+        if (all_deleted) {
+            useShowToast(toast.warning, "Debes agregar al menos un detalle al documento.");
+        } else {
+            swal({
+                title: '¿Está seguro de actualizar el concepto de ingreso?',
+                icon: 'question',
+                iconHtml: '❓',
+                confirmButtonText: 'Si, Actualizar',
+                confirmButtonColor: '#141368',
+                cancelButtonText: 'Cancelar',
+                showCancelButton: true,
+                showCloseButton: true
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    saveDocAdquisicion(doc, '/update-acq-doc');
+                }
+            });
+        }
     };
 
-    const saveConceptoIngreso = async (doc, url) => {
+    const saveDocAdquisicion = async (doc, url) => {
         isLoadingRequest.value = true;
         await axios
             .post(url, doc)
@@ -177,13 +287,21 @@ export const useDocumentoAdquisicion = (context) => {
         if (err.response.status === 422) {
             if (err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
-
+                context.emit("cerrar-modal")
+                context.emit("get-table")
             } else {
-                useShowToast(
-                    toast.warning,
-                    "Tienes algunos errores, por favor verifica los datos enviados."
-                );
-                errors.value = err.response.data.errors;
+                useShowToast(toast.warning, "Tienes algunos errores por favor verifica tus datos.");
+                backend_errors.value = err.response.data.errors;
+                // Itera sobre las propiedades del objeto de errores
+                for (const key in backend_errors.value) {
+                    var parts = key.split(".");
+                    if (parts.length > 1) {
+                        var index = parseInt(parts[1]);
+                        index_errors.value.push(index)
+                    } else {
+                        currentPage.value = 1
+                    }
+                }
             }
         } else {
             showErrorMessage(err);
@@ -205,11 +323,139 @@ export const useDocumentoAdquisicion = (context) => {
         swal({ title: title, text: text, icon: icon, timer: 5000 });
     };
 
+    const goToNextPage = () => {
+        const fieldMappings = {
+            type_id: 'Tipo documento',
+            management_type_id: 'Tipo gestion',
+            supplier_id: 'Proveedor',
+            number: 'Numero documento',
+            management_number: 'Numero gestion',
+            award_date: 'Fecha adjudicacion',
+        };
+
+        if (currentPage.value === 1) {
+            const requiredFields = [
+                'type_id',
+                'management_type_id',
+                'supplier_id',
+                'number',
+                'management_number',
+                'award_date'
+            ];
+
+            let page_with_errors = '';
+
+            requiredFields.forEach(field => {
+                if (acq_doc.value[field]) {
+                    errors.value[field] = '';
+                } else {
+                    errors.value[field] = `El campo ${fieldMappings[field]} es obligatorio.`;
+                }
+            });
+            if (Object.values(errors.value).some(error => error !== '')) {
+                page_with_errors = 1;
+            }
+        }
+
+        const err = Object.values(errors.value);
+        if (err.every(error => error === '')) {
+            item_errors.value = []
+            currentPage.value++;
+        } else {
+            if (page_with_errors !== currentPage.value) {
+                currentPage.value++;
+            } else {
+                useShowToast(toast.warning, "Tienes algunos errores, por favor verifica los datos enviados.");
+            }
+        }
+    }
+
+    const editItem = (item, index) => {
+        new_item.value = false
+        item_errors.value = []
+        const itemToClean = acq_doc.value.items.find(item => item.selected);
+        if (itemToClean) {
+            itemToClean.selected = false;
+        }
+        array_item.value.id = item.id
+        array_item.value.name = item.name
+        array_item.value.commitment_number = item.commitment_number
+        array_item.value.amount = item.amount
+        array_item.value.contract_manager = item.contract_manager
+        array_item.value.index = index
+        array_item.value.financing_source_id = item.financing_source_id
+        array_item.value.has_quedan = item.has_quedan
+        array_item.value.deleted = false
+        array_item.value.selected = true
+        acq_doc.value.items[index].selected = true
+    }
+
+    const deleteItem = (index) => {
+        swal({
+            title: 'Eliminar item.',
+            text: "¿Estas seguro?",
+            icon: 'warning',
+            showCancelButton: true,
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#DC2626',
+            cancelButtonColor: '#4B5563',
+            confirmButtonText: 'Si, Eliminar.'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                if (acq_doc.value.items[index].has_quedan) {
+                    useShowToast(toast.error, "No puedes eliminar este detalle porque tiene quedan asignados, elimina primero los quedan asignados.");
+                } else {
+                    if (acq_doc.value.items[index].selected) {
+                        // Empty the array
+                        Object.keys(array_item.value).forEach(key => {
+                            array_item.value[key] = '';
+                        });
+                    }
+                    if (acq_doc.value.items[index].id === '') {
+                        acq_doc.value.items.splice(index, 1)
+                    } else {
+                        acq_doc.value.items[index].deleted = true
+                        acq_doc.value.items[index].selected = false
+                    }
+                    updateTotal()
+                }
+            }
+        })
+    }
+
+    const item_available = computed(() => {
+        let exist = false
+        if (acq_doc.value.items) {
+            for (var i = 0; i < acq_doc.value.items.length; i++) {
+                if (acq_doc.value.items[i].deleted == false) {
+                    exist = true
+                }
+            }
+            if (exist) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    });
+
+    const itemSelected = computed(() => {
+        const itemToClean = acq_doc.value.items.find(item => item.selected);
+        if (itemToClean) {
+            return true
+        } else {
+            return false
+        }
+    });
+
     return {
-        isLoadingRequest, errors, acq_doc, config, array_item, index_errors, 
+        isLoadingRequest, errors, acq_doc, config, array_item, index_errors,
         item_errors, backend_errors, new_item, currentPage, doc_types, management_types,
-        financing_sources, suppliers,
-        getInfoForModalDocumentoAdquisicion, storeDocumentoAdquisicion, updateDocumentoAdquisicion
+        financing_sources, suppliers, item_available, itemSelected,
+        getInfoForModalDocumentoAdquisicion, storeDocumentoAdquisicion, updateDocumentoAdquisicion,
+        goToNextPage, addItem, cleanArrayItem, editItem, deleteItem
     }
 }
 

@@ -51,7 +51,7 @@
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="doc-number" v-model="acq_doc.number" type="text"
-                                    placeholder="Numero documento" @update:modelValue="validateGeneralInput('number', 20)">
+                                    placeholder="Numero documento" @update:modelValue="handleValidation('number', {limit:20,upper:true})">
                                     <LabelToInput icon="objects" forLabel="doc-number" />
                                 </TextInput>
                                 <InputError v-for="(item, index) in backend_errors.number" :key="index" class="mt-2"
@@ -61,7 +61,7 @@
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="mngm-number" v-model="acq_doc.management_number" type="text"
                                     placeholder="Numero gestion"
-                                    @update:modelValue="validateGeneralInput('management_number', 20)">
+                                    @update:modelValue="handleValidation('management_number', {limit:20})">
                                     <LabelToInput icon="objects" forLabel="mngm-number" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errors.management_number" />
@@ -110,7 +110,7 @@
                             <div class="mb-4 md:mx-2 md:mb-0 basis-1/2">
                                 <TextInput id="mngm-number" v-model="acq_doc.award_number" type="text"
                                     placeholder="Numero adjudicacion" :required="false"
-                                    @update:modelValue="validateGeneralInput('award_number', 20)">
+                                    @update:modelValue="handleValidation('award_number', {limit:20})">
                                     <LabelToInput icon="objects" forLabel="mngm-number" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errors.award_number" />
@@ -148,7 +148,7 @@
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="commt-number" v-model="array_item.commitment_number" type="text"
                                     placeholder="Numero(s) compromiso(s)"
-                                    @update:modelValue="validateItemInput('commitment_number', 20, false, commitment_number = true)">
+                                    @update:modelValue="handleValidation('commitment_number', {limit:20,numbersCommasAndSpaces:true})">
                                     <LabelToInput icon="objects" forLabel="commt-number" />
                                 </TextInput>
                                 <InputError
@@ -158,7 +158,7 @@
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="amount" v-model="array_item.amount" type="text" placeholder="Monto detalle"
-                                    @update:modelValue="validateItemInput('amount', 10, monto = true)">
+                                    @update:modelValue="handleValidation('amount', {limit:10,amount:true})">
                                     <LabelToInput icon="money" forLabel="amount" />
                                 </TextInput>
                                 <InputError v-for="(item, index) in backend_errors['items.' + array_item.index + '.amount']"
@@ -170,7 +170,7 @@
                         <div class="mb-4 md:flex flex-row justify-items-start">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-full">
                                 <TextInput id="item-name" v-model="array_item.name" type="text" placeholder="Nombre"
-                                    @update:modelValue="validateItemInput('name', 250, monto = false)">
+                                    @update:modelValue="handleValidation('name', {limit:250})">
                                     <LabelToInput icon="standard" forLabel="item-name" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="item_errors.name" />
@@ -183,7 +183,7 @@
                             </label>
                             <textarea v-model="array_item.contract_manager" id="cotract-manager" name="contract-manager"
                                 class="resize-none w-full h-10 overflow-y-auto peer text-xs font-semibold rounded-r-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
-                                @input="validateItemInput('contract_manager', limit = 250)">
+                                @input="handleValidation('contract_manager', {limit:250})">
                             </textarea>
                             <InputError class="mt-2" :message="item_errors.contract_manager" />
                         </div>
@@ -218,10 +218,8 @@
                                                 item.selected ? 'bg-orange-400 hover:bg-orange-500' :
                                                     index_errors.includes(index) ? 'bg-red-300 hover:bg-red-400' : '']">
                                             <td class="text-center">{{ item.commitment_number }}</td>
-                                            <td class="td-data-table">
-                                                <div class="ellipsis text-center">
-                                                    {{ item.name }}
-                                                </div>
+                                            <td class="text-center max-w-[100px]">
+                                                {{ item.name }}
                                             </td>
                                             <td class="text-center">{{ item.name_financing_source }}</td>
                                             <td class="text-center">${{ item.amount }}</td>
@@ -273,7 +271,7 @@
                         </div>
                     </div>
                     <!-- Buttons to navigate -->
-                    <div class="flex justify-center mt-5" :class="modalData == '' ? 'mr-2' : ''">
+                    <div class="flex justify-center mt-5">
                         <div class="flex items-center mr-1">
                             <button v-if="currentPage != 2"
                                 class="flex items-center bg-blue-600 hover:bg-blue-700 text-white pl-3 pr-2 py-1.5 text-center mb-2 rounded"
@@ -300,9 +298,9 @@
                         </div>
                         <div class="flex items-center ml-1">
                             <div class="flex w-1/2">
-                                <button v-if="currentPage != 1" :class="modalData == '' ? 'mr-4' : ''"
-                                    class="flex items-center bg-gray-600 hover:bg-gray-700 text-white pl-2 pr-3 py-1.5 text-center mb-2 rounded"
-                                    :disabled="currentPage === 1" @click="goToPreviousPage">
+                                <button v-if="currentPage != 1" 
+                                    class="flex items-center bg-gray-600 hover:bg-gray-700 text-white pl-2 pr-3 py-1.5 text-center mb-2 rounded mr-2"
+                                    :disabled="currentPage === 1" @click="errors=[];currentPage--;">
                                     <svg width="20px" height="20px" viewBox="-3 0 32 32" version="1.1"
                                         xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
                                         fill="#ffffff" stroke="#ffffff">
@@ -325,12 +323,12 @@
                             </div>
 
                             <div class="md:flex flex-row justify-center">
-                                <GeneralButton v-if="modalData != '' && currentPage === 2 && !itemSelected"
-                                    @click="updateAcqDoc()" color="bg-orange-700 hover:bg-orange-800" text="Actualizar"
-                                    icon="update" class="" />
-                                <GeneralButton v-if="modalData == '' && currentPage === 2 && !itemSelected"
-                                    @click="saveNewAcqDoc()" color="bg-green-700 hover:bg-green-800" text="Guardar"
-                                    icon="add" class="" />
+                                <GeneralButton v-if="docAdquisicionId > 0 && currentPage === 2 && !itemSelected"
+                                    @click="updateDocumentoAdquisicion(acq_doc)" color="bg-orange-700 hover:bg-orange-800" text="Actualizar"
+                                    icon="update" />
+                                <GeneralButton v-if="docAdquisicionId <= 0 && currentPage === 2 && !itemSelected"
+                                    @click="storeDocumentoAdquisicion(acq_doc)" color="bg-green-700 hover:bg-green-800" text="Guardar"
+                                    icon="add" />
                             </div>
                         </div>
 
@@ -378,7 +376,9 @@ export default {
             config, array_item, index_errors,
             item_errors, backend_errors, new_item, currentPage,
             doc_types, management_types, financing_sources, suppliers,
-            getInfoForModalDocumentoAdquisicion, storeDocumentoAdquisicion, updateDocumentoAdquisicion
+            item_available, itemSelected,
+            getInfoForModalDocumentoAdquisicion, storeDocumentoAdquisicion, updateDocumentoAdquisicion,
+            goToNextPage, addItem, cleanArrayItem, editItem, deleteItem
         } = useDocumentoAdquisicion(context);
 
         const {
@@ -386,7 +386,14 @@ export default {
         } = useValidateInput()
 
         const handleValidation = (input, validation) => {
-            acq_doc.value[input] = validateInput(acq_doc.value[input], validation)
+            if (input === 'commitment_number' || input === 'amount' || input === 'contract_manager' || input === 'name') {
+                index_errors.value = []
+                backend_errors.value = []
+                item_errors.value = []
+                array_item.value[input] = validateInput(array_item.value[input], validation)
+            }else{
+                acq_doc.value[input] = validateInput(acq_doc.value[input], validation)
+            }
         }
 
         onMounted(
@@ -396,11 +403,13 @@ export default {
         )
 
         return {
-            isLoadingRequest, acq_doc, errors,
+            isLoadingRequest, acq_doc, errors, docAdquisicionId,
             config, array_item, index_errors,
             item_errors, backend_errors, new_item, currentPage,
             financing_sources, doc_types, management_types, suppliers,
-            storeDocumentoAdquisicion, updateDocumentoAdquisicion, handleValidation
+            item_available, itemSelected,
+            storeDocumentoAdquisicion, updateDocumentoAdquisicion, handleValidation,
+            goToNextPage, addItem, cleanArrayItem, editItem, deleteItem
         }
     }
 };
@@ -410,7 +419,6 @@ export default {
 .td-data-table {
     max-width: 100px;
     white-space: nowrap;
-    height: 50px;
 }
 
 .ellipsis {
