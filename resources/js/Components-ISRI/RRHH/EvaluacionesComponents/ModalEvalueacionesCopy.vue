@@ -353,13 +353,13 @@
                     <DocumentoEvaluacionCopy :class="headerOptions === 'DocumentoEvalacionVue' ? '' : 'hidden'"
                         :isLoadingObtenerCategoriaYRubrica="isLoadingObtenerCategoriaYRubrica"
                         :evaluacionPersonalProp="evaluacionToPassDocumento"
-                        :rubricaAndCategoriaByEvaluacion="rubricaAndCategoriaByEvaluacion" />
+                        :rubricaAndCategoriaByEvaluacion="rubricaAndCategoriaByEvaluacion" @actualizar-datatable="$emit('actualizar-datatable')" />
 
 
-                    <doc-analisis-des :class="headerOptions === 'DocumentoAnalisisDesempeñoVue' ? '' : 'hidden'"
+                    <DocAnalisisDes :class="headerOptions === 'DocumentoAnalisisDesempeñoVue' ? '' : 'hidden'"
                         :isLoadingObtenerCategoriaYRubrica="isLoadingObtenerCategoriaYRubrica"
                         :evaluacionPersonalProp="evaluacionToPassDocumento"
-                        :rubricaAndCategoriaByEvaluacion="rubricaAndCategoriaByEvaluacion"></doc-analisis-des>
+                        :rubricaAndCategoriaByEvaluacion="rubricaAndCategoriaByEvaluacion" @actualizar-datatable="$emit('actualizar-datatable')" />
                 </div>
 
 

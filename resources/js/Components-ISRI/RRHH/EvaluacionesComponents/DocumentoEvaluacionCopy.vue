@@ -1,7 +1,8 @@
 
 <template>
     <div class="mx-4 overflow-y-auto h-[550px] py-3 px-2 mb-4 ">
-        <div v-if="rubricaAndCategoriaByEvaluacion && !isLoadingObtenerCategoriaYRubrica && evaluacionPersonalProp" class="w-full">
+        <div v-if="rubricaAndCategoriaByEvaluacion && !isLoadingObtenerCategoriaYRubrica && evaluacionPersonalProp"
+            class="w-full">
 
             <table class="w-full ">
                 <tbody>
@@ -499,6 +500,17 @@
             </div>
         </div>
 
+
+        <div class="w-full h-[500px] px-1 text-selection-disable" v-if="!isLoadingObtenerCategoriaYRubrica && rubricaAndCategoriaByEvaluacion == ''">
+
+            <div class="flex flex-col items-center justify-center h-full">
+                <img src="../../../../img/evaluationModal.svg" class="h-96 rounded-full mx-auto" alt="SVG Image"
+                    draggable="false">
+                <h1 class="font-medium text-center">Evalúa al personal con honestidad</h1>
+                <p class="text-[9pt] text-center">Recuerda que solo evaluarás a los empleados que están a tu cargo.</p>
+            </div>
+        </div>
+
     </div>
 </template>
 
@@ -531,7 +543,8 @@ export default {
             default: false,
         },
     },
-    setup(props) {
+    emit: ["actualizar-datatable"],
+    setup(props,{ emit }) {
         const { evaluacionPersonalProp, rubricaAndCategoriaByEvaluacion } = toRefs(props)
         const { separarTexto, evaluacionPersonal, saveResponseWhenIsClickedCheckbox, optionsSelected, sendResponsesEvaluation, ranges, isScoreInRange } = useDocumentoEvaluacion();
         watch(evaluacionPersonalProp, (newValue, oldValue) => {
@@ -568,8 +581,10 @@ export default {
                         "La evaluacion se ha enviado"
                     );
                     console.log("HACEMOS ALGO DESPUES");
+                    emit("actualizar-datatable")
+
                 } else {
-                    alert("alerta ");
+                    toast.warning('No has seleccionado todas las opciones. Por favor, asegúrate de seleccionar todas las opciones antes de finalizar.');
 
                 }
             }

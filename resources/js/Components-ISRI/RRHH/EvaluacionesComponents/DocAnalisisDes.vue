@@ -389,42 +389,49 @@
                         <td class="w-52">COMENTARIO</td>
                     </tr>
                 </thead>
-                <tbody v-for="(incidente, i) in dataIndiceEvaluacion" :key="i">
-                    <tr @contextmenu.prevent="deleteRow(incidente.idIncidenteEvaluacion)" v-if="!incidente.isDeleted"
-                        class="*:border *:text-xs *:text-center *:align-middle *:border-black *:h-24 *:text-slate-600 ">
-                        <td class="w-24">{{ i + 1 }}</td>
-                        <td class="w-32">{{ moment(incidente.fechaRegIncidenteEvaluacion).format('L')  }}</td>
-                        <td class="w-40">
-                            <div class="relative flex h-8 w-full ">
-
-                                <Multiselect :filter-results="true" v-model="incidente.idCategoriaRendimiento"
-                                    :searchable="true" :clear-on-search="true" placeholder="Categorias" :classes="{
-                                        wrapper: 'relative text-xs cursor-not-allowed mx-auto w-full flex items-center justify-end box-border cursor-pointer outline-none',
-                                        containerDisabled: 'cursor-not-allowed bg-gray-200 text-text-slate-400',
-                                        placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                    }" noOptionsText="<p class='text-xs'>Sin resultados<p>"
-                                    noResultsText="<p class='text-xs'>Sin resultados  <p>"
-                                    :options="opcionesCategoriaRendimiento" />
-                            </div>
-                        </td>
-                        <td class="w-28">
-                            <div class="relative flex h-8 w-full ">
-                                <Multiselect :filter-results="true" v-model="incidente.resultadoIncidenteEvaluacion"
-                                    :searchable="true" :clear-on-search="true" placeholder="Tipos" :classes="{
-                                        wrapper: 'relative text-xs cursor-not-allowed mx-auto w-full flex items-center justify-end box-border cursor-pointer outline-none',
-                                        containerDisabled: 'cursor-not-allowed bg-gray-200 text-slate-400',
-                                        placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                    }" noOptionsText="<p class='text-xs'>Sin resultados<p>"
-                                    noResultsText="<p class='text-xs'>Sin resultados  <p>"
-                                    :options="[{ value: 0, label: 'F - FAVORABLE' }, { value: 1, label: 'D - DESFAVORABLE' }]" />
-                            </div>
-
-                        </td>
-                        <td class="w-52 p-2" contenteditable="true"
-                            @input="incidente.comentarioIncidenteEvaluacion = $event.target.innerText"> {{
-                                incidente.comentarioIncidenteEvaluacion }}</td>
+                <tbody v-if="dataIndiceEvaluacion.length > 0">
+                    <template v-for="(incidente, i) in dataIndiceEvaluacion" :key="i">
+                        <tr @contextmenu.prevent="deleteRow(incidente.idIncidenteEvaluacion)" v-if="!incidente.isDeleted"
+                            class="*:border *:text-xs *:text-center *:align-middle *:border-black *:h-24 *:text-slate-600">
+                            <td class="w-24">{{ i + 1 }}</td>
+                            <td class="w-32">{{ moment(incidente.fechaRegIncidenteEvaluacion).format('L') }}</td>
+                            <td class="w-40">
+                                <div class="relative flex h-8 w-full">
+                                    <Multiselect :filter-results="true" v-model="incidente.idCategoriaRendimiento"
+                                        :searchable="true" :clear-on-search="true" placeholder="Categorias" :classes="{
+                                            wrapper: 'relative text-xs cursor-not-allowed mx-auto w-full flex items-center justify-end box-border cursor-pointer outline-none',
+                                            containerDisabled: 'cursor-not-allowed bg-gray-200 text-text-slate-400',
+                                            placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                        }" noOptionsText="<p class='text-xs'>Sin resultados</p>"
+                                        noResultsText="<p class='text-xs'>Sin resultados</p>"
+                                        :options="opcionesCategoriaRendimiento" />
+                                </div>
+                            </td>
+                            <td class="w-28">
+                                <div class="relative flex h-8 w-full">
+                                    <Multiselect :filter-results="true" v-model="incidente.resultadoIncidenteEvaluacion"
+                                        :searchable="true" :clear-on-search="true" placeholder="Tipos" :classes="{
+                                            wrapper: 'relative text-xs cursor-not-allowed mx-auto w-full flex items-center justify-end box-border cursor-pointer outline-none',
+                                            containerDisabled: 'cursor-not-allowed bg-gray-200 text-slate-400',
+                                            placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                        }" noOptionsText="<p class='text-xs'>Sin resultados</p>"
+                                        noResultsText="<p class='text-xs'>Sin resultados</p>"
+                                        :options="[{ value: 0, label: 'F - FAVORABLE' }, { value: 1, label: 'D - DESFAVORABLE' }]" />
+                                </div>
+                            </td>
+                            <td class="w-52 p-2" contenteditable="true"
+                                @input="incidente.comentarioIncidenteEvaluacion = $event.target.innerText">
+                                {{ incidente.comentarioIncidenteEvaluacion }}
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+                <tbody v-else>
+                    <tr>
+                        <td colspan="5" class="text-center">No hay incidentes de evaluación disponibles</td>
                     </tr>
                 </tbody>
+
             </table>
             <button @click="guardarYEnviarIncidentes"
                 class="bg-indigo-900 rounded-sm shadow text-center text-white text-sm font-light w-full py-1 mt-5">
@@ -453,6 +460,18 @@
                         stroke-width="24"></line>
                 </svg>
                 <span class="loading-text">Cargando...</span>
+            </div>
+        </div>
+
+
+        <div class="w-full h-[500px] px-1 text-selection-disable"
+            v-if="!isLoadingObtenerCategoriaYRubrica && rubricaAndCategoriaByEvaluacion == ''">
+
+            <div class="flex flex-col items-center justify-center h-full">
+                <img src="../../../../img/evaluationModal.svg" class="h-96 rounded-full mx-auto" alt="SVG Image"
+                    draggable="false">
+                <h1 class="font-medium text-center">Evalúa al personal con honestidad</h1>
+                <p class="text-[9pt] text-center">Recuerda que solo evaluarás a los empleados que están a tu cargo.</p>
             </div>
         </div>
     </div>
@@ -487,7 +506,8 @@ export default {
             default: false,
         },
     },
-    setup(props) {
+    emit: ["actualizar-datatable"],
+    setup(props, { emit }) {
         const { evaluacionPersonalProp, rubricaAndCategoriaByEvaluacion } = toRefs(props)
         const { separarTexto } = useDocumentoEvaluacion();
         const { opcionesCategoriaRendimiento, objectCat, dataIndiceEvaluacion, addDataIndiceEvaluacion, deleteRow, saveIncidentesEvaluacionesRequest } = useAnalisisDes(evaluacionPersonalProp)
@@ -534,10 +554,17 @@ export default {
             });
             if (confirmed.isConfirmed) {
 
-                executeRequest(
-                    saveIncidentesEvaluacionesRequest(),
-                    "La evaluacion se ha enviado"
-                );
+
+                if (dataIndiceEvaluacion.length > 0) {
+                    await executeRequest(
+                        saveIncidentesEvaluacionesRequest(),
+                        "La evaluacion se ha enviado"
+                    );
+                    emit("actualizar-datatable")
+                } else {
+                    toast.warning('No hay incidentes registrados. Por favor, agrega al menos uno para enviar la información.');
+
+                }
 
             }
         };
