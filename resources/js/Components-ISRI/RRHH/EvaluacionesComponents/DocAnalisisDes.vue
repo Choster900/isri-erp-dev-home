@@ -10,7 +10,17 @@
                             </div>
                         </td>
                         <td class="border text-sm border-black text-center font-medium uppercase" rowspan="2">
-                            FORMULARIO DE ANALISIS DEL DESEMPEÑO
+                            <div class="flex items-center justify-center">
+                                <div class="relative text-center">
+                                    FORMULARIO DE ANALISIS DE DESEMPEÑO
+                                </div>
+                                <svg @click="printEvaluacionDesemp" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                    class="w-5 h-5 ml-2 stroke-slate-400 hover:stroke-slate-500 cursor-pointer">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z" />
+                                </svg>
+                            </div>
                         </td>
                         <td class="border border-black text-[7pt] font-semibold pr-3 px-1.5">FECHA : {{
                             evaluacionPersonalProp.data.fecha_evaluacion_personal }}</td>
@@ -361,58 +371,67 @@
             </div>
 
             <button @click="addDataIndiceEvaluacion"
-                style="float: right;margin-right:-4px;margin-top:0.1px; font-size: 30px; padding: 0 10px; border: 0; background-color: transparent;">
+                style="float: right;margin-right:-4px;margin-top:13px; font-size: 30px; padding: 0 10px; border: 0; background-color: transparent;">
                 <span type="button" data-toggle="tooltip" data-placement="right">
                     +
                 </span>
             </button>
-            <span class="underline text-xs underline-offset-1 text-slate-500">Click derecho en cualquier fila para eliminar el registro</span>
+            <span class="underline text-xs underline-offset-1 text-slate-500">Click derecho en cualquier fila para eliminar
+                el registro</span>
             <table class="">
                 <thead>
-                    <tr class="*:border *:text-xs *:text-center *:align-middle *:border-slate-400 *:h-7 *:text-slate-600 ">
-                        <th class="w-24">#</th>
-                        <th class="w-32">FECHA</th>
-                        <th class="w-40">CATEGORIA</th>
-                        <th class="w-28">TIPO INCIDENTE</th>
-                        <th class="w-52">COMENTARIO</th>
+                    <tr
+                        class="*:border *:text-xs *:text-center *:align-middle *:border-black *:h-7 *:text-white *:bg-black ">
+                        <td class="w-24">#</td>
+                        <td class="w-32">FECHA</td>
+                        <td class="w-40">CATEGORIA</td>
+                        <td class="w-28">TIPO INCIDENTE</td>
+                        <td class="w-52">COMENTARIO</td>
                     </tr>
                 </thead>
-                <tbody v-for="(incidente, i) in dataIndiceEvaluacion" :key="i">
-                    <tr @contextmenu.prevent="deleteRow(incidente.idIncidenteEvaluacion)" v-if="!incidente.isDeleted"
-                        class="*:border *:text-xs *:text-center *:align-middle *:border-slate-400 *:h-24 *:text-slate-600 ">
-                        <td class="w-24">{{ i + 1 }}</td>
-                        <td class="w-32">{{ incidente.fechaRegIncidenteEvaluacion }}</td>
-                        <td class="w-40">
-                            <div class="relative flex h-8 w-full ">
-
-                                <Multiselect :filter-results="true" v-model="incidente.idCategoriaRendimiento"
-                                    :searchable="true" :clear-on-search="true" placeholder="Categorias" :classes="{
-                                        wrapper: 'relative text-xs cursor-not-allowed mx-auto w-full flex items-center justify-end box-border cursor-pointer outline-none',
-                                        containerDisabled: 'cursor-not-allowed bg-gray-200 text-text-slate-400',
-                                        placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                    }" noOptionsText="<p class='text-xs'>Sin resultados<p>"
-                                    noResultsText="<p class='text-xs'>Sin resultados  <p>"
-                                    :options="opcionesCategoriaRendimiento" />
-                            </div>
-                        </td>
-                        <td class="w-28">
-                            <div class="relative flex h-8 w-full ">
-                                <Multiselect :filter-results="true" v-model="incidente.resultadoIncidenteEvaluacion"
-                                    :searchable="true" :clear-on-search="true" placeholder="Tipos" :classes="{
-                                        wrapper: 'relative text-xs cursor-not-allowed mx-auto w-full flex items-center justify-end box-border cursor-pointer outline-none',
-                                        containerDisabled: 'cursor-not-allowed bg-gray-200 text-slate-400',
-                                        placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                    }" noOptionsText="<p class='text-xs'>Sin resultados<p>"
-                                    noResultsText="<p class='text-xs'>Sin resultados  <p>"
-                                    :options="[{ value: 0, label: 'F - favorable' }, { value: 1, label: 'D - desfavorable' }]" />
-                            </div>
-
-                        </td>
-                        <td class="w-52" contenteditable="true"
-                            @input="incidente.comentarioIncidenteEvaluacion = $event.target.innerText"> {{
-                                incidente.comentarioIncidenteEvaluacion }}</td>
+                <tbody v-if="dataIndiceEvaluacion.length > 0">
+                    <template v-for="(incidente, i) in dataIndiceEvaluacion" :key="i">
+                        <tr @contextmenu.prevent="deleteRow(incidente.idIncidenteEvaluacion)" v-if="!incidente.isDeleted"
+                            class="*:border *:text-xs *:text-center *:align-middle *:border-black *:h-24 *:text-slate-600">
+                            <td class="w-24">{{ i + 1 }}</td>
+                            <td class="w-32">{{ moment(incidente.fechaRegIncidenteEvaluacion).format('L') }}</td>
+                            <td class="w-40">
+                                <div class="relative flex h-8 w-full">
+                                    <Multiselect :filter-results="true" v-model="incidente.idCategoriaRendimiento"
+                                        :searchable="true" :clear-on-search="true" placeholder="Categorias" :classes="{
+                                            wrapper: 'relative text-xs cursor-not-allowed mx-auto w-full flex items-center justify-end box-border cursor-pointer outline-none',
+                                            containerDisabled: 'cursor-not-allowed bg-gray-200 text-text-slate-400',
+                                            placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                        }" noOptionsText="<p class='text-xs'>Sin resultados</p>"
+                                        noResultsText="<p class='text-xs'>Sin resultados</p>"
+                                        :options="opcionesCategoriaRendimiento" />
+                                </div>
+                            </td>
+                            <td class="w-28">
+                                <div class="relative flex h-8 w-full">
+                                    <Multiselect :filter-results="true" v-model="incidente.resultadoIncidenteEvaluacion"
+                                        :searchable="true" :clear-on-search="true" placeholder="Tipos" :classes="{
+                                            wrapper: 'relative text-xs cursor-not-allowed mx-auto w-full flex items-center justify-end box-border cursor-pointer outline-none',
+                                            containerDisabled: 'cursor-not-allowed bg-gray-200 text-slate-400',
+                                            placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                        }" noOptionsText="<p class='text-xs'>Sin resultados</p>"
+                                        noResultsText="<p class='text-xs'>Sin resultados</p>"
+                                        :options="[{ value: 0, label: 'F - FAVORABLE' }, { value: 1, label: 'D - DESFAVORABLE' }]" />
+                                </div>
+                            </td>
+                            <td class="w-52 p-2" contenteditable="true"
+                                @input="incidente.comentarioIncidenteEvaluacion = $event.target.innerText">
+                                {{ incidente.comentarioIncidenteEvaluacion }}
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+                <tbody v-else>
+                    <tr>
+                        <td colspan="5" class="text-center">No hay incidentes de evaluación disponibles</td>
                     </tr>
                 </tbody>
+
             </table>
             <button @click="guardarYEnviarIncidentes"
                 class="bg-indigo-900 rounded-sm shadow text-center text-white text-sm font-light w-full py-1 mt-5">
@@ -443,12 +462,24 @@
                 <span class="loading-text">Cargando...</span>
             </div>
         </div>
+
+
+        <div class="w-full h-[500px] px-1 text-selection-disable"
+            v-if="!isLoadingObtenerCategoriaYRubrica && rubricaAndCategoriaByEvaluacion == ''">
+
+            <div class="flex flex-col items-center justify-center h-full">
+                <img src="../../../../img/evaluationModal.svg" class="h-96 rounded-full mx-auto" alt="SVG Image"
+                    draggable="false">
+                <h1 class="font-medium text-center">Evalúa al personal con honestidad</h1>
+                <p class="text-[9pt] text-center">Recuerda que solo evaluarás a los empleados que están a tu cargo.</p>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
 import { useDocumentoEvaluacion } from '@/Composables/RRHH/Evaluaciones/useDocumentoEvaluacion';
-import { ref, toRefs, watch } from 'vue';
+import { ref, toRefs, watch, createApp, h } from 'vue';
 import Tooltip from '@/Components-ISRI/Tooltip.vue';
 import moment from 'moment';
 import Swal from "sweetalert2";
@@ -456,7 +487,9 @@ import { toast } from 'vue3-toastify'
 import { executeRequest } from "@/plugins/requestHelpers.js";
 import 'vue3-toastify/dist/index.css';
 import { useAnalisisDes } from '@/Composables/RRHH/Evaluaciones/useAnalisisDes'
-
+import { jsPDF } from "jspdf";
+import html2pdf from 'html2pdf.js'
+import AnalisisDesemPdf from '@/pdf/RRHH/AnalisisDesemPdf.vue';
 export default {
     components: { Tooltip },
     props: {
@@ -473,7 +506,8 @@ export default {
             default: false,
         },
     },
-    setup(props) {
+    emit: ["actualizar-datatable"],
+    setup(props, { emit }) {
         const { evaluacionPersonalProp, rubricaAndCategoriaByEvaluacion } = toRefs(props)
         const { separarTexto } = useDocumentoEvaluacion();
         const { opcionesCategoriaRendimiento, objectCat, dataIndiceEvaluacion, addDataIndiceEvaluacion, deleteRow, saveIncidentesEvaluacionesRequest } = useAnalisisDes(evaluacionPersonalProp)
@@ -520,11 +554,53 @@ export default {
             });
             if (confirmed.isConfirmed) {
 
-                executeRequest(
-                    saveIncidentesEvaluacionesRequest(),
-                    "La evaluacion se ha enviado"
-                );
 
+                if (dataIndiceEvaluacion.length > 0) {
+                    await executeRequest(
+                        saveIncidentesEvaluacionesRequest(),
+                        "La evaluacion se ha enviado"
+                    );
+                    emit("actualizar-datatable")
+                } else {
+                    toast.warning('No hay incidentes registrados. Por favor, agrega al menos uno para enviar la información.');
+
+                }
+
+            }
+        };
+
+
+        const printEvaluacionDesemp = async () => {
+            try {
+                document.body.style.cursor = 'wait';
+
+                const opt = {
+                    margin: [0.1, 0.1, 0.1, 0.1],//top, left, buttom, right,
+                    filename: 'evaluacion',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true },
+                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+                    //pagebreak: { mode: 'avoid-all', before: '#page2el' },
+                    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+                };
+
+                const app = createApp(AnalisisDesemPdf, {
+                    rubricaAndCategoriaByEvaluacion: rubricaAndCategoriaByEvaluacion.value.categorias_rendimiento,
+                    evaluacionPersonalProp: evaluacionPersonalProp.value,
+                    dataIndiceEvaluacion: dataIndiceEvaluacion.value,
+                    opcionesCategoriaRendimiento: opcionesCategoriaRendimiento.value,
+                });
+
+                const div = document.createElement('div');
+                const pdfPrint = app.mount(div);
+                const html = div.outerHTML;
+
+                await html2pdf().set(opt).from(html).save();
+            } catch (error) {
+                console.error('Error al generar el PDF:', error);
+                // Manejar el error según tus necesidades
+            } finally {
+                document.body.style.cursor = 'default';
             }
         };
 
@@ -533,6 +609,7 @@ export default {
             separarTexto,
             opcionesCategoriaRendimiento,
             objectCat,
+            printEvaluacionDesemp,
             guardarYEnviarIncidentes,
             addDataIndiceEvaluacion,
             dataIndiceEvaluacion,
@@ -571,27 +648,27 @@ td {
 
 
 .loader {
-  display: flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
 }
 
 .icon {
-  height: 1.5rem;
-  width: 1.5rem;
-  animation: spin 1s linear infinite;
-  stroke: rgba(107, 114, 128, 1);
+    height: 1.5rem;
+    width: 1.5rem;
+    animation: spin 1s linear infinite;
+    stroke: rgba(107, 114, 128, 1);
 }
 
 .loading-text {
-  font-size: 0.75rem;
-  line-height: 1rem;
-  font-weight: 500;
-  color: rgba(107, 114, 128, 1);
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 500;
+    color: rgba(107, 114, 128, 1);
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}   
+    to {
+        transform: rotate(360deg);
+    }
+}
 </style>

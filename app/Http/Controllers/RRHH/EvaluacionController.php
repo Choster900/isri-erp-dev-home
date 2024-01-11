@@ -57,7 +57,9 @@ class EvaluacionController extends Controller
             "plazas_asignadas.centro_atencion.dependencias",
             "plazas_asignadas.dependencia.jefatura.empleado.plazas_asignadas.detalle_plaza.plaza",
             "plazas_asignadas.detalle_plaza.plaza",
-            "evaluaciones_personal.incidentes_evaluacion",
+            "evaluaciones_personal.incidentes_evaluacion" => function ($query) {
+                return $query->where("estado_incidente_evaluacion", 1);
+            },
             "evaluaciones_personal.detalle_evaluaciones_personal.categoria_rendimiento.evaluacion_rendimiento.tablas_rendimiento",
             "evaluaciones_personal.detalle_evaluaciones_personal.rubrica_rendimiento",
             "evaluaciones_personal.plaza_evaluada.plaza_asignada.detalle_plaza.plaza",
@@ -135,7 +137,7 @@ class EvaluacionController extends Controller
         }
 
         $results = Persona::with([
-            'empleado' => function ($query) {
+            'empleado'                  => function ($query) {
                 $query->where('estado_empleado', 1); // Empleados activos
             },
             'empleado.evaluaciones_personal',
@@ -170,7 +172,7 @@ class EvaluacionController extends Controller
                 'value'           => $item->id_persona,
                 'label'           => $item->nombre_completo,
                 'allDataPersonas' => $item,
-                "mergedResults" => $mergedResults,
+                "mergedResults"   => $mergedResults,
 
             ];
         });
@@ -579,10 +581,10 @@ class EvaluacionController extends Controller
 
         // Reglas de validación
         $rules = [
-            'idCategoriaRendimiento'         => 'required',
-            'resultadoIncidenteEvaluacion'   => 'required',
-            'comentarioIncidenteEvaluacion'  => 'required',
-            'idEvaluacionPersonal'            => 'required',
+            'idCategoriaRendimiento'        => 'required',
+            'resultadoIncidenteEvaluacion'  => 'required',
+            'comentarioIncidenteEvaluacion' => 'required',
+            'idEvaluacionPersonal'          => 'required',
         ];
 
         // Mensajes de error personalizados
@@ -607,7 +609,7 @@ class EvaluacionController extends Controller
             'estado_incidente_evaluacion'     => 1,
             'usuario_incidente_evaluacion'    => $request->user()->nick_usuario,
             'ip_incidente_evaluacion'         => $request->ip(),
-            'id_evaluacion_personal'  => $request->dataIndiceEvaluacion['idEvaluacionPersonal'],
+            'id_evaluacion_personal'          => $request->dataIndiceEvaluacion['idEvaluacionPersonal'],
         ];
 
         // Condiciones de búsqueda
@@ -621,15 +623,26 @@ class EvaluacionController extends Controller
 
         // Determinar si es una actualización o inserción
         if ($existingResponse) {
+
             // Si existe, añadir la fecha de modificación
             $data['fecha_mod_incidente_evaluacion'] = Carbon::now();
-            // Actualizar el registro existente
-            IncidenteEvaluacion::where($conditions)->update($data);
+            if ($request->dataIndiceEvaluacion["isDeleted"]) {
+
+                IncidenteEvaluacion::where($conditions)->update(['estado_incidente_evaluacion' => 0,]);
+            } else if (!$request->dataIndiceEvaluacion["isDeleted"]) {
+
+                IncidenteEvaluacion::where($conditions)->update($data);
+            }
         } else {
-            // Si no existe, añadir la fecha de creación
-            $data['fecha_reg_incidente_evaluacion'] = Carbon::now();
-            // Insertar un nuevo registro y obtener el ID
-            $insertedId = IncidenteEvaluacion::insertGetId($data);
+
+
+            if (!$request->dataIndiceEvaluacion["isDeleted"]) {
+
+                // Si no existe, añadir la fecha de creación
+                $data['fecha_reg_incidente_evaluacion'] = Carbon::now();
+                // Insertar un nuevo registro y obtener el ID
+                $insertedId = IncidenteEvaluacion::insertGetId($data);
+            }
         }
 
         // Confirmar la transacción

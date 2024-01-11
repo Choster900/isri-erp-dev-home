@@ -285,7 +285,7 @@ export default {
     },
     methods: {
         /**
-         * 
+         *
          * @param {int} id_evaluacion_rendimiento // almacena el id de la version que pertenece la evaluación
          */
         async getPersonalEvaluation(id_evaluacion_rendimiento) {
@@ -300,7 +300,7 @@ export default {
             }
         },
         /**
-         * 
+         *
          * @param {String} query // Almacena el nombre del empleado a buscar
          */
         handleEmployeeSearchChange(query) {
@@ -312,7 +312,7 @@ export default {
             }
         },
         /**
-         * 
+         *
          * @param {String} query // Almacena el nombre del empleado
          */
         async searchingUsers(query) {

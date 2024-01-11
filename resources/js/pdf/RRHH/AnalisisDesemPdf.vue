@@ -130,7 +130,7 @@
                 </div>
             </div>
 
-            <div class="flex items-center justify-between pt-2 gap-2 pb-4">
+            <div class="flex items-center justify-start pt-2 gap-2 pb-4">
                 <div class="flex flex-row items-center text-[7pt] font-normal gap-2">
                     <label class="text-[7pt]">
                         <div class="" style="margin-top: -9px;">JEFE INME:</div>
@@ -169,122 +169,57 @@
                                 }).join('-') || '' }}</div>
                     </div>
                 </div>
-                <div class="flex flex-row items-center text-[7pt] font-normal gap-2">
-                    <label class="text-[7pt]">
-                        <div class="" style="margin-top: -9px;">PUNTAJE TOTAL:</div>
-                    </label>
-                    <div
-                        class="text-left text-[7pt] w-10 font-medium capitalize h-5 border-x-0 border-t-0 border-b border-black overflow-hidden">
-                        <div class="overflow-ellipsis" style="margin-top: -2px;">{{ optionsSelected.reduce((score, object) =>
-                            score + parseFloat(object.puntaje_rubrica_rendimiento), 0) }}</div>
-                    </div>
-                </div>
 
 
+                <!-- {{ dataIndiceEvaluacion }} -->
             </div>
         </div>
-        <table border="0" cellpadding="0" cellspacing="0">
-            <tbody v-for="(evaluacion, i) in rubricaAndCategoriaByEvaluacion" :key="i">
-                <tr class="">
-                    <td class="border border-black bg-black text-[9pt] text-white text-center pl-8 py-2" colspan="2">
-                        <div class="mt-[-12px]">{{ evaluacion.nombre_cat_rendimiento }}</div>
-                    </td>
-                    <td class="border border-black bg-black text-[9pt] text-white text-center pl-1 px-7">
-                        <div class="mt-[-12px] w-full ml-3">PUNTOS:10</div>
-                    </td>
+
+
+        <table class="w-full">
+            <thead>
+                <tr class="*:border *:text-xs *:text-center *:align-middle *:border-black *:h-7 *:text-white *:bg-black ">
+                    <td class="w-24">#</td>
+                    <td class="w-32">FECHA</td>
+                    <td class="w-40">CATEGORIA</td>
+                    <td class="w-28">TIPO INCIDENTE</td>
+                    <td class="w-52">COMENTARIO</td>
                 </tr>
-                <tr class="">
-                    <td class="border-x border-b border-black bg-slate-300/60"
-                        :rowspan="evaluacion.rubricas_rendimiento.length + 1">
-                        <div class="w-48 px-3 text-[8pt] text-justify text-[#4f4f4f] font-medium mt-[-12px]">{{
-                            evaluacion.descripcion_cat_rendimiento }}
+            </thead>
+            <tbody v-for="(incidente, i) in dataIndiceEvaluacion" :key="i">
+                <tr v-if="!incidente.isDeleted"
+                    class="*:border *:text-xs *:text-center *:align-middle *:border-black *:h-24 *:text-slate-600 ">
+                    <td class="w-24">
+                        <div class="mt-[-12px] w-full"> {{ i + 1 }}</div>
+                    </td>
+                    <td class="w-32">
+                        <div class="mt-[-12px] w-full">{{  moment(incidente.fechaRegIncidenteEvaluacion).format('L')  }} </div>
+                    </td>
+                    <td class="w-40">
+                        <div class="relative flex  w-full ">
+
+                            <div class="mt-[-12px] w-full">
+                                {{ opcionesCategoriaRendimiento.find(index => index.value ===
+                                    incidente.idCategoriaRendimiento).label }}
+                            </div>
                         </div>
                     </td>
+                    <td class="w-28">
+                        <div class="relative flex w-full ">
 
-                </tr>
-                <tr class="" v-for="(rubrica, j ) in evaluacion.rubricas_rendimiento" :key="j">
-                    <td class="text-[8pt] border-l-0 border-r border-t-0 border-black w-full border-b px-2 py-2">
-                        <div class="mt-[-12px] "> {{ rubrica.descripcion_rubrica_rendimiento }}</div>
-                    </td>
-                    <td class="border-x-0 border-t-0 border-black justify-center text-center  px-4 py-2 border-b border-r">
-                        <div class="container mt-1 ml-4">
-                            <label>
-                                <div class="border border-black size-4"
-                                    :class="optionsSelected.find(cat => cat.id_cat_rendimiento === rubrica.id_cat_rendimiento)?.id_rubrica_rendimiento == rubrica.id_rubrica_rendimiento ? 'bg-black text-black' : ''">
-                                </div>
-                                <p class="mt-[-12px] pl-2">{{ rubrica.opcion_rubrica_rendimiento }}</p>
-                            </label>
+                            <div class="mt-[-12px] w-full">
+                                {{ incidente.resultadoIncidenteEvaluacion === 1 ? 'FAVORABLE' : 'DESFAVORABLE' }}
+                            </div>
                         </div>
 
                     </td>
+                    <td class="w-52 p-2" contenteditable="true">
+                        <div class="mt-[-12px] w-full">{{ incidente.comentarioIncidenteEvaluacion }}</div>
+                    </td>
                 </tr>
-
             </tbody>
         </table>
 
-
-        <div class="flex  justify-between flex-row space-x-5">
-
-            <!-- Primera tabla -->
-            <div class="w-1/2 overflow-x-auto">
-                <table class="w-full">
-                    <tr class="text-start">
-                        <th class="py-2 text-center border border-white" colspan="5">
-                            <h1 class="text-sm font-bold">TABLA DE VALORACIÓN</h1>
-                        </th>
-                    </tr>
-                    <tr class="text-xs text-center bg-gray-200">
-                        <th class="border border-black">
-                            <div class="mt-[-12px] py-2">FACTOR</div>
-                        </th>
-                        <th class="border border-black">
-                            <div class="mt-[-12px] py-2">A</div>
-                        </th>
-                        <th class="border border-black">
-                            <div class="mt-[-12px] py-2">B</div>
-                        </th>
-                        <th class="border border-black">
-                            <div class="mt-[-12px] py-2">C</div>
-                        </th>
-                        <th class="border border-black">
-                            <div class="mt-[-12px] py-2">D</div>
-                        </th>
-                    </tr>
-                    <tr class="text-center text-[8pt]" v-for="(data, i) in rubricaAndCategoriaByEvaluacion" :key="i">
-                        <td class="border border-black text-start px-2 w-4">
-                            <div class="mt-[-12px] py-2">
-                                {{ i + 1 }} - {{ data.nombre_cat_rendimiento }}
-                            </div>
-                        </td>
-                        <td v-for="(rubrica, j) in data.rubricas_rendimiento" :key="j"
-                            class="border border-black  text-[8pt] w-4"
-                            :class="optionsSelected.find(cat => cat.id_cat_rendimiento === data.id_cat_rendimiento)?.id_rubrica_rendimiento == rubrica.id_rubrica_rendimiento ? 'bg-slate-400 text-black' : ''">
-                            <div class="mt-[-12px] py-2">
-                                {{ rubrica.puntaje_rubrica_rendimiento }}
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            <!-- Segunda tabla -->
-            <div class="w-1/3 mt-6 md:mt-0 overflow-x-auto">
-                <table class="w-full">
-                    <tr class="text-start">
-                        <th class="py-2 border border-white" colspan="2">
-                            <h1 class="text-sm font-bold">CALIFICACIÓN POR PUNTOS Y POR RANGOS</h1>
-                        </th>
-                    </tr>
-                    <tr v-for="range in ranges" :key="range.label" class="text-start text-[8pt]">
-                        <td class="border border-black" :class="{ 'bg-slate-400': isScoreInRange(range.min, range.max) }">
-                            <div class="mt-[-12px] py-2">{{ range.label }}</div>
-                        </td>
-                        <td class="border border-black">
-                            <div class="mt-[-12px] py-2"> {{ range.min }} a {{ range.max }} puntos</div>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        </div>
     </div>
 </template>
 
@@ -293,23 +228,14 @@ import { useDocumentoEvaluacion } from '@/Composables/RRHH/Evaluaciones/useDocum
 import { toRef, toRefs } from 'vue';
 import moment from 'moment';
 export default {
-    props: ["rubricaAndCategoriaByEvaluacion", "optionsSelected", "evaluacionPersonalProp"],
+    props: ["rubricaAndCategoriaByEvaluacion", "dataIndiceEvaluacion", "opcionesCategoriaRendimiento", "evaluacionPersonalProp"],
     setup(props) {
         const { ranges, separarTexto } = useDocumentoEvaluacion()
-        const { optionsSelected } = toRefs(props)
-        const isScoreInRange = (min, max) => {
-            const totalScore = optionsSelected.value.reduce(
-                (score, object) => score + parseFloat(object.puntaje_rubrica_rendimiento),
-                0
-            );
-            return totalScore >= min && totalScore <= max;
-        }
 
         return {
             separarTexto,
             moment,
             ranges,
-            isScoreInRange,
         }
     }
 }
