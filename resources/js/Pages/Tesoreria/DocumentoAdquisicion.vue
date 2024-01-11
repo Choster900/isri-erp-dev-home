@@ -210,8 +210,8 @@ export default {
             { width: "9%", label: "Tipo", name: "nombre_tipo_doc_adquisicion", type: "text" },
             { width: "15%", label: "Numero", name: "numero_doc_adquisicion", type: "text" },
             { width: "22%", label: "Proveedor", name: "razon_social_proveedor", type: "text" },
-            { width: "15%", label: "Monto", name: "monto_doc_adquisicion", type: "text" },
-            { width: "15%", label: "Compromisos", name: "compromiso_ppto_det_doc_adquisicion", type: "text" },
+            { width: "12%", label: "Monto", name: "monto_doc_adquisicion", type: "text" },
+            { width: "18%", label: "Compromisos", name: "compromiso_ppto_det_doc_adquisicion", type: "text" },
             {
                 width: "10%", label: "Estado", name: "estado_doc_adquisicion", type: "select",
                 options: [
