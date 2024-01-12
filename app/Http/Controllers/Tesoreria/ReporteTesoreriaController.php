@@ -9,6 +9,7 @@ use App\Http\Requests\Tesoreria\ReporteIngresoDiarioRequest;
 use App\Http\Requests\Tesoreria\ReporteIngresoRequest;
 use App\Http\Requests\Tesoreria\ReporteQuedanRequest;
 use App\Http\Requests\Tesoreria\RetencionISRRequest;
+use App\Models\CentroAtencion;
 use App\Models\ConceptoIngreso;
 use App\Models\CuentaPresupuestal;
 use App\Models\Dependencia;
@@ -513,10 +514,9 @@ class ReporteTesoreriaController extends Controller
             ->where('estado_proy_financiado', '=', 1)
             ->orderBy('nombre_proy_financiado')
             ->get();
-        $dependencies = Dependencia::selectRaw("id_dependencia as value , concat(codigo_dependencia, ' - ', nombre_dependencia) as label")
-            ->where('id_tipo_dependencia', '=', 1)
-            ->where('estado_dependencia', '=', 1)
-            ->orderBy('nombre_dependencia')
+        $dependencies = CentroAtencion::selectRaw("id_centro_atencion as value , concat(codigo_centro_atencion, ' - ', nombre_centro_atencion) as label")
+            ->where('estado_centro_atencion', '=', 1)
+            ->orderBy('id_centro_atencion')
             ->get();
         $budget_accounts = CuentaPresupuestal::selectRaw("id_ccta_presupuestal as value , concat(id_ccta_presupuestal, ' - ', nombre_ccta_presupuestal) as label")
             ->where('tesoreria_ccta_presupuestal', '=', 1)
@@ -540,17 +540,17 @@ class ReporteTesoreriaController extends Controller
             $fuente_financiamiento = 'TODOS LOS FONDOS';
         }
         if ($request->filled('dependency_id')) {
-            $query_dependency = ' AND d.id_dependencia = ' . $request->dependency_id;
+            $query_dependency = ' AND d.id_centro_atencion = ' . $request->dependency_id;
             $query_select_concept = 'ci.nombre_concepto_ingreso ';
-            $dependencia = Dependencia::find($request->dependency_id);
+            $dependencia = CentroAtencion::find($request->dependency_id);
             if ($dependencia) {
-                $codigo_dependencia = $dependencia->codigo_dependencia;
+                $codigo_dependencia = $dependencia->codigo_centro_atencion;
             } else {
                 $codigo_dependencia = 'NO EXISTE DEPENDENCIA';
             }
         } else {
             $query_dependency = '';
-            $query_select_concept = 'COALESCE(CONCAT_WS(" - ",d.codigo_dependencia,ci.nombre_concepto_ingreso)) as nombre_concepto_ingreso ';
+            $query_select_concept = 'COALESCE(CONCAT_WS(" - ",d.codigo_centro_atencion,ci.nombre_concepto_ingreso)) as nombre_concepto_ingreso ';
             $codigo_dependencia = 'TODAS LAS DEPENDENCIAS';
         }
         if ($request->filled('budget_account_id')) {
@@ -569,7 +569,7 @@ class ReporteTesoreriaController extends Controller
 			INNER JOIN detalle_recibo_ingreso dri ON ri.id_recibo_ingreso = dri.id_recibo_ingreso
 			INNER JOIN concepto_ingreso ci ON dri.id_concepto_ingreso = ci.id_concepto_ingreso
 			INNER JOIN proyecto_financiado pf ON ci.id_proy_financiado = pf.id_proy_financiado 
-			LEFT JOIN dependencia d ON ci.id_dependencia = d.id_dependencia
+			LEFT JOIN centro_atencion d ON ci.id_centro_atencion = d.id_centro_atencion
 
             WHERE ri.estado_recibo_ingreso = 1
             AND ri.fecha_recibo_ingreso BETWEEN ? AND ?
