@@ -138,7 +138,6 @@ Route::group(['middleware' => ['auth']], function () {
         }
     )->name('ts.reporteQuedan');
     Route::post('create-quedan-report', [ReporteTesoreriaController::class, 'createQuedanReport'])->name('reporteTesoreria.createQuedanReport');
-    Route::post('create-quedan-report-pdf', [ReporteTesoreriaController::class, 'createQuedanReportPDF'])->name('reporteTesoreria.createQuedanReportPDF');
     Route::get('get-selects-report', [ReporteTesoreriaController::class, 'getSelectsReport'])->name('reporteTesoreria.getSelectsReport');
     Route::get(
         '/ts/reporte-facturas',

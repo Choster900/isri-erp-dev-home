@@ -253,7 +253,7 @@ class ReporteTesoreriaController extends Controller
             SELECT 
 			IFNULL(p.nit_proveedor,p.dui_proveedor) AS documento,
 			p.razon_social_proveedor,
-			dp.codigo_dependencia,
+			dp.codigo_centro_atencion,
 			q.numero_compromiso_ppto_quedan,
 			rp.numero_requerimiento_pago,
             DATE_FORMAT(dq.fecha_factura_det_quedan,"%d/%m/%Y") as fecha_factura_det_quedan,
@@ -266,7 +266,7 @@ class ReporteTesoreriaController extends Controller
             FROM 
             quedan AS q
             INNER JOIN detalle_quedan AS dq on q.id_quedan = dq.id_quedan
-            INNER JOIN dependencia AS dp on dq.id_dependencia = dp.id_dependencia 
+            INNER JOIN centro_atencion AS dp on dq.id_centro_atencion = dp.id_centro_atencion 
             INNER JOIN proveedor AS p on q.id_proveedor = p.id_proveedor
             INNER JOIN sujeto_retencion AS sr on p.id_sujeto_retencion = sr.id_sujeto_retencion  
             LEFT OUTER JOIN requerimiento_pago AS rp on q.id_requerimiento_pago = rp.id_requerimiento_pago 
@@ -283,7 +283,7 @@ class ReporteTesoreriaController extends Controller
         }
 
         $array = json_decode(json_encode($array), true);
-        array_unshift($array, array('NIT/DUI', 'SUMINISTRANTE', 'DEPENDENCIA', 'COMPROMISO', 'REQUERIMIENTO', 'FECHA', 'MONTO', 'RENTA', 'IVA', 'LIQUIDO', 'CONCEPTO', 'PRIORIDAD'));
+        array_unshift($array, array('NIT/DUI', 'SUMINISTRANTE', 'CENTRO', 'COMPROMISO', 'REQUERIMIENTO', 'FECHA', 'MONTO', 'RENTA', 'IVA', 'LIQUIDO', 'CONCEPTO', 'PRIORIDAD'));
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
@@ -339,45 +339,6 @@ class ReporteTesoreriaController extends Controller
         header('Cache-Control: max-age=0');
 
         $writer->save('php://output');
-    }
-
-    public function createQuedanReportPDF(ReporteQuedanRequest $request)
-    {
-        if ($request->filled('financing_source_id')) {
-            $query_financing_source = 'AND `id_proy_financiado` = ' . $request->financing_source_id;
-        } else {
-            $query_financing_source = '';
-        }
-        if ($request->filled('state_quedan_id')) {
-            $query_quedan_state = ' AND `id_estado_quedan` = ' . $request->state_quedan_id;
-        } else {
-            $query_quedan_state = '';
-        }
-        $array = DB::select(
-            '
-            SELECT 
-            `p`.`razon_social_proveedor`, 
-            `rp`.`numero_requerimiento_pago`, 
-            DATE_FORMAT(`rp`.`fecha_requerimiento_pago`,"%d/%m/%Y") as fecha_requerimiento_pago, 
-            `monto_liquido_quedan`,
-            IFNULL((SELECT SUM(`lq`.`monto_liquidacion_quedan`) FROM `liquidacion_quedan` lq WHERE `lq`.`id_quedan` = `quedan`.`id_quedan` GROUP BY `lq`.`id_quedan` ), 0) AS monto_pagado, 
-            DATE_FORMAT(`fecha_emision_quedan`,"%d/%m/%Y") as fecha_emision_quedan, 
-            `pp`.`nivel_prioridad_pago`,
-            `pp`.`nombre_prioridad_pago` 
-            FROM 
-            `quedan` 
-            INNER JOIN `proveedor` AS p on `quedan`.`id_proveedor` = `p`.`id_proveedor` 
-            LEFT OUTER JOIN `requerimiento_pago` AS rp ON `quedan`.`id_requerimiento_pago` = `rp`.`id_requerimiento_pago`
-            INNER JOIN `prioridad_pago` AS pp on `quedan`.`id_prioridad_pago` = `pp`.`id_prioridad_pago`
-            WHERE `fecha_emision_quedan` BETWEEN ? AND ?
-            ' . $query_financing_source . $query_quedan_state,
-            [$request->start_date, $request->end_date]
-        );
-
-        if (empty($array)) {
-            return response()->json(['error' => 'No se encontraron registros'], 404);
-        }
-        return ['mensaje' => 'Hola desde el back'];
     }
     public function getSelectsWithholdingTaxReport(Request $request)
     {
