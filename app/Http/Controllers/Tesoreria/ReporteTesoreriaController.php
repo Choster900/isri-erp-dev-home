@@ -94,13 +94,13 @@ class ReporteTesoreriaController extends Controller
 
         $array = json_decode(json_encode($array), true);
 
-        array_unshift($array, array('NUMERO', 'SUMINISTRANTE', 'N° REQUERIMIENTO', 'FECHA REQUERIMIENTO','TOTAL','IVA','ISR', 'LIQUIDO', 'MONTO PAGADO', 'FACTURA(FECHA)', 'PRIORIDAD', 'DESCRIPCION'));
+        array_unshift($array, array('NUMERO', 'SUMINISTRANTE', 'N° REQUERIMIENTO', 'FECHA REQUERIMIENTO', 'TOTAL', 'IVA', 'ISR', 'LIQUIDO', 'MONTO PAGADO', 'FACTURA(FECHA)', 'PRIORIDAD', 'DESCRIPCION'));
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
         $sheet->getStyle('3')->getFont()->setBold(true);
-        $columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H','I','J'];
+        $columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
         foreach ($columns as $column) {
             $sheet->getColumnDimension($column)->setAutoSize(true);
         }
@@ -668,8 +668,8 @@ class ReporteTesoreriaController extends Controller
         $details = DB::select(
             '
             SELECT
-            t.id_dependencia,
-            t.codigo_dependencia,
+            t.id_centro_atencion,
+            t.codigo_centro_atencion,
             GROUP_CONCAT(DISTINCT t.nombre_concepto_ingreso SEPARATOR ", ") as observacion,
             SUM(IF(t.id_ccta_presupuestal = 14199, t.total, 0)) as "14199",
             SUM(IF(t.id_ccta_presupuestal = 14202, t.total, 0)) as "14202",
@@ -683,27 +683,28 @@ class ReporteTesoreriaController extends Controller
             FROM
             (
                 SELECT 
-                ci.id_dependencia, 
+                ci.id_centro_atencion, 
                 ci.id_ccta_presupuestal,
-                d.codigo_dependencia, 
+                d.codigo_centro_atencion, 
                 ci.nombre_concepto_ingreso, 
                 SUM(dri.monto_det_recibo_ingreso) as total 
                 FROM 
                 recibo_ingreso ri
                 INNER JOIN detalle_recibo_ingreso dri ON ri.id_recibo_ingreso = dri.id_recibo_ingreso
                 INNER JOIN concepto_ingreso ci ON dri.id_concepto_ingreso = ci.id_concepto_ingreso
-                LEFT JOIN dependencia d ON ci.id_dependencia = d.id_dependencia
+                LEFT JOIN centro_atencion d ON ci.id_centro_atencion = d.id_centro_atencion
                 WHERE ri.estado_recibo_ingreso = 1
                 AND ri.fecha_recibo_ingreso = ?
                 AND ci.id_proy_financiado = ?
                 AND ci.id_ccta_presupuestal <> 16201 
                 AND dri.estado_det_recibo_ingreso = 1
                 GROUP BY 
-                ci.id_dependencia, 
-                d.codigo_dependencia, 
+                ci.id_centro_atencion, 
+                d.codigo_centro_atencion, 
                 ci.id_ccta_presupuestal,
-                ci.nombre_concepto_ingreso) as t
-                GROUP BY  t.id_dependencia, t.codigo_dependencia
+                ci.nombre_concepto_ingreso
+            ) as t
+            GROUP BY  t.id_centro_atencion, t.codigo_centro_atencion
         ',
             [$request->start_date, $request->financing_source_id]
         );
