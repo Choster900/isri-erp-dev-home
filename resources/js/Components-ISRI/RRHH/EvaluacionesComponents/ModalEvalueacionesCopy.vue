@@ -242,13 +242,15 @@
                                     <div class="accordion-content" :class="i === activeIndex ? 'open' : ''">
                                         <div>
                                             <div v-for="(evaluacion, j) in año.evaluaciones" :key="j"
-                                                @click="obtenerCategoriaYRubricaRendimiento(evaluacion.evaluacion_rendimiento.id_evaluacion_rendimiento); evaluacionToPassDocumento = { data: evaluacion, allData: año.allContent }"
                                                 class="bg-slate-300/40 border-l-[4px] border-y-0 border-r-0 border-l-indigo-500 hover:bg-slate-300 cursor-pointer"
                                                 :class="j == 1 ? ' border-b border-b-slate-400' : ''">
-                                                <ul class="ml-10 list-circle py-2 ">
+                                                <ul class="ml-10 list-circle py-2 "
+                                                    @click="obtenerCategoriaYRubricaRendimiento(evaluacion.evaluacion_rendimiento.id_evaluacion_rendimiento); evaluacionToPassDocumento = { data: evaluacion, allData: año.allContent }">
                                                     <li
                                                         class="relative text-xs text-slate-500 before:w-[10px] before:h-[10px] before:border-[3px] before:border-indigo-500 before:rounded-full before:absolute before:-left-4 before:top-1">
-                                                        Puntuación</li>
+                                                        Puntuación
+
+                                                    </li>
                                                     <p class="font-medium text-xs">{{
                                                         evaluacion.puntaje_evaluacion_personal }}</p>
                                                     <li
@@ -292,6 +294,17 @@
                                                         }}
                                                     </p>
                                                 </ul>
+                                                <button v-if="evaluacion.id_estado_evaluacion_personal == 1"
+                                                    title="Envía la evaluación para que el empleado la revise y acepte o rechace"
+                                                    class="w-full bg-white text-gray-800 font-medium  border-y-2 border-green-500 hover:border-green-600 hover:bg-green-500 hover:text-white shadow-md py-1 px-6 inline-flex items-center justify-center gap-3">
+                                                    <span class="text-sm text-center font-semibold">Enviar para revisión
+                                                       </span>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                                        viewBox="0 0 24 24">
+                                                        <path fill="currentcolor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z">
+                                                        </path>
+                                                    </svg>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -353,13 +366,15 @@
                     <DocumentoEvaluacionCopy :class="headerOptions === 'DocumentoEvalacionVue' ? '' : 'hidden'"
                         :isLoadingObtenerCategoriaYRubrica="isLoadingObtenerCategoriaYRubrica"
                         :evaluacionPersonalProp="evaluacionToPassDocumento"
-                        :rubricaAndCategoriaByEvaluacion="rubricaAndCategoriaByEvaluacion" @actualizar-datatable="$emit('actualizar-datatable')" />
+                        :rubricaAndCategoriaByEvaluacion="rubricaAndCategoriaByEvaluacion"
+                        @actualizar-datatable="$emit('actualizar-datatable')" />
 
 
                     <DocAnalisisDes :class="headerOptions === 'DocumentoAnalisisDesempeñoVue' ? '' : 'hidden'"
                         :isLoadingObtenerCategoriaYRubrica="isLoadingObtenerCategoriaYRubrica"
                         :evaluacionPersonalProp="evaluacionToPassDocumento"
-                        :rubricaAndCategoriaByEvaluacion="rubricaAndCategoriaByEvaluacion" @actualizar-datatable="$emit('actualizar-datatable')" />
+                        :rubricaAndCategoriaByEvaluacion="rubricaAndCategoriaByEvaluacion"
+                        @actualizar-datatable="$emit('actualizar-datatable')" />
                 </div>
 
 
@@ -413,6 +428,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue';
 import { useEvaluacion } from '@/Composables/RRHH/Evaluaciones/useEvaluacion';
 import { useDocumentoEvaluacion } from '@/Composables/RRHH/Evaluaciones/useDocumentoEvaluacion';
 import DocAnalisisDes from './DocAnalisisDes.vue';
+import DropDownOptions from '@/Components-ISRI/DropDownOptions.vue';
 export default {
     components: {
         Modal,
@@ -424,6 +440,7 @@ export default {
         DocumentoEvaluacionCopy,
         ModalMorenThanOneTipo,
         DocAnalisisDes,
+        DropDownOptions
     },
     emit: ["cerrar-modal", "actualizar-datatable"],
     props: {
@@ -611,4 +628,5 @@ export default {
     --ms-tag-color: #ffffff;
     --ms-tag-font-size: 0.875rem;
 
-}</style>
+}
+</style>

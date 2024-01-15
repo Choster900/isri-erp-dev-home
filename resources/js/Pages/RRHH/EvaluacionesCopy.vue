@@ -50,11 +50,80 @@
                                                                         ${evaluacion.persona.tapellido_persona ? evaluacion.persona.tapellido_persona : ''}` }}
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">
-                                    {{ evaluacion.email_institucional_empleado }}
-                                </div>
-                            </td>
+
+
+                            <div class="max-h-auto overflow-y-auto scrollbar">
+                                <template v-for="(ren, j) in evaluacion.evaluaciones_personal" :key="j">
+                                    <div class="mb-2 text-start">
+                                        <div class="validaciones_de_arranques" id="tabla-validacion-arranque0">
+                                            <table class="table table-bordered"
+                                                style="font-size: 8px;width: auto !important;padding: 0px !important;margin: 0 auto;text-align: center; margin-top: 10px;">
+                                                <thead>
+                                                    <tr class="*:border">
+                                                        <td colspan="4" class="p-0"
+                                                            style="font-size: 6pt; margin-top: 10px;">
+                                                            <span class="">Detalle Evaluación</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="align-middle *:border *:px-2">
+                                                        <td style="font-size: 6pt;">Periodo</td>
+                                                        <td style="font-size: 6pt;">Tipo</td>
+                                                        <td style="font-size: 6pt;">% Puntuacion</td>
+                                                        <td style="font-size: 6pt;">Estado</td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="*:border">
+                                                    <tr class="align-middle *:border  *:px-2">
+                                                        <td style="font-size: 6pt;">1°</td>
+                                                        <td style="font-size: 6pt;">Desempeño</td>
+                                                        <td style="font-size: 6pt;">75</td>
+                                                        <td style="font-size: 6pt;">8</td>
+                                                    </tr>
+                                                    <tr class="align-middle *:border" >
+                                                        <td style="font-size: 6pt;" colspan="4">Desde 12/8/2021 hasta 28/89/2124</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+
+                                    </div>
+                                    <template v-if="j < evaluacion.evaluaciones_personal.length - 1">
+                                        <hr class="my-2 border-t border-gray-300">
+                                    </template>
+                                </template>
+                            </div>
+
+                            <!-- <div class="max-h-[200px] overflow-y-auto scrollbar">
+                                <template v-for="(ren, j) in evaluacion.evaluaciones_personal" :key="j">
+                                    <div class="mb-2 text-start">
+                                        <p class="text-[10pt]">
+                                            <span class="font-medium">DESDE: </span>{{moment(ren.fecha_inicio_evaluacion_personal).format('L') }}
+                                            <span class="font-medium">HASTA: </span>{{ moment(ren.fecha_fin_evaluacion_personal).format('L') }}
+                                        </p>
+                                        <p class="text-[10pt]">
+                                            <span class="font-medium">PERIODO: </span>{{
+                                                ren.periodo_evaluacion.nombre_periodo_evaluacion }}
+                                        </p>
+                                        <p class="text-[10pt]">
+                                            <span class="font-medium">TIPO: </span>{{
+                                                ren.tipo_evaluacion_personal.nombre_tipo_evaluacion_personal }}
+                                        </p>
+                                        <p class="text-[10pt]">
+                                            <span class="font-medium">PUNTUACION: </span>{{ ren.puntaje_evaluacion_personal
+                                            }}
+                                        </p>
+                                        <p class="text-[10pt]">
+                                            <span class="font-medium">OBSERVACIONES: </span>{{
+                                                `${ren.observacion_incidente_personal || 'Sin observaciones'} ` }}
+                                        </p>
+                                    </div>
+                                    <template v-if="j < evaluacion.evaluaciones_personal.length - 1">
+                                        <hr class="my-2 border-t border-gray-300">
+                                    </template>
+                                </template>
+                            </div> -->
+
 
                             <td class="first:pl-5 last:pr-5">
                                 <div class="space-x-1">
@@ -155,7 +224,8 @@
 
         <ModalEvalueacionesVue v-if="listDependencias != ''" :evaluacionPersonalProp="objectEvaluacionPersonal"
             @actualizar-datatable="getEvaluaciones()" :showModal="showModalEvaluacion"
-            @cerrar-modal="showModalEvaluacion = false; objectEvaluacionPersonal = []" :listDependencias="listDependencias" />
+            @cerrar-modal="showModalEvaluacion = false; objectEvaluacionPersonal = []"
+            :listDependencias="listDependencias" />
     </AppLayoutVue>
 </template>
 
@@ -165,6 +235,7 @@ import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import ModalEvalueacionesVue from '@/Components-ISRI/RRHH/EvaluacionesComponents/ModalEvalueacionesCopy.vue';
+import moment from "moment";
 export default {
     components: { Head, AppLayoutVue, Datatable, ModalEvalueacionesVue },
     setup() {
@@ -201,6 +272,7 @@ export default {
             perPage,
             tableData,
             getEvaluaciones,
+            moment,
             sortOrders,
             objectEvaluacionPersonal,
             pagination,
@@ -216,4 +288,17 @@ export default {
 
 }
 </script>
+<style scoped>
+#tabla_imprentas td {
+    padding: 0 !important;
+    margin: 0 !important;
+}
 
+#tabla_imprentas tbody tr:hover {
+    background-color: rgba(31, 53, 88, 0.1);
+}
+
+.less-padding {
+    padding: 0;
+}
+</style>

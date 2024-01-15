@@ -1,27 +1,26 @@
-<script setup>
-import Modal from "@/Components/Modal.vue";
-import { Head } from "@inertiajs/vue3";
-import AppLayoutVue from "@/Layouts/AppLayout.vue";
-import Datatable from "@/Components-ISRI/Datatable.vue";
-import ModalVue from "@/Components-ISRI/AllModal/BasicModal.vue";
-import ModalIncomeReceiptVue from '@/Components-ISRI/Tesoreria/ModalIncomeReceipt.vue';
-import ModalReceiptFormatVue from '@/Components-ISRI/Tesoreria/ModalReceiptFormat.vue';
-import moment from 'moment';
-import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
-
-import { toast } from 'vue3-toastify';
-import 'vue3-toastify/dist/index.css';
-
-import axios from 'axios';
-
-</script>
-
 <template>
     <Head title="Proceso - Ingreso" />
     <AppLayoutVue nameSubModule="Tesoreria - Recibos de Ingreso">
+        <div v-if="isLoadingTop"
+            class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
+            <div role="status" class="flex items-center">
+                <svg aria-hidden="true" class="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-800"
+                    viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                        fill="currentColor" />
+                    <path
+                        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                        fill="currentFill" />
+                </svg>
+                <div class="bg-gray-200 rounded-lg p-1 font-semibold">
+                    <span class="text-blue-800">CARGANDO...</span>
+                </div>
+            </div>
+        </div>
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="addIncomeConcept()" v-if="permits.insertar == 1"
+                <GeneralButton @click="show_modal_receipt = true; incomeReceiptId=0;" v-if="permits.insertar == 1"
                     color="bg-green-700  hover:bg-green-800" text="Agregar Recibo" icon="add" />
             </div>
         </div>
@@ -30,8 +29,10 @@ import axios from 'axios';
                 <div class="mb-4 md:flex flex-row justify-items-start">
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-                            <Multiselect v-model="tableData.length" @select="getIncomeReceipts()" :options="perPage"
-                                :searchable="true" placeholder="Cantidad a mostrar" />
+                            <Multiselect v-model="tableData.length" @select="getDataToShow()" :options="perPage"
+                                @deselect=" tableData.length = 5; getDataToShow()"
+                                @clear="tableData.length = 5; getDataToShow()" :searchable="true"
+                                placeholder="Cantidad a mostrar" />
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
@@ -44,16 +45,16 @@ import axios from 'axios';
 
             <div class="overflow-x-auto">
                 <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
-                    @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getIncomeReceipts()">
-                    <tbody class="text-sm divide-y divide-slate-200">
-                        <tr v-for="receipt in income_receipts" :key="receipt.id_recibo_ingreso">
+                    @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getDataToShow()">
+                    <tbody class="text-sm divide-y divide-slate-200" v-if="!isLoadinRequest">
+                        <tr v-for="receipt in dataToShow" :key="receipt.id_recibo_ingreso">
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
                                 <div class="font-medium text-slate-800 text-center">{{ receipt.numero_recibo_ingreso }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
                                 <div class="font-medium text-slate-800 ellipsis text-center">
-                                    {{ formatearFecha(receipt.fecha_recibo_ingreso) }}
+                                    {{ moment(receipt.fecha_recibo_ingreso).format('DD/MM/YYYY') }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 td-data-table">
@@ -91,7 +92,7 @@ import axios from 'axios';
 
                                     <DropDownOptions>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            @click="editIncomeReceipt(receipt)"
+                                            @click="show_modal_receipt = true; incomeReceiptId = receipt.id_recibo_ingreso;"
                                             v-if="permits.actualizar == 1 && receipt.estado_recibo_ingreso == 1">
                                             <div class="w-8 text-green-900">
                                                 <span class="text-xs">
@@ -106,7 +107,7 @@ import axios from 'axios';
                                             <div class="font-semibold">Editar</div>
                                         </div>
 
-                                        <div @click="changeStateIncomeReceipt(receipt.id_recibo_ingreso, receipt.numero_recibo_ingreso, receipt.estado_recibo_ingreso)"
+                                        <div @click="changeStatus(receipt.id_recibo_ingreso, receipt.estado_recibo_ingreso)"
                                             v-if="permits.eliminar == 1"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="ml-0.5 mr-2 w-5 h-5"
@@ -122,7 +123,7 @@ import axios from 'axios';
                                             </div>
                                         </div>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            v-if="receipt.estado_recibo_ingreso == 1" @click="viewReceipt(receipt)">
+                                            v-if="receipt.estado_recibo_ingreso == 1" @click="view_receipt=true;incomeReceiptId=receipt.id_recibo_ingreso;">
                                             <div class="w-8 text-blue-900">
                                                 <span class="text-xs">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -141,17 +142,32 @@ import axios from 'axios';
                             </td>
                         </tr>
                     </tbody>
+                    <tbody v-else>
+                        <tr>
+                            <td colspan="6" class="text-center">
+                                <img src="../../../img/IsSearching.gif" alt="" class="w-60 h-60 mx-auto">
+                                <h1 class="font-medium text-xl mt-4">Cargando!!!</h1>
+                                <p class="text-sm text-gray-600 mt-2 pb-10">Por favor espera un momento mientras se carga la
+                                    información.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody v-if="emptyObject && !isLoadinRequest">
+                        <tr>
+                            <td colspan="6" class="text-center">
+                                <img src="../../../img/NoData.gif" alt="" class="w-60 h-60 mx-auto">
+                                <h1 class="font-medium text-xl mt-4">No se encontraron resultados!</h1>
+                                <p class="text-sm text-gray-600 mt-2 pb-10">Parece que no hay registros disponibles en este
+                                    momento.</p>
+                            </td>
+                        </tr>
+                    </tbody>
                 </datatable>
 
             </div>
-            <div v-if="empty_object" class="flex text-center py-2">
-                <p class="text-red-500 font-semibold text-[16px]" style="margin: 0 auto; text-align: center;">No se
-                    encontraron
-                    registros.</p>
-            </div>
         </div>
 
-        <div v-if="!empty_object" class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
+        <div v-if="!emptyObject" class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
             <div>
                 <nav class="flex justify-between" role="navigation" aria-label="Navigation">
                     <div class="grow text-center">
@@ -161,7 +177,7 @@ import axios from 'axios';
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
 
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="page != 1 ? getIncomeReceipts(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                        <a @click="link.url ? getDataToShow(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                             text-indigo-500">
                                             &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
                                         </a>
@@ -170,7 +186,7 @@ import axios from 'axios';
                                 <span v-else-if="(link.label == 'Siguiente')"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
                                     <div class="flex-1 text-right ml-2">
-                                        <a @click="hasNext ? getIncomeReceipts(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
+                                        <a @click="link.url ? getDataToShow(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
                                             text-indigo-500">
                                             <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
                                         </a>
@@ -178,7 +194,7 @@ import axios from 'axios';
                                 </span>
                                 <span class="cursor-pointer" v-else
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
-                                        class=" w-5" @click="getIncomeReceipts(link.url)">{{ link.label }}</span>
+                                        class=" w-5" @click="getDataToShow(link.url)">{{ link.label }}</span>
                                 </span>
                             </li>
                         </ul>
@@ -187,26 +203,49 @@ import axios from 'axios';
             </div>
         </div>
 
-        <ModalIncomeReceiptVue :show_modal_receipt="show_modal_receipt" :modal_data="modal_data"
+        <modal-income-receipt-vue v-if="show_modal_receipt" :show_modal_receipt="show_modal_receipt" :incomeReceiptId="incomeReceiptId"
             :budget_accounts="budget_accounts" :treasury_clerk="treasury_clerk" @cerrar-modal="show_modal_receipt = false"
-            @get-table="tableData.column = -1; getIncomeReceipts(tableData.currentPage)" />
+            @get-table="tableData.column = -1; getDataToShow(tableData.currentPage)" />
 
-        <ModalReceiptFormatVue :view_receipt="view_receipt" :receipt_to_print="receipt_to_print"
+        <modal-receipt-format-vue v-if="view_receipt" :view_receipt="view_receipt" :incomeReceiptId="incomeReceiptId"
             @cerrar-modal="view_receipt = false" />
 
     </AppLayoutVue>
 </template>
 
 <script>
+import { Head } from "@inertiajs/vue3";
+import AppLayoutVue from "@/Layouts/AppLayout.vue";
+import Datatable from "@/Components-ISRI/Datatable.vue";
+import ModalIncomeReceiptVue from '@/Components-ISRI/Tesoreria/ModalIncomeReceipt.vue';
+import ModalReceiptFormatVue from '@/Components-ISRI/Tesoreria/ModalReceiptFormat.vue';
+import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
+
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
+import moment from 'moment';
+
+import { usePermissions } from '@/Composables/General/usePermissions.js';
+import { useToDataTable } from '@/Composables/General/useToDataTable.js';
+import { ref, toRefs } from 'vue';
+
+
 export default {
-    created() {
-        this.getIncomeReceipts()
-        this.getPermissions(this)
-        this.getModalReceiptSelects()
+    components: { Head, AppLayoutVue, Datatable, ModalIncomeReceiptVue, ModalReceiptFormatVue, IconM },
+    props: {
+        menu: {
+            type: Object,
+            default: {}
+        },
     },
-    data() {
-        let sortOrders = {};
-        let columns = [
+    setup(props, context) {
+        const { menu } = toRefs(props);
+        const permits = usePermissions(menu.value, window.location.pathname);
+
+        const incomeReceiptId = ref(0)
+        const show_modal_receipt = ref(false)
+        const view_receipt = ref(false)
+        const columns = [
             { width: "11%", label: "Numero", name: "numero_recibo_ingreso", type: "text" },
             { width: "6%", label: "Fecha", name: "fecha_recibo_ingreso", type: "date" },
             { width: "25%", label: "Cliente", name: "cliente_recibo_ingreso", type: "text" },
@@ -222,147 +261,32 @@ export default {
             },
             { width: "7%", label: "Acciones", name: "Acciones" },
         ];
-        columns.forEach((column) => {
-            if (column.name === 'id_recibo_ingreso')
-                sortOrders[column.name] = 1;
-            else
-                sortOrders[column.name] = -1;
-        });
-        return {
-            hasNext: false, //variable to know if there is a next page.
-            page: '', //variable to find out which is the current page
-            empty_object: false, //variable to find out if there is no object in the server response.
-            view_receipt: false,
-            receipt_to_print: [],
-            //Data for datatable
-            income_receipts: [],
-            //Data for modal
-            income_concepts: [],
-            financing_sources: [],
-            treasury_clerk: [],
-            show_modal_receipt: false,
-            modal_data: [],
-            permits: [],
-            budget_accounts: [],
-            links: [],
-            columns: columns,
-            sortKey: "id_recibo_ingreso",
-            sortOrders: sortOrders,
-            perPage: ["10", "20", "30"],
-            tableData: {
-                currentPage: '',
-                draw: 0,
-                length: 5,
-                search: "",
-                column: -1,
-                dir: "desc",
-                total: ""
-            },
+        const requestUrl = "/recibos-ingreso"
+        const columntToSort = "id_recibo_ingreso"
+        const initialCol = -1 // Opcional, el composable recibe 0 por defecto
+        const dir = 'desc'
+        const {
+            dataToShow,
+            tableData, perPage,
+            links, sortKey,
+            sortOrders,
+            isLoadinRequest,
+            isLoadingTop,
+            emptyObject,
+            getDataToShow, handleData, sortBy, changeStatusElement
+        } = useToDataTable(columns, requestUrl, columntToSort, dir, initialCol)
+
+        const changeStatus = async (id, status) => {
+            await changeStatusElement(id, status, "/change-state-income-receipt")
         }
-    },
-    methods: {
-        formatearFecha(date) {
-            return moment(date).format('DD/MM/YYYY');
-        },
-        viewReceipt(receipt) {
-            const filteredReceipt = {
-                ...receipt,
-                detalles: receipt.detalles.filter(detalle => detalle.estado_det_recibo_ingreso === 1)
-            };
-            this.receipt_to_print = filteredReceipt
-            this.view_receipt = true
-        },
-        editIncomeReceipt(income_concept) {
-            this.modal_data = income_concept
-            this.show_modal_receipt = true
-        },
-        addIncomeConcept() {
-            this.modal_data = []
-            this.show_modal_receipt = true
-        },
-        getModalReceiptSelects() {
-            axios.get("/get-modal-receipt-selects")
-                .then((response) => {
-                    this.budget_accounts = response.data.budget_accounts
-                    this.income_concepts = response.data.income_concepts
-                    this.treasury_clerk = response.data.treasury_clerk
-                    //this.financing_sources = response.data.financing_sources
-                })
-                .catch((errors) => {
-                    this.manageError(errors, this)
-                    this.$emit("cerrar-modal");
-                });
-        },
-        changeStateIncomeReceipt(income_receipt_id, income_receipt_number, income_receipt_state) {
-            let msg
-            income_receipt_state == 1 ? msg = "Desactivar" : msg = "Activar"
-            this.$swal.fire({
-                title: msg + ' recibo de ingreso numero: ' + income_receipt_number + '.',
-                text: "¿Estas seguro?",
-                icon: "question",
-                iconHtml: "❓",
-                confirmButtonText: 'Si, ' + msg,
-                confirmButtonColor: "#001b47",
-                cancelButtonText: "Cancelar",
-                showCancelButton: true,
-                showCloseButton: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    axios.post("/change-state-income-receipt", {
-                        income_receipt_id: income_receipt_id,
-                        income_receipt_state: income_receipt_state
-                    })
-                        .then((response) => {
-                            this.$swal.fire({
-                                text: response.data.mensaje,
-                                icon: 'success',
-                                timer: 5000
-                            })
-                            this.getIncomeReceipts(this.tableData.currentPage);
-                        })
-                        .catch((errors) => {
-                            this.manageError(errors, this)
-                        })
-                }
-            })
-        },
-        async getIncomeReceipts(url = "/recibos-ingreso") {
-            this.tableData.draw++;
-            this.tableData.currentPage = url
-            await axios.post(url, this.tableData).then((response) => {
-                let data = response.data;
-                if (this.tableData.draw == data.draw) {
-                    this.page = data.data.current_page
-                    this.hasNext = data.data.current_page !== data.data.last_page;
-                    this.links = data.data.links;
-                    this.tableData.total = data.data.total;
-                    this.links[0].label = "Anterior";
-                    this.links[this.links.length - 1].label = "Siguiente";
-                    this.income_receipts = data.data.data;
-                    this.income_receipts.length > 0 ? this.empty_object = false : this.empty_object = true
-                }
-            }).catch((errors) => {
-                this.manageError(errors, this)
-            })
-        },
-        sortBy(key) {
-            if (key != "Acciones") {
-                this.sortKey = key;
-                this.sortOrders[key] = this.sortOrders[key] * -1;
-                this.tableData.column = this.getIndex(this.columns, "name", key);
-                this.tableData.dir = this.sortOrders[key] === 1 ? "asc" : "desc";
-                this.getIncomeReceipts();
-            }
-        },
-        getIndex(array, key, value) {
-            return array.findIndex((i) => i[key] == value);
-        },
-        handleData(myEventData) {
-            this.tableData.search = myEventData;
-            const data = Object.values(myEventData);
-            if (data.every(error => error === '')) {
-                this.getIncomeReceipts()
-            }
+
+        return {
+            permits, dataToShow, tableData,
+            perPage, links, sortKey, isLoadingTop,
+            sortOrders, sortBy, incomeReceiptId,
+            handleData, isLoadinRequest,
+            getDataToShow, changeStatus, show_modal_receipt, view_receipt,
+            emptyObject, columns, moment
         }
     }
 }
