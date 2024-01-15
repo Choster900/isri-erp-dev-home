@@ -18,6 +18,7 @@ use App\Models\PlazaAsignada;
 use App\Models\PlazaEvaluada;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -51,6 +52,21 @@ class EvaluacionController extends Controller
         $dir = $request->input('dir');
         $data = $request->input('search');
 
+        $idPersona = $request->user()->id_persona;
+
+        $idDependenciWhereIAm = Dependencia::where('id_persona', $idPersona)
+            ->where('estado_dependencia', 1)
+            ->pluck('id_dependencia')
+            ->toArray();
+
+        $idDependencies = Dependencia::whereIn('dep_id_dependencia', $idDependenciWhereIAm)
+            ->pluck('id_dependencia')
+            ->toArray();
+
+        $idPersonas = Dependencia::whereIn('dep_id_dependencia', $idDependenciWhereIAm)
+            ->pluck('id_persona')
+            ->toArray();
+
         // Construir la consulta base con las relaciones
         $query = Empleado::with([
             "persona",
@@ -70,10 +86,24 @@ class EvaluacionController extends Controller
             "evaluaciones_personal.evaluacion_rendimiento",
             "evaluaciones_personal.tipo_evaluacion_personal",
             "evaluaciones_personal.periodo_evaluacion",
-            "evaluaciones_personal" => function ($query) {
-                return $query->orderBy("fecha_reg_evaluacion_personal", "asc");
+            "evaluaciones_personal" => function ($query) use ($idDependencies) {
+                $query->whereIn("id_estado_evaluacion_personal", !empty($idDependencies) ? [1, 5, 6, 8] : [1, 4, 7, 8])
+                    ->orderBy("fecha_reg_evaluacion_personal", "asc");
+                return $query;
             },
+
         ])->whereHas("evaluaciones_personal")->orderBy($columns[$column], $dir);
+
+
+        // Aplicar el filtro de plazas_asignadas
+        $query->whereHas("plazas_asignadas", function ($query) use ($idDependencies, $idDependenciWhereIAm) {
+            if (!empty($idDependencies)) {
+                $combinedDependencies = array_merge($idDependencies,  $idDependenciWhereIAm);
+                $query->whereIn("id_dependencia", $combinedDependencies);
+            } else {
+                $query->whereIn("id_dependencia", $idDependenciWhereIAm);
+            }
+        });
 
         if ($data) {
             $query->where('id_empleado', 'like', '%' . $data["id_empleado"] . '%')
@@ -101,10 +131,35 @@ class EvaluacionController extends Controller
                 }
             ); */
         }
+
         $acuerdos = $query->paginate($length)->onEachSide(1);
+
+        $formattedResults = $acuerdos->map(function ($item) use ($idDependenciWhereIAm, $idDependencies, $idPersonas) {
+            if (!in_array($item->id_persona, $idPersonas)) { //Tomar personas que no están en la lista (porque los que están quiero que aparezcan)
+                $item->evaluaciones_personal = $item->evaluaciones_personal->filter(function ($item2) use ($idDependenciWhereIAm) {
+                    if (!in_array($item2->id_dependencia, $idDependenciWhereIAm)) {
+                        if ($item2->id_estado_evaluacion_personal == 1) {
+                            $item2->hasAnotherState = true;
+                        }
+                    }
+                });
+            }
+            return $item;
+        });
+
+
+        $paginator = new LengthAwarePaginator(
+            $formattedResults,
+            $acuerdos->total(),
+            $acuerdos->perPage(),
+            $acuerdos->currentPage(),
+            ['path' => url()->current()]
+        );
         return [
-            'data' => $acuerdos,
+            'data' => $paginator,
             'draw' => $request->input('draw'),
+            'DependenciaDondeEstoy' => $idDependenciWhereIAm,
+            'dependencies' => $idDependencies,
         ];
     }
 
@@ -179,9 +234,6 @@ class EvaluacionController extends Controller
 
         return response()->json($formattedResults);
     }
-
-
-
 
     function getPlazaAsignadaByUserAndDependencia(Request $request)
     {
@@ -360,7 +412,6 @@ class EvaluacionController extends Controller
         ];
     }
 
-
     function createNewEvaluation(EvaluacionRequest $request)
     {
 
@@ -390,9 +441,11 @@ class EvaluacionController extends Controller
                     ];
                 }
 
-                // Definir fechas límite para determinar el periodo
-                $limitePrimerPeriodo = Carbon::parse('2023-06-30');
-                $limiteSegundoPeriodo = Carbon::parse('2023-12-31');
+                $anio = $fechaInicioObj->year;
+
+                $limitePrimerPeriodo = Carbon::parse("{$anio}-06-30");
+                $limiteSegundoPeriodo = Carbon::parse("{$anio}-12-31");
+
 
                 // Añadir mensajes de depuración para las fechas
                 $mensaje_debug = [
@@ -407,10 +460,6 @@ class EvaluacionController extends Controller
                 } elseif ($fechaInicioObj->gte($limitePrimerPeriodo) && $fechaFinObj->lte($limiteSegundoPeriodo)) {
                     $id_periodo_evaluacion = 2; // Segundo periodo
                     $mensaje_periodo = 'Segundo periodo';
-                } else {
-                    // Manejar el caso en que las fechas no se ajusten a ninguno de los periodos
-                    $id_periodo_evaluacion = 1;
-                    $mensaje_periodo = 'Las fechas no corresponden a ningún periodo';
                 }
 
                 // Añadir mensajes de depuración para el periodo
@@ -419,7 +468,7 @@ class EvaluacionController extends Controller
                 // Manejar el caso en que no se proporcionaron fechas
                 $fecha_inicio = null;
                 $fecha_fin = null;
-                $id_periodo_evaluacion = 1;
+                /* $id_periodo_evaluacion = 1; */
                 $mensaje_periodo = 'No se proporcionaron fechas';
             }
 
@@ -427,7 +476,8 @@ class EvaluacionController extends Controller
                 'id_evaluacion_rendimiento'        => $request->idEvaluacionRendimiento,
                 'id_periodo_evaluacion'            => $id_periodo_evaluacion,
                 'id_empleado'                      => $request->idEmpleado,
-                'id_dependencia'                   => $request->idCentroAtencion, //TODO: poner la dependencia y no el centro de atencion
+                'id_estado_evaluacion_personal'    => 1, // ** Se deja por default en 1
+                'id_dependencia'                   => $request->plazasAsignadas[0]["dependencia"]["id_dependencia"], // ?Si el empleado tiene multiples plazas que dependencia voy a ingresar aqui
                 'id_tipo_evaluacion_personal'      => $request->idTipoEvaluacion,
                 'fecha_evaluacion_personal'        => Carbon::now(),
                 'puntaje_evaluacion_personal'      => 0, // Inicialmente

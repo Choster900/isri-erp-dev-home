@@ -20,6 +20,7 @@ class EvaluacionPersonal extends Model
         'id_periodo_evaluacion',
         'id_empleado',
         'id_dependencia',
+        "id_estado_evaluacion_personal",
         'id_tipo_evaluacion_personal',
         'fecha_evaluacion_personal',
         'puntaje_evaluacion_personal',
@@ -93,5 +94,14 @@ class EvaluacionPersonal extends Model
     public function periodo_evaluacion(): BelongsTo
     {
         return $this->belongsTo(PeriodoEvaluacion::class, 'id_periodo_evaluacion', 'id_periodo_evaluacion');
+    }
+    /**
+     * Get the estado_evaluacion_personal that owns the EvaluacionPersonal
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function estado_evaluacion_personal(): BelongsTo
+    {
+        return $this->belongsTo(EstadoEvaluacionPersonal::class, 'id_estado_evaluacion_personal', 'id_estado_evaluacion_personal');
     }
 }
