@@ -280,8 +280,8 @@ export const useEvaluacion = () => {
             value: index.id_plaza_asignada,
             label: index.detalle_plaza.plaza.nombre_plaza,
             id_tipo_plaza: index.detalle_plaza.plaza.tipo_plaza.id_tipo_plaza,
-            nombre_tipo_plaza:
-                index.detalle_plaza.plaza.tipo_plaza.nombre_tipo_plaza,
+            nombre_tipo_plaza: index.detalle_plaza.plaza.tipo_plaza.nombre_tipo_plaza,
+            dependencia: index.dependencia,
         }));
         showPlazasModal.value = true;
         existMoreThanOne.value = true;
