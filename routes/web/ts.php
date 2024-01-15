@@ -84,10 +84,8 @@ Route::group(['middleware' => ['auth']], function () {
     )->name('ts.conceptosIngreso');
     Route::post('ingresos', [ConceptoIngresoController::class, 'getConceptoIngresos'])->name('conceptoIngreso.getConceptoIngresos');
     Route::post('change-state-income-concept', [ConceptoIngresoController::class, 'changeStateIncomeConcept'])->name('conceptoIngreso.changeStateIncomeConcept');
-    Route::get('get-selects-income-concept', [ConceptoIngresoController::class, 'getSelectsIncomeConcept'])->name('conceptoIngreso.getSelectsIncomeConcept');
     Route::post('save-income-concept', [ConceptoIngresoController::class, 'saveIncomeConcept'])->name('conceptoIngreso.saveIncomeConcept');
     Route::post('update-income-concept', [ConceptoIngresoController::class, 'updateIncomeConcept'])->name('conceptoIngreso.updateIncomeConcept');
-
     //New route for Composition API
     Route::get('get-info-modal-concepto-ingreso/{id}', [ConceptoIngresoController::class, 'getInfoModalConceptoIngreso'])->name('conceptoIngreso.getInfoModalConceptoIngreso');
 
@@ -106,6 +104,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('update-income-receipt', [ReciboIngresoController::class, 'updateIncomeReceipt'])->name('conceptoIngreso.updateIncomeReceipt');
     Route::get('get-select-financing-source', [ReciboIngresoController::class, 'getSelectFinancingSource'])->name('reciboIngreso.getSelectFinancingSource');
     Route::get('get-select-income-concept', [ReciboIngresoController::class, 'getSelectIncomeConcept'])->name('reciboIngreso.getSelectIncomeConcept');
+    //New route for Composition API
+    Route::get('get-info-modal-recibo-ingreso/{id}', [ReciboIngresoController::class, 'getInfoModalReciboIngreso'])->name('reciboIngreso.getInfoModalReciboIngreso');
+    Route::get('get-info-modal-recibo-format/{id}', [ReciboIngresoController::class, 'getInfoModalReciboFormat'])->name('reciboIngreso.getInfoModalReciboFormat');
 
     //Routes to manage acquisition doc
     Route::get(
@@ -116,10 +117,8 @@ Route::group(['middleware' => ['auth']], function () {
     )->name('ts.docAdquisicion');
     Route::post('doc-adquisicion', [DocumentoAdquisicionController::class, 'getDocAdquisicion'])->name('documentoAdquisicion.getDocAdquisicion');
     Route::post('change-state-acq-doc', [DocumentoAdquisicionController::class, 'changeStateAcqdoc'])->name('documentoAdquisicion.changeStateAcqdoc');
-    Route::get('get-selects-acq-doc', [DocumentoAdquisicionController::class, 'getSelectsAcqDoc'])->name('documentoAdquisicion.getSelectsAcqDoc');
     Route::post('save-acq-doc', [DocumentoAdquisicionController::class, 'saveAcqDoc'])->name('documentoAdquisicion.saveAcqDoc');
     Route::post('update-acq-doc', [DocumentoAdquisicionController::class, 'updateAcqDoc'])->name('documentoAdquisicion.updateAcqDoc');
-
     //New route for Composition API
     Route::get('get-info-modal-doc-adquisicion/{id}', [DocumentoAdquisicionController::class, 'getInfoModalDocAdquisicion'])->name('documentoAdquisicion.getInfoModalDocAdquisicion');
 
@@ -142,7 +141,6 @@ Route::group(['middleware' => ['auth']], function () {
         }
     )->name('ts.reporteQuedan');
     Route::post('create-quedan-report', [ReporteTesoreriaController::class, 'createQuedanReport'])->name('reporteTesoreria.createQuedanReport');
-    Route::post('create-quedan-report-pdf', [ReporteTesoreriaController::class, 'createQuedanReportPDF'])->name('reporteTesoreria.createQuedanReportPDF');
     Route::get('get-selects-report', [ReporteTesoreriaController::class, 'getSelectsReport'])->name('reporteTesoreria.getSelectsReport');
     Route::get(
         '/ts/reporte-facturas',

@@ -12,17 +12,17 @@ export const useEvaluacion = () => {
             name: "codigo_empleado",
             type: "text",
         },
-        { width: "20%", label: "Nombres", name: "collecNombre", type: "text" },
+        { width: "15%", label: "Nombres", name: "collecNombre", type: "text" },
         {
-            width: "20%",
+            width: "15%",
             label: "Apellidos",
             name: "collecApellido",
             type: "text",
         },
         {
             width: "20%",
-            label: "Correo institucional",
-            name: "email_institucional_empleado",
+            label: "Detalle de evaluación",
+            name: "detalle_evaluacionda_data",
             type: "text",
         },
         { width: "1%", label: "", name: "Acciones" },
@@ -71,6 +71,37 @@ export const useEvaluacion = () => {
             const data = response.data;
 
             if (tableData.value.draw === data.draw) {
+                let resultado = data.data.data;
+
+                // Obtener todas las evaluaciones filtradas
+                let nuevasEvaluaciones = resultado.flatMap(item =>
+                    item.evaluaciones_personal.filter(subItem =>
+                        subItem.hasAnotherState === false || !('hasAnotherState' in subItem) || subItem.hasAnotherState !== true
+                    )
+                );
+
+                console.log(nuevasEvaluaciones);
+
+                data.data.data.forEach(element => {
+                    // Buscar correspondencias en las nuevas evaluaciones
+                    let evaluacionesEmpleado = nuevasEvaluaciones.filter(element2 =>
+                        element2.id_empleado === element.id_empleado
+                    );
+
+                    // Hacer algo con las evaluaciones del empleado (por ejemplo, asignarlas al elemento)
+                    element.evaluaciones_personal = evaluacionesEmpleado;
+
+                    console.log(element);
+                });
+
+                // Eliminar elementos vacíos
+                data.data.data = data.data.data.filter(element =>
+                    element.evaluaciones_personal.length > 0
+                );
+
+
+                console.log(data.data.data);
+
                 evaluaciones.value = data.data.data;
                 pagination.value.total = data.data.total;
                 links.value = data.data.links;

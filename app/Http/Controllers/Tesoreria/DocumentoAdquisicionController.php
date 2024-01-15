@@ -42,7 +42,8 @@ class DocumentoAdquisicionController extends Controller
         }
 
         if ($search_value) {
-            $query->where('nombre_tipo_doc_adquisicion', 'like', '%' . $search_value['nombre_tipo_doc_adquisicion'] . '%')
+            $query->where('id_doc_adquisicion', 'like', '%' . $search_value['id_doc_adquisicion'] . '%')
+                ->where('nombre_tipo_doc_adquisicion', 'like', '%' . $search_value['nombre_tipo_doc_adquisicion'] . '%')
                 ->where('numero_doc_adquisicion', 'like', '%' . $search_value['numero_doc_adquisicion'] . '%')
                 ->where('razon_social_proveedor', 'like', '%' . $search_value['razon_social_proveedor'] . '%')
                 ->where('monto_doc_adquisicion', 'like', '%' . $search_value['monto_doc_adquisicion'] . '%')

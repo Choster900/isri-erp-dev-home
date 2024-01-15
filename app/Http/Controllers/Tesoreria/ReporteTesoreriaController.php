@@ -9,6 +9,7 @@ use App\Http\Requests\Tesoreria\ReporteIngresoDiarioRequest;
 use App\Http\Requests\Tesoreria\ReporteIngresoRequest;
 use App\Http\Requests\Tesoreria\ReporteQuedanRequest;
 use App\Http\Requests\Tesoreria\RetencionISRRequest;
+use App\Models\CentroAtencion;
 use App\Models\ConceptoIngreso;
 use App\Models\CuentaPresupuestal;
 use App\Models\Dependencia;
@@ -93,13 +94,13 @@ class ReporteTesoreriaController extends Controller
 
         $array = json_decode(json_encode($array), true);
 
-        array_unshift($array, array('NUMERO', 'SUMINISTRANTE', 'N° REQUERIMIENTO', 'FECHA REQUERIMIENTO','TOTAL','IVA','ISR', 'LIQUIDO', 'MONTO PAGADO', 'FACTURA(FECHA)', 'PRIORIDAD', 'DESCRIPCION'));
+        array_unshift($array, array('NUMERO', 'SUMINISTRANTE', 'N° REQUERIMIENTO', 'FECHA REQUERIMIENTO', 'TOTAL', 'IVA', 'ISR', 'LIQUIDO', 'MONTO PAGADO', 'FACTURA(FECHA)', 'PRIORIDAD', 'DESCRIPCION'));
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
         $sheet->getStyle('3')->getFont()->setBold(true);
-        $columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H','I','J'];
+        $columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
         foreach ($columns as $column) {
             $sheet->getColumnDimension($column)->setAutoSize(true);
         }
@@ -252,7 +253,7 @@ class ReporteTesoreriaController extends Controller
             SELECT 
 			IFNULL(p.nit_proveedor,p.dui_proveedor) AS documento,
 			p.razon_social_proveedor,
-			dp.codigo_dependencia,
+			dp.codigo_centro_atencion,
 			q.numero_compromiso_ppto_quedan,
 			rp.numero_requerimiento_pago,
             DATE_FORMAT(dq.fecha_factura_det_quedan,"%d/%m/%Y") as fecha_factura_det_quedan,
@@ -265,7 +266,7 @@ class ReporteTesoreriaController extends Controller
             FROM 
             quedan AS q
             INNER JOIN detalle_quedan AS dq on q.id_quedan = dq.id_quedan
-            INNER JOIN dependencia AS dp on dq.id_dependencia = dp.id_dependencia 
+            INNER JOIN centro_atencion AS dp on dq.id_centro_atencion = dp.id_centro_atencion 
             INNER JOIN proveedor AS p on q.id_proveedor = p.id_proveedor
             INNER JOIN sujeto_retencion AS sr on p.id_sujeto_retencion = sr.id_sujeto_retencion  
             LEFT OUTER JOIN requerimiento_pago AS rp on q.id_requerimiento_pago = rp.id_requerimiento_pago 
@@ -282,7 +283,7 @@ class ReporteTesoreriaController extends Controller
         }
 
         $array = json_decode(json_encode($array), true);
-        array_unshift($array, array('NIT/DUI', 'SUMINISTRANTE', 'DEPENDENCIA', 'COMPROMISO', 'REQUERIMIENTO', 'FECHA', 'MONTO', 'RENTA', 'IVA', 'LIQUIDO', 'CONCEPTO', 'PRIORIDAD'));
+        array_unshift($array, array('NIT/DUI', 'SUMINISTRANTE', 'CENTRO', 'COMPROMISO', 'REQUERIMIENTO', 'FECHA', 'MONTO', 'RENTA', 'IVA', 'LIQUIDO', 'CONCEPTO', 'PRIORIDAD'));
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
@@ -338,45 +339,6 @@ class ReporteTesoreriaController extends Controller
         header('Cache-Control: max-age=0');
 
         $writer->save('php://output');
-    }
-
-    public function createQuedanReportPDF(ReporteQuedanRequest $request)
-    {
-        if ($request->filled('financing_source_id')) {
-            $query_financing_source = 'AND `id_proy_financiado` = ' . $request->financing_source_id;
-        } else {
-            $query_financing_source = '';
-        }
-        if ($request->filled('state_quedan_id')) {
-            $query_quedan_state = ' AND `id_estado_quedan` = ' . $request->state_quedan_id;
-        } else {
-            $query_quedan_state = '';
-        }
-        $array = DB::select(
-            '
-            SELECT 
-            `p`.`razon_social_proveedor`, 
-            `rp`.`numero_requerimiento_pago`, 
-            DATE_FORMAT(`rp`.`fecha_requerimiento_pago`,"%d/%m/%Y") as fecha_requerimiento_pago, 
-            `monto_liquido_quedan`,
-            IFNULL((SELECT SUM(`lq`.`monto_liquidacion_quedan`) FROM `liquidacion_quedan` lq WHERE `lq`.`id_quedan` = `quedan`.`id_quedan` GROUP BY `lq`.`id_quedan` ), 0) AS monto_pagado, 
-            DATE_FORMAT(`fecha_emision_quedan`,"%d/%m/%Y") as fecha_emision_quedan, 
-            `pp`.`nivel_prioridad_pago`,
-            `pp`.`nombre_prioridad_pago` 
-            FROM 
-            `quedan` 
-            INNER JOIN `proveedor` AS p on `quedan`.`id_proveedor` = `p`.`id_proveedor` 
-            LEFT OUTER JOIN `requerimiento_pago` AS rp ON `quedan`.`id_requerimiento_pago` = `rp`.`id_requerimiento_pago`
-            INNER JOIN `prioridad_pago` AS pp on `quedan`.`id_prioridad_pago` = `pp`.`id_prioridad_pago`
-            WHERE `fecha_emision_quedan` BETWEEN ? AND ?
-            ' . $query_financing_source . $query_quedan_state,
-            [$request->start_date, $request->end_date]
-        );
-
-        if (empty($array)) {
-            return response()->json(['error' => 'No se encontraron registros'], 404);
-        }
-        return ['mensaje' => 'Hola desde el back'];
     }
     public function getSelectsWithholdingTaxReport(Request $request)
     {
@@ -513,10 +475,9 @@ class ReporteTesoreriaController extends Controller
             ->where('estado_proy_financiado', '=', 1)
             ->orderBy('nombre_proy_financiado')
             ->get();
-        $dependencies = Dependencia::selectRaw("id_dependencia as value , concat(codigo_dependencia, ' - ', nombre_dependencia) as label")
-            ->where('id_tipo_dependencia', '=', 1)
-            ->where('estado_dependencia', '=', 1)
-            ->orderBy('nombre_dependencia')
+        $dependencies = CentroAtencion::selectRaw("id_centro_atencion as value , concat(codigo_centro_atencion, ' - ', nombre_centro_atencion) as label")
+            ->where('estado_centro_atencion', '=', 1)
+            ->orderBy('id_centro_atencion')
             ->get();
         $budget_accounts = CuentaPresupuestal::selectRaw("id_ccta_presupuestal as value , concat(id_ccta_presupuestal, ' - ', nombre_ccta_presupuestal) as label")
             ->where('tesoreria_ccta_presupuestal', '=', 1)
@@ -540,17 +501,17 @@ class ReporteTesoreriaController extends Controller
             $fuente_financiamiento = 'TODOS LOS FONDOS';
         }
         if ($request->filled('dependency_id')) {
-            $query_dependency = ' AND d.id_dependencia = ' . $request->dependency_id;
+            $query_dependency = ' AND d.id_centro_atencion = ' . $request->dependency_id;
             $query_select_concept = 'ci.nombre_concepto_ingreso ';
-            $dependencia = Dependencia::find($request->dependency_id);
+            $dependencia = CentroAtencion::find($request->dependency_id);
             if ($dependencia) {
-                $codigo_dependencia = $dependencia->codigo_dependencia;
+                $codigo_dependencia = $dependencia->codigo_centro_atencion;
             } else {
                 $codigo_dependencia = 'NO EXISTE DEPENDENCIA';
             }
         } else {
             $query_dependency = '';
-            $query_select_concept = 'COALESCE(CONCAT_WS(" - ",d.codigo_dependencia,ci.nombre_concepto_ingreso)) as nombre_concepto_ingreso ';
+            $query_select_concept = 'COALESCE(CONCAT_WS(" - ",d.codigo_centro_atencion,ci.nombre_concepto_ingreso)) as nombre_concepto_ingreso ';
             $codigo_dependencia = 'TODAS LAS DEPENDENCIAS';
         }
         if ($request->filled('budget_account_id')) {
@@ -569,7 +530,7 @@ class ReporteTesoreriaController extends Controller
 			INNER JOIN detalle_recibo_ingreso dri ON ri.id_recibo_ingreso = dri.id_recibo_ingreso
 			INNER JOIN concepto_ingreso ci ON dri.id_concepto_ingreso = ci.id_concepto_ingreso
 			INNER JOIN proyecto_financiado pf ON ci.id_proy_financiado = pf.id_proy_financiado 
-			LEFT JOIN dependencia d ON ci.id_dependencia = d.id_dependencia
+			LEFT JOIN centro_atencion d ON ci.id_centro_atencion = d.id_centro_atencion
 
             WHERE ri.estado_recibo_ingreso = 1
             AND ri.fecha_recibo_ingreso BETWEEN ? AND ?
@@ -668,8 +629,8 @@ class ReporteTesoreriaController extends Controller
         $details = DB::select(
             '
             SELECT
-            t.id_dependencia,
-            t.codigo_dependencia,
+            t.id_centro_atencion,
+            t.codigo_centro_atencion,
             GROUP_CONCAT(DISTINCT t.nombre_concepto_ingreso SEPARATOR ", ") as observacion,
             SUM(IF(t.id_ccta_presupuestal = 14199, t.total, 0)) as "14199",
             SUM(IF(t.id_ccta_presupuestal = 14202, t.total, 0)) as "14202",
@@ -683,27 +644,28 @@ class ReporteTesoreriaController extends Controller
             FROM
             (
                 SELECT 
-                ci.id_dependencia, 
+                ci.id_centro_atencion, 
                 ci.id_ccta_presupuestal,
-                d.codigo_dependencia, 
+                d.codigo_centro_atencion, 
                 ci.nombre_concepto_ingreso, 
                 SUM(dri.monto_det_recibo_ingreso) as total 
                 FROM 
                 recibo_ingreso ri
                 INNER JOIN detalle_recibo_ingreso dri ON ri.id_recibo_ingreso = dri.id_recibo_ingreso
                 INNER JOIN concepto_ingreso ci ON dri.id_concepto_ingreso = ci.id_concepto_ingreso
-                LEFT JOIN dependencia d ON ci.id_dependencia = d.id_dependencia
+                LEFT JOIN centro_atencion d ON ci.id_centro_atencion = d.id_centro_atencion
                 WHERE ri.estado_recibo_ingreso = 1
                 AND ri.fecha_recibo_ingreso = ?
                 AND ci.id_proy_financiado = ?
                 AND ci.id_ccta_presupuestal <> 16201 
                 AND dri.estado_det_recibo_ingreso = 1
                 GROUP BY 
-                ci.id_dependencia, 
-                d.codigo_dependencia, 
+                ci.id_centro_atencion, 
+                d.codigo_centro_atencion, 
                 ci.id_ccta_presupuestal,
-                ci.nombre_concepto_ingreso) as t
-                GROUP BY  t.id_dependencia, t.codigo_dependencia
+                ci.nombre_concepto_ingreso
+            ) as t
+            GROUP BY  t.id_centro_atencion, t.codigo_centro_atencion
         ',
             [$request->start_date, $request->financing_source_id]
         );
