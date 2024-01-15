@@ -121,7 +121,7 @@ export const useDocumentoAdquisicion = (context) => {
                 acq_doc.value.items.push(arrayInsert)
             })
         } else {
-            acq_doc.items = []
+            acq_doc.value.items = []
         }
     };
 

@@ -4,7 +4,7 @@ import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
 import { toast } from "vue3-toastify";
 
-export const useToDataTable = (columns, requestUrl, columnToSort, dir) => {
+export const useToDataTable = (columns, requestUrl, columnToSort, dir, col = 0) => {
     const swal = inject("$swal");
     const sortOrders = ref([]);
     const isLoadinRequest = ref(false);
@@ -22,7 +22,7 @@ export const useToDataTable = (columns, requestUrl, columnToSort, dir) => {
     const tableData = ref({
         draw: 0,
         length: 5,
-        column: 0,
+        column: col,
         dir: dir,
         total: "",
         currentPage: "",

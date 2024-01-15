@@ -104,6 +104,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('update-income-receipt', [ReciboIngresoController::class, 'updateIncomeReceipt'])->name('conceptoIngreso.updateIncomeReceipt');
     Route::get('get-select-financing-source', [ReciboIngresoController::class, 'getSelectFinancingSource'])->name('reciboIngreso.getSelectFinancingSource');
     Route::get('get-select-income-concept', [ReciboIngresoController::class, 'getSelectIncomeConcept'])->name('reciboIngreso.getSelectIncomeConcept');
+    //New route for Composition API
+    Route::get('get-info-modal-recibo-ingreso/{id}', [ReciboIngresoController::class, 'getInfoModalReciboIngreso'])->name('reciboIngreso.getInfoModalReciboIngreso');
+    Route::get('get-info-modal-recibo-format/{id}', [ReciboIngresoController::class, 'getInfoModalReciboFormat'])->name('reciboIngreso.getInfoModalReciboFormat');
 
     //Routes to manage acquisition doc
     Route::get(
