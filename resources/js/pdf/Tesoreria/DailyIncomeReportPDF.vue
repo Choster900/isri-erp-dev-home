@@ -43,7 +43,7 @@
                 </thead>
                 <tbody>
                     <tr v-for="concept in daily_income_report" :key="concept.id_det_recibo_ingreso" class="h-auto">
-                        <td class="border border-black  text-center center-vertically"> {{ concept.codigo_dependencia }}
+                        <td class="border border-black  text-center center-vertically"> {{ concept.codigo_centro_atencion }}
                         </td>
                         <td class="border border-black  text-center center-vertically"> {{ concept.observacion }}</td>
                         <td class="border border-black center-vertically text-right"> ${{ concept['14199'] }}</td>
@@ -144,7 +144,7 @@
                     </thead>
                     <tbody>
                         <tr v-for="concept in daily_income_report" :key="concept.id_det_recibo_ingreso" class="h-auto">
-                            <td class="border border-black  text-center center-vertically"> {{ concept.codigo_dependencia }}
+                            <td class="border border-black  text-center center-vertically"> {{ concept.codigo_centro_atencion }}
                             </td>
                             <td class="border border-black  text-center center-vertically"> {{ concept.observacion }}</td>
                             <td class="border border-black center-vertically text-right"> ${{ concept['14199'] }}</td>

@@ -115,8 +115,7 @@ export const useDependencia = (context) => {
 
     const depFilter = computed(() => {
         const result = dependencies.value.filter((element) => {
-            return element.id_centro_atencion === depInfo.value.centerId
-            && element.value != depInfo.value.id; // Agregar el 'return'
+            return element.value != depInfo.value.id
         });
         return result ?? [];
     });
