@@ -1,23 +1,14 @@
+<script setup>
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
+import moment from 'moment';
+import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
+import { jsPDF } from "jspdf";
+import html2pdf from 'html2pdf.js'
+</script>
 <template>
     <div class="m-1.5 p-10">
-        <div v-if="isLoadingRequest"
-            class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
-            <div role="status" class="flex items-center">
-                <svg aria-hidden="true" class="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-800"
-                    viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                        fill="currentColor" />
-                    <path
-                        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                        fill="currentFill" />
-                </svg>
-                <div class="bg-gray-200 rounded-lg p-1 font-semibold">
-                    <span class="text-blue-800">CARGANDO...</span>
-                </div>
-            </div>
-        </div>
-        <ProcessModal v-else maxWidth='4xl' :show="view_receipt" @close="$emit('cerrar-modal')">
+        <ProcessModal maxWidth='4xl' :show="view_receipt" @close="$emit('cerrar-modal')">
             <div class=" flex   justify-center pt-2 content-between">
                 <div class="px-2">
                     <GeneralButton color="bg-red-700   hover:bg-red-800" text="PDF" icon="pdf" @click="printPdf()" />
@@ -204,46 +195,83 @@
 </template>
 
 <script>
-import { useReciboFormat } from '@/Composables/Tesoreria/ReciboIngreso/useReciboFormat.js';
-import moment from 'moment';
-import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
-import { toRefs, onMounted, } from 'vue';
-
+import IncomeReceiptPDF from '@/pdf/Tesoreria/IncomeReceiptPDF.vue';
+import ReciboIngresoMatricialVue from '@/pdf/Tesoreria/ReciboIngresoMatricial.vue';
+import { createApp, h } from 'vue'
 export default {
-    components: { ProcessModal },
     props: {
-        incomeReceiptId: {
-            type: Number,
-            default: 0,
-        },
         view_receipt: {
             type: Boolean,
             default: false,
         },
+        receipt_to_print: {
+            type: Array,
+            default: [],
+        },
     },
-    setup(props, context) {
-
-        const { incomeReceiptId } = toRefs(props);
-
-        const {
-            isLoadingRequest, receipt_to_print,
-            formatedAmount, empleado, nombre_cuenta, fecha_recibo,
-            getInfoForModalReciboFormat, printPdf
-        } = useReciboFormat(context);
-
-        onMounted(
-            async () => {
-                await getInfoForModalReciboFormat(incomeReceiptId.value)
-            }
-        )
-
+    data: function () {
         return {
-            isLoadingRequest, receipt_to_print,
-            formatedAmount, empleado, nombre_cuenta, fecha_recibo,
-            getInfoForModalReciboFormat, printPdf, moment
         }
-    }
-};
+    },
+    methods: {
+        printPdf() {
+            let fecha = moment().format('DD-MM-YYYY');
+            let name = 'RECIBO ' + this.receipt_to_print.numero_recibo_ingreso + ' - ' + fecha;
+            const opt = {
+                margin: 0,
+                filename: name,
+                //pagebreak: {mode:'css',before:'#pagebreak'},
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 3, useCORS: true },
+                //jsPDF: { unit: 'cm', format: [13.95,21.5], orientation: 'landscape' }
+                jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' },
+            };
+
+            const limiteCaracteres = 70;
+            if (this.receipt_to_print.monto_letras.length <= limiteCaracteres) {
+                this.letras1 = this.receipt_to_print.monto_letras;
+                this.letras2 = ''
+            } else {
+                let textoTruncado = this.receipt_to_print.monto_letras.slice(0, limiteCaracteres);
+                let ultimoEspacio = textoTruncado.lastIndexOf(' ');
+                this.letras1 = textoTruncado.slice(0, ultimoEspacio);
+                this.letras2 = this.receipt_to_print.monto_letras.slice(ultimoEspacio + 1);
+            }
+
+            const app = createApp(ReciboIngresoMatricialVue, {
+                receipt_to_print: this.receipt_to_print,
+                formatedAmount: this.receipt_to_print.monto_recibo_ingreso,
+                empleado: this.empleado,
+                nombre_cuenta: this.nombre_cuenta,
+                fecha_recibo: this.fecha_recibo,
+                letras1: this.letras1,
+                letras2: this.letras2
+            });
+            const div = document.createElement('div');
+            const pdfPrint = app.mount(div);
+            const html = div.outerHTML;
+
+            html2pdf().set(opt).from(html).save();
+            //html2pdf().set(opt).from(html).output('dataurlnewwindow');
+        }
+    },
+    watch: {
+    },
+    computed: {
+        formatedAmount() {
+            return '$' + this.receipt_to_print.monto_recibo_ingreso
+        },
+        empleado() {
+            return this.receipt_to_print.empleado_tesoreria ? this.receipt_to_print.empleado_tesoreria.nombre_empleado_tesoreria : ''
+        },
+        nombre_cuenta() {
+            return this.receipt_to_print.cuenta_presupuestal ? this.receipt_to_print.cuenta_presupuestal.nombre_ccta_presupuestal : ''
+        },
+        fecha_recibo() {
+            return this.receipt_to_print.cuenta_presupuestal ? moment(this.receipt_to_print.fecha_recibo_ingreso, 'Y-M-D').format('DD/MM/Y') : ''
+        },
+    },
+}
 </script>
 
 <style>
