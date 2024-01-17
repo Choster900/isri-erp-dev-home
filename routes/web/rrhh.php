@@ -19,6 +19,7 @@ use App\Http\Controllers\RRHH\SubDirectorMedicoController;
 use App\Models\ArchivoAnexo;
 use App\Models\CentroAtencion;
 use App\Models\Dependencia;
+use App\Models\EvaluacionPersonal;
 use App\Models\EvaluacionRendimiento;
 use App\Models\Persona;
 use App\Models\TipoArchivoAnexo;
@@ -129,6 +130,19 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         })->get();
     })->name('evaluaciones.getAllDependencias');
 
+
+    Route::post('changeStateEvaluation', function (Request $request) {
+        $idEvaluation = $request->idEvaluation;
+        $stateToChange = $request->stateToChange;
+        return EvaluacionPersonal::where('id_evaluacion_personal', $idEvaluation)->update(["id_estado_evaluacion_personal" => $stateToChange]);
+    })->name('evaluaciones.changeStateEvaluation');
+
+
+    Route::post('addJustificationRejection', function (Request $request) {
+        $idEvaluation = $request->idEvaluation;
+        $textRejection = $request->textRejection;
+        return EvaluacionPersonal::where('id_evaluacion_personal', $idEvaluation)->update(["motivo_rechazo_ratificador_evaluacion_personal" => $textRejection]);
+    })->name('evaluaciones.changeStateEvaluation');
 
     Route::post('search-employees-for-evaluations', [EvaluacionController::class, 'searchEmployeesForNewEvaluationRequest'])->name('evaluaciones.search-employees');
     Route::post('create-new-evaluacion', [EvaluacionController::class, 'createNewEvaluation'])->name('evaluaciones.new-evaluacion');

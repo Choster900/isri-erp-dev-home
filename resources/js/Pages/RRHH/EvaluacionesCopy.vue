@@ -50,79 +50,87 @@
                                                                         ${evaluacion.persona.tapellido_persona ? evaluacion.persona.tapellido_persona : ''}` }}
                                 </div>
                             </td>
-
-
-                            <div class="max-h-auto overflow-y-auto scrollbar">
-                                <template v-for="(ren, j) in evaluacion.evaluaciones_personal" :key="j">
-                                    <div class="mb-2 text-start">
-                                        <div class="validaciones_de_arranques" id="tabla-validacion-arranque0">
-                                            <table class="table table-bordered"
-                                                style="font-size: 8px;width: auto !important;padding: 0px !important;margin: 0 auto;text-align: center; margin-top: 10px;">
-                                                <thead>
-                                                    <tr class="*:border">
-                                                        <td colspan="4" class="p-0"
-                                                            style="font-size: 6pt; margin-top: 10px;">
-                                                            <span class="">Detalle Evaluación</span>
-                                                        </td>
-                                                    </tr>
-                                                    <tr class="align-middle *:border *:px-2">
-                                                        <td style="font-size: 6pt;">Periodo</td>
-                                                        <td style="font-size: 6pt;">Tipo</td>
-                                                        <td style="font-size: 6pt;">% Puntuacion</td>
-                                                        <td style="font-size: 6pt;">Estado</td>
-                                                    </tr>
-                                                </thead>
-                                                <tbody class="*:border">
-                                                    <tr class="align-middle *:border  *:px-2">
-                                                        <td style="font-size: 6pt;">1°</td>
-                                                        <td style="font-size: 6pt;">Desempeño</td>
-                                                        <td style="font-size: 6pt;">75</td>
-                                                        <td style="font-size: 6pt;">8</td>
-                                                    </tr>
-                                                    <tr class="align-middle *:border" >
-                                                        <td style="font-size: 6pt;" colspan="4">Desde 12/8/2021 hasta 28/89/2124</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-
-                                        </div>
-
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800 text-center">
+                                    <div class="max-h-[200px] overflow-y-auto scrollbar">
+                                        <template v-for="(ren, j) in evaluacion.evaluaciones_personal" :key="j">
+                                            <div class="mb-2 text-center">
+                                                <p class="text-[10pt]">
+                                                    {{ moment(ren.fecha_reg_evaluacion_personal).format('L') }}
+                                                </p>
+                                            </div>
+                                            <template v-if="j < evaluacion.evaluaciones_personal.length - 1">
+                                                <hr class="my-2 border-t border-gray-300">
+                                            </template>
+                                        </template>
                                     </div>
-                                    <template v-if="j < evaluacion.evaluaciones_personal.length - 1">
-                                        <hr class="my-2 border-t border-gray-300">
-                                    </template>
-                                </template>
-                            </div>
-
-                            <!-- <div class="max-h-[200px] overflow-y-auto scrollbar">
-                                <template v-for="(ren, j) in evaluacion.evaluaciones_personal" :key="j">
-                                    <div class="mb-2 text-start">
-                                        <p class="text-[10pt]">
-                                            <span class="font-medium">DESDE: </span>{{moment(ren.fecha_inicio_evaluacion_personal).format('L') }}
-                                            <span class="font-medium">HASTA: </span>{{ moment(ren.fecha_fin_evaluacion_personal).format('L') }}
-                                        </p>
-                                        <p class="text-[10pt]">
-                                            <span class="font-medium">PERIODO: </span>{{
-                                                ren.periodo_evaluacion.nombre_periodo_evaluacion }}
-                                        </p>
-                                        <p class="text-[10pt]">
-                                            <span class="font-medium">TIPO: </span>{{
-                                                ren.tipo_evaluacion_personal.nombre_tipo_evaluacion_personal }}
-                                        </p>
-                                        <p class="text-[10pt]">
-                                            <span class="font-medium">PUNTUACION: </span>{{ ren.puntaje_evaluacion_personal
-                                            }}
-                                        </p>
-                                        <p class="text-[10pt]">
-                                            <span class="font-medium">OBSERVACIONES: </span>{{
-                                                `${ren.observacion_incidente_personal || 'Sin observaciones'} ` }}
-                                        </p>
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800 text-center">
+                                    <div class="max-h-[200px] overflow-y-auto scrollbar">
+                                        <template v-for="(ren, j) in evaluacion.evaluaciones_personal" :key="j">
+                                            <div class="mb-2 text-center">
+                                                <p class="text-[10pt]">
+                                                    {{ ren.periodo_evaluacion.nombre_periodo_evaluacion }}
+                                                </p>
+                                            </div>
+                                            <template v-if="j < evaluacion.evaluaciones_personal.length - 1">
+                                                <hr class="my-2 border-t border-gray-300">
+                                            </template>
+                                        </template>
                                     </div>
-                                    <template v-if="j < evaluacion.evaluaciones_personal.length - 1">
-                                        <hr class="my-2 border-t border-gray-300">
-                                    </template>
-                                </template>
-                            </div> -->
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800 text-center">
+                                    <div class="max-h-[200px] overflow-y-auto scrollbar">
+                                        <template v-for="(ren, j) in evaluacion.evaluaciones_personal" :key="j">
+                                            <div class="mb-2 text-center">
+                                                <p class="text-[10pt]">
+                                                    {{ ren.tipo_evaluacion_personal.nombre_tipo_evaluacion_personal }}
+                                                </p>
+                                            </div>
+                                            <template v-if="j < evaluacion.evaluaciones_personal.length - 1">
+                                                <hr class="my-2 border-t border-gray-300">
+                                            </template>
+                                        </template>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800 text-center">
+                                    <div class="max-h-[200px] overflow-y-auto scrollbar">
+                                        <template v-for="(ren, j) in evaluacion.evaluaciones_personal" :key="j">
+                                            <div class="mb-2 text-center">
+                                                <p class="text-[10pt]">
+                                                    {{ ren.puntaje_evaluacion_personal }} pts
+                                                </p>
+                                            </div>
+                                            <template v-if="j < evaluacion.evaluaciones_personal.length - 1">
+                                                <hr class="my-2 border-t border-gray-300">
+                                            </template>
+                                        </template>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800 text-center">
+                                    <div class="max-h-[200px] overflow-y-auto scrollbar">
+                                        <template v-for="(ren, j) in evaluacion.evaluaciones_personal" :key="j">
+                                            <div class="mb-2 text-center">
+                                                <p class="text-[10pt]">
+                                                    ID: {{ ren.estado_evaluacion_personal.id_estado_evaluacion_personal }}
+                                                </p>
+                                            </div>
+                                            <template v-if="j < evaluacion.evaluaciones_personal.length - 1">
+                                                <hr class="my-2 border-t border-gray-300">
+                                            </template>
+                                        </template>
+                                    </div>
+                                </div>
+                            </td>
 
 
                             <td class="first:pl-5 last:pr-5">
@@ -150,7 +158,7 @@
                     </tbody>
                     <tbody v-else>
                         <tr>
-                            <td colspan="6" class="text-center">
+                            <td colspan="9" class="text-center">
                                 <img src="../../../img/IsSearching.gif" alt="" class="w-60 h-60 mx-auto">
                                 <h1 class="font-medium text-xl mt-4">Cargando!!!</h1>
                                 <p class="text-sm text-gray-600 mt-2 pb-10">Por favor espera un momento mientras se carga la
@@ -160,7 +168,7 @@
                     </tbody>
                     <tbody v-if="emptyObject && !isLoadinRequest">
                         <tr>
-                            <td colspan="6" class="text-center">
+                            <td colspan="9" class="text-center">
                                 <img src="../../../img/NoData.gif" alt="" class="w-60 h-60 mx-auto">
                                 <h1 class="font-medium text-xl mt-4">No se encontraron resultados!</h1>
                                 <p class="text-sm text-gray-600 mt-2 pb-10">Parece que no hay registros disponibles en este

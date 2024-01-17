@@ -6,25 +6,14 @@ export const useEvaluacion = () => {
     const objectEvaluacionPersonal = ref([]);
     const columns = [
         { width: "10%", label: "ID", name: "id_empleado", type: "text" },
-        {
-            width: "10%",
-            label: "Codigo",
-            name: "codigo_empleado",
-            type: "text",
-        },
+        { width: "10%", label: "Codigo", name: "codigo_empleado", type: "text", },
         { width: "15%", label: "Nombres", name: "collecNombre", type: "text" },
-        {
-            width: "15%",
-            label: "Apellidos",
-            name: "collecApellido",
-            type: "text",
-        },
-        {
-            width: "20%",
-            label: "Detalle de evaluación",
-            name: "detalle_evaluacionda_data",
-            type: "text",
-        },
+        { width: "15%", label: "Apellidos", name: "collecApellido", type: "text", },
+        { width: "20%", label: "Fecha creacion", name: "", type: "date", },
+        { width: "20%", label: "Periodo evaluacion", name: "", type: "text", },
+        { width: "20%", label: "Tipo evaluacion", name: "", type: "text", },
+        { width: "20%", label: "Puntuacion", name: "", type: "text", },
+        { width: "20%", label: "Estado evaluacion", name: "", type: "text", },
         { width: "1%", label: "", name: "Acciones" },
     ];
     const isLoadinRequest = ref(false);
