@@ -3,7 +3,8 @@
         <span v-if="required" class="text-red-600 font-extrabold">*</span></label>
     <vue-date-picker v-model="modelValue" :enable-time-picker="enableTimePicker" :format="format" 
         :no-today="noToday" :placeholder="placeholder" :disabled="disabled" :teleport="teleport"
-        :locale="localeConfig" :day-names="dayNames"  @update:model-value="$emit('update:modelValue', $event)">
+        :locale="localeConfig" :day-names="dayNames"  @update:model-value="$emit('update:modelValue', $event)"
+        :style="hasError ? '--dp-border-color: #F87171;' : ''">
     </vue-date-picker>
 </template>
 
@@ -25,6 +26,10 @@ export default {
         enableTimePicker: {
             type: Boolean,
             default: false,
+        },
+        hasError: {
+            type: Boolean,
+            default: false
         },
         noToday: {
             type: Boolean,

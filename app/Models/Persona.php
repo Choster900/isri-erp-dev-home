@@ -154,5 +154,22 @@ class Persona extends Model
         return $nombreCompleto;
     }
 
-    protected $appends = ['nombre_completo'];
+    public function getNombreApellidoAttribute()
+    {
+        $nombreApellido = $this->pnombre_persona;
+
+        $nombreApellido = $this->snombre_persona ? $nombreApellido . ' '.$this->snombre_persona : $nombreApellido;
+
+        $nombreApellido = $this->tnombre_persona ? $nombreApellido . ' '.$this->tnombre_persona : $nombreApellido;
+
+        $nombreApellido .= ' '.$this->papellido_persona;
+
+        $nombreApellido = $this->sapellido_persona ? $nombreApellido . ' '.$this->sapellido_persona : $nombreApellido;
+
+        $nombreApellido = $this->tapellido_persona ? $nombreApellido . ' '.$this->tapellido_persona : $nombreApellido;
+
+        return $nombreApellido;
+    }
+
+    protected $appends = ['nombre_completo','nombre_apellido'];
 }
