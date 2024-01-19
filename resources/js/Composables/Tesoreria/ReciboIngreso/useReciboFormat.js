@@ -41,13 +41,13 @@ export const useReciboFormat = (context) => {
         let fecha = moment().format('DD-MM-YYYY');
         let name = 'RECIBO ' + receipt_to_print.value.numero_recibo_ingreso + ' - ' + fecha;
         const opt = {
-            margin: 0,
+            //margin: [0.1, 0.1, 0.1, 0.1], //top, left, buttom, right,
             filename: name,
             //pagebreak: {mode:'css',before:'#pagebreak'},
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 3, useCORS: true },
-            //jsPDF: { unit: 'cm', format: [13.95,21.5], orientation: 'landscape' }
-            jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' },
+            jsPDF: { unit: 'cm', format: [13.9,19], orientation: 'landscape' }
+            //jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' },
         };
 
         const limiteCaracteres = 70;

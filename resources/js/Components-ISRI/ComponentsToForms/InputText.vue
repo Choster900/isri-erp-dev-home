@@ -4,7 +4,7 @@
             <span v-if="required" class="text-red-600 font-extrabold">*</span></label>
         <div class="relative">
             <div class="absolute inset-y-0 start-0 flex rounded-l-md items-center px-2 pointer-events-none border-r border-gray-300"
-            :class="addClasses">
+                :class="addClasses">
                 <template v-if="iconName === 'email'">
                     <svg class="w-[22px] h-[22px] p-0.5 dark:text-gray-500" aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 16">
@@ -73,8 +73,8 @@
                     </svg>
                 </template>
                 <template v-else-if="iconName === 'number'">
-                    <svg class="w-4 h-4 dark:text-gray-600" viewBox="0 0 16 16"
-                        xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                    <svg class="w-4 h-4 dark:text-gray-600" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"
+                        fill="currentColor">
                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                         <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
                         <g id="SVGRepo_iconCarrier">
@@ -135,8 +135,10 @@
                     </svg>
                 </template>
             </div>
-            <input :type="type" :id="id" :required="required" :value="modelValue" :placeholder="placeholder" :class="inputClasses"
-                :validation="validation" @input="updateValue($event)" />
+            <input :type="type" :id="id" :required="required" :value="modelValue" :placeholder="placeholder"
+                :class="hasError ? 'bg-red-50 border border-red-400' : 'bg-gray-50 border border-gray-300'" :validation="validation" @input="updateValue($event)"
+                class="text-gray-900 rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full pl-12 font-semibold text-[12px] placeholder-gray-400',
+            'dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 hover:border-gray-400" />
         </div>
     </div>
 </template>
@@ -148,6 +150,10 @@ export default {
         label: {
             type: String,
             default: ''
+        },
+        hasError: {
+            type: Boolean,
+            default: false
         },
         required: {
             type: Boolean,
@@ -223,7 +229,7 @@ export default {
         };
         // Dynamic classes for the input
         const inputClasses = [
-            'bg-gray-50 border border-gray-300 text-gray-900 rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full pl-12 font-semibold text-[12px] placeholder-gray-400',
+            'bg-red-50 border border-red-400 text-gray-900 rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full pl-12 font-semibold text-[12px] placeholder-gray-400',
             'dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
         ];
 

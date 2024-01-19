@@ -155,8 +155,8 @@
                                                     class="relative flex w-full flex-row center-vertically h-1/11">
                                                     <label for=""
                                                         class="font-bold flex items-center text-[10px] w-2/3 mx-4 mt-0">
-                                                        {{ detail.concepto_ingreso.dependencia ?
-                                                            detail.concepto_ingreso.dependencia.codigo_dependencia + ' - ' : ''
+                                                        {{ detail.concepto_ingreso.centro_atencion ?
+                                                            detail.concepto_ingreso.centro_atencion.codigo_centro_atencion + ' - ' : ''
                                                         }}
                                                         {{
                                                             detail.concepto_ingreso.nombre_concepto_ingreso }}

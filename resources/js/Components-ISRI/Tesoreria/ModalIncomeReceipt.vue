@@ -18,21 +18,58 @@
                 </div>
             </div>
         </div>
-        <Modal v-else :show="show_modal_receipt" :modal-title="'Administración de recibos de ingreso. '" maxWidth="3xl"
-            @close="$emit('cerrar-modal')">
-            <div class="px-5 py-4">
-                <div class="space-y-2">
-                    <div class="mb-2" id="app">
-                        <div class="mb-2 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <TextInput id="name-client" v-model="income_receipt.client"
-                                    type="text" placeholder="Nombre o Razón Social"
-                                    @update:modelValue="handleValidation('client', {limit: 145})">
+        <ProcessModal v-else maxWidth='4xl' :show="show_modal_receipt" @close="$emit('cerrar-modal')" :rounded="true">
+            <div class="flex flex-wrap">
+                <!-- Columna con 25% de ancho -->
+                <div class="w-full max-h-full sm:w-[25%] bg-indigo-500 p-4 rounded-lg">
+                    <!-- Paso 1 -->
+                    <div class="flex items-center mb-4 my-5" :class="currentPage == 1 ? '' : 'opacity-70'">
+                        <div class="rounded-full font-bold w-9 h-9 flex items-center justify-center mr-4"
+                            :class="currentPage == 1 ? 'bg-indigo-200 text-black' : 'bg-indigo-500 border border-indigo-200 text-indigo-200'">
+                            1
+                        </div>
+                        <div :class="currentPage == 1 ? 'text-black' : 'text-indigo-200'">
+                            <p class="font-bold text-[12px]">PASO 1</p>
+                            <p class=" font-bold text-sm">INFORMACION</p>
+                        </div>
+                    </div>
+
+                    <!-- Paso 2 -->
+                    <div class="flex items-center my-5" :class="currentPage == 2 ? '' : 'opacity-70'">
+                        <div class="rounded-full font-bold w-9 h-9 flex items-center justify-center mr-4"
+                            :class="currentPage == 2 ? 'bg-indigo-200 text-black' : 'bg-indigo-500 border border-indigo-200 text-indigo-200'">
+                            2
+                        </div>
+                        <div :class="currentPage == 2 ? 'text-black' : 'text-indigo-200'">
+                            <p class="font-bold text-[12px] ">PASO 2</p>
+                            <p class="font-bold text-sm">INGRESOS</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna con 75% de ancho -->
+                <div class="w-full sm:w-[75%] bg-white p-4 h-full">
+                    <div id="page1" v-if="currentPage == 1">
+                        <div class="mb-4 md:flex flex-row justify-between px-2 mt-4">
+                            <div class="md:w-full">
+                                <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
+                                    Información general.
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="mb-2 md:flex flex-row justify-items-start px-2">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-full">
+                                <TextInput id="name-client" v-model="income_receipt.client" type="text"
+                                    placeholder="Nombre o Razón Social"
+                                    @update:modelValue="handleValidation('client', { limit: 145 })">
                                     <LabelToInput icon="standard" forLabel="name-client" />
                                 </TextInput>
-                                <InputError v-for="(item, index) in errors.client" :key="index" class="mt-2"
-                                    :message="item" />
+                                <InputError class="mt-2" :message="errors.client" />
                             </div>
+                        </div>
+
+                        <div class="mb-2 md:flex flex-row justify-items-start px-2">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Especifico <span class="text-red-600 font-extrabold">*</span>
@@ -43,36 +80,9 @@
                                         :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
-                                <InputError v-for="(item, index) in errors.budget_account_id" :key="index" class="mt-2"
-                                    :message="item" />
+                                <InputError class="mt-2" :message="errors.budget_account_id" />
                             </div>
-                        </div>
-                        <div class="mb-2 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                                <label class="block mb-2 text-xs font-light text-gray-600">
-                                    Fuente Financiamiento <span class="text-red-600 font-extrabold">*</span>
-                                </label>
-                                <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
-                                    <Multiselect v-model="income_receipt.financing_source_id" :options="financing_sources"
-                                        :loading="isLoadingFinancingSource" :disabled="isLoadingFinancingSource"
-                                        :placeholder="isLoadingFinancingSource ? 'Cargando' : 'Seleccione Financiamiento'"
-                                        @change="getIncomeConcept($event,income_receipt.budget_account_id)"
-                                        :searchable="true" />
-                                    <LabelToInput icon="list" />
-                                </div>
-                                <InputError v-for="(item, index) in errors.financing_source_id" :key="index" class="mt-2"
-                                    :message="item" />
-                            </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                                <TextInput id="number" v-model="income_receipt.number"
-                                    type="text" placeholder="Numero de recibo"
-                                    @update:modelValue="handleValidation('number', {limit: 8})">
-                                    <LabelToInput icon="standard" forLabel="number" />
-                                </TextInput>
-                                <InputError v-for="(item, index) in errors.number" :key="index" class="mt-2"
-                                    :message="item" />
-                            </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Tesorero, Pagador o Colector <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -81,63 +91,85 @@
                                         placeholder="Seleccione Tesorero" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
-                                <InputError v-for="(item, index) in errors.treasury_clerk_id" :key="index" class="mt-2"
-                                    :message="item" />
+                                <InputError class="mt-2" :message="errors.treasury_clerk_id" />
+                            </div>
+                        </div>
+
+                        <div class="mb-2 md:flex flex-row justify-items-start px-2">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                                <label class="block mb-2 text-xs font-light text-gray-600">
+                                    Fuente Financiamiento <span class="text-red-600 font-extrabold">*</span>
+                                </label>
+                                <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
+                                    <Multiselect v-model="income_receipt.financing_source_id" :options="financing_sources"
+                                        :loading="isLoadingFinancingSource" :disabled="isLoadingFinancingSource"
+                                        :placeholder="isLoadingFinancingSource ? 'Cargando' : 'Seleccione Financiamiento'"
+                                        @change="getIncomeConcept($event, income_receipt.budget_account_id)"
+                                        :searchable="true" />
+                                    <LabelToInput icon="list" />
+                                </div>
+                                <InputError class="mt-2" :message="errors.financing_source_id" />
+                            </div>
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                                <TextInput id="number" v-model="income_receipt.number" type="text"
+                                    placeholder="Numero de recibo"
+                                    @update:modelValue="handleValidation('number', { limit: 8 })">
+                                    <LabelToInput icon="standard" forLabel="number" />
+                                </TextInput>
+                                <InputError
+                                    v-for="(item, index2) in backend_errors.number"
+                                    :key="index2" class="mt-2" :message="item" />
+                                <InputError class="mt-2" :message="errors.number" />
                             </div>
                         </div>
 
                         <div v-if="income_receipt.budget_account_id === 16304"
-                            class="mb-4 md:flex flex-row justify-items-start">
+                            class="mb-4 md:flex flex-row justify-items-start px-2">
                             <div class="mb-4 md:mr-2 md:mb-0 basis-2/3">
-                                <TextInput id="client-direccion" v-model="income_receipt.direction"
-                                    type="text" placeholder="Direccion"
-                                    @update:modelValue="handleValidation('direction', {limit: 250})">
+                                <TextInput id="client-direccion" v-model="income_receipt.direction" type="text"
+                                    placeholder="Direccion"
+                                    @update:modelValue="handleValidation('direction', { limit: 250 })">
                                     <LabelToInput icon="standard" forLabel="client-direccion" />
                                 </TextInput>
-                                <InputError v-for="(item, index) in errors.direction" :key="index" class="mt-2"
-                                    :message="item" />
+                                <InputError class="mt-2" :message="errors.direction" />
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                                <TextInput id="document-client" v-model="income_receipt.document"
-                                    type="text" placeholder="Documento (DUI o NIT)"
-                                    @update:modelValue="handleValidation('document', {limit: 17})">
+                                <TextInput id="document-client" v-model="income_receipt.document" type="text"
+                                    placeholder="Documento (DUI o NIT)"
+                                    @update:modelValue="handleValidation('document', { limit: 17 })">
                                     <LabelToInput icon="standard" forLabel="document-client" />
                                 </TextInput>
-                                <InputError v-for="(item, index) in errors.document" :key="index" class="mt-2"
-                                    :message="item" />
+                                <InputError class="mt-2" :message="errors.document" />
                             </div>
                         </div>
 
-                        <div class="mb-4 md:mr-2 md:mb-0 basis-full" style="border: none; background-color: transparent;">
+                        <div class="mb-4 md:mr-2 md:mb-0 basis-full px-2"
+                            style="border: none; background-color: transparent;">
                             <label class="block mb-2 text-xs font-light text-gray-600" for="descripcion">
                                 Descripcion <span class="text-red-600 font-extrabold">*</span>
                             </label>
                             <textarea v-model="income_receipt.description" id="descripcion" name="descripcion"
-                                class="resize-none w-full h-10 overflow-y-auto peer text-xs font-semibold rounded-r-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
-                                @input="handleValidation('description', {limit: 250})">
+                                class="resize-none w-full h-14 overflow-y-auto peer text-xs font-semibold rounded-r-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
+                                @input="handleValidation('description', { limit: 290 })">
                             </textarea>
-                            <InputError v-for="(item, index) in errors.description" :key="index" class="mt-2"
-                                :message="item" />
+                            <InputError class="mt-2" :message="errors.description" />
                         </div>
+                    </div>
 
-                        <div class="mb-1 mt-0 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <span class="font-semibold text-slate-800 mb-2 text-lg underline underline-offset-2">
+                    <div id="page2" v-if="currentPage == 2">
+                        <div class="mb-4 md:flex flex-row justify-between px-2 mt-4">
+                            <div class="md:w-full">
+                                <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
                                     Detalle del recibo.
-                                </span>
-                            </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2 text-right">
-                                <span class="font-semibold text-slate-800 mb-2 text-lg">
-                                    Total: ${{ calculateTotal }}
                                 </span>
                             </div>
                         </div>
                         <!-- Table -->
-                        <div class="mt-0 pb-6">
+                        <div class="mt-0 pb-2 px-2">
                             <div class="table-header">
-                                <div class="basis-2/3 text-slate-800">Concepto</div>
-                                <div class="basis-1/3 text-slate-800">Monto</div>
-                                <div>
+                                <div class="basis-[65%] text-slate-800">Concepto</div>
+                                <div class="basis-[30%] text-slate-800">Monto</div>
+                                <div class="basis-[5%]">
                                     <button :disabled="active_details.length > 6"
                                         class="text-green-500 hover:text-green-600 rounded-full" @click="addRow()">
                                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -153,32 +185,33 @@
                                 </div>
                             </div>
                             <template v-for="(row, index) in income_receipt.income_detail" :key="index">
-                                <div v-if="row.deleted == false" class="table-row">
-                                    <div class="mb-2 md:mr-2 md:mb-0 basis-2/3">
+                                <div v-if="row.deleted == false" class="table-row hover:bg-gray-200 py-2">
+                                    <div class="md:mr-2 md:mb-0 basis-[65%]">
                                         <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                                             <Multiselect v-model="row.income_concept_id" :loading="isLoadingIncomeConcept"
                                                 :disabled="isLoadingIncomeConcept"
                                                 :placeholder="isLoadingIncomeConcept ? 'Cargando' : 'Seleccione Concepto'"
-                                                :options="filteredOptions" 
-                                                :searchable="true" @open="openOption(row.income_concept_id)" />
+                                                :options="filteredOptions" :searchable="true"
+                                                @open="openOption(row.income_concept_id)" />
                                             <LabelToInput icon="list" />
                                         </div>
                                         <InputError
-                                            v-for="(item, index2) in errors['income_detail.' + index + '.income_concept_id']"
+                                            v-for="(item, index2) in backend_errors['income_detail.' + index + '.income_concept_id']"
                                             :key="index2" class="mt-2" :message="item" />
                                     </div>
 
-                                    <div class="mb-2 md:mr-2 md:mb-0 basis-1/3">
-                                        <TextInput id="detail-amount" v-model="row.amount"
-                                            :label-input="false" type="text" placeholder="Monto"
-                                            @update:modelValue="handleValidation('amount', {limit: 10, amount:true}, index)">
+                                    <div class="md:mr-2 md:mb-0 basis-[30%]">
+                                        <TextInput id="detail-amount" v-model="row.amount" :label-input="false" type="text"
+                                            placeholder="Monto"
+                                            @update:modelValue="handleValidation('amount', { limit: 10, amount: true }, index)">
                                             <LabelToInput icon="money" forLabel="detail-amount" />
                                         </TextInput>
-                                        <InputError v-for="(item, index2) in errors['income_detail.' + index + '.amount']"
+                                        <InputError
+                                            v-for="(item, index2) in backend_errors['income_detail.' + index + '.amount']"
                                             :key="index2" class="mt-2" :message="item" />
                                     </div>
 
-                                    <div>
+                                    <div class="basis-[5%]">
                                         <button @click="deleteRow(index, row.detail_id)"
                                             class="text-red-500 hover:text-red-600 rounded-full">
                                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -194,27 +227,50 @@
                                 </div>
                             </template>
                         </div>
+                        <div class="mb-1 md:flex flex-row justify-items-start px-2">
+                            <div class="mb-4 md:mr-0 md:mb-0 basis-[65%]">
 
-                    </div>
-
-                    <div class="mt-4 mb-4 md:flex flex-row justify-center">
-                        <GeneralButton v-if="incomeReceiptId > 0" @click="updateReciboIngreso(income_receipt)"
-                            color="bg-orange-700  hover:bg-orange-800" text="Actualizar" icon="update" />
-                        <GeneralButton v-else @click="storeReciboIngreso(income_receipt)"
-                            color="bg-green-700  hover:bg-green-800" text="Agregar" icon="add" />
-                        <div class="mb-4 md:mr-2 md:mb-0 px-1">
-                            <GeneralButton text="Cancelar" icon="add" @click="$emit('cerrar-modal')" />
+                            </div>
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-[35%] text-left">
+                                <span class="text-slate-800 mb-2 text-md font-semibold">
+                                    Total: <span class="text-green-500 text-[15px]">${{ calculateTotal
+                                    }}</span>
+                                </span>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- Botones de navegación -->
+                    <div class="flex px-2 mt-6">
+                        <div class="w-1/2">
+                            <button @click="$emit('cerrar-modal')"
+                                class="bg-gray-700 hover:bg-gray-800 text-white font-semibold text-[12px] px-3 py-1.5 rounded mr-1.5">CERRAR</button>
+                        </div>
+                        <div class="w-1/2 flex justify-end">
+                            <button v-if="currentPage == 2" @click="currentPage--"
+                                class="hover:border-blue-700 border border-white bg-white text-[12px] font-semibold text-gray-700 px-4 py-1 rounded mr-1.5">ANTERIOR</button>
+                            <button v-if="currentPage == 1" @click="goToNextPage()"
+                                class="bg-blue-700 hover:bg-blue-900 text-white font-semibold text-[12px] px-3 py-1.5 rounded mr-1.5">SIGUIENTE</button>
+                            <div v-if="currentPage == 2">
+                                <button v-if="incomeReceiptId > 0" @click="updateReciboIngreso(income_receipt)"
+                                    class="bg-orange-700 hover:bg-orange-800 text-white font-semibold text-[12px] px-3 py-1.5 rounded mr-1.5">ACTUALIZAR</button>
+                                <button v-else @click="storeReciboIngreso(income_receipt)"
+                                    class="bg-green-700 hover:bg-green-800 text-white font-semibold text-[12px] px-3 py-1.5 rounded mr-1.5">GUARDAR</button>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
+
             </div>
-        </Modal>
+        </ProcessModal>
     </div>
 </template>
 
 <script>
 import { useReciboIngreso } from '@/Composables/Tesoreria/ReciboIngreso/useReciboIngreso.js';
 import Modal from "@/Components-ISRI/AllModal/Modal.vue";
+import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 import InputError from "@/Components/InputError.vue";
 import GeneralButton from "@/Components-ISRI/ComponentsToForms/GeneralButton.vue";
 import TextInput from "@/Components-ISRI/ComponentsToForms/TextInput.vue";
@@ -227,7 +283,7 @@ import axios from "axios";
 import { useValidateInput } from '@/Composables/General/useValidateInput';
 
 export default {
-    components: { Modal, InputError, GeneralButton, TextInput, LabelToInput },
+    components: { Modal, InputError, GeneralButton, TextInput, LabelToInput, ProcessModal },
     props: {
         incomeReceiptId: {
             type: Number,
@@ -249,17 +305,17 @@ export default {
             financing_sources, treasury_clerk, filteredOptions,
             active_details, calculateTotal,//computed
             getInfoForModalReciboIngreso, storeReciboIngreso, updateReciboIngreso, addRow, deleteRow, openOption,
-            getFinanceSource, getIncomeConcept,
+            getFinanceSource, getIncomeConcept, goToNextPage
         } = useReciboIngreso(context);
 
         const {
             validateInput
         } = useValidateInput()
 
-        const handleValidation = (input, validation,index) => {
-            if(input === 'amount'){
-                income_receipt.value.income_detail[index].amount = validateInput(income_receipt.value.income_detail[index].amount,validation)
-            }else{
+        const handleValidation = (input, validation, index) => {
+            if (input === 'amount') {
+                income_receipt.value.income_detail[index].amount = validateInput(income_receipt.value.income_detail[index].amount, validation)
+            } else {
                 income_receipt.value[input] = validateInput(income_receipt.value[input], validation)
             }
         }
@@ -277,7 +333,7 @@ export default {
             financing_sources, treasury_clerk,
             active_details, calculateTotal, filteredOptions,
             storeReciboIngreso, updateReciboIngreso, addRow, deleteRow,
-            getFinanceSource, openOption, getIncomeConcept, handleValidation,
+            getFinanceSource, openOption, getIncomeConcept, handleValidation, goToNextPage
         }
     }
 };
@@ -293,7 +349,5 @@ export default {
 .table-row {
     display: flex;
     justify-content: space-between;
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
 }
 </style>

@@ -43,15 +43,15 @@
                                 <icon-m :iconName="'personInfoMulti'"></icon-m>
                             </div>
                         </div>
-                        <!-- <InputError v-for="(item, index) in errors.parentId" :key="index" class="mt-2"
-                                :message="item" /> -->
+                        <InputError v-for="(item, index) in errors.personId" :key="index" class="mt-2"
+                                :message="item" />
                     </div>
                     <div class="mb-4 md:mr-0 md:mb-0 basis-1/3">
                         <input-text label="Monto de finiquito" iconName="money" id="amount" v-model="finiquito.amount"
                             :required="true" type="text" placeholder="Monto" :validation="{ limit: 8, amount: true }">
                         </input-text>
-                        <!-- <InputError v-for="(item, index) in errors.amount" :key="index" class="mt-2"
-                                :message="item" /> -->
+                        <InputError v-for="(item, index) in errors.amount" :key="index" class="mt-2"
+                                :message="item" />
                     </div>
                 </div>
                 <div class="mx-4 overflow-x-auto">
@@ -64,34 +64,35 @@
                             <div class="w-[20%] text-center">INTERVALO*</div>
                         </div>
                         <div v-for="(center, index) in finiquito.centros" :key="index"
+                        :class="checkIfHasError(center.id) ? 'bg-red-200 hover:bg-red-300' : ''"
                             class="flex justify-between border-b border-gray-100 text-[14px] px-2 py-2 hover:bg-gray-300">
-                            <div class="w-[20%] text-center break-words overflow-wrap flex items-center justify-center">
+                            <div class="w-[20%] text-center overflow-wrap flex items-center justify-center">
                                 {{
                                     `${center.center + '(' + center.empleados.length + ')'}`
                                 }}
                             </div>
-                            <div class="w-[20%] text-center break-words overflow-wrap flex items-center justify-center">
+                            <div class="w-[20%] text-center overflow-wrap flex items-center justify-center">
                                 <div class="mb-5 md:mr-2 md:mb-0 basis-full justify-start text-left">
                                     <date-time-picker-m v-model="center.date" />
                                     <!-- <InputError v-for="(item, index) in errors.startDate" :key="index" class="mt-2"
                                         :message="item" /> -->
                                 </div>
                             </div>
-                            <div class="w-[20%] text-center break-words overflow-wrap flex items-center justify-center">
+                            <div class="w-[20%] text-center overflow-wrap flex items-center justify-center">
                                 <div class="md:mr-2 md:mb-0 basis-full">
                                     <time-picker-m :height="200" v-model="center.startTime" :placeholder="'Hora inicio'" />
                                     <!-- <InputError v-for="(item, index) in errors.amount" :key="index" class="mt-2"
                                 :message="item" /> -->
                                 </div>
                             </div>
-                            <div class="w-[20%] text-center break-words overflow-wrap flex items-center justify-center">
+                            <div class="w-[20%] text-center overflow-wrap flex items-center justify-center">
                                 <div class="md:mr-2 md:mb-0 basis-full">
                                     <time-picker-m :height="200" v-model="center.endTime" :placeholder="'Hora fin'" />
                                     <!-- <InputError v-for="(item, index) in errors.amount" :key="index" class="mt-2"
                                 :message="item" /> -->
                                 </div>
                             </div>
-                            <div class="w-[20%] text-center break-words overflow-wrap flex items-center justify-center">
+                            <div class="w-[20%] text-center overflow-wrap flex items-center justify-center">
                                 <div class="md:mr-2 md:mb-0 basis-full">
                                     <input-text iconName="number" id="amount" v-model="center.interval" type="text"
                                         placeholder="Minutos" :validation="{ limit: 2, number: true }"
@@ -133,9 +134,10 @@ export default {
     },
     setup(props, context) {
         const {
-            isLoadingRequest, finiquito, personId, amount,
-            isLoadingPerson, persons,
-            getInfoForModalFiniquitos, asyncFindPerson, storeFiniquitos
+            isLoadingRequest, finiquito, 
+            isLoadingPerson, persons, errors,
+            getInfoForModalFiniquitos, asyncFindPerson, storeFiniquitos,
+            checkIfHasError
         } = useFiniquitos(context);
 
         const handleSearchChange = async (query) => {
@@ -151,8 +153,8 @@ export default {
         )
 
         return {
-            isLoadingRequest, finiquito, isLoadingPerson, persons,
-            getInfoForModalFiniquitos, handleSearchChange, storeFiniquitos
+            isLoadingRequest, finiquito, isLoadingPerson, persons, errors,
+            getInfoForModalFiniquitos, handleSearchChange, storeFiniquitos, checkIfHasError
         }
     }
 }
