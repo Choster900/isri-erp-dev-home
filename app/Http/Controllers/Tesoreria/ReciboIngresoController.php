@@ -284,7 +284,7 @@ class ReciboIngresoController extends Controller
     public function getInfoModalReciboIngreso(Request $request, $id)
     {
         $receipt = ReciboIngreso::with([
-            'detalles.concepto_ingreso.dependencia',
+            'detalles.concepto_ingreso.centro_atencion',
             'cuenta_presupuestal',
             'proyecto_financiado',
             'empleado_tesoreria'
@@ -355,7 +355,7 @@ class ReciboIngresoController extends Controller
     public function getInfoModalReciboFormat(Request $request, $id)
     {
         $receipt = ReciboIngreso::with([
-            'detalles.concepto_ingreso.dependencia',
+            'detalles.concepto_ingreso.centro_atencion',
             'cuenta_presupuestal',
             'proyecto_financiado',
             'empleado_tesoreria'
