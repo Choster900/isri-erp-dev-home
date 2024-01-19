@@ -483,7 +483,28 @@ export const useEvaluacion = () => {
     }
 
 
+    const changeStateEvaluation = async (objectInfo) => {
+        try {
+            // Realiza la búsqueda de empleados
+            const response = await axios.post(
+                "/changeStateEvaluation",
+                {
+                    idEvaluation: objectInfo.idEvaluation,
+                    stateToChange: objectInfo.newState,
+                }
+            );
+
+            return response;
+        } catch (error) {
+            // Manejo de errores específicos
+            console.error("Error al cambiar de estado:", error);
+            // Lanza el error para que pueda ser manejado por el componente que utiliza este composable
+            throw new Error("Error al cambiar de estado");
+        }
+    };
+
     return {
+        changeStateEvaluation,
         opcionEmpleado,
         handleEmployeeSearch,
         configSecondInput,

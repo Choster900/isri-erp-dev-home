@@ -7,7 +7,7 @@ import { jsPDF } from "jspdf";
 import html2pdf from 'html2pdf.js'
 </script>
 <template>
-    <div class="w-[18.5] h-[12.5cm] ml-[1.7cm] mr-[1.3cm] mt-[0.80cm] mb-[0.6cm]">
+    <div class="w-[18.5] h-[12.5cm] ml-[1.7cm] mr-[1.3cm] mt-[0.85cm] mb-[0.6cm]">
         <!-- Contenido para la sección superior aquí -->
         <div class="h-[2.7cm] invisible">
             <div class="flex justify-between items-center">

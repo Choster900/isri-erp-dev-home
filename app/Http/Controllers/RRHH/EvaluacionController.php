@@ -85,9 +85,10 @@ class EvaluacionController extends Controller
             "evaluaciones_personal.plaza_evaluada.plaza_asignada.dependencia.jefatura.empleado.plazas_asignadas.dependencia",
             "evaluaciones_personal.evaluacion_rendimiento",
             "evaluaciones_personal.tipo_evaluacion_personal",
+            "evaluaciones_personal.estado_evaluacion_personal",
             "evaluaciones_personal.periodo_evaluacion",
             "evaluaciones_personal" => function ($query) use ($idDependencies) {
-                $query->whereIn("id_estado_evaluacion_personal", !empty($idDependencies) ? [1, 5, 6, 8] : [1, 4, 7, 8])
+                $query->whereIn("id_estado_evaluacion_personal", !empty($idDependencies) ? [1, 5, 6] : [1, 4, 7])
                     ->orderBy("fecha_reg_evaluacion_personal", "asc");
                 return $query;
             },
@@ -521,6 +522,7 @@ class EvaluacionController extends Controller
                 "evaluaciones_personal.evaluacion_rendimiento",
                 "evaluaciones_personal.tipo_evaluacion_personal",
                 "evaluaciones_personal.periodo_evaluacion",
+                "evaluaciones_personal.estado_evaluacion_personal",
                 "evaluaciones_personal" => function ($query) {
                     return $query->orderBy("fecha_reg_evaluacion_personal", "asc");
                 },
