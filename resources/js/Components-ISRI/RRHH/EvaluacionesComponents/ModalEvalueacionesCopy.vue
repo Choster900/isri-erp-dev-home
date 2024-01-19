@@ -218,7 +218,7 @@
                     <div
                         class="h-[300px] overflow-y-auto col-span-full xl:col-span-6 bg-white shadow-lg  border border-slate-300">
                         <div class="p-3">
-                            <div class="max-h-[300px] ">
+                            <div class="max-h-[5000px] ">
                                 <article class="pt-4 border-b border-slate-200"
                                     v-for="(año, i) in evaluacionesAgrupadasPorAño" :key="i">
 
@@ -252,7 +252,7 @@
 
                                                     </li>
                                                     <p class="font-medium text-xs">{{
-                                                        evaluacion.puntaje_evaluacion_personal }}</p>
+                                                        evaluacion.puntaje_evaluacion_personal }} pts</p>
                                                     <li
                                                         class="relative text-xs text-slate-500 before:w-[10px] before:h-[10px] before:border-[3px] before:border-indigo-500 before:rounded-full before:absolute before:-left-4 before:top-1">
                                                         Fecha Evaluado</li>
@@ -294,17 +294,8 @@
                                                         }}
                                                     </p>
                                                 </ul>
-                                                <button v-if="evaluacion.id_estado_evaluacion_personal == 1"
-                                                    title="Envía la evaluación para que el empleado la revise y acepte o rechace"
-                                                    class="w-full bg-white text-gray-800 font-medium  border-y-2 border-green-500 hover:border-green-600 hover:bg-green-500 hover:text-white shadow-md py-1 px-6 inline-flex items-center justify-center gap-3">
-                                                    <span class="text-sm text-center font-semibold">Enviar para revisión
-                                                       </span>
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                                        viewBox="0 0 24 24">
-                                                        <path fill="currentcolor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z">
-                                                        </path>
-                                                    </svg>
-                                                </button>
+                                                <!-- {{ evaluacion.estado_evaluacion_personal.id_estado_evaluacion_personal }} -->
+                                                <ButtonsStatesEvaluation :data="evaluacion" @changeState="changeState" />
                                             </div>
                                         </div>
                                     </div>
@@ -429,6 +420,7 @@ import { useEvaluacion } from '@/Composables/RRHH/Evaluaciones/useEvaluacion';
 import { useDocumentoEvaluacion } from '@/Composables/RRHH/Evaluaciones/useDocumentoEvaluacion';
 import DocAnalisisDes from './DocAnalisisDes.vue';
 import DropDownOptions from '@/Components-ISRI/DropDownOptions.vue';
+import ButtonsStatesEvaluation from './ButtonsStatesEvaluation.vue';
 export default {
     components: {
         Modal,
@@ -440,7 +432,8 @@ export default {
         DocumentoEvaluacionCopy,
         ModalMorenThanOneTipo,
         DocAnalisisDes,
-        DropDownOptions
+        DropDownOptions,
+        ButtonsStatesEvaluation
     },
     emit: ["cerrar-modal", "actualizar-datatable"],
     props: {
@@ -464,6 +457,7 @@ export default {
             idEmpleado, errorsData,
             messageAlert, handleAccept,
             handleCancel, plazaOptions, headerOptions,
+            changeStateEvaluation,
             handleTagToSelect, evaluationsOptions,
             objectEvaluaciones, fechaInicioFechafin,
             showPlazasModal, existMoreThanOne, clearLock,
@@ -530,9 +524,93 @@ export default {
             }
         };
 
+
+        const changeState = async (e) => {
+
+            const confirmed = await Swal.fire({
+                title: '<p class="text-[16pt] text-center">¿Esta seguro de dmkasdkasj?</p>',
+                icon: "question",
+                iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
+                confirmButtonText: "Si, Agregar",
+                confirmButtonColor: "#001b47",
+                cancelButtonText: "Cancelar",
+                showCancelButton: true,
+                showCloseButton: true,
+            });
+            if (confirmed.isConfirmed) {
+
+
+                if (e.newState == 7) {
+
+                    Swal.fire({
+                        title: '<p class="text-lg font-semibold text-center">Proporciona Justificación de Desaprobación</p>',
+                        input: "text",
+                        inputAttributes: {
+                            autocapitalize: 'on',
+                            class: 'w-full p-3 border border-gray-300 rounded-md',
+                            placeholder: 'Escribe aquí...',
+                            rows: 5,
+                        },
+                        showCancelButton: true,
+                        confirmButtonText: "Enviar justificación",
+                        showLoaderOnConfirm: true,
+                        inputValidator: (value) => {
+                            return new Promise((resolve) => {
+                                if (value.trim()) {
+                                    resolve();
+                                } else {
+                                    resolve('La justificación no puede estar vacía');
+                                }
+                            });
+                        },
+                        preConfirm: async (text) => {
+                            try {
+                                const response = await axios.post(
+                                    "/addJustificationRejection",
+                                    {
+                                        idEvaluation: e.idEvaluation,
+                                        textRejection: text,
+                                    }
+                                );
+
+                                return response;
+                            } catch (error) {
+                                Swal.showValidationMessage(`Request failed: ${error}`);
+                            }
+                        },
+                        allowOutsideClick: () => !Swal.isLoading()
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+
+                             executeRequest(
+                                changeStateEvaluation(e),
+                                "Cambiado"
+                            );
+                            Swal.fire({
+                                title: 'Justificación Aceptada',
+                                text: `Tu justificación: ${result.value}`,
+                                icon: 'success',
+                            });
+                        }
+                    });
+                } else {
+
+                    await executeRequest(
+                        changeStateEvaluation(e),
+                        "Cambiado"
+                    );
+                    emit("actualizar-datatable")
+
+                }
+
+            }
+
+        }
+
         return {
             moment,
             errorsData,
+            changeState,
             objectPlazas,
             plazaOptions,
             opcionEmpleado,

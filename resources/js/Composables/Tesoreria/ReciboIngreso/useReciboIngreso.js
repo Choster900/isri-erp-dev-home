@@ -250,7 +250,10 @@ export const useReciboIngreso = (context) => {
                 useShowToast(toast.error, err.response.data.logical_error);
             } else {
                 useShowToast(toast.warning, "Tienes algunos errores, por favor verifica los datos enviados.");
-                errors.value = err.response.data.errors;
+                backend_errors.value = err.response.data.errors;
+                if(backend_errors.value.number){
+                    currentPage.value = 1
+                }
             }
         } else {
             showErrorMessage(err);
@@ -263,6 +266,65 @@ export const useReciboIngreso = (context) => {
         context.emit("cerrar-modal")
         context.emit("get-table")
     }
+
+    const goToNextPage = () => {
+        const fieldMappings = {
+            financing_source_id: 'Fuente de financiamiento',
+            number: 'Numero de recibo',
+            client: 'Nombre o Razon social',
+            budget_account_id: 'Especifico',
+            treasury_clerk_id: 'Tesorero, pagador o colector',
+            description: 'Descripcion',
+            direction: 'Direccion',
+            document: 'Documento (DUI o NIT)'
+        };
+
+        if (currentPage.value === 1) {
+            let requiredFields = []
+            if (income_receipt.value.budget_account_id === 16304) {
+                requiredFields = [
+                    'financing_source_id',
+                    'number',
+                    'client',
+                    'budget_account_id',
+                    'treasury_clerk_id',
+                    'description',
+                    'direction',
+                    'document'
+                ];
+            } else {
+                requiredFields = [
+                    'financing_source_id',
+                    'number',
+                    'client',
+                    'budget_account_id',
+                    'treasury_clerk_id',
+                    'description',
+                ];
+            }
+
+            let page_with_errors = '';
+
+            requiredFields.forEach(field => {
+                if (income_receipt.value[field]) {
+                    errors.value[field] = '';
+                } else {
+                    errors.value[field] = `El campo ${fieldMappings[field]} es obligatorio.`;
+                }
+            });
+            if (Object.values(errors.value).some(error => error !== '')) {
+                page_with_errors = 1;
+            }
+        }
+
+        const err = Object.values(errors.value);
+        if (err.every(error => error === '')) {
+            currentPage.value++;
+        } else {
+            useShowToast(toast.warning, "Tienes algunos errores, por favor verifica los datos enviados.");
+        }
+    }
+
 
     const showErrorMessage = (err) => {
         const { title, text, icon } = useHandleError(err);
@@ -277,7 +339,7 @@ export const useReciboIngreso = (context) => {
         budget_accounts, income_concept_select, financing_sources, treasury_clerk,
         active_details, calculateTotal, filteredOptions,//computed
         getInfoForModalReciboIngreso, storeReciboIngreso, updateReciboIngreso, addRow, deleteRow, openOption,
-        getFinanceSource, getIncomeConcept,
+        getFinanceSource, getIncomeConcept, goToNextPage
     }
 }
 
