@@ -73,31 +73,31 @@ class ReciboIngresoController extends Controller
 
     public function changeStateIncomeReceipt(Request $request)
     {
-        $recibo_ingreso = ReciboIngreso::find($request->income_receipt_id);
+        $recibo_ingreso = ReciboIngreso::find($request->id);
         if ($recibo_ingreso->estado_recibo_ingreso == 1) {
-            if ($request->income_receipt_state == 1) {
+            if ($request->status == 1) {
                 $recibo_ingreso->update([
                     'estado_recibo_ingreso' => 0,
                     'fecha_mod_recibo_ingreso' => Carbon::now(),
                     'usuario_recibo_ingreso' => $request->user()->nick_usuario,
                     'ip_recibo_ingreso' => $request->ip(),
                 ]);
-                return ['mensaje' => 'Recibo de ingreso ' . $recibo_ingreso->numero_recibo_ingreso . ' ha sido desactivado con exito'];
+                return ['message' => 'Recibo de ingreso ' . $recibo_ingreso->numero_recibo_ingreso . ' ha sido desactivado con exito'];
             } else {
-                return ['mensaje' => 'El recibo de ingreso seleccionado ya ha sido activado por otro usuario'];
+                return ['message' => 'El recibo de ingreso seleccionado ya ha sido activado por otro usuario'];
             }
         } else {
             if ($recibo_ingreso->estado_concepto_ingreso == 0) {
-                if ($request->income_receipt_state == 0) {
+                if ($request->status == 0) {
                     $recibo_ingreso->update([
                         'estado_recibo_ingreso' => 1,
                         'fecha_mod_recibo_ingreso' => Carbon::now(),
                         'usuario_recibo_ingreso' => $request->user()->nick_usuario,
                         'ip_recibo_ingreso' => $request->ip(),
                     ]);
-                    return ['mensaje' => 'Recibo de ingreso ' . $recibo_ingreso->numero_recibo_ingreso . ' ha sido activado con exito'];
+                    return ['message' => 'Recibo de ingreso ' . $recibo_ingreso->numero_recibo_ingreso . ' ha sido activado con exito'];
                 } else {
-                    return ['mensaje' => 'El recibo de ingreso seleccionado ya ha sido desactivado por otro usuario'];
+                    return ['message' => 'El recibo de ingreso seleccionado ya ha sido desactivado por otro usuario'];
                 }
             }
         }
