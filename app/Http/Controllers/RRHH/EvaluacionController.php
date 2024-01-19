@@ -218,7 +218,6 @@ class EvaluacionController extends Controller
                     "MATCH ( pnombre_persona, snombre_persona, tnombre_persona, papellido_persona, sapellido_persona, tapellido_persona ) AGAINST ( '" . $request->nombre . "')"
                 );
             })
-            ->whereDoesntHave('empleado.evaluaciones_personal')
             ->get();
 
         $mergedResults = collect($personasJefeByDependencia)->merge($results)->unique('id_persona');

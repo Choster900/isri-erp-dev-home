@@ -1,8 +1,8 @@
 <script setup>
 import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
-import HojaServiciosSidebarVue from "@/Components-ISRI/RRHH/HojaServiciosSidebar.vue";
-import HojaServiciosBodyVue from "@/Components-ISRI/RRHH/HojaServiciosBody.vue";
+import HojaServiciosSidebarVue from "@/Components-ISRI/RRHH/ArchivosInstitucionalesComponents/HojaServiciosSidebar.vue";
+import HojaServiciosBodyVue from "@/Components-ISRI/RRHH/ArchivosInstitucionalesComponents/HojaServiciosBody.vue";
 </script>
 
 <template>
