@@ -1,14 +1,10 @@
 <script setup>
-import { toast } from 'vue3-toastify';
-import 'vue3-toastify/dist/index.css';
 import moment from 'moment';
-import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
-import { jsPDF } from "jspdf";
-import html2pdf from 'html2pdf.js'
 </script>
 <template>
-    <div class="w-[18.5] h-[12.5cm] ml-[1.7cm] mr-[1.3cm] mt-[0.85cm] mb-[0.6cm]">
+    <div class="w-[18.5cm] h-[13.9cm] ml-[0.6cm]">
         <!-- Contenido para la sección superior aquí -->
+        <div class="h-[0.8cm]"></div>
         <div class="h-[2.7cm] invisible">
             <div class="flex justify-between items-center">
                 <!-- Encabezado izquierdo  -->
@@ -16,8 +12,8 @@ import html2pdf from 'html2pdf.js'
                     <img src="../../../img/escudo-nacional.png" alt="Escudo El Salvador"
                         class="w-[50px] h-[50px] object-contain">
                     <div class="text-center">
-                        <div class="text-[11px] font-bold ml-0 mr-5 text-left">REPUBLICA DE EL SALVADOR</div>
-                        <div class="text-[11px] font-bold ml-0 mr-5 text-left">MINISTERIO DE SALUD</div>
+                        <div class="text-[11px] font-bold ml-0  text-left">REPUBLICA DE EL SALVADOR</div>
+                        <div class="text-[11px] font-bold ml-0 text-left">MINISTERIO DE SALUD</div>
                     </div>
                 </div>
                 <!-- Encabezado centrado  -->
@@ -28,7 +24,7 @@ import html2pdf from 'html2pdf.js'
                 <!-- Encabezado derecho -->
                 <div class="flex-none w-[33.33%] flex flex-col justify-center items-center">
                     <img src="../../../img/isri-logo2.png" alt="Logo ISRI" class="w-[50px] h-[50px] object-contain ">
-                    <div class="text-center text-[11px] font-bold ml-5 mr-0" style="text-align: center;">INSTITUTO
+                    <div class="text-center text-[11px] font-bold ml-0 mr-0" style="text-align: center;">INSTITUTO
                         SALVADOREÑO DE
                         REHABILITACION INTEGRAL</div>
                 </div>
@@ -51,32 +47,32 @@ import html2pdf from 'html2pdf.js'
                             REHABILITACION DE INVALIDOS</label>
                     </div>
                 </div>
-                <div class="flex w-[8cm] text-left">
+                <div class="flex w-[8cm] text-left ">
                     <div class="relative flex w-full flex-row">
                         <label for="" class="w-[3.5cm] flex items-center text-[10px] invisible">3) LUGAR Y FECHA </label>
-                        <div class="w-[4.5cm] ml-1 text-center  text-[10px] font-bold">
-                            <p class="mb-[5px]"> {{ ciudad + ' ' + fecha_recibo }}</p>
+                        <div class="w-[4.5cm] ml-0 text-center  text-[10px] font-bold">
+                            <p class="mb-0"> {{ ciudad + ' ' + fecha_recibo }}</p>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="h-[0.4cm] flex w-full justify-between items-center"></div>
+            <div class="h-[0.2cm] flex w-full justify-between items-center"></div>
 
-            <div class="h-[8.5cm] flex justify-between items-center w-full">
+            <div class="h-[8.7cm] flex justify-between items-center w-full">
                 <table class="h-full table-auto w-full">
                     <tbody class="h-full w-full">
-                        <tr class="h-[1.85cm] w-full">
+                        <tr class="h-[1.85cm] w-full ">
                             <td class="h-full w-full " colspan="2">
                                 <!-- First row, first container -->
                                 <div class="flex w-full h-[0.45cm] justify-between items-center">
                                     <div class="h-full flex w-full text-left">
                                         <div class="h-full relative flex w-full flex-row">
                                             <label for=""
-                                                class="h-full flex w-[4cm] items-center text-[10px] mb-0.3 mt-[-2px] invisible">4)
+                                                class="invisible h-full flex w-[4.5cm] items-center text-[10px] mb-0 mt-0">4)
                                                 Nombre o
                                                 Razón Social</label>
-                                            <div class="h-full ml-1 text-left w-[14.5cm] text-[10px] font-bold">
-                                                <p class="ml-4">{{ receipt_to_print.cliente_recibo_ingreso
+                                            <div class="h-full ml-0 text-left w-[14.0cm] text-[10px] font-bold ">
+                                                <p class="ml-0">{{ receipt_to_print.cliente_recibo_ingreso
                                                 }}</p>
                                             </div>
                                         </div>
@@ -88,21 +84,21 @@ import html2pdf from 'html2pdf.js'
                                         <div class="flex w-[4.5cm] text-left">
                                             <div class="relative flex w-full flex-row">
                                                 <label for=""
-                                                    class="w-[1.1cm] flex items-center text-[10px] mb-0.3 mt-[-2px] invisible">5)
+                                                    class="invisible w-[1.1cm] flex items-center text-[10px] mb-0 mt-0">5)
                                                     Por</label>
                                                 <div class="text-center w-[3.4cm]  text-[10px] font-bold">
-                                                    <p class="ml-4">{{ formatedAmount }}</p>
+                                                    <p class="ml-0">{{ formatedAmount }}</p>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="relative flex w-[14cm] flex-row">
                                             <label for=""
-                                                class="w-[2.8cm] flex items-center text-[10px] mb-0.3 mt-[-2px] invisible">6)
+                                                class="invisible w-[3.1cm] flex items-center text-[10px] mb-0 mt-0">6)
                                                 Total
                                                 en
                                                 Letras</label>
-                                            <div class="text-left w-[11.2cm] text-[9px] font-bold">
-                                                <p class="ml-4">{{ letras1 }}</p>
+                                            <div class="text-left w-[10.9cm] text-[9px] font-bold">
+                                                <p class="ml-0">{{ letras1 }}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -111,7 +107,7 @@ import html2pdf from 'html2pdf.js'
                                     <div class="h-full flex w-full text-left">
                                         <div class="h-full relative flex w-full flex-row">
                                             <div class="text-left w-full  text-[9px] font-bold">
-                                                <p class="ml-4">{{ letras2 ? letras2: '' }}</p>
+                                                <p class="ml-0">{{ letras2 ? letras2 : '' }}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -121,17 +117,17 @@ import html2pdf from 'html2pdf.js'
                             </td>
                         </tr>
                         <tr class="h-[0.60cm] invisible">
-                            <td class="text-center w-1/2 border border-black border-t-0 border-r-0 ">
-                                <h2 class="text-[10px] mb-0.5 mt-[-5px]">CARGO EN CAJA</h2>
+                            <td class="text-center w-[9.1cm] border border-black border-t-0 border-r-0 ">
+                                <h2 class="text-[10px] mb-0 mt-0">CARGO EN CAJA</h2>
                             </td>
-                            <td class="text-center w-1/2 border border-black border-t-0">
-                                <h2 class="text-[10px] mb-0.5 mt-[-5px]">CONCEPTO O MANDAMIENTO DE INGRESO</h2>
+                            <td class="text-center w-[9.4cm] border border-black border-t-0">
+                                <h2 class="text-[10px] mb-0 mt-0">CONCEPTO O MANDAMIENTO DE INGRESO</h2>
                             </td>
                         </tr>
                         <tr class="h-[5.2cm]">
-                            <td class="h-full justify-center items-start ">
-                                <div class="h-full flex flex-col">
-                                    <div class="flex justify-center items-start mb-2 h-[4cm]">
+                            <td class="h-full w-[9.1cm] justify-center items-start">
+                                <div class="h-full flex flex-col ">
+                                    <div class="flex justify-center items-start mb-0 h-[4cm]">
                                         <div class="flex w-full text-left mx-4 mt-0">
                                             <div class="font-bold flex items-center text-[10px]">
                                                 {{ receipt_to_print.descripcion_recibo_ingreso }}
@@ -139,15 +135,15 @@ import html2pdf from 'html2pdf.js'
                                         </div>
                                     </div>
 
-                                    <div class="flex justify-center items-start mb-2 h-[1.2cm]">
+                                    <div class="flex justify-center items-start mb-0 h-[1.2cm]">
                                         <div class="w-full flex flex-col h-full">
                                             <div class="w-max-full flex justify-center mx-4 h-[0.5cm]">
-                                                <div class="ml-1 text-center w-full text-[9px] font-bold">
-                                                    <p class="ml-1 mb-0.3 mt-[-2px]">{{ empleado }}</p>
+                                                <div class="ml-0 text-center w-full text-[9px] font-bold">
+                                                    <p class="ml-0 mb-0 mt-0">{{ empleado }}</p>
                                                 </div>
                                             </div>
                                             <div
-                                                class="flex w-max-full justify-center mx-4 h-[0.7cm] border-t border-black border-solid invisible">
+                                                class="invisible flex w-max-full justify-center mx-4 h-[0.7cm] border-t border-black border-solid">
                                                 <p class="w-max-full flex items-center text-[11px]">Tesorero,
                                                     Pagador o Colector</p>
                                             </div>
@@ -155,7 +151,7 @@ import html2pdf from 'html2pdf.js'
                                     </div>
                                 </div>
                             </td>
-                            <td class="h-full ">
+                            <td class="h-full w-[9.4cm]">
                                 <div class="h-full flex flex-col">
                                     <div class="flex justify-center items-start h-[0.7cm]">
                                         <div class="font-bold flex w-full text-left text-[9px] mx-4 mt-0">
@@ -166,11 +162,11 @@ import html2pdf from 'html2pdf.js'
                                     <div class="flex justify-center items-start h-[4.5cm]">
                                         <div class="w-full flex flex-col h-full">
                                             <div v-for="(detail, index) in receipt_to_print.detalles" :key="index"
-                                                class="relative flex w-full h-[0.5cm] flex-row center-vertically mt-1">
+                                                class="relative flex w-full h-[0.5cm] flex-row center-vertically mt-0">
                                                 <div class="font-bold flex items-center text-[9px] w-2/3 mx-4">
                                                     <label class="">
-                                                        {{ detail.concepto_ingreso.dependencia ?
-                                                            detail.concepto_ingreso.dependencia.codigo_dependencia + ' - ' : ''
+                                                        {{ detail.concepto_ingreso.centro_atencion ?
+                                                            detail.concepto_ingreso.centro_atencion.codigo_centro_atencion + ' - ' : ''
                                                         }}
                                                         {{
                                                             detail.concepto_ingreso.nombre_concepto_ingreso }}
@@ -206,22 +202,20 @@ import html2pdf from 'html2pdf.js'
                             </td>
                         </tr>
                         <tr class="h-[0.8cm] w-full invisible">
-                            <td class="h-full w-full border-t-0 border-r-0 border border-black">
+                            <td class="h-full w-[9.1cm]  border-t-0 border-r-0 border border-black">
                             </td>
-                            <td class="h-full w-full border-t-0 border border-black">
+                            <td class="h-full w-[9.4cm]  border-t-0 border border-black">
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
+        <div class="h-[0.6cm]"></div>
     </div>
 </template>
 
 <script>
-import IncomeReceiptPDF from '@/pdf/Tesoreria/IncomeReceiptPDF.vue';
-import ReciboIngresoMatricialVue from '@/pdf/Tesoreria/ReciboIngresoMatricial.vue';
-import { createApp, h } from 'vue'
 export default {
     props: {
         view_receipt: {
@@ -252,7 +246,7 @@ export default {
             type: String,
             default: '',
         },
-        letras2:{
+        letras2: {
             type: String,
             default: '',
         }

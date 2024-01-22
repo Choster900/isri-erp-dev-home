@@ -1,10 +1,10 @@
 <script setup>
-import TooltipVue from '../Tooltip.vue';
+import TooltipVue from '../../Tooltip.vue';
 import moment from 'moment';
 import ListAcuerdosVue from './ListAcuerdos.vue';
 </script>
 <template>
-    <div v-show="showAcuerdos">
+    <div >
         <!-- Calendario de contribuciones -->
         <div class="p-2 bg-slate-50 rounded-lg border border-slate-200">
             <div class="flex  justify-center">
@@ -97,10 +97,7 @@ import ListAcuerdosVue from './ListAcuerdos.vue';
 <script>
 export default {
     props: {
-        showAcuerdos: {
-            type: Boolean,
-            default: false,
-        },
+
         deals: {
             type: Object,
             default: [],
@@ -113,7 +110,7 @@ export default {
             monthName: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
             year: '',
             listYears: [],
-            objectToShowDeals: [],//data para imprimr 
+            objectToShowDeals: [],//data para imprimr
             currentDealIndex: null,
             dataFiltered: [],
             isFiltering: false,
@@ -169,7 +166,7 @@ export default {
     },
     methods: {
         newFilter(filterFromHere) {
-            // Pasamos esta data a true 
+            // Pasamos esta data a true
             this.isFiltering = true;
             // Almacenamos la fecha de filtrado
             this.filterDate = filterFromHere

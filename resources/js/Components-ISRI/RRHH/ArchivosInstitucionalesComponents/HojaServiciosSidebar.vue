@@ -24,7 +24,7 @@
                 </form>
                 <!-- Team members -->
                 <div class="mt-4">
-                   
+
                     <div class="pt-2" v-if="isLoading">
                         <LoaderBar></LoaderBar>
                         <div class="text-center">
@@ -69,9 +69,9 @@
         </div>
     </div>
 </template>
-  
+
 <script>
-import LoaderBar from '../LoaderBar.vue';
+import LoaderBar from '@/Components-ISRI/LoaderBar.vue';
 export default {
     props: ['isProfileSelected'],
     components: { LoaderBar },
