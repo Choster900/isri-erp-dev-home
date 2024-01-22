@@ -136,9 +136,9 @@
                 </template>
             </div>
             <input :type="type" :id="id" :required="required" :value="modelValue" :placeholder="placeholder"
-                :class="hasError ? 'bg-red-50 border border-red-400' : 'bg-gray-50 border border-gray-300'" :validation="validation" @input="updateValue($event)"
+                :class="hasError ? 'border border-red-400' : 'bg-gray-50 border border-gray-300'" :validation="validation" @input="updateValue($event)"
                 class="text-gray-900 rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full pl-12 font-semibold text-[12px] placeholder-gray-400',
-            'dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 hover:border-gray-400" />
+            'dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 hover:border-gray-400 transition duration-300 ease-in-out" />
         </div>
     </div>
 </template>

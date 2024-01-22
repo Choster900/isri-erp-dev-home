@@ -103,23 +103,6 @@ class ReciboIngresoController extends Controller
         }
     }
 
-    public function getModalReceiptSelects(Request $request)
-    {
-        $budget_accounts = CuentaPresupuestal::selectRaw("id_ccta_presupuestal as value , concat(id_ccta_presupuestal, ' - ', nombre_ccta_presupuestal) as label")
-            ->where('tesoreria_ccta_presupuestal', '=', 1)
-            ->where('estado_ccta_presupuestal', '=', 1)
-            ->whereHas('conceptos_ingreso', function ($query) use ($request) {
-                $query->where('estado_concepto_ingreso', 1);
-            })
-            ->orderBy('nombre_ccta_presupuestal')
-            ->get();
-        $treasury_clerk = DB::table('empleado_tesoreria')
-            ->select('id_empleado_tesoreria as value', 'nombre_empleado_tesoreria as label')
-            ->get();
-
-        return ['budget_accounts' => $budget_accounts, 'treasury_clerk' => $treasury_clerk];
-    }
-
     public function getSelectFinancingSource(Request $request)
     {
         $financing_sources = ProyectoFinanciado::selectRaw('id_proy_financiado as value, nombre_proy_financiado as label')
