@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Juridico;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Juridico\AllFiniquitosRequest;
 use App\Models\EjercicioFiscal;
 use App\Models\Empleado;
 use App\Models\FiniquitoLaboral;
@@ -53,7 +54,7 @@ class FiniquitoController extends Controller
                     ->where('id_estado_empleado', 1)
                     //I'm testing just with one center
                     ->whereHas('plazas_asignadas.centro_atencion', function ($query) {
-                        $query->where('id_centro_atencion', 10);
+                        $query->whereIn('id_centro_atencion', [9,10]);
                     });
                 //->where('id_empleado', '>', 935);
 
@@ -99,14 +100,14 @@ class FiniquitoController extends Controller
         );
     }
 
-    public function storeFiniquitos(Request $request)
+    public function storeFiniquitos(AllFiniquitosRequest $request)
     {
         // Obtener los centros y sus horarios desde la vista
         $centros = $request->centers;
 
         // Arreglo para almacenar los horarios ocupados por cada fecha
         $horariosOcupados = [];
-        $centrosConConflictos = []; // Arreglo para almacenar los IDs de centros con conflictos
+        $conflictoConHorario = []; // Arreglo para almacenar los IDs de centros con conflictos
         $conflictoConEspacio = [];
 
         foreach ($centros as $centro) {
@@ -119,14 +120,14 @@ class FiniquitoController extends Controller
                 $fecha = date('d/m/Y', strtotime($centro['date']));
 
                 // Construir la cadena de tiempo para la hora de inicio
-                $horaInicio = sprintf('%02d', $centro['startTime']['hours']) . ':' . sprintf('%02d', $centro['startTime']['minutes']) . ':' . sprintf('%02d', $centro['startTime']['seconds']);
+                //$horaInicio = sprintf('%02d', $centro['startTime']['hours']) . ':' . sprintf('%02d', $centro['startTime']['minutes']) . ':' . sprintf('%02d', $centro['startTime']['seconds']);
 
                 // Construir la cadena de tiempo para la hora de fin
-                $horaFin = sprintf('%02d', $centro['endTime']['hours']) . ':' . sprintf('%02d', $centro['endTime']['minutes']) . ':' . sprintf('%02d', $centro['endTime']['seconds']);
+                //$horaFin = sprintf('%02d', $centro['endTime']['hours']) . ':' . sprintf('%02d', $centro['endTime']['minutes']) . ':' . sprintf('%02d', $centro['endTime']['seconds']);
 
                 //Calculamos el tiempo disponible en minutos
-                $hora1 = Carbon::createFromFormat('H:i:s', $horaInicio);
-                $hora2 = Carbon::createFromFormat('H:i:s', $horaFin);
+                $hora1 = Carbon::createFromFormat('H:i:s', $centro['startTime']);
+                $hora2 = Carbon::createFromFormat('H:i:s', $centro['endTime']);
                 $minutosDisp = $hora2->diffInMinutes($hora1);
 
                 if (($intervalo * $totalEmpleados) > $minutosDisp) { //Verificamos si hay tiempo suficiente
@@ -139,8 +140,8 @@ class FiniquitoController extends Controller
                     $conflicto = false;
                     foreach ($horariosOcupados[$fecha] as $horario) {
                         // Verificar si la hora de inicio o fin caen dentro del rango ocupado
-                        if (($horaInicio >= $horario['horaInicio'] && $horaInicio <= $horario['horaFin']) ||
-                            ($horaFin >= $horario['horaInicio'] && $horaFin <= $horario['horaFin'])
+                        if (($centro['startTime'] >= $horario['horaInicio'] && $centro['startTime'] <= $horario['horaFin']) ||
+                            ($centro['endTime'] >= $horario['horaInicio'] && $centro['endTime'] <= $horario['horaFin'])
                         ) {
                             $conflicto = true;
                             break; // Hay conflicto, salir del bucle
@@ -148,34 +149,34 @@ class FiniquitoController extends Controller
                     }
 
                     if ($conflicto) {
-                        // Agregar el ID del centro con conflicto al arreglo de centrosConConflictos
-                        $centrosConConflictos[] = $id;
+                        // Agregar el ID del centro con conflicto al arreglo de conflictoConHorario
+                        $conflictoConHorario[] = $id;
                     } else {
                         // No hay conflicto, agregar estos horarios a la lista de ocupados
                         $horariosOcupados[$fecha][] = [
-                            'horaInicio' => $horaInicio,
-                            'horaFin' => $horaFin,
+                            'horaInicio' => $centro['startTime'],
+                            'horaFin' => $centro['endTime'],
                         ];
                     }
                 } else {
                     // Si la fecha no está registrada, agregar estos horarios a la lista de ocupados
                     $horariosOcupados[$fecha][] = [
-                        'horaInicio' => $horaInicio,
-                        'horaFin' => $horaFin,
+                        'horaInicio' => $centro['startTime'],
+                        'horaFin' => $centro['endTime'],
                     ];
                 }
             }
         }
 
-        if (count($centrosConConflictos) > 0) {
+        if (count($conflictoConHorario) > 0) {
             return response()->json([
                 'logical_error' => 'Existe conflicto en los horarios seleccionados.',
-                'centrosConConflicto' => $centrosConConflictos
+                'conflictoConHorario' => $conflictoConHorario
             ], 422);
         } else if (count($conflictoConEspacio) > 0) {
             return response()->json([
                 'logical_error' => 'El rango de tiempo seleccionado no es suficiente para cubrir todos los empleados, cambie sus parametros de intervalo, hora inicio y hora fin e intente nuevamente.',
-                'conflictoEspacio' => $conflictoConEspacio
+                'conflictoConEspacio' => $conflictoConEspacio
             ], 422);
         } else {
             $year = Carbon::now()->year;
@@ -185,8 +186,8 @@ class FiniquitoController extends Controller
                 foreach ($centros as $center) {
                     $fecha = date('Y/m/d', strtotime($center['date']));
                     $intervalo = $center['interval'];
-                    $horaFirma = sprintf('%02d', $center['startTime']['hours']) . ':' . sprintf('%02d', $centro['startTime']['minutes']) . ':' . sprintf('%02d', $centro['startTime']['seconds']);
-                    $horaFormat = Carbon::createFromFormat('H:i:s', $horaFirma);
+                    //$horaFirma = sprintf('%02d', $center['startTime']['hours']) . ':' . sprintf('%02d', $centro['startTime']['minutes']) . ':' . sprintf('%02d', $centro['startTime']['seconds']);
+                    $horaFormat = Carbon::createFromFormat('H:i:s', $center['startTime']);
 
                     foreach ($center['empleados'] as $indice => $empleado) {
                         if ($indice == 0) {

@@ -348,7 +348,19 @@
                                             Desempeño</span>
                                     </a>
                                 </li>
-
+                                <li
+                                    class="pb-3 mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8">
+                                    <a :class="headerOptions === 'RadarChartStackedEvaluation' ? 'text-indigo-500' : 'text-slate-500 hover:text-slate-600'"
+                                        class="  whitespace-nowrap flex items-center cursor-pointer">
+                                        <svg class="w-4 h-4 shrink-0 fill-current  mr-2"
+                                            :class="headerOptions === 'RadarChartStackedEvaluation' ? 'text-indigo-500' : 'text-slate-500 hover:text-slate-600'"
+                                            viewBox=" 0 0 16 16">
+                                            <path
+                                                d="M14.3.3c.4-.4 1-.4 1.4 0 .4.4.4 1 0 1.4l-8 8c-.2.2-.4.3-.7.3-.3 0-.5-.1-.7-.3-.4-.4-.4-1 0-1.4l8-8zM15 7c.6 0 1 .4 1 1 0 4.4-3.6 8-8 8s-8-3.6-8-8 3.6-8 8-8c.6 0 1 .4 1 1s-.4 1-1 1C4.7 2 2 4.7 2 8s2.7 6 6 6 6-2.7 6-6c0-.6.4-1 1-1z" />
+                                        </svg>
+                                        <span @click="headerOptions = 'RadarChartStackedEvaluation'">Analisis total</span>
+                                    </a>
+                                </li>
                             </ul>
                         </div>
 
@@ -366,6 +378,11 @@
                         :evaluacionPersonalProp="evaluacionToPassDocumento"
                         :rubricaAndCategoriaByEvaluacion="rubricaAndCategoriaByEvaluacion"
                         @actualizar-datatable="$emit('actualizar-datatable')" />
+
+                    <RadarChartStackedEvaluation :class="headerOptions === 'RadarChartStackedEvaluation' ? '' : 'hidden'"
+                        :isLoadingObtenerCategoriaYRubrica="isLoadingObtenerCategoriaYRubrica"
+                        :evaluacionPersonalProp="evaluacionToPassDocumento"
+                        :rubricaAndCategoriaByEvaluacion="rubricaAndCategoriaByEvaluacion" />
                 </div>
 
 
@@ -421,6 +438,7 @@ import { useDocumentoEvaluacion } from '@/Composables/RRHH/Evaluaciones/useDocum
 import DocAnalisisDes from './DocAnalisisDes.vue';
 import DropDownOptions from '@/Components-ISRI/DropDownOptions.vue';
 import ButtonsStatesEvaluation from './ButtonsStatesEvaluation.vue';
+import RadarChartStackedEvaluation from './RadarChartStackedEvaluation.vue';
 export default {
     components: {
         Modal,
@@ -433,7 +451,8 @@ export default {
         ModalMorenThanOneTipo,
         DocAnalisisDes,
         DropDownOptions,
-        ButtonsStatesEvaluation
+        ButtonsStatesEvaluation,
+        RadarChartStackedEvaluation
     },
     emit: ["cerrar-modal", "actualizar-datatable"],
     props: {
@@ -582,7 +601,7 @@ export default {
                     }).then((result) => {
                         if (result.isConfirmed) {
 
-                             executeRequest(
+                            executeRequest(
                                 changeStateEvaluation(e),
                                 "Cambiado"
                             );

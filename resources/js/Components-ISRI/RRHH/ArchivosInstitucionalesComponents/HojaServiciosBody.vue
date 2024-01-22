@@ -11,7 +11,8 @@ import html2pdf from 'html2pdf.js'
 
         <!-- Profile background -->
         <div class="relative h-60">
-            <img class="object-cover h-full w-full " src="../../../img/banerHojaDeServicio.jpg" alt="Profile background" />
+            <img class="object-cover h-full w-full " src="../../../../img/banerHojaDeServicio.jpg"
+                alt="Profile background" />
             <!-- Close button -->
             <button class="md:hidden absolute top-4 left-4 sm:left-6 text-white opacity-80 hover:opacity-100"
                 @click.stop="$emit('toggle-profilesidebar')" aria-controls="profile-sidebar"
@@ -157,30 +158,42 @@ import html2pdf from 'html2pdf.js'
                 <ul class="relative text-sm font-medium flex flex-nowrap -mx-4 sm:-mx-6 lg:-mx-8">
                     <li class="mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8">
                         <a class="block pb-3 cursor-pointer  whitespace-nowrap "
-                            @click="isSelected.showInformation = true; isSelected.showAcuerdos = false"
-                            :class="isSelected.showInformation ? 'border-b-2 text-indigo-500 border-indigo-500' : 'text-slate-500'">General</a>
+                            @click="showingSections = 'GeneralInformationVue';"
+                            :class="showingSections == 'GeneralInformationVue' ? 'border-b-2 text-indigo-500 border-indigo-500' : 'text-slate-500'">General</a>
                     </li>
                     <li class="mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8">
                         <a class="block pb-3 cursor-pointer hover:text-slate-600 whitespace-nowrap"
-                            @click="isSelected.showAcuerdos = true; isSelected.showInformation = false"
-                            :class="isSelected.showAcuerdos ? 'border-b-2 text-indigo-500 border-indigo-500' : 'text-slate-500'">Acuerdos</a>
+                            @click="showingSections = 'FooterServiciosBodyVue';"
+                            :class="showingSections == 'FooterServiciosBodyVue' ? 'border-b-2 text-indigo-500 border-indigo-500' : 'text-slate-500'">Acuerdos</a>
+                    </li>
+                    <li class="mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8">
+                        <a class="block pb-3 cursor-pointer hover:text-slate-600 whitespace-nowrap"
+                            @click="showingSections = 'FooterEvaluationsVue';"
+                            :class="showingSections == 'FooterEvaluationsVue' ? 'border-b-2 text-indigo-500 border-indigo-500' : 'text-slate-500'">Evaluaciones</a>
                     </li>
                 </ul>
             </div>
             <!--  {{ pruebaDeOtroPdf() }} -->
             <!-- GENERAL -->
-            <GeneralInformationVue :showInformation="isSelected.showInformation"
+            <GeneralInformationVue :class="showingSections == 'GeneralInformationVue' ? '' : 'hidden'"
                 :moreInformacionEmployee="userData != '' ? userData : ''" />
-            <FooterServiciosBodyVue :showAcuerdos="isSelected.showAcuerdos"
+
+            <FooterServiciosBodyVue :class="showingSections == 'FooterServiciosBodyVue' ? '' : 'hidden'"
                 :deals="userData != '' ? userData.empleado.acuerdo_laboral : []" />
+
+            <FooterEvaluationsVue :class="showingSections == 'FooterEvaluationsVue' ? '' : 'hidden'"
+                :userData="userData != '' ? userData.empleado.evaluaciones_personal : []" />
         </div>
     </div>
 </template>
-  
+
 <script>
 import { toast } from 'vue3-toastify';
 import { createApp, h } from 'vue'
 import HojaServiciosPdfVue from '@/pdf/RRHH/HojaServiciosPdfCopy.vue';
+import ListEvaluationsVue from './ListEvaluations.vue';
+import FooterEvaluationsVue from './FooterEvaluations.vue';
+
 export default {
     props: {
         userData: {
@@ -191,10 +204,9 @@ export default {
     },
     data() {
         return {
-            isSelected: {
-                showInformation: false,
-                showAcuerdos: true,
-            }
+
+            showingSections: 'FooterEvaluationsVue',
+
         }
     },
     methods: {

@@ -11,9 +11,15 @@ export const useFiniquitos = (context) => {
     const isLoadingRequest = ref(false);
     const errors = ref([]);
     const empleados = ref([])
-    const finiquito = ref([])
+    const finiquito = ref({
+        personId: '',
+        amount: 0,
+        centros: []
+    })
     const persons = ref([]);
     const isLoadingPerson = ref(false);
+    const conflictoConHorario = ref([])
+    const conflictoConEspacio = ref([])
 
     const getInfoForModalFiniquitos = async () => {
         try {
@@ -39,10 +45,6 @@ export const useFiniquitos = (context) => {
     };
 
     const setModalValues = (empleados) => {
-        finiquito.value.personId = ""
-        finiquito.value.amount = 0
-        finiquito.value.centros = []
-
         empleados.forEach((empleado) => {
             const idCentro = empleado.plazas_asignadas[0].centro_atencion.id_centro_atencion;
             // Buscar el índice del centro correspondiente en 'centros'
@@ -90,7 +92,7 @@ export const useFiniquitos = (context) => {
             title: "¿Está seguro de generar el finiquito para todos los empleados?",
             icon: "question",
             iconHtml: "❓",
-            confirmButtonText: "Si, Guardar",
+            confirmButtonText: "Si, generar",
             confirmButtonColor: "#115E59",
             cancelButtonText: "Cancelar",
             showCancelButton: true,
@@ -125,21 +127,43 @@ export const useFiniquitos = (context) => {
     const handleErrorResponse = (err) => {
         if (err.response.status === 422) {
             if (err.response.data.logical_error) {
-                console.log(err.response);
+                conflictoConEspacio.value = err.response.data.conflictoConEspacio ?? []
+                conflictoConHorario.value = err.response.data.conflictoConHorario ?? []
                 useShowToast(toast.error, err.response.data.logical_error);
-
             } else {
                 useShowToast(
                     toast.warning,
                     "Tienes algunos errores, por favor verifica los datos enviados."
                 );
                 errors.value = err.response.data.errors;
+                console.log(err.response.data);
             }
         } else {
             showErrorMessage(err);
             context.emit("cerrar-modal")
         }
     };
+
+    const checkIfHasError = (idCentro) => {
+        let err = false
+
+        if (conflictoConHorario.value.length > 0) {
+            conflictoConHorario.value.forEach((value, index) => {
+                if (value === idCentro) {
+                    err = true;
+                }
+            });
+        }
+        else {
+            conflictoConEspacio.value.forEach((value, index) => {
+                if (value === idCentro) {
+                    err = true;
+                }
+            });
+        }
+
+        return err
+    }
 
     const handleSuccessResponse = (response) => {
         useShowToast(
@@ -157,6 +181,7 @@ export const useFiniquitos = (context) => {
 
     return {
         isLoadingRequest, finiquito, empleados, isLoadingPerson, persons,
-        getInfoForModalFiniquitos, asyncFindPerson, storeFiniquitos,
+        conflictoConHorario, conflictoConEspacio, errors,
+        getInfoForModalFiniquitos, asyncFindPerson, storeFiniquitos, checkIfHasError,
     };
 };

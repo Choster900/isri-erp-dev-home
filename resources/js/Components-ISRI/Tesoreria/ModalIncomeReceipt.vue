@@ -149,8 +149,8 @@
                                 Descripcion <span class="text-red-600 font-extrabold">*</span>
                             </label>
                             <textarea v-model="income_receipt.description" id="descripcion" name="descripcion"
-                                class="resize-none w-full h-10 overflow-y-auto peer text-xs font-semibold rounded-r-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
-                                @input="handleValidation('description', { limit: 250 })">
+                                class="resize-none w-full h-14 overflow-y-auto peer text-xs font-semibold rounded-r-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
+                                @input="handleValidation('description', { limit: 290 })">
                             </textarea>
                             <InputError class="mt-2" :message="errors.description" />
                         </div>
@@ -248,7 +248,7 @@
                         </div>
                         <div class="w-1/2 flex justify-end">
                             <button v-if="currentPage == 2" @click="currentPage--"
-                                class="hover:border-blue-700 border border-white bg-white text-[12px] font-semibold text-gray-700 px-4 py-1 rounded mr-1.5">ATRAS</button>
+                                class="hover:border-blue-700 border border-white bg-white text-[12px] font-semibold text-gray-700 px-4 py-1 rounded mr-1.5">ANTERIOR</button>
                             <button v-if="currentPage == 1" @click="goToNextPage()"
                                 class="bg-blue-700 hover:bg-blue-900 text-white font-semibold text-[12px] px-3 py-1.5 rounded mr-1.5">SIGUIENTE</button>
                             <div v-if="currentPage == 2">

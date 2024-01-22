@@ -3,7 +3,7 @@ import moment from 'moment';
 import AccordionBasicVue from '@/Components-ISRI/AccordionBasic.vue';
 </script>
 <template>
-    <div class="flex flex-col xl:flex-row xl:space-x-16" v-show="showInformation">
+    <div class="flex flex-col xl:flex-row xl:space-x-16" >
         <div class="space-y-4 mb-8 xl:mb-0">
             <div>
                 <div class="flex flex-col md:flex-row  md:space-y-0">
@@ -13,7 +13,7 @@ import AccordionBasicVue from '@/Components-ISRI/AccordionBasic.vue';
                                 <div class="bg-white p-4 border border-slate-200 rounded-sm shadow-sm">
                                     <ul class="space-y-3">
                                         <!-- Item -->
-                                        <li class="sm:flex sm:items-center sm:justify-between" v-for="job,i in moreInformacionEmployee.empleado.plazas_asignadas" :key="i"> 
+                                        <li class="sm:flex sm:items-center sm:justify-between" v-for="job,i in moreInformacionEmployee.empleado.plazas_asignadas" :key="i">
                                             <div class="sm:grow flex items-center text-sm">
                                                 <!-- Icon -->
                                                 <lord-icon src="https://cdn.lordicon.com/twprnhsj.json" trigger="hover"
@@ -29,7 +29,7 @@ import AccordionBasicVue from '@/Components-ISRI/AccordionBasic.vue';
                                                         <div>{{ moment(job.fecha_plaza_asignada, 'YYYY-MM-DD').format('MMMM D, YYYY') }} - {{  job.fecha_mod_plaza_asignada ? moment(job.fecha_mod_plaza_asignada, 'YYYY-MM-DD').format('MMMM D, YYYY') : 'Ahora'}}</div>
                                                     </div>
                                                 </div>
-                                            </div>  
+                                            </div>
                                             <!-- Tags -->
                                             <div class="sm:ml-2 mt-2 sm:mt-0">
                                                 <ul class="flex flex-wrap sm:justify-end -m-1">
@@ -43,7 +43,7 @@ import AccordionBasicVue from '@/Components-ISRI/AccordionBasic.vue';
                                                     <!--     <DropDownOptions position="right-up">
                                                             <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                                                 <div class="font-semibold text-xs">
-                                                                    
+
                                                                     Lorem ipsum dolor, sit amet consectetur adipisicing elit. Molestias perspiciatis dolores consequatur aliquam distinctio. Vitae, magni dicta! Nostrum fuga aut, libero, alias architecto commodi nam iusto sunt perspiciatis qui ex.
                                                                 </div>
                                                             </div>
@@ -96,10 +96,6 @@ import AccordionBasicVue from '@/Components-ISRI/AccordionBasic.vue';
 <script>
 export default {
     props: {
-        showInformation: {
-            type: Boolean,
-            default: false,
-        },
         moreInformacionEmployee: {
             type: Object,
             default: [],

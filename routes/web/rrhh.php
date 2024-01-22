@@ -91,11 +91,11 @@ Route::group(['middleware' => ['auth', 'access']], function () {
 
 
     Route::get(
-        '/rrhh/hoja-servicios',
+        '/rrhh/archivos-institucionales',
         function (Request $request) {
-            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/hoja-servicios', 'RRHH/HojaServicios');
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/archivos-institucionales', 'RRHH/ArchivosInstitucionales');
         }
-    )->name('rrhh.hoja-servicios');
+    )->name('rrhh.archivos-institucionales');
     Route::post('search-employees', [HojaServicioController::class, 'getEmployees'])->name('empleado.SearchEmployees');
 
     Route::get(
@@ -262,4 +262,14 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get('get-info-for-reports', [ReporteRRHHController::class, 'getInfoForReports'])->name('reporteRRHH.getInfoForReports');
     Route::post('get-report-employees-rrhh', [ReporteRRHHController::class, 'getReportEmployeesRRHH'])->name('reporteRRHH.getReportEmployeesRRHH');
     Route::post('create-excel-employees', [ReporteRRHHController::class, 'createExcelEmployees'])->name('reporteRRHH.createExcelEmployees');
+
+
+    Route::get(
+        '/rrhh/hoja-laboral',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/hoja-laboral', 'RRHH/HojaLaboral');
+        }
+    )->name('rrhh.hoja-laboral');
+    Route::post('get-my-own-information', [HojaServicioController::class, 'getMyOwnInformation'])->name('reporteRRHH.getMyOwnInformation');
+
 });
