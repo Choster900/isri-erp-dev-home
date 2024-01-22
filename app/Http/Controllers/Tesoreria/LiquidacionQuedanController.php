@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\tesoreria;
+namespace App\Http\Controllers\Tesoreria;
 
 use App\Http\Controllers\Controller;
 use App\Models\Quedan;
