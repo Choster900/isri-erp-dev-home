@@ -20,7 +20,7 @@
         <ProcessModal v-else maxWidth='4xl' :show="showModalSettlement" @close="$emit('cerrar-modal')">
             <div class="justify-end flex mx-4 mt-4">
                 <button @click="storeFiniquitos(finiquito)"
-                class="bg-cyan-600 hover:bg-cyan-800 text-white text-[14px] font-semiBold py-2 px-3 rounded-md">
+                    class="bg-cyan-600 hover:bg-cyan-800 text-white text-[14px] font-semiBold py-2 px-3 rounded-md">
                     PROGRAMAR FINIQUITOS
                 </button>
             </div>
@@ -31,27 +31,24 @@
                             Encargado<span class="text-red-600 font-extrabold">*</span>
                         </label>
                         <div class="relative font-semibold flex h-10 w-full flex-row-reverse">
-                            <Multiselect placeholder="Escriba para buscar persona" v-model="finiquito.personId" :options="persons"
-                                :searchable="true" :loading="isLoadingPerson" :internal-search="false"
+                            <Multiselect placeholder="Escriba para buscar persona" v-model="finiquito.personId"
+                                :options="persons" :searchable="true" :loading="isLoadingPerson" :internal-search="false"
                                 @search-change="handleSearchChange" :clear-on-search="true"
-                                :noResultsText="'Sin resultados'" :noOptionsText="'Sin resultados'"
-                                :classes="{
+                                :noResultsText="'Sin resultados'" :noOptionsText="'Sin resultados'" :classes="{
                                     optionSelected: 'text-white bg-teal-800',
-                                    optionSelectedPointed: 'text-white bg-teal-800 opacity-90',}" 
-                                />
+                                    optionSelectedPointed: 'text-white bg-teal-800 opacity-90',
+                                }" />
                             <div class="flex items-center px-2 pointer-events-none border rounded-l-md border-gray-300">
                                 <icon-m :iconName="'personInfoMulti'"></icon-m>
                             </div>
                         </div>
-                        <InputError v-for="(item, index) in errors.personId" :key="index" class="mt-2"
-                                :message="item" />
+                        <InputError v-for="(item, index) in errors.personId" :key="index" class="mt-2" :message="item" />
                     </div>
                     <div class="mb-4 md:mr-0 md:mb-0 basis-1/3">
                         <input-text label="Monto de finiquito" iconName="money" id="amount" v-model="finiquito.amount"
                             :required="true" type="text" placeholder="Monto" :validation="{ limit: 8, amount: true }">
                         </input-text>
-                        <InputError v-for="(item, index) in errors.amount" :key="index" class="mt-2"
-                                :message="item" />
+                        <InputError v-for="(item, index) in errors.amount" :key="index" class="mt-2" :message="item" />
                     </div>
                 </div>
                 <div class="mx-4 overflow-x-auto">
@@ -64,8 +61,8 @@
                             <div class="w-[20%] text-center">INTERVALO*</div>
                         </div>
                         <div v-for="(center, index) in finiquito.centros" :key="index"
-                        :class="checkIfHasError(center.id) ? 'bg-red-200 hover:bg-red-300' : ''"
-                            class="flex justify-between border-b border-gray-100 text-[14px] px-2 py-2 hover:bg-gray-300">
+                            :class="checkIfHasError(center.id) ? 'bg-red-200 hover:bg-red-300' : ''"
+                            class="table-row border-b border-gray-100 text-[14px] px-2 py-2 hover:bg-gray-300">
                             <div class="w-[20%] text-center overflow-wrap flex items-center justify-center">
                                 {{
                                     `${center.center + '(' + center.empleados.length + ')'}`
@@ -73,33 +70,35 @@
                             </div>
                             <div class="w-[20%] text-center overflow-wrap flex items-center justify-center">
                                 <div class="mb-5 md:mr-2 md:mb-0 basis-full justify-start text-left">
-                                    <date-time-picker-m v-model="center.date" />
-                                    <!-- <InputError v-for="(item, index) in errors.startDate" :key="index" class="mt-2"
-                                        :message="item" /> -->
+                                    <date-time-picker-m v-model="center.date" :hasError="errors['centers.' + index + '.date'] ? true:false" />
+                                    <InputError v-for="(item, index2) in errors['centers.' + index + '.date']" :key="index2"
+                                        class="mt-2 h-[32px]" :message="item" />
                                 </div>
                             </div>
                             <div class="w-[20%] text-center overflow-wrap flex items-center justify-center">
                                 <div class="md:mr-2 md:mb-0 basis-full">
-                                    <time-picker-m :height="200" v-model="center.startTime" :placeholder="'Hora inicio'" />
-                                    <!-- <InputError v-for="(item, index) in errors.amount" :key="index" class="mt-2"
-                                :message="item" /> -->
+                                    <time-picker-m :height="200" v-model="center.startTime" :placeholder="'Hora inicio'" 
+                                    :hasError="errors['centers.' + index + '.startTime'] ? true:false"/>
+                                    <InputError v-for="(item, index2) in errors['centers.' + index + '.startTime']" :key="index2"
+                                        class="mt-2 h-[32px]" :message="item" />
                                 </div>
                             </div>
                             <div class="w-[20%] text-center overflow-wrap flex items-center justify-center">
                                 <div class="md:mr-2 md:mb-0 basis-full">
-                                    <time-picker-m :height="200" v-model="center.endTime" :placeholder="'Hora fin'" />
-                                    <!-- <InputError v-for="(item, index) in errors.amount" :key="index" class="mt-2"
-                                :message="item" /> -->
+                                    <time-picker-m :height="200" v-model="center.endTime" :placeholder="'Hora fin'" 
+                                    :hasError="errors['centers.' + index + '.endTime'] ? true:false"/>
+                                    <InputError v-for="(item, index2) in errors['centers.' + index + '.endTime']" :key="index2"
+                                        class="mt-2 h-[32px]" :message="item" />
                                 </div>
                             </div>
                             <div class="w-[20%] text-center overflow-wrap flex items-center justify-center">
                                 <div class="md:mr-2 md:mb-0 basis-full">
                                     <input-text iconName="number" id="amount" v-model="center.interval" type="text"
                                         placeholder="Minutos" :validation="{ limit: 2, number: true }"
-                                        :addClasses="'text-gray-500'">
+                                        :addClasses="'text-gray-500'" :hasError="errors['centers.' + index + '.interval'] ? true : false">
                                     </input-text>
-                                    <!-- <InputError v-for="(item, index) in errors.amount" :key="index" class="mt-2"
-                                :message="item" /> -->
+                                    <InputError v-for="(item, index2) in errors['centers.' + index + '.interval']" :key="index2"
+                                        class="mt-2 h-[32px]" :message="item" />
                                 </div>
                             </div>
                         </div>
@@ -134,7 +133,7 @@ export default {
     },
     setup(props, context) {
         const {
-            isLoadingRequest, finiquito, 
+            isLoadingRequest, finiquito,
             isLoadingPerson, persons, errors,
             getInfoForModalFiniquitos, asyncFindPerson, storeFiniquitos,
             checkIfHasError
@@ -161,8 +160,8 @@ export default {
 </script>
 
 <style>
-/* .multiselect-option.is-selected {
-    background: var(--ms-option-bg-selected, #81146a);
-    color: var(--ms-option-color-selected, #fff);
-} */
+.table-row {
+    display: flex;
+    justify-content: space-between;
+}
 </style>

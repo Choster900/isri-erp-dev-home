@@ -45,15 +45,11 @@ class AllFiniquitosRequest extends FormRequest
             'amount.required' => 'El monto del finiquito es obligatorio.',
             'personId.required' => 'Debe seleccionar el notario a cargo.',
 
-            'centers.*.date.required' => 'La fecha es obligatoria para todos los centros.',
-            //'centers.*.date.date' => 'La fecha debe ser un formato válido.',
-            'centers.*.startTime.required' => 'La hora de inicio es obligatoria para todos los centros.',
-            //'centers.*.startTime.date_format' => 'La hora de inicio debe tener el formato H:i.',
-            'centers.*.endTime.required' => 'La hora de fin es obligatoria para todos los centros.',
-            //'centers.*.endTime.date_format' => 'La hora de fin debe tener el formato H:i.',
-            'centers.*.endTime.after' => 'La hora de fin debe ser posterior a la hora de inicio.',
-            'centers.*.interval.required' => 'El intervalo es obligatorio para todos los centros.',
-            //'centers.*.interval.integer' => 'El intervalo debe ser un número entero.',
+            'centers.*.date.required' => 'La fecha es obligatoria.',
+            'centers.*.startTime.required' => 'La hora de inicio es obligatoria.',
+            'centers.*.endTime.required' => 'La hora de fin es obligatoria.',
+            'centers.*.endTime.after' => 'La hora fin debe ser mayor a la hora de inicio.',
+            'centers.*.interval.required' => 'El intervalo es obligatorio.',
             'centers.*.interval.min' => 'El intervalo debe ser al menos 1.',
         ];
     }
@@ -75,12 +71,13 @@ class AllFiniquitosRequest extends FormRequest
     {
         $hours = $time['hours'] ?? "";
         $minutes = $time['minutes'] ?? "";
+        $seconds = $time['seconds'] ?? "";
 
         $formattedTime = "";
 
-        if ($hours != "" && $minutes != "") {
+        if ($hours != "" && $minutes != "" && $seconds != "") {
             // Aquí realizas el formateo del objeto de tiempo
-            $formattedTime = sprintf('%02d:%02d', $hours, $minutes);
+            $formattedTime = sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
         }
 
         return $formattedTime;

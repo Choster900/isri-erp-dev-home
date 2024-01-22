@@ -54,7 +54,8 @@ class FiniquitoController extends Controller
                     ->where('id_estado_empleado', 1)
                     //I'm testing just with one center
                     ->whereHas('plazas_asignadas.centro_atencion', function ($query) {
-                        $query->whereIn('id_centro_atencion', [9,10]);
+                        //$query->whereIn('id_centro_atencion', [9,10]);
+                        $query->where('id_centro_atencion', 10);
                     });
                 //->where('id_empleado', '>', 935);
 
@@ -119,12 +120,6 @@ class FiniquitoController extends Controller
                 $id = $centro['id'];
                 $fecha = date('d/m/Y', strtotime($centro['date']));
 
-                // Construir la cadena de tiempo para la hora de inicio
-                //$horaInicio = sprintf('%02d', $centro['startTime']['hours']) . ':' . sprintf('%02d', $centro['startTime']['minutes']) . ':' . sprintf('%02d', $centro['startTime']['seconds']);
-
-                // Construir la cadena de tiempo para la hora de fin
-                //$horaFin = sprintf('%02d', $centro['endTime']['hours']) . ':' . sprintf('%02d', $centro['endTime']['minutes']) . ':' . sprintf('%02d', $centro['endTime']['seconds']);
-
                 //Calculamos el tiempo disponible en minutos
                 $hora1 = Carbon::createFromFormat('H:i:s', $centro['startTime']);
                 $hora2 = Carbon::createFromFormat('H:i:s', $centro['endTime']);
@@ -186,7 +181,6 @@ class FiniquitoController extends Controller
                 foreach ($centros as $center) {
                     $fecha = date('Y/m/d', strtotime($center['date']));
                     $intervalo = $center['interval'];
-                    //$horaFirma = sprintf('%02d', $center['startTime']['hours']) . ':' . sprintf('%02d', $centro['startTime']['minutes']) . ':' . sprintf('%02d', $centro['startTime']['seconds']);
                     $horaFormat = Carbon::createFromFormat('H:i:s', $center['startTime']);
 
                     foreach ($center['empleados'] as $indice => $empleado) {
@@ -222,6 +216,20 @@ class FiniquitoController extends Controller
                     'error' => $th->getMessage(),
                 ], 422);
             }
+        }
+    }
+
+    public function getInforModalFiniquitoEmp(Request $request, $id)
+    {
+        $finiquitoEmp = FiniquitoLaboral::with('empleado.persona')->find($id);
+        if ($finiquitoEmp) {
+            return response()->json([
+                'finiquitoEmp'                   => $finiquitoEmp ?? []
+            ]);
+        } else {
+            return response()->json([
+                'logical_error' => 'No existe el finiquito que estas intentando modificar.',
+            ], 422);
         }
     }
 }

@@ -90,8 +90,10 @@
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="space-x-1 text-center">
-                                    <!-- <DropDownOptions>
-                                        <div @click="showModalSettlement = true; settlementId = ejercicio_fiscal.id_ejercicio_fiscal" v-if="permits.actualizar == 1" class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
+                                    <DropDownOptions>
+                                        <div @click="showModalSettlementEmp = true; finiquitoId = finiquito.id_finiquito_laboral"
+                                            v-if="permits.actualizar == 1"
+                                            class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-orange-800 w-[22px] h-[22px] mr-2">
                                                 <span class="text-xs ">
                                                     <icon-m :iconName="'editM'"></icon-m>
@@ -99,7 +101,7 @@
                                             </div>
                                             <div class="font-semibold">Editar</div>
                                         </div>
-                                    </DropDownOptions> -->
+                                    </DropDownOptions>
                                 </div>
                             </td>
                         </tr>
@@ -168,6 +170,10 @@
         <modal-finiquitos-vue v-if="showModalSettlement" :showModalSettlement="showModalSettlement"
             @cerrar-modal="showModalSettlement = false" @get-table="getDataToShow(tableData.currentPage)" />
 
+        <modal-finiquito-emp-vue v-if="showModalSettlementEmp" :showModalSettlementEmp="showModalSettlementEmp"
+            :finiquitoId="finiquitoId" @cerrar-modal="showModalSettlementEmp = false"
+            @get-table="getDataToShow(tableData.currentPage)" />
+
     </AppLayoutVue>
 </template>
 
@@ -176,6 +182,7 @@ import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import ModalFiniquitosVue from '@/Components-ISRI/Juridico/ModalFiniquitos.vue';
+import ModalFiniquitoEmpVue from '@/Components-ISRI/Juridico/ModalFiniquitoEmp.vue';
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
 
 import moment from 'moment';
@@ -190,7 +197,7 @@ import 'vue3-toastify/dist/index.css';
 import axios from 'axios';
 
 export default {
-    components: { Head, AppLayoutVue, Datatable, IconM, ModalFiniquitosVue },
+    components: { Head, AppLayoutVue, Datatable, IconM, ModalFiniquitosVue, ModalFiniquitoEmpVue },
     props: {
         menu: {
             type: Object,
@@ -202,6 +209,10 @@ export default {
         const permits = usePermissions(menu.value, window.location.pathname);
 
         const showModalSettlement = ref(false)
+        const showModalSettlementEmp = ref(false)
+
+        const finiquitoId = ref(0)
+
         const columns = [
             { width: "10%", label: "ID", name: "id_empleado", type: "text" },
             { width: "30%", label: "Nombre", name: "nombre_empleado", type: "text" },
@@ -233,7 +244,7 @@ export default {
         } = useToDataTable(columns, requestUrl, columntToSort, dir)
 
         return {
-            permits, dataToShow, showModalSettlement, tableData, perPage,
+            permits, dataToShow, showModalSettlement, tableData, perPage, showModalSettlementEmp, finiquitoId,
             links, sortKey, sortOrders, isLoadinRequest, isLoadingTop, emptyObject, columns,
             getDataToShow, handleData, sortBy, changeStatusElement
         };
