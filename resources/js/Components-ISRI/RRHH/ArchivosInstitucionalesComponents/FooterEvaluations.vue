@@ -11,9 +11,8 @@ Chart.register(LineController, ArcElement, CategoryScale, LinearScale, PointElem
 
 </script>
 <template>
-    <div class="w-full ">
-
-        <LineChart :chart-data="data" :options="options" css-classes="chart-container" class="-ml- h-72 " />
+  <div class="w-full chart-container" style="height: 100px;">
+        <LineChart :chart-data="data" :options="options" />
 
         <div class="flex flex-col md:flex-row  md:space-y-0">
 
@@ -113,8 +112,6 @@ Chart.register(LineController, ArcElement, CategoryScale, LinearScale, PointElem
             </div>
         </div>
 
-
-
     </div>
 </template>
 
@@ -134,7 +131,7 @@ export default {
                     pointRadius: 2, // Añade el radio de los puntos
                     fill: true,
                     borderColor: '#001c48',
-                    tension: 0.1
+                    tension: 0.3
                 }]
             },
             options: {
@@ -145,7 +142,7 @@ export default {
                     x: {
                         ticks: {
                             font: {
-                                size: 9, // Ajusta el tamaño de la fuente para el eje x
+                                size: 10, // Ajusta el tamaño de la fuente para el eje x
                             },
                             /*   maxRotation: 60,
                               minRotation: 60 */
@@ -168,7 +165,7 @@ export default {
                     },
                     title: {
                         display: false,
-                        text: "Gatos del requerimiento"
+                        text: ""
                     }
                 }
             },
