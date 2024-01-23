@@ -3,6 +3,7 @@ import axios from "axios";
 import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
 import { toast } from "vue3-toastify";
+import { useFormatDateTime } from "@/Composables/General/useFormatDateTime.js";
 import moment from 'moment';
 
 export const useFiniquitoEmp = (context) => {
@@ -18,6 +19,10 @@ export const useFiniquitoEmp = (context) => {
         signatureDate: '',
         amount: ''
     })
+
+    const {
+        formatDateVue3DP, formatTimeVue3DP
+    } = useFormatDateTime()
 
     const getInfoForModalFiniquitoEmp = async (id) => {
         try {
@@ -40,12 +45,13 @@ export const useFiniquitoEmp = (context) => {
     };
 
     const setModalValues = (data) => {
-        finiquitoEmp.value.id = data.finiquitoEmp.id_finiquito_laboral
-        finiquitoEmp.value.signatureTime = data.finiquitoEmp.hora_firma_finiquito_laboral
-        finiquitoEmp.value.signatureDate = data.finiquitoEmp.fecha_firma_finiquito_laboral
-        finiquitoEmp.value.amount = data.finiquitoEmp.monto_finiquito_laboral
-        finiquitoEmp.value.empleado = data.finiquitoEmp.empleado.persona.nombre_apellido
-        finiquitoEmp.value.codigo = data.finiquitoEmp.empleado.codigo_empleado
+        let finiquito = data.finiquitoEmp
+        finiquitoEmp.value.id = finiquito.id_finiquito_laboral
+        finiquitoEmp.value.signatureTime = formatTimeVue3DP(finiquito.hora_firma_finiquito_laboral)
+        finiquitoEmp.value.signatureDate = formatDateVue3DP(finiquito.fecha_firma_finiquito_laboral);
+        finiquitoEmp.value.amount = finiquito.monto_finiquito_laboral
+        finiquitoEmp.value.empleado = finiquito.empleado.persona.nombre_apellido
+        finiquitoEmp.value.codigo = finiquito.empleado.codigo_empleado
     };
 
     const updateFiniquitoEmp = async (doc) => {

@@ -138,7 +138,7 @@
                         <div class="mb-4 md:flex flex-row justify-between">
                             <div class="md:w-1/2">
                                 <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
-                                    Detalles
+                                    Items
                                 </span>
                             </div>
                             <div class="md:w-1/2 md:text-right">
@@ -151,7 +151,7 @@
                             <div v-if="showItemInfo" id="item-info">
                                 <!-- Item inputs -->
                                 <!-- First row -->
-                                <div class="mb-4 md:flex flex-row justify   Detalles-start">
+                                <div class="mb-4 md:flex flex-row justify-start">
                                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                         <label class="block mb-2 text-xs font-light text-gray-600">
                                             Fuente Financiamiento <span class="text-red-600 font-extrabold">*</span>
@@ -207,7 +207,7 @@
                                         name="contract-manager"
                                         class="resize-none w-full h-10 overflow-y-auto peer text-xs font-semibold rounded-r-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
                                         @input="handleValidation('contract_manager', { limit: 250 })">
-                            </textarea>
+                                    </textarea>
                                     <InputError class="mt-2" :message="item_errors.contract_manager" />
                                 </div>
                                 <!-- Add item button -->
@@ -225,7 +225,8 @@
 
                                 <div class="my-2 flex justify-end">
                                     <button type="button" @click="showItemInfo = true"
-                                        class="text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-2.5 py-1 text-center mb-2 dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-600 dark:focus:ring-green-800">AGREGAR ITEM</button>
+                                        class="text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-2.5 py-1 text-center mb-2 dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-600 dark:focus:ring-green-800">AGREGAR
+                                        ITEM</button>
                                 </div>
                                 <!-- Items table -->
                                 <div class="tabla-modal">
@@ -245,7 +246,7 @@
                                                     :class="[
                                                         'hover:bg-[#141414]/10',
                                                         'border-b-2',
-                                                            index_errors.includes(index) ? 'bg-red-300 hover:bg-red-400' : '']">
+                                                        index_errors.includes(index) ? 'bg-red-300 hover:bg-red-400' : '']">
                                                     <td class="text-center">{{ item.commitment_number }}</td>
                                                     <td class="text-center max-w-[100px]">
                                                         {{ item.name }}
@@ -295,7 +296,7 @@
                                 </div>
                                 <div v-else class="mt-2">
                                     <p class="text-[14px] text-black text-center font-semibold">
-                                        SIN DETALLES ASIGNADOS
+                                        SIN ITEMS ASIGNADOS
                                     </p>
                                 </div>
                                 <!-- Buttons to navigate -->
@@ -319,8 +320,7 @@
                                             <GeneralButton v-if="docAdquisicionId > 0"
                                                 @click="updateDocumentoAdquisicion(acq_doc)"
                                                 color="bg-orange-700 hover:bg-orange-800" text="Actualizar" icon="update" />
-                                            <GeneralButton
-                                                v-if="docAdquisicionId <= 0"
+                                            <GeneralButton v-if="docAdquisicionId <= 0"
                                                 @click="storeDocumentoAdquisicion(acq_doc)"
                                                 color="bg-green-700 hover:bg-green-800" text="Guardar" icon="add" />
                                         </div>
@@ -349,9 +349,6 @@ import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
 
 import { ref, toRefs, onMounted, } from 'vue';
 
-import { toast } from "vue3-toastify";
-import "vue3-toastify/dist/index.css";
-import axios from "axios";
 import { useValidateInput } from '@/Composables/General/useValidateInput';
 
 export default {

@@ -4,7 +4,6 @@ import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
 import { toast } from "vue3-toastify";
 import _ from "lodash";
-import moment from 'moment';
 export const useDocumentoAdquisicion = (context) => {
     const swal = inject("$swal");
     const isLoadingRequest = ref(false);
@@ -228,10 +227,10 @@ export const useDocumentoAdquisicion = (context) => {
     const storeDocumentoAdquisicion = async (doc) => {
         const all_deleted = acq_doc.value.items.every(item => item.deleted === true);
         if (all_deleted) {
-            useShowToast(toast.warning, "Debes agregar al menos un detalle al documento.");
+            useShowToast(toast.warning, "Debes agregar al menos un item al documento.");
         } else {
             swal({
-                title: '¿Está seguro de guardar el nuevo concepto de ingreso?',
+                title: '¿Está seguro de guardar el nuevo documento de adquisicion?',
                 icon: 'question',
                 iconHtml: '❓',
                 confirmButtonText: 'Si, Guardar',
@@ -250,10 +249,10 @@ export const useDocumentoAdquisicion = (context) => {
     const updateDocumentoAdquisicion = async (doc) => {
         const all_deleted = acq_doc.value.items.every(item => item.deleted === true);
         if (all_deleted) {
-            useShowToast(toast.warning, "Debes agregar al menos un detalle al documento.");
+            useShowToast(toast.warning, "Debes agregar al menos un item al documento.");
         } else {
             swal({
-                title: '¿Está seguro de actualizar el concepto de ingreso?',
+                title: '¿Está seguro de actualizar el documento de adquisicion?',
                 icon: 'question',
                 iconHtml: '❓',
                 confirmButtonText: 'Si, Actualizar',
@@ -406,7 +405,7 @@ export const useDocumentoAdquisicion = (context) => {
         }).then((result) => {
             if (result.isConfirmed) {
                 if (acq_doc.value.items[index].has_quedan) {
-                    useShowToast(toast.error, "No puedes eliminar este detalle porque tiene quedan asignados, elimina primero los quedan asignados.");
+                    useShowToast(toast.error, "No puedes eliminar este item porque tiene quedan asignados, elimina primero los quedan asignados.");
                 } else {
                     if (acq_doc.value.items[index].selected) {
                         // Empty the array
