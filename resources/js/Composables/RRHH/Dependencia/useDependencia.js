@@ -97,17 +97,11 @@ export const useDependencia = (context) => {
             const response = await axios.get(
                 `/get-info-modal-dependencias/${depId}`
             );
-            return {
-                data: response.data,
-                isError: false,
-            };
+            setModalValues(response.data)
         } catch (error) {
+            console.log(error);
             showErrorMessage(error);
             context.emit("cerrar-modal")
-            return {
-                data: [],
-                isError: true,
-            };
         } finally {
             isLoadingRequest.value = false;
         }
@@ -119,7 +113,6 @@ export const useDependencia = (context) => {
         });
         return result ?? [];
     });
-
 
     const asyncFindEmployee = _.debounce(async (query) => {
         try {
@@ -135,55 +128,33 @@ export const useDependencia = (context) => {
         }
     }, 350);
 
-    const fetchData = async (depId) => {
-        const { data, isError } = await getInfoForModalDependencias(depId);
-        if (!isError) {
-            mainCenters.value = data.mainCenters;
-            depToShow.value = data.dependency
-            dependencies.value = data.dependencies
+    const setModalValues = (data) => {
+        mainCenters.value = data.mainCenters;
+        depToShow.value = data.dependency
+        dependencies.value = data.dependencies
 
-            //Set the employee name
-            if (data.dependency != "") {
-                if (data.dependency.jefatura) {
-                    const pnombre = data.dependency.jefatura.pnombre_persona;
-                    const snombre = data.dependency.jefatura.snombre_persona;
-                    const tnombre = data.dependency.jefatura.tnombre_persona;
-                    const papellido =
-                        data.dependency.jefatura.papellido_persona;
-                    const sapellido =
-                        data.dependency.jefatura.sapellido_persona;
-                    const tapellido =
-                        data.dependency.jefatura.tapellido_persona;
-                    let employeeName = pnombre;
-                    if (snombre) employeeName += " " + snombre;
-                    if (tnombre) employeeName += " " + tnombre;
-                    if (papellido) employeeName += " " + papellido;
-                    if (sapellido) employeeName += " " + sapellido;
-                    if (tapellido) employeeName += " " + tapellido;
+        if (data.dependency.jefatura) {
+            let array = {
+                value: data.dependency.id_persona,
+                label: data.dependency.jefatura.nombre_apellido,
+            };
+            baseOptions.value.push(array);
+        }
 
-                    let array = {
-                        value: data.dependency.id_persona,
-                        label: employeeName,
-                    };
-                    baseOptions.value.push(array);
-                }
-
-                Object.assign(depInfo.value, {
-                    id: data.dependency.id_dependencia,
-                    type: data.dependency.id_tipo_dependencia,
-                    jerarquia:
-                        data.dependency.jerarquia_organizacion_dependencia ?? 0,
-                    personId: data.dependency.id_persona,
-                    parentId:
-                        data.dependency.jerarquia_organizacion_dependencia ?? 1,
-                    centerId: data.dependency.id_centro_atencion,
-                    depName: data.dependency.nombre_dependencia,
-                    email: data.dependency.email_dependencia,
-                    code: data.dependency.codigo_dependencia,
-                    phoneNumber: data.dependency.telefono_dependencia,
-                    address: data.dependency.direccion_dependencia,
-                });
-            }
+        if (data.dependency) {
+            Object.assign(depInfo.value, {
+                id:             data.dependency.id_dependencia,
+                type:           data.dependency.id_tipo_dependencia,
+                jerarquia:      data.dependency.jerarquia_organizacion_dependencia ?? 0,
+                personId:       data.dependency.id_persona,
+                parentId:       data.dependency.jerarquia_organizacion_dependencia ?? 1,
+                centerId:       data.dependency.id_centro_atencion,
+                depName:        data.dependency.nombre_dependencia,
+                email:          data.dependency.email_dependencia,
+                code:           data.dependency.codigo_dependencia,
+                phoneNumber:    data.dependency.telefono_dependencia,
+                address:        data.dependency.direccion_dependencia,
+            });
         }
     };
 
@@ -282,7 +253,6 @@ export const useDependencia = (context) => {
     return {
         getCentrosAtencion,
         getInfoForModalDependencias,
-        fetchData,
         storeDependency,
         updateDependency,
         desactiveDependency,

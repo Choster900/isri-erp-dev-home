@@ -9,6 +9,7 @@ export const useDocumentoAdquisicion = (context) => {
     const swal = inject("$swal");
     const isLoadingRequest = ref(false);
     const new_item = ref(true);
+    const showItemInfo = ref(false)
     const currentPage = ref(1)
     const errors = ref([]);
     const index_errors = ref([]);
@@ -147,41 +148,40 @@ export const useDocumentoAdquisicion = (context) => {
         });
         const err = Object.values(item_errors.value);
         if (err.every(error => error === '')) {
-            const { id, index, financing_source_id, commitment_number, amount, contract_manager, name, has_quedan } = array_item.value;
-            const parsedAmount = parseFloat(amount);
+
+            const parsedAmount = parseFloat(array_item.value.amount);
             const formattedAmount = parsedAmount.toFixed(2);
-            const arrayInsert = {
-                id: id ? id : '',
-                index: index ? index : '',
-                financing_source_id: financing_source_id ? financing_source_id : '',
-                commitment_number: commitment_number ? commitment_number : '',
-                amount: formattedAmount ? formattedAmount : '',
-                contract_manager: contract_manager ? contract_manager : '',
-                name: name ? name : '',
-                has_quedan: has_quedan ? has_quedan : '',
-                selected: false,
-                deleted: false
-            };
-            if (acq_doc.value.items.some(item => item.commitment_number === commitment_number)) {
-                const index_to_compare = acq_doc.value.items.findIndex(item => item.commitment_number === commitment_number)
-                if (acq_doc.value.items[index_to_compare].selected) {
-                    Object.assign(acq_doc.value.items[index_to_compare], arrayInsert);
-                    cleanAndUpdateTotal()
-                } else {
-                    if (acq_doc.value.items[index_to_compare].deleted) {
-                        Object.assign(this.acq_doc.items[index_to_compare], arrayInsert);
-                        cleanAndUpdateTotal()
-                    } else {
-                        useShowToast(toast.warning, "El numero de compromiso " + commitment_number + " ya ha sido agregado.");
-                    }
-                }
+
+            if (formattedAmount <= 0) {
+                useShowToast(toast.warning, "El monto del item debe ser mayor a cero.");
             } else {
-                if (acq_doc.value.items.some(item => item.id === id)) {
-                    Object.assign(acq_doc.value.items[index], arrayInsert)
+                let name_source = financing_sources.value.filter((e) => e.value === array_item.value.financing_source_id);
+
+                const arrayInsert = {
+                    id: array_item.value.id != '' ? array_item.value.id : '',
+                    index: array_item.value.index != '' ? array_item.value.index : '',
+                    financing_source_id: array_item.value.financing_source_id != '' ? array_item.value.financing_source_id : '',
+                    commitment_number: array_item.value.commitment_number != '' ? array_item.value.commitment_number : '',
+                    amount: formattedAmount ? formattedAmount : '',
+                    contract_manager: array_item.value.contract_manager != '' ? array_item.value.contract_manager : '',
+                    name_financing_source: name_source[0].codigo_proy_financiado,
+                    name: array_item.value.name != '' ? array_item.value.name : '',
+                    has_quedan: array_item.value.has_quedan != '' ? array_item.value.has_quedan : false,
+                    selected: false,
+                    deleted: false
+                };
+
+                if (acq_doc.value.items.some(item => item.commitment_number === array_item.value.commitment_number && !item.selected && !item.deleted)) {
+                    useShowToast(toast.warning, "El numero de compromiso " + array_item.value.commitment_number + " ya ha sido agregado.");
                 } else {
-                    acq_doc.value.items.push(arrayInsert)
+                    if (new_item.value) {
+                        acq_doc.value.items.push(arrayInsert)
+                    } else {
+                        Object.assign(acq_doc.value.items[array_item.value.index], arrayInsert);
+                    }
+                    cleanAndUpdateTotal()
+                    showItemInfo.value = false
                 }
-                cleanAndUpdateTotal()
             }
         } else {
             useShowToast(toast.warning, "Tienes algunos errores, por favor verifica los datos enviados.");
@@ -222,6 +222,7 @@ export const useDocumentoAdquisicion = (context) => {
             array_item.value[key] = '';
         });
         new_item.value = true
+        showItemInfo.value = false
     }
 
     const storeDocumentoAdquisicion = async (doc) => {
@@ -370,30 +371,32 @@ export const useDocumentoAdquisicion = (context) => {
         }
     }
 
-    const editItem = (item, index) => {
+    const editItem = (itemEdit, index) => {
         new_item.value = false
         item_errors.value = []
         const itemToClean = acq_doc.value.items.find(item => item.selected);
         if (itemToClean) {
             itemToClean.selected = false;
         }
-        array_item.value.id = item.id
-        array_item.value.name = item.name
-        array_item.value.commitment_number = item.commitment_number
-        array_item.value.amount = item.amount
-        array_item.value.contract_manager = item.contract_manager
+        array_item.value.id = itemEdit.id
+        array_item.value.name = itemEdit.name
+        array_item.value.commitment_number = itemEdit.commitment_number
+        array_item.value.amount = itemEdit.amount
+        array_item.value.contract_manager = itemEdit.contract_manager
         array_item.value.index = index
-        array_item.value.financing_source_id = item.financing_source_id
-        array_item.value.has_quedan = item.has_quedan
+        array_item.value.financing_source_id = itemEdit.financing_source_id
+        array_item.value.has_quedan = itemEdit.has_quedan
         array_item.value.deleted = false
         array_item.value.selected = true
         acq_doc.value.items[index].selected = true
+        //Flag to show item-info
+        showItemInfo.value = true
     }
 
     const deleteItem = (index) => {
         swal({
             title: 'Eliminar item.',
-            text: "¿Estas seguro?",
+            text: "¿Estas seguro de eliminar temporalmente? Los cambios surtiran efecto hasta que actualices el documento.",
             icon: 'warning',
             showCancelButton: true,
             cancelButtonText: 'Cancelar',
@@ -453,7 +456,7 @@ export const useDocumentoAdquisicion = (context) => {
     return {
         isLoadingRequest, errors, acq_doc, config, array_item, index_errors,
         item_errors, backend_errors, new_item, currentPage, doc_types, management_types,
-        financing_sources, suppliers, item_available, itemSelected,
+        financing_sources, suppliers, item_available, itemSelected, showItemInfo,
         getInfoForModalDocumentoAdquisicion, storeDocumentoAdquisicion, updateDocumentoAdquisicion,
         goToNextPage, addItem, cleanArrayItem, editItem, deleteItem
     }

@@ -36,7 +36,7 @@
                 </svg>
             </div>
 
-            <div class="flex flex-col space-y-1 md:flex-row md:space-x-2 mt-5">
+            <div class="flex flex-col space-y-1 md:flex-row md:space-x-2 mt-5 mx-10">
                 <div class="w-full md:w-[70%]">
                     <p class="text-sm text-gray-500">Empleado</p>
                     <p class="text-base font-medium text-navy-700 ">
@@ -51,9 +51,40 @@
                 </div>
             </div>
 
-            <div class="py-4 mt-5">
-                <pre>{{ finiquitoEmp }}</pre>
+            <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-10">
+                <div class="md:mr-2 md:mb-0 basis-1/2">
+                    <date-time-picker-m v-model="finiquitoEmp.signatureDate" :placeholder="'Fecha firma'"
+                        :label="'Fecha firma'" :required="true" />
+                    <!-- <InputError v-for="(item, index2) in errors['centers.' + index + '.date']" :key="index2"
+                        class="mt-2 h-[32px]" :message="item" /> -->
+                </div>
+                <div class="md:mr-2 md:mb-0 basis-1/2">
+                    <time-picker-m :height="200" v-model="finiquitoEmp.signatureTime" :placeholder="'Hora firma'"
+                        :label="'Hora firma'" :required="true" />
+                    <!-- <InputError v-for="(item, index2) in errors['centers.' + index + '.startTime']" :key="index2"
+                        class="mt-2 h-[32px]" :message="item" /> -->
+                </div>
             </div>
+
+            <div class="mb-4 md:flex flex-row justify-items-start mx-10">
+                <div class="md:mr-2 md:mb-0 basis-1/2 pr-2">
+                    <input-text iconName="money" id="amount" v-model="finiquitoEmp.amount" type="text" placeholder="Monto"
+                        :validation="{ limit: 6, amount: true }" :addClasses="'text-gray-500'" label="Monto"
+                        :required="true">
+                    </input-text>
+                    <!-- <InputError v-for="(item, index2) in errors['centers.' + index + '.interval']" :key="index2"
+                        class="mt-2 h-[32px]" :message="item" /> -->
+                </div>
+            </div>
+
+            <div class="md:flex flex-row justify-center py-6">
+                <button @click="$emit('cerrar-modal')"
+                    class="bg-gray-700 hover:bg-gray-800 text-white font-semibold text-[12px] px-3 py-1.5 rounded mr-1.5">CERRAR</button>
+                <button
+                    class="bg-orange-700 hover:bg-orange-800 text-white font-semibold text-[12px] px-3 py-1.5 rounded mr-1.5">ACTUALIZAR</button>
+            </div>
+
+
         </ProcessModal>
     </div>
 </template>
@@ -111,4 +142,5 @@ export default {
 .table-row {
     display: flex;
     justify-content: space-between;
-}</style>
+}
+</style>
