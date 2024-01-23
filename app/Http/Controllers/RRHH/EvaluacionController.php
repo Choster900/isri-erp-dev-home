@@ -550,7 +550,7 @@ class EvaluacionController extends Controller
     // Traer la version de evaluacion rendimiento para saber cual es la que tomo
     function getPersonalPerformanceEvaluationVersion(Request $request)
     {
-        $query = EvaluacionRendimiento::select("*")->with([
+        $query = EvaluacionRendimiento::with([
             "categorias_rendimiento.rubricas_rendimiento"
         ])->where("id_evaluacion_rendimiento", $request->idEvaluacionRendimiento)->first();
         return $query;

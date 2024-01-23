@@ -54,7 +54,7 @@ class PlazaAsignada extends Model
     }
     /**
      * The function "centro_atencion" returns a relationship between the current model and the
-     * "CentroAtencion" model. 
+     * "CentroAtencion" model.
      */
     public function centro_atencion()
     {
@@ -74,5 +74,5 @@ class PlazaAsignada extends Model
     {
         return $this->hasMany(PlazaEvaluada::class, 'id_plaza_asignada', 'id_plaza_asignada');
     }
-    
+
 }
