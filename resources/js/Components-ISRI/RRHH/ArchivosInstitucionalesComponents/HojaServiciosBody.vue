@@ -182,7 +182,7 @@ import html2pdf from 'html2pdf.js'
                 :deals="userData != '' ? userData.empleado.acuerdo_laboral : []" />
 
             <FooterEvaluationsVue :class="showingSections == 'FooterEvaluationsVue' ? '' : 'hidden'"
-                :userData="userData != '' ? userData.empleado.evaluaciones_personal : []" />
+                :userData="userData != '' ? userData.empleado : []" />
         </div>
     </div>
 </template>

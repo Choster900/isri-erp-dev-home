@@ -1,30 +1,19 @@
-<script setup>
-import { toast } from 'vue3-toastify';
-import 'vue3-toastify/dist/index.css';
-import moment from 'moment';
-import ListEvaluations from './ListEvaluations.vue'
-import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
-import { computed, ref } from "vue"
-import { LineChart } from "vue-chart-3"
-import { Chart, LineController, ArcElement, CategoryScale, LinearScale, PointElement, LineElement } from "chart.js"
-Chart.register(LineController, ArcElement, CategoryScale, LinearScale, PointElement, LineElement)
 
-</script>
 <template>
-  <div class="w-full chart-container" style="height: 100px;">
-        <LineChart :chart-data="data" :options="options" />
+    <div class="w-full chart-container">
+          <LineChart :chart-data="data" :options="options" />
 
         <div class="flex flex-col md:flex-row  md:space-y-0">
 
             <div class="md:py-8 w-4/5">
 
-
-
                 <article class="bg-white shadow-md rounded border border-slate-200 px-3 py-1 mb-2"
                     v-for="(evaluation, i) in newFilteredData" :key="i">
-                    <div class="flex flex-start space-x-4">
+                    <div class="flex flex-start space-x-4 cursor-pointer" @click="obtenerCategoriaYRubricaRendimiento(evaluation.id_evaluacion_personal);
+                    evaluacionPersonalProp = { data: evaluation, allData: userData }">
                         <div class="shrink-0 mt-1.5">
                             <div class="relative">
+                                {{ evaluation.id_evaluacion_personal }}
                                 <lord-icon src="https://cdn.lordicon.com/depeqmsz.json" trigger="hover"
                                     style="width:40px;height:40px">
                                 </lord-icon>
@@ -50,7 +39,7 @@ Chart.register(LineController, ArcElement, CategoryScale, LinearScale, PointElem
                             <footer class="flex flex-wrap text-sm">
                                 <div
                                     class="flex items-center after:block after:content-['·'] last:after:content-[''] after:text-sm after:text-slate-400 after:px-2">
-                                    <a class="font-medium text-indigo-500 hover:text-indigo-600" href="#0">
+                                    <span class="font-medium text-indigo-500 hover:text-indigo-600">
                                         <div class="flex items-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                                                 class="w-5 h-5 mr-1">
@@ -67,7 +56,7 @@ Chart.register(LineController, ArcElement, CategoryScale, LinearScale, PointElem
                                                 {{ moment(evaluation.fecha_inicio_evaluacion_personal).year() }}
                                             </span>
                                         </div>
-                                    </a>
+                                    </span>
                                 </div>
                                 <div
                                     class="flex items-center after:block after:content-['·'] last:after:content-[''] after:text-sm after:text-slate-400 after:px-2">
@@ -112,122 +101,187 @@ Chart.register(LineController, ArcElement, CategoryScale, LinearScale, PointElem
             </div>
         </div>
 
+
+        <ModalSeeEvaluation @cerrar-modal="showModal = false; rubricaAndCategoriaByEvaluacion = []" :showModal="showModal"
+            :rubricaAndCategoriaByEvaluacion="rubricaAndCategoriaByEvaluacion"
+            :evaluacionPersonalProp="evaluacionPersonalProp"
+            :isLoadingObtenerCategoriaYRubrica="isLoadingObtenerCategoriaYRubrica" />
     </div>
 </template>
 
 <script>
+import { ref, onMounted, watch, computed, toRefs } from 'vue';
+import moment from 'moment'; // Asegúrate de importar moment aquí si no lo has hecho
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
+import { LineChart } from "vue-chart-3"
+import { Chart, LineController, ArcElement, CategoryScale, LinearScale, PointElement, LineElement } from "chart.js"
+import axios from 'axios';
+import ModalSeeEvaluation from './ModalSeeEvaluation.vue';
+Chart.register(LineController, ArcElement, CategoryScale, LinearScale, PointElement, LineElement)
+
 export default {
     props: ["userData"],
-    data() {
-        const arraySemester = []
-        return {
-            data:
-            {
-                labels: [],
-                datasets: [{
-                    label: 'Calificaciones',
-                    data: [],
-                    borderWidth: 2, // Añade el ancho de la línea
-                    pointRadius: 2, // Añade el radio de los puntos
-                    fill: true,
-                    borderColor: '#001c48',
-                    tension: 0.3
-                }]
-            },
-            options: {
-                responsive: true,
+    components: { LineChart, ModalSeeEvaluation },
+    setup(props) {
+        const arraySemester = ref([]);
+        const data = ref({
+            labels: [],
+            datasets: [{
+                label: 'Calificaciones',
+                data: [],
+                borderWidth: 2,
+                pointRadius: 2,
+                fill: true,
+                borderColor: '#001c48',
+                tension: 0.3
+            }]
+        });
 
-                type: 'line',
-                scales: {
-                    x: {
-                        ticks: {
-                            font: {
-                                size: 10, // Ajusta el tamaño de la fuente para el eje x
-                            },
-                            /*   maxRotation: 60,
-                              minRotation: 60 */
-                        }
-                    },
-                    y: {
-                        ticks: {
-                            font: {
-                                size: 10, // Ajusta el tamaño de la fuente para el eje y
-                            }
-                        }
+        const options = ref({
+            responsive: true,
+            type: 'line',
+            scales: {
+                x: {
+                    ticks: {
+                        font: {
+                            size: 10,
+                        },
                     }
                 },
-
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        display: false,
-
-                    },
-                    title: {
-                        display: false,
-                        text: ""
+                y: {
+                    ticks: {
+                        font: {
+                            size: 10,
+                        }
                     }
                 }
             },
-            moment,
-            yearsArray: [],
-            year: null,
-            newFilteredData: [],
-        }
-    },
-    methods: {
-        filterAllYearsInDeals() {
-            const uniqueYearsSet = new Set();
-            // Iteramos sobre el arreglo dataDeals y agregamos los años al conjunto
-            this.userData.forEach((obj, index) => {
-                // Extraemos el año de la fecha_inicio_evaluacion_personal y lo agregamos al conjunto
-                if (obj.fecha_inicio_evaluacion_personal) {
-                    const year = moment(obj.fecha_inicio_evaluacion_personal).year();
-                    uniqueYearsSet.add(year);
+            plugins: {
+                legend: {
+                    position: 'top',
+                    display: false,
+                },
+                title: {
+                    display: false,
+                    text: ""
                 }
-            });
-            // Convertimos el conjunto a un nuevo arreglo y lo ordenamos
+            }
+        });
+
+        const rubricaAndCategoriaByEvaluacion = ref([])
+        const evaluacionPersonalProp = ref([])
+        const showModal = ref(false);
+        const yearsArray = ref([]);
+        const year = ref(null);
+        const newFilteredData = ref([]);
+        const isLoadingObtenerCategoriaYRubrica = ref(false);
+
+        const { userData } = toRefs(props)
+        const filterAllYearsInDeals = () => {
+            const uniqueYearsSet = new Set();
+
+            if (
+                userData.value &&
+                userData.value.evaluaciones_personal &&
+                userData.value.evaluaciones_personal.length > 0
+            ) {
+                userData.value.evaluaciones_personal.forEach((obj, index) => {
+                    if (obj.fecha_inicio_evaluacion_personal) {
+                        const year = moment(obj.fecha_inicio_evaluacion_personal).year();
+                        uniqueYearsSet.add(year);
+                    }
+                });
+
+            }
+
             const uniqueYearsArray = Array.from(uniqueYearsSet).sort();
-            this.yearsArray = uniqueYearsArray
-            this.year = this.yearsArray[this.yearsArray.length - 1]
-            this.newFilteredDataSet(this.year)
-        },
-        newFilteredDataSet(year) {
-            this.newFilteredData = this.userData.filter(obj => moment(obj.fecha_inicio_evaluacion_personal).year() == year)
-            console.log(this.userData.filter(obj => moment(obj.fecha_inicio_evaluacion_personal).year() == year));
-        },
+            yearsArray.value = uniqueYearsArray;
+            year.value = yearsArray.value[yearsArray.value.length - 1];
+            newFilteredDataSet(year.value);
+        };
 
-    },
-    mounted() {
-        this.filterAllYearsInDeals()
-    },
-    computed: {
-        spliceEachSemester() {
+        const newFilteredDataSet = (selectedYear) => {
 
-            if (this.userData != '') {
-                this.userData.forEach(element => {
-                    console.log(element);
+            if (
+                userData.value &&
+                userData.value.evaluaciones_personal &&
+                userData.value.evaluaciones_personal.length > 0
+            ) {
+
+                newFilteredData.value = userData.value.evaluaciones_personal.filter(obj => moment(obj.fecha_inicio_evaluacion_personal).year() === selectedYear);
+                console.log(userData.value.evaluaciones_personal.filter(obj => moment(obj.fecha_inicio_evaluacion_personal).year() === selectedYear));
+
+            }
+
+
+        };
+
+        onMounted(() => {
+            filterAllYearsInDeals();
+        });
+
+        watch(userData, () => {
+            filterAllYearsInDeals();
+            data.value.labels = [];
+            data.value.datasets[0].data = [];
+
+            if (userData.value !== '') {
+                userData.value.evaluaciones_personal.forEach(element => {
+                    data.value.labels.push(`${element.periodo_evaluacion.nombre_periodo_evaluacion} - ${moment(element.fecha_inicio_evaluacion_personal).year()}`);
+                    data.value.datasets[0].data.push(element.puntaje_evaluacion_personal);
                 });
             }
-        }
-    },
-    watch: {
-        userData() {
-            this.filterAllYearsInDeals()
-            this.data.labels = []
-            this.data.datasets[0].data = []
-            if (this.userData != '') {
-                this.userData.forEach(element => {
-                    this.data.labels.push(`${element.periodo_evaluacion.nombre_periodo_evaluacion} - ${moment(element.fecha_inicio_evaluacion_personal).year()}`)
-                    this.data.datasets[0].data.push(element.puntaje_evaluacion_personal)
-                    //console.log(element.periodo_evaluacion.nombre_periodo_evaluacion);
-                });
-            }
-            console.log(this.data.labels);
 
-        }
+            console.log(data.value.labels);
+        });
+
+        // Aquí puedes definir otras funciones computadas si es necesario
+
+        /**
+         * Obtiene la información de categoría y rubrica de rendimiento por evaluación.
+         * @param {number} idEvaluacionRendimiento - Identificador de la evaluación de rendimiento.
+         */
+        const obtenerCategoriaYRubricaRendimiento = async (idEvaluacionRendimiento) => {
+            try {
+                showModal.value = true;
+                isLoadingObtenerCategoriaYRubrica.value = true;
+                // Realiza la solicitud al servidor.
+                const response = await axios.post('/get-evaluacion', { idEvaluacionRendimiento: idEvaluacionRendimiento });
+
+                // Almacena la respuesta en la referencia.
+                rubricaAndCategoriaByEvaluacion.value = response.data;
+                console.log(response);
+                isLoadingObtenerCategoriaYRubrica.value = false;
+            } catch (error) {
+                // Maneja los errores imprimiéndolos en la consola.
+                console.error('Error en la búsqueda:', error);
+            } finally {
+                isLoadingObtenerCategoriaYRubrica.value = false;
+                // Detiene el indicador de carga, independientemente de si hubo éxito o error.
+            }
+        };
+
+
+        return {
+            obtenerCategoriaYRubricaRendimiento,
+            arraySemester,
+            data,
+            showModal,
+            rubricaAndCategoriaByEvaluacion,
+            options,
+            moment,
+            yearsArray,
+            isLoadingObtenerCategoriaYRubrica,
+            year,
+            newFilteredData,
+            filterAllYearsInDeals,
+            newFilteredDataSet,
+            evaluacionPersonalProp,
+            // Otras variables y funciones computadas si es necesario
+        };
     }
-}
+};
 </script>
 
 <style></style>

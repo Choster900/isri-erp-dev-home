@@ -13,7 +13,7 @@ class HojaServicioController extends Controller
     function getEmployees(Request $request)
     {
         $query = Persona::with([
-            'empleado',
+            'empleado.persona',
             'fotos' => function ($query) {
                 $query->where('estado_foto', 1);
             },
@@ -28,14 +28,23 @@ class HojaServicioController extends Controller
             'empleado.acuerdo_laboral.tipo_acuerdo_laboral',
             'empleado.plazas_asignadas.detalle_plaza.plaza',
             'empleado.plazas_asignadas.dependencia',
-            'empleado.evaluaciones_personal.detalle_evaluaciones_personal',
+            'empleado.evaluaciones_personal.detalle_evaluaciones_personal.categoria_rendimiento.evaluacion_rendimiento.tablas_rendimiento',
+            'empleado.evaluaciones_personal.detalle_evaluaciones_personal.rubrica_rendimiento',
             'empleado.evaluaciones_personal.periodo_evaluacion',
             'empleado.evaluaciones_personal.tipo_evaluacion_personal',
             'empleado.evaluaciones_personal.plaza_evaluada.plaza_asignada.detalle_plaza.plaza',
+            'empleado.evaluaciones_personal.plaza_evaluada.plaza_asignada.centro_atencion',
+            'empleado.evaluaciones_personal.plaza_evaluada.plaza_asignada.dependencia.jefatura.empleado.plazas_asignadas.detalle_plaza.plaza',
+            'empleado.evaluaciones_personal.plaza_evaluada.plaza_asignada.dependencia.jefatura.empleado.plazas_asignadas.centro_atencion',
+            'empleado.evaluaciones_personal.plaza_evaluada.plaza_asignada.dependencia.jefatura.empleado.plazas_asignadas.dependencia',
+            'empleado.evaluaciones_personal.evaluacion_rendimiento',
+            'empleado.evaluaciones_personal.estado_evaluacion_personal',
+           /*  "empleado.evaluaciones_personal" => function ($query) {
+                $query->whereIn("id_estado_evaluacion_personal",  [2, 3, 8])
+                    ->orderBy("fecha_reg_evaluacion_personal", "asc");
+                return $query;
+            }, */
         ]);
-        /* ->whereHas('empleado', function ($query) use ($request) {
-                $query->where('codigo_empleado', 'like', '%' . $request["data"] . '%');
-            }); */
         if (!empty($request["data"])) {
             $query->orWhere(function ($query) use ($request) {
                 $query->whereRaw("MATCH ( pnombre_persona,
