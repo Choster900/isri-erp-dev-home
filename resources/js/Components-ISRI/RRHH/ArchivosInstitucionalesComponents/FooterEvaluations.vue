@@ -1,7 +1,7 @@
 
 <template>
     <div class="w-full chart-container">
-          <LineChart :chart-data="data" :options="options" />
+        <LineChart :chart-data="data" :options="options" v-if="data.datasets.data" />
 
         <div class="flex flex-col md:flex-row  md:space-y-0">
 

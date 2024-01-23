@@ -472,20 +472,26 @@ export default {
         },
     },
     setup(props, { emit }) {
+        // Desestructuración de propiedades
         const { evaluacionPersonalProp, listDependencias, showModal } = toRefs(props);
+        // Desestructuración de objetos y funciones de useEvaluacion
         const {
-            idEmpleado, errorsData,
+            clearLock, idEmpleado,
+            errorsData, activeIndex,
             messageAlert, handleAccept,
-            handleCancel, plazaOptions, headerOptions,
-            changeStateEvaluation,
-            handleTagToSelect, evaluationsOptions,
-            objectEvaluaciones, fechaInicioFechafin,
-            showPlazasModal, existMoreThanOne, clearLock,
-            showMessageAlert, idTipoEvaluacion, selectedEmpleadoValue,
-            handleEmployeeSearch, idEvaluacionRendimiento, opcionEmpleado,
-            idCentroAtencion, doesntExistResult, evaluacionesAgrupadasPorAño,
-            activeIndex, objectPlazas, evaluacionPersonal, evaluacionToPassDocumento,
-            loadingEvaluacionRendimiento, createPersonalEvaluationRequest, getPlazasByEmployeeIdAndCentroAtencionId, configSecondInput,
+            handleCancel, plazaOptions,
+            objectPlazas, headerOptions,
+            opcionEmpleado, showPlazasModal,
+            existMoreThanOne, showMessageAlert,
+            idTipoEvaluacion, idCentroAtencion,
+            handleTagToSelect, doesntExistResult,
+            configSecondInput, evaluationsOptions,
+            objectEvaluaciones, evaluacionPersonal,
+            fechaInicioFechafin, handleEmployeeSearch,
+            changeStateEvaluation, selectedEmpleadoValue,
+            idEvaluacionRendimiento, evaluacionToPassDocumento,
+            evaluacionesAgrupadasPorAño, loadingEvaluacionRendimiento,
+            createPersonalEvaluationRequest, getPlazasByEmployeeIdAndCentroAtencionId,
         } = useEvaluacion();
 
         const {
@@ -494,8 +500,11 @@ export default {
             obtenerCategoriaYRubricaRendimiento,
         } = useDocumentoEvaluacion()
 
+        // Utilizando una función de flecha para la callback de watch
         watch(showModal, (newValue, oldValue) => {
+            // Verifica si showModal se ha establecido en falso (se cerró el modal)
             if (!newValue) {
+                // Restablecer los valores a nulos o vacíos
                 idEmpleado.value = null;
                 objectPlazas.value = null;
                 idCentroAtencion.value = null;
@@ -503,46 +512,63 @@ export default {
                 rubricaAndCategoriaByEvaluacion.value = [];
                 plazaOptions.value = [];
                 showPlazasModal.value = false;
-                evaluationsOptions.value = []
+                evaluationsOptions.value = [];
                 idEvaluacionRendimiento.value = null;
                 fechaInicioFechafin.value = null;
             }
-        })
+        });
 
+
+        // Utiliza una función de flecha para mayor claridad y consistencia
         watch(evaluacionPersonalProp, (newValue, oldValue) => {
-            console.log({ newValue, oldValue });
-            if (newValue != '') {
-                evaluacionPersonal.value = newValue
+            // Verifica si newValue no es nulo ni indefinido antes de compararlo con una cadena vacía
+            if (newValue !== null && newValue !== undefined && newValue !== '') {
+                evaluacionPersonal.value = newValue;
 
-                if (newValue.plazas_asignadas.length === 1) {
-                    idCentroAtencion.value = newValue.plazas_asignadas[0].id_centro_atencion
+                // Verifica que newValue.plazas_asignadas sea un array y tenga al menos un elemento antes de acceder a la propiedad id_centro_atencion
+                if (Array.isArray(newValue.plazas_asignadas) && newValue.plazas_asignadas.length === 1) {
+                    idCentroAtencion.value = newValue.plazas_asignadas[0].id_centro_atencion;
                 }
             } else {
                 evaluacionPersonal.value = null;
             }
-        })
+        });
 
+
+        /**
+         * Función asincrónica para crear una nueva evaluación personal.
+         */
         const createEvaluationPersona = async () => {
+            // Muestra un cuadro de confirmación utilizando SweetAlert2
             const confirmed = await Swal.fire({
-                title: '<p class="text-[16pt] text-center">¿Esta seguro de agregar una nueva evaluacion?</p>',
+                title: '<p class="text-[16pt] text-center">¿Está seguro de agregar una nueva evaluación?</p>',
                 icon: "question",
                 iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
-                confirmButtonText: "Si, Agregar",
+                confirmButtonText: "Sí, Agregar",
                 confirmButtonColor: "#001b47",
                 cancelButtonText: "Cancelar",
                 showCancelButton: true,
                 showCloseButton: true,
             });
+
+            // Verifica si el usuario confirmó la acción
             if (confirmed.isConfirmed) {
                 let res = null;
+
+                // Realiza la solicitud para crear la evaluación personal
                 res = await executeRequest(
                     createPersonalEvaluationRequest(),
-                    "La evaluacion se ha creado"
+                    "La evaluación se ha creado"
                 );
-                evaluacionPersonal.value = res.data.response
-                emit("actualizar-datatable")
+
+                // Actualiza el valor de evaluacionPersonal con la respuesta de la solicitud
+                evaluacionPersonal.value = res.data.response;
+
+                // Emite un evento para actualizar la datatable
+                emit("actualizar-datatable");
             }
         };
+
 
 
         const changeState = async (e) => {
@@ -628,32 +654,27 @@ export default {
         }
 
         return {
-            moment,
-            errorsData,
-            changeState,
-            objectPlazas,
-            plazaOptions,
-            opcionEmpleado,
-            showMessageAlert,
-            listDependencias,
-            configSecondInput,
-            evaluacionPersonal,
-            handleEmployeeSearch,
-            activeIndex, activeIndex,
-            handleAccept, handleCancel,
-            evaluacionesAgrupadasPorAño, headerOptions,
+            moment, clearLock,
+            errorsData, idEmpleado,
+            changeState, activeIndex,
+            activeIndex, objectPlazas,
+            handleAccept, plazaOptions,
+            messageAlert, handleCancel,
+            headerOptions, opcionEmpleado,
+            showPlazasModal, idCentroAtencion,
+            showMessageAlert, listDependencias,
             existMoreThanOne, idTipoEvaluacion,
-            messageAlert, selectedEmpleadoValue,
-            evaluacionToPassDocumento, clearLock,
             handleTagToSelect, doesntExistResult,
+            configSecondInput, evaluacionPersonal,
             evaluacionPersonal, objectEvaluaciones,
             evaluationsOptions, fechaInicioFechafin,
             getPlazasByEmployeeIdAndCentroAtencionId,
-            createEvaluationPersona, idEvaluacionRendimiento,
-            obtenerCategoriaYRubricaRendimiento, showPlazasModal,
-            evaluacionesAgrupadasPorAño, idEmpleado, idCentroAtencion,
-            loadingEvaluacionRendimiento, createPersonalEvaluationRequest,
-            isLoadingObtenerCategoriaYRubrica, rubricaAndCategoriaByEvaluacion,
+            handleEmployeeSearch, selectedEmpleadoValue,
+            idEvaluacionRendimiento, createEvaluationPersona,
+            evaluacionToPassDocumento, evaluacionesAgrupadasPorAño,
+            evaluacionesAgrupadasPorAño, loadingEvaluacionRendimiento,
+            createPersonalEvaluationRequest, rubricaAndCategoriaByEvaluacion,
+            isLoadingObtenerCategoriaYRubrica, obtenerCategoriaYRubricaRendimiento,
         }
     }
 

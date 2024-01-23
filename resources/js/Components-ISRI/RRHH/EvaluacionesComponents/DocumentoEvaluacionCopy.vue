@@ -501,7 +501,8 @@
         </div>
 
 
-        <div class="w-full h-[500px] px-1 text-selection-disable" v-if="!isLoadingObtenerCategoriaYRubrica && rubricaAndCategoriaByEvaluacion == ''">
+        <div class="w-full h-[500px] px-1 text-selection-disable"
+            v-if="!isLoadingObtenerCategoriaYRubrica && rubricaAndCategoriaByEvaluacion == ''">
 
             <div class="flex flex-col items-center justify-center h-full">
                 <img src="../../../../img/evaluationModal.svg" class="h-96 rounded-full mx-auto" alt="SVG Image"
@@ -544,84 +545,112 @@ export default {
         },
     },
     emit: ["actualizar-datatable"],
-    setup(props,{ emit }) {
-        const { evaluacionPersonalProp, rubricaAndCategoriaByEvaluacion } = toRefs(props)
+    setup(props, { emit }) {
+        // Desestructuración de propiedades y funciones de toRefs y useDocumentoEvaluacion
+        const { evaluacionPersonalProp, rubricaAndCategoriaByEvaluacion } = toRefs(props);
         const { separarTexto, evaluacionPersonal, saveResponseWhenIsClickedCheckbox, optionsSelected, sendResponsesEvaluation, ranges, isScoreInRange } = useDocumentoEvaluacion();
+
+        // Utilizando watch para observar cambios en evaluacionPersonalProp
         watch(evaluacionPersonalProp, (newValue, oldValue) => {
+            // Verifica si newValue tiene un valor (no es nulo ni indefinido)
             if (newValue) {
-                optionsSelected.value = []
-                evaluacionPersonal.value = newValue.data
+                // Reinicia el array optionsSelected
+                optionsSelected.value = [];
+
+                // Asigna el valor de evaluacionPersonal a partir de newValue.data
+                evaluacionPersonal.value = newValue.data;
+
+                // Itera sobre cada elemento en detalle_evaluaciones_personal y agrega información a optionsSelected
                 evaluacionPersonal.value.detalle_evaluaciones_personal.forEach(element => {
                     optionsSelected.value.push({
                         id_cat_rendimiento: element.categoria_rendimiento.id_cat_rendimiento,
                         id_rubrica_rendimiento: element.rubrica_rendimiento.id_rubrica_rendimiento,
                         puntaje_rubrica_rendimiento: element.rubrica_rendimiento.puntaje_rubrica_rendimiento
-                    })
+                    });
                 });
             }
-        })
+        });
 
+
+        /**
+         * Función asincrónica para guardar y enviar la evaluación.
+         */
         const guardarYEnviarEvaluacion = async () => {
+            // Muestra un cuadro de confirmación utilizando SweetAlert2
             const confirmed = await Swal.fire({
-                title: '<p class="text-[16pt] text-center">¿Esta seguro de enviar la evaluacion?</p>',
+                title: '<p class="text-[16pt] text-center">¿Está seguro de enviar la evaluación?</p>',
                 icon: "question",
                 iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
-                confirmButtonText: "Si, Enviar",
+                confirmButtonText: "Sí, Enviar",
                 confirmButtonColor: "#001b47",
                 cancelButtonText: "Cancelar",
                 showCancelButton: true,
                 showCloseButton: true,
             });
-            if (confirmed.isConfirmed) {
 
-                if (rubricaAndCategoriaByEvaluacion.value.categorias_rendimiento.length == optionsSelected.value.length) {
+            // Verifica si el usuario confirmó la acción
+            if (confirmed.isConfirmed) {
+                // Verifica si se han seleccionado todas las opciones de categorías de rendimiento
+                if (rubricaAndCategoriaByEvaluacion.value.categorias_rendimiento.length === optionsSelected.value.length) {
                     let res = null;
+
+                    // Realiza la solicitud para enviar las respuestas de la evaluación
                     res = await executeRequest(
                         sendResponsesEvaluation(),
-                        "La evaluacion se ha enviado"
+                        "La evaluación se ha enviado"
                     );
-                    console.log("HACEMOS ALGO DESPUES");
-                    emit("actualizar-datatable")
 
+                    console.log("HACEMOS ALGO DESPUÉS");
+                    // Emite un evento para actualizar la datatable
+                    emit("actualizar-datatable");
                 } else {
+                    // Muestra una advertencia si no se han seleccionado todas las opciones
                     toast.warning('No has seleccionado todas las opciones. Por favor, asegúrate de seleccionar todas las opciones antes de finalizar.');
-
                 }
             }
         };
 
+        /**
+         * Función asincrónica para imprimir la evaluación en formato PDF.
+         */
         const printEvaluacion = async () => {
             try {
+                // Cambia el cursor del cuerpo del documento a "wait" durante la generación del PDF
                 document.body.style.cursor = 'wait';
 
+                // Configuración para la generación del PDF
                 const opt = {
-                    margin: [0.1, 0.1, 0.1, 0.1],//top, left, buttom, right,
+                    margin: [0.1, 0.1, 0.1, 0.1], //top, left, bottom, right,
                     filename: 'evaluacion',
                     image: { type: 'jpeg', quality: 0.98 },
                     html2canvas: { scale: 2, useCORS: true },
                     pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
-                    //pagebreak: { mode: 'avoid-all', before: '#page2el' },
                     jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
                 };
 
+                // Crear una instancia de la aplicación Vue para la generación del PDF
                 const app = createApp(EvaluacionPdfVue, {
                     rubricaAndCategoriaByEvaluacion: rubricaAndCategoriaByEvaluacion.value.categorias_rendimiento,
                     optionsSelected: optionsSelected.value,
                     evaluacionPersonalProp: evaluacionPersonalProp.value
                 });
 
+                // Crear un elemento div para montar la aplicación Vue
                 const div = document.createElement('div');
                 const pdfPrint = app.mount(div);
                 const html = div.outerHTML;
 
+                // Utilizar html2pdf para generar y guardar el PDF
                 await html2pdf().set(opt).from(html).save();
             } catch (error) {
                 console.error('Error al generar el PDF:', error);
                 // Manejar el error según tus necesidades
             } finally {
+                // Restaurar el cursor del cuerpo del documento a "default" después de la generación del PDF
                 document.body.style.cursor = 'default';
             }
         };
+
 
 
         return {
