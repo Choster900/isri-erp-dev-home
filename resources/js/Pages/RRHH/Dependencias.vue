@@ -92,7 +92,8 @@
                                 <div class="space-x-1 text-center">
                                     <DropDownOptions>
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            @click="showModalDetail = true; dependencyId = dependencia.id_dependencia">
+                                            @click="showModalDetail = true; dependencyId = dependencia.id_dependencia"
+                                            v-if="dependencia.estado_dependencia == 0">
                                             <div class="w-8 text-blue-900">
                                                 <span class="text-xs">
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"

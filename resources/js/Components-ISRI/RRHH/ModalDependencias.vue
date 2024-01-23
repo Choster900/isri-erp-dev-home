@@ -186,7 +186,6 @@ export default {
             errors,
             depFilter,
             getInfoForModalDependencias,
-            fetchData,
             storeDependency,
             updateDependency
         } = useDependencia(context);
@@ -208,7 +207,7 @@ export default {
 
         onMounted(
             async () => {
-                await fetchData(dependencyId.value)
+                await getInfoForModalDependencias(dependencyId.value)
             }
         )
 
