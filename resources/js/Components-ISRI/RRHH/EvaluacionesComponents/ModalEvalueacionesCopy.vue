@@ -244,6 +244,7 @@
                                             <div v-for="(evaluacion, j) in año.evaluaciones" :key="j"
                                                 class="bg-slate-300/40 border-l-[4px] border-y-0 border-r-0 border-l-indigo-500 hover:bg-slate-300 cursor-pointer"
                                                 :class="j == 1 ? ' border-b border-b-slate-400' : ''">
+
                                                 <ul class="ml-10 list-circle py-2 "
                                                     @click="obtenerCategoriaYRubricaRendimiento(evaluacion.evaluacion_rendimiento.id_evaluacion_rendimiento);
                                                     evaluacionToPassDocumento = { data: evaluacion, allData: año.allContent }">
@@ -295,8 +296,9 @@
                                                         }}
                                                     </p>
                                                 </ul>
-                                                <!-- {{ evaluacion.estado_evaluacion_personal.id_estado_evaluacion_personal }} -->
-                                                <ButtonsStatesEvaluation :data="evaluacion" @changeState="changeState" />
+                                                <ButtonsStatesEvaluation v-if="evaluacion.detalle_evaluaciones_personal.length > 0 ||
+                                                        showButtonToSend.includes(evaluacion.id_evaluacion_personal)"
+                                                    :data="evaluacion" @changeState="changeState" />
                                             </div>
                                         </div>
                                     </div>
@@ -371,7 +373,8 @@
                         :isLoadingObtenerCategoriaYRubrica="isLoadingObtenerCategoriaYRubrica"
                         :evaluacionPersonalProp="evaluacionToPassDocumento"
                         :rubricaAndCategoriaByEvaluacion="rubricaAndCategoriaByEvaluacion"
-                        @actualizar-datatable="$emit('actualizar-datatable')" />
+                        @actualizar-datatable="$emit('actualizar-datatable')"
+                        @showOptionToSendEvaluation="addingDataToShowButton" />
 
 
                     <DocAnalisisDes :class="headerOptions === 'DocumentoAnalisisDesempeñoVue' ? '' : 'hidden'"
@@ -476,6 +479,7 @@ export default {
         const { evaluacionPersonalProp, listDependencias, showModal } = toRefs(props);
         // Desestructuración de objetos y funciones de useEvaluacion
         const {
+            showButtonToSend, addingDataToShowButton,
             clearLock, idEmpleado,
             errorsData, activeIndex,
             messageAlert, handleAccept,
@@ -530,7 +534,7 @@ export default {
                     idCentroAtencion.value = newValue.plazas_asignadas[0].id_centro_atencion;
                 }
             } else {
-                evaluacionPersonal.value = null;
+                evaluacionPersonal.value = {};
             }
         });
 
@@ -555,18 +559,31 @@ export default {
             if (confirmed.isConfirmed) {
                 let res = null;
 
-                // Realiza la solicitud para crear la evaluación personal
-                res = await executeRequest(
-                    createPersonalEvaluationRequest(),
-                    "La evaluación se ha creado"
-                );
+                try {
+                    // Realiza la solicitud para crear la evaluación personal
+                    res = await executeRequest(createPersonalEvaluationRequest(), "La evaluación se ha creado");
 
-                // Actualiza el valor de evaluacionPersonal con la respuesta de la solicitud
-                evaluacionPersonal.value = res.data.response;
+                    // Desestructura la respuesta para obtener el objeto evaluaciones_personal
+                    const { evaluaciones_personal } = res.data.response;
 
-                // Emite un evento para actualizar la datatable
-                emit("actualizar-datatable");
+                    // Verifica si evaluacionPersonal.value no está vacío
+                    if (evaluacionPersonal.value != '') {
+                        // Agrega la nueva evaluación al array existente
+                        evaluacionPersonal.value.evaluaciones_personal.push(evaluaciones_personal[0]);
+                    } else {
+                        // Asigna la respuesta completa si evaluacionPersonal.value está vacío
+                        evaluacionPersonal.value = res.data.response;
+                    }
+                    //Asignacion a index el año de el ultimo registro que ingreso
+                    activeIndex.value = moment(evaluaciones_personal[0].fecha_fin_evaluacion_personal).year().toString();
+                    // Emite un evento para actualizar la datatable
+                    emit("actualizar-datatable");
+                } catch (error) {
+                    // Maneja los errores, por ejemplo, puedes mostrar un mensaje de error
+                    console.error("Error al crear la evaluación personal:", error.message);
+                }
             }
+
         };
 
 
@@ -574,7 +591,7 @@ export default {
         const changeState = async (e) => {
 
             const confirmed = await Swal.fire({
-                title: '<p class="text-[16pt] text-center">¿Esta seguro de dmkasdkasj?</p>',
+                title: '<p class="text-[16pt] text-center">¿Confirma el envío de la evaluación para que el empleado la vea?</p>',
                 icon: "question",
                 iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
                 confirmButtonText: "Si, Agregar",
@@ -645,6 +662,7 @@ export default {
                         changeStateEvaluation(e),
                         "Cambiado"
                     );
+                    emit('cerrar-modal')
                     emit("actualizar-datatable")
 
                 }
@@ -654,6 +672,8 @@ export default {
         }
 
         return {
+            showButtonToSend,
+            addingDataToShowButton,
             moment, clearLock,
             errorsData, idEmpleado,
             changeState, activeIndex,
