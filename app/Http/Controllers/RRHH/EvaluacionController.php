@@ -510,7 +510,14 @@ class EvaluacionController extends Controller
                 "plazas_asignadas.centro_atencion.dependencias",
                 "plazas_asignadas.dependencia.jefatura.empleado.plazas_asignadas.detalle_plaza.plaza",
                 "plazas_asignadas.detalle_plaza.plaza",
-                "evaluaciones_personal.incidentes_evaluacion",
+                "evaluaciones_personal" => function ($query) use ($evaluacionInsertedId) {
+                    $query->find($evaluacionInsertedId)
+                        ->orderBy("fecha_reg_evaluacion_personal", "asc");
+                    return $query;
+                },
+                "evaluaciones_personal.incidentes_evaluacion" => function ($query) {
+                    return $query->where("estado_incidente_evaluacion", 1);
+                },
                 "evaluaciones_personal.detalle_evaluaciones_personal.categoria_rendimiento.evaluacion_rendimiento.tablas_rendimiento",
                 "evaluaciones_personal.detalle_evaluaciones_personal.rubrica_rendimiento",
                 "evaluaciones_personal.plaza_evaluada.plaza_asignada.detalle_plaza.plaza",
@@ -522,10 +529,24 @@ class EvaluacionController extends Controller
                 "evaluaciones_personal.tipo_evaluacion_personal",
                 "evaluaciones_personal.periodo_evaluacion",
                 "evaluaciones_personal.estado_evaluacion_personal",
-                "evaluaciones_personal" => function ($query) {
-                    return $query->orderBy("fecha_reg_evaluacion_personal", "asc");
-                },
             ])->whereHas("evaluaciones_personal")->find($request->idEmpleado);
+
+            /*  $query = EvaluacionPersonal::with([
+                "incidentes_evaluacion" => function ($query) {
+                    return $query->where("estado_incidente_evaluacion", 1);
+                },
+                "detalle_evaluaciones_personal.categoria_rendimiento.evaluacion_rendimiento.tablas_rendimiento",
+                "detalle_evaluaciones_personal.rubrica_rendimiento",
+                "plaza_evaluada.plaza_asignada.detalle_plaza.plaza",
+                "plaza_evaluada.plaza_asignada.centro_atencion",
+                "plaza_evaluada.plaza_asignada.dependencia.jefatura.empleado.plazas_asignadas.detalle_plaza.plaza",
+                "plaza_evaluada.plaza_asignada.dependencia.jefatura.empleado.plazas_asignadas.centro_atencion",
+                "plaza_evaluada.plaza_asignada.dependencia.jefatura.empleado.plazas_asignadas.dependencia",
+                "evaluacion_rendimiento",
+                "tipo_evaluacion_personal",
+                "periodo_evaluacion",
+                "estado_evaluacion_personal",
+            ])->find($evaluacionInsertedId); */
 
             DB::commit();
 
@@ -550,7 +571,7 @@ class EvaluacionController extends Controller
     // Traer la version de evaluacion rendimiento para saber cual es la que tomo
     function getPersonalPerformanceEvaluationVersion(Request $request)
     {
-        $query = EvaluacionRendimiento::select("*")->with([
+        $query = EvaluacionRendimiento::with([
             "categorias_rendimiento.rubricas_rendimiento"
         ])->where("id_evaluacion_rendimiento", $request->idEvaluacionRendimiento)->first();
         return $query;
@@ -702,122 +723,6 @@ class EvaluacionController extends Controller
         // Respuesta exitosa con el ID del registro insertado (si es una inserción)
         return response()->json(['message' => 'Respuestas guardadas exitosamente', 'inserted_id' => $insertedId ?? null], 200);
     }
-
-
-
-    /* function saveResponseInEvaluation(EvaluacionRespuestasRequest $request)
-    {
-        try {
-            // Buscar la evaluación personal
-            $evaluationPersonal = EvaluacionPersonal::findOrFail($request->id_evaluacion_personal);
-
-            // Buscar la evaluación de rendimiento
-            $evaluationPerformance = EvaluacionRendimiento::findOrFail($evaluationPersonal->id_evaluacion_rendimiento);
-
-            // Obtener las categorías de rendimiento asociadas
-            $performanceCategories = CategoriaRendimiento::where("id_evaluacion_rendimiento", $evaluationPerformance->id_evaluacion_rendimiento)->get();
-
-            DB::beginTransaction();
-
-            try {
-
-                EvaluacionPersonal::where("id_evaluacion_personal", $request->id_evaluacion_personal)->update([
-                    'observacion_incidente_personal' => $request->observacion_incidente_personal
-                ]);
-
-                // Iterar sobre las respuestas
-
-                foreach ($request->data as $value) {
-                    $data = [
-                        'id_evaluacion_personal'       => $request->id_evaluacion_personal,
-                        'id_cat_rendimiento'           => $value['id_cat_rendimiento'],
-                        'id_rubrica_rendimiento'       => $value['id_rubrica_rendimiento'],
-                        'usuario_detalle_eva_personal' => $request->user()->nick_usuario,
-                        'ip_detalle_eva_personal'      => $request->ip(),
-                    ];
-
-                    // Condiciones de búsqueda
-                    $conditions = [
-                        'id_evaluacion_personal' => $request->id_evaluacion_personal,
-                        'id_cat_rendimiento'     => $value['id_cat_rendimiento'],
-                    ];
-
-                    // Verificar si ya existe una respuesta para esta categoría
-                    $existingResponse = DetalleEvaluacionPersonal::where($conditions)->first();
-
-                    if ($existingResponse) {
-                        // Si existe, añadir la fecha de modificación
-                        $data['fecha_mod_detalle_eva_personal'] = Carbon::now();
-                    } else {
-                        // Si no existe, añadir la fecha de creación
-                        $data['fecha_reg_detalle_eva_personal'] = Carbon::now();
-                    }
-
-                    // Actualizar o insertar el registro
-                    DetalleEvaluacionPersonal::updateOrInsert($conditions, $data);
-                }
-
-                EvaluacionPersonal::where("id_evaluacion_personal", $request->id_evaluacion_personal)->update([
-                    'puntaje_evaluacion_personal'   => $request->puntaje_evaluacion_personal,
-                    'fecha_mod_evaluacion_personal' => Carbon::now(),
-                ]);
-
-
-                $data1 = [];
-                //INSERTANDO EN LA TABLA DE INCIDENTE EVALUACION
-                foreach ($request->dataIncidenteEvaluacion as $key => $value) {
-
-                    $data = [
-                        'id_evaluacion_personal'          => $request->id_evaluacion_personal,
-                        'id_cat_rendimiento'              => $value['id_cat_rendimiento'],
-                        'resultado_incidente_evaluacion'  => $value['resultado_incidente_evaluacion'],
-                        'comentario_incidente_evaluacion' => $value['comentario_incidente_evaluacion'],
-                        'estado_incidente_evaluacion'     => 1,
-                        'fecha_reg_incidente_evaluacion'  => $value['fecha_reg_incidente_evaluacion'],
-                        'usuario_incidente_evaluacion'    => $request->user()->nick_usuario,
-                        'ip_incidente_evaluacion'         => $request->ip(),
-                    ];
-
-
-                    // Condiciones de búsqueda
-                    $conditions = [
-                        'id_incidente_evaluacion' => $value['id_incidente_evaluacion'],
-                        'id_evaluacion_personal'  => $request->id_evaluacion_personal,
-                    ];
-
-                    $existingResponse = IncidenteEvaluacion::where($conditions)->first();
-
-                    if ($existingResponse) {
-                        // Si existe, añadir la fecha de modificación
-                        $data['fecha_mod_incidente_evaluacion'] = Carbon::now();
-                    } else {
-                        // Si no existe, añadir la fecha de creación
-                        $data['fecha_reg_incidente_evaluacion'] = Carbon::now();
-                    }
-
-                    if ($value["isDelete"] && !empty($value["id_cat_rendimiento"])) {
-                        IncidenteEvaluacion::destroy($value["id_incidente_evaluacion"]);
-                    } else if (!$value["isDelete"]) {
-                        IncidenteEvaluacion::updateOrInsert($conditions, $data);
-                    }
-                }
-
-                // Commit de la transacción
-                DB::commit();
-                // Respuesta exitosa
-                return response()->json(['message' => 'Respuestas guardadas exitosamente'], 200);
-            } catch (\Exception $e) {
-                // Si ocurre un error, hacer rollback de la transacción
-                DB::rollback();
-                return response()->json(['error' => $e], 500);
-            }
-        } catch (\Exception $e) {
-            // Manejar el caso de que no se encuentre la evaluación personal o de rendimiento
-            return response()->json(['error' => 'Evaluación no encontrada'], 404);
-        }
-    } */
-
-
     function getEvaluationById(Request $request)
     {
         return Empleado::select('*')

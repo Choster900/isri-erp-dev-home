@@ -359,12 +359,12 @@ export default {
         const {
             isLoadingRequest,
             depToShow,
-            fetchData,
+            getInfoForModalDependencias,
         } = useDependencia(context);
 
         onMounted(
             async () => {
-                await fetchData(dependencyId.value)
+                await getInfoForModalDependencias(dependencyId.value)
             }
         )
 

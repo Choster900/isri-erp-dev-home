@@ -179,7 +179,7 @@ import axios from 'axios';
                     </tbody>
                     <tbody v-else>
                         <tr>
-                            <td colspan="6" class="text-center">
+                            <td colspan="7" class="text-center">
                                 <img src="../../../img/IsSearching.gif" alt="" class="w-60 h-60 mx-auto">
                                 <h1 class="font-medium text-xl mt-4">Cargando!!!</h1>
                                 <p class="text-sm text-gray-600 mt-2 pb-10">Por favor espera un momento mientras se carga la
@@ -189,7 +189,7 @@ import axios from 'axios';
                     </tbody>
                     <tbody v-if="empty_object && !isLoadinRequest">
                         <tr>
-                            <td colspan="6" class="text-center">
+                            <td colspan="7" class="text-center">
                                 <img src="../../../img/NoData.gif" alt="" class="w-60 h-60 mx-auto">
                                 <h1 class="font-medium text-xl mt-4">No se encontraron resultados!</h1>
                                 <p class="text-sm text-gray-600 mt-2 pb-10">Parece que no hay registros disponibles en este

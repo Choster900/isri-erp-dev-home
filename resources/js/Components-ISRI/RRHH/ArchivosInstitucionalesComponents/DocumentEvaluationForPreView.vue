@@ -3,7 +3,6 @@
     <div class="mx-4 overflow-y-auto h-[550px] py-3 px-2 mb-4 ">
         <div v-if="rubricaAndCategoriaByEvaluacion && !isLoadingObtenerCategoriaYRubrica && evaluacionPersonalProp"
             class="w-full">
-
             <table class="w-full ">
                 <tbody>
                     <tr>
@@ -57,6 +56,7 @@
                     </tr>
                 </tbody>
             </table>
+
             <div id="especificaciones">
                 <div class="flex items-center justify-between pt-4 gap-2">
                     <div class="flex items-center">
@@ -380,13 +380,15 @@
                     </div>
                 </div>
             </div>
+
+
             <table border="0" cellpadding="0" cellspacing="0">
                 <tbody v-for="(evaluacion, i) in rubricaAndCategoriaByEvaluacion.categorias_rendimiento" :key="i">
                     <tr class="">
                         <td class="border border-black bg-black text-[9pt] text-white text-center pl-8 py-1" colspan="2">{{
                             evaluacion.nombre_cat_rendimiento }}
                         </td>
-                        <td class="border border-black bg-black text-[9pt] text-white text-start pl-1">PUNTOS: {{
+                        <td class="border border-black bg-black text-[9pt] text-white text-start">PUNTOS: {{
                             (optionsSelected.find(obj => obj.id_cat_rendimiento === evaluacion.id_cat_rendimiento) || {
                                 puntaje_rubrica_rendimiento: 0
                             }).puntaje_rubrica_rendimiento
@@ -409,11 +411,10 @@
                             class="border-x-0 border-t-0 border-black justify-center text-center  px-4 py-2 border-b border-r">
                             <div class="container mt-1">
                                 <label>
-                                    <input type="radio" :name="evaluacion.nombre_cat_rendimiento"
-                                        @click="saveResponseWhenIsClickedCheckbox(evaluacion.id_cat_rendimiento, rubrica.id_rubrica_rendimiento, rubrica.puntaje_rubrica_rendimiento)"
-                                        :checked="optionsSelected.find(cat => cat.id_cat_rendimiento === evaluacion.id_cat_rendimiento)?.id_rubrica_rendimiento == rubrica.id_rubrica_rendimiento">
-                                    <span class="text-xs justify-center text-center "> {{
-                                        rubrica.opcion_rubrica_rendimiento }}</span>
+                                    <div class="border border-black size-4"
+                                        :class="optionsSelected.find(cat => cat.id_cat_rendimiento === rubrica.id_cat_rendimiento)?.id_rubrica_rendimiento == rubrica.id_rubrica_rendimiento ? 'bg-black text-black' : ''">
+                                    </div>
+                                    <p class="mt-[-4px] pl-2">{{ rubrica.opcion_rubrica_rendimiento }}</p>
                                 </label>
                             </div>
                         </td>
@@ -422,8 +423,6 @@
                 </tbody>
             </table>
             <div class="flex flex-col justify-between md:flex-row gap-10">
-
-                <!-- Primera tabla -->
                 <div class="w-full md:w-1/2 overflow-x-auto">
                     <table class="w-full">
                         <tr class="text-center">
@@ -451,7 +450,6 @@
                         </tr>
                     </table>
                 </div>
-                <!-- Segunda tabla -->
                 <div class="w-full md:w-1/3 mt-6 md:mt-0 overflow-x-auto">
                     <table class="w-full">
                         <tr class="text-start">
@@ -471,10 +469,19 @@
                     </table>
                 </div>
             </div>
-            <button @click="guardarYEnviarEvaluacion"
-                v-if="!arrayShowButtons.includes(evaluacionPersonal.id_evaluacion_personal) && evaluacionPersonal.id_estado_evaluacion_personal === 1 && evaluacionPersonalProp.data.detalle_evaluaciones_personal.length < 7"
-                class="bg-indigo-900 rounded-sm shadow text-center text-white text-sm font-light w-full py-1 mt-5">
-                TERMINAR EVALUACIÓN (Los datos se guardaran entonces)</button>
+            <div class="flex flex-col items-center space-y-3 mt-5" v-if="$page.props.auth.user.id_persona == evaluacionPersonalProp.data.id_empleado">
+                <!--  <p class="text-center text-sm">¿Cómo te sientes con la evaluación?</p> -->
+                <div class="w-full flex flex-row space-x-10">
+                    <button @click="changeStateFromEvaluation(5, evaluacionPersonalProp.data.id_evaluacion_personal)"
+                        class="bg-blue-900 rounded-sm shadow text-center text-white text-sm font-light w-full py-1">
+                        ESTOY DE ACUERDO </button>
+                    <button @click="changeStateFromEvaluation(4, evaluacionPersonalProp.data.id_evaluacion_personal)"
+                        class="bg-red-900 rounded-sm shadow text-center text-white text-sm font-light w-full py-1">
+                        NO ESTOY DE ACUERDO</button>
+                </div>
+            </div>
+
+
         </div>
 
         <div v-if="isLoadingObtenerCategoriaYRubrica" class="flex items-center justify-center h-full">
@@ -508,8 +515,10 @@
             <div class="flex flex-col items-center justify-center h-full">
                 <img src="../../../../img/evaluationModal.svg" class="h-96 rounded-full mx-auto" alt="SVG Image"
                     draggable="false">
-                <h1 class="font-medium text-center">Evalúa al personal con honestidad</h1>
-                <p class="text-[9pt] text-center">Recuerda que solo evaluarás a los empleados que están a tu cargo.</p>
+                <h1 class="font-medium text-center">Todas tus evaluaciones aparecerán aquí</h1>
+                <p class="text-[9pt] text-center">Parece que la evaluación aún no está lista. Comunícate con tu jefe
+                    inmediato para obtener más información.</p>
+
             </div>
         </div>
 
@@ -545,129 +554,106 @@ export default {
             default: false,
         },
     },
-    emit: ["actualizar-datatable", "showOptionToSendEvaluation"],
+    emit: ["actualizar-datatable"],
     setup(props, { emit }) {
-        // Desestructuración de propiedades y funciones de toRefs y useDocumentoEvaluacion
-        const { evaluacionPersonalProp, rubricaAndCategoriaByEvaluacion } = toRefs(props);
-        const { arrayShowButtons, separarTexto, evaluacionPersonal, saveResponseWhenIsClickedCheckbox, optionsSelected, sendResponsesEvaluation, ranges, isScoreInRange } = useDocumentoEvaluacion();
-
-        // Utilizando watch para observar cambios en evaluacionPersonalProp
-        watch(evaluacionPersonalProp, (newValue, oldValue) => {
-            // Verifica si newValue tiene un valor (no es nulo ni indefinido)
+        const { evaluacionPersonalProp, rubricaAndCategoriaByEvaluacion } = toRefs(props)
+        const { separarTexto, evaluacionPersonal, saveResponseWhenIsClickedCheckbox, optionsSelected, sendResponsesEvaluation, ranges, isScoreInRange } = useDocumentoEvaluacion();
+        watch(() => evaluacionPersonalProp.value, (newValue, oldValue) => {
             if (newValue) {
-                // Reinicia el array optionsSelected
-                optionsSelected.value = [];
-
-                // Asigna el valor de evaluacionPersonal a partir de newValue.data
-                evaluacionPersonal.value = newValue.data;
-
-                // Itera sobre cada elemento en detalle_evaluaciones_personal y agrega información a optionsSelected
+                optionsSelected.value = []
+                evaluacionPersonal.value = newValue.data
                 evaluacionPersonal.value.detalle_evaluaciones_personal.forEach(element => {
                     optionsSelected.value.push({
                         id_cat_rendimiento: element.categoria_rendimiento.id_cat_rendimiento,
                         id_rubrica_rendimiento: element.rubrica_rendimiento.id_rubrica_rendimiento,
                         puntaje_rubrica_rendimiento: element.rubrica_rendimiento.puntaje_rubrica_rendimiento
-                    });
+                    })
                 });
-            } else {
-
             }
-        });
+        }, { immediate: true });
 
 
-        /**
-         * Función asincrónica para guardar y enviar la evaluación.
-         */
-        const guardarYEnviarEvaluacion = async () => {
-            // Muestra un cuadro de confirmación utilizando SweetAlert2
+        const changeStateEvaluationRequest = async (objectInfo) => {
+            try {
+                // Realiza la búsqueda de empleados
+                const response = await axios.post(
+                    "/changeStateEvaluation",
+                    {
+                        idEvaluation: objectInfo.idEvaluation,
+                        stateToChange: objectInfo.newState,
+                    }
+                );
+
+                return response;
+            } catch (error) {
+                // Manejo de errores específicos
+                console.error("Error al cambiar de estado:", error);
+                // Lanza el error para que pueda ser manejado por el componente que utiliza este composable
+                throw new Error("Error al cambiar de estado");
+            }
+        };
+
+
+        const changeStateFromEvaluation = async (state, idEvaluation) => {
             const confirmed = await Swal.fire({
-                title: '<p class="text-[16pt] text-center">¿Confirma el envío de la evaluación?</p>',
+                title: '<p class="text-[16pt] text-center">¿Esta seguro de enviar la evaluacion?</p>',
                 icon: "question",
                 iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
-                confirmButtonText: "Sí, Enviar",
+                confirmButtonText: "Si, Enviar",
                 confirmButtonColor: "#001b47",
                 cancelButtonText: "Cancelar",
                 showCancelButton: true,
                 showCloseButton: true,
             });
-
-            // Verifica si el usuario confirmó la acción
             if (confirmed.isConfirmed) {
-                // Verifica si se han seleccionado todas las opciones de categorías de rendimiento
-                if (rubricaAndCategoriaByEvaluacion.value.categorias_rendimiento.length === optionsSelected.value.length) {
-                    let res = null;
-
-                    // Realiza la solicitud para enviar las respuestas de la evaluación
-                    res = await executeRequest(
-                        sendResponsesEvaluation(),
-                        "La evaluación se ha enviado"
-                    );
-
-                    console.log(optionsSelected.value);
-
-                    console.log("HACEMOS ALGO DESPUÉS");
-                    // Emite un evento para actualizar la datatable
-                    emit("actualizar-datatable");
-                    emit("showOptionToSendEvaluation", evaluacionPersonal.value.id_evaluacion_personal);
-                    arrayShowButtons.value.push(evaluacionPersonal.value.id_evaluacion_personal);
-                } else {
-                    // Muestra una advertencia si no se han seleccionado todas las opciones
-                    toast.warning('No has seleccionado todas las opciones. Por favor, asegúrate de seleccionar todas las opciones antes de finalizar.');
-                }
+                await executeRequest(
+                    changeStateEvaluationRequest({ idEvaluation: idEvaluation, newState: state }),
+                    "La respuesta se ha enviado corretamente"
+                );
             }
         };
 
-        /**
-         * Función asincrónica para imprimir la evaluación en formato PDF.
-         */
         const printEvaluacion = async () => {
             try {
-                // Cambia el cursor del cuerpo del documento a "wait" durante la generación del PDF
                 document.body.style.cursor = 'wait';
 
-                // Configuración para la generación del PDF
                 const opt = {
-                    margin: [0.1, 0.1, 0.1, 0.1], //top, left, bottom, right,
+                    margin: [0.1, 0.1, 0.1, 0.1],//top, left, buttom, right,
                     filename: 'evaluacion',
                     image: { type: 'jpeg', quality: 0.98 },
                     html2canvas: { scale: 2, useCORS: true },
                     pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+                    //pagebreak: { mode: 'avoid-all', before: '#page2el' },
                     jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
                 };
 
-                // Crear una instancia de la aplicación Vue para la generación del PDF
                 const app = createApp(EvaluacionPdfVue, {
                     rubricaAndCategoriaByEvaluacion: rubricaAndCategoriaByEvaluacion.value.categorias_rendimiento,
                     optionsSelected: optionsSelected.value,
                     evaluacionPersonalProp: evaluacionPersonalProp.value
                 });
 
-                // Crear un elemento div para montar la aplicación Vue
                 const div = document.createElement('div');
                 const pdfPrint = app.mount(div);
                 const html = div.outerHTML;
 
-                // Utilizar html2pdf para generar y guardar el PDF
                 await html2pdf().set(opt).from(html).save();
             } catch (error) {
                 console.error('Error al generar el PDF:', error);
                 // Manejar el error según tus necesidades
             } finally {
-                // Restaurar el cursor del cuerpo del documento a "default" después de la generación del PDF
                 document.body.style.cursor = 'default';
             }
         };
 
 
-
         return {
             printEvaluacion,
-            arrayShowButtons,
             separarTexto,
             optionsSelected,
             moment,
             optionsSelected,
-            guardarYEnviarEvaluacion,
+            changeStateFromEvaluation,
             isScoreInRange,
             ranges,
             saveResponseWhenIsClickedCheckbox,
@@ -687,7 +673,6 @@ export default {
 
 .container label {
     display: flex;
-    cursor: pointer;
     font-weight: 500;
     position: relative;
     overflow: hidden;

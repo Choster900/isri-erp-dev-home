@@ -190,7 +190,7 @@ export default {
             };
 
             copiedData[matchingArrayIndex] = updatedMatchingArray;
-            return copiedData.filter(deal => deal.mesAño <= targetMonthYear);
+            return copiedData.filter(deal => deal.mesAño <= b);
         },
         showMoreActivity(reset = false, filterFromHere = '') {
             // Dejar el codigo asi (NO TOCAR 🚫)

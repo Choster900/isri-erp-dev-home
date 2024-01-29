@@ -40,6 +40,18 @@ export const useEvaluacion = () => {
 
     const optionToShowIntoDocument = ref(null);
     const headerOptions = ref("DocumentoEvalacionVue");
+
+    const showButtonToSend = ref([]);
+
+    /**
+     * Agrega id_evaluacion_personal a arreglo para validar si se guardo las respuestas
+     *
+     * @param {BigInteger} data - IdEvaluacion
+     */
+    const addingDataToShowButton = (data) => {
+        showButtonToSend.value.push(data);
+    };
+
     /**
      * Busca empleados por nombre para evaluaciones.
      *
@@ -442,7 +454,7 @@ export const useEvaluacion = () => {
                     value: evaluacionPersonal.value.persona.id_persona,
                     label: `${evaluacionPersonal.value.persona.pnombre_persona || ''} ${evaluacionPersonal.value.persona.snombre_persona || ''} ${evaluacionPersonal.value.persona.tnombre_persona || ''}  ${evaluacionPersonal.value.persona.papellido_persona || ''}  ${evaluacionPersonal.value.persona.sapellido_persona || ''}  ${evaluacionPersonal.value.persona.tapellido_persona || ''}`
                 }] : [];
-            return objectPersonaOption; // Corregir aquí: evaluacionPersonal.value.persona en lugar de evaluacionPersonal.persona
+            return objectPersonaOption;
         } else {
             return null;
         }
@@ -469,7 +481,7 @@ export const useEvaluacion = () => {
                 }
                 // Agregar la evaluación al arreglo correspondiente al año
                 evaluacionesAgrupadas[year].evaluaciones.push(evaluacion);
-                activeIndex.value = moment(evaluacionPersonal.value.evaluaciones_personal[0].fecha_inicio_evaluacion_personal).year().toString();
+                /*  activeIndex.value = moment(evaluacionPersonal.value.evaluaciones_personal[0].fecha_inicio_evaluacion_personal).year().toString(); */
             });
         }
         return evaluacionesAgrupadas;
@@ -505,6 +517,7 @@ export const useEvaluacion = () => {
 
     return {
         changeStateEvaluation,
+        addingDataToShowButton,
         opcionEmpleado,
         handleEmployeeSearch,
         configSecondInput,
@@ -536,6 +549,7 @@ export const useEvaluacion = () => {
         showMessageAlert,
         handleAccept,
         headerOptions,
+        showButtonToSend,
         handleCancel,
     };
 };

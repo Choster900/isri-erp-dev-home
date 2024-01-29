@@ -5,7 +5,7 @@
         :disabled="disabled" @update:model-value="$emit('update:modelValue', $event)"
         :style="hasError ? '--dp-border-color: #F87171;' : ''">
         <template #input-icon>
-            <svg class="ml-[10px] w-auto h-[17px] relative text-gray-500" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg class="ml-[10px] w-auto h-[20px] relative text-gray-500" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                 <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
                 <g id="SVGRepo_iconCarrier">

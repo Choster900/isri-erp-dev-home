@@ -31,7 +31,7 @@ export const useAnalisisDes = (evaluacionPersonalProp) => {
             idCategoriaRendimiento: null,
             resultadoIncidenteEvaluacion: null,
             comentarioIncidenteEvaluacion: null,
-            fechaRegIncidenteEvaluacion: moment().format('l'),
+            fechaRegIncidenteEvaluacion: moment(),
             idIncidenteEvaluacion: uuidv4(),
             isDeleted: false,
         })

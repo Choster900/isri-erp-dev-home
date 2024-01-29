@@ -244,8 +244,10 @@
                                             <div v-for="(evaluacion, j) in año.evaluaciones" :key="j"
                                                 class="bg-slate-300/40 border-l-[4px] border-y-0 border-r-0 border-l-indigo-500 hover:bg-slate-300 cursor-pointer"
                                                 :class="j == 1 ? ' border-b border-b-slate-400' : ''">
+
                                                 <ul class="ml-10 list-circle py-2 "
-                                                    @click="obtenerCategoriaYRubricaRendimiento(evaluacion.evaluacion_rendimiento.id_evaluacion_rendimiento); evaluacionToPassDocumento = { data: evaluacion, allData: año.allContent }">
+                                                    @click="obtenerCategoriaYRubricaRendimiento(evaluacion.evaluacion_rendimiento.id_evaluacion_rendimiento);
+                                                    evaluacionToPassDocumento = { data: evaluacion, allData: año.allContent }">
                                                     <li
                                                         class="relative text-xs text-slate-500 before:w-[10px] before:h-[10px] before:border-[3px] before:border-indigo-500 before:rounded-full before:absolute before:-left-4 before:top-1">
                                                         Puntuación
@@ -294,8 +296,9 @@
                                                         }}
                                                     </p>
                                                 </ul>
-                                                <!-- {{ evaluacion.estado_evaluacion_personal.id_estado_evaluacion_personal }} -->
-                                                <ButtonsStatesEvaluation :data="evaluacion" @changeState="changeState" />
+                                                <ButtonsStatesEvaluation v-if="evaluacion.detalle_evaluaciones_personal.length > 0 ||
+                                                        showButtonToSend.includes(evaluacion.id_evaluacion_personal)"
+                                                    :data="evaluacion" @changeState="changeState" />
                                             </div>
                                         </div>
                                     </div>
@@ -370,7 +373,8 @@
                         :isLoadingObtenerCategoriaYRubrica="isLoadingObtenerCategoriaYRubrica"
                         :evaluacionPersonalProp="evaluacionToPassDocumento"
                         :rubricaAndCategoriaByEvaluacion="rubricaAndCategoriaByEvaluacion"
-                        @actualizar-datatable="$emit('actualizar-datatable')" />
+                        @actualizar-datatable="$emit('actualizar-datatable')"
+                        @showOptionToSendEvaluation="addingDataToShowButton" />
 
 
                     <DocAnalisisDes :class="headerOptions === 'DocumentoAnalisisDesempeñoVue' ? '' : 'hidden'"
@@ -471,20 +475,27 @@ export default {
         },
     },
     setup(props, { emit }) {
+        // Desestructuración de propiedades
         const { evaluacionPersonalProp, listDependencias, showModal } = toRefs(props);
+        // Desestructuración de objetos y funciones de useEvaluacion
         const {
-            idEmpleado, errorsData,
+            showButtonToSend, addingDataToShowButton,
+            clearLock, idEmpleado,
+            errorsData, activeIndex,
             messageAlert, handleAccept,
-            handleCancel, plazaOptions, headerOptions,
-            changeStateEvaluation,
-            handleTagToSelect, evaluationsOptions,
-            objectEvaluaciones, fechaInicioFechafin,
-            showPlazasModal, existMoreThanOne, clearLock,
-            showMessageAlert, idTipoEvaluacion, selectedEmpleadoValue,
-            handleEmployeeSearch, idEvaluacionRendimiento, opcionEmpleado,
-            idCentroAtencion, doesntExistResult, evaluacionesAgrupadasPorAño,
-            activeIndex, objectPlazas, evaluacionPersonal, evaluacionToPassDocumento,
-            loadingEvaluacionRendimiento, createPersonalEvaluationRequest, getPlazasByEmployeeIdAndCentroAtencionId, configSecondInput,
+            handleCancel, plazaOptions,
+            objectPlazas, headerOptions,
+            opcionEmpleado, showPlazasModal,
+            existMoreThanOne, showMessageAlert,
+            idTipoEvaluacion, idCentroAtencion,
+            handleTagToSelect, doesntExistResult,
+            configSecondInput, evaluationsOptions,
+            objectEvaluaciones, evaluacionPersonal,
+            fechaInicioFechafin, handleEmployeeSearch,
+            changeStateEvaluation, selectedEmpleadoValue,
+            idEvaluacionRendimiento, evaluacionToPassDocumento,
+            evaluacionesAgrupadasPorAño, loadingEvaluacionRendimiento,
+            createPersonalEvaluationRequest, getPlazasByEmployeeIdAndCentroAtencionId,
         } = useEvaluacion();
 
         const {
@@ -493,8 +504,11 @@ export default {
             obtenerCategoriaYRubricaRendimiento,
         } = useDocumentoEvaluacion()
 
+        // Utilizando una función de flecha para la callback de watch
         watch(showModal, (newValue, oldValue) => {
+            // Verifica si showModal se ha establecido en falso (se cerró el modal)
             if (!newValue) {
+                // Restablecer los valores a nulos o vacíos
                 idEmpleado.value = null;
                 objectPlazas.value = null;
                 idCentroAtencion.value = null;
@@ -502,52 +516,82 @@ export default {
                 rubricaAndCategoriaByEvaluacion.value = [];
                 plazaOptions.value = [];
                 showPlazasModal.value = false;
-                evaluationsOptions.value = []
+                evaluationsOptions.value = [];
                 idEvaluacionRendimiento.value = null;
                 fechaInicioFechafin.value = null;
             }
-        })
+        });
 
+
+        // Utiliza una función de flecha para mayor claridad y consistencia
         watch(evaluacionPersonalProp, (newValue, oldValue) => {
-            console.log({ newValue, oldValue });
-            if (newValue != '') {
-                evaluacionPersonal.value = newValue
+            // Verifica si newValue no es nulo ni indefinido antes de compararlo con una cadena vacía
+            if (newValue !== null && newValue !== undefined && newValue !== '') {
+                evaluacionPersonal.value = newValue;
 
-                if (newValue.plazas_asignadas.length === 1) {
-                    idCentroAtencion.value = newValue.plazas_asignadas[0].id_centro_atencion
+                // Verifica que newValue.plazas_asignadas sea un array y tenga al menos un elemento antes de acceder a la propiedad id_centro_atencion
+                if (Array.isArray(newValue.plazas_asignadas) && newValue.plazas_asignadas.length === 1) {
+                    idCentroAtencion.value = newValue.plazas_asignadas[0].id_centro_atencion;
                 }
             } else {
-                evaluacionPersonal.value = null;
+                evaluacionPersonal.value = {};
             }
-        })
+        });
 
+
+        /**
+         * Función asincrónica para crear una nueva evaluación personal.
+         */
         const createEvaluationPersona = async () => {
+            // Muestra un cuadro de confirmación utilizando SweetAlert2
             const confirmed = await Swal.fire({
-                title: '<p class="text-[16pt] text-center">¿Esta seguro de agregar una nueva evaluacion?</p>',
+                title: '<p class="text-[16pt] text-center">¿Está seguro de agregar una nueva evaluación?</p>',
                 icon: "question",
                 iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
-                confirmButtonText: "Si, Agregar",
+                confirmButtonText: "Sí, Agregar",
                 confirmButtonColor: "#001b47",
                 cancelButtonText: "Cancelar",
                 showCancelButton: true,
                 showCloseButton: true,
             });
+
+            // Verifica si el usuario confirmó la acción
             if (confirmed.isConfirmed) {
                 let res = null;
-                res = await executeRequest(
-                    createPersonalEvaluationRequest(),
-                    "La evaluacion se ha creado"
-                );
-                evaluacionPersonal.value = res.data.response
-                emit("actualizar-datatable")
+
+                try {
+                    // Realiza la solicitud para crear la evaluación personal
+                    res = await executeRequest(createPersonalEvaluationRequest(), "La evaluación se ha creado");
+
+                    // Desestructura la respuesta para obtener el objeto evaluaciones_personal
+                    const { evaluaciones_personal } = res.data.response;
+
+                    // Verifica si evaluacionPersonal.value no está vacío
+                    if (evaluacionPersonal.value != '') {
+                        // Agrega la nueva evaluación al array existente
+                        evaluacionPersonal.value.evaluaciones_personal.push(evaluaciones_personal[0]);
+                    } else {
+                        // Asigna la respuesta completa si evaluacionPersonal.value está vacío
+                        evaluacionPersonal.value = res.data.response;
+                    }
+                    //Asignacion a index el año de el ultimo registro que ingreso
+                    activeIndex.value = moment(evaluaciones_personal[0].fecha_fin_evaluacion_personal).year().toString();
+                    // Emite un evento para actualizar la datatable
+                    emit("actualizar-datatable");
+                } catch (error) {
+                    // Maneja los errores, por ejemplo, puedes mostrar un mensaje de error
+                    console.error("Error al crear la evaluación personal:", error.message);
+                }
             }
+
         };
+
 
 
         const changeState = async (e) => {
 
             const confirmed = await Swal.fire({
-                title: '<p class="text-[16pt] text-center">¿Esta seguro de dmkasdkasj?</p>',
+                title: '<p class="text-[16pt] text-center">¿Confirma el envío de la evaluación para que el empleado la vea?</p>',
                 icon: "question",
                 iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
                 confirmButtonText: "Si, Agregar",
@@ -618,6 +662,7 @@ export default {
                         changeStateEvaluation(e),
                         "Cambiado"
                     );
+                    emit('cerrar-modal')
                     emit("actualizar-datatable")
 
                 }
@@ -627,32 +672,29 @@ export default {
         }
 
         return {
-            moment,
-            errorsData,
-            changeState,
-            objectPlazas,
-            plazaOptions,
-            opcionEmpleado,
-            showMessageAlert,
-            listDependencias,
-            configSecondInput,
-            evaluacionPersonal,
-            handleEmployeeSearch,
-            activeIndex, activeIndex,
-            handleAccept, handleCancel,
-            evaluacionesAgrupadasPorAño, headerOptions,
+            showButtonToSend,
+            addingDataToShowButton,
+            moment, clearLock,
+            errorsData, idEmpleado,
+            changeState, activeIndex,
+            activeIndex, objectPlazas,
+            handleAccept, plazaOptions,
+            messageAlert, handleCancel,
+            headerOptions, opcionEmpleado,
+            showPlazasModal, idCentroAtencion,
+            showMessageAlert, listDependencias,
             existMoreThanOne, idTipoEvaluacion,
-            messageAlert, selectedEmpleadoValue,
-            evaluacionToPassDocumento, clearLock,
             handleTagToSelect, doesntExistResult,
+            configSecondInput, evaluacionPersonal,
             evaluacionPersonal, objectEvaluaciones,
             evaluationsOptions, fechaInicioFechafin,
             getPlazasByEmployeeIdAndCentroAtencionId,
-            createEvaluationPersona, idEvaluacionRendimiento,
-            obtenerCategoriaYRubricaRendimiento, showPlazasModal,
-            evaluacionesAgrupadasPorAño, idEmpleado, idCentroAtencion,
-            loadingEvaluacionRendimiento, createPersonalEvaluationRequest,
-            isLoadingObtenerCategoriaYRubrica, rubricaAndCategoriaByEvaluacion,
+            handleEmployeeSearch, selectedEmpleadoValue,
+            idEvaluacionRendimiento, createEvaluationPersona,
+            evaluacionToPassDocumento, evaluacionesAgrupadasPorAño,
+            evaluacionesAgrupadasPorAño, loadingEvaluacionRendimiento,
+            createPersonalEvaluationRequest, rubricaAndCategoriaByEvaluacion,
+            isLoadingObtenerCategoriaYRubrica, obtenerCategoriaYRubricaRendimiento,
         }
     }
 

@@ -555,7 +555,7 @@ export default {
             if (confirmed.isConfirmed) {
 
 
-                if (dataIndiceEvaluacion.length > 0) {
+                if (dataIndiceEvaluacion.value.length > 0) {
                     await executeRequest(
                         saveIncidentesEvaluacionesRequest(),
                         "La evaluacion se ha enviado"
