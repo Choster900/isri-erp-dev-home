@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Luecano\NumeroALetras\NumeroALetras;
 
 class FiniquitoController extends Controller
 {
@@ -28,6 +29,23 @@ class FiniquitoController extends Controller
                 'empleado.persona',
             ])
             ->orderBy('id_finiquito_laboral', 'DESC');
+
+        if ($search_value) {
+            $query->where('id_empleado', 'like', '%' . $search_value['id_empleado'] . '%');
+                //->where('codigo_empleado', 'like', '%' . $search_value['codigo_empleado'] . '%')
+                //->where('id_estado_empleado', 'like', '%' . $search_value['estado_empleado'] . '%')
+                // ->whereHas('persona', function ($query) use ($search_value) {
+                //     $query->where('dui_persona', 'like', '%' . $search_value["dui_persona"] . '%');
+                // })
+                // ->whereHas(
+                //     'persona',
+                //     function ($query) use ($search_value) {
+                //         if ($search_value["nombre_persona"] != '') {
+                //             $query->whereRaw("MATCH(pnombre_persona, snombre_persona, tnombre_persona, papellido_persona, sapellido_persona, tapellido_persona) AGAINST(?)", $search_value["nombre_persona"]);
+                //         }
+                //     }
+                // );
+        }
 
         $data = $query->paginate($length)->onEachSide(1);
         return ['data' => $data, 'draw' => $request->input('draw')];
@@ -290,6 +308,77 @@ class FiniquitoController extends Controller
                 ], 422);
             }
             $finiquitoEmp = FiniquitoLaboral::find($request->id);
+        }
+    }
+
+    public function getInfoForModalShowFiniquito(Request $request, $id)
+    {
+        $finiquitoEmp = FiniquitoLaboral::with([
+            'empleado.persona',
+            'empleado.persona.profesion',
+            'empleado.persona.residencias' => function ($query) {
+                $query->with('municipio.departamento')
+                    ->where('estado_residencia', 1)
+                    ->orderBy('fecha_reg_residencia', 'desc');
+            },
+            'persona.profesion',
+            'persona.residencias' => function ($query) {
+                $query->with('municipio.departamento')
+                    ->where('estado_residencia', 1)
+                    ->orderBy('fecha_reg_residencia', 'desc');
+            }
+        ])->find($id);
+
+        $formatter = new NumeroALetras();
+        $formatterDateA = new NumeroALetras();
+        $formatterDateA->apocope=true;
+
+        //Format hire date
+        $hireDate = Carbon::parse($finiquitoEmp->empleado->fecha_contratacion_empleado)->format('Y-m-d');
+        $hireMonth = Carbon::createFromFormat('Y-m-d', $hireDate)->format('m');
+        $hireMonthText = strtoupper(Carbon::createFromFormat('m', $hireMonth)->locale('es_ES')->monthName);
+        $hireDayText = $formatter->toWords(Carbon::createFromFormat('Y-m-d', $hireDate)->format('d'));
+        $hireYearText = $formatter->toWords(Carbon::createFromFormat('Y-m-d', $hireDate)->format('Y'));
+
+        //Format signature date apocope
+        $signatureDateA = Carbon::parse($finiquitoEmp->fecha_firma_finiquito_laboral)->format('Y-m-d');
+        $signatureMonthA = Carbon::createFromFormat('Y-m-d', $signatureDateA)->format('m');
+        $signatureMonthTextA = strtoupper(Carbon::createFromFormat('m', $signatureMonthA)->locale('es_ES')->monthName);
+        $signatureDayTextA = $formatterDateA->toWords(Carbon::createFromFormat('Y-m-d', $signatureDateA)->format('d'));
+        $signatureYearTextA = $formatter->toWords(Carbon::createFromFormat('Y-m-d', $signatureDateA)->format('Y'));
+
+        //Format settlement period
+        $settlementDate = Carbon::parse($finiquitoEmp->fecha_reg_finiquito_laboral)->format('Y-m-d');
+        $settlementYear = mb_strtolower($formatter->toWords(Carbon::createFromFormat('Y-m-d', $settlementDate)->format('Y')), 'UTF-8');
+
+        //Format hour
+        $time = Carbon::parse($finiquitoEmp->hora_firma_finiquito_laboral);
+        $hoursText = $formatter->toWords($time->format('h'));
+        $minutesText = $formatter->toWords($time->format('i'));
+
+        //Format signature date
+        $signatureDate = Carbon::parse($finiquitoEmp->fecha_firma_finiquito_laboral)->format('Y-m-d');
+        $signatureMonth = Carbon::createFromFormat('Y-m-d', $signatureDate)->format('m');
+        $signatureMonthText = strtoupper(Carbon::createFromFormat('m', $signatureMonth)->locale('es_ES')->monthName);
+        $signatureDayText = $formatterDateA->toWords(Carbon::createFromFormat('Y-m-d', $signatureDate)->format('d'));
+        $signatureYearText = $formatter->toWords(Carbon::createFromFormat('Y-m-d', $signatureDate)->format('Y'));
+
+
+        if ($finiquitoEmp) {
+            return response()->json([
+                'finiquitoEmp'          => $finiquitoEmp ?? [],
+                'hireDate'              => $hireDayText." de ".$hireMonthText." de ".$hireYearText,
+                'signatureDateA'        => $signatureDayTextA." días del mes de ".$signatureMonthTextA." de ".$signatureYearTextA,
+                'period'                => "del uno de enero al treinta y uno de diciembre del año ".$settlementYear,
+                'signatureTime'         => $hoursText." horas con ".$minutesText." minutos",
+                'signatureDate'         => $signatureDayText." de ".$signatureMonthText." de ".$signatureYearText,
+                'amountText'            => $formatter->toInvoice($finiquitoEmp->monto_finiquito_laboral, 2, 'DÓLARES DE LOS ESTADOS UNIDOS DE AMERICA'),
+                'year'                  => $formatter->toWords(Carbon::createFromFormat('Y-m-d', $signatureDate)->format('Y'))
+            ]);
+        } else {
+            return response()->json([
+                'logical_error' => 'No existe el finiquito que estas intentando modificar.',
+            ], 422);
         }
     }
 }

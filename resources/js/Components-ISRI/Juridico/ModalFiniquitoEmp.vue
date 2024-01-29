@@ -92,15 +92,13 @@
 <script>
 import { useFiniquitoEmp } from '@/Composables/Juridico/Finiquito/useFiniquitoEmp.js';
 import InputError from "@/Components/InputError.vue";
-import { toast } from 'vue3-toastify';
-import 'vue3-toastify/dist/index.css';
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 import InputText from "@/Components-ISRI/ComponentsToForms/InputText.vue";
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
 import DateTimePickerM from "@/Components-ISRI/ComponentsToForms/DateTimePickerM.vue";
 import TimePickerM from "@/Components-ISRI/ComponentsToForms/TimePickerM.vue";
 
-import { ref, toRefs, onMounted, } from 'vue';
+import { toRefs, onMounted, } from 'vue';
 
 export default {
     emits: ["cerrar-modal", "get-table"],
