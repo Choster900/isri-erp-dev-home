@@ -17,7 +17,7 @@
                 </div>
             </div>
         </div>
-        <ProcessModal v-else maxWidth='2xl' :show="showModalSettlementEmp" @close="$emit('cerrar-modal')">
+        <ProcessModal v-else maxWidth='2xl' :show="showModalSettlementEmp" @close="$emit('cerrar-modal')" :rounded="true">
             <div class="flex items-center justify-between p-4 border-b border-blue-900/30 shadow-blue-900/10 shadow-lg">
                 <svg transform="rotate(270)" class="h-6 w-6 text-blue-900" fill="currentColor" viewBox="0 0 24 24"
                     xmlns="http://www.w3.org/2000/svg">
@@ -55,33 +55,33 @@
                 <div class="md:mr-2 md:mb-0 basis-1/2">
                     <date-time-picker-m v-model="finiquitoEmp.signatureDate" :placeholder="'Fecha firma'"
                         :label="'Fecha firma'" :required="true" />
-                    <!-- <InputError v-for="(item, index2) in errors['centers.' + index + '.date']" :key="index2"
-                        class="mt-2 h-[32px]" :message="item" /> -->
+                    <InputError v-for="(item, index2) in errors.signatureDate" :key="index2"
+                        class="mt-2" :message="item" />
                 </div>
                 <div class="md:mr-2 md:mb-0 basis-1/2">
                     <time-picker-m :height="200" v-model="finiquitoEmp.signatureTime" :placeholder="'Hora firma'"
                         :label="'Hora firma'" :required="true" />
-                    <!-- <InputError v-for="(item, index2) in errors['centers.' + index + '.startTime']" :key="index2"
-                        class="mt-2 h-[32px]" :message="item" /> -->
+                        <InputError v-for="(item, index2) in errors.signatureTime" :key="index2"
+                        class="mt-2" :message="item" />
                 </div>
             </div>
 
             <div class="mb-4 md:flex flex-row justify-items-start mx-10">
                 <div class="md:mr-2 md:mb-0 basis-1/2 pr-2">
                     <input-text iconName="money" id="amount" v-model="finiquitoEmp.amount" type="text" placeholder="Monto"
-                        :validation="{ limit: 6, amount: true }" :addClasses="'text-gray-500'" label="Monto"
+                        :validation="{ limit: 8, amount: true }" :addClasses="'text-gray-500'" label="Monto"
                         :required="true">
                     </input-text>
-                    <!-- <InputError v-for="(item, index2) in errors['centers.' + index + '.interval']" :key="index2"
-                        class="mt-2 h-[32px]" :message="item" /> -->
+                    <InputError v-for="(item, index2) in errors.amount" :key="index2"
+                        class="mt-2" :message="item" />
                 </div>
             </div>
 
             <div class="md:flex flex-row justify-center py-6">
-                <button @click="$emit('cerrar-modal')"
-                    class="bg-gray-700 hover:bg-gray-800 text-white font-semibold text-[12px] px-3 py-1.5 rounded mr-1.5">CERRAR</button>
-                <button
-                    class="bg-orange-700 hover:bg-orange-800 text-white font-semibold text-[12px] px-3 py-1.5 rounded mr-1.5">ACTUALIZAR</button>
+                <button type="button" @click="$emit('cerrar-modal')"
+                    class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-2.5 py-1 text-center mb-2 dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
+                <button @click="updateFiniquitoEmp(finiquitoEmp)"
+                    class="bg-orange-700 hover:bg-orange-800 text-white font-medium text-sm px-2.5 py-1 rounded-lg mr-1.5 mb-2">ACTUALIZAR</button>
             </div>
 
 

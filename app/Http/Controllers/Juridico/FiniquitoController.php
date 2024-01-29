@@ -10,7 +10,7 @@ use App\Models\FiniquitoLaboral;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class FiniquitoController extends Controller
 {
@@ -230,6 +230,66 @@ class FiniquitoController extends Controller
             return response()->json([
                 'logical_error' => 'No existe el finiquito que estas intentando modificar.',
             ], 422);
+        }
+    }
+
+    public function updateFiniquito(Request $request)
+    {
+        $customMessages = [
+            'signatureTime.required'    => 'La hora de firma es requerida.',
+            'signatureDate.required'    => 'La fecha firma es requerida.',
+            'amount.required'           => 'El monto de finiquito es requerido.',
+            'amount.min'                => 'El monto debe ser mayor a cero.',
+        ];
+
+        // Validate the request data with custom error messages and custom rule
+        $validatedData = Validator::make($request->all(), [
+            'signatureTime' => 'required',
+            'signatureDate' => 'required',
+            'amount'        => 'required|numeric|min:1'
+        ], $customMessages)->validate();
+
+        $fecha = date('Y/m/d', strtotime($request->signatureDate));
+        $time = $request->signatureTime;
+        $format = sprintf('%02d:%02d:%02d', $time['hours'], $time['minutes'], $time['seconds']);
+        $timeFormat = Carbon::createFromFormat('H:i:s', $format);
+
+        $existFiniquito = FiniquitoLaboral::where([
+            ['id_finiquito_laboral', '!=', $request->id],
+            ['fecha_firma_finiquito_laboral', '=', $fecha],
+            ['hora_firma_finiquito_laboral', '=', $timeFormat],
+        ])->exists();
+
+        if ($existFiniquito) {
+            return response()->json([
+                'logical_error' => 'La combinacion fecha y hora ya ha sido designada para el finiquito de otro empleado, cambia los valores e intenta nuevamente.',
+            ], 422);
+        } else {
+            DB::beginTransaction();
+            try {
+                $finiquitoEmp = FiniquitoLaboral::find($request->id);
+
+                $finiquitoEmp->update([
+                    'monto_finiquito_laboral'            => $request->amount,
+                    'fecha_firma_finiquito_laboral'      => $fecha,
+                    'hora_firma_finiquito_laboral'       => $timeFormat,
+                    'fecha_mod_finiquito_laboral'        => Carbon::now(),
+                    'usuario_finiquito_laboral'          => $request->user()->nick_usuario,
+                    'ip_finiquito_laboral'               => $request->ip(),
+                ]);
+
+                DB::commit(); // Confirma las operaciones en la base de datos
+                return response()->json([
+                    'message'          => "Finiquito actualizado con éxito.",
+                ]);
+            } catch (\Throwable $th) {
+                DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+                return response()->json([
+                    'logical_error' => 'Ha ocurrido un error con sus datos.',
+                    'error' => $th->getMessage(),
+                ], 422);
+            }
+            $finiquitoEmp = FiniquitoLaboral::find($request->id);
         }
     }
 }
