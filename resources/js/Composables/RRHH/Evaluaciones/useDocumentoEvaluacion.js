@@ -17,6 +17,9 @@ export const useDocumentoEvaluacion = () => {
 
     const evaluacionPersonal = ref(null);
 
+    // Maneja la visibilidad del boton de enviar evaluacion
+    const arrayShowButtons = ref([]);
+
     const ranges = ref([
         { label: 'Excelente', min: 73, max: 84 },
         { label: 'Muy Bueno', min: 56, max: 72 },
@@ -36,7 +39,6 @@ export const useDocumentoEvaluacion = () => {
             const response = await axios.post('/get-evaluacion', { idEvaluacionRendimiento: idEvaluacionRendimiento });
 
             // Almacena la respuesta en la referencia.
-            console.log(response);
             rubricaAndCategoriaByEvaluacion.value = response.data;
         } catch (error) {
             // Maneja los errores imprimiéndolos en la consola.
@@ -110,6 +112,7 @@ export const useDocumentoEvaluacion = () => {
     return {
         obtenerCategoriaYRubricaRendimiento,
         isScoreInRange,
+        arrayShowButtons,
         isLoadingObtenerCategoriaYRubrica,
         ranges,
         rubricaAndCategoriaByEvaluacion,

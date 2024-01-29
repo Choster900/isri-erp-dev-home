@@ -17,7 +17,7 @@
                 </div>
             </div>
         </div>
-        <ProcessModal v-else maxWidth='2xl' :show="showModalSettlementEmp" @close="$emit('cerrar-modal')">
+        <ProcessModal v-else maxWidth='2xl' :show="showModalSettlementEmp" @close="$emit('cerrar-modal')" :rounded="true">
             <div class="flex items-center justify-between p-4 border-b border-blue-900/30 shadow-blue-900/10 shadow-lg">
                 <svg transform="rotate(270)" class="h-6 w-6 text-blue-900" fill="currentColor" viewBox="0 0 24 24"
                     xmlns="http://www.w3.org/2000/svg">
@@ -36,7 +36,7 @@
                 </svg>
             </div>
 
-            <div class="flex flex-col space-y-1 md:flex-row md:space-x-2 mt-5">
+            <div class="flex flex-col space-y-1 md:flex-row md:space-x-2 mt-5 mx-10">
                 <div class="w-full md:w-[70%]">
                     <p class="text-sm text-gray-500">Empleado</p>
                     <p class="text-base font-medium text-navy-700 ">
@@ -51,9 +51,40 @@
                 </div>
             </div>
 
-            <div class="py-4 mt-5">
-                <pre>{{ finiquitoEmp }}</pre>
+            <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-10">
+                <div class="md:mr-2 md:mb-0 basis-1/2">
+                    <date-time-picker-m v-model="finiquitoEmp.signatureDate" :placeholder="'Fecha firma'"
+                        :label="'Fecha firma'" :required="true" />
+                    <InputError v-for="(item, index2) in errors.signatureDate" :key="index2"
+                        class="mt-2" :message="item" />
+                </div>
+                <div class="md:mr-2 md:mb-0 basis-1/2">
+                    <time-picker-m :height="200" v-model="finiquitoEmp.signatureTime" :placeholder="'Hora firma'"
+                        :label="'Hora firma'" :required="true" />
+                        <InputError v-for="(item, index2) in errors.signatureTime" :key="index2"
+                        class="mt-2" :message="item" />
+                </div>
             </div>
+
+            <div class="mb-4 md:flex flex-row justify-items-start mx-10">
+                <div class="md:mr-2 md:mb-0 basis-1/2 pr-2">
+                    <input-text iconName="money" id="amount" v-model="finiquitoEmp.amount" type="text" placeholder="Monto"
+                        :validation="{ limit: 8, amount: true }" :addClasses="'text-gray-500'" label="Monto"
+                        :required="true">
+                    </input-text>
+                    <InputError v-for="(item, index2) in errors.amount" :key="index2"
+                        class="mt-2" :message="item" />
+                </div>
+            </div>
+
+            <div class="md:flex flex-row justify-center py-6">
+                <button type="button" @click="$emit('cerrar-modal')"
+                    class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-2.5 py-1 text-center mb-2 dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
+                <button @click="updateFiniquitoEmp(finiquitoEmp)"
+                    class="bg-orange-700 hover:bg-orange-800 text-white font-medium text-sm px-2.5 py-1 rounded-lg mr-1.5 mb-2">ACTUALIZAR</button>
+            </div>
+
+
         </ProcessModal>
     </div>
 </template>
@@ -61,15 +92,13 @@
 <script>
 import { useFiniquitoEmp } from '@/Composables/Juridico/Finiquito/useFiniquitoEmp.js';
 import InputError from "@/Components/InputError.vue";
-import { toast } from 'vue3-toastify';
-import 'vue3-toastify/dist/index.css';
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 import InputText from "@/Components-ISRI/ComponentsToForms/InputText.vue";
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
 import DateTimePickerM from "@/Components-ISRI/ComponentsToForms/DateTimePickerM.vue";
 import TimePickerM from "@/Components-ISRI/ComponentsToForms/TimePickerM.vue";
 
-import { ref, toRefs, onMounted, } from 'vue';
+import { toRefs, onMounted, } from 'vue';
 
 export default {
     emits: ["cerrar-modal", "get-table"],
@@ -111,4 +140,5 @@ export default {
 .table-row {
     display: flex;
     justify-content: space-between;
-}</style>
+}
+</style>

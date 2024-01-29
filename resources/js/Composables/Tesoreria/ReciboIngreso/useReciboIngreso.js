@@ -246,6 +246,7 @@ export const useReciboIngreso = (context) => {
 
     const handleErrorResponse = (err) => {
         if (err.response.status === 422) {
+            filteredOptions.value = income_concept_select.value
             if (err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
             } else {

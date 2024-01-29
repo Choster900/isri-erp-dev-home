@@ -1,14 +1,14 @@
 <template>
     <div class="mx-4 overflow-y-auto h-[550px]  mb-4 ">
-        <RadarChart :chart-data="data" :options="options" css-classes="chart-container"/>
+        <RadarChart :chart-data="data" :options="options" css-classes="chart-container" />
     </div>
 </template>
 
 <script>
 import { RadarChart } from "vue-chart-3"
-import { Chart, RadarController, CategoryScale, LinearScale, RadialLinearScale, PointElement, LineElement } from "chart.js"
 import { computed, ref, toRefs, watch } from 'vue'
 Chart.register(RadarController, CategoryScale, LinearScale, RadialLinearScale, PointElement, LineElement)
+import { Chart, RadarController, CategoryScale, LinearScale, RadialLinearScale, PointElement, LineElement } from "chart.js"
 
 export default {
     props: {
@@ -27,14 +27,17 @@ export default {
     },
     components: { RadarChart },
     setup(props) {
-        const { rubricaAndCategoriaByEvaluacion, evaluacionPersonalProp } = toRefs(props)
+        // Desestructura las propiedades recibidas mediante props
+        const { rubricaAndCategoriaByEvaluacion, evaluacionPersonalProp } = toRefs(props);
 
-        const categories = ref([])
-        const score = ref([])
-        const data = ref([])
+        // Variables reactivas para almacenar datos de categorías, puntuaciones y datos del gráfico
+        const categories = ref([]);
+        const score = ref([]);
+        const data = ref([]);
 
+        // Utiliza watch para reaccionar a cambios en evaluacionPersonalProp
         watch(evaluacionPersonalProp, () => {
-
+            // Calcula las categorías a partir de rubricaAndCategoriaByEvaluacion
             categories.value = computed(() => {
                 const data = rubricaAndCategoriaByEvaluacion.value;
 
@@ -45,16 +48,18 @@ export default {
                 }
             });
 
+            // Calcula las puntuaciones a partir de evaluacionPersonalProp
             score.value = computed(() => {
                 const data = evaluacionPersonalProp.value;
 
-                if (data && data) {
+                if (data && data.data) {
                     return data.data.detalle_evaluaciones_personal.map(index => index.rubrica_rendimiento.puntaje_rubrica_rendimiento);
                 } else {
                     return [];
                 }
             });
 
+            // Actualiza los datos del gráfico
             data.value = {
                 labels: categories.value,
                 datasets: [
@@ -70,10 +75,10 @@ export default {
                         pointHoverBorderColor: '#001c48'
                     }
                 ]
-            }
+            };
+        });
 
-        })
-
+        // Configuración de opciones para el gráfico
         const options = ref({
             responsive: true,
             layout: {
@@ -82,25 +87,22 @@ export default {
             type: 'line',
             scales: {
                 x: {
-                    display: false, // Oculta el eje x
-
+                    display: false,
                     ticks: {
                         font: {
-                            size: 9, // Ajusta el tamaño de la fuente para el eje x
+                            size: 9,
                         },
                     }
                 },
                 y: {
-                    display: false, // Oculta el eje x
-
+                    display: false,
                     ticks: {
                         font: {
-                            size: 10, // Ajusta el tamaño de la fuente para el eje y
+                            size: 10,
                         }
                     }
                 }
             },
-
             plugins: {
                 colors: {
                     enabled: true
@@ -108,22 +110,23 @@ export default {
                 legend: {
                     position: 'top',
                     display: false,
-
                 },
                 title: {
                     display: false,
                     text: "Radar Chart"
                 }
             }
-        })
+        });
 
+        // Retorna las variables reactivas para ser utilizadas en el componente
         return {
             categories,
             score,
             data,
             options,
-        }
+        };
     }
+
 }
 </script>
 

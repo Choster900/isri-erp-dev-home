@@ -31,20 +31,20 @@
                     <tbody class="text-sm divide-y divide-slate-200" v-if="!isLoadinRequest">
                         <tr v-for="(evaluacion, i) in evaluaciones" :key="i">
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center ">{{ evaluacion.id_empleado }}</div>
+                                <div class="font-medium text-slate-800 text-center text-[8.5pt]">{{ evaluacion.id_empleado }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center ">{{ evaluacion.codigo_empleado }}</div>
+                                <div class="font-medium text-slate-800 text-center text-[8.5pt]">{{ evaluacion.codigo_empleado }}</div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">
+                                <div class="font-medium text-slate-800 text-center text-[8.5pt]">
                                     {{ `${evaluacion.persona.pnombre_persona ? evaluacion.persona.pnombre_persona : ''}
                                                                         ${evaluacion.persona.snombre_persona ? evaluacion.persona.snombre_persona : ''}
                                                                         ${evaluacion.persona.tapellido_persona ? evaluacion.persona.tapellido_persona : ''}` }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">
+                                <div class="font-medium text-slate-800 text-center text-[8.5pt]">
                                     {{ `${evaluacion.persona.papellido_persona ? evaluacion.persona.papellido_persona : ''}
                                                                         ${evaluacion.persona.sapellido_persona ? evaluacion.persona.sapellido_persona : ''}
                                                                         ${evaluacion.persona.tapellido_persona ? evaluacion.persona.tapellido_persona : ''}` }}
@@ -52,15 +52,15 @@
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
-                                    <div class="max-h-[200px] overflow-y-auto scrollbar">
+                                    <div class=" overflow-y-auto scrollbar">
                                         <template v-for="(ren, j) in evaluacion.evaluaciones_personal" :key="j">
-                                            <div class="mb-2 text-center">
-                                                <p class="text-[10pt]">
+                                            <div class=" text-center">
+                                                <p class="text-[8.5pt]">
                                                     {{ moment(ren.fecha_reg_evaluacion_personal).format('L') }}
                                                 </p>
                                             </div>
                                             <template v-if="j < evaluacion.evaluaciones_personal.length - 1">
-                                                <hr class="my-2 border-t border-gray-300">
+                                                <hr class="my-0.5 border-t border-gray-300">
                                             </template>
                                         </template>
                                     </div>
@@ -68,15 +68,15 @@
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
-                                    <div class="max-h-[200px] overflow-y-auto scrollbar">
+                                    <div class=" overflow-y-auto scrollbar">
                                         <template v-for="(ren, j) in evaluacion.evaluaciones_personal" :key="j">
-                                            <div class="mb-2 text-center">
-                                                <p class="text-[10pt]">
+                                            <div class=" text-center">
+                                                <p class="text-[8.5pt]">
                                                     {{ ren.periodo_evaluacion.nombre_periodo_evaluacion }}
                                                 </p>
                                             </div>
                                             <template v-if="j < evaluacion.evaluaciones_personal.length - 1">
-                                                <hr class="my-2 border-t border-gray-300">
+                                                <hr class="my-0.5 border-t border-gray-300">
                                             </template>
                                         </template>
                                     </div>
@@ -84,15 +84,15 @@
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
-                                    <div class="max-h-[200px] overflow-y-auto scrollbar">
+                                    <div class=" overflow-y-auto scrollbar">
                                         <template v-for="(ren, j) in evaluacion.evaluaciones_personal" :key="j">
-                                            <div class="mb-2 text-center">
-                                                <p class="text-[10pt]">
+                                            <div class=" text-center">
+                                                <p class="text-[8.5pt]">
                                                     {{ ren.tipo_evaluacion_personal.nombre_tipo_evaluacion_personal }}
                                                 </p>
                                             </div>
                                             <template v-if="j < evaluacion.evaluaciones_personal.length - 1">
-                                                <hr class="my-2 border-t border-gray-300">
+                                                <hr class="my-0.5 border-t border-gray-300">
                                             </template>
                                         </template>
                                     </div>
@@ -100,15 +100,15 @@
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
-                                    <div class="max-h-[200px] overflow-y-auto scrollbar">
+                                    <div class=" overflow-y-auto scrollbar">
                                         <template v-for="(ren, j) in evaluacion.evaluaciones_personal" :key="j">
-                                            <div class="mb-2 text-center">
-                                                <p class="text-[10pt]">
+                                            <div class=" text-center">
+                                                <p class="text-[8.5pt]">
                                                     {{ ren.puntaje_evaluacion_personal }} pts
                                                 </p>
                                             </div>
                                             <template v-if="j < evaluacion.evaluaciones_personal.length - 1">
-                                                <hr class="my-2 border-t border-gray-300">
+                                                <hr class="my-0.5 border-t border-gray-300">
                                             </template>
                                         </template>
                                     </div>
@@ -117,15 +117,15 @@
 
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
-                                    <div class="max-h-[200px] overflow-y-auto scrollbar">
+                                    <div class=" overflow-y-auto scrollbar">
                                         <template v-for="(ren, j) in evaluacion.evaluaciones_personal" :key="j">
-                                            <div class="mb-2 text-center">
-                                                <p class="text-[10pt]">
+                                            <div class=" text-center">
+                                                <p class="text-[8.5pt]">
                                                     ID: {{ ren.estado_evaluacion_personal.id_estado_evaluacion_personal }}
                                                 </p>
                                             </div>
                                             <template v-if="j < evaluacion.evaluaciones_personal.length - 1">
-                                                <hr class="my-2 border-t border-gray-300">
+                                                <hr class="my-0.5 border-t border-gray-300">
                                             </template>
                                         </template>
                                     </div>
@@ -232,7 +232,7 @@
 
         <ModalEvalueacionesVue v-if="listDependencias != ''" :evaluacionPersonalProp="objectEvaluacionPersonal"
             @actualizar-datatable="getEvaluaciones()" :showModal="showModalEvaluacion"
-            @cerrar-modal="showModalEvaluacion = false; objectEvaluacionPersonal = []"
+            @cerrar-modal="showModalEvaluacion = false; objectEvaluacionPersonal = []; "
             :listDependencias="listDependencias" />
     </AppLayoutVue>
 </template>

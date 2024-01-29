@@ -51,7 +51,8 @@
                             </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="doc-number" v-model="acq_doc.number" type="text"
-                                    placeholder="Numero documento" @update:modelValue="handleValidation('number', {limit:20,upper:true})">
+                                    placeholder="Numero documento"
+                                    @update:modelValue="handleValidation('number', { limit: 20, upper: true })">
                                     <LabelToInput icon="objects" forLabel="doc-number" />
                                 </TextInput>
                                 <InputError v-for="(item, index) in backend_errors.number" :key="index" class="mt-2"
@@ -61,7 +62,7 @@
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                                 <TextInput id="mngm-number" v-model="acq_doc.management_number" type="text"
                                     placeholder="Numero gestion"
-                                    @update:modelValue="handleValidation('management_number', {limit:20})">
+                                    @update:modelValue="handleValidation('management_number', { limit: 20 })">
                                     <LabelToInput icon="objects" forLabel="mngm-number" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errors.management_number" />
@@ -110,19 +111,34 @@
                             <div class="mb-4 md:mx-2 md:mb-0 basis-1/2">
                                 <TextInput id="mngm-number" v-model="acq_doc.award_number" type="text"
                                     placeholder="Numero adjudicacion" :required="false"
-                                    @update:modelValue="handleValidation('award_number', {limit:20})">
+                                    @update:modelValue="handleValidation('award_number', { limit: 20 })">
                                     <LabelToInput icon="objects" forLabel="mngm-number" />
                                 </TextInput>
                                 <InputError class="mt-2" :message="errors.award_number" />
                             </div>
                         </div>
+
+                        <div class="flex justify-center mt-5">
+                            <button v-if="currentPage != 2"
+                                class="flex items-center bg-blue-600 hover:bg-blue-700 text-white pl-3 pr-2 py-1.5 text-center mb-2 rounded"
+                                @click="goToNextPage">
+                                <div class="text-[12px]">SIGUIENTE</div>
+                                <span class="ml-1 pl-1 py-2.5 text-base text-gray-100 border-l-2 border-gray-100"></span>
+                                <div class="w-[20px] h-[20px] text-white">
+                                    <icon-m :iconName="'right-arrow-circle'">
+                                    </icon-m>
+                                </div>
+                            </button>
+                        </div>
+
+
                     </div>
                     <!-- Page 2 -->
                     <div id="page2" v-show="currentPage === 2">
-                        <div class="mb-2 md:flex flex-row justify-between">
+                        <div class="mb-4 md:flex flex-row justify-between">
                             <div class="md:w-1/2">
                                 <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
-                                    Detalles
+                                    Items
                                 </span>
                             </div>
                             <div class="md:w-1/2 md:text-right">
@@ -131,208 +147,189 @@
                                 </span>
                             </div>
                         </div>
-                        <!-- Item inputs -->
-                        <!-- First row -->
-                        <div class="mb-4 md:flex flex-row justify   Detalles-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                                <label class="block mb-2 text-xs font-light text-gray-600">
-                                    Fuente Financiamiento <span class="text-red-600 font-extrabold">*</span>
-                                </label>
-                                <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
-                                    <Multiselect v-model="array_item.financing_source_id" :options="financing_sources"
-                                        placeholder="Seleccion financiamiento" :searchable="true" />
-                                    <LabelToInput icon="list" />
+                        <transition name="fade" mode="out-in">
+                            <div v-if="showItemInfo" id="item-info">
+                                <!-- Item inputs -->
+                                <!-- First row -->
+                                <div class="mb-4 md:flex flex-row justify-start">
+                                    <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
+                                        <label class="block mb-2 text-xs font-light text-gray-600">
+                                            Fuente Financiamiento <span class="text-red-600 font-extrabold">*</span>
+                                        </label>
+                                        <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
+                                            <Multiselect v-model="array_item.financing_source_id"
+                                                :options="financing_sources" placeholder="Seleccion financiamiento"
+                                                :searchable="true" />
+                                            <LabelToInput icon="list" />
+                                        </div>
+                                        <InputError class="mt-2" :message="item_errors.financing_source_id" />
+                                    </div>
+                                    <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
+                                        <TextInput id="commt-number" v-model="array_item.commitment_number" type="text"
+                                            placeholder="Numero(s) compromiso(s)"
+                                            @update:modelValue="handleValidation('commitment_number', { limit: 20, numbersCommasAndSpaces: true })">
+                                            <LabelToInput icon="objects" forLabel="commt-number" />
+                                        </TextInput>
+                                        <InputError
+                                            v-for="(item, index) in backend_errors['items.' + array_item.index + '.commitment_number']"
+                                            :key="index" class="mt-2" :message="item" />
+                                        <InputError class="mt-2" :message="item_errors.commitment_number" />
+                                    </div>
+                                    <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
+                                        <TextInput id="amount" v-model="array_item.amount" type="text"
+                                            placeholder="Monto detalle"
+                                            @update:modelValue="handleValidation('amount', { limit: 10, amount: true })">
+                                            <LabelToInput icon="money" forLabel="amount" />
+                                        </TextInput>
+                                        <InputError
+                                            v-for="(item, index) in backend_errors['items.' + array_item.index + '.amount']"
+                                            :key="index" class="mt-2" :message="item" />
+                                        <InputError class="mt-2" :message="item_errors.amount" />
+                                    </div>
                                 </div>
-                                <InputError class="mt-2" :message="item_errors.financing_source_id" />
+                                <!-- Second row -->
+                                <div class="mb-4 md:flex flex-row justify-items-start">
+                                    <div class="mb-4 md:mr-2 md:mb-0 basis-full">
+                                        <TextInput id="item-name" v-model="array_item.name" type="text" placeholder="Nombre"
+                                            @update:modelValue="handleValidation('name', { limit: 250 })">
+                                            <LabelToInput icon="standard" forLabel="item-name" />
+                                        </TextInput>
+                                        <InputError class="mt-2" :message="item_errors.name" />
+                                    </div>
+                                </div>
+                                <!-- third row -->
+                                <div class="mb-4 md:mr-2 md:mb-0 basis-full"
+                                    style="border: none; background-color: transparent;">
+                                    <label class="block mb-2 text-xs font-light text-gray-600" for="descripcion">
+                                        Administrador de documento
+                                    </label>
+                                    <textarea v-model="array_item.contract_manager" id="cotract-manager"
+                                        name="contract-manager"
+                                        class="resize-none w-full h-10 overflow-y-auto peer text-xs font-semibold rounded-r-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
+                                        @input="handleValidation('contract_manager', { limit: 250 })">
+                                    </textarea>
+                                    <InputError class="mt-2" :message="item_errors.contract_manager" />
+                                </div>
+                                <!-- Add item button -->
+                                <div class="flex justify-center mb-2 mt-1">
+                                    <div class="flex items-center">
+                                        <GeneralButton class="mr-1" :text="'Cancelar'" color="bg-gray-600 hover:bg-gray-700"
+                                            icon="delete" @click="cleanArrayItem()" />
+                                        <GeneralButton class="ml-1" color="bg-blue-600 hover:bg-blue-700"
+                                            :text="new_item ? 'Agregar' : 'Actualizar'" icon="add" @click="addItem()" />
+                                    </div>
+                                </div>
                             </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                                <TextInput id="commt-number" v-model="array_item.commitment_number" type="text"
-                                    placeholder="Numero(s) compromiso(s)"
-                                    @update:modelValue="handleValidation('commitment_number', {limit:20,numbersCommasAndSpaces:true})">
-                                    <LabelToInput icon="objects" forLabel="commt-number" />
-                                </TextInput>
-                                <InputError
-                                    v-for="(item, index) in backend_errors['items.' + array_item.index + '.commitment_number']"
-                                    :key="index" class="mt-2" :message="item" />
-                                <InputError class="mt-2" :message="item_errors.commitment_number" />
-                            </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
-                                <TextInput id="amount" v-model="array_item.amount" type="text" placeholder="Monto detalle"
-                                    @update:modelValue="handleValidation('amount', {limit:10,amount:true})">
-                                    <LabelToInput icon="money" forLabel="amount" />
-                                </TextInput>
-                                <InputError v-for="(item, index) in backend_errors['items.' + array_item.index + '.amount']"
-                                    :key="index" class="mt-2" :message="item" />
-                                <InputError class="mt-2" :message="item_errors.amount" />
-                            </div>
-                        </div>
-                        <!-- Second row -->
-                        <div class="mb-4 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-full">
-                                <TextInput id="item-name" v-model="array_item.name" type="text" placeholder="Nombre"
-                                    @update:modelValue="handleValidation('name', {limit:250})">
-                                    <LabelToInput icon="standard" forLabel="item-name" />
-                                </TextInput>
-                                <InputError class="mt-2" :message="item_errors.name" />
-                            </div>
-                        </div>
-                        <!-- third row -->
-                        <div class="mb-4 md:mr-2 md:mb-0 basis-full" style="border: none; background-color: transparent;">
-                            <label class="block mb-2 text-xs font-light text-gray-600" for="descripcion">
-                                Administrador de documento
-                            </label>
-                            <textarea v-model="array_item.contract_manager" id="cotract-manager" name="contract-manager"
-                                class="resize-none w-full h-10 overflow-y-auto peer text-xs font-semibold rounded-r-md border border-slate-400 px-2 text-slate-900 transition-colors duration-300 focus:border-[#001b47] focus:outline-none"
-                                @input="handleValidation('contract_manager', {limit:250})">
-                            </textarea>
-                            <InputError class="mt-2" :message="item_errors.contract_manager" />
-                        </div>
-                        <!-- Add item button -->
-                        <div class="flex justify-center mb-2 mt-1">
-                            <div class="flex items-center">
-                                <GeneralButton class="mr-1" :text="new_item ? 'Limpiar' : 'Cancelar'"
-                                    color="bg-red-600 hover:bg-red-700" icon="delete" @click="cleanArrayItem()" />
-                                <GeneralButton class="ml-1" color="bg-blue-600 hover:bg-blue-700"
-                                    :text="new_item ? 'Agregar' : 'Actualizar'" icon="add" @click="addItem()" />
-                            </div>
-                        </div>
 
-                        <!-- Items table -->
-                        <div class="tabla-modal">
-                            <table class="w-full" id="">
-                                <thead class="bg-[#1F3558] text-white">
-                                    <tr class="">
-                                        <th class="rounded-tl-lg w-[15%] py-1">COMPROMISO(S)</th>
-                                        <th class="w-[40%]">NOMBRE</th>
-                                        <th class="w-[10%]">FUENTE</th>
-                                        <th class="w-[20%]">MONTO</th>
-                                        <th class="rounded-tr-lg w-[15%]">ACCIONES</th>
-                                    </tr>
-                                </thead>
-                                <template v-for="(item, index) in acq_doc.items" :key="index">
-                                    <tbody class="text-sm divide-y divide-slate-200">
-                                        <tr v-if="item.deleted == false"
-                                            :class="[
-                                                'hover:bg-[#141414]/10',
-                                                'border-b-2',
-                                                item.selected ? 'bg-orange-400 hover:bg-orange-500' :
-                                                    index_errors.includes(index) ? 'bg-red-300 hover:bg-red-400' : '']">
-                                            <td class="text-center">{{ item.commitment_number }}</td>
-                                            <td class="text-center max-w-[100px]">
-                                                {{ item.name }}
-                                            </td>
-                                            <td class="text-center">{{ item.name_financing_source }}</td>
-                                            <td class="text-center">${{ item.amount }}</td>
-                                            <td class="text-center">
-                                                <div class="space-x-1">
-                                                    <button class="text-slate-400 hover:text-slate-500 rounded-full"
-                                                        @click="editItem(item, index)">
-                                                        <span class="sr-only">Edit</span>
-                                                        <svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
-                                                            <path
-                                                                d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z">
-                                                            </path>
-                                                        </svg>
-                                                    </button>
-                                                    <button class="text-rose-500 hover:text-rose-600 rounded-full"
-                                                        @click="deleteItem(index)">
-                                                        <span class="sr-only">Delete</span>
-                                                        <svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
-                                                            <path d="M13 15h2v6h-2zM17 15h2v6h-2z"></path>
-                                                            <path
-                                                                d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z">
-                                                            </path>
-                                                        </svg>
-                                                    </button>
+                            <div v-else id="table-info">
+
+                                <div class="my-2 flex justify-end">
+                                    <button type="button" @click="showItemInfo = true"
+                                        class="text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-2.5 py-1 text-center mb-2 dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-600 dark:focus:ring-green-800">AGREGAR
+                                        ITEM</button>
+                                </div>
+                                <!-- Items table -->
+                                <div class="tabla-modal">
+                                    <table class="w-full" id="">
+                                        <thead class="bg-[#1F3558] text-white">
+                                            <tr class="">
+                                                <th class="rounded-tl-lg w-[15%] py-1">COMPROMISO(S)</th>
+                                                <th class="w-[40%]">NOMBRE</th>
+                                                <th class="w-[10%]">FUENTE</th>
+                                                <th class="w-[20%]">MONTO</th>
+                                                <th class="rounded-tr-lg w-[15%]">ACCIONES</th>
+                                            </tr>
+                                        </thead>
+                                        <template v-for="(item, index) in acq_doc.items" :key="index">
+                                            <tbody class="text-sm divide-y divide-slate-200">
+                                                <tr v-if="item.deleted == false"
+                                                    :class="[
+                                                        'hover:bg-[#141414]/10',
+                                                        'border-b-2',
+                                                        index_errors.includes(index) ? 'bg-red-300 hover:bg-red-400' : '']">
+                                                    <td class="text-center">{{ item.commitment_number }}</td>
+                                                    <td class="text-center max-w-[100px]">
+                                                        {{ item.name }}
+                                                    </td>
+                                                    <td class="text-center">{{ item.name_financing_source }}</td>
+                                                    <td class="text-center">${{ item.amount }}</td>
+                                                    <td class="text-center">
+                                                        <div class="space-x-1">
+                                                            <button class="text-slate-400 hover:text-slate-500 rounded-full"
+                                                                @click="editItem(item, index)">
+                                                                <span class="sr-only">Edit</span>
+                                                                <svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
+                                                                    <path
+                                                                        d="M19.7 8.3c-.4-.4-1-.4-1.4 0l-10 10c-.2.2-.3.4-.3.7v4c0 .6.4 1 1 1h4c.3 0 .5-.1.7-.3l10-10c.4-.4.4-1 0-1.4l-4-4zM12.6 22H10v-2.6l6-6 2.6 2.6-6 6zm7.4-7.4L17.4 12l1.6-1.6 2.6 2.6-1.6 1.6z">
+                                                                    </path>
+                                                                </svg>
+                                                            </button>
+                                                            <button class="text-rose-500 hover:text-rose-600 rounded-full"
+                                                                @click="deleteItem(index)">
+                                                                <span class="sr-only">Delete</span>
+                                                                <svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
+                                                                    <path d="M13 15h2v6h-2zM17 15h2v6h-2z"></path>
+                                                                    <path
+                                                                        d="M20 9c0-.6-.4-1-1-1h-6c-.6 0-1 .4-1 1v2H8v2h1v10c0 .6.4 1 1 1h12c.6 0 1-.4 1-1V13h1v-2h-4V9zm-6 1h4v1h-4v-1zm7 3v9H11v-9h10z">
+                                                                    </path>
+                                                                </svg>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </template>
+                                    </table>
+                                </div>
+                                <!-- Total amount of items -->
+                                <div v-if="item_available" class="w-full flex flex-row mt-1">
+                                    <div class="w-[15%]"></div>
+                                    <div class="w-[50%]">
+                                        <p class="text-[14px] text-right font-semibold">TOTAL DOCUMENTO</p>
+                                    </div>
+                                    <div class="w-[20%]">
+                                        <p class="text-[14px] text-green-700 text-center font-semibold">
+                                            ${{ acq_doc.total }}
+                                        </p>
+                                    </div>
+                                    <div class="w-[15%]"></div>
+                                </div>
+                                <div v-else class="mt-2">
+                                    <p class="text-[14px] text-black text-center font-semibold">
+                                        SIN ITEMS ASIGNADOS
+                                    </p>
+                                </div>
+                                <!-- Buttons to navigate -->
+                                <div class="flex justify-center mt-5">
+                                    <div class="flex items-center ml-1">
+                                        <div class="flex w-1/2">
+                                            <button
+                                                class="flex items-center bg-gray-600 hover:bg-gray-700 text-white pl-2 pr-3 py-1.5 text-center mb-2 rounded mr-2"
+                                                :disabled="currentPage === 1" @click="errors = []; currentPage--;">
+                                                <div class="w-[20px] h-[20px] text-white">
+                                                    <icon-m :iconName="'left-arrow-circle'">
+                                                    </icon-m>
                                                 </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </template>
-                            </table>
-                        </div>
-                        <!-- Total amount of items -->
-                        <div v-if="item_available" class="w-full flex flex-row mt-1">
-                            <div class="w-[15%]"></div>
-                            <div class="w-[50%]">
-                                <p class="text-[14px] text-right font-semibold">TOTAL DOCUMENTO</p>
-                            </div>
-                            <div class="w-[20%]">
-                                <p class="text-[14px] text-green-700 text-center font-semibold">
-                                    ${{ acq_doc.total }}
-                                </p>
-                            </div>
-                            <div class="w-[15%]"></div>
-                        </div>
-                        <div v-else class="mt-2">
-                            <p class="text-[14px] text-black text-center font-semibold">
-                                SIN DETALLES ASIGNADOS
-                            </p>
-                        </div>
-                    </div>
-                    <!-- Buttons to navigate -->
-                    <div class="flex justify-center mt-5">
-                        <div class="flex items-center mr-1">
-                            <button v-if="currentPage != 2"
-                                class="flex items-center bg-blue-600 hover:bg-blue-700 text-white pl-3 pr-2 py-1.5 text-center mb-2 rounded"
-                                @click="goToNextPage">
-                                <div class="text-[12px]">SIGUIENTE</div>
-                                <span
-                                    class="ml-1 pl-1 pr-0 py-2.5 text-base text-gray-100 border-l-2 border-gray-100"></span>
-                                <svg width="20px" height="20px" viewBox="-3 0 32 32" version="1.1"
-                                    xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                                    fill="#ffffff" stroke="#ffffff">
-                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                                    <g id="SVGRepo_iconCarrier">
-                                        <g id="icomoon-ignore"> </g>
-                                        <path
-                                            d="M13.11 29.113c7.243 0 13.113-5.871 13.113-13.113s-5.87-13.113-13.113-13.113c-7.242 0-13.113 5.871-13.113 13.113s5.871 13.113 13.113 13.113zM13.11 3.936c6.652 0 12.064 5.412 12.064 12.064s-5.412 12.064-12.064 12.064c-6.653 0-12.064-5.412-12.064-12.064s5.411-12.064 12.064-12.064z"
-                                            fill="#ffffff"> </path>
-                                        <path
-                                            d="M13.906 21.637l0.742 0.742 6.378-6.379-6.378-6.379-0.742 0.742 5.112 5.112h-12.727v1.049h12.727z"
-                                            fill="#ffffff"> </path>
-                                    </g>
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="flex items-center ml-1">
-                            <div class="flex w-1/2">
-                                <button v-if="currentPage != 1" 
-                                    class="flex items-center bg-gray-600 hover:bg-gray-700 text-white pl-2 pr-3 py-1.5 text-center mb-2 rounded mr-2"
-                                    :disabled="currentPage === 1" @click="errors=[];currentPage--;">
-                                    <svg width="20px" height="20px" viewBox="-3 0 32 32" version="1.1"
-                                        xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                                        fill="#ffffff" stroke="#ffffff">
-                                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                                        <g id="SVGRepo_iconCarrier">
-                                            <g id="icomoon-ignore"> </g>
-                                            <path
-                                                d="M13.114 2.887c-7.243 0-13.114 5.871-13.114 13.113s5.871 13.113 13.114 13.113c7.242 0 13.112-5.871 13.112-13.113s-5.87-13.113-13.112-13.113zM13.114 28.064c-6.653 0-12.065-5.412-12.065-12.064s5.412-12.063 12.065-12.063c6.652 0 12.063 5.412 12.063 12.063s-5.411 12.064-12.063 12.064z"
-                                                fill="#ffffff"> </path>
-                                            <path
-                                                d="M12.318 10.363l-0.742-0.742-6.379 6.379 6.379 6.379 0.742-0.742-5.113-5.113h12.726v-1.049h-12.726z"
-                                                fill="#ffffff"> </path>
-                                        </g>
-                                    </svg>
-                                    <span
-                                        class="ml-1 px-1 py-2.5 text-base text-gray-100 border-l-2 border-gray-100"></span>
-                                    <div class="text-[12px]">ANTERIOR</div>
-                                </button>
-                            </div>
+                                                <span
+                                                    class="ml-1 px-1 py-2.5 text-base text-gray-100 border-l-2 border-gray-100"></span>
+                                                <div class="text-[12px]">ANTERIOR</div>
+                                            </button>
+                                        </div>
 
-                            <div class="md:flex flex-row justify-center">
-                                <GeneralButton v-if="docAdquisicionId > 0 && currentPage === 2 && !itemSelected"
-                                    @click="updateDocumentoAdquisicion(acq_doc)" color="bg-orange-700 hover:bg-orange-800" text="Actualizar"
-                                    icon="update" />
-                                <GeneralButton v-if="docAdquisicionId <= 0 && currentPage === 2 && !itemSelected"
-                                    @click="storeDocumentoAdquisicion(acq_doc)" color="bg-green-700 hover:bg-green-800" text="Guardar"
-                                    icon="add" />
+                                        <div class="md:flex flex-row justify-center">
+                                            <GeneralButton v-if="docAdquisicionId > 0"
+                                                @click="updateDocumentoAdquisicion(acq_doc)"
+                                                color="bg-orange-700 hover:bg-orange-800" text="Actualizar" icon="update" />
+                                            <GeneralButton v-if="docAdquisicionId <= 0"
+                                                @click="storeDocumentoAdquisicion(acq_doc)"
+                                                color="bg-green-700 hover:bg-green-800" text="Guardar" icon="add" />
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-
+                        </transition>
                     </div>
+
                 </div>
             </div>
 
@@ -347,16 +344,15 @@ import InputError from "@/Components/InputError.vue";
 import GeneralButton from "@/Components-ISRI/ComponentsToForms/GeneralButton.vue";
 import TextInput from "@/Components-ISRI/ComponentsToForms/TextInput.vue";
 import LabelToInput from "@/Components-ISRI/ComponentsToForms/LabelToInput.vue";
+import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
+
 
 import { ref, toRefs, onMounted, } from 'vue';
 
-import { toast } from "vue3-toastify";
-import "vue3-toastify/dist/index.css";
-import axios from "axios";
 import { useValidateInput } from '@/Composables/General/useValidateInput';
 
 export default {
-    components: { Modal, InputError, GeneralButton, TextInput, LabelToInput },
+    components: { Modal, InputError, GeneralButton, TextInput, LabelToInput, IconM },
     props: {
         docAdquisicionId: {
             type: Number,
@@ -372,11 +368,11 @@ export default {
         const { docAdquisicionId } = toRefs(props);
 
         const {
-            isLoadingRequest, acq_doc,errors,
+            isLoadingRequest, acq_doc, errors,
             config, array_item, index_errors,
             item_errors, backend_errors, new_item, currentPage,
             doc_types, management_types, financing_sources, suppliers,
-            item_available, itemSelected,
+            item_available, itemSelected, showItemInfo,
             getInfoForModalDocumentoAdquisicion, storeDocumentoAdquisicion, updateDocumentoAdquisicion,
             goToNextPage, addItem, cleanArrayItem, editItem, deleteItem
         } = useDocumentoAdquisicion(context);
@@ -391,7 +387,7 @@ export default {
                 backend_errors.value = []
                 item_errors.value = []
                 array_item.value[input] = validateInput(array_item.value[input], validation)
-            }else{
+            } else {
                 acq_doc.value[input] = validateInput(acq_doc.value[input], validation)
             }
         }
@@ -407,7 +403,7 @@ export default {
             config, array_item, index_errors,
             item_errors, backend_errors, new_item, currentPage,
             financing_sources, doc_types, management_types, suppliers,
-            item_available, itemSelected,
+            item_available, itemSelected, showItemInfo,
             storeDocumentoAdquisicion, updateDocumentoAdquisicion, handleValidation,
             goToNextPage, addItem, cleanArrayItem, editItem, deleteItem
         }
@@ -416,6 +412,16 @@ export default {
 </script>
 
 <style>
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s;
+}
+
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
+}
+
 .td-data-table {
     max-width: 100px;
     white-space: nowrap;
