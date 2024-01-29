@@ -66,9 +66,6 @@
                         </div>
 
                     </div>
-                    <!--  <pre>
-                        {{ evaluacionPersonalProp.data }}
-                    </pre> -->
                     <DocumentEvaluationForPreView v-if="evaluacionPersonalProp.data"
                         :class="headerOptions === 'DocumentoEvalacionVue' ? '' : 'hidden'"
                         :isLoadingObtenerCategoriaYRubrica="isLoadingObtenerCategoriaYRubrica"
@@ -131,7 +128,7 @@ export default {
         }
     },
     setup(props, { emit }) {
-        const { evaluacionPersonalProp, rubricaAndCategoriaByEvaluacion, showModal,isLoadingObtenerCategoriaYRubrica } = toRefs(props);
+        const { showModal,isLoadingObtenerCategoriaYRubrica } = toRefs(props);
         const {
             idEmpleado, errorsData,
             messageAlert, handleAccept,
@@ -165,19 +162,11 @@ export default {
             }
         })
 
-        watch(evaluacionPersonalProp, (newValue, oldValue) => {
-            console.log({ newValue, oldValue });
-        })
-
-
-
-
 
 
         return {
             moment,
             errorsData,
-            isLoadingObtenerCategoriaYRubrica,
             objectPlazas,
             plazaOptions,
             opcionEmpleado,
@@ -187,7 +176,8 @@ export default {
             handleEmployeeSearch,
             activeIndex, activeIndex,
             handleAccept, handleCancel,
-            evaluacionesAgrupadasPorAño, headerOptions,
+            isLoadingObtenerCategoriaYRubrica,
+            isLoadingObtenerCategoriaYRubrica,
             existMoreThanOne, idTipoEvaluacion,
             messageAlert, selectedEmpleadoValue,
             evaluacionToPassDocumento, clearLock,
@@ -195,10 +185,10 @@ export default {
             evaluacionPersonal, objectEvaluaciones,
             evaluationsOptions, fechaInicioFechafin,
             getPlazasByEmployeeIdAndCentroAtencionId,
+            evaluacionesAgrupadasPorAño, headerOptions,
             obtenerCategoriaYRubricaRendimiento, showPlazasModal,
             evaluacionesAgrupadasPorAño, idEmpleado, idCentroAtencion,
             loadingEvaluacionRendimiento, createPersonalEvaluationRequest,
-            isLoadingObtenerCategoriaYRubrica,
         }
     }
 

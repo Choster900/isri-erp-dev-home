@@ -69,7 +69,6 @@ export const useEvaluacion = () => {
                     )
                 );
 
-                console.log(nuevasEvaluaciones);
 
                 data.data.data.forEach(element => {
                     // Buscar correspondencias en las nuevas evaluaciones
@@ -80,7 +79,6 @@ export const useEvaluacion = () => {
                     // Hacer algo con las evaluaciones del empleado (por ejemplo, asignarlas al elemento)
                     element.evaluaciones_personal = evaluacionesEmpleado;
 
-                    console.log(element);
                 });
 
                 // Eliminar elementos vacíos
@@ -89,7 +87,6 @@ export const useEvaluacion = () => {
                 );
 
 
-                console.log(data.data.data);
 
                 evaluaciones.value = data.data.data;
                 pagination.value.total = data.data.total;
@@ -145,7 +142,7 @@ export const useEvaluacion = () => {
 
             });
             listDependencias.value = list
-            //console.log(listDependencias.value);
+
         } catch (error) {
             console.error(error);
         }

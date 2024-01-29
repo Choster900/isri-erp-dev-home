@@ -1,7 +1,7 @@
 
 <template>
     <div class="w-full chart-container">
-        <LineChart :chart-data="data" :options="options" v-if="data.datasets.data" />
+        <LineChart :chart-data="data" :options="options" class="h-44" />
 
         <div class="flex flex-col md:flex-row  md:space-y-0">
 
@@ -9,11 +9,11 @@
 
                 <article class="bg-white shadow-md rounded border border-slate-200 px-3 py-1 mb-2"
                     v-for="(evaluation, i) in newFilteredData" :key="i">
-                    <div class="flex flex-start space-x-4 cursor-pointer" @click="obtenerCategoriaYRubricaRendimiento(evaluation.id_evaluacion_personal);
-                    evaluacionPersonalProp = { data: evaluation, allData: userData }">
+                    <div class="flex flex-start space-x-4 cursor-pointer" @click="obtenerCategoriaYRubricaRendimiento(evaluation.evaluacion_rendimiento.id_evaluacion_rendimiento);
+                    evaluacionPersonalProp = { data: evaluation, allData: userData };
+                    updateStateAsView(evaluation.id_evaluacion_personal)">
                         <div class="shrink-0 mt-1.5">
                             <div class="relative">
-                                {{ evaluation.id_evaluacion_personal }}
                                 <lord-icon src="https://cdn.lordicon.com/depeqmsz.json" trigger="hover"
                                     style="width:40px;height:40px">
                                 </lord-icon>
@@ -102,9 +102,9 @@
         </div>
 
 
-        <ModalSeeEvaluation @cerrar-modal="showModal = false; rubricaAndCategoriaByEvaluacion = []" :showModal="showModal"
-            :rubricaAndCategoriaByEvaluacion="rubricaAndCategoriaByEvaluacion"
+        <ModalSeeEvaluation @cerrar-modal="showModal = false; rubricaAndCategoriaByEvaluacion = []"
             :evaluacionPersonalProp="evaluacionPersonalProp"
+            :rubricaAndCategoriaByEvaluacion="rubricaAndCategoriaByEvaluacion" :showModal="showModal"
             :isLoadingObtenerCategoriaYRubrica="isLoadingObtenerCategoriaYRubrica" />
     </div>
 </template>
@@ -210,8 +210,9 @@ export default {
             ) {
 
                 newFilteredData.value = userData.value.evaluaciones_personal.filter(obj => moment(obj.fecha_inicio_evaluacion_personal).year() === selectedYear);
-                console.log(userData.value.evaluaciones_personal.filter(obj => moment(obj.fecha_inicio_evaluacion_personal).year() === selectedYear));
 
+            } else {
+                newFilteredData.value = []
             }
 
 
@@ -233,7 +234,6 @@ export default {
                 });
             }
 
-            console.log(data.value.labels);
         });
 
         // Aquí puedes definir otras funciones computadas si es necesario
@@ -248,10 +248,8 @@ export default {
                 isLoadingObtenerCategoriaYRubrica.value = true;
                 // Realiza la solicitud al servidor.
                 const response = await axios.post('/get-evaluacion', { idEvaluacionRendimiento: idEvaluacionRendimiento });
-
                 // Almacena la respuesta en la referencia.
                 rubricaAndCategoriaByEvaluacion.value = response.data;
-                console.log(response);
                 isLoadingObtenerCategoriaYRubrica.value = false;
             } catch (error) {
                 // Maneja los errores imprimiéndolos en la consola.
@@ -263,7 +261,26 @@ export default {
         };
 
 
+        /**
+         * Actualizar evaluacion rendimiento a estado 3 (Actualizado como visto)
+         * @param {number} idEvaluacionPersonal - Identificador de evaluacion.
+         */
+        const updateStateAsView = async (idEvaluacionPersonal, objectValidation) => {
+            try {
+                const { userId, state } = objectValidation;
+                if (userId == 1 && state == 2) {
+
+                }
+                const response = await axios.post('/changeStateEvaluation', { idEvaluation: idEvaluacionPersonal, stateToChange: 3 });
+                console.log(response);
+            } catch (error) {
+                // Maneja los errores imprimiéndolos en la consola.
+                console.error('Error en el cambio: ', error);
+            }
+        };
+
         return {
+            updateStateAsView,
             obtenerCategoriaYRubricaRendimiento,
             arraySemester,
             data,

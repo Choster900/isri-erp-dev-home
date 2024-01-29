@@ -3,7 +3,6 @@
     <div class="mx-4 overflow-y-auto h-[550px] py-3 px-2 mb-4 ">
         <div v-if="rubricaAndCategoriaByEvaluacion && !isLoadingObtenerCategoriaYRubrica && evaluacionPersonalProp"
             class="w-full">
-
             <table class="w-full ">
                 <tbody>
                     <tr>
@@ -389,7 +388,7 @@
                         <td class="border border-black bg-black text-[9pt] text-white text-center pl-8 py-1" colspan="2">{{
                             evaluacion.nombre_cat_rendimiento }}
                         </td>
-                        <td class="border border-black bg-black text-[9pt] text-white text-start pl-1">PUNTOS: {{
+                        <td class="border border-black bg-black text-[9pt] text-white text-start">PUNTOS: {{
                             (optionsSelected.find(obj => obj.id_cat_rendimiento === evaluacion.id_cat_rendimiento) || {
                                 puntaje_rubrica_rendimiento: 0
                             }).puntaje_rubrica_rendimiento
@@ -470,15 +469,13 @@
                     </table>
                 </div>
             </div>
-
-
-            <div class="flex flex-col items-center space-y-3 mt-5">
-               <!--  <p class="text-center text-sm">¿Cómo te sientes con la evaluación?</p> -->
+            <div class="flex flex-col items-center space-y-3 mt-5" v-if="$page.props.auth.user.id_persona == evaluacionPersonalProp.data.id_empleado">
+                <!--  <p class="text-center text-sm">¿Cómo te sientes con la evaluación?</p> -->
                 <div class="w-full flex flex-row space-x-10">
-                    <button @click="guardarYEnviarEvaluacion"
+                    <button @click="changeStateFromEvaluation(5, evaluacionPersonalProp.data.id_evaluacion_personal)"
                         class="bg-blue-900 rounded-sm shadow text-center text-white text-sm font-light w-full py-1">
                         ESTOY DE ACUERDO </button>
-                    <button @click="guardarYEnviarEvaluacion"
+                    <button @click="changeStateFromEvaluation(4, evaluacionPersonalProp.data.id_evaluacion_personal)"
                         class="bg-red-900 rounded-sm shadow text-center text-white text-sm font-light w-full py-1">
                         NO ESTOY DE ACUERDO</button>
                 </div>
@@ -561,7 +558,7 @@ export default {
     setup(props, { emit }) {
         const { evaluacionPersonalProp, rubricaAndCategoriaByEvaluacion } = toRefs(props)
         const { separarTexto, evaluacionPersonal, saveResponseWhenIsClickedCheckbox, optionsSelected, sendResponsesEvaluation, ranges, isScoreInRange } = useDocumentoEvaluacion();
-        watch(evaluacionPersonalProp, (newValue, oldValue) => {
+        watch(() => evaluacionPersonalProp.value, (newValue, oldValue) => {
             if (newValue) {
                 optionsSelected.value = []
                 evaluacionPersonal.value = newValue.data
@@ -573,9 +570,31 @@ export default {
                     })
                 });
             }
-        })
+        }, { immediate: true });
 
-        const guardarYEnviarEvaluacion = async () => {
+
+        const changeStateEvaluationRequest = async (objectInfo) => {
+            try {
+                // Realiza la búsqueda de empleados
+                const response = await axios.post(
+                    "/changeStateEvaluation",
+                    {
+                        idEvaluation: objectInfo.idEvaluation,
+                        stateToChange: objectInfo.newState,
+                    }
+                );
+
+                return response;
+            } catch (error) {
+                // Manejo de errores específicos
+                console.error("Error al cambiar de estado:", error);
+                // Lanza el error para que pueda ser manejado por el componente que utiliza este composable
+                throw new Error("Error al cambiar de estado");
+            }
+        };
+
+
+        const changeStateFromEvaluation = async (state, idEvaluation) => {
             const confirmed = await Swal.fire({
                 title: '<p class="text-[16pt] text-center">¿Esta seguro de enviar la evaluacion?</p>',
                 icon: "question",
@@ -587,20 +606,10 @@ export default {
                 showCloseButton: true,
             });
             if (confirmed.isConfirmed) {
-
-                if (rubricaAndCategoriaByEvaluacion.value.categorias_rendimiento.length == optionsSelected.value.length) {
-                    let res = null;
-                    res = await executeRequest(
-                        sendResponsesEvaluation(),
-                        "La evaluacion se ha enviado"
-                    );
-                    console.log("HACEMOS ALGO DESPUES");
-                    emit("actualizar-datatable")
-
-                } else {
-                    toast.warning('No has seleccionado todas las opciones. Por favor, asegúrate de seleccionar todas las opciones antes de finalizar.');
-
-                }
+                await executeRequest(
+                    changeStateEvaluationRequest({ idEvaluation: idEvaluation, newState: state }),
+                    "La respuesta se ha enviado corretamente"
+                );
             }
         };
 
@@ -644,7 +653,7 @@ export default {
             optionsSelected,
             moment,
             optionsSelected,
-            guardarYEnviarEvaluacion,
+            changeStateFromEvaluation,
             isScoreInRange,
             ranges,
             saveResponseWhenIsClickedCheckbox,

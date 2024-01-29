@@ -472,6 +472,7 @@
                 </div>
             </div>
             <button @click="guardarYEnviarEvaluacion"
+                v-if="!arrayShowButtons.includes(evaluacionPersonal.id_evaluacion_personal) && evaluacionPersonal.id_estado_evaluacion_personal === 1 && evaluacionPersonalProp.data.detalle_evaluaciones_personal.length < 7"
                 class="bg-indigo-900 rounded-sm shadow text-center text-white text-sm font-light w-full py-1 mt-5">
                 TERMINAR EVALUACIÓN (Los datos se guardaran entonces)</button>
         </div>
@@ -544,11 +545,11 @@ export default {
             default: false,
         },
     },
-    emit: ["actualizar-datatable"],
+    emit: ["actualizar-datatable", "showOptionToSendEvaluation"],
     setup(props, { emit }) {
         // Desestructuración de propiedades y funciones de toRefs y useDocumentoEvaluacion
         const { evaluacionPersonalProp, rubricaAndCategoriaByEvaluacion } = toRefs(props);
-        const { separarTexto, evaluacionPersonal, saveResponseWhenIsClickedCheckbox, optionsSelected, sendResponsesEvaluation, ranges, isScoreInRange } = useDocumentoEvaluacion();
+        const { arrayShowButtons, separarTexto, evaluacionPersonal, saveResponseWhenIsClickedCheckbox, optionsSelected, sendResponsesEvaluation, ranges, isScoreInRange } = useDocumentoEvaluacion();
 
         // Utilizando watch para observar cambios en evaluacionPersonalProp
         watch(evaluacionPersonalProp, (newValue, oldValue) => {
@@ -568,6 +569,8 @@ export default {
                         puntaje_rubrica_rendimiento: element.rubrica_rendimiento.puntaje_rubrica_rendimiento
                     });
                 });
+            } else {
+
             }
         });
 
@@ -578,7 +581,7 @@ export default {
         const guardarYEnviarEvaluacion = async () => {
             // Muestra un cuadro de confirmación utilizando SweetAlert2
             const confirmed = await Swal.fire({
-                title: '<p class="text-[16pt] text-center">¿Está seguro de enviar la evaluación?</p>',
+                title: '<p class="text-[16pt] text-center">¿Confirma el envío de la evaluación?</p>',
                 icon: "question",
                 iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
                 confirmButtonText: "Sí, Enviar",
@@ -600,9 +603,13 @@ export default {
                         "La evaluación se ha enviado"
                     );
 
+                    console.log(optionsSelected.value);
+
                     console.log("HACEMOS ALGO DESPUÉS");
                     // Emite un evento para actualizar la datatable
                     emit("actualizar-datatable");
+                    emit("showOptionToSendEvaluation", evaluacionPersonal.value.id_evaluacion_personal);
+                    arrayShowButtons.value.push(evaluacionPersonal.value.id_evaluacion_personal);
                 } else {
                     // Muestra una advertencia si no se han seleccionado todas las opciones
                     toast.warning('No has seleccionado todas las opciones. Por favor, asegúrate de seleccionar todas las opciones antes de finalizar.');
@@ -655,6 +662,7 @@ export default {
 
         return {
             printEvaluacion,
+            arrayShowButtons,
             separarTexto,
             optionsSelected,
             moment,

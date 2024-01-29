@@ -8,8 +8,6 @@ import HojaServiciosBodyVue from "@/Components-ISRI/RRHH/ArchivosInstitucionales
     <Head title="RRHH - Hoja de servicios" />
     <AppLayoutVue nameSubModule="RRHH - Hoja De Servicios" :autoPadding="false">
         <div class="relative flex">
-<!--             <HojaServiciosSidebarVue @send-user-data-when-is-click="reciveUserData" :is-profile-selected="profileSelected"
-                @send-first-user-data="reciveUserData" /> -->
             <HojaServiciosBodyVue :user-data="userMatches[0]" @profile-selected="profile" />
         </div>
     </AppLayoutVue>

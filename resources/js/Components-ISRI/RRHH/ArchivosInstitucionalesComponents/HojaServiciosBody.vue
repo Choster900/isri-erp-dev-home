@@ -173,7 +173,6 @@ import html2pdf from 'html2pdf.js'
                     </li>
                 </ul>
             </div>
-            <!--  {{ pruebaDeOtroPdf() }} -->
             <!-- GENERAL -->
             <GeneralInformationVue :class="showingSections == 'GeneralInformationVue' ? '' : 'hidden'"
                 :moreInformacionEmployee="userData != '' ? userData : ''" />
