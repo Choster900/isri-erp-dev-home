@@ -18,4 +18,6 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     //Route to manage the settlement for an specific employee.
     Route::get('get-info-modal-finiquito-emp/{id}', [FiniquitoController::class, 'getInforModalFiniquitoEmp'])->name('finiquito.getInforModalFiniquitoEmp');
     Route::post('update-finiquito', [FiniquitoController::class, 'updateFiniquito'])->name('finiquito.updateFiniquito');
+    //Route to manage show settlement modal
+    Route::get('get-info-modal-show-finiquito/{id}', [FiniquitoController::class, 'getInfoForModalShowFiniquito'])->name('finiquito.getInfoForModalShowFiniquito');
 });
