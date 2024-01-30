@@ -1,6 +1,6 @@
 import { ref } from "vue";
 import axios from "axios";
-import { createApp } from 'vue'
+import { createApp, inject } from 'vue'
 import FiniquitoEmpPDFVue from '@/pdf/Juridico/FiniquitoEmpPDF.vue';
 import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
@@ -12,6 +12,7 @@ moment.locale('es', localeData)
 
 
 export const useShowFiniquito = (context) => {
+    const swal = inject("$swal");
     const finiquito = ref([])
     const isLoadingRequest = ref(false)
     const hireDate = ref("")
@@ -70,34 +71,70 @@ export const useShowFiniquito = (context) => {
     }
 
     const printPdf = () => {
-        let fecha = moment().format('DD-MM-YYYY');
-        let name = 'FINIQUITO ' + finiquito.value.empleado.persona.nombre_apellido + ' - ' + fecha;
-        const opt = {
-            //margin: [0, 2.5, 0, 2.5], //top, left, buttom, right,
-            margin: [2.5, 2.5, 2.5, 2.5],
-            filename: name,
-            //pagebreak: {mode:'avoid-all'},
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 3, useCORS: false },
-            jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' }
-            //jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' },
-        };
-        const app = createApp(FiniquitoEmpPDFVue, {
-            finiquito: finiquito.value,
-            DUIWords: DUIToWords(finiquito.value.empleado.persona.dui_persona),
-            hireDate: hireDate.value,
-            signatureDate: signatureDate.value,
-            signatureDateA: signatureDateA.value,
-            signatureTime: signatureTime.value,
-            period: period.value,
-            amount: amount.value,
-            year: year.value
-        });
-        const div = document.createElement('div');
-        const pdfPrint = app.mount(div);
-        const html = div.outerHTML;
+        if (finiquito.value.firmado_finiquito_laboral == 1) {
+            generatePDF();
+        } else {
+            swal({
+                title: '¿Está seguro de generar PDF? Una vez generado el sistema lo registrará como firmado.',
+                icon: 'question',
+                iconHtml: '❓',
+                confirmButtonText: 'Si, generar',
+                confirmButtonColor: '#141368',
+                cancelButtonText: 'Cancelar',
+                showCancelButton: true,
+                showCloseButton: true
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    await generatePDF();
+                }
+            });
+        }
+    }
 
-        html2pdf().set(opt).from(html).save();
+    const generatePDF = async () => {
+        try {
+            isLoadingRequest.value = true;
+            const response = await axios.get(
+                `/print-settlement/${finiquito.value.id_finiquito_laboral}`
+            );
+            let fecha = moment().format('DD-MM-YYYY');
+            let name = 'FINIQUITO ' + finiquito.value.empleado.persona.nombre_apellido + ' - ' + fecha;
+            const opt = {
+                //margin: [0, 2.5, 0, 2.5], //top, left, buttom, right,
+                margin: [2.5, 2.5, 2.5, 2.5],
+                filename: name,
+                //pagebreak: {mode:'avoid-all'},
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 3, useCORS: false },
+                jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' }
+                //jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' },
+            };
+            const app = createApp(FiniquitoEmpPDFVue, {
+                finiquito: finiquito.value,
+                DUIWords: DUIToWords(finiquito.value.empleado.persona.dui_persona),
+                hireDate: hireDate.value,
+                signatureDate: signatureDate.value,
+                signatureDateA: signatureDateA.value,
+                signatureTime: signatureTime.value,
+                period: period.value,
+                amount: amount.value,
+                year: year.value
+            });
+            const div = document.createElement('div');
+            const pdfPrint = app.mount(div);
+            const html = div.outerHTML;
+
+            html2pdf().set(opt).from(html).save();
+
+        } catch (error) {
+            showErrorMessage(error);
+            context.emit("cerrar-modal");
+            context.emit("get-table");
+        } finally {
+            isLoadingRequest.value = false;
+            context.emit("cerrar-modal");
+            context.emit("get-table");
+        }
     }
 
     const showErrorMessage = (err) => {

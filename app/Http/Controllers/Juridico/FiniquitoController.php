@@ -99,10 +99,10 @@ class FiniquitoController extends Controller
                     'plazas_asignadas.centro_atencion'
                 ])
                     ->where('id_estado_empleado', 1);
-                    //I'm testing just with one center
-                    // ->whereHas('plazas_asignadas.centro_atencion', function ($query) {
-                    //     $query->where('id_centro_atencion', 10);
-                    // });
+                //I'm testing just with one center
+                // ->whereHas('plazas_asignadas.centro_atencion', function ($query) {
+                //     $query->where('id_centro_atencion', 10);
+                // });
 
                 return response()->json([
                     'empleados' => $empleados->get()
@@ -405,6 +405,36 @@ class FiniquitoController extends Controller
         } else {
             return response()->json([
                 'logical_error' => 'No existe el finiquito que estas intentando modificar.',
+            ], 422);
+        }
+    }
+
+    public function printSettlement(Request $request, $id)
+    {
+        $finiquitoEmp = FiniquitoLaboral::find($id);
+
+        DB::beginTransaction();
+        try {
+            $finiquitoEmp = FiniquitoLaboral::find($request->id);
+
+            if ($finiquitoEmp->firmado_finiquito_laboral == 0) {
+                $finiquitoEmp->update([
+                    'firmado_finiquito_laboral'             => 1,
+                    'fecha_mod_finiquito_laboral'           => Carbon::now(),
+                    'usuario_finiquito_laboral'             => $request->user()->nick_usuario,
+                    'ip_finiquito_laboral'                  => $request->ip(),
+                ]);
+            }
+
+            DB::commit(); // Confirma las operaciones en la base de datos
+            return response()->json([
+                'message'          => "Finiquito actualizado con éxito.",
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+            return response()->json([
+                'logical_error' => 'Ha ocurrido un error con sus datos.',
+                'error' => $th->getMessage(),
             ], 422);
         }
     }
