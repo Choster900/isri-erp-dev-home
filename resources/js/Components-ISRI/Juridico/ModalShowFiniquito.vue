@@ -19,20 +19,24 @@
         </div>
         <ProcessModal v-else maxWidth='3xl' :show="showSettlement" @close="$emit('cerrar-modal')">
 
-            <div class=" flex justify-center pt-2 content-between">
+            <div v-if="permits.ejecutar == 1" class="flex justify-center pt-2 content-between">
                 <div class="px-2">
-                    <GeneralButton color="bg-red-700   hover:bg-red-800" text="PDF" icon="pdf" @click="printPdf()" />
+                    <GeneralButton color="bg-red-700 hover:bg-red-800" text="PDF" icon="pdf" @click="printPdf()" />
                 </div>
             </div>
 
             <div class="mt-[0.5cm] mb-[1cm] mx-[1.5cm]">
-                <p class="mb-[2cm] text-justify">
-                    Yo, <span class="font-semibold">{{ finiquito.empleado ? finiquito.empleado.persona.nombre_apellido : ""
+                <p class="mb-[2cm] text-justify font-[Roboto]">
+                    Yo, <span class="font-[Roboto] font-semibold">{{ finiquito.empleado ?
+                        finiquito.empleado.persona.nombre_apellido : ""
                     }}</span>,
-                    mayor de edad, de nacionalidad salvadoreña, <span class="font-semibold">{{ finiquito.empleado ?
+                    mayor de edad, de nacionalidad salvadoreña, <span class="font-[Roboto] font-semibold">{{
+                        finiquito.empleado ?
                         finiquito.empleado.persona.profesion.nombre_profesion : "" }}</span>,
                     del domicilio de {{ finiquito.empleado ?
                         finiquito.empleado.persona.residencias[0].municipio.nombre_municipio : "" }},
+                    departamento de {{ finiquito.empleado ?
+                        finiquito.empleado.persona.residencias[0].municipio.departamento.nombre_departamento : "" }},
                     con Documento Único de identidad numero {{ finiquito.empleado ?
                         DUIToWords(finiquito.empleado.persona.dui_persona) : "" }},
                     por medio del presente documento OTORGO: AMPLIO Y SUFICIENTE FINIQUITO a favor del INSTITUTO SALVADOREÑO
@@ -54,7 +58,7 @@
                     presente documento en la
                     ciudad de San Salvador a los {{ signatureDateA }}.
                 </p>
-                <p class="pb-[1cm] border-b border-gray-400 text-justify">
+                <p class="font-[Roboto] pb-[1cm] border-b border-gray-400 text-justify">
                     En la ciudad de San Salvador a las {{ signatureTime }}, del día {{ signatureDate }}.
                     Ante mí, {{ finiquito.persona ? finiquito.persona.nombre_apellido : "" }},
                     {{ finiquito.persona ? finiquito.persona.profesion.nombre_profesion : "" }}, del domicilio de
@@ -104,9 +108,11 @@
                     en un solo acto sin interrupción, ratifica su contenido y firmamos DOY FE. -
                 </p>
                 <div class="mt-[1.5cm]">
-                    <p class="text-right font-semibold text-[18px] mb-8">Por $ {{ finiquito.monto_finiquito_laboral }}</p>
-                    <p class="mb-20 text-justify">
-                        Yo, <span class="font-semibold">{{ finiquito.empleado ? finiquito.empleado.persona.nombre_apellido :
+                    <p class="text-right font-[Roboto] font-semibold text-[18px] mb-8">Por $ {{
+                        finiquito.monto_finiquito_laboral }}</p>
+                    <p class="font-[Roboto] mb-20 text-justify">
+                        Yo, <span class="font-[Roboto] font-semibold">{{ finiquito.empleado ?
+                            finiquito.empleado.persona.nombre_apellido :
                             "" }}</span>
                         con Documento Único de Identidad número: {{ finiquito.empleado ?
                             DUIToWords(finiquito.empleado.persona.dui_persona) : "" }},
@@ -117,7 +123,7 @@
                         interés del Instituto y de todos sus empleados.
                     </p>
                     <p class="mb-20">F.________________________</p>
-                    <p class="text-[12px] mb-20 text-justify">
+                    <p class="font-[Roboto] text-[12px] mb-20 text-justify">
                         EL SUSCRITO NOTARIO DA FE: Que la firma que calza el anterior documento y que se lee "ilegible"
                         es AUTENTICA por haber sido puesta a mi presencia de su puño y letra por
                         {{ finiquito.empleado ? finiquito.empleado.persona.nombre_apellido : "" }}, mayor de edad,
@@ -157,6 +163,10 @@ export default {
         finiquitoId: {
             type: Number,
             default: 0
+        },
+        permits: {
+            type: Object,
+            default: {}
         }
     },
     setup(props, context) {
@@ -189,5 +199,4 @@ export default {
 .table-row {
     display: flex;
     justify-content: space-between;
-}
-</style>
+}</style>

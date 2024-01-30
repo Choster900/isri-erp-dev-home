@@ -31,7 +31,9 @@
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
                             <Multiselect v-model="tableData.length" @select="getDataToShow()" :options="perPage"
-                                :searchable="true" placeholder="Cantidad a mostrar" />
+                                :searchable="true" placeholder="Cantidad a mostrar"
+                                @deselect=" tableData.length = 5; getDataToShow()"
+                                @clear="tableData.length = 5; getDataToShow()" />
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
@@ -48,7 +50,7 @@
                         <tr v-for="finiquito in dataToShow" :key="finiquito.id_finiquito_laboral" class="hover:bg-gray-200">
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 flex items-center justify-center min-h-[50px]">
-                                    {{ finiquito.empleado.id_empleado }}
+                                    {{ finiquito.empleado.persona.dui_persona }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5">
@@ -63,7 +65,7 @@
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ finiquito.fecha_firma_finiquito_laboral }}
+                                    {{ moment(finiquito.fecha_firma_finiquito_laboral).format('DD/MM/YYYY') }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
@@ -92,7 +94,7 @@
                                 <div class="space-x-1 text-center">
                                     <DropDownOptions>
                                         <div @click="showModalSettlementEmp = true; finiquitoId = finiquito.id_finiquito_laboral"
-                                            v-if="permits.actualizar == 1"
+                                            v-if="permits.actualizar === 1 && finiquito.firmado_finiquito_laboral != 1"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-orange-800 w-[22px] h-[22px] mr-2">
                                                 <icon-m :iconName="'editM'"></icon-m>
@@ -180,7 +182,7 @@
             @get-table="getDataToShow(tableData.currentPage)" />
 
         <modal-show-finiquito-vue v-if="showSettlement" :showSettlement="showSettlement"
-            :finiquitoId="finiquitoId" @cerrar-modal="showSettlement = false"
+            :finiquitoId="finiquitoId" @cerrar-modal="showSettlement = false" :permits="permits"
             @get-table="getDataToShow(tableData.currentPage)" />
 
     </AppLayoutVue>
@@ -225,13 +227,13 @@ export default {
         const finiquitoId = ref(0)
 
         const columns = [
-            { width: "10%", label: "ID", name: "id_empleado", type: "text" },
-            { width: "30%", label: "Nombre", name: "nombre_empleado", type: "text" },
-            { width: "12%", label: "Fecha firma", name: "fecha_firma", type: "text" },
-            { width: "12%", label: "Hora firma", name: "hora_firma", type: "text" },
-            { width: "13%", label: "monto", name: "monto", type: "text" },
+            { width: "14%", label: "DUI", name: "dui_empleado", type: "text" },
+            { width: "33%", label: "Nombre", name: "nombre_empleado", type: "text" },
+            { width: "12%", label: "Fecha firma", name: "fecha_firma_finiquito_laboral", type: "date" },
+            { width: "10%", label: "Hora firma", name: "hora_firma_finiquito_laboral", type: "text" },
+            { width: "11%", label: "monto", name: "monto_finiquito_laboral", type: "text" },
             {
-                width: "13%", label: "Estado", name: "estado_finiquito", type: "select",
+                width: "10%", label: "Estado", name: "firmado_finiquito_laboral", type: "select",
                 options: [
                     { value: "1", label: "Firmado" },
                     { value: "0", label: "No Firmado" }
@@ -242,6 +244,7 @@ export default {
         const requestUrl = "/finiquitos"
         const columntToSort = "id_ejercicio"
         const dir = 'desc'
+        const initialCol = -1 // Opcional, el composable recibe 0 por defecto
 
         const {
             dataToShow,
@@ -252,12 +255,12 @@ export default {
             isLoadingTop,
             emptyObject,
             getDataToShow, handleData, sortBy, changeStatusElement
-        } = useToDataTable(columns, requestUrl, columntToSort, dir)
+        } = useToDataTable(columns, requestUrl, columntToSort, dir, initialCol)
 
         return {
             permits, dataToShow, showModalSettlement, tableData, perPage, showModalSettlementEmp, finiquitoId,
             links, sortKey, sortOrders, isLoadinRequest, isLoadingTop, emptyObject, columns, showSettlement,
-            getDataToShow, handleData, sortBy, changeStatusElement
+            getDataToShow, handleData, sortBy, changeStatusElement, moment
         };
     },
 }

@@ -1,12 +1,14 @@
 <template>
     <div class="">
-        <p class="mb-[1.9cm] text-justify">
-            Yo, <span class="font-semibold">{{ finiquito.empleado ? finiquito.empleado.persona.nombre_apellido : ""
+        <p class="font-[Roboto] mb-[1.9cm] text-justify">
+            Yo, <span class="font-[Roboto] font-semibold">{{ finiquito.empleado ? finiquito.empleado.persona.nombre_apellido : ""
             }}</span>,
-            mayor de edad, de nacionalidad salvadoreña, <span class="font-semibold">{{ finiquito.empleado ?
+            mayor de edad, de nacionalidad salvadoreña, <span class="font-[Roboto] font-semibold">{{ finiquito.empleado ?
                 finiquito.empleado.persona.profesion.nombre_profesion : "" }}</span>,
             del domicilio de {{ finiquito.empleado ?
                 finiquito.empleado.persona.residencias[0].municipio.nombre_municipio : "" }},
+            departamento de {{ finiquito.empleado ?
+                finiquito.empleado.persona.residencias[0].municipio.departamento.nombre_departamento : "" }},
             con Documento Único de identidad numero {{ finiquito.empleado ?
                 DUIWords : "" }},
             por medio del presente documento OTORGO: AMPLIO Y SUFICIENTE FINIQUITO a favor del INSTITUTO SALVADOREÑO
@@ -26,9 +28,9 @@
             consecuencia lo declaro solvente de toda obligación derivada de dicho Laudo Arbitral y exento de toda
             responsabilidad para conmigo, extendiéndole amplio y total FINIQUITO. En fe de lo dicho, firmo el
             presente documento en la
-            ciudad de San Salvador a los {{ signatureDate }}.
+            ciudad de San Salvador a los {{ signatureDateA }}.
         </p>
-        <p class="pb-[1cm] text-justify mt-[-5px]">
+        <p class="font-[Roboto] pb-[1cm] text-justify mt-[-5px]">
             En la ciudad de San Salvador a las {{ signatureTime }}, del día {{ signatureDate }}.
             Ante mí, {{ finiquito.persona ? finiquito.persona.nombre_apellido : "" }},
             {{ finiquito.persona ? finiquito.persona.profesion.nombre_profesion : "" }}, del domicilio de
@@ -80,8 +82,8 @@
     </div>
 
     <div id="pagebreak">
-        <p class="text-right font-semibold text-[18px] mb-8">Por $ {{ finiquito.monto_finiquito_laboral }}</p>
-        <p class="mb-[100px] text-justify">
+        <p class="text-right font-[Roboto] font-semibold text-[18px] mb-8">Por $ {{ finiquito.monto_finiquito_laboral }}</p>
+        <p class="font-[Roboto] mb-[100px] text-justify">
             Yo, <span class="font-semibold">{{ finiquito.empleado ? finiquito.empleado.persona.nombre_apellido :
                 "" }}</span>
             con Documento Único de Identidad número: {{ finiquito.empleado ?
@@ -94,14 +96,14 @@
             del Instituto y de todos sus empleados.
         </p>
         <div class="flex w-full mb-[100px]">
-            <p class="w-[3%]">
+            <p class="w-[3%] font-[Roboto]">
                 F.
             </p>
             <p class="w-[50%] border-b border-black mb-[-5px]">
 
             </p>
         </div>
-        <p class="text-[12px] mb-20 text-justify">
+        <p class="font-[Roboto] text-[12px] mb-20 text-justify">
             EL SUSCRITO NOTARIO DA FE: Que la firma que calza el anterior documento y que se lee "ilegible"
             es AUTENTICA por haber sido puesta a mi presencia de su puño y letra por
             {{ finiquito.empleado ? finiquito.empleado.persona.nombre_apellido : "" }}, mayor de edad,

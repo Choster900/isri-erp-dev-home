@@ -17,7 +17,7 @@ class FiniquitoController extends Controller
 {
     public function getFiniquitos(Request $request)
     {
-        $columns = ['id_empleado', 'nombre_empleado', 'fecha_firma', 'hora_firma', 'monto', 'estado_finiquito'];
+        $columns = ['dui_empleado', 'nombre_empleado', 'fecha_firma_finiquito_laboral', 'hora_firma_finiquito_laboral', 'monto_finiquito_laboral', 'firmado_finiquito_laboral'];
 
         $length = $request->length;
         $column = $request->column; //Index
@@ -27,24 +27,53 @@ class FiniquitoController extends Controller
         $query = FiniquitoLaboral::select('*')
             ->with([
                 'empleado.persona',
-            ])
-            ->orderBy('id_finiquito_laboral', 'DESC');
+            ]);
+
+        if ($column == -1) {
+            $query->orderBy('id_finiquito_laboral', 'desc');
+        } else {
+            if ($column == 0) { //dui
+                $query->orderByRaw('
+                        (SELECT dui_persona FROM persona WHERE persona.id_persona = 
+                            (SELECT id_persona FROM empleado WHERE empleado.id_empleado = finiquito_laboral.id_empleado) 
+                        ) ' . $dir);
+            } else {
+                if ($column == 1) { //nombre
+                    $query->orderByRaw('
+                        (SELECT pnombre_persona FROM persona WHERE persona.id_persona = 
+                            (SELECT id_persona FROM empleado WHERE empleado.id_empleado = finiquito_laboral.id_empleado) 
+                        ) ' . $dir);
+                } else {
+                    $query->orderBy($columns[$column], $dir);
+                }
+            }
+        }
 
         if ($search_value) {
-            $query->where('id_empleado', 'like', '%' . $search_value['id_empleado'] . '%');
-                //->where('codigo_empleado', 'like', '%' . $search_value['codigo_empleado'] . '%')
-                //->where('id_estado_empleado', 'like', '%' . $search_value['estado_empleado'] . '%')
-                // ->whereHas('persona', function ($query) use ($search_value) {
-                //     $query->where('dui_persona', 'like', '%' . $search_value["dui_persona"] . '%');
-                // })
-                // ->whereHas(
-                //     'persona',
-                //     function ($query) use ($search_value) {
-                //         if ($search_value["nombre_persona"] != '') {
-                //             $query->whereRaw("MATCH(pnombre_persona, snombre_persona, tnombre_persona, papellido_persona, sapellido_persona, tapellido_persona) AGAINST(?)", $search_value["nombre_persona"]);
-                //         }
-                //     }
-                // );
+            $query->where('fecha_firma_finiquito_laboral', 'like', '%' . $search_value['fecha_firma_finiquito_laboral'] . '%')
+                ->where('monto_finiquito_laboral', 'like', '%' . $search_value['monto_finiquito_laboral'] . '%')
+                ->where('hora_firma_finiquito_laboral', 'like', '%' . $search_value['hora_firma_finiquito_laboral'] . '%')
+                ->where('firmado_finiquito_laboral', 'like', '%' . $search_value['firmado_finiquito_laboral'] . '%');
+            if ($search_value['nombre_empleado']) {
+                $query->whereHas(
+                    'empleado.persona',
+                    function ($query) use ($search_value) {
+                        if ($search_value["nombre_empleado"] != '') {
+                            $query->whereRaw("MATCH(pnombre_persona, snombre_persona, tnombre_persona, papellido_persona, sapellido_persona, tapellido_persona) AGAINST(?)", $search_value["nombre_empleado"]);
+                        }
+                    }
+                );
+            }
+            if ($search_value['dui_empleado']) {
+                $query->whereHas(
+                    'empleado.persona',
+                    function ($query) use ($search_value) {
+                        if ($search_value["dui_empleado"] != '') {
+                            $query->where('dui_persona', 'like', '%' . $search_value['dui_empleado'] . '%');
+                        }
+                    }
+                );
+            }
         }
 
         $data = $query->paginate($length)->onEachSide(1);
@@ -69,13 +98,11 @@ class FiniquitoController extends Controller
                     },
                     'plazas_asignadas.centro_atencion'
                 ])
-                    ->where('id_estado_empleado', 1)
+                    ->where('id_estado_empleado', 1);
                     //I'm testing just with one center
-                    ->whereHas('plazas_asignadas.centro_atencion', function ($query) {
-                        //$query->whereIn('id_centro_atencion', [9,10]);
-                        $query->where('id_centro_atencion', 10);
-                    });
-                //->where('id_empleado', '>', 935);
+                    // ->whereHas('plazas_asignadas.centro_atencion', function ($query) {
+                    //     $query->where('id_centro_atencion', 10);
+                    // });
 
                 return response()->json([
                     'empleados' => $empleados->get()
@@ -331,7 +358,7 @@ class FiniquitoController extends Controller
 
         $formatter = new NumeroALetras();
         $formatterDateA = new NumeroALetras();
-        $formatterDateA->apocope=true;
+        $formatterDateA->apocope = true;
 
         //Format hire date
         $hireDate = Carbon::parse($finiquitoEmp->empleado->fecha_contratacion_empleado)->format('Y-m-d');
@@ -367,11 +394,11 @@ class FiniquitoController extends Controller
         if ($finiquitoEmp) {
             return response()->json([
                 'finiquitoEmp'          => $finiquitoEmp ?? [],
-                'hireDate'              => $hireDayText." de ".$hireMonthText." de ".$hireYearText,
-                'signatureDateA'        => $signatureDayTextA." días del mes de ".$signatureMonthTextA." de ".$signatureYearTextA,
-                'period'                => "del uno de enero al treinta y uno de diciembre del año ".$settlementYear,
-                'signatureTime'         => $hoursText." horas con ".$minutesText." minutos",
-                'signatureDate'         => $signatureDayText." de ".$signatureMonthText." de ".$signatureYearText,
+                'hireDate'              => $hireDayText . " de " . $hireMonthText . " de " . $hireYearText,
+                'signatureDateA'        => $signatureDayTextA . " días del mes de " . $signatureMonthTextA . " de " . $signatureYearTextA,
+                'period'                => "del uno de enero al treinta y uno de diciembre del año " . $settlementYear,
+                'signatureTime'         => $hoursText . " horas con " . $minutesText . " minutos",
+                'signatureDate'         => $signatureDayText . " de " . $signatureMonthText . " de " . $signatureYearText,
                 'amountText'            => $formatter->toInvoice($finiquitoEmp->monto_finiquito_laboral, 2, 'DÓLARES DE LOS ESTADOS UNIDOS DE AMERICA'),
                 'year'                  => $formatter->toWords(Carbon::createFromFormat('Y-m-d', $signatureDate)->format('Y'))
             ]);
