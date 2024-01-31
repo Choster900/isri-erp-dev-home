@@ -101,6 +101,9 @@ class HojaServicioController extends Controller
             'empleado.evaluaciones_personal.plaza_evaluada.plaza_asignada.dependencia.jefatura.empleado.plazas_asignadas.dependencia',
             'empleado.evaluaciones_personal.evaluacion_rendimiento',
             'empleado.evaluaciones_personal.estado_evaluacion_personal',
+            'empleado.evaluaciones_personal.incidentes_evaluacion' => function ($query) {
+                return $query->where("estado_incidente_evaluacion", 1);
+            },
             "empleado.evaluaciones_personal" => function ($query) {
                 $query->whereIn("id_estado_evaluacion_personal",  [2, 3, 8])
                     ->orderBy("fecha_reg_evaluacion_personal", "asc");

@@ -109,28 +109,32 @@ class EvaluacionController extends Controller
         if ($data) {
             $query->where('id_empleado', 'like', '%' . $data["id_empleado"] . '%')
                 ->where('codigo_empleado', 'like', '%' . $data['codigo_empleado'] . '%');
-
-            /*  if (isset($data['email_institucional_empleado'])) {
-                $query->where('email_institucional_empleado', 'like', '%' . $data['email_institucional_empleado'] . '%');
-            }
             $query->whereHas(
                 'persona',
                 function ($query) use ($data) {
-                    $searchNombres = $data["collecNombre"];
-                    $query->where(function ($query) use ($searchNombres) {
-                        $query->where('pnombre_persona', 'like', '%' . $searchNombres . '%')
-                            ->orWhere('snombre_persona', 'like', '%' . $searchNombres . '%')
-                            ->orWhere('tapellido_persona', 'like', '%' . $searchNombres . '%');
-                    });
 
+                    $searchNombres = $data["collecNombre"];
+                    if (isset($searchNombres)) {
+                        $query->whereRaw("MATCH ( pnombre_persona, snombre_persona, tnombre_persona ) AGAINST ( '" . $searchNombres . "')");
+                    }
                     $searchApellidos = $data["collecApellido"];
-                    $query->where(function ($query) use ($searchApellidos) {
-                        $query->where('papellido_persona', 'like', '%' . $searchApellidos . '%')
-                            ->orWhere('sapellido_persona', 'like', '%' . $searchApellidos . '%')
-                            ->orWhere('tapellido_persona', 'like', '%' . $searchApellidos . '%');
-                    });
+                    if (isset($searchApellidos)) {
+                        $query->whereRaw("MATCH ( papellido_persona, sapellido_persona, tapellido_persona ) AGAINST ( '" . $searchApellidos . "')");
+                    }
                 }
-            ); */
+            );
+            $query->whereHas('evaluaciones_personal', function ($query) use ($data) {
+                $query->where('fecha_reg_evaluacion_personal', 'like', '%' . $data["fecha_reg_evaluacion_personal"] . '%');
+            });
+            $query->whereHas('evaluaciones_personal', function ($query) use ($data) {
+                $query->where('id_periodo_evaluacion', 'like', '%' . $data["id_periodo_evaluacion"] . '%');
+            });
+            $query->whereHas('evaluaciones_personal', function ($query) use ($data) {
+                $query->where('id_tipo_evaluacion_personal', 'like', '%' . $data["id_tipo_evaluacion_personal"] . '%');
+            });
+            $query->whereHas('evaluaciones_personal', function ($query) use ($data) {
+                $query->where('puntaje_evaluacion_personal', 'like', '%' . $data["puntaje_evaluacion_personal"] . '%');
+            });
         }
 
         $acuerdos = $query->paginate($length)->onEachSide(1);
@@ -159,21 +163,23 @@ class EvaluacionController extends Controller
         return [
             'data' => $paginator,
             'draw' => $request->input('draw'),
-            'DependenciaDondeEstoy' => $idDependenciWhereIAm,
-            'dependencies' => $idDependencies,
         ];
     }
 
     function searchEmployeesForNewEvaluationRequest(Request $request)
     {
+        // Obtener el ID de la persona que realiza la solicitud y el nombre de búsqueda
         $idPersona = $request->user()->id_persona;
         $nombre = $request->nombre;
 
+
+        // Obtener IDs de dependencias asociadas a la persona
         $depIds = Dependencia::where('id_persona', $idPersona)
             ->where('estado_dependencia', 1)
             ->pluck('id_dependencia')
             ->toArray();
 
+        // Obtener dependencias con información de jefatura y empleados
         $dependencies = Dependencia::with(['jefatura.empleado.plazas_asignadas'])
             ->whereIn('dep_id_dependencia', $depIds)
             ->whereHas('jefatura', function ($query) use ($nombre) {
@@ -185,12 +191,12 @@ class EvaluacionController extends Controller
                 });
             })->get();
 
-        $personasJefeByDependencia = array();
-        foreach ($dependencies as $dep) {
-            if ($dep->jefatura && $dep->estado_dependencia == 1) {
-                $personasJefeByDependencia[] = $dep->jefatura;
-            }
-        }
+        // Filtrar y obtener jefaturas activas
+        $personasJefeByDependencia = $dependencies
+            ->filter(function ($dep) {
+                return $dep->jefatura && $dep->estado_dependencia == 1;
+            })
+            ->pluck('jefatura');
 
         $results = Persona::with([
             'empleado'                  => function ($query) {
@@ -215,203 +221,220 @@ class EvaluacionController extends Controller
             })
             ->where(function ($query) use ($request) {
                 $query->whereRaw(
-                    "MATCH ( pnombre_persona, snombre_persona, tnombre_persona, papellido_persona, sapellido_persona, tapellido_persona ) AGAINST ( '" . $request->nombre . "')"
+                    "MATCH ( pnombre_persona, snombre_persona, tnombre_persona, papellido_persona, sapellido_persona, tapellido_persona ) AGAINST ( ? )",
+                    [$request->nombre]
                 );
             })
             ->get();
+        // Fusionar resultados únicos de jefaturas y empleados
+        $mergedResults = $personasJefeByDependencia->merge($results)->unique('id_persona');
 
-        $mergedResults = collect($personasJefeByDependencia)->merge($results)->unique('id_persona');
-
-        $formattedResults = $mergedResults->map(function ($item) use ($mergedResults) {
+        // Formatear resultados para respuesta JSON
+        $formattedResults = $mergedResults->map(function ($item) {
             return [
                 'value'           => $item->id_persona,
                 'label'           => $item->nombre_completo,
                 'allDataPersonas' => $item,
-                "mergedResults"   => $mergedResults,
-
             ];
         });
 
         return response()->json($formattedResults);
     }
-
+    /**
+     * Obtener plazas asignadas según el usuario y la dependencia.
+     *
+     * @param Request $request
+     * @return array
+     */
     function getPlazaAsignadaByUserAndDependencia(Request $request)
     {
-        $employeeId = $request->employeeId;
-        $idCentroAtencion = $request->centroAtencionId;
-        $tipoEvaluacionId = $request->idTipoEvaluacion;
+        try {
 
-        $mensaje_debug = [];
+            // Obtener parámetros de la solicitud
+            $employeeId = $request->employeeId;
+            $idCentroAtencion = $request->centroAtencionId;
+            $tipoEvaluacionId = $request->idTipoEvaluacion;
 
-        // Verificar si se proporcionaron fechas
-        if (!empty($request->fechaInicioFechafin)) {
-            [$fecha_inicio, $fecha_fin] = explode(" a ", $request->fechaInicioFechafin) + [null, null];
+            $mensaje_debug = [];
 
-            try {
-                // Convertir fechas a objetos Carbon para comparaciones
-                $fechaInicioObj = Carbon::parse($fecha_inicio);
-                $fechaFinObj = Carbon::parse($fecha_fin);
-            } catch (\Exception $e) {
+            // Verificar si se proporcionaron fechas
+            if (!empty($request->fechaInicioFechafin)) {
+                // Separar las fechas proporcionadas
+                [$fecha_inicio, $fecha_fin] = explode(" a ", $request->fechaInicioFechafin) + [null, null];
+
+                try {
+                    // Convertir fechas a objetos Carbon para comparaciones
+                    $fechaInicioObj = Carbon::parse($fecha_inicio);
+                    $fechaFinObj = Carbon::parse($fecha_fin);
+                } catch (\Exception $e) {
+                    // Manejar errores al parsear las fechas
+                    throw new \Exception("Error al parsear las fechas. " . $e->getMessage(), 422);
+                }
+                // Obtener el año de las fechas
+                $anio = $fechaInicioObj->year;
+
+                // Definir límites para los periodos según el tipo de evaluación ( 1 == Evaluacion de desempeño, 2 == Evaluacion de periodo de prueba)
+                if ($tipoEvaluacionId == 1) {
+                    $limitePrimerPeriodo = Carbon::parse("{$anio}-06-30");
+                    $limiteSegundoPeriodo = Carbon::parse("{$anio}-12-31");
+                } else {
+                    $limitePrimerPeriodo = $fechaInicioObj->copy();
+                    $limiteSegundoPeriodo = $fechaInicioObj->copy()->addMonths(3);
+                }
+
+                // Determinar el periodo en base a las fechas
+                if ($fechaInicioObj->lte($limitePrimerPeriodo) && $fechaFinObj->lte($limitePrimerPeriodo)) {
+                    $id_periodo_evaluacion = 1; // Primer periodo
+                    $mensaje_periodo = 'Primer periodo';
+                } elseif ($fechaInicioObj->gte($limitePrimerPeriodo) && $fechaFinObj->lte($limiteSegundoPeriodo)) {
+                    $id_periodo_evaluacion = 2; // Segundo periodo
+                    $mensaje_periodo = 'Segundo periodo';
+                } else {
+                    // Manejar el caso en que las fechas no se ajusten a ninguno de los periodos
+
+                    if ($tipoEvaluacionId == 1) {
+
+                        return response()->json([
+                            "error"           => "Las fechas no .",
+                            "mensaje_periodo" => 'Las evaluaciones de desempeño deben estar dentro del primer periodo (del 1 de enero al 30 de junio) o del segundo periodo (del 1 de julio al 31 de diciembre).',
+                        ], 422);
+                    } else {
+
+                        return response()->json([
+                            "error"           => "Las fechas no .",
+                            "mensaje_periodo" => 'Las evaluaciones de periodo de prueba deben tener un rango máximo de 3 meses.',
+                        ], 422);
+                    }
+                }
+
+                $mensaje_debug = [
+                    "fechaInicio" => $fechaInicioObj->toDateString(),
+                    "fechaFin"    => $fechaFinObj->toDateString(),
+                    "periodo"     => ($fechaInicioObj->lte($limitePrimerPeriodo) && $fechaFinObj->lte($limitePrimerPeriodo)) ? 'Primer periodo' : 'Segundo periodo',
+                ];
+            } else {
+                // Caso en que no se proporcionaron fechas - Devolver error 422
                 return response()->json([
-                    "error"   => "Error al parsear las fechas.",
-                    "mensaje" => $e->getMessage(),
+                    "error"           => "No se proporcionaron fechas.",
+                    "mensaje_periodo" => 'No se proporcionaron fechas',
                 ], 422);
             }
-            // Obtener el año de las fechas
-            $anio = $fechaInicioObj->year;
 
-            if ($tipoEvaluacionId == 1) {
-                // Caso en que idTipoEvaluacion es igual a 1
-                $limitePrimerPeriodo = Carbon::parse("{$anio}-06-30");
-                $limiteSegundoPeriodo = Carbon::parse("{$anio}-12-31");
-            } else {
-                // Caso en que idTipoEvaluacion no es igual a 1
-                $limitePrimerPeriodo = $fechaInicioObj->copy();
-                $limiteSegundoPeriodo = $fechaInicioObj->copy()->addMonths(3);
-            }
+            // Obtener evaluaciones para el periodo y tipo de evaluación
+            $objectEvaluation = EvaluacionPersonal::where("id_periodo_evaluacion", $id_periodo_evaluacion)
+                ->where("id_tipo_evaluacion_personal", $tipoEvaluacionId)
+                ->whereYear("fecha_inicio_evaluacion_personal", optional($fechaInicioObj)->year)
+                ->where("id_empleado", $employeeId)
+                ->get();
 
+            // Obtener evaluaciones para pruebas
+            $objectEvaluationByPrueba = EvaluacionPersonal::with(["plaza_evaluada.plaza_asignada"])
+                ->where("id_tipo_evaluacion_personal", $tipoEvaluacionId)
+                ->where("id_empleado", $employeeId)
+                ->get();
 
+            // Obtener una colección de todos los id_plaza_asignada
+            $idPlazaAsignadaCollection = $objectEvaluationByPrueba->pluck('plaza_evaluada.*.plaza_asignada.id_plaza_asignada')->flatten();
 
-            // Determinar el periodo en base a las fechas
-            if ($fechaInicioObj->lte($limitePrimerPeriodo) && $fechaFinObj->lte($limitePrimerPeriodo)) {
-                $id_periodo_evaluacion = 1; // Primer periodo
-                $mensaje_periodo = 'Primer periodo';
-            } elseif ($fechaInicioObj->gte($limitePrimerPeriodo) && $fechaFinObj->lte($limiteSegundoPeriodo)) {
-                $id_periodo_evaluacion = 2; // Segundo periodo
-                $mensaje_periodo = 'Segundo periodo';
-            } else {
-                // Manejar el caso en que las fechas no se ajusten a ninguno de los periodos
+            // Contar las evaluaciones por id_plaza_asignada
+            $conteoPorPlazaAsignada = $idPlazaAsignadaCollection->countBy();
 
-                if ($tipoEvaluacionId == 1) {
-
-                    return response()->json([
-                        "error"           => "Las fechas no .",
-                        "mensaje_periodo" => 'Las evaluaciones de desempeño deben estar dentro del primer periodo (del 1 de enero al 30 de junio) o del segundo periodo (del 1 de julio al 31 de diciembre).',
-                    ], 422);
-                } else {
-
-                    return response()->json([
-                        "error"           => "Las fechas no .",
-                        "mensaje_periodo" => 'Las evaluaciones de periodo de prueba deben tener un rango máximo de 3 meses.',
-                    ], 422);
-                }
-            }
-
-            $mensaje_debug = [
-                "fechaInicio" => $fechaInicioObj->toDateString(),
-                "fechaFin"    => $fechaFinObj->toDateString(),
-                "periodo"     => ($fechaInicioObj->lte($limitePrimerPeriodo) && $fechaFinObj->lte($limitePrimerPeriodo)) ? 'Primer periodo' : 'Segundo periodo',
-            ];
-        } else {
-            // Caso en que no se proporcionaron fechas - Devolver error 422
-            return response()->json([
-                "error"           => "No se proporcionaron fechas.",
-                "mensaje_periodo" => 'No se proporcionaron fechas',
-            ], 422);
-        }
-
-        // Obtener evaluaciones
-        $objectEvaluation = EvaluacionPersonal::where("id_periodo_evaluacion", optional($mensaje_debug)['periodo'] == 'Primer periodo' ? 1 : 2)
-            ->where("id_tipo_evaluacion_personal", $tipoEvaluacionId)
-            ->whereYear("fecha_inicio_evaluacion_personal", optional($fechaInicioObj)->year)
-            ->where("id_empleado", $employeeId)
-            ->get();
-
-
-        $objectEvaluationByPrueba = EvaluacionPersonal::with(["plaza_evaluada.plaza_asignada"])
-            ->where("id_tipo_evaluacion_personal", $tipoEvaluacionId)
-            ->where("id_empleado", $employeeId)
-            ->get();
-
-        // Obtén una colección de todos los id_plaza_asignada
-        $idPlazaAsignadaCollection = $objectEvaluationByPrueba->pluck('plaza_evaluada.*.plaza_asignada.id_plaza_asignada')->flatten();
-
-        $conteoPorPlazaAsignada = $idPlazaAsignadaCollection->countBy();
-
-        // Filtra las plazas asignadas que tienen un conteo de 2 o más
-        $plazasConDosOMasEvaluaciones = $conteoPorPlazaAsignada->filter(function ($conteo) {
-            return $conteo >= 2;
-        });
-
-        // Obtiene las claves (id_plaza_asignada) del arreglo filtrado
-        $plazasDosOMasEvaluaciones = $plazasConDosOMasEvaluaciones->keys()->toArray();
-
-
-        $plazasAsignadasPruebas = PlazaAsignada::with([
-            'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos'
-        ])->where('id_empleado', $employeeId)->whereNotIn("id_plaza_asignada", $plazasDosOMasEvaluaciones)
-            ->where('id_centro_atencion', $idCentroAtencion)->get();
-
-
-        if ($objectEvaluation->isEmpty()) {
-
-            if ($tipoEvaluacionId == 1) {
-                $plazasAsignadas = PlazaAsignada::with([
-                    'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos',
-                    'centro_atencion',
-                    'dependencia',
-                ])->where('id_empleado', $employeeId)->where('id_centro_atencion', $idCentroAtencion)->get();
-            } else {
-                $plazasAsignadas = PlazaAsignada::with([
-                    'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos',
-                    'centro_atencion',
-                    'dependencia',
-                ])->where('id_empleado', $employeeId)->whereNotIn("id_plaza_asignada", $plazasDosOMasEvaluaciones)
-                    ->where('id_centro_atencion', $idCentroAtencion)->get();
-            }
-        } else {
-
-            if ($tipoEvaluacionId == 1) {
-                # code...
-                $plazasAsignadas = PlazaAsignada::with([
-                    'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos',
-                    'centro_atencion',
-                    'dependencia',
-                ])->where('id_empleado', $employeeId)->where('id_centro_atencion', $idCentroAtencion)->doesntHave("plaza_evaluada")->get();
-            } else {
-                $plazasAsignadas = PlazaAsignada::with([
-                    'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos',
-                    'centro_atencion',
-                    'dependencia',
-                ])->where('id_empleado', $employeeId)->whereNotIn("id_plaza_asignada", $plazasDosOMasEvaluaciones)
-                    ->where('id_centro_atencion', $idCentroAtencion)->get();
-            }
-        }
-
-        // Obtener evaluaciones de rendimiento con información de tipo de plaza
-        $evaluacionRendimiento = $plazasAsignadas->flatMap(function ($item) {
-            $tipoPlaza = $item->detalle_plaza->plaza->tipo_plaza;
-
-            return $tipoPlaza->evaluaciones_rendimientos->map(function ($evaluacion) use ($tipoPlaza) {
-                return [
-                    'id_evaluacion_rendimiento'        => $evaluacion->id_evaluacion_rendimiento,
-                    'codigo_evaluacion_rendimiento'    => $evaluacion->codigo_evaluacion_rendimiento,
-                    'nombre_evaluacion_rendimiento'    => $evaluacion->nombre_evaluacion_rendimiento,
-                    'version_evaluacion_rendimiento'   => $evaluacion->version_evaluacion_rendimiento,
-                    'estado_evaluacion_rendimiento'    => $evaluacion->estado_evaluacion_rendimiento,
-                    'fecha_reg_evaluacion_rendimiento' => $evaluacion->fecha_reg_evaluacion_rendimiento,
-                    'fecha_mod_evaluacion_rendimiento' => $evaluacion->fecha_mod_evaluacion_rendimiento,
-                    'usuario_evaluacion_rendimiento'   => $evaluacion->usuario_evaluacion_rendimiento,
-                    'ip_evaluacion_rendimiento'        => $evaluacion->ip_evaluacion_rendimiento,
-                    'tipo_plaza'                       => [
-                        'id_tipo_plaza'     => $tipoPlaza->id_tipo_plaza,
-                        'nombre_tipo_plaza' => $tipoPlaza->nombre_tipo_plaza,
-                    ],
-                ];
+            // Filtra las plazas asignadas que tienen un conteo de 2 o más
+            $plazasConDosOMasEvaluaciones = $conteoPorPlazaAsignada->filter(function ($conteo) {
+                return $conteo >= 2;
             });
-        })->unique('id_evaluacion_rendimiento');
 
-        $cantidadEvaluacionesRendimiento = $evaluacionRendimiento->count();
+            // Obtiene las claves (id_plaza_asignada) del arreglo filtrado
+            $plazasDosOMasEvaluaciones = $plazasConDosOMasEvaluaciones->keys()->toArray();
 
-        return [
-            //Data que uso en el front
-            "plazasAsignadas"                 => $plazasAsignadas,
-            "evaluacionRendimiento"           => $evaluacionRendimiento,
-            'cantidadEvaluacionesRendimiento' => $cantidadEvaluacionesRendimiento,
-            "mensaje_debug"                   => $mensaje_debug
-        ];
+            if ($objectEvaluation->isEmpty()) {
+
+                // Obtener todas las plazas asignadas
+                $plazasAsignadas = ($tipoEvaluacionId == 1)
+                    ? PlazaAsignada::with([
+                        'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos',
+                        'centro_atencion',
+                        'dependencia',
+                    ])->where('id_empleado', $employeeId)
+                    ->where('id_centro_atencion', $idCentroAtencion)
+                    ->get()
+                    : PlazaAsignada::with([
+                        'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos',
+                        'centro_atencion',
+                        'dependencia',
+                    ])->where('id_empleado', $employeeId)
+                    ->whereNotIn("id_plaza_asignada", $plazasDosOMasEvaluaciones)
+                    ->where('id_centro_atencion', $idCentroAtencion)
+                    ->get();
+            } else {
+
+                // Obtener plazas asignadas sin evaluaciones
+                $plazasAsignadas = ($tipoEvaluacionId == 1)
+                    ? PlazaAsignada::with([
+                        'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos',
+                        'centro_atencion',
+                        'dependencia',
+                    ])->where('id_empleado', $employeeId)
+                    ->where('id_centro_atencion', $idCentroAtencion)
+                    ->doesntHave("plaza_evaluada")
+                    ->get()
+                    : PlazaAsignada::with([
+                        'detalle_plaza.plaza.tipo_plaza.evaluaciones_rendimientos',
+                        'centro_atencion',
+                        'dependencia',
+                    ])->where('id_empleado', $employeeId)
+                    ->whereNotIn("id_plaza_asignada", $plazasDosOMasEvaluaciones)
+                    ->where('id_centro_atencion', $idCentroAtencion)
+                    ->get();
+            }
+
+            // Obtener evaluaciones de rendimiento con información de tipo de plaza
+            $evaluacionRendimiento = $plazasAsignadas->flatMap(function ($item) {
+                $tipoPlaza = $item->detalle_plaza->plaza->tipo_plaza;
+
+                return $tipoPlaza->evaluaciones_rendimientos->map(function ($evaluacion) use ($tipoPlaza) {
+                    return [
+                        'id_evaluacion_rendimiento'        => $evaluacion->id_evaluacion_rendimiento,
+                        'codigo_evaluacion_rendimiento'    => $evaluacion->codigo_evaluacion_rendimiento,
+                        'nombre_evaluacion_rendimiento'    => $evaluacion->nombre_evaluacion_rendimiento,
+                        'version_evaluacion_rendimiento'   => $evaluacion->version_evaluacion_rendimiento,
+                        'estado_evaluacion_rendimiento'    => $evaluacion->estado_evaluacion_rendimiento,
+                        'fecha_reg_evaluacion_rendimiento' => $evaluacion->fecha_reg_evaluacion_rendimiento,
+                        'fecha_mod_evaluacion_rendimiento' => $evaluacion->fecha_mod_evaluacion_rendimiento,
+                        'usuario_evaluacion_rendimiento'   => $evaluacion->usuario_evaluacion_rendimiento,
+                        'ip_evaluacion_rendimiento'        => $evaluacion->ip_evaluacion_rendimiento,
+                        'tipo_plaza'                       => [
+                            'id_tipo_plaza'     => $tipoPlaza->id_tipo_plaza,
+                            'nombre_tipo_plaza' => $tipoPlaza->nombre_tipo_plaza,
+                        ],
+                    ];
+                });
+            })->unique('id_evaluacion_rendimiento');
+
+            $cantidadEvaluacionesRendimiento = $evaluacionRendimiento->count();
+
+            // Devolver el resultado
+            return [
+                //Data que uso en el front
+                "plazasAsignadas"                 => $plazasAsignadas,
+                "evaluacionRendimiento"           => $evaluacionRendimiento,
+                'cantidadEvaluacionesRendimiento' => $cantidadEvaluacionesRendimiento,
+                "mensaje_debug"                   => $mensaje_debug
+            ];
+        } catch (\Throwable $th) {
+            // Manejar errores y devolver respuesta JSON con código de estado 500
+            return response()->json([
+                "error"   => "Error en la transacción.",
+                "mensaje" => is_array($th->getMessage()) ? json_encode($th->getMessage()) : $th->getMessage(),
+            ], 500);
+        }
     }
-
+    /**
+     * Crear una nueva evaluación para un empleado.
+     *
+     * @param EvaluacionRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     function createNewEvaluation(EvaluacionRequest $request)
     {
 
@@ -435,10 +458,10 @@ class EvaluacionController extends Controller
                     $fechaFinObj = Carbon::parse($fecha_fin);
                 } catch (\Exception $e) {
                     // Manejar errores al parsear las fechas
-                    return [
+                    return response()->json([
                         "error"   => "Error al parsear las fechas.",
                         "mensaje" => $e->getMessage(),
-                    ];
+                    ], 400);
                 }
 
                 $anio = $fechaInicioObj->year;
@@ -488,8 +511,9 @@ class EvaluacionController extends Controller
                 'usuario_evaluacion_personal'      => $request->user()->nick_usuario,
                 'ip_evaluacion_personal'           => $request->ip(),
             ];
+            // Insertar la nueva evaluación personal
             $evaluacionInsertedId = EvaluacionPersonal::insertGetId($evaluacionPersonalArray);
-
+            // Datos para las plazas evaluadas
             $plazas = [];
             foreach ($request->plazasAsignadas as $key => $value) {
                 $plazaEvaluada = [
@@ -503,8 +527,9 @@ class EvaluacionController extends Controller
                 ];
                 $plazas[] = $plazaEvaluada;
             }
+            // Insertar las plazas evaluadas
             $response = PlazaEvaluada::insert($plazas);
-
+            // Obtener información adicional del empleado con las evaluaciones
             $query = Empleado::with([
                 "persona",
                 "plazas_asignadas.centro_atencion.dependencias",
@@ -531,25 +556,7 @@ class EvaluacionController extends Controller
                 "evaluaciones_personal.estado_evaluacion_personal",
             ])->whereHas("evaluaciones_personal")->find($request->idEmpleado);
 
-            /*  $query = EvaluacionPersonal::with([
-                "incidentes_evaluacion" => function ($query) {
-                    return $query->where("estado_incidente_evaluacion", 1);
-                },
-                "detalle_evaluaciones_personal.categoria_rendimiento.evaluacion_rendimiento.tablas_rendimiento",
-                "detalle_evaluaciones_personal.rubrica_rendimiento",
-                "plaza_evaluada.plaza_asignada.detalle_plaza.plaza",
-                "plaza_evaluada.plaza_asignada.centro_atencion",
-                "plaza_evaluada.plaza_asignada.dependencia.jefatura.empleado.plazas_asignadas.detalle_plaza.plaza",
-                "plaza_evaluada.plaza_asignada.dependencia.jefatura.empleado.plazas_asignadas.centro_atencion",
-                "plaza_evaluada.plaza_asignada.dependencia.jefatura.empleado.plazas_asignadas.dependencia",
-                "evaluacion_rendimiento",
-                "tipo_evaluacion_personal",
-                "periodo_evaluacion",
-                "estado_evaluacion_personal",
-            ])->find($evaluacionInsertedId); */
-
             DB::commit();
-
 
             // Devolver el resultado
             return response()->json([
@@ -558,7 +565,7 @@ class EvaluacionController extends Controller
                 "mensaje_debug"         => $mensaje_debug,
                 "evaluacionInsertedId"  => $evaluacionInsertedId,
                 "response"              => $query
-            ]);
+            ], 200);
         } catch (\Throwable $th) {
             DB::rollback();
             return response()->json([
@@ -568,14 +575,23 @@ class EvaluacionController extends Controller
         }
     }
 
-    // Traer la version de evaluacion rendimiento para saber cual es la que tomo
+    /**
+     * Obtener la versión de la evaluación de rendimiento personal.
+     *
+     * @param Request $request
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Builder|object|null
+     */
     function getPersonalPerformanceEvaluationVersion(Request $request)
     {
+        // Utilizar Eloquent para obtener la evaluación de rendimiento personal con sus categorías y rubricas asociadas
         $query = EvaluacionRendimiento::with([
             "categorias_rendimiento.rubricas_rendimiento"
         ])->where("id_evaluacion_rendimiento", $request->idEvaluacionRendimiento)->first();
+
+        // Retornar el resultado de la consulta
         return $query;
     }
+
 
     // Guardamos la respuesta que se ha seleccionado en la evaluacion
 
@@ -647,89 +663,125 @@ class EvaluacionController extends Controller
         }
     }
 
+    /**
+     * Guardar o actualizar incidentes de evaluación.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     function saveIncidentesEvaluacion(Request $request)
     {
+        // Iniciar una transacción en la base de datos
         DB::beginTransaction();
 
-        // Reglas de validación
-        $rules = [
-            'idCategoriaRendimiento'        => 'required',
-            'resultadoIncidenteEvaluacion'  => 'required',
-            'comentarioIncidenteEvaluacion' => 'required',
-            'idEvaluacionPersonal'          => 'required',
-        ];
+        try {
+            // Reglas de validación para los datos de entrada
+            $rules = [
+                'idCategoriaRendimiento'        => 'required',
+                'resultadoIncidenteEvaluacion'  => 'required',
+                'comentarioIncidenteEvaluacion' => 'required',
+                'idEvaluacionPersonal'          => 'required',
+            ];
 
-        // Mensajes de error personalizados
-        $messages = [
-            'required' => 'El campo :attribute es obligatorio.',
-        ];
+            // Mensajes de error personalizados
+            $messages = [
+                'required' => 'El campo :attribute es obligatorio.',
+            ];
 
-        // Validar los datos de entrada
-        $validator = Validator::make($request->dataIndiceEvaluacion, $rules, $messages);
+            // Validar los datos de entrada
+            $validator = Validator::make($request->dataIndiceEvaluacion, $rules, $messages);
 
-        // Comprobar si la validación falla
-        if ($validator->fails()) {
-            // Enviar respuesta con mensajes de error
-            return response()->json(['error' => $validator->errors()->first()], 400);
-        }
-
-        // Datos a ingresar o actualizar
-        $data = [
-            'id_cat_rendimiento'              => $request->dataIndiceEvaluacion['idCategoriaRendimiento'],
-            'resultado_incidente_evaluacion'  => $request->dataIndiceEvaluacion['resultadoIncidenteEvaluacion'],
-            'comentario_incidente_evaluacion' => $request->dataIndiceEvaluacion['comentarioIncidenteEvaluacion'],
-            'estado_incidente_evaluacion'     => 1,
-            'usuario_incidente_evaluacion'    => $request->user()->nick_usuario,
-            'ip_incidente_evaluacion'         => $request->ip(),
-            'id_evaluacion_personal'          => $request->dataIndiceEvaluacion['idEvaluacionPersonal'],
-        ];
-
-        // Condiciones de búsqueda
-        $conditions = [
-            'id_incidente_evaluacion' => (int) $request->dataIndiceEvaluacion['idIncidenteEvaluacion'],
-            'id_evaluacion_personal'  => $request->dataIndiceEvaluacion['idEvaluacionPersonal'],
-        ];
-
-        // Verificar si ya existe un registro
-        $existingResponse = IncidenteEvaluacion::where($conditions)->first();
-
-        // Determinar si es una actualización o inserción
-        if ($existingResponse) {
-
-            // Si existe, añadir la fecha de modificación
-            $data['fecha_mod_incidente_evaluacion'] = Carbon::now();
-            if ($request->dataIndiceEvaluacion["isDeleted"]) {
-
-                IncidenteEvaluacion::where($conditions)->update(['estado_incidente_evaluacion' => 0,]);
-            } else if (!$request->dataIndiceEvaluacion["isDeleted"]) {
-
-                IncidenteEvaluacion::where($conditions)->update($data);
+            // Comprobar si la validación falla
+            if ($validator->fails()) {
+                // Enviar respuesta con mensajes de error
+                return response()->json(['error' => $validator->errors()->first()], 400);
             }
-        } else {
 
+            // Datos a ingresar o actualizar
+            $data = [
+                'id_cat_rendimiento'              => $request->dataIndiceEvaluacion['idCategoriaRendimiento'],
+                'resultado_incidente_evaluacion'  => $request->dataIndiceEvaluacion['resultadoIncidenteEvaluacion'],
+                'comentario_incidente_evaluacion' => $request->dataIndiceEvaluacion['comentarioIncidenteEvaluacion'],
+                'estado_incidente_evaluacion'     => 1,
+                'usuario_incidente_evaluacion'    => $request->user()->nick_usuario,
+                'ip_incidente_evaluacion'         => $request->ip(),
+                'id_evaluacion_personal'          => $request->dataIndiceEvaluacion['idEvaluacionPersonal'],
+            ];
 
-            if (!$request->dataIndiceEvaluacion["isDeleted"]) {
+            // Condiciones de búsqueda
+            $conditions = [
+                'id_incidente_evaluacion' => (int) $request->dataIndiceEvaluacion['idIncidenteEvaluacion'],
+                'id_evaluacion_personal'  => $request->dataIndiceEvaluacion['idEvaluacionPersonal'],
+            ];
 
-                // Si no existe, añadir la fecha de creación
-                $data['fecha_reg_incidente_evaluacion'] = Carbon::now();
-                // Insertar un nuevo registro y obtener el ID
-                $insertedId = IncidenteEvaluacion::insertGetId($data);
+            // Verificar si ya existe un registro
+            $existingResponse = IncidenteEvaluacion::where($conditions)->first();
+
+            // Determinar si es una actualización o inserción
+            if ($existingResponse) {
+                // Si existe, añadir la fecha de modificación
+                $data['fecha_mod_incidente_evaluacion'] = Carbon::now();
+
+                if ($request->dataIndiceEvaluacion["isDeleted"]) {
+                    // Actualizar el estado del incidente si es borrado
+                    IncidenteEvaluacion::where($conditions)->update(['estado_incidente_evaluacion' => 0]);
+                } else {
+                    // Actualizar el registro existente
+                    IncidenteEvaluacion::where($conditions)->update($data);
+                }
+            } else {
+                if (!$request->dataIndiceEvaluacion["isDeleted"]) {
+                    // Si no existe y no está marcado como eliminado, añadir la fecha de creación
+                    $data['fecha_reg_incidente_evaluacion'] = Carbon::now();
+                    // Insertar un nuevo registro y obtener el ID
+                    $insertedId = IncidenteEvaluacion::insertGetId($data);
+                }
             }
+
+            // Confirmar la transacción
+            DB::commit();
+
+            // Respuesta exitosa con el ID del registro insertado (si es una inserción)
+            return response()->json(['message' => 'Respuestas guardadas exitosamente', 'inserted_id' => $insertedId ?? null], 200);
+        } catch (\Exception $e) {
+            // En caso de error, revertir la transacción
+            DB::rollBack();
+
+            // Responder con un mensaje de error
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-
-        // Confirmar la transacción
-        DB::commit();
-
-        // Respuesta exitosa con el ID del registro insertado (si es una inserción)
-        return response()->json(['message' => 'Respuestas guardadas exitosamente', 'inserted_id' => $insertedId ?? null], 200);
     }
+
+    /**
+     * Obtener la evaluación de un empleado por su ID.
+     *
+     * @param Request $request
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|\Illuminate\Http\JsonResponse|null
+     */
     function getEvaluationById(Request $request)
     {
-        return Empleado::select('*')
-            ->with([
-                "persona",
-                "evaluaciones_personal.detalle_evaluaciones_personal"
-            ])->whereHas("evaluaciones_personal")
-            ->where("id_empleado", $request->id_empleado)->first();
+        try {
+            // Seleccionar todos los campos de la tabla 'empleados' y cargar relaciones necesarias
+            $evaluation = Empleado::select('*')
+                ->with([
+                    "persona",  // Relación con la información personal del empleado
+                    "evaluaciones_personal.detalle_evaluaciones_personal"  // Relación con los detalles de la evaluación personal
+                ])
+                ->whereHas("evaluaciones_personal")  // Filtrar empleados que tengan evaluaciones personales asociadas
+                ->where("id_empleado", $request->id_empleado)  // Filtrar por el ID del empleado proporcionado
+                ->first();  // Obtener el primer resultado
+
+            // Verificar si se encontró una evaluación para el empleado
+            if ($evaluation) {
+                // Devolver la evaluación con sus relaciones cargadas
+                return $evaluation;
+            } else {
+                // Devolver una respuesta JSON indicando que no se encontraron evaluaciones
+                return response()->json(['message' => 'No se encontraron evaluaciones para el empleado.'], 404);
+            }
+        } catch (\Exception $e) {
+            // Manejar cualquier excepción lanzada durante la ejecución
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }
