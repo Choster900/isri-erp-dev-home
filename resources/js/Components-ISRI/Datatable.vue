@@ -145,6 +145,15 @@ input.tabla[type="date"] {
     text-align: center;
 }
 
+input.tabla[type="number"] {
+    height: 28px;
+    line-height: 28px;
+    border-radius: 30px;
+    padding: 0 8px;
+    border: none;
+    background-color: #1f355833;
+    text-align: center;
+}
 select {
     height: 28px;
     line-height: 28px;
