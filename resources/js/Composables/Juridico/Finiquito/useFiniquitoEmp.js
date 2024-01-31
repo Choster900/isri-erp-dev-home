@@ -4,7 +4,6 @@ import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
 import { toast } from "vue3-toastify";
 import { useFormatDateTime } from "@/Composables/General/useFormatDateTime.js";
-import moment from 'moment';
 
 export const useFiniquitoEmp = (context) => {
     const swal = inject("$swal");
