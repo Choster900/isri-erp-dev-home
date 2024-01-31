@@ -49,7 +49,7 @@ import moment from 'moment';
                             class="bg-gray-50 rounded-lg mx-4 max-w-full relative mb-3 mt-1">
                             <div class="absolute inset-0 bg-gray-600 rounded-lg blur opacity-50 z-0"></div>
                             <div class="relative z-10 px-4 py-2 bg-white ring-1 ring-gray-900/5 rounded-lg leading-none"
-                                :class="{ 'px-4': showStage(index), 'py-2': !showStage(index), 'bg-green-100 hover:bg-green-200': setGreenBg(index), 'bg-red-100 hover:bg-red-200': !setGreenBg(index) }">
+                                :class="{ 'px-4': showStage(index), 'py-2': !showStage(index), 'bg-[#DCFCE7] hover:bg-green-200': setGreenBg(index), 'bg-[#FEE2E2] hover:bg-red-200': !setGreenBg(index) }">
                                 <!-- header -->
                                 <div class="w-full">
                                     <div class="w-full flex justify-between cursor-pointer" @click="setTarget(index)">
