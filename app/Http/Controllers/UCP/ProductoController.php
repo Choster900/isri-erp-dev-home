@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\UCP;
 
 use App\Http\Controllers\Controller;
+use App\Models\CatalogoUnspsc;
+use App\Models\ProcesoCompra;
 use App\Models\Producto;
 use Illuminate\Http\Request;
 
@@ -18,12 +20,43 @@ class ProductoController extends Controller
         $search_value = $request->search;
 
         $query = Producto::select('*')
-            // ->with([
-            //     'empleado.persona',
-            // ])
-            ;
+            ->with([
+                'unidad_medida',
+            ]);
 
         $data = $query->paginate($length)->onEachSide(1);
         return ['data' => $data, 'draw' => $request->input('draw')];
+    }
+
+    public function getInfoModalProd(Request $request, $id)
+    {
+        $prod = Producto::with(['unidad_medida', 'catalogo_unspsc'])->find($id);
+
+        $purchaseProcedures = ProcesoCompra::select('id_proceso_compra as value', 'nombre_proceso_compra as label')->get();
+
+        if ($prod) {
+            return response()->json([
+                'prod'                      => $prod ?? [],
+                'purchaseProcedures'        => $purchaseProcedures,
+            ]);
+        } else {
+            return response()->json([
+                'logical_error' => 'No existe el producto que estas intentando modificar.',
+            ], 422);
+        }
+    }
+
+    public function searchUnspsc(Request $request)
+    {
+        $search = $request->busqueda;
+        if ($search != '') {
+            $catUnspsc = CatalogoUnspsc::select('id_catalogo_unspsc as value', 'nombre_catalogo_unspsc as label')
+                ->where('nombre_catalogo_unspsc', 'like', '%' . $search . '%')->get();
+        }
+        return response()->json(
+            [
+                'catUnspsc'          => $search != '' ? $catUnspsc : [],
+            ]
+        );
     }
 }

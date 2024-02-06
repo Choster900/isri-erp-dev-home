@@ -53,27 +53,32 @@
                                     {{ prod.id_producto }}
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5">
+                            <td class="px-2 first:pl-5 last:pr-5 max-w-[27%]">
                                 <div class="font-medium text-slate-800 text-center">
                                     {{ prod.nombre_producto }}
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                            <td class="px-2 first:pl-5 last:pr-5 max-w-[20%]">
                                 <div class="font-medium text-slate-800 text-center">
                                     {{ prod.descripcion_producto }}
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                            <td class="px-2 first:pl-5 last:pr-5">
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{ prod.id_ccta_presupuestal }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5 max-w-[13%]">
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{ prod.unidad_medida.nombre_unidad_medida }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 text-center">
                                     ${{ prod.precio_producto }}
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">
-                                    {{ prod.fecha_reg_producto }}
-                                </div>
-                            </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                            <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="space-x-1 text-center">
                                     <DropDownOptions>
                                         <div @click="showModalProd = true; prodId = prod.id_producto"
@@ -150,6 +155,9 @@
             </div>
         </div>
 
+        <modal-productos-vue v-if="showModalProd" :showModalProd="showModalProd" :prodId="prodId"
+            @cerrar-modal="showModalProd = false" @get-table="getDataToShow(tableData.currentPage)" />
+
     </AppLayoutVue>
 </template>
 
@@ -158,6 +166,7 @@ import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
+import ModalProductosVue from '@/Components-ISRI/UCP/ModalProductos.vue';
 
 import moment from 'moment';
 import { ref, toRefs } from 'vue';
@@ -171,7 +180,7 @@ import 'vue3-toastify/dist/index.css';
 import axios from 'axios';
 
 export default {
-    components: { Head, AppLayoutVue, Datatable, IconM },
+    components: { Head, AppLayoutVue, Datatable, IconM, ModalProductosVue },
     props: {
         menu: {
             type: Object,
@@ -187,18 +196,12 @@ export default {
         const prodId = ref(0)
 
         const columns = [
-            { width: "14%", label: "ID", name: "id_producto", type: "text" },
-            { width: "33%", label: "Nombre", name: "nombre_producto", type: "text" },
-            { width: "17%", label: "Descripcion", name: "descripcion_producto", type: "date" },
-            { width: "15%", label: "Precio", name: "precio_producto", type: "text" },
-            { width: "11%", label: "Registro", name: "fecha_reg_producto", type: "text" },
-            // {
-            //     width: "10%", label: "Estado", name: "firmado_finiquito_laboral", type: "select",
-            //     options: [
-            //         { value: "1", label: "Firmado" },
-            //         { value: "0", label: "No Firmado" }
-            //     ]
-            // },
+            { width: "10%", label: "ID", name: "id_producto", type: "text" },
+            { width: "27%", label: "Nombre", name: "nombre_producto", type: "text" },
+            { width: "20%", label: "Descripcion", name: "descripcion_producto", type: "text" },
+            { width: "10%", label: "Especifico", name: "id_ccta_presupuestal", type: "text" },
+            { width: "13%", label: "Medida", name: "id_unidad_medida", type: "text" },
+            { width: "10%", label: "Precio", name: "precio_producto", type: "text" },
             { width: "10%", label: "Acciones", name: "Acciones" },
         ];
         const requestUrl = "/productos"
@@ -226,5 +229,4 @@ export default {
 }
 </script>
 
-<style>
-</style>
+<style></style>

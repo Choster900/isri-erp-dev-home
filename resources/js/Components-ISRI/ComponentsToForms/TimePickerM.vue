@@ -1,5 +1,5 @@
 <template>
-    <label :for="id" class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">{{ label }}
+    <label v-if="label" :for="id" class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">{{ label }}
         <span v-if="required" class="text-red-600 font-extrabold">*</span></label>
     <vue-date-picker :config="config" v-model="modelValue" time-picker :placeholder="placeholder" :teleport="teleport"
         :disabled="disabled" @update:model-value="$emit('update:modelValue', $event)"

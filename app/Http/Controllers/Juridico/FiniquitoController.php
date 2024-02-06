@@ -7,6 +7,7 @@ use App\Http\Requests\Juridico\AllFiniquitosRequest;
 use App\Models\EjercicioFiscal;
 use App\Models\Empleado;
 use App\Models\FiniquitoLaboral;
+use App\Models\Persona;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -141,7 +142,7 @@ class FiniquitoController extends Controller
          is empty, the 'employees' array will be empty as well. */
         return response()->json(
             [
-                'persons'          => $search != '' ? $persons : [],
+                'persons'          => $persons,
             ]
         );
     }

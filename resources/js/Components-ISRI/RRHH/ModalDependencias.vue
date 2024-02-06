@@ -78,7 +78,7 @@
                             <div class="font-semibold relative flex h-10 w-full flex-row-reverse ">
                                 <Multiselect placeholder="Digite nombre empleado" v-model="depInfo.personId"
                                     :options="load && depInfo.id ? baseOptions : employees" :searchable="true"
-                                    :loading="isLoadingEmployee" :internal-search="false"
+                                    :loading="isLoadingEmployee" :internal-search="false" :filter-results="false"
                                     @search-change="handleSearchChange" :clear-on-search="true"
                                     :noResultsText="'Sin resultados'" :noOptionsText="'Sin resultados'" />
                                 <div class="flex items-center px-2 pointer-events-none border rounded-l-md border-gray-300">

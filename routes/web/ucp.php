@@ -12,6 +12,6 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('ucp.productos');
     Route::post('productos', [ProductoController::class, 'getProductos'])->name('producto.getProductos');
-
-
+    Route::get('get-info-modal-prod/{id}', [ProductoController::class, 'getInfoModalProd'])->name('producto.getInfoModalProd');
+    Route::post('search-unspsc', [ProductoController::class, 'searchUnspsc'])->name('producto.searchUnspsc');
 });

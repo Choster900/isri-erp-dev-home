@@ -31,4 +31,14 @@ class Producto extends Model
         'usuario_producto',
         'ip_producto',
     ];
+
+    public function unidad_medida()
+    {
+        return $this->belongsTo('App\Models\UnidadMedida','id_unidad_medida','id_unidad_medida');
+    }
+
+    public function catalogo_unspsc()
+    {
+        return $this->belongsTo('App\Models\CatalogoUnspsc','id_catalogo_unspsc','id_catalogo_unspsc');
+    }
 }
