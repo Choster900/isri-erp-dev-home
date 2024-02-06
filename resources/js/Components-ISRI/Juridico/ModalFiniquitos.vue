@@ -32,7 +32,7 @@
                         </label>
                         <div class="relative font-semibold flex h-10 w-full flex-row-reverse">
                             <Multiselect placeholder="Escriba para buscar persona" v-model="finiquito.personId"
-                                :options="persons" :searchable="true" :loading="isLoadingPerson" :internal-search="false" :filter-results="false"
+                                :options="persons" :searchable="true" :loading="isLoadingPerson" :internal-search="false"
                                 @search-change="handleSearchChange" :clear-on-search="true"
                                 :noResultsText="'Sin resultados'" :noOptionsText="'Sin resultados'" :classes="{
                                     optionSelected: 'text-white bg-teal-800',
@@ -62,20 +62,20 @@
                         </div>
                         <div v-for="(center, index) in finiquito.centros" :key="index"
                             :class="checkIfHasError(center.id) ? 'bg-red-200 hover:bg-red-300' : ''"
-                            class="table-row border-b border-gray-100 text-[14px] px-2 py-2 hover:bg-gray-300">
-                            <div class="w-[20%] text-center flex items-center justify-center">
+                            class="table-row border-b border-gray-100 text-[14px] px-2 py-1 hover:bg-gray-300">
+                            <div class="w-[20%] text-center overflow-wrap flex items-center justify-center">
                                 {{
                                     `${center.center + '(' + center.empleados.length + ')'}`
                                 }}
                             </div>
-                            <div class="w-[20%] text-center flex items-center justify-center">
-                                <div class="md:mr-2 md:mb-0 basis-full">
+                            <div class="w-[20%] text-center overflow-wrap flex items-center justify-center">
+                                <div class="mb-5 md:mr-2 md:mb-0 basis-full justify-start text-left">
                                     <date-time-picker-m v-model="center.date" :hasError="errors['centers.' + index + '.date'] ? true:false" />
                                     <InputError v-for="(item, index2) in errors['centers.' + index + '.date']" :key="index2"
                                         class="mt-2 h-[32px]" :message="item" />
                                 </div>
                             </div>
-                            <div class="w-[20%] text-center flex items-center justify-center">
+                            <div class="w-[20%] text-center overflow-wrap flex items-center justify-center">
                                 <div class="md:mr-2 md:mb-0 basis-full">
                                     <time-picker-m :height="200" v-model="center.startTime" :placeholder="'Hora inicio'" 
                                     :hasError="errors['centers.' + index + '.startTime'] ? true:false"/>
@@ -83,7 +83,7 @@
                                         class="mt-2 h-[32px]" :message="item" />
                                 </div>
                             </div>
-                            <div class="w-[20%] text-center flex items-center justify-center">
+                            <div class="w-[20%] text-center overflow-wrap flex items-center justify-center">
                                 <div class="md:mr-2 md:mb-0 basis-full">
                                     <time-picker-m :height="200" v-model="center.endTime" :placeholder="'Hora fin'" 
                                     :hasError="errors['centers.' + index + '.endTime'] ? true:false"/>
@@ -91,11 +91,11 @@
                                         class="mt-2 h-[32px]" :message="item" />
                                 </div>
                             </div>
-                            <div class="w-[20%] text-center flex items-center justify-center mb-2">
-                                <div class="md:mr-2 md:mb-0 basis-full ">
+                            <div class="w-[20%] text-center overflow-wrap flex items-center justify-center mb-2">
+                                <div class="md:mr-2 md:mb-0 basis-full">
                                     <input-text iconName="number" id="amount" v-model="center.interval" type="text"
                                         placeholder="Minutos" :validation="{ limit: 2, number: true }"
-                                        :iconColor="'text-gray-500'" :hasError="errors['centers.' + index + '.interval'] ? true : false">
+                                        :addClasses="'text-gray-500'" :hasError="errors['centers.' + index + '.interval'] ? true : false">
                                     </input-text>
                                     <InputError v-for="(item, index2) in errors['centers.' + index + '.interval']" :key="index2"
                                         class="mt-2 h-[32px]" :message="item" />
