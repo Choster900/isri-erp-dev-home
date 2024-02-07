@@ -24,6 +24,8 @@ class Producto extends Model
         'nombre_producto',
         'descripcion_producto',
         'precio_producto',
+        'basico_producto',
+        'perecedero_producto',
         'estado_producto',
         'critico_producto',
         'fecha_reg_producto',

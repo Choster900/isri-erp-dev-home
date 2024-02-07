@@ -4,6 +4,7 @@ namespace App\Http\Controllers\UCP;
 
 use App\Http\Controllers\Controller;
 use App\Models\CatalogoUnspsc;
+use App\Models\CuentaPresupuestal;
 use App\Models\ProcesoCompra;
 use App\Models\Producto;
 use Illuminate\Http\Request;
@@ -33,11 +34,15 @@ class ProductoController extends Controller
         $prod = Producto::with(['unidad_medida', 'catalogo_unspsc'])->find($id);
 
         $purchaseProcedures = ProcesoCompra::select('id_proceso_compra as value', 'nombre_proceso_compra as label')->get();
+        $budgetAccounts = CuentaPresupuestal::select('id_ccta_presupuestal as value', 'nombre_ccta_presupuestal as label')
+        ->where('compra_ccta_presupuestal',1)
+        ->get();
 
         if ($prod) {
             return response()->json([
                 'prod'                      => $prod ?? [],
                 'purchaseProcedures'        => $purchaseProcedures,
+                'budgetAccounts'            => $budgetAccounts
             ]);
         } else {
             return response()->json([

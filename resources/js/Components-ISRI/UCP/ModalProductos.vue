@@ -45,7 +45,7 @@
                 </div>
             </div>
 
-            <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8 pb-[100px]">
+            <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
                 <div class="mb-4 md:mr-2 md:mb-0 basis-1/2" :class="{ 'selected-opt': prod.purchaseProcedureId > 0, }">
                     <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Proceso de compra
                         <span class="text-red-600 font-extrabold">*</span>
@@ -61,9 +61,21 @@
                     </label>
                     <div class="relative font-semibold flex h-[35px] w-full">
                         <Multiselect v-model="prod.unspscId" :options="catUnspsc" :searchable="true"
-                            :loading="isLoadingUnspsc" :internal-search="false" @search-change="handleSearchChange"
-                            :clear-on-search="true" :noOptionsText="'Lista vacía.'" ref="selectCatUn"
+                            :loading="isLoadingUnspsc" :internal-search="false" @search-change="handleSearchChange($event)"
+                            :clear-on-search="true" :filter-results="false" :resolve-on-load="true"
+                            :noOptionsText="'Escriba para buscar...'" ref="selectCatUn"
                             placeholder="Seleccione catalogo unspsc" />
+                    </div>
+                </div>
+            </div>
+            <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8 pb-[100px]">
+                <div class="mb-4 md:mr-0 md:mb-0 basis-1/2 pr-2" :class="{ 'selected-opt': prod.budgetAccountId > 0, }">
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Especifico
+                        <span class="text-red-600 font-extrabold">*</span>
+                    </label>
+                    <div class="relative font-semibold flex h-[35px] w-full">
+                        <Multiselect v-model="prod.budgetAccountId" :options="budgetAccounts" :searchable="true"
+                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione especifico" />
                     </div>
                 </div>
             </div>
@@ -110,15 +122,12 @@ export default {
 
         const {
             isLoadingRequest, prod, errors, purchaseProcedures, catUnspsc, isLoadingUnspsc,
+            budgetAccounts,
             asyncFindUnspsc, getInfoForModalProd
         } = useProducto(context);
 
         const handleSearchChange = async (query) => {
-            if (query != '') {
-                await asyncFindUnspsc(query);
-            }else{
-                catUnspsc.value = []
-            }
+            await asyncFindUnspsc(query);
         }
 
         onMounted(
@@ -129,6 +138,7 @@ export default {
 
         return {
             isLoadingRequest, prod, errors, purchaseProcedures, catUnspsc, isLoadingUnspsc,
+            budgetAccounts,
             handleSearchChange
         }
     }

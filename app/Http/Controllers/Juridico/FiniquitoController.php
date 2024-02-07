@@ -122,19 +122,21 @@ class FiniquitoController extends Controller
         if ($search != '') {
             $persons = DB::table('persona')
                 ->selectRaw('
-                    CONCAT_WS(" ", 
-                    COALESCE(pnombre_persona, ""), 
-                    COALESCE(snombre_persona, ""), 
-                    COALESCE(tnombre_persona, ""), 
-                    COALESCE(papellido_persona, ""), 
-                    COALESCE(sapellido_persona, ""), 
-                    COALESCE(tapellido_persona, "")
-                ) AS label,
-                id_persona as value')
+                        CONCAT_WS(" ", 
+                            COALESCE(pnombre_persona, ""), 
+                            COALESCE(snombre_persona, ""), 
+                            COALESCE(tnombre_persona, ""), 
+                            COALESCE(papellido_persona, ""), 
+                            COALESCE(sapellido_persona, ""), 
+                            COALESCE(tapellido_persona, "")
+                        ) AS label,
+                        persona.id_persona as value')
+                ->leftJoin('empleado', 'persona.id_empleado', '=', 'empleado.id_empleado')
                 ->where(function ($query) use ($search) {
                     $query->whereRaw("MATCH(pnombre_persona, snombre_persona, tnombre_persona, papellido_persona, sapellido_persona, tapellido_persona) AGAINST(?)", $search);
                 })
-                ->where('estado_persona', 1)
+                ->where('persona.estado_persona', 1)
+                ->where('empleado.id_estado_empleado', 1)
                 ->get();
         }
         /* The above code is returning a JSON response in PHP. It includes an array called 'employees'

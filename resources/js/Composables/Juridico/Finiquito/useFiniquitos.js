@@ -71,10 +71,14 @@ export const useFiniquitos = (context) => {
     const asyncFindPerson = _.debounce(async (query) => {
         try {
             isLoadingPerson.value = true;
-            const response = await axios.post("/search-person-jrd", {
-                busqueda: query,
-            });
-            persons.value = response.data.persons;
+            if (query.length > 3) {
+                const response = await axios.post("/search-person-jrd", {
+                    busqueda: query,
+                });
+                persons.value = response.data.persons;
+            } else {
+                persons.value = [];
+            }
         } catch (errors) {
             persons.value = [];
         } finally {

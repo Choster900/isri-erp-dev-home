@@ -12,9 +12,10 @@ export const useProducto = (context) => {
     const errors = ref([]);
     const purchaseProcedures = ref([])
     const catUnspsc = ref([])
+    const budgetAccounts = ref([])
 
     const prod = ref({
-        id:'',
+        id: '',
         name: '',
         description: '',
         mUnitId: '',
@@ -31,6 +32,7 @@ export const useProducto = (context) => {
                 `/get-info-modal-prod/${id}`
             );
             purchaseProcedures.value = response.data.purchaseProcedures
+            budgetAccounts.value = response.data.budgetAccounts
             setModalValues(response.data.prod)
         } catch (err) {
             if (err.response.data.logical_error) {
@@ -48,10 +50,14 @@ export const useProducto = (context) => {
     const asyncFindUnspsc = _.debounce(async (query) => {
         try {
             isLoadingUnspsc.value = true;
-            const response = await axios.post("/search-unspsc", {
-                busqueda: query,
-            });
-            catUnspsc.value = response.data.catUnspsc;
+            if (query.length > 3) {
+                const response = await axios.post("/search-unspsc", {
+                    busqueda: query,
+                });
+                catUnspsc.value = response.data.catUnspsc;
+            } else {
+                catUnspsc.value = [];
+            }
         } catch (errors) {
             catUnspsc.value = [];
         } finally {
@@ -122,6 +128,7 @@ export const useProducto = (context) => {
 
     return {
         errors, isLoadingRequest, prod, purchaseProcedures, catUnspsc, isLoadingUnspsc,
+        budgetAccounts,
         asyncFindUnspsc, getInfoForModalProd
     }
 }

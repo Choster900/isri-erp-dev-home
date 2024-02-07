@@ -18,8 +18,8 @@
                 </div>
             </div>
         </div>
-        <Modal v-else :show="showModalBoss" @close="$emit('cerrar-modal')"
-            :modal-title="'Cambiar empleado a cargo. '" maxWidth="xl">
+        <Modal v-else :show="showModalBoss" @close="$emit('cerrar-modal')" :modal-title="'Cambiar empleado a cargo. '"
+            maxWidth="xl">
             <div class="px-5 py-4">
                 <div class="text-sm">
                     <!-- Second row -->
@@ -33,7 +33,7 @@
                                     :options="load && depInfo.id ? baseOptions : employees" :searchable="true"
                                     :loading="isLoadingEmployee" :internal-search="false" :filter-results="false"
                                     @search-change="handleSearchChange" :clear-on-search="true"
-                                    :noResultsText="'Sin resultados'" :noOptionsText="'Sin resultados'" />
+                                    :noResultsText="'Sin resultados'" :noOptionsText="'Escriba para buscar...'" />
                                 <div class="flex items-center px-2 pointer-events-none border rounded-l-md border-gray-300">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-[#001c48]">
@@ -103,9 +103,7 @@ export default {
 
         const handleSearchChange = async (query) => {
             load.value = false
-            if (query != '') {
-                await asyncFindEmployee(query);
-            }
+            await asyncFindEmployee(query);
         }
 
         const change = async () => {
