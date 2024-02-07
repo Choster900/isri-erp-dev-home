@@ -9,22 +9,22 @@ export const useEvaluacion = () => {
         { width: "10%", label: "Codigo", name: "codigo_empleado", type: "text", },
         { width: "15%", label: "Nombres", name: "collecNombre", type: "text" },
         { width: "15%", label: "Apellidos", name: "collecApellido", type: "text", },
-        { width: "20%", label: "Fecha creacion", name: "fecha_reg_evaluacion_personal", type: "date", },
+        { width: "10%", label: "Fecha creacion", name: "fecha_reg_evaluacion_personal", type: "date", },
         {
-            width: "20%", label: "Periodo evaluacion", name: "id_periodo_evaluacion", type: "select", options: [
+            width: "15%", label: "Periodo evaluacion", name: "id_periodo_evaluacion", type: "select", options: [
                 { value: "1", label: "PRIMER PERIODO" },
                 { value: "2", label: "SEGUNDO PERIODO" },
 
             ]
         },
         {
-            width: "20%", label: "Tipo evaluacion", name: "id_tipo_evaluacion_personal", type: "select", options: [
+            width: "10%", label: "Tipo evaluacion", name: "id_tipo_evaluacion_personal", type: "select", options: [
                 { value: "1", label: "DESEMPEÑO" },
                 { value: "2", label: "PRUEBA" },
 
             ]
         },
-        { width: "20%", label: "Puntuacion", name: "puntaje_evaluacion_personal", type: "number", },
+        { width: "5%", label: "Puntuacion", name: "puntaje_evaluacion_personal", type: "number", },
         {
             width: "20%", label: "Estado evaluacion", name: "", type: "select", options: [
                 { value: "1", label: "-" },
