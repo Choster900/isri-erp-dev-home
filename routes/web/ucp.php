@@ -14,4 +14,12 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('productos', [ProductoController::class, 'getProductos'])->name('producto.getProductos');
     Route::get('get-info-modal-prod/{id}', [ProductoController::class, 'getInfoModalProd'])->name('producto.getInfoModalProd');
     Route::post('search-unspsc', [ProductoController::class, 'searchUnspsc'])->name('producto.searchUnspsc');
+
+
+    Route::get(
+        '/ucp/bienes-servicvios',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/ucp/bienes-servicvios', 'UCP/Productos');
+        }
+    )->name('ucp.bienes-servicios');
 });
