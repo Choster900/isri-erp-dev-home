@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\RRHH\DependenciaRequest;
 use App\Models\CentroAtencion;
 use App\Models\Dependencia;
+use App\Models\Empleado;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -72,9 +73,9 @@ class DependenciaController extends Controller
             ->find($id);
 
         $dependencies = Dependencia::selectRaw("id_dependencia as value, concat(nombre_dependencia,' (',codigo_dependencia,')') as label, id_centro_atencion")
-        ->where('estado_dependencia', 1)->get();
+            ->where('estado_dependencia', 1)->get();
         $mainCenters = CentroAtencion::selectRaw("id_centro_atencion as value, concat(nombre_centro_atencion,' (',codigo_centro_atencion,' )') as label")
-        ->where('estado_centro_atencion', 1)->get();
+            ->where('estado_centro_atencion', 1)->get();
 
         return response()->json([
             'dependency'      => $dependency ?? [],
@@ -251,7 +252,8 @@ class DependenciaController extends Controller
         }
     }
 
-    public function changeDepBoss(Request $request){
+    public function changeDepBoss(Request $request)
+    {
         $customMessages = [
             'personId.required' => 'Debe seleccionar empleado a cargo.',
         ];

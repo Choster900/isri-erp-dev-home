@@ -4,7 +4,6 @@ import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
 import { toast } from "vue3-toastify";
 import _ from "lodash";
-import moment from 'moment';
 
 export const useFiniquitos = (context) => {
     const swal = inject("$swal");
@@ -28,10 +27,8 @@ export const useFiniquitos = (context) => {
                 `/get-info-modal-finiquitos`
             );
             empleados.value = response.data.empleados
-            //console.log(empleados.value);
             setModalValues(empleados.value)
         } catch (err) {
-            console.log(err);
             if (err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
                 context.emit("get-table");
@@ -69,16 +66,19 @@ export const useFiniquitos = (context) => {
                 finiquito.value.centros[indiceCentro].empleados.push(empleado);
             }
         });
-        //console.log(finiquito.value);
     };
 
     const asyncFindPerson = _.debounce(async (query) => {
         try {
             isLoadingPerson.value = true;
-            const response = await axios.post("/search-person-jrd", {
-                busqueda: query,
-            });
-            persons.value = response.data.persons;
+            if (query.length > 3) {
+                const response = await axios.post("/search-person-jrd", {
+                    busqueda: query,
+                });
+                persons.value = response.data.persons;
+            } else {
+                persons.value = [];
+            }
         } catch (errors) {
             persons.value = [];
         } finally {
@@ -87,7 +87,6 @@ export const useFiniquitos = (context) => {
     }, 350);
 
     const storeFiniquitos = async (finiq) => {
-        //console.log(finiq);
         swal({
             title: "¿Está seguro de generar el finiquito para todos los empleados?",
             icon: "question",
@@ -105,7 +104,6 @@ export const useFiniquitos = (context) => {
     };
 
     const saveFiniquito = async (finiq, url) => {
-        //console.log(finiquitos);
         isLoadingRequest.value = true;
         await axios
             .post(url, {
@@ -136,7 +134,6 @@ export const useFiniquitos = (context) => {
                     "Tienes algunos errores, por favor verifica los datos enviados."
                 );
                 errors.value = err.response.data.errors;
-                console.log(err.response.data);
             }
         } else {
             showErrorMessage(err);

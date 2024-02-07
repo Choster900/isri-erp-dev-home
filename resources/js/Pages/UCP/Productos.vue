@@ -20,8 +20,8 @@
         </div>
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="showModalSettlement = true" v-if="permits.insertar == 1"
-                    color="bg-green-700  hover:bg-green-800" text="Crear Finiquito" icon="add" />
+                <GeneralButton @click="showModalProd = true" v-if="permits.insertar == 1"
+                    color="bg-green-700  hover:bg-green-800" text="Crear producto" icon="add" />
             </div>
         </div>
 
@@ -37,7 +37,7 @@
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Finiquitos: <span class="text-slate-400 font-medium">{{
+                    <h2 class="font-semibold text-slate-800 pt-1">Productos: <span class="text-slate-400 font-medium">{{
                         tableData.total
                     }}</span></h2>
                 </div>
@@ -47,66 +47,47 @@
                     :staticSelect="false" @sort="sortBy" @datos-enviados="handleData($event)"
                     @execute-search="getDataToShow()">
                     <tbody v-if="!isLoadinRequest" class="text-sm divide-y divide-slate-200">
-                        <tr v-for="finiquito in dataToShow" :key="finiquito.id_finiquito_laboral" class="hover:bg-gray-200">
+                        <tr v-for="prod in dataToShow" :key="prod.id_producto" class="hover:bg-gray-200">
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 flex items-center justify-center min-h-[50px]">
-                                    {{ finiquito.empleado.persona.dui_persona }}
+                                    {{ prod.id_producto }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5 max-w-[27%]">
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{ prod.nombre_producto }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5 max-w-[20%]">
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{ prod.descripcion_producto }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ finiquito.empleado.persona.pnombre_persona }}
-                                    {{ finiquito.empleado.persona.snombre_persona }}
-                                    {{ finiquito.empleado.persona.tnombre_persona }}
-                                    {{ finiquito.empleado.persona.papellido_persona }}
-                                    {{ finiquito.empleado.persona.sapellido_persona }}
-                                    {{ finiquito.empleado.persona.tapellido_persona }}
+                                    {{ prod.id_ccta_presupuestal }}
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                            <td class="px-2 first:pl-5 last:pr-5 max-w-[13%]">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ moment(finiquito.fecha_firma_finiquito_laboral).format('DD/MM/YYYY') }}
+                                    {{ prod.unidad_medida.nombre_unidad_medida }}
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                            <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ finiquito.hora_firma_finiquito_laboral }}
+                                    ${{ prod.precio_producto }}
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">
-                                    ${{ finiquito.monto_finiquito_laboral }}
-                                </div>
-                            </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">
-                                    <div v-if="(finiquito.firmado_finiquito_laboral == 1)"
-                                        class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
-                                        Firmado
-                                    </div>
-                                    <div v-else-if="(finiquito.firmado_finiquito_laboral == 0)"
-                                        class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-red-100 text-red-500">
-                                        No firmado
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                            <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="space-x-1 text-center">
                                     <DropDownOptions>
-                                        <div @click="showModalSettlementEmp = true; finiquitoId = finiquito.id_finiquito_laboral"
-                                            v-if="permits.actualizar === 1 && finiquito.firmado_finiquito_laboral != 1"
+                                        <div @click="showModalProd = true; prodId = prod.id_producto"
+                                            v-if="permits.actualizar === 1"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-orange-800 w-[22px] h-[22px] mr-2">
                                                 <icon-m :iconName="'editM'"></icon-m>
                                             </div>
                                             <div class="font-semibold pt-0.5">Editar</div>
-                                        </div>
-                                        <div @click="showSettlement = true; finiquitoId = finiquito.id_finiquito_laboral"
-                                            class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
-                                            <div class="text-blue-800 w-[25px] h-[25px] mr-2">
-                                                <icon-m :iconName="'see'"></icon-m>
-                                            </div>
-                                            <div class="font-semibold pt-0.5">Ver</div>
                                         </div>
                                     </DropDownOptions>
                                 </div>
@@ -174,16 +155,8 @@
             </div>
         </div>
 
-        <modal-finiquitos-vue v-if="showModalSettlement" :showModalSettlement="showModalSettlement"
-            @cerrar-modal="showModalSettlement = false" @get-table="getDataToShow(tableData.currentPage)" />
-
-        <modal-finiquito-emp-vue v-if="showModalSettlementEmp" :showModalSettlementEmp="showModalSettlementEmp"
-            :finiquitoId="finiquitoId" @cerrar-modal="showModalSettlementEmp = false"
-            @get-table="getDataToShow(tableData.currentPage)" />
-
-        <modal-show-finiquito-vue v-if="showSettlement" :showSettlement="showSettlement"
-            :finiquitoId="finiquitoId" @cerrar-modal="showSettlement = false" :permits="permits"
-            @get-table="getDataToShow(tableData.currentPage)" />
+        <modal-productos-vue v-if="showModalProd" :showModalProd="showModalProd" :prodId="prodId"
+            @cerrar-modal="showModalProd = false" @get-table="getDataToShow(tableData.currentPage)" />
 
     </AppLayoutVue>
 </template>
@@ -192,13 +165,11 @@
 import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
-import ModalFiniquitosVue from '@/Components-ISRI/Juridico/ModalFiniquitos.vue';
-import ModalFiniquitoEmpVue from '@/Components-ISRI/Juridico/ModalFiniquitoEmp.vue';
-import ModalShowFiniquitoVue from '@/Components-ISRI/Juridico/ModalShowFiniquito.vue';
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
+import ModalProductosVue from '@/Components-ISRI/UCP/ModalProductos.vue';
 
 import moment from 'moment';
-import { ref, toRefs, computed, onMounted, watch } from 'vue';
+import { ref, toRefs } from 'vue';
 import { usePermissions } from '@/Composables/General/usePermissions.js';
 import { useToDataTable } from '@/Composables/General/useToDataTable.js';
 
@@ -209,7 +180,7 @@ import 'vue3-toastify/dist/index.css';
 import axios from 'axios';
 
 export default {
-    components: { Head, AppLayoutVue, Datatable, IconM, ModalFiniquitosVue, ModalFiniquitoEmpVue, ModalShowFiniquitoVue },
+    components: { Head, AppLayoutVue, Datatable, IconM, ModalProductosVue },
     props: {
         menu: {
             type: Object,
@@ -220,31 +191,23 @@ export default {
         const { menu } = toRefs(props);
         const permits = usePermissions(menu.value, window.location.pathname);
 
-        const showModalSettlement = ref(false)
-        const showModalSettlementEmp = ref(false)
-        const showSettlement = ref(false)
+        const showModalProd = ref(false)
 
-        const finiquitoId = ref(0)
+        const prodId = ref(0)
 
         const columns = [
-            { width: "14%", label: "DUI", name: "dui_empleado", type: "text" },
-            { width: "33%", label: "Nombre", name: "nombre_empleado", type: "text" },
-            { width: "12%", label: "Fecha firma", name: "fecha_firma_finiquito_laboral", type: "date" },
-            { width: "10%", label: "Hora firma", name: "hora_firma_finiquito_laboral", type: "text" },
-            { width: "11%", label: "monto", name: "monto_finiquito_laboral", type: "text" },
-            {
-                width: "10%", label: "Estado", name: "firmado_finiquito_laboral", type: "select",
-                options: [
-                    { value: "1", label: "Firmado" },
-                    { value: "0", label: "No Firmado" }
-                ]
-            },
+            { width: "10%", label: "ID", name: "id_producto", type: "text" },
+            { width: "27%", label: "Nombre", name: "nombre_producto", type: "text" },
+            { width: "20%", label: "Descripcion", name: "descripcion_producto", type: "text" },
+            { width: "10%", label: "Especifico", name: "id_ccta_presupuestal", type: "text" },
+            { width: "13%", label: "Medida", name: "id_unidad_medida", type: "text" },
+            { width: "10%", label: "Precio", name: "precio_producto", type: "text" },
             { width: "10%", label: "Acciones", name: "Acciones" },
         ];
-        const requestUrl = "/finiquitos"
-        const columntToSort = "id_ejercicio"
+        const requestUrl = "/productos"
+        const columntToSort = "id_producto"
         const dir = 'desc'
-        const initialCol = -1 // Opcional, el composable recibe 0 por defecto
+        //const initialCol = -1 // Opcional, el composable recibe 0 por defecto
 
         const {
             dataToShow,
@@ -255,17 +218,15 @@ export default {
             isLoadingTop,
             emptyObject,
             getDataToShow, handleData, sortBy, changeStatusElement
-        } = useToDataTable(columns, requestUrl, columntToSort, dir, initialCol)
+        } = useToDataTable(columns, requestUrl, columntToSort, dir)
 
         return {
-            permits, dataToShow, showModalSettlement, tableData, perPage, showModalSettlementEmp, finiquitoId,
-            links, sortKey, sortOrders, isLoadinRequest, isLoadingTop, emptyObject, columns, showSettlement,
+            permits, dataToShow, showModalProd, tableData, perPage, prodId,
+            links, sortKey, sortOrders, isLoadinRequest, isLoadingTop, emptyObject, columns,
             getDataToShow, handleData, sortBy, changeStatusElement, moment
         };
     },
 }
 </script>
 
-<style>
-
-</style>
+<style></style>
