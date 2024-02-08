@@ -17,4 +17,10 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('save-product', [ProductoController::class, 'saveProduct'])->name('producto.saveProduct');
     Route::post('update-product', [ProductoController::class, 'updateProduct'])->name('producto.updateProduct');
 
+    Route::get(
+        '/ucp/bienes-servicvios',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/ucp/bienes-servicvios', 'UCP/Productos');
+        }
+    )->name('ucp.bienes-servicios');
 });

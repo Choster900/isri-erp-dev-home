@@ -122,9 +122,19 @@
                                     <div class=" overflow-y-auto scrollbar">
                                         <template v-for="(ren, j) in evaluacion.evaluaciones_personal" :key="j">
                                             <div class=" text-center">
-                                                <p class="text-[8.5pt]">
-                                                    ID: {{ ren.estado_evaluacion_personal.id_estado_evaluacion_personal }}
-                                                </p>
+                                                <div :class="{
+                                                    'bg-indigo-100 text-indigo-600': ren.estado_evaluacion_personal.id_estado_evaluacion_personal == 1,
+                                                    'bg-sky-100 text-sky-600': ren.estado_evaluacion_personal.id_estado_evaluacion_personal == 2,
+                                                    'bg-slate-100 text-slate-500': ren.estado_evaluacion_personal.id_estado_evaluacion_personal == 3,
+                                                    'bg-slate-700 text-slate-100': ren.estado_evaluacion_personal.id_estado_evaluacion_personal == 4,
+                                                    'bg-blue-100 text-blue-600': ren.estado_evaluacion_personal.id_estado_evaluacion_personal == 5,
+                                                    'bg-amber-100 text-amber-600': ren.estado_evaluacion_personal.id_estado_evaluacion_personal == 6,
+                                                    'bg-rose-100 text-rose-600': ren.estado_evaluacion_personal.id_estado_evaluacion_personal == 7,
+                                                    'bg-emerald-100 text-emerald-600': ren.estado_evaluacion_personal.id_estado_evaluacion_personal == 8,
+                                                }"
+                                                    class="text-xs inline-flex font-medium  rounded-full text-center px-2.5 py-1">
+                                                    {{ ren.estado_evaluacion_personal.nombre_estado_evaluacion_personal }}
+                                                </div>
                                             </div>
                                             <template v-if="j < evaluacion.evaluaciones_personal.length - 1">
                                                 <hr class="my-0.5 border-t border-gray-300">
@@ -133,7 +143,6 @@
                                     </div>
                                 </div>
                             </td>
-
 
                             <td class="first:pl-5 last:pr-5">
                                 <div class="space-x-1">
