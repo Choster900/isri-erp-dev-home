@@ -20,11 +20,11 @@
         <ProcessModal v-else maxWidth='3xl' :show="showModalProd" @close="$emit('cerrar-modal')" class="bg-red-400">
             <div class="flex items-center justify-between py-3 px-8 border-b border-gray-400 border-opacity-70">
                 <div class="flex">
-                    <span class="text-[16px] font-semibold font-[Roboto] text-gray-500 text-opacity-70">Producto</span>
+                    <span class="text-[16px] font-medium font-[Roboto] text-gray-500 text-opacity-70">Producto</span>
                     <div class="mt-[5px] text-gray-500 text-opacity-70 w-[14px] h-[14px] mx-2">
                         <icon-m :iconName="'nextSvgVector'"></icon-m>
                     </div>
-                    <span class="text-[16px] font-semibold text-gray-700 font-[Roboto]">Crear Producto</span>
+                    <span class="text-[16px] font-medium text-black font-[Roboto]">{{ prodId > 0 ? 'Editar producto' : 'Crear producto' }}</span>
                 </div>
                 <svg class="h-6 w-6 text-gray-400 hover:text-gray-600 cursor-pointer" @click="$emit('cerrar-modal')"
                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -33,15 +33,75 @@
             </div>
 
             <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
-                <div class="mb-4 md:mr-2 md:mb-0 basis-1/2 h-[35px]">
+                <div class="mb-4 md:mr-2 md:mb-0 basis-2/3">
                     <input-text label="Nombre producto" :withIcon="false" id="phone1" v-model="prod.name" type="text"
-                        placeholder="Escriba nombre" :required="true" :addClases="'h-[35px]'">
+                        placeholder="Escriba nombre" :required="true" :addClases="'h-[35px]'"
+                        :validation="{ limit: 85, upper: true }">
                     </input-text>
+                    <InputError v-for="(item, index) in errors.name" :key="index" class="mt-2" :message="item" />
                 </div>
-                <div class="mb-4 md:mr-0 md:mb-0 basis-1/2">
-                    <input-text label="Descripción" :withIcon="false" id="phone2" v-model="prod.description" type="text"
-                        placeholder="Escriba descripción" :required="true" :addClases="'h-[35px]'">
+                <div class="mb-4 md:mr-0 md:mb-0 basis-1/3" :class="{ 'selected-opt': prod.mUnitId > 0 }">
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Unidad de medida
+                        <span class="text-red-600 font-extrabold">*</span>
+                    </label>
+                    <div class="relative font-semibold flex h-[35px] w-full">
+                        <Multiselect v-model="prod.mUnitId" :options="unitsMeasmt" :searchable="true"
+                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione unidad" />
+                    </div>
+                    <InputError v-for="(item, index) in errors.mUnitId" :key="index" class="mt-2" :message="item" />
+                </div>
+            </div>
+
+            <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
+                <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
+                    <input-text label="Precio referencia" :withIcon="false" id="price" v-model="prod.price" type="text"
+                        placeholder="Escriba precio" :required="true" :addClases="'h-[35px]'"
+                        :validation="{ limit: 10, amount: true }">
                     </input-text>
+                    <InputError v-for="(item, index) in errors.price" :key="index" class="mt-2" :message="item" />
+                </div>
+                <div class="mb-4 md:mr-2 md:mb-0 basis-1/3 justify-center text-center">
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Perecedero
+                        <span class="text-red-600 font-extrabold">*</span>
+                    </label>
+                    <label for="checbox1" class="text-sm font-semibold text-gray-600 ml-4 mr-1">SI</label>
+                    <checkbox :checked="prod.perishable == 1 ? true : false"
+                        @click="(prod.perishable == 0 || prod.perishable == -1) ? prod.perishable = 1 : prod.perishable = -1"
+                        class="mr-3" id="checbox1" />
+                    <label for="checbox2" class="text-sm font-semibold text-gray-600 ml-4 mr-1">NO</label>
+                    <checkbox :checked="prod.perishable == 0 ? true : false"
+                        @click="(prod.perishable == 1 || prod.perishable == -1) ? prod.perishable = 0 : prod.perishable = -1"
+                        class="mr-3" id="checbox2" />
+                    <InputError v-for="(item, index) in errors.perishable" :key="index" class="mt-2" :message="item" />
+                </div>
+                <div class="mb-4 md:mr-0 md:mb-0 basis-1/3 justify-center text-center">
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Cuadro bienes y
+                        servicios
+                        <span class="text-red-600 font-extrabold">*</span>
+                    </label>
+                    <label for="checbox3" class="text-sm font-semibold text-gray-600 ml-4 mr-1">SI</label>
+                    <checkbox :checked="prod.gAndS == 1 ? true : false"
+                        @click="(prod.gAndS == 0 || prod.gAndS == -1) ? prod.gAndS = 1 : prod.gAndS = -1" class="mr-3"
+                        id="checbox3" />
+                    <label for="checbox4" class="text-sm font-semibold text-gray-600 ml-4 mr-1">NO</label>
+                    <checkbox :checked="prod.gAndS == 0 ? true : false"
+                        @click="(prod.gAndS == 1 || prod.gAndS == -1) ? prod.gAndS = 0 : prod.gAndS = -1" class="mr-3"
+                        id="checbox4" />
+                    <InputError v-for="(item, index) in errors.gAndS" :key="index" class="mt-2" :message="item" />
+                </div>
+            </div>
+
+            <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
+                <div class="mb-4 md:mr-0 md:mb-0 basis-full" style="border: none; background-color: transparent;">
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Descripción
+                        <span class="text-red-600 font-extrabold">*</span>
+                    </label>
+                    <textarea v-model="prod.description" id="descripcion" name="descripcion"
+                        placeholder="Escriba descripción del producto" :class="prod.description != '' ? 'bg-gray-200' : ''"
+                        class="w-full h-14 overflow-y-auto peer placeholder-gray-400 text-xs font-semibold border border-gray-300 hover:border-gray-400 px-2 text-slate-900 transition-colors duration-300 focus:ring-blue-500 focus:border-blue-500"
+                        @input="handleValidation('description', { limit: 290 })" style="border-radius: 4px;">
+                    </textarea>
+                    <InputError v-for="(item, index) in errors.description" :key="index" class="mt-2" :message="item" />
                 </div>
             </div>
 
@@ -54,6 +114,7 @@
                         <Multiselect v-model="prod.purchaseProcedureId" :options="purchaseProcedures" :searchable="true"
                             :noOptionsText="'Lista vacía.'" placeholder="Seleccione proceso de compra" />
                     </div>
+                    <InputError v-for="(item, index) in errors.purchaseProcedureId" :key="index" class="mt-2" :message="item" />
                 </div>
                 <div class="mb-4 md:mr-0 md:mb-0 basis-1/2" :class="{ 'selected-opt': prod.unspscId > 0, }">
                     <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Catalogo Unspsc
@@ -66,10 +127,12 @@
                             :noOptionsText="'Escriba para buscar...'" ref="selectCatUn"
                             placeholder="Seleccione catalogo unspsc" />
                     </div>
+                    <InputError v-for="(item, index) in errors.unspscId" :key="index" class="mt-2" :message="item" />
                 </div>
             </div>
-            <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8 pb-[100px]">
-                <div class="mb-4 md:mr-0 md:mb-0 basis-1/2 pr-2" :class="{ 'selected-opt': prod.budgetAccountId > 0, }">
+
+            <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
+                <div class="mb-4 md:mr-2 md:mb-0 basis-1/2 pr-1" :class="{ 'selected-opt': prod.budgetAccountId > 0, }">
                     <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Especifico
                         <span class="text-red-600 font-extrabold">*</span>
                     </label>
@@ -77,15 +140,18 @@
                         <Multiselect v-model="prod.budgetAccountId" :options="budgetAccounts" :searchable="true"
                             :noOptionsText="'Lista vacía.'" placeholder="Seleccione especifico" />
                     </div>
+                    <InputError v-for="(item, index) in errors.budgetAccountId" :key="index" class="mt-2" :message="item" />
                 </div>
             </div>
 
-            <!-- <div class="md:flex flex-row justify-center py-6">
+            <div class="md:flex my-6 flex-row justify-end mx-8">
                 <button type="button" @click="$emit('cerrar-modal')"
-                    class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-2.5 py-1.5 text-center mb-2 dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
-                <button @click="updateFiniquitoEmp(finiquitoEmp)"
-                    class="bg-orange-700 hover:bg-orange-800 text-white font-medium text-sm px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">ACTUALIZAR</button>
-            </div> -->
+                    class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-[12px] px-2.5 py-1.5 text-center mb-2 dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
+                <button v-if="prodId > 0" @click="updateProduct(prod)"
+                    class="bg-orange-700 hover:bg-orange-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">ACTUALIZAR</button>
+                <button v-else @click="storeProduct(prod)"
+                    class="bg-green-700 hover:bg-green-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">GUARDAR</button>
+            </div>
 
 
         </ProcessModal>
@@ -100,6 +166,7 @@ import InputText from "@/Components-ISRI/ComponentsToForms/InputText.vue";
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
 import DateTimePickerM from "@/Components-ISRI/ComponentsToForms/DateTimePickerM.vue";
 import TimePickerM from "@/Components-ISRI/ComponentsToForms/TimePickerM.vue";
+import { useValidateInput } from '@/Composables/General/useValidateInput';
 
 import { toRefs, onMounted, ref, watch } from 'vue';
 
@@ -122,9 +189,18 @@ export default {
 
         const {
             isLoadingRequest, prod, errors, purchaseProcedures, catUnspsc, isLoadingUnspsc,
-            budgetAccounts,
-            asyncFindUnspsc, getInfoForModalProd
+            budgetAccounts, unitsMeasmt,
+            asyncFindUnspsc, getInfoForModalProd, storeProduct, updateProduct
         } = useProducto(context);
+
+        const {
+            validateInput
+        } = useValidateInput()
+
+        const handleValidation = (input, validation) => {
+            prod.value[input] = validateInput(prod.value[input], validation)
+
+        }
 
         const handleSearchChange = async (query) => {
             await asyncFindUnspsc(query);
@@ -138,8 +214,8 @@ export default {
 
         return {
             isLoadingRequest, prod, errors, purchaseProcedures, catUnspsc, isLoadingUnspsc,
-            budgetAccounts,
-            handleSearchChange
+            budgetAccounts, unitsMeasmt,
+            handleSearchChange, handleValidation, storeProduct, updateProduct
         }
     }
 }
@@ -153,10 +229,14 @@ export default {
 
 .selected-opt .multiselect {
     background: var(--ms-bg, #E5E7EB);
-
 }
 
 .selected-opt .multiselect-wrapper input {
     background-color: #E5E7EB;
 }
+
+
+/* .select-err .multiselect-wrapper input {
+    background-color: #FECACA;
+} */
 </style>

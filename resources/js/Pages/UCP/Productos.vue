@@ -1,6 +1,6 @@
 <template>
-    <Head title="Proceso - Finiquitos" />
-    <AppLayoutVue nameSubModule="Juridico - Finiquitos" :colorSide="' bg-[#343a40] '">
+    <Head title="Catalogo - Productos" />
+    <AppLayoutVue nameSubModule="UCP - Productos" :colorSide="' bg-[#343a40] '">
         <div v-if="isLoadingTop"
             class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
             <div role="status" class="flex items-center">
@@ -20,7 +20,7 @@
         </div>
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="showModalProd = true" v-if="permits.insertar == 1"
+                <GeneralButton @click="showModalProd = true; prodId = 0;" v-if="permits.insertar == 1"
                     color="bg-green-700  hover:bg-green-800" text="Crear producto" icon="add" />
             </div>
         </div>
@@ -200,14 +200,21 @@ export default {
             { width: "27%", label: "Nombre", name: "nombre_producto", type: "text" },
             { width: "20%", label: "Descripcion", name: "descripcion_producto", type: "text" },
             { width: "10%", label: "Especifico", name: "id_ccta_presupuestal", type: "text" },
-            { width: "13%", label: "Medida", name: "id_unidad_medida", type: "text" },
+            { width: "13%", label: "Medida", name: "unidad_medida", type: "text" },
             { width: "10%", label: "Precio", name: "precio_producto", type: "text" },
             { width: "10%", label: "Acciones", name: "Acciones" },
         ];
         const requestUrl = "/productos"
         const columntToSort = "id_producto"
         const dir = 'desc'
-        //const initialCol = -1 // Opcional, el composable recibe 0 por defecto
+
+        const inputsToValidate = ref([
+            { inputName: 'id_empleado', number: true, limit: 4 },
+            { inputName: 'codigo_empleado', number: false, limit: 5 },
+            { inputName: 'nombre_persona', number: false, limit: 50 },
+            { inputName: 'dui_persona', number: false, limit: 10 },
+            { inputName: 'dependencia', number: false, limit: 8 },
+        ])
 
         const {
             dataToShow,
@@ -221,7 +228,7 @@ export default {
         } = useToDataTable(columns, requestUrl, columntToSort, dir)
 
         return {
-            permits, dataToShow, showModalProd, tableData, perPage, prodId,
+            permits, dataToShow, showModalProd, tableData, perPage, prodId, inputsToValidate,
             links, sortKey, sortOrders, isLoadinRequest, isLoadingTop, emptyObject, columns,
             getDataToShow, handleData, sortBy, changeStatusElement, moment
         };

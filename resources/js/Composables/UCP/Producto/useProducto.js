@@ -13,6 +13,7 @@ export const useProducto = (context) => {
     const purchaseProcedures = ref([])
     const catUnspsc = ref([])
     const budgetAccounts = ref([])
+    const unitsMeasmt = ref([])
 
     const prod = ref({
         id: '',
@@ -23,6 +24,8 @@ export const useProducto = (context) => {
         budgetAccountId: '',
         purchaseProcedureId: '',
         unspscId: '',
+        perishable: -1,
+        gAndS:-1
     })
 
     const getInfoForModalProd = async (id) => {
@@ -33,7 +36,8 @@ export const useProducto = (context) => {
             );
             purchaseProcedures.value = response.data.purchaseProcedures
             budgetAccounts.value = response.data.budgetAccounts
-            setModalValues(response.data.prod)
+            unitsMeasmt.value = response.data.unitsMeasmt
+            id > 0 ? setModalValues(response.data.prod) : ''
         } catch (err) {
             if (err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
@@ -65,7 +69,6 @@ export const useProducto = (context) => {
         }
     }, 350);
 
-
     const setModalValues = (product) => {
         if (product.catalogo_unspsc) {
             let array = {
@@ -79,12 +82,47 @@ export const useProducto = (context) => {
         prod.value.name = product.nombre_producto
         prod.value.description = product.descripcion_producto
         prod.value.mUnitId = product.unidad_medida.id_unidad_medida
-        prod.value.price = product.precio_producto
+        prod.value.price = '$'+product.precio_producto
         prod.value.budgetAccountId = product.id_ccta_presupuestal
         prod.value.purchaseProcedureId = product.id_proceso_compra
         prod.value.unspscId = product.id_catalogo_unspsc
-
+        prod.value.perishable = product.perecedero_producto
+        prod.value.gAndS = product.basico_producto
     }
+
+    const storeProduct = async (obj) => {
+        swal({
+            title: '¿Está seguro de guardar el nuevo producto?',
+            icon: 'question',
+            iconHtml: '❓',
+            confirmButtonText: 'Si, Guardar',
+            confirmButtonColor: '#141368',
+            cancelButtonText: 'Cancelar',
+            showCancelButton: true,
+            showCloseButton: true
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                saveObject(obj, '/save-product');
+            }
+        });
+    };
+
+    const updateProduct = async (obj) => {
+        swal({
+            title: '¿Está seguro de actualizar el producto?',
+            icon: 'question',
+            iconHtml: '❓',
+            confirmButtonText: 'Si, Actualizar',
+            confirmButtonColor: '#141368',
+            cancelButtonText: 'Cancelar',
+            showCancelButton: true,
+            showCloseButton: true
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                saveObject(obj, '/update-product');
+            }
+        });
+    };
 
     const saveObject = async (obj, url) => {
         isLoadingRequest.value = true;
@@ -100,6 +138,7 @@ export const useProducto = (context) => {
                 isLoadingRequest.value = false;
             });
     };
+
 
     const handleErrorResponse = (err) => {
         if (err.response.status === 422) {
@@ -128,7 +167,7 @@ export const useProducto = (context) => {
 
     return {
         errors, isLoadingRequest, prod, purchaseProcedures, catUnspsc, isLoadingUnspsc,
-        budgetAccounts,
-        asyncFindUnspsc, getInfoForModalProd
+        budgetAccounts, unitsMeasmt,
+        asyncFindUnspsc, getInfoForModalProd, storeProduct, updateProduct
     }
 }
