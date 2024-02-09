@@ -236,12 +236,12 @@ export default {
         const dir = 'desc'
 
         const inputsToValidate = ref([
-            { inputName: 'id_producto', number: true, limit: 6 },
-            { inputName: 'nombre_producto', number: false, limit: 50 },
-            { inputName: 'descripcion_producto', number: false, limit: 50 },
+            { inputName: 'id_producto', limit: 6 },
+            { inputName: 'nombre_producto', limit: 50 },
+            { inputName: 'descripcion_producto', limit: 50 },
             { inputName: 'id_ccta_presupuestal', number: true, limit: 5 },
-            { inputName: 'unidad_medida', number: false, limit: 10 },
-            { inputName: 'precio_producto', number: true, limit: 8 },
+            { inputName: 'unidad_medida', limit: 10 },
+            { inputName: 'precio_producto', amount: true, limit: 8 },
         ])
 
         const changeStatus = async (id, status) => {
