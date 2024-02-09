@@ -14,6 +14,7 @@ class HojaServicioController extends Controller
     {
         $query = Persona::with([
             'empleado.persona',
+            'empleado.persona',
             'fotos' => function ($query) {
                 $query->where('estado_foto', 1);
             },
@@ -28,6 +29,8 @@ class HojaServicioController extends Controller
             'empleado.acuerdo_laboral.tipo_acuerdo_laboral',
             'empleado.plazas_asignadas.detalle_plaza.plaza',
             'empleado.plazas_asignadas.dependencia',
+            'empleado.evaluaciones_personal.detalle_evaluaciones_personal.categoria_rendimiento.evaluacion_rendimiento.tablas_rendimiento',
+            'empleado.evaluaciones_personal.detalle_evaluaciones_personal.rubrica_rendimiento',
             'empleado.evaluaciones_personal.detalle_evaluaciones_personal.categoria_rendimiento.evaluacion_rendimiento.tablas_rendimiento',
             'empleado.evaluaciones_personal.detalle_evaluaciones_personal.rubrica_rendimiento',
             'empleado.evaluaciones_personal.periodo_evaluacion',
@@ -75,6 +78,7 @@ class HojaServicioController extends Controller
     function getMyOwnInformation(Request $request)
     {
         $query = Persona::with([
+            'empleado.persona',
             'empleado.persona',
             'fotos' => function ($query) {
                 $query->where('estado_foto', 1);

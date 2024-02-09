@@ -1,5 +1,8 @@
 
+
 <template>
+    <div class="w-full chart-container">
+        <LineChart :chart-data="data" :options="options" class="h-44" />
     <div class="w-full chart-container">
         <LineChart :chart-data="data" :options="options" class="h-44" />
 
@@ -40,6 +43,7 @@
                                 <div
                                     class="flex items-center after:block after:content-['·'] last:after:content-[''] after:text-sm after:text-slate-400 after:px-2">
                                     <span class="font-medium text-indigo-500 hover:text-indigo-600">
+                                    <span class="font-medium text-indigo-500 hover:text-indigo-600">
                                         <div class="flex items-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                                                 class="w-5 h-5 mr-1">
@@ -56,6 +60,7 @@
                                                 {{ moment(evaluation.fecha_inicio_evaluacion_personal).year() }}
                                             </span>
                                         </div>
+                                    </span>
                                     </span>
                                 </div>
                                 <div
@@ -101,6 +106,11 @@
             </div>
         </div>
 
+
+        <ModalSeeEvaluation @cerrar-modal="showModal = false; rubricaAndCategoriaByEvaluacion = []"
+            :evaluacionPersonalProp="evaluacionPersonalProp"
+            :rubricaAndCategoriaByEvaluacion="rubricaAndCategoriaByEvaluacion" :showModal="showModal"
+            :isLoadingObtenerCategoriaYRubrica="isLoadingObtenerCategoriaYRubrica" />
 
         <ModalSeeEvaluation @cerrar-modal="showModal = false; rubricaAndCategoriaByEvaluacion = []"
             :evaluacionPersonalProp="evaluacionPersonalProp"
@@ -196,6 +206,21 @@ export default {
 
             }
 
+
+            if (
+                userData.value &&
+                userData.value.evaluaciones_personal &&
+                userData.value.evaluaciones_personal.length > 0
+            ) {
+                userData.value.evaluaciones_personal.forEach((obj, index) => {
+                    if (obj.fecha_inicio_evaluacion_personal) {
+                        const year = moment(obj.fecha_inicio_evaluacion_personal).year();
+                        uniqueYearsSet.add(year);
+                    }
+                });
+
+            }
+
             const uniqueYearsArray = Array.from(uniqueYearsSet).sort();
             yearsArray.value = uniqueYearsArray;
             year.value = yearsArray.value[yearsArray.value.length - 1];
@@ -227,7 +252,41 @@ export default {
             filterAllYearsInDeals();
             data.value.labels = [];
             data.value.datasets[0].data = [];
+            yearsArray.value = uniqueYearsArray;
+            year.value = yearsArray.value[yearsArray.value.length - 1];
+            newFilteredDataSet(year.value);
+        };
 
+        const newFilteredDataSet = (selectedYear) => {
+
+            if (
+                userData.value &&
+                userData.value.evaluaciones_personal &&
+                userData.value.evaluaciones_personal.length > 0
+            ) {
+
+                newFilteredData.value = userData.value.evaluaciones_personal.filter(obj => moment(obj.fecha_inicio_evaluacion_personal).year() === selectedYear);
+
+            } else {
+                newFilteredData.value = []
+            }
+
+
+        };
+
+        onMounted(() => {
+            filterAllYearsInDeals();
+        });
+
+        watch(userData, () => {
+            filterAllYearsInDeals();
+            data.value.labels = [];
+            data.value.datasets[0].data = [];
+
+            if (userData.value !== '') {
+                userData.value.evaluaciones_personal.forEach(element => {
+                    data.value.labels.push(`${element.periodo_evaluacion.nombre_periodo_evaluacion} - ${moment(element.fecha_inicio_evaluacion_personal).year()}`);
+                    data.value.datasets[0].data.push(element.puntaje_evaluacion_personal);
             if (userData.value !== '') {
                 userData.value.evaluaciones_personal.forEach(element => {
                     data.value.labels.push(`${element.periodo_evaluacion.nombre_periodo_evaluacion} - ${moment(element.fecha_inicio_evaluacion_personal).year()}`);
@@ -305,6 +364,7 @@ export default {
             // Otras variables y funciones computadas si es necesario
         };
     }
+};
 };
 </script>
 
