@@ -40,8 +40,8 @@
                             </label>
                             <div class="font-semibold relative flex h-10 w-full flex-row-reverse ">
                                 <Multiselect placeholder="Seleccione centro" v-model="depInfo.centerId"
-                                    :options="mainCenters" :searchable="true" :noResultsText="'Sin resultados'" :noOptionsText="'Sin resultados'" 
-                                    @change="depInfo.parentId = ''"/>
+                                    :options="mainCenters" :searchable="true" :noResultsText="'Sin resultados'"
+                                    :noOptionsText="'Sin resultados'" @change="depInfo.parentId = ''" />
                                 <div class="flex items-center px-2 pointer-events-none border rounded-l-md border-gray-300">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-[#001c48]">
@@ -78,9 +78,9 @@
                             <div class="font-semibold relative flex h-10 w-full flex-row-reverse ">
                                 <Multiselect placeholder="Digite nombre empleado" v-model="depInfo.personId"
                                     :options="load && depInfo.id ? baseOptions : employees" :searchable="true"
-                                    :loading="isLoadingEmployee" :internal-search="false"
+                                    :loading="isLoadingEmployee" :internal-search="false" :filter-results="false"
                                     @search-change="handleSearchChange" :clear-on-search="true"
-                                    :noResultsText="'Sin resultados'" :noOptionsText="'Sin resultados'" />
+                                    :noResultsText="'Sin resultados'" :noOptionsText="'Escriba para buscar...'" />
                                 <div class="flex items-center px-2 pointer-events-none border rounded-l-md border-gray-300">
                                     <svg class="w-5 h-5 text-[#001c48] dark:text-gray-600" viewBox="0 0 24 24" fill="none"
                                         xmlns="http://www.w3.org/2000/svg">
@@ -192,9 +192,7 @@ export default {
 
         const handleSearchChange = async (query) => {
             load.value = false
-            if (query != '') {
-                await asyncFindEmployee(query);
-            }
+            await asyncFindEmployee(query);
         }
 
         const save = async () => {

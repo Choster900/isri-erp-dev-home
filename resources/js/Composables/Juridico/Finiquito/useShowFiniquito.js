@@ -1,15 +1,18 @@
-import { ref, inject, computed } from "vue";
+import { ref } from "vue";
 import axios from "axios";
+import { createApp, inject } from 'vue'
+import FiniquitoEmpPDFVue from '@/pdf/Juridico/FiniquitoEmpPDF.vue';
 import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
 import { toast } from "vue3-toastify";
-import { useFormatDateTime } from "@/Composables/General/useFormatDateTime.js";
+import html2pdf from 'html2pdf.js'
 import { localeData } from 'moment_spanish_locale';
 import moment from 'moment';
 moment.locale('es', localeData)
 
 
 export const useShowFiniquito = (context) => {
+    const swal = inject("$swal");
     const finiquito = ref([])
     const isLoadingRequest = ref(false)
     const hireDate = ref("")
@@ -34,9 +37,7 @@ export const useShowFiniquito = (context) => {
             signatureTime.value = response.data.signatureTime
             amount.value = response.data.amountText
             year.value = response.data.year
-            console.log(response.data);
         } catch (err) {
-            //console.log(err);
             if (err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
                 context.emit("get-table");
@@ -69,76 +70,81 @@ export const useShowFiniquito = (context) => {
         return words
     }
 
-    const dayToWords = (day) => {
-        let numerosEnPalabras = {
-            '01': 'uno',
-            '02': 'dos',
-            '03': 'tres',
-            '04': 'cuatro',
-            '05': 'cinco',
-            '06': 'seis',
-            '07': 'siete',
-            '08': 'ocho',
-            '09': 'nueve',
-            '10': 'diez',
-            '11': 'once',
-            '12': 'doce',
-            '13': 'trece',
-            '14': 'catorce',
-            '15': 'quince',
-            '16': 'dieciseis',
-            '17': 'diecisiete',
-            '18': 'dieciocho',
-            '19': 'diecinueve',
-            '20': 'veinte',
-            '10': 'veitiun',
-            '11': 'once',
-            '12': 'doce',
-            '13': 'trece',
-            '14': 'catorce',
-            '15': 'quince',
-            '16': 'dieciseis',
-            '17': 'diecisiete',
-            '18': 'dieciocho',
-            '19': 'diecinueve',
-            '20': 'veinte',
-            '20': 'veinte',
+    const printPdf = () => {
+        if (finiquito.value.firmado_finiquito_laboral == 1) {
+            generatePDF();
+        } else {
+            swal({
+                title: '¿Está seguro de generar PDF? Una vez generado el sistema lo registrará como firmado.',
+                icon: 'question',
+                iconHtml: '❓',
+                confirmButtonText: 'Si, generar',
+                confirmButtonColor: '#141368',
+                cancelButtonText: 'Cancelar',
+                showCancelButton: true,
+                showCloseButton: true
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    await generatePDF();
+                }
+            });
         }
     }
 
-    const formatearFecha = (date) => {
+    const generatePDF = async () => {
+        try {
+            isLoadingRequest.value = true;
+            const response = await axios.get(
+                `/print-settlement/${finiquito.value.id_finiquito_laboral}`
+            );
+            let fecha = moment().format('DD-MM-YYYY');
+            let name = 'FINIQUITO ' + finiquito.value.empleado.persona.nombre_apellido + ' - ' + fecha;
+            const opt = {
+                //margin: [0, 2.5, 0, 2.5], //top, left, buttom, right,
+                margin: [2.5, 2.5, 2.5, 2.5],
+                filename: name,
+                //pagebreak: {mode:'avoid-all'},
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 3, useCORS: false },
+                jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' }
+                //jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' },
+            };
+            const app = createApp(FiniquitoEmpPDFVue, {
+                finiquito: finiquito.value,
+                DUIWords: DUIToWords(finiquito.value.empleado.persona.dui_persona),
+                hireDate: hireDate.value,
+                signatureDate: signatureDate.value,
+                signatureDateA: signatureDateA.value,
+                signatureTime: signatureTime.value,
+                period: period.value,
+                amount: amount.value,
+                year: year.value
+            });
+            const div = document.createElement('div');
+            const pdfPrint = app.mount(div);
+            const html = div.outerHTML;
 
-        const fechaMoment = moment(date, 'YYYY-MM-DD');
-        let fechaFormateada = ""
+            html2pdf().set(opt).from(html).save();
 
-        fechaFormateada = fechaMoment.format('DD');
-
-        return 'nada'
-        // if (fechaMoment.isValid()) {
-        //     // Formato personalizado de fecha
-        //     const formatoFecha = fechaMoment.format('DD [de] MMMM [de] YYYY');
-
-        //     // Convertir números a palabras en el formato
-        //     fechaFormateada = formatDayName(formatoFecha);
-        // } else {
-        //     fechaFormateada = "Formato de fecha inválido";
-        // }
-        // return fechaFormateada
+        } catch (error) {
+            showErrorMessage(error);
+            context.emit("cerrar-modal");
+            context.emit("get-table");
+        } finally {
+            isLoadingRequest.value = false;
+            context.emit("cerrar-modal");
+            context.emit("get-table");
+        }
     }
 
-    const formatDayName = (fecha) => {
-        // Función auxiliar para convertir números a palabras en una cadena de texto
-        return fecha.replace(/\b\d+\b/g, function (match) {
-            // Utilizamos moment para convertir números a palabras
-            return moment(match, 'D').format('MMMM') === 'Invalid date'
-                ? match  // No es un número del día, mantener sin cambios
-                : moment(match, 'D').format('MMMM').toUpperCase(); // Convertir número del día a palabras
-        });
-    }
+    const showErrorMessage = (err) => {
+        const { title, text, icon } = useHandleError(err);
+        swal({ title: title, text: text, icon: icon, timer: 5000 });
+    };
 
     return {
-        finiquito, isLoadingRequest, hireDate, signatureDateA, period, signatureTime, 
+        finiquito, isLoadingRequest, hireDate, signatureDateA, period, signatureTime,
         signatureDate, amount, year,
-        getInfoForModalFiniquito, DUIToWords, formatearFecha
+        getInfoForModalFiniquito, DUIToWords, printPdf,
     }
 }

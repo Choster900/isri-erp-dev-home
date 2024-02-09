@@ -18,6 +18,7 @@ class CuentaPresupuestal extends Model
         'nombre_ccta_presupuestal',
         'estado_ccta_presupuestal',
         'tesoreria_ccta_presupuestal',
+        'compra_ccta_presupuestal',
         'descripcion_ccta_presupuestal',
     ];
 

@@ -1,5 +1,5 @@
 <template>
-    <label :for="id" class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">{{ label }}
+    <label v-if="label" :for="id" class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">{{ label }}
         <span v-if="required" class="text-red-600 font-extrabold">*</span></label>
     <vue-date-picker v-model="modelValue" :enable-time-picker="enableTimePicker" :format="format" :no-today="noToday"
         :placeholder="placeholder" :disabled="disabled" :teleport="teleport" auto-apply :locale="localeConfig" :day-names="dayNames"

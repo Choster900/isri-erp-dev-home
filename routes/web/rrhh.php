@@ -117,7 +117,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get(
         '/rrhh/evaluaciones',
         function (Request $request) {
-            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/evaluaciones', 'RRHH/EvaluacionesCopy');
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/rrhh/evaluaciones', 'RRHH/Evaluaciones');
         }
     )->name('rrhh.evaluaciones');
     Route::post('evaluaciones', [EvaluacionController::class, 'getEvaluaciones'])->name('evaluaciones.getEvaluaciones');

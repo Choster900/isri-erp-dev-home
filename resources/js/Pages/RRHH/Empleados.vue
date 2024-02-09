@@ -298,7 +298,7 @@ export default {
             inputsToValidate: [
                 { inputName: 'id_empleado', number: true, limit: 4 },
                 { inputName: 'codigo_empleado', number: false, limit: 5 },
-                { inputName: 'nombre_persona', number: false, limit: 20 },
+                { inputName: 'nombre_persona', number: false, limit: 50 },
                 { inputName: 'dui_persona', number: false, limit: 10 },
                 { inputName: 'dependencia', number: false, limit: 8},
             ],

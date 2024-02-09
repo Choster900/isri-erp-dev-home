@@ -14,6 +14,7 @@ class HojaServicioController extends Controller
     {
         $query = Persona::with([
             'empleado.persona',
+            'empleado.persona',
             'fotos' => function ($query) {
                 $query->where('estado_foto', 1);
             },
@@ -30,6 +31,8 @@ class HojaServicioController extends Controller
             'empleado.plazas_asignadas.dependencia',
             'empleado.evaluaciones_personal.detalle_evaluaciones_personal.categoria_rendimiento.evaluacion_rendimiento.tablas_rendimiento',
             'empleado.evaluaciones_personal.detalle_evaluaciones_personal.rubrica_rendimiento',
+            'empleado.evaluaciones_personal.detalle_evaluaciones_personal.categoria_rendimiento.evaluacion_rendimiento.tablas_rendimiento',
+            'empleado.evaluaciones_personal.detalle_evaluaciones_personal.rubrica_rendimiento',
             'empleado.evaluaciones_personal.periodo_evaluacion',
             'empleado.evaluaciones_personal.tipo_evaluacion_personal',
             'empleado.evaluaciones_personal.plaza_evaluada.plaza_asignada.detalle_plaza.plaza',
@@ -38,6 +41,9 @@ class HojaServicioController extends Controller
             'empleado.evaluaciones_personal.plaza_evaluada.plaza_asignada.dependencia.jefatura.empleado.plazas_asignadas.centro_atencion',
             'empleado.evaluaciones_personal.plaza_evaluada.plaza_asignada.dependencia.jefatura.empleado.plazas_asignadas.dependencia',
             'empleado.evaluaciones_personal.evaluacion_rendimiento',
+            'empleado.evaluaciones_personal.incidentes_evaluacion' => function ($query) {
+                return $query->where("estado_incidente_evaluacion", 1);
+            },
             'empleado.evaluaciones_personal.estado_evaluacion_personal',
             "empleado.evaluaciones_personal" => function ($query) {
                 $query->whereIn("id_estado_evaluacion_personal",  [2, 3, 8])
@@ -73,6 +79,7 @@ class HojaServicioController extends Controller
     {
         $query = Persona::with([
             'empleado.persona',
+            'empleado.persona',
             'fotos' => function ($query) {
                 $query->where('estado_foto', 1);
             },
@@ -98,6 +105,9 @@ class HojaServicioController extends Controller
             'empleado.evaluaciones_personal.plaza_evaluada.plaza_asignada.dependencia.jefatura.empleado.plazas_asignadas.dependencia',
             'empleado.evaluaciones_personal.evaluacion_rendimiento',
             'empleado.evaluaciones_personal.estado_evaluacion_personal',
+            'empleado.evaluaciones_personal.incidentes_evaluacion' => function ($query) {
+                return $query->where("estado_incidente_evaluacion", 1);
+            },
             "empleado.evaluaciones_personal" => function ($query) {
                 $query->whereIn("id_estado_evaluacion_personal",  [2, 3, 8])
                     ->orderBy("fecha_reg_evaluacion_personal", "asc");

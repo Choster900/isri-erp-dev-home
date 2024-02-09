@@ -1,7 +1,7 @@
 <template>
     <table class="table-auto w-full editor_listing_table ">
         <thead class="text-xs font-semibold uppercase  text-white border-t border-b border-slate-200"
-        :class="$page.props.menu.sistema === 'Juridico' ? 'bg-[#3c4557]' : 'bg-[#001c48]'">
+            :class="$page.props.menu.sistema === 'Juridico' ? 'bg-[#3c4557]' : 'bg-[#001c48]'">
             <tr>
                 <th v-for="column in columns" :key="column.name" @click="$emit('sort', column.name)"
                     :class="sortKey === column.name ? (sortOrders[column.name] > 0 ? 'sorting_asc' : 'sorting_desc') : 'sorting'"
@@ -38,7 +38,7 @@
                         <div v-else>
                             <select @change="sendData($event)" :id="column.name" ref="myInput" class="appearance-none"
                                 style="appearance: none; -webkit-appearance: none; -moz-appearance: none;"
-                                :style = "staticSelect ? 'width: 100px;' : 'width: 100%;'">
+                                :style="staticSelect ? 'width: 100px;' : 'width: 100%;'">
                                 <option value=""></option>
                                 <option v-for="(option, i) in column.options " :key="i" :value="option.value">{{
                                     option.label }}
@@ -110,6 +110,14 @@ export default {
                     // Limitar la longitud del valor
                     event.target.value = event.target.value.substring(0, inputToValidate.limit);
                 }
+                if (inputToValidate.amount) {
+                    let x = event.target.value.replace(/^\./, '').replace(/[^0-9.]/g, '')
+                    event.target.value = x
+                    const regex = /^(\d+)?([.]?\d{0,2})?$/
+                    if (!regex.test(event.target.value)) {
+                        event.target.value = event.target.value.match(regex) || x.substring(0, x.length - 1)
+                    }
+                }
             }
             const value = event.target.value;
             if (id in this.columnsComputed) {
@@ -136,6 +144,16 @@ input.tabla[type="text"] {
 }
 
 input.tabla[type="date"] {
+    height: 28px;
+    line-height: 28px;
+    border-radius: 30px;
+    padding: 0 8px;
+    border: none;
+    background-color: #1f355833;
+    text-align: center;
+}
+
+input.tabla[type="number"] {
     height: 28px;
     line-height: 28px;
     border-radius: 30px;

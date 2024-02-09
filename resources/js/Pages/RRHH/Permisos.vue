@@ -322,9 +322,9 @@ export default {
                     const format = this.getFormatToPrint(updatedPermission);
                     let id_tipo_flujo;
                     if (format === 1 || format === 2) {
-                        id_tipo_flujo = updatedPermission.plaza_asignada.dependencia.dep_id_dependencia === 1 ? 1 : 3;
+                        id_tipo_flujo = updatedPermission.plaza_asignada.centro_atencion.id_centro_atencion === 1 ? 1 : 3;
                     } else if (format === 3) {
-                        id_tipo_flujo = updatedPermission.plaza_asignada.dependencia.dep_id_dependencia === 1 ? 2 : 4;
+                        id_tipo_flujo = updatedPermission.plaza_asignada.centro_atencion.id_centro_atencion === 1 ? 2 : 4;
                     }
 
                     try {

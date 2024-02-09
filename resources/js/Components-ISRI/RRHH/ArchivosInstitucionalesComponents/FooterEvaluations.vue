@@ -1,5 +1,8 @@
 
+
 <template>
+    <div class="w-full chart-container">
+        <LineChart :chart-data="data" :options="options" class="h-44" />
     <div class="w-full chart-container">
         <LineChart :chart-data="data" :options="options" class="h-44" />
 
@@ -11,7 +14,7 @@
                     v-for="(evaluation, i) in newFilteredData" :key="i">
                     <div class="flex flex-start space-x-4 cursor-pointer" @click="obtenerCategoriaYRubricaRendimiento(evaluation.evaluacion_rendimiento.id_evaluacion_rendimiento);
                     evaluacionPersonalProp = { data: evaluation, allData: userData };
-                    updateStateAsView(evaluation.id_evaluacion_personal)">
+                    updateStateAsView(evaluation)">
                         <div class="shrink-0 mt-1.5">
                             <div class="relative">
                                 <lord-icon src="https://cdn.lordicon.com/depeqmsz.json" trigger="hover"
@@ -40,6 +43,7 @@
                                 <div
                                     class="flex items-center after:block after:content-['·'] last:after:content-[''] after:text-sm after:text-slate-400 after:px-2">
                                     <span class="font-medium text-indigo-500 hover:text-indigo-600">
+                                    <span class="font-medium text-indigo-500 hover:text-indigo-600">
                                         <div class="flex items-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                                                 class="w-5 h-5 mr-1">
@@ -56,6 +60,7 @@
                                                 {{ moment(evaluation.fecha_inicio_evaluacion_personal).year() }}
                                             </span>
                                         </div>
+                                    </span>
                                     </span>
                                 </div>
                                 <div
@@ -106,14 +111,20 @@
             :evaluacionPersonalProp="evaluacionPersonalProp"
             :rubricaAndCategoriaByEvaluacion="rubricaAndCategoriaByEvaluacion" :showModal="showModal"
             :isLoadingObtenerCategoriaYRubrica="isLoadingObtenerCategoriaYRubrica" />
+
+        <ModalSeeEvaluation @cerrar-modal="showModal = false; rubricaAndCategoriaByEvaluacion = []"
+            :evaluacionPersonalProp="evaluacionPersonalProp"
+            :rubricaAndCategoriaByEvaluacion="rubricaAndCategoriaByEvaluacion" :showModal="showModal"
+            :isLoadingObtenerCategoriaYRubrica="isLoadingObtenerCategoriaYRubrica" />
     </div>
 </template>
 
 <script>
-import { ref, onMounted, watch, computed, toRefs } from 'vue';
+import { ref, onMounted, watch, computed, toRefs, getCurrentInstance } from 'vue';
 import moment from 'moment'; // Asegúrate de importar moment aquí si no lo has hecho
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
+import { usePage } from '@inertiajs/vue3'
 import { LineChart } from "vue-chart-3"
 import { Chart, LineController, ArcElement, CategoryScale, LinearScale, PointElement, LineElement } from "chart.js"
 import axios from 'axios';
@@ -123,7 +134,7 @@ Chart.register(LineController, ArcElement, CategoryScale, LinearScale, PointElem
 export default {
     props: ["userData"],
     components: { LineChart, ModalSeeEvaluation },
-    setup(props) {
+    setup(props, context) {
         const arraySemester = ref([]);
         const data = ref({
             labels: [],
@@ -195,7 +206,52 @@ export default {
 
             }
 
+
+            if (
+                userData.value &&
+                userData.value.evaluaciones_personal &&
+                userData.value.evaluaciones_personal.length > 0
+            ) {
+                userData.value.evaluaciones_personal.forEach((obj, index) => {
+                    if (obj.fecha_inicio_evaluacion_personal) {
+                        const year = moment(obj.fecha_inicio_evaluacion_personal).year();
+                        uniqueYearsSet.add(year);
+                    }
+                });
+
+            }
+
             const uniqueYearsArray = Array.from(uniqueYearsSet).sort();
+            yearsArray.value = uniqueYearsArray;
+            year.value = yearsArray.value[yearsArray.value.length - 1];
+            newFilteredDataSet(year.value);
+        };
+
+        const newFilteredDataSet = (selectedYear) => {
+
+            if (
+                userData.value &&
+                userData.value.evaluaciones_personal &&
+                userData.value.evaluaciones_personal.length > 0
+            ) {
+
+                newFilteredData.value = userData.value.evaluaciones_personal.filter(obj => moment(obj.fecha_inicio_evaluacion_personal).year() === selectedYear);
+
+            } else {
+                newFilteredData.value = []
+            }
+
+
+        };
+
+        onMounted(() => {
+            filterAllYearsInDeals();
+        });
+
+        watch(userData, () => {
+            filterAllYearsInDeals();
+            data.value.labels = [];
+            data.value.datasets[0].data = [];
             yearsArray.value = uniqueYearsArray;
             year.value = yearsArray.value[yearsArray.value.length - 1];
             newFilteredDataSet(year.value);
@@ -231,6 +287,10 @@ export default {
                 userData.value.evaluaciones_personal.forEach(element => {
                     data.value.labels.push(`${element.periodo_evaluacion.nombre_periodo_evaluacion} - ${moment(element.fecha_inicio_evaluacion_personal).year()}`);
                     data.value.datasets[0].data.push(element.puntaje_evaluacion_personal);
+            if (userData.value !== '') {
+                userData.value.evaluaciones_personal.forEach(element => {
+                    data.value.labels.push(`${element.periodo_evaluacion.nombre_periodo_evaluacion} - ${moment(element.fecha_inicio_evaluacion_personal).year()}`);
+                    data.value.datasets[0].data.push(element.puntaje_evaluacion_personal);
                 });
             }
 
@@ -262,22 +322,28 @@ export default {
 
 
         /**
-         * Actualizar evaluacion rendimiento a estado 3 (Actualizado como visto)
-         * @param {number} idEvaluacionPersonal - Identificador de evaluacion.
+         * Actualiza el estado de la evaluación de rendimiento a "Visto" (estado 3).
+         * @param {Object} objectValidation - Objeto con datos necesarios para la validación y actualización.
          */
-        const updateStateAsView = async (idEvaluacionPersonal, objectValidation) => {
+        const updateStateAsView = async (objectValidation) => {
             try {
-                const { userId, state } = objectValidation;
-                if (userId == 1 && state == 2) {
-
+                // Extraer datos del objeto de validación
+                const { id_evaluacion_personal, id_empleado, estado_evaluacion_personal } = objectValidation;
+                // Obtener el ID de persona del usuario autenticado
+                const authUserId = usePage().props.auth.user.id_persona;
+                // Validar si la evaluación está en estado pendiente (2) y si el usuario autenticado es el mismo que el empleado asociado
+                if (estado_evaluacion_personal.id_estado_evaluacion_personal === 2 && authUserId === id_empleado) {
+                    // Enviar una solicitud para cambiar el estado de la evaluación a "Visto" (estado 3)
+                    const response = await axios.post('/changeStateEvaluation', { idEvaluation: id_evaluacion_personal, stateToChange: 3 });
+                    // Imprimir la respuesta del servidor para propósitos de depuración
+                    // console.log(response);
                 }
-                const response = await axios.post('/changeStateEvaluation', { idEvaluation: idEvaluacionPersonal, stateToChange: 3 });
-                console.log(response);
             } catch (error) {
-                // Maneja los errores imprimiéndolos en la consola.
+                // Manejar los errores imprimiéndolos en la consola.
                 console.error('Error en el cambio: ', error);
             }
         };
+
 
         return {
             updateStateAsView,
@@ -298,6 +364,7 @@ export default {
             // Otras variables y funciones computadas si es necesario
         };
     }
+};
 };
 </script>
 
