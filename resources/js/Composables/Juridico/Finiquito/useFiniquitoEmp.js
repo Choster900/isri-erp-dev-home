@@ -23,6 +23,10 @@ export const useFiniquitoEmp = (context) => {
         formatDateVue3DP, formatTimeVue3DP
     } = useFormatDateTime()
 
+    const {
+        formatDateVue3DP, formatTimeVue3DP
+    } = useFormatDateTime()
+
     const getInfoForModalFiniquitoEmp = async (id) => {
         try {
             isLoadingRequest.value = true;
@@ -44,6 +48,13 @@ export const useFiniquitoEmp = (context) => {
     };
 
     const setModalValues = (data) => {
+        let finiquito = data.finiquitoEmp
+        finiquitoEmp.value.id = finiquito.id_finiquito_laboral
+        finiquitoEmp.value.signatureTime = formatTimeVue3DP(finiquito.hora_firma_finiquito_laboral)
+        finiquitoEmp.value.signatureDate = formatDateVue3DP(finiquito.fecha_firma_finiquito_laboral);
+        finiquitoEmp.value.amount = finiquito.monto_finiquito_laboral
+        finiquitoEmp.value.empleado = finiquito.empleado.persona.nombre_apellido
+        finiquitoEmp.value.codigo = finiquito.empleado.codigo_empleado
         let finiquito = data.finiquitoEmp
         finiquitoEmp.value.id = finiquito.id_finiquito_laboral
         finiquitoEmp.value.signatureTime = formatTimeVue3DP(finiquito.hora_firma_finiquito_laboral)

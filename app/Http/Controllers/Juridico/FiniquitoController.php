@@ -13,6 +13,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Luecano\NumeroALetras\NumeroALetras;
+use Illuminate\Support\Facades\Validator;
+use Luecano\NumeroALetras\NumeroALetras;
 
 class FiniquitoController extends Controller
 {
