@@ -17,7 +17,7 @@ class ProductoController extends Controller
 {
     public function getProductos(Request $request)
     {
-        $columns = ['id_producto', 'nombre_producto', 'descripcion_producto', 'id_ccta_presupuestal', 'id_unidad_medida', 'precio_producto'];
+        $columns = ['id_producto', 'nombre_producto', 'descripcion_producto', 'id_ccta_presupuestal', 'id_unidad_medida', 'precio_producto', 'estado_producto'];
 
         $length = $request->length;
         $column = $request->column; //Index
@@ -36,6 +36,7 @@ class ProductoController extends Controller
                 ->where('descripcion_producto', 'like', '%' . $search_value['descripcion_producto'] . '%')
                 ->where('id_ccta_presupuestal', 'like', '%' . $search_value['id_ccta_presupuestal'] . '%')
                 ->where('precio_producto', 'like', '%' . $search_value['precio_producto'] . '%')
+                ->where('estado_producto', 'like', '%' . $search_value['estado_producto'] . '%')
                 ->whereHas('unidad_medida', function ($query) use ($search_value) {
                     $query->where('nombre_unidad_medida', 'like', '%' . $search_value["unidad_medida"] . '%');
                 });
@@ -146,6 +147,35 @@ class ProductoController extends Controller
                     'error' => $th->getMessage(),
                 ], 422);
             }
+        }
+    }
+
+    public function changeStatusProduct(Request $request)
+    {
+        $prod = Producto::find($request->id);
+
+        if ($request->status == $prod->estado_producto) {
+            DB::beginTransaction();
+            try {
+                $prod->update([
+                    'estado_producto'                        => $prod->estado_producto == 1 ? 0 : 1,
+                    'fecha_mod_producto'                     => Carbon::now(),
+                    'usuario_producto'                       => $request->user()->nick_usuario,
+                    'ip_producto'                            => $request->ip(),
+                ]);
+                DB::commit(); // Confirma las operaciones en la base de datos
+                return response()->json([
+                    'message'          => "Acción ejecutada con éxito.",
+                ]);
+            } catch (\Exception $e) {
+                DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+                return response()->json([
+                    'logical_error' => 'Ha ocurrido un error con sus datos.',
+                    'error' => $e,
+                ], 422);
+            }
+        } else {
+            return response()->json(['logical_error' => 'Error, este producto ya ha sido ' . $prod->estado_producto == 1 ? 'activado.' : 'desactivado.',], 422);
         }
     }
 }

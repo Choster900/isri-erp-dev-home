@@ -45,7 +45,7 @@
             <div class="overflow-x-auto">
                 <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
                     :staticSelect="false" @sort="sortBy" @datos-enviados="handleData($event)"
-                    @execute-search="getDataToShow()">
+                    :inputsToValidate="inputsToValidate" @execute-search="getDataToShow()">
                     <tbody v-if="!isLoadinRequest" class="text-sm divide-y divide-slate-200">
                         <tr v-for="prod in dataToShow" :key="prod.id_producto" class="hover:bg-gray-200">
                             <td class="px-2 first:pl-5 last:pr-5">
@@ -78,16 +78,43 @@
                                     ${{ prod.precio_producto }}
                                 </div>
                             </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800 text-center">
+                                    <div v-if="(prod.estado_producto == 1)"
+                                        class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
+                                        Activo
+                                    </div>
+                                    <div v-else
+                                        class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-rose-100 text-rose-600">
+                                        Inactivo
+                                    </div>
+                                </div>
+                            </td>
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="space-x-1 text-center">
                                     <DropDownOptions>
                                         <div @click="showModalProd = true; prodId = prod.id_producto"
-                                            v-if="permits.actualizar === 1"
+                                            v-if="permits.actualizar === 1 && prod.estado_producto == 1"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
-                                            <div class="text-orange-800 w-[22px] h-[22px] mr-2">
+                                            <div class="text-orange-600 w-[22px] h-[22px] mr-2">
                                                 <icon-m :iconName="'editM'"></icon-m>
                                             </div>
                                             <div class="font-semibold pt-0.5">Editar</div>
+                                        </div>
+                                        <div @click="changeStatus(prod.id_producto, prod.estado_producto)"
+                                            v-if="permits.eliminar == 1"
+                                            class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
+                                            <div class="ml-0.5 mr-2 w-5 h-5"
+                                                :class="prod.estado_producto == 1 ? 'text-red-800' : 'text-green-800'">
+                                                <span class="text-xs ">
+                                                    <icon-m
+                                                        :iconName="prod.estado_producto == 1 ? 'desactivate' : 'activate'">
+                                                    </icon-m>
+                                                </span>
+                                            </div>
+                                            <div class="font-semibold">
+                                                {{ prod.estado_producto == 1 ? 'Desactivar' : 'Activar' }}
+                                            </div>
                                         </div>
                                     </DropDownOptions>
                                 </div>
@@ -96,7 +123,7 @@
                     </tbody>
                     <tbody v-else>
                         <tr>
-                            <td colspan="7" class="text-center">
+                            <td colspan="8" class="text-center">
                                 <img src="../../../img/IsSearching.gif" alt="" class="w-60 h-60 mx-auto">
                                 <h1 class="font-medium text-xl mt-4">Cargando!!!</h1>
                                 <p class="text-sm text-gray-600 mt-2 pb-10">Por favor espera un momento mientras se carga la
@@ -106,7 +133,7 @@
                     </tbody>
                     <tbody v-if="emptyObject && !isLoadinRequest">
                         <tr>
-                            <td colspan="7" class="text-center">
+                            <td colspan="8" class="text-center">
                                 <img src="../../../img/NoData.gif" alt="" class="w-60 h-60 mx-auto">
                                 <h1 class="font-medium text-xl mt-4">No se encontraron resultados!</h1>
                                 <p class="text-sm text-gray-600 mt-2 pb-10">Parece que no hay registros disponibles en este
@@ -168,16 +195,9 @@ import Datatable from "@/Components-ISRI/Datatable.vue";
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
 import ModalProductosVue from '@/Components-ISRI/UCP/ModalProductos.vue';
 
-import moment from 'moment';
 import { ref, toRefs } from 'vue';
 import { usePermissions } from '@/Composables/General/usePermissions.js';
 import { useToDataTable } from '@/Composables/General/useToDataTable.js';
-
-
-import { toast } from 'vue3-toastify';
-import 'vue3-toastify/dist/index.css';
-
-import axios from 'axios';
 
 export default {
     components: { Head, AppLayoutVue, Datatable, IconM, ModalProductosVue },
@@ -196,25 +216,37 @@ export default {
         const prodId = ref(0)
 
         const columns = [
-            { width: "10%", label: "ID", name: "id_producto", type: "text" },
-            { width: "27%", label: "Nombre", name: "nombre_producto", type: "text" },
+            { width: "8%", label: "ID", name: "id_producto", type: "text" },
+            { width: "24%", label: "Nombre", name: "nombre_producto", type: "text" },
             { width: "20%", label: "Descripcion", name: "descripcion_producto", type: "text" },
-            { width: "10%", label: "Especifico", name: "id_ccta_presupuestal", type: "text" },
+            { width: "8%", label: "Especifico", name: "id_ccta_presupuestal", type: "text" },
             { width: "13%", label: "Medida", name: "unidad_medida", type: "text" },
             { width: "10%", label: "Precio", name: "precio_producto", type: "text" },
-            { width: "10%", label: "Acciones", name: "Acciones" },
+            {
+                width: "9%", label: "Estado", name: "estado_producto", type: "select",
+                options: [
+                    { value: "1", label: "Activo" },
+                    { value: "0", label: "Inactivo" }
+                ]
+            },
+            { width: "8%", label: "Acciones", name: "Acciones" },
         ];
         const requestUrl = "/productos"
         const columntToSort = "id_producto"
         const dir = 'desc'
 
         const inputsToValidate = ref([
-            { inputName: 'id_empleado', number: true, limit: 4 },
-            { inputName: 'codigo_empleado', number: false, limit: 5 },
-            { inputName: 'nombre_persona', number: false, limit: 50 },
-            { inputName: 'dui_persona', number: false, limit: 10 },
-            { inputName: 'dependencia', number: false, limit: 8 },
+            { inputName: 'id_producto', number: true, limit: 6 },
+            { inputName: 'nombre_producto', number: false, limit: 50 },
+            { inputName: 'descripcion_producto', number: false, limit: 50 },
+            { inputName: 'id_ccta_presupuestal', number: true, limit: 5 },
+            { inputName: 'unidad_medida', number: false, limit: 10 },
+            { inputName: 'precio_producto', number: true, limit: 8 },
         ])
+
+        const changeStatus = async (id, status) => {
+            await changeStatusElement(id, status, "/change-status-product")
+        }
 
         const {
             dataToShow,
@@ -230,7 +262,7 @@ export default {
         return {
             permits, dataToShow, showModalProd, tableData, perPage, prodId, inputsToValidate,
             links, sortKey, sortOrders, isLoadinRequest, isLoadingTop, emptyObject, columns,
-            getDataToShow, handleData, sortBy, changeStatusElement, moment
+            getDataToShow, handleData, sortBy, changeStatusElement, changeStatus
         };
     },
 }
