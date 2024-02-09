@@ -543,6 +543,14 @@ class EvaluacionController extends Controller
                 "evaluaciones_personal.incidentes_evaluacion" => function ($query) {
                     return $query->where("estado_incidente_evaluacion", 1);
                 },
+                "evaluaciones_personal" => function ($query) use ($evaluacionInsertedId) {
+                    $query->find($evaluacionInsertedId)
+                        ->orderBy("fecha_reg_evaluacion_personal", "asc");
+                    return $query;
+                },
+                "evaluaciones_personal.incidentes_evaluacion" => function ($query) {
+                    return $query->where("estado_incidente_evaluacion", 1);
+                },
                 "evaluaciones_personal.detalle_evaluaciones_personal.categoria_rendimiento.evaluacion_rendimiento.tablas_rendimiento",
                 "evaluaciones_personal.detalle_evaluaciones_personal.rubrica_rendimiento",
                 "evaluaciones_personal.plaza_evaluada.plaza_asignada.detalle_plaza.plaza",
@@ -555,6 +563,23 @@ class EvaluacionController extends Controller
                 "evaluaciones_personal.periodo_evaluacion",
                 "evaluaciones_personal.estado_evaluacion_personal",
             ])->whereHas("evaluaciones_personal")->find($request->idEmpleado);
+
+            /*  $query = EvaluacionPersonal::with([
+                "incidentes_evaluacion" => function ($query) {
+                    return $query->where("estado_incidente_evaluacion", 1);
+                },
+                "detalle_evaluaciones_personal.categoria_rendimiento.evaluacion_rendimiento.tablas_rendimiento",
+                "detalle_evaluaciones_personal.rubrica_rendimiento",
+                "plaza_evaluada.plaza_asignada.detalle_plaza.plaza",
+                "plaza_evaluada.plaza_asignada.centro_atencion",
+                "plaza_evaluada.plaza_asignada.dependencia.jefatura.empleado.plazas_asignadas.detalle_plaza.plaza",
+                "plaza_evaluada.plaza_asignada.dependencia.jefatura.empleado.plazas_asignadas.centro_atencion",
+                "plaza_evaluada.plaza_asignada.dependencia.jefatura.empleado.plazas_asignadas.dependencia",
+                "evaluacion_rendimiento",
+                "tipo_evaluacion_personal",
+                "periodo_evaluacion",
+                "estado_evaluacion_personal",
+            ])->find($evaluacionInsertedId); */
 
             DB::commit();
 

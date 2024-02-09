@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Luecano\NumeroALetras\NumeroALetras;
 
+
 class FiniquitoController extends Controller
 {
     public function getFiniquitos(Request $request)

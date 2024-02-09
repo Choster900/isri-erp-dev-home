@@ -1,9 +1,11 @@
 <template>
     <div>
-        <label :for="id" class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">{{ label }}
+        <label :for="id" class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white" :class="addClasesLabel">{{
+            label }}
             <span v-if="required" class="text-red-600 font-extrabold">*</span></label>
         <div class="relative">
-            <div v-if="withIcon" class="absolute inset-y-0 start-0 flex rounded-l-md items-center px-2 pointer-events-none border-r border-gray-300"
+            <div v-if="withIcon"
+                class="absolute inset-y-0 start-0 flex rounded-l-md items-center px-2 pointer-events-none border-r border-gray-300"
                 :class="iconColor">
                 <template v-if="iconName === 'email'">
                     <svg class="w-[22px] h-[22px] p-0.5 dark:text-gray-500" aria-hidden="true"
@@ -138,15 +140,14 @@
             <input :type="type" :id="id" :required="required" :value="modelValue" :placeholder="placeholder" :class="[{
                 'border border-red-400': hasError,
                 'border border-gray-300': !hasError,
-                'bg-gray-50 pl-12': withIcon, 
+                'bg-gray-50 pl-12': withIcon,
                 'pl-[14px]': !withIcon,
-                'bg-gray-200' : !withIcon && modelValue,
-                'bg-gray-50' : modelValue === '',
-            }], addClases" 
-            :validation="validation" @input="updateValue($event)"
+                'bg-gray-200': !withIcon && modelValue,
+                'bg-gray-50': modelValue === '',
+            }], addClases" :validation="validation" @input="updateValue($event)"
                 class="text-gray-900 focus:ring-blue-500 focus:border-blue-500 block w-full font-semibold text-[12px] placeholder-gray-400
-                dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 hover:border-gray-400 transition duration-300 ease-in-out" 
-                style="border-radius: 4px;"/>
+                dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 hover:border-gray-400 transition duration-300 ease-in-out"
+                style="border-radius: 4px;" />
         </div>
     </div>
 </template>
@@ -172,6 +173,10 @@ export default {
             default: 'text-[#001c48]'
         },
         addClases: {
+            type: String,
+            default: ''
+        },
+        addClasesLabel: {
             type: String,
             default: ''
         },
@@ -207,7 +212,7 @@ export default {
     },
     emits: ["update:modelValue"],
     setup(props, { emit }) {
-        const { validation } = toRefs(props);
+        const { validation, withIcon } = toRefs(props);
 
         const updateValue = ($event) => {
 
@@ -228,8 +233,16 @@ export default {
 
             if (validation.value.amount) {
                 let x = $event.target.value.replace(/^\./, '').replace(/[^0-9.]/g, '');
+                let regex = ""
+                if (withIcon.value) {
+                    regex = /^(\d+)?([.]?\d{0,2})?$/;
+                } else {
+                    if (!x.startsWith('$')) {
+                        x = '$' + x;
+                    }
+                    regex = /^\$?(\d+)?([.]?\d{0,2})?$/;
+                }
                 $event.target.value = x;
-                const regex = /^(\d+)?([.]?\d{0,2})?$/;
                 if (!regex.test($event.target.value)) {
                     const matched = $event.target.value.match(regex);
                     $event.target.value = matched ? matched[0] : x.substring(0, x.length - 1);
