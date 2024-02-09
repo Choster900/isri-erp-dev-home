@@ -1,6 +1,6 @@
 <template>
-    <Head title="Proceso - Finiquitos" />
-    <AppLayoutVue nameSubModule="Juridico - Finiquitos" :colorSide="' bg-[#343a40] '">
+    <Head title="Catalogo - Productos" />
+    <AppLayoutVue nameSubModule="UCP - Productos" :colorSide="' bg-[#343a40] '">
         <div v-if="isLoadingTop"
             class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
             <div role="status" class="flex items-center">
@@ -20,8 +20,8 @@
         </div>
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="showModalSettlement = true" v-if="permits.insertar == 1"
-                    color="bg-green-700  hover:bg-green-800" text="Crear Finiquito" icon="add" />
+                <GeneralButton @click="showModalProd = true; prodId = 0;" v-if="permits.insertar == 1"
+                    color="bg-green-700  hover:bg-green-800" text="Crear producto" icon="add" />
             </div>
         </div>
 
@@ -37,7 +37,7 @@
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Finiquitos: <span class="text-slate-400 font-medium">{{
+                    <h2 class="font-semibold text-slate-800 pt-1">Productos: <span class="text-slate-400 font-medium">{{
                         tableData.total
                     }}</span></h2>
                 </div>
@@ -45,68 +45,76 @@
             <div class="overflow-x-auto">
                 <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
                     :staticSelect="false" @sort="sortBy" @datos-enviados="handleData($event)"
-                    @execute-search="getDataToShow()">
+                    :inputsToValidate="inputsToValidate" @execute-search="getDataToShow()">
                     <tbody v-if="!isLoadinRequest" class="text-sm divide-y divide-slate-200">
-                        <tr v-for="finiquito in dataToShow" :key="finiquito.id_finiquito_laboral" class="hover:bg-gray-200">
+                        <tr v-for="prod in dataToShow" :key="prod.id_producto" class="hover:bg-gray-200">
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 flex items-center justify-center min-h-[50px]">
-                                    {{ finiquito.empleado.persona.dui_persona }}
+                                    {{ prod.id_producto }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5 max-w-[27%]">
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{ prod.nombre_producto }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5 max-w-[20%]">
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{ prod.descripcion_producto }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ finiquito.empleado.persona.pnombre_persona }}
-                                    {{ finiquito.empleado.persona.snombre_persona }}
-                                    {{ finiquito.empleado.persona.tnombre_persona }}
-                                    {{ finiquito.empleado.persona.papellido_persona }}
-                                    {{ finiquito.empleado.persona.sapellido_persona }}
-                                    {{ finiquito.empleado.persona.tapellido_persona }}
+                                    {{ prod.id_ccta_presupuestal }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5 max-w-[13%]">
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{ prod.unidad_medida.nombre_unidad_medida }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5">
+                                <div class="font-medium text-slate-800 text-center">
+                                    ${{ prod.precio_producto }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ moment(finiquito.fecha_firma_finiquito_laboral).format('DD/MM/YYYY') }}
-                                </div>
-                            </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">
-                                    {{ finiquito.hora_firma_finiquito_laboral }}
-                                </div>
-                            </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">
-                                    ${{ finiquito.monto_finiquito_laboral }}
-                                </div>
-                            </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">
-                                    <div v-if="(finiquito.firmado_finiquito_laboral == 1)"
+                                    <div v-if="(prod.estado_producto == 1)"
                                         class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
-                                        Firmado
+                                        Activo
                                     </div>
-                                    <div v-else-if="(finiquito.firmado_finiquito_laboral == 0)"
-                                        class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-red-100 text-red-500">
-                                        No firmado
+                                    <div v-else
+                                        class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-rose-100 text-rose-600">
+                                        Inactivo
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                            <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="space-x-1 text-center">
                                     <DropDownOptions>
-                                        <div @click="showModalSettlementEmp = true; finiquitoId = finiquito.id_finiquito_laboral"
-                                            v-if="permits.actualizar === 1 && finiquito.firmado_finiquito_laboral != 1"
+                                        <div @click="showModalProd = true; prodId = prod.id_producto"
+                                            v-if="permits.actualizar === 1 && prod.estado_producto == 1"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
-                                            <div class="text-orange-800 w-[22px] h-[22px] mr-2">
+                                            <div class="text-orange-600 w-[22px] h-[22px] mr-2">
                                                 <icon-m :iconName="'editM'"></icon-m>
                                             </div>
                                             <div class="font-semibold pt-0.5">Editar</div>
                                         </div>
-                                        <div @click="showSettlement = true; finiquitoId = finiquito.id_finiquito_laboral"
+                                        <div @click="changeStatus(prod.id_producto, prod.estado_producto)"
+                                            v-if="permits.eliminar == 1"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
-                                            <div class="text-blue-800 w-[25px] h-[25px] mr-2">
-                                                <icon-m :iconName="'see'"></icon-m>
+                                            <div class="ml-0.5 mr-2 w-5 h-5"
+                                                :class="prod.estado_producto == 1 ? 'text-red-800' : 'text-green-800'">
+                                                <span class="text-xs ">
+                                                    <icon-m
+                                                        :iconName="prod.estado_producto == 1 ? 'desactivate' : 'activate'">
+                                                    </icon-m>
+                                                </span>
                                             </div>
-                                            <div class="font-semibold pt-0.5">Ver</div>
+                                            <div class="font-semibold">
+                                                {{ prod.estado_producto == 1 ? 'Desactivar' : 'Activar' }}
+                                            </div>
                                         </div>
                                     </DropDownOptions>
                                 </div>
@@ -115,7 +123,7 @@
                     </tbody>
                     <tbody v-else>
                         <tr>
-                            <td colspan="7" class="text-center">
+                            <td colspan="8" class="text-center">
                                 <img src="../../../img/IsSearching.gif" alt="" class="w-60 h-60 mx-auto">
                                 <h1 class="font-medium text-xl mt-4">Cargando!!!</h1>
                                 <p class="text-sm text-gray-600 mt-2 pb-10">Por favor espera un momento mientras se carga la
@@ -125,7 +133,7 @@
                     </tbody>
                     <tbody v-if="emptyObject && !isLoadinRequest">
                         <tr>
-                            <td colspan="7" class="text-center">
+                            <td colspan="8" class="text-center">
                                 <img src="../../../img/NoData.gif" alt="" class="w-60 h-60 mx-auto">
                                 <h1 class="font-medium text-xl mt-4">No se encontraron resultados!</h1>
                                 <p class="text-sm text-gray-600 mt-2 pb-10">Parece que no hay registros disponibles en este
@@ -174,16 +182,8 @@
             </div>
         </div>
 
-        <modal-finiquitos-vue v-if="showModalSettlement" :showModalSettlement="showModalSettlement"
-            @cerrar-modal="showModalSettlement = false" @get-table="getDataToShow(tableData.currentPage)" />
-
-        <modal-finiquito-emp-vue v-if="showModalSettlementEmp" :showModalSettlementEmp="showModalSettlementEmp"
-            :finiquitoId="finiquitoId" @cerrar-modal="showModalSettlementEmp = false"
-            @get-table="getDataToShow(tableData.currentPage)" />
-
-        <modal-show-finiquito-vue v-if="showSettlement" :showSettlement="showSettlement"
-            :finiquitoId="finiquitoId" @cerrar-modal="showSettlement = false" :permits="permits"
-            @get-table="getDataToShow(tableData.currentPage)" />
+        <modal-productos-vue v-if="showModalProd" :showModalProd="showModalProd" :prodId="prodId"
+            @cerrar-modal="showModalProd = false" @get-table="getDataToShow(tableData.currentPage)" />
 
     </AppLayoutVue>
 </template>
@@ -192,24 +192,15 @@
 import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
-import ModalFiniquitosVue from '@/Components-ISRI/Juridico/ModalFiniquitos.vue';
-import ModalFiniquitoEmpVue from '@/Components-ISRI/Juridico/ModalFiniquitoEmp.vue';
-import ModalShowFiniquitoVue from '@/Components-ISRI/Juridico/ModalShowFiniquito.vue';
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
+import ModalProductosVue from '@/Components-ISRI/UCP/ModalProductos.vue';
 
-import moment from 'moment';
-import { ref, toRefs, computed, onMounted, watch } from 'vue';
+import { ref, toRefs } from 'vue';
 import { usePermissions } from '@/Composables/General/usePermissions.js';
 import { useToDataTable } from '@/Composables/General/useToDataTable.js';
 
-
-import { toast } from 'vue3-toastify';
-import 'vue3-toastify/dist/index.css';
-
-import axios from 'axios';
-
 export default {
-    components: { Head, AppLayoutVue, Datatable, IconM, ModalFiniquitosVue, ModalFiniquitoEmpVue, ModalShowFiniquitoVue },
+    components: { Head, AppLayoutVue, Datatable, IconM, ModalProductosVue },
     props: {
         menu: {
             type: Object,
@@ -220,31 +211,42 @@ export default {
         const { menu } = toRefs(props);
         const permits = usePermissions(menu.value, window.location.pathname);
 
-        const showModalSettlement = ref(false)
-        const showModalSettlementEmp = ref(false)
-        const showSettlement = ref(false)
+        const showModalProd = ref(false)
 
-        const finiquitoId = ref(0)
+        const prodId = ref(0)
 
         const columns = [
-            { width: "14%", label: "DUI", name: "dui_empleado", type: "text" },
-            { width: "33%", label: "Nombre", name: "nombre_empleado", type: "text" },
-            { width: "12%", label: "Fecha firma", name: "fecha_firma_finiquito_laboral", type: "date" },
-            { width: "10%", label: "Hora firma", name: "hora_firma_finiquito_laboral", type: "text" },
-            { width: "11%", label: "monto", name: "monto_finiquito_laboral", type: "text" },
+            { width: "8%", label: "ID", name: "id_producto", type: "text" },
+            { width: "24%", label: "Nombre", name: "nombre_producto", type: "text" },
+            { width: "20%", label: "Descripcion", name: "descripcion_producto", type: "text" },
+            { width: "8%", label: "Especifico", name: "id_ccta_presupuestal", type: "text" },
+            { width: "13%", label: "Medida", name: "unidad_medida", type: "text" },
+            { width: "10%", label: "Precio", name: "precio_producto", type: "text" },
             {
-                width: "10%", label: "Estado", name: "firmado_finiquito_laboral", type: "select",
+                width: "9%", label: "Estado", name: "estado_producto", type: "select",
                 options: [
-                    { value: "1", label: "Firmado" },
-                    { value: "0", label: "No Firmado" }
+                    { value: "1", label: "Activo" },
+                    { value: "0", label: "Inactivo" }
                 ]
             },
-            { width: "10%", label: "Acciones", name: "Acciones" },
+            { width: "8%", label: "Acciones", name: "Acciones" },
         ];
-        const requestUrl = "/finiquitos"
-        const columntToSort = "id_ejercicio"
+        const requestUrl = "/productos"
+        const columntToSort = "id_producto"
         const dir = 'desc'
-        const initialCol = -1 // Opcional, el composable recibe 0 por defecto
+
+        const inputsToValidate = ref([
+            { inputName: 'id_producto', limit: 6 },
+            { inputName: 'nombre_producto', limit: 50 },
+            { inputName: 'descripcion_producto', limit: 50 },
+            { inputName: 'id_ccta_presupuestal', number: true, limit: 5 },
+            { inputName: 'unidad_medida', limit: 10 },
+            { inputName: 'precio_producto', amount: true, limit: 8 },
+        ])
+
+        const changeStatus = async (id, status) => {
+            await changeStatusElement(id, status, "/change-status-product")
+        }
 
         const {
             dataToShow,
@@ -255,17 +257,15 @@ export default {
             isLoadingTop,
             emptyObject,
             getDataToShow, handleData, sortBy, changeStatusElement
-        } = useToDataTable(columns, requestUrl, columntToSort, dir, initialCol)
+        } = useToDataTable(columns, requestUrl, columntToSort, dir)
 
         return {
-            permits, dataToShow, showModalSettlement, tableData, perPage, showModalSettlementEmp, finiquitoId,
-            links, sortKey, sortOrders, isLoadinRequest, isLoadingTop, emptyObject, columns, showSettlement,
-            getDataToShow, handleData, sortBy, changeStatusElement, moment
+            permits, dataToShow, showModalProd, tableData, perPage, prodId, inputsToValidate,
+            links, sortKey, sortOrders, isLoadinRequest, isLoadingTop, emptyObject, columns,
+            getDataToShow, handleData, sortBy, changeStatusElement, changeStatus
         };
     },
 }
 </script>
 
-<style>
-
-</style>
+<style></style>

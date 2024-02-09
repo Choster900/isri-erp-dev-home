@@ -186,8 +186,8 @@ import moment from 'moment';
                                         <p class="text-sm text-gray-600">Ultima modificación</p>
                                         <p class="text-base font-medium text-navy-700 "> {{
                                             allUserInfo.usuario.fecha_mod_usuario ?
-                                            moment(allUserInfo.usuario.fecha_mod_usuario).format('DD/MM/YYYY') :
-                                            moment(allUserInfo.usuario.fecha_reg_usuario).format('DD/MM/YYYY') }} </p>
+                                            moment(allUserInfo.usuario.fecha_mod_usuario).fromNow() :
+                                            moment(allUserInfo.usuario.fecha_reg_usuario).fromNow() }} </p>
                                     </div>
                                     <div class="md:w-[40%]">
                                         <p class="text-sm text-gray-600">Usuario ejecuto acción</p>
@@ -224,7 +224,7 @@ import moment from 'moment';
                                             <td class="text-center">{{ showRolName(rol.rolId) }}</td>
                                             <td class="text-center">
                                                 <div class="space-x-1 h-7">
-                                                    <button @click="editRol(rol, index)"
+                                                    <button @click="editRol(rol, rol.index)"
                                                         class="text-slate-400 hover:text-slate-500 rounded-full">
                                                         <span class="sr-only">Edit</span>
                                                         <svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
@@ -233,7 +233,7 @@ import moment from 'moment';
                                                             </path>
                                                         </svg>
                                                     </button>
-                                                    <button @click="deleteRol(rol.systemId, index)"
+                                                    <button @click="deleteRol(rol.systemId, rol.index)"
                                                         class="text-rose-500 hover:text-rose-600 rounded-full">
                                                         <span class="sr-only">Delete</span><svg class="w-6 h-6 fill-current"
                                                             viewBox="0 0 32 32">
@@ -361,12 +361,13 @@ export default {
             }
         },
         setRolesValue(roles) {
-            roles.forEach(element => {
+            roles.forEach((element,index2) => {
                 let array = {
                     accessId: element.pivot.id_permiso_usuario,
                     rolId: element.id_rol,
                     systemId: element.sistema.id_sistema,
-                    deletedVw: element.pivot.estado_permiso_usuario === 0 ? true : false
+                    deletedVw: element.pivot.estado_permiso_usuario === 0 ? true : false,
+                    index : index2
                 }
                 this.userRoles.push(array)
             });

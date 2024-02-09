@@ -20,4 +20,6 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('update-finiquito', [FiniquitoController::class, 'updateFiniquito'])->name('finiquito.updateFiniquito');
     //Route to manage show settlement modal
     Route::get('get-info-modal-show-finiquito/{id}', [FiniquitoController::class, 'getInfoForModalShowFiniquito'])->name('finiquito.getInfoForModalShowFiniquito');
+    Route::get('print-settlement/{id}', [FiniquitoController::class, 'printSettlement'])->name('finiquito.printSettlement');
+
 });

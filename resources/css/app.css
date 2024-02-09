@@ -2,11 +2,12 @@
 @import url('../../public/css/font_poppins.css');
 @import url('../../public/css/font_bembo.css');
 @import url('../../public/css/font_museo_sans.css');
+@import url('../../public/css/font_roboto.css');
 @import '@vueform/multiselect/themes/default.css';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 *{
-    font-family: 'Poppins', sans-serif,'Bembo','MuseoSans';
+    font-family: 'Poppins', sans-serif,'Bembo','MuseoSans', 'Roboto';
 }

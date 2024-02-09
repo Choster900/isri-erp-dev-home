@@ -117,10 +117,14 @@ export const useDependencia = (context) => {
     const asyncFindEmployee = _.debounce(async (query) => {
         try {
             isLoadingEmployee.value = true;
-            const response = await axios.post("/search-employee", {
-                busqueda: query,
-            });
-            employees.value = response.data.employees;
+            if (query.length > 3) {
+                const response = await axios.post("/search-employee", {
+                    busqueda: query,
+                });
+                employees.value = response.data.employees;
+            } else {
+                employees.value = [];
+            }
         } catch (errors) {
             employees.value = [];
         } finally {
@@ -143,17 +147,17 @@ export const useDependencia = (context) => {
 
         if (data.dependency) {
             Object.assign(depInfo.value, {
-                id:             data.dependency.id_dependencia,
-                type:           data.dependency.id_tipo_dependencia,
-                jerarquia:      data.dependency.jerarquia_organizacion_dependencia ?? 0,
-                personId:       data.dependency.id_persona,
-                parentId:       data.dependency.jerarquia_organizacion_dependencia ?? 1,
-                centerId:       data.dependency.id_centro_atencion,
-                depName:        data.dependency.nombre_dependencia,
-                email:          data.dependency.email_dependencia,
-                code:           data.dependency.codigo_dependencia,
-                phoneNumber:    data.dependency.telefono_dependencia,
-                address:        data.dependency.direccion_dependencia,
+                id: data.dependency.id_dependencia,
+                type: data.dependency.id_tipo_dependencia,
+                jerarquia: data.dependency.jerarquia_organizacion_dependencia ?? 0,
+                personId: data.dependency.id_persona,
+                parentId: data.dependency.jerarquia_organizacion_dependencia ?? 1,
+                centerId: data.dependency.id_centro_atencion,
+                depName: data.dependency.nombre_dependencia,
+                email: data.dependency.email_dependencia,
+                code: data.dependency.codigo_dependencia,
+                phoneNumber: data.dependency.telefono_dependencia,
+                address: data.dependency.direccion_dependencia,
             });
         }
     };

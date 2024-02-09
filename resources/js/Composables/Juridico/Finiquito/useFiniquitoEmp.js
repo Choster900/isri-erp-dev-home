@@ -4,7 +4,6 @@ import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
 import { toast } from "vue3-toastify";
 import { useFormatDateTime } from "@/Composables/General/useFormatDateTime.js";
-import moment from 'moment';
 
 export const useFiniquitoEmp = (context) => {
     const swal = inject("$swal");
@@ -19,6 +18,10 @@ export const useFiniquitoEmp = (context) => {
         signatureDate: '',
         amount: ''
     })
+
+    const {
+        formatDateVue3DP, formatTimeVue3DP
+    } = useFormatDateTime()
 
     const {
         formatDateVue3DP, formatTimeVue3DP
@@ -45,6 +48,13 @@ export const useFiniquitoEmp = (context) => {
     };
 
     const setModalValues = (data) => {
+        let finiquito = data.finiquitoEmp
+        finiquitoEmp.value.id = finiquito.id_finiquito_laboral
+        finiquitoEmp.value.signatureTime = formatTimeVue3DP(finiquito.hora_firma_finiquito_laboral)
+        finiquitoEmp.value.signatureDate = formatDateVue3DP(finiquito.fecha_firma_finiquito_laboral);
+        finiquitoEmp.value.amount = finiquito.monto_finiquito_laboral
+        finiquitoEmp.value.empleado = finiquito.empleado.persona.nombre_apellido
+        finiquitoEmp.value.codigo = finiquito.empleado.codigo_empleado
         let finiquito = data.finiquitoEmp
         finiquitoEmp.value.id = finiquito.id_finiquito_laboral
         finiquitoEmp.value.signatureTime = formatTimeVue3DP(finiquito.hora_firma_finiquito_laboral)
