@@ -168,10 +168,6 @@ export default {
             type: Boolean,
             default: false
         },
-        dSign: {
-            type: Boolean,
-            default: false
-        },
         iconColor: {
             type: String,
             default: 'text-[#001c48]'
@@ -216,7 +212,7 @@ export default {
     },
     emits: ["update:modelValue"],
     setup(props, { emit }) {
-        const { validation, dSign } = toRefs(props);
+        const { validation, withIcon } = toRefs(props);
 
         const updateValue = ($event) => {
 
@@ -237,11 +233,16 @@ export default {
 
             if (validation.value.amount) {
                 let x = $event.target.value.replace(/^\./, '').replace(/[^0-9.]/g, '');
-                if (!x.startsWith('$')) {
-                    x = '$' + x;
+                let regex = ""
+                if (withIcon.value) {
+                    regex = /^(\d+)?([.]?\d{0,2})?$/;
+                } else {
+                    if (!x.startsWith('$')) {
+                        x = '$' + x;
+                    }
+                    regex = /^\$?(\d+)?([.]?\d{0,2})?$/;
                 }
                 $event.target.value = x;
-                const regex = /^\$?(\d+)?([.]?\d{0,2})?$/;
                 if (!regex.test($event.target.value)) {
                     const matched = $event.target.value.match(regex);
                     $event.target.value = matched ? matched[0] : x.substring(0, x.length - 1);

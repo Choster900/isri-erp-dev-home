@@ -55,7 +55,7 @@
             <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
                 <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
                     <input-text label="Precio referencia" :withIcon="false" id="price" v-model="prod.price" type="text"
-                        placeholder="Escriba precio" :required="true" :addClases="'h-[35px]'"
+                        placeholder="Escriba precio" :required="true" :addClases="'h-[35px]'" :dSign="true"
                         :validation="{ limit: 10, amount: true }">
                     </input-text>
                     <InputError v-for="(item, index) in errors.price" :key="index" class="mt-2" :message="item" />
