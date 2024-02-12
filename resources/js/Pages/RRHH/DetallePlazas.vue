@@ -302,11 +302,11 @@ export default {
                     this.links[this.links.length - 1].label = "Siguiente";
                     this.jobPositions = data.data.data;
                     this.jobPositions.length > 0 ? this.emptyObject = false : this.emptyObject = true
-                    this.isLoadinRequest = false
                 }
             }).catch((errors) => {
                 this.manageError(errors, this)
             })
+            .finally(()=> {this.isLoadinRequest = false;})
         },
         sortBy(key) {
             if (key != "Acciones") {
