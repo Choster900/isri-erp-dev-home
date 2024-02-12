@@ -100,7 +100,7 @@ import html2pdf from 'html2pdf.js'
                                 4&#41; Cargo:
                             </div>
                             <div class="relative  text-[6pt]" style="top: -7px;" v-if="beneficiarios != ''">
-                               <!--  {{ beneficiarios.empleado.plazas_asignadas.
+                                <!--  {{ beneficiarios.empleado.plazas_asignadas.
                                     filter((plaza) => plaza.estado_plaza_asignada == 1).map((plaza, index) => {
                                         return `${plaza.detalle_plaza.plaza.nombre_plaza}`
                                     }).join(", ")
@@ -116,7 +116,8 @@ import html2pdf from 'html2pdf.js'
                                 5&#41; Dirección del Asegurado:
                             </div>
                             <div class="relative pl-4 text-[6pt]" style="top: -7px;" v-if="beneficiarios != ''">
-                                {{ beneficiarios.residencias.find(index => index.estado_residencia == 1).direccion_residencia }}
+                                {{ beneficiarios.residencias.find(index => index.estado_residencia ==
+                                    1).direccion_residencia }}
                             </div>
                         </td>
                     </tr>
