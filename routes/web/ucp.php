@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\UCP\BienesServiciosController;
 use App\Http\Controllers\UCP\ProductoController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -24,4 +25,6 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             return checkModuleAccessAndRedirect($request->user()->id_usuario, '/ucp/bienes-servicvios', 'UCP/BienesServicios');
         }
     )->name('ucp.bienes-servicios');
+    Route::post('get-all-linea-trabajo', [BienesServiciosController::class, 'getAllLineaTrabajo'])->name('bieneservicios.getAllLineaTrabajo');
+
 });

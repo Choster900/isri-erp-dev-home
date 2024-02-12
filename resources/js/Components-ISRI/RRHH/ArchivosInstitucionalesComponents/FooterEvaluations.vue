@@ -3,8 +3,7 @@
 <template>
     <div class="w-full chart-container">
         <LineChart :chart-data="data" :options="options" class="h-44" />
-    <div class="w-full chart-container">
-        <LineChart :chart-data="data" :options="options" class="h-44" />
+
 
         <div class="flex flex-col md:flex-row  md:space-y-0">
 
@@ -255,24 +254,9 @@ export default {
             yearsArray.value = uniqueYearsArray;
             year.value = yearsArray.value[yearsArray.value.length - 1];
             newFilteredDataSet(year.value);
-        };
-
-        const newFilteredDataSet = (selectedYear) => {
-
-            if (
-                userData.value &&
-                userData.value.evaluaciones_personal &&
-                userData.value.evaluaciones_personal.length > 0
-            ) {
-
-                newFilteredData.value = userData.value.evaluaciones_personal.filter(obj => moment(obj.fecha_inicio_evaluacion_personal).year() === selectedYear);
-
-            } else {
-                newFilteredData.value = []
-            }
+        })
 
 
-        };
 
         onMounted(() => {
             filterAllYearsInDeals();
@@ -287,10 +271,7 @@ export default {
                 userData.value.evaluaciones_personal.forEach(element => {
                     data.value.labels.push(`${element.periodo_evaluacion.nombre_periodo_evaluacion} - ${moment(element.fecha_inicio_evaluacion_personal).year()}`);
                     data.value.datasets[0].data.push(element.puntaje_evaluacion_personal);
-            if (userData.value !== '') {
-                userData.value.evaluaciones_personal.forEach(element => {
-                    data.value.labels.push(`${element.periodo_evaluacion.nombre_periodo_evaluacion} - ${moment(element.fecha_inicio_evaluacion_personal).year()}`);
-                    data.value.datasets[0].data.push(element.puntaje_evaluacion_personal);
+
                 });
             }
 
@@ -364,8 +345,8 @@ export default {
             // Otras variables y funciones computadas si es necesario
         };
     }
-};
-};
+}
+
 </script>
 
 <style></style>

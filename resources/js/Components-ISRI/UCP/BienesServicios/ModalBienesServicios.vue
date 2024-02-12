@@ -11,11 +11,7 @@
                     </svg>
 
                 </div>
-                <div class="mx-6 mt-2">
-                    <!--   <h2 class="flex gap-2 text-xl text-slate-800 font-medium mb-6">Evaluación de Desempeño para Personal
-                        Administrativo</h2> -->
-                </div>
-                <!-- <div class="border border-black mx-3"> -->
+                <div class="mx-6 mt-2"></div>
                 <div class="mx-4 overflow-y-auto h-[650px] py-3 pl-2 pr-4 mt-4">
                     <table class="w-[710px] sheet0 " border="0" cellpadding="0" cellspacing="0">
                         <col class="col0">
@@ -68,14 +64,16 @@
 
                             <tr>
                                 <td class="border border-black  h-5  " colspan="3">
-                                    <Multiselect :filter-results="false" :searchable="true" :clear-on-search="true"
+                                    <!--  <Multiselect :filter-results="false" :searchable="true" :clear-on-search="true"
                                         :min-chars="1" placeholder="Busca proveedores por nombre o razon social" :classes="{
                                             placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
                                             search: 'w-full absolute text-center inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5',
 
                                         }" noOptionsText="<p class='text-xs'>Lista vacia<p>"
                                         noResultsText="<p class='text-xs'>Sin resultados de personas <p>"
-                                        :options="[{ value: 1, label: 'CIA DE ALUMBRADO ELECTRICO DE SAN SALVADOR S.A DE C.V' }]" />
+                                        :options="[{ value: 1, label: 'CIA DE ALUMBRADO ELECTRICO DE SAN SALVADOR S.A DE C.V' }]" /> -->
+                                    <h1 class="text-xs font-medium text-center ">CIA DE ALUMBRADO ELECTRICO DE SAN SALVADOR
+                                        S.A DE C.V</h1>
                                 </td>
                                 <td class="border border-black  h-5  text-center text-[9pt] ">
                                     0614-071017-102-3
@@ -106,28 +104,29 @@
                         <thead>
                             <tr class="*:text-[8pt] *:bg-black *:text-white *:px-2 *:py-0.5 *:font-normal *:border--white">
                                 <th class="border border-black border-r-white border-b-white">CANTIDAD</th>
-                                <th class="border border-black border-r-white border-b-white" colspan="2">UNIDADES DE MEDIDA
-                                </th>
+                                <th class="border border-black border-r-white border-b-white" colspan="2">U/MEDIDAS</th>
                                 <th class="border border-black border-r-white border-b-white">ESPECIFICO</th>
                                 <th class="border border-black border-r-white border-b-white">DEPENDENCIA</th>
-                                <th class="border border-black border-r-white border-b-white w-60" colspan="2">DESCRIPCION
+                                <th class="border border-black border-r-white border-b-white">PRODUCTO
+                                </th>
+                                <th class="border border-black border-r-white w-40 border-b-white" colspan="2">DESCRIPCION
                                 </th>
                                 <th class="border border-black border-r-white">PRECIO UNITARIO</th>
                                 <th class="border border-black ">VALOR TOTAL</th>
                             </tr>
                         </thead>
-                        <tbody v-for="j in 1" :key="j">
+                        <tbody>
                             <tr class="*:border-black">
                                 <td colspan="2"
                                     class="uppercase border bg-black text-[8pt] text-white border-black border-t-white text-center">
                                     Linea de trabajo:</td>
                                 <td colspan="3" class="border border-t-black">
                                     <Multiselect :filter-results="false" :searchable="true" :clear-on-search="true"
-                                        :min-chars="1" :classes="{
-                                            placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                        :min-chars="1" placeholder="-" :classes="{
+                                            placeholder: ' flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
                                             search: 'w-full absolute text-center inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5',
                                             container: 'relative mx-auto w-full h-6  flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none',
-                                            singleLabel: 'pr-14 text-[9pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5  box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                            singleLabel: 'pr-14 text-[8pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5  box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
                                             option: 'flex items-center justify-start box-border text-left cursor-pointer text-[7.5pt] leading-snug py-2 px-3',
                                             optionSelected: 'text-white bg-[#001c48]',
                                             optionPointed: 'text-gray-800 bg-gray-100',
@@ -137,15 +136,14 @@
                                 </td>
                                 <td colspan="2"
                                     class="uppercase border bg-black text-[8pt] text-white border-black text-center">
-                                    Documento de
-                                    aquisicion:</td>
-                                <td colspan="3" class="border border-black">
+                                    Doc. Adquisición:</td>
+                                <td colspan="4" class="border border-black">
                                     <Multiselect :filter-results="false" :searchable="true" :clear-on-search="true"
-                                        :min-chars="1" :classes="{
+                                        placeholder="-" :min-chars="1" :classes="{
                                             placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
                                             search: 'w-full absolute text-center inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5',
                                             container: 'relative mx-auto w-full h-6  flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none',
-                                            singleLabel: 'pr-14 text-[9pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5  box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                            singleLabel: 'pr-14 text-[8pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5  box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
                                             option: 'flex items-center justify-start box-border text-left cursor-pointer text-[7.5pt] leading-snug py-2 px-3',
                                             optionSelected: 'text-white bg-[#001c48]',
                                             optionPointed: 'text-gray-800 bg-gray-100',
@@ -155,56 +153,97 @@
                                 </td>
                             </tr>
                             <tr class="*:text-[8pt]  *:px-2 *:py-0.5 *:font-normal *:border *:border-black hover:bg-slate-200"
-                                v-for="i in 5" :key="i">
-                                <td class="hover:bg-slate-400/60 w-12">
+                                v-for="i in 2" :key="i">
+                                <td class=" w-12 relative ">
                                     <input type="number"
-                                        class="w-full bg-transparent border-none text-center text-[8pt] p-0 outline-none focus:outline-none focus:ring focus:ring-transparent"
+                                        class="absolute top-0 left-0 w-full bg-transparent border-none pl-2 text-center text-[8pt] p-0 outline-none focus:outline-none focus:ring focus:ring-transparent"
                                         placeholder="0" min="0" max="1000" />
                                 </td>
 
-                                <td class="hover:bg-slate-400/60 " colspan="2">
-                                    KILOGRAMO
+
+
+                                <td class=" relative h-28" style="padding-left: 0 !important; padding-right: 0 !important; "
+                                    colspan="2">
+                                    <div class="absolute top-0 w-full flex flex-col items-center">
+                                        <Multiselect :filter-results="false" :searchable="false" :canClear="false"
+                                            :clear-on-search="true" :min-chars="1" :classes="{
+                                                placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                                search: 'w-full absolute text-center inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5',
+                                                container: 'relative mx-auto w-full h-6  flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none',
+                                                singleLabel: ' text-[8pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5  box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                                option: 'flex items-center justify-start box-border text-left cursor-pointer text-[7.5pt] leading-snug py-2 px-3',
+                                                optionSelected: 'text-white bg-[#001c48]',
+                                                optionPointed: 'text-gray-800 bg-gray-100',
+                                            }" noOptionsText="<p class='text-xs'>Lista vacia<p>"
+                                            noResultsText="<p class='text-xs'>Sin resultados de personas <p>"
+                                            :options="[{ value: 1, label: 'KG' }, { value: 2, label: 'T' }, { value: 3, label: 'ONZ' }]" />
+                                        <span class="text-center">
+                                            -
+                                        </span>
+                                    </div>
                                 </td>
-                                <td class="hover:bg-slate-400/60">54111</td>
-                                <td class="hover:bg-slate-400/60">ADMON SUPERIOR</td>
-                                <td class="hover:bg-slate-400/60 w-60" colspan="2">ARENA DE RIO</td>
-                                <td class="hover:bg-slate-400/60">$28.00</td>
-                                <td class="hover:bg-slate-400/60">$420.00</td>
-                            </tr>
-                            <tr>
-                                <td colspan="9" class="">
-                                    <button style="outline: none;"
-                                        class="w-full  border-4 border-dashed border-slate-300 hover:border-slate-400  my-3 py-1">
-                                        <div class="flex justify-center">
-                                            <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                                class="w-5 h-5 text-slate-600">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    d="M12 4.5v15m7.5-7.5h-15" />
-                                            </svg>
-                                            <span class="text-xs pt-0.5 text-slate-600">
-                                                AGREGAR NUEVA FILA
-                                            </span>
-                                        </div>
-                                    </button>
+                                <!-- Para el span -->
+                                <td class=" relative text-center">
+                                    <span class="absolute top-1 left-0 w-full flex flex-col items-center">4111</span>
+                                </td>
+                                <td class=" relative h-20 w-24"
+                                    style="padding-left: 0 !important; padding-right: 0 !important; ">
+                                    <div class="absolute top-0 w-full flex flex-col items-center">
+                                        <Multiselect :filter-results="false" :searchable="false" :canClear="false"
+                                            :clear-on-search="true" :min-chars="1" :classes="{
+                                                placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                                search: 'w-full absolute text-center inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5',
+                                                container: 'relative mx-auto w-full h-7  flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none',
+                                                singleLabel: 'pr-6 text-[8pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5  box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                                option: 'flex items-center justify-start box-border text-left cursor-pointer text-[7.5pt] leading-snug py-2 px-3',
+                                                optionSelected: 'text-white bg-[#001c48]',
+                                                optionPointed: 'text-gray-800 bg-gray-100',
+                                            }" noOptionsText="<p class='text-xs'>Lista vacia<p>"
+                                            noResultsText="<p class='text-xs'>Sin resultados de personas <p>"
+                                            :options="[{ value: 1, label: 'ADMON' }, { value: 2, label: 'CAA' }, { value: 3, label: 'CAL' }]" />
+                                        <span class="text-center mx-10 px-10">-</span>
+                                    </div>
+                                </td>
+                                <td class=" relative h-20 w-28"
+                                    style="padding-left: 0 !important; padding-right: 0 !important; ">
+                                    <div class="absolute top-0 w-full flex flex-col items-center">
+
+                                        <Multiselect :filter-results="false" :searchable="false" :canClear="false"
+                                            :clear-on-search="true" :min-chars="1" :classes="{
+                                                placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                                search: 'w-full absolute text-center inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5',
+                                                container: 'relative mx-auto w-full h-7  flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none',
+                                                singleLabel: 'pr-1 text-[8pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5  box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                                singleLabelText: 'text-center overflow-ellipsis overflow-hidden block whitespace-nowrap max-w-full',
+                                                option: 'flex items-center justify-start box-border text-left cursor-pointer text-[7.5pt] leading-snug py-2 px-3',
+                                                optionSelected: 'text-white bg-[#001c48]',
+                                                optionPointed: 'text-gray-800 bg-gray-100',
+                                            }" noOptionsText="<p class='text-xs'>Lista vacia<p>"
+                                            noResultsText="<p class='text-xs'>Sin resultados de personas <p>"
+                                            :options="[{ value: 1, label: '61102' }, { value: 2, label: '62201' }, { value: 3, label: '9999999' }]" />
+
+                                        <span class="text-center ">-</span>
+                                    </div>
+                                </td>
+                                <td class=" w-72 p-0 uppercase" colspan="2" contenteditable="true">
+                                </td>
+                                <td class=" relative text-center">
+                                    <div class="flex justify-center space-x-1 absolute top-0 left-0 ">
+                                        <!--  <div class="flex items-center">
+                                            <span>$</span>
+                                        </div> -->
+                                        <input type="text"
+                                            class="w-full bg-transparent border-none  text-center text-[8pt] p-0 outline-none focus:outline-none focus:ring focus:ring-transparent"
+                                            placeholder="$00.00" min="0" max="1000" />
+                                    </div>
+                                </td>
+                                <td class=" relative text-center w-20">
+                                    <span class="absolute top-1 left-0 w-full flex flex-col items-center">$1287.32</span>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
 
-                    <div>
-                        <button style="outline: none;"
-                            class="w-full  border-4 border-dashed border-slate-500 hover:border-slate-800  my-3 py-10 ">
-                            <div class="flex justify-center">
-                                <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                    class="w-6 h-6 text-slate-900">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                                </svg>
-                                <span class="text-sm font-medium pt-0.5 text-slate-900">
-                                    AGREGAR DETALLES DE ADQUISICION
-                                </span>
-                            </div>
-                        </button>
-                    </div>
                 </div>
 
                 <!--  </div> -->
@@ -213,18 +252,58 @@
     </template>
 </template>
 
+<!-- Este es un componente Vue.js que importa el componente ProcessModal -->
 <script>
+// Importa el componente ProcessModal desde la ruta relativa '@/Components-ISRI/AllModal/ProcessModal.vue'
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue';
+import { ref } from 'vue';
 
+// Define el componente Vue.js
 export default {
+    // Indica que este componente utiliza el componente ProcessModal
     components: { ProcessModal },
+
+    // Define un array de eventos personalizados que puede emitir este componente
     emit: ["cerrar-modal"],
+
+    // Define las propiedades que este componente puede recibir
     props: {
+        // La propiedad showModal es de tipo Booleano utilizado para manejar estado del modal y su valor predeterminado es falso
         showModal: {
             type: Boolean,
             default: false,
         },
+    },
+    // Configuración del componente utilizando el nuevo sistema de configuración de Vue 3
+    setup() {
+        const arrayProductoAdquisicion = ref([
+            {
+                idLt: 0,
+                idDetDocAdquisicion: 1,
 
+            }
+        ])
+
+        /**
+         * Obtener todas las lineas de trabajos
+         *
+         * @returns {Promise<object>} - Promesa que se resuelve con la respuesta del servidor.
+         */
+        const getAllLineaTrabajo = async () => {
+            try {
+                const resp = await axios.post("/get-all-linea-trabajo");
+                console.log(resp);
+            } catch (error) {
+                reject(error);
+                console.error("Error en la creación de la evaluación personal:", error);
+                throw new Error("Error en la creación de la evaluación personal");
+            }
+
+        };
+        getAllLineaTrabajo()
+        return {
+            arrayProductoAdquisicion,
+        };
     },
 }
 </script>
@@ -293,5 +372,10 @@ table.sheet0 col.col1 {
 td {
     outline: none;
     /* Desactiva el marco de enfoque */
+}
+
+#tabla_imprentas td {
+    padding: 0 !important;
+    margin: 0 !important;
 }
 </style>
