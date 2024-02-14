@@ -18,7 +18,7 @@ class TipoDocumentoAdquisicion extends Model
     protected $fillable = [
         'nombre_tipo_doc_adquisicion',
         'estado_tipo_doc_adquisicion',
-
+        'siglas_tipo_doc_adquisicion',
     ];
 
     /**

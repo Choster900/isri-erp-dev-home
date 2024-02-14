@@ -663,7 +663,6 @@ export default {
             this.getDestination()
         },
         setApprobalRejectButtons(permission) {
-            console.log(permission);
             if (this.showOptions && permission.id_estado_permiso != 3 && permission.id_estado_permiso != 4) {
                 const rolId = this.$page.props.menu.id_rol
                 const range = [14, 15, 16, 17]

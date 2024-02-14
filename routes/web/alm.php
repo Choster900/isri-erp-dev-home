@@ -1,0 +1,17 @@
+<?php
+
+use App\Http\Controllers\Almacen\RecepcionController;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+
+Route::group(['middleware' => ['auth', 'access']], function () {
+    Route::get(
+        '/alm/recepciones',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/recepciones', 'Almacen/Recepciones');
+        }
+    )->name('alm.recepciones');
+    Route::post('recepciones', [RecepcionController::class, 'getRecepciones'])->name('recepcion.getRecepciones');
+    Route::get('get-info-modal-recep/{id}', [RecepcionController::class, 'getInfoModalRecep'])->name('recepcion.getInfoModalRecep');
+    Route::get('get-initial-doc-info', [RecepcionController::class, 'getInitialInfoDoc'])->name('recepcion.getInitialInfoDoc');
+});
