@@ -57,9 +57,8 @@ import axios from 'axios';
                 <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
                     :inputsToValidate="inputsToValidate" @sort="sortBy" @datos-enviados="handleData($event)"
                     @execute-search="getPermissionRequests()">
-                    <tbody class="text-sm divide-y divide-slate-200">
-                        <tr v-for="permission in jobPermissions" :key="permission.id_permiso"
-                        class="hover:bg-gray-200">
+                    <tbody class="text-sm divide-y divide-slate-200" v-if="!isLoadinRequest">
+                        <tr v-for="permission in jobPermissions" :key="permission.id_permiso" class="hover:bg-gray-200">
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 flex items-center justify-center min-h-[50px]">
                                     {{ permission.id_permiso }}
@@ -123,16 +122,32 @@ import axios from 'axios';
                             </td>
                         </tr>
                     </tbody>
+                    <tbody v-else>
+                        <tr>
+                            <td colspan="7" class="text-center">
+                                <div class="flex items-center justify-center my-4">
+                                    <img src="../../../img/loader-spinner.gif" alt="" class="w-8 h-8">
+                                    <h1 class="ml-4 font-medium text-xl text-[#001c48]">Cargando...</h1>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody v-if="emptyObject && !isLoadinRequest">
+                        <tr>
+                            <td colspan="7" class="text-center">
+                                <p class="font-semibold text-red-500 text-[16px] py-4"
+                                    style="margin: 0 auto; text-align: center;">No se
+                                    encontraron registros.</p>
+                            </td>
+                        </tr>
+                    </tbody>
                 </datatable>
 
             </div>
-            <div v-if="emptyObject" class="flex text-center py-2">
-                <p class="font-semibold text-red-500 text-[16px]" style="margin: 0 auto; text-align: center;">No se
-                    encontraron registros.</p>
-            </div>
         </div>
 
-        <div v-if="!emptyObject" class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
+        <div v-if="!emptyObject && !isLoadinRequest"
+            class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
             <div>
                 <nav class="flex justify-between" role="navigation" aria-label="Navigation">
                     <div class="grow text-center">
@@ -194,19 +209,19 @@ export default {
         let sortOrders = {};
         let columns = [
             { width: "10%", label: "Id", name: "id_permiso", type: "text" },
-            { width: "25%", label: "Tipo permiso", name: "nombre_tipo_permiso", type: "text" },
+            { width: "23%", label: "Tipo permiso", name: "nombre_tipo_permiso", type: "text" },
             { width: "30%", label: "Empleado", name: "pnombre_persona", type: "text" },
             { width: "15%", label: "Fechas", name: "fecha_inicio_permiso", type: "date" },
             { width: "10%", label: "Tiempo", name: "horas", type: "text" },
             {
-                width: "10%", label: "Estado", name: "id_estado_permiso", type: "select",
+                width: "14%", label: "Estado", name: "id_estado_permiso", type: "select",
                 options: [
-                    { value: null, label: "Pendiente" },
-                    { value: "3", label: "Aprobado" },
-                    { value: "4", label: "Denegado" },
+                    { value: 1, label: "Pendiente" },
+                    { value: 2, label: "Aprobado" },
+                    { value: 3, label: "Denegado" },
                 ]
             },
-            { width: "10%", label: "Acciones", name: "Acciones" },
+            { width: "8%", label: "Acciones", name: "Acciones" },
         ];
         columns.forEach((column) => {
             if (column.name === 'id_permiso')
@@ -222,6 +237,7 @@ export default {
             limite: '',
             permissionToPrint: [],
             isLoading: false,
+            isLoadinRequest: false,
             emptyObject: false,
             //Data for datatable
             jobPermissions: [],
@@ -256,7 +272,7 @@ export default {
     methods: {
         checkApproval(permission) {
             const idRol = this.$page.props.menu.id_rol
-            if (idRol === 14) { //Jefe inmediato
+            if (idRol === 14 || idRol === 4) { //Jefe inmediato
                 if (permission.etapa_permiso[1]) {
                     if (permission.etapa_permiso[1].id_estado_etapa_permiso === 2) {
                         return 3 //Approved
@@ -271,7 +287,7 @@ export default {
                     return 1
                 }
             }
-            if (idRol === 15) { //Director de centro
+            if (idRol === 15 || idRol === 4) { //Director de centro
                 if (permission.etapa_permiso[1]) {
                     if (permission.etapa_permiso[1].id_estado_etapa_permiso === 4) {
                         return 3 //Approved
@@ -286,7 +302,7 @@ export default {
                     return 1
                 }
             }
-            if (idRol === 16) { //Direccion/Subdireccion Medica
+            if (idRol === 16 || idRol === 4) { //Direccion/Subdireccion Medica
                 if (permission.etapa_permiso[1]) {
                     if (permission.etapa_permiso[1].id_estado_etapa_permiso === 6) {
                         return 3 //Approved
@@ -301,7 +317,7 @@ export default {
                     return 1
                 }
             }
-            if (idRol === 17) { //Gerente General
+            if (idRol === 17 || idRol === 4) { //Gerente General
                 if (permission.etapa_permiso[1]) {
                     if (permission.etapa_permiso[1].id_estado_etapa_permiso === 8) {
                         return 3 //Approved
@@ -458,6 +474,7 @@ export default {
             this.tableData.draw++;
             this.tableData.currentPage = url
             this.tableData.execute = this.permits.ejecutar
+            this.isLoadinRequest = true
             await axios.post(url, this.tableData).then((response) => {
                 let data = response.data;
                 if (this.tableData.draw == data.draw) {
@@ -466,12 +483,12 @@ export default {
                     this.links[0].label = "Anterior";
                     this.links[this.links.length - 1].label = "Siguiente";
                     this.jobPermissions = data.data.data;
-                    //console.log(this.jobPermissions);
                     this.jobPermissions.length > 0 ? this.emptyObject = false : this.emptyObject = true
                 }
             }).catch((errors) => {
                 this.manageError(errors, this)
             })
+            .finally(()=> {this.isLoadinRequest = false;})
         },
         sortBy(key) {
             if (key != "Acciones") {
