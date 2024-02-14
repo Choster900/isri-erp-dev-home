@@ -355,11 +355,11 @@ export default {
                     this.links[this.links.length - 1].label = "Siguiente";
                     this.employees = data.data.data;
                     this.employees.length > 0 ? this.empty_object = false : this.empty_object = true
-                    this.isLoadinRequest = false
                 }
             }).catch((errors) => {
                 this.manageError(errors, this)
             })
+            .finally(()=> {this.isLoadinRequest = false;})
         },
         sortBy(key) {
             if (key != "Acciones") {

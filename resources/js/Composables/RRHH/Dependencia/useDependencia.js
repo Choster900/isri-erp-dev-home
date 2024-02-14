@@ -97,10 +97,15 @@ export const useDependencia = (context) => {
             const response = await axios.get(
                 `/get-info-modal-dependencias/${depId}`
             );
-            setModalValues(response.data)
-        } catch (error) {
-            console.log(error);
-            showErrorMessage(error);
+            mainCenters.value = response.data.mainCenters;
+            depToShow.value = response.data.dependency
+            dependencies.value = response.data.dependencies
+            if(depId > 0){
+                setModalValues(response.data)
+            }
+        } catch (err) {
+            console.log(err);
+            showErrorMessage(err);
             context.emit("cerrar-modal")
         } finally {
             isLoadingRequest.value = false;
@@ -133,10 +138,6 @@ export const useDependencia = (context) => {
     }, 350);
 
     const setModalValues = (data) => {
-        mainCenters.value = data.mainCenters;
-        depToShow.value = data.dependency
-        dependencies.value = data.dependencies
-
         if (data.dependency.jefatura) {
             let array = {
                 value: data.dependency.id_persona,
