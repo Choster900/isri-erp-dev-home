@@ -54,7 +54,7 @@ export const useProducto = (context) => {
     const asyncFindUnspsc = _.debounce(async (query) => {
         try {
             isLoadingUnspsc.value = true;
-            if (query.length > 3) {
+            if (query.length >= 3) {
                 const response = await axios.post("/search-unspsc", {
                     busqueda: query,
                 });

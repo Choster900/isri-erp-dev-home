@@ -74,13 +74,11 @@ class PermisoController extends Controller
             $query->where(function ($query) use ($search_value) {
                 $query->where('id_permiso', 'like', '%' . $search_value['id_permiso'] . '%')
                     ->where('codigo_tipo_permiso', 'like', '%' . $search_value['nombre_tipo_permiso'] . '%')
+                    ->where('id_estado_permiso', 'like', '%' . $search_value['id_estado_permiso'] . '%')
                     ->where(function ($query) use ($search_value) {
-                        $query->where('pnombre_persona', 'like', '%' . $search_value['pnombre_persona'] . '%')
-                            ->orWhere('snombre_persona', 'like', '%' . $search_value['pnombre_persona'] . '%')
-                            ->orWhere('tnombre_persona', 'like', '%' . $search_value['pnombre_persona'] . '%')
-                            ->orWhere('papellido_persona', 'like', '%' . $search_value['pnombre_persona'] . '%')
-                            ->orWhere('sapellido_persona', 'like', '%' . $search_value['pnombre_persona'] . '%')
-                            ->orWhere('tapellido_persona', 'like', '%' . $search_value['pnombre_persona'] . '%');
+                        if ($search_value['pnombre_persona']) {
+                            $query->whereRaw("MATCH(pnombre_persona, snombre_persona, tnombre_persona, papellido_persona, sapellido_persona, tapellido_persona) AGAINST(?)", $search_value["pnombre_persona"]);
+                        }
                     })
                     ->where(function ($query) use ($search_value) {
                         if ($search_value['fecha_inicio_permiso']) {

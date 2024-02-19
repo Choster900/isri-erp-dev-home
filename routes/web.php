@@ -58,3 +58,4 @@ require __DIR__ . '/web/pr.php';
 require __DIR__ . '/web/ts.php';
 require __DIR__ . '/web/jrd.php';
 require __DIR__ . '/web/ucp.php';
+require __DIR__ . '/web/alm.php';

@@ -57,7 +57,7 @@ import axios from 'axios';
                 <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
                     :inputsToValidate="inputsToValidate" @sort="sortBy" @datos-enviados="handleData($event)"
                     @execute-search="getPermissionRequests()">
-                    <tbody class="text-sm divide-y divide-slate-200">
+                    <tbody class="text-sm divide-y divide-slate-200" v-if="!isLoadinRequest">
                         <tr v-for="permission in jobPermissions" :key="permission.id_permiso"
                         class="hover:bg-gray-200">
                             <td class="px-2 first:pl-5 last:pr-5">
@@ -123,12 +123,27 @@ import axios from 'axios';
                             </td>
                         </tr>
                     </tbody>
+                    <tbody v-else>
+                        <tr>
+                            <td colspan="7" class="text-center">
+                                <div class="flex items-center justify-center my-4">
+                                    <img src="../../../img/loader-spinner.gif" alt="" class="w-8 h-8">
+                                    <h1 class="ml-4 font-medium text-xl text-[#001c48]">Cargando...</h1>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody v-if="emptyObject && !isLoadinRequest">
+                        <tr>
+                            <td colspan="7" class="text-center">
+                                <p class="font-semibold text-red-500 text-[16px] py-4"
+                                    style="margin: 0 auto; text-align: center;">No se
+                                    encontraron registros.</p>
+                            </td>
+                        </tr>
+                    </tbody>
                 </datatable>
 
-            </div>
-            <div v-if="emptyObject" class="flex text-center py-2">
-                <p class="font-semibold text-red-500 text-[16px]" style="margin: 0 auto; text-align: center;">No se
-                    encontraron registros.</p>
             </div>
         </div>
 
@@ -223,6 +238,7 @@ export default {
             limite: '',
             permissionToPrint: [],
             isLoading: false,
+            isLoadinRequest: false,
             emptyObject: false,
             //Data for datatable
             jobPermissions: [],
@@ -414,6 +430,7 @@ export default {
             this.tableData.draw++;
             this.tableData.currentPage = url
             this.tableData.execute = this.permits.ejecutar
+            this.isLoadinRequest = true
             await axios.post(url, this.tableData).then((response) => {
                 let data = response.data;
                 if (this.tableData.draw == data.draw) {
@@ -427,6 +444,7 @@ export default {
             }).catch((errors) => {
                 this.manageError(errors, this)
             })
+            .finally(()=> {this.isLoadinRequest = false;})
         },
         sortBy(key) {
             if (key != "Acciones") {
