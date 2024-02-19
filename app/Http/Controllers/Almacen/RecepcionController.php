@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Almacen;
 
 use App\Http\Controllers\Controller;
+use App\Models\CentroAtencion;
 use App\Models\DetDocumentoAdquisicion;
 use App\Models\DocumentoAdquisicion;
 use App\Models\Producto;
@@ -33,15 +34,22 @@ class RecepcionController extends Controller
         return ['data' => $data, 'draw' => $request->input('draw')];
     }
 
-    public function getInfoModalRecep(Request $request, $id)
+    public function getInfoModalRecep(Request $request)
     {
-        $recep = RecepcionPedido::with([
-            'detalle_recepcion.producto',
-            'det_doc_adquisicion.documento_adquisicion.tipo_documento_adquisicion',
-            'estado_recepcion'
-        ])->find($id);
+        $idRec = $request->id;
+        if ($idRec > 0) {
+            $recep = RecepcionPedido::with([
+                'detalle_recepcion.producto',
+                'det_doc_adquisicion.documento_adquisicion.tipo_documento_adquisicion',
+                'estado_recepcion'
+            ])->find($idRec);
+            $item = DetDocumentoAdquisicion::find($recep->det_doc_adquisicion->id_det_doc_adquisicion);
+        } else {
+            $recep = [];
+            $item = DetDocumentoAdquisicion::find($request->detId);
+        }
 
-        if ($recep->det_doc_adquisicion->estado_det_doc_adquisicion == 0) {
+        if ($item->estado_det_doc_adquisicion == 0 && $recep != []) {
             $data = [
                 'id_estado_recepcion_pedido'            => 3,
                 'fecha_mod_permiso'                     => Carbon::now(),
@@ -53,39 +61,21 @@ class RecepcionController extends Controller
                 'logical_error' => 'Error, el item del documento asociado ha sido eliminado.',
             ], 422);
         } else {
-            $subQuery = DB::table('recepcion_pedido as rp')
-                ->join('detalle_recepcion_pedido as drp', 'rp.id_recepcion_pedido', 'drp.id_recepcion_pedido')
-                ->selectRaw(
-                    'drp.id_producto,
-                    SUM(drp.cant_det_recepcion_pedido) AS registrados'
-                )
-                ->where('rp.id_estado_recepcion_pedido', '!=', 3)
-                ->where('drp.estado_det_recepcion_pedido', 1)
-                ->where('drp.id_recepcion_pedido', '!=', $recep->id_recepcion_pedido)
-                ->where('rp.id_det_doc_adquisicion', $recep->det_doc_adquisicion->id_det_doc_adquisicion)
-                ->groupByRaw('drp.id_producto, drp.cant_det_recepcion_pedido');
+            if($idRec > 0){
+                $procedure = DB::select('CALL PR_GET_PRODUCT_ACQUISITION_MINUS_CURRENT_RECEIPT(?, ?)', 
+                array($item->id_det_doc_adquisicion, $recep->id_recepcion_pedido));
+            }else{
+                $procedure = DB::select('CALL PR_GET_PRODUCT_ACQUISITION(?)', 
+                array($item->id_det_doc_adquisicion));
+            }
+            $centers = CentroAtencion::selectRaw('id_centro_atencion as value, concat(codigo_centro_atencion," - ",nombre_centro_atencion) as label')->get();
 
-            $productos = DB::table('detalle_documento_adquisicion as dda')
-                ->join('producto_adquisicion as pa', 'dda.id_det_doc_adquisicion', 'pa.id_det_doc_adquisicion')
-                ->join('producto as p', 'p.id_producto', 'pa.id_producto')
-                ->leftJoinSub($subQuery, 'subQuery', function ($join) {
-                    $join->on('p.id_producto', '=', 'subQuery.id_producto');
-                })
-                ->selectRaw(
-                    '
-                        p.id_producto as value,
-                        p.nombre_producto as label,
-                        pa.cant_prod_adquisicion, 
-                        (pa.cant_prod_adquisicion-IFNULL(subQuery.registrados,0)) as disponible
-                    '
-                )
-                ->where('dda.id_det_doc_adquisicion', $recep->det_doc_adquisicion->id_det_doc_adquisicion)
-                ->where('pa.estado_prod_adquisicion', 1)
-                ->get();
+
 
             return response()->json([
-                'recep'                         => $recep ?? [],
-                'products'                      => $productos,
+                'recep'                         => $recep,
+                'products'                      => $procedure,
+                'centers'                       => $centers
             ]);
         }
     }
@@ -93,10 +83,10 @@ class RecepcionController extends Controller
     public function getInitialInfoDoc(Request $request)
     {
         $documents = DB::table('documento_adquisicion as da')
-            ->join('detalle_documento_adquisicion as dda','da.id_doc_adquisicion','dda.id_doc_adquisicion')
+            ->join('detalle_documento_adquisicion as dda', 'da.id_doc_adquisicion', 'dda.id_doc_adquisicion')
             ->select('da.id_doc_adquisicion as value', 'da.numero_doc_adquisicion as label', 'da.id_tipo_doc_adquisicion')
             ->where('dda.id_estado_doc_adquisicion', 2)
-            ->groupBy('da.id_doc_adquisicion','da.numero_doc_adquisicion','da.id_tipo_doc_adquisicion')->get();
+            ->groupBy('da.id_doc_adquisicion', 'da.numero_doc_adquisicion', 'da.id_tipo_doc_adquisicion')->get();
         $items = DetDocumentoAdquisicion::select('id_det_doc_adquisicion as value', 'nombre_det_doc_adquisicion as label', 'id_doc_adquisicion')
             ->where('estado_det_doc_adquisicion', 1)
             ->where('id_estado_doc_adquisicion', 2)->get();

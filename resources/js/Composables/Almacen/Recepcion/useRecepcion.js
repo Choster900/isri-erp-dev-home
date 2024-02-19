@@ -8,6 +8,7 @@ export const useRecepcion = (context) => {
     const swal = inject("$swal");
     const isLoadingRequest = ref(false);
     const errors = ref([]);
+
     const purchaseProcedures = ref([])
     const catUnspsc = ref([])
     const budgetAccounts = ref([])
@@ -17,68 +18,122 @@ export const useRecepcion = (context) => {
     const reception = ref([])
     const products = ref([])
     const documents = ref([])
+    const items = ref([])
+    const startRec = ref(false)
 
-    // const reception = ref({
-    //     id: '',
-    //     name: '',
-    //     description: '',
-    //     mUnitId: '',
-    //     price: '',
-    //     budgetAccountId: '',
-    //     purchaseProcedureId: '',
-    //     unspscId: '',
-    //     perishable: -1,
-    //     gAndS:-1
-    // })
+    const recDocument = ref({
+        id: '',
+        docId: '',
+        detDocId: '',
+        prods: []
+    })
 
     const getInfoForModalRecep = async (id) => {
-        try {
-            isLoadingRequest.value = true;
-            if (id > 0) {
-                const response = await axios.get(
-                    `/get-info-modal-recep/${id}`
-                );
-                reception.value = response.data.recep
-                products.value = response.data.products
-            } else {
+        if (id > 0) {
+            await startReception(id)
+        } else {
+            try {
+                isLoadingRequest.value = true;
                 const response = await axios.get(
                     `/get-initial-doc-info`
                 );
                 documents.value = response.data.documents
+                items.value = response.data.items
+            } catch (err) {
+                if (err.response.data.logical_error) {
+                    useShowToast(toast.error, err.response.data.logical_error);
+                    context.emit("get-table");
+                } else {
+                    showErrorMessage(err);
+                }
+                context.emit("cerrar-modal");
+            } finally {
+                isLoadingRequest.value = false;
             }
-            //id > 0 ? setModalValues(response.data.prod) : ''
-        } catch (err) {
-            if (err.response.data.logical_error) {
-                useShowToast(toast.error, err.response.data.logical_error);
-                context.emit("get-table");
-            } else {
-                showErrorMessage(err);
-            }
-            context.emit("cerrar-modal");
-        } finally {
-            isLoadingRequest.value = false;
         }
     };
 
-    const setModalValues = (product) => {
-        if (product.catalogo_unspsc) {
+    const startReception = async (id) => {
+        if (recDocument.value.detDocId === '' && id <= 0) {
+            useShowToast(toast.error, "Error, no se puede procesar la petición por información incompleta.");
+        } else {
+            try {
+                isLoadingRequest.value = true;
+                const response = await axios.post(
+                    `/get-info-modal-recep`, {
+                    id: id,
+                    detId: recDocument.value.detDocId
+                });
+                setModalValues(response.data, id)
+            } catch (err) {
+                if (err.response.data.logical_error) {
+                    useShowToast(toast.error, err.response.data.logical_error);
+                    context.emit("get-table");
+                } else {
+                    showErrorMessage(err);
+                }
+                context.emit("cerrar-modal");
+            } finally {
+                isLoadingRequest.value = false;
+            }
+        }
+    }
+
+    const setModalValues = (data, id) => {
+        //reception.value = response.data.recep
+        products.value = data.products
+
+
+        if (id > 0) {
             let array = {
                 value: product.catalogo_unspsc.id_catalogo_unspsc,
                 label: product.catalogo_unspsc.nombre_catalogo_unspsc,
             };
-            catUnspsc.value.push(array);
+            recDocument.value.prods.push(array);
+        } else {
+            let array = {
+                prodId: "",
+                desc: "",
+                unit: "",
+                avails: "",
+                qty: "",
+                cost: "",
+                total: ""
+            }
+            recDocument.value.prods.push(array);
         }
 
-        prod.value.id = product.id_producto
-        prod.value.name = product.nombre_producto
-        prod.value.description = product.descripcion_producto
-        prod.value.mUnitId = product.unidad_medida.id_unidad_medida
-        prod.value.price = '$' + product.precio_producto
-        prod.value.budgetAccountId = product.id_ccta_presupuestal
-        prod.value.purchaseProcedureId = product.id_proceso_compra
-        prod.value.unspscId = product.id_catalogo_unspsc
-        prod.value.perishable = product.perecedero_producto
-        prod.value.gAndS = product.basico_producto
+        startRec.value = true
+    }
+
+    const setProdItem = (index, paId) => {
+        if(paId){
+            const selectedProd = products.value.find((element) => {
+                return element.value === paId; // Adding a return statement here
+            });
+            //console.log(selectedProd.descripcion_producto);
+            recDocument.value.prods[index].desc = selectedProd.descripcion_prod_adquisicion
+            recDocument.value.prods[index].unit = selectedProd.abreviatura_unidad_medida
+            recDocument.value.prods[index].avails = selectedProd.diferencia
+            recDocument.value.prods[index].cost = selectedProd.costo_prod_adquisicion
+        }else{
+            recDocument.value.prods[index].desc = ""
+            recDocument.value.prods[index].unit = ""
+            recDocument.value.prods[index].avails = ""
+            recDocument.value.prods[index].cost = ""
+            recDocument.value.prods[index].total = ""
+        }   
+    }
+
+    const updateItemTotal = (index,qty,paId) => {
+        if(paId != ''){
+            const selectedProd = products.value.find((element) => {
+                return element.value === paId; // Adding a return statement here
+            });
+            recDocument.value.prods[index].total = (selectedProd.costo_prod_adquisicion * qty).toFixed(2)
+        }else{
+            recDocument.value.prods[index].total = ''
+        }
     }
 
     const ordenC = computed(() => {
@@ -98,6 +153,13 @@ export const useRecepcion = (context) => {
     const filteredDoc = computed(() => {
         const result = documents.value.filter((element) => {
             return element.id_tipo_doc_adquisicion == docSelected.value
+        });
+        return result ?? [];
+    });
+
+    const filteredItems = computed(() => {
+        const result = items.value.filter((element) => {
+            return element.id_doc_adquisicion == recDocument.value.docId
         });
         return result ?? [];
     });
@@ -130,7 +192,7 @@ export const useRecepcion = (context) => {
     return {
         errors, isLoadingRequest, reception, purchaseProcedures, catUnspsc,
         budgetAccounts, unitsMeasmt, products, documents, ordenC, contrato, docSelected,
-        filteredDoc,
-        getInfoForModalRecep
+        filteredDoc, filteredItems, recDocument, startRec,
+        getInfoForModalRecep, startReception, setProdItem, updateItemTotal
     }
 }

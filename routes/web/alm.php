@@ -12,6 +12,6 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('alm.recepciones');
     Route::post('recepciones', [RecepcionController::class, 'getRecepciones'])->name('recepcion.getRecepciones');
-    Route::get('get-info-modal-recep/{id}', [RecepcionController::class, 'getInfoModalRecep'])->name('recepcion.getInfoModalRecep');
+    Route::post('get-info-modal-recep', [RecepcionController::class, 'getInfoModalRecep'])->name('recepcion.getInfoModalRecep');
     Route::get('get-initial-doc-info', [RecepcionController::class, 'getInitialInfoDoc'])->name('recepcion.getInitialInfoDoc');
 });
