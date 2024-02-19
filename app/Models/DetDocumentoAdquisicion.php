@@ -29,7 +29,7 @@ class DetDocumentoAdquisicion extends Model
 
     public function documento_adquisicion()
     {
-        return $this->belongsTo('App\Models\DocumentoAdquisicion','id_doc_adquisicion','id_doc_adquisicion');
+        return $this->belongsTo(DocumentoAdquisicion::class,'id_doc_adquisicion','id_doc_adquisicion');
     }
     public function fuente_financiamiento()
     {
