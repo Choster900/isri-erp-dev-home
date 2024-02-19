@@ -6,21 +6,49 @@ use App\Http\Controllers\Controller;
 use App\Models\CentroAtencion;
 use App\Models\DetDocumentoAdquisicion;
 use App\Models\LineaTrabajo;
+use App\Models\Marca;
+use App\Models\ProductoAdquisicion;
 use App\Models\UnidadMedida;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BienesServiciosController extends Controller
 {
 
 
-    function saveProductoAdquisicion(Request $request): array
+    public function saveProductoAdquisicion(Request $request): object
     {
+        $detalles = $request->productAdq;
+        $idDetDocAdquisicion = $request->idDetDocAdquisicion;
+        $usuario = $request->user()->nick_usuario;
+        $ip = $request->ip();
+        $fechaActual = now();
 
+        foreach ($detalles as $detalle) {
+            foreach ($detalle["detalleDoc"] as $detalleProducto) {
+                $nuevoDetalle = [
+                    'id_producto'                  => $detalleProducto["idProducto"],
+                    'id_det_doc_adquisicion'       => $idDetDocAdquisicion,
+                    'id_marca'                     => $detalleProducto["idMarca"],
+                    'id_lt'                        => $detalle["idLt"],
+                    'id_centro_atencion'           => $detalleProducto["idCentroAtencion"],
+                    'cant_prod_adquisicion'        => $detalleProducto["cantProdAdquisicion"],
+                    'costo_prod_adquisicion'       => $detalleProducto["costoProdAdquisicion"],
+                    'descripcion_prod_adquisicion' => $detalleProducto["descripcionProdAdquisicion"],
+                    'estado_prod_adquisicion'      => 1,
+                    'fecha_reg_prod_adquisicion'   => $fechaActual,
+                    'usuario_prod_adquisicion'     => $usuario,
+                    'ip_prod_adquisicion'          => $ip,
+                ];
 
+                // Usar DB::insert para insertar directamente y mejorar el rendimiento
+                DB::table('producto_adquisicion')->insert($nuevoDetalle);
+            }
+        }
 
-        return [];
+        return response()->json($request); // O cualquier otra respuesta que desees enviar
     }
-
 
     /**
      * Obtiene arreglo de dinstintos objetos para el uso en multiselect.
@@ -42,7 +70,7 @@ class BienesServiciosController extends Controller
         $centrosAtencion = CentroAtencion::all();
 
         // Obtener marca
-        $centrosAtencion = CentroAtencion::all();
+        $marca = Marca::all();
 
         // Devolver un arreglo asociativo con los resultados
         return [
@@ -50,6 +78,7 @@ class BienesServiciosController extends Controller
             "lineaTrabajo"          => $lineaTrabajo,
             "unidadesMedida"        => $unidadesMedida,
             "centrosAtencion"       => $centrosAtencion,
+            "marca"                 => $marca,
         ];
     }
 }

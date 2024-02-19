@@ -46,4 +46,6 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         });
         return response()->json($formattedResults);
     })->name('bieneservicios.getProductByCodigoProducto');
+    Route::post('save-prod-adquicicion', [BienesServiciosController::class, 'saveProductoAdquisicion'])->name('bieneservicios.saveProdAdquisicion');
+
 });
