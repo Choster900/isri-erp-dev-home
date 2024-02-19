@@ -17,6 +17,7 @@ class ProductoAdquisicion extends Model
         'id_det_doc_adquisicion',
         'id_lt',
         'id_centro_atencion',
+        'id_producto',
         'cant_prod_adquisicion',
         'costo_prod_adquisicion',
         'descripcion_prod_adquisicion',

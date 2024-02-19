@@ -2,6 +2,11 @@
 
 use App\Http\Controllers\UCP\BienesServiciosController;
 use App\Http\Controllers\UCP\ProductoController;
+use App\Models\CentroAtencion;
+use App\Models\DetDocumentoAdquisicion;
+use App\Models\LineaTrabajo;
+use App\Models\Producto;
+use App\Models\UnidadMedida;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
@@ -26,5 +31,21 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('ucp.bienes-servicios');
     Route::post('get-all-linea-trabajo', [BienesServiciosController::class, 'getAllLineaTrabajo'])->name('bieneservicios.getAllLineaTrabajo');
+
+
+    Route::post('get-array-objects-for-multiselect', [BienesServiciosController::class, 'getArrayObjectoForMultiSelect'])->name('bieneservicios.getAllLineaTrabajo');
+    Route::post('get-product-by-codigo-producto', function (Request $request) {
+        $product = Producto::with(["unidad_medida"])->where('codigo_producto', 'like', '%' . $request->codigoProducto . '%')->get();
+        // Formatear resultados para respuesta JSON
+        $formattedResults = $product->map(function ($item) {
+            return [
+                'value'           => $item->id_producto,
+                'label'           => $item->codigo_producto,
+                'allDataProducto' => $item,
+            ];
+        });
+        return response()->json($formattedResults);
+    })->name('bieneservicios.getProductByCodigoProducto');
+    Route::post('save-prod-adquicicion', [BienesServiciosController::class, 'saveProductoAdquisicion'])->name('bieneservicios.saveProdAdquisicion');
 
 });
