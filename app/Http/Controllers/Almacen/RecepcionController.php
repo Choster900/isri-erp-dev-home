@@ -39,11 +39,17 @@ class RecepcionController extends Controller
         $idRec = $request->id;
         if ($idRec > 0) {
             $recep = RecepcionPedido::with([
-                'detalle_recepcion.producto',
+                'detalle_recepcion.producto.unidad_medida',
+                'detalle_recepcion.producto_adquisicion',
                 'det_doc_adquisicion.documento_adquisicion.tipo_documento_adquisicion',
                 'estado_recepcion'
             ])->find($idRec);
             $item = DetDocumentoAdquisicion::find($recep->det_doc_adquisicion->id_det_doc_adquisicion);
+            if (!$recep || !$item) {
+                return response()->json([
+                    'logical_error' => 'Error, no fue posible obtener la recepción consultada. Consulte con el administrador.',
+                ], 422);
+            } 
         } else {
             $recep = [];
             $item = DetDocumentoAdquisicion::find($request->detId);
@@ -61,16 +67,22 @@ class RecepcionController extends Controller
                 'logical_error' => 'Error, el item del documento asociado ha sido eliminado.',
             ], 422);
         } else {
-            if($idRec > 0){
-                $procedure = DB::select('CALL PR_GET_PRODUCT_ACQUISITION_MINUS_CURRENT_RECEIPT(?, ?)', 
-                array($item->id_det_doc_adquisicion, $recep->id_recepcion_pedido));
-            }else{
-                $procedure = DB::select('CALL PR_GET_PRODUCT_ACQUISITION(?)', 
-                array($item->id_det_doc_adquisicion));
-            }
+            // if ($idRec > 0) {
+            //     $procedure = DB::select(
+            //         'CALL PR_GET_PRODUCT_ACQUISITION_MINUS_CURRENT_RECEIPT(?, ?)',
+            //         array($item->id_det_doc_adquisicion, $recep->id_recepcion_pedido)
+            //     );
+            // } else {
+            //     $procedure = DB::select(
+            //         'CALL PR_GET_PRODUCT_ACQUISITION(?)',
+            //         array($item->id_det_doc_adquisicion)
+            //     );
+            // }
+            $procedure = DB::select(
+                'CALL PR_GET_PRODUCT_ACQUISITION(?)',
+                array($item->id_det_doc_adquisicion)
+            );
             $centers = CentroAtencion::selectRaw('id_centro_atencion as value, concat(codigo_centro_atencion," - ",nombre_centro_atencion) as label')->get();
-
-
 
             return response()->json([
                 'recep'                         => $recep,

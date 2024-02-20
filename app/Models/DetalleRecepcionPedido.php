@@ -17,6 +17,7 @@ class DetalleRecepcionPedido extends Model
         'id_det_doc_adquisicion',
         'id_centro_atencion',
         'id_producto',
+        'id_producto_adquisicion',
         'id_recepcion_pedido',
         'cant_det_recepcion_pedido',
         'costo_det_recepcion_pedido',
@@ -30,5 +31,10 @@ class DetalleRecepcionPedido extends Model
     public function producto()
     {
         return $this->belongsTo('App\Models\Producto','id_producto','id_producto');
+    }
+
+    public function producto_adquisicion()
+    {
+        return $this->belongsTo('App\Models\ProductoAdquisicion','id_prod_adquisicion','id_prod_adquisicion');
     }
 }
