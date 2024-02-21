@@ -67,21 +67,17 @@ class RecepcionController extends Controller
                 'logical_error' => 'Error, el item del documento asociado ha sido eliminado.',
             ], 422);
         } else {
-            // if ($idRec > 0) {
-            //     $procedure = DB::select(
-            //         'CALL PR_GET_PRODUCT_ACQUISITION_MINUS_CURRENT_RECEIPT(?, ?)',
-            //         array($item->id_det_doc_adquisicion, $recep->id_recepcion_pedido)
-            //     );
-            // } else {
-            //     $procedure = DB::select(
-            //         'CALL PR_GET_PRODUCT_ACQUISITION(?)',
-            //         array($item->id_det_doc_adquisicion)
-            //     );
-            // }
-            $procedure = DB::select(
-                'CALL PR_GET_PRODUCT_ACQUISITION(?)',
-                array($item->id_det_doc_adquisicion)
-            );
+            if ($idRec > 0) {
+                $procedure = DB::select(
+                    'CALL PR_GET_PRODUCT_ACQUISITION_MINUS_CURRENT_RECEIPT(?, ?)',
+                    array($item->id_det_doc_adquisicion, $recep->id_recepcion_pedido)
+                );
+            } else {
+                $procedure = DB::select(
+                    'CALL PR_GET_PRODUCT_ACQUISITION(?)',
+                    array($item->id_det_doc_adquisicion)
+                );
+            }
             $centers = CentroAtencion::selectRaw('id_centro_atencion as value, concat(codigo_centro_atencion," - ",nombre_centro_atencion) as label')->get();
 
             return response()->json([

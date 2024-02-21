@@ -119,7 +119,7 @@ export const useRecepcion = (context) => {
         startRec.value = true
     }
 
-    const setProdItem = (index,paId,recepId) => {
+    const setProdItem = (index, paId, recepId) => {
         if (paId) {
             const selectedProd = products.value.find((element) => {
                 return element.value === paId; // Adding a return statement here
@@ -146,10 +146,8 @@ export const useRecepcion = (context) => {
             const selectedProd = products.value.find((element) => {
                 return element.value === paId; // Adding a return statement here
             });
-            recDocument.value.prods[index].avails = selectedProd.total_menos_acumulado
-                
-                // recDocument.value.prods[index].avails = qty === '' ?
-                // selectedProd.total_menos_acumulado : selectedProd.total_menos_acumulado - qty
+            recDocument.value.prods[index].avails = qty === '' ?
+                selectedProd.total_menos_acumulado : selectedProd.total_menos_acumulado - qty
             recDocument.value.prods[index].total = (selectedProd.costo_prod_adquisicion * qty).toFixed(2)
         } else {
             recDocument.value.prods[index].total = ''
@@ -161,7 +159,7 @@ export const useRecepcion = (context) => {
         products.value.map((element) => {
             const isSelected = recDocument.value.prods.some((e) => e.prodId === element.value && e.deleted === false);
             const isClicked = element.value === option
-            if (!isSelected || isClicked) {
+            if ((!isSelected || isClicked) && element.total_menos_acumulado != 0) {
                 newOptions.push(element)
             }
         });
@@ -170,9 +168,16 @@ export const useRecepcion = (context) => {
 
 
     const addNewRow = () => {
-        if(activeDetails.value.length < products.value.length){
+        const avOptions = []
+        products.value.map((element) => {
+            const isSelected = recDocument.value.prods.some((e) => e.prodId === element.value && e.deleted === false);
+            if (!isSelected && element.total_menos_acumulado != 0) {
+                avOptions.push(element)
+            }
+        });
+        if (activeDetails.value.length <= avOptions.length) {
             let array = {
-                recId:"",
+                recId: "",
                 prodId: "",
                 desc: "",
                 unit: "",
@@ -183,8 +188,8 @@ export const useRecepcion = (context) => {
                 deleted: false
             }
             recDocument.value.prods.push(array);
-        }else{
-            useShowToast(toast.warning, "Has excedido la cantidad maxima de filas disponibles.");
+        } else {
+            useShowToast(toast.warning, "Has alcanzado el maximo de filas disponibles.");
         }
     }
 
