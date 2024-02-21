@@ -3,8 +3,9 @@
     <AppLayoutVue nameSubModule="Compras - Bienes y Servicios" :colorSide="' bg-[#343a40] '">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="shoModalBienesServicios = true" v-if="permits.insertar == 1"
-                    color="bg-green-700  hover:bg-green-800" text="Generar documento" icon="add" />
+                <GeneralButton @click="objectProductoAdquisicion = []; shoModalBienesServicios = true;"
+                    v-if="permits.insertar == 1" color="bg-green-700  hover:bg-green-800" text="Generar documento"
+                    icon="add" />
             </div>
         </div>
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
@@ -100,8 +101,8 @@
 
             </div>
         </div>
-        <ModalBienesServicios :showModal="shoModalBienesServicios" @cerrar-modal="shoModalBienesServicios = false;"
-            :propProdAdquisicion="objectProductoAdquisicion" />
+        <ModalBienesServicios :propProdAdquisicion="objectProductoAdquisicion" :showModal="shoModalBienesServicios"
+            @cerrar-modal="shoModalBienesServicios = false; objectProductoAdquisicion = []" />
     </AppLayoutVue>
 </template>
 

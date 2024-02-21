@@ -224,9 +224,10 @@
                                     </div>
                                 </td>
                                 <td class="w-72 p-0 uppercase align-top" colspan="2">
-                                    <textarea v-model="detalle.descripcionProdAdquisicion"
-                                        class="uppercase text-[8pt] p-0 border-none bg-transparent outline-none focus:outline-none focus:ring focus:ring-transparent"></textarea>
+                                    <textarea v-model="detalle.descripcionProdAdquisicion" rows="9"
+                                        class="uppercase text-[8pt] p-0 border-none bg-transparent outline-none focus:outline-none focus:ring focus:ring-transparent leading-tight w-full"></textarea>
                                 </td>
+
                                 <td class=" relative h-28" style="padding-left: 0 !important; padding-right: 0 !important; "
                                     colspan="2">
                                     <div class="absolute top-0 w-full flex flex-col items-center">
@@ -439,93 +440,77 @@ export default {
             if (!newValue) {
                 // Restablecer los valores a nulos o vacíos
                 objectGetFromProp.value = []
+                arrayProductoAdquisicion.value = []
                 console.log(newValue);
             }
         });
         watch(propProdAdquisicion, (newValue, oldValue) => {
+            console.log(newValue);
             // Verifica si showModal se ha establecido en falso (se cerró el modal)
-            if (newValue !== null && newValue !== undefined && newValue !== '') {
+            if (newValue !== null && newValue !== undefined && (Array.isArray(newValue) ? newValue.length > 0 : newValue !== '')) {
+                // Utiliza el patrón de objeto "guard" para simplificar las verificaciones
                 objectGetFromProp.value = newValue;
-                // objectGetFromProp.value.productos_adquisiciones sera el arreglo original de producto
                 let productosAdquisiciones = objectGetFromProp.value.productos_adquisiciones;
 
                 // Utilizando un conjunto para rastrear los id_lt únicos
                 let idLtSet = new Set();
                 let productArray = new Set();
 
-                arrayProductsWhenIsEditable.value = productosAdquisiciones.reduce((nuevoArreglo, producto) => {
+                // Utiliza map en lugar de reduce para simplificar la lógica
+                arrayProductsWhenIsEditable.value = productosAdquisiciones.map(producto => {
                     let idProduct = producto.id_producto;
 
                     if (!productArray.has(idProduct)) {
-                        // Agregar el id_lt al conjunto para evitar duplicados
                         productArray.add(idProduct);
-                        const product = producto.producto
-                        // Crear un nuevo objeto con la propiedad value y agregarlo al nuevo arreglo
-                        nuevoArreglo.push(
-                            {
-                                value: product.id_producto,
-                                label: product.nombre_producto
-                            }
-
-                        );
+                        const product = producto.producto;
+                        return {
+                            value: product.id_producto,
+                            label: product.codigo_producto
+                        };
                     }
-                    return nuevoArreglo;
-                }, []);
+                }).filter(Boolean);  // Filtra los elementos nulos o indefinidos
 
-                // Filtrar los productos y crear nuevos objetos solo para id_lt no repetidos
-                arrayProductoAdquisicion.value = productosAdquisiciones.reduce((nuevoArreglo, producto) => {
-                    let idLt = producto.id_lt;
-
-                    // Verificar si el id_lt ya se ha agregado
-                    if (!idLtSet.has(idLt)) {
-                        // Agregar el id_lt al conjunto para evitar duplicados
-                        idLtSet.add(idLt);
-                        const product = producto
-                        // Crear un nuevo objeto con la propiedad value y agregarlo al nuevo arreglo
-                        nuevoArreglo.push(
-                            {
+                // Utiliza map y filter para mejorar la legibilidad y reducir código duplicado
+                arrayProductoAdquisicion.value = productosAdquisiciones
+                    .map(producto => {
+                        let idLt = producto.id_lt;
+                        if (!idLtSet.has(idLt)) {
+                            idLtSet.add(idLt);
+                            return {
                                 idLt: idLt,
                                 detalleDoc: []
-                            }
-
-                        );
-                    }
-
-                    return nuevoArreglo;
-                }, []);
-
-
-                productosAdquisiciones.map(index => {
-                    console.log(index);
-                    let indice = arrayProductoAdquisicion.value.findIndex(i => i.idLt == index.id_lt)
-
-                    const { producto } = index
-                    arrayProductoAdquisicion.value[indice]["detalleDoc"].push(
-                        {
-                            "especifico": producto.id_ccta_presupuestal,
-                            "idProducto": producto.id_producto,
-                            "detalleProducto": producto.nombre_producto,
-                            "pesoProducto": producto.unidad_medida.id_unidad_medida,
-                            "idCentroAtencion": index.id_centro_atencion,
-                            "detalleCentro": index.centro_atencion.nombre_centro_atencion,
-                            "idMarca": index.id_marca,
-                            "cantProdAdquisicion": index.cant_prod_adquisicion,
-                            "costoProdAdquisicion": index.costo_prod_adquisicion,
-                            "descripcionProdAdquisicion": index.descripcion_prod_adquisicion,
-                            "estadoProdAdquisicion": "",
-                            "valorTotalProduct": index.cant_prod_adquisicion * index.costo_prod_adquisicion,
+                            };
                         }
-                    )
-                    // arrayProductoAdquisicion.value[indice]
+                    })
+                    .filter(Boolean);
 
+                // Utiliza forEach en lugar de map cuando no necesitas un nuevo arreglo resultante
+                productosAdquisiciones.forEach(index => {
+                    let indice = arrayProductoAdquisicion.value.findIndex(i => i.idLt == index.id_lt);
+                    const { producto } = index;
 
-                })
+                    arrayProductoAdquisicion.value[indice]["detalleDoc"].push({
+                        "especifico": producto.id_ccta_presupuestal,
+                        "idProducto": producto.id_producto,
+                        "detalleProducto": producto.nombre_producto,
+                        "pesoProducto": producto.unidad_medida.id_unidad_medida,
+                        "idCentroAtencion": index.id_centro_atencion,
+                        "detalleCentro": index.centro_atencion.nombre_centro_atencion,
+                        "idMarca": index.id_marca,
+                        "cantProdAdquisicion": index.cant_prod_adquisicion,
+                        "costoProdAdquisicion": index.costo_prod_adquisicion,
+                        "descripcionProdAdquisicion": index.descripcion_prod_adquisicion,
+                        "estadoProdAdquisicion": "",
+                        "valorTotalProduct": index.cant_prod_adquisicion * index.costo_prod_adquisicion,
+                    });
+                });
+
                 console.log(arrayProductoAdquisicion.value);
-
             } else {
-                objectGetFromProp.value = {};
+                objectGetFromProp.value = [];
             }
         });
+
 
 
         return {
