@@ -17,6 +17,7 @@ export const useRecepcion = (context) => {
     const docSelected = ref('')
     const reception = ref([])
     const products = ref([])
+    const filteredProds = ref([])
     const documents = ref([])
     const items = ref([])
     const startRec = ref(false)
@@ -66,6 +67,7 @@ export const useRecepcion = (context) => {
                 });
                 setModalValues(response.data, id)
             } catch (err) {
+                console.log(err);
                 if (err.response.data.logical_error) {
                     useShowToast(toast.error, err.response.data.logical_error);
                     context.emit("get-table");
@@ -81,60 +83,145 @@ export const useRecepcion = (context) => {
 
     const setModalValues = (data, id) => {
         //reception.value = response.data.recep
-        products.value = data.products
 
+        products.value = data.products
+        filteredProds.value = data.products
 
         if (id > 0) {
-            let array = {
-                value: product.catalogo_unspsc.id_catalogo_unspsc,
-                label: product.catalogo_unspsc.nombre_catalogo_unspsc,
-            };
-            recDocument.value.prods.push(array);
+            data.recep.detalle_recepcion.forEach(element => {
+                if (element.estado_det_recepcion_pedido === 1) {
+                    const paId = element.producto_adquisicion.id_prod_adquisicion
+                    const cantRecep = element.cant_det_recepcion_pedido
+                    const recepId = element.id_recepcion_pedido
+                    let array = {
+                        recId: recepId,
+                        prodId: paId,
+                        desc: "",
+                        unit: "",
+                        avails: "",
+                        qty: cantRecep,
+                        cost: "",
+                        total: "",
+                        deleted: false
+                    }
+                    recDocument.value.prods.push(array);
+
+                    // Get the index of the last item in the array
+                    let lastIndex = recDocument.value.prods.length - 1;
+                    setProdItem(lastIndex, paId, recepId)
+                    updateItemTotal(lastIndex, cantRecep, paId)
+                }
+            });
         } else {
-            let array = {
-                prodId: "",
-                desc: "",
-                unit: "",
-                avails: "",
-                qty: "",
-                cost: "",
-                total: ""
-            }
-            recDocument.value.prods.push(array);
+            addNewRow()
         }
 
         startRec.value = true
     }
 
-    const setProdItem = (index, paId) => {
-        if(paId){
+    const setProdItem = (index, paId, recepId) => {
+        if (paId) {
             const selectedProd = products.value.find((element) => {
                 return element.value === paId; // Adding a return statement here
             });
             //console.log(selectedProd.descripcion_producto);
             recDocument.value.prods[index].desc = selectedProd.descripcion_prod_adquisicion
             recDocument.value.prods[index].unit = selectedProd.abreviatura_unidad_medida
-            recDocument.value.prods[index].avails = selectedProd.diferencia
+            recDocument.value.prods[index].avails = selectedProd.total_menos_acumulado
             recDocument.value.prods[index].cost = selectedProd.costo_prod_adquisicion
-        }else{
+            recDocument.value.prods[index].qty = recepId ? recDocument.value.prods[index].qty : ''
+            recDocument.value.prods[index].total = '0.00'
+        } else {
             recDocument.value.prods[index].desc = ""
             recDocument.value.prods[index].unit = ""
             recDocument.value.prods[index].avails = ""
+            recDocument.value.prods[index].qty = ""
             recDocument.value.prods[index].cost = ""
-            recDocument.value.prods[index].total = ""
-        }   
+            recDocument.value.prods[index].total = '0.00'
+        }
     }
 
-    const updateItemTotal = (index,qty,paId) => {
-        if(paId != ''){
+    const updateItemTotal = (index, qty, paId) => {
+        if (paId != '') {
             const selectedProd = products.value.find((element) => {
                 return element.value === paId; // Adding a return statement here
             });
+            recDocument.value.prods[index].avails = qty === '' ?
+                selectedProd.total_menos_acumulado : selectedProd.total_menos_acumulado - qty
             recDocument.value.prods[index].total = (selectedProd.costo_prod_adquisicion * qty).toFixed(2)
-        }else{
+        } else {
             recDocument.value.prods[index].total = ''
         }
     }
+
+    const openOption = (option) => {
+        const newOptions = []
+        products.value.map((element) => {
+            const isSelected = recDocument.value.prods.some((e) => e.prodId === element.value && e.deleted === false);
+            const isClicked = element.value === option
+            if ((!isSelected || isClicked) && element.total_menos_acumulado != 0) {
+                newOptions.push(element)
+            }
+        });
+        filteredProds.value = newOptions
+    }
+
+
+    const addNewRow = () => {
+        const avOptions = []
+        products.value.map((element) => {
+            const isSelected = recDocument.value.prods.some((e) => e.prodId === element.value && e.deleted === false);
+            if (!isSelected && element.total_menos_acumulado != 0) {
+                avOptions.push(element)
+            }
+        });
+        if (activeDetails.value.length <= avOptions.length) {
+            let array = {
+                recId: "",
+                prodId: "",
+                desc: "",
+                unit: "",
+                avails: "",
+                qty: "",
+                cost: "",
+                total: '0.00',
+                deleted: false
+            }
+            recDocument.value.prods.push(array);
+        } else {
+            useShowToast(toast.warning, "Has alcanzado el maximo de filas disponibles.");
+        }
+    }
+
+    const deleteRow = (index, recId) => {
+        if (activeDetails.value.length <= 1) {
+            useShowToast(toast.warning, "No puedes eliminar todos las filas.");
+        } else {
+            swal({
+                title: 'Eliminar producto.',
+                text: "¿Estas seguro de eliminar temporalmente el producto? Los cambios surtiran efecto al actualizar la recepcion.",
+                icon: 'warning',
+                showCancelButton: true,
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#DC2626',
+                cancelButtonColor: '#4B5563',
+                confirmButtonText: 'Si, Eliminar.'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    useShowToast(toast.success, "Producto eliminado temporalmente.");
+                    if (recId === "") {
+                        recDocument.value.prods.splice(index, 1);
+                    } else {
+                        recDocument.value.prods[index].deleted = true
+                    }
+                }
+            });
+        }
+    }
+
+    const activeDetails = computed(() => {
+        return recDocument.value.prods.filter((detail) => detail.deleted == false)
+    });
 
     const ordenC = computed(() => {
         const result = documents.value.filter((element) => {
@@ -191,8 +278,9 @@ export const useRecepcion = (context) => {
 
     return {
         errors, isLoadingRequest, reception, purchaseProcedures, catUnspsc,
-        budgetAccounts, unitsMeasmt, products, documents, ordenC, contrato, docSelected,
-        filteredDoc, filteredItems, recDocument, startRec,
-        getInfoForModalRecep, startReception, setProdItem, updateItemTotal
+        budgetAccounts, unitsMeasmt, documents, ordenC, contrato, docSelected,
+        filteredDoc, filteredItems, recDocument, startRec, filteredProds,
+        getInfoForModalRecep, startReception, setProdItem, updateItemTotal, addNewRow,
+        openOption, deleteRow
     }
 }
