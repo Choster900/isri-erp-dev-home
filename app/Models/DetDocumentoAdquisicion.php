@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class DetDocumentoAdquisicion extends Model
 {
@@ -38,5 +39,14 @@ class DetDocumentoAdquisicion extends Model
     public function quedan()
     {
         return $this->hasMany(Quedan::class,'id_det_doc_adquisicion','id_det_doc_adquisicion');
+    }
+    /**
+     * Get all of the productos_adquisiciones for the DetDocumentoAdquisicion
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function productos_adquisiciones(): HasMany
+    {
+        return $this->hasMany(ProductoAdquisicion::class, 'id_det_doc_adquisicion', 'id_det_doc_adquisicion');
     }
 }

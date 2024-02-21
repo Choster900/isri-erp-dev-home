@@ -4,13 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Proveedor extends Model
 {
     use HasFactory;
-    protected $table = 'proveedor';
-    protected $primaryKey = 'id_proveedor';
-    public $timestamps = false;
+    protected $table = 'proveedor'; // Nombre de la tabla
+    protected $primaryKey = 'id_proveedor'; // Llave primari de la tabla
+    public $timestamps = false; // Deshabilitando campos generados por laravel
 
     protected $fillable = [
         'id_tipo_contribuyente',
@@ -38,11 +40,15 @@ class Proveedor extends Model
     {
         return $this->belongsTo(SujetoRetencion::class, "id_sujeto_retencion", "id_sujeto_retencion");
     }
-    public function giro()
+    /**
+     * Get the giro that owns the Proveedor
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function giro(): BelongsTo
     {
-        return $this->belongsTo(Giro::class, "id_giro", "id_giro");
+        return $this->belongsTo(Giro::class, 'id_giro', 'id_giro');
     }
-
     public function scopeWithSujetoRetencion($query)
     {
         return $query->with("sujeto_retencion");
@@ -50,6 +56,15 @@ class Proveedor extends Model
     public function quedan()
     {
         return $this->hasMany(Quedan::class, "id_proveedor", "id_proveedor");
+    }
+    /**
+     * Get all of the documentos_adquisiciones for the Proveedor
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function documentos_adquisiciones(): HasMany
+    {
+        return $this->hasMany(DocumentoAdquisicion::class, 'id_proveedor', 'id_proveedor');
     }
 
 }

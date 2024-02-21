@@ -5,9 +5,11 @@ namespace App\Http\Controllers\UCP;
 use App\Http\Controllers\Controller;
 use App\Models\CentroAtencion;
 use App\Models\DetDocumentoAdquisicion;
+use App\Models\DocumentoAdquisicion;
 use App\Models\LineaTrabajo;
 use App\Models\Marca;
 use App\Models\ProductoAdquisicion;
+use App\Models\Proveedor;
 use App\Models\UnidadMedida;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -16,6 +18,48 @@ use Illuminate\Support\Facades\DB;
 class BienesServiciosController extends Controller
 {
 
+    public function getProductoAdquisicionByDocumentoAdquisicion(Request $request)
+    {
+        $v_columns = [
+            'id_doc_adquisicion',
+           /*  'dui_proveedor',
+            'nrc_proveedor',
+            'nit_proveedor',
+            'id_tipo_contribuyente',
+            'id_sujeto_retencion',
+            'razon_social_proveedor',
+            'estado_proveedor',
+            'nombre_comercial_proveedor', */
+        ];
+
+        $v_length = $request->input('length');
+        $v_column = $request->input('column'); //Index
+        $v_dir = $request->input('dir');
+        $data = $request->input('search');
+
+
+        $v_query = DetDocumentoAdquisicion::with([
+            "productos_adquisiciones.producto.unidad_medida",
+            "productos_adquisiciones.linea_trabajo",
+            "productos_adquisiciones.centro_atencion",
+            "productos_adquisiciones.marca",
+            "documento_adquisicion.proveedor"
+        ])->has('productos_adquisiciones')->orderBy($v_columns[$v_column], $v_dir);
+
+        if ($data) {
+          /*   $v_query->where('id_proveedor', 'like', '%' . $data["id_proveedor"] . '%')
+                ->whereRaw('IFNULL(dui_proveedor, IFNULL(nit_proveedor, "")) like ?', '%' . $data["dui_proveedor"] . '%')
+                ->where('razon_social_proveedor', 'like', '%' . $data["razon_social_proveedor"] . '%')
+                ->where('nombre_comercial_proveedor', 'like', '%' . $data["nombre_comercial_proveedor"] . '%')
+                ->where('estado_proveedor', 'like', '%' . $data["estado_proveedor"] . '%'); */
+        }
+
+        $v_roles = $v_query->paginate($v_length)->onEachSide(1);
+        return [
+            'data' => $v_roles,
+            'draw' => $request->input('draw'),
+        ];
+    }
 
     public function saveProductoAdquisicion(Request $request): object
     {
@@ -58,7 +102,10 @@ class BienesServiciosController extends Controller
     function getArrayObjectoForMultiSelect(): array
     {
         // Obtener detalles de documentos de adquisición con información adicional
-        $detalleDocumentoAdquisicion = DetDocumentoAdquisicion::with(["documento_adquisicion.proveedor"])->get();
+        $detalleDocumentoAdquisicion = DetDocumentoAdquisicion::with(["documento_adquisicion.proveedor"])
+            ->where("estado_det_doc_adquisicion", 1)
+            ->get();
+
 
         // Obtener todas las unidades de medida
         $unidadesMedida = UnidadMedida::all();

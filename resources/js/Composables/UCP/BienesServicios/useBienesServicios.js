@@ -11,6 +11,7 @@ export const useBienesServicios = () => {
     const arrayMarca = ref([])
     const productDataSearched = ref(null)
 
+    const objectGetFromProp = ref(null)
     /**
      * Agrega una nueva fila de detalle de adquisición a la matriz de productos de adquisición.
      * @param {number} i - Índice de la fila en la que se agregará el detalle de adquisición.
@@ -252,6 +253,7 @@ export const useBienesServicios = () => {
         idLt,
         arrayLineaTrabajo,
         arrayDocAdquisicion,
+        objectGetFromProp,
         arrayUnidadMedida,
         arrayMarca,
         arrayCentroAtencion,

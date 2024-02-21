@@ -211,7 +211,7 @@
                                 </td>
                                 <td class="w-72 p-0 uppercase align-top" colspan="2">
                                     <textarea v-model="detalle.descripcionProdAdquisicion"
-                                        class="text-[8pt] p-0 border-none bg-transparent outline-none focus:outline-none focus:ring focus:ring-transparent"></textarea>
+                                        class="uppercase text-[8pt] p-0 border-none bg-transparent outline-none focus:outline-none focus:ring focus:ring-transparent"></textarea>
                                 </td>
                                 <td class=" relative h-28" style="padding-left: 0 !important; padding-right: 0 !important; "
                                     colspan="2">
@@ -367,7 +367,7 @@
 <script>
 // Importa el componente ProcessModal desde la ruta relativa '@/Components-ISRI/AllModal/ProcessModal.vue'
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue';
-import { ref } from 'vue';
+import { ref, toRefs, watch } from 'vue';
 import { useBienesServicios } from '@/Composables/UCP/BienesServicios/useBienesServicios.js';
 // Define el componente Vue.js
 export default {
@@ -384,42 +384,68 @@ export default {
             type: Boolean,
             default: false,
         },
+        propProdAdquisicion: {
+            type: Object,
+            default: () => { },
+        },
     },
     // Configuración del componente utilizando el nuevo sistema de configuración de Vue 3
-    setup() {
+    setup(props) {
 
-        const { arrayProductoAdquisicion,
-            idDetDocAdquisicion,
+        const { propProdAdquisicion, showModal } = toRefs(props)
+        const {
             idLt,
-            arrayLineaTrabajo,
-            arrayDocAdquisicion,
-            arrayUnidadMedida,
-            saveProductAdquisicion,
             arrayMarca,
+            addingRows,
+            calculateTotal,
+            arrayLineaTrabajo,
+            objectGetFromProp,
+            arrayUnidadMedida,
+            idDetDocAdquisicion,
+            arrayDocAdquisicion,
             addinDocAdquisicion,
             arrayCentroAtencion,
             productDataSearched,
-            calculateTotal,
-            addingRows,
+            setInformacionProduct,
+            saveProductAdquisicion,
+            arrayProductoAdquisicion,
             handleProductoSearchByCodigo,
-            setInformacionProduct, } = useBienesServicios()
+        } = useBienesServicios()
+
+        watch(showModal, (newValue, oldValue) => {
+            // Verifica si showModal se ha establecido en falso (se cerró el modal)
+            if (!newValue) {
+                // Restablecer los valores a nulos o vacíos
+                console.log(newValue);
+            }
+        });
+        watch(propProdAdquisicion, (newValue, oldValue) => {
+            // Verifica si showModal se ha establecido en falso (se cerró el modal)
+            if (newValue !== null && newValue !== undefined && newValue !== '') {
+                objectGetFromProp.value = newValue;
+                console.log(objectGetFromProp.value);
+            } else {
+                objectGetFromProp.value = {};
+            }
+        });
 
 
         return {
-            setInformacionProduct,
-            handleProductoSearchByCodigo,
-            calculateTotal,
-            arrayProductoAdquisicion,
-            saveProductAdquisicion,
-            addinDocAdquisicion,
-            arrayMarca,
-            arrayLineaTrabajo,
-            arrayCentroAtencion,
-            addingRows,
-            arrayDocAdquisicion,
-            arrayUnidadMedida,
-            idDetDocAdquisicion,
             idLt,
+            arrayMarca,
+            addingRows,
+            objectGetFromProp,
+            calculateTotal,
+            arrayLineaTrabajo,
+            arrayUnidadMedida,
+            addinDocAdquisicion,
+            arrayCentroAtencion,
+            arrayDocAdquisicion,
+            idDetDocAdquisicion,
+            setInformacionProduct,
+            saveProductAdquisicion,
+            arrayProductoAdquisicion,
+            handleProductoSearchByCodigo,
         };
     },
 }
