@@ -12,6 +12,7 @@ export const useBienesServicios = () => {
     const productDataSearched = ref(null)
 
     const objectGetFromProp = ref(null)
+    const arrayProductsWhenIsEditable = ref(null)
     /**
      * Agrega una nueva fila de detalle de adquisición a la matriz de productos de adquisición.
      * @param {number} i - Índice de la fila en la que se agregará el detalle de adquisición.
@@ -153,7 +154,7 @@ export const useBienesServicios = () => {
                 // Actualiza el peso del producto en arrayProductoAdquisicion
                 arrayProductoAdquisicion.value[rowDocAdq].detalleDoc[rowDetalleDocAdq].pesoProducto = unidad_medida.id_unidad_medida;
                 arrayProductoAdquisicion.value[rowDocAdq].detalleDoc[rowDetalleDocAdq].detalleProducto = nombre_producto;
-                arrayProductoAdquisicion.value[rowDocAdq].detalleDoc[rowDetalleDocAdq].detalleProducto = nombre_producto;
+
                 arrayProductoAdquisicion.value[rowDocAdq].detalleDoc[rowDetalleDocAdq].especifico = id_ccta_presupuestal;
 
                 // Obtén el producto en la fila especificada
@@ -251,6 +252,7 @@ export const useBienesServicios = () => {
         calculateTotal,
         idDetDocAdquisicion,
         idLt,
+        arrayProductsWhenIsEditable,
         arrayLineaTrabajo,
         arrayDocAdquisicion,
         objectGetFromProp,

@@ -156,7 +156,7 @@
                                 <td class=" relative h-20 w-28"
                                     style="padding-left: 0 !important; padding-right: 0 !important; ">
                                     <div class="absolute top-0 w-full flex flex-col items-center">
-                                        <Multiselect :filter-results="false" :canClear="false" :resolve-on-load="false"
+                                        <!-- <Multiselect :filter-results="false" :canClear="false" :resolve-on-load="false"
                                             v-model="detalle.idProducto" :delay="1000" :searchable="true"
                                             :clear-on-search="true" :min-chars="3"
                                             @select="setInformacionProduct($event, i, j)" :classes="{
@@ -171,7 +171,21 @@
                                             }" noOptionsText="<p class='text-xs'>Lista vacia<p>"
                                             noResultsText="<p class='text-xs'>Sin resultados de producto <p>" :options="async function (query) {
                                                 return await handleProductoSearchByCodigo(query)
-                                            }" />
+                                            }" /> -->
+
+                                        <Multiselect :filter-results="false" :canClear="false" :resolve-on-load="false"
+                                            v-model="detalle.idProducto" :classes="{
+                                                placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                                search: 'w-full absolute text-start inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5 pr-3.5',
+                                                container: 'relative mx-auto w-full h-7  flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none',
+                                                singleLabel: 'pr-16 text-[8pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5  box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                                singleLabelText: 'text-center overflow-ellipsis overflow-hidden block whitespace-nowrap max-w-full',
+                                                option: 'flex items-center justify-start box-border text-left cursor-pointer text-[7.5pt] leading-snug py-2 px-3',
+                                                optionSelected: 'text-white bg-[#001c48]',
+                                                optionPointed: 'text-gray-800 bg-gray-100',
+                                            }" noOptionsText="<p class='text-xs'>Lista vacia<p>"
+                                            noResultsText="<p class='text-xs'>Sin resultados de producto <p>"
+                                            :options="arrayProductsWhenIsEditable" />
                                         <span class="text-center ">{{ detalle.detalleProducto }}</span>
                                     </div>
                                 </td>
@@ -327,6 +341,13 @@
                             </tr>
 
                         </tbody>
+                        <!-- <pre>
+                            {{ arrayProductoAdquisicion }}
+                        </pre>
+
+                        <pre>
+                            {{ arrayProductsWhenIsEditable }}
+                        </pre> -->
                     </table>
 
                     <div>
@@ -408,6 +429,7 @@ export default {
             productDataSearched,
             setInformacionProduct,
             saveProductAdquisicion,
+            arrayProductsWhenIsEditable,
             arrayProductoAdquisicion,
             handleProductoSearchByCodigo,
         } = useBienesServicios()
@@ -416,6 +438,7 @@ export default {
             // Verifica si showModal se ha establecido en falso (se cerró el modal)
             if (!newValue) {
                 // Restablecer los valores a nulos o vacíos
+                objectGetFromProp.value = []
                 console.log(newValue);
             }
         });
@@ -423,7 +446,82 @@ export default {
             // Verifica si showModal se ha establecido en falso (se cerró el modal)
             if (newValue !== null && newValue !== undefined && newValue !== '') {
                 objectGetFromProp.value = newValue;
-                console.log(objectGetFromProp.value);
+                // objectGetFromProp.value.productos_adquisiciones sera el arreglo original de producto
+                let productosAdquisiciones = objectGetFromProp.value.productos_adquisiciones;
+
+                // Utilizando un conjunto para rastrear los id_lt únicos
+                let idLtSet = new Set();
+                let productArray = new Set();
+
+                arrayProductsWhenIsEditable.value = productosAdquisiciones.reduce((nuevoArreglo, producto) => {
+                    let idProduct = producto.id_producto;
+
+                    if (!productArray.has(idProduct)) {
+                        // Agregar el id_lt al conjunto para evitar duplicados
+                        productArray.add(idProduct);
+                        const product = producto.producto
+                        // Crear un nuevo objeto con la propiedad value y agregarlo al nuevo arreglo
+                        nuevoArreglo.push(
+                            {
+                                value: product.id_producto,
+                                label: product.nombre_producto
+                            }
+
+                        );
+                    }
+                    return nuevoArreglo;
+                }, []);
+
+                // Filtrar los productos y crear nuevos objetos solo para id_lt no repetidos
+                arrayProductoAdquisicion.value = productosAdquisiciones.reduce((nuevoArreglo, producto) => {
+                    let idLt = producto.id_lt;
+
+                    // Verificar si el id_lt ya se ha agregado
+                    if (!idLtSet.has(idLt)) {
+                        // Agregar el id_lt al conjunto para evitar duplicados
+                        idLtSet.add(idLt);
+                        const product = producto
+                        // Crear un nuevo objeto con la propiedad value y agregarlo al nuevo arreglo
+                        nuevoArreglo.push(
+                            {
+                                idLt: idLt,
+                                detalleDoc: []
+                            }
+
+                        );
+                    }
+
+                    return nuevoArreglo;
+                }, []);
+
+
+                productosAdquisiciones.map(index => {
+                    console.log(index);
+                    let indice = arrayProductoAdquisicion.value.findIndex(i => i.idLt == index.id_lt)
+
+                    const { producto } = index
+                    arrayProductoAdquisicion.value[indice]["detalleDoc"].push(
+                        {
+                            "especifico": producto.id_ccta_presupuestal,
+                            "idProducto": producto.id_producto,
+                            "detalleProducto": producto.nombre_producto,
+                            "pesoProducto": producto.unidad_medida.id_unidad_medida,
+                            "idCentroAtencion": index.id_centro_atencion,
+                            "detalleCentro": index.centro_atencion.nombre_centro_atencion,
+                            "idMarca": index.id_marca,
+                            "cantProdAdquisicion": index.cant_prod_adquisicion,
+                            "costoProdAdquisicion": index.costo_prod_adquisicion,
+                            "descripcionProdAdquisicion": index.descripcion_prod_adquisicion,
+                            "estadoProdAdquisicion": "",
+                            "valorTotalProduct": index.cant_prod_adquisicion * index.costo_prod_adquisicion,
+                        }
+                    )
+                    // arrayProductoAdquisicion.value[indice]
+
+
+                })
+                console.log(arrayProductoAdquisicion.value);
+
             } else {
                 objectGetFromProp.value = {};
             }
@@ -445,6 +543,7 @@ export default {
             setInformacionProduct,
             saveProductAdquisicion,
             arrayProductoAdquisicion,
+            arrayProductsWhenIsEditable,
             handleProductoSearchByCodigo,
         };
     },
