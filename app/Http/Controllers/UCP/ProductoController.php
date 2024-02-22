@@ -83,18 +83,23 @@ class ProductoController extends Controller
     {
         DB::beginTransaction();
         try {
+            $newProductCode = "";
             $lastProduct = Producto::where('id_ccta_presupuestal', $request->budgetAccountId)
                 ->orderBy('fecha_reg_producto', 'desc')
                 ->first();
 
-            // Extract the correlative part of the product code
-            $correlative = explode('-', $lastProduct->codigo_producto)[1];
+            if ($lastProduct) {
+                // Extract the correlative part of the product code
+                $correlative = explode('-', $lastProduct->codigo_producto)[1];
 
-            // Increment the correlative part by one
-            $newCorrelative = intval($correlative) + 1;
+                // Increment the correlative part by one
+                $newCorrelative = intval($correlative) + 1;
 
-            // Concatenate the category part of the product code with the incremented correlative part
-            $newProductCode = $request->budgetAccountId . '-' . $newCorrelative;
+                // Concatenate the category part of the product code with the incremented correlative part
+                $newProductCode = $request->budgetAccountId . '-' . $newCorrelative;
+            }else{
+                $newProductCode = $request->budgetAccountId.'-1';
+            }
 
             $product = new Producto([
                 'id_proceso_compra'         => $request->purchaseProcedureId,

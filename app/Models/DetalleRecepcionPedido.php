@@ -19,6 +19,7 @@ class DetalleRecepcionPedido extends Model
         'id_producto',
         'id_producto_adquisicion',
         'id_recepcion_pedido',
+        'fecha_vencimiento_det_recepcion_pedido',
         'cant_det_recepcion_pedido',
         'costo_det_recepcion_pedido',
         'estado_det_recepcion_pedido',

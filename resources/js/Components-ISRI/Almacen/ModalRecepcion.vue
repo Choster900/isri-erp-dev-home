@@ -32,7 +32,7 @@
                             <div class="mx-auto w-[70%] h-[125px] border rounded-md shadow-lg  flex flex-col items-center justify-center
                              cursor-pointer hover:shadow-blue-200 hover:text-blue-700 transition duration-300 ease-in-out bg-white"
                                 :class="docSelected === 1 ? ' text-blue-600 border-blue-600 border-2' : 'border-gray-300'"
-                                @click="docSelected = 1; recDocument.docId = ''; recDocument.detDocId = '';">
+                                @click="docSelected = 1; infoToShow.docId = ''; infoToShow.detDocId = '';">
                                 <div class="mb-2">
                                     <p class="font-[Roboto] ">CONTRATOS</p>
                                 </div>
@@ -45,7 +45,7 @@
                             <div class="mx-auto w-[70%] h-[125px] border rounded-md shadow-lg  flex flex-col items-center justify-center
                             cursor-pointer hover:shadow-blue-200 hover:text-blue-700 transition duration-300 ease-in-out bg-white"
                                 :class="docSelected === 2 ? ' text-blue-600 border-blue-600 border-2' : 'border-gray-300'"
-                                @click="docSelected = 2; recDocument.docId = ''; recDocument.detDocId = '';">
+                                @click="docSelected = 2; infoToShow.docId = ''; infoToShow.detDocId = '';">
                                 <div class="mb-2">
                                     <p class="font-[Roboto]">ORDENES DE COMPRA</p>
                                 </div>
@@ -63,9 +63,9 @@
                         <label for="doc" class="font-[Roboto]">Numero documento:</label>
                     </div>
                     <div class="relative font-semibold flex h-[35px] w-full md:w-[60%]">
-                        <Multiselect id="doc" v-model="recDocument.docId" :options="filteredDoc" :searchable="true"
+                        <Multiselect id="doc" v-model="infoToShow.docId" :options="filteredDoc" :searchable="true"
                             :noOptionsText="'Lista vacía.'" placeholder="Seleccione documento"
-                            @clear="recDocument.detDocId = ''" />
+                            @clear="infoToShow.detDocId = ''" />
                     </div>
                 </div>
                 <div class="flex flex-col md:flex-row items-center mb-[50px] h-10 mx-8 max-w-full">
@@ -73,16 +73,16 @@
                         <label for="det-doc" class="font-[Roboto]">Item:</label>
                     </div>
                     <div class="relative font-semibold flex h-[35px] w-full md:w-[60%]">
-                        <Multiselect id="det-doc" v-model="recDocument.detDocId" :options="filteredItems" :searchable="true"
-                            @clear="recDocument.detDocId = ''" :noOptionsText="'Lista vacía.'"
+                        <Multiselect id="det-doc" v-model="infoToShow.detDocId" :options="filteredItems" :searchable="true"
+                            @clear="infoToShow.detDocId = ''" :noOptionsText="'Lista vacía.'"
                             placeholder="Seleccione item" />
                     </div>
                 </div>
 
                 <div class="md:flex my-6 flex-row justify-end mx-8">
-                    <button type="button" :disabled="recDocument.docId == '' || recDocument.detDocId == ''"
-                        :class="(recDocument.docId == '' || recDocument.detDocId == '') ? 'cursor-not-allowed opacity-50' : ''"
-                        :title="(recDocument.docId == '' || recDocument.detDocId == '') ? 'Información incompleta' : 'Iniciar proceso de recepción'"
+                    <button type="button" :disabled="infoToShow.docId == '' || infoToShow.detDocId == ''"
+                        :class="(infoToShow.docId == '' || infoToShow.detDocId == '') ? 'cursor-not-allowed opacity-50' : ''"
+                        :title="(infoToShow.docId == '' || infoToShow.detDocId == '') ? 'Información incompleta' : 'Iniciar proceso de recepción'"
                         class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                         @click="startReception(recepId)">
                         Iniciar recepcion
@@ -99,137 +99,213 @@
                 <pre>{{ products }}</pre>
             </div> -->
             <div v-else>
-                <transition name="fade" mode="out-in">
-                    <div class="ml-8 mr-0 overflow-x-auto mt-4">
-                        <div class="max-w-[97%] min-w-[540px] flex">
-                            <div class="flex w-full">
-                                <!-- Columna 1 -->
-                                <div class="w-[23%] min-w-[100px] bg-white border border-black p-2">
-                                    <img src="../../../img/isri-gob.png" alt="Logo del instituto" class="w-full">
-                                </div>
-                                <!-- Columna 2 -->
-                                <div class="w-[77%] min-w-[440px] bg-white border-y border-r border-black p-2">
-                                    <p class="font-[Bembo] text-center text-[15px] font-bold">ALMACEN CENTRAL</p>
-                                    <p class="font-[Bembo] text-center text-[15px] font-bold">CONTRATO LG01/2024</p>
-                                    <p class="font-[Bembo] text-center text-[15px] font-bold">ACTA DE RECEPCION 001/2024
-                                    </p>
-                                </div>
+                <div class="ml-8 mr-0 overflow-x-auto mt-4">
+                    <div class="max-w-[97%] min-w-[690px] flex">
+                        <div class="flex w-full">
+                            <!-- Columna 1 -->
+                            <div class="w-[23%] min-w-[175px] bg-white border border-gray-500 p-2">
+                                <img src="../../../img/isri-gob.png" alt="Logo del instituto" class="w-full">
+                            </div>
+                            <!-- Columna 2 -->
+                            <div class="w-[77%] min-w-[440px] bg-white border-y border-r border-gray-500 p-2">
+                                <p class="font-[Bembo] text-center text-[15px] font-bold">ALMACEN CENTRAL</p>
+                                <p class="font-[Bembo] text-center text-[15px] font-bold">CONTRATO {{ infoToShow.docName
+                                }}</p>
+                                <p class="font-[Bembo] text-center text-[15px] font-bold">ACTA DE RECEPCION {{
+                                    recDocument.acta ?? '' }}
+                                </p>
                             </div>
                         </div>
-                        <div class="max-w-[97%] min-w-[540px] flex">
-                            <div class="flex w-full">
-                                <div class="justify-center flex border-x w-full bg-white border-black">
-                                    <p class="font-[MuseoSans] text-[12px] py-2 font-bold">LISTADO DE PRODUCTOS</p>
-                                </div>
+                    </div>
+                    <div class="max-w-[97%] min-w-[690px] flex">
+                        <div class="flex w-full border-gray-500">
+                            <div
+                                class="justify-start flex items-center border-l border-gray-500 min-w-[345px] w-[50%] bg-white">
+                                <p class="font-[MuseoSans] text-gray-700 text-[11px] py-1 ml-2">FECHA Y HORA: 22/02/2024,
+                                    15:06:28</p>
+                            </div>
+                            <div class="justify-start flex items-center min-w-[172.5px] w-[25%] bg-white">
+                                <p class="font-[MuseoSans] text-gray-700 text-[11px] py-1">FINANCIAMIENTO: FG</p>
+                            </div>
+                            <div
+                                class="justify-start flex items-center border-r border-gray-500 min-w-[172.5px] w-[25%] bg-white">
+                                <p class="font-[MuseoSans] text-gray-700 text-[11px] py-1">COMPROMISO: 1911</p>
                             </div>
                         </div>
-                        <div class="max-w-full min-w-[555px] flex">
-                            <div class="flex w-[97%]">
+                    </div>
+                    <div class="max-w-[97%] min-w-[690px] flex">
+                        <div class="flex w-full border-b border-gray-500">
+                            <div
+                                class="justify-start flex items-center border-l border-gray-500 min-w-[517.5px] w-[75%] bg-white">
+                                <p class="font-[MuseoSans] text-gray-700 text-[11px] py-1 ml-2">PROVEEDOR: GBM DE EL
+                                    SALVADOR S.A DE C.V</p>
+                            </div>
+                            <div
+                                class="justify-start flex items-center border-r border-gray-500 min-w-[172.5px] w-[25%] bg-white">
+                                <p class="font-[MuseoSans] text-gray-700 text-[11px] py-1">NIT: 0715-080994-102-4</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="max-w-[97%] min-w-[690px] border-b border-gray-500 flex">
+                        <div class="flex w-full">
+                            <div
+                                class="justify-start flex items-center w-[23%] border-x min-w-[175px] h-[65px] bg-white border-gray-500">
+                                <p class="font-[MuseoSans] text-gray-600 text-[12px] mx-2">FACTURA:</p>
+                                <input v-model="recDocument.invoice"
+                                    class="font-bold w-[55%] p-1 h-[35px] rounded-[4px] font-[MuseoSans] text-sm border-[#d1d5db]"
+                                    type="text" name="" id="">
+                            </div>
+                            <div
+                                class="justify-center flex items-center w-[77%] border-r min-w-[515px] h-[65px] bg-white border-gray-500">
+                                <p class="font-[MuseoSans] text-gray-600 text-[12px] mx-2">OBSERVACION:</p>
+                                <textarea class="max-h-[50px] w-[70%] overflow-y-hidden resize-none peer placeholder-gray-400 rounded-[4px] text-xs font-semibold border-gray-300 focus:border-transparent px-2 text-slate-900"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- <div class="max-w-[97%] min-w-[690px] flex">
+                            <div class="flex w-full border-b border-gray-500">
+                                <div class="justify-start flex items-center border-x border-gray-500 w-full bg-white">
+                                    <p class="font-[MuseoSans] text-gray-700 text-[11px] py-1 mx-2">SE HACE CONSTAR QUE LOS BIENES DETALLADOS A CONTINUACION, CUMPLEN CON LAS CONDICIONES Y ESPECIFICACIONES TECNICAS PREVIAMENTE DEFINIDAS EN EL DOCUMENTO DE ADQUISICION.</p>
+                                </div>
+                            </div>
+                        </div> -->
+                    <div class="max-w-[97%] min-w-[690px] flex">
+                        <div class="flex w-full border-x border-b border-gray-500">
+                            <div class="justify-center flex w-full bg-white">
+                                <p class="font-[MuseoSans] text-[12px] py-2 font-bold">LISTADO DE PRODUCTOS</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="max-w-full min-w-[705px] flex">
+                        <div
+                            class="flex w-[97%] bg-[#001c48] border-b border-x border-gray-500 bg-opacity-80 min-w-[690px] text-white">
+                            <!-- Cabecera de la tabla -->
+                            <div class="w-[23%] min-w-[175px] border-r border-gray-500 h-[30px]">
+                                <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px] w-full">PRODUCTO
+                                </p>
+                            </div>
+                            <div class="w-[23%] min-w-[175px] border-r border-gray-500 h-[30px]">
+                                <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px] w-full">
+                                    DESCRIPCION</p>
+                            </div>
+                            <div class="w-[8%] min-w-[60px] border-r border-gray-500 h-[30px]">
+                                <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px]">REST.</p>
+                            </div>
+                            <div class="w-[12%] min-w-[80px] border-r border-gray-500 h-[30px]">
+                                <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px]">VENCIMIENTO</p>
+                            </div>
+                            <div class="w-[10%] min-w-[80px] border-r border-gray-500 h-[30px]">
+                                <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px]">CANTIDAD</p>
+                            </div>
+                            <div class="w-[12%] min-w-[60px] border-r border-gray-500 h-[30px]">
+                                <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px]">COSTO</p>
+                            </div>
+                            <div class="w-[12%] min-w-[60px] border-gray-500 h-[30px]">
+                                <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px]">TOTAL</p>
+                            </div>
+                        </div>
+                        <div class="flex w-[3%]">
+                            <div class="w-full min-w-[15px] h-[30px]">
+                                <svg @click="addNewRow()" class="text-green-600 cursor-pointer hover:text-green-800"
+                                    width="28px" height="28px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 6V18M6 12H18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <template v-for="(prod, index) in recDocument.prods" :key="index">
+                        <div v-if="prod.deleted == false" class="max-w-full flex min-w-[705px] ">
+                            <div class="flex w-[97%] min-w-[690px] bg-white hover:bg-gray-200 text-gray-800">
                                 <!-- Cabecera de la tabla -->
-                                <div class="w-[23%] min-w-[100px] border  border-gray-500 h-[30px]">
-                                    <p class="text-center font-[MuseoSans] text-[12px] font-bold mt-[5px] w-full">PRODUCTO
+                                <div class="w-[23%] min-w-[175px] flex items-center justify-center border-x border-b  border-gray-500 min-h-[75px]"
+                                    :class="errors['prods.' + index + '.prodId'] ? 'bg-red-300' : ''">
+                                    <Multiselect id="doc" v-model="prod.prodId" :options="filteredProds" class="h-[35px]"
+                                        :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione"
+                                        @input="setProdItem(index, $event, null)" @open="openOption(prod.prodId)" />
+                                </div>
+                                <div
+                                    class="w-[23%] min-w-[175px] flex items-center justify-center border-r border-b  border-gray-500 min-h-[75px]">
+                                    <p class="font-[MuseoSans] text-sm p-1 ">{{ prod.desc }}</p>
+                                </div>
+                                <div class="w-[8%] min-w-[60px] flex items-center justify-center border-r border-b  border-gray-500 min-h-[75px]"
+                                    :class="prod.avails < 0 ? 'bg-red-300' : ''">
+                                    <p class="font-[MuseoSans] text-sm p-1 ">{{ prod.avails }}</p>
+                                </div>
+                                <div class="w-[12%] min-w-[80px] flex items-center justify-center border-r border-b  border-gray-500 min-h-[75px]"
+                                    :class="errors['prods.' + index + '.expiryDate'] ? 'bg-red-300' : ''">
+                                    <!-- <p class="font-[MuseoSans] text-sm p-1 ">{{ prod.unit }}</p> -->
+                                    <date-time-picker-m v-if="prod.perishable === 1" v-model="prod.expiryDate"
+                                        :showIcon="false" :placeholder="'Seleccione'" />
+                                    <p v-else class="font-[MuseoSans] text-sm p-1 ">N/A</p>
+                                </div>
+                                <div class="w-[10%] min-w-[80px] flex items-center justify-center border-r border-b  border-gray-500 min-h-[75px]"
+                                    :class="errors['prods.' + index + '.qty'] ? 'bg-red-300' : ''">
+                                    <input v-model="prod.qty"
+                                        class="font-bold max-w-[75%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-sm border-[#d1d5db]"
+                                        type="text" name="" id=""
+                                        @input="handleValidation('qty', { limit: 3, number: true }, { index: index, qty: prod.qty, prodId: prod.prodId })">
+                                </div>
+                                <div
+                                    class="w-[12%] min-w-[60px] flex items-center justify-center border-r border-b  border-gray-500 min-h-[75px]">
+                                    <p class="font-[MuseoSans] text-sm p-1 ">
+                                        {{ prod.cost != '' ? '$' + prod.cost : '' }}
                                     </p>
                                 </div>
-                                <div class="w-[23%] min-w-[100px] border-y border-r  border-gray-500 h-[30px]">
-                                    <p class="text-center font-[MuseoSans] text-[12px] font-bold mt-[5px] w-full">
-                                        DESCRIPCION</p>
-                                </div>
-                                <div class="w-[10%] min-w-[80px] border-y border-r  border-gray-500 h-[30px]">
-                                    <p class="text-center font-[MuseoSans] text-[12px] font-bold mt-[5px]">RESTANTE</p>
-                                </div>
-                                <div class="w-[10%] min-w-[60px] border-y border-r  border-gray-500 h-[30px]">
-                                    <p class="text-center font-[MuseoSans] text-[12px] font-bold mt-[5px]">UNIDAD</p>
-                                </div>
-                                <div class="w-[10%] min-w-[80px] border-y border-r  border-gray-500 h-[30px]">
-                                    <p class="text-center font-[MuseoSans] text-[12px] font-bold mt-[5px]">CANTIDAD</p>
-                                </div>
-                                <div class="w-[12%] min-w-[60px] border-y border-r  border-gray-500 h-[30px]">
-                                    <p class="text-center font-[MuseoSans] text-[12px] font-bold mt-[5px]">COSTO</p>
-                                </div>
-                                <div class="w-[12%] min-w-[60px] border-y border-r border-gray-500 h-[30px]">
-                                    <p class="text-center font-[MuseoSans] text-[12px] font-bold mt-[5px]">TOTAL</p>
+                                <div
+                                    class="w-[12%] min-w-[60px] flex items-center justify-center border-r border-b  border-gray-500 min-h-[75px]">
+                                    <p class="font-[MuseoSans] text-sm p-1 font-bold">
+                                        {{ prod.total != '' ? '$' + prod.total : '' }}
+                                    </p>
                                 </div>
                             </div>
-                            <div class="flex w-[3%]">
+                            <div class="w-[3%] flex items-center justify-center">
                                 <div class="w-full min-w-[15px] h-[30px]">
-                                    <svg @click="addNewRow()" class="text-green-600 cursor-pointer" width="24" height="24"
-                                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M12 6V18M6 12H18" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round" />
+                                    <svg @click="deleteRow(index, prod.detRecId)"
+                                        class="text-red-600 cursor-pointer ml-1 hover:text-red-800" width="20px"
+                                        height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round">
+                                        </g>
+                                        <g id="SVGRepo_iconCarrier">
+                                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                                d="M6.30958 3.54424C7.06741 2.56989 8.23263 2 9.46699 2H20.9997C21.8359 2 22.6103 2.37473 23.1614 2.99465C23.709 3.61073 23.9997 4.42358 23.9997 5.25V18.75C23.9997 19.5764 23.709 20.3893 23.1614 21.0054C22.6103 21.6253 21.8359 22 20.9997 22H9.46699C8.23263 22 7.06741 21.4301 6.30958 20.4558L0.687897 13.2279C0.126171 12.5057 0.126169 11.4943 0.687897 10.7721L6.30958 3.54424ZM10.2498 7.04289C10.6403 6.65237 11.2734 6.65237 11.664 7.04289L14.4924 9.87132L17.3208 7.04289C17.7113 6.65237 18.3445 6.65237 18.735 7.04289L19.4421 7.75C19.8327 8.14052 19.8327 8.77369 19.4421 9.16421L16.6137 11.9926L19.4421 14.8211C19.8327 15.2116 19.8327 15.8448 19.4421 16.2353L18.735 16.9424C18.3445 17.3329 17.7113 17.3329 17.3208 16.9424L14.4924 14.114L11.664 16.9424C11.2734 17.3329 10.6403 17.3329 10.2498 16.9424L9.54265 16.2353C9.15212 15.8448 9.15212 15.2116 9.54265 14.8211L12.3711 11.9926L9.54265 9.16421C9.15212 8.77369 9.15212 8.14052 9.54265 7.75L10.2498 7.04289Z"
+                                                fill="currentColor"></path>
+                                        </g>
                                     </svg>
                                 </div>
                             </div>
                         </div>
-                        <template v-for="(prod, index) in recDocument.prods" :key="index">
-                            <div v-if="prod.deleted == false" class="max-w-full flex min-w-[555px]">
-                                <div class="flex w-[97%]">
-                                    <!-- Cabecera de la tabla -->
-                                    <div
-                                        class="w-[23%] min-w-[100px] border-x border-b bg-white border-gray-500 min-h-[75px]">
-                                        <Multiselect id="doc" v-model="prod.prodId" :options="filteredProds"
-                                            class="h-[35px]" :searchable="true" :noOptionsText="'Lista vacía.'"
-                                            placeholder="Seleccione" @input="setProdItem(index, $event, null)"
-                                            @open="openOption(prod.prodId)" />
-                                    </div>
-                                    <div
-                                        class="w-[23%] min-w-[100px] border-r border-b bg-white border-gray-500 min-h-[75px]">
-                                        <p class="font-[MuseoSans] text-sm p-1 text-gray-600">{{ prod.desc }}</p>
-                                    </div>
-                                    <div
-                                        class="w-[10%] min-w-[80px] border-r border-b bg-white border-gray-500 min-h-[75px]">
-                                        <p class="font-[MuseoSans] text-sm p-1 text-gray-600">{{ prod.avails }}</p>
-                                    </div>
-                                    <div
-                                        class="w-[10%] min-w-[60px] border-r border-b bg-white border-gray-500 min-h-[75px]">
-                                        <p class="font-[MuseoSans] text-sm p-1 text-gray-600">{{ prod.unit }}</p>
-                                    </div>
-                                    <div
-                                        class="w-[10%] min-w-[80px] border-r border-b bg-white border-gray-500 min-h-[75px]">
-                                        <input v-model="prod.qty" class="font-bold max-w-full font-[MuseoSans] text-sm"
-                                            type="text" name="" id=""
-                                            @input="updateItemTotal(index, prod.qty, prod.prodId)">
-                                    </div>
-                                    <div
-                                        class="w-[12%] min-w-[60px] border-r border-b bg-white border-gray-500 min-h-[75px]">
-                                        <p class="font-[MuseoSans] text-sm p-1 text-gray-600">
-                                            {{ prod.cost != '' ? '$' + prod.cost : '' }}
-                                        </p>
-                                    </div>
-                                    <div
-                                        class="w-[12%] min-w-[60px] border-r border-b bg-white border-gray-500 min-h-[75px]">
-                                        <p class="font-[MuseoSans] text-sm p-1 font-bold">
-                                            {{ prod.total != '' ? '$' + prod.total : '' }}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="flex w-[3%]">
-                                    <div class="w-full min-w-[15px] h-[30px]">
-                                        <svg @click="deleteRow(index,prod.recId)" class="text-red-600 cursor-pointer" width="20px" height="20px"
-                                            viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round">
-                                            </g>
-                                            <g id="SVGRepo_iconCarrier">
-                                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                                    d="M6.30958 3.54424C7.06741 2.56989 8.23263 2 9.46699 2H20.9997C21.8359 2 22.6103 2.37473 23.1614 2.99465C23.709 3.61073 23.9997 4.42358 23.9997 5.25V18.75C23.9997 19.5764 23.709 20.3893 23.1614 21.0054C22.6103 21.6253 21.8359 22 20.9997 22H9.46699C8.23263 22 7.06741 21.4301 6.30958 20.4558L0.687897 13.2279C0.126171 12.5057 0.126169 11.4943 0.687897 10.7721L6.30958 3.54424ZM10.2498 7.04289C10.6403 6.65237 11.2734 6.65237 11.664 7.04289L14.4924 9.87132L17.3208 7.04289C17.7113 6.65237 18.3445 6.65237 18.735 7.04289L19.4421 7.75C19.8327 8.14052 19.8327 8.77369 19.4421 9.16421L16.6137 11.9926L19.4421 14.8211C19.8327 15.2116 19.8327 15.8448 19.4421 16.2353L18.735 16.9424C18.3445 17.3329 17.7113 17.3329 17.3208 16.9424L14.4924 14.114L11.664 16.9424C11.2734 17.3329 10.6403 17.3329 10.2498 16.9424L9.54265 16.2353C9.15212 15.8448 9.15212 15.2116 9.54265 14.8211L12.3711 11.9926L9.54265 9.16421C9.15212 8.77369 9.15212 8.14052 9.54265 7.75L10.2498 7.04289Z"
-                                                    fill="currentColor"></path>
-                                            </g>
-                                        </svg>
-                                    </div>
-                                </div>
+                    </template>
+                    <div class="max-w-[97%] min-w-[540px] flex">
+                        <div class="flex w-full">
+                            <div
+                                class="justify-center flex w-[66%] border-l border-b min-w-[490px] h-[30px] bg-white border-gray-500">
+
                             </div>
-                        </template>
-                        <div class="md:flex my-6 flex-row justify-end mx-8">
-                            <button type="button" @click="$emit('cerrar-modal')"
-                                class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-[12px] px-2.5 py-1.5 text-center mb-2 dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
-                            <button
-                                class="bg-orange-700 hover:bg-orange-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">ACTUALIZAR</button>
-                            <button
-                                class="bg-green-700 hover:bg-green-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">GUARDAR</button>
+                            <div
+                                class="justify-center flex border-r border-b w-[22%] min-w-[140px] h-[30px]  border-gray-500">
+                                <p class="font-[MuseoSans] text-sm py-2 font-bold mt-[-4px]">TOTAL ACTA</p>
+                            </div>
+                            <div
+                                class="justify-center flex border-r border-b w-[12%] min-w-[60px] h-[30px]  border-gray-500">
+                                <p class="font-[MuseoSans] text-sm py-2 font-bold text-green-800 mt-[-4px]">${{ totalRec }}
+                                </p>
+                            </div>
                         </div>
                     </div>
-
-                </transition>
+                    
+                    <div class="md:flex my-6 flex-row justify-end mx-8">
+                        <button type="button" @click="$emit('cerrar-modal')"
+                            class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-[12px] px-2.5 py-1.5 text-center mb-2 dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
+                        <button v-if="recepId > 0" @click="updateReception(recDocument)"
+                            class="bg-orange-700 hover:bg-orange-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">ACTUALIZAR</button>
+                        <button v-else @click="storeReception(recDocument)"
+                            class="bg-green-700 hover:bg-green-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">GUARDAR</button>
+                    </div>
+                </div>
             </div>
 
 
@@ -253,15 +329,14 @@ import InputError from "@/Components/InputError.vue";
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 import InputText from "@/Components-ISRI/ComponentsToForms/InputText.vue";
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
-// import DateTimePickerM from "@/Components-ISRI/ComponentsToForms/DateTimePickerM.vue";
+import DateTimePickerM from "@/Components-ISRI/ComponentsToForms/DateTimePickerM.vue";
 // import TimePickerM from "@/Components-ISRI/ComponentsToForms/TimePickerM.vue";
-import { useValidateInput } from '@/Composables/General/useValidateInput';
 
 import { toRefs, onMounted, ref, watch } from 'vue';
 
 export default {
     emits: ["cerrar-modal", "get-table"],
-    components: { ProcessModal, InputError, InputText, IconM },
+    components: { ProcessModal, InputError, InputText, IconM, DateTimePickerM },
     props: {
         showModalRecep: {
             type: Boolean,
@@ -279,18 +354,10 @@ export default {
         const {
             isLoadingRequest, recDocument, errors, purchaseProcedures, catUnspsc,
             budgetAccounts, unitsMeasmt, documents, ordenC, contrato, docSelected,
-            filteredDoc, filteredItems, startRec, filteredProds,
+            filteredDoc, filteredItems, startRec, filteredProds, totalRec, infoToShow,
             getInfoForModalRecep, startReception, setProdItem, updateItemTotal, addNewRow,
-            openOption, deleteRow
+            openOption, deleteRow, handleValidation, storeReception, updateReception
         } = useRecepcion(context);
-
-        const {
-            validateInput
-        } = useValidateInput()
-
-        const handleValidation = (input, validation) => {
-            prod.value[input] = validateInput(prod.value[input], validation)
-        }
 
         const handleSearchChange = async (query) => {
             await asyncFindUnspsc(query);
@@ -305,18 +372,32 @@ export default {
         return {
             isLoadingRequest, recDocument, errors, purchaseProcedures, catUnspsc,
             budgetAccounts, unitsMeasmt, documents, ordenC, contrato, docSelected,
-            filteredDoc, filteredItems, startRec, filteredProds,
+            filteredDoc, filteredItems, startRec, filteredProds, totalRec, infoToShow,
             handleSearchChange, handleValidation, startReception, setProdItem, updateItemTotal,
-            addNewRow, openOption, deleteRow
+            addNewRow, openOption, deleteRow, storeReception, updateReception
         }
     }
 }
 </script>
 
 <style>
-.table-row {
-    display: flex;
-    justify-content: space-between;
+.input-border-bottom {
+    border-width: 0 0 1px 0;
+    /* Establece el ancho del borde solo en la parte inferior */
+    border-color: #6B7280;
+    /* Color del borde */
+    border-style: solid;
+    /* Establece el estilo del borde como una línea sólida */
+    outline: none;
+    /* Elimina el contorno del input */
+}
+
+.custom-hover:hover>div {
+    filter: saturate(150%);
+}
+
+.dp__input_wrap {
+    height: 35px;
 }
 
 .selected-opt .multiselect {
@@ -327,16 +408,7 @@ export default {
     background-color: #E5E7EB;
 }
 
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.5s;
-}
-
-.fade-enter,
-.fade-leave-to {
-    opacity: 0;
-}
-
 /* .select-err .multiselect-wrapper input {
     background-color: #FECACA;
-} */</style>
+} */
+</style>
