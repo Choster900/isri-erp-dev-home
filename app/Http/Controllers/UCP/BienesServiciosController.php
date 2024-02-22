@@ -22,7 +22,7 @@ class BienesServiciosController extends Controller
     {
         $v_columns = [
             'id_doc_adquisicion',
-           /*  'dui_proveedor',
+            /*  'dui_proveedor',
             'nrc_proveedor',
             'nit_proveedor',
             'id_tipo_contribuyente',
@@ -39,6 +39,9 @@ class BienesServiciosController extends Controller
 
 
         $v_query = DetDocumentoAdquisicion::with([
+            "productos_adquisiciones" => function ($query) {
+                return $query->where("estado_prod_adquisicion", 1);
+            },
             "productos_adquisiciones.producto.unidad_medida",
             "productos_adquisiciones.linea_trabajo",
             "productos_adquisiciones.centro_atencion",
@@ -47,7 +50,7 @@ class BienesServiciosController extends Controller
         ])->has('productos_adquisiciones')->orderBy($v_columns[$v_column], $v_dir);
 
         if ($data) {
-          /*   $v_query->where('id_proveedor', 'like', '%' . $data["id_proveedor"] . '%')
+            /*   $v_query->where('id_proveedor', 'like', '%' . $data["id_proveedor"] . '%')
                 ->whereRaw('IFNULL(dui_proveedor, IFNULL(nit_proveedor, "")) like ?', '%' . $data["dui_proveedor"] . '%')
                 ->where('razon_social_proveedor', 'like', '%' . $data["razon_social_proveedor"] . '%')
                 ->where('nombre_comercial_proveedor', 'like', '%' . $data["nombre_comercial_proveedor"] . '%')
@@ -70,33 +73,119 @@ class BienesServiciosController extends Controller
         $fechaActual = now();
 
         foreach ($detalles as $detalle) {
-            foreach ($detalle["detalleDoc"] as $detalleProducto) {
-                $nuevoDetalle = [
-                    'id_producto'                  => $detalleProducto["idProducto"],
-                    'id_det_doc_adquisicion'       => $idDetDocAdquisicion,
-                    'id_marca'                     => $detalleProducto["idMarca"],
-                    'id_lt'                        => $detalle["idLt"],
-                    'id_centro_atencion'           => $detalleProducto["idCentroAtencion"],
-                    'cant_prod_adquisicion'        => $detalleProducto["cantProdAdquisicion"],
-                    'costo_prod_adquisicion'       => $detalleProducto["costoProdAdquisicion"],
-                    'descripcion_prod_adquisicion' => $detalleProducto["descripcionProdAdquisicion"],
-                    'estado_prod_adquisicion'      => 1,
-                    'fecha_reg_prod_adquisicion'   => $fechaActual,
-                    'usuario_prod_adquisicion'     => $usuario,
-                    'ip_prod_adquisicion'          => $ip,
-                ];
+            if ($detalle["estadoLt"] != 0) {
+                foreach ($detalle["detalleDoc"] as $detalleProducto) {
+                    if ($detalleProducto["estadoProdAdquisicion"] == 1) {
+                        $nuevoDetalle = [
+                            'id_producto'                  => $detalleProducto["idProducto"],
+                            'id_det_doc_adquisicion'       => $idDetDocAdquisicion,
+                            'id_marca'                     => $detalleProducto["idMarca"],
+                            'id_lt'                        => $detalle["idLt"],
+                            'id_centro_atencion'           => $detalleProducto["idCentroAtencion"],
+                            'cant_prod_adquisicion'        => $detalleProducto["cantProdAdquisicion"],
+                            'costo_prod_adquisicion'       => $detalleProducto["costoProdAdquisicion"],
+                            'descripcion_prod_adquisicion' => $detalleProducto["descripcionProdAdquisicion"],
+                            'estado_prod_adquisicion'      => 1,
+                            'fecha_reg_prod_adquisicion'   => $fechaActual,
+                            'usuario_prod_adquisicion'     => $usuario,
+                            'ip_prod_adquisicion'          => $ip,
+                        ];
 
-                // Usar DB::insert para insertar directamente y mejorar el rendimiento
-                DB::table('producto_adquisicion')->insert($nuevoDetalle);
+                        // Usar DB::insert para insertar directamente y mejorar el rendimiento
+                        DB::table('producto_adquisicion')->insert($nuevoDetalle);
+                    }
+                }
             }
         }
 
         return response()->json($request); // O cualquier otra respuesta que desees enviar
     }
 
-    public function updateProductoAdquisicion (Request $request){
-        return $request;
+    public function updateProductoAdquisicion(Request $request)
+    {
+        try {
+            $detalles = $request->productAdq;
+            $idDetDocAdquisicion = $request->idDetDocAdquisicion;
+            $usuario = $request->user()->nick_usuario;
+            $ip = $request->ip();
+            $fechaActual = now();
+
+            foreach ($detalles as $detalle) {
+                // Verificar si la linea de trabajo del producto adquisicion no ha sido eliminada en el front
+                if ($detalle["estadoLt"] != 0) {
+                    foreach ($detalle["detalleDoc"] as $detalleProducto) {
+                        // Actualizar producto existente
+                        if ($detalleProducto["estadoProdAdquisicion"] == 2) {
+                            ProductoAdquisicion::where([
+                                'id_prod_adquisicion' => $detalleProducto["idProdAdquisicion"],
+                                'id_lt'               => $detalle["idLt"],
+                            ])->update([
+                                // Actualizar campos del producto
+                                'id_producto'                  => $detalleProducto["idProducto"],
+                                'id_det_doc_adquisicion'       => $idDetDocAdquisicion,
+                                'id_marca'                     => $detalleProducto["idMarca"],
+                                'id_lt'                        => $detalle["idLt"],
+                                'id_centro_atencion'           => $detalleProducto["idCentroAtencion"],
+                                'cant_prod_adquisicion'        => $detalleProducto["cantProdAdquisicion"],
+                                'costo_prod_adquisicion'       => $detalleProducto["costoProdAdquisicion"],
+                                'descripcion_prod_adquisicion' => $detalleProducto["descripcionProdAdquisicion"],
+                                'estado_prod_adquisicion'      => 1,
+                                'fecha_reg_prod_adquisicion'   => $fechaActual,
+                                'usuario_prod_adquisicion'     => $usuario,
+                                'ip_prod_adquisicion'          => $ip,
+                            ]);
+                        }
+                        // Insertar nuevo producto
+                        else if ($detalleProducto["estadoProdAdquisicion"] == 1) {
+                            $nuevoDetalle = [
+                                'id_producto'                  => $detalleProducto["idProducto"],
+                                'id_det_doc_adquisicion'       => $idDetDocAdquisicion,
+                                'id_marca'                     => $detalleProducto["idMarca"],
+                                'id_lt'                        => $detalle["idLt"],
+                                'id_centro_atencion'           => $detalleProducto["idCentroAtencion"],
+                                'cant_prod_adquisicion'        => $detalleProducto["cantProdAdquisicion"],
+                                'costo_prod_adquisicion'       => $detalleProducto["costoProdAdquisicion"],
+                                'descripcion_prod_adquisicion' => $detalleProducto["descripcionProdAdquisicion"],
+                                'estado_prod_adquisicion'      => 1,
+                                'fecha_reg_prod_adquisicion'   => $fechaActual,
+                                'usuario_prod_adquisicion'     => $usuario,
+                                'ip_prod_adquisicion'          => $ip,
+                            ];
+
+                            // Usar DB::insert para insertar directamente y mejorar el rendimiento
+                            DB::table('producto_adquisicion')->insert($nuevoDetalle);
+                        }
+                        // Desactivar producto
+                        else {
+                            ProductoAdquisicion::where([
+                                'id_prod_adquisicion' => $detalleProducto["idProdAdquisicion"],
+                                'id_lt'               => $detalle["idLt"],
+                            ])->update([
+                                'estado_prod_adquisicion' => 0,
+                            ]);
+                        }
+                    }
+                }
+                // Desactivar los productos adquisiciones por linea de trabajo
+                else {
+                    foreach ($detalle["detalleDoc"] as $detalleProducto) {
+                        ProductoAdquisicion::where([
+                            'id_prod_adquisicion' => $detalleProducto["idProdAdquisicion"],
+                            'id_lt'               => $detalle["idLt"],
+                        ])->update([
+                            'estado_prod_adquisicion' => 0,
+                        ]);
+                    }
+                }
+            }
+
+            return response()->json(["message" => "Actualización exitosa"]);
+        } catch (\Exception $e) {
+            // Manejar excepciones y retornar un mensaje de error
+            return response()->json(["error" => "Error en la actualización: " . $e->getMessage()], 500);
+        }
     }
+
 
     /**
      * Obtiene arreglo de dinstintos objetos para el uso en multiselect.
@@ -108,6 +197,7 @@ class BienesServiciosController extends Controller
         // Obtener detalles de documentos de adquisición con información adicional
         $detalleDocumentoAdquisicion = DetDocumentoAdquisicion::with(["documento_adquisicion.proveedor"])
             ->where("estado_det_doc_adquisicion", 1)
+             ->whereDoesntHave("productos_adquisiciones")
             ->get();
 
 

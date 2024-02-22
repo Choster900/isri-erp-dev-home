@@ -10,6 +10,7 @@ export const useBienesServicios = () => {
     const arrayCentroAtencion = ref([])
     const arrayMarca = ref([])
     const productDataSearched = ref(null)
+    const arrayWhenIsEditingDocAdq = ref([])
 
     const objectGetFromProp = ref(null)
     const arrayProductsWhenIsEditable = ref(null)
@@ -27,6 +28,7 @@ export const useBienesServicios = () => {
                 // Agrega un nuevo objeto de detalle de adquisición a la matriz de productos
                 arrayProductoAdquisicion.value[i].detalleDoc.push({
                     especifico: '',
+                    idProdAdquisicion: '', // [Comment: 'Identificador producto adquisicion por producto]
                     idProducto: '',
                     detalleProducto: '',
                     pesoProducto: '',
@@ -61,8 +63,10 @@ export const useBienesServicios = () => {
         try {
             // Agrega un nuevo objeto de documento de adquisición a la matriz de productos
             arrayProductoAdquisicion.value.push({
+                idProdAdquisicion: '', // [Comment: 'Identificador producto adquisicion por linea de trabajo]
                 idLt: '',
                 estadoLt: 1, // [Comment: Estado manejado en 0 => deleted,1 => created,2 =>edited]
+                hoverToDelete: false, // [Comment: It´ll add color]
                 detalleDoc: [],
             });
 
@@ -286,6 +290,7 @@ export const useBienesServicios = () => {
         arrayCentroAtencion,
         productDataSearched,
         addingRows,
+        arrayWhenIsEditingDocAdq,
         handleProductoSearchByCodigo,
         setInformacionProduct,
     }
