@@ -10,7 +10,10 @@ export const useBienesServicios = () => {
     const arrayCentroAtencion = ref([])
     const arrayMarca = ref([])
     const productDataSearched = ref(null)
+    const arrayWhenIsEditingDocAdq = ref([])
 
+    const objectGetFromProp = ref(null)
+    const arrayProductsWhenIsEditable = ref(null)
     /**
      * Agrega una nueva fila de detalle de adquisición a la matriz de productos de adquisición.
      * @param {number} i - Índice de la fila en la que se agregará el detalle de adquisición.
@@ -25,6 +28,7 @@ export const useBienesServicios = () => {
                 // Agrega un nuevo objeto de detalle de adquisición a la matriz de productos
                 arrayProductoAdquisicion.value[i].detalleDoc.push({
                     especifico: '',
+                    idProdAdquisicion: '', // [Comment: 'Identificador producto adquisicion por producto]
                     idProducto: '',
                     detalleProducto: '',
                     pesoProducto: '',
@@ -34,7 +38,7 @@ export const useBienesServicios = () => {
                     cantProdAdquisicion: '',
                     costoProdAdquisicion: '',
                     descripcionProdAdquisicion: '',
-                    estadoProdAdquisicion: '',
+                    estadoProdAdquisicion: 1,
                     valorTotalProduct: '',
                 });
 
@@ -59,7 +63,10 @@ export const useBienesServicios = () => {
         try {
             // Agrega un nuevo objeto de documento de adquisición a la matriz de productos
             arrayProductoAdquisicion.value.push({
+                idProdAdquisicion: '', // [Comment: 'Identificador producto adquisicion por linea de trabajo]
                 idLt: '',
+                estadoLt: 1, // [Comment: Estado manejado en 0 => deleted,1 => created,2 =>edited]
+                hoverToDelete: false, // [Comment: It´ll add color]
                 detalleDoc: [],
             });
 
@@ -152,7 +159,7 @@ export const useBienesServicios = () => {
                 // Actualiza el peso del producto en arrayProductoAdquisicion
                 arrayProductoAdquisicion.value[rowDocAdq].detalleDoc[rowDetalleDocAdq].pesoProducto = unidad_medida.id_unidad_medida;
                 arrayProductoAdquisicion.value[rowDocAdq].detalleDoc[rowDetalleDocAdq].detalleProducto = nombre_producto;
-                arrayProductoAdquisicion.value[rowDocAdq].detalleDoc[rowDetalleDocAdq].detalleProducto = nombre_producto;
+
                 arrayProductoAdquisicion.value[rowDocAdq].detalleDoc[rowDetalleDocAdq].especifico = id_ccta_presupuestal;
 
                 // Obtén el producto en la fila especificada
@@ -213,7 +220,7 @@ export const useBienesServicios = () => {
 
 
     /**
-   * Busca producto por codigo.
+   * Guarda productos adquisicion
    *
    * @param {string} productCode - codigo del producto a buscar.
    * @returns {Promise<object>} - Objeto con los datos de la respuesta.
@@ -228,35 +235,62 @@ export const useBienesServicios = () => {
                 idDetDocAdquisicion: idDetDocAdquisicion.value
             });
             console.log(response);
+            alert("guardado")
         } catch (error) {
             // Manejo de errores específicos
             console.error("Error en guardar los datos:", error);
             // Lanza el error para que pueda ser manejado por el componente que utiliza este composable
             throw new Error("Error ");
         }
-    };
+    }
 
-    const updateDescripcion = (event) => {
-        this.detalle.descripcionProdAdquisicion = event.target.textContent;
+
+    /**
+     * Edita productos adquisicion
+     *
+     * @param {string} productCode - codigo del producto a buscar.
+     * @returns {Promise<object>} - Objeto con los datos de la respuesta.
+     * @throws {Error} - Error al obtener empleados por nombre.
+     */
+    const updateProductAdquisicion = async () => {
+        try {
+            // Realiza la búsqueda de empleados
+            const response = await axios.post(
+                "/update-prod-adquicicion", {
+                productAdq: arrayProductoAdquisicion.value,
+                idDetDocAdquisicion: idDetDocAdquisicion.value
+            });
+            console.log(response);
+            alert("guardado")
+        } catch (error) {
+            // Manejo de errores específicos
+            console.error("Error en guardar los datos:", error);
+            // Lanza el error para que pueda ser manejado por el componente que utiliza este composable
+            throw new Error("Error ");
+        }
     }
 
     onMounted(() => {
         getArrayObject()
     })
     return {
+        updateProductAdquisicion,
         addinDocAdquisicion,
         saveProductAdquisicion,
         arrayProductoAdquisicion,
         calculateTotal,
         idDetDocAdquisicion,
         idLt,
+        arrayProductsWhenIsEditable,
         arrayLineaTrabajo,
         arrayDocAdquisicion,
+        objectGetFromProp,
         arrayUnidadMedida,
         arrayMarca,
         arrayCentroAtencion,
         productDataSearched,
         addingRows,
+        arrayWhenIsEditingDocAdq,
         handleProductoSearchByCodigo,
         setInformacionProduct,
     }
