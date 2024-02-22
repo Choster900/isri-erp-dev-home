@@ -151,14 +151,15 @@
                                 </td>
                             </tr>
 
-                            <tr class="*:text-[8pt]  *:px-2 *:py-0.5 *:font-normal *:border *:border-black hover:bg-slate-200"
-                                v-for="(detalle, j) in docAdq.detalleDoc" :key="j">
+                            <tr class="*:text-[8pt]  *:px-2 *:py-0.5 *:font-normal *:border *:border-black hover:bg-slate-200 cursor-pointer"
+                                @dblclick="eliminar(docAdq.idLt, j)" v-for="(detalle, j) in docAdq.detalleDoc" :key="j"
+                                v-show="detalle.estadoProdAdquisicion != 0">
                                 <td class=" relative h-20 w-28"
                                     style="padding-left: 0 !important; padding-right: 0 !important; ">
                                     <div class="absolute top-0 w-full flex flex-col items-center">
-                                        <!-- <Multiselect :filter-results="false" :canClear="false" :resolve-on-load="false"
-                                            v-model="detalle.idProducto" :delay="1000" :searchable="true"
-                                            :clear-on-search="true" :min-chars="3"
+                                        <Multiselect :filter-results="false" :canClear="false" :resolve-on-load="false"
+                                            v-if="detalle.estadoProdAdquisicion == 1" v-model="detalle.idProducto"
+                                            :delay="1000" :searchable="true" :clear-on-search="true" :min-chars="3"
                                             @select="setInformacionProduct($event, i, j)" :classes="{
                                                 placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
                                                 search: 'w-full absolute text-start inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5 pr-3.5',
@@ -171,10 +172,10 @@
                                             }" noOptionsText="<p class='text-xs'>Lista vacia<p>"
                                             noResultsText="<p class='text-xs'>Sin resultados de producto <p>" :options="async function (query) {
                                                 return await handleProductoSearchByCodigo(query)
-                                            }" /> -->
+                                            }" />
 
                                         <Multiselect :filter-results="false" :canClear="false" :resolve-on-load="false"
-                                            v-model="detalle.idProducto" :classes="{
+                                            v-else v-model="detalle.idProducto" :classes="{
                                                 placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
                                                 search: 'w-full absolute text-start inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5 pr-3.5',
                                                 container: 'relative mx-auto w-full h-7  flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none',
@@ -373,7 +374,18 @@
                                     d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z">
                                 </path>
                             </svg>
-                            <span class="ml-2">Agregar evento</span>
+                            <span class="ml-2">Agregar </span>
+                        </button>
+                    </div>
+                    <div>
+                        <button class=" w-full btn bg-orange-500 hover:bg-orange-600 text-white"
+                            @click="updateProductAdquisicion">
+                            <svg class="w-4 h-4 fill-current opacity-50 shrink-0" viewBox="0 0 16 16">
+                                <path
+                                    d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z">
+                                </path>
+                            </svg>
+                            <span class="ml-2">Editar </span>
                         </button>
                     </div>
 
@@ -391,6 +403,7 @@
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue';
 import { ref, toRefs, watch } from 'vue';
 import { useBienesServicios } from '@/Composables/UCP/BienesServicios/useBienesServicios.js';
+import Swal from 'sweetalert2';
 // Define el componente Vue.js
 export default {
     // Indica que este componente utiliza el componente ProcessModal
@@ -427,6 +440,7 @@ export default {
             arrayDocAdquisicion,
             addinDocAdquisicion,
             arrayCentroAtencion,
+            updateProductAdquisicion,
             productDataSearched,
             setInformacionProduct,
             saveProductAdquisicion,
@@ -468,7 +482,7 @@ export default {
                             label: product.codigo_producto
                         };
                     }
-                }).filter(Boolean);  // Filtra los elementos nulos o indefinidos
+                }).filter(Boolean)  // Filtra los elementos nulos o indefinidos
 
                 // Utiliza map y filter para mejorar la legibilidad y reducir código duplicado
                 arrayProductoAdquisicion.value = productosAdquisiciones
@@ -478,6 +492,7 @@ export default {
                             idLtSet.add(idLt);
                             return {
                                 idLt: idLt,
+                                estadoLt: 2, // [Comment: Estado manejado en 0 => deleted,1 => created,2 =>edited]
                                 detalleDoc: []
                             };
                         }
@@ -488,32 +503,56 @@ export default {
                 productosAdquisiciones.forEach(index => {
                     let indice = arrayProductoAdquisicion.value.findIndex(i => i.idLt == index.id_lt);
                     const { producto } = index;
-
+                    console.log(index);
+                    idDetDocAdquisicion.value = index.id_det_doc_adquisicion
                     arrayProductoAdquisicion.value[indice]["detalleDoc"].push({
-                        "especifico": producto.id_ccta_presupuestal,
-                        "idProducto": producto.id_producto,
-                        "detalleProducto": producto.nombre_producto,
-                        "pesoProducto": producto.unidad_medida.id_unidad_medida,
-                        "idCentroAtencion": index.id_centro_atencion,
-                        "detalleCentro": index.centro_atencion.nombre_centro_atencion,
-                        "idMarca": index.id_marca,
-                        "cantProdAdquisicion": index.cant_prod_adquisicion,
-                        "costoProdAdquisicion": index.costo_prod_adquisicion,
-                        "descripcionProdAdquisicion": index.descripcion_prod_adquisicion,
-                        "estadoProdAdquisicion": "",
-                        "valorTotalProduct": index.cant_prod_adquisicion * index.costo_prod_adquisicion,
+                        especifico: producto.id_ccta_presupuestal,
+                        idProducto: producto.id_producto,
+                        detalleProducto: producto.nombre_producto,
+                        pesoProducto: producto.unidad_medida.id_unidad_medida,
+                        idCentroAtencion: index.id_centro_atencion,
+                        detalleCentro: index.centro_atencion.nombre_centro_atencion,
+                        idMarca: index.id_marca,
+                        cantProdAdquisicion: index.cant_prod_adquisicion,
+                        costoProdAdquisicion: index.costo_prod_adquisicion,
+                        descripcionProdAdquisicion: index.descripcion_prod_adquisicion,
+                        estadoProdAdquisicion: 2, // [Comment: Estado manejado en 0 => deleted,1 => created,2 =>edited]
+                        valorTotalProduct: index.cant_prod_adquisicion * index.costo_prod_adquisicion,
                     });
                 });
 
                 console.log(arrayProductoAdquisicion.value);
             } else {
                 objectGetFromProp.value = [];
+                arrayProductoAdquisicion.value = []
+                addinDocAdquisicion()
+                addingRows(0)
             }
         });
 
 
+        const eliminar = (indexDdLT, indexProdAdq) => {
 
+            const confirmed = Swal.fire({
+                title: '<p class="text-[18pt] text-center">¿Esta seguro de eliminar el producto?</p>',
+                icon: "question",
+                iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
+                confirmButtonText: `<p class="text-[10pt] text-center">Si, Eliminar</p>`,
+                confirmButtonColor: "#D2691E",
+                cancelButtonText: `<p class="text-[10pt] text-center">Cancelar</p>`,
+                showCancelButton: true,
+                showCloseButton: true,
+            });
+            if (confirmed.isConfirmed) {
+                arrayProductoAdquisicion.value.find(index => index.idLt == indexDdLT).detalleDoc[indexProdAdq].estadoProdAdquisicion = 0
+                console.log(arrayProductoAdquisicion.value.find(index => index.idLt == indexDdLT).detalleDoc[indexProdAdq].estadoProdAdquisicion);
+                //alert("comming soon for delete")
+            }
+
+
+        }
         return {
+            eliminar,
             idLt,
             arrayMarca,
             addingRows,
@@ -522,6 +561,7 @@ export default {
             arrayLineaTrabajo,
             arrayUnidadMedida,
             addinDocAdquisicion,
+            updateProductAdquisicion,
             arrayCentroAtencion,
             arrayDocAdquisicion,
             idDetDocAdquisicion,

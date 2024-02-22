@@ -94,6 +94,10 @@ class BienesServiciosController extends Controller
         return response()->json($request); // O cualquier otra respuesta que desees enviar
     }
 
+    public function updateProductoAdquisicion (Request $request){
+        return $request;
+    }
+
     /**
      * Obtiene arreglo de dinstintos objetos para el uso en multiselect.
      *
