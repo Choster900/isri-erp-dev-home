@@ -37,7 +37,7 @@
                                     <p class="font-[Roboto] ">CONTRATOS</p>
                                 </div>
                                 <div>
-                                    <p class="font-[Roboto] ">Disponibles: {{ contrato.length }}</p>
+                                    <p class="font-[Roboto] ">Pendientes: {{ contrato.length }}</p>
                                 </div>
                             </div>
                         </div>
@@ -50,7 +50,7 @@
                                     <p class="font-[Roboto]">ORDENES DE COMPRA</p>
                                 </div>
                                 <div>
-                                    <p class="font-[Roboto]">Disponibles: {{ ordenC.length }}</p>
+                                    <p class="font-[Roboto]">Pendientes: {{ ordenC.length }}</p>
                                 </div>
                             </div>
                         </div>
@@ -99,7 +99,7 @@
                 <pre>{{ products }}</pre>
             </div> -->
             <div v-else>
-                <div class="ml-8 mr-0 overflow-x-auto mt-4">
+                <div class="ml-8 mr-0 overflow-x-auto mt-4 h-[400px] overflow-y-auto">
                     <div class="max-w-[97%] min-w-[690px] flex">
                         <div class="flex w-full">
                             <!-- Columna 1 -->
@@ -108,10 +108,14 @@
                             </div>
                             <!-- Columna 2 -->
                             <div class="w-[77%] min-w-[440px] bg-white border-y border-r border-gray-500 p-2">
-                                <p class="font-[Bembo] text-center text-[15px] font-bold">ALMACEN CENTRAL</p>
-                                <p class="font-[Bembo] text-center text-[15px] font-bold">CONTRATO {{ infoToShow.docName
-                                }}</p>
-                                <p class="font-[Bembo] text-center text-[15px] font-bold">ACTA DE RECEPCION {{
+                                <p class="font-[Bembo] text-center text-[14px] font-bold">ALMACEN CENTRAL</p>
+                                <p class="font-[Bembo] text-center text-[14px] font-bold">CONTRATO
+                                    {{ infoToShow.docName }}
+                                </p>
+                                <p class="font-[Bembo] text-center text-[14px] font-bold">
+                                    {{ infoToShow.itemName }}
+                                </p>
+                                <p class="font-[Bembo] text-center text-[14px] font-bold">ACTA DE RECEPCION {{
                                     recDocument.acta ?? '' }}
                                 </p>
                             </div>
@@ -121,28 +125,41 @@
                         <div class="flex w-full border-gray-500">
                             <div
                                 class="justify-start flex items-center border-l border-gray-500 min-w-[345px] w-[50%] bg-white">
-                                <p class="font-[MuseoSans] text-gray-700 text-[11px] py-1 ml-2">FECHA Y HORA: 22/02/2024,
-                                    15:06:28</p>
+                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2">FECHA Y HORA DE RECEPCION:
+                                    <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
+                                        infoToShow.dateTime }}</span>
+                                </p>
                             </div>
                             <div class="justify-start flex items-center min-w-[172.5px] w-[25%] bg-white">
-                                <p class="font-[MuseoSans] text-gray-700 text-[11px] py-1">FINANCIAMIENTO: FG</p>
+                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1">FINANCIAMIENTO:
+                                    <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
+                                        infoToShow.financingSource }}</span>
+                                </p>
                             </div>
                             <div
                                 class="justify-start flex items-center border-r border-gray-500 min-w-[172.5px] w-[25%] bg-white">
-                                <p class="font-[MuseoSans] text-gray-700 text-[11px] py-1">COMPROMISO: 1911</p>
+                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1">COMPROMISO:
+                                    <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
+                                        infoToShow.commitment }}</span>
+                                </p>
                             </div>
                         </div>
                     </div>
-                    <div class="max-w-[97%] min-w-[690px] flex">
-                        <div class="flex w-full border-b border-gray-500">
+                    <div class="max-w-[97%] min-w-[690px] border-b border-gray-500 flex">
+                        <div class="flex w-full">
                             <div
                                 class="justify-start flex items-center border-l border-gray-500 min-w-[517.5px] w-[75%] bg-white">
-                                <p class="font-[MuseoSans] text-gray-700 text-[11px] py-1 ml-2">PROVEEDOR: GBM DE EL
-                                    SALVADOR S.A DE C.V</p>
+                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2">PROVEEDOR:
+                                    <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
+                                        infoToShow.supplier }}</span>
+                                </p>
                             </div>
                             <div
                                 class="justify-start flex items-center border-r border-gray-500 min-w-[172.5px] w-[25%] bg-white">
-                                <p class="font-[MuseoSans] text-gray-700 text-[11px] py-1">NIT: 0715-080994-102-4</p>
+                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1">NIT:
+                                    <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{ infoToShow.nit
+                                    }}</span>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -159,18 +176,11 @@
                             <div
                                 class="justify-center flex items-center w-[77%] border-r min-w-[515px] h-[65px] bg-white border-gray-500">
                                 <p class="font-[MuseoSans] text-gray-600 text-[12px] mx-2">OBSERVACION:</p>
-                                <textarea class="max-h-[50px] w-[70%] overflow-y-hidden resize-none peer placeholder-gray-400 rounded-[4px] text-xs font-semibold border-gray-300 focus:border-transparent px-2 text-slate-900"></textarea>
+                                <textarea v-model="recDocument.observation"
+                                    class="max-h-[50px] font-[MuseoSans] w-[70%] overflow-y-hidden resize-none peer placeholder-gray-400 rounded-[4px] text-xs font-semibold border-gray-300 focus:border-transparent px-2 text-slate-900"></textarea>
                             </div>
                         </div>
                     </div>
-
-                    <!-- <div class="max-w-[97%] min-w-[690px] flex">
-                            <div class="flex w-full border-b border-gray-500">
-                                <div class="justify-start flex items-center border-x border-gray-500 w-full bg-white">
-                                    <p class="font-[MuseoSans] text-gray-700 text-[11px] py-1 mx-2">SE HACE CONSTAR QUE LOS BIENES DETALLADOS A CONTINUACION, CUMPLEN CON LAS CONDICIONES Y ESPECIFICACIONES TECNICAS PREVIAMENTE DEFINIDAS EN EL DOCUMENTO DE ADQUISICION.</p>
-                                </div>
-                            </div>
-                        </div> -->
                     <div class="max-w-[97%] min-w-[690px] flex">
                         <div class="flex w-full border-x border-b border-gray-500">
                             <div class="justify-center flex w-full bg-white">
@@ -217,7 +227,7 @@
                         </div>
                     </div>
                     <template v-for="(prod, index) in recDocument.prods" :key="index">
-                        <div v-if="prod.deleted == false" class="max-w-full flex min-w-[705px] ">
+                        <div :id="'row-' + index" v-if="prod.deleted == false" class="max-w-full flex min-w-[705px] ">
                             <div class="flex w-[97%] min-w-[690px] bg-white hover:bg-gray-200 text-gray-800">
                                 <!-- Cabecera de la tabla -->
                                 <div class="w-[23%] min-w-[175px] flex items-center justify-center border-x border-b  border-gray-500 min-h-[75px]"
@@ -296,15 +306,15 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="md:flex my-6 flex-row justify-end mx-8">
-                        <button type="button" @click="$emit('cerrar-modal')"
-                            class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-[12px] px-2.5 py-1.5 text-center mb-2 dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
-                        <button v-if="recepId > 0" @click="updateReception(recDocument)"
-                            class="bg-orange-700 hover:bg-orange-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">ACTUALIZAR</button>
-                        <button v-else @click="storeReception(recDocument)"
-                            class="bg-green-700 hover:bg-green-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">GUARDAR</button>
-                    </div>
+                </div>
+                <div class="md:flex my-6 sticky flex-row justify-end mx-8">
+                    <button type="button" @click="$emit('cerrar-modal')"
+                        class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-[12px] px-2.5 py-1.5 text-center mb-2 dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
+                    <button v-if="recepId > 0"
+                        @click="updateReception(recDocument)"
+                        class="bg-orange-700 hover:bg-orange-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">ACTUALIZAR</button>
+                    <button v-else @click="storeReception(recDocument)"
+                        class="bg-green-700 hover:bg-green-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">GUARDAR</button>
                 </div>
             </div>
 
