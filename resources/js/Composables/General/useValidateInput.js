@@ -24,11 +24,16 @@ export const useValidateInput = () => {
             }
         }
 
-        if(validation.number){
+        // Si la validación de no empezar con cero está habilitada
+        if (validation.noBeginZero) {
+            validatedInput = validatedInput.replace(/^0*(?!$)[0-9]+/, ''); 
+        }
+
+        if (validation.number) {
             validatedInput = validatedInput.replace(/[^0-9]/g, '');
         }
 
-        if(validation.numbersCommasAndSpaces){
+        if (validation.numbersCommasAndSpaces) {
             validatedInput = validatedInput.replace(/[^\d, ]/g, '')
         }
 

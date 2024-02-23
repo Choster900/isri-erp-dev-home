@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Almacen;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Almacen\RecepcionRequest;
 use App\Models\CentroAtencion;
 use App\Models\DetDocumentoAdquisicion;
 use App\Models\DocumentoAdquisicion;
@@ -44,7 +45,7 @@ class RecepcionController extends Controller
                 'det_doc_adquisicion.documento_adquisicion.tipo_documento_adquisicion',
                 'estado_recepcion'
             ])->find($idRec);
-            $item = DetDocumentoAdquisicion::find($recep->det_doc_adquisicion->id_det_doc_adquisicion);
+            $item = DetDocumentoAdquisicion::with('documento_adquisicion')->find($recep->det_doc_adquisicion->id_det_doc_adquisicion);
             if (!$recep || !$item) {
                 return response()->json([
                     'logical_error' => 'Error, no fue posible obtener la recepción consultada. Consulte con el administrador.',
@@ -52,7 +53,7 @@ class RecepcionController extends Controller
             } 
         } else {
             $recep = [];
-            $item = DetDocumentoAdquisicion::find($request->detId);
+            $item = DetDocumentoAdquisicion::with('documento_adquisicion')->find($request->detId);
         }
 
         if ($item->estado_det_doc_adquisicion == 0 && $recep != []) {
@@ -83,7 +84,8 @@ class RecepcionController extends Controller
             return response()->json([
                 'recep'                         => $recep,
                 'products'                      => $procedure,
-                'centers'                       => $centers
+                'centers'                       => $centers,
+                'itemInfo'                      => $item
             ]);
         }
     }
@@ -101,6 +103,12 @@ class RecepcionController extends Controller
         return response()->json([
             'documents'                  => $documents,
             'items'                      => $items,
+        ]);
+    }
+
+    public function storeReception(RecepcionRequest $request){
+        return response()->json([
+            'message'          => 'Validacion exitosa MF.',
         ]);
     }
 }
