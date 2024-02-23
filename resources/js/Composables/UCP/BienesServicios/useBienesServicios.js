@@ -1,5 +1,7 @@
 import { ref, onMounted } from "vue";
 import axios from "axios";
+import { executeRequest } from "@/plugins/requestHelpers";
+import Swal from "sweetalert2";
 export const useBienesServicios = () => {
     const arrayProductoAdquisicion = ref([])
     const idDetDocAdquisicion = ref(null)
@@ -65,6 +67,7 @@ export const useBienesServicios = () => {
             arrayProductoAdquisicion.value.push({
                 idProdAdquisicion: '', // [Comment: 'Identificador producto adquisicion por linea de trabajo]
                 idLt: '',
+                vShowLt: true, //
                 estadoLt: 1, // [Comment: Estado manejado en 0 => deleted,1 => created,2 =>edited]
                 hoverToDelete: false, // [Comment: It´ll add color]
                 detalleDoc: [],
@@ -217,7 +220,36 @@ export const useBienesServicios = () => {
             console.error("Error al calcular el valor total del producto:", error);
         }
     };
+    const errorsValidation = ref([]);
+    const saveProductAdquisicionRequest = () => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const response = await axios.post(
+                    "/save-prod-adquicicion", {
+                    productAdq: arrayProductoAdquisicion.value,
+                    idDetDocAdquisicion: idDetDocAdquisicion.value
+                });
+                this.$emit("actualizar-table-data");
+                resolve(response); // Resolvemos la promesa con la respuesta exitosa
+            } catch (error) {
+                if (error.response.status === 422) {
 
+                    let data = error.response.data.errors
+                    var myData = new Object();
+                    for (const errorBack in data) {
+                        myData[errorBack] = data[errorBack][0]
+                    }
+                    errorsValidation.value = myData
+                    setTimeout(() => {
+                        errorsValidation.value = [];
+                    }, 5000);
+                    console.error("Error en guardar los datos:", error);
+                }
+                // Manejo de errores específicos
+                reject(error); // Rechazamos la promesa en caso de excepción
+            }
+        });
+    }
 
     /**
    * Guarda productos adquisicion
@@ -227,23 +259,53 @@ export const useBienesServicios = () => {
    * @throws {Error} - Error al obtener empleados por nombre.
    */
     const saveProductAdquisicion = async () => {
-        try {
-            // Realiza la búsqueda de empleados
-            const response = await axios.post(
-                "/save-prod-adquicicion", {
-                productAdq: arrayProductoAdquisicion.value,
-                idDetDocAdquisicion: idDetDocAdquisicion.value
-            });
-            console.log(response);
-            alert("guardado")
-        } catch (error) {
-            // Manejo de errores específicos
-            console.error("Error en guardar los datos:", error);
-            // Lanza el error para que pueda ser manejado por el componente que utiliza este composable
-            throw new Error("Error ");
+        const confirmed = await Swal.fire({
+            title: '<p class="text-[18pt] text-center">¿Esta seguro de guardar el anexo?</p>',
+            icon: "question",
+            iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
+            confirmButtonText: "Si, Editar",
+            confirmButtonColor: "#001b47",
+            cancelButtonText: "Cancelar",
+            showCancelButton: true,
+            showCloseButton: true,
+        });
+        if (confirmed.isConfirmed) {
+            executeRequest(
+                saveProductAdquisicionRequest(),
+                "¡El documento de adquisicion se ha guardado correctamente!"
+            );
         }
     }
 
+
+    const updateProductAdquisicionRequest = () => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const response = await axios.post(
+                    "/update-prod-adquicicion", {
+                    productAdq: arrayProductoAdquisicion.value,
+                    idDetDocAdquisicion: idDetDocAdquisicion.value
+                });
+                resolve(response); // Resolvemos la promesa con la respuesta exitosa
+            } catch (error) {
+                if (error.response.status === 422) {
+
+                    let data = error.response.data.errors
+                    var myData = new Object();
+                    for (const errorBack in data) {
+                        myData[errorBack] = data[errorBack][0]
+                    }
+                    errorsValidation.value = myData
+                    setTimeout(() => {
+                        errorsValidation.value = [];
+                    }, 5000);
+                    console.error("Error en guardar los datos:", error);
+                }
+                // Manejo de errores específicos
+                reject(error); // Rechazamos la promesa en caso de excepción
+            }
+        });
+    };
 
     /**
      * Edita productos adquisicion
@@ -253,20 +315,21 @@ export const useBienesServicios = () => {
      * @throws {Error} - Error al obtener empleados por nombre.
      */
     const updateProductAdquisicion = async () => {
-        try {
-            // Realiza la búsqueda de empleados
-            const response = await axios.post(
-                "/update-prod-adquicicion", {
-                productAdq: arrayProductoAdquisicion.value,
-                idDetDocAdquisicion: idDetDocAdquisicion.value
-            });
-            console.log(response);
-            alert("guardado")
-        } catch (error) {
-            // Manejo de errores específicos
-            console.error("Error en guardar los datos:", error);
-            // Lanza el error para que pueda ser manejado por el componente que utiliza este composable
-            throw new Error("Error ");
+        const confirmed = await Swal.fire({
+            title: '<p class="text-[18pt] text-center">¿Esta seguro de editar?</p>',
+            icon: "question",
+            iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
+            confirmButtonText: "Si, Editar",
+            confirmButtonColor: "#001b47",
+            cancelButtonText: "Cancelar",
+            showCancelButton: true,
+            showCloseButton: true,
+        });
+        if (confirmed.isConfirmed) {
+            executeRequest(
+                updateProductAdquisicionRequest(),
+                "¡El documento de adquisicion se ha actualizado correctamente!"
+            );
         }
     }
 
@@ -275,6 +338,7 @@ export const useBienesServicios = () => {
     })
     return {
         updateProductAdquisicion,
+        errorsValidation,
         addinDocAdquisicion,
         saveProductAdquisicion,
         arrayProductoAdquisicion,
