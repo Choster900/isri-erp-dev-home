@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\UCP;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UCP\BienesServiciosRequest;
 use App\Models\CentroAtencion;
 use App\Models\DetDocumentoAdquisicion;
 use App\Models\DocumentoAdquisicion;
@@ -64,41 +65,48 @@ class BienesServiciosController extends Controller
         ];
     }
 
-    public function saveProductoAdquisicion(Request $request): object
+    public function saveProductoAdquisicion(BienesServiciosRequest $request): object
     {
-        $detalles = $request->productAdq;
-        $idDetDocAdquisicion = $request->idDetDocAdquisicion;
-        $usuario = $request->user()->nick_usuario;
-        $ip = $request->ip();
-        $fechaActual = now();
+        try {
+            DB::beginTransaction();
+            $detalles = $request->productAdq;
+            $idDetDocAdquisicion = $request->idDetDocAdquisicion;
+            $usuario = $request->user()->nick_usuario;
+            $ip = $request->ip();
+            $fechaActual = now();
 
-        foreach ($detalles as $detalle) {
-            if ($detalle["estadoLt"] != 0) {
-                foreach ($detalle["detalleDoc"] as $detalleProducto) {
-                    if ($detalleProducto["estadoProdAdquisicion"] == 1) {
-                        $nuevoDetalle = [
-                            'id_producto'                  => $detalleProducto["idProducto"],
-                            'id_det_doc_adquisicion'       => $idDetDocAdquisicion,
-                            'id_marca'                     => $detalleProducto["idMarca"],
-                            'id_lt'                        => $detalle["idLt"],
-                            'id_centro_atencion'           => $detalleProducto["idCentroAtencion"],
-                            'cant_prod_adquisicion'        => $detalleProducto["cantProdAdquisicion"],
-                            'costo_prod_adquisicion'       => $detalleProducto["costoProdAdquisicion"],
-                            'descripcion_prod_adquisicion' => $detalleProducto["descripcionProdAdquisicion"],
-                            'estado_prod_adquisicion'      => 1,
-                            'fecha_reg_prod_adquisicion'   => $fechaActual,
-                            'usuario_prod_adquisicion'     => $usuario,
-                            'ip_prod_adquisicion'          => $ip,
-                        ];
+            foreach ($detalles as $detalle) {
+                if ($detalle["estadoLt"] != 0) {
+                    foreach ($detalle["detalleDoc"] as $detalleProducto) {
+                        if ($detalleProducto["estadoProdAdquisicion"] == 1) {
+                            $nuevoDetalle = [
+                                'id_producto'                  => $detalleProducto["idProducto"],
+                                'id_det_doc_adquisicion'       => $idDetDocAdquisicion,
+                                'id_marca'                     => $detalleProducto["idMarca"],
+                                'id_lt'                        => $detalle["idLt"],
+                                'id_centro_atencion'           => $detalleProducto["idCentroAtencion"],
+                                'cant_prod_adquisicion'        => $detalleProducto["cantProdAdquisicion"],
+                                'costo_prod_adquisicion'       => $detalleProducto["costoProdAdquisicion"],
+                                'descripcion_prod_adquisicion' => $detalleProducto["descripcionProdAdquisicion"],
+                                'estado_prod_adquisicion'      => 1,
+                                'fecha_reg_prod_adquisicion'   => $fechaActual,
+                                'usuario_prod_adquisicion'     => $usuario,
+                                'ip_prod_adquisicion'          => $ip,
+                            ];
 
-                        // Usar DB::insert para insertar directamente y mejorar el rendimiento
-                        DB::table('producto_adquisicion')->insert($nuevoDetalle);
+                            // Usar DB::insert para insertar directamente y mejorar el rendimiento
+                            DB::table('producto_adquisicion')->insert($nuevoDetalle);
+                        }
                     }
                 }
             }
+            DB::commit();
+            return response()->json($request); // O cualquier otra respuesta que desees enviar
+        } catch (\Throwable $th) {
+            //throw $th;
+            DB::rollback();
+            return response()->json($th->getMessage(), 500);
         }
-
-        return response()->json($request); // O cualquier otra respuesta que desees enviar
     }
 
     public function updateProductoAdquisicion(Request $request)
@@ -197,7 +205,7 @@ class BienesServiciosController extends Controller
         // Obtener detalles de documentos de adquisición con información adicional
         $detalleDocumentoAdquisicion = DetDocumentoAdquisicion::with(["documento_adquisicion.proveedor"])
             ->where("estado_det_doc_adquisicion", 1)
-             ->whereDoesntHave("productos_adquisiciones")
+            ->whereDoesntHave("productos_adquisiciones")
             ->get();
 
 
