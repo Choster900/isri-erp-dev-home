@@ -109,7 +109,7 @@
                             <!-- Columna 2 -->
                             <div class="w-[77%] min-w-[440px] bg-white border-y border-r border-gray-500 p-2">
                                 <p class="font-[Bembo] text-center text-[14px] font-bold">ALMACEN CENTRAL</p>
-                                <p class="font-[Bembo] text-center text-[14px] font-bold">CONTRATO
+                                <p class="font-[Bembo] text-center text-[14px] font-bold">
                                     {{ infoToShow.docName }}
                                 </p>
                                 <p class="font-[Bembo] text-center text-[14px] font-bold">
@@ -167,14 +167,14 @@
                     <div class="max-w-[97%] min-w-[690px] border-b border-gray-500 flex">
                         <div class="flex w-full">
                             <div
-                                class="justify-start flex items-center w-[23%] border-x min-w-[175px] h-[65px] bg-white border-gray-500">
+                                class="justify-start flex items-center hover:bg-gray-200 w-[23%] border-x min-w-[175px] h-[65px] bg-white border-gray-500">
                                 <p class="font-[MuseoSans] text-gray-600 text-[12px] mx-2">FACTURA:</p>
                                 <input v-model="recDocument.invoice"
                                     class="font-bold w-[55%] p-1 h-[35px] rounded-[4px] font-[MuseoSans] text-sm border-[#d1d5db]"
                                     type="text" name="" id="">
                             </div>
                             <div
-                                class="justify-center flex items-center w-[77%] border-r min-w-[515px] h-[65px] bg-white border-gray-500">
+                                class="justify-center flex items-center w-[77%] hover:bg-gray-200 border-r min-w-[515px] h-[65px] bg-white border-gray-500">
                                 <p class="font-[MuseoSans] text-gray-600 text-[12px] mx-2">OBSERVACION:</p>
                                 <textarea v-model="recDocument.observation"
                                     class="max-h-[50px] font-[MuseoSans] w-[70%] overflow-y-hidden resize-none peer placeholder-gray-400 rounded-[4px] text-xs font-semibold border-gray-300 focus:border-transparent px-2 text-slate-900"></textarea>
@@ -203,10 +203,10 @@
                             <div class="w-[8%] min-w-[60px] border-r border-gray-500 h-[30px]">
                                 <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px]">REST.</p>
                             </div>
-                            <div class="w-[12%] min-w-[80px] border-r border-gray-500 h-[30px]">
+                            <div class="w-[12%] min-w-[100px] border-r border-gray-500 h-[30px]">
                                 <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px]">VENCIMIENTO</p>
                             </div>
-                            <div class="w-[10%] min-w-[80px] border-r border-gray-500 h-[30px]">
+                            <div class="w-[10%] min-w-[60px] border-r border-gray-500 h-[30px]">
                                 <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px]">CANTIDAD</p>
                             </div>
                             <div class="w-[12%] min-w-[60px] border-r border-gray-500 h-[30px]">
@@ -244,14 +244,14 @@
                                     :class="prod.avails < 0 ? 'bg-red-300' : ''">
                                     <p class="font-[MuseoSans] text-sm p-1 ">{{ prod.avails }}</p>
                                 </div>
-                                <div class="w-[12%] min-w-[80px] flex items-center justify-center border-r border-b  border-gray-500 min-h-[75px]"
+                                <div class="w-[12%] min-w-[100px] flex items-center justify-center border-r border-b  border-gray-500 min-h-[75px]"
                                     :class="errors['prods.' + index + '.expiryDate'] ? 'bg-red-300' : ''">
                                     <!-- <p class="font-[MuseoSans] text-sm p-1 ">{{ prod.unit }}</p> -->
                                     <date-time-picker-m v-if="prod.perishable === 1" v-model="prod.expiryDate"
                                         :showIcon="false" :placeholder="'Seleccione'" />
                                     <p v-else class="font-[MuseoSans] text-sm p-1 ">N/A</p>
                                 </div>
-                                <div class="w-[10%] min-w-[80px] flex items-center justify-center border-r border-b  border-gray-500 min-h-[75px]"
+                                <div class="w-[10%] min-w-[60px] flex items-center justify-center border-r border-b  border-gray-500 min-h-[75px]"
                                     :class="errors['prods.' + index + '.qty'] ? 'bg-red-300' : ''">
                                     <input v-model="prod.qty"
                                         class="font-bold max-w-[75%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-sm border-[#d1d5db]"
@@ -317,18 +317,6 @@
                         class="bg-green-700 hover:bg-green-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">GUARDAR</button>
                 </div>
             </div>
-
-
-            <!-- <div class="md:flex my-6 flex-row justify-end mx-8">
-                <button type="button" @click="$emit('cerrar-modal')"
-                    class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-[12px] px-2.5 py-1.5 text-center mb-2 dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
-                <button v-if="prodId > 0" @click="updateProduct(prod)"
-                    class="bg-orange-700 hover:bg-orange-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">ACTUALIZAR</button>
-                <button v-else @click="storeProduct(prod)"
-                    class="bg-green-700 hover:bg-green-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">GUARDAR</button>
-            </div> -->
-
-
         </ProcessModal>
     </div>
 </template>
@@ -340,9 +328,8 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 import InputText from "@/Components-ISRI/ComponentsToForms/InputText.vue";
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
 import DateTimePickerM from "@/Components-ISRI/ComponentsToForms/DateTimePickerM.vue";
-// import TimePickerM from "@/Components-ISRI/ComponentsToForms/TimePickerM.vue";
 
-import { toRefs, onMounted, ref, watch } from 'vue';
+import { toRefs, onMounted } from 'vue';
 
 export default {
     emits: ["cerrar-modal", "get-table"],
@@ -362,16 +349,12 @@ export default {
         const { recepId } = toRefs(props)
 
         const {
-            isLoadingRequest, recDocument, errors, purchaseProcedures, catUnspsc,
-            budgetAccounts, unitsMeasmt, documents, ordenC, contrato, docSelected,
+            isLoadingRequest, recDocument, errors,
+            documents, ordenC, contrato, docSelected,
             filteredDoc, filteredItems, startRec, filteredProds, totalRec, infoToShow,
             getInfoForModalRecep, startReception, setProdItem, updateItemTotal, addNewRow,
             openOption, deleteRow, handleValidation, storeReception, updateReception
         } = useRecepcion(context);
-
-        const handleSearchChange = async (query) => {
-            await asyncFindUnspsc(query);
-        }
 
         onMounted(
             async () => {
@@ -380,10 +363,10 @@ export default {
         )
 
         return {
-            isLoadingRequest, recDocument, errors, purchaseProcedures, catUnspsc,
-            budgetAccounts, unitsMeasmt, documents, ordenC, contrato, docSelected,
+            isLoadingRequest, recDocument, errors,
+            documents, ordenC, contrato, docSelected,
             filteredDoc, filteredItems, startRec, filteredProds, totalRec, infoToShow,
-            handleSearchChange, handleValidation, startReception, setProdItem, updateItemTotal,
+            handleValidation, startReception, setProdItem, updateItemTotal,
             addNewRow, openOption, deleteRow, storeReception, updateReception
         }
     }

@@ -15,11 +15,6 @@ export const useRecepcion = (context) => {
     const isLoadingRequest = ref(false);
     const errors = ref([]);
 
-    const purchaseProcedures = ref([])
-    const catUnspsc = ref([])
-    const budgetAccounts = ref([])
-    const unitsMeasmt = ref([])
-
     const docSelected = ref('')
     const reception = ref([])
     const products = ref([])
@@ -36,7 +31,7 @@ export const useRecepcion = (context) => {
         commitment: '',
         supplier: '',
         nit: '',
-        dateTime: ''
+        dateTime: '',
     })
 
     const recDocument = ref({
@@ -106,9 +101,8 @@ export const useRecepcion = (context) => {
     }
 
     const setModalValues = (data, id) => {
-        console.log(data.recep);
         const recepData = data.recep
-        infoToShow.value.docName = data.itemInfo.documento_adquisicion.numero_doc_adquisicion
+        infoToShow.value.docName = data.itemInfo.documento_adquisicion.tipo_documento_adquisicion.nombre_tipo_doc_adquisicion+" "+data.itemInfo.documento_adquisicion.numero_doc_adquisicion
         infoToShow.value.itemName = upperCase(data.itemInfo.nombre_det_doc_adquisicion)
         infoToShow.value.financingSource = data.itemInfo.fuente_financiamiento.codigo_proy_financiado
         infoToShow.value.commitment = data.itemInfo.compromiso_ppto_det_doc_adquisicion
@@ -187,7 +181,6 @@ export const useRecepcion = (context) => {
             const selectedProd = products.value.find((element) => {
                 return element.value === paId; // Adding a return statement here
             });
-            //console.log(selectedProd.descripcion_producto);
             recDocument.value.prods[index].desc =
                 selectedProd.nombre_producto + ' -- ' +
                 selectedProd.abreviatura_unidad_medida + ' -- ' +
@@ -403,7 +396,6 @@ export const useRecepcion = (context) => {
     };
 
     const handleErrorResponse = (err) => {
-        console.log(err);
         if (err.response.status === 422) {
             if (err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
@@ -425,7 +417,6 @@ export const useRecepcion = (context) => {
     };
 
     const handleSuccessResponse = (response) => {
-        console.log(response);
         useShowToast(toast.success, response.data.message);
         context.emit("cerrar-modal")
         context.emit("get-table")
@@ -437,10 +428,9 @@ export const useRecepcion = (context) => {
     };
 
     return {
-        errors, isLoadingRequest, reception, purchaseProcedures, catUnspsc,
-        budgetAccounts, unitsMeasmt, documents, ordenC, contrato, docSelected,
-        filteredDoc, filteredItems, recDocument, startRec, filteredProds, totalRec,
-        infoToShow,
+        errors, isLoadingRequest, reception, infoToShow,
+        documents, ordenC, contrato, docSelected, totalRec,
+        filteredDoc, filteredItems, recDocument, startRec, filteredProds, 
         getInfoForModalRecep, startReception, setProdItem, updateItemTotal, addNewRow,
         openOption, deleteRow, handleValidation, storeReception, updateReception
     }

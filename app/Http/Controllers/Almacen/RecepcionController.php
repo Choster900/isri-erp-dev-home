@@ -102,7 +102,7 @@ class RecepcionController extends Controller
                 'det_doc_adquisicion.documento_adquisicion.tipo_documento_adquisicion',
                 'estado_recepcion'
             ])->find($idRec);
-            $item = DetDocumentoAdquisicion::with(['documento_adquisicion.proveedor', 'fuente_financiamiento'])->find($recep->det_doc_adquisicion->id_det_doc_adquisicion);
+            $item = DetDocumentoAdquisicion::with(['documento_adquisicion.proveedor', 'fuente_financiamiento', 'documento_adquisicion.tipo_documento_adquisicion'])->find($recep->det_doc_adquisicion->id_det_doc_adquisicion);
             if (!$recep || !$item) {
                 return response()->json([
                     'logical_error' => 'Error, no fue posible obtener la recepción consultada. Consulte con el administrador.',
@@ -110,7 +110,7 @@ class RecepcionController extends Controller
             }
         } else {
             $recep = [];
-            $item = DetDocumentoAdquisicion::with(['documento_adquisicion.proveedor', 'fuente_financiamiento'])->find($request->detId);
+            $item = DetDocumentoAdquisicion::with(['documento_adquisicion.proveedor', 'fuente_financiamiento', 'documento_adquisicion.tipo_documento_adquisicion'])->find($request->detId);
         }
 
         if ($item->estado_det_doc_adquisicion == 0 && $recep != []) {
@@ -271,10 +271,11 @@ class RecepcionController extends Controller
                 ]);
 
                 foreach ($request->prods as $prod) {
+                    $prodAdq = ProductoAdquisicion::find($prod['prodId']);
                     $compare = $collection->firstWhere('value', $prod['prodId']);
+                    
                     if ($compare->total_menos_acumulado == $prod['initial']) { //$prod['initial] is 'total_menos_acumulado' from the view
                         if ($prod['detRecId'] != "" && $prod['deleted'] == false) {
-                            $prodAdq = ProductoAdquisicion::find($prod['prodId']);
                             $det = DetalleRecepcionPedido::find($prod['detRecId']);
                             $det->update([
                                 'id_centro_atencion'                        => $prodAdq->id_centro_atencion,
@@ -304,12 +305,13 @@ class RecepcionController extends Controller
 
                         if ($prod['detRecId'] == "" && $prod['deleted'] == false) {
                             $existDetail = DetalleRecepcionPedido::where('id_recepcion_pedido', $request->id)
-                                ->where('id_det_recepcion_pedido', $prod['detRecId'])
+                                ->where('id_prod_adquisicion', $prod['prodId'])
                                 ->first();
                             if ($existDetail) {
                                 $existDetail->update([
                                     'cant_det_recepcion_pedido'                 => $prod['qty'],
                                     'fecha_vencimiento_det_recepcion_pedido'    => $prod['expiryDate'],
+                                    'estado_det_recepcion_pedido'               => 1,
                                     'fecha_mod_det_recepcion_pedido'            => Carbon::now(),
                                     'usuario_det_recepcion_pedido'              => $request->user()->nick_usuario,
                                     'ip_det_recepcion_pedido'                   => $request->ip()
@@ -320,6 +322,7 @@ class RecepcionController extends Controller
                                     'id_producto'                               => $prodAdq->id_producto,
                                     'id_marca'                                  => $prodAdq->id_marca,
                                     'id_lt'                                     => $prodAdq->id_lt,
+                                    'id_recepcion_pedido'                       => $request->id,
                                     'id_prod_adquisicion'                       => $prod['prodId'],
                                     'cant_det_recepcion_pedido'                 => $prod['qty'],
                                     'estado_det_recepcion_pedido'               => 1,
