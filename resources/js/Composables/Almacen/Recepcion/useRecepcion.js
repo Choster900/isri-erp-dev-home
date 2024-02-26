@@ -44,7 +44,7 @@ export const useRecepcion = (context) => {
         acta: '',
         invoice: '',
         financingSourceId: '',
-        observation : '',
+        observation: '',
         detDocId: '',
         prods: [],
         procedure: []
@@ -106,6 +106,7 @@ export const useRecepcion = (context) => {
     }
 
     const setModalValues = (data, id) => {
+        console.log(data.recep);
         const recepData = data.recep
         infoToShow.value.docName = data.itemInfo.documento_adquisicion.numero_doc_adquisicion
         infoToShow.value.itemName = upperCase(data.itemInfo.nombre_det_doc_adquisicion)
@@ -115,8 +116,8 @@ export const useRecepcion = (context) => {
         infoToShow.value.nit = data.itemInfo.documento_adquisicion.proveedor.nit_proveedor
         infoToShow.value.dateTime = recepData ? moment(recepData.fecha_reg_recepcion_pedido).format('DD/MM/YYYY, HH:mm:ss') : ''
 
-        recDocument.value.detDocId = infoToShow.value.detDocId
         recDocument.value.financingSourceId = data.itemInfo.id_proy_financiado
+        recDocument.value.detDocId = data.itemInfo.id_det_doc_adquisicion
 
         // Check if id > 0
         if (id > 0) {
@@ -402,9 +403,17 @@ export const useRecepcion = (context) => {
     };
 
     const handleErrorResponse = (err) => {
+        console.log(err);
         if (err.response.status === 422) {
             if (err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
+                if (err.response.data.refresh) {
+                    products.value = filteredProds.value = err.response.data.prods
+                    recDocument.value.prods.forEach((element, index) => {
+                        setProdItem(index, element.prodId, element.detRecId);
+                        updateItemTotal(index, element.qty, element.prodId);
+                    })
+                }
             } else {
                 useShowToast(toast.warning, "Tienes errores en tus datos, por favor verifica e intenta nuevamente.");
                 errors.value = err.response.data.errors;
@@ -416,6 +425,7 @@ export const useRecepcion = (context) => {
     };
 
     const handleSuccessResponse = (response) => {
+        console.log(response);
         useShowToast(toast.success, response.data.message);
         context.emit("cerrar-modal")
         context.emit("get-table")

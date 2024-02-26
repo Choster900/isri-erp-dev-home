@@ -210,7 +210,7 @@
                                 <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px]">CANTIDAD</p>
                             </div>
                             <div class="w-[12%] min-w-[60px] border-r border-gray-500 h-[30px]">
-                                <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px]">COSTO</p>
+                                <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px]">PRECIO</p>
                             </div>
                             <div class="w-[12%] min-w-[60px] border-gray-500 h-[30px]">
                                 <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px]">TOTAL</p>
@@ -408,6 +408,13 @@ export default {
 
 .dp__input_wrap {
     height: 35px;
+}
+
+.dp__theme_light {
+    /* I've edited this */
+    --dp-primary-color: rgba(0, 28, 72, 0.8);
+    --dp-cell-size: 25px;
+    --dp-font-size: 0.8rem;
 }
 
 .selected-opt .multiselect {
