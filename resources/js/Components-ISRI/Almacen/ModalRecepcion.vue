@@ -169,7 +169,8 @@
                             <div
                                 class="justify-start flex items-center hover:bg-gray-200 w-[23%] border-x min-w-[175px] h-[65px] bg-white border-gray-500">
                                 <p class="font-[MuseoSans] text-gray-600 text-[12px] mx-2">FACTURA:</p>
-                                <input v-model="recDocument.invoice"
+                                <input v-model="recDocument.invoice" :disabled="infoToShow.status != 1"
+                                    @input="handleValidation('invoice', { limit: 20 })"
                                     class="font-bold w-[55%] p-1 h-[35px] rounded-[4px] font-[MuseoSans] text-sm border-[#d1d5db]"
                                     type="text" name="" id="">
                             </div>
@@ -177,6 +178,7 @@
                                 class="justify-center flex items-center w-[77%] hover:bg-gray-200 border-r min-w-[515px] h-[65px] bg-white border-gray-500">
                                 <p class="font-[MuseoSans] text-gray-600 text-[12px] mx-2">OBSERVACION:</p>
                                 <textarea v-model="recDocument.observation"
+                                    @input="handleValidation('observation', { limit: 255 })" :disabled="infoToShow.status != 1"
                                     class="max-h-[50px] font-[MuseoSans] w-[70%] overflow-y-hidden resize-none peer placeholder-gray-400 rounded-[4px] text-xs font-semibold border-gray-300 focus:border-transparent px-2 text-slate-900"></textarea>
                             </div>
                         </div>
@@ -218,8 +220,9 @@
                         </div>
                         <div class="flex w-[3%]">
                             <div class="w-full min-w-[15px] h-[30px]">
-                                <svg @click="addNewRow()" class="text-green-600 cursor-pointer hover:text-green-800"
-                                    width="28px" height="28px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <svg v-if="infoToShow.status != 3" @click="addNewRow()"
+                                    class="text-green-600 cursor-pointer hover:text-green-800" width="28px" height="28px"
+                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M12 6V18M6 12H18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                         stroke-linejoin="round" />
                                 </svg>
@@ -233,8 +236,12 @@
                                 <div class="w-[23%] min-w-[175px] flex items-center justify-center border-x border-b  border-gray-500 min-h-[75px]"
                                     :class="errors['prods.' + index + '.prodId'] ? 'bg-red-300' : ''">
                                     <Multiselect id="doc" v-model="prod.prodId" :options="filteredProds" class="h-[35px]"
-                                        :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione"
-                                        @input="setProdItem(index, $event, null)" @open="openOption(prod.prodId)" />
+                                        :disabled="infoToShow.status != 1" :searchable="true"
+                                        :noOptionsText="'Lista vacía.'" placeholder="Seleccione"
+                                        @input="setProdItem(index, $event, null)" @open="openOption(prod.prodId)" :classes="{
+                                            optionSelected: 'text-white bg-[#001c48] bg-opacity-80',
+                                            optionSelectedPointed: 'text-white bg-[#001c48] opacity-90',
+                                        }" />
                                 </div>
                                 <div
                                     class="w-[23%] min-w-[175px] flex items-center justify-center border-r border-b  border-gray-500 min-h-[75px]">
@@ -246,14 +253,13 @@
                                 </div>
                                 <div class="w-[12%] min-w-[100px] flex items-center justify-center border-r border-b  border-gray-500 min-h-[75px]"
                                     :class="errors['prods.' + index + '.expiryDate'] ? 'bg-red-300' : ''">
-                                    <!-- <p class="font-[MuseoSans] text-sm p-1 ">{{ prod.unit }}</p> -->
                                     <date-time-picker-m v-if="prod.perishable === 1" v-model="prod.expiryDate"
-                                        :showIcon="false" :placeholder="'Seleccione'" />
+                                        :showIcon="false" :placeholder="'Seleccione'" :disabled="infoToShow.status != 1" />
                                     <p v-else class="font-[MuseoSans] text-sm p-1 ">N/A</p>
                                 </div>
                                 <div class="w-[10%] min-w-[60px] flex items-center justify-center border-r border-b  border-gray-500 min-h-[75px]"
                                     :class="errors['prods.' + index + '.qty'] ? 'bg-red-300' : ''">
-                                    <input v-model="prod.qty"
+                                    <input v-model="prod.qty" :disabled="infoToShow.status != 1"
                                         class="font-bold max-w-[75%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-sm border-[#d1d5db]"
                                         type="text" name="" id=""
                                         @input="handleValidation('qty', { limit: 3, number: true }, { index: index, qty: prod.qty, prodId: prod.prodId })">
@@ -273,7 +279,7 @@
                             </div>
                             <div class="w-[3%] flex items-center justify-center">
                                 <div class="w-full min-w-[15px] h-[30px]">
-                                    <svg @click="deleteRow(index, prod.detRecId)"
+                                    <svg v-if="infoToShow.status != 3" @click="deleteRow(index, prod.detRecId)"
                                         class="text-red-600 cursor-pointer ml-1 hover:text-red-800" width="20px"
                                         height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -307,14 +313,15 @@
                         </div>
                     </div>
                 </div>
-                <div class="md:flex my-6 sticky flex-row justify-end mx-8">
+                <div class="md:flex flex md:items-center my-6 sticky flex-row justify-center mx-8">
                     <button type="button" @click="$emit('cerrar-modal')"
                         class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-[12px] px-2.5 py-1.5 text-center mb-2 dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
-                    <button v-if="recepId > 0"
-                        @click="updateReception(recDocument)"
-                        class="bg-orange-700 hover:bg-orange-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">ACTUALIZAR</button>
-                    <button v-else @click="storeReception(recDocument)"
-                        class="bg-green-700 hover:bg-green-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">GUARDAR</button>
+                    <div class="" v-if="infoToShow.status != 3">
+                        <button v-if="recepId > 0" @click="updateReception(recDocument)"
+                            class="bg-orange-700 hover:bg-orange-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">ACTUALIZAR</button>
+                        <button v-else @click="storeReception(recDocument)"
+                            class="bg-green-700 hover:bg-green-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">GUARDAR</button>
+                    </div>
                 </div>
             </div>
         </ProcessModal>
@@ -342,7 +349,7 @@ export default {
         recepId: {
             type: Number,
             default: 0
-        }
+        },
     },
     setup(props, context) {
 
@@ -364,8 +371,8 @@ export default {
 
         return {
             isLoadingRequest, recDocument, errors,
-            documents, ordenC, contrato, docSelected,
-            filteredDoc, filteredItems, startRec, filteredProds, totalRec, infoToShow,
+            documents, ordenC, contrato, docSelected, totalRec,
+            filteredDoc, filteredItems, startRec, filteredProds, infoToShow,
             handleValidation, startReception, setProdItem, updateItemTotal,
             addNewRow, openOption, deleteRow, storeReception, updateReception
         }
@@ -385,10 +392,6 @@ export default {
     /* Elimina el contorno del input */
 }
 
-.custom-hover:hover>div {
-    filter: saturate(150%);
-}
-
 .dp__input_wrap {
     height: 35px;
 }
@@ -399,16 +402,4 @@ export default {
     --dp-cell-size: 25px;
     --dp-font-size: 0.8rem;
 }
-
-.selected-opt .multiselect {
-    background: var(--ms-bg, #E5E7EB);
-}
-
-.selected-opt .multiselect-wrapper input {
-    background-color: #E5E7EB;
-}
-
-/* .select-err .multiselect-wrapper input {
-    background-color: #FECACA;
-} */
 </style>

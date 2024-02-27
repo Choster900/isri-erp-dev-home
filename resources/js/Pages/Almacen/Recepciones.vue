@@ -55,7 +55,9 @@
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ reception.det_doc_adquisicion.documento_adquisicion.tipo_documento_adquisicion.siglas_tipo_doc_adquisicion }}
+                                    {{
+                                        reception.det_doc_adquisicion.documento_adquisicion.tipo_documento_adquisicion.siglas_tipo_doc_adquisicion
+                                    }}
                                     - {{ reception.det_doc_adquisicion.documento_adquisicion.numero_doc_adquisicion }}
                                 </div>
                             </td>
@@ -89,21 +91,37 @@
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="space-x-1 text-center">
                                     <DropDownOptions>
-                                        <div @click="showModalRecep = true; recepId = reception.id_recepcion_pedido"
-                                            v-if="permits.actualizar === 1"
+                                        <div v-if="permits.ejecutar === 1 && reception.id_estado_recepcion_pedido != 3"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
-                                            <div class="text-orange-800 w-[22px] h-[22px] mr-2">
+                                            <div class="text-lime-700 w-[24px] h-[24px] mr-1">
+                                                <icon-m :iconName="'clipboard-arrow'"></icon-m>
+                                            </div>
+                                            <div class="font-semibold pt-0.5">Kardex</div>
+                                        </div>
+                                        <div @click="showModalRecep = true; recepId = reception.id_recepcion_pedido"
+                                            v-if="permits.actualizar === 1 && reception.id_estado_recepcion_pedido != 3"
+                                            class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
+                                            <div class="text-orange-700 w-[22px] h-[22px] mr-2">
                                                 <icon-m :iconName="'editM'"></icon-m>
                                             </div>
                                             <div class="font-semibold pt-0.5">Editar</div>
                                         </div>
-                                        <!-- <div @click="showSettlement = true; finiquitoId = reception.id_finiquito_laboral"
+                                        <div @click="showModalRecep = true; recepId = reception.id_recepcion_pedido"
+                                            v-if="reception.id_estado_recepcion_pedido === 3"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-blue-800 w-[25px] h-[25px] mr-2">
                                                 <icon-m :iconName="'see'"></icon-m>
                                             </div>
                                             <div class="font-semibold pt-0.5">Ver</div>
-                                        </div> -->
+                                        </div>
+                                        <div @click="changeStatusElement(reception.id_recepcion_pedido, reception.id_estado_recepcion_pedido)"
+                                            v-if="permits.eliminar === 1 && reception.id_estado_recepcion_pedido != 3"
+                                            class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
+                                            <div class="text-red-700 w-[24px] h-[24px] mr-1">
+                                                <icon-m :iconName="'trash'"></icon-m>
+                                            </div>
+                                            <div class="font-semibold pt-0.5">Eliminar</div>
+                                        </div>
                                     </DropDownOptions>
                                 </div>
                             </td>
@@ -173,13 +191,6 @@
         <modal-recepcion-vue v-if="showModalRecep" :showModalRecep="showModalRecep" :recepId="recepId"
             @cerrar-modal="showModalRecep = false" @get-table="getDataToShow(tableData.currentPage)" />
 
-        <!-- <modal-reception-emp-vue v-if="showModalSettlementEmp" :showModalSettlementEmp="showModalSettlementEmp"
-            :finiquitoId="finiquitoId" @cerrar-modal="showModalSettlementEmp = false"
-            @get-table="getDataToShow(tableData.currentPage)" />
-
-        <modal-show-reception-vue v-if="showSettlement" :showSettlement="showSettlement" :finiquitoId="finiquitoId"
-            @cerrar-modal="showSettlement = false" :permits="permits" @get-table="getDataToShow(tableData.currentPage)" /> -->
-
     </AppLayoutVue>
 </template>
 
@@ -191,14 +202,13 @@ import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
 import ModalRecepcionVue from '@/Components-ISRI/Almacen/ModalRecepcion.vue';
 
 import moment from 'moment';
-import { ref, toRefs, computed, onMounted, watch } from 'vue';
+import { ref, toRefs, inject } from 'vue';
 import { usePermissions } from '@/Composables/General/usePermissions.js';
 import { useToDataTable } from '@/Composables/General/useToDataTable.js';
-
-import { toast } from 'vue3-toastify';
+import { useHandleError } from "@/Composables/General/useHandleError.js";
+import { useShowToast } from "@/Composables/General/useShowToast.js";
+import { toast } from "vue3-toastify";
 import 'vue3-toastify/dist/index.css';
-
-import axios from 'axios';
 
 export default {
     components: { Head, AppLayoutVue, Datatable, IconM, ModalRecepcionVue },
@@ -209,12 +219,11 @@ export default {
         },
     },
     setup(props, context) {
+        const swal = inject("$swal");
         const { menu } = toRefs(props);
         const permits = usePermissions(menu.value, window.location.pathname);
 
         const showModalRecep = ref(false)
-        // const showModalSettlementEmp = ref(false)
-        // const showSettlement = ref(false)
 
         const recepId = ref(0)
 
@@ -246,12 +255,48 @@ export default {
             isLoadinRequest,
             isLoadingTop,
             emptyObject,
-            getDataToShow, handleData, sortBy, changeStatusElement
+            getDataToShow, handleData, sortBy
         } = useToDataTable(columns, requestUrl, columntToSort, dir)
+
+        const changeStatusElement = async (elementId, status) => {
+            swal({
+                title: "¿Está seguro de Eliminar esta recepcion?",
+                icon: "question",
+                iconHtml: "❓",
+                confirmButtonText: "Si, Eliminar",
+                confirmButtonColor: "#DC2626",
+                cancelButtonText: "Cancelar",
+                showCancelButton: true,
+                showCloseButton: true,
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    isLoadingTop.value = true;
+                    try {
+                        const response = await axios.post('/change-status-reception', {
+                            id: elementId,
+                            status: status
+                        });
+                        useShowToast(toast.success, response.data.message);
+                    } catch (err) {
+                        if (err.response.status === 422) {
+                            if (err.response.data.logical_error) {
+                                useShowToast(toast.error, err.response.data.logical_error);
+                            }
+                        } else {
+                            const { title, text, icon } = useHandleError(err);
+                            swal({ title: title, text: text, icon: icon, timer: 5000 });
+                        }
+                    } finally {
+                        isLoadingTop.value = false;
+                        getDataToShow()
+                    }
+                }
+            });
+        }
 
         return {
             permits, dataToShow, showModalRecep, tableData, perPage, recepId,
-            links, sortKey, sortOrders, isLoadinRequest, isLoadingTop, emptyObject, columns, 
+            links, sortKey, sortOrders, isLoadinRequest, isLoadingTop, emptyObject, columns,
             getDataToShow, handleData, sortBy, changeStatusElement, moment
         };
     },

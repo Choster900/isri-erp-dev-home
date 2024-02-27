@@ -60,7 +60,8 @@ class RecepcionController extends Controller
                     recepcion_pedido AS rp
                 INNER JOIN detalle_recepcion_pedido AS drp ON rp.id_recepcion_pedido = drp.id_recepcion_pedido
                 WHERE
-                    drp.estado_det_recepcion_pedido = 1
+                    drp.estado_det_recepcion_pedido = 1 
+                    AND rp.id_estado_recepcion_pedido != 3
                 GROUP BY
                     drp.id_prod_adquisicion
             ) AS ing ON pa.id_prod_adquisicion = ing.id_prod_adquisicion
@@ -273,7 +274,7 @@ class RecepcionController extends Controller
                 foreach ($request->prods as $prod) {
                     $prodAdq = ProductoAdquisicion::find($prod['prodId']);
                     $compare = $collection->firstWhere('value', $prod['prodId']);
-                    
+
                     if ($compare->total_menos_acumulado == $prod['initial']) { //$prod['initial] is 'total_menos_acumulado' from the view
                         if ($prod['detRecId'] != "" && $prod['deleted'] == false) {
                             $det = DetalleRecepcionPedido::find($prod['detRecId']);
@@ -360,6 +361,34 @@ class RecepcionController extends Controller
                     'error' => $th->getMessage(),
                 ], 422);
             }
+        }
+    }
+
+    public function changeStatusReception(Request $request)
+    {
+        $reception = RecepcionPedido::find($request->id);
+        if ($reception->id_estado_recepcion_pedido == 1 && $request->status == 1) {
+            DB::beginTransaction();
+            try {
+                $reception->update([
+                    'id_estado_recepcion_pedido'            => 3,
+                    'fecha_mod_recepcion_pedido'            => Carbon::now(),
+                    'usuario_recepcion_pedido'              => $request->user()->nick_usuario,
+                    'ip_recepcion_pedido'                   => $request->ip(),
+                ]);
+                DB::commit(); // Confirma las operaciones en la base de datos
+                return response()->json([
+                    'message'          => "Recepción eliminada con éxito.",
+                ]);
+            } catch (\Exception $e) {
+                DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+                return response()->json([
+                    'logical_error' => 'Ha ocurrido un error con sus datos.',
+                    'error' => $e,
+                ], 422);
+            }
+        } else {
+            return response()->json(['logical_error' => 'Error, otro usuario ha cambiado el estado de esta recepción.',], 422);
         }
     }
 }

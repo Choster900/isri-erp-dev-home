@@ -41,12 +41,13 @@ export const useRecepcion = (context) => {
         financingSourceId: '',
         observation: '',
         detDocId: '',
+        status: '',
         prods: [],
         procedure: []
     })
 
     const {
-        formatDateVue3DP, formatTimeVue3DP
+        formatDateVue3DP
     } = useFormatDateTime()
 
     const getInfoForModalRecep = async (id) => {
@@ -102,13 +103,14 @@ export const useRecepcion = (context) => {
 
     const setModalValues = (data, id) => {
         const recepData = data.recep
-        infoToShow.value.docName = data.itemInfo.documento_adquisicion.tipo_documento_adquisicion.nombre_tipo_doc_adquisicion+" "+data.itemInfo.documento_adquisicion.numero_doc_adquisicion
+        infoToShow.value.docName = data.itemInfo.documento_adquisicion.tipo_documento_adquisicion.nombre_tipo_doc_adquisicion + " " + data.itemInfo.documento_adquisicion.numero_doc_adquisicion
         infoToShow.value.itemName = upperCase(data.itemInfo.nombre_det_doc_adquisicion)
         infoToShow.value.financingSource = data.itemInfo.fuente_financiamiento.codigo_proy_financiado
         infoToShow.value.commitment = data.itemInfo.compromiso_ppto_det_doc_adquisicion
         infoToShow.value.supplier = data.itemInfo.documento_adquisicion.proveedor.razon_social_proveedor
         infoToShow.value.nit = data.itemInfo.documento_adquisicion.proveedor.nit_proveedor
         infoToShow.value.dateTime = recepData ? moment(recepData.fecha_reg_recepcion_pedido).format('DD/MM/YYYY, HH:mm:ss') : ''
+        infoToShow.value.status = id > 0 ? recepData.id_estado_recepcion_pedido : 1
 
         recDocument.value.financingSourceId = data.itemInfo.id_proy_financiado
         recDocument.value.detDocId = data.itemInfo.id_det_doc_adquisicion
@@ -119,14 +121,19 @@ export const useRecepcion = (context) => {
             recDocument.value.acta = recepData.acta_recepcion_pedido
             recDocument.value.invoice = recepData.factura_recepcion_pedido
             recDocument.value.observation = recepData.observacion_recepcion_pedido
-            // Filter products based on conditions
-            const newOptions = data.products.filter(element => {
-                const rightOpt = recepData.detalle_recepcion.some(e => e.id_prod_adquisicion === element.value && e.estado_prod_adquisicion === 1);
-                return rightOpt || element.total_menos_acumulado != 0;
-            });
 
-            // Set products and filteredProds to newOptions
-            products.value = filteredProds.value = newOptions;
+            if (recepData.id_estado_recepcion_pedido === 1) {
+                // Filter products based on conditions
+                const newOptions = data.products.filter(element => {
+                    const rightOpt = recepData.detalle_recepcion.some(e => e.id_prod_adquisicion === element.value && e.estado_prod_adquisicion === 1);
+                    return rightOpt || element.total_menos_acumulado != 0;
+                });
+
+                // Set products and filteredProds to newOptions
+                products.value = filteredProds.value = newOptions;
+            }else{
+                filteredProds.value = products.value = data.products
+            }
 
             // Iterate over detalle_recepcion
             recepData.detalle_recepcion.forEach(element => {
@@ -215,7 +222,7 @@ export const useRecepcion = (context) => {
             recDocument.value.prods[element.index][input] = validateInput(recDocument.value.prods[element.index][input], validation)
             updateItemTotal(element.index, recDocument.value.prods[element.index][input], recDocument.value.prods[element.index].prodId)
         } else {
-            recDocument.value.prods[input] = validateInput(recDocument.value.prods[input], validation)
+            recDocument.value[input] = validateInput(recDocument.value[input], validation)
         }
     }
 
@@ -430,7 +437,7 @@ export const useRecepcion = (context) => {
     return {
         errors, isLoadingRequest, reception, infoToShow,
         documents, ordenC, contrato, docSelected, totalRec,
-        filteredDoc, filteredItems, recDocument, startRec, filteredProds, 
+        filteredDoc, filteredItems, recDocument, startRec, filteredProds,
         getInfoForModalRecep, startReception, setProdItem, updateItemTotal, addNewRow,
         openOption, deleteRow, handleValidation, storeReception, updateReception
     }
