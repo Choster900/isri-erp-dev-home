@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Tesoreria;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Tesoreria\DocumentoAdquisicionRequest;
+use App\Models\AdministradorAdquisicion;
 use App\Models\DetDocumentoAdquisicion;
 use App\Models\DocumentoAdquisicion;
+use App\Models\Empleado;
 use App\Models\Proveedor;
 use App\Models\ProyectoFinanciado;
 use Carbon\Carbon;
@@ -93,8 +95,15 @@ class DocumentoAdquisicionController extends Controller
             }
         }
     }
-    public function getSelectsAcqDoc(Request $request)
+    //New method for composition API
+    public function getInfoModalDocAdquisicion(Request $request, $id)
     {
+        $acqDoc = DocumentoAdquisicion::with([
+            'detalles.quedan', 'proveedor', 'tipo_gestion_compra',
+            'tipo_documento_adquisicion', 'detalles.fuente_financiamiento',
+            'administradores'
+        ])->find($id);
+
         $doc_types = DB::table('tipo_documento_adquisicion')
             ->select('id_tipo_doc_adquisicion as value', 'nombre_tipo_doc_adquisicion as label')
             ->where('estado_tipo_doc_adquisicion', 1)
@@ -113,10 +122,23 @@ class DocumentoAdquisicionController extends Controller
             ->where('estado_proveedor', '=', 1)
             ->orderBy('razon_social_proveedor')
             ->get();
-        return [
-            'doc_types' => $doc_types, 'management_types' => $management_types,
-            'financing_sources' => $financing_sources, 'suppliers' => $suppliers,
-        ];
+        $allEmployees = Empleado::with('persona')
+            ->where('id_estado_empleado', 1)->get();
+        $employees = $allEmployees->map(function ($e) {
+            return [
+                'value'           => $e->id_empleado,
+                'label'           => $e->persona->nombre_apellido
+            ];
+        });
+
+        return response()->json([
+            'doc_types'                     => $doc_types,
+            'management_types'              => $management_types,
+            'financing_sources'             => $financing_sources,
+            'suppliers'                     => $suppliers,
+            'acqDoc'                        => $acqDoc ?? [],
+            'employees'                     => $employees
+        ]);
     }
     public function saveAcqDoc(DocumentoAdquisicionRequest $request)
     {
@@ -137,6 +159,18 @@ class DocumentoAdquisicionController extends Controller
                 'ip_doc_adquisicion' => $request->ip(),
             ]);
             $new_acq_doc->save();
+
+            foreach ($request->employees as $emp) {
+                $newAdm = new AdministradorAdquisicion([
+                    'id_doc_adquisicion'            => $new_acq_doc->id_doc_adquisicion,
+                    'id_empleado'                   => $emp,
+                    'estado_admon_adquisicion'      => 1,
+                    'fecha_reg_admon_adquisicion'   => Carbon::now(),
+                    'usuario_admon_adquisicion'     => $request->user()->nick_usuario,
+                    'ip_admon_adquisicion'          => $request->ip(),
+                ]);
+                $newAdm->save();
+            }
 
             foreach ($request->items as $detail) {
                 $new_item = new DetDocumentoAdquisicion([
@@ -165,38 +199,6 @@ class DocumentoAdquisicionController extends Controller
                 'error' => $th->getMessage(),
             ], 422);
         }
-
-        // $new_acq_doc = new DocumentoAdquisicion([
-        //     'id_tipo_gestion_compra' => $request->management_type_id,
-        //     'id_tipo_doc_adquisicion' => $request->type_id,
-        //     'id_proveedor' => $request->supplier_id,
-        //     'monto_doc_adquisicion' => $request->total,
-        //     'numero_doc_adquisicion' => $request->number,
-        //     'numero_gestion_doc_adquisicion' => $request->management_number,
-        //     'numero_adjudicacion_doc_adquisicion' => $request->award_number,
-        //     'fecha_adjudicacion_doc_adquisicion' => $request->award_date,
-        //     'estado_doc_adquisicion' => 1,
-        //     'fecha_reg_doc_adquisicion' => Carbon::now(),
-        //     'usuario_doc_adquisicion' => $request->user()->nick_usuario,
-        //     'ip_doc_adquisicion' => $request->ip(),
-        // ]);
-        // $new_acq_doc->save();
-        // foreach ($request->items as $detail) {
-        //     $new_item = new DetDocumentoAdquisicion([
-        //         'id_doc_adquisicion' => $new_acq_doc->id_doc_adquisicion,
-        //         'id_proy_financiado' => $detail['financing_source_id'],
-        //         'nombre_det_doc_adquisicion' => $detail['name'],
-        //         'monto_det_doc_adquisicion' => $detail['amount'],
-        //         'compromiso_ppto_det_doc_adquisicion' => $detail['commitment_number'],
-        //         'admon_det_doc_adquisicion' => $detail['contract_manager'],
-        //         'estado_det_doc_adquisicion' => 1,
-        //         'fecha_reg_det_doc_adquisicion' => Carbon::now(),
-        //         'usuario_det_doc_adquisicion' => $request->user()->nick_usuario,
-        //         'ip_det_doc_adquisicion' => $request->ip()
-        //     ]);
-        //     $new_item->save();
-        // }
-        // return ['message' => 'Guardado documento numero ' . $new_acq_doc->numero_doc_adquisicion . ' con éxito'];
     }
     public function updateAcqDoc(DocumentoAdquisicionRequest $request)
     {
@@ -219,6 +221,48 @@ class DocumentoAdquisicionController extends Controller
                     'usuario_doc_adquisicion' => $request->user()->nick_usuario,
                     'ip_doc_adquisicion' => $request->ip(),
                 ]);
+
+                //CRUD doc managers
+                $newEmpIds = $request->employees;
+                $currentEmpIds = AdministradorAdquisicion::where('id_doc_adquisicion', $acq_doc->id_doc_adquisicion)
+                    ->where('estado_admon_adquisicion',1)
+                    ->pluck('id_empleado')
+                    ->toArray();
+                $deletedEmpIds = array_diff($currentEmpIds, $newEmpIds);
+                //Deleting doc managers
+                AdministradorAdquisicion::where('id_doc_adquisicion', $acq_doc->id_doc_adquisicion)
+                    ->whereIn('id_empleado', $deletedEmpIds)
+                    ->update([
+                        'estado_admon_adquisicion'      => 0,
+                        'fecha_mod_admon_adquisicion'   => Carbon::now(),
+                        'usuario_admon_adquisicion'     => $request->user()->nick_usuario,
+                        'ip_admon_adquisicion'          => $request->ip(),
+                    ]);
+                //Activate an inactive doc manager or create a new one
+                foreach ($newEmpIds as $empId) {
+                    if (!in_array($empId, $currentEmpIds)) {
+                        $existAdm = AdministradorAdquisicion::where('id_doc_adquisicion', $acq_doc->id_doc_adquisicion)
+                            ->where('id_empleado', $empId)->first();
+                        if ($existAdm) {
+                            $existAdm->update([
+                                'estado_admon_adquisicion'          => 1,
+                                'fecha_mod_admon_adquisicion'       => Carbon::now(),
+                                'usuario_admon_adquisicion'         => $request->user()->nick_usuario,
+                                'ip_admon_adquisicion'              => $request->ip(),
+                            ]);
+                        } else {
+                            $newAdm = new AdministradorAdquisicion([
+                                'id_empleado'                       => $empId,
+                                'id_doc_adquisicion'                => $acq_doc->id_doc_adquisicion,
+                                'estado_admon_adquisicion'          => 1,
+                                'fecha_reg_admon_adquisicion'       => Carbon::now(),
+                                'usuario_admon_adquisicion'         => $request->user()->nick_usuario,
+                                'ip_admon_adquisicion'              => $request->ip(),
+                            ]);
+                            $newAdm->save();
+                        }
+                    }
+                }
 
                 foreach ($request->items as $detail) {
                     if ($detail['id'] != "" && $detail['deleted'] == false) {
@@ -368,41 +412,5 @@ class DocumentoAdquisicionController extends Controller
             // }
             // return ['mensaje' => 'Actualizado documento numero ' . $acq_doc->numero_doc_adquisicion . ' con éxito.'];
         }
-    }
-
-    //New method for composition API
-    public function getInfoModalDocAdquisicion(Request $request, $id)
-    {
-        $acqDoc = DocumentoAdquisicion::with([
-            'detalles.quedan', 'proveedor', 'tipo_gestion_compra',
-            'tipo_documento_adquisicion', 'detalles.fuente_financiamiento'
-        ])->find($id);
-
-        $doc_types = DB::table('tipo_documento_adquisicion')
-            ->select('id_tipo_doc_adquisicion as value', 'nombre_tipo_doc_adquisicion as label')
-            ->where('estado_tipo_doc_adquisicion', 1)
-            ->orderBy('nombre_tipo_doc_adquisicion')
-            ->get();
-        $management_types = DB::table('tipo_gestion_compra')
-            ->select('id_tipo_gestion_compra as value', 'nombre_tipo_gestion_compra as label')
-            ->where('estado_tipo_gestion_compra', '=', 1)
-            ->orderBy('nombre_tipo_gestion_compra')
-            ->get();
-        $financing_sources = ProyectoFinanciado::select('id_proy_financiado as value', 'nombre_proy_financiado as label', 'codigo_proy_financiado')
-            ->where('estado_proy_financiado', '=', 1)
-            ->orderBy('nombre_proy_financiado')
-            ->get();
-        $suppliers = Proveedor::select('id_proveedor as value', 'razon_social_proveedor as label')
-            ->where('estado_proveedor', '=', 1)
-            ->orderBy('razon_social_proveedor')
-            ->get();
-
-        return response()->json([
-            'doc_types'                     => $doc_types,
-            'management_types'              => $management_types,
-            'financing_sources'             => $financing_sources,
-            'suppliers'                     => $suppliers,
-            'acqDoc'                        => $acqDoc ?? []
-        ]);
     }
 }
