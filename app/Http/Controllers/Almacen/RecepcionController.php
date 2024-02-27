@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Almacen;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Almacen\RecepcionRequest;
+use App\Models\AdministradorAdquisicion;
 use App\Models\CentroAtencion;
 use App\Models\DetalleRecepcionPedido;
 use App\Models\DetDocumentoAdquisicion;
@@ -390,5 +391,29 @@ class RecepcionController extends Controller
         } else {
             return response()->json(['logical_error' => 'Error, otro usuario ha cambiado el estado de esta recepción.',], 422);
         }
+    }
+
+    public function getInfoModalSendKardex(Request $request, $id)
+    {
+        $recInfo = RecepcionPedido::with(
+            [
+                'det_doc_adquisicion.documento_adquisicion.administradores' => function ($query) {
+                    $query->where('estado_admon_adquisicion', 1);
+                },
+                'det_doc_adquisicion.documento_adquisicion.administradores.empleado.persona'
+            ]
+        )->find($id);
+
+        $empOptions = $recInfo->det_doc_adquisicion->documento_adquisicion->administradores->map(function ($e) {
+            return [
+                'value'           => $e->empleado->id_empleado,
+                'label'           => $e->empleado->persona->nombre_apellido
+            ];
+        });
+
+        return response()->json([
+            'recInfo'                           => $recInfo,
+            'empOptions'                        => $empOptions
+        ]);
     }
 }

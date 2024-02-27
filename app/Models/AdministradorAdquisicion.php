@@ -22,4 +22,9 @@ class AdministradorAdquisicion extends Model
         'usuario_admon_adquisicion',
         'ip_admon_adquisicion',
     ];
+
+    public function empleado()
+    {
+        return $this->belongsTo('App\Models\Empleado','id_empleado','id_empleado');
+    }
 }

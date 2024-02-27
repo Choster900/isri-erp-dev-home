@@ -3,7 +3,7 @@
         <div v-if="isLoadingRequest"
             class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-900 opacity-75 z-50">
             <div class="flex items-center justify-center my-4">
-                <img src="../../../img/loader-spinner.gif" alt="" class="w-8 h-8">
+                <img src="../../../../img/loader-spinner.gif" alt="" class="w-8 h-8">
                 <h1 class="ml-4 font-medium text-xl text-white font-[Roboto]">Procesando...</h1>
             </div>
         </div>
@@ -104,7 +104,7 @@
                         <div class="flex w-full">
                             <!-- Columna 1 -->
                             <div class="w-[23%] min-w-[175px] bg-white border border-gray-500 p-2">
-                                <img src="../../../img/isri-gob.png" alt="Logo del instituto" class="w-full">
+                                <img src="../../../../img/isri-gob.png" alt="Logo del instituto" class="w-full">
                             </div>
                             <!-- Columna 2 -->
                             <div class="w-[77%] min-w-[440px] bg-white border-y border-r border-gray-500 p-2">
