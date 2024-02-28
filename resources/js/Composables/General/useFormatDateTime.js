@@ -4,8 +4,12 @@ moment.locale('en');
 export const useFormatDateTime = () => {
     //Must be format YYYY/mm/dd
     const formatDateVue3DP = (date) => {
-        moment.locale('en');
-        return moment(date).format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+        if(date){
+            moment.locale('en');
+            return moment(date).format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+        }else{
+            return null
+        }
     }
 
     //Must be format HH:mm:ss
@@ -16,7 +20,7 @@ export const useFormatDateTime = () => {
         objectTime.minutes = timeObj.minutes()
         objectTime.seconds = timeObj.seconds()
         
-        return objectTime
+        return time ? objectTime : null
     }
 
     return {

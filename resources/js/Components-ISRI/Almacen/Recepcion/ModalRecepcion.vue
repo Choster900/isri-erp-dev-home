@@ -3,7 +3,7 @@
         <div v-if="isLoadingRequest"
             class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-900 opacity-75 z-50">
             <div class="flex items-center justify-center my-4">
-                <img src="../../../img/loader-spinner.gif" alt="" class="w-8 h-8">
+                <img src="../../../../img/loader-spinner.gif" alt="" class="w-8 h-8">
                 <h1 class="ml-4 font-medium text-xl text-white font-[Roboto]">Procesando...</h1>
             </div>
         </div>
@@ -37,7 +37,7 @@
                                     <p class="font-[Roboto] ">CONTRATOS</p>
                                 </div>
                                 <div>
-                                    <p class="font-[Roboto] ">Disponibles: {{ contrato.length }}</p>
+                                    <p class="font-[Roboto] ">Pendientes: {{ contrato.length }}</p>
                                 </div>
                             </div>
                         </div>
@@ -50,7 +50,7 @@
                                     <p class="font-[Roboto]">ORDENES DE COMPRA</p>
                                 </div>
                                 <div>
-                                    <p class="font-[Roboto]">Disponibles: {{ ordenC.length }}</p>
+                                    <p class="font-[Roboto]">Pendientes: {{ ordenC.length }}</p>
                                 </div>
                             </div>
                         </div>
@@ -99,19 +99,23 @@
                 <pre>{{ products }}</pre>
             </div> -->
             <div v-else>
-                <div class="ml-8 mr-0 overflow-x-auto mt-4">
+                <div class="ml-8 mr-0 overflow-x-auto mt-4 h-[400px] overflow-y-auto">
                     <div class="max-w-[97%] min-w-[690px] flex">
                         <div class="flex w-full">
                             <!-- Columna 1 -->
                             <div class="w-[23%] min-w-[175px] bg-white border border-gray-500 p-2">
-                                <img src="../../../img/isri-gob.png" alt="Logo del instituto" class="w-full">
+                                <img src="../../../../img/isri-gob.png" alt="Logo del instituto" class="w-full">
                             </div>
                             <!-- Columna 2 -->
                             <div class="w-[77%] min-w-[440px] bg-white border-y border-r border-gray-500 p-2">
-                                <p class="font-[Bembo] text-center text-[15px] font-bold">ALMACEN CENTRAL</p>
-                                <p class="font-[Bembo] text-center text-[15px] font-bold">CONTRATO {{ infoToShow.docName
-                                }}</p>
-                                <p class="font-[Bembo] text-center text-[15px] font-bold">ACTA DE RECEPCION {{
+                                <p class="font-[Bembo] text-center text-[14px] font-bold">ALMACEN CENTRAL</p>
+                                <p class="font-[Bembo] text-center text-[14px] font-bold">
+                                    {{ infoToShow.docName }}
+                                </p>
+                                <p class="font-[Bembo] text-center text-[14px] font-bold">
+                                    {{ infoToShow.itemName }}
+                                </p>
+                                <p class="font-[Bembo] text-center text-[14px] font-bold">ACTA DE RECEPCION {{
                                     recDocument.acta ?? '' }}
                                 </p>
                             </div>
@@ -121,28 +125,41 @@
                         <div class="flex w-full border-gray-500">
                             <div
                                 class="justify-start flex items-center border-l border-gray-500 min-w-[345px] w-[50%] bg-white">
-                                <p class="font-[MuseoSans] text-gray-700 text-[11px] py-1 ml-2">FECHA Y HORA: 22/02/2024,
-                                    15:06:28</p>
+                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2">FECHA Y HORA DE RECEPCION:
+                                    <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
+                                        infoToShow.dateTime }}</span>
+                                </p>
                             </div>
                             <div class="justify-start flex items-center min-w-[172.5px] w-[25%] bg-white">
-                                <p class="font-[MuseoSans] text-gray-700 text-[11px] py-1">FINANCIAMIENTO: FG</p>
+                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1">FINANCIAMIENTO:
+                                    <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
+                                        infoToShow.financingSource }}</span>
+                                </p>
                             </div>
                             <div
                                 class="justify-start flex items-center border-r border-gray-500 min-w-[172.5px] w-[25%] bg-white">
-                                <p class="font-[MuseoSans] text-gray-700 text-[11px] py-1">COMPROMISO: 1911</p>
+                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1">COMPROMISO:
+                                    <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
+                                        infoToShow.commitment }}</span>
+                                </p>
                             </div>
                         </div>
                     </div>
-                    <div class="max-w-[97%] min-w-[690px] flex">
-                        <div class="flex w-full border-b border-gray-500">
+                    <div class="max-w-[97%] min-w-[690px] border-b border-gray-500 flex">
+                        <div class="flex w-full">
                             <div
                                 class="justify-start flex items-center border-l border-gray-500 min-w-[517.5px] w-[75%] bg-white">
-                                <p class="font-[MuseoSans] text-gray-700 text-[11px] py-1 ml-2">PROVEEDOR: GBM DE EL
-                                    SALVADOR S.A DE C.V</p>
+                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2">PROVEEDOR:
+                                    <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
+                                        infoToShow.supplier }}</span>
+                                </p>
                             </div>
                             <div
                                 class="justify-start flex items-center border-r border-gray-500 min-w-[172.5px] w-[25%] bg-white">
-                                <p class="font-[MuseoSans] text-gray-700 text-[11px] py-1">NIT: 0715-080994-102-4</p>
+                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1">NIT:
+                                    <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{ infoToShow.nit
+                                    }}</span>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -150,27 +167,22 @@
                     <div class="max-w-[97%] min-w-[690px] border-b border-gray-500 flex">
                         <div class="flex w-full">
                             <div
-                                class="justify-start flex items-center w-[23%] border-x min-w-[175px] h-[65px] bg-white border-gray-500">
+                                class="justify-start flex items-center hover:bg-gray-200 w-[23%] border-x min-w-[175px] h-[65px] bg-white border-gray-500">
                                 <p class="font-[MuseoSans] text-gray-600 text-[12px] mx-2">FACTURA:</p>
-                                <input v-model="recDocument.invoice"
+                                <input v-model="recDocument.invoice" :disabled="infoToShow.status != 1"
+                                    @input="handleValidation('invoice', { limit: 20 })"
                                     class="font-bold w-[55%] p-1 h-[35px] rounded-[4px] font-[MuseoSans] text-sm border-[#d1d5db]"
                                     type="text" name="" id="">
                             </div>
                             <div
-                                class="justify-center flex items-center w-[77%] border-r min-w-[515px] h-[65px] bg-white border-gray-500">
+                                class="justify-center flex items-center w-[77%] hover:bg-gray-200 border-r min-w-[515px] h-[65px] bg-white border-gray-500">
                                 <p class="font-[MuseoSans] text-gray-600 text-[12px] mx-2">OBSERVACION:</p>
-                                <textarea class="max-h-[50px] w-[70%] overflow-y-hidden resize-none peer placeholder-gray-400 rounded-[4px] text-xs font-semibold border-gray-300 focus:border-transparent px-2 text-slate-900"></textarea>
+                                <textarea v-model="recDocument.observation"
+                                    @input="handleValidation('observation', { limit: 255 })" :disabled="infoToShow.status != 1"
+                                    class="max-h-[50px] font-[MuseoSans] w-[70%] overflow-y-hidden resize-none peer placeholder-gray-400 rounded-[4px] text-xs font-semibold border-gray-300 focus:border-transparent px-2 text-slate-900"></textarea>
                             </div>
                         </div>
                     </div>
-
-                    <!-- <div class="max-w-[97%] min-w-[690px] flex">
-                            <div class="flex w-full border-b border-gray-500">
-                                <div class="justify-start flex items-center border-x border-gray-500 w-full bg-white">
-                                    <p class="font-[MuseoSans] text-gray-700 text-[11px] py-1 mx-2">SE HACE CONSTAR QUE LOS BIENES DETALLADOS A CONTINUACION, CUMPLEN CON LAS CONDICIONES Y ESPECIFICACIONES TECNICAS PREVIAMENTE DEFINIDAS EN EL DOCUMENTO DE ADQUISICION.</p>
-                                </div>
-                            </div>
-                        </div> -->
                     <div class="max-w-[97%] min-w-[690px] flex">
                         <div class="flex w-full border-x border-b border-gray-500">
                             <div class="justify-center flex w-full bg-white">
@@ -193,14 +205,14 @@
                             <div class="w-[8%] min-w-[60px] border-r border-gray-500 h-[30px]">
                                 <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px]">REST.</p>
                             </div>
-                            <div class="w-[12%] min-w-[80px] border-r border-gray-500 h-[30px]">
+                            <div class="w-[12%] min-w-[100px] border-r border-gray-500 h-[30px]">
                                 <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px]">VENCIMIENTO</p>
                             </div>
-                            <div class="w-[10%] min-w-[80px] border-r border-gray-500 h-[30px]">
+                            <div class="w-[10%] min-w-[60px] border-r border-gray-500 h-[30px]">
                                 <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px]">CANTIDAD</p>
                             </div>
                             <div class="w-[12%] min-w-[60px] border-r border-gray-500 h-[30px]">
-                                <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px]">COSTO</p>
+                                <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px]">PRECIO</p>
                             </div>
                             <div class="w-[12%] min-w-[60px] border-gray-500 h-[30px]">
                                 <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px]">TOTAL</p>
@@ -208,8 +220,9 @@
                         </div>
                         <div class="flex w-[3%]">
                             <div class="w-full min-w-[15px] h-[30px]">
-                                <svg @click="addNewRow()" class="text-green-600 cursor-pointer hover:text-green-800"
-                                    width="28px" height="28px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <svg v-if="infoToShow.status != 3" @click="addNewRow()"
+                                    class="text-green-600 cursor-pointer hover:text-green-800" width="28px" height="28px"
+                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M12 6V18M6 12H18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                         stroke-linejoin="round" />
                                 </svg>
@@ -217,14 +230,18 @@
                         </div>
                     </div>
                     <template v-for="(prod, index) in recDocument.prods" :key="index">
-                        <div v-if="prod.deleted == false" class="max-w-full flex min-w-[705px] ">
+                        <div :id="'row-' + index" v-if="prod.deleted == false" class="max-w-full flex min-w-[705px] ">
                             <div class="flex w-[97%] min-w-[690px] bg-white hover:bg-gray-200 text-gray-800">
                                 <!-- Cabecera de la tabla -->
                                 <div class="w-[23%] min-w-[175px] flex items-center justify-center border-x border-b  border-gray-500 min-h-[75px]"
                                     :class="errors['prods.' + index + '.prodId'] ? 'bg-red-300' : ''">
                                     <Multiselect id="doc" v-model="prod.prodId" :options="filteredProds" class="h-[35px]"
-                                        :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione"
-                                        @input="setProdItem(index, $event, null)" @open="openOption(prod.prodId)" />
+                                        :disabled="infoToShow.status != 1" :searchable="true"
+                                        :noOptionsText="'Lista vacía.'" placeholder="Seleccione"
+                                        @input="setProdItem(index, $event, null)" @open="openOption(prod.prodId)" :classes="{
+                                            optionSelected: 'text-white bg-[#001c48] bg-opacity-80',
+                                            optionSelectedPointed: 'text-white bg-[#001c48] opacity-90',
+                                        }" />
                                 </div>
                                 <div
                                     class="w-[23%] min-w-[175px] flex items-center justify-center border-r border-b  border-gray-500 min-h-[75px]">
@@ -234,16 +251,15 @@
                                     :class="prod.avails < 0 ? 'bg-red-300' : ''">
                                     <p class="font-[MuseoSans] text-sm p-1 ">{{ prod.avails }}</p>
                                 </div>
-                                <div class="w-[12%] min-w-[80px] flex items-center justify-center border-r border-b  border-gray-500 min-h-[75px]"
+                                <div class="w-[12%] min-w-[100px] flex items-center justify-center border-r border-b  border-gray-500 min-h-[75px]"
                                     :class="errors['prods.' + index + '.expiryDate'] ? 'bg-red-300' : ''">
-                                    <!-- <p class="font-[MuseoSans] text-sm p-1 ">{{ prod.unit }}</p> -->
                                     <date-time-picker-m v-if="prod.perishable === 1" v-model="prod.expiryDate"
-                                        :showIcon="false" :placeholder="'Seleccione'" />
+                                        :showIcon="false" :placeholder="'Seleccione'" :disabled="infoToShow.status != 1" />
                                     <p v-else class="font-[MuseoSans] text-sm p-1 ">N/A</p>
                                 </div>
-                                <div class="w-[10%] min-w-[80px] flex items-center justify-center border-r border-b  border-gray-500 min-h-[75px]"
+                                <div class="w-[10%] min-w-[60px] flex items-center justify-center border-r border-b  border-gray-500 min-h-[75px]"
                                     :class="errors['prods.' + index + '.qty'] ? 'bg-red-300' : ''">
-                                    <input v-model="prod.qty"
+                                    <input v-model="prod.qty" :disabled="infoToShow.status != 1"
                                         class="font-bold max-w-[75%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-sm border-[#d1d5db]"
                                         type="text" name="" id=""
                                         @input="handleValidation('qty', { limit: 3, number: true }, { index: index, qty: prod.qty, prodId: prod.prodId })">
@@ -263,7 +279,7 @@
                             </div>
                             <div class="w-[3%] flex items-center justify-center">
                                 <div class="w-full min-w-[15px] h-[30px]">
-                                    <svg @click="deleteRow(index, prod.detRecId)"
+                                    <svg v-if="infoToShow.status != 3" @click="deleteRow(index, prod.detRecId)"
                                         class="text-red-600 cursor-pointer ml-1 hover:text-red-800" width="20px"
                                         height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -296,10 +312,11 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="md:flex my-6 flex-row justify-end mx-8">
-                        <button type="button" @click="$emit('cerrar-modal')"
-                            class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-[12px] px-2.5 py-1.5 text-center mb-2 dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
+                </div>
+                <div class="md:flex flex md:items-center my-6 sticky flex-row justify-center mx-8">
+                    <button type="button" @click="$emit('cerrar-modal')"
+                        class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-[12px] px-2.5 py-1.5 text-center mb-2 dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
+                    <div class="" v-if="infoToShow.status != 3">
                         <button v-if="recepId > 0" @click="updateReception(recDocument)"
                             class="bg-orange-700 hover:bg-orange-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">ACTUALIZAR</button>
                         <button v-else @click="storeReception(recDocument)"
@@ -307,18 +324,6 @@
                     </div>
                 </div>
             </div>
-
-
-            <!-- <div class="md:flex my-6 flex-row justify-end mx-8">
-                <button type="button" @click="$emit('cerrar-modal')"
-                    class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-[12px] px-2.5 py-1.5 text-center mb-2 dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
-                <button v-if="prodId > 0" @click="updateProduct(prod)"
-                    class="bg-orange-700 hover:bg-orange-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">ACTUALIZAR</button>
-                <button v-else @click="storeProduct(prod)"
-                    class="bg-green-700 hover:bg-green-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">GUARDAR</button>
-            </div> -->
-
-
         </ProcessModal>
     </div>
 </template>
@@ -330,9 +335,8 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 import InputText from "@/Components-ISRI/ComponentsToForms/InputText.vue";
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
 import DateTimePickerM from "@/Components-ISRI/ComponentsToForms/DateTimePickerM.vue";
-// import TimePickerM from "@/Components-ISRI/ComponentsToForms/TimePickerM.vue";
 
-import { toRefs, onMounted, ref, watch } from 'vue';
+import { toRefs, onMounted } from 'vue';
 
 export default {
     emits: ["cerrar-modal", "get-table"],
@@ -345,23 +349,19 @@ export default {
         recepId: {
             type: Number,
             default: 0
-        }
+        },
     },
     setup(props, context) {
 
         const { recepId } = toRefs(props)
 
         const {
-            isLoadingRequest, recDocument, errors, purchaseProcedures, catUnspsc,
-            budgetAccounts, unitsMeasmt, documents, ordenC, contrato, docSelected,
+            isLoadingRequest, recDocument, errors,
+            documents, ordenC, contrato, docSelected,
             filteredDoc, filteredItems, startRec, filteredProds, totalRec, infoToShow,
             getInfoForModalRecep, startReception, setProdItem, updateItemTotal, addNewRow,
             openOption, deleteRow, handleValidation, storeReception, updateReception
         } = useRecepcion(context);
-
-        const handleSearchChange = async (query) => {
-            await asyncFindUnspsc(query);
-        }
 
         onMounted(
             async () => {
@@ -370,10 +370,10 @@ export default {
         )
 
         return {
-            isLoadingRequest, recDocument, errors, purchaseProcedures, catUnspsc,
-            budgetAccounts, unitsMeasmt, documents, ordenC, contrato, docSelected,
-            filteredDoc, filteredItems, startRec, filteredProds, totalRec, infoToShow,
-            handleSearchChange, handleValidation, startReception, setProdItem, updateItemTotal,
+            isLoadingRequest, recDocument, errors,
+            documents, ordenC, contrato, docSelected, totalRec,
+            filteredDoc, filteredItems, startRec, filteredProds, infoToShow,
+            handleValidation, startReception, setProdItem, updateItemTotal,
             addNewRow, openOption, deleteRow, storeReception, updateReception
         }
     }
@@ -392,23 +392,14 @@ export default {
     /* Elimina el contorno del input */
 }
 
-.custom-hover:hover>div {
-    filter: saturate(150%);
-}
-
 .dp__input_wrap {
     height: 35px;
 }
 
-.selected-opt .multiselect {
-    background: var(--ms-bg, #E5E7EB);
+.dp__theme_light {
+    /* I've edited this */
+    --dp-primary-color: rgba(0, 28, 72, 0.8);
+    --dp-cell-size: 25px;
+    --dp-font-size: 0.8rem;
 }
-
-.selected-opt .multiselect-wrapper input {
-    background-color: #E5E7EB;
-}
-
-/* .select-err .multiselect-wrapper input {
-    background-color: #FECACA;
-} */
 </style>

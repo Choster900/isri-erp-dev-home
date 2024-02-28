@@ -17,7 +17,7 @@ class DetalleRecepcionPedido extends Model
         'id_det_doc_adquisicion',
         'id_centro_atencion',
         'id_producto',
-        'id_producto_adquisicion',
+        'id_prod_adquisicion',
         'id_recepcion_pedido',
         'fecha_vencimiento_det_recepcion_pedido',
         'cant_det_recepcion_pedido',
