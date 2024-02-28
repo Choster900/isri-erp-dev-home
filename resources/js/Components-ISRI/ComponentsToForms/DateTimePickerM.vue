@@ -1,9 +1,10 @@
 <template>
     <label v-if="label" :for="id" class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">{{ label }}
         <span v-if="required" class="text-red-600 font-extrabold">*</span></label>
-    <vue-date-picker v-model="modelValue" :enable-time-picker="enableTimePicker" :format="format" :no-today="noToday"
+    <vue-date-picker v-model="modelValue" :enable-time-picker="enableTimePicker" :format="format" :no-today="noToday" :hide-input-icon="!showIcon"
         :placeholder="placeholder" :disabled="disabled" :teleport="teleport" auto-apply :locale="localeConfig" :day-names="dayNames"
-        @update:model-value="$emit('update:modelValue', $event)" :style="hasError ? '--dp-border-color: #F87171;' : ''">
+        @update:model-value="$emit('update:modelValue', $event)" :style="hasError ? '--dp-border-color: #F87171;' : ''"
+        class="py-0">
         <template #input-icon>
             <svg :class="iconColor" fill="currentColor" class="ml-[10px] w-auto h-[16px] relative" viewBox="0 0 35 35"
                 data-name="Layer 2" id="a866a81f-2948-4418-8bd5-1a5193c5f74e" xmlns="http://www.w3.org/2000/svg">
@@ -56,6 +57,10 @@ export default {
         noToday: {
             type: Boolean,
             default: false,
+        },
+        showIcon: {
+            type: Boolean,
+            default: true,
         },
         teleport: {
             type: Boolean,

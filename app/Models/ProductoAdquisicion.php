@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProductoAdquisicion extends Model
 {
@@ -14,7 +15,10 @@ class ProductoAdquisicion extends Model
     public $timestamps = false;
 
     protected $fillable = [
+        'id_prod_adquisicion',
+        'id_producto',
         'id_det_doc_adquisicion',
+        'id_marca',
         'id_lt',
         'id_centro_atencion',
         'cant_prod_adquisicion',
@@ -26,4 +30,40 @@ class ProductoAdquisicion extends Model
         'usuario_prod_adquisicion',
         'ip_prod_adquisicion',
     ];
+    /**
+     * Get the marca that owns the ProductoAdquisicion
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function marca(): BelongsTo
+    {
+        return $this->belongsTo(Marca::class, 'id_marca', 'id_marca');
+    }
+    /**
+     * Get the producto that owns the ProductoAdquisicion
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function producto(): BelongsTo
+    {
+        return $this->belongsTo(Producto::class, 'id_producto', 'id_producto');
+    }
+    /**
+     * Get the linea_trabajo that owns the ProductoAdquisicion
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function linea_trabajo(): BelongsTo
+    {
+        return $this->belongsTo(LineaTrabajo::class, 'id_lt', 'id_lt');
+    }
+    /**
+     * Get the centro_atencion that owns the ProductoAdquisicion
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function centro_atencion(): BelongsTo
+    {
+        return $this->belongsTo(CentroAtencion::class, 'id_centro_atencion', 'id_centro_atencion');
+    }
 }

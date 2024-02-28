@@ -22,6 +22,7 @@ class Producto extends Model
         'id_sub_almacen',
         'id_unidad_medida',
         'nombre_producto',
+        'codigo_producto',
         'descripcion_producto',
         'precio_producto',
         'basico_producto',

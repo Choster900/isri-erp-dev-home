@@ -24,12 +24,53 @@
                     <div class="mt-[5px] text-gray-500 text-opacity-70 w-[14px] h-[14px] mx-2">
                         <icon-m :iconName="'nextSvgVector'"></icon-m>
                     </div>
-                    <span class="text-[16px] font-medium text-black font-[Roboto]">{{ prodId > 0 ? 'Editar producto' : 'Crear producto' }}</span>
+                    <span class="text-[16px] font-medium text-black font-[Roboto]">{{ prodId > 0 ? 'Editar producto' :
+                        'Crear producto' }}</span>
                 </div>
                 <svg class="h-6 w-6 text-gray-400 hover:text-gray-600 cursor-pointer" @click="$emit('cerrar-modal')"
                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
+            </div>
+
+            <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
+                <div class="mb-4 md:mr-2 md:mb-0 basis-1/2" :class="{ 'selected-opt': prod.purchaseProcedureId > 0, }">
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Proceso de compra
+                        <span class="text-red-600 font-extrabold">*</span>
+                    </label>
+                    <div class="relative font-semibold flex h-[35px] w-full">
+                        <Multiselect v-model="prod.purchaseProcedureId" :options="purchaseProcedures" :searchable="true"
+                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione proceso de compra" />
+                    </div>
+                    <InputError v-for="(item, index) in errors.purchaseProcedureId" :key="index" class="mt-2"
+                        :message="item" />
+                </div>
+                <div class="mb-4 md:mr-0 md:mb-0 basis-1/2" :class="{ 'selected-opt': prod.unspscId > 0, }">
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Catalogo Unspsc
+                        <span class="text-red-600 font-extrabold">*</span>
+                    </label>
+                    <div class="relative font-semibold flex h-[35px] w-full">
+                        <Multiselect v-model="prod.unspscId" :options="catUnspsc" :searchable="true"
+                            :loading="isLoadingUnspsc" :internal-search="false" @search-change="handleSearchChange($event)"
+                            :clear-on-search="true" :filter-results="false" :resolve-on-load="true"
+                            :noOptionsText="'Escriba para buscar...'" ref="selectCatUn"
+                            placeholder="Seleccione catalogo unspsc" />
+                    </div>
+                    <InputError v-for="(item, index) in errors.unspscId" :key="index" class="mt-2" :message="item" />
+                </div>
+            </div>
+
+            <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
+                <div class="mb-4 md:mr-2 md:mb-0 basis-1/2 pr-1" :class="{ 'selected-opt': prod.budgetAccountId > 0, }">
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Especifico
+                        <span class="text-red-600 font-extrabold">*</span>
+                    </label>
+                    <div class="relative font-semibold flex h-[35px] w-full">
+                        <Multiselect v-model="prod.budgetAccountId" :options="budgetAccounts" :searchable="true"
+                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione especifico" />
+                    </div>
+                    <InputError v-for="(item, index) in errors.budgetAccountId" :key="index" class="mt-2" :message="item" />
+                </div>
             </div>
 
             <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
@@ -102,45 +143,6 @@
                         @input="handleValidation('description', { limit: 290 })" style="border-radius: 4px;">
                     </textarea>
                     <InputError v-for="(item, index) in errors.description" :key="index" class="mt-2" :message="item" />
-                </div>
-            </div>
-
-            <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
-                <div class="mb-4 md:mr-2 md:mb-0 basis-1/2" :class="{ 'selected-opt': prod.purchaseProcedureId > 0, }">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Proceso de compra
-                        <span class="text-red-600 font-extrabold">*</span>
-                    </label>
-                    <div class="relative font-semibold flex h-[35px] w-full">
-                        <Multiselect v-model="prod.purchaseProcedureId" :options="purchaseProcedures" :searchable="true"
-                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione proceso de compra" />
-                    </div>
-                    <InputError v-for="(item, index) in errors.purchaseProcedureId" :key="index" class="mt-2" :message="item" />
-                </div>
-                <div class="mb-4 md:mr-0 md:mb-0 basis-1/2" :class="{ 'selected-opt': prod.unspscId > 0, }">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Catalogo Unspsc
-                        <span class="text-red-600 font-extrabold">*</span>
-                    </label>
-                    <div class="relative font-semibold flex h-[35px] w-full">
-                        <Multiselect v-model="prod.unspscId" :options="catUnspsc" :searchable="true"
-                            :loading="isLoadingUnspsc" :internal-search="false" @search-change="handleSearchChange($event)"
-                            :clear-on-search="true" :filter-results="false" :resolve-on-load="true"
-                            :noOptionsText="'Escriba para buscar...'" ref="selectCatUn"
-                            placeholder="Seleccione catalogo unspsc" />
-                    </div>
-                    <InputError v-for="(item, index) in errors.unspscId" :key="index" class="mt-2" :message="item" />
-                </div>
-            </div>
-
-            <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
-                <div class="mb-4 md:mr-2 md:mb-0 basis-1/2 pr-1" :class="{ 'selected-opt': prod.budgetAccountId > 0, }">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Especifico
-                        <span class="text-red-600 font-extrabold">*</span>
-                    </label>
-                    <div class="relative font-semibold flex h-[35px] w-full">
-                        <Multiselect v-model="prod.budgetAccountId" :options="budgetAccounts" :searchable="true"
-                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione especifico" />
-                    </div>
-                    <InputError v-for="(item, index) in errors.budgetAccountId" :key="index" class="mt-2" :message="item" />
                 </div>
             </div>
 
