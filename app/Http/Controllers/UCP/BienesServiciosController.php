@@ -109,7 +109,7 @@ class BienesServiciosController extends Controller
         }
     }
 
-    public function updateProductoAdquisicion(Request $request)
+    public function updateProductoAdquisicion(BienesServiciosRequest $request)
     {
         try {
             $detalles = $request->productAdq;
