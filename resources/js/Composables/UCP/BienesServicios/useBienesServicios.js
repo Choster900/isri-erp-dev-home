@@ -45,7 +45,11 @@ export const useBienesServicios = () => {
                 });
 
                 // Muestra la matriz actualizada en la consola
+<<<<<<< HEAD
                 console.log("Matriz de productos de adquisición actualizada:", arrayProductoAdquisicion.value);
+=======
+                //console.log("Matriz de productos de adquisición actualizada:", arrayProductoAdquisicion.value);
+>>>>>>> 63fa7ae2fa0221515133457cf9daeb508dfddf8b
             } else {
                 // Muestra un mensaje de error si faltan datos para agregar filas
                 console.error("No se pueden agregar filas debido a datos faltantes.");
@@ -72,9 +76,15 @@ export const useBienesServicios = () => {
                 hoverToDelete: false, // [Comment: It´ll add color]
                 detalleDoc: [],
             });
+<<<<<<< HEAD
 
             // Muestra la matriz actualizada en la consola
             console.log("Matriz de productos de adquisición actualizada:", arrayProductoAdquisicion.value);
+=======
+            addingRows(arrayProductoAdquisicion.value.length - 1)
+            // Muestra la matriz actualizada en la consola
+            //console.log("Matriz de productos de adquisición actualizada:", arrayProductoAdquisicion.value);
+>>>>>>> 63fa7ae2fa0221515133457cf9daeb508dfddf8b
         } catch (error) {
             // Maneja los errores imprimiéndolos en la consola
             console.error("Error al agregar documento de adquisición:", error);
@@ -90,9 +100,14 @@ export const useBienesServicios = () => {
     const getArrayObject = async () => {
         try {
             const resp = await axios.post("/get-array-objects-for-multiselect");
+<<<<<<< HEAD
             console.log(resp);
             arrayLineaTrabajo.value = resp.data.lineaTrabajo.map(index => {
                 return { value: index.id_lt, label: index.nombre_lt };
+=======
+            arrayLineaTrabajo.value = resp.data.lineaTrabajo.map(index => {
+                return { value: index.id_lt, label: index.nombre_lt, disabled: false };
+>>>>>>> 63fa7ae2fa0221515133457cf9daeb508dfddf8b
             })
             arrayDocAdquisicion.value = resp.data.detalleDocAdquisicion.map(index => {
                 return { value: index.id_det_doc_adquisicion, label: index.nombre_det_doc_adquisicion, dataDoc: index };
@@ -107,7 +122,10 @@ export const useBienesServicios = () => {
             arrayMarca.value = resp.data.marca.map(index => {
                 return { value: index.id_marca, label: index.nombre_marca, dataMarca: index };
             })
+<<<<<<< HEAD
             console.log(arrayLineaTrabajo.value);
+=======
+>>>>>>> 63fa7ae2fa0221515133457cf9daeb508dfddf8b
         } catch (error) {
             reject(error);
             console.error("Error en la creación de la evaluación personal:", error);
@@ -206,15 +224,24 @@ export const useBienesServicios = () => {
             const { cantProdAdquisicion, costoProdAdquisicion } = producto;
 
             // Log de las cantidades y costos antes del cálculo
+<<<<<<< HEAD
             console.log(`Cantidad: ${cantProdAdquisicion}, Costo: ${costoProdAdquisicion}`);
+=======
+            //console.log(`Cantidad: ${cantProdAdquisicion}, Costo: ${costoProdAdquisicion}`);
+>>>>>>> 63fa7ae2fa0221515133457cf9daeb508dfddf8b
 
             // Realiza el cálculo del valor total y asigna al producto
             const valorTotal = cantProdAdquisicion * costoProdAdquisicion;
             arrayProductoAdquisicion.value[docAdq].detalleDoc[detalleDocAdq].valorTotalProduct = valorTotal;
 
             // Log del valor total calculado y del producto actualizado
+<<<<<<< HEAD
             console.log(`Valor total calculado: ${valorTotal}`);
             console.log("Producto actualizado con el valor total:", arrayProductoAdquisicion.value[docAdq].detalleDoc[detalleDocAdq]);
+=======
+            // console.log(`Valor total calculado: ${valorTotal}`);
+            // console.log("Producto actualizado con el valor total:", arrayProductoAdquisicion.value[docAdq].detalleDoc[detalleDocAdq]);
+>>>>>>> 63fa7ae2fa0221515133457cf9daeb508dfddf8b
         } catch (error) {
             // Maneja los errores imprimiéndolos en la consola.
             console.error("Error al calcular el valor total del producto:", error);
@@ -333,10 +360,38 @@ export const useBienesServicios = () => {
         }
     }
 
+<<<<<<< HEAD
+=======
+    const disableLt = (e = null) => {
+        // Obtener la línea de trabajo seleccionada
+        const selectedLineaTrabajo = arrayLineaTrabajo.value[e - 1];
+
+        if (selectedLineaTrabajo) {
+
+            selectedLineaTrabajo.disabled = true;
+        }
+
+        // Si no existe, habilitar todas las opciones y deshabilitar la seleccionada
+        arrayLineaTrabajo.value.forEach((item) => {
+            const existe = arrayProductoAdquisicion.value.some((index) => item.value === index.idLt);
+            if (!existe) {
+                item.disabled = false;
+            } else {
+                item.disabled = true;
+            }
+        });
+
+    };
+
+>>>>>>> 63fa7ae2fa0221515133457cf9daeb508dfddf8b
     onMounted(() => {
         getArrayObject()
     })
     return {
+<<<<<<< HEAD
+=======
+        disableLt,
+>>>>>>> 63fa7ae2fa0221515133457cf9daeb508dfddf8b
         updateProductAdquisicion,
         errorsValidation,
         addinDocAdquisicion,

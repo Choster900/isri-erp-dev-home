@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\UCP\BienesServiciosController;
+use App\Http\Controllers\UCP\BienesServiciosController;
 use App\Http\Controllers\UCP\ProductoController;
 use App\Models\CentroAtencion;
 use App\Models\DetDocumentoAdquisicion;

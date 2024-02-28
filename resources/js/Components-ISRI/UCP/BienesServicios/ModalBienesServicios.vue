@@ -166,26 +166,51 @@
                                     class="uppercase border bg-black text-[8pt] text-white border-black border-t-white text-center text-selection-disable">
 
                                     Linea de trabajo:</td>
+<<<<<<< HEAD
                                 <td colspan="3" class="border border-t-black ">
                                     <!--  <pre class="">
                                         {{ errorsValidation[`productAdq.${i}.idLt`] }}
                                     </pre> -->
                                     <Multiselect :filter-results="false" :searchable="true" :clear-on-search="true"
                                         v-model="docAdq.idLt" :min-chars="1" placeholder="-" :classes="{
+=======
+
+
+                                <td colspan="3" class="border border-t-black ">
+                                    <Multiselect :filter-results="false" :searchable="true" :clear-on-search="true"
+                                        @select="disableLt($event)" v-model="docAdq.idLt" :min-chars="1" placeholder="-"
+                                        :classes="{
+                                            optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed',
+>>>>>>> 63fa7ae2fa0221515133457cf9daeb508dfddf8b
                                             optionPointed: 'text-gray-800 bg-gray-100',
                                             container: `relative mx-auto w-full h-6 flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none ${errorsValidation[`productAdq.${i}.idLt`] ? 'bg-red-500' : ''}`,
                                             placeholder: `flex items-center text-center h-full absolute left-0 top-0 pointer-events-none leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ${errorsValidation[`productAdq.${i}.idLt`] ? 'bg-red-500' : ''}`,
                                             search: `w-full absolute text-start inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans rounded pl-3.5 rtl:pl-0 rtl:pr-3.5 ${errorsValidation[`productAdq.${i}.idLt`] ? 'bg-red-500' : ''}`,
                                             singleLabel: `pr-14 text-[8pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none leading-snug pl-3.5 box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ${errorsValidation[`productAdq.${i}.idLt`] ? 'bg-red-500' : ''}`,
+<<<<<<< HEAD
                                             option: 'flex items-center justify-start box-border text-left cursor-pointer text-[7.5pt] leading-snug py-2 px-3',
                                             optionSelected: 'text-white bg-[#001c48]',
+=======
+                                            option: 'flex items-center justify-start box-border text-left  text-[7.5pt] leading-snug py-2 px-3',
+                                            optionSelected: 'text-white bg-[#001c48]',
+                                            optionDisabled: 'text-gray-300 cursor-not-allowed',
+
+>>>>>>> 63fa7ae2fa0221515133457cf9daeb508dfddf8b
                                         }" noOptionsText="<p class='text-xs'>Lista vacía</p>"
                                         noResultsText="<p class='text-xs'>Sin resultados de personas</p>"
                                         :options="arrayLineaTrabajo" />
 
+<<<<<<< HEAD
                                 </td>
                                 <td colspan="3" @mouseover="docAdq.hoverToDelete = true"
                                     @mouseout="docAdq.hoverToDelete = false" @dblclick="eliminarLinea(i)"
+=======
+
+                                </td>
+                                <td colspan="3" @mouseover="docAdq.hoverToDelete = true"
+                                    @click="docAdq.vShowLt = !docAdq.vShowLt" @mouseout="docAdq.hoverToDelete = false"
+                                    @contextmenu.prevent="eliminarLinea(i)"
+>>>>>>> 63fa7ae2fa0221515133457cf9daeb508dfddf8b
                                     class="uppercase border bg-black text-[8pt] text-white border-black text-center text-selection-disable">
                                     Doc. Adquisición: </td>
                                 <td colspan="4" class="border border-black">
@@ -404,9 +429,16 @@
                             </template>
                             <template v-else>
                                 <tr>
+<<<<<<< HEAD
                                     <td colspan="11" class="text-center border border-black cursor-pointer" @click="docAdq.vShowLt = true">
                                         <div class="flex items-center justify-center space-x-1">
                                             <span >oculto </span>
+=======
+                                    <td colspan="11" class="text-center border border-black cursor-pointer"
+                                        @click="docAdq.vShowLt = true">
+                                        <div class="flex items-center justify-center space-x-1">
+                                            <span>oculto </span>
+>>>>>>> 63fa7ae2fa0221515133457cf9daeb508dfddf8b
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                                 stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -422,6 +454,7 @@
                                     <button style="outline: none;" @click="addingRows(i); docAdq.vShowLt = true;"
                                         class="w-full  border-4 border-dashed border-slate-300 hover:border-slate-400  my-1 py-1">
                                         <div class="flex justify-center">
+<<<<<<< HEAD
                                             <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                                                 class="w-5 h-5 text-slate-600">
                                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -429,6 +462,13 @@
                                             </svg>
                                             <span class="text-xs pt-0.5 text-slate-600">
                                                 NUEVO PRODUCTO ADQUISICION
+=======
+                                            <span class="text-xs pt-0.5 text-slate-600">
+                                                NUEVO PRODUCTO ADQUISICION EN:
+                                                <br>
+                                                {{ arrayLineaTrabajo.find(index => index.value == docAdq.idLt)?.label || ''
+                                                }}
+>>>>>>> 63fa7ae2fa0221515133457cf9daeb508dfddf8b
                                             </span>
                                         </div>
                                     </button>
@@ -474,10 +514,11 @@
                             <span class="ml-2">Terminar edicion documento de adquisicion </span>
                         </button>
                     </div>
+<<<<<<< HEAD
 
+=======
+>>>>>>> 63fa7ae2fa0221515133457cf9daeb508dfddf8b
                 </div>
-
-                <!--  </div> -->
             </ProcessModal>
         </div>
     </template>
@@ -535,6 +576,10 @@ export default {
             arrayProductsWhenIsEditable,
             arrayProductoAdquisicion,
             errorsValidation,
+<<<<<<< HEAD
+=======
+            disableLt,
+>>>>>>> 63fa7ae2fa0221515133457cf9daeb508dfddf8b
             handleProductoSearchByCodigo,
         } = useBienesServicios()
 
@@ -545,6 +590,12 @@ export default {
                 objectGetFromProp.value = []
                 arrayProductoAdquisicion.value = []
                 arrayWhenIsEditingDocAdq.value = []
+<<<<<<< HEAD
+=======
+                arrayLineaTrabajo.value.forEach((item) => {
+                    item.disabled = false;
+                });
+>>>>>>> 63fa7ae2fa0221515133457cf9daeb508dfddf8b
             }
         });
         watch(propProdAdquisicion, (newValue, oldValue) => {
@@ -620,11 +671,19 @@ export default {
                         valorTotalProduct: index.cant_prod_adquisicion * index.costo_prod_adquisicion,
                     });
                 });
+<<<<<<< HEAD
+=======
+                disableLt()
+>>>>>>> 63fa7ae2fa0221515133457cf9daeb508dfddf8b
             } else {
                 objectGetFromProp.value = [];
                 arrayProductoAdquisicion.value = []
                 addinDocAdquisicion()
+<<<<<<< HEAD
                 addingRows(0)
+=======
+                // addingRows(0)
+>>>>>>> 63fa7ae2fa0221515133457cf9daeb508dfddf8b
             }
         });
 
@@ -675,6 +734,10 @@ export default {
             errorsValidation,
             arrayMarca,
             addingRows,
+<<<<<<< HEAD
+=======
+            disableLt,
+>>>>>>> 63fa7ae2fa0221515133457cf9daeb508dfddf8b
             objectGetFromProp,
             calculateTotal,
             arrayLineaTrabajo,

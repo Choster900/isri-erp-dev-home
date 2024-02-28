@@ -109,7 +109,11 @@ class BienesServiciosController extends Controller
         }
     }
 
+<<<<<<< HEAD
     public function updateProductoAdquisicion(Request $request)
+=======
+    public function updateProductoAdquisicion(BienesServiciosRequest $request)
+>>>>>>> 63fa7ae2fa0221515133457cf9daeb508dfddf8b
     {
         try {
             $detalles = $request->productAdq;
