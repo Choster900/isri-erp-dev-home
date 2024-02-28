@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\UCP\BienesServiciosController;
-use App\Http\Controllers\UCP\BienesServiciosController;
 use App\Http\Controllers\UCP\ProductoController;
 use App\Models\CentroAtencion;
 use App\Models\DetDocumentoAdquisicion;
@@ -28,7 +27,6 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get(
         '/ucp/bienes-servicvios',
         function (Request $request) {
-            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/ucp/bienes-servicvios', 'UCP/BienesServicios');
             return checkModuleAccessAndRedirect($request->user()->id_usuario, '/ucp/bienes-servicvios', 'UCP/BienesServicios');
         }
     )->name('ucp.bienes-servicios');
