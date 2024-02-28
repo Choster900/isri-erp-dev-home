@@ -45,7 +45,7 @@ export const useBienesServicios = () => {
                 });
 
                 // Muestra la matriz actualizada en la consola
-                console.log("Matriz de productos de adquisición actualizada:", arrayProductoAdquisicion.value);
+                //console.log("Matriz de productos de adquisición actualizada:", arrayProductoAdquisicion.value);
             } else {
                 // Muestra un mensaje de error si faltan datos para agregar filas
                 console.error("No se pueden agregar filas debido a datos faltantes.");
@@ -72,9 +72,9 @@ export const useBienesServicios = () => {
                 hoverToDelete: false, // [Comment: It´ll add color]
                 detalleDoc: [],
             });
-
+            addingRows(arrayProductoAdquisicion.value.length - 1)
             // Muestra la matriz actualizada en la consola
-            console.log("Matriz de productos de adquisición actualizada:", arrayProductoAdquisicion.value);
+            //console.log("Matriz de productos de adquisición actualizada:", arrayProductoAdquisicion.value);
         } catch (error) {
             // Maneja los errores imprimiéndolos en la consola
             console.error("Error al agregar documento de adquisición:", error);
@@ -90,9 +90,8 @@ export const useBienesServicios = () => {
     const getArrayObject = async () => {
         try {
             const resp = await axios.post("/get-array-objects-for-multiselect");
-            console.log(resp);
             arrayLineaTrabajo.value = resp.data.lineaTrabajo.map(index => {
-                return { value: index.id_lt, label: index.nombre_lt };
+                return { value: index.id_lt, label: index.nombre_lt, disabled: false };
             })
             arrayDocAdquisicion.value = resp.data.detalleDocAdquisicion.map(index => {
                 return { value: index.id_det_doc_adquisicion, label: index.nombre_det_doc_adquisicion, dataDoc: index };
@@ -107,7 +106,6 @@ export const useBienesServicios = () => {
             arrayMarca.value = resp.data.marca.map(index => {
                 return { value: index.id_marca, label: index.nombre_marca, dataMarca: index };
             })
-            console.log(arrayLineaTrabajo.value);
         } catch (error) {
             reject(error);
             console.error("Error en la creación de la evaluación personal:", error);
@@ -206,15 +204,15 @@ export const useBienesServicios = () => {
             const { cantProdAdquisicion, costoProdAdquisicion } = producto;
 
             // Log de las cantidades y costos antes del cálculo
-            console.log(`Cantidad: ${cantProdAdquisicion}, Costo: ${costoProdAdquisicion}`);
+            //console.log(`Cantidad: ${cantProdAdquisicion}, Costo: ${costoProdAdquisicion}`);
 
             // Realiza el cálculo del valor total y asigna al producto
             const valorTotal = cantProdAdquisicion * costoProdAdquisicion;
             arrayProductoAdquisicion.value[docAdq].detalleDoc[detalleDocAdq].valorTotalProduct = valorTotal;
 
             // Log del valor total calculado y del producto actualizado
-            console.log(`Valor total calculado: ${valorTotal}`);
-            console.log("Producto actualizado con el valor total:", arrayProductoAdquisicion.value[docAdq].detalleDoc[detalleDocAdq]);
+            // console.log(`Valor total calculado: ${valorTotal}`);
+            // console.log("Producto actualizado con el valor total:", arrayProductoAdquisicion.value[docAdq].detalleDoc[detalleDocAdq]);
         } catch (error) {
             // Maneja los errores imprimiéndolos en la consola.
             console.error("Error al calcular el valor total del producto:", error);
@@ -333,10 +331,32 @@ export const useBienesServicios = () => {
         }
     }
 
+    const disableLt = (e = null) => {
+        // Obtener la línea de trabajo seleccionada
+        const selectedLineaTrabajo = arrayLineaTrabajo.value[e - 1];
+
+        if (selectedLineaTrabajo) {
+
+            selectedLineaTrabajo.disabled = true;
+        }
+
+        // Si no existe, habilitar todas las opciones y deshabilitar la seleccionada
+        arrayLineaTrabajo.value.forEach((item) => {
+            const existe = arrayProductoAdquisicion.value.some((index) => item.value === index.idLt);
+            if (!existe) {
+                item.disabled = false;
+            } else {
+                item.disabled = true;
+            }
+        });
+
+    };
+
     onMounted(() => {
         getArrayObject()
     })
     return {
+        disableLt,
         updateProductAdquisicion,
         errorsValidation,
         addinDocAdquisicion,
