@@ -280,7 +280,7 @@ export default {
                 .catch(errors => {
                     this.manageError(errors,this)
                 });
-            this.getSuppilers(this.lastUrl); //llamamos de nuevo el metodo para que actualize la tabla 
+            this.getSuppilers(this.lastUrl); //llamamos de nuevo el metodo para que actualize la tabla
         },
         enableStateForSupplier(id_proveedor, estado) {
             let state = estado == 0 ? "habilitar" : "deshabilitar";
@@ -297,7 +297,7 @@ export default {
                 showCloseButton: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    this.enable(id_proveedor, estado); //peticion async hace la modificacion 
+                    this.enable(id_proveedor, estado); //peticion async hace la modificacion
                     toast.success(`El proveedor se ha ${stateToas} con exito`, {
                         autoClose: 4000,
                         position: "top-right",
@@ -328,7 +328,7 @@ export default {
     },
 };
 </script>
-  
+
 <style>
 .td-data-table {
     max-width: 100px;

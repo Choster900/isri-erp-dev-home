@@ -32,9 +32,14 @@ class DocumentoAdquisicion extends Model
     public function detalles()
     {
         return $this->hasMany('App\Models\DetDocumentoAdquisicion', 'id_doc_adquisicion', 'id_doc_adquisicion')->where('estado_det_doc_adquisicion', 1);
+    }   
+    public function administradores()
+    {
+        return $this->hasMany('App\Models\AdministradorAdquisicion', 'id_doc_adquisicion', 'id_doc_adquisicion')->where('estado_admon_adquisicion', 1);
     }
+
     public function tipo_documento_adquisicion()
-    { 
+    {
         return $this->belongsTo(TipoDocumentoAdquisicion::class, "id_tipo_doc_adquisicion", "id_tipo_doc_adquisicion");
     }
     public function Quedan()
@@ -42,11 +47,11 @@ class DocumentoAdquisicion extends Model
         return $this->hasManyThrough(DocumentoAdquisicion::class, TipoDocumentoAdquisicion::class);
     }
     public function proveedor()
-    { 
+    {
         return $this->belongsTo(Proveedor::class, "id_proveedor", "id_proveedor");
     }
     public function tipo_gestion_compra()
-    { 
+    {
         return $this->belongsTo(TipoGestionCompra::class, "id_tipo_gestion_compra", "id_tipo_gestion_compra");
     }
 }

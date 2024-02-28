@@ -18,6 +18,7 @@ export const useDocumentoAdquisicion = (context) => {
     const management_types = ref([])
     const financing_sources = ref([])
     const suppliers = ref([])
+    const employees = ref([])
 
     const acq_doc = ref(
         {
@@ -30,7 +31,8 @@ export const useDocumentoAdquisicion = (context) => {
             award_number: '',
             award_date: '',
             total: '',
-            items: []
+            items: [],
+            employees: []
         }
     )
     const array_item = ref(
@@ -89,11 +91,13 @@ export const useDocumentoAdquisicion = (context) => {
     };
 
     const setModalValues = (data) => {
+        //Set the multiselects options
         management_types.value = data.management_types
         financing_sources.value = data.financing_sources
         suppliers.value = data.suppliers
         doc_types.value = data.doc_types
-
+        employees.value = data.employees
+        //Set the doc attributes
         acq_doc.value.id = data.acqDoc.id_doc_adquisicion ?? ""
         acq_doc.value.type_id = data.acqDoc.id_tipo_doc_adquisicion ?? ""
         acq_doc.value.management_type_id = data.acqDoc.id_tipo_gestion_compra ?? ""
@@ -103,26 +107,27 @@ export const useDocumentoAdquisicion = (context) => {
         acq_doc.value.award_number = data.acqDoc.numero_adjudicacion_doc_adquisicion ?? ""
         acq_doc.value.award_date = data.acqDoc.fecha_adjudicacion_doc_adquisicion ?? ""
         acq_doc.value.total = data.acqDoc.monto_doc_adquisicion ?? ""
+        //Set the doc managers
+        acq_doc.value.employees = data.acqDoc.administradores.map(element => element.id_empleado);
+        //Set each document item
         if (data.acqDoc.detalles) {
-            data.acqDoc.detalles.forEach((value, index) => {
-                var arrayInsert = {
-                    id: value.id_det_doc_adquisicion,
-                    index: index,
-                    financing_source_id: value.id_proy_financiado,
-                    name_financing_source: value.fuente_financiamiento.codigo_proy_financiado,
-                    commitment_number: value.compromiso_ppto_det_doc_adquisicion,
-                    amount: value.monto_det_doc_adquisicion,
-                    contract_manager: value.admon_det_doc_adquisicion,
-                    name: value.nombre_det_doc_adquisicion,
-                    has_quedan: value.quedan.length > 0 ? true : false,
-                    selected: false,
-                    deleted: false,
-                };
-                acq_doc.value.items.push(arrayInsert)
-            })
+            acq_doc.value.items = data.acqDoc.detalles.map((value, index) => ({
+                id: value.id_det_doc_adquisicion,
+                index: index,
+                financing_source_id: value.id_proy_financiado,
+                name_financing_source: value.fuente_financiamiento.codigo_proy_financiado,
+                commitment_number: value.compromiso_ppto_det_doc_adquisicion,
+                amount: value.monto_det_doc_adquisicion,
+                contract_manager: value.admon_det_doc_adquisicion,
+                name: value.nombre_det_doc_adquisicion,
+                has_quedan: value.quedan.length > 0,
+                selected: false,
+                deleted: false,
+            }));
         } else {
-            acq_doc.value.items = []
+            acq_doc.value.items = [];
         }
+
     };
 
     const addItem = () => {
@@ -247,6 +252,7 @@ export const useDocumentoAdquisicion = (context) => {
     };
 
     const updateDocumentoAdquisicion = async (doc) => {
+        console.log(doc);
         const all_deleted = acq_doc.value.items.every(item => item.deleted === true);
         if (all_deleted) {
             useShowToast(toast.warning, "Debes agregar al menos un item al documento.");
@@ -452,12 +458,19 @@ export const useDocumentoAdquisicion = (context) => {
         }
     });
 
+    const selectEmployees = (emp) => {
+        if (emp.length > 10) {
+            useShowToast(toast.warning, "No puedes agregar más de 10 empleados.");
+            emp.pop(); // Elimina el último elemento del array
+        }
+    }
+
     return {
         isLoadingRequest, errors, acq_doc, config, array_item, index_errors,
         item_errors, backend_errors, new_item, currentPage, doc_types, management_types,
-        financing_sources, suppliers, item_available, itemSelected, showItemInfo,
+        financing_sources, suppliers, item_available, itemSelected, showItemInfo, employees,
         getInfoForModalDocumentoAdquisicion, storeDocumentoAdquisicion, updateDocumentoAdquisicion,
-        goToNextPage, addItem, cleanArrayItem, editItem, deleteItem
+        goToNextPage, addItem, cleanArrayItem, editItem, deleteItem, selectEmployees
     }
 }
 

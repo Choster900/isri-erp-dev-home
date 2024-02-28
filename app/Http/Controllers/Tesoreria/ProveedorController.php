@@ -32,7 +32,7 @@ class ProveedorController extends Controller
         $data = $request->input('search');
         $v_query = Proveedor::select('*')
             ->join('tipo_contribuyente', 'proveedor.id_tipo_contribuyente', '=', 'tipo_contribuyente.id_tipo_contribuyente')
-            ->with('sujeto_retencion')
+            ->with(['sujeto_retencion','documentos_adquisiciones'])
             ->select('*')
             ->orderBy($v_columns[$v_column], $v_dir);
 
@@ -43,7 +43,7 @@ class ProveedorController extends Controller
                 ->where('nombre_comercial_proveedor', 'like', '%' . $data["nombre_comercial_proveedor"] . '%')
                 ->where('estado_proveedor', 'like', '%' . $data["estado_proveedor"] . '%');
         }
-        
+
         $v_roles = $v_query->paginate($v_length)->onEachSide(1);
         return [
             'data' => $v_roles,

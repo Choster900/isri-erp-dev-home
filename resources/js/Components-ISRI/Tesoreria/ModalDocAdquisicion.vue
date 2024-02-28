@@ -38,7 +38,7 @@
 
                         <!-- First row -->
                         <div class="mb-5 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Tipo Documento <span class="text-red-600 font-extrabold">*</span>
                                 </label>
@@ -49,7 +49,7 @@
                                 </div>
                                 <InputError class="mt-2" :message="errors.type_id" />
                             </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                                 <TextInput id="doc-number" v-model="acq_doc.number" type="text"
                                     placeholder="Numero documento"
                                     @update:modelValue="handleValidation('number', { limit: 20, upper: true })">
@@ -59,7 +59,7 @@
                                     :message="item" />
                                 <InputError class="mt-2" :message="errors.number" />
                             </div>
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/3">
+                            <div class="mb-4 md:mr-0 md:mb-0 basis-1/4">
                                 <TextInput id="mngm-number" v-model="acq_doc.management_number" type="text"
                                     placeholder="Numero gestion"
                                     @update:modelValue="handleValidation('management_number', { limit: 20 })">
@@ -67,20 +67,17 @@
                                 </TextInput>
                                 <InputError class="mt-2" :message="errors.management_number" />
                             </div>
+                            <div class="mb-4 md:mx-2 md:mb-0 basis-1/4">
+                                <TextInput id="mngm-number" v-model="acq_doc.award_number" type="text"
+                                    placeholder="Numero adjudicacion" :required="false"
+                                    @update:modelValue="handleValidation('award_number', { limit: 20 })">
+                                    <LabelToInput icon="objects" forLabel="mngm-number" />
+                                </TextInput>
+                                <InputError class="mt-2" :message="errors.award_number" />
+                            </div>
                         </div>
                         <!-- Second row -->
                         <div class="mb-5 md:flex flex-row justify-items-start">
-                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                                <label class="block mb-2 text-xs font-light text-gray-600">
-                                    Tipo Gestión <span class="text-red-600 font-extrabold">*</span>
-                                </label>
-                                <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
-                                    <Multiselect v-model="acq_doc.management_type_id" :options="management_types"
-                                        placeholder="Seleccione gestion" :searchable="true" />
-                                    <LabelToInput icon="list" />
-                                </div>
-                                <InputError class="mt-2" :message="errors.management_type_id" />
-                            </div>
                             <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
                                 <label class="block mb-2 text-xs font-light text-gray-600">
                                     Proveedor <span class="text-red-600 font-extrabold">*</span>
@@ -92,9 +89,17 @@
                                 </div>
                                 <InputError class="mt-2" :message="errors.supplier_id" />
                             </div>
-                        </div>
-                        <!-- Third row -->
-                        <div class="mb-5 md:flex flex-row justify-items-start">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                                <label class="block mb-2 text-xs font-light text-gray-600">
+                                    Tipo Gestión <span class="text-red-600 font-extrabold">*</span>
+                                </label>
+                                <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
+                                    <Multiselect v-model="acq_doc.management_type_id" :options="management_types"
+                                        placeholder="Seleccione gestion" :searchable="true" />
+                                    <LabelToInput icon="list" />
+                                </div>
+                                <InputError class="mt-2" :message="errors.management_type_id" />
+                            </div>
                             <div class="mb-4 md:mr-0 md:mb-0 basis-1/2">
                                 <label class="block mb-2 text-xs font-light text-gray-600" for="fecha_nacimiento">
                                     Fecha adjudicacion<span class="text-red-600 font-extrabold">*</span>
@@ -108,17 +113,34 @@
                                 </div>
                                 <InputError class="mt-2" :message="errors.award_date" />
                             </div>
-                            <div class="mb-4 md:mx-2 md:mb-0 basis-1/2">
-                                <TextInput id="mngm-number" v-model="acq_doc.award_number" type="text"
-                                    placeholder="Numero adjudicacion" :required="false"
-                                    @update:modelValue="handleValidation('award_number', { limit: 20 })">
-                                    <LabelToInput icon="objects" forLabel="mngm-number" />
-                                </TextInput>
-                                <InputError class="mt-2" :message="errors.award_number" />
+                        </div>
+
+                        <div class="mb-2 md:flex flex-row justify-between">
+                            <div class="md:w-1/2">
+                                <span class="font-semibold text-slate-800 text-lg underline underline-offset-2">
+                                    Administradores de documento
+                                </span>
+                            </div>
+                        </div>
+                        <div class="mb-5 md:flex flex-row justify-items-start">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-full">
+                                <label class="block mb-2 text-xs font-light text-gray-600">
+                                    Empleados <span class="text-red-600 font-extrabold">*</span>
+                                </label>
+                                <div class="relative flex h-auto min-h-8 w-full flex-row-reverse">
+                                    <Multiselect v-model="acq_doc.employees" :options="employees" placeholder="Seleccione empleado"
+                                    @change="selectEmployees($event)"
+                                        mode="tags" :searchable="true" :classes="{
+                                            tags: 'flex-grow flex-shrink flex flex-wrap items-center mt-1 pl-2 min-w-0 rtl:pl-0 rtl:pr-2',
+                                            tag: 'bg-[#002b5f] bg-opacity-90 text-white text-[12px] py-1 pl-2 rounded mr-1 mb-1 flex items-center whitespace-nowrap min-w-0 rtl:pl-0 rtl:pr-2 rtl:mr-0 rtl:ml-1',
+                                        }" />
+                                </div>
+                                <InputError class="mt-2" :message="errors.employees" />
                             </div>
                         </div>
 
-                        <div class="flex justify-center mt-5">
+
+                        <div class="flex justify-center pt-8 pb-4">
                             <button v-if="currentPage != 2"
                                 class="flex items-center bg-blue-600 hover:bg-blue-700 text-white pl-3 pr-2 py-1.5 text-center mb-2 rounded"
                                 @click="goToNextPage">
@@ -372,9 +394,9 @@ export default {
             config, array_item, index_errors,
             item_errors, backend_errors, new_item, currentPage,
             doc_types, management_types, financing_sources, suppliers,
-            item_available, itemSelected, showItemInfo,
+            item_available, itemSelected, showItemInfo, employees,
             getInfoForModalDocumentoAdquisicion, storeDocumentoAdquisicion, updateDocumentoAdquisicion,
-            goToNextPage, addItem, cleanArrayItem, editItem, deleteItem
+            goToNextPage, addItem, cleanArrayItem, editItem, deleteItem, selectEmployees
         } = useDocumentoAdquisicion(context);
 
         const {
@@ -403,9 +425,9 @@ export default {
             config, array_item, index_errors,
             item_errors, backend_errors, new_item, currentPage,
             financing_sources, doc_types, management_types, suppliers,
-            item_available, itemSelected, showItemInfo,
+            item_available, itemSelected, showItemInfo, employees,
             storeDocumentoAdquisicion, updateDocumentoAdquisicion, handleValidation,
-            goToNextPage, addItem, cleanArrayItem, editItem, deleteItem
+            goToNextPage, addItem, cleanArrayItem, editItem, deleteItem, selectEmployees
         }
     }
 };

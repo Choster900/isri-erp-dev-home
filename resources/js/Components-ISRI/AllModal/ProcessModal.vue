@@ -21,6 +21,10 @@ const props = defineProps({
     rounded: {
         type: Boolean,
         default: false
+    },
+    addClases: {
+        type: String,
+        default: ' bg-white '
     }
 });
 
@@ -93,8 +97,8 @@ const isRounded = computed(() => {
                     enter-to-class="opacity-100 translate-y-0" leave-active-class="ease-in duration-200"
                     leave-from-class="opacity-100 translate-y-0" leave-to-class="opacity-0 translate-y-[-100%]">
                     <div v-show="show"
-                        class="mb-6 bg-white rounded- overflow-hidden shadow-xl transform transition-all sm:w-full sm:mx-auto"
-                        :class="maxWidthClass+isRounded">
+                        class="mb-6 rounded- overflow-hidden shadow-xl transform transition-all sm:w-full sm:mx-auto"
+                        :class="maxWidthClass+isRounded+addClases">
                         <slot />
                     </div>
                 </transition>
