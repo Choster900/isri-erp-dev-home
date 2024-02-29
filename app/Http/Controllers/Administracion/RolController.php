@@ -63,7 +63,7 @@ class RolController extends Controller
             $id = $request->input('id_rol');
             $rol = Rol::find($id);
             $sistema = Sistema::find($rol->id_sistema);
-            
+
             $id_menus_asignados=[];
             $menus_asignados = $rol->menus->load('parentMenu')
                 ->where('estado_menu','=',1)
@@ -125,7 +125,7 @@ class RolController extends Controller
             }
             return ['childrenMenus' => $array_rol];
     }
-    
+
     public function saveMenu(Request $request){
             $id_parent_menu = $request->input('modalData.id_menu');
             $id_children_menu = $request->input('modalData.id_childrenMenu');
@@ -281,7 +281,7 @@ class RolController extends Controller
             $new_rol->ip_rol=$request->ip();
             $new_rol->usuario_rol=$request->user()->nick_usuario;
             $new_rol->save();
-            
+
             foreach($menus as $menu){
                 $new_acceso_menu = new AccesoMenu();
                 $new_acceso_menu->id_rol=$new_rol->id_rol;
