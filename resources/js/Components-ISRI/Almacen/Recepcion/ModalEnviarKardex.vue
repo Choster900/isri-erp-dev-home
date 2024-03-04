@@ -91,7 +91,7 @@
                     class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-[12px] px-2.5 py-1.5 text-center dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
                 <button type="button"
                     class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                    @click="sendReception(recepId)">
+                    @click="sendReception(infoToSend)">
                     Enviar Kardex
                     <svg class="w-[24px] h-[24px] ml-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -145,7 +145,7 @@ export default {
 
         const {
             isLoadingRequest, recInfo, errors, empOptions, infoToSend,
-            getInfoForModalSendKardex
+            getInfoForModalSendKardex, sendReception
         } = useEnviarKardex(context);
 
         const {
@@ -164,24 +164,13 @@ export default {
 
         return {
             isLoadingRequest, recInfo, errors, empOptions, infoToSend,
-            getInfoForModalSendKardex, handleValidation
+            getInfoForModalSendKardex, handleValidation, sendReception
         }
     }
 }
 </script>
 
 <style>
-.input-border-bottom {
-    border-width: 0 0 1px 0;
-    /* Establece el ancho del borde solo en la parte inferior */
-    border-color: #6B7280;
-    /* Color del borde */
-    border-style: solid;
-    /* Establece el estilo del borde como una línea sólida */
-    outline: none;
-    /* Elimina el contorno del input */
-}
-
 .dp__input_wrap {
     height: 35px;
 }
