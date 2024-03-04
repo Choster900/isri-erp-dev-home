@@ -73,7 +73,7 @@
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ reception.fecha_recepcion_pedido }}
+                                    {{ moment(reception.fecha_recepcion_pedido, 'YYYY/MM/DD').format('D-MMM-YYYY') }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">

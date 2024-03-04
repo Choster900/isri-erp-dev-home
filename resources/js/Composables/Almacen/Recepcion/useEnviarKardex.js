@@ -17,6 +17,13 @@ export const useEnviarKardex = (context) => {
 
     const recInfo = ref({})
     const empOptions = ref([])
+    const infoToSend = ref({
+        id: '',
+        conctManagerId: '',
+        nonCompliant: -1,
+        observation: '',
+        suppRep: ''
+    })
 
     const getInfoForModalSendKardex = async (id) => {
         try {
@@ -24,9 +31,8 @@ export const useEnviarKardex = (context) => {
             const response = await axios.get(
                 `/get-info-modal-send-kardex/${id}`
             );
-            recInfo.value = response.data.recInfo
+            recInfo.value.id = data.recInfo.id_recepcion_pedido
             empOptions.value = response.data.empOptions
-
         } catch (err) {
             if (err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
@@ -46,7 +52,7 @@ export const useEnviarKardex = (context) => {
     };
 
     return {
-        isLoadingRequest, recInfo, errors, empOptions,
+        isLoadingRequest, recInfo, errors, empOptions, infoToSend,
         getInfoForModalSendKardex
     }
 }
