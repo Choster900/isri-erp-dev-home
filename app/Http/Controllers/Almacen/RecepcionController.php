@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Almacen;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Almacen\RecepcionRequest;
+use App\Models\DetalleKardex;
 use App\Models\DetalleRecepcionPedido;
 use App\Models\DetDocumentoAdquisicion;
+use App\Models\Kardex;
 use App\Models\ProductoAdquisicion;
 use App\Models\RecepcionPedido;
 use App\Models\User;
@@ -185,8 +187,6 @@ class RecepcionController extends Controller
                 'factura_recepcion_pedido'              => $request->invoice,
                 'fecha_recepcion_pedido'                => Carbon::now(),
                 'acta_recepcion_pedido'                 => $codeActa,
-                //'incumple_acuerdo_recepcion_pedido'     => $request->direction,
-                //'incumplimiento_recepcion_pedido'       => $request->number,
                 'observacion_recepcion_pedido'          => $request->observation,
                 'fecha_reg_recepcion_pedido'            => Carbon::now(),
                 'usuario_recepcion_pedido'              => $request->user()->nick_usuario,
@@ -415,6 +415,7 @@ class RecepcionController extends Controller
 
     public function sendGoodsReception(Request $request)
     {
+        //Define the custom messages
         $customMessages = [
             'conctManagerId.required' => 'Debe seleccionar el administrador de documento.',
             'suppRep.required' => 'Debe escribir el nombre del representante del proveedor.',
@@ -431,14 +432,23 @@ class RecepcionController extends Controller
             'observation' => 'required_if:nonCompliant,1',
         ], $customMessages)->validate();
 
-        $reception = RecepcionPedido::find($request->id);
+        //Find the current products reception
+        $reception = RecepcionPedido::with([
+            'det_doc_adquisicion.fuente_financiamiento',
+            'detalle_recepcion' => function ($query) {
+                $query->where('estado_det_recepcion_pedido', 1);
+            },
+            'detalle_recepcion.producto_adquisicion'
+        ])->find($request->id);
+        //Find the user who stores the products reception
         $user = User::with('persona.empleado')->find($request->user()->id_usuario);
 
         //Missing change status for DetDocumentoAdquisicion, if no product is missing
 
-        if ($reception->id_estado_recepcion_pedido == 1) {
-            DB::beginTransaction();
+        if ($reception->id_estado_recepcion_pedido == 1) { //We must evaluate if the reception has the status 'CREADO'
+            DB::beginTransaction(); //Start the transaction
             try {
+                //We update the reception
                 $reception->update([
                     'id_estado_recepcion_pedido'            => 2,
                     'incumple_acuerdo_recepcion_pedido'     => $request->nonCompliant,
@@ -450,6 +460,34 @@ class RecepcionController extends Controller
                     'usuario_recepcion_pedido'              => $request->user()->nick_usuario,
                     'ip_recepcion_pedido'                   => $request->ip(),
                 ]);
+                //Create a new Kardex object
+                $kardex = new Kardex([
+                    'id_recepcion_pedido'                   => $reception->id_recepcion_pedido,
+                    'id_proy_financiado'                    => $reception->id_proy_financiado,
+                    'id_tipo_mov_kardex'                    => 1,
+                    'fecha_kardex'                          => Carbon::now(),
+                    'fecha_reg_kardex'                      => Carbon::now(),
+                    'usuario_kardex'                        => $request->user()->nick_usuario,
+                    'ip_kardex'                             => $request->ip(),
+                ]);
+                $kardex->save();
+                //Foreach 'detalle_reception' we create a 'detalle_kardex' instance
+                foreach ($reception->detalle_recepcion as $det) {
+                    $detKardex = new DetalleKardex([
+                        'id_kardex'                         => $kardex->id_kardex,
+                        'id_producto'                       => $det->producto_adquisicion->id_producto,
+                        'id_lt'                             => $det->producto_adquisicion->id_lt,
+                        'id_centro_atencion'                => $det->producto_adquisicion->id_centro_atencion,
+                        'id_marca'                          => $det->producto_adquisicion->id_marca,
+                        'cant_det_kardex'                   => $det->cant_det_recepcion_pedido,
+                        'costo_det_kardex'                  => $det->costo_det_recepcion_pedido,
+                        'fecha_reg_det_kardex'              => Carbon::now(),
+                        'usuario_det_kardex'                => $request->user()->nick_usuario,
+                        'ip_det_kardex'                     => $request->ip(),
+                    ]);
+                    $detKardex->save();
+                }
+
                 DB::commit(); // Confirma las operaciones en la base de datos
                 return response()->json([
                     'message'          => "Recepción enviada al Kardex con éxito.",
@@ -458,11 +496,29 @@ class RecepcionController extends Controller
                 DB::rollBack(); // En caso de error, revierte las operaciones anteriores
                 return response()->json([
                     'logical_error' => 'Ha ocurrido un error con sus datos.',
-                    'error' => $e,
-                ], 422);
+                    'error' => $e->getMessage(),
+54                ], 422);
             }
         } else {
             return response()->json(['logical_error' => 'Error, otro usuario ha cambiado el estado de esta recepción.',], 422);
+        }
+    }
+
+    public function printReception(Request $request, $id)
+    {
+        $recToPrint = RecepcionPedido::with([
+            'detalle_recepcion' => function ($query) {
+                $query->where('estado_det_recepcion_pedido', 1);
+            },
+            'det_doc_adquisicion.documento_adquisicion.tipo_documento_adquisicion',
+            'det_doc_adquisicion.documento_adquisicion.proveedor'
+        ])->find($id);
+        if ($recToPrint->id_estado_recepcion_pedido == 2) {
+            return response()->json([
+                'recToPrint'                        => $recToPrint,
+            ]);
+        } else {
+            return response()->json(['logical_error' => 'Error, la recepcion ha cambiado de estado.',], 422);
         }
     }
 }
