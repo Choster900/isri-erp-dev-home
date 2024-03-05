@@ -53,15 +53,17 @@ import Modal from "@/Components-ISRI/AllModal/Modal.vue";
                                             Acuerdo laboral <span class="text-red-600 font-extrabold pl-1">*</span>
                                         </label>
                                         <div class="relative font-medium  flex h-8 w-full flex-row-reverse">
-                                            <Multiselect v-model="dataForm.deal.id_tipo_acuerdo_laboral"
-                                                @select="dataForm.deal.nombre_tipo_acuerdo_laboral = JSON.parse(JSON.stringify(dataForSelect.tipo_acuerdo_laboral.find((index) => index.value == dataForm.deal.id_tipo_acuerdo_laboral))).label, dataForm.deal.color_tipo_acuerdo_laboral = JSON.parse(JSON.stringify(dataForSelect.tipo_acuerdo_laboral.find((index) => index.value == dataForm.deal.id_tipo_acuerdo_laboral))).color"
-                                                :clearOnSearch="true" :searchable="true"
-                                                :options="dataForSelect.tipo_acuerdo_laboral"
-                                                noResultsText="<p class='text-xs'>Registro no encontrado<p>"
-                                                noOptionsText="<p class='text-xs'>Sin registros<p>" :classes="{
-                                                    placeholder: 'flex items-center h-full absolute text-[9px] left-0 top-0 pointer-events-none bg-transparent leading-snug pl-2 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                                }" />
-                                            <LabelToInput icon="list" />
+                                            <div class="relative font-medium flex h-8 w-full flex-row-reverse">
+                                                <Multiselect v-model="dataForm.deal.id_tipo_acuerdo_laboral"
+                                                    @select="onTipoAcuerdoLaboralSelect" :clearOnSearch="true"
+                                                    :searchable="true" :options="dataForSelect.tipo_acuerdo_laboral"
+                                                    noResultsText="<p class='text-xs'>Registro no encontrado<p>"
+                                                    noOptionsText="<p class='text-xs'>Sin registros<p>" :classes="{
+                                                        placeholder: 'flex items-center h-full absolute text-[9px] left-0 top-0 pointer-events-none bg-transparent leading-snug pl-2 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                                    }" />
+                                                <LabelToInput icon="list" />
+                                            </div>
+
                                         </div>
                                     </div>
 
@@ -432,6 +434,13 @@ export default {
             // Agregar la marca de tiempo para asegurarse de que sea único en cada generación
             id += Date.now();
             return id;
+        },
+        onTipoAcuerdoLaboralSelect() {
+            const selectedOption = this.dataForSelect.tipo_acuerdo_laboral.find(index => index.value == this.dataForm.deal.id_tipo_acuerdo_laboral);
+            if (selectedOption) {
+                this.dataForm.deal.nombre_tipo_acuerdo_laboral = JSON.parse(JSON.stringify(selectedOption)).label;
+                this.dataForm.deal.color_tipo_acuerdo_laboral = JSON.parse(JSON.stringify(selectedOption)).color;
+            }
         },
 
         createNewDeal() {

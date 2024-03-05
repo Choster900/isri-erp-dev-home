@@ -316,7 +316,7 @@
                 <div class="md:flex flex md:items-center my-6 sticky flex-row justify-center mx-8">
                     <button type="button" @click="$emit('cerrar-modal')"
                         class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-[12px] px-2.5 py-1.5 text-center mb-2 dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
-                    <div class="" v-if="infoToShow.status != 3">
+                    <div class="" v-if="infoToShow.status == 1">
                         <button v-if="recepId > 0" @click="updateReception(recDocument)"
                             class="bg-orange-700 hover:bg-orange-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">ACTUALIZAR</button>
                         <button v-else @click="storeReception(recDocument)"

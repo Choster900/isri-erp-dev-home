@@ -13,9 +13,12 @@ export const useBienesServicios = () => {
     const arrayMarca = ref([])
     const productDataSearched = ref(null)
     const arrayWhenIsEditingDocAdq = ref([])
+    const errorsValidation = ref([]);
 
     const objectGetFromProp = ref(null)
     const arrayProductsWhenIsEditable = ref(null)
+
+    const estadoDocAdq = ref(1)
     /**
      * Agrega una nueva fila de detalle de adquisición a la matriz de productos de adquisición.
      * @param {number} i - Índice de la fila en la que se agregará el detalle de adquisición.
@@ -24,8 +27,6 @@ export const useBienesServicios = () => {
         try {
             // Verifica si hay datos en la posición i de arrayProductoAdquisicion y si hay documentos de adquisición disponibles
             if (arrayProductoAdquisicion.value[i] && arrayDocAdquisicion.value.length > 0) {
-                // Obtiene el compromiso presupuestario del documento de adquisición actual
-                //const compromisoPpto = arrayDocAdquisicion.value.find(index => index.value == idDetDocAdquisicion.value)?.dataDoc?.compromiso_ppto_det_doc_adquisicion || '';
 
                 // Agrega un nuevo objeto de detalle de adquisición a la matriz de productos
                 arrayProductoAdquisicion.value[i].detalleDoc.push({
@@ -55,7 +56,6 @@ export const useBienesServicios = () => {
             console.error("Error al agregar filas:", error);
         }
     };
-
 
 
     /**
@@ -91,7 +91,7 @@ export const useBienesServicios = () => {
         try {
             const resp = await axios.post("/get-array-objects-for-multiselect");
             arrayLineaTrabajo.value = resp.data.lineaTrabajo.map(index => {
-                return { value: index.id_lt, label: index.nombre_lt, disabled: false };
+                return { value: index.id_lt, label: `${index.codigo_up_lt} - ${index.nombre_lt}`, disabled: false };
             })
             arrayDocAdquisicion.value = resp.data.detalleDocAdquisicion.map(index => {
                 return { value: index.id_det_doc_adquisicion, label: index.nombre_det_doc_adquisicion, dataDoc: index };
@@ -143,7 +143,8 @@ export const useBienesServicios = () => {
     /**
      *
      * Configura la información del producto seleccionado.
-     * @param {number} productoId - El valor del producto seleccionado.
+     * Al seleccionar producto toma tuda su informacion y la setea a la fila correspoendiente
+     * @param {number} productoId - El id del producto seleccionado.
      * @param {number} rowDocAdq - Índice del documento adquisicion.
      * @param {number} rowDetalleDocAdq - Índice del detalle documento adquisicion.
      */
@@ -218,159 +219,191 @@ export const useBienesServicios = () => {
             console.error("Error al calcular el valor total del producto:", error);
         }
     };
-    const errorsValidation = ref([]);
+
+    /**
+     * Guarda productos adquisición en el servidor.
+     *
+     * @returns {Promise<object>} - Promesa que se resuelve con la respuesta exitosa o se rechaza con el error.
+     */
     const saveProductAdquisicionRequest = () => {
         return new Promise(async (resolve, reject) => {
             try {
+                // Hace una solicitud POST a la ruta "/save-prod-adquicicion" con los datos necesarios
                 const response = await axios.post(
                     "/save-prod-adquicicion", {
                     productAdq: arrayProductoAdquisicion.value,
                     idDetDocAdquisicion: idDetDocAdquisicion.value
                 });
-                this.$emit("actualizar-table-data");
-                resolve(response); // Resolvemos la promesa con la respuesta exitosa
+                // Se resuelve la promesa con la respuesta exitosa de la solicitud
+                resolve(response);
             } catch (error) {
+                console.log(error);
+                // Si hay un error y el código de respuesta es 422 (Unprocessable Entity), maneja los errores de validación
                 if (error.response.status === 422) {
-
-                    let data = error.response.data.errors
+                    // Obtiene los errores del cuerpo de la respuesta y los transforma a un formato más manejable
+                    let data = error.response.data.errors;
                     var myData = new Object();
                     for (const errorBack in data) {
-                        myData[errorBack] = data[errorBack][0]
+                        myData[errorBack] = data[errorBack][0];
                     }
-                    errorsValidation.value = myData
+                    // Actualiza el estado "errorsValidation" con los errores y los limpia después de 5 segundos
+                    errorsValidation.value = myData;
                     setTimeout(() => {
                         errorsValidation.value = [];
                     }, 5000);
                     console.error("Error en guardar los datos:", error);
                 }
-                // Manejo de errores específicos
-                reject(error); // Rechazamos la promesa en caso de excepción
+                // Rechaza la promesa en caso de excepción
+                reject(error);
             }
         });
     }
 
     /**
-   * Guarda productos adquisicion
-   *
-   * @param {string} productCode - codigo del producto a buscar.
-   * @returns {Promise<object>} - Objeto con los datos de la respuesta.
-   * @throws {Error} - Error al obtener empleados por nombre.
-   */
-    const saveProductAdquisicion = async () => {
-        const confirmed = await Swal.fire({
-            title: '<p class="text-[18pt] text-center">¿Esta seguro de guardar el anexo?</p>',
-            icon: "question",
-            iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
-            confirmButtonText: "Si, Editar",
-            confirmButtonColor: "#001b47",
-            cancelButtonText: "Cancelar",
-            showCancelButton: true,
-            showCloseButton: true,
-        });
-        if (confirmed.isConfirmed) {
-            executeRequest(
-                saveProductAdquisicionRequest(),
-                "¡El documento de adquisicion se ha guardado correctamente!"
-            );
-        }
-    }
-
-
+     * Actualiza productos de adquisición en el servidor.
+     *
+     * @returns {Promise<object>} - Promesa que se resuelve con la respuesta exitosa o se rechaza con el error.
+     */
     const updateProductAdquisicionRequest = () => {
         return new Promise(async (resolve, reject) => {
             try {
-                const response = await axios.post(
-                    "/update-prod-adquicicion", {
+                // Hace una solicitud POST a la ruta "/update-prod-adquicicion" con los datos necesarios
+                const response = await axios.post("/update-prod-adquicicion", {
                     productAdq: arrayProductoAdquisicion.value,
-                    idDetDocAdquisicion: idDetDocAdquisicion.value
+                    idDetDocAdquisicion: idDetDocAdquisicion.value,
                 });
-                resolve(response); // Resolvemos la promesa con la respuesta exitosa
+                // Se resuelve la promesa con la respuesta exitosa de la solicitud
+                resolve(response);
             } catch (error) {
+                // Si hay un error y el código de respuesta es 422 (Unprocessable Entity), maneja los errores de validación
                 if (error.response.status === 422) {
-
-                    let data = error.response.data.errors
+                    // Obtiene los errores del cuerpo de la respuesta y los transforma a un formato más manejable
+                    let data = error.response.data.errors;
                     var myData = new Object();
                     for (const errorBack in data) {
-                        myData[errorBack] = data[errorBack][0]
+                        myData[errorBack] = data[errorBack][0];
                     }
-                    errorsValidation.value = myData
+                    // Actualiza el estado "errorsValidation" con los errores y los limpia después de 5 segundos
+                    errorsValidation.value = myData;
                     setTimeout(() => {
                         errorsValidation.value = [];
                     }, 5000);
                     console.error("Error en guardar los datos:", error);
                 }
-                // Manejo de errores específicos
-                reject(error); // Rechazamos la promesa en caso de excepción
+                // Rechaza la promesa en caso de excepción
+                reject(error);
             }
         });
     };
 
     /**
-     * Edita productos adquisicion
+     * Deshabilita una línea de trabajo específica y habilita las demás en el array.
      *
-     * @param {string} productCode - codigo del producto a buscar.
-     * @returns {Promise<object>} - Objeto con los datos de la respuesta.
-     * @throws {Error} - Error al obtener empleados por nombre.
+     * @param {number} e - Índice de la línea de trabajo a deshabilitar (opcional).
      */
-    const updateProductAdquisicion = async () => {
-        const confirmed = await Swal.fire({
-            title: '<p class="text-[18pt] text-center">¿Esta seguro de editar?</p>',
-            icon: "question",
-            iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
-            confirmButtonText: "Si, Editar",
-            confirmButtonColor: "#001b47",
-            cancelButtonText: "Cancelar",
-            showCancelButton: true,
-            showCloseButton: true,
-        });
-        if (confirmed.isConfirmed) {
-            executeRequest(
-                updateProductAdquisicionRequest(),
-                "¡El documento de adquisicion se ha actualizado correctamente!"
-            );
-        }
-    }
-
     const disableLt = (e = null) => {
         // Obtener la línea de trabajo seleccionada
         const selectedLineaTrabajo = arrayLineaTrabajo.value[e - 1];
 
+        // Si la línea de trabajo seleccionada existe, la deshabilita
         if (selectedLineaTrabajo) {
-
             selectedLineaTrabajo.disabled = true;
         }
 
-        // Si no existe, habilitar todas las opciones y deshabilitar la seleccionada
+        // Recorre todas las líneas de trabajo en el array
         arrayLineaTrabajo.value.forEach((item) => {
+            // Verifica si la línea de trabajo actual existe en el arrayProductoAdquisicion
             const existe = arrayProductoAdquisicion.value.some((index) => item.value === index.idLt);
+
+            // Si no existe en el arrayProductoAdquisicion, habilita la línea de trabajo
             if (!existe) {
                 item.disabled = false;
             } else {
+                // Si existe, la deshabilita
                 item.disabled = true;
             }
         });
-
     };
 
+    /**
+     * Función para eliminar temporalmente un producto de adquisición.
+     *
+     * @param {number} indexDdLT - Índice de la línea de trabajo a la que pertenece el producto.
+     * @param {number} indexProdAdq - Índice del producto de adquisición a eliminar.
+     * @returns {Promise<void>} - Promesa que indica si el producto fue eliminado o no.
+     */
+    const deleteProductAdq = async (indexDdLT, indexProdAdq) => {
+        // Muestra un cuadro de diálogo de confirmación usando la biblioteca Swal
+        const confirmedEliminarProd = await Swal.fire({
+            title: '<p class="text-[15pt]">¿Eliminar producto adquisicion?. </p>',
+            text: "Al confirmar esta acción, el producto de adquisición se eliminará temporalmente. Recuerde que los cambios serán permanentes una vez que guarde.",
+            icon: "question",
+            iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
+            confirmButtonText: `<p class="text-[10pt] text-center">Si, Eliminar</p>`,
+            confirmButtonColor: "#D2691E",
+            cancelButtonText: `<p class="text-[10pt] text-center">Cancelar</p>`,
+            showCancelButton: true,
+            showCloseButton: true,
+        });
+
+        // Verifica si el usuario confirmó la eliminación
+        if (confirmedEliminarProd.isConfirmed) {
+            // Accede al array de productos de adquisición y actualiza el estado del producto a "eliminado" (estadoProdAdquisicion = 0)
+            arrayProductoAdquisicion.value.find(index => index.idLt == indexDdLT).detalleDoc[indexProdAdq].estadoProdAdquisicion = 0;
+        }
+    };
+
+    /**
+     * Función para eliminar de forma permanente una línea de trabajo y sus productos de adquisición asociados.
+     *
+     * @param {number} indexDdLT - Índice de la línea de trabajo a eliminar.
+     * @returns {Promise<void>} - Promesa que indica si la línea de trabajo fue eliminada o no.
+     */
+    const deletLineaTrabajo = async (indexDdLT) => {
+        // Muestra un cuadro de diálogo de confirmación usando la biblioteca Swal
+        const confirmedEliminarLinea = await Swal.fire({
+            title: '<p class="text-[18pt] text-center">¿Eliminar linea de trabajo?.</p>',
+            text: 'Al confirmar esta acción, se eliminará de manera permanente la línea y cada producto de adquisición asociado a esta línea será eliminado de forma irreversible.',
+            icon: "question",
+            iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
+            confirmButtonText: `<p class="text-[10pt] text-center">Si, Eliminar</p>`,
+            confirmButtonColor: "#D2691E",
+            cancelButtonText: `<p class="text-[10pt] text-center">Cancelar</p>`,
+            showCancelButton: true,
+            showCloseButton: true,
+        });
+
+        // Verifica si el usuario confirmó la eliminación
+        if (confirmedEliminarLinea.isConfirmed) {
+            // Accede al array de productos de adquisición y actualiza el estado de la línea de trabajo a "eliminado" (estadoLt = 0)
+            arrayProductoAdquisicion.value[indexDdLT].estadoLt = 0;
+        }
+    };
+
+    // Se llama a la función getArrayObject() cuando el componente se monta para realizar alguna lógica específica.
     onMounted(() => {
-        getArrayObject()
-    })
+        getArrayObject();
+    });
+
     return {
+        deleteProductAdq,
+        deletLineaTrabajo,
         disableLt,
-        updateProductAdquisicion,
         errorsValidation,
         addinDocAdquisicion,
-        saveProductAdquisicion,
         arrayProductoAdquisicion,
         calculateTotal,
         idDetDocAdquisicion,
         idLt,
         arrayProductsWhenIsEditable,
+        saveProductAdquisicionRequest,
+        estadoDocAdq,
         arrayLineaTrabajo,
         arrayDocAdquisicion,
         objectGetFromProp,
         arrayUnidadMedida,
         arrayMarca,
+        updateProductAdquisicionRequest,
         arrayCentroAtencion,
         productDataSearched,
         addingRows,

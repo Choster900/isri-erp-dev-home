@@ -1,16 +1,27 @@
+import { executeRequest } from "@/plugins/requestHelpers";
 import axios from "axios";
+import Swal from "sweetalert2";
 import { onMounted, ref } from "vue";
 
 export const useDatatable = () => {
     const sortOrders = ref({});
     const objectProductoAdquisicion = ref([]);
     const columns = [
-        { width: "10%", label: "ID", name: "id_proveedor", type: "text" },
-       /*  { width: "10%", label: "Codigo", name: "codigo_empleado", type: "text", },
-        { width: "15%", label: "Nombres", name: "collecNombre", type: "text" },
-        { width: "15%", label: "Apellidos", name: "collecApellido", type: "text", },
-        { width: "10%", label: "Fecha creacion", name: "fecha_reg_evaluacion_personal", type: "date", }, */
-
+        { width: "22%", label: "Proveedor", name: "id_proveedor", type: "text" },
+        { width: "1%", label: "Tipo Adquisicion", name: "codigo_empleado", type: "text", },
+        { width: "1%", label: "Gestion Compra", name: "collecNombre", type: "text" },
+        { width: "7%", label: "Numero Adquisicion", name: "collecApellido", type: "text", },
+        { width: "22%", label: "Nombre adquisicion", name: "fecha_reg_evaluacion_personal", type: "text", },
+        { width: "1%", label: "Monto", name: "fecha_reg_evaluacion_personal", type: "text", },
+        { width: "1%", label: "Fecha", name: "fecha_reg_evaluacion_personal", type: "date", },
+        {
+            width: "1%", label: "Estado", name: "fecha_reg_evaluacion_personal", type: "select",
+            options: [
+                { value: "1", label: "Abierto" },
+                { value: "2", label: "Enviado" },
+                { value: "3", label: "Cerrado" }
+            ]
+        },
         { width: "1%", label: "", name: "Acciones" },
     ];
     const isLoadinRequest = ref(false);
@@ -30,7 +41,7 @@ export const useDatatable = () => {
     const perPage = ref(["10", "20", "30"]);
     const tableData = ref({
         draw: 0,
-        length: 10,
+        length: 6,
         column: 0,
         dir: "desc",
         search: {},
@@ -46,7 +57,7 @@ export const useDatatable = () => {
         to: "",
     });
 
-    const getEvaluaciones = async (url = "/producto-adquisiciono") => {
+    const getProductoAdquisicion = async (url = "/producto-adquisiciono") => {
         try {
             isLoadinRequest.value = true;
             lastUrl.value = url;
@@ -83,7 +94,59 @@ export const useDatatable = () => {
             sortOrders.value[key] = sortOrders.value[key] * -1;
             tableData.value.column = getIndex(columns, "name", key);
             tableData.value.dir = sortOrders.value[key] === 1 ? "desc" : "asc";
-            getEvaluaciones();
+            getProductoAdquisicion();
+        }
+    };
+
+
+    const updateDetDocAdquisicionRequest = (idDetDoc, idState) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const response = await axios.post(
+                    "/change-state-detalle-doc-adquisicion", {
+                    id: idDetDoc,
+                    idState: idState,
+                });
+                resolve(response); // Resolvemos la promesa con la respuesta exitosa
+            } catch (error) {
+                // Manejo de errores específicos
+                reject(error); // Rechazamos la promesa en caso de excepción
+            }
+        });
+    };
+
+    /**
+   * Busca producto por codigo.
+   *
+   * @param {BigInteger} idDetDoc - id documento detalle adquisicion.
+   * @param {BigInteger} idState - id estado det doc adq
+   * @returns {Promise<object>} - Objeto con los datos de la respuesta.
+   * @throws {Error} - Error al obtener empleados por nombre.
+   */
+    const changeState = async (idDetDoc, idState) => {
+        try {
+            const confirmedEliminarProd = await Swal.fire({
+                title: `<p class="text-[15pt]">¿Desea ${idState == 2 ? `Enviar` : `Cerrar`} el documento?.</p>`,
+                icon: "question",
+                iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
+                confirmButtonText: `<p class="text-[10pt] text-center">Si, Eliminar</p>`,
+                confirmButtonColor: "#D2691E",
+                cancelButtonText: `<p class="text-[10pt] text-center">Cancelar</p>`,
+                showCancelButton: true,
+                showCloseButton: true,
+            });
+            if (confirmedEliminarProd.isConfirmed) {
+                executeRequest(
+                    updateDetDocAdquisicionRequest(idDetDoc, idState),
+                    `¡El documento de adquisicion se ha ${idState == 2 ? `Enviado` : `Cerrado`} correctamente!`
+                );
+                getProductoAdquisicion(lastUrl.value)
+            }
+        } catch (error) {
+            // Manejo de errores específicos
+            console.error("Error en cambiar de estado:", error);
+            // Lanza el error para que pueda ser manejado por el componente que utiliza este composable
+            throw new Error("Error en cambiar de estado po:");
         }
     };
 
@@ -98,7 +161,7 @@ export const useDatatable = () => {
     const handleData = (myEventData) => {
         if (validarCamposVacios(myEventData)) {
             tableData.value.search = {};
-            getEvaluaciones();
+            getProductoAdquisicion();
         } else {
             tableData.value.search = myEventData;
         }
@@ -120,11 +183,12 @@ export const useDatatable = () => {
 
     onMounted(async () => {
         getAllDependencias();
-        getEvaluaciones();
+        getProductoAdquisicion();
     });
 
     return {
         columns,
+        changeState,
         sortKey,
         sortOrders,
         objectProductoAdquisicion,
@@ -141,7 +205,7 @@ export const useDatatable = () => {
         perPage,
         isLoadinRequest,
         sortBy,
-        getEvaluaciones,
+        getProductoAdquisicion,
         handleData,
     };
 };
