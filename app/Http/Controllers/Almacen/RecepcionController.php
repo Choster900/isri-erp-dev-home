@@ -183,6 +183,7 @@ class RecepcionController extends Controller
             $rec = new RecepcionPedido([
                 'id_det_doc_adquisicion'                => $request->detDocId,
                 'id_proy_financiado'                    => $request->financingSourceId,
+                'monto_recepcion_pedido'                => $request->total,
                 'id_estado_recepcion_pedido'            => 1,
                 'factura_recepcion_pedido'              => $request->invoice,
                 'fecha_recepcion_pedido'                => Carbon::now(),
@@ -261,6 +262,7 @@ class RecepcionController extends Controller
             DB::beginTransaction();
             try {
                 $rec->update([
+                    'monto_recepcion_pedido'                => $request->total,
                     'factura_recepcion_pedido'              => $request->invoice,
                     'observacion_recepcion_pedido'          => $request->observation,
                     'fecha_mod_recepcion_pedido'            => Carbon::now(),
@@ -443,8 +445,6 @@ class RecepcionController extends Controller
         //Find the user who stores the products reception
         $user = User::with('persona.empleado')->find($request->user()->id_usuario);
 
-        //Missing change status for DetDocumentoAdquisicion, if no product is missing
-
         if ($reception->id_estado_recepcion_pedido == 1) { //We must evaluate if the reception has the status 'CREADO'
             DB::beginTransaction(); //Start the transaction
             try {
@@ -488,6 +488,8 @@ class RecepcionController extends Controller
                     $detKardex->save();
                 }
 
+                //Missing change status for DetDocumentoAdquisicion, if no product is missing
+
                 DB::commit(); // Confirma las operaciones en la base de datos
                 return response()->json([
                     'message'          => "Recepción enviada al Kardex con éxito.",
@@ -497,7 +499,7 @@ class RecepcionController extends Controller
                 return response()->json([
                     'logical_error' => 'Ha ocurrido un error con sus datos.',
                     'error' => $e->getMessage(),
-54                ], 422);
+                ], 422);
             }
         } else {
             return response()->json(['logical_error' => 'Error, otro usuario ha cambiado el estado de esta recepción.',], 422);

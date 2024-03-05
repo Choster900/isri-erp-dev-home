@@ -100,7 +100,7 @@
                                             <div class="font-semibold pt-0.5">Editar</div>
                                         </div>
                                         <div @click="showModalRecep = true; recepId = reception.id_recepcion_pedido"
-                                            v-if="reception.id_estado_recepcion_pedido != 1"
+                                            v-if="reception.id_estado_recepcion_pedido == 3"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-blue-800 w-[25px] h-[25px] mr-2">
                                                 <icon-m :iconName="'see'"></icon-m>
@@ -108,7 +108,7 @@
                                             <div class="font-semibold pt-0.5">Ver</div>
                                         </div>
                                         <div @click="printReception(reception.id_recepcion_pedido)"
-                                            v-if="reception.id_estado_recepcion_pedido != 1"
+                                            v-if="reception.id_estado_recepcion_pedido == 2"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-red-800 w-[23px] h-[23px] mr-1.5 ml-0.5">
                                                 <icon-m :iconName="'download-file'"></icon-m>

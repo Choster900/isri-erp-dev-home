@@ -42,6 +42,7 @@ export const useRecepcion = (context) => {
         observation: '',
         detDocId: '',
         status: '',
+        total: '',
         prods: [],
         procedure: []
     })
@@ -261,7 +262,7 @@ export const useRecepcion = (context) => {
                 }
             }
         }
-        //recDocument.value.total = sum.toFixed(2);
+        recDocument.value.total = sum.toFixed(2);
         return sum.toFixed(2);
     });
 
