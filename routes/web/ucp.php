@@ -47,5 +47,13 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     })->name('bieneservicios.getProductByCodigoProducto');
     Route::post('save-prod-adquicicion', [BienesServiciosController::class, 'saveProductoAdquisicion'])->name('bieneservicios.saveProdAdquisicion');
     Route::post('update-prod-adquicicion', [BienesServiciosController::class, 'updateProductoAdquisicion'])->name('bieneservicios.updateProdAdquisicion');
+    Route::post(
+        'change-state-detalle-doc-adquisicion',
+        function (Request $request) {
+            return DetDocumentoAdquisicion::where('id_det_doc_adquisicion', $request->id)->update([
+                'id_estado_doc_adquisicion' => $request->idState,
+            ]);
+        }
 
+    )->name('bieneservicios.updateProdAdquisicion');
 });

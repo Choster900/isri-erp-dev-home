@@ -40,6 +40,7 @@ class BienesServiciosController extends Controller
 
 
         $v_query = DetDocumentoAdquisicion::with([
+            "estado_documento_adquisicion",
             "productos_adquisiciones" => function ($query) {
                 return $query->where("estado_prod_adquisicion", 1);
             },
@@ -47,7 +48,9 @@ class BienesServiciosController extends Controller
             "productos_adquisiciones.linea_trabajo",
             "productos_adquisiciones.centro_atencion",
             "productos_adquisiciones.marca",
-            "documento_adquisicion.proveedor"
+            "documento_adquisicion.proveedor",
+            "documento_adquisicion.tipo_documento_adquisicion",
+            "documento_adquisicion.tipo_gestion_compra",
         ])->has('productos_adquisiciones')->orderBy($v_columns[$v_column], $v_dir);
 
         if ($data) {

@@ -4,18 +4,16 @@ namespace App\Http\Controllers\Almacen;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Almacen\RecepcionRequest;
-use App\Models\AdministradorAdquisicion;
-use App\Models\CentroAtencion;
 use App\Models\DetalleRecepcionPedido;
 use App\Models\DetDocumentoAdquisicion;
-use App\Models\DocumentoAdquisicion;
-use App\Models\Producto;
 use App\Models\ProductoAdquisicion;
 use App\Models\RecepcionPedido;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Validator;
 
 class RecepcionController extends Controller
 {
@@ -264,8 +262,6 @@ class RecepcionController extends Controller
             try {
                 $rec->update([
                     'factura_recepcion_pedido'              => $request->invoice,
-                    //'incumple_acuerdo_recepcion_pedido'     => $request->direction,
-                    //'incumplimiento_recepcion_pedido'       => $request->number,
                     'observacion_recepcion_pedido'          => $request->observation,
                     'fecha_mod_recepcion_pedido'            => Carbon::now(),
                     'usuario_recepcion_pedido'              => $request->user()->nick_usuario,
@@ -415,5 +411,58 @@ class RecepcionController extends Controller
             'recInfo'                           => $recInfo,
             'empOptions'                        => $empOptions
         ]);
+    }
+
+    public function sendGoodsReception(Request $request)
+    {
+        $customMessages = [
+            'conctManagerId.required' => 'Debe seleccionar el administrador de documento.',
+            'suppRep.required' => 'Debe escribir el nombre del representante del proveedor.',
+            'nonCompliant.required' => 'Debe seleccionar si existe incumplimiento.',
+            'nonCompliant.not_in' => 'Debe seleccionar si existe incumplimiento.',
+            'observation.required_if' => 'Debe agregar la descripción por incumplimiento.'
+        ];
+
+        // Validate the request data with custom error messages and custom rule
+        $validatedData = Validator::make($request->all(), [
+            'conctManagerId' => 'required',
+            'suppRep' => 'required',
+            'nonCompliant' => 'required|not_in:-1',
+            'observation' => 'required_if:nonCompliant,1',
+        ], $customMessages)->validate();
+
+        $reception = RecepcionPedido::find($request->id);
+        $user = User::with('persona.empleado')->find($request->user()->id_usuario);
+
+        //Missing change status for DetDocumentoAdquisicion, if no product is missing
+
+        if ($reception->id_estado_recepcion_pedido == 1) {
+            DB::beginTransaction();
+            try {
+                $reception->update([
+                    'id_estado_recepcion_pedido'            => 2,
+                    'incumple_acuerdo_recepcion_pedido'     => $request->nonCompliant,
+                    'incumplimiento_recepcion_pedido'       => $request->nonCompliant == 1 ? $request->observation : null,
+                    'id_empleado'                           => $request->conctManagerId,
+                    'representante_prov_recepcion_pedido'   => $request->suppRep,
+                    'emp_id_empleado'                       => $user->persona->empleado->id_empleado,
+                    'fecha_mod_recepcion_pedido'            => Carbon::now(),
+                    'usuario_recepcion_pedido'              => $request->user()->nick_usuario,
+                    'ip_recepcion_pedido'                   => $request->ip(),
+                ]);
+                DB::commit(); // Confirma las operaciones en la base de datos
+                return response()->json([
+                    'message'          => "Recepción enviada al Kardex con éxito.",
+                ]);
+            } catch (\Exception $e) {
+                DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+                return response()->json([
+                    'logical_error' => 'Ha ocurrido un error con sus datos.',
+                    'error' => $e,
+                ], 422);
+            }
+        } else {
+            return response()->json(['logical_error' => 'Error, otro usuario ha cambiado el estado de esta recepción.',], 422);
+        }
     }
 }

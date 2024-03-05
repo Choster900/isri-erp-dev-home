@@ -20,5 +20,6 @@ Route::group(['middleware' => ['auth', 'access']], function () {
 
     //Functionality to send information to Kardex
     Route::get('get-info-modal-send-kardex/{id}', [RecepcionController::class, 'getInfoModalSendKardex'])->name('recepcion.getInfoModalSendKardex');
+    Route::post('send-goods-reception', [RecepcionController::class, 'sendGoodsReception'])->name('recepcion.sendGoodsReception');
 
 });

@@ -73,17 +73,19 @@
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ reception.fecha_recepcion_pedido }}
+                                    {{ moment(reception.fecha_recepcion_pedido, 'YYYY/MM/DD').format('D-MMM-YYYY') }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
                                     <div :class="{
-                                        'bg-blue-100 text-blue-500': reception.id_estado_recepcion_pedido == 1,
-                                        'bg-emerald-100 text-emerald-500': reception.id_estado_recepcion_pedido == 2,
-                                        'bg-red-100 text-red-500': reception.id_estado_recepcion_pedido == 3
-                                    }"
-                                        class="inline-flex font-medium rounded-full text-center px-2.5 py-0.5 bg-emerald-100 text-emerald-500">
+                                        ' text-emerald-600 bg-emerald-100 ': reception.id_estado_recepcion_pedido == 1,
+                                        ' text-blue-600 bg-blue-100 ': reception.id_estado_recepcion_pedido == 2,
+                                        ' text-red-600 bg-red-100 ': reception.id_estado_recepcion_pedido == 3
+                                    }" class="inline-flex font-medium rounded-full px-2.5 py-1 ">
+                                    <svg class="w-3 h-3 inline-flex mr-2 my-auto">
+                                        <circle class="opacity-80" cx="50%" cy="50%" r="50%" fill="currentColor" />
+                                    </svg>
                                         {{ reception.estado_recepcion.estado_recepcion_pedido }}
                                     </div>
                                 </div>
@@ -100,15 +102,15 @@
                                             <div class="font-semibold pt-0.5">Kardex</div>
                                         </div>
                                         <div @click="showModalRecep = true; recepId = reception.id_recepcion_pedido"
-                                            v-if="permits.actualizar === 1 && reception.id_estado_recepcion_pedido != 3"
+                                            v-if="permits.actualizar === 1 && reception.id_estado_recepcion_pedido == 1"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
-                                            <div class="text-orange-700 w-[22px] h-[22px] mr-2">
+                                            <div class="text-orange-700 w-[22px] h-[22px] mr-1.5 ml-0.5">
                                                 <icon-m :iconName="'editM'"></icon-m>
                                             </div>
                                             <div class="font-semibold pt-0.5">Editar</div>
                                         </div>
                                         <div @click="showModalRecep = true; recepId = reception.id_recepcion_pedido"
-                                            v-if="reception.id_estado_recepcion_pedido === 3"
+                                            v-if="reception.id_estado_recepcion_pedido != 1"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-blue-800 w-[25px] h-[25px] mr-2">
                                                 <icon-m :iconName="'see'"></icon-m>
@@ -116,7 +118,7 @@
                                             <div class="font-semibold pt-0.5">Ver</div>
                                         </div>
                                         <div @click="changeStatusElement(reception.id_recepcion_pedido, reception.id_estado_recepcion_pedido)"
-                                            v-if="permits.eliminar === 1 && reception.id_estado_recepcion_pedido != 3"
+                                            v-if="permits.eliminar === 1 && reception.id_estado_recepcion_pedido == 1"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-red-700 w-[24px] h-[24px] mr-1">
                                                 <icon-m :iconName="'trash'"></icon-m>
