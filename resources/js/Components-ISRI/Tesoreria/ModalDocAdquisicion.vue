@@ -114,6 +114,26 @@
                                 <InputError class="mt-2" :message="errors.award_date" />
                             </div>
                         </div>
+                        <!-- Third row -->
+                        <!-- !WORKING ON IT -->
+                        <div class="mb-5 md:flex flex-row justify-items-start">
+                            <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
+                                <label class="block mb-2 text-xs font-light text-gray-600">
+                                    Proceso compra <span class="text-red-600 font-extrabold">*</span>
+                                </label>
+                                <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
+                                    <Multiselect v-model="acq_doc.procesoCompraId" :options="procesoCompra"
+                                        @select="onSelectMultiSelectProcesoCompra($event)"
+                                        placeholder="Seleccione proveedor" :searchable="true" />
+                                    <LabelToInput icon="list" />
+                                </div>
+                                <!-- !MODIFICAR -->
+                                <!-- <InputError class="mt-2" :message="errors.supplier_id" /> -->
+                             <!--    {{ procesoCompra }} -->
+                         <!--        tipo: {{ tipoProcesoCompraValue }} -->
+                            </div>
+
+                        </div>
 
                         <div class="mb-2 md:flex flex-row justify-between">
                             <div class="md:w-1/2">
@@ -128,12 +148,12 @@
                                     Empleados <span class="text-red-600 font-extrabold">*</span>
                                 </label>
                                 <div class="relative flex h-auto min-h-8 w-full flex-row-reverse">
-                                    <Multiselect v-model="acq_doc.employees" :options="employees" placeholder="Seleccione empleado"
-                                    @change="selectEmployees($event)"
-                                        mode="tags" :searchable="true" :classes="{
-                                            tags: 'flex-grow flex-shrink flex flex-wrap items-center mt-1 pl-2 min-w-0 rtl:pl-0 rtl:pr-2',
-                                            tag: 'bg-[#002b5f] bg-opacity-90 text-white text-[12px] py-1 pl-2 rounded mr-1 mb-1 flex items-center whitespace-nowrap min-w-0 rtl:pl-0 rtl:pr-2 rtl:mr-0 rtl:ml-1',
-                                        }" />
+                                    <Multiselect v-model="acq_doc.employees" :options="employees"
+                                        placeholder="Seleccione empleado" @change="selectEmployees($event)" mode="tags"
+                                        :searchable="true" :classes="{
+            tags: 'flex-grow flex-shrink flex flex-wrap items-center mt-1 pl-2 min-w-0 rtl:pl-0 rtl:pr-2',
+            tag: 'bg-[#002b5f] bg-opacity-90 text-white text-[12px] py-1 pl-2 rounded mr-1 mb-1 flex items-center whitespace-nowrap min-w-0 rtl:pl-0 rtl:pr-2 rtl:mr-0 rtl:ml-1',
+        }" />
                                 </div>
                                 <InputError class="mt-2" :message="errors.employees" />
                             </div>
@@ -145,7 +165,8 @@
                                 class="flex items-center bg-blue-600 hover:bg-blue-700 text-white pl-3 pr-2 py-1.5 text-center mb-2 rounded"
                                 @click="goToNextPage">
                                 <div class="text-[12px]">SIGUIENTE</div>
-                                <span class="ml-1 pl-1 py-2.5 text-base text-gray-100 border-l-2 border-gray-100"></span>
+                                <span
+                                    class="ml-1 pl-1 py-2.5 text-base text-gray-100 border-l-2 border-gray-100"></span>
                                 <div class="w-[20px] h-[20px] text-white">
                                     <icon-m :iconName="'right-arrow-circle'">
                                     </icon-m>
@@ -212,7 +233,8 @@
                                 <!-- Second row -->
                                 <div class="mb-4 md:flex flex-row justify-items-start">
                                     <div class="mb-4 md:mr-2 md:mb-0 basis-full">
-                                        <TextInput id="item-name" v-model="array_item.name" type="text" placeholder="Nombre"
+                                        <TextInput id="item-name" v-model="array_item.name" type="text"
+                                            placeholder="Nombre"
                                             @update:modelValue="handleValidation('name', { limit: 250 })">
                                             <LabelToInput icon="standard" forLabel="item-name" />
                                         </TextInput>
@@ -235,8 +257,9 @@
                                 <!-- Add item button -->
                                 <div class="flex justify-center mb-2 mt-1">
                                     <div class="flex items-center">
-                                        <GeneralButton class="mr-1" :text="'Cancelar'" color="bg-gray-600 hover:bg-gray-700"
-                                            icon="delete" @click="cleanArrayItem()" />
+                                        <GeneralButton class="mr-1" :text="'Cancelar'"
+                                            color="bg-gray-600 hover:bg-gray-700" icon="delete"
+                                            @click="cleanArrayItem()" />
                                         <GeneralButton class="ml-1" color="bg-blue-600 hover:bg-blue-700"
                                             :text="new_item ? 'Agregar' : 'Actualizar'" icon="add" @click="addItem()" />
                                     </div>
@@ -264,20 +287,20 @@
                                         </thead>
                                         <template v-for="(item, index) in acq_doc.items" :key="index">
                                             <tbody class="text-sm divide-y divide-slate-200">
-                                                <tr v-if="item.deleted == false"
-                                                    :class="[
-                                                        'hover:bg-[#141414]/10',
-                                                        'border-b-2',
-                                                        index_errors.includes(index) ? 'bg-red-300 hover:bg-red-400' : '']">
+                                                <tr v-if="item.deleted == false" :class="[
+            'hover:bg-[#141414]/10',
+            'border-b-2',
+            index_errors.includes(index) ? 'bg-red-300 hover:bg-red-400' : '']">
                                                     <td class="text-center">{{ item.commitment_number }}</td>
                                                     <td class="text-center max-w-[100px]">
                                                         {{ item.name }}
                                                     </td>
                                                     <td class="text-center">{{ item.name_financing_source }}</td>
-                                                    <td class="text-center">${{ item.amount }}</td>
+                                                    <td class="text-center">${{ isNaN(item.amount) ? '00.00' : item.amount }}</td>
                                                     <td class="text-center">
                                                         <div class="space-x-1">
-                                                            <button class="text-slate-400 hover:text-slate-500 rounded-full"
+                                                            <button
+                                                                class="text-slate-400 hover:text-slate-500 rounded-full"
                                                                 @click="editItem(item, index)">
                                                                 <span class="sr-only">Edit</span>
                                                                 <svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
@@ -286,7 +309,8 @@
                                                                     </path>
                                                                 </svg>
                                                             </button>
-                                                            <button class="text-rose-500 hover:text-rose-600 rounded-full"
+                                                            <button
+                                                                class="text-rose-500 hover:text-rose-600 rounded-full"
                                                                 @click="deleteItem(index)">
                                                                 <span class="sr-only">Delete</span>
                                                                 <svg class="w-6 h-6 fill-current" viewBox="0 0 32 32">
@@ -341,7 +365,8 @@
                                         <div class="md:flex flex-row justify-center">
                                             <GeneralButton v-if="docAdquisicionId > 0"
                                                 @click="updateDocumentoAdquisicion(acq_doc)"
-                                                color="bg-orange-700 hover:bg-orange-800" text="Actualizar" icon="update" />
+                                                color="bg-orange-700 hover:bg-orange-800" text="Actualizar"
+                                                icon="update" />
                                             <GeneralButton v-if="docAdquisicionId <= 0"
                                                 @click="storeDocumentoAdquisicion(acq_doc)"
                                                 color="bg-green-700 hover:bg-green-800" text="Guardar" icon="add" />
@@ -390,11 +415,11 @@ export default {
         const { docAdquisicionId } = toRefs(props);
 
         const {
-            isLoadingRequest, acq_doc, errors,
+            isLoadingRequest, acq_doc, errors,tipoProcesoCompraValue,
             config, array_item, index_errors,
-            item_errors, backend_errors, new_item, currentPage,
+            item_errors, backend_errors, new_item, currentPage, procesoCompra,
             doc_types, management_types, financing_sources, suppliers,
-            item_available, itemSelected, showItemInfo, employees,
+            item_available, itemSelected, showItemInfo, employees,onSelectMultiSelectProcesoCompra,
             getInfoForModalDocumentoAdquisicion, storeDocumentoAdquisicion, updateDocumentoAdquisicion,
             goToNextPage, addItem, cleanArrayItem, editItem, deleteItem, selectEmployees
         } = useDocumentoAdquisicion(context);
@@ -421,11 +446,11 @@ export default {
         )
 
         return {
-            isLoadingRequest, acq_doc, errors, docAdquisicionId,
+            isLoadingRequest, acq_doc, errors, docAdquisicionId,tipoProcesoCompraValue,
             config, array_item, index_errors,
-            item_errors, backend_errors, new_item, currentPage,
+            item_errors, backend_errors, new_item, currentPage, procesoCompra,
             financing_sources, doc_types, management_types, suppliers,
-            item_available, itemSelected, showItemInfo, employees,
+            item_available, itemSelected, showItemInfo, employees,onSelectMultiSelectProcesoCompra,
             storeDocumentoAdquisicion, updateDocumentoAdquisicion, handleValidation,
             goToNextPage, addItem, cleanArrayItem, editItem, deleteItem, selectEmployees
         }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DocumentoAdquisicion extends Model
 {
@@ -17,6 +18,7 @@ class DocumentoAdquisicion extends Model
         'id_tipo_gestion_compra',
         'id_tipo_doc_adquisicion',
         'id_proveedor',
+        'id_proceso_compra',
         'monto_doc_adquisicion',
         'numero_doc_adquisicion',
         'numero_gestion_doc_adquisicion',
@@ -32,7 +34,7 @@ class DocumentoAdquisicion extends Model
     public function detalles()
     {
         return $this->hasMany('App\Models\DetDocumentoAdquisicion', 'id_doc_adquisicion', 'id_doc_adquisicion')->where('estado_det_doc_adquisicion', 1);
-    }   
+    }
     public function administradores()
     {
         return $this->hasMany('App\Models\AdministradorAdquisicion', 'id_doc_adquisicion', 'id_doc_adquisicion')->where('estado_admon_adquisicion', 1);
@@ -53,5 +55,14 @@ class DocumentoAdquisicion extends Model
     public function tipo_gestion_compra()
     {
         return $this->belongsTo(TipoGestionCompra::class, "id_tipo_gestion_compra", "id_tipo_gestion_compra");
+    }
+    /**
+     * Get the proceso_compra that owns the DocumentoAdquisicion
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function proceso_compra(): BelongsTo
+    {
+        return $this->belongsTo(ProcesoCompra::class, 'id_proceso_compra', 'id_proceso_compra');
     }
 }

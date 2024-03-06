@@ -56,4 +56,11 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
 
     )->name('bieneservicios.updateProdAdquisicion');
+
+    Route::get(
+        '/ucp/documento-adquisicion',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/ucp/documento-adquisicion', 'Tesoreria/DocAdquisicion');
+        }
+    )->name('ucp.documento-adquisicion-ucp');
 });
