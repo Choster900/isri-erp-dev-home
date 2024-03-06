@@ -1,6 +1,6 @@
 <template>
     <div>
-        <label :for="id" class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white" :class="addClasesLabel">{{
+        <label :for="id" class="block mb-2 text-[13px] font-medium text-gray-600 " :class="addClasesLabel">{{
             label }}
             <span v-if="required" class="text-red-600 font-extrabold">*</span></label>
         <div class="relative">
@@ -146,8 +146,9 @@
                 'bg-gray-50': modelValue === '',
             }], addClases" :validation="validation" @input="updateValue($event)"
                 class="text-gray-900 focus:ring-blue-500 focus:border-blue-500 block w-full font-semibold text-[12px] placeholder-gray-400
-                dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 hover:border-gray-400 transition duration-300 ease-in-out"
+                hover:border-gray-400 transition duration-300 ease-in-out"
                 style="border-radius: 4px;" />
+                <!-- Clases dark: dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 -->
         </div>
     </div>
 </template>

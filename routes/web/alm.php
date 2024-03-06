@@ -17,8 +17,9 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('save-goods-reception', [RecepcionController::class, 'storeReception'])->name('recepcion.storeReception');
     Route::post('update-goods-reception', [RecepcionController::class, 'updateReception'])->name('recepcion.updateReception');
     Route::post('change-status-reception', [RecepcionController::class, 'changeStatusReception'])->name('recepcion.changeStatusReception');
-
     //Functionality to send information to Kardex
     Route::get('get-info-modal-send-kardex/{id}', [RecepcionController::class, 'getInfoModalSendKardex'])->name('recepcion.getInfoModalSendKardex');
-
+    Route::post('send-goods-reception', [RecepcionController::class, 'sendGoodsReception'])->name('recepcion.sendGoodsReception');
+    //Print reception
+    Route::get('print-reception/{id}', [RecepcionController::class, 'printReception'])->name('recepcion.printReception');
 });

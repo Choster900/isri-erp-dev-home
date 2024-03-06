@@ -167,7 +167,8 @@
                     <div class="max-w-[97%] min-w-[690px] border-b border-gray-500 flex">
                         <div class="flex w-full">
                             <div
-                                class="justify-start flex items-center hover:bg-gray-200 w-[23%] border-x min-w-[175px] h-[65px] bg-white border-gray-500">
+                                class="justify-start flex items-center hover:bg-gray-200 w-[23%] border-x min-w-[175px] h-[65px] border-gray-500"
+                                :class="errors.invoice ? 'bg-red-300' : 'bg-white'">
                                 <p class="font-[MuseoSans] text-gray-600 text-[12px] mx-2">FACTURA:</p>
                                 <input v-model="recDocument.invoice" :disabled="infoToShow.status != 1"
                                     @input="handleValidation('invoice', { limit: 20 })"
@@ -316,7 +317,7 @@
                 <div class="md:flex flex md:items-center my-6 sticky flex-row justify-center mx-8">
                     <button type="button" @click="$emit('cerrar-modal')"
                         class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-[12px] px-2.5 py-1.5 text-center mb-2 dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
-                    <div class="" v-if="infoToShow.status != 3">
+                    <div class="" v-if="infoToShow.status == 1">
                         <button v-if="recepId > 0" @click="updateReception(recDocument)"
                             class="bg-orange-700 hover:bg-orange-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">ACTUALIZAR</button>
                         <button v-else @click="storeReception(recDocument)"

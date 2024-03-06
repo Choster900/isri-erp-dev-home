@@ -17,7 +17,11 @@ class RecepcionPedido extends Model
         'id_det_doc_adquisicion',
         'id_proy_financiado',
         'id_estado_recepcion_pedido',
+        'id_empleado', //Administrador de contrato
+        'emp_id_empleado', //Guardaalmacen
         'factura_recepcion_pedido',
+        'monto_recepcion_pedido',
+        'representante_prov_recepcion_pedido',
         'fecha_recepcion_pedido',
         'acta_recepcion_pedido',
         'incumple_acuerdo_recepcion_pedido',
