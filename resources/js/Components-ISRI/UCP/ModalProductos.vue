@@ -35,7 +35,7 @@
 
             <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
                 <div class="mb-4 md:mr-2 md:mb-0 basis-1/2" :class="{ 'selected-opt': prod.purchaseProcedureId > 0, }">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Proceso de compra
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Proceso de compra
                         <span class="text-red-600 font-extrabold">*</span>
                     </label>
                     <div class="relative font-semibold flex h-[35px] w-full">
@@ -46,7 +46,7 @@
                         :message="item" />
                 </div>
                 <div class="mb-4 md:mr-0 md:mb-0 basis-1/2" :class="{ 'selected-opt': prod.unspscId > 0, }">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Catalogo Unspsc
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Catalogo Unspsc
                         <span class="text-red-600 font-extrabold">*</span>
                     </label>
                     <div class="relative font-semibold flex h-[35px] w-full">
@@ -62,7 +62,7 @@
 
             <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
                 <div class="mb-4 md:mr-2 md:mb-0 basis-1/2 pr-1" :class="{ 'selected-opt': prod.budgetAccountId > 0, }">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Especifico
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Especifico
                         <span class="text-red-600 font-extrabold">*</span>
                     </label>
                     <div class="relative font-semibold flex h-[35px] w-full">
@@ -82,7 +82,7 @@
                     <InputError v-for="(item, index) in errors.name" :key="index" class="mt-2" :message="item" />
                 </div>
                 <div class="mb-4 md:mr-0 md:mb-0 basis-1/3" :class="{ 'selected-opt': prod.mUnitId > 0 }">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Unidad de medida
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Unidad de medida
                         <span class="text-red-600 font-extrabold">*</span>
                     </label>
                     <div class="relative font-semibold flex h-[35px] w-full">
@@ -102,7 +102,7 @@
                     <InputError v-for="(item, index) in errors.price" :key="index" class="mt-2" :message="item" />
                 </div>
                 <div class="mb-4 md:mr-2 md:mb-0 basis-1/3 justify-center text-center">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Perecedero
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Perecedero
                         <span class="text-red-600 font-extrabold">*</span>
                     </label>
                     <label for="checbox1" class="text-sm font-semibold text-gray-600 ml-4 mr-1">SI</label>
@@ -116,7 +116,7 @@
                     <InputError v-for="(item, index) in errors.perishable" :key="index" class="mt-2" :message="item" />
                 </div>
                 <div class="mb-4 md:mr-0 md:mb-0 basis-1/3 justify-center text-center">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Cuadro bienes y
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Cuadro bienes y
                         servicios
                         <span class="text-red-600 font-extrabold">*</span>
                     </label>
@@ -134,7 +134,7 @@
 
             <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
                 <div class="mb-4 md:mr-0 md:mb-0 basis-full" style="border: none; background-color: transparent;">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Descripción
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Descripción
                         <span class="text-red-600 font-extrabold">*</span>
                     </label>
                     <textarea v-model="prod.description" id="descripcion" name="descripcion"

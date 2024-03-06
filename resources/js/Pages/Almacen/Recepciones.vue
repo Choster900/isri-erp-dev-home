@@ -39,35 +39,37 @@
                     <tbody v-if="!isLoadinRequest" class="text-sm divide-y divide-slate-200">
                         <tr v-for="reception in dataToShow" :key="reception.id_recepcion_pedido" class="hover:bg-gray-200">
                             <td class="px-2 first:pl-5 last:pr-5">
-                                <div class="font-medium text-slate-800 flex items-center justify-center min-h-[50px]">
+                                <div class="font-medium text-slate-800 flex items-center justify-center min-h-[40px]">
                                     {{ reception.id_recepcion_pedido }}
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5">
-                                <div class="font-medium text-slate-800 text-center">
-                                    {{
-                                        reception.det_doc_adquisicion.documento_adquisicion.tipo_documento_adquisicion.siglas_tipo_doc_adquisicion
-                                    }}
-                                    - {{ reception.det_doc_adquisicion.documento_adquisicion.numero_doc_adquisicion }}
-                                </div>
-                            </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">
-                                    {{ reception.det_doc_adquisicion.nombre_det_doc_adquisicion }}
-                                </div>
-                            </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap">
                                 <div class="font-medium text-slate-800 text-center">
                                     {{ reception.acta_recepcion_pedido }}
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">
+                            <td class="px-2 first:pl-5 last:pr-5">
+                                <div class="font-medium text-slate-800 flex items-center justify-center min-h-[40px]">
+                                    {{ reception.det_doc_adquisicion.documento_adquisicion.id_tipo_doc_adquisicion === 1 ? 'CONTRATO' : 'ORDEN' }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5">
+                                <div class="font-medium text-slate-800 flex items-center justify-center min-h-[40px]">
+                                     {{ reception.det_doc_adquisicion.documento_adquisicion.numero_doc_adquisicion }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap">
+                                <div class="font-medium text-slate-800 flex items-center justify-center min-h-[40px]">
+                                    ${{ reception.monto_recepcion_pedido }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap">
+                                <div class="font-medium text-slate-800 flex items-center justify-center min-h-[40px]">
                                     {{ moment(reception.fecha_recepcion_pedido, 'YYYY/MM/DD').format('D-MMM-YYYY') }}
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap">
+                                <div class="font-bold text-[13px] text-slate-800 flex items-center justify-center min-h-[40px]">
                                     <div :class="{
                                         ' text-emerald-600 bg-emerald-100 ': reception.id_estado_recepcion_pedido == 1,
                                         ' text-blue-600 bg-blue-100 ': reception.id_estado_recepcion_pedido == 2,
@@ -153,7 +155,7 @@
             </div>
 
         </div>
-        <div v-if="!emptyObject" class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
+        <div v-if="!emptyObject" class="px-6 py-4 bg-white shadow-lg rounded-sm border-slate-200 relative">
             <div>
                 <nav class="flex justify-between" role="navigation" aria-label="Navigation">
                     <div class="grow text-center">
@@ -237,19 +239,26 @@ export default {
 
         const columns = [
             { width: "10%", label: "Id", name: "id_recepcion_pedido", type: "text" },
-            { width: "20%", label: "Documento", name: "documento", type: "text" },
-            { width: "30%", label: "Item", name: "item", type: "text" },
-            { width: "10%", label: "acta", name: "acta_recepcion_pedido", type: "text" },
+            { width: "15%", label: "acta", name: "acta_recepcion_pedido", type: "text" },
+            {
+                width: "13%", label: "TIPO DOC", name: "tipo_documento", type: "select",
+                options: [
+                    { value: "1", label: "CONTRATO" },
+                    { value: "2", label: "ORDEN" },
+                ]
+            },
+            { width: "20%", label: "Numero", name: "numero_documento", type: "text" },
+            { width: "15%", label: "Monto", name: "monto_recepcion_pedido", type: "text" },
             { width: "10%", label: "fecha", name: "fecha_recepcion_pedido", type: "date" },
             {
-                width: "10%", label: "Estado", name: "id_estado_recepcion_pedido", type: "select",
+                width: "12%", label: "Estado", name: "id_estado_recepcion_pedido", type: "select",
                 options: [
                     { value: "1", label: "CREADO" },
                     { value: "2", label: "PROCESADO" },
                     { value: "3", label: "ELIMINADO" }
                 ]
             },
-            { width: "10%", label: "Acciones", name: "Acciones" },
+            { width: "5%", label: "Acciones", name: "Acciones" },
         ];
         const requestUrl = "/recepciones"
         const columntToSort = "id_recepcion_pedido"
