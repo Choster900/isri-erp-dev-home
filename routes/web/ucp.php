@@ -34,7 +34,23 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('get-all-linea-trabajo', [BienesServiciosController::class, 'getAllLineaTrabajo'])->name('bieneservicios.getAllLineaTrabajo');
     Route::post('get-array-objects-for-multiselect', [BienesServiciosController::class, 'getArrayObjectoForMultiSelect'])->name('bieneservicios.getAllLineaTrabajo');
     Route::post('get-product-by-codigo-producto', function (Request $request) {
-        $product = Producto::with(["unidad_medida"])->where('codigo_producto', 'like', '%' . $request->codigoProducto . '%')->get();
+        $product = Producto::with(["unidad_medida"])
+            ->where('codigo_producto', 'like', '%' . $request->codigoProducto . '%')
+            ->get();
+        // Formatear resultados para respuesta JSON
+        $formattedResults = $product->map(function ($item) {
+            return [
+                'value'           => $item->id_producto,
+                'label'           => $item->codigo_producto,
+                'allDataProducto' => $item,
+            ];
+        });
+        return response()->json($formattedResults);
+    })->name('bieneservicios.getProductByCodigoProducto');
+    Route::post('get-product-by-proceso', function (Request $request) {
+        $product = Producto::with(["unidad_medida"])
+            ->where('id_proceso_compra', $request->procesoId)
+            ->get();
         // Formatear resultados para respuesta JSON
         $formattedResults = $product->map(function ($item) {
             return [
@@ -56,4 +72,11 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
 
     )->name('bieneservicios.updateProdAdquisicion');
+
+    Route::get(
+        '/ucp/documento-adquisicion',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/ucp/documento-adquisicion', 'Tesoreria/DocAdquisicion');
+        }
+    )->name('ucp.documento-adquisicion-ucp');
 });
