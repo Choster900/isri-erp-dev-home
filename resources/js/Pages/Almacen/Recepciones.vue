@@ -241,7 +241,7 @@ export default {
             { width: "10%", label: "Id", name: "id_recepcion_pedido", type: "text" },
             { width: "15%", label: "acta", name: "acta_recepcion_pedido", type: "text" },
             {
-                width: "13%", label: "TIPO DOC", name: "tipo_documento", type: "select",
+                width: "12%", label: "TIPO DOC", name: "tipo_documento", type: "select",
                 options: [
                     { value: "1", label: "CONTRATO" },
                     { value: "2", label: "ORDEN" },
@@ -251,7 +251,7 @@ export default {
             { width: "15%", label: "Monto", name: "monto_recepcion_pedido", type: "text" },
             { width: "10%", label: "fecha", name: "fecha_recepcion_pedido", type: "date" },
             {
-                width: "12%", label: "Estado", name: "id_estado_recepcion_pedido", type: "select",
+                width: "13%", label: "Estado", name: "id_estado_recepcion_pedido", type: "select",
                 options: [
                     { value: "1", label: "CREADO" },
                     { value: "2", label: "PROCESADO" },

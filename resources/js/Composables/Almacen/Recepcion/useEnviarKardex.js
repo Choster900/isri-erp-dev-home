@@ -99,8 +99,8 @@ export const useEnviarKardex = (context) => {
                     let fecha = moment().format('DD-MM-YYYY');
                     let name = 'ACTA ' + response.data.recToPrint.acta_recepcion_pedido + ' - ' + fecha;
                     const opt = {
-                        //margin: [0, 2.5, 0, 2.5], //top, left, buttom, right,
-                        margin: [1, 1, 1, 1],
+                        //margin: [1, 1, 1, 1], //top, left, buttom, right,
+                        margin: 1,
                         filename: name,
                         //pagebreak: {mode:'avoid-all'},
                         image: { type: 'jpeg', quality: 0.98 },
@@ -130,13 +130,13 @@ export const useEnviarKardex = (context) => {
                             //Get the middle position including the text width
                             const textX = centerX - (textWidth1 / 2);
                             //Write the text in the desired coordinates.
-                            pdf.text(textX, (pdf.internal.pageSize.getHeight() - 0.4), text);
+                            pdf.text(textX, (pdf.internal.pageSize.getHeight() - 0.6), text);
                             //Text for the date and time.
                             let date_text = 'Generado: ' + currentDateTime
                             //Get the text width
                             const textWidth = pdf.getStringUnitWidth(date_text) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
                             //Write the text in the desired coordinates.
-                            pdf.text(pdf.internal.pageSize.getWidth() - textWidth - 0.2, pdf.internal.pageSize.getHeight() - 0.4, date_text);
+                            pdf.text(pdf.internal.pageSize.getWidth() - textWidth - 0.6, pdf.internal.pageSize.getHeight() - 0.6, date_text);
                         }
 
                     })

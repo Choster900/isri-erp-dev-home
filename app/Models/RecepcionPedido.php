@@ -47,4 +47,15 @@ class RecepcionPedido extends Model
     {
         return $this->hasOne('App\Models\EstadoRecepcionPedido','id_estado_recepcion_pedido','id_estado_recepcion_pedido');
     }
+
+    public function administrador_contrato()
+    {
+        return $this->belongsTo('App\Models\Empleado','id_empleado','id_empleado');
+    }
+
+    public function guarda_almacen()
+    {
+        return $this->belongsTo('App\Models\Empleado','emp_id_empleado','id_empleado');
+    }
+
 }

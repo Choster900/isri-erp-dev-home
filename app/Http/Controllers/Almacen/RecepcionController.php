@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
+use Luecano\NumeroALetras\NumeroALetras;
 
 class RecepcionController extends Controller
 {
@@ -126,15 +127,15 @@ class RecepcionController extends Controller
             )
             ->where('pendiente.diferencia', '>', 0)
             ->groupBy('pendiente.id_doc_adquisicion');
-
+        //This returns the missing documents id
         $idDocs = $pendingItems->pluck('pendiente.id_doc_adquisicion')->toArray();
-
+        //We only get the pending acquisition documents
         $docs = DB::table('documento_adquisicion')
             ->select('id_doc_adquisicion as value', 'numero_doc_adquisicion as label', 'id_tipo_doc_adquisicion')
             ->whereIn('id_doc_adquisicion', $idDocs)
             ->where('estado_doc_adquisicion', 1)
             ->get();
-
+        //Return the response to the view
         return response()->json([
             'test'                          => $pendingItems->get(),
             'docs'                          => $docs
@@ -143,8 +144,8 @@ class RecepcionController extends Controller
 
     public function getInfoModalRecep(Request $request)
     {
-        $idRec = $request->id;
-        if ($idRec > 0) {
+        $idRec = $request->id; //Reception id from the view, if it's 0 that means we are creating a new reception
+        if ($idRec > 0) { //This means we are updating an existing reception
             $recep = RecepcionPedido::with([
                 'detalle_recepcion.producto.unidad_medida',
                 'detalle_recepcion.producto_adquisicion',
@@ -560,9 +561,19 @@ class RecepcionController extends Controller
                 $query->where('estado_det_recepcion_pedido', 1);
             },
             'det_doc_adquisicion.documento_adquisicion.tipo_documento_adquisicion',
-            'det_doc_adquisicion.documento_adquisicion.proveedor'
+            'det_doc_adquisicion.documento_adquisicion.proveedor',
+            'det_doc_adquisicion.fuente_financiamiento',
+            'detalle_recepcion.producto_adquisicion.producto.unidad_medida',
+            'detalle_recepcion.producto_adquisicion.centro_atencion',
+            'detalle_recepcion.producto_adquisicion.marca',
+            'administrador_contrato.persona',
+            'guarda_almacen.persona'
         ])->find($id);
         if ($recToPrint->id_estado_recepcion_pedido == 2) {
+            $numeroLetras = new NumeroALetras();
+            $monto_letras = $numeroLetras->toInvoice($recToPrint['monto_recepcion_pedido'], 2, 'DÓLARES');
+
+            $recToPrint->monto_letras = $monto_letras;
             return response()->json([
                 'recToPrint'                        => $recToPrint,
             ]);
