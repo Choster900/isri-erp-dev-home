@@ -158,7 +158,7 @@ export const useDocumentoAdquisicion = (context) => {
             'name',
         ];
 
-        if (tipoProcesoCompraValue.value === 1) {
+        if (tipoProcesoCompraValue.value === 2) {
             requiredFields.push('amount');
         } else {
             const index = requiredFields.indexOf('amount');

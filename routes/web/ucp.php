@@ -47,6 +47,20 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         });
         return response()->json($formattedResults);
     })->name('bieneservicios.getProductByCodigoProducto');
+    Route::post('get-product-by-proceso', function (Request $request) {
+        $product = Producto::with(["unidad_medida"])
+            ->where('id_proceso_compra', $request->procesoId)
+            ->get();
+        // Formatear resultados para respuesta JSON
+        $formattedResults = $product->map(function ($item) {
+            return [
+                'value'           => $item->id_producto,
+                'label'           => $item->codigo_producto,
+                'allDataProducto' => $item,
+            ];
+        });
+        return response()->json($formattedResults);
+    })->name('bieneservicios.getProductByCodigoProducto');
     Route::post('save-prod-adquicicion', [BienesServiciosController::class, 'saveProductoAdquisicion'])->name('bieneservicios.saveProdAdquisicion');
     Route::post('update-prod-adquicicion', [BienesServiciosController::class, 'updateProductoAdquisicion'])->name('bieneservicios.updateProdAdquisicion');
     Route::post(

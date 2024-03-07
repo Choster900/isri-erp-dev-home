@@ -19,6 +19,9 @@ export const useBienesServicios = () => {
     const arrayProductsWhenIsEditable = ref(null)
 
     const estadoDocAdq = ref(1)
+    const tipoProcesoCompra = ref(null)
+
+    const ArrayProductFiltered = ref([])
     /**
      * Agrega una nueva fila de detalle de adquisición a la matriz de productos de adquisición.
      * @param {number} i - Índice de la fila en la que se agregará el detalle de adquisición.
@@ -57,7 +60,6 @@ export const useBienesServicios = () => {
         }
     };
 
-
     /**
     * Agrega un nuevo objeto de documento de adquisición a la matriz de productos de adquisición.
     */
@@ -81,7 +83,6 @@ export const useBienesServicios = () => {
         }
     };
 
-
     /**
      * Obtener Arrays de objetos para multiselect
      *
@@ -89,7 +90,7 @@ export const useBienesServicios = () => {
      */
     const getArrayObject = async () => {
         try {
-            const resp = await axios.post("/get-array-objects-for-multiselect");
+            const resp = await axios.post("/get-array-objects-for-multiselect", {});
             arrayLineaTrabajo.value = resp.data.lineaTrabajo.map(index => {
                 return { value: index.id_lt, label: `${index.codigo_up_lt} - ${index.nombre_lt}`, disabled: false };
             })
@@ -114,7 +115,6 @@ export const useBienesServicios = () => {
 
     };
 
-
     /**
     * Busca producto por codigo.
     *
@@ -138,7 +138,6 @@ export const useBienesServicios = () => {
             throw new Error("Error en la búsqueda de empleados");
         }
     };
-
 
     /**
      *
@@ -186,7 +185,6 @@ export const useBienesServicios = () => {
             console.error("Error al configurar la información del producto:", error);
         }
     };
-
 
     /**
      * Calcula el valor total del producto en la fila especificada.
@@ -380,6 +378,30 @@ export const useBienesServicios = () => {
         }
     };
 
+    /**
+     *
+     * @description Funcion para obtener los productos por proceso del item seleccionado.
+     * @param {number} valueDocument - El valor del documento de adquisición seleccionado.
+     * @returns {Promise<void>} - Una promesa que se resuelve después de completar la operación.
+     */
+    const onSelectDocAdquisicion = async (valueDocument) => {
+        try {
+            // Obtiene el ID del proceso de compra asociado al documento de adquisición seleccionado.
+            const procesoId = arrayDocAdquisicion.value.find(d => d.value === valueDocument).dataDoc.documento_adquisicion.proceso_compra.id_proceso_compra;
+
+            // Realiza una solicitud para obtener los productos asociados al proceso de compra.
+            const resp = await axios.post("/get-product-by-proceso", { procesoId });
+
+            // Actualiza el valor de productDataSearched con la información obtenida.
+            productDataSearched.value = resp.data;
+        } catch (error) {
+            // Manejo de errores: rechaza la promesa, muestra un mensaje de error en la consola y lanza una excepción.
+            console.error("Error en la obtención de productos por proceso:", error);
+            throw new Error("Error en la obtención de productos por proceso");
+        }
+    };
+
+
     // Se llama a la función getArrayObject() cuando el componente se monta para realizar alguna lógica específica.
     onMounted(() => {
         getArrayObject();
@@ -387,8 +409,10 @@ export const useBienesServicios = () => {
 
     return {
         deleteProductAdq,
+        onSelectDocAdquisicion,
         deletLineaTrabajo,
         disableLt,
+        ArrayProductFiltered,
         errorsValidation,
         addinDocAdquisicion,
         arrayProductoAdquisicion,

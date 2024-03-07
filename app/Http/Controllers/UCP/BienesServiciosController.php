@@ -77,6 +77,7 @@ class BienesServiciosController extends Controller
             $usuario = $request->user()->nick_usuario;
             $ip = $request->ip();
             $fechaActual = now();
+            $totCostoProdAdquisicion = 0; // Variable para almacenar la el total
 
             foreach ($detalles as $detalle) {
                 if ($detalle["estadoLt"] != 0) {
@@ -96,6 +97,8 @@ class BienesServiciosController extends Controller
                                 'usuario_prod_adquisicion'     => $usuario,
                                 'ip_prod_adquisicion'          => $ip,
                             ];
+                            // Sumando el total
+                            $totCostoProdAdquisicion += $detalleProducto["costoProdAdquisicion"];
 
                             // Usar DB::insert para insertar directamente y mejorar el rendimiento
                             DB::table('producto_adquisicion')->insert($nuevoDetalle);
@@ -103,6 +106,10 @@ class BienesServiciosController extends Controller
                     }
                 }
             }
+            DetDocumentoAdquisicion::where("id_det_doc_adquisicion", $idDetDocAdquisicion)->update([
+                "monto_det_doc_adquisicion" => $totCostoProdAdquisicion
+            ]);
+
             DB::commit();
             return response()->json($request); // O cualquier otra respuesta que desees enviar
         } catch (\Throwable $th) {
@@ -120,6 +127,7 @@ class BienesServiciosController extends Controller
             $usuario = $request->user()->nick_usuario;
             $ip = $request->ip();
             $fechaActual = now();
+            $totCostoProdAdquisicion = 0; // Variable para almacenar la el total
 
             foreach ($detalles as $detalle) {
                 // Verificar si la linea de trabajo del producto adquisicion no ha sido eliminada en el front
@@ -145,6 +153,9 @@ class BienesServiciosController extends Controller
                                 'usuario_prod_adquisicion'     => $usuario,
                                 'ip_prod_adquisicion'          => $ip,
                             ]);
+
+                            // Sumando el total
+                            $totCostoProdAdquisicion += $detalleProducto["costoProdAdquisicion"];
                         }
                         // Insertar nuevo producto
                         else if ($detalleProducto["estadoProdAdquisicion"] == 1) {
@@ -163,6 +174,8 @@ class BienesServiciosController extends Controller
                                 'ip_prod_adquisicion'          => $ip,
                             ];
 
+                            // Sumando el total
+                            $totCostoProdAdquisicion += $detalleProducto["costoProdAdquisicion"];
                             // Usar DB::insert para insertar directamente y mejorar el rendimiento
                             DB::table('producto_adquisicion')->insert($nuevoDetalle);
                         }
@@ -189,6 +202,9 @@ class BienesServiciosController extends Controller
                     }
                 }
             }
+            DetDocumentoAdquisicion::where("id_det_doc_adquisicion", $idDetDocAdquisicion)->update([
+                "monto_det_doc_adquisicion" => $totCostoProdAdquisicion
+            ]);
 
             return response()->json(["message" => "Actualización exitosa"]);
         } catch (\Exception $e) {
@@ -203,10 +219,13 @@ class BienesServiciosController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Request
      */
-    function getArrayObjectoForMultiSelect(): array
+    function getArrayObjectoForMultiSelect(Request $request): array
     {
         // Obtener detalles de documentos de adquisición con información adicional
-        $detalleDocumentoAdquisicion = DetDocumentoAdquisicion::with(["documento_adquisicion.proveedor"])
+        $detalleDocumentoAdquisicion = DetDocumentoAdquisicion::with([
+            "documento_adquisicion.proveedor",
+            "documento_adquisicion.proceso_compra"
+        ])
             ->where("estado_det_doc_adquisicion", 1)
             ->whereDoesntHave("productos_adquisiciones")
             ->get();
