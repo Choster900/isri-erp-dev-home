@@ -34,7 +34,9 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('get-all-linea-trabajo', [BienesServiciosController::class, 'getAllLineaTrabajo'])->name('bieneservicios.getAllLineaTrabajo');
     Route::post('get-array-objects-for-multiselect', [BienesServiciosController::class, 'getArrayObjectoForMultiSelect'])->name('bieneservicios.getAllLineaTrabajo');
     Route::post('get-product-by-codigo-producto', function (Request $request) {
-        $product = Producto::with(["unidad_medida"])->where('codigo_producto', 'like', '%' . $request->codigoProducto . '%')->get();
+        $product = Producto::with(["unidad_medida"])
+            ->where('codigo_producto', 'like', '%' . $request->codigoProducto . '%')
+            ->get();
         // Formatear resultados para respuesta JSON
         $formattedResults = $product->map(function ($item) {
             return [
