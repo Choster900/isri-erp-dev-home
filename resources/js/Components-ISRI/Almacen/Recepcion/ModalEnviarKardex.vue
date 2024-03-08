@@ -77,7 +77,7 @@
             </div>
 
             <div class="mb-2 mt-2 md:flex flex-row justify-items-start mx-8">
-                <div class="mb-4 md:mr-0 pr-1 md:mb-0 basis-2/3">
+                <div class="mb-4 md:mr-0 md:mb-0 basis-full">
                     <input-text label="Representante proveedor" :withIcon="false" id="price" v-model="infoToSend.suppRep" type="text"
                         placeholder="Escriba nombre representante" :required="true" :addClases="'h-[35px]'" :dSign="true"
                         :validation="{ limit: 100 }">

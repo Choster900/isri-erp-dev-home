@@ -20,12 +20,20 @@ export const useDocumentoAdquisicion = (context) => {
     const suppliers = ref([])
     const employees = ref([])
 
+    const procesoCompra = ref([]) //Array para multiselect
+    const tipoProcesoCompraValue = ref(null)
+    const onSelectMultiSelectProcesoCompra = (e) => {
+        tipoProcesoCompraValue.value = procesoCompra.value.find(proc => proc.value === e).idTipoProcesoCompra
+    };
+
     const acq_doc = ref(
         {
             id: '',
             type_id: '',
             management_type_id: '',
             supplier_id: '',
+            procesoCompraId: '',
+            tipoProceso: '',
             number: '',
             management_number: '',
             award_number: '',
@@ -91,10 +99,12 @@ export const useDocumentoAdquisicion = (context) => {
     };
 
     const setModalValues = (data) => {
+        console.log(data);
         //Set the multiselects options
         management_types.value = data.management_types
         financing_sources.value = data.financing_sources
         suppliers.value = data.suppliers
+        procesoCompra.value = data.procesoCompra
         doc_types.value = data.doc_types
         employees.value = data.employees
         //Set the doc attributes
@@ -107,6 +117,8 @@ export const useDocumentoAdquisicion = (context) => {
         acq_doc.value.award_number = data.acqDoc.numero_adjudicacion_doc_adquisicion ?? ""
         acq_doc.value.award_date = data.acqDoc.fecha_adjudicacion_doc_adquisicion ?? ""
         acq_doc.value.total = data.acqDoc.monto_doc_adquisicion ?? ""
+        acq_doc.value.procesoCompraId = data.acqDoc.id_proceso_compra ?? ""
+        onSelectMultiSelectProcesoCompra(acq_doc.value.procesoCompraId)
         //Set the doc managers
         acq_doc.value.employees = data.acqDoc.administradores.map(element => element.id_empleado);
         //Set each document item
@@ -137,26 +149,45 @@ export const useDocumentoAdquisicion = (context) => {
             amount: 'Monto Compromiso',
             name: 'Nombre item',
         };
+
+        // Ajustando en requiredFields para hacer que 'amount' sea opcional si tipoProcesoCompraValue es igual a 2
         const requiredFields = [
             'financing_source_id',
             'commitment_number',
-            'amount',
+            // (tipoProcesoCompraValue.value === 1 && 'amount') || '', // Hacer 'amount' opcional si tipoProcesoCompraValue es igual a 2
             'name',
         ];
+
+        if (tipoProcesoCompraValue.value === 2) {
+            requiredFields.push('amount');
+        } else {
+            const index = requiredFields.indexOf('amount');
+            if (index !== -1) {
+                requiredFields.splice(index, 1);
+            }
+        }
+
         requiredFields.forEach(field => {
-            if (array_item.value[field]) {
+            console.log(field);
+            if (field === 'amount' && tipoProcesoCompraValue.value === 2) {
+                // Si tipoProcesoCompraValue es igual a 2, no se requiere el monto
+                item_errors.value[field] = '';
+            } else if (array_item.value[field]) {
                 item_errors.value[field] = '';
             } else {
-                item_errors.value[field] = `El campo ${fieldMappingsItem[field]} es obligatorio.`;
+                item_errors.value[field] = `El campo ${fieldMappingsItem[field]} es obligatorio.`; // Asegúrate de que fieldMappingsItem[field] esté definido
             }
         });
-        const err = Object.values(item_errors.value);
-        if (err.every(error => error === '')) {
+        console.log(array_item.value);
 
+        const err = Object.values(item_errors.value);
+        console.log(err);
+
+        if (err.every(error => error === '')) {
             const parsedAmount = parseFloat(array_item.value.amount);
             const formattedAmount = parsedAmount.toFixed(2);
 
-            if (formattedAmount <= 0) {
+            if (formattedAmount <= 0 && tipoProcesoCompraValue.value == 1) {
                 useShowToast(toast.warning, "El monto del item debe ser mayor a cero.");
             } else {
                 let name_source = financing_sources.value.filter((e) => e.value === array_item.value.financing_source_id);
@@ -166,7 +197,7 @@ export const useDocumentoAdquisicion = (context) => {
                     index: array_item.value.index != '' ? array_item.value.index : '',
                     financing_source_id: array_item.value.financing_source_id != '' ? array_item.value.financing_source_id : '',
                     commitment_number: array_item.value.commitment_number != '' ? array_item.value.commitment_number : '',
-                    amount: formattedAmount ? formattedAmount : '',
+                    amount: formattedAmount ? formattedAmount : 0,
                     contract_manager: array_item.value.contract_manager != '' ? array_item.value.contract_manager : '',
                     name_financing_source: name_source[0].codigo_proy_financiado,
                     name: array_item.value.name != '' ? array_item.value.name : '',
@@ -191,6 +222,7 @@ export const useDocumentoAdquisicion = (context) => {
             useShowToast(toast.warning, "Tienes algunos errores, por favor verifica los datos enviados.");
         }
     };
+
 
     const cleanAndUpdateTotal = () => {
         updateTotal()
@@ -466,9 +498,10 @@ export const useDocumentoAdquisicion = (context) => {
     }
 
     return {
-        isLoadingRequest, errors, acq_doc, config, array_item, index_errors,
+        isLoadingRequest, errors, acq_doc, config, array_item, index_errors, procesoCompra,
         item_errors, backend_errors, new_item, currentPage, doc_types, management_types,
         financing_sources, suppliers, item_available, itemSelected, showItemInfo, employees,
+        onSelectMultiSelectProcesoCompra, tipoProcesoCompraValue,
         getInfoForModalDocumentoAdquisicion, storeDocumentoAdquisicion, updateDocumentoAdquisicion,
         goToNextPage, addItem, cleanArrayItem, editItem, deleteItem, selectEmployees
     }

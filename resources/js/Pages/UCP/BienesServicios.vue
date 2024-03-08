@@ -1,4 +1,5 @@
 <template>
+
     <Head title="Proceso - Bienes y Servicios" />
     <AppLayoutVue nameSubModule="Compras - Bienes y Servicios" :colorSide="' bg-[#343a40] '">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
@@ -23,8 +24,8 @@
                     </div>
                     <h2 class="font-semibold text-slate-800 pt-1">Documentos adquisiciones: <span
                             class="text-slate-400 font-medium">{{
-                                prodAdquisicion ? pagination.total : ''
-                            }}</span></h2>
+        prodAdquisicion ? pagination.total : ''
+    }}</span></h2>
                 </div>
             </header>
             <!--     -->
@@ -40,7 +41,8 @@
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 max-w-[1%]">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ prod.documento_adquisicion.tipo_documento_adquisicion.nombre_tipo_doc_adquisicion }}
+                                    {{ prod.documento_adquisicion.tipo_documento_adquisicion.nombre_tipo_doc_adquisicion
+                                    }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 max-w-[1%]">
@@ -66,18 +68,18 @@
                             <td class="px-2 first:pl-5 last:pr-5 max-w-[2%]">
                                 <div class="font-medium text-slate-800 text-center uppercase">
                                     {{
-                                        moment(prod.productos_adquisiciones[0].fecha_reg_prod_adquisicion)
-                                            .format("MMM DD / YYYY")
-                                    }}
+        moment(prod.productos_adquisiciones[0].fecha_reg_prod_adquisicion)
+            .format("MMM DD / YYYY")
+    }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 max-w-[2%]">
                                 <div class="font-medium text-slate-800 text-center">
                                     <div :class="{
-                                                'text-green-600 bg-green-200': prod.id_estado_doc_adquisicion === 1,
-                                                'bg-blue-300 text-blue-600': prod.id_estado_doc_adquisicion === 2,
-                                                'text-red-600 bg-red-300': prod.id_estado_doc_adquisicion === 3
-                                            }" class="inline-flex font-medium rounded-full text-center px-1.5 py-.5">
+            'text-green-600 bg-green-200': prod.id_estado_doc_adquisicion === 1,
+            'bg-blue-300 text-blue-600': prod.id_estado_doc_adquisicion === 2,
+            'text-red-600 bg-red-300': prod.id_estado_doc_adquisicion === 3
+        }" class="inline-flex font-medium rounded-full text-center px-1.5 py-.5">
                                         {{ prod.estado_documento_adquisicion.nombre_estado_doc_adquisicion }}
                                     </div>
                                 </div>
@@ -90,8 +92,9 @@
                                             @click.stop="objectProductoAdquisicion = prod; shoModalBienesServicios = !shoModalBienesServicios">
                                             <div class="w-8 text-blue-900">
                                                 <span class="text-xs">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                        class="w-6 h-6">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
                                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -107,8 +110,9 @@
                                             @click.stop="changeState(prod.id_det_doc_adquisicion, 2)">
                                             <div class="w-8 text-blue-900">
                                                 <span class="text-xs">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                        class="w-6 h-6">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
                                                     </svg>
@@ -125,8 +129,8 @@
                                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
                                                         class="w-6 h-6 text-red-500" color="#000000" fill="none">
                                                         <path d="M15.7494 15L9.75 9M9.75064 15L15.75 9"
-                                                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                                                            stroke-linejoin="round" />
+                                                            stroke="currentColor" stroke-width="1.5"
+                                                            stroke-linecap="round" stroke-linejoin="round" />
                                                         <path
                                                             d="M22.75 12C22.75 6.47715 18.2728 2 12.75 2C7.22715 2 2.75 6.47715 2.75 12C2.75 17.5228 7.22715 22 12.75 22C18.2728 22 22.75 17.5228 22.75 12Z"
                                                             stroke="currentColor" stroke-width="1.5" />
@@ -145,7 +149,8 @@
                             <td colspan="9" class="text-center">
                                 <img src="../../../img/IsSearching.gif" alt="" class="w-60 h-60 mx-auto">
                                 <h1 class="font-medium text-xl mt-4">Cargando!!!</h1>
-                                <p class="text-sm text-gray-600 mt-2 pb-10">Por favor espera un momento mientras se carga la
+                                <p class="text-sm text-gray-600 mt-2 pb-10">Por favor espera un momento mientras se
+                                    carga la
                                     información.</p>
                             </td>
                         </tr>
@@ -155,7 +160,8 @@
                             <td colspan="9" class="text-center">
                                 <img src="../../../img/NoData.gif" alt="" class="w-60 h-60 mx-auto">
                                 <h1 class="font-medium text-xl mt-4">No se encontraron resultados!</h1>
-                                <p class="text-sm text-gray-600 mt-2 pb-10">Parece que no hay registros disponibles en este
+                                <p class="text-sm text-gray-600 mt-2 pb-10">Parece que no hay registros disponibles en
+                                    este
                                     momento.</p>
                             </td>
                         </tr>
@@ -213,7 +219,8 @@
         </div>
         <ModalBienesServicios :propProdAdquisicion="objectProductoAdquisicion" :showModal="shoModalBienesServicios"
             @cerrar-modal="shoModalBienesServicios = false; objectProductoAdquisicion = []"
-            @actualizar-datatable="getProductoAdquisicion(lastUrl)" :canEdit="permits.actualizar == 1 ? true : false" />
+            @actualizar-datatable="getProductoAdquisicion(lastUrl); shoModalBienesServicios = false;"
+            :canEdit="permits.actualizar == 1 ? true : false" />
     </AppLayoutVue>
 </template>
 
