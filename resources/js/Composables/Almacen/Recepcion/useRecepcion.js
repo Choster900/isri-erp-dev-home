@@ -22,28 +22,29 @@ export const useRecepcion = (context) => {
     const documents = ref([])
     const items = ref([])
     const startRec = ref(false)
-    const infoToShow = ref({
-        docId: '',
-        detDocId: '',
-        docName: '',
-        itemName: '',
-        financingSource: '',
-        commitment: '',
-        supplier: '',
-        nit: '',
-        dateTime: '',
+    const infoToShow = ref({ //This is an object used to show general information related to the acquisition document
+        docId: '', //id_doc_adquisicion
+        detDocId: '', //id_det_doc_adquisicion
+        docName: '', //nombre_tipo_doc_adquisicion
+        itemName: '', //nombre_det_doc_adquisicion
+        financingSource: '', //codigo_proy_financiado
+        commitment: '', //compromiso_ppto_det_doc_adquisicion
+        supplier: '', //razon_social_proveedor
+        nit: '', //nit_proveedor
+        dateTime: '', //fecha_reg_recepcion_pedido
     })
 
     const recDocument = ref({
-        id: '',
-        acta: '',
-        invoice: '',
+        id: '', //reception id
+        acta: '', //Acta number
+        invoice: '', //Invoice number
         financingSourceId: '',
-        observation: '',
-        detDocId: '',
-        status: '',
-        prods: [],
-        procedure: []
+        observation: '', //Reception observation
+        detDocId: '', //Identifier of the document detail related to the reception
+        status: '', //We use this to manage some functionalities in the view, it represent the reception status
+        total: '', //This is the sum of all products
+        prods: [], //Array of products
+        procedure: [] //This is the result of the query we are using to compare the quantity of each product, we are sending this to backend to compare with a updated query
     })
 
     const {
@@ -103,6 +104,7 @@ export const useRecepcion = (context) => {
 
     const setModalValues = (data, id) => {
         const recepData = data.recep
+        //Set the general information to show in the view
         infoToShow.value.docName = data.itemInfo.documento_adquisicion.tipo_documento_adquisicion.nombre_tipo_doc_adquisicion + " " + data.itemInfo.documento_adquisicion.numero_doc_adquisicion
         infoToShow.value.itemName = upperCase(data.itemInfo.nombre_det_doc_adquisicion)
         infoToShow.value.financingSource = data.itemInfo.fuente_financiamiento.codigo_proy_financiado
@@ -117,9 +119,9 @@ export const useRecepcion = (context) => {
 
         // Check if id > 0
         if (id > 0) {
-            recDocument.value.id = recepData.id_recepcion_pedido
-            recDocument.value.acta = recepData.acta_recepcion_pedido
-            recDocument.value.invoice = recepData.factura_recepcion_pedido
+            recDocument.value.id = recepData.id_recepcion_pedido //Set reception id
+            recDocument.value.acta = recepData.acta_recepcion_pedido //Set acta number
+            recDocument.value.invoice = recepData.factura_recepcion_pedido //Set invoice number
             recDocument.value.observation = recepData.observacion_recepcion_pedido
 
             if (recepData.id_estado_recepcion_pedido === 1) {
@@ -145,17 +147,17 @@ export const useRecepcion = (context) => {
 
                     // Construct array
                     const array = {
-                        detRecId: detRecepId,
-                        prodId: paId,
-                        desc: "",
+                        detRecId: detRecepId, //id_det_recepcion_pedido
+                        prodId: paId, //id_prod_adquisicion
+                        desc: "", //Acquisition product description
                         expiryDate: formatDateVue3DP(element.fecha_vencimiento_det_recepcion_pedido),
-                        perishable: "",
-                        avails: "",
-                        qty: cantRecep,
-                        cost: "",
-                        total: "",
-                        deleted: false,
-                        initial: ""
+                        perishable: "", //If the product is perishable, set to true, otherwise set to false.
+                        avails: "", //Represents the maximum number of products that the user can write.
+                        qty: cantRecep, //Represents the the number of products the user wants to register
+                        cost: "", //Represents the the cost of the product
+                        total: "", //Represents the result of qty x cost for every row
+                        deleted: false, //This is the state of the row, it represents the logical deletion.
+                        initial: "" //Represents the initial availability of a product
                     };
 
                     // Push array to prods
@@ -261,7 +263,7 @@ export const useRecepcion = (context) => {
                 }
             }
         }
-        //recDocument.value.total = sum.toFixed(2);
+        recDocument.value.total = sum.toFixed(2);
         return sum.toFixed(2);
     });
 

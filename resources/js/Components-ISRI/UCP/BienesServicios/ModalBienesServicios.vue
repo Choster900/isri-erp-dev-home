@@ -179,6 +179,7 @@
                                 <td colspan="4" class="border border-black">
                                     <!-- {{ idDetDocAdquisicion }} -->
                                     <Multiselect :filter-results="false" :searchable="true" :clear-on-search="true"
+                                    @select="onSelectDocAdquisicion($event)"
                                         v-model="idDetDocAdquisicion" placeholder="-" :min-chars="1" :classes="{
                                             container: `relative mx-auto w-full h-6 flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none ${errorsValidation.idDetDocAdquisicion ? 'bg-red-500' : ''}`,
                                             placeholder: `flex items-center text-center h-full absolute left-0 top-0 pointer-events-none leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ${errorsValidation.idDetDocAdquisicion ? 'bg-red-500' : ''}`,
@@ -209,7 +210,8 @@
                                         :class="{ 'bg-red-500': errorsValidation[`productAdq.${i}.detalleDoc.${j}.idProducto`] }"
                                         style="padding-left: 0 !important; padding-right: 0 !important; ">
                                         <div class="absolute top-0 w-full flex flex-col items-center">
-                                            <Multiselect :filter-results="false" :canClear="false" :resolve-on-load="false"
+
+                                            <!-- <Multiselect :filter-results="false" :canClear="false" :resolve-on-load="false"
                                                 v-if="detalle.estadoProdAdquisicion == 1" v-model="detalle.idProducto"
                                                 :delay="1000" :searchable="true" :clear-on-search="true" :min-chars="3"
                                                 @select="setInformacionProduct($event, i, j)" :classes="{
@@ -224,7 +226,22 @@
                                                 }" noOptionsText="<p class='text-xs'>Lista vacia<p>"
                                                 noResultsText="<p class='text-xs'>Sin resultados de producto <p>" :options="async function (query) {
                                                     return await handleProductoSearchByCodigo(query)
-                                                }" />
+                                                }" /> -->
+
+                                            <Multiselect :filter-results="false" :canClear="false" :resolve-on-load="false"
+                                                v-if="detalle.estadoProdAdquisicion == 1" v-model="detalle.idProducto"
+                                                :delay="1000" :searchable="true" :clear-on-search="true" :min-chars="3"
+                                                @select="setInformacionProduct($event, i, j)" :classes="{
+                                                    placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                                    search: 'w-full absolute text-start inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5 pr-3.5',
+                                                    container: 'relative mx-auto w-full h-7  flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none',
+                                                    singleLabel: 'pr-16 text-[8pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5  box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+                                                    singleLabelText: 'text-center overflow-ellipsis overflow-hidden block whitespace-nowrap max-w-full',
+                                                    option: 'flex items-center justify-start box-border text-left cursor-pointer text-[7.5pt] leading-snug py-2 px-3',
+                                                    optionSelected: 'text-white bg-[#001c48]',
+                                                    optionPointed: 'text-gray-800 bg-gray-100',
+                                                }" noOptionsText="<p class='text-xs'>Lista vacia<p>"
+                                                noResultsText="<p class='text-xs'>Sin resultados de producto <p>" :options="productDataSearched" />
 
                                             <Multiselect :filter-results="false" :canClear="false" :resolve-on-load="false"
                                                 :disabled="estadoDocAdq !== 1" v-else v-model="detalle.idProducto" :classes="{
@@ -508,7 +525,7 @@ export default {
         },
     },
     // Configuración del componente utilizando el nuevo sistema de configuración de Vue 3
-    setup(props) {
+    setup(props, { emit }) {
 
         const { propProdAdquisicion, showModal } = toRefs(props)
         const {
@@ -522,6 +539,7 @@ export default {
             saveProductAdquisicionRequest,
             idDetDocAdquisicion,
             arrayWhenIsEditingDocAdq,
+            onSelectDocAdquisicion,
             arrayDocAdquisicion,
             addinDocAdquisicion,
             deleteProductAdq,
@@ -531,6 +549,7 @@ export default {
             productDataSearched,
             setInformacionProduct,
             estadoDocAdq,
+            ArrayProductFiltered,
             arrayProductsWhenIsEditable,
             arrayProductoAdquisicion,
             errorsValidation,
@@ -660,7 +679,7 @@ export default {
                 showCloseButton: true,
             });
             if (confirmed.isConfirmed) {
-                executeRequest(
+                await  executeRequest(
                     saveProductAdquisicionRequest(),
                     "¡El documento de adquisicion se ha guardado correctamente!"
                 );
@@ -688,7 +707,7 @@ export default {
                 showCloseButton: true,
             });
             if (confirmed.isConfirmed) {
-                executeRequest(
+                await  executeRequest(
                     updateProductAdquisicionRequest(),
                     "¡El documento de adquisicion se ha actualizado correctamente!"
                 );
@@ -697,12 +716,14 @@ export default {
         }
 
         return {
+            onSelectDocAdquisicion,
             deletLineaTrabajo,
             deleteProductAdq,
             idLt,
             arrayWhenIsEditingDocAdq,
             errorsValidation,
             arrayMarca,
+            ArrayProductFiltered,
             addingRows,
             disableLt,
             objectGetFromProp,
@@ -713,6 +734,7 @@ export default {
             moment,
             addinDocAdquisicion,
             updateProductAdquisicion,
+            productDataSearched,
             arrayCentroAtencion,
             arrayDocAdquisicion,
             idDetDocAdquisicion,

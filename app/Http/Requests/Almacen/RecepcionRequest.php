@@ -22,6 +22,7 @@ class RecepcionRequest extends FormRequest
      */
     public function rules(Request $request)
     {
+        $rules["invoice"] = ['required'];
         foreach ($this->input('prods', []) as $key => $prod) {
             $rules["prods.{$key}.prodId"] = [
                 function ($attribute, $value, $fail) use ($key, $prod) {
@@ -58,7 +59,7 @@ class RecepcionRequest extends FormRequest
     public function messages()
     {
         $messages = [];   
-        // $messages["number.unique"] = "Este numero de recibo ya ha sido registrado.";
+        $messages["invoice.required"] = "Debe ingresar factura.";
         return $messages;
     }
 }

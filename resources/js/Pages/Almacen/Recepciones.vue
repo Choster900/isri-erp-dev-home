@@ -1,21 +1,11 @@
 <template>
     <Head title="Producto - Recepciones" />
     <AppLayoutVue nameSubModule="Almacen - Productos">
-        <div v-if="isLoadingTop"
-            class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
-            <div role="status" class="flex items-center">
-                <svg aria-hidden="true" class="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-800"
-                    viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path
-                        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                        fill="currentColor" />
-                    <path
-                        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                        fill="currentFill" />
-                </svg>
-                <div class="bg-gray-200 rounded-lg p-1 font-semibold">
-                    <span class="text-blue-800">CARGANDO...</span>
-                </div>
+        <div v-if="isLoadingTop || isLoadingSend"
+            class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-900 opacity-75 z-50">
+            <div class="flex items-center justify-center my-4">
+                <img src="../../../img/loader-spinner.gif" alt="" class="w-8 h-8">
+                <h1 class="ml-4 font-medium text-xl text-white font-[Roboto]">Procesando...</h1>
             </div>
         </div>
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
@@ -49,35 +39,37 @@
                     <tbody v-if="!isLoadinRequest" class="text-sm divide-y divide-slate-200">
                         <tr v-for="reception in dataToShow" :key="reception.id_recepcion_pedido" class="hover:bg-gray-200">
                             <td class="px-2 first:pl-5 last:pr-5">
-                                <div class="font-medium text-slate-800 flex items-center justify-center min-h-[50px]">
+                                <div class="font-medium text-slate-800 flex items-center justify-center min-h-[40px]">
                                     {{ reception.id_recepcion_pedido }}
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5">
-                                <div class="font-medium text-slate-800 text-center">
-                                    {{
-                                        reception.det_doc_adquisicion.documento_adquisicion.tipo_documento_adquisicion.siglas_tipo_doc_adquisicion
-                                    }}
-                                    - {{ reception.det_doc_adquisicion.documento_adquisicion.numero_doc_adquisicion }}
-                                </div>
-                            </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">
-                                    {{ reception.det_doc_adquisicion.nombre_det_doc_adquisicion }}
-                                </div>
-                            </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap">
                                 <div class="font-medium text-slate-800 text-center">
                                     {{ reception.acta_recepcion_pedido }}
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">
+                            <td class="px-2 first:pl-5 last:pr-5">
+                                <div class="font-medium text-slate-800 flex items-center justify-center min-h-[40px]">
+                                    {{ reception.det_doc_adquisicion.documento_adquisicion.id_tipo_doc_adquisicion === 1 ? 'CONTRATO' : 'ORDEN' }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5">
+                                <div class="font-medium text-slate-800 flex items-center justify-center min-h-[40px]">
+                                     {{ reception.det_doc_adquisicion.documento_adquisicion.numero_doc_adquisicion }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap">
+                                <div class="font-medium text-slate-800 flex items-center justify-center min-h-[40px]">
+                                    ${{ reception.monto_recepcion_pedido }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap">
+                                <div class="font-medium text-slate-800 flex items-center justify-center min-h-[40px]">
                                     {{ moment(reception.fecha_recepcion_pedido, 'YYYY/MM/DD').format('D-MMM-YYYY') }}
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center">
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap">
+                                <div class="font-bold text-[13px] text-slate-800 flex items-center justify-center min-h-[40px]">
                                     <div :class="{
                                         ' text-emerald-600 bg-emerald-100 ': reception.id_estado_recepcion_pedido == 1,
                                         ' text-blue-600 bg-blue-100 ': reception.id_estado_recepcion_pedido == 2,
@@ -110,12 +102,20 @@
                                             <div class="font-semibold pt-0.5">Editar</div>
                                         </div>
                                         <div @click="showModalRecep = true; recepId = reception.id_recepcion_pedido"
-                                            v-if="reception.id_estado_recepcion_pedido != 1"
+                                            v-if="reception.id_estado_recepcion_pedido == 3"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-blue-800 w-[25px] h-[25px] mr-2">
                                                 <icon-m :iconName="'see'"></icon-m>
                                             </div>
                                             <div class="font-semibold pt-0.5">Ver</div>
+                                        </div>
+                                        <div @click="printReception(reception.id_recepcion_pedido)"
+                                            v-if="reception.id_estado_recepcion_pedido == 2"
+                                            class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
+                                            <div class="text-red-800 w-[23px] h-[23px] mr-1.5 ml-0.5">
+                                                <icon-m :iconName="'download-file'"></icon-m>
+                                            </div>
+                                            <div class="font-semibold pt-0.5">PDF</div>
                                         </div>
                                         <div @click="changeStatusElement(reception.id_recepcion_pedido, reception.id_estado_recepcion_pedido)"
                                             v-if="permits.eliminar === 1 && reception.id_estado_recepcion_pedido == 1"
@@ -155,7 +155,7 @@
             </div>
 
         </div>
-        <div v-if="!emptyObject" class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
+        <div v-if="!emptyObject" class="px-6 py-4 bg-white shadow-lg rounded-sm border-slate-200 relative">
             <div>
                 <nav class="flex justify-between" role="navigation" aria-label="Navigation">
                     <div class="grow text-center">
@@ -214,6 +214,7 @@ import { usePermissions } from '@/Composables/General/usePermissions.js';
 import { useToDataTable } from '@/Composables/General/useToDataTable.js';
 import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
+import { useEnviarKardex } from '@/Composables/Almacen/Recepcion/useEnviarKardex.js';
 import { toast } from "vue3-toastify";
 import 'vue3-toastify/dist/index.css';
 
@@ -234,22 +235,30 @@ export default {
         const showModalKardex = ref(false)
 
         const recepId = ref(0)
+        const isLoadingTop = ref(false)
 
         const columns = [
             { width: "10%", label: "Id", name: "id_recepcion_pedido", type: "text" },
-            { width: "20%", label: "Documento", name: "documento", type: "text" },
-            { width: "30%", label: "Item", name: "item", type: "text" },
-            { width: "10%", label: "acta", name: "acta_recepcion_pedido", type: "text" },
+            { width: "15%", label: "acta", name: "acta_recepcion_pedido", type: "text" },
+            {
+                width: "12%", label: "TIPO DOC", name: "tipo_documento", type: "select",
+                options: [
+                    { value: "1", label: "CONTRATO" },
+                    { value: "2", label: "ORDEN" },
+                ]
+            },
+            { width: "20%", label: "Numero", name: "numero_documento", type: "text" },
+            { width: "15%", label: "Monto", name: "monto_recepcion_pedido", type: "text" },
             { width: "10%", label: "fecha", name: "fecha_recepcion_pedido", type: "date" },
             {
-                width: "10%", label: "Estado", name: "id_estado_recepcion_pedido", type: "select",
+                width: "13%", label: "Estado", name: "id_estado_recepcion_pedido", type: "select",
                 options: [
                     { value: "1", label: "CREADO" },
                     { value: "2", label: "PROCESADO" },
                     { value: "3", label: "ELIMINADO" }
                 ]
             },
-            { width: "10%", label: "Acciones", name: "Acciones" },
+            { width: "5%", label: "Acciones", name: "Acciones" },
         ];
         const requestUrl = "/recepciones"
         const columntToSort = "id_recepcion_pedido"
@@ -261,10 +270,14 @@ export default {
             links, sortKey,
             sortOrders,
             isLoadinRequest,
-            isLoadingTop,
             emptyObject,
             getDataToShow, handleData, sortBy
         } = useToDataTable(columns, requestUrl, columntToSort, dir)
+
+        const {
+            isLoadingSend, 
+            printReception
+        } = useEnviarKardex(context);
 
         const changeStatusElement = async (elementId, status) => {
             swal({
@@ -304,8 +317,8 @@ export default {
 
         return {
             permits, dataToShow, showModalRecep, tableData, perPage, recepId, showModalKardex,
-            links, sortKey, sortOrders, isLoadinRequest, isLoadingTop, emptyObject, columns,
-            getDataToShow, handleData, sortBy, changeStatusElement, moment
+            links, sortKey, sortOrders, isLoadinRequest, isLoadingTop, emptyObject, columns, isLoadingSend,
+            getDataToShow, handleData, sortBy, changeStatusElement, moment, printReception
         };
     },
 }

@@ -167,7 +167,8 @@
                     <div class="max-w-[97%] min-w-[690px] border-b border-gray-500 flex">
                         <div class="flex w-full">
                             <div
-                                class="justify-start flex items-center hover:bg-gray-200 w-[23%] border-x min-w-[175px] h-[65px] bg-white border-gray-500">
+                                class="justify-start flex items-center hover:bg-gray-200 w-[23%] border-x min-w-[175px] h-[65px] border-gray-500"
+                                :class="errors.invoice ? 'bg-red-300' : 'bg-white'">
                                 <p class="font-[MuseoSans] text-gray-600 text-[12px] mx-2">FACTURA:</p>
                                 <input v-model="recDocument.invoice" :disabled="infoToShow.status != 1"
                                     @input="handleValidation('invoice', { limit: 20 })"
