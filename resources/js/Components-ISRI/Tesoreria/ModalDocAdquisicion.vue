@@ -242,7 +242,7 @@
                                     </div>
                                 </div>
                                 <!-- third row -->
-                                <div class="mb-4 md:mr-2 md:mb-0 basis-full"
+                                <!-- <div class="mb-4 md:mr-2 md:mb-0 basis-full"
                                     style="border: none; background-color: transparent;">
                                     <label class="block mb-2 text-xs font-light text-gray-600" for="descripcion">
                                         Administrador de documento
@@ -253,7 +253,7 @@
                                         @input="handleValidation('contract_manager', { limit: 250 })">
                                     </textarea>
                                     <InputError class="mt-2" :message="item_errors.contract_manager" />
-                                </div>
+                                </div> -->
                                 <!-- Add item button -->
                                 <div class="flex justify-center mb-2 mt-1">
                                     <div class="flex items-center">
