@@ -85,7 +85,6 @@ export const useDocumentoAdquisicion = (context) => {
             );
             setModalValues(response.data)
         } catch (err) {
-            console.log(err);
             if (err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
                 context.emit("get-table");
@@ -99,7 +98,6 @@ export const useDocumentoAdquisicion = (context) => {
     };
 
     const setModalValues = (data) => {
-        console.log(data);
         //Set the multiselects options
         management_types.value = data.management_types
         financing_sources.value = data.financing_sources
@@ -262,6 +260,7 @@ export const useDocumentoAdquisicion = (context) => {
     }
 
     const storeDocumentoAdquisicion = async (doc) => {
+        console.log(doc);
         const all_deleted = acq_doc.value.items.every(item => item.deleted === true);
         if (all_deleted) {
             useShowToast(toast.warning, "Debes agregar al menos un item al documento.");

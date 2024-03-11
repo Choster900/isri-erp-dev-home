@@ -3,11 +3,12 @@
         <!-- Document header -->
         <div class="flex w-full">
             <!-- Columna 1 -->
-            <div class="w-[23%]  border border-gray-500 p-1">
+            <div class="w-[23%] flex justify-center items-center border border-gray-500 p-1">
                 <img src="../../../img/isri-gob.png" alt="Logo del instituto" class="w-full my-auto">
             </div>
             <!-- Columna 2 -->
-            <div class="w-[77%]  border-y border-r border-gray-500 p-1">
+            <div
+                class="w-[77%] justify-center items-center border-y border-r border-gray-500 pb-[10px]">
                 <p class="font-[Bembo] text-center text-[12px] font-bold">ALMACEN CENTRAL</p>
                 <p class="font-[Bembo] text-center text-[12px] font-bold">
                     RECEPCION DE BIENES&nbsp;Y SERVICIOS
@@ -21,6 +22,7 @@
                 </p>
             </div>
         </div>
+
         <!-- Date and time, financing source and commitment number -->
         <div class="flex w-full border-x border-gray-500 pt-2">
             <div class="w-[50%] flex justify-start items-center text-[12px] mt-[-5px] pb-[8px]">
@@ -59,8 +61,9 @@
         </div>
         <!-- Third row -->
         <div class="flex bg-gray-800  justify-center items-center font-[MuseoSans] pb-[12px]">
-            <p class="font-[MuseoSans] font-bold text-white text-[11px]">ACTA DE RECEPCION DE BIENES {{ recToPrint.acta_recepcion_pedido
-                }}</p>
+            <p class="font-[MuseoSans] font-bold text-white text-[11px]">ACTA DE RECEPCION DE BIENES {{
+                        recToPrint.acta_recepcion_pedido
+                    }}</p>
         </div>
 
         <!-- Table header -->
@@ -173,8 +176,10 @@
                         == 1 ? recToPrint.incumplimiento_recepcion_pedido : "Sin incumplimiento." }}</p>
             </div>
         </div>
-        <div class="mt-[70px]"> <!-- Signatures -->
-            <div class="mb-[50px]"> <!-- First segment -->
+        <div class="" style="page-break-inside: avoid;"> <!-- Signatures -->
+            <p class="text-center font-[MuseoSans] text-[12px] pt-[20px] mt-[-5px] font-bold">Firmas acta de recepcion
+                de bienes {{ recToPrint.acta_recepcion_pedido }}</p>
+            <div class="mb-[50px] pt-[70px]"> <!-- First segment -->
                 <div class="flex w-full mb-1">
                     <div class="w-[50%] flex justify-center ">
                         <p class="mb-[6px] text-[12px] font-[MuseoSans] mt-[-5px] font-bold mr-1">F.</p>

@@ -248,7 +248,7 @@ class RecepcionController extends Controller
                 if ($compare->total_menos_acumulado == $prod['initial']) { //$prod['initial] is 'total_menos_acumulado' from the view
                     $prodAdq = ProductoAdquisicion::find($prod['prodId']);
                     $newDet = new DetalleRecepcionPedido([
-                        'id_centro_atencion'                        => $rec->id_recepcion_pedido,
+                        'id_centro_atencion'                        => $prodAdq->id_centro_atencion,
                         'id_producto'                               => $prodAdq->id_producto,
                         'id_recepcion_pedido'                       => $rec->id_recepcion_pedido,
                         'id_marca'                                  => $prodAdq->id_marca,

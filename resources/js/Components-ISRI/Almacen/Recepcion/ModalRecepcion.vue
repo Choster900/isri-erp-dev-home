@@ -191,16 +191,16 @@
                             </div>
                         </div>
                     </div>
-                    <div class="max-w-full min-w-[705px] flex">
+                    <div class="max-w-[97%] min-w-[690px] flex">
                         <div
-                            class="flex w-[97%] bg-[#001c48] border-b border-x border-gray-500 bg-opacity-80 min-w-[690px] text-white">
+                            class="flex w-full bg-[#001c48] border-b border-x border-gray-500 bg-opacity-80 min-w-[690px] text-white">
                             <!-- Cabecera de la tabla -->
                             <div class="w-[23%] min-w-[175px] border-r border-gray-500 h-[30px]">
-                                <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px] w-full">PRODUCTO
+                                <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px]">PRODUCTO
                                 </p>
                             </div>
                             <div class="w-[23%] min-w-[175px] border-r border-gray-500 h-[30px]">
-                                <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px] w-full">
+                                <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px]">
                                     DESCRIPCION</p>
                             </div>
                             <div class="w-[8%] min-w-[60px] border-r border-gray-500 h-[30px]">
@@ -219,22 +219,13 @@
                                 <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px]">TOTAL</p>
                             </div>
                         </div>
-                        <div class="flex w-[3%]">
-                            <div class="w-full min-w-[15px] h-[30px]">
-                                <svg v-if="infoToShow.status != 3" @click="addNewRow()"
-                                    class="text-green-600 cursor-pointer hover:text-green-800" width="28px" height="28px"
-                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 6V18M6 12H18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round" />
-                                </svg>
-                            </div>
-                        </div>
+                        <!--  -->
                     </div>
                     <template v-for="(prod, index) in recDocument.prods" :key="index">
-                        <div :id="'row-' + index" v-if="prod.deleted == false" class="max-w-full flex min-w-[705px] ">
-                            <div class="flex w-[97%] min-w-[690px] bg-white hover:bg-gray-200 text-gray-800">
+                        <div :id="'row-' + index" v-if="prod.deleted == false" class="max-w-full flex min-w-[705px]">
+                            <div class="flex w-[97%] min-w-[690px] bg-white hover:bg-gray-200 text-gray-800 border-b border-x border-gray-500">
                                 <!-- Cabecera de la tabla -->
-                                <div class="w-[23%] min-w-[175px] flex items-center justify-center border-x border-b  border-gray-500 min-h-[75px]"
+                                <div class="w-[23%] min-w-[175px] flex items-center justify-center border-r border-gray-500 min-h-[75px]"
                                     :class="errors['prods.' + index + '.prodId'] ? 'bg-red-300' : ''">
                                     <Multiselect id="doc" v-model="prod.prodId" :options="filteredProds" class="h-[35px]"
                                         :disabled="infoToShow.status != 1" :searchable="true"
@@ -245,20 +236,20 @@
                                         }" />
                                 </div>
                                 <div
-                                    class="w-[23%] min-w-[175px] flex items-center justify-center border-r border-b  border-gray-500 min-h-[75px]">
+                                    class="w-[23%] min-w-[175px] flex items-center justify-center border-r  border-gray-500 min-h-[75px]">
                                     <p class="font-[MuseoSans] text-sm p-1 ">{{ prod.desc }}</p>
                                 </div>
-                                <div class="w-[8%] min-w-[60px] flex items-center justify-center border-r border-b  border-gray-500 min-h-[75px]"
+                                <div class="w-[8%] min-w-[60px] flex items-center justify-center border-r border-gray-500 min-h-[75px]"
                                     :class="prod.avails < 0 ? 'bg-red-300' : ''">
                                     <p class="font-[MuseoSans] text-sm p-1 ">{{ prod.avails }}</p>
                                 </div>
-                                <div class="w-[12%] min-w-[100px] flex items-center justify-center border-r border-b  border-gray-500 min-h-[75px]"
+                                <div class="w-[12%] min-w-[100px] flex items-center justify-center border-r border-gray-500 min-h-[75px]"
                                     :class="errors['prods.' + index + '.expiryDate'] ? 'bg-red-300' : ''">
                                     <date-time-picker-m v-if="prod.perishable === 1" v-model="prod.expiryDate"
                                         :showIcon="false" :placeholder="'Seleccione'" :disabled="infoToShow.status != 1" />
                                     <p v-else class="font-[MuseoSans] text-sm p-1 ">N/A</p>
                                 </div>
-                                <div class="w-[10%] min-w-[60px] flex items-center justify-center border-r border-b  border-gray-500 min-h-[75px]"
+                                <div class="w-[10%] min-w-[60px] flex items-center justify-center border-r border-gray-500 min-h-[75px]"
                                     :class="errors['prods.' + index + '.qty'] ? 'bg-red-300' : ''">
                                     <input v-model="prod.qty" :disabled="infoToShow.status != 1"
                                         class="font-bold max-w-[75%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-sm border-[#d1d5db]"
@@ -266,13 +257,13 @@
                                         @input="handleValidation('qty', { limit: 3, number: true }, { index: index, qty: prod.qty, prodId: prod.prodId })">
                                 </div>
                                 <div
-                                    class="w-[12%] min-w-[60px] flex items-center justify-center border-r border-b  border-gray-500 min-h-[75px]">
+                                    class="w-[12%] min-w-[60px] flex items-center justify-center border-r border-gray-500 min-h-[75px]">
                                     <p class="font-[MuseoSans] text-sm p-1 ">
                                         {{ prod.cost != '' ? '$' + prod.cost : '' }}
                                     </p>
                                 </div>
                                 <div
-                                    class="w-[12%] min-w-[60px] flex items-center justify-center border-r border-b  border-gray-500 min-h-[75px]">
+                                    class="w-[12%] min-w-[60px] flex items-center justify-center min-h-[75px]">
                                     <p class="font-[MuseoSans] text-sm p-1 font-bold">
                                         {{ prod.total != '' ? '$' + prod.total : '' }}
                                     </p>
@@ -296,20 +287,30 @@
                             </div>
                         </div>
                     </template>
-                    <div class="max-w-[97%] min-w-[540px] flex">
-                        <div class="flex w-full">
+                    <div class="max-w-full min-w-[705px] flex">
+                        <div class="flex w-[97%] min-w-[690px] border-x border-b border-gray-500">
                             <div
-                                class="justify-center flex w-[66%] border-l border-b min-w-[490px] h-[30px] bg-white border-gray-500">
+                                class="justify-center flex w-[66%] min-w-[490px] h-[30px] bg-white border-gray-500">
 
                             </div>
                             <div
-                                class="justify-center flex border-r border-b w-[22%] min-w-[140px] h-[30px]  border-gray-500">
+                                class="justify-center flex border-r w-[22%] min-w-[140px] h-[30px]  border-gray-500">
                                 <p class="font-[MuseoSans] text-sm py-2 font-bold mt-[-4px]">TOTAL ACTA</p>
                             </div>
                             <div
-                                class="justify-center flex border-r border-b w-[12%] min-w-[60px] h-[30px]  border-gray-500">
+                                class="justify-center flex w-[12%] min-w-[60px] h-[30px] ">
                                 <p class="font-[MuseoSans] text-sm py-2 font-bold text-green-800 mt-[-4px]">${{ totalRec }}
                                 </p>
+                            </div>
+                        </div>
+                        <div class="flex w-[3%]">
+                            <div class="w-full min-w-[15px] h-[30px]">
+                                <svg v-if="infoToShow.status != 3" @click="addNewRow()"
+                                    class="text-green-600 cursor-pointer hover:text-green-800" width="28px" height="28px"
+                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 6V18M6 12H18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                </svg>
                             </div>
                         </div>
                     </div>
