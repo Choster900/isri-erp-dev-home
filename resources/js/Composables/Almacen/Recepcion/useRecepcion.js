@@ -150,7 +150,7 @@ export const useRecepcion = (context) => {
                         detRecId: detRecepId, //id_det_recepcion_pedido
                         prodId: paId, //id_prod_adquisicion
                         desc: "", //Acquisition product description
-                        expiryDate: formatDateVue3DP(element.fecha_vencimiento_det_recepcion_pedido),
+                        //expiryDate: formatDateVue3DP(element.fecha_vencimiento_det_recepcion_pedido),
                         perishable: "", //If the product is perishable, set to true, otherwise set to false.
                         avails: "", //Represents the maximum number of products that the user can write.
                         qty: cantRecep, //Represents the the number of products the user wants to register
@@ -192,11 +192,11 @@ export const useRecepcion = (context) => {
             });
             recDocument.value.prods[index].desc =
                 selectedProd.nombre_producto + ' -- ' +
-                selectedProd.abreviatura_unidad_medida + ' -- ' +
+                selectedProd.nombre_unidad_medida + ' -- ' +
                 selectedProd.descripcion_prod_adquisicion
 
             recDocument.value.prods[index].perishable = recepId ? recDocument.value.prods[index].perishable : ''
-            recDocument.value.prods[index].expiryDate = recepId ? recDocument.value.prods[index].expiryDate : ''
+            //recDocument.value.prods[index].expiryDate = recepId ? recDocument.value.prods[index].expiryDate : ''
             recDocument.value.prods[index].avails = selectedProd.total_menos_acumulado
             recDocument.value.prods[index].perishable = selectedProd.perecedero_producto
             recDocument.value.prods[index].cost = selectedProd.costo_prod_adquisicion
@@ -206,7 +206,7 @@ export const useRecepcion = (context) => {
         } else {
             recDocument.value.prods[index].desc = ""
             recDocument.value.prods[index].perishable = ""
-            recDocument.value.prods[index].expiryDate = ""
+            //recDocument.value.prods[index].expiryDate = ""
             recDocument.value.prods[index].avails = ""
             recDocument.value.prods[index].qty = ""
             recDocument.value.prods[index].cost = ""
@@ -273,7 +273,7 @@ export const useRecepcion = (context) => {
                 detRecId: "",
                 prodId: "",
                 desc: "",
-                expiryDate: '',
+                //expiryDate: '',
                 perishable: "",
                 avails: "",
                 qty: "",
