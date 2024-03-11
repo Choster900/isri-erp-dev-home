@@ -34,7 +34,8 @@ class RecepcionController extends Controller
                 'detalle_recepcion',
                 'det_doc_adquisicion.documento_adquisicion.tipo_documento_adquisicion',
                 'estado_recepcion'
-            ]);
+            ])
+            ->where('id_proy_financiado',"!=",4);
 
         if ($column == 2) { //Order by document type
             $query->orderByRaw('
