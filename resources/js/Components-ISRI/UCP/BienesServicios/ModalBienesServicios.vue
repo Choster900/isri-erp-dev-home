@@ -36,7 +36,7 @@
                                             UCP DEL INSITUTO SALVADOREÑO DE REHABILITACION INTEGRAL
                                         </div>
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                            stroke-width="1.5" stroke="currentColor"
+                                            stroke-width="1.5" stroke="currentColor" @click="printPdf"
                                             class="w-5 h-5 ml-2 stroke-slate-400 hover:stroke-slate-500 cursor-pointer">
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z" />
@@ -131,8 +131,7 @@
                             <tr class="*:text-[8pt] *:bg-black *:text-white *:px-2 *:py-0.5 *:font-normal *:border--white">
                                 <th class="border border-black border-r-white border-b-white h-9 w-[110px]">PRODUCTO</th>
                                 <th class="border border-black border-r-white border-b-white w-[110px]">MARCA</th>
-                                <th class="border border-black border-r-white w-40 border-b-white" colspan="2">DESCRIPCION
-                                </th>
+                                <th class="border border-black border-r-white w-40 border-b-white" colspan="2">DESCRIPCION</th>
                                 <th class="border border-black border-r-white border-b-white" colspan="2">U/MEDIDAS</th>
                                 <th class="border border-black border-r-white border-b-white">ESPECIFICO</th>
                                 <th class="border border-black border-r-white border-b-white">DEPENDENCIA</th>
@@ -178,7 +177,7 @@
                                     Doc. Adquisición: </td>
                                 <td colspan="4" class="border border-black">
                                     <!-- {{ idDetDocAdquisicion }} -->
-                                    <Multiselect :filter-results="false" :searchable="true" :clear-on-search="true"
+                                    <Multiselect :filter-results="true" :searchable="true" :clear-on-search="true"
                                     @select="onSelectDocAdquisicion($event)"
                                         v-model="idDetDocAdquisicion" placeholder="-" :min-chars="1" :classes="{
                                             container: `relative mx-auto w-full h-6 flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none ${errorsValidation.idDetDocAdquisicion ? 'bg-red-500' : ''}`,
@@ -211,26 +210,9 @@
                                         style="padding-left: 0 !important; padding-right: 0 !important; ">
                                         <div class="absolute top-0 w-full flex flex-col items-center">
 
-                                            <!-- <Multiselect :filter-results="false" :canClear="false" :resolve-on-load="false"
-                                                v-if="detalle.estadoProdAdquisicion == 1" v-model="detalle.idProducto"
-                                                :delay="1000" :searchable="true" :clear-on-search="true" :min-chars="3"
-                                                @select="setInformacionProduct($event, i, j)" :classes="{
-                                                    placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                                    search: 'w-full absolute text-start inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5 pr-3.5',
-                                                    container: 'relative mx-auto w-full h-7  flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none',
-                                                    singleLabel: 'pr-16 text-[8pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5  box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                                    singleLabelText: 'text-center overflow-ellipsis overflow-hidden block whitespace-nowrap max-w-full',
-                                                    option: 'flex items-center justify-start box-border text-left cursor-pointer text-[7.5pt] leading-snug py-2 px-3',
-                                                    optionSelected: 'text-white bg-[#001c48]',
-                                                    optionPointed: 'text-gray-800 bg-gray-100',
-                                                }" noOptionsText="<p class='text-xs'>Lista vacia<p>"
-                                                noResultsText="<p class='text-xs'>Sin resultados de producto <p>" :options="async function (query) {
-                                                    return await handleProductoSearchByCodigo(query)
-                                                }" /> -->
-
-                                            <Multiselect :filter-results="false" :canClear="false" :resolve-on-load="false"
-                                                v-if="detalle.estadoProdAdquisicion == 1" v-model="detalle.idProducto"
-                                                :delay="1000" :searchable="true" :clear-on-search="true" :min-chars="3"
+                                            <Multiselect :filter-results="true" :canClear="false"
+                                               v-model="detalle.idProducto" :loading="loader"
+                                                 :searchable="true" :clear-on-search="false"
                                                 @select="setInformacionProduct($event, i, j)" :classes="{
                                                     placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
                                                     search: 'w-full absolute text-start inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5 pr-3.5',
@@ -242,21 +224,6 @@
                                                     optionPointed: 'text-gray-800 bg-gray-100',
                                                 }" noOptionsText="<p class='text-xs'>Lista vacia<p>"
                                                 noResultsText="<p class='text-xs'>Sin resultados de producto <p>" :options="productDataSearched" />
-
-                                            <Multiselect :filter-results="false" :canClear="false" :resolve-on-load="false"
-                                                :disabled="estadoDocAdq !== 1" v-else v-model="detalle.idProducto" :classes="{
-                                                    placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                                    search: 'w-full absolute text-start inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5 pr-3.5',
-                                                    container: 'relative mx-auto w-full h-7  flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none',
-                                                    singleLabel: 'pr-16 text-[8pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5  box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                                    singleLabelText: 'text-center overflow-ellipsis overflow-hidden block whitespace-nowrap max-w-full',
-                                                    option: 'flex items-center justify-start box-border text-left cursor-pointer text-[7.5pt] leading-snug py-2 px-3',
-                                                    optionSelected: 'text-white bg-[#001c48]',
-                                                    optionPointed: 'text-gray-800 bg-gray-100',
-                                                    wrapper: `relative mx-auto w-full flex items-center justify-end box-border  outline-none ${estadoDocAdq !== 1 ? 'cursor-not-allowed' : ''}`,
-                                                }" noOptionsText="<p class='text-xs'>Lista vacia<p>"
-                                                noResultsText="<p class='text-xs'>Sin resultados de producto <p>"
-                                                :options="arrayProductsWhenIsEditable" />
                                             <span class="text-center ">{{ detalle.detalleProducto }}</span>
                                         </div>
                                     </td>
@@ -279,6 +246,7 @@
                                                 }" noOptionsText="<p class='text-xs'>Lista vacia<p>"
                                                 noResultsText="<p class='text-xs'>Sin resultados de producto <p>"
                                                 :options="arrayMarca" />
+
                                             <span class="text-center ">
                                                 {{
                                                     // Comprueba si arrayUnidadMedida no
@@ -499,6 +467,11 @@ import Swal from 'sweetalert2';
 import Tooltip from '@/Components-ISRI/Tooltip.vue';
 import moment from 'moment';
 import { executeRequest } from '@/plugins/requestHelpers';
+import { useConfigPdf } from '@/Composables/UCP/BienesServicios/useConfigPdf';
+import { jsPDF } from "jspdf";
+import html2pdf from 'html2pdf.js'
+import { createApp, h } from 'vue'
+import OrdenCompraBienesServicios from "@/pdf/UnidadComprasPublicas/OrdenCompraBienesServicios.vue";
 
 // Define el componente Vue.js
 export default {
@@ -506,7 +479,7 @@ export default {
     components: { ProcessModal, Tooltip },
 
     // Define un array de eventos personalizados que puede emitir este componente
-    emit: ["cerrar-modal","actualizar-datatable"],
+    emit: ["cerrar-modal", "actualizar-datatable"],
 
     // Define las propiedades que este componente puede recibir
     props: {
@@ -538,6 +511,7 @@ export default {
             arrayUnidadMedida,
             saveProductAdquisicionRequest,
             idDetDocAdquisicion,
+            brandsUsedInDoc,
             arrayWhenIsEditingDocAdq,
             onSelectDocAdquisicion,
             arrayDocAdquisicion,
@@ -547,6 +521,7 @@ export default {
             arrayCentroAtencion,
             updateProductAdquisicionRequest,
             productDataSearched,
+            loader,
             setInformacionProduct,
             estadoDocAdq,
             ArrayProductFiltered,
@@ -564,6 +539,7 @@ export default {
                 objectGetFromProp.value = []
                 arrayProductoAdquisicion.value = []
                 arrayWhenIsEditingDocAdq.value = []
+                productDataSearched.value = []
                 // Encuentra el índice del objeto que tiene el valor específico en la propiedad "value"
                 const indexAEliminar = arrayDocAdquisicion.value.findIndex(item => item.value === idDetDocAdquisicion.value);
                 // Si el índice es encontrado (diferente de -1), elimina ese elemento del array
@@ -577,18 +553,18 @@ export default {
                 });
             }
         });
+
         watch(propProdAdquisicion, (newValue, oldValue) => {
             // Verifica si showModal se ha establecido en falso (se cerró el modal)
             if (newValue !== null && newValue !== undefined && (Array.isArray(newValue) ? newValue.length > 0 : newValue !== '')) {
                 // Utiliza el patrón de objeto "guard" para simplificar las verificaciones
                 objectGetFromProp.value = newValue;
                 let productosAdquisiciones = objectGetFromProp.value.productos_adquisiciones;
-
+                console.log(productosAdquisiciones);
                 // Utilizando un conjunto para rastrear los id_lt únicos
                 let idLtSet = new Set();
                 let productArray = new Set();
-
-                console.log(objectGetFromProp.value);
+                let brandArray = new Set();
 
                 estadoDocAdq.value = objectGetFromProp.value.id_estado_doc_adquisicion
 
@@ -598,6 +574,20 @@ export default {
                     dataDoc: objectGetFromProp.value
                 })
 
+                 // Utiliza map en lugar de reduce para simplificar la lógica
+                 brandsUsedInDoc.value = productosAdquisiciones.map(producto => {
+                    let idMarca = producto.id_marca;
+
+                    if (!brandArray.has(idMarca)) {
+                        brandArray.add(idMarca);
+                        const marca = producto.marca;
+                        return {
+                            value: marca.id_marca,
+                            label: marca.nombre_marca
+                        };
+                    }
+                }).filter(Boolean)  // Filtra los elementos nulos o indefinidos
+               /*  console.log(brandsUsedInDoc.value); */
                 // Utiliza map en lugar de reduce para simplificar la lógica
                 arrayProductsWhenIsEditable.value = productosAdquisiciones.map(producto => {
                     let idProduct = producto.id_producto;
@@ -652,6 +642,7 @@ export default {
                         valorTotalProduct: index.cant_prod_adquisicion * index.costo_prod_adquisicion,
                     });
                 });
+                onSelectDocAdquisicion( idDetDocAdquisicion.value)
                 disableLt()
             } else {
                 objectGetFromProp.value = [];
@@ -659,7 +650,6 @@ export default {
                 addinDocAdquisicion()
             }
         });
-
 
         /**
           * Guarda productos adquisicion
@@ -679,14 +669,13 @@ export default {
                 showCloseButton: true,
             });
             if (confirmed.isConfirmed) {
-                await  executeRequest(
+                await executeRequest(
                     saveProductAdquisicionRequest(),
                     "¡El documento de adquisicion se ha guardado correctamente!"
                 );
                 emit("actualizar-datatable");
             }
         };
-
 
         /**
          * Edita productos adquisicion
@@ -707,13 +696,47 @@ export default {
                 showCloseButton: true,
             });
             if (confirmed.isConfirmed) {
-                await  executeRequest(
+                await executeRequest(
                     updateProductAdquisicionRequest(),
                     "¡El documento de adquisicion se ha actualizado correctamente!"
                 );
                 emit("actualizar-datatable");
             }
         }
+
+        //const { printPdf } = useConfigPdf(arrayDocAdquisicion,idDetDocAdquisicion,objectGetFromProp)
+
+        const printPdf = () => {
+    /*         console.log(idDetDocAdquisicion.value);
+            console.log(arrayDocAdquisicion.value); */
+            console.log(objectGetFromProp.value);
+            let fecha = moment().format('DD-MM-YYYY');
+            let name = 'NOMBRE DOCUMENTO - FECHA - CODIGO';
+            const opt = {
+                margin: [0.2, 0.2, 0.1, 0.2], //top, left, bottom, right,
+                filename: 'evaluacion',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+            };
+            // Crear una instancia de la aplicación Vue para generar el componente quedanPDFVue
+            const app = createApp(OrdenCompraBienesServicios, {
+                arrayDocAdquisicion: arrayDocAdquisicion.value,
+                idDetDocAdquisicion: idDetDocAdquisicion.value,
+                objectGetFromProp: objectGetFromProp.value,
+                arrayLineaTrabajo:arrayLineaTrabajo.value,
+                arrayProductoAdquisicion:arrayProductoAdquisicion.value,
+                arrayMarca:brandsUsedInDoc.value,
+            });
+            // Crear un elemento div y montar la instancia de la aplicación en él
+            const div = document.createElement('div');
+            const pdfPrint = app.mount(div);
+            const html = div.outerHTML;
+
+            // Generar y guardar el PDF utilizando html2pdf
+            html2pdf().set(opt).from(html).save();
+    };
 
         return {
             onSelectDocAdquisicion,
@@ -725,9 +748,11 @@ export default {
             arrayMarca,
             ArrayProductFiltered,
             addingRows,
+            printPdf,
             disableLt,
             objectGetFromProp,
             estadoDocAdq,
+            loader,
             calculateTotal,
             arrayLineaTrabajo,
             arrayUnidadMedida,

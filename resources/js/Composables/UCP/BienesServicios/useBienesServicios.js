@@ -22,6 +22,11 @@ export const useBienesServicios = () => {
     const tipoProcesoCompra = ref(null)
 
     const ArrayProductFiltered = ref([])
+
+    // Se creó esta variable 'brandsUsedInDoc' para almacenar información que se enviará al documento PDF.
+    // Esto se hace con el propósito de evitar el procesamiento lento al enviar el documento completo de marcas.
+    const brandsUsedInDoc = ref(null)
+    const loader = ref(null)
     /**
      * Agrega una nueva fila de detalle de adquisición a la matriz de productos de adquisición.
      * @param {number} i - Índice de la fila en la que se agregará el detalle de adquisición.
@@ -385,9 +390,19 @@ export const useBienesServicios = () => {
      * @returns {Promise<void>} - Una promesa que se resuelve después de completar la operación.
      */
     const onSelectDocAdquisicion = async (valueDocument) => {
+        console.log({ valueDocument });
+        console.log(arrayDocAdquisicion.value);
+
         try {
+            loader.value = true;
+            productDataSearched.value = []
             // Obtiene el ID del proceso de compra asociado al documento de adquisición seleccionado.
-            const procesoId = arrayDocAdquisicion.value.find(d => d.value === valueDocument).dataDoc.documento_adquisicion.proceso_compra.id_proceso_compra;
+            const procesoId = arrayDocAdquisicion.value.find(d => d.value === valueDocument)?.dataDoc?.documento_adquisicion?.id_proceso_compra;
+            console.log(procesoId);
+            console.log(arrayDocAdquisicion.value);
+            if (!procesoId) {
+                throw new Error("ID del proceso de compra no encontrado");
+            }
 
             // Realiza una solicitud para obtener los productos asociados al proceso de compra.
             const resp = await axios.post("/get-product-by-proceso", { procesoId });
@@ -396,10 +411,13 @@ export const useBienesServicios = () => {
             productDataSearched.value = resp.data;
         } catch (error) {
             // Manejo de errores: rechaza la promesa, muestra un mensaje de error en la consola y lanza una excepción.
-            console.error("Error en la obtención de productos por proceso:", error);
-            throw new Error("Error en la obtención de productos por proceso");
+            console.error("Error en la obtención de productos por proceso de adquisicion:", error);
+            throw new Error("Error en obtener los productos por proceso de adquisicion: " + error.message);
+        } finally {
+            loader.value = false;
         }
     };
+
 
 
     // Se llama a la función getArrayObject() cuando el componente se monta para realizar alguna lógica específica.
@@ -413,6 +431,7 @@ export const useBienesServicios = () => {
         deletLineaTrabajo,
         disableLt,
         ArrayProductFiltered,
+        loader,
         errorsValidation,
         addinDocAdquisicion,
         arrayProductoAdquisicion,
@@ -432,6 +451,7 @@ export const useBienesServicios = () => {
         productDataSearched,
         addingRows,
         arrayWhenIsEditingDocAdq,
+        brandsUsedInDoc,
         handleProductoSearchByCodigo,
         setInformacionProduct,
     }
