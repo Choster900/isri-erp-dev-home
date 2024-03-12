@@ -327,6 +327,7 @@ export const useDocumentoAdquisicion = (context) => {
                 context.emit("cerrar-modal")
                 context.emit("get-table")
             } else {
+                console.log(err.response);
                 useShowToast(toast.warning, "Tienes algunos errores por favor verifica tus datos.");
                 backend_errors.value = err.response.data.errors;
                 // Itera sobre las propiedades del objeto de errores
