@@ -110,7 +110,7 @@
     <table class="w-full" border="0" cellpadding="0" cellspacing="0">
         <thead>
             <tr class="*:text-[8pt] *:bg-black *:text-white *:px-2 *:py-0.5 *:font-normal *:border--white">
-                <th class="border border-black border-r-white border-b-white h-9 w-[100px]">
+                <th class="border border-black border-r-white border-b-white h-9 w-[90px]">
                     <div style="margin-top: -9px">
                         PRODUCTO
                     </div>
@@ -159,50 +159,132 @@
             </tr>
         </thead>
         <tbody v-for="(docAdq, i) in arrayProductoAdquisicion" :key="i">
-            <tr class="*:border-black cursor-pointer">
-                <td colspan="2"
-                    class="uppercase border bg-black text-[8pt] text-white border-black border-t-white text-center text-selection-disable">
-                    <div style="margin-top: -9px">
+            <tr class="">
+                <td colspan="6"
+                    class="uppercase border py-1 bg-black text-[8pt] text-white border-black border-r-white  text-center ">
+                    <div style="margin-top: -10px">
                         Linea de trabajo:
                     </div>
                 </td>
-                <td colspan="4" class="border border-t-black ">
+
+                <td colspan="5"
+                    class="uppercase border py-1 bg-black text-[8pt] text-white border-black text-center ">
+                    <div style="margin-top: -10px">
+                        Documento de adquisicion:
+                    </div>
+                </td>
+
+            </tr>
+            <tr class="">
+
+                <td colspan="6" class="border border-y-black border-l-black border-r-black">
                     <div style="margin-top: -4px" class="text-[7pt] pb-2 px-0.5">
-                        <!--  {{ idLt }} -->
-                        ATENCIONES DE REHABILTACION INTEGRAL A NIÑOS (AS) CON ALGUNA CONDICION DE DISCAPACIDAD
-                        <!-- {{ arrayLineaTrabajo }} -->
+                        {{ arrayLineaTrabajo.find(d => d.value === docAdq.idLt)?.label }}
                     </div>
                 </td>
-                <td colspan="2"
-                    class="uppercase border bg-black text-[8pt] text-white border-black text-center text-selection-disable">
-                    <div style="margin-top: -9px">
-                        Doc. Adquisición:
-                    </div>
-                </td>
-                <td colspan="4" class="border border-black">
+
+                <td colspan="5" class="border border-y-black border-l-0 border-r-black">
                     <div style="margin-top: -4px" class="text-[7pt] pb-2 px-1   ">
-                        <!-- {{ idDetDocAdquisicion }} -->
                         {{ arrayDocAdquisicion.find(d => d.value === idDetDocAdquisicion)?.label ||
                             '' }}
-                        <!-- SUMINISTRO DE INSUMOS PARA LA PREPARACION DE ALIMENTOS PARA PERSONAS DE LAS DIFERENTES DEPENDENCIAS DEL ISRI -->
                     </div>
 
                 </td>
             </tr>
-            <tr class="*:text-[8pt]  *:px-2 *:py-0.5 *:font-normal *:border *:border-black  cursor-pointer"
-                v-for="(detalle, j) in docAdq.detalleDoc" :key="j">
-                <td class="relative h-20 w-[100px]" style="padding-left: 0 !important; padding-right: 0 !important; ">
-
-                    <div style="margin-top: -42px" class="text-[7pt] pb-2 text-center">
+            <tr style="page-break-inside: avoid;"
+                class="*:px-2 *:py-0.5 *:font-normal *:border *:border-black *:border-l-0" :class="{
+                            '*:border-b-0': j + 1 != docAdq.detalleDoc.length,
+                            '*:border-t-0': j == 0
+                        }" v-for="(detalle, j) in docAdq.detalleDoc" :key="j">
+                <td class="relative  align-top" style="border-left: 1px solid black !important;">
+                    <div class="text-[6pt]  text-center">
                         {{ detalle.detalleProducto }}
+                        {{ j + 1 }}
+                        {{ docAdq.detalleDoc.length }}
                     </div>
                 </td>
-                <td class="relative h-20 w-[100px]" style="padding-left: 0 !important; padding-right: 0 !important; ">
-
-                    <div style="margin-top: -42px" class="text-[7pt] pb-2 text-center">
+                <td class="relative w-[80px] align-top">
+                    <div class="text-[6pt]  text-center">
                         {{ arrayMarca.find(d => d.value === detalle.idMarca).label }}
                     </div>
                 </td>
+                <td class="relative w-32 uppercase align-top" colspan="2">
+                    <div class="text-[6pt] text-center pb-2">
+                        {{ detalle.descripcionProdAdquisicion }}
+                    </div>
+                </td>
+                <td class="relative  w-[80px] align-top" colspan="2">
+                    <div class="text-[6pt]  text-center">
+                        {{
+                            arrayUnidadMedida
+                                .find(d => d.value === detalle.pesoProducto)
+                                .dataUnidad.nombre_unidad_medida
+                        }}
+                    </div>
+                </td>
+                <td class=" relative text-center align-top">
+                    <div class="text-[6pt]  text-center">
+                        {{ detalle.especifico }}
+
+                    </div>
+                </td>
+                <td class="relative h-20 w-[100px] align-top">
+
+                    <div class="text-[6pt]  text-center">
+                        {{ arrayCentroAtencion.
+                            find(d => d.value === detalle.idCentroAtencion)
+                            .label }}
+                    </div>
+                </td>
+
+                <td class=" w-12 relative align-top">
+                    <div class="text-[6pt]  text-center">
+                        {{ detalle.cantProdAdquisicion }}
+                    </div>
+
+                </td>
+
+                <td class=" relative text-center align-top">
+                    <div class="text-[6pt]  text-center">
+                        ${{ detalle.costoProdAdquisicion }}
+                    </div>
+                </td>
+                <td class="relative text-center w-20 align-top ">
+                    <div class="text-[6pt]  text-center">
+                        ${{ detalle.valorTotalProduct !== undefined ?
+                            detalle.valorTotalProduct.toLocaleString('en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            }) : '00.00' }}
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+        <tbody >
+            <tr class="">
+                <td colspan="10"
+                    class="pl-7 uppercase border py-1 bg-black text-[8pt] text-white border-x-0 border-t-0 border-b-white   text-start ">
+                    <div style="margin-top: -10px">
+                        total
+                    </div>
+                </td>
+
+                <td colspan="1"
+                    class="uppercase border py-1 bg-black text-[8pt] text-white border-b-white border-x-0 border-t-0  text-center ">
+                    <div style="margin-top: -10px">
+                        $ 1500.00
+                    </div>
+                </td>
+
+            </tr>
+            <tr class="">
+                <td colspan="11"
+                    class="uppercase border py-1 bg-black text-[8pt] text-white border-x-0 border-t-0 border-r-white  text-center ">
+                    <div style="margin-top: -10px">
+                        SON: SIETE MIL OCHENTA DOS 48/100 DOLARES
+                    </div>
+                </td>
+
 
             </tr>
         </tbody>
@@ -239,6 +321,16 @@ export default {
             required: true,
         },
         arrayMarca: {
+            type: Object,
+            default: () => { },
+            required: true,
+        },
+        arrayUnidadMedida: {
+            type: Object,
+            default: () => { },
+            required: true,
+        },
+        arrayCentroAtencion: {
             type: Object,
             default: () => { },
             required: true,

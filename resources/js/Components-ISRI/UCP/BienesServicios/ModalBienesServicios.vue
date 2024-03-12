@@ -142,13 +142,20 @@
                         </thead>
                         <tbody v-for="(docAdq, i) in arrayProductoAdquisicion" :key="i" v-show="docAdq.estadoLt != 0">
                             <tr class="*:border-black cursor-pointer" :class="{ 'custom-pulse': docAdq.hoverToDelete }">
-                                <td colspan="2" @click="docAdq.vShowLt = !docAdq.vShowLt"
+                                <td colspan="6" @click="docAdq.vShowLt = !docAdq.vShowLt"
                                     @mouseover=" docAdq.hoverToDelete = true" @mouseout=" docAdq.hoverToDelete = false"
                                     @contextmenu.prevent="estadoDocAdq !== 1 ? '' : deletLineaTrabajo(i)"
-                                    class="uppercase border bg-black text-[8pt] text-white border-black border-t-white text-center text-selection-disable">
+                                    class="uppercase border bg-black text-[8pt] text-white border-black border-t-white border-r-white text-center text-selection-disable">
 
                                     Linea de trabajo:</td>
-                                <td colspan="3" class="border border-t-black ">
+                                <td colspan="5" @mouseover="docAdq.hoverToDelete = true"
+                                    @click="docAdq.vShowLt = !docAdq.vShowLt" @mouseout="docAdq.hoverToDelete = false"
+                                    @contextmenu.prevent="deletLineaTrabajo(i)"
+                                    class="uppercase border bg-black text-[8pt] text-white border-black border-l-white text-center text-selection-disable">
+                                    Documento de adquiicion: </td>
+                            </tr>
+                            <tr class="*:border-black cursor-pointer" :class="{ 'custom-pulse': docAdq.hoverToDelete }">
+                                <td colspan="6" class="border border-t-black ">
                                     <Multiselect :filter-results="false" :searchable="true" :clear-on-search="true"
                                         :disabled="estadoDocAdq !== 1" @select="disableLt($event)" v-model="docAdq.idLt"
                                         :min-chars="1" placeholder="-" :classes="{
@@ -167,16 +174,8 @@
                                         }" noOptionsText="<p class='text-xs'>Lista vacía</p>"
                                         noResultsText="<p class='text-xs'>Sin resultados de personas</p>"
                                         :options="arrayLineaTrabajo" />
-
-
                                 </td>
-                                <td colspan="3" @mouseover="docAdq.hoverToDelete = true"
-                                    @click="docAdq.vShowLt = !docAdq.vShowLt" @mouseout="docAdq.hoverToDelete = false"
-                                    @contextmenu.prevent="deletLineaTrabajo(i)"
-                                    class="uppercase border bg-black text-[8pt] text-white border-black text-center text-selection-disable">
-                                    Doc. Adquisición: </td>
-                                <td colspan="4" class="border border-black">
-                                    <!-- {{ idDetDocAdquisicion }} -->
+                                <td colspan="5" class="border border-black">
                                     <Multiselect :filter-results="true" :searchable="true" :clear-on-search="true"
                                     @select="onSelectDocAdquisicion($event)"
                                         v-model="idDetDocAdquisicion" placeholder="-" :min-chars="1" :classes="{
@@ -190,10 +189,8 @@
                                         }" noOptionsText="<p class='text-xs'>Lista vacia</p>"
                                         noResultsText="<p class='text-xs'>Sin resultados de personas</p>"
                                         :options="arrayDocAdquisicion" />
-
                                 </td>
                             </tr>
-
                             <template v-if="docAdq.vShowLt">
                                 <tr class="*:text-[8pt]  *:px-2 *:py-0.5 *:font-normal *:border *:border-black  cursor-pointer"
                                     :class="{
@@ -713,12 +710,12 @@ export default {
             let fecha = moment().format('DD-MM-YYYY');
             let name = 'NOMBRE DOCUMENTO - FECHA - CODIGO';
             const opt = {
-                margin: [0.2, 0.2, 0.1, 0.2], //top, left, bottom, right,
+                margin: [0.5, 0.5, 2, 0.5], //top, left, bottom, right,
                 filename: 'evaluacion',
+                //pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+                html2canvas: { scale: 3, useCORS: true },
+                jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' }
             };
             // Crear una instancia de la aplicación Vue para generar el componente quedanPDFVue
             const app = createApp(OrdenCompraBienesServicios, {
@@ -728,14 +725,41 @@ export default {
                 arrayLineaTrabajo:arrayLineaTrabajo.value,
                 arrayProductoAdquisicion:arrayProductoAdquisicion.value,
                 arrayMarca:brandsUsedInDoc.value,
+                arrayUnidadMedida:arrayUnidadMedida.value,
+                arrayCentroAtencion:arrayCentroAtencion.value,
             });
             // Crear un elemento div y montar la instancia de la aplicación en él
             const div = document.createElement('div');
             const pdfPrint = app.mount(div);
             const html = div.outerHTML;
+            const currentDateTime = moment().format('DD/MM/YYYY, HH:mm:ss');
 
             // Generar y guardar el PDF utilizando html2pdf
-            html2pdf().set(opt).from(html).save();
+            html2pdf().set(opt).from(html).toPdf().get('pdf').then(function (pdf) {
+                        var totalPages = pdf.internal.getNumberOfPages();
+                        for (var i = 1; i <= totalPages; i++) {
+                            pdf.setPage(i);
+                            pdf.setFontSize(10);
+                            //Text for the page number
+                            let text = 'Página ' + i + ' de ' + totalPages;
+                            const centerX = pdf.internal.pageSize.getWidth() / 2;
+                            //Get the text width
+                            const textWidth1 = pdf.getStringUnitWidth(text) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
+                            //Get the middle position including the text width
+                            const textX = centerX - (textWidth1 / 2);
+                            //Write the text in the desired coordinates.
+                            pdf.text(textX, (pdf.internal.pageSize.getHeight() - 0.6), text);
+                            //Text for the date and time.
+                            let date_text = 'Generado: ' + currentDateTime
+                            //Get the text width
+                            const textWidth = pdf.getStringUnitWidth(date_text) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
+                            //Write the text in the desired coordinates.
+                            pdf.text(pdf.internal.pageSize.getWidth() - textWidth - 0.6, pdf.internal.pageSize.getHeight() - 0.6, date_text);
+                        }
+
+                    })
+                        .save()
+                        .catch(err => console.log(err));
     };
 
         return {
