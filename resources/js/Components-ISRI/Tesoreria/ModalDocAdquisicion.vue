@@ -129,8 +129,8 @@
                                 </div>
                                 <!-- !MODIFICAR -->
                                 <!-- <InputError class="mt-2" :message="errors.supplier_id" /> -->
-                             <!--    {{ procesoCompra }} -->
-                         <!--        tipo: {{ tipoProcesoCompraValue }} -->
+                                <!--    {{ procesoCompra }} -->
+                                <!--        tipo: {{ tipoProcesoCompraValue }} -->
                             </div>
 
                         </div>
@@ -151,11 +151,13 @@
                                     <Multiselect v-model="acq_doc.employees" :options="employees"
                                         placeholder="Seleccione empleado" @change="selectEmployees($event)" mode="tags"
                                         :searchable="true" :classes="{
+            tagsSearch: 'absolute inset-0 border-0 outline-none focus:ring-0 appearance-none p-0 text-base font-sans box-border w-full',
             tags: 'flex-grow flex-shrink flex flex-wrap items-center mt-1 pl-2 min-w-0 rtl:pl-0 rtl:pr-2',
             tag: 'bg-[#002b5f] bg-opacity-90 text-white text-[12px] py-1 pl-2 rounded mr-1 mb-1 flex items-center whitespace-nowrap min-w-0 rtl:pl-0 rtl:pr-2 rtl:mr-0 rtl:ml-1',
         }" />
                                 </div>
-                                <InputError class="mt-2" :message="errors.employees" />
+                                <InputError v-for="(item, index) in backend_errors.employees" :key="index" class="mt-2"
+                                    :message="item" />
                             </div>
                         </div>
 
@@ -296,7 +298,8 @@
                                                         {{ item.name }}
                                                     </td>
                                                     <td class="text-center">{{ item.name_financing_source }}</td>
-                                                    <td class="text-center">${{ isNaN(item.amount) ? '00.00' : item.amount }}</td>
+                                                    <td class="text-center">${{ isNaN(item.amount) ? '00.00' :
+            item.amount }}</td>
                                                     <td class="text-center">
                                                         <div class="space-x-1">
                                                             <button
@@ -415,11 +418,11 @@ export default {
         const { docAdquisicionId } = toRefs(props);
 
         const {
-            isLoadingRequest, acq_doc, errors,tipoProcesoCompraValue,
+            isLoadingRequest, acq_doc, errors, tipoProcesoCompraValue,
             config, array_item, index_errors,
             item_errors, backend_errors, new_item, currentPage, procesoCompra,
             doc_types, management_types, financing_sources, suppliers,
-            item_available, itemSelected, showItemInfo, employees,onSelectMultiSelectProcesoCompra,
+            item_available, itemSelected, showItemInfo, employees, onSelectMultiSelectProcesoCompra,
             getInfoForModalDocumentoAdquisicion, storeDocumentoAdquisicion, updateDocumentoAdquisicion,
             goToNextPage, addItem, cleanArrayItem, editItem, deleteItem, selectEmployees
         } = useDocumentoAdquisicion(context);
@@ -446,11 +449,11 @@ export default {
         )
 
         return {
-            isLoadingRequest, acq_doc, errors, docAdquisicionId,tipoProcesoCompraValue,
+            isLoadingRequest, acq_doc, errors, docAdquisicionId, tipoProcesoCompraValue,
             config, array_item, index_errors,
             item_errors, backend_errors, new_item, currentPage, procesoCompra,
             financing_sources, doc_types, management_types, suppliers,
-            item_available, itemSelected, showItemInfo, employees,onSelectMultiSelectProcesoCompra,
+            item_available, itemSelected, showItemInfo, employees, onSelectMultiSelectProcesoCompra,
             storeDocumentoAdquisicion, updateDocumentoAdquisicion, handleValidation,
             goToNextPage, addItem, cleanArrayItem, editItem, deleteItem, selectEmployees
         }
@@ -459,6 +462,10 @@ export default {
 </script>
 
 <style>
+.multi-select-wrapper input {
+    padding-left: 0px;
+}
+
 .fade-enter-active,
 .fade-leave-active {
     transition: opacity 0.5s;

@@ -38,13 +38,13 @@ class RecepcionRequest extends FormRequest
                     }
                 }
             ];
-            $rules["prods.{$key}.expiryDate"] = [
-                function ($attribute, $value, $fail) use ($key, $prod) {
-                    if (!$prod['deleted'] && (empty($value) && $prod['perishable'] == 1)) {
-                        $fail("Debe seleccionar la fecha de caducidad.");
-                    }
-                }
-            ];
+            // $rules["prods.{$key}.expiryDate"] = [
+            //     function ($attribute, $value, $fail) use ($key, $prod) {
+            //         if (!$prod['deleted'] && (empty($value) && $prod['perishable'] == 1)) {
+            //             $fail("Debe seleccionar la fecha de caducidad.");
+            //         }
+            //     }
+            // ];
             $rules["prods.{$key}.avails"] = [
                 function ($attribute, $value, $fail) use ($key, $prod) {
                     if (!$prod['deleted'] && ($value < 0)) {

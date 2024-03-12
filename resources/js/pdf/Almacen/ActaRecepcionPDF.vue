@@ -67,61 +67,61 @@
         </div>
 
         <!-- Table header -->
-        <div class="flex w-full border-x border-b border-gray-500">
-            <div class="w-[10%] flex justify-center items-center border-r border-gray-500">
+        <div class="flex w-full border-x border-b border-gray-500" style="page-break-inside: avoid;">
+            <div class="w-[12%] flex justify-center items-center border-r border-gray-500">
                 <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[11px] font-bold">CODIGO</p>
             </div>
             <div class="w-[35%] flex justify-center items-center border-r border-gray-500">
                 <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[11px] font-bold">PRODUCTO</p>
             </div>
-            <div class="w-[5%] flex justify-center items-center border-r border-gray-500">
-                <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[11px] font-bold">UNI.</p>
+            <div class="w-[8%] flex justify-center items-center border-r border-gray-500">
+                <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[11px] font-bold">UNIDAD</p>
             </div>
-            <div class="w-[10%] flex justify-center items-center border-r border-gray-500">
+            <!-- <div class="w-[10%] flex justify-center items-center border-r border-gray-500">
                 <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[11px] font-bold">VENC.</p>
-            </div>
+            </div> -->
             <div class="w-[10%] flex justify-center items-center border-r border-gray-500">
                 <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[11px] font-bold">CENTRO</p>
             </div>
             <div class="w-[10%] flex justify-center items-center border-r border-gray-500">
                 <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[11px] font-bold">CANT.</p>
             </div>
-            <div class="w-[10%] flex justify-center items-center border-r border-gray-500">
+            <div class="w-[12%] flex justify-center items-center border-r border-gray-500">
                 <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[11px] font-bold">COSTO</p>
             </div>
-            <div class="w-[10%] flex justify-center items-center">
+            <div class="w-[13%] flex justify-center items-center">
                 <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[11px] font-bold">TOTAL</p>
             </div>
         </div>
         <!-- Table body -->
         <div v-for="(prod, index) in recToPrint.detalle_recepcion" :key="index"
-            class="flex w-full border-x border-b border-gray-500">
+            class="flex w-full border-x border-b border-gray-500" style="page-break-inside: avoid;">
             <!-- Codigo -->
-            <div class="w-[10%] flex justify-center items-center border-r border-gray-500">
+            <div class="w-[12%] flex justify-center items-center border-r border-gray-500">
                 <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[11px]">{{
                         prod.producto_adquisicion.producto.codigo_producto }}</p>
             </div>
             <!-- Producto -->
             <div class="w-[35%] flex justify-center items-center border-r border-gray-500">
-                <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[11px]">
+                <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[11px] px-0.5">
                     {{ prod.producto_adquisicion.producto.nombre_producto + " - " +
                         prod.producto_adquisicion.descripcion_prod_adquisicion + " - " +
                         prod.producto_adquisicion.marca.nombre_marca ?? "Sin marca" }}
                 </p>
             </div>
             <!-- Unidad -->
-            <div class="w-[5%] flex justify-center items-center border-r border-gray-500">
+            <div class="w-[8%] flex justify-center items-center border-r border-gray-500">
                 <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[11px]">
                     {{ prod.producto_adquisicion.producto.unidad_medida.abreviatura_unidad_medida }}
                 </p>
             </div>
             <!-- Vencimiento -->
-            <div class="w-[10%] flex justify-center items-center border-r border-gray-500">
+            <!-- <div class="w-[10%] flex justify-center items-center border-r border-gray-500">
                 <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[11px]">
                     {{ prod.fecha_vencimiento_det_recepcion_pedido ? moment(prod.fecha_vencimiento_det_recepcion_pedido,
                         'YYYY/MM/DD').format('DD/MM/YYYY') : 'N/A' }}
                 </p>
-            </div>
+            </div> -->
             <!-- Centro -->
             <div class="w-[10%] flex justify-center items-center border-r border-gray-500">
                 <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[11px]">
@@ -135,29 +135,29 @@
                 </p>
             </div>
             <!-- Costo -->
-            <div class="w-[10%] flex justify-center items-center border-r border-gray-500">
+            <div class="w-[12%] flex justify-center items-center border-r border-gray-500">
                 <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[11px]">
                     ${{ prod.costo_det_recepcion_pedido }}
                 </p>
             </div>
             <!-- Total -->
-            <div class="w-[10%] flex justify-center items-center">
+            <div class="w-[13%] flex justify-center items-center">
                 <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[11px]">
                     ${{ (prod.cant_det_recepcion_pedido * prod.costo_det_recepcion_pedido).toFixed(2) }}
                 </p>
             </div>
         </div>
         <!-- Table footer -->
-        <div class="flex w-full border-x border-b border-gray-500">
-            <div class="w-[90%] flex justify-end items-center border-r border-gray-500">
+        <div class="flex w-full border-x border-b border-gray-500" style="page-break-inside: avoid;">
+            <div class="w-[87%] flex justify-end items-center border-r border-gray-500">
                 <p class="mb-[10px] mt-[-5px] mr-2 font-[MuseoSans] text-[11px] font-bold">TOTAL ACTA</p>
             </div>
-            <div class="w-[10%] flex justify-center items-center">
+            <div class="w-[13%] flex justify-center items-center">
                 <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[11px] font-bold"> ${{
                         recToPrint.monto_recepcion_pedido }}</p>
             </div>
         </div>
-        <div class="flex w-full border-x border-b border-gray-500">
+        <div class="flex w-full border-x border-b border-gray-500" style="page-break-inside: avoid;">
             <div class="w-full flex justify-start items-center">
                 <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[11px] font-bold ml-2">
                     SON: {{ recToPrint.monto_letras }}</p>
@@ -176,7 +176,7 @@
                         == 1 ? recToPrint.incumplimiento_recepcion_pedido : "Sin incumplimiento." }}</p>
             </div>
         </div>
-        <div class="" style="page-break-inside: avoid;"> <!-- Signatures -->
+        <div class="" style="page-break-inside: avoid;" > <!-- Signatures -->
             <p class="text-center font-[MuseoSans] text-[12px] pt-[20px] mt-[-5px] font-bold">Firmas acta de recepcion
                 de bienes {{ recToPrint.acta_recepcion_pedido }}</p>
             <div class="mb-[50px] pt-[70px]"> <!-- First segment -->

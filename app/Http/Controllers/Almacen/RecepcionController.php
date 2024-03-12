@@ -34,7 +34,8 @@ class RecepcionController extends Controller
                 'detalle_recepcion',
                 'det_doc_adquisicion.documento_adquisicion.tipo_documento_adquisicion',
                 'estado_recepcion'
-            ]);
+            ])
+            ->where('id_proy_financiado',"!=",4);
 
         if ($column == 2) { //Order by document type
             $query->orderByRaw('
@@ -256,7 +257,7 @@ class RecepcionController extends Controller
                         'id_prod_adquisicion'                       => $prod['prodId'],
                         'cant_det_recepcion_pedido'                 => $prod['qty'],
                         'costo_det_recepcion_pedido'                => $prodAdq->costo_prod_adquisicion,
-                        'fecha_vencimiento_det_recepcion_pedido'    => $prod['expiryDate'] ? date('Y/m/d', strtotime($prod['expiryDate'])) : null,
+                        //'fecha_vencimiento_det_recepcion_pedido'    => $prod['expiryDate'] ? date('Y/m/d', strtotime($prod['expiryDate'])) : null,
                         'estado_det_recepcion_pedido'               => 1,
                         'fecha_reg_det_recepcion_pedido'            => Carbon::now(),
                         'usuario_det_recepcion_pedido'              => $request->user()->nick_usuario,
@@ -334,7 +335,7 @@ class RecepcionController extends Controller
                                 'id_prod_adquisicion'                       => $prod['prodId'],
                                 'cant_det_recepcion_pedido'                 => $prod['qty'],
                                 'costo_det_recepcion_pedido'                => $prodAdq->costo_prod_adquisicion,
-                                'fecha_vencimiento_det_recepcion_pedido'    => $prod['expiryDate'] ? date('Y/m/d', strtotime($prod['expiryDate'])) : null,
+                                //'fecha_vencimiento_det_recepcion_pedido'    => $prod['expiryDate'] ? date('Y/m/d', strtotime($prod['expiryDate'])) : null,
                                 'fecha_mod_det_recepcion_pedido'            => Carbon::now(),
                                 'usuario_det_recepcion_pedido'              => $request->user()->nick_usuario,
                                 'ip_det_recepcion_pedido'                   => $request->ip()
@@ -358,7 +359,7 @@ class RecepcionController extends Controller
                             if ($existDetail) {
                                 $existDetail->update([
                                     'cant_det_recepcion_pedido'                 => $prod['qty'],
-                                    'fecha_vencimiento_det_recepcion_pedido'    => $prod['expiryDate'],
+                                    //'fecha_vencimiento_det_recepcion_pedido'    => $prod['expiryDate'],
                                     'estado_det_recepcion_pedido'               => 1,
                                     'fecha_mod_det_recepcion_pedido'            => Carbon::now(),
                                     'usuario_det_recepcion_pedido'              => $request->user()->nick_usuario,
@@ -375,7 +376,7 @@ class RecepcionController extends Controller
                                     'cant_det_recepcion_pedido'                 => $prod['qty'],
                                     'estado_det_recepcion_pedido'               => 1,
                                     'costo_det_recepcion_pedido'                => $prodAdq->costo_prod_adquisicion,
-                                    'fecha_vencimiento_det_recepcion_pedido'    => $prod['expiryDate'] ? date('Y/m/d', strtotime($prod['expiryDate'])) : null,
+                                    //'fecha_vencimiento_det_recepcion_pedido'    => $prod['expiryDate'] ? date('Y/m/d', strtotime($prod['expiryDate'])) : null,
                                     'fecha_reg_det_recepcion_pedido'            => Carbon::now(),
                                     'usuario_det_recepcion_pedido'              => $request->user()->nick_usuario,
                                     'ip_det_recepcion_pedido'                   => $request->ip()
