@@ -107,22 +107,22 @@
                     <div
                         class="flex w-full bg-[#001c48] border-b border-x border-gray-500 bg-opacity-80 min-w-[800px] text-white">
                         <!-- Cabecera de la tabla -->
-                        <div class="w-[30%] min-w-[200px] border-r border-gray-500 h-[30px]">
+                        <div class="w-[20%] min-w-[125px] border-r border-gray-500 h-[30px]">
                             <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px]">PRODUCTO
                             </p>
                         </div>
-                        <div class="w-[10%] min-w-[100px] border-r border-gray-500 h-[30px]">
+                        <div class="w-[25%] min-w-[200px] border-r border-gray-500 h-[30px]">
                             <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px]">
-                                UNIDAD</p>
+                                INFO. PRODUCTO</p>
                         </div>
-                        <div class="w-[15%] min-w-[125px] border-r border-gray-500 h-[30px]">
+                        <div class="w-[13%] min-w-[125px] border-r border-gray-500 h-[30px]">
                             <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px]">CENTRO</p>
                         </div>
-                        <div class="w-[15%] min-w-[125px] border-r border-gray-500 h-[30px]">
+                        <div class="w-[12%] min-w-[100px] border-r border-gray-500 h-[30px]">
                             <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px]">CANTIDAD</p>
                         </div>
                         <div class="w-[15%] min-w-[125px] border-r border-gray-500 h-[30px]">
-                            <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px]">PRECIO</p>
+                            <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px]">C. UNITARIO</p>
                         </div>
                         <div class="w-[15%] min-w-[125px] border-gray-500 h-[30px]">
                             <p class="text-center font-[MuseoSans] text-[12px]  mt-[5px]">TOTAL</p>
@@ -134,42 +134,40 @@
                         <div
                             class="flex w-[97%] min-w-[800px] bg-white hover:bg-gray-200 text-gray-800 border-b border-x border-gray-500">
                             <!-- Cabecera de la tabla -->
-                            <div class="w-[30%] min-w-[200px] flex items-center justify-center border-r border-gray-500 min-h-[75px]"
+                            <div class="w-[20%] min-w-[125px] flex items-center justify-center border-r border-gray-500 min-h-[75px]"
                                 :class="errors['prods.' + index + '.prodId'] ? 'bg-red-300' : ''">
-
+                                <!-- Select for products -->
                                 <Multiselect id="doc" v-model="prod.prodId" :options="products" class="h-[35px]"
-                                    @search-change="handleSearchChange($event, index, prod.prodId)" :searchable="true"
-                                    @select="selectProd($event)"
-                                    :loading="prod.isLoadingProd" :internal-search="false" :clear-on-search="true"
-                                    :filter-results="false" :resolve-on-load="true"
+                                    :disabled="donInfo.status != 1" :searchable="true" :internal-search="false"
+                                    @search-change="handleSearchChange($event, index, prod.prodId)"
+                                    @select="selectProd($event, index)" :loading="prod.isLoadingProd"
+                                    :clear-on-search="true" :filter-results="false" :resolve-on-load="true"
                                     :noOptionsText="'Escriba para buscar...'" placeholder="Seleccione"
                                     @open="openAnySelect(prod.prodId)"
-                                    :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', }" />
-
+                                    :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right',}" />
                             </div>
                             <div
-                                class="w-[10%] min-w-[100px] flex items-center justify-center border-r border-gray-500 min-h-[75px] max-h-[100px]">
-                                <div class="overflow-y-auto h-full">
-                                    <p class="font-[MuseoSans] text-sm p-1">{{ }}</p>
-                                </div>
+                                class="w-[25%] min-w-[200px] flex items-center justify-center border-r border-gray-500 min-h-[75px] max-h-[100px]">
+                                <p class="font-[MuseoSans] text-sm p-1">{{ prod.desc }}</p>
                             </div>
 
-                            <div class="w-[15%] min-w-[125px] flex items-center justify-center border-r border-gray-500 min-h-[75px]"
+                            <div class="w-[13%] min-w-[125px] flex items-center justify-center border-r border-gray-500 min-h-[75px]"
                                 :class="prod.avails < 0 ? 'bg-red-300' : ''">
-                                <p class="font-[MuseoSans] text-sm p-1 ">{{ }}</p>
+                                <Multiselect id="doc" v-model="prod.centerId" :options="centers" class="h-[35px]"
+                                    :disabled="donInfo.status != 1" :searchable="true" :noOptionsText="'Lista vacía.'"
+                                    placeholder="Centro" :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90',}"/>
                             </div>
-                            <div class="w-[15%] min-w-[125px] flex items-center justify-center border-r border-gray-500 min-h-[75px]"
+                            <div class="w-[12%] min-w-[100px] flex items-center justify-center border-r border-gray-500 min-h-[75px]"
                                 :class="errors['prods.' + index + '.qty'] ? 'bg-red-300' : ''">
                                 <input v-model="prod.qty" :disabled="donInfo.status != 1"
                                     class="font-bold max-w-[75%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-sm border-[#d1d5db]"
-                                    type="text" name="" id=""
-                                    @input="handleValidation('qty', { limit: 3, number: true }, { index: index, qty: prod.qty, prodId: prod.prodId })">
+                                    type="text" name="" id="">
                             </div>
                             <div
                                 class="w-[15%] min-w-[125px] flex items-center justify-center border-r border-gray-500 min-h-[75px]">
-                                <p class="font-[MuseoSans] text-sm p-1 ">
-                                    {{ prod.cost != '' ? '$' + prod.cost : '' }}
-                                </p>
+                                <input v-model="prod.cost" :disabled="donInfo.status != 1"
+                                    class="font-bold max-w-[75%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-sm border-[#d1d5db]"
+                                    type="text" name="" id="">
                             </div>
                             <div class="w-[15%] min-w-[125px] flex items-center justify-center min-h-[75px]">
                                 <p class="font-[MuseoSans] text-sm p-1 font-bold">
@@ -195,6 +193,38 @@
                         </div>
                     </div>
                 </template>
+                <div class="max-w-full min-w-[815px] flex">
+                    <div class="flex w-[97%] min-w-[800px] border-b border-gray-500">
+                        <div class="justify-end flex border-x w-[85%] min-w-[125px] h-[30px]  border-gray-500">
+                            <p class="font-[MuseoSans] text-sm py-2 mr-2 font-bold mt-[-4px]">TOTAL ACTA</p>
+                        </div>
+                        <div class="justify-center flex w-[15%] min-w-[125px] h-[30px] border-gray-500 border-r">
+                            <p class="font-[MuseoSans] text-sm py-2 font-bold text-green-800 mt-[-4px]">${{ totalRec
+                                }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex w-[3%]">
+                        <div class="w-full min-w-[15px] h-[30px]">
+                            <svg v-if="donInfo.status != 3" @click="addNewRow()"
+                                class="text-green-600 cursor-pointer hover:text-green-800" width="28px" height="28px"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 6V18M6 12H18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="md:flex flex md:items-center my-6 sticky flex-row justify-center mx-8">
+                <button type="button" @click="$emit('cerrar-modal')"
+                    class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-[12px] px-2.5 py-1.5 text-center mb-2 dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
+                <div class="" v-if="donInfo.status == 1">
+                    <button v-if="recepId > 0" @click="updateReception(recDocument)"
+                        class="bg-orange-700 hover:bg-orange-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">ACTUALIZAR</button>
+                    <button v-else @click="storeReception(recDocument)"
+                        class="bg-green-700 hover:bg-green-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">GUARDAR</button>
+                </div>
             </div>
         </ProcessModal>
     </div>
@@ -227,9 +257,9 @@ export default {
         const { recepId } = toRefs(props);
 
         const {
-            isLoadingRequest, donInfo, errors, suppliers, products,
-            asyncFindProduct, isLoadingProduct,
-            getInfoForModalDonation, selectProv, openAnySelect, selectProd
+            isLoadingRequest, donInfo, errors, suppliers, products, centers,
+            asyncFindProduct, isLoadingProduct, totalRec,
+            getInfoForModalDonation, selectProv, openAnySelect, selectProd, addNewRow
         } = useDonacion(context);
 
         const handleSearchChange = async (query, index, prodId) => {
@@ -241,9 +271,9 @@ export default {
         });
 
         return {
-            isLoadingRequest, donInfo, errors, suppliers, products,
-            isLoadingProduct,
-            selectProv, handleSearchChange, openAnySelect, selectProd
+            isLoadingRequest, donInfo, errors, suppliers, products, centers,
+            isLoadingProduct, totalRec,
+            selectProv, handleSearchChange, openAnySelect, selectProd, addNewRow
         };
     },
 };

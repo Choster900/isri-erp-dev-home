@@ -1,4 +1,4 @@
-import { ref, inject, computed, nextTick } from "vue";
+import { ref, inject, computed, nextTick, watch } from "vue";
 import axios from "axios";
 import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
@@ -14,8 +14,9 @@ export const useDonacion = (context) => {
     const errors = ref([]);
 
     const isLoadingProduct = ref(false);
-    const defaultProds = ref([])
     const products = ref([])
+    const centers = ref([])
+    const defaultProds = ref([])
     const suppliers = ref([])
 
     const donInfo = ref({
@@ -57,6 +58,7 @@ export const useDonacion = (context) => {
         //Set the general information to show in the view
 
         suppliers.value = data.suppliers
+        centers.value = data.centers
 
         donInfo.value.status = id > 0 ? recepData.id_estado_recepcion_pedido : 1
         donInfo.value.dateTime = recepData ? moment(recepData.fecha_reg_recepcion_pedido).format('DD/MM/YYYY, HH:mm:ss') : ''
@@ -78,17 +80,19 @@ export const useDonacion = (context) => {
                     //Construct the options
                     let arrayOpt = {
                         value: element.producto.id_producto,
-                        label: element.producto.nombre_producto,
+                        label: element.producto.id_ccta_presupuestal+" - "+element.producto.nombre_producto,
                     };
                     products.value.push(arrayOpt);
-                    defaultProds.value.push(arrayOpt)
+                    defaultProds.value.push(arrayOpt);
 
                     // Construct array
                     const array = {
                         detRecId: element.id_det_recepcion_pedido, //id_det_recepcion_pedido
                         prodId: element.id_producto, //id_product
-                        isLoadingProd: false,
-                        desc: element.producto.descripcion_producto, //Product description
+                        centerId: element.id_centro_atencion, //Care center
+                        isLoadingProd: false, //Flag to manage loader for every multiselect
+                        //Product description
+                        desc: element.producto.codigo_producto+' — '+ element.producto.nombre_producto + ' — ' + element.producto.descripcion_producto + ' — ' + element.producto.unidad_medida.nombre_unidad_medida,
                         qty: element.cant_det_recepcion_pedido, //Represents the the number of products the user wants to register
                         cost: element.costo_det_recepcion_pedido, //Represents the the cost of the product
                         total: "", //Represents the result of qty x cost for every row
@@ -108,6 +112,8 @@ export const useDonacion = (context) => {
         let array = {
             detRecId: "",
             prodId: "",
+            centerId: "",
+            isLoadingProd: false,
             desc: "",
             qty: "",
             cost: "",
@@ -150,8 +156,9 @@ export const useDonacion = (context) => {
     }, 350);
 
     const openAnySelect = (prodId) => {
-        const selectedProd = defaultProds.value.filter((e) => e.value === prodId)
-        products.value = selectedProd
+        // const selectedProd = defaultProds.value.filter((e) => e.value === prodId)
+        // products.value = selectedProd
+        products.value = []
     }
 
     const selectProv = (id) => {
@@ -159,13 +166,34 @@ export const useDonacion = (context) => {
         donInfo.value.nit = selectedProv.nit_proveedor
     }
 
-    const selectProd = (prodId, vModel) => {
-        const existP = defaultProds.value.find((e) => e.value === prodId)
-        if(!existP){
-            const selectedProd = products.value.find((e) => e.value === prodId);
-            defaultProds.value.push(selectedProd)
-        }
+    const selectProd = (prodId, index) => {
+        const selectedProd = products.value.find((e) => e.value === prodId)
+        donInfo.value.prods[index].desc = selectedProd.allInfo.codigo_producto+' — '+selectedProd.allInfo.nombre_producto+' — '+selectedProd.allInfo.descripcion_producto+' — '+selectedProd.allInfo.unidad_medida.nombre_unidad_medida
+        donInfo.value.prods[index].centerId = ''
+        donInfo.value.prods[index].qty = ''
+        donInfo.value.prods[index].cost = ''
     }
+
+    const totalRec = computed(() => {
+        let sum = 0
+        for (let i = 0; i < donInfo.value.prods.length; i++) {
+            if (donInfo.value.prods[i].deleted == false) {
+                let amount = parseFloat(donInfo.value.prods[i].total);
+                if (!isNaN(amount)) {
+                    sum += amount;
+                }
+            }
+        }
+        donInfo.value.total = sum.toFixed(2);
+        return sum.toFixed(2);
+    });
+
+    // Observa cambios en las propiedades qty y cost de cada producto
+    watch(donInfo, (newValue) => {
+        newValue.prods.forEach((prod) => {
+            prod.total = (prod.qty * prod.cost).toFixed(2);
+        });
+    }, { deep: true });
 
     const showErrorMessage = (err) => {
         const { title, text, icon } = useHandleError(err);
@@ -173,8 +201,8 @@ export const useDonacion = (context) => {
     };
 
     return {
-        isLoadingRequest, errors, donInfo, suppliers, products,
-        asyncFindProduct, isLoadingProduct,
-        getInfoForModalDonation, selectProv, openAnySelect, selectProd
+        isLoadingRequest, errors, donInfo, suppliers, products, centers,
+        asyncFindProduct, isLoadingProduct, totalRec, 
+        getInfoForModalDonation, selectProv, openAnySelect, selectProd, addNewRow
     }
 }

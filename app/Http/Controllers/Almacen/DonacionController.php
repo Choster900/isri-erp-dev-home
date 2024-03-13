@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Almacen;
 
 use App\Http\Controllers\Controller;
+use App\Models\CentroAtencion;
 use App\Models\Producto;
 use App\Models\Proveedor;
 use App\Models\RecepcionPedido;
@@ -53,9 +54,12 @@ class DonacionController extends Controller
                 ->where('estado_proveedor', 1)->get();
         }
 
+        $centers = CentroAtencion::select('id_centro_atencion as value', 'codigo_centro_atencion as label')->get();
+
         return response()->json([
             'recep'                         => $recep,
-            'suppliers'                     => $suppliers
+            'suppliers'                     => $suppliers,
+            'centers'                       => $centers
         ]);
     }
 
@@ -64,11 +68,29 @@ class DonacionController extends Controller
         $search = $request->busqueda;
         $prodIdToIgnore = $request->prodIdToIgnore;
         if ($search != '') {
-            $products = Producto::select('id_producto as value', 'nombre_producto as label')
-                ->where('nombre_producto', 'like', '%' . $search . '%')
+            $matchProds = Producto::with('unidad_medida')
+                ->where(function ($query) use ($search) {
+                    $query->where('nombre_producto', 'like', '%' . $search . '%')
+                        ->orWhere('id_ccta_presupuestal', 'like', '%' . $search . '%');
+                })
                 ->where('estado_producto', 1)
                 ->whereNotIn('id_producto', $prodIdToIgnore)
                 ->get();
+
+            $products = $matchProds->map(function ($prod) {
+                return [
+                    'value'             => $prod->id_producto,
+                    'label'             => $prod->id_ccta_presupuestal . " - " . $prod->nombre_producto,
+                    'allInfo'           => $prod
+                ];
+            });
+
+
+            // $products = Producto::select('id_producto as value', 'nombre_producto as label')
+            //     ->where('nombre_producto', 'like', '%' . $search . '%')
+            //     ->where('estado_producto', 1)
+            //     ->whereNotIn('id_producto', $prodIdToIgnore)
+            //     ->get();
         }
         return response()->json(
             [
