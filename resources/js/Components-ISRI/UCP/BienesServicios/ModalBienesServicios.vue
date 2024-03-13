@@ -69,37 +69,37 @@
                                 <td class="border border-black h-5" colspan="3">
                                     <h1 class="text-xs font-medium text-center">
                                         {{ arrayDocAdquisicion != '' && idDetDocAdquisicion != null
-                                            && arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion)
-                                            && arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion).dataDoc
-                                            && arrayDocAdquisicion.find(index => index.value
-                                                ==
-                                                idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.razon_social_proveedor
-                                            ?
-                                            arrayDocAdquisicion.find(index => index.value
-                                                ==
-                                                idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.razon_social_proveedor
-                                            :
-                                            '' }}
+                && arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion)
+                && arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion).dataDoc
+                && arrayDocAdquisicion.find(index => index.value
+                    ==
+                    idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.razon_social_proveedor
+                ?
+                arrayDocAdquisicion.find(index => index.value
+                    ==
+                    idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.razon_social_proveedor
+                :
+                '' }}
                                     </h1>
                                 </td>
                                 <td class="border border-black  h-5  text-center text-[9pt] ">
                                     <h1 class="text-xs font-medium text-center">
                                         {{
-                                        arrayDocAdquisicion != '' && idDetDocAdquisicion != null &&
-                                            arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion) &&
-                                            arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion).dataDoc &&
-                                            (arrayDocAdquisicion.find(index => index.value ==
-                                                idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.nit_proveedor !==
-                                                null
-                                                ||
-                                                arrayDocAdquisicion.find(index => index.value ==
-                                                    idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.dui_proveedor !==
-                                                null)
-                                            ? (arrayDocAdquisicion.find(index => index.value ==
-                                                idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.nit_proveedor ||
-                                                arrayDocAdquisicion.find(index => index.value ==
-                                                    idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.dui_proveedor)
-                                            : '' }}
+                arrayDocAdquisicion != '' && idDetDocAdquisicion != null &&
+                    arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion) &&
+                    arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion).dataDoc &&
+                    (arrayDocAdquisicion.find(index => index.value ==
+                        idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.nit_proveedor !==
+                        null
+                        ||
+                        arrayDocAdquisicion.find(index => index.value ==
+                            idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.dui_proveedor !==
+                        null)
+                    ? (arrayDocAdquisicion.find(index => index.value ==
+                        idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.nit_proveedor ||
+                        arrayDocAdquisicion.find(index => index.value ==
+                            idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.dui_proveedor)
+                    : '' }}
                                     </h1>
                                 </td>
                             </tr>
@@ -212,18 +212,18 @@
                                                 :options="arrayMarca" />
                                             <span class="text-center ">
                                                 {{
-                                                    arrayMarca.length > 0 &&
-                                                        arrayMarca
-                                                            .find(index => index.value == detalle.idMarca)
-                                                            ?.dataMarca
-                                                        ?
-                                                        arrayMarca
-                                                            .find(index => index.value ==
-                                                                detalle
-                                                                    .idMarca)
-                                                            .dataMarca.nombre_marca :
-                                                        '-'
-                                                }}
+                arrayMarca.length > 0 &&
+                    arrayMarca
+                        .find(index => index.value == detalle.idMarca)
+                        ?.dataMarca
+                    ?
+                    arrayMarca
+                        .find(index => index.value ==
+                            detalle
+                                .idMarca)
+                        .dataMarca.nombre_marca :
+                    '-'
+            }}
                                             </span>
                                         </div>
                                     </td>
@@ -246,14 +246,14 @@
                                                 :options="arrayUnidadMedida" />
                                             <span class="text-center">
                                                 {{
-                                                    arrayUnidadMedida.length > 0 &&
-                                                        arrayUnidadMedida.find(index => index.value ==
-                                                            detalle.pesoProducto)?.dataUnidad
-                                                        ?
-                                                        arrayUnidadMedida.find(index => index.value ==
-                                                            detalle.pesoProducto).dataUnidad.nombre_unidad_medida :
-                                                        '-'
-                                                }}
+                arrayUnidadMedida.length > 0 &&
+                    arrayUnidadMedida.find(index => index.value ==
+                        detalle.pesoProducto)?.dataUnidad
+                    ?
+                    arrayUnidadMedida.find(index => index.value ==
+                        detalle.pesoProducto).dataUnidad.nombre_unidad_medida :
+                    '-'
+            }}
                                             </span>
                                         </div>
                                     </td>
@@ -275,9 +275,9 @@
                                                 :options="arrayCentroAtencion" />
                                             <span class="text-center">
                                                 {{ arrayCentroAtencion.length > 0 && arrayCentroAtencion.find(index =>
-                                                    index.value == detalle.idCentroAtencion)?.dataCentro ?
-                                                    arrayCentroAtencion.find(index => index.value ==
-                                                        detalle.idCentroAtencion).dataCentro.nombre_centro_atencion : '-' }}
+                index.value == detalle.idCentroAtencion)?.dataCentro ?
+                arrayCentroAtencion.find(index => index.value ==
+                    detalle.idCentroAtencion).dataCentro.nombre_centro_atencion : '-' }}
                                             </span>
                                         </div>
                                     </td>
@@ -340,7 +340,7 @@
                                                 NUEVO PRODUCTO ADQUISICION EN:
                                                 <br>
                                                 {{ arrayLineaTrabajo.find(index => index.value == docAdq.idLt)?.label
-                                                ||''}}
+                                                || '' }}
                                             </span>
                                         </div>
                                     </button>
@@ -372,17 +372,18 @@
                         <col style="width: 550pt;">
                         <tbody>
                             <tr class="*:border *:border-black *:hover:bg-slate-200">
-                                <td class="pl-7 uppercase border py-1  text-[8pt]   text-start ">
+                                <td class="px-1 uppercase border py-1  text-[8pt]   text-start ">
                                     <div>total</div>
                                 </td>
                                 <td class="uppercase border py-1 text-[8pt] font-bold text-center ">
-                                    <div>$ {{ totProductos }}</div>
+                                    <div>$ {{ totProductos || '00.00' }}</div>
                                 </td>
                             </tr>
                             <tr class="*:border *:border-black *:hover:bg-slate-200">
                                 <td colspan="2" class="uppercase border py-1  text-[8pt] font-bold text-center ">
                                     <!-- <div> SON: SIETE MIL OCHENTA DOS 48/100 DOLARES</div> -->
-                                    <div v-if="!loadingNumberLetter"> SON: {{ letterNumber || '' }}</div>
+                                    <div v-if="!loadingNumberLetter"> SON: {{ letterNumber || 'CERO 00/00 DOLAR' }}
+                                    </div>
                                     <div v-else class="flex items-center justify-center h-full">
                                         <div aria-label="Loading..." role="status" class="loader">
                                             <svg class="icon" viewBox="0 0 256 256">
@@ -408,6 +409,27 @@
                                     </div>
                                 </td>
 
+                            </tr>
+                            <tr class="*:border *:border-black *:hover:bg-slate-200">
+                                <td class="px-1 h-auto uppercase border py-1  text-[8pt]   text-start " colspan="2">
+                                    <textarea rows="8" placeholder="OBSERVACION: "
+                                        v-model="observacionDetDocAdquisicion"
+                                        class=" uppercase text-[8pt] p-0 border-none bg-transparent outline-none focus:outline-none focus:ring focus:ring-transparent leading-tight w-full"></textarea>
+                                </td>
+                            </tr>
+                            <tr class="*:border *:border-black *:hover:bg-slate-200">
+                                <td class="px-1 uppercase border py-1  text-[8pt]   text-start " colspan="2">
+                                    <textarea rows="1" placeholder="LUGAR DE ENTREGA: "
+                                        v-model="recepcionDetDocAdquisicion"
+                                        class=" uppercase text-[8pt] p-0 border-none bg-transparent outline-none focus:outline-none focus:ring focus:ring-transparent leading-tight w-full"></textarea>
+                                </td>
+                            </tr>
+                            <tr class="*:border *:border-black *:hover:bg-slate-200">
+                                <td class="px-1 uppercase border py-1  text-[8pt]   text-start " colspan="2">
+                                    <textarea rows="4" placeholder="LUGAR DE NOTIFICACION: "
+                                        v-model="notificacionDetDocAdquisicion"
+                                        class="uppercase text-[8pt] p-0 border-none bg-transparent outline-none focus:outline-none focus:ring focus:ring-transparent leading-tight w-full"></textarea>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -493,6 +515,9 @@ export default {
             addingRows,
             loadingNumberLetter,
             calculateTotal,
+            notificacionDetDocAdquisicion,
+            recepcionDetDocAdquisicion,
+            observacionDetDocAdquisicion,
             sumatorioTotalProduct,
             arrayLineaTrabajo,
             objectGetFromProp,
@@ -536,6 +561,9 @@ export default {
                 if (indexAEliminar !== -1) {
                     arrayDocAdquisicion.value.splice(indexAEliminar, 1);
                 }
+                observacionDetDocAdquisicion.value = ''
+                recepcionDetDocAdquisicion.value = ''
+                notificacionDetDocAdquisicion.value = ''
                 idDetDocAdquisicion.value = null
                 estadoDocAdq.value = 1
                 arrayLineaTrabajo.value.forEach((item) => {
@@ -551,6 +579,11 @@ export default {
             if (newValue !== null && newValue !== undefined && (Array.isArray(newValue) ? newValue.length > 0 : newValue !== '')) {
                 // Utiliza el patrón de objeto "guard" para simplificar las verificaciones
                 objectGetFromProp.value = newValue;
+
+                observacionDetDocAdquisicion.value = objectGetFromProp.value.observacion_det_doc_adquisicion
+                recepcionDetDocAdquisicion.value = objectGetFromProp.value.recepcion_det_doc_adquisicion
+                notificacionDetDocAdquisicion.value = objectGetFromProp.value.notificacion_det_doc_adquisicion
+
                 let productosAdquisiciones = objectGetFromProp.value.productos_adquisiciones;
                 console.log(productosAdquisiciones);
                 // Utilizando un conjunto para rastrear los id_lt únicos
@@ -618,6 +651,7 @@ export default {
                     let indice = arrayProductoAdquisicion.value.findIndex(i => i.idLt == index.id_lt);
                     const { producto } = index;
                     idDetDocAdquisicion.value = index.id_det_doc_adquisicion
+
                     arrayProductoAdquisicion.value[indice]["detalleDoc"].push({
                         idProdAdquisicion: index.id_prod_adquisicion,
                         especifico: producto.id_ccta_presupuestal,
@@ -714,12 +748,17 @@ export default {
             const app = createApp(OrdenCompraBienesServicios, {
                 arrayDocAdquisicion: arrayDocAdquisicion.value,
                 idDetDocAdquisicion: idDetDocAdquisicion.value,
+                notificacionDetDocAdquisicion: notificacionDetDocAdquisicion.value,
+                recepcionDetDocAdquisicion: recepcionDetDocAdquisicion.value,
+                observacionDetDocAdquisicion: observacionDetDocAdquisicion.value,
                 objectGetFromProp: objectGetFromProp.value,
                 arrayLineaTrabajo: arrayLineaTrabajo.value,
                 arrayProductoAdquisicion: arrayProductoAdquisicion.value,
                 arrayMarca: brandsUsedInDoc.value,
                 arrayUnidadMedida: arrayUnidadMedida.value,
                 arrayCentroAtencion: arrayCentroAtencion.value,
+                letterNumber: letterNumber.value,
+                totProductos: totProductos.value,
             });
             // Crear un elemento div y montar la instancia de la aplicación en él
             const div = document.createElement('div');
@@ -789,6 +828,9 @@ export default {
             arrayProductoAdquisicion,
             arrayProductsWhenIsEditable,
             handleProductoSearchByCodigo,
+            notificacionDetDocAdquisicion,
+            recepcionDetDocAdquisicion,
+            observacionDetDocAdquisicion,
         };
     },
 }
