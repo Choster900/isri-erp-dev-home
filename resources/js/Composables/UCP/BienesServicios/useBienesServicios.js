@@ -1,10 +1,13 @@
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import axios from "axios";
 import { executeRequest } from "@/plugins/requestHelpers";
 import Swal from "sweetalert2";
-export const useBienesServicios = () => {
+export const useBienesServicios = (propProdAdquisicion, showModal) => {
     const arrayProductoAdquisicion = ref([])
     const idDetDocAdquisicion = ref(null)
+    const observacionDetDocAdquisicion = ref(null)
+    const recepcionDetDocAdquisicion = ref(null)
+    const notificacionDetDocAdquisicion = ref(null)
     const idLt = ref(null)
     const arrayLineaTrabajo = ref([])
     const arrayDocAdquisicion = ref([])
@@ -239,20 +242,20 @@ export const useBienesServicios = () => {
     }
 
     const loadingNumberLetter = ref(false)
-      /**
-    * Convertir numeros a letras
-    *
-    * @param {string} number - numero a convertir
-    * @returns {Promise<object>} - Objeto con los datos de la respuesta.
-    * @throws {Error} - Error al obtener empleados por nombre.
-    */
-      const getTextForNumber = async (number) => {
+    /**
+  * Convertir numeros a letras
+  *
+  * @param {string} number - numero a convertir
+  * @returns {Promise<object>} - Objeto con los datos de la respuesta.
+  * @throws {Error} - Error al obtener empleados por nombre.
+  */
+    const getTextForNumber = async (number) => {
         try {
             loadingNumberLetter.value = true;
             // Realiza la búsqueda de empleados
             const response = await axios.post(
                 "/convert-numbers-to-string", {
-                    number: number,
+                number: number,
             });
             console.log(response);
             letterNumber.value = response.data
@@ -279,7 +282,10 @@ export const useBienesServicios = () => {
                 const response = await axios.post(
                     "/save-prod-adquicicion", {
                     productAdq: arrayProductoAdquisicion.value,
-                    idDetDocAdquisicion: idDetDocAdquisicion.value
+                    idDetDocAdquisicion: idDetDocAdquisicion.value,
+                    notificacionDetDocAdquisicion: notificacionDetDocAdquisicion.value,
+                    recepcionDetDocAdquisicion: recepcionDetDocAdquisicion.value,
+                    observacionDetDocAdquisicion: observacionDetDocAdquisicion.value,
                 });
                 // Se resuelve la promesa con la respuesta exitosa de la solicitud
                 resolve(response);
@@ -318,6 +324,9 @@ export const useBienesServicios = () => {
                 const response = await axios.post("/update-prod-adquicicion", {
                     productAdq: arrayProductoAdquisicion.value,
                     idDetDocAdquisicion: idDetDocAdquisicion.value,
+                    notificacionDetDocAdquisicion: notificacionDetDocAdquisicion.value,
+                    recepcionDetDocAdquisicion: recepcionDetDocAdquisicion.value,
+                    observacionDetDocAdquisicion: observacionDetDocAdquisicion.value,
                 });
                 // Se resuelve la promesa con la respuesta exitosa de la solicitud
                 resolve(response);
@@ -469,6 +478,138 @@ export const useBienesServicios = () => {
         getArrayObject();
     });
 
+
+    watch(showModal, (newValue, oldValue) => {
+        // Verifica si showModal se ha establecido en falso (se cerró el modal)
+        if (!newValue) {
+            // Restablecer los valores a nulos o vacíos
+            objectGetFromProp.value = []
+            arrayProductoAdquisicion.value = []
+            arrayWhenIsEditingDocAdq.value = []
+            productDataSearched.value = []
+            // Encuentra el índice del objeto que tiene el valor específico en la propiedad "value"
+            const indexAEliminar = arrayDocAdquisicion.value.findIndex(item => item.value === idDetDocAdquisicion.value);
+            // Si el índice es encontrado (diferente de -1), elimina ese elemento del array
+            if (indexAEliminar !== -1) {
+                arrayDocAdquisicion.value.splice(indexAEliminar, 1);
+            }
+            observacionDetDocAdquisicion.value = ''
+            recepcionDetDocAdquisicion.value = ''
+            notificacionDetDocAdquisicion.value = ''
+            idDetDocAdquisicion.value = null
+            estadoDocAdq.value = 1
+            arrayLineaTrabajo.value.forEach((item) => {
+                item.disabled = false;
+            });
+            totProductos.value = null
+            letterNumber.value = null
+        }
+    });
+
+    watch(propProdAdquisicion, (newValue, oldValue) => {
+        // Verifica si showModal se ha establecido en falso (se cerró el modal)
+        if (newValue !== null && newValue !== undefined && (Array.isArray(newValue) ? newValue.length > 0 : newValue !== '')) {
+            // Utiliza el patrón de objeto "guard" para simplificar las verificaciones
+            objectGetFromProp.value = newValue;
+
+            observacionDetDocAdquisicion.value = objectGetFromProp.value.observacion_det_doc_adquisicion
+            recepcionDetDocAdquisicion.value = objectGetFromProp.value.recepcion_det_doc_adquisicion
+            notificacionDetDocAdquisicion.value = objectGetFromProp.value.notificacion_det_doc_adquisicion
+
+            let productosAdquisiciones = objectGetFromProp.value.productos_adquisiciones;
+            console.log(productosAdquisiciones);
+            // Utilizando un conjunto para rastrear los id_lt únicos
+            let idLtSet = new Set();
+            let productArray = new Set();
+            let brandArray = new Set();
+
+            estadoDocAdq.value = objectGetFromProp.value.id_estado_doc_adquisicion
+
+            arrayDocAdquisicion.value.push({
+                value: objectGetFromProp.value.id_det_doc_adquisicion,
+                label: objectGetFromProp.value.nombre_det_doc_adquisicion,
+                dataDoc: objectGetFromProp.value
+            })
+
+            // Utiliza map en lugar de reduce para simplificar la lógica
+            brandsUsedInDoc.value = productosAdquisiciones.map(producto => {
+                let idMarca = producto.id_marca;
+
+                if (!brandArray.has(idMarca)) {
+                    brandArray.add(idMarca);
+                    const marca = producto.marca;
+                    return {
+                        value: marca.id_marca,
+                        label: marca.nombre_marca
+                    };
+                }
+            }).filter(Boolean)  // Filtra los elementos nulos o indefinidos
+            /*  console.log(brandsUsedInDoc.value); */
+            // Utiliza map en lugar de reduce para simplificar la lógica
+            arrayProductsWhenIsEditable.value = productosAdquisiciones.map(producto => {
+                let idProduct = producto.id_producto;
+
+                if (!productArray.has(idProduct)) {
+                    productArray.add(idProduct);
+                    const product = producto.producto;
+                    return {
+                        value: product.id_producto,
+                        label: product.codigo_producto
+                    };
+                }
+            }).filter(Boolean)  // Filtra los elementos nulos o indefinidos
+
+
+            // Utiliza map y filter para mejorar la legibilidad y reducir código duplicado
+            arrayProductoAdquisicion.value = productosAdquisiciones
+                .map(producto => {
+                    let idLt = producto.id_lt;
+                    if (!idLtSet.has(idLt)) {
+                        idLtSet.add(idLt);
+                        return {
+                            idProdAdquisicion: producto.id_prod_adquisicion,
+                            idLt: idLt,
+                            vShowLt: true,
+                            hoverToDelete: false,
+                            estadoLt: 2, // [Comment: Estado manejado en 0 => deleted,1 => created,2 =>edited]
+                            detalleDoc: []
+                        };
+                    }
+                })
+                .filter(Boolean);
+
+            // Utiliza forEach en lugar de map cuando no necesitas un nuevo arreglo resultante
+            productosAdquisiciones.forEach(index => {
+                let indice = arrayProductoAdquisicion.value.findIndex(i => i.idLt == index.id_lt);
+                const { producto } = index;
+                idDetDocAdquisicion.value = index.id_det_doc_adquisicion
+
+                arrayProductoAdquisicion.value[indice]["detalleDoc"].push({
+                    idProdAdquisicion: index.id_prod_adquisicion,
+                    especifico: producto.id_ccta_presupuestal,
+                    idProducto: producto.id_producto,
+                    detalleProducto: producto.nombre_producto,
+                    pesoProducto: producto.unidad_medida.id_unidad_medida,
+                    idCentroAtencion: index.id_centro_atencion,
+                    detalleCentro: index.centro_atencion.nombre_centro_atencion,
+                    idMarca: index.id_marca,
+                    cantProdAdquisicion: index.cant_prod_adquisicion,
+                    costoProdAdquisicion: index.costo_prod_adquisicion,
+                    descripcionProdAdquisicion: index.descripcion_prod_adquisicion,
+                    estadoProdAdquisicion: 2, // [Comment: Estado manejado en 0 => deleted,1 => created,2 =>edited]
+                    valorTotalProduct: index.cant_prod_adquisicion * index.costo_prod_adquisicion,
+                });
+            });
+            onSelectDocAdquisicion(idDetDocAdquisicion.value)
+            sumatorioTotalProduct()
+            disableLt()
+        } else {
+            objectGetFromProp.value = [];
+            arrayProductoAdquisicion.value = []
+            addinDocAdquisicion()
+        }
+    });
+
     return {
         deleteProductAdq,
         totProductos,
@@ -488,6 +629,9 @@ export const useBienesServicios = () => {
         saveProductAdquisicionRequest,
         estadoDocAdq,
         arrayLineaTrabajo,
+        notificacionDetDocAdquisicion,
+        recepcionDetDocAdquisicion,
+        observacionDetDocAdquisicion,
         arrayDocAdquisicion,
         objectGetFromProp,
         arrayUnidadMedida,

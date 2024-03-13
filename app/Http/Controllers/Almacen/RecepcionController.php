@@ -84,6 +84,53 @@ class RecepcionController extends Controller
             }
         }
 
+        if ($column == 2) { //Order by document type
+            $query->orderByRaw('
+                (SELECT id_tipo_doc_adquisicion FROM documento_adquisicion WHERE documento_adquisicion.id_doc_adquisicion = 
+                (SELECT id_doc_adquisicion FROM detalle_documento_adquisicion WHERE detalle_documento_adquisicion.id_det_doc_adquisicion = recepcion_pedido.id_det_doc_adquisicion) 
+            ) ' . $dir);
+        } else {
+            if ($column == 3) { //Order by document number
+                $query->orderByRaw('
+                (SELECT numero_doc_adquisicion FROM documento_adquisicion WHERE documento_adquisicion.id_doc_adquisicion = 
+                (SELECT id_doc_adquisicion FROM detalle_documento_adquisicion WHERE detalle_documento_adquisicion.id_det_doc_adquisicion = recepcion_pedido.id_det_doc_adquisicion) 
+            ) ' . $dir);
+            } else {
+                $query->orderBy($columns[$column], $dir);
+            }
+        }
+
+
+        if ($search_value) {
+            $query->where('id_recepcion_pedido', 'like', '%' . $search_value['id_recepcion_pedido'] . '%') //Search by reception id
+                ->where('acta_recepcion_pedido', 'like', '%' . $search_value['acta_recepcion_pedido'] . '%') //Search by Acta
+                ->where('id_estado_recepcion_pedido', 'like', '%' . $search_value['id_estado_recepcion_pedido'] . '%') //Search by reception status
+                ->where('fecha_recepcion_pedido', 'like', '%' . $search_value['fecha_recepcion_pedido'] . '%') //Search by reception date
+                ->where('monto_recepcion_pedido', 'like', '%' . $search_value['monto_recepcion_pedido'] . '%'); //Search by reception amount
+            //Search by document type
+            if ($search_value['tipo_documento']) {
+                $query->whereHas(
+                    'det_doc_adquisicion.documento_adquisicion',
+                    function ($query) use ($search_value) {
+                        if ($search_value["tipo_documento"] != '') {
+                            $query->where('id_tipo_doc_adquisicion', 'like', '%' . $search_value['tipo_documento'] . '%');
+                        }
+                    }
+                );
+            }
+            //Search by document number
+            if ($search_value['numero_documento']) {
+                $query->whereHas(
+                    'det_doc_adquisicion.documento_adquisicion',
+                    function ($query) use ($search_value) {
+                        if ($search_value["numero_documento"] != '') {
+                            $query->where('numero_doc_adquisicion', 'like', '%' . $search_value['numero_documento'] . '%');
+                        }
+                    }
+                );
+            }
+        }
+
         $data = $query->paginate($length)->onEachSide(1);
         return ['data' => $data, 'draw' => $request->input('draw')];
     }

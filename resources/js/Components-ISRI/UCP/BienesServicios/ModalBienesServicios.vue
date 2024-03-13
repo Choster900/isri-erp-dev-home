@@ -69,37 +69,38 @@
                                 <td class="border border-black h-5" colspan="3">
                                     <h1 class="text-xs font-medium text-center">
                                         {{ arrayDocAdquisicion != '' && idDetDocAdquisicion != null
-                                            && arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion)
-                                            && arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion).dataDoc
-                                            && arrayDocAdquisicion.find(index => index.value
-                                                ==
-                                                idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.razon_social_proveedor
-                                            ?
-                                            arrayDocAdquisicion.find(index => index.value
-                                                ==
-                                                idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.razon_social_proveedor
-                                            :
-                                            '' }}
+                && arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion)
+                && arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion).dataDoc
+                && arrayDocAdquisicion.find(index => index.value
+                    ==
+                    idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.razon_social_proveedor
+                ?
+                arrayDocAdquisicion.find(index => index.value
+                    ==
+                    idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.razon_social_proveedor
+                :
+                '' }}
+                
                                     </h1>
                                 </td>
                                 <td class="border border-black  h-5  text-center text-[9pt] ">
                                     <h1 class="text-xs font-medium text-center">
                                         {{
-                                        arrayDocAdquisicion != '' && idDetDocAdquisicion != null &&
-                                            arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion) &&
-                                            arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion).dataDoc &&
-                                            (arrayDocAdquisicion.find(index => index.value ==
-                                                idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.nit_proveedor !==
-                                                null
-                                                ||
-                                                arrayDocAdquisicion.find(index => index.value ==
-                                                    idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.dui_proveedor !==
-                                                null)
-                                            ? (arrayDocAdquisicion.find(index => index.value ==
-                                                idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.nit_proveedor ||
-                                                arrayDocAdquisicion.find(index => index.value ==
-                                                    idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.dui_proveedor)
-                                            : '' }}
+                arrayDocAdquisicion != '' && idDetDocAdquisicion != null &&
+                    arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion) &&
+                    arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion).dataDoc &&
+                    (arrayDocAdquisicion.find(index => index.value ==
+                        idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.nit_proveedor !==
+                        null
+                        ||
+                        arrayDocAdquisicion.find(index => index.value ==
+                            idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.dui_proveedor !==
+                        null)
+                    ? (arrayDocAdquisicion.find(index => index.value ==
+                        idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.nit_proveedor ||
+                        arrayDocAdquisicion.find(index => index.value ==
+                            idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.dui_proveedor)
+                    : '' }}
                                     </h1>
                                 </td>
                             </tr>
@@ -212,18 +213,18 @@
                                                 :options="arrayMarca" />
                                             <span class="text-center ">
                                                 {{
-                                                    arrayMarca.length > 0 &&
-                                                        arrayMarca
-                                                            .find(index => index.value == detalle.idMarca)
-                                                            ?.dataMarca
-                                                        ?
-                                                        arrayMarca
-                                                            .find(index => index.value ==
-                                                                detalle
-                                                                    .idMarca)
-                                                            .dataMarca.nombre_marca :
-                                                        '-'
-                                                }}
+                arrayMarca.length > 0 &&
+                    arrayMarca
+                        .find(index => index.value == detalle.idMarca)
+                        ?.dataMarca
+                    ?
+                    arrayMarca
+                        .find(index => index.value ==
+                            detalle
+                                .idMarca)
+                        .dataMarca.nombre_marca :
+                    '-'
+            }}
                                             </span>
                                         </div>
                                     </td>
@@ -246,14 +247,14 @@
                                                 :options="arrayUnidadMedida" />
                                             <span class="text-center">
                                                 {{
-                                                    arrayUnidadMedida.length > 0 &&
-                                                        arrayUnidadMedida.find(index => index.value ==
-                                                            detalle.pesoProducto)?.dataUnidad
-                                                        ?
-                                                        arrayUnidadMedida.find(index => index.value ==
-                                                            detalle.pesoProducto).dataUnidad.nombre_unidad_medida :
-                                                        '-'
-                                                }}
+                arrayUnidadMedida.length > 0 &&
+                    arrayUnidadMedida.find(index => index.value ==
+                        detalle.pesoProducto)?.dataUnidad
+                    ?
+                    arrayUnidadMedida.find(index => index.value ==
+                        detalle.pesoProducto).dataUnidad.nombre_unidad_medida :
+                    '-'
+            }}
                                             </span>
                                         </div>
                                     </td>
@@ -275,9 +276,9 @@
                                                 :options="arrayCentroAtencion" />
                                             <span class="text-center">
                                                 {{ arrayCentroAtencion.length > 0 && arrayCentroAtencion.find(index =>
-                                                    index.value == detalle.idCentroAtencion)?.dataCentro ?
-                                                    arrayCentroAtencion.find(index => index.value ==
-                                                        detalle.idCentroAtencion).dataCentro.nombre_centro_atencion : '-' }}
+                index.value == detalle.idCentroAtencion)?.dataCentro ?
+                arrayCentroAtencion.find(index => index.value ==
+                    detalle.idCentroAtencion).dataCentro.nombre_centro_atencion : '-' }}
                                             </span>
                                         </div>
                                     </td>
@@ -340,7 +341,7 @@
                                                 NUEVO PRODUCTO ADQUISICION EN:
                                                 <br>
                                                 {{ arrayLineaTrabajo.find(index => index.value == docAdq.idLt)?.label
-                                                ||''}}
+                                                || '' }}
                                             </span>
                                         </div>
                                     </button>
@@ -372,17 +373,18 @@
                         <col style="width: 550pt;">
                         <tbody>
                             <tr class="*:border *:border-black *:hover:bg-slate-200">
-                                <td class="pl-7 uppercase border py-1  text-[8pt]   text-start ">
+                                <td class="px-1 uppercase border py-1  text-[8pt]   text-start ">
                                     <div>total</div>
                                 </td>
                                 <td class="uppercase border py-1 text-[8pt] font-bold text-center ">
-                                    <div>$ {{ totProductos }}</div>
+                                    <div>$ {{ totProductos || '00.00' }}</div>
                                 </td>
                             </tr>
                             <tr class="*:border *:border-black *:hover:bg-slate-200">
                                 <td colspan="2" class="uppercase border py-1  text-[8pt] font-bold text-center ">
                                     <!-- <div> SON: SIETE MIL OCHENTA DOS 48/100 DOLARES</div> -->
-                                    <div v-if="!loadingNumberLetter"> SON: {{ letterNumber || '' }}</div>
+                                    <div v-if="!loadingNumberLetter"> SON: {{ letterNumber || 'CERO 00/00 DOLAR' }}
+                                    </div>
                                     <div v-else class="flex items-center justify-center h-full">
                                         <div aria-label="Loading..." role="status" class="loader">
                                             <svg class="icon" viewBox="0 0 256 256">
@@ -408,6 +410,27 @@
                                     </div>
                                 </td>
 
+                            </tr>
+                            <tr class="*:border *:border-black *:hover:bg-slate-200">
+                                <td class="px-1 h-auto uppercase border py-1  text-[8pt]   text-start " colspan="2">
+                                    <textarea rows="8" placeholder="OBSERVACION: "
+                                        v-model="observacionDetDocAdquisicion"
+                                        class=" uppercase text-[8pt] p-0 border-none bg-transparent outline-none focus:outline-none focus:ring focus:ring-transparent leading-tight w-full"></textarea>
+                                </td>
+                            </tr>
+                            <tr class="*:border *:border-black *:hover:bg-slate-200">
+                                <td class="px-1 uppercase border py-1  text-[8pt]   text-start " colspan="2">
+                                    <textarea rows="1" placeholder="LUGAR DE ENTREGA: "
+                                        v-model="recepcionDetDocAdquisicion"
+                                        class=" uppercase text-[8pt] p-0 border-none bg-transparent outline-none focus:outline-none focus:ring focus:ring-transparent leading-tight w-full"></textarea>
+                                </td>
+                            </tr>
+                            <tr class="*:border *:border-black *:hover:bg-slate-200">
+                                <td class="px-1 uppercase border py-1  text-[8pt]   text-start " colspan="2">
+                                    <textarea rows="4" placeholder="LUGAR DE NOTIFICACION: "
+                                        v-model="notificacionDetDocAdquisicion"
+                                        class="uppercase text-[8pt] p-0 border-none bg-transparent outline-none focus:outline-none focus:ring focus:ring-transparent leading-tight w-full"></textarea>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -445,21 +468,15 @@
 <script>
 // Importa el componente ProcessModal desde la ruta relativa '@/Components-ISRI/AllModal/ProcessModal.vue'
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue';
-import { ref, toRefs, watch } from 'vue';
+import {toRefs } from 'vue';
 import { useBienesServicios } from '@/Composables/UCP/BienesServicios/useBienesServicios.js';
 import Swal from 'sweetalert2';
 import Tooltip from '@/Components-ISRI/Tooltip.vue';
 import moment from 'moment';
 import { executeRequest } from '@/plugins/requestHelpers';
 import { useConfigPdf } from '@/Composables/UCP/BienesServicios/useConfigPdf';
-import { jsPDF } from "jspdf";
-import html2pdf from 'html2pdf.js'
-import { createApp, h } from 'vue'
-import OrdenCompraBienesServicios from "@/pdf/UnidadComprasPublicas/OrdenCompraBienesServicios.vue";
-import { useNumbersToString } from '@/Composables/UCP/BienesServicios/useNumbersToString';
-/* import {useNumbersToString} from '@/Composables/UCP/BienesServicios/useNumbersToString'; */
-/* useNumbersToString */
-// Define el componente Vue.js
+
+
 export default {
     // Indica que este componente utiliza el componente ProcessModal
     components: { ProcessModal, Tooltip },
@@ -489,161 +506,41 @@ export default {
         const { propProdAdquisicion, showModal } = toRefs(props)
         const {
             idLt,
+            loader,
+            disableLt,
             arrayMarca,
             addingRows,
-            loadingNumberLetter,
-            calculateTotal,
-            sumatorioTotalProduct,
-            arrayLineaTrabajo,
-            objectGetFromProp,
-            arrayUnidadMedida,
-            saveProductAdquisicionRequest,
-            idDetDocAdquisicion,
-            brandsUsedInDoc,
-            arrayWhenIsEditingDocAdq,
-            onSelectDocAdquisicion,
-            arrayDocAdquisicion,
-            addinDocAdquisicion,
-            deleteProductAdq,
-            deletLineaTrabajo,
-            arrayCentroAtencion,
-            updateProductAdquisicionRequest,
-            productDataSearched,
-            loader,
-            setInformacionProduct,
             totProductos,
             letterNumber,
             estadoDocAdq,
-            ArrayProductFiltered,
-            arrayProductsWhenIsEditable,
-            arrayProductoAdquisicion,
+            calculateTotal,
+            brandsUsedInDoc,
+            deleteProductAdq,
             errorsValidation,
-            disableLt,
+            arrayLineaTrabajo,
+            objectGetFromProp,
+            arrayUnidadMedida,
+            deletLineaTrabajo,
+            loadingNumberLetter,
+            idDetDocAdquisicion,
+            arrayDocAdquisicion,
+            addinDocAdquisicion,
+            arrayCentroAtencion,
+            productDataSearched,
+            ArrayProductFiltered,
+            sumatorioTotalProduct,
+            setInformacionProduct,
+            onSelectDocAdquisicion,
+            arrayWhenIsEditingDocAdq,
+            arrayProductoAdquisicion,
+            recepcionDetDocAdquisicion,
+            arrayProductsWhenIsEditable,
+            observacionDetDocAdquisicion,
             handleProductoSearchByCodigo,
-        } = useBienesServicios()
-
-        watch(showModal, (newValue, oldValue) => {
-            // Verifica si showModal se ha establecido en falso (se cerró el modal)
-            if (!newValue) {
-                // Restablecer los valores a nulos o vacíos
-                objectGetFromProp.value = []
-                arrayProductoAdquisicion.value = []
-                arrayWhenIsEditingDocAdq.value = []
-                productDataSearched.value = []
-                // Encuentra el índice del objeto que tiene el valor específico en la propiedad "value"
-                const indexAEliminar = arrayDocAdquisicion.value.findIndex(item => item.value === idDetDocAdquisicion.value);
-                // Si el índice es encontrado (diferente de -1), elimina ese elemento del array
-                if (indexAEliminar !== -1) {
-                    arrayDocAdquisicion.value.splice(indexAEliminar, 1);
-                }
-                idDetDocAdquisicion.value = null
-                estadoDocAdq.value = 1
-                arrayLineaTrabajo.value.forEach((item) => {
-                    item.disabled = false;
-                });
-                totProductos.value = null
-                letterNumber.value = null
-            }
-        });
-
-        watch(propProdAdquisicion, (newValue, oldValue) => {
-            // Verifica si showModal se ha establecido en falso (se cerró el modal)
-            if (newValue !== null && newValue !== undefined && (Array.isArray(newValue) ? newValue.length > 0 : newValue !== '')) {
-                // Utiliza el patrón de objeto "guard" para simplificar las verificaciones
-                objectGetFromProp.value = newValue;
-                let productosAdquisiciones = objectGetFromProp.value.productos_adquisiciones;
-                console.log(productosAdquisiciones);
-                // Utilizando un conjunto para rastrear los id_lt únicos
-                let idLtSet = new Set();
-                let productArray = new Set();
-                let brandArray = new Set();
-
-                estadoDocAdq.value = objectGetFromProp.value.id_estado_doc_adquisicion
-
-                arrayDocAdquisicion.value.push({
-                    value: objectGetFromProp.value.id_det_doc_adquisicion,
-                    label: objectGetFromProp.value.nombre_det_doc_adquisicion,
-                    dataDoc: objectGetFromProp.value
-                })
-
-                // Utiliza map en lugar de reduce para simplificar la lógica
-                brandsUsedInDoc.value = productosAdquisiciones.map(producto => {
-                    let idMarca = producto.id_marca;
-
-                    if (!brandArray.has(idMarca)) {
-                        brandArray.add(idMarca);
-                        const marca = producto.marca;
-                        return {
-                            value: marca.id_marca,
-                            label: marca.nombre_marca
-                        };
-                    }
-                }).filter(Boolean)  // Filtra los elementos nulos o indefinidos
-                /*  console.log(brandsUsedInDoc.value); */
-                // Utiliza map en lugar de reduce para simplificar la lógica
-                arrayProductsWhenIsEditable.value = productosAdquisiciones.map(producto => {
-                    let idProduct = producto.id_producto;
-
-                    if (!productArray.has(idProduct)) {
-                        productArray.add(idProduct);
-                        const product = producto.producto;
-                        return {
-                            value: product.id_producto,
-                            label: product.codigo_producto
-                        };
-                    }
-                }).filter(Boolean)  // Filtra los elementos nulos o indefinidos
-
-
-                // Utiliza map y filter para mejorar la legibilidad y reducir código duplicado
-                arrayProductoAdquisicion.value = productosAdquisiciones
-                    .map(producto => {
-                        let idLt = producto.id_lt;
-                        if (!idLtSet.has(idLt)) {
-                            idLtSet.add(idLt);
-                            return {
-                                idProdAdquisicion: producto.id_prod_adquisicion,
-                                idLt: idLt,
-                                vShowLt: true,
-                                hoverToDelete: false,
-                                estadoLt: 2, // [Comment: Estado manejado en 0 => deleted,1 => created,2 =>edited]
-                                detalleDoc: []
-                            };
-                        }
-                    })
-                    .filter(Boolean);
-
-                // Utiliza forEach en lugar de map cuando no necesitas un nuevo arreglo resultante
-                productosAdquisiciones.forEach(index => {
-                    let indice = arrayProductoAdquisicion.value.findIndex(i => i.idLt == index.id_lt);
-                    const { producto } = index;
-                    idDetDocAdquisicion.value = index.id_det_doc_adquisicion
-                    arrayProductoAdquisicion.value[indice]["detalleDoc"].push({
-                        idProdAdquisicion: index.id_prod_adquisicion,
-                        especifico: producto.id_ccta_presupuestal,
-                        idProducto: producto.id_producto,
-                        detalleProducto: producto.nombre_producto,
-                        pesoProducto: producto.unidad_medida.id_unidad_medida,
-                        idCentroAtencion: index.id_centro_atencion,
-                        detalleCentro: index.centro_atencion.nombre_centro_atencion,
-                        idMarca: index.id_marca,
-                        cantProdAdquisicion: index.cant_prod_adquisicion,
-                        costoProdAdquisicion: index.costo_prod_adquisicion,
-                        descripcionProdAdquisicion: index.descripcion_prod_adquisicion,
-                        estadoProdAdquisicion: 2, // [Comment: Estado manejado en 0 => deleted,1 => created,2 =>edited]
-                        valorTotalProduct: index.cant_prod_adquisicion * index.costo_prod_adquisicion,
-                    });
-                });
-                onSelectDocAdquisicion(idDetDocAdquisicion.value)
-                sumatorioTotalProduct()
-                disableLt()
-            } else {
-                objectGetFromProp.value = [];
-                arrayProductoAdquisicion.value = []
-                addinDocAdquisicion()
-
-            }
-        });
+            notificacionDetDocAdquisicion,
+            saveProductAdquisicionRequest,
+            updateProductAdquisicionRequest,
+        } = useBienesServicios(propProdAdquisicion, showModal)
 
         /**
           * Guarda productos adquisicion
@@ -698,97 +595,59 @@ export default {
             }
         }
 
-        const printPdf = () => {
-            console.log(objectGetFromProp.value);
-            let fecha = moment().format('DD-MM-YYYY');
-            let name = 'NOMBRE DOCUMENTO - FECHA - CODIGO';
-            const opt = {
-                margin: [0.5, 0.5, 2, 0.5], //top, left, bottom, right,
-                filename: 'evaluacion',
-                //pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 3, useCORS: true },
-                jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' }
-            };
-            // Crear una instancia de la aplicación Vue para generar el componente quedanPDFVue
-            const app = createApp(OrdenCompraBienesServicios, {
-                arrayDocAdquisicion: arrayDocAdquisicion.value,
-                idDetDocAdquisicion: idDetDocAdquisicion.value,
-                objectGetFromProp: objectGetFromProp.value,
-                arrayLineaTrabajo: arrayLineaTrabajo.value,
-                arrayProductoAdquisicion: arrayProductoAdquisicion.value,
-                arrayMarca: brandsUsedInDoc.value,
-                arrayUnidadMedida: arrayUnidadMedida.value,
-                arrayCentroAtencion: arrayCentroAtencion.value,
-            });
-            // Crear un elemento div y montar la instancia de la aplicación en él
-            const div = document.createElement('div');
-            const pdfPrint = app.mount(div);
-            const html = div.outerHTML;
-            const currentDateTime = moment().format('DD/MM/YYYY, HH:mm:ss');
-
-            // Generar y guardar el PDF utilizando html2pdf
-            html2pdf().set(opt).from(html).toPdf().get('pdf').then(function (pdf) {
-                var totalPages = pdf.internal.getNumberOfPages();
-                for (var i = 1; i <= totalPages; i++) {
-                    pdf.setPage(i);
-                    pdf.setFontSize(10);
-                    //Text for the page number
-                    let text = 'Página ' + i + ' de ' + totalPages;
-                    const centerX = pdf.internal.pageSize.getWidth() / 2;
-                    //Get the text width
-                    const textWidth1 = pdf.getStringUnitWidth(text) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
-                    //Get the middle position including the text width
-                    const textX = centerX - (textWidth1 / 2);
-                    //Write the text in the desired coordinates.
-                    pdf.text(textX, (pdf.internal.pageSize.getHeight() - 0.6), text);
-                    //Text for the date and time.
-                    let date_text = 'Generado: ' + currentDateTime
-                    //Get the text width
-                    const textWidth = pdf.getStringUnitWidth(date_text) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
-                    //Write the text in the desired coordinates.
-                    pdf.text(pdf.internal.pageSize.getWidth() - textWidth - 0.6, pdf.internal.pageSize.getHeight() - 0.6, date_text);
-                }
-
-            })
-                .save()
-                .catch(err => console.log(err));
-        };
+        const { printPdf } = useConfigPdf(
+            arrayDocAdquisicion,
+            idDetDocAdquisicion,
+            objectGetFromProp,
+            notificacionDetDocAdquisicion,
+            recepcionDetDocAdquisicion,
+            observacionDetDocAdquisicion,
+            arrayLineaTrabajo,
+            arrayProductoAdquisicion,
+            brandsUsedInDoc,
+            arrayUnidadMedida,
+            arrayCentroAtencion,
+            letterNumber,
+            totProductos
+        )
 
         return {
-            letterNumber,
-            onSelectDocAdquisicion,
-            deletLineaTrabajo,
-            deleteProductAdq,
             idLt,
-            arrayWhenIsEditingDocAdq,
-            errorsValidation,
-            arrayMarca,
-            ArrayProductFiltered,
-            addingRows,
+            loader,
+            moment,
             printPdf,
             disableLt,
-            objectGetFromProp,
+            arrayMarca,
+            addingRows,
+            letterNumber,
             estadoDocAdq,
-            loader,
+            totProductos,
+            letterNumber,
             calculateTotal,
+            deleteProductAdq,
+            errorsValidation,
+            deletLineaTrabajo,
+            objectGetFromProp,
             arrayLineaTrabajo,
             arrayUnidadMedida,
-            moment,
             addinDocAdquisicion,
-            updateProductAdquisicion,
             productDataSearched,
             arrayCentroAtencion,
             arrayDocAdquisicion,
             idDetDocAdquisicion,
-            setInformacionProduct,
             loadingNumberLetter,
+            ArrayProductFiltered,
+            setInformacionProduct,
+            onSelectDocAdquisicion,
             saveProductAdquisicion,
-            totProductos,
-            letterNumber,
+            arrayWhenIsEditingDocAdq,
+            updateProductAdquisicion,
             arrayProductoAdquisicion,
+            recepcionDetDocAdquisicion,
             arrayProductsWhenIsEditable,
             handleProductoSearchByCodigo,
+            observacionDetDocAdquisicion,
+            notificacionDetDocAdquisicion,
         };
     },
 }

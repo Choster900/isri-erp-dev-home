@@ -74,6 +74,9 @@ class BienesServiciosController extends Controller
             DB::beginTransaction();
             $detalles = $request->productAdq;
             $idDetDocAdquisicion = $request->idDetDocAdquisicion;
+            $notificacionDetDocAdquisicion = $request->notificacionDetDocAdquisicion;
+            $recepcionDetDocAdquisicion = $request->recepcionDetDocAdquisicion;
+            $observacionDetDocAdquisicion = $request->observacionDetDocAdquisicion;
             $usuario = $request->user()->nick_usuario;
             $ip = $request->ip();
             $fechaActual = now();
@@ -98,7 +101,7 @@ class BienesServiciosController extends Controller
                                 'ip_prod_adquisicion'          => $ip,
                             ];
                             // Sumando el total
-                            $totCostoProdAdquisicion += $detalleProducto["costoProdAdquisicion"];
+                            $totCostoProdAdquisicion += $detalleProducto["valorTotalProduct"];
 
                             // Usar DB::insert para insertar directamente y mejorar el rendimiento
                             DB::table('producto_adquisicion')->insert($nuevoDetalle);
@@ -107,7 +110,10 @@ class BienesServiciosController extends Controller
                 }
             }
             DetDocumentoAdquisicion::where("id_det_doc_adquisicion", $idDetDocAdquisicion)->update([
-                "monto_det_doc_adquisicion" => $totCostoProdAdquisicion
+                "monto_det_doc_adquisicion" => $totCostoProdAdquisicion,
+                "observacion_det_doc_adquisicion" => $notificacionDetDocAdquisicion,
+                "recepcion_det_doc_adquisicion" => $recepcionDetDocAdquisicion,
+                "notificacion_det_doc_adquisicion" => $observacionDetDocAdquisicion,
             ]);
 
             DB::commit();
@@ -124,6 +130,9 @@ class BienesServiciosController extends Controller
         try {
             $detalles = $request->productAdq;
             $idDetDocAdquisicion = $request->idDetDocAdquisicion;
+            $notificacionDetDocAdquisicion = $request->notificacionDetDocAdquisicion;
+            $recepcionDetDocAdquisicion = $request->recepcionDetDocAdquisicion;
+            $observacionDetDocAdquisicion = $request->observacionDetDocAdquisicion;
             $usuario = $request->user()->nick_usuario;
             $ip = $request->ip();
             $fechaActual = now();
@@ -155,7 +164,7 @@ class BienesServiciosController extends Controller
                             ]);
 
                             // Sumando el total
-                            $totCostoProdAdquisicion += $detalleProducto["costoProdAdquisicion"];
+                            $totCostoProdAdquisicion += $detalleProducto["valorTotalProduct"];
                         }
                         // Insertar nuevo producto
                         else if ($detalleProducto["estadoProdAdquisicion"] == 1) {
@@ -175,7 +184,7 @@ class BienesServiciosController extends Controller
                             ];
 
                             // Sumando el total
-                            $totCostoProdAdquisicion += $detalleProducto["costoProdAdquisicion"];
+                            $totCostoProdAdquisicion += $detalleProducto["valorTotalProduct"];
                             // Usar DB::insert para insertar directamente y mejorar el rendimiento
                             DB::table('producto_adquisicion')->insert($nuevoDetalle);
                         }
@@ -203,7 +212,10 @@ class BienesServiciosController extends Controller
                 }
             }
             DetDocumentoAdquisicion::where("id_det_doc_adquisicion", $idDetDocAdquisicion)->update([
-                "monto_det_doc_adquisicion" => $totCostoProdAdquisicion
+                "monto_det_doc_adquisicion" => $totCostoProdAdquisicion,
+                "observacion_det_doc_adquisicion" => $notificacionDetDocAdquisicion,
+                "recepcion_det_doc_adquisicion" => $recepcionDetDocAdquisicion,
+                "notificacion_det_doc_adquisicion" => $observacionDetDocAdquisicion,
             ]);
 
             return response()->json(["message" => "Actualización exitosa"]);

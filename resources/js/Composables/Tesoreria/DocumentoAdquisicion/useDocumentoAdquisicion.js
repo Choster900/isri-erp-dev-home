@@ -98,6 +98,7 @@ export const useDocumentoAdquisicion = (context) => {
     };
 
     const setModalValues = (data) => {
+        console.log(data);
         //Set the multiselects options
         management_types.value = data.management_types
         financing_sources.value = data.financing_sources

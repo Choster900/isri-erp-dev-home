@@ -85,7 +85,7 @@
                 <label for="" class="text-[7pt] font-semibold mr-2">LUGAR Y FECHA: </label>
 
                 <div
-                    class="w-96 text-[7pt] font-medium uppercase  h-5 border-x-0 border-t-0 border-b border-black text-center">
+                    class="w-96 text-[7pt] font-medium uppercase  h-5 border-x-0 border-t-0 border-b border-black text-start">
                     <div class="" style="margin-top: -2px">
                         {{ `SAN SALVADOR
                         ${moment(objectGetFromProp.fecha_reg_det_doc_adquisicion)
@@ -98,7 +98,7 @@
                 <label for="" class="text-[7pt] font-semibold mr-2">N°.ORDEN:</label>
 
                 <div
-                    class="w-40 text-[7pt] font-medium uppercase  h-5 border-x-0 border-t-0 border-b border-black text-center">
+                    class="w-40 text-[7pt] font-medium uppercase  h-5 border-x-0 border-t-0 border-b border-black text-start">
                     <div class="" style="margin-top: -2px">
                         {{ ((arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion) || {}).dataDoc ||
                             {}).documento_adquisicion?.numero_doc_adquisicion || '-' }}
@@ -109,7 +109,7 @@
     </div>
     <table class="w-full" border="0" cellpadding="0" cellspacing="0">
         <thead>
-            <tr class="*:text-[8pt] *:bg-black *:text-white *:px-2 *:py-0.5 *:font-normal *:border--white">
+            <tr class="*:text-[7pt] *:bg-black *:text-white *:px-2 *:py-0.5 *:font-normal *:border--white">
                 <th class="border border-black border-r-white border-b-white h-9 w-[90px]">
                     <div style="margin-top: -9px">
                         PRODUCTO
@@ -125,7 +125,7 @@
                         DESCRIPCION
                     </div>
                 </th>
-                <th class="border border-black border-r-white border-b-white  w-10" colspan="2">
+                <th class="border border-black border-r-white border-b-white  w-10" colspan="1">
                     <div style="margin-top: -9px">
                         U/MEDIDAS
                     </div>
@@ -159,32 +159,31 @@
             </tr>
         </thead>
         <tbody v-for="(docAdq, i) in arrayProductoAdquisicion" :key="i">
-            <tr class="">
-                <td colspan="6"
+            <tr class="" style="page-break-inside: avoid;">
+                <td colspan="5"
                     class="uppercase border py-1 bg-black text-[8pt] text-white border-black border-r-white  text-center ">
                     <div style="margin-top: -10px">
                         Linea de trabajo:
                     </div>
                 </td>
 
-                <td colspan="5"
-                    class="uppercase border py-1 bg-black text-[8pt] text-white border-black text-center ">
+                <td colspan="5" class="uppercase border py-1 bg-black text-[8pt] text-white border-black text-center ">
                     <div style="margin-top: -10px">
                         Documento de adquisicion:
                     </div>
                 </td>
 
             </tr>
-            <tr class="">
+            <tr class="" style="page-break-inside: avoid;">
 
-                <td colspan="6" class="border border-y-black border-l-black border-r-black">
-                    <div style="margin-top: -4px" class="text-[7pt] pb-2 px-0.5">
+                <td colspan="5" class="border border-y-black border-l-black border-r-black">
+                    <div style="margin-top: -4px" class="text-[6pt] pb-2 px-1">
                         {{ arrayLineaTrabajo.find(d => d.value === docAdq.idLt)?.label }}
                     </div>
                 </td>
 
                 <td colspan="5" class="border border-y-black border-l-0 border-r-black">
-                    <div style="margin-top: -4px" class="text-[7pt] pb-2 px-1   ">
+                    <div style="margin-top: -4px" class="text-[6pt] pb-2 px-1   ">
                         {{ arrayDocAdquisicion.find(d => d.value === idDetDocAdquisicion)?.label ||
                             '' }}
                     </div>
@@ -192,15 +191,13 @@
                 </td>
             </tr>
             <tr style="page-break-inside: avoid;"
-                class="*:px-2 *:py-0.5 *:font-normal *:border *:border-black *:border-l-0" :class="{
-                            '*:border-b-0': j + 1 != docAdq.detalleDoc.length,
+                class="*:px-2 *:pb-2 *:font-normal *:border *:border-black *:border-l-0" :class="{
+                            '*:border-b-1': j + 1 != docAdq.detalleDoc.length,
                             '*:border-t-0': j == 0
                         }" v-for="(detalle, j) in docAdq.detalleDoc" :key="j">
                 <td class="relative  align-top" style="border-left: 1px solid black !important;">
                     <div class="text-[6pt]  text-center">
                         {{ detalle.detalleProducto }}
-                        {{ j + 1 }}
-                        {{ docAdq.detalleDoc.length }}
                     </div>
                 </td>
                 <td class="relative w-[80px] align-top">
@@ -209,11 +206,11 @@
                     </div>
                 </td>
                 <td class="relative w-32 uppercase align-top" colspan="2">
-                    <div class="text-[6pt] text-center pb-2">
+                    <div class="text-[6pt] pb-2 text-justify">
                         {{ detalle.descripcionProdAdquisicion }}
                     </div>
                 </td>
-                <td class="relative  w-[80px] align-top" colspan="2">
+                <td class="relative  align-top" colspan="1">
                     <div class="text-[6pt]  text-center">
                         {{
                             arrayUnidadMedida
@@ -228,7 +225,7 @@
 
                     </div>
                 </td>
-                <td class="relative h-20 w-[100px] align-top">
+                <td class="relative  w-[100px] align-top">
 
                     <div class="text-[6pt]  text-center">
                         {{ arrayCentroAtencion.
@@ -260,34 +257,94 @@
                 </td>
             </tr>
         </tbody>
-        <tbody >
-            <tr class="">
-                <td colspan="10"
-                    class="pl-7 uppercase border py-1  text-[8pt]  border-x-black border-t-0 border-b-0   text-start ">
+        <tbody style="page-break-inside: avoid;">
+            <tr class="" style="page-break-inside: avoid;">
+                <td colspan="9"
+                    class="px-1 uppercase border py-1  text-[8pt]  border-x-black border-t-black border-b-0   text-start ">
                     <div style="margin-top: -10px">
                         total
                     </div>
                 </td>
 
                 <td colspan="1"
-                    class="uppercase border py-1 text-[8pt]  border-b-0 border-l-0 border-t-0 border-r-black  text-center ">
+                    class="uppercase border py-1 text-[8pt]  border-b-0 border-l-0 border-t-black border-r-black  text-center ">
                     <div style="margin-top: -10px">
-                        $ 1500.00
+                        $ {{ totProductos }}
                     </div>
                 </td>
 
             </tr>
-            <tr class="">
-                <td colspan="11"
-                    class="uppercase border py-1  text-[8pt]  border-x-black border-t-black border-r-black border-b-black text-center ">
+            <tr class="" style="page-break-inside: avoid;">
+                <td colspan="10"
+                    class="uppercase border py-1  text-[8pt] font-bold border-x-black border-t-black border-r-black border-b-black text-center ">
                     <div style="margin-top: -10px">
-                        SON: SIETE MIL OCHENTA DOS 48/100 DOLARES
+                        SON: {{ letterNumber }}
                     </div>
                 </td>
-
-
             </tr>
+            <!-- !NUEVO -->
+            <tr class="" style="page-break-inside: avoid;">
+                <td colspan="10"
+                    class="uppercase relative  align-top border py-1 h-20 text-[7pt] px-1  border-x-black border-t-black border-t-0 border-r-black border-b-black text-start ">
+                    <div style="margin-top: -10px">
+                        {{ observacionDetDocAdquisicion }}
+                    </div>
+                </td>
+            </tr>
+            <tr class="" style="page-break-inside: avoid;">
+                <td colspan="10"
+                    class="uppercase border py-1  relative h-8 align-top text-[7pt] px-1 border-x-black border-t-black border-t-0 border-r-black border-b-black text-start ">
+                    <div style="margin-top: -10px">
+                        {{ recepcionDetDocAdquisicion }}
+                    </div>
+                </td>
+            </tr>
+            <tr class="" style="page-break-inside: avoid;">
+                <td colspan="10"
+                    class="uppercase border py-1 h-14 relative  align-top text-[7pt] px-1 border-x-black border-t-black border-t-0 border-r-black border-b-black text-start ">
+                    <div style="margin-top: -10px">
+                        {{ notificacionDetDocAdquisicion }}
+                    </div>
+                </td>
+            </tr>
+
         </tbody>
+    </table>
+    <!-- ! FIRMA  -->
+    <table class="w-full">
+        <tr class="" style="page-break-inside: avoid;">
+            <td colspan="5"
+                class="uppercase border py-1 h-24 relative  align-bottom text-[7pt] px-1 border-x-black border-t-black border-t-0 border-r-black border-b-black text-center ">
+
+
+                <div class="flex flex-col items-center justify-center" style="margin-top: -20px">
+                    <hr class="w-[50%] border-1 border-black">
+                    <span class="block">titular o designado</span>
+                </div>
+            </td>
+            <td colspan="5"
+                class="uppercase border py-1 h-24 relative  align-top text-[7pt] px-1 border-x-black border-t-black border-t-0 border-r-black border-b-black text-start ">
+                <div style="margin-top: -10px" class="text-white">
+                    titular o designado <!-- no se mostrara en el pdf pero es para que no se modifique el estilo -->
+                </div>
+            </td>
+        </tr>
+        <tr class="" style="page-break-inside: avoid;">
+            <td colspan="5"
+                class="uppercase border py-1 h-24 relative  align-bottom text-[7pt] px-1 border-x-black border-t-black border-t-0 border-r-black border-b-black text-start ">
+                <div class="flex flex-col items-center justify-center" style="margin-top: -20px">
+                    <hr class="w-[50%] border-1 border-black">
+                   <!--  <span class="block">titular o designado</span> -->
+                </div>
+            </td>
+            <td colspan="5"
+                class="uppercase border py-1 h-24 relative  align-bottom text-[7pt] px-1 border-x-black border-t-black border-t-0 border-r-black border-b-black text-start ">
+                <div class="flex flex-col items-center justify-center" style="margin-top: -20px">
+                    <hr class="w-[50%] border-1 border-black">
+                    <span class="block">Suministrante</span>
+                </div>
+            </td>
+        </tr>
     </table>
 </template>
 
@@ -335,7 +392,31 @@ export default {
             default: () => { },
             required: true,
         },
-
+        notificacionDetDocAdquisicion: {
+            type: Object,
+            default: () => { },
+            required: true,
+        },
+        observacionDetDocAdquisicion: {
+            type: Object,
+            default: () => { },
+            required: true,
+        },
+        recepcionDetDocAdquisicion: {
+            type: Object,
+            default: () => { },
+            required: true,
+        },
+        letterNumber: {
+            type: Object,
+            default: () => { },
+            required: true,
+        },
+        totProductos: {
+            type: Object,
+            default: () => { },
+            required: true,
+        },
     },
     setup() {
         return {
