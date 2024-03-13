@@ -263,14 +263,14 @@
         <tbody >
             <tr class="">
                 <td colspan="10"
-                    class="pl-7 uppercase border py-1 bg-black text-[8pt] text-white border-x-0 border-t-0 border-b-white   text-start ">
+                    class="pl-7 uppercase border py-1  text-[8pt]  border-x-black border-t-0 border-b-0   text-start ">
                     <div style="margin-top: -10px">
                         total
                     </div>
                 </td>
 
                 <td colspan="1"
-                    class="uppercase border py-1 bg-black text-[8pt] text-white border-b-white border-x-0 border-t-0  text-center ">
+                    class="uppercase border py-1 text-[8pt]  border-b-0 border-l-0 border-t-0 border-r-black  text-center ">
                     <div style="margin-top: -10px">
                         $ 1500.00
                     </div>
@@ -279,7 +279,7 @@
             </tr>
             <tr class="">
                 <td colspan="11"
-                    class="uppercase border py-1 bg-black text-[8pt] text-white border-x-0 border-t-0 border-r-white  text-center ">
+                    class="uppercase border py-1  text-[8pt]  border-x-black border-t-black border-r-black border-b-black text-center ">
                     <div style="margin-top: -10px">
                         SON: SIETE MIL OCHENTA DOS 48/100 DOLARES
                     </div>

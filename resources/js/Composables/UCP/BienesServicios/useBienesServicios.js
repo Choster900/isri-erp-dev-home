@@ -27,6 +27,10 @@ export const useBienesServicios = () => {
     // Esto se hace con el propósito de evitar el procesamiento lento al enviar el documento completo de marcas.
     const brandsUsedInDoc = ref(null)
     const loader = ref(null)
+
+    const letterNumber = ref(null)
+    const totProductos = ref(null)
+
     /**
      * Agrega una nueva fila de detalle de adquisición a la matriz de productos de adquisición.
      * @param {number} i - Índice de la fila en la que se agregará el detalle de adquisición.
@@ -46,11 +50,11 @@ export const useBienesServicios = () => {
                     idCentroAtencion: '',
                     detalleCentro: '',
                     idMarca: '',
-                    cantProdAdquisicion: '',
-                    costoProdAdquisicion: '',
+                    cantProdAdquisicion: 0,
+                    costoProdAdquisicion: 0,
                     descripcionProdAdquisicion: '',
                     estadoProdAdquisicion: 1,
-                    valorTotalProduct: '',
+                    valorTotalProduct: 0,
                 });
 
                 // Muestra la matriz actualizada en la consola
@@ -213,13 +217,53 @@ export const useBienesServicios = () => {
             // Realiza el cálculo del valor total y asigna al producto
             const valorTotal = cantProdAdquisicion * costoProdAdquisicion;
             arrayProductoAdquisicion.value[docAdq].detalleDoc[detalleDocAdq].valorTotalProduct = valorTotal;
-
-            // Log del valor total calculado y del producto actualizado
-            // console.log(`Valor total calculado: ${valorTotal}`);
-            // console.log("Producto actualizado con el valor total:", arrayProductoAdquisicion.value[docAdq].detalleDoc[detalleDocAdq]);
+            sumatorioTotalProduct()
         } catch (error) {
             // Maneja los errores imprimiéndolos en la consola.
             console.error("Error al calcular el valor total del producto:", error);
+        }
+    };
+
+    const sumatorioTotalProduct = () => {
+        let suma = []
+        arrayProductoAdquisicion.value.forEach(element => {
+            element.detalleDoc.forEach(element2 => {
+                suma.push(element2)
+            });
+        });
+
+        let sumaTotal = suma.reduce((acumulador, producto) => acumulador + producto.valorTotalProduct, 0);
+        console.log("La suma total de los valores de los productos es: " + sumaTotal);
+        totProductos.value = sumaTotal
+        getTextForNumber(sumaTotal)
+    }
+
+    const loadingNumberLetter = ref(false)
+      /**
+    * Convertir numeros a letras
+    *
+    * @param {string} number - numero a convertir
+    * @returns {Promise<object>} - Objeto con los datos de la respuesta.
+    * @throws {Error} - Error al obtener empleados por nombre.
+    */
+      const getTextForNumber = async (number) => {
+        try {
+            loadingNumberLetter.value = true;
+            // Realiza la búsqueda de empleados
+            const response = await axios.post(
+                "/convert-numbers-to-string", {
+                    number: number,
+            });
+            console.log(response);
+            letterNumber.value = response.data
+            //return response.data;
+        } catch (error) {
+            // Manejo de errores específicos
+            console.error("Error al obtener empleados por nombre:", error);
+            // Lanza el error para que pueda ser manejado por el componente que utiliza este composable
+            throw new Error("Error en la búsqueda de empleados");
+        } finally {
+            loadingNumberLetter.value = false;
         }
     };
 
@@ -427,6 +471,8 @@ export const useBienesServicios = () => {
 
     return {
         deleteProductAdq,
+        totProductos,
+        letterNumber,
         onSelectDocAdquisicion,
         deletLineaTrabajo,
         disableLt,
@@ -451,7 +497,9 @@ export const useBienesServicios = () => {
         productDataSearched,
         addingRows,
         arrayWhenIsEditingDocAdq,
+        sumatorioTotalProduct,
         brandsUsedInDoc,
+        loadingNumberLetter,
         handleProductoSearchByCodigo,
         setInformacionProduct,
     }
