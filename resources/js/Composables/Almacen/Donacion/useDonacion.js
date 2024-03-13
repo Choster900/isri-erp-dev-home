@@ -80,7 +80,7 @@ export const useDonacion = (context) => {
                     //Construct the options
                     let arrayOpt = {
                         value: element.producto.id_producto,
-                        label: element.producto.id_ccta_presupuestal+" - "+element.producto.nombre_producto,
+                        label: element.producto.id_ccta_presupuestal + " - " + element.producto.nombre_producto,
                     };
                     products.value.push(arrayOpt);
                     defaultProds.value.push(arrayOpt);
@@ -92,7 +92,7 @@ export const useDonacion = (context) => {
                         centerId: element.id_centro_atencion, //Care center
                         isLoadingProd: false, //Flag to manage loader for every multiselect
                         //Product description
-                        desc: element.producto.codigo_producto+' — '+ element.producto.nombre_producto + ' — ' + element.producto.descripcion_producto + ' — ' + element.producto.unidad_medida.nombre_unidad_medida,
+                        desc: element.producto.codigo_producto + ' — ' + element.producto.nombre_producto + ' — ' + element.producto.descripcion_producto + ' — ' + element.producto.unidad_medida.nombre_unidad_medida,
                         qty: element.cant_det_recepcion_pedido, //Represents the the number of products the user wants to register
                         cost: element.costo_det_recepcion_pedido, //Represents the the cost of the product
                         total: "", //Represents the result of qty x cost for every row
@@ -132,12 +132,42 @@ export const useDonacion = (context) => {
         });
     }
 
+    const deleteRow = (index, detRecId) => {
+        if (activeDetails.value.length <= 1) {
+            useShowToast(toast.warning, "No puedes eliminar todas las filas.");
+        } else {
+            swal({
+                title: 'Eliminar producto.',
+                text: "¿Estas seguro de eliminar temporalmente el producto? Los cambios surtiran efecto al actualizar la donacion.",
+                icon: 'warning',
+                showCancelButton: true,
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#DC2626',
+                cancelButtonColor: '#4B5563',
+                confirmButtonText: 'Si, Eliminar.'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    useShowToast(toast.success, "Producto eliminado temporalmente.");
+                    if (detRecId === "") {
+                        donInfo.value.prods.splice(index, 1);
+                    } else {
+                        donInfo.value.prods[index].deleted = true
+                    }
+                }
+            });
+        }
+    }
+
+    const activeDetails = computed(() => {
+        return donInfo.value.prods.filter((detail) => detail.deleted == false)
+    });
+
     const asyncFindProduct = _.debounce(async (query, index, prodId) => {
         try {
             donInfo.value.prods[index].isLoadingProd = true
             if (query.length >= 3) {
                 // Filtrar los elementos de defaultProds que tengan un valor diferente a prodId
-                const filteredProds = donInfo.value.prods.filter((e) => e.prodId !== prodId);
+                const filteredProds = donInfo.value.prods.filter((e) => e.prodId !== prodId && e.deleted == false);
                 // Crear un array no asociativo con solo las propiedades 'value' de los elementos filtrados
                 const prodIdToIgnore = filteredProds.map((e) => e.prodId); //Productos que debe ignorar al momento de realizar la busqueda asincrona
                 const response = await axios.post("/search-donation-product", {
@@ -167,8 +197,12 @@ export const useDonacion = (context) => {
     }
 
     const selectProd = (prodId, index) => {
-        const selectedProd = products.value.find((e) => e.value === prodId)
-        donInfo.value.prods[index].desc = selectedProd.allInfo.codigo_producto+' — '+selectedProd.allInfo.nombre_producto+' — '+selectedProd.allInfo.descripcion_producto+' — '+selectedProd.allInfo.unidad_medida.nombre_unidad_medida
+        if (prodId) {
+            const selectedProd = products.value.find((e) => e.value === prodId)
+            donInfo.value.prods[index].desc = selectedProd.allInfo.codigo_producto + ' — ' + selectedProd.allInfo.nombre_producto + ' — ' + selectedProd.allInfo.descripcion_producto + ' — ' + selectedProd.allInfo.unidad_medida.nombre_unidad_medida
+        }else{
+            donInfo.value.prods[index].desc = ''
+        }
         donInfo.value.prods[index].centerId = ''
         donInfo.value.prods[index].qty = ''
         donInfo.value.prods[index].cost = ''
@@ -202,7 +236,8 @@ export const useDonacion = (context) => {
 
     return {
         isLoadingRequest, errors, donInfo, suppliers, products, centers,
-        asyncFindProduct, isLoadingProduct, totalRec, 
-        getInfoForModalDonation, selectProv, openAnySelect, selectProd, addNewRow
+        asyncFindProduct, isLoadingProduct, totalRec,
+        getInfoForModalDonation, selectProv, openAnySelect, selectProd, addNewRow,
+        deleteRow
     }
 }
