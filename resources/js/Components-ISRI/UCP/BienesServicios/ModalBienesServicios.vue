@@ -68,42 +68,43 @@
                             <tr>
                                 <td class="border border-black h-5" colspan="3">
                                     <h1 class="text-xs font-medium text-center">
-                                        {{
-                                            arrayDocAdquisicion != '' && idDetDocAdquisicion != null &&
-                                            arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion) &&
-                                            arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion).dataDoc &&
-                                            arrayDocAdquisicion.find(index => index.value ==
+                                        {{ arrayDocAdquisicion != '' && idDetDocAdquisicion != null
+                                            && arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion)
+                                            && arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion).dataDoc
+                                            && arrayDocAdquisicion.find(index => index.value
+                                                ==
                                                 idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.razon_social_proveedor
-                                            ? arrayDocAdquisicion.find(index => index.value ==
+                                            ?
+                                            arrayDocAdquisicion.find(index => index.value
+                                                ==
                                                 idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.razon_social_proveedor
-                                            : ''
-                                        }}
+                                            :
+                                            '' }}
                                     </h1>
                                 </td>
                                 <td class="border border-black  h-5  text-center text-[9pt] ">
                                     <h1 class="text-xs font-medium text-center">
                                         {{
-                                            arrayDocAdquisicion != '' && idDetDocAdquisicion != null &&
+                                        arrayDocAdquisicion != '' && idDetDocAdquisicion != null &&
                                             arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion) &&
                                             arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion).dataDoc &&
                                             (arrayDocAdquisicion.find(index => index.value ==
-                                                idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.nit_proveedor !== null
+                                                idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.nit_proveedor !==
+                                                null
                                                 ||
                                                 arrayDocAdquisicion.find(index => index.value ==
-                                                    idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.dui_proveedor !== null)
+                                                    idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.dui_proveedor !==
+                                                null)
                                             ? (arrayDocAdquisicion.find(index => index.value ==
                                                 idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.nit_proveedor ||
                                                 arrayDocAdquisicion.find(index => index.value ==
                                                     idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.dui_proveedor)
-                                            : ''
-                                        }}
+                                            : '' }}
                                     </h1>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
-
-
                     <div id="especificaciones" class="mb-4">
                         <div class="flex items-center justify-between pt-4 ">
                             <div class="flex items-center" v-if="propProdAdquisicion == ''">
@@ -128,10 +129,13 @@
                     </div>
                     <table class="w-[830px]" border="0" cellpadding="0" cellspacing="0">
                         <thead>
-                            <tr class="*:text-[8pt] *:bg-black *:text-white *:px-2 *:py-0.5 *:font-normal *:border--white">
-                                <th class="border border-black border-r-white border-b-white h-9 w-[110px]">PRODUCTO</th>
+                            <tr
+                                class="*:text-[8pt] *:bg-black *:text-white *:px-2 *:py-0.5 *:font-normal *:border--white">
+                                <th class="border border-black border-r-white border-b-white h-9 w-[110px]">PRODUCTO
+                                </th>
                                 <th class="border border-black border-r-white border-b-white w-[110px]">MARCA</th>
-                                <th class="border border-black border-r-white w-40 border-b-white" colspan="2">DESCRIPCION</th>
+                                <th class="border border-black border-r-white w-40 border-b-white" colspan="2">
+                                    DESCRIPCION</th>
                                 <th class="border border-black border-r-white border-b-white" colspan="2">U/MEDIDAS</th>
                                 <th class="border border-black border-r-white border-b-white">ESPECIFICO</th>
                                 <th class="border border-black border-r-white border-b-white">DEPENDENCIA</th>
@@ -142,66 +146,41 @@
                         </thead>
                         <tbody v-for="(docAdq, i) in arrayProductoAdquisicion" :key="i" v-show="docAdq.estadoLt != 0">
                             <tr class="*:border-black cursor-pointer" :class="{ 'custom-pulse': docAdq.hoverToDelete }">
-                                <td colspan="2" @click="docAdq.vShowLt = !docAdq.vShowLt"
+                                <td colspan="6" @click="docAdq.vShowLt = !docAdq.vShowLt"
                                     @mouseover=" docAdq.hoverToDelete = true" @mouseout=" docAdq.hoverToDelete = false"
                                     @contextmenu.prevent="estadoDocAdq !== 1 ? '' : deletLineaTrabajo(i)"
-                                    class="uppercase border bg-black text-[8pt] text-white border-black border-t-white text-center text-selection-disable">
+                                    class="uppercase border bg-black text-[8pt] text-white border-black border-t-white border-r-white text-center text-selection-disable">
 
                                     Linea de trabajo:</td>
-                                <td colspan="3" class="border border-t-black ">
-                                    <Multiselect :filter-results="false" :searchable="true" :clear-on-search="true"
-                                        :disabled="estadoDocAdq !== 1" @select="disableLt($event)" v-model="docAdq.idLt"
-                                        :min-chars="1" placeholder="-" :classes="{
-                                            containerDisabled: ' bg-gray-200 text-text-slate-400',
-                                            optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed',
-                                            optionPointed: 'text-gray-800 bg-gray-100',
-                                            container: `relative mx-auto w-full h-6 flex items-center justify-end box-border   border border-gray-300 rounded bg-white text-base leading-snug outline-none ${[errorsValidation[`productAdq.${i}.idLt`] ? 'bg-red-500' : ''], [estadoDocAdq !== 1 ? 'bg-slate-500/20' : '']}`,
-                                            placeholder: `flex items-center text-center h-full absolute left-0 top-0 pointer-events-none leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ${errorsValidation[`productAdq.${i}.idLt`] ? 'bg-red-500' : ''}`,
-                                            search: `w-full absolute text-start inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans rounded pl-3.5 rtl:pl-0 rtl:pr-3.5  ${errorsValidation[`productAdq.${i}.idLt`] ? 'bg-red-500' : ''}`,
-                                            singleLabel: `pr-14 text-[8pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none leading-snug pl-3.5 box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ${errorsValidation[`productAdq.${i}.idLt`] ? 'bg-red-500' : ''}`,
-                                            option: 'flex items-center justify-start box-border text-left  text-[7.5pt] leading-snug py-2 px-3',
-                                            optionSelected: 'text-white bg-[#001c48]',
-                                            optionDisabled: 'text-gray-300 cursor-not-allowed',
-                                            wrapper: `relative mx-auto w-full flex items-center justify-end box-border  outline-none ${estadoDocAdq !== 1 ? 'cursor-not-allowed' : ''}`,
-
-                                        }" noOptionsText="<p class='text-xs'>Lista vacía</p>"
-                                        noResultsText="<p class='text-xs'>Sin resultados de personas</p>"
-                                        :options="arrayLineaTrabajo" />
-
-
-                                </td>
-                                <td colspan="3" @mouseover="docAdq.hoverToDelete = true"
+                                <td colspan="5" @mouseover="docAdq.hoverToDelete = true"
                                     @click="docAdq.vShowLt = !docAdq.vShowLt" @mouseout="docAdq.hoverToDelete = false"
                                     @contextmenu.prevent="deletLineaTrabajo(i)"
-                                    class="uppercase border bg-black text-[8pt] text-white border-black text-center text-selection-disable">
-                                    Doc. Adquisición: </td>
-                                <td colspan="4" class="border border-black">
-                                    <!-- {{ idDetDocAdquisicion }} -->
+                                    class="uppercase border bg-black text-[8pt] text-white border-black border-l-white text-center text-selection-disable">
+                                    Documento de adquiicion: </td>
+                            </tr>
+                            <tr class="*:border-black cursor-pointer" :class="{ 'custom-pulse': docAdq.hoverToDelete }">
+                                <td colspan="6" class="border border-t-black ">
+                                    <Multiselect :filter-results="false" :searchable="true" :clear-on-search="true"
+                                        :disabled="estadoDocAdq !== 1" @select="disableLt($event)" v-model="docAdq.idLt"
+                                        :min-chars="1" placeholder="-"
+                                        noOptionsText="<p class='text-xs'>Lista vacía</p>"
+                                        noResultsText="<p class='text-xs'>Sin resultados de personas</p>"
+                                        :options="arrayLineaTrabajo"
+                                        :classes="{ containerDisabled: ' bg-gray-200 text-text-slate-400', optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed', optionPointed: 'text-gray-800 bg-gray-100', container: `relative mx-auto w-full h-6 flex items-center justify-end box-border   border border-gray-300 rounded bg-white text-base leading-snug outline-none ${[errorsValidation[`productAdq.${i}.idLt`] ? 'bg-red-500' : ''], [estadoDocAdq !== 1 ? 'bg-slate-500/20' : '']}`, placeholder: `flex items-center text-center h-full absolute left-0 top-0 pointer-events-none leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ${errorsValidation[`productAdq.${i}.idLt`] ? 'bg-red-500' : ''}`, search: `w-full absolute text-start inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans rounded pl-3.5 rtl:pl-0 rtl:pr-3.5  ${errorsValidation[`productAdq.${i}.idLt`] ? 'bg-red-500' : ''}`, singleLabel: `pr-14 text-[8pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none leading-snug pl-3.5 box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ${errorsValidation[`productAdq.${i}.idLt`] ? 'bg-red-500' : ''}`, option: 'flex items-center justify-start box-border text-left  text-[7.5pt] leading-snug py-2 px-3', optionSelected: 'text-white bg-[#001c48]', optionDisabled: 'text-gray-300 cursor-not-allowed', wrapper: `relative mx-auto w-full flex items-center justify-end box-border  outline-none ${estadoDocAdq !== 1 ? 'cursor-not-allowed' : ''}`, }" />
+                                </td>
+                                <td colspan="5" class="border border-black">
                                     <Multiselect :filter-results="true" :searchable="true" :clear-on-search="true"
-                                    @select="onSelectDocAdquisicion($event)"
-                                        v-model="idDetDocAdquisicion" placeholder="-" :min-chars="1" :classes="{
-                                            container: `relative mx-auto w-full h-6 flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none ${errorsValidation.idDetDocAdquisicion ? 'bg-red-500' : ''}`,
-                                            placeholder: `flex items-center text-center h-full absolute left-0 top-0 pointer-events-none leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ${errorsValidation.idDetDocAdquisicion ? 'bg-red-500' : ''}`,
-                                            search: `w-full absolute text-start inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans rounded pl-3.5 rtl:pl-0 rtl:pr-3.5 ${errorsValidation.idDetDocAdquisicion ? 'bg-red-500' : ''}`,
-                                            singleLabel: `pr-14 text-[8pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none leading-snug pl-3.5 box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ${errorsValidation.idDetDocAdquisicion ? 'bg-red-500' : ''}`,
-                                            option: 'flex items-center justify-start box-border text-left cursor-pointer text-[7.5pt] leading-snug py-2 px-3',
-                                            optionSelected: 'text-white bg-[#001c48]',
-                                            optionPointed: 'text-gray-800 bg-gray-100',
-                                        }" noOptionsText="<p class='text-xs'>Lista vacia</p>"
+                                        @select="onSelectDocAdquisicion($event)" v-model="idDetDocAdquisicion"
+                                        placeholder="-" :min-chars="1"
+                                        :classes="{ container: `relative mx-auto w-full h-6 flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none ${errorsValidation.idDetDocAdquisicion ? 'bg-red-500' : ''}`, placeholder: `flex items-center text-center h-full absolute left-0 top-0 pointer-events-none leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ${errorsValidation.idDetDocAdquisicion ? 'bg-red-500' : ''}`, search: `w-full absolute text-start inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans rounded pl-3.5 rtl:pl-0 rtl:pr-3.5 ${errorsValidation.idDetDocAdquisicion ? 'bg-red-500' : ''}`, singleLabel: `pr-14 text-[8pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none leading-snug pl-3.5 box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ${errorsValidation.idDetDocAdquisicion ? 'bg-red-500' : ''}`, option: 'flex items-center justify-start box-border text-left cursor-pointer text-[7.5pt] leading-snug py-2 px-3', optionSelected: 'text-white bg-[#001c48]', optionPointed: 'text-gray-800 bg-gray-100', }"
+                                        noOptionsText="<p class='text-xs'>Lista vacia</p>"
                                         noResultsText="<p class='text-xs'>Sin resultados de personas</p>"
                                         :options="arrayDocAdquisicion" />
-
                                 </td>
                             </tr>
-
                             <template v-if="docAdq.vShowLt">
                                 <tr class="*:text-[8pt]  *:px-2 *:py-0.5 *:font-normal *:border *:border-black  cursor-pointer"
-                                    :class="{
-                                        '*:bg-emerald-100 -400/80 animate-pulse animate-infinite': docAdq.hoverToDelete && estadoDocAdq === 1,
-                                        '*:bg-slate-300 -400/80 animate-pulse animate-infinite': docAdq.hoverToDelete && estadoDocAdq !== 1,
-                                        'bg-slate-200': estadoDocAdq !== 1,
-                                        'hover:bg-slate-200': estadoDocAdq === 1
-                                    }"
+                                    :class="{ '*:bg-emerald-100 -400/80 animate-pulse animate-infinite': docAdq.hoverToDelete && estadoDocAdq === 1, '*:bg-slate-300 -400/80 animate-pulse animate-infinite': docAdq.hoverToDelete && estadoDocAdq !== 1, 'bg-slate-200': estadoDocAdq !== 1, 'hover:bg-slate-200': estadoDocAdq === 1 }"
                                     @contextmenu.prevent="estadoDocAdq !== 1 ? '' : deleteProductAdq(docAdq.idLt, j)"
                                     v-for="(detalle, j) in docAdq.detalleDoc" :key="j"
                                     v-show="(detalle.estadoProdAdquisicion != 0)">
@@ -211,19 +190,12 @@
                                         <div class="absolute top-0 w-full flex flex-col items-center">
 
                                             <Multiselect :filter-results="true" :canClear="false"
-                                               v-model="detalle.idProducto" :loading="loader"
-                                                 :searchable="true" :clear-on-search="false"
-                                                @select="setInformacionProduct($event, i, j)" :classes="{
-                                                    placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                                    search: 'w-full absolute text-start inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5 pr-3.5',
-                                                    container: 'relative mx-auto w-full h-7  flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none',
-                                                    singleLabel: 'pr-16 text-[8pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5  box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                                    singleLabelText: 'text-center overflow-ellipsis overflow-hidden block whitespace-nowrap max-w-full',
-                                                    option: 'flex items-center justify-start box-border text-left cursor-pointer text-[7.5pt] leading-snug py-2 px-3',
-                                                    optionSelected: 'text-white bg-[#001c48]',
-                                                    optionPointed: 'text-gray-800 bg-gray-100',
-                                                }" noOptionsText="<p class='text-xs'>Lista vacia<p>"
-                                                noResultsText="<p class='text-xs'>Sin resultados de producto <p>" :options="productDataSearched" />
+                                                v-model="detalle.idProducto" :loading="loader" :searchable="true"
+                                                :clear-on-search="false" @select="setInformacionProduct($event, i, j)"
+                                                :classes="{ placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5', search: 'w-full absolute text-start inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5 pr-3.5', container: 'relative mx-auto w-full h-7  flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none', singleLabel: 'pr-16 text-[8pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5  box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5', singleLabelText: 'text-center overflow-ellipsis overflow-hidden block whitespace-nowrap max-w-full', option: 'flex items-center justify-start box-border text-left cursor-pointer text-[7.5pt] leading-snug py-2 px-3', optionSelected: 'text-white bg-[#001c48]', optionPointed: 'text-gray-800 bg-gray-100', }"
+                                                noOptionsText="<p class='text-xs'>Lista vacia<p>"
+                                                noResultsText="<p class='text-xs'>Sin resultados de producto <p>"
+                                                :options="productDataSearched" />
                                             <span class="text-center ">{{ detalle.detalleProducto }}</span>
                                         </div>
                                     </td>
@@ -231,34 +203,26 @@
                                         :class="{ 'bg-red-500': errorsValidation[`productAdq.${i}.detalleDoc.${j}.idMarca`] }"
                                         style="padding-left: 0 !important; padding-right: 0 !important; ">
                                         <div class="absolute top-0 w-full flex flex-col items-center">
-                                            <Multiselect :filter-results="true" :canClear="false" v-model="detalle.idMarca"
-                                                :disabled="estadoDocAdq !== 1" :searchable="true" :clear-on-search="true"
-                                                :min-chars="3" :classes="{
-                                                    placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                                    search: 'w-full absolute text-start inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5 pr-3.5',
-                                                    container: 'relative mx-auto w-full h-7  flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none',
-                                                    singleLabel: 'pr-16 text-[8pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5  box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                                    singleLabelText: 'text-center overflow-ellipsis overflow-hidden block whitespace-nowrap max-w-full',
-                                                    option: 'flex items-center justify-start box-border text-left cursor-pointer text-[7.5pt] leading-snug py-2 px-3',
-                                                    optionSelected: 'text-white bg-[#001c48]',
-                                                    wrapper: `relative mx-auto w-full flex items-center justify-end box-border  outline-none ${estadoDocAdq !== 1 ? 'cursor-not-allowed' : ''}`,
-                                                    optionPointed: 'text-gray-800 bg-gray-100',
-                                                }" noOptionsText="<p class='text-xs'>Lista vacia<p>"
+                                            <Multiselect :filter-results="true" :canClear="false"
+                                                v-model="detalle.idMarca" :disabled="estadoDocAdq !== 1"
+                                                :searchable="true" :clear-on-search="true" :min-chars="3"
+                                                :classes="{ placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5', search: 'w-full absolute text-start inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5 pr-3.5', container: 'relative mx-auto w-full h-7  flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none', singleLabel: 'pr-16 text-[8pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5  box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5', singleLabelText: 'text-center overflow-ellipsis overflow-hidden block whitespace-nowrap max-w-full', option: 'flex items-center justify-start box-border text-left cursor-pointer text-[7.5pt] leading-snug py-2 px-3', optionSelected: 'text-white bg-[#001c48]', wrapper: `relative mx-auto w-full flex items-center justify-end box-border  outline-none ${estadoDocAdq !== 1 ? 'cursor-not-allowed' : ''}`, optionPointed: 'text-gray-800 bg-gray-100', }"
+                                                noOptionsText="<p class='text-xs'>Lista vacia<p>"
                                                 noResultsText="<p class='text-xs'>Sin resultados de producto <p>"
                                                 :options="arrayMarca" />
-
                                             <span class="text-center ">
                                                 {{
-                                                    // Comprueba si arrayUnidadMedida no
-                                                    // está vacío y si tiene la propiedad dataUnidad
                                                     arrayMarca.length > 0 &&
-                                                    arrayMarca.find(index => index.value == detalle.idMarca)?.dataMarca
-                                                    ?
-                                                    // Si la condición es verdadera, muestra el nombre de la unidad de medida
-                                                    arrayMarca.find(index => index.value ==
-                                                        detalle.idMarca).dataMarca.nombre_marca :
-                                                    // Si no, muestra un guion
-                                                    '-'
+                                                        arrayMarca
+                                                            .find(index => index.value == detalle.idMarca)
+                                                            ?.dataMarca
+                                                        ?
+                                                        arrayMarca
+                                                            .find(index => index.value ==
+                                                                detalle
+                                                                    .idMarca)
+                                                            .dataMarca.nombre_marca :
+                                                        '-'
                                                 }}
                                             </span>
                                         </div>
@@ -275,31 +239,20 @@
                                         <div class="absolute top-0 w-full flex flex-col items-center">
                                             <Multiselect :filter-results="false" :searchable="false" :canClear="false"
                                                 :disabled="estadoDocAdq !== 1" v-model="detalle.pesoProducto"
-                                                :clear-on-search="true" :min-chars="1" :classes="{
-                                                    wrapper: `relative mx-auto w-full flex items-center justify-end box-border  outline-none ${estadoDocAdq !== 1 ? 'cursor-not-allowed' : ''}`,
-                                                    placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                                    search: 'w-full absolute text-center inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5',
-                                                    container: 'relative mx-auto w-full h-7  flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none',
-                                                    singleLabel: ' text-[8pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5  box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                                    option: 'flex items-center justify-start box-border text-left cursor-pointer text-[7.5pt] leading-snug py-2 px-3',
-                                                    optionSelected: 'text-white bg-[#001c48]',
-                                                    optionPointed: 'text-gray-800 bg-gray-100',
-                                                }" noOptionsText="<p class='text-xs'>Lista vacia<p>"
+                                                :clear-on-search="true" :min-chars="1"
+                                                :classes="{ wrapper: `relative mx-auto w-full flex items-center justify-end box-border  outline-none ${estadoDocAdq !== 1 ? 'cursor-not-allowed' : ''}`, placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5', search: 'w-full absolute text-center inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', container: 'relative mx-auto w-full h-7  flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none', singleLabel: ' text-[8pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5  box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5', option: 'flex items-center justify-start box-border text-left cursor-pointer text-[7.5pt] leading-snug py-2 px-3', optionSelected: 'text-white bg-[#001c48]', optionPointed: 'text-gray-800 bg-gray-100', }"
+                                                noOptionsText="<p class='text-xs'>Lista vacia<p>"
                                                 noResultsText="<p class='text-xs'>Sin resultados de personas <p>"
                                                 :options="arrayUnidadMedida" />
                                             <span class="text-center">
                                                 {{
-                                                    // Comprueba si arrayUnidadMedida no
-                                                    // está vacío y si tiene la propiedad dataUnidad
                                                     arrayUnidadMedida.length > 0 &&
-                                                    arrayUnidadMedida.find(index => index.value ==
-                                                        detalle.pesoProducto)?.dataUnidad
-                                                    ?
-                                                    // Si la condición es verdadera, muestra el nombre de la unidad de medida
-                                                    arrayUnidadMedida.find(index => index.value ==
-                                                        detalle.pesoProducto).dataUnidad.nombre_unidad_medida :
-                                                    // Si no, muestra un guion
-                                                    '-'
+                                                        arrayUnidadMedida.find(index => index.value ==
+                                                            detalle.pesoProducto)?.dataUnidad
+                                                        ?
+                                                        arrayUnidadMedida.find(index => index.value ==
+                                                            detalle.pesoProducto).dataUnidad.nombre_unidad_medida :
+                                                        '-'
                                                 }}
                                             </span>
                                         </div>
@@ -315,32 +268,16 @@
                                         <div class="absolute top-0 w-full flex flex-col items-center">
                                             <Multiselect :filter-results="false" :searchable="false" :canClear="false"
                                                 :disabled="estadoDocAdq !== 1" v-model="detalle.idCentroAtencion"
-                                                :clear-on-search="true" :min-chars="1" :classes="{
-                                                    wrapper: `relative mx-auto w-full flex items-center justify-end box-border  outline-none ${estadoDocAdq !== 1 ? 'cursor-not-allowed' : ''}`,
-                                                    placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                                    search: 'w-full absolute text-center inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5',
-                                                    container: 'relative mx-auto w-full h-7  flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none',
-                                                    singleLabel: 'pr-6 text-[8pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5  box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                                    option: 'flex items-center justify-start box-border text-left cursor-pointer text-[7.5pt] leading-snug py-2 px-3',
-                                                    optionSelected: 'text-white bg-[#001c48]',
-                                                    optionPointed: 'text-gray-800 bg-gray-100',
-                                                }" noOptionsText="<p class='text-xs'>Lista vacia<p>"
+                                                :clear-on-search="true" :min-chars="1"
+                                                :classes="{ wrapper: `relative mx-auto w-full flex items-center justify-end box-border  outline-none ${estadoDocAdq !== 1 ? 'cursor-not-allowed' : ''}`, placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5', search: 'w-full absolute text-center inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', container: 'relative mx-auto w-full h-7  flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none', singleLabel: 'pr-6 text-[8pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5  box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5', option: 'flex items-center justify-start box-border text-left cursor-pointer text-[7.5pt] leading-snug py-2 px-3', optionSelected: 'text-white bg-[#001c48]', optionPointed: 'text-gray-800 bg-gray-100', }"
+                                                noOptionsText="<p class='text-xs'>Lista vacia<p>"
                                                 noResultsText="<p class='text-xs'>Sin resultados de personas <p>"
                                                 :options="arrayCentroAtencion" />
                                             <span class="text-center">
-                                                {{
-                                                    // Comprueba si arrayUnidadMedida no
-                                                    // está vacío y si tiene la propiedad dataCentro
-                                                    arrayCentroAtencion.length > 0 &&
+                                                {{ arrayCentroAtencion.length > 0 && arrayCentroAtencion.find(index =>
+                                                    index.value == detalle.idCentroAtencion)?.dataCentro ?
                                                     arrayCentroAtencion.find(index => index.value ==
-                                                        detalle.idCentroAtencion)?.dataCentro
-                                                    ?
-                                                    // Si la condición es verdadera, muestra el nombre de la unidad de medida
-                                                    arrayCentroAtencion.find(index => index.value ==
-                                                        detalle.idCentroAtencion).dataCentro.nombre_centro_atencion :
-                                                    // Si no, muestra un guion
-                                                    '-'
-                                                }}
+                                                        detalle.idCentroAtencion).dataCentro.nombre_centro_atencion : '-' }}
                                             </span>
                                         </div>
                                     </td>
@@ -359,7 +296,7 @@
                                             <input type="text" v-model="detalle.costoProdAdquisicion"
                                                 :disabled="estadoDocAdq !== 1"
                                                 :class="estadoDocAdq !== 1 ? 'cursor-not-allowed' : 'cursor-pointer '"
-                                                @input="calculateTotal(i, j)"
+                                                @input="calculateTotal(i, j);"
                                                 class="w-full bg-transparent border-none  text-center text-[8pt] p-0 outline-none focus:outline-none focus:ring focus:ring-transparent"
                                                 placeholder="$00.00" min="0" max="1000" />
                                         </div>
@@ -367,10 +304,10 @@
                                     <td class="relative text-center w-20">
                                         <span class="absolute top-1 left-0 w-full flex flex-col items-center">
                                             ${{ detalle.valorTotalProduct !== undefined ?
-                                                detalle.valorTotalProduct.toLocaleString('en-US', {
-                                                    minimumFractionDigits: 2,
-                                                    maximumFractionDigits: 2
-                                                }) : '00.00' }}
+                                            detalle.valorTotalProduct.toLocaleString('en-US', {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                            }) : '00.00' }}
                                         </span>
                                     </td>
 
@@ -385,7 +322,7 @@
                                             <div class="text-xs py-3">Ocultando linea:
                                                 <span class="font-medium">
                                                     {{ arrayLineaTrabajo.find(index =>
-                                                        index.value == docAdq.idLt)?.label || '' }}
+                                                    index.value == docAdq.idLt)?.label || '' }}
                                                 </span>
                                             </div>
                                         </div>
@@ -402,8 +339,8 @@
                                             <span class="text-xs pt-0.5 text-slate-600">
                                                 NUEVO PRODUCTO ADQUISICION EN:
                                                 <br>
-                                                {{ arrayLineaTrabajo.find(index => index.value == docAdq.idLt)?.label || ''
-                                                }}
+                                                {{ arrayLineaTrabajo.find(index => index.value == docAdq.idLt)?.label
+                                                ||''}}
                                             </span>
                                         </div>
                                     </button>
@@ -411,6 +348,8 @@
                             </tr>
 
                         </tbody>
+
+
                     </table>
 
                     <div v-if="estadoDocAdq == 1">
@@ -427,6 +366,52 @@
                             </div>
                         </button>
                     </div>
+
+
+                    <table class="w-[830px] my-4 ">
+                        <col style="width: 550pt;">
+                        <tbody>
+                            <tr class="*:border *:border-black *:hover:bg-slate-200">
+                                <td class="pl-7 uppercase border py-1  text-[8pt]   text-start ">
+                                    <div>total</div>
+                                </td>
+                                <td class="uppercase border py-1 text-[8pt] font-bold text-center ">
+                                    <div>$ {{ totProductos }}</div>
+                                </td>
+                            </tr>
+                            <tr class="*:border *:border-black *:hover:bg-slate-200">
+                                <td colspan="2" class="uppercase border py-1  text-[8pt] font-bold text-center ">
+                                    <!-- <div> SON: SIETE MIL OCHENTA DOS 48/100 DOLARES</div> -->
+                                    <div v-if="!loadingNumberLetter"> SON: {{ letterNumber || '' }}</div>
+                                    <div v-else class="flex items-center justify-center h-full">
+                                        <div aria-label="Loading..." role="status" class="loader">
+                                            <svg class="icon" viewBox="0 0 256 256">
+                                                <line x1="128" y1="32" x2="128" y2="64" stroke-linecap="round"
+                                                    stroke-linejoin="round" stroke-width="24"></line>
+                                                <line x1="195.9" y1="60.1" x2="173.3" y2="82.7" stroke-linecap="round"
+                                                    stroke-linejoin="round" stroke-width="24"></line>
+                                                <line x1="224" y1="128" x2="192" y2="128" stroke-linecap="round"
+                                                    stroke-linejoin="round" stroke-width="24"></line>
+                                                <line x1="195.9" y1="195.9" x2="173.3" y2="173.3" stroke-linecap="round"
+                                                    stroke-linejoin="round" stroke-width="24"></line>
+                                                <line x1="128" y1="224" x2="128" y2="192" stroke-linecap="round"
+                                                    stroke-linejoin="round" stroke-width="24"></line>
+                                                <line x1="60.1" y1="195.9" x2="82.7" y2="173.3" stroke-linecap="round"
+                                                    stroke-linejoin="round" stroke-width="24"></line>
+                                                <line x1="32" y1="128" x2="64" y2="128" stroke-linecap="round"
+                                                    stroke-linejoin="round" stroke-width="24"></line>
+                                                <line x1="60.1" y1="60.1" x2="82.7" y2="82.7" stroke-linecap="round"
+                                                    stroke-linejoin="round" stroke-width="24"></line>
+                                            </svg>
+                                            <span class="loading-text">Cargando...</span>
+                                        </div>
+                                    </div>
+                                </td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+
                     <div v-if="propProdAdquisicion == ''">
                         <button class=" w-96 btn bg-indigo-500 hover:bg-indigo-600 text-white"
                             @click="saveProductAdquisicion">
@@ -438,7 +423,6 @@
                             <span class="ml-2">Terminar documento de adquisicion </span>
                         </button>
                     </div>
-
 
                     <div v-else-if="estadoDocAdq === 1 && canEdit">
                         <button class=" w-96 btn bg-orange-500 hover:bg-orange-600 text-white"
@@ -472,7 +456,9 @@ import { jsPDF } from "jspdf";
 import html2pdf from 'html2pdf.js'
 import { createApp, h } from 'vue'
 import OrdenCompraBienesServicios from "@/pdf/UnidadComprasPublicas/OrdenCompraBienesServicios.vue";
-
+import { useNumbersToString } from '@/Composables/UCP/BienesServicios/useNumbersToString';
+/* import {useNumbersToString} from '@/Composables/UCP/BienesServicios/useNumbersToString'; */
+/* useNumbersToString */
 // Define el componente Vue.js
 export default {
     // Indica que este componente utiliza el componente ProcessModal
@@ -505,7 +491,9 @@ export default {
             idLt,
             arrayMarca,
             addingRows,
+            loadingNumberLetter,
             calculateTotal,
+            sumatorioTotalProduct,
             arrayLineaTrabajo,
             objectGetFromProp,
             arrayUnidadMedida,
@@ -523,6 +511,8 @@ export default {
             productDataSearched,
             loader,
             setInformacionProduct,
+            totProductos,
+            letterNumber,
             estadoDocAdq,
             ArrayProductFiltered,
             arrayProductsWhenIsEditable,
@@ -551,6 +541,8 @@ export default {
                 arrayLineaTrabajo.value.forEach((item) => {
                     item.disabled = false;
                 });
+                totProductos.value = null
+                letterNumber.value = null
             }
         });
 
@@ -574,8 +566,8 @@ export default {
                     dataDoc: objectGetFromProp.value
                 })
 
-                 // Utiliza map en lugar de reduce para simplificar la lógica
-                 brandsUsedInDoc.value = productosAdquisiciones.map(producto => {
+                // Utiliza map en lugar de reduce para simplificar la lógica
+                brandsUsedInDoc.value = productosAdquisiciones.map(producto => {
                     let idMarca = producto.id_marca;
 
                     if (!brandArray.has(idMarca)) {
@@ -587,7 +579,7 @@ export default {
                         };
                     }
                 }).filter(Boolean)  // Filtra los elementos nulos o indefinidos
-               /*  console.log(brandsUsedInDoc.value); */
+                /*  console.log(brandsUsedInDoc.value); */
                 // Utiliza map en lugar de reduce para simplificar la lógica
                 arrayProductsWhenIsEditable.value = productosAdquisiciones.map(producto => {
                     let idProduct = producto.id_producto;
@@ -642,12 +634,14 @@ export default {
                         valorTotalProduct: index.cant_prod_adquisicion * index.costo_prod_adquisicion,
                     });
                 });
-                onSelectDocAdquisicion( idDetDocAdquisicion.value)
+                onSelectDocAdquisicion(idDetDocAdquisicion.value)
+                sumatorioTotalProduct()
                 disableLt()
             } else {
                 objectGetFromProp.value = [];
                 arrayProductoAdquisicion.value = []
                 addinDocAdquisicion()
+
             }
         });
 
@@ -704,41 +698,65 @@ export default {
             }
         }
 
-        //const { printPdf } = useConfigPdf(arrayDocAdquisicion,idDetDocAdquisicion,objectGetFromProp)
-
         const printPdf = () => {
-    /*         console.log(idDetDocAdquisicion.value);
-            console.log(arrayDocAdquisicion.value); */
             console.log(objectGetFromProp.value);
             let fecha = moment().format('DD-MM-YYYY');
             let name = 'NOMBRE DOCUMENTO - FECHA - CODIGO';
             const opt = {
-                margin: [0.2, 0.2, 0.1, 0.2], //top, left, bottom, right,
+                margin: [0.5, 0.5, 2, 0.5], //top, left, bottom, right,
                 filename: 'evaluacion',
+                //pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+                html2canvas: { scale: 3, useCORS: true },
+                jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' }
             };
             // Crear una instancia de la aplicación Vue para generar el componente quedanPDFVue
             const app = createApp(OrdenCompraBienesServicios, {
                 arrayDocAdquisicion: arrayDocAdquisicion.value,
                 idDetDocAdquisicion: idDetDocAdquisicion.value,
                 objectGetFromProp: objectGetFromProp.value,
-                arrayLineaTrabajo:arrayLineaTrabajo.value,
-                arrayProductoAdquisicion:arrayProductoAdquisicion.value,
-                arrayMarca:brandsUsedInDoc.value,
+                arrayLineaTrabajo: arrayLineaTrabajo.value,
+                arrayProductoAdquisicion: arrayProductoAdquisicion.value,
+                arrayMarca: brandsUsedInDoc.value,
+                arrayUnidadMedida: arrayUnidadMedida.value,
+                arrayCentroAtencion: arrayCentroAtencion.value,
             });
             // Crear un elemento div y montar la instancia de la aplicación en él
             const div = document.createElement('div');
             const pdfPrint = app.mount(div);
             const html = div.outerHTML;
+            const currentDateTime = moment().format('DD/MM/YYYY, HH:mm:ss');
 
             // Generar y guardar el PDF utilizando html2pdf
-            html2pdf().set(opt).from(html).save();
-    };
+            html2pdf().set(opt).from(html).toPdf().get('pdf').then(function (pdf) {
+                var totalPages = pdf.internal.getNumberOfPages();
+                for (var i = 1; i <= totalPages; i++) {
+                    pdf.setPage(i);
+                    pdf.setFontSize(10);
+                    //Text for the page number
+                    let text = 'Página ' + i + ' de ' + totalPages;
+                    const centerX = pdf.internal.pageSize.getWidth() / 2;
+                    //Get the text width
+                    const textWidth1 = pdf.getStringUnitWidth(text) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
+                    //Get the middle position including the text width
+                    const textX = centerX - (textWidth1 / 2);
+                    //Write the text in the desired coordinates.
+                    pdf.text(textX, (pdf.internal.pageSize.getHeight() - 0.6), text);
+                    //Text for the date and time.
+                    let date_text = 'Generado: ' + currentDateTime
+                    //Get the text width
+                    const textWidth = pdf.getStringUnitWidth(date_text) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
+                    //Write the text in the desired coordinates.
+                    pdf.text(pdf.internal.pageSize.getWidth() - textWidth - 0.6, pdf.internal.pageSize.getHeight() - 0.6, date_text);
+                }
+
+            })
+                .save()
+                .catch(err => console.log(err));
+        };
 
         return {
+            letterNumber,
             onSelectDocAdquisicion,
             deletLineaTrabajo,
             deleteProductAdq,
@@ -764,7 +782,10 @@ export default {
             arrayDocAdquisicion,
             idDetDocAdquisicion,
             setInformacionProduct,
+            loadingNumberLetter,
             saveProductAdquisicion,
+            totProductos,
+            letterNumber,
             arrayProductoAdquisicion,
             arrayProductsWhenIsEditable,
             handleProductoSearchByCodigo,
@@ -855,5 +876,30 @@ td {
 
 .custom-pulse {
     animation: pulse 1s infinite;
+}
+
+.loader {
+    display: flex;
+    align-items: center;
+}
+
+.icon {
+    height: 1.1rem;
+    width: 1.1rem;
+    animation: spin 1s linear infinite;
+    stroke: rgba(107, 114, 128, 1);
+}
+
+.loading-text {
+    font-size: 0.65rem;
+    line-height: 1rem;
+    font-weight: 500;
+    color: rgba(107, 114, 128, 1);
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 </style>
