@@ -80,7 +80,7 @@
                 <div class="mb-4 md:mr-0 md:mb-0 basis-full">
                     <input-text label="Representante proveedor" :withIcon="false" id="price" v-model="infoToSend.suppRep" type="text"
                         placeholder="Escriba nombre representante" :required="true" :addClases="'h-[35px]'" :dSign="true"
-                        :validation="{ limit: 100 }">
+                        :validation="{ limit: 100, upper : true }">
                     </input-text>
                     <InputError v-for="(item, index) in errors.suppRep" :key="index" class="mt-2" :message="item" />
                 </div>

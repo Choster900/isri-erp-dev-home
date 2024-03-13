@@ -9,6 +9,7 @@ use App\Models\Producto;
 use App\Models\UnidadMedida;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use Luecano\NumeroALetras\NumeroALetras;
 
 Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get(
@@ -70,9 +71,18 @@ Route::group(['middleware' => ['auth', 'access']], function () {
                 'id_estado_doc_adquisicion' => $request->idState,
             ]);
         }
-
     )->name('bieneservicios.updateProdAdquisicion');
+    Route::post(
+        'convert-numbers-to-string',
+        function (Request $request) {
+            $numbersToLetters = new NumeroALetras();
+            $numero = $request->number;
+            $amountLetter =  $numbersToLetters->toInvoice($numero, 2, 'DÓLARES');
+            
 
+            return $amountLetter;
+        }
+    )->name('bieneservicios.updateProdAdquisicion');
     Route::get(
         '/ucp/documento-adquisicion',
         function (Request $request) {

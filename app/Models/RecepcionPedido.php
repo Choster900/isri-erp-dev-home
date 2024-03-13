@@ -17,6 +17,7 @@ class RecepcionPedido extends Model
         'id_det_doc_adquisicion',
         'id_proy_financiado',
         'id_estado_recepcion_pedido',
+        'id_proveedor',
         'id_empleado', //Administrador de contrato
         'emp_id_empleado', //Guardaalmacen
         'factura_recepcion_pedido',
@@ -58,4 +59,8 @@ class RecepcionPedido extends Model
         return $this->belongsTo('App\Models\Empleado','emp_id_empleado','id_empleado');
     }
 
+    public function proveedor()
+    {
+        return $this->belongsTo('App\Models\Proveedor','id_proveedor','id_proveedor');
+    }
 }

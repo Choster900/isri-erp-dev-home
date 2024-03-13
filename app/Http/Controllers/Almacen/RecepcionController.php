@@ -34,7 +34,55 @@ class RecepcionController extends Controller
                 'detalle_recepcion',
                 'det_doc_adquisicion.documento_adquisicion.tipo_documento_adquisicion',
                 'estado_recepcion'
-            ]);
+            ])
+            ->where('id_proy_financiado',"!=",4);
+
+        if ($column == 2) { //Order by document type
+            $query->orderByRaw('
+                (SELECT id_tipo_doc_adquisicion FROM documento_adquisicion WHERE documento_adquisicion.id_doc_adquisicion = 
+                (SELECT id_doc_adquisicion FROM detalle_documento_adquisicion WHERE detalle_documento_adquisicion.id_det_doc_adquisicion = recepcion_pedido.id_det_doc_adquisicion) 
+            ) ' . $dir);
+        } else {
+            if ($column == 3) { //Order by document number
+                $query->orderByRaw('
+                (SELECT numero_doc_adquisicion FROM documento_adquisicion WHERE documento_adquisicion.id_doc_adquisicion = 
+                (SELECT id_doc_adquisicion FROM detalle_documento_adquisicion WHERE detalle_documento_adquisicion.id_det_doc_adquisicion = recepcion_pedido.id_det_doc_adquisicion) 
+            ) ' . $dir);
+            } else {
+                $query->orderBy($columns[$column], $dir);
+            }
+        }
+
+
+        if ($search_value) {
+            $query->where('id_recepcion_pedido', 'like', '%' . $search_value['id_recepcion_pedido'] . '%') //Search by reception id
+                ->where('acta_recepcion_pedido', 'like', '%' . $search_value['acta_recepcion_pedido'] . '%') //Search by Acta
+                ->where('id_estado_recepcion_pedido', 'like', '%' . $search_value['id_estado_recepcion_pedido'] . '%') //Search by reception status
+                ->where('fecha_recepcion_pedido', 'like', '%' . $search_value['fecha_recepcion_pedido'] . '%') //Search by reception date
+                ->where('monto_recepcion_pedido', 'like', '%' . $search_value['monto_recepcion_pedido'] . '%'); //Search by reception amount
+            //Search by document type
+            if ($search_value['tipo_documento']) {
+                $query->whereHas(
+                    'det_doc_adquisicion.documento_adquisicion',
+                    function ($query) use ($search_value) {
+                        if ($search_value["tipo_documento"] != '') {
+                            $query->where('id_tipo_doc_adquisicion', 'like', '%' . $search_value['tipo_documento'] . '%');
+                        }
+                    }
+                );
+            }
+            //Search by document number
+            if ($search_value['numero_documento']) {
+                $query->whereHas(
+                    'det_doc_adquisicion.documento_adquisicion',
+                    function ($query) use ($search_value) {
+                        if ($search_value["numero_documento"] != '') {
+                            $query->where('numero_doc_adquisicion', 'like', '%' . $search_value['numero_documento'] . '%');
+                        }
+                    }
+                );
+            }
+        }
 
         if ($column == 2) { //Order by document type
             $query->orderByRaw('
@@ -248,7 +296,7 @@ class RecepcionController extends Controller
                 if ($compare->total_menos_acumulado == $prod['initial']) { //$prod['initial] is 'total_menos_acumulado' from the view
                     $prodAdq = ProductoAdquisicion::find($prod['prodId']);
                     $newDet = new DetalleRecepcionPedido([
-                        'id_centro_atencion'                        => $rec->id_recepcion_pedido,
+                        'id_centro_atencion'                        => $prodAdq->id_centro_atencion,
                         'id_producto'                               => $prodAdq->id_producto,
                         'id_recepcion_pedido'                       => $rec->id_recepcion_pedido,
                         'id_marca'                                  => $prodAdq->id_marca,
@@ -256,7 +304,7 @@ class RecepcionController extends Controller
                         'id_prod_adquisicion'                       => $prod['prodId'],
                         'cant_det_recepcion_pedido'                 => $prod['qty'],
                         'costo_det_recepcion_pedido'                => $prodAdq->costo_prod_adquisicion,
-                        'fecha_vencimiento_det_recepcion_pedido'    => $prod['expiryDate'] ? date('Y/m/d', strtotime($prod['expiryDate'])) : null,
+                        //'fecha_vencimiento_det_recepcion_pedido'    => $prod['expiryDate'] ? date('Y/m/d', strtotime($prod['expiryDate'])) : null,
                         'estado_det_recepcion_pedido'               => 1,
                         'fecha_reg_det_recepcion_pedido'            => Carbon::now(),
                         'usuario_det_recepcion_pedido'              => $request->user()->nick_usuario,
@@ -334,7 +382,7 @@ class RecepcionController extends Controller
                                 'id_prod_adquisicion'                       => $prod['prodId'],
                                 'cant_det_recepcion_pedido'                 => $prod['qty'],
                                 'costo_det_recepcion_pedido'                => $prodAdq->costo_prod_adquisicion,
-                                'fecha_vencimiento_det_recepcion_pedido'    => $prod['expiryDate'] ? date('Y/m/d', strtotime($prod['expiryDate'])) : null,
+                                //'fecha_vencimiento_det_recepcion_pedido'    => $prod['expiryDate'] ? date('Y/m/d', strtotime($prod['expiryDate'])) : null,
                                 'fecha_mod_det_recepcion_pedido'            => Carbon::now(),
                                 'usuario_det_recepcion_pedido'              => $request->user()->nick_usuario,
                                 'ip_det_recepcion_pedido'                   => $request->ip()
@@ -358,7 +406,7 @@ class RecepcionController extends Controller
                             if ($existDetail) {
                                 $existDetail->update([
                                     'cant_det_recepcion_pedido'                 => $prod['qty'],
-                                    'fecha_vencimiento_det_recepcion_pedido'    => $prod['expiryDate'],
+                                    //'fecha_vencimiento_det_recepcion_pedido'    => $prod['expiryDate'],
                                     'estado_det_recepcion_pedido'               => 1,
                                     'fecha_mod_det_recepcion_pedido'            => Carbon::now(),
                                     'usuario_det_recepcion_pedido'              => $request->user()->nick_usuario,
@@ -375,7 +423,7 @@ class RecepcionController extends Controller
                                     'cant_det_recepcion_pedido'                 => $prod['qty'],
                                     'estado_det_recepcion_pedido'               => 1,
                                     'costo_det_recepcion_pedido'                => $prodAdq->costo_prod_adquisicion,
-                                    'fecha_vencimiento_det_recepcion_pedido'    => $prod['expiryDate'] ? date('Y/m/d', strtotime($prod['expiryDate'])) : null,
+                                    //'fecha_vencimiento_det_recepcion_pedido'    => $prod['expiryDate'] ? date('Y/m/d', strtotime($prod['expiryDate'])) : null,
                                     'fecha_reg_det_recepcion_pedido'            => Carbon::now(),
                                     'usuario_det_recepcion_pedido'              => $request->user()->nick_usuario,
                                     'ip_det_recepcion_pedido'                   => $request->ip()

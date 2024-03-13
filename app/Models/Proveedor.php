@@ -66,5 +66,8 @@ class Proveedor extends Model
     {
         return $this->hasMany(DocumentoAdquisicion::class, 'id_proveedor', 'id_proveedor');
     }
-
+    public function recepciones()
+    {
+        return $this->hasMany('App\Models\Recepcion', 'id_proveedor', 'id_proveedor');
+    }
 }

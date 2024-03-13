@@ -61,9 +61,9 @@ class BienesServiciosController extends Controller
                 ->where('estado_proveedor', 'like', '%' . $data["estado_proveedor"] . '%'); */
         }
 
-        $v_roles = $v_query->paginate($v_length)->onEachSide(1);
+        $data = $v_query->paginate($v_length)->onEachSide(1);
         return [
-            'data' => $v_roles,
+            'data' => $data,
             'draw' => $request->input('draw'),
         ];
     }

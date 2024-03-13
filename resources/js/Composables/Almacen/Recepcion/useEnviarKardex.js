@@ -102,7 +102,7 @@ export const useEnviarKardex = (context) => {
                         //margin: [1, 1, 1, 1], //top, left, buttom, right,
                         margin: 1,
                         filename: name,
-                        //pagebreak: {mode:'avoid-all'},
+                        //pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
                         image: { type: 'jpeg', quality: 0.98 },
                         html2canvas: { scale: 3, useCORS: true },
                         jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' }
