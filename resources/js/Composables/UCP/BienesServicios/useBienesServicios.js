@@ -5,6 +5,9 @@ import Swal from "sweetalert2";
 export const useBienesServicios = () => {
     const arrayProductoAdquisicion = ref([])
     const idDetDocAdquisicion = ref(null)
+    const observacionDetDocAdquisicion = ref(null)
+    const recepcionDetDocAdquisicion = ref(null)
+    const notificacionDetDocAdquisicion = ref(null)
     const idLt = ref(null)
     const arrayLineaTrabajo = ref([])
     const arrayDocAdquisicion = ref([])
@@ -279,7 +282,10 @@ export const useBienesServicios = () => {
                 const response = await axios.post(
                     "/save-prod-adquicicion", {
                     productAdq: arrayProductoAdquisicion.value,
-                    idDetDocAdquisicion: idDetDocAdquisicion.value
+                    idDetDocAdquisicion: idDetDocAdquisicion.value,
+                    notificacionDetDocAdquisicion:notificacionDetDocAdquisicion.value,
+                    recepcionDetDocAdquisicion:recepcionDetDocAdquisicion.value,
+                    observacionDetDocAdquisicion:observacionDetDocAdquisicion.value,
                 });
                 // Se resuelve la promesa con la respuesta exitosa de la solicitud
                 resolve(response);
@@ -318,6 +324,9 @@ export const useBienesServicios = () => {
                 const response = await axios.post("/update-prod-adquicicion", {
                     productAdq: arrayProductoAdquisicion.value,
                     idDetDocAdquisicion: idDetDocAdquisicion.value,
+                    notificacionDetDocAdquisicion:notificacionDetDocAdquisicion.value,
+                    recepcionDetDocAdquisicion:recepcionDetDocAdquisicion.value,
+                    observacionDetDocAdquisicion:observacionDetDocAdquisicion.value,
                 });
                 // Se resuelve la promesa con la respuesta exitosa de la solicitud
                 resolve(response);
@@ -488,6 +497,9 @@ export const useBienesServicios = () => {
         saveProductAdquisicionRequest,
         estadoDocAdq,
         arrayLineaTrabajo,
+        notificacionDetDocAdquisicion,
+        recepcionDetDocAdquisicion,
+        observacionDetDocAdquisicion,
         arrayDocAdquisicion,
         objectGetFromProp,
         arrayUnidadMedida,

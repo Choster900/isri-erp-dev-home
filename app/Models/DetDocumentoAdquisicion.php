@@ -14,7 +14,6 @@ class DetDocumentoAdquisicion extends Model
     protected $table = 'detalle_documento_adquisicion';
     protected $primaryKey = 'id_det_doc_adquisicion';
     public $timestamps = false;
-
     protected $fillable = [
         'id_doc_adquisicion',
         'id_estado_doc_adquisicion',
@@ -23,12 +22,14 @@ class DetDocumentoAdquisicion extends Model
         'monto_det_doc_adquisicion',
         'compromiso_ppto_det_doc_adquisicion',
         'admon_det_doc_adquisicion',
+        'observacion_det_doc_adquisicion',
+        'recepcion_det_doc_adquisicion',
+        'notificacion_det_doc_adquisicion',
         'estado_det_doc_adquisicion',
         'fecha_reg_det_doc_adquisicion',
         'fecha_mod_det_doc_adquisicion',
         'usuario_det_doc_adquisicion',
         'ip_det_doc_adquisicion',
-
     ];
 
     public function documento_adquisicion()
