@@ -80,6 +80,7 @@
                     idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.razon_social_proveedor
                 :
                 '' }}
+                
                                     </h1>
                                 </td>
                                 <td class="border border-black  h-5  text-center text-[9pt] ">
