@@ -85,7 +85,6 @@ export const useDocumentoAdquisicion = (context) => {
             );
             setModalValues(response.data)
         } catch (err) {
-            console.log(err);
             if (err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
                 context.emit("get-table");
@@ -262,6 +261,7 @@ export const useDocumentoAdquisicion = (context) => {
     }
 
     const storeDocumentoAdquisicion = async (doc) => {
+        console.log(doc);
         const all_deleted = acq_doc.value.items.every(item => item.deleted === true);
         if (all_deleted) {
             useShowToast(toast.warning, "Debes agregar al menos un item al documento.");
@@ -328,6 +328,7 @@ export const useDocumentoAdquisicion = (context) => {
                 context.emit("cerrar-modal")
                 context.emit("get-table")
             } else {
+                console.log(err.response);
                 useShowToast(toast.warning, "Tienes algunos errores por favor verifica tus datos.");
                 backend_errors.value = err.response.data.errors;
                 // Itera sobre las propiedades del objeto de errores

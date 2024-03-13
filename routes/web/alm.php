@@ -1,10 +1,12 @@
 <?php
 
+use App\Http\Controllers\Almacen\DonacionController;
 use App\Http\Controllers\Almacen\RecepcionController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
 Route::group(['middleware' => ['auth', 'access']], function () {
+    //Normal receptions
     Route::get(
         '/alm/recepciones',
         function (Request $request) {
@@ -22,4 +24,15 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('send-goods-reception', [RecepcionController::class, 'sendGoodsReception'])->name('recepcion.sendGoodsReception');
     //Print reception
     Route::get('print-reception/{id}', [RecepcionController::class, 'printReception'])->name('recepcion.printReception');
+
+    //Donations
+    Route::get(
+        '/alm/donaciones',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/donaciones', 'Almacen/Donaciones');
+        }
+    )->name('alm.donaciones');
+    Route::post('donaciones', [DonacionController::class, 'getDonaciones'])->name('donacion.getDonaciones');
+    Route::post('get-info-modal-donation', [DonacionController::class, 'getInfoModalDonation'])->name('donacion.getInfoModalDonation');
+    Route::post('search-donation-product', [DonacionController::class, 'searchProduct'])->name('donacion.searchProduct');
 });

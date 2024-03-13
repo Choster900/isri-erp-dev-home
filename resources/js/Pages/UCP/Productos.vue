@@ -59,7 +59,7 @@
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 max-w-[20%]">
-                                <div class="font-medium text-slate-800 text-center">
+                                <div class="font-medium text-slate-800 text-center max-h-[125px] overflow-y-auto">
                                     {{ prod.descripcion_producto }}
                                 </div>
                             </td>
