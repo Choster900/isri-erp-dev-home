@@ -467,21 +467,15 @@
 <script>
 // Importa el componente ProcessModal desde la ruta relativa '@/Components-ISRI/AllModal/ProcessModal.vue'
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue';
-import { ref, toRefs, watch } from 'vue';
+import {toRefs } from 'vue';
 import { useBienesServicios } from '@/Composables/UCP/BienesServicios/useBienesServicios.js';
 import Swal from 'sweetalert2';
 import Tooltip from '@/Components-ISRI/Tooltip.vue';
 import moment from 'moment';
 import { executeRequest } from '@/plugins/requestHelpers';
 import { useConfigPdf } from '@/Composables/UCP/BienesServicios/useConfigPdf';
-import { jsPDF } from "jspdf";
-import html2pdf from 'html2pdf.js'
-import { createApp, h } from 'vue'
-import OrdenCompraBienesServicios from "@/pdf/UnidadComprasPublicas/OrdenCompraBienesServicios.vue";
-import { useNumbersToString } from '@/Composables/UCP/BienesServicios/useNumbersToString';
-/* import {useNumbersToString} from '@/Composables/UCP/BienesServicios/useNumbersToString'; */
-/* useNumbersToString */
-// Define el componente Vue.js
+
+
 export default {
     // Indica que este componente utiliza el componente ProcessModal
     components: { ProcessModal, Tooltip },
@@ -511,173 +505,41 @@ export default {
         const { propProdAdquisicion, showModal } = toRefs(props)
         const {
             idLt,
+            loader,
+            disableLt,
             arrayMarca,
             addingRows,
-            loadingNumberLetter,
-            calculateTotal,
-            notificacionDetDocAdquisicion,
-            recepcionDetDocAdquisicion,
-            observacionDetDocAdquisicion,
-            sumatorioTotalProduct,
-            arrayLineaTrabajo,
-            objectGetFromProp,
-            arrayUnidadMedida,
-            saveProductAdquisicionRequest,
-            idDetDocAdquisicion,
-            brandsUsedInDoc,
-            arrayWhenIsEditingDocAdq,
-            onSelectDocAdquisicion,
-            arrayDocAdquisicion,
-            addinDocAdquisicion,
-            deleteProductAdq,
-            deletLineaTrabajo,
-            arrayCentroAtencion,
-            updateProductAdquisicionRequest,
-            productDataSearched,
-            loader,
-            setInformacionProduct,
             totProductos,
             letterNumber,
             estadoDocAdq,
-            ArrayProductFiltered,
-            arrayProductsWhenIsEditable,
-            arrayProductoAdquisicion,
+            calculateTotal,
+            brandsUsedInDoc,
+            deleteProductAdq,
             errorsValidation,
-            disableLt,
+            arrayLineaTrabajo,
+            objectGetFromProp,
+            arrayUnidadMedida,
+            deletLineaTrabajo,
+            loadingNumberLetter,
+            idDetDocAdquisicion,
+            arrayDocAdquisicion,
+            addinDocAdquisicion,
+            arrayCentroAtencion,
+            productDataSearched,
+            ArrayProductFiltered,
+            sumatorioTotalProduct,
+            setInformacionProduct,
+            onSelectDocAdquisicion,
+            arrayWhenIsEditingDocAdq,
+            arrayProductoAdquisicion,
+            recepcionDetDocAdquisicion,
+            arrayProductsWhenIsEditable,
+            observacionDetDocAdquisicion,
             handleProductoSearchByCodigo,
-        } = useBienesServicios()
-
-        watch(showModal, (newValue, oldValue) => {
-            // Verifica si showModal se ha establecido en falso (se cerró el modal)
-            if (!newValue) {
-                // Restablecer los valores a nulos o vacíos
-                objectGetFromProp.value = []
-                arrayProductoAdquisicion.value = []
-                arrayWhenIsEditingDocAdq.value = []
-                productDataSearched.value = []
-                // Encuentra el índice del objeto que tiene el valor específico en la propiedad "value"
-                const indexAEliminar = arrayDocAdquisicion.value.findIndex(item => item.value === idDetDocAdquisicion.value);
-                // Si el índice es encontrado (diferente de -1), elimina ese elemento del array
-                if (indexAEliminar !== -1) {
-                    arrayDocAdquisicion.value.splice(indexAEliminar, 1);
-                }
-                observacionDetDocAdquisicion.value = ''
-                recepcionDetDocAdquisicion.value = ''
-                notificacionDetDocAdquisicion.value = ''
-                idDetDocAdquisicion.value = null
-                estadoDocAdq.value = 1
-                arrayLineaTrabajo.value.forEach((item) => {
-                    item.disabled = false;
-                });
-                totProductos.value = null
-                letterNumber.value = null
-            }
-        });
-
-        watch(propProdAdquisicion, (newValue, oldValue) => {
-            // Verifica si showModal se ha establecido en falso (se cerró el modal)
-            if (newValue !== null && newValue !== undefined && (Array.isArray(newValue) ? newValue.length > 0 : newValue !== '')) {
-                // Utiliza el patrón de objeto "guard" para simplificar las verificaciones
-                objectGetFromProp.value = newValue;
-
-                observacionDetDocAdquisicion.value = objectGetFromProp.value.observacion_det_doc_adquisicion
-                recepcionDetDocAdquisicion.value = objectGetFromProp.value.recepcion_det_doc_adquisicion
-                notificacionDetDocAdquisicion.value = objectGetFromProp.value.notificacion_det_doc_adquisicion
-
-                let productosAdquisiciones = objectGetFromProp.value.productos_adquisiciones;
-                console.log(productosAdquisiciones);
-                // Utilizando un conjunto para rastrear los id_lt únicos
-                let idLtSet = new Set();
-                let productArray = new Set();
-                let brandArray = new Set();
-
-                estadoDocAdq.value = objectGetFromProp.value.id_estado_doc_adquisicion
-
-                arrayDocAdquisicion.value.push({
-                    value: objectGetFromProp.value.id_det_doc_adquisicion,
-                    label: objectGetFromProp.value.nombre_det_doc_adquisicion,
-                    dataDoc: objectGetFromProp.value
-                })
-
-                // Utiliza map en lugar de reduce para simplificar la lógica
-                brandsUsedInDoc.value = productosAdquisiciones.map(producto => {
-                    let idMarca = producto.id_marca;
-
-                    if (!brandArray.has(idMarca)) {
-                        brandArray.add(idMarca);
-                        const marca = producto.marca;
-                        return {
-                            value: marca.id_marca,
-                            label: marca.nombre_marca
-                        };
-                    }
-                }).filter(Boolean)  // Filtra los elementos nulos o indefinidos
-                /*  console.log(brandsUsedInDoc.value); */
-                // Utiliza map en lugar de reduce para simplificar la lógica
-                arrayProductsWhenIsEditable.value = productosAdquisiciones.map(producto => {
-                    let idProduct = producto.id_producto;
-
-                    if (!productArray.has(idProduct)) {
-                        productArray.add(idProduct);
-                        const product = producto.producto;
-                        return {
-                            value: product.id_producto,
-                            label: product.codigo_producto
-                        };
-                    }
-                }).filter(Boolean)  // Filtra los elementos nulos o indefinidos
-
-
-                // Utiliza map y filter para mejorar la legibilidad y reducir código duplicado
-                arrayProductoAdquisicion.value = productosAdquisiciones
-                    .map(producto => {
-                        let idLt = producto.id_lt;
-                        if (!idLtSet.has(idLt)) {
-                            idLtSet.add(idLt);
-                            return {
-                                idProdAdquisicion: producto.id_prod_adquisicion,
-                                idLt: idLt,
-                                vShowLt: true,
-                                hoverToDelete: false,
-                                estadoLt: 2, // [Comment: Estado manejado en 0 => deleted,1 => created,2 =>edited]
-                                detalleDoc: []
-                            };
-                        }
-                    })
-                    .filter(Boolean);
-
-                // Utiliza forEach en lugar de map cuando no necesitas un nuevo arreglo resultante
-                productosAdquisiciones.forEach(index => {
-                    let indice = arrayProductoAdquisicion.value.findIndex(i => i.idLt == index.id_lt);
-                    const { producto } = index;
-                    idDetDocAdquisicion.value = index.id_det_doc_adquisicion
-
-                    arrayProductoAdquisicion.value[indice]["detalleDoc"].push({
-                        idProdAdquisicion: index.id_prod_adquisicion,
-                        especifico: producto.id_ccta_presupuestal,
-                        idProducto: producto.id_producto,
-                        detalleProducto: producto.nombre_producto,
-                        pesoProducto: producto.unidad_medida.id_unidad_medida,
-                        idCentroAtencion: index.id_centro_atencion,
-                        detalleCentro: index.centro_atencion.nombre_centro_atencion,
-                        idMarca: index.id_marca,
-                        cantProdAdquisicion: index.cant_prod_adquisicion,
-                        costoProdAdquisicion: index.costo_prod_adquisicion,
-                        descripcionProdAdquisicion: index.descripcion_prod_adquisicion,
-                        estadoProdAdquisicion: 2, // [Comment: Estado manejado en 0 => deleted,1 => created,2 =>edited]
-                        valorTotalProduct: index.cant_prod_adquisicion * index.costo_prod_adquisicion,
-                    });
-                });
-                onSelectDocAdquisicion(idDetDocAdquisicion.value)
-                sumatorioTotalProduct()
-                disableLt()
-            } else {
-                objectGetFromProp.value = [];
-                arrayProductoAdquisicion.value = []
-                addinDocAdquisicion()
-
-            }
-        });
+            notificacionDetDocAdquisicion,
+            saveProductAdquisicionRequest,
+            updateProductAdquisicionRequest,
+        } = useBienesServicios(propProdAdquisicion, showModal)
 
         /**
           * Guarda productos adquisicion
@@ -732,105 +594,59 @@ export default {
             }
         }
 
-        const printPdf = () => {
-            console.log(objectGetFromProp.value);
-            let fecha = moment().format('DD-MM-YYYY');
-            let name = 'NOMBRE DOCUMENTO - FECHA - CODIGO';
-            const opt = {
-                margin: [0.5, 0.5, 2, 0.5], //top, left, bottom, right,
-                filename: 'evaluacion',
-                //pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 3, useCORS: true },
-                jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' }
-            };
-            // Crear una instancia de la aplicación Vue para generar el componente quedanPDFVue
-            const app = createApp(OrdenCompraBienesServicios, {
-                arrayDocAdquisicion: arrayDocAdquisicion.value,
-                idDetDocAdquisicion: idDetDocAdquisicion.value,
-                notificacionDetDocAdquisicion: notificacionDetDocAdquisicion.value,
-                recepcionDetDocAdquisicion: recepcionDetDocAdquisicion.value,
-                observacionDetDocAdquisicion: observacionDetDocAdquisicion.value,
-                objectGetFromProp: objectGetFromProp.value,
-                arrayLineaTrabajo: arrayLineaTrabajo.value,
-                arrayProductoAdquisicion: arrayProductoAdquisicion.value,
-                arrayMarca: brandsUsedInDoc.value,
-                arrayUnidadMedida: arrayUnidadMedida.value,
-                arrayCentroAtencion: arrayCentroAtencion.value,
-                letterNumber: letterNumber.value,
-                totProductos: totProductos.value,
-            });
-            // Crear un elemento div y montar la instancia de la aplicación en él
-            const div = document.createElement('div');
-            const pdfPrint = app.mount(div);
-            const html = div.outerHTML;
-            const currentDateTime = moment().format('DD/MM/YYYY, HH:mm:ss');
-
-            // Generar y guardar el PDF utilizando html2pdf
-            html2pdf().set(opt).from(html).toPdf().get('pdf').then(function (pdf) {
-                var totalPages = pdf.internal.getNumberOfPages();
-                for (var i = 1; i <= totalPages; i++) {
-                    pdf.setPage(i);
-                    pdf.setFontSize(10);
-                    //Text for the page number
-                    let text = 'Página ' + i + ' de ' + totalPages;
-                    const centerX = pdf.internal.pageSize.getWidth() / 2;
-                    //Get the text width
-                    const textWidth1 = pdf.getStringUnitWidth(text) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
-                    //Get the middle position including the text width
-                    const textX = centerX - (textWidth1 / 2);
-                    //Write the text in the desired coordinates.
-                    pdf.text(textX, (pdf.internal.pageSize.getHeight() - 0.6), text);
-                    //Text for the date and time.
-                    let date_text = 'Generado: ' + currentDateTime
-                    //Get the text width
-                    const textWidth = pdf.getStringUnitWidth(date_text) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
-                    //Write the text in the desired coordinates.
-                    pdf.text(pdf.internal.pageSize.getWidth() - textWidth - 0.6, pdf.internal.pageSize.getHeight() - 0.6, date_text);
-                }
-
-            })
-                .save()
-                .catch(err => console.log(err));
-        };
+        const { printPdf } = useConfigPdf(
+            arrayDocAdquisicion,
+            idDetDocAdquisicion,
+            objectGetFromProp,
+            notificacionDetDocAdquisicion,
+            recepcionDetDocAdquisicion,
+            observacionDetDocAdquisicion,
+            arrayLineaTrabajo,
+            arrayProductoAdquisicion,
+            brandsUsedInDoc,
+            arrayUnidadMedida,
+            arrayCentroAtencion,
+            letterNumber,
+            totProductos
+        )
 
         return {
-            letterNumber,
-            onSelectDocAdquisicion,
-            deletLineaTrabajo,
-            deleteProductAdq,
             idLt,
-            arrayWhenIsEditingDocAdq,
-            errorsValidation,
-            arrayMarca,
-            ArrayProductFiltered,
-            addingRows,
+            loader,
+            moment,
             printPdf,
             disableLt,
-            objectGetFromProp,
+            arrayMarca,
+            addingRows,
+            letterNumber,
             estadoDocAdq,
-            loader,
+            totProductos,
+            letterNumber,
             calculateTotal,
+            deleteProductAdq,
+            errorsValidation,
+            deletLineaTrabajo,
+            objectGetFromProp,
             arrayLineaTrabajo,
             arrayUnidadMedida,
-            moment,
             addinDocAdquisicion,
-            updateProductAdquisicion,
             productDataSearched,
             arrayCentroAtencion,
             arrayDocAdquisicion,
             idDetDocAdquisicion,
-            setInformacionProduct,
             loadingNumberLetter,
+            ArrayProductFiltered,
+            setInformacionProduct,
+            onSelectDocAdquisicion,
             saveProductAdquisicion,
-            totProductos,
-            letterNumber,
+            arrayWhenIsEditingDocAdq,
+            updateProductAdquisicion,
             arrayProductoAdquisicion,
+            recepcionDetDocAdquisicion,
             arrayProductsWhenIsEditable,
             handleProductoSearchByCodigo,
-            notificacionDetDocAdquisicion,
-            recepcionDetDocAdquisicion,
             observacionDetDocAdquisicion,
+            notificacionDetDocAdquisicion,
         };
     },
 }
