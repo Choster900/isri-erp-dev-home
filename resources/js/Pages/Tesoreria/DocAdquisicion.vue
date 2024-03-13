@@ -30,7 +30,7 @@
                 <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" @sort="sortBy"
                     :searchButton="true" @datos-enviados="handleData($event)" @execute-search="getDataToShow()">
                     <tbody class="text-sm divide-y divide-slate-200" v-if="!isLoadinRequest">
-                        <tr v-for="doc in dataToShow" :key="doc.id_doc_adquisicion">
+                        <tr v-for="doc in dataToShow" :key="doc.id_doc_adquisicion" class="hover:bg-gray-200">
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">{{ doc.id_doc_adquisicion }}</div>
                             </td>

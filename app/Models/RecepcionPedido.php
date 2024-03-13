@@ -59,4 +59,8 @@ class RecepcionPedido extends Model
         return $this->belongsTo('App\Models\Empleado','emp_id_empleado','id_empleado');
     }
 
+    public function proveedor()
+    {
+        return $this->belongsTo('App\Models\Proveedor','id_proveedor','id_proveedor');
+    }
 }

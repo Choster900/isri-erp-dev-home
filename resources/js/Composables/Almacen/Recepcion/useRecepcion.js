@@ -89,7 +89,7 @@ export const useRecepcion = (context) => {
                 });
                 setModalValues(response.data, id)
             } catch (err) {
-                if (err.response.data.logical_error) {
+                if (err.response && err.response.data.logical_error) {
                     useShowToast(toast.error, err.response.data.logical_error);
                     context.emit("get-table");
                 } else {
@@ -406,7 +406,7 @@ export const useRecepcion = (context) => {
 
     const handleErrorResponse = (err) => {
         if (err.response.status === 422) {
-            if (err.response.data.logical_error) {
+            if (err.response && err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
                 if (err.response.data.refresh) {
                     products.value = filteredProds.value = err.response.data.prods

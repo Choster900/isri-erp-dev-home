@@ -33,4 +33,6 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('alm.donaciones');
     Route::post('donaciones', [DonacionController::class, 'getDonaciones'])->name('donacion.getDonaciones');
+    Route::post('get-info-modal-donation', [DonacionController::class, 'getInfoModalDonation'])->name('donacion.getInfoModalDonation');
+    Route::post('search-donation-product', [DonacionController::class, 'searchProduct'])->name('donacion.searchProduct');
 });
