@@ -85,7 +85,7 @@
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="space-x-1 text-center">
                                     <DropDownOptions>
-                                        <div @click="showModalRecep = true; recepId = reception.id_recepcion_pedido"
+                                        <div @click="showModalDonation = true; recepId = reception.id_recepcion_pedido"
                                             v-if="permits.actualizar === 1 && reception.id_estado_recepcion_pedido == 1"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-orange-700 w-[22px] h-[22px] mr-1.5 ml-0.5">
@@ -159,11 +159,11 @@
             </div>
         </div>
 
-        <!-- <modal-recepcion-vue v-if="showModalRecep" :showModalRecep="showModalRecep" :recepId="recepId"
-            @cerrar-modal="showModalRecep = false" @get-table="getDataToShow(tableData.currentPage)" />
+         <modal-donacion-vue v-if="showModalDonation" :showModalDonation="showModalDonation" :recepId="recepId"
+            @cerrar-modal="showModalDonation = false" @get-table="getDataToShow(tableData.currentPage)" />
 
-        <modal-enviar-kardex-vue v-if="showModalKardex" :showModalKardex="showModalKardex" :recepId="recepId"
-            @cerrar-modal="showModalKardex = false" @get-table="getDataToShow(tableData.currentPage)" /> -->
+        <!-- <modal-enviar-kardex-vue v-if="showModalKardex" :showModalKardex="showModalKardex" :recepId="recepId"
+            @cerrar-modal="showModalKardex = false" @get-table="getDataToShow(tableData.currentPage)" />  -->
 
     </AppLayoutVue>
 </template>
@@ -173,7 +173,7 @@ import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
-import ModalRecepcionVue from '@/Components-ISRI/Almacen/Recepcion/ModalRecepcion.vue';
+import ModalDonacionVue from '@/Components-ISRI/Almacen/Donacion/ModalDonacion.vue';
 import ModalEnviarKardexVue from '@/Components-ISRI/Almacen/Recepcion/ModalEnviarKardex.vue';
 
 import moment from 'moment';
@@ -187,7 +187,7 @@ import { toast } from "vue3-toastify";
 import 'vue3-toastify/dist/index.css';
 
 export default {
-    components: { Head, AppLayoutVue, Datatable, IconM, ModalRecepcionVue, ModalEnviarKardexVue },
+    components: { Head, AppLayoutVue, Datatable, IconM, ModalDonacionVue, ModalEnviarKardexVue },
     props: {
         menu: {
             type: Object,
@@ -199,7 +199,7 @@ export default {
         const { menu } = toRefs(props);
         const permits = usePermissions(menu.value, window.location.pathname);
 
-        const showModalRecep = ref(false)
+        const showModalDonation = ref(false)
         const showModalKardex = ref(false)
 
         const recepId = ref(0)
@@ -278,7 +278,7 @@ export default {
         }
 
         return {
-            permits, dataToShow, showModalRecep, tableData, perPage, recepId, showModalKardex,
+            permits, dataToShow, showModalDonation, tableData, perPage, recepId, showModalKardex,
             links, sortKey, sortOrders, isLoadinRequest, isLoadingTop, emptyObject, columns, isLoadingSend,
             getDataToShow, handleData, sortBy, changeStatusElement, moment, printReception
         };
