@@ -124,8 +124,9 @@ export const useDonacion = (context) => {
 
         // Desplazar la pantalla hasta la última fila agregada
         nextTick(() => {
-            const newRowIndex = donInfo.value.prods.length - 1;
-            const newRowElement = document.getElementById(`row-${newRowIndex}`);
+            //const newRowIndex = donInfo.value.prods.length - 1;
+            //const newRowElement = document.getElementById(`row-${newRowIndex}`);
+            const newRowElement = document.getElementById(`total`);
             if (newRowElement) {
                 newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
             }
@@ -156,6 +157,76 @@ export const useDonacion = (context) => {
                 }
             });
         }
+    }
+
+    const storeReception = async (obj) => {
+        swal({
+            title: '¿Está seguro de guardar nueva donación de productos?',
+            icon: 'question',
+            iconHtml: '❓',
+            confirmButtonText: 'Si, Guardar',
+            confirmButtonColor: '#141368',
+            cancelButtonText: 'Cancelar',
+            showCancelButton: true,
+            showCloseButton: true
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                saveObject(obj, '/save-donation-info');
+            }
+        });
+    };
+
+    const updateReception = async (obj) => {
+        swal({
+            title: '¿Está seguro de actualizar la donación de productos?',
+            icon: 'question',
+            iconHtml: '❓',
+            confirmButtonText: 'Si, Actualizar',
+            confirmButtonColor: '#141368',
+            cancelButtonText: 'Cancelar',
+            showCancelButton: true,
+            showCloseButton: true
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                saveObject(obj, '/update-donation-info');
+            }
+        });
+    };
+
+    const saveObject = async (obj, url) => {
+        isLoadingRequest.value = true;
+        await axios
+            .post(url, obj)
+            .then((response) => {
+                handleSuccessResponse(response)
+            })
+            .catch((error) => {
+                handleErrorResponse(error)
+            })
+            .finally(() => {
+                isLoadingRequest.value = false;
+            });
+    };
+
+    const handleErrorResponse = (err) => {
+        console.log(err);
+        if (err.response.status === 422) {
+            if (err.response && err.response.data.logical_error) {
+                useShowToast(toast.error, err.response.data.logical_error);
+            } else {
+                useShowToast(toast.warning, "Tienes errores en tus datos, por favor verifica e intenta nuevamente.");
+                errors.value = err.response.data.errors;
+            }
+        } else {
+            showErrorMessage(err);
+            context.emit("cerrar-modal")
+        }
+    };
+
+    const handleSuccessResponse = (response) => {
+        useShowToast(toast.success, response.data.message);
+        context.emit("cerrar-modal")
+        context.emit("get-table")
     }
 
     const activeDetails = computed(() => {
@@ -200,7 +271,7 @@ export const useDonacion = (context) => {
         if (prodId) {
             const selectedProd = products.value.find((e) => e.value === prodId)
             donInfo.value.prods[index].desc = selectedProd.allInfo.codigo_producto + ' — ' + selectedProd.allInfo.nombre_producto + ' — ' + selectedProd.allInfo.descripcion_producto + ' — ' + selectedProd.allInfo.unidad_medida.nombre_unidad_medida
-        }else{
+        } else {
             donInfo.value.prods[index].desc = ''
         }
         donInfo.value.prods[index].centerId = ''
@@ -238,6 +309,6 @@ export const useDonacion = (context) => {
         isLoadingRequest, errors, donInfo, suppliers, products, centers,
         asyncFindProduct, isLoadingProduct, totalRec,
         getInfoForModalDonation, selectProv, openAnySelect, selectProd, addNewRow,
-        deleteRow
+        deleteRow, storeReception, updateReception
     }
 }

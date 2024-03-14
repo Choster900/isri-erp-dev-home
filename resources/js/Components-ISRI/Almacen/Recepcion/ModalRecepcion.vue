@@ -296,7 +296,7 @@
                             </div>
                         </div>
                     </template>
-                    <div class="max-w-full min-w-[705px] flex">
+                    <div id="total" class="max-w-full min-w-[705px] flex">
                         <div class="flex w-[97%] min-w-[690px] border-x border-b border-gray-500">
                             <div class="justify-center flex w-[66%] min-w-[460px] h-[30px] bg-white border-gray-500">
 

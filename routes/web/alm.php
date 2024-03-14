@@ -35,4 +35,6 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('donaciones', [DonacionController::class, 'getDonaciones'])->name('donacion.getDonaciones');
     Route::post('get-info-modal-donation', [DonacionController::class, 'getInfoModalDonation'])->name('donacion.getInfoModalDonation');
     Route::post('search-donation-product', [DonacionController::class, 'searchProduct'])->name('donacion.searchProduct');
+    Route::post('save-donation-info', [DonacionController::class, 'storeDonationInfo'])->name('donacion.storeDonationInfo');
+    Route::post('update-donation-info', [DonacionController::class, 'updateDonationInfo'])->name('donacion.updateDonationInfo');
 });

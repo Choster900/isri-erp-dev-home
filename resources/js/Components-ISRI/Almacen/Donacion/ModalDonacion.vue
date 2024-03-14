@@ -27,7 +27,7 @@
                     </path>
                 </svg>
             </div>
-            <div class="ml-8 mr-0 overflow-x-auto mt-4 h-[485px] overflow-y-auto">
+            <div class="ml-8 mr-0 overflow-x-auto mt-4 h-[400px] overflow-y-auto">
                 <div class="max-w-[97%] min-w-[800px] flex">
                     <div class="flex w-full">
                         <!-- Columna 1 -->
@@ -76,14 +76,16 @@
                 </div>
                 <div class="max-w-[97%] min-w-[800px] border-b border-x border-gray-500 flex py-1 bg-white">
                     <div class="flex w-full">
-                        <div class="justify-start flex-row flex items-center min-w-[517.5px] w-[75%]">
+                        <div :class="{ 'select-err': errors.supplierId }"
+                            class="justify-start flex-row flex items-center min-w-[517.5px] w-[75%]">
                             <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2">
                                 DONANTE:
                             </p>
                             <div class="flex items-center w-[53%] ml-2">
                                 <Multiselect id="doc" v-model="donInfo.supplierId" :options="suppliers" class="h-[30px]"
-                                    :disabled="donInfo.status != 1" :searchable="true" :noOptionsText="'Lista vacía.'"
-                                    placeholder="Seleccione" @input="selectProv($event)"
+                                    :class="{ 'bg-red-200': errors.supplierId }" :disabled="donInfo.status != 1"
+                                    :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione"
+                                    @input="selectProv($event)"
                                     :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', optionPointed: 'text-white bg-[#001c48] bg-opacity-40' }" />
                             </div>
                         </div>
@@ -154,7 +156,7 @@
                             </div>
 
                             <div class="w-[13%] min-w-[125px] flex items-center justify-center border-r border-gray-500 min-h-[75px]"
-                                :class="prod.avails < 0 ? 'bg-red-300' : ''">
+                                :class="errors['prods.' + index + '.centerId'] ? 'bg-red-300' : ''">
                                 <Multiselect id="doc" v-model="prod.centerId" :options="centers" class="h-[35px]"
                                     :disabled="donInfo.status != 1" :searchable="true" :noOptionsText="'Lista vacía.'"
                                     placeholder="Centro"
@@ -166,8 +168,8 @@
                                     class="font-bold max-w-[75%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-sm border-[#d1d5db]"
                                     type="text" name="" id="">
                             </div>
-                            <div
-                                class="w-[15%] min-w-[125px] flex items-center justify-center border-r border-gray-500 min-h-[75px]">
+                            <div class="w-[15%] min-w-[125px] flex items-center justify-center border-r border-gray-500 min-h-[75px]"
+                                :class="errors['prods.' + index + '.cost'] ? 'bg-red-300' : ''">
                                 <input v-model="prod.cost" :disabled="donInfo.status != 1"
                                     class="font-bold max-w-[75%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-sm border-[#d1d5db]"
                                     type="text" name="" id="">
@@ -196,7 +198,7 @@
                         </div>
                     </div>
                 </template>
-                <div class="max-w-full min-w-[815px] flex">
+                <div id="total" class="max-w-full min-w-[815px] flex">
                     <div class="flex w-[97%] min-w-[800px] border-b border-x border-gray-500">
                         <div class="justify-end flex border-r w-[85%] min-w-[675px] h-[30px]  border-gray-500">
                             <p class="font-[MuseoSans] text-sm py-2 mr-2 font-bold mt-[-4px]">TOTAL ACTA</p>
@@ -218,15 +220,15 @@
                         </div>
                     </div>
                 </div>
-                <div class="md:flex flex md:items-center my-6 sticky flex-row justify-center mx-8">
-                    <button type="button" @click="$emit('cerrar-modal')"
-                        class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-[12px] px-2.5 py-1.5 text-center mb-2 dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
-                    <div class="" v-if="donInfo.status == 1">
-                        <button v-if="recepId > 0" @click="updateReception(recDocument)"
-                            class="bg-orange-700 hover:bg-orange-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">ACTUALIZAR</button>
-                        <button v-else @click="storeReception(recDocument)"
-                            class="bg-green-700 hover:bg-green-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">GUARDAR</button>
-                    </div>
+            </div>
+            <div id="buttons" class="md:flex flex md:items-center my-6 sticky flex-row justify-center mx-8">
+                <button type="button" @click="$emit('cerrar-modal')"
+                    class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-[12px] px-2.5 py-1.5 text-center mb-2 dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
+                <div class="" v-if="donInfo.status == 1">
+                    <button v-if="recepId > 0" @click="updateReception(donInfo)"
+                        class="bg-orange-700 hover:bg-orange-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">ACTUALIZAR</button>
+                    <button v-else @click="storeReception(donInfo)"
+                        class="bg-green-700 hover:bg-green-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">GUARDAR</button>
                 </div>
             </div>
         </ProcessModal>
@@ -263,7 +265,7 @@ export default {
             isLoadingRequest, donInfo, errors, suppliers, products, centers,
             asyncFindProduct, isLoadingProduct, totalRec,
             getInfoForModalDonation, selectProv, openAnySelect, selectProd, addNewRow,
-            deleteRow
+            deleteRow, storeReception, updateReception
         } = useDonacion(context);
 
         const handleSearchChange = async (query, index, prodId) => {
@@ -278,7 +280,7 @@ export default {
             isLoadingRequest, donInfo, errors, suppliers, products, centers,
             isLoadingProduct, totalRec,
             selectProv, handleSearchChange, openAnySelect, selectProd, addNewRow,
-            deleteRow
+            deleteRow, storeReception, updateReception
         };
     },
 };
@@ -298,6 +300,10 @@ export default {
 
 .dp__input_wrap {
     height: 35px;
+}
+
+.select-err .multiselect-wrapper input {
+    background-color: #FECACA;
 }
 
 .dp__theme_light {
