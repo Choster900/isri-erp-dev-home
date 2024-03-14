@@ -27,7 +27,7 @@
                     </path>
                 </svg>
             </div>
-            <div class="ml-8 mr-0 overflow-x-auto mt-4 h-[400px] overflow-y-auto">
+            <div class="ml-8 mr-0 overflow-x-auto mt-4 max-h-[400px] overflow-y-auto">
                 <div class="max-w-[97%] min-w-[800px] flex">
                     <div class="flex w-full">
                         <!-- Columna 1 -->

@@ -17,7 +17,7 @@ class DonacionController extends Controller
 {
     public function getDonaciones(Request $request)
     {
-        $columns = ['id_recepcion_pedido', 'acta_recepcion_pedido', 'id_proy_financiado', 'incumple_acuerdo_recepcion_pedido', 'monto_recepcion_pedido', 'fecha_recepcion_pedido', 'id_estado_recepcion_pedido'];
+        $columns = ['id_recepcion_pedido', 'acta_recepcion_pedido', 'proveedor', 'monto_recepcion_pedido', 'fecha_recepcion_pedido', 'id_estado_recepcion_pedido'];
 
         $length = $request->length;
         $column = $request->column; //Index
@@ -28,8 +28,17 @@ class DonacionController extends Controller
             ->with([
                 'estado_recepcion'
             ])
-            ->where('id_proy_financiado', 4)
-            ->orderBy($columns[$column], $dir);
+            ->where('id_proy_financiado', 4);
+
+        // if ($column == 2) { //Order by document type
+        //     $query->orderByRaw('
+        //             (SELECT id_tipo_doc_adquisicion FROM documento_adquisicion WHERE documento_adquisicion.id_doc_adquisicion = 
+        //             (SELECT id_doc_adquisicion FROM detalle_documento_adquisicion WHERE detalle_documento_adquisicion.id_det_doc_adquisicion = recepcion_pedido.id_det_doc_adquisicion) 
+        //         ) ' . $dir);
+        // } else {
+        //     $query->orderBy($columns[$column], $dir);
+        // }
+
 
         $data = $query->paginate($length)->onEachSide(1);
         return ['data' => $data, 'draw' => $request->input('draw')];

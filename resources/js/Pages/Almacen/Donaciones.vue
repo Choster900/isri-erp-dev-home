@@ -208,8 +208,7 @@ export default {
         const columns = [
             { width: "10%", label: "Id", name: "id_recepcion_pedido", type: "text" },
             { width: "15%", label: "acta", name: "acta_recepcion_pedido", type: "text" },
-            { width: "15%", label: "fuente", name: "id_proy_financiado", type: "text" },
-            { width: "20%", label: "incumple", name: "incumple_acuerdo_recepcion_pedido", type: "text" },
+            { width: "35%", label: "donante", name: "donante", type: "text" },
             { width: "15%", label: "Monto", name: "monto_recepcion_pedido", type: "text" },
             { width: "10%", label: "fecha", name: "fecha_recepcion_pedido", type: "date" },
             {
