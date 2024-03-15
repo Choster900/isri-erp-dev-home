@@ -50,17 +50,12 @@
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 flex items-center justify-center min-h-[40px]">
-                                    {{ reception.id_proy_financiado }}
+                                    {{ reception.proveedor.razon_social_proveedor }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 flex items-center justify-center min-h-[40px]">
-                                     {{ reception.incumple_acuerdo_recepcion_pedido }}
-                                </div>
-                            </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap">
-                                <div class="font-medium text-slate-800 flex items-center justify-center min-h-[40px]">
-                                    ${{ reception.monto_recepcion_pedido }}
+                                     ${{ reception.monto_recepcion_pedido }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap">
@@ -208,7 +203,7 @@ export default {
         const columns = [
             { width: "10%", label: "Id", name: "id_recepcion_pedido", type: "text" },
             { width: "15%", label: "acta", name: "acta_recepcion_pedido", type: "text" },
-            { width: "35%", label: "donante", name: "donante", type: "text" },
+            { width: "35%", label: "donante", name: "proveedor", type: "text" },
             { width: "15%", label: "Monto", name: "monto_recepcion_pedido", type: "text" },
             { width: "10%", label: "fecha", name: "fecha_recepcion_pedido", type: "date" },
             {
