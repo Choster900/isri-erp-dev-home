@@ -33,7 +33,7 @@
                 </div>
             </header>
             <div class="overflow-x-auto">
-                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
+                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true" :sortIcons="true"
                     :staticSelect="false" @sort="sortBy" @datos-enviados="handleData($event)"
                     :inputsToValidate="inputsToValidate" @execute-search="getDataToShow()">
                     <tbody v-if="!isLoadinRequest" class="text-sm divide-y divide-slate-200">

@@ -5,13 +5,18 @@ namespace App\Http\Controllers\Almacen;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Almacen\DonacionRequest;
 use App\Models\CentroAtencion;
+use App\Models\DetalleKardex;
 use App\Models\DetalleRecepcionPedido;
+use App\Models\Empleado;
+use App\Models\Kardex;
 use App\Models\Producto;
 use App\Models\Proveedor;
 use App\Models\RecepcionPedido;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Validator;
 
 class DonacionController extends Controller
 {
@@ -31,7 +36,7 @@ class DonacionController extends Controller
             ])
             ->where('id_proy_financiado', 4);
 
-        if ($column == 2) { //Order by document type
+        if ($column == 2) { //Order by supplier name
             $query->orderByRaw('
                     (SELECT razon_social_proveedor FROM proveedor WHERE proveedor.id_proveedor = recepcion_pedido.id_proveedor) ' . $dir);
         } else {
@@ -269,6 +274,150 @@ class DonacionController extends Controller
                     'error' => $th->getMessage(),
                 ], 422);
             }
+        }
+    }
+
+    public function changeStatusDonation(Request $request)
+    {
+        $reception = RecepcionPedido::find($request->id);
+        if ($reception->id_estado_recepcion_pedido == 1 && $request->status == 1) {
+            DB::beginTransaction();
+            try {
+                $reception->update([
+                    'id_estado_recepcion_pedido'            => 3,
+                    'fecha_mod_recepcion_pedido'            => Carbon::now(),
+                    'usuario_recepcion_pedido'              => $request->user()->nick_usuario,
+                    'ip_recepcion_pedido'                   => $request->ip(),
+                ]);
+                DB::commit(); // Confirma las operaciones en la base de datos
+                return response()->json([
+                    'message'          => "Donación eliminada con éxito.",
+                ]);
+            } catch (\Exception $e) {
+                DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+                return response()->json([
+                    'logical_error' => 'Ha ocurrido un error con sus datos.',
+                    'error' => $e,
+                ], 422);
+            }
+        } else {
+            return response()->json(['logical_error' => 'Error, otro usuario ha cambiado el estado de esta donacion.',], 422);
+        }
+    }
+
+    public function getInfoModalSendDonation(Request $request, $id)
+    {
+        // $recInfo = RecepcionPedido::with(
+        //     [
+        //         'det_doc_adquisicion.documento_adquisicion.administradores' => function ($query) {
+        //             $query->where('estado_admon_adquisicion', 1);
+        //         },
+        //         'det_doc_adquisicion.documento_adquisicion.administradores.empleado.persona'
+        //     ]
+        // )->find($id);
+
+        $empleados = Empleado::with('persona')->where('id_estado_empleado',1)->get();
+
+        $empOptions = $empleados->map(function ($e) {
+            return [
+                'value'           => $e->id_empleado,
+                'label'           => $e->persona->nombre_apellido
+            ];
+        });
+
+        return response()->json([
+            //'recInfo'                           => $recInfo,
+            'empOptions'                        => $empOptions
+        ]);
+    }
+
+    public function sendGoodsDonation(Request $request)
+    {
+        //Define the custom messages
+        $customMessages = [
+            'authorizeEmpId.required' => 'Debe seleccionar el empleado que autoriza la donación.',
+            'receiveEmpId.required' => 'Debe seleccionar el empleado que recibe la donación.',
+            'observation.required' => 'Debe agregar la descripción de la donación.'
+        ];
+
+        // Validate the request data with custom error messages and custom rule
+        $validatedData = Validator::make($request->all(), [
+            'authorizeEmpId' => 'required',
+            'receiveEmpId' => 'required',
+            'observation' => 'required',
+        ], $customMessages)->validate();
+
+        //Find the current products reception
+        $reception = RecepcionPedido::with([
+            'detalle_recepcion' => function ($query) {
+                $query->where('estado_det_recepcion_pedido', 1);
+            },
+            'detalle_recepcion.producto'
+        ])->find($request->id);
+        //Find the user who stores the products reception
+        $user = User::with('persona.empleado')->find($request->user()->id_usuario);
+        //Find the name for the employee who receive the donation
+        $receiveEmp = Empleado::with('persona')->find($request->receiveEmpId);
+
+        if ($reception->id_estado_recepcion_pedido == 1) { //We must evaluate if the reception has the status 'CREADO'
+            DB::beginTransaction(); //Start the transaction
+            try {
+                //We update the reception
+                $reception->update([
+                    'id_estado_recepcion_pedido'            => 2,
+                    'id_empleado'                           => $request->authorizeEmpId,
+                    'emp_id_empleado'                       => $user->persona->empleado->id_empleado,
+                    'representante_prov_recepcion_pedido'   => $receiveEmp->persona->nombre_apellido, //Employee Name who receipt the donation
+                    'fecha_mod_recepcion_pedido'            => Carbon::now(),
+                    'usuario_recepcion_pedido'              => $request->user()->nick_usuario,
+                    'ip_recepcion_pedido'                   => $request->ip(),
+                ]);
+                //Create a new Kardex object
+                $kardex = new Kardex([
+                    'id_recepcion_pedido'                   => $reception->id_recepcion_pedido,
+                    'id_proy_financiado'                    => $reception->id_proy_financiado,
+                    'id_tipo_mov_kardex'                    => 1,
+                    'fecha_kardex'                          => Carbon::now(),
+                    'fecha_reg_kardex'                      => Carbon::now(),
+                    'usuario_kardex'                        => $request->user()->nick_usuario,
+                    'ip_kardex'                             => $request->ip(),
+                ]);
+                $kardex->save();
+                //Foreach 'detalle_reception' we create a 'detalle_kardex' instance
+                foreach ($reception->detalle_recepcion as $det) {
+                    $detKardex = new DetalleKardex([
+                        'id_kardex'                         => $kardex->id_kardex,
+                        'id_producto'                       => $det->producto->id_producto,
+                        'id_centro_atencion'                => $det->id_centro_atencion,
+                        'cant_det_kardex'                   => $det->cant_det_recepcion_pedido,
+                        'costo_det_kardex'                  => $det->costo_det_recepcion_pedido,
+                        'fecha_reg_det_kardex'              => Carbon::now(),
+                        'usuario_det_kardex'                => $request->user()->nick_usuario,
+                        'ip_det_kardex'                     => $request->ip(),
+                    ]);
+                    $detKardex->save();
+                }
+
+                //Missing call the procedure to update the stock
+
+                // $resultados = DB::select("SELECT * FROM FN_UPDATE_EXISTENCIA_ALMACEN(?,?,?,?,?,?,?,?,?,?)",[
+                //     $reception->id_proy_financiado,
+                //     $
+                // ]);
+
+                DB::commit(); // Confirma las operaciones en la base de datos
+                return response()->json([
+                    'message'          => "Donacion enviada al Kardex con éxito.",
+                ]);
+            } catch (\Exception $e) {
+                DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+                return response()->json([
+                    'logical_error' => 'Ha ocurrido un error con sus datos.',
+                    'error' => $e->getMessage(),
+                ], 422);
+            }
+        } else {
+            return response()->json(['logical_error' => 'Error, otro usuario ha cambiado el estado de esta donacion.',], 422);
         }
     }
 }

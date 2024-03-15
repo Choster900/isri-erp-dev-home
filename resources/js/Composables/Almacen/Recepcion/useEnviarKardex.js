@@ -49,7 +49,7 @@ export const useEnviarKardex = (context) => {
 
     const sendReception = async (obj) => {
         swal({
-            title: '¿Está seguro de registrar la recepcion en el kardex?, ten en cuenta que no podrás revertir los cambios.',
+            title: '¿Está seguro de registrar la recepcion en el kardex? Ten en cuenta que no podrás revertir los cambios.',
             icon: 'question',
             iconHtml: '❓',
             confirmButtonText: 'Si, Registrar',

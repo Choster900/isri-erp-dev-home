@@ -3,10 +3,10 @@ import axios from "axios";
 import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
 import { toast } from "vue3-toastify";
-import { localeData } from 'moment_spanish_locale';
+//import { localeData } from 'moment_spanish_locale';
 import moment from 'moment';
 import _ from "lodash";
-moment.locale('es', localeData)
+//moment.locale('es', localeData)
 
 export const useDonacion = (context) => {
     const swal = inject("$swal");

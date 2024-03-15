@@ -1,6 +1,6 @@
 <template>
     <Head title="Producto - Recepciones" />
-    <AppLayoutVue nameSubModule="Almacen - Productos">
+    <AppLayoutVue nameSubModule="Almacen - Recepcion de Productos">
         <div v-if="isLoadingTop || isLoadingSend"
             class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-900 opacity-75 z-50">
             <div class="flex items-center justify-center my-4">
@@ -33,7 +33,7 @@
                 </div>
             </header>
             <div class="overflow-x-auto">
-                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
+                <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true" :sortIcons="true"
                     :staticSelect="false" @sort="sortBy" @datos-enviados="handleData($event)"
                     @execute-search="getDataToShow()">
                     <tbody v-if="!isLoadinRequest" class="text-sm divide-y divide-slate-200">
@@ -64,7 +64,7 @@
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap">
-                                <div class="font-medium text-slate-800 flex items-center justify-center min-h-[40px]">
+                                <div class="font-medium text-slate-800 w-full flex items-center justify-center min-h-[40px]">
                                     {{ moment(reception.fecha_recepcion_pedido, 'YYYY/MM/DD').format('D-MMM-YYYY') }}
                                 </div>
                             </td>
@@ -209,6 +209,7 @@ import ModalRecepcionVue from '@/Components-ISRI/Almacen/Recepcion/ModalRecepcio
 import ModalEnviarKardexVue from '@/Components-ISRI/Almacen/Recepcion/ModalEnviarKardex.vue';
 
 import moment from 'moment';
+//import 'moment/locale/es';
 import { ref, toRefs, inject } from 'vue';
 import { usePermissions } from '@/Composables/General/usePermissions.js';
 import { useToDataTable } from '@/Composables/General/useToDataTable.js';
@@ -309,7 +310,7 @@ export default {
                         }
                     } finally {
                         isLoadingTop.value = false;
-                        getDataToShow()
+                        getDataToShow(tableData.value.currentPage)
                     }
                 }
             });

@@ -1,7 +1,8 @@
 <template>
+
     <Head title="Producto - Recepciones" />
-    <AppLayoutVue nameSubModule="Almacen - Productos">
-        <div v-if="isLoadingTop || isLoadingSend"
+    <AppLayoutVue nameSubModule="Almacen - Donaciones">
+        <div v-if="isLoadingTop"
             class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-900 opacity-75 z-50">
             <div class="flex items-center justify-center my-4">
                 <img src="../../../img/loader-spinner.gif" alt="" class="w-8 h-8">
@@ -27,17 +28,19 @@
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Donaciones: <span class="text-slate-400 font-medium">{{
-                        tableData.total
-                    }}</span></h2>
+                    <h2 class="font-semibold text-slate-800 pt-1">Donaciones: <span
+                            class="text-slate-400 font-medium">{{
+            tableData.total
+        }}</span></h2>
                 </div>
             </header>
             <div class="overflow-x-auto">
                 <datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
-                    :staticSelect="false" @sort="sortBy" @datos-enviados="handleData($event)"
+                    :sortIcons="true" :staticSelect="false" @sort="sortBy" @datos-enviados="handleData($event)"
                     @execute-search="getDataToShow()">
                     <tbody v-if="!isLoadinRequest" class="text-sm divide-y divide-slate-200">
-                        <tr v-for="reception in dataToShow" :key="reception.id_recepcion_pedido" class="hover:bg-gray-200">
+                        <tr v-for="reception in dataToShow" :key="reception.id_recepcion_pedido"
+                            class="hover:bg-gray-200">
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 flex items-center justify-center min-h-[40px]">
                                     {{ reception.id_recepcion_pedido }}
@@ -49,30 +52,31 @@
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5">
-                                <div class="font-medium text-slate-800 flex items-center justify-center min-h-[40px]">
+                                <div class="font-medium text-slate-800 flex items-center justify-center text-center min-h-[40px]">
                                     {{ reception.proveedor.razon_social_proveedor }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5">
-                                <div class="font-medium text-slate-800 flex items-center justify-center min-h-[40px]">
-                                     ${{ reception.monto_recepcion_pedido }}
+                                <div class="font-medium text-slate-800 flex items-center justify-center text-cente min-h-[40px]">
+                                    ${{ reception.monto_recepcion_pedido }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap">
-                                <div class="font-medium text-slate-800 flex items-center justify-center min-h-[40px]">
+                                <div class="font-medium text-slate-800 flex items-center justify-center text-cente min-h-[40px]">
                                     {{ moment(reception.fecha_recepcion_pedido, 'YYYY/MM/DD').format('D-MMM-YYYY') }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap">
-                                <div class="font-bold text-[13px] text-slate-800 flex items-center justify-center min-h-[40px]">
+                                <div
+                                    class="font-bold text-[13px] text-slate-800 flex items-center justify-center text-cente min-h-[40px]">
                                     <div :class="{
-                                        ' text-emerald-600 bg-emerald-100 ': reception.id_estado_recepcion_pedido == 1,
-                                        ' text-blue-600 bg-blue-100 ': reception.id_estado_recepcion_pedido == 2,
-                                        ' text-red-600 bg-red-100 ': reception.id_estado_recepcion_pedido == 3
-                                    }" class="inline-flex font-medium rounded-full px-2.5 py-1 ">
-                                    <svg class="w-3 h-3 inline-flex mr-2 my-auto">
-                                        <circle class="opacity-80" cx="50%" cy="50%" r="50%" fill="currentColor" />
-                                    </svg>
+            ' text-emerald-600 bg-emerald-100 ': reception.id_estado_recepcion_pedido == 1,
+            ' text-blue-600 bg-blue-100 ': reception.id_estado_recepcion_pedido == 2,
+            ' text-red-600 bg-red-100 ': reception.id_estado_recepcion_pedido == 3
+        }" class="inline-flex font-medium rounded-full px-2.5 py-1 ">
+                                        <svg class="w-3 h-3 inline-flex mr-2 my-auto">
+                                            <circle class="opacity-80" cx="50%" cy="50%" r="50%" fill="currentColor" />
+                                        </svg>
                                         {{ reception.estado_recepcion.estado_recepcion_pedido }}
                                     </div>
                                 </div>
@@ -80,6 +84,14 @@
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="space-x-1 text-center">
                                     <DropDownOptions>
+                                        <div v-if="permits.ejecutar === 1 && reception.id_estado_recepcion_pedido == 1"
+                                            @click="showModalSendDonation = true; recepId = reception.id_recepcion_pedido"
+                                            class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
+                                            <div class="text-lime-700 w-[24px] h-[24px] mr-1">
+                                                <icon-m :iconName="'clipboard-arrow'"></icon-m>
+                                            </div>
+                                            <div class="font-semibold pt-0.5">Kardex</div>
+                                        </div>
                                         <div @click="showModalDonation = true; recepId = reception.id_recepcion_pedido"
                                             v-if="permits.actualizar === 1 && reception.id_estado_recepcion_pedido == 1"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
@@ -87,6 +99,14 @@
                                                 <icon-m :iconName="'editM'"></icon-m>
                                             </div>
                                             <div class="font-semibold pt-0.5">Editar</div>
+                                        </div>
+                                        <div @click="changeStatusElement(reception.id_recepcion_pedido, reception.id_estado_recepcion_pedido)"
+                                            v-if="permits.eliminar === 1 && reception.id_estado_recepcion_pedido == 1"
+                                            class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
+                                            <div class="text-red-700 w-[24px] h-[24px] mr-1">
+                                                <icon-m :iconName="'trash'"></icon-m>
+                                            </div>
+                                            <div class="font-semibold pt-0.5">Eliminar</div>
                                         </div>
                                     </DropDownOptions>
                                 </div>
@@ -98,7 +118,8 @@
                             <td colspan="6" class="text-center">
                                 <img src="../../../img/IsSearching.gif" alt="" class="w-60 h-60 mx-auto">
                                 <h1 class="font-medium text-xl mt-4">Cargando!!!</h1>
-                                <p class="text-sm text-gray-600 mt-2 pb-10">Por favor espera un momento mientras se carga la
+                                <p class="text-sm text-gray-600 mt-2 pb-10">Por favor espera un momento mientras se
+                                    carga la
                                     información.</p>
                             </td>
                         </tr>
@@ -108,7 +129,8 @@
                             <td colspan="6" class="text-center">
                                 <img src="../../../img/NoData.gif" alt="" class="w-60 h-60 mx-auto">
                                 <h1 class="font-medium text-xl mt-4">No se encontraron resultados!</h1>
-                                <p class="text-sm text-gray-600 mt-2 pb-10">Parece que no hay registros disponibles en este
+                                <p class="text-sm text-gray-600 mt-2 pb-10">Parece que no hay registros disponibles en
+                                    este
                                     momento.</p>
                             </td>
                         </tr>
@@ -143,7 +165,8 @@
                                         </a>
                                     </div>
                                 </span>
-                                <span class="cursor-pointer mt-2" v-else @click="link.url ? getDataToShow(link.url) : ''"
+                                <span class="cursor-pointer mt-2" v-else
+                                    @click="link.url ? getDataToShow(link.url) : ''"
                                     :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-[#29303C] text-[#29303C] shadow-sm hover:text-indigo-500 hover:border-indigo-500' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
                                         class="min-w-[20px]">{{ link.label }}</span>
                                 </span>
@@ -154,11 +177,11 @@
             </div>
         </div>
 
-         <modal-donacion-vue v-if="showModalDonation" :showModalDonation="showModalDonation" :recepId="recepId"
+        <modal-donacion-vue v-if="showModalDonation" :showModalDonation="showModalDonation" :recepId="recepId"
             @cerrar-modal="showModalDonation = false" @get-table="getDataToShow(tableData.currentPage)" />
 
-        <!-- <modal-enviar-kardex-vue v-if="showModalKardex" :showModalKardex="showModalKardex" :recepId="recepId"
-            @cerrar-modal="showModalKardex = false" @get-table="getDataToShow(tableData.currentPage)" />  -->
+        <modal-enviar-donacion-vue v-if="showModalSendDonation" :showModalSendDonation="showModalSendDonation" :recepId="recepId"
+            @cerrar-modal="showModalSendDonation = false" @get-table="getDataToShow(tableData.currentPage)" /> 
 
     </AppLayoutVue>
 </template>
@@ -169,20 +192,16 @@ import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
 import ModalDonacionVue from '@/Components-ISRI/Almacen/Donacion/ModalDonacion.vue';
-import ModalEnviarKardexVue from '@/Components-ISRI/Almacen/Recepcion/ModalEnviarKardex.vue';
+import ModalEnviarDonacionVue from '@/Components-ISRI/Almacen/Donacion/ModalEnviarDonacion.vue';
 
 import moment from 'moment';
 import { ref, toRefs, inject } from 'vue';
 import { usePermissions } from '@/Composables/General/usePermissions.js';
 import { useToDataTable } from '@/Composables/General/useToDataTable.js';
-import { useHandleError } from "@/Composables/General/useHandleError.js";
-import { useShowToast } from "@/Composables/General/useShowToast.js";
-import { useEnviarKardex } from '@/Composables/Almacen/Recepcion/useEnviarKardex.js';
-import { toast } from "vue3-toastify";
-import 'vue3-toastify/dist/index.css';
+import { useEnviarDonacion } from '@/Composables/Almacen/Donacion/useEnviarDonacion.js';
 
 export default {
-    components: { Head, AppLayoutVue, Datatable, IconM, ModalDonacionVue, ModalEnviarKardexVue },
+    components: { Head, AppLayoutVue, Datatable, IconM, ModalDonacionVue, ModalEnviarDonacionVue },
     props: {
         menu: {
             type: Object,
@@ -190,15 +209,13 @@ export default {
         },
     },
     setup(props, context) {
-        const swal = inject("$swal");
         const { menu } = toRefs(props);
         const permits = usePermissions(menu.value, window.location.pathname);
 
         const showModalDonation = ref(false)
-        const showModalKardex = ref(false)
+        const showModalSendDonation = ref(false)
 
         const recepId = ref(0)
-        const isLoadingTop = ref(false)
 
         const columns = [
             { width: "10%", label: "Id", name: "id_recepcion_pedido", type: "text" },
@@ -231,49 +248,15 @@ export default {
         } = useToDataTable(columns, requestUrl, columntToSort, dir)
 
         const {
-            isLoadingSend, 
-            printReception
-        } = useEnviarKardex(context);
+            isLoadingTop,
+            printReception,
+            changeStatusElement
+        } = useEnviarDonacion(context, getDataToShow, tableData.value);
 
-        const changeStatusElement = async (elementId, status) => {
-            swal({
-                title: "¿Está seguro de Eliminar esta recepcion?",
-                icon: "question",
-                iconHtml: "❓",
-                confirmButtonText: "Si, Eliminar",
-                confirmButtonColor: "#DC2626",
-                cancelButtonText: "Cancelar",
-                showCancelButton: true,
-                showCloseButton: true,
-            }).then(async (result) => {
-                if (result.isConfirmed) {
-                    isLoadingTop.value = true;
-                    try {
-                        const response = await axios.post('/change-status-reception', {
-                            id: elementId,
-                            status: status
-                        });
-                        useShowToast(toast.success, response.data.message);
-                    } catch (err) {
-                        if (err.response.status === 422) {
-                            if (err.response.data.logical_error) {
-                                useShowToast(toast.error, err.response.data.logical_error);
-                            }
-                        } else {
-                            const { title, text, icon } = useHandleError(err);
-                            swal({ title: title, text: text, icon: icon, timer: 5000 });
-                        }
-                    } finally {
-                        isLoadingTop.value = false;
-                        getDataToShow()
-                    }
-                }
-            });
-        }
 
         return {
-            permits, dataToShow, showModalDonation, tableData, perPage, recepId, showModalKardex,
-            links, sortKey, sortOrders, isLoadinRequest, isLoadingTop, emptyObject, columns, isLoadingSend,
+            permits, dataToShow, showModalDonation, tableData, perPage, recepId, showModalSendDonation,
+            links, sortKey, sortOrders, isLoadinRequest, isLoadingTop, emptyObject, columns,
             getDataToShow, handleData, sortBy, changeStatusElement, moment, printReception
         };
     },
