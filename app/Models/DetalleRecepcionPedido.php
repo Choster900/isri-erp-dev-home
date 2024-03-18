@@ -31,11 +31,16 @@ class DetalleRecepcionPedido extends Model
 
     public function producto()
     {
-        return $this->belongsTo('App\Models\Producto','id_producto','id_producto');
+        return $this->belongsTo('App\Models\Producto', 'id_producto', 'id_producto');
     }
 
     public function producto_adquisicion()
     {
-        return $this->belongsTo('App\Models\ProductoAdquisicion','id_prod_adquisicion','id_prod_adquisicion');
+        return $this->belongsTo('App\Models\ProductoAdquisicion', 'id_prod_adquisicion', 'id_prod_adquisicion');
+    }
+
+    public function centro_atencion()
+    {
+        return $this->belongsTo('App\Models\CentroAtencion', 'id_centro_atencion', 'id_centro_atencion');
     }
 }

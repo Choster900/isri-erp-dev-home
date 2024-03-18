@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
+use Luecano\NumeroALetras\NumeroALetras;
 
 class DonacionController extends Controller
 {
@@ -149,7 +150,6 @@ class DonacionController extends Controller
                 'id_proveedor'                          => $request->supplierId,
                 'monto_recepcion_pedido'                => $request->total,
                 'id_estado_recepcion_pedido'            => 1,
-                'factura_recepcion_pedido'              => 66666, //We should delete this line afterwards
                 'fecha_recepcion_pedido'                => Carbon::now(),
                 'acta_recepcion_pedido'                 => $codeActa,
                 'observacion_recepcion_pedido'          => $request->observation,
@@ -166,7 +166,6 @@ class DonacionController extends Controller
                     'id_recepcion_pedido'                       => $rec->id_recepcion_pedido,
                     'cant_det_recepcion_pedido'                 => $prod['qty'],
                     'costo_det_recepcion_pedido'                => $prod['cost'],
-                    'id_prod_adquisicion'                       => 41, //We should delete this line afterwards
                     'estado_det_recepcion_pedido'               => 1,
                     'fecha_reg_det_recepcion_pedido'            => Carbon::now(),
                     'usuario_det_recepcion_pedido'              => $request->user()->nick_usuario,
@@ -199,7 +198,6 @@ class DonacionController extends Controller
                 $rec->update([
                     'monto_recepcion_pedido'                => $request->total,
                     'id_proveedor'                          => $request->supplierId,
-                    'observacion_recepcion_pedido'          => $request->observation,
                     'fecha_mod_recepcion_pedido'            => Carbon::now(),
                     'usuario_recepcion_pedido'              => $request->user()->nick_usuario,
                     'ip_recepcion_pedido'                   => $request->ip(),
@@ -252,7 +250,6 @@ class DonacionController extends Controller
                                 'id_recepcion_pedido'                       => $request->id,
                                 'cant_det_recepcion_pedido'                 => $prod['qty'],
                                 'costo_det_recepcion_pedido'                => $prod['cost'],
-                                'id_prod_adquisicion'                       => 41, //We should delete this line afterwards
                                 'estado_det_recepcion_pedido'               => 1,
                                 'fecha_reg_det_recepcion_pedido'            => Carbon::now(),
                                 'usuario_det_recepcion_pedido'              => $request->user()->nick_usuario,
@@ -316,7 +313,7 @@ class DonacionController extends Controller
         //     ]
         // )->find($id);
 
-        $empleados = Empleado::with('persona')->where('id_estado_empleado',1)->get();
+        $empleados = Empleado::with('persona')->where('id_estado_empleado', 1)->get();
 
         $empOptions = $empleados->map(function ($e) {
             return [
@@ -368,6 +365,7 @@ class DonacionController extends Controller
                     'id_empleado'                           => $request->authorizeEmpId,
                     'emp_id_empleado'                       => $user->persona->empleado->id_empleado,
                     'representante_prov_recepcion_pedido'   => $receiveEmp->persona->nombre_apellido, //Employee Name who receipt the donation
+                    'observacion_recepcion_pedido'          => $request->observation,
                     'fecha_mod_recepcion_pedido'            => Carbon::now(),
                     'usuario_recepcion_pedido'              => $request->user()->nick_usuario,
                     'ip_recepcion_pedido'                   => $request->ip(),
@@ -396,19 +394,20 @@ class DonacionController extends Controller
                         'ip_det_kardex'                     => $request->ip(),
                     ]);
                     $detKardex->save();
+                    //We update the stock
+                    $resultados = DB::select(" SELECT FN_UPDATE_EXISTENCIA_ALMACEN(?, ?, ?, NULL, NULL, ?, ?, ?, ?, ?)", [
+                        $reception->id_proy_financiado,
+                        $det->producto->id_producto,
+                        $det->id_centro_atencion,
+                        $det->cant_det_recepcion_pedido,
+                        $det->costo_det_recepcion_pedido,
+                        Carbon::now(),
+                        $request->user()->nick_usuario,
+                        $request->ip()
+                    ]);
                 }
 
-                //Missing call the procedure to update the stock
-
-                // $resultados = DB::select("SELECT * FROM FN_UPDATE_EXISTENCIA_ALMACEN(?,?,?,?,?,?,?,?,?,?)",[
-                //     $reception->id_proy_financiado,
-                //     $
-                // ]);
-
                 DB::commit(); // Confirma las operaciones en la base de datos
-                return response()->json([
-                    'message'          => "Donacion enviada al Kardex con éxito.",
-                ]);
             } catch (\Exception $e) {
                 DB::rollBack(); // En caso de error, revierte las operaciones anteriores
                 return response()->json([
@@ -416,8 +415,37 @@ class DonacionController extends Controller
                     'error' => $e->getMessage(),
                 ], 422);
             }
+            return response()->json([
+                'message'          => "Donacion enviada al Kardex con éxito.",
+            ]);
         } else {
             return response()->json(['logical_error' => 'Error, otro usuario ha cambiado el estado de esta donacion.',], 422);
+        }
+    }
+
+    public function printDonation(Request $request, $id)
+    {
+        $recToPrint = RecepcionPedido::with([
+            'detalle_recepcion' => function ($query) {
+                $query->where('estado_det_recepcion_pedido', 1);
+            },
+            'detalle_recepcion.centro_atencion',
+            'fuente_financiamiento',
+            'proveedor',
+            'detalle_recepcion.producto.unidad_medida',
+            'administrador_contrato.persona',
+            'guarda_almacen.persona'
+        ])->find($id);
+        if ($recToPrint->id_estado_recepcion_pedido == 2) {
+            $numeroLetras = new NumeroALetras();
+            $monto_letras = $numeroLetras->toInvoice($recToPrint->monto_recepcion_pedido, 2, 'DÓLARES');
+
+            $recToPrint->monto_letras = $monto_letras;
+            return response()->json([
+                'recToPrint'                        => $recToPrint,
+            ]);
+        } else {
+            return response()->json(['logical_error' => 'Error, la recepcion ha cambiado de estado.',], 422);
         }
     }
 }

@@ -41,4 +41,6 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     //Functionality to send information to Kardex
     Route::get('get-info-modal-send-donation/{id}', [DonacionController::class, 'getInfoModalSendDonation'])->name('donacion.getInfoModalSendDonation');
     Route::post('send-goods-donation', [DonacionController::class, 'sendGoodsDonation'])->name('donacion.sendGoodsDonation');
+    //Print donation document
+    Route::get('print-donation/{id}', [DonacionController::class, 'printDonation'])->name('donacion.printDonation');
 });

@@ -1,14 +1,12 @@
-import ActaRecepcionPDFVue from '@/pdf/Almacen/ActaRecepcionPDF.vue';
 import { createApp, ref, inject } from "vue";
-import html2pdf from 'html2pdf.js'
+import html2pdf from 'html2pdf.js';
+import ActaDonacionPDFVue from '@/pdf/Almacen/ActaDonacionPDF.vue';
 
 import axios from "axios";
 import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
 import { toast } from "vue3-toastify";
-//import { localeData } from 'moment_spanish_locale';
 import moment from 'moment';
-//moment.locale('es', localeData)
 
 export const useEnviarDonacion = (context, getDataToShow, tableData) => {
     const swal = inject("$swal");
@@ -44,6 +42,80 @@ export const useEnviarDonacion = (context, getDataToShow, tableData) => {
             isLoadingRequest.value = false;
         }
     };
+
+    const printDonation = async (id) => {
+        swal({
+            title: '¿Está seguro de imprimir el acta de recepción?.',
+            icon: 'question',
+            iconHtml: '❓',
+            confirmButtonText: 'Si, imprimir',
+            confirmButtonColor: '#141368',
+            cancelButtonText: 'Cancelar',
+            showCancelButton: true,
+            showCloseButton: true
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    isLoadingTop.value = true;
+                    const response = await axios.get(
+                        `/print-donation/${id}`
+                    );
+                    let fecha = moment().format('DD-MM-YYYY');
+                    let name = 'ACTA ' + response.data.recToPrint.acta_recepcion_pedido + ' - ' + fecha;
+                    const opt = {
+                        //margin: [1, 1, 1, 1], //top, left, buttom, right,
+                        margin: 1,
+                        filename: name,
+                        //pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 3, useCORS: true },
+                        jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' }
+                        //jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' },
+                    };
+                    const app = createApp(ActaDonacionPDFVue, {
+                        recToPrint: response.data.recToPrint,
+                    });
+                    const div = document.createElement('div');
+                    const pdfPrint = app.mount(div);
+                    const html = div.outerHTML;
+
+                    const currentDateTime = moment().format('DD/MM/YYYY, HH:mm:ss');
+
+                    html2pdf().set(opt).from(html).toPdf().get('pdf').then(function (pdf) {
+                        var totalPages = pdf.internal.getNumberOfPages();
+                        for (var i = 1; i <= totalPages; i++) {
+                            pdf.setPage(i);
+                            pdf.setFontSize(10);
+                            //Text for the page number
+                            let text = 'Página ' + i + ' de ' + totalPages;
+                            const centerX = pdf.internal.pageSize.getWidth() / 2;
+                            //Get the text width
+                            const textWidth1 = pdf.getStringUnitWidth(text) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
+                            //Get the middle position including the text width
+                            const textX = centerX - (textWidth1 / 2);
+                            //Write the text in the desired coordinates.
+                            pdf.text(textX, (pdf.internal.pageSize.getHeight() - 0.6), text);
+                            //Text for the date and time.
+                            let date_text = 'Generado: ' + currentDateTime
+                            //Get the text width
+                            const textWidth = pdf.getStringUnitWidth(date_text) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
+                            //Write the text in the desired coordinates.
+                            pdf.text(pdf.internal.pageSize.getWidth() - textWidth - 0.6, pdf.internal.pageSize.getHeight() - 0.6, date_text);
+                        }
+
+                    })
+                        .save()
+                        .catch(err => console.log(err));
+
+                } catch (error) {
+                    console.log(error);
+                    showErrorMessage(error);
+                } finally {
+                    isLoadingTop.value = false;
+                }
+            }
+        });
+    }
 
     const changeStatusElement = async (elementId, status) => {
         swal({
@@ -140,6 +212,6 @@ export const useEnviarDonacion = (context, getDataToShow, tableData) => {
 
     return {
         isLoadingTop, isLoadingRequest, infoToSend, errors, empOptions,
-        changeStatusElement, getInfoForModalSendDonation, sendDonation
+        changeStatusElement, getInfoForModalSendDonation, sendDonation, printDonation
     }
 }

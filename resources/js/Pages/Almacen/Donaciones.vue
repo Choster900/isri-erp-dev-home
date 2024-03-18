@@ -100,6 +100,22 @@
                                             </div>
                                             <div class="font-semibold pt-0.5">Editar</div>
                                         </div>
+                                        <div @click="showModalDonation = true; recepId = reception.id_recepcion_pedido"
+                                            v-if="reception.id_estado_recepcion_pedido == 3"
+                                            class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
+                                            <div class="text-blue-800 w-[25px] h-[25px] mr-2">
+                                                <icon-m :iconName="'see'"></icon-m>
+                                            </div>
+                                            <div class="font-semibold pt-0.5">Ver</div>
+                                        </div>
+                                        <div @click="printDonation(reception.id_recepcion_pedido)"
+                                            v-if="reception.id_estado_recepcion_pedido == 2"
+                                            class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
+                                            <div class="text-red-800 w-[23px] h-[23px] mr-1.5 ml-0.5">
+                                                <icon-m :iconName="'download-file'"></icon-m>
+                                            </div>
+                                            <div class="font-semibold pt-0.5">PDF</div>
+                                        </div>
                                         <div @click="changeStatusElement(reception.id_recepcion_pedido, reception.id_estado_recepcion_pedido)"
                                             v-if="permits.eliminar === 1 && reception.id_estado_recepcion_pedido == 1"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
@@ -249,15 +265,15 @@ export default {
 
         const {
             isLoadingTop,
-            printReception,
-            changeStatusElement
+            changeStatusElement,
+            printDonation
         } = useEnviarDonacion(context, getDataToShow, tableData.value);
 
 
         return {
             permits, dataToShow, showModalDonation, tableData, perPage, recepId, showModalSendDonation,
             links, sortKey, sortOrders, isLoadinRequest, isLoadingTop, emptyObject, columns,
-            getDataToShow, handleData, sortBy, changeStatusElement, moment, printReception
+            getDataToShow, handleData, sortBy, changeStatusElement, moment, printDonation
         };
     },
 }
