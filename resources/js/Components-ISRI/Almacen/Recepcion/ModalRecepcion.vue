@@ -101,7 +101,7 @@
                 <pre>{{ products }}</pre>
             </div> -->
             <div v-else>
-                <div class="ml-8 mr-0 overflow-x-auto mt-4 h-[400px] overflow-y-auto">
+                <div class="ml-8 mr-0 overflow-x-auto mt-4 max-h-[400px] overflow-y-auto">
                     <div class="max-w-[97%] min-w-[690px] flex">
                         <div class="flex w-full">
                             <!-- Columna 1 -->
@@ -296,7 +296,7 @@
                             </div>
                         </div>
                     </template>
-                    <div class="max-w-full min-w-[705px] flex">
+                    <div id="total" class="max-w-full min-w-[705px] flex">
                         <div class="flex w-[97%] min-w-[690px] border-x border-b border-gray-500">
                             <div class="justify-center flex w-[66%] min-w-[460px] h-[30px] bg-white border-gray-500">
 

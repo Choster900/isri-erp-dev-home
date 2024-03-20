@@ -7,12 +7,11 @@
                 <h1 class="ml-4 font-medium text-xl text-white font-[Roboto]">Procesando...</h1>
             </div>
         </div>
-        <ProcessModal v-else :maxWidth="'2xl'" :show="showModalKardex"
-            @close="$emit('cerrar-modal')" >
+        <ProcessModal v-else :maxWidth="'2xl'" :show="showModalSendDonation" @close="$emit('cerrar-modal')">
 
             <div class="flex items-center justify-between py-3 px-4 border-b border-gray-400 border-opacity-70">
                 <div class="flex">
-                    <span class="text-[16px] font-medium font-[Roboto] text-gray-500 text-opacity-70">Recepcion</span>
+                    <span class="text-[16px] font-medium font-[Roboto] text-gray-500 text-opacity-70">Donación</span>
                     <div class="mt-[5px] text-gray-500 text-opacity-70 w-[14px] h-[14px] mx-2">
                         <icon-m :iconName="'nextSvgVector'"></icon-m>
                     </div>
@@ -20,7 +19,8 @@
                 </div>
                 <svg class="h-6 w-6 text-gray-400 hover:text-gray-600 cursor-pointer" @click="$emit('cerrar-modal')"
                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
                 </svg>
             </div>
 
@@ -33,41 +33,37 @@
             </div>
 
             <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
-                <div class="mb-4 md:mr-0 md:mb-0 basis-2/3" :class="{ 'selected-opt': infoToSend.conctManagerId > 0 }">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Administrador de
-                        contrato
+                <div class="mb-4 md:mr-2 md:mb-0 basis-1/2" :class="{ 'selected-opt': infoToSend.conctManagerId > 0 }">
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Acepta donación
                         <span class="text-red-600 font-extrabold">*</span>
                     </label>
                     <div class="relative font-semibold flex h-[35px] w-full">
-                        <Multiselect v-model="infoToSend.conctManagerId" :options="empOptions" :searchable="true"
-                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione administrador" />
+                        <Multiselect v-model="infoToSend.authorizeEmpId" :options="empOptions" :searchable="true"
+                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione empleado" />
                     </div>
-                    <InputError v-for="(item, index) in errors.conctManagerId" :key="index" class="mt-2" :message="item" />
+                    <InputError v-for="(item, index) in errors.authorizeEmpId" :key="index" class="mt-2"
+                        :message="item" />
                 </div>
-                <div class="mb-4 md:mr-2 md:mb-0 basis-1/3 justify-center text-center">
-                    <label class="block mb-3 text-[13px] font-medium text-gray-600 dark:text-white">Incumple recepcion
+                <div class="mb-4 md:mr-0 md:mb-0 basis-1/2" :class="{ 'selected-opt': infoToSend.conctManagerId > 0 }">
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Recibe donación
                         <span class="text-red-600 font-extrabold">*</span>
                     </label>
-                    <label for="checbox1" class="text-sm font-semibold text-gray-600 ml-4 mr-1">SI</label>
-                    <checkbox :checked="infoToSend.nonCompliant == 1 ? true : false"
-                        @click="(infoToSend.nonCompliant == 0 || infoToSend.nonCompliant == -1) ? infoToSend.nonCompliant = 1 : infoToSend.nonCompliant = -1"
-                        class="mr-3" id="checbox1" />
-                    <label for="checbox2" class="text-sm font-semibold text-gray-600 ml-4 mr-1">NO</label>
-                    <checkbox :checked="infoToSend.nonCompliant == 0 ? true : false"
-                        @click="(infoToSend.nonCompliant == 1 || infoToSend.nonCompliant == -1) ? infoToSend.nonCompliant = 0 : infoToSend.nonCompliant = -1"
-                        class="mr-3" id="checbox2" />
-                    <InputError v-for="(item, index) in errors.nonCompliant" :key="index" class="mt-2" :message="item" />
+                    <div class="relative font-semibold flex h-[35px] w-full">
+                        <Multiselect v-model="infoToSend.receiveEmpId" :options="empOptions" :searchable="true"
+                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione empleado" />
+                    </div>
+                    <InputError v-for="(item, index) in errors.receiveEmpId" :key="index" class="mt-2"
+                        :message="item" />
                 </div>
             </div>
 
-            <div v-if="infoToSend.nonCompliant == 1" class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
+            <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
                 <div class="mb-4 md:mr-0 md:mb-0 basis-full" style="border: none; background-color: transparent;">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Observacion sobre
-                        incumplimiento
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Observacion 
                         <span class="text-red-600 font-extrabold">*</span>
                     </label>
                     <textarea v-model="infoToSend.observation" id="descripcion" name="descripcion"
-                        placeholder="Escriba observacion sobre incumplimiento"
+                        placeholder="Escriba observación sobre donación"
                         :class="infoToSend.observation != '' ? 'bg-gray-200' : ''"
                         class="w-full h-16 overflow-y-auto peer placeholder-gray-400 text-xs font-semibold border border-gray-300 hover:border-gray-400 px-2 text-slate-900 transition-colors duration-300 focus:ring-blue-500 focus:border-blue-500"
                         @input="handleValidation('observation', { limit: 290 })" style="border-radius: 4px;">
@@ -76,24 +72,15 @@
                 </div>
             </div>
 
-            <div class="mb-2 mt-2 md:flex flex-row justify-items-start mx-8">
-                <div class="mb-4 md:mr-0 md:mb-0 basis-full">
-                    <input-text label="Representante proveedor" :withIcon="false" id="price" v-model="infoToSend.suppRep" type="text"
-                        placeholder="Escriba nombre representante" :required="true" :addClases="'h-[35px]'" :dSign="true"
-                        :validation="{ limit: 100, upper : true }">
-                    </input-text>
-                    <InputError v-for="(item, index) in errors.suppRep" :key="index" class="mt-2" :message="item" />
-                </div>
-            </div>
-
             <div class="md:flex flex md:items-center py-4 sticky flex-row justify-center mx-8">
                 <button type="button" @click="$emit('cerrar-modal')"
                     class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-[12px] px-2.5 py-1.5 text-center dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
                 <button type="button"
                     class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                    @click="sendReception(infoToSend)">
+                    @click="sendDonation(infoToSend)">
                     Enviar Kardex
-                    <svg class="w-[24px] h-[24px] ml-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="w-[24px] h-[24px] ml-2" viewBox="0 0 24 24" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                         <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
                         <g id="SVGRepo_iconCarrier">
@@ -116,7 +103,7 @@
 </template>
 
 <script>
-import { useEnviarKardex } from '@/Composables/Almacen/Recepcion/useEnviarKardex.js';
+import { useEnviarDonacion } from '@/Composables/Almacen/Donacion/useEnviarDonacion.js';
 import InputError from "@/Components/InputError.vue";
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 import InputText from "@/Components-ISRI/ComponentsToForms/InputText.vue";
@@ -130,7 +117,7 @@ export default {
     emits: ["cerrar-modal", "get-table"],
     components: { ProcessModal, InputError, InputText, IconM, DateTimePickerM },
     props: {
-        showModalKardex: {
+        showModalSendDonation: {
             type: Boolean,
             default: false,
         },
@@ -144,9 +131,9 @@ export default {
         const { recepId } = toRefs(props)
 
         const {
-            isLoadingRequest, recInfo, errors, empOptions, infoToSend,
-            getInfoForModalSendKardex, sendReception
-        } = useEnviarKardex(context);
+            isLoadingRequest, errors, empOptions, infoToSend,
+            getInfoForModalSendDonation, sendDonation
+        } = useEnviarDonacion(context);
 
         const {
             validateInput
@@ -158,13 +145,13 @@ export default {
 
         onMounted(
             async () => {
-                await getInfoForModalSendKardex(recepId.value)
+                await getInfoForModalSendDonation(recepId.value)
             }
         )
 
         return {
-            isLoadingRequest, recInfo, errors, empOptions, infoToSend,
-            getInfoForModalSendKardex, handleValidation, sendReception
+            isLoadingRequest, errors, empOptions, infoToSend,
+            handleValidation, sendDonation
         }
     }
 }

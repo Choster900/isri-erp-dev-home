@@ -63,4 +63,9 @@ class RecepcionPedido extends Model
     {
         return $this->belongsTo('App\Models\Proveedor','id_proveedor','id_proveedor');
     }
+
+    public function fuente_financiamiento()
+    {
+        return $this->belongsTo('App\Models\ProyectoFinanciado','id_proy_financiado','id_proy_financiado');
+    }
 }

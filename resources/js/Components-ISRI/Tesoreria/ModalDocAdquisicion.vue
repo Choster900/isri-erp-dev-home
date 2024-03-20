@@ -237,7 +237,7 @@
                                     <div class="mb-4 md:mr-2 md:mb-0 basis-full">
                                         <TextInput id="item-name" v-model="array_item.name" type="text"
                                             placeholder="Nombre"
-                                            @update:modelValue="handleValidation('name', { limit: 250 })">
+                                            @update:modelValue="handleValidation('name', { limit: 250, upper:true })">
                                             <LabelToInput icon="standard" forLabel="item-name" />
                                         </TextInput>
                                         <InputError class="mt-2" :message="item_errors.name" />
