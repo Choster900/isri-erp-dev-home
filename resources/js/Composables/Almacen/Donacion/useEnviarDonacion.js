@@ -1,36 +1,32 @@
-import ActaRecepcionPDFVue from '@/pdf/Almacen/ActaRecepcionPDF.vue';
 import { createApp, ref, inject } from "vue";
-import html2pdf from 'html2pdf.js'
+import html2pdf from 'html2pdf.js';
+import ActaDonacionPDFVue from '@/pdf/Almacen/ActaDonacionPDF.vue';
 
 import axios from "axios";
 import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
 import { toast } from "vue3-toastify";
-import { localeData } from 'moment_spanish_locale';
 import moment from 'moment';
-moment.locale('es', localeData)
 
-export const useEnviarKardex = (context) => {
+export const useEnviarDonacion = (context, getDataToShow, tableData) => {
     const swal = inject("$swal");
     const isLoadingRequest = ref(false);
     const errors = ref([]);
-    const isLoadingSend = ref(false)
-
-    const recInfo = ref({})
+    const isLoadingTop = ref(false)
     const empOptions = ref([])
+
     const infoToSend = ref({
         id: '',
-        conctManagerId: '',
-        nonCompliant: -1,
+        authorizeEmpId: '',
+        receiveEmpId: '',
         observation: '',
-        suppRep: ''
     })
 
-    const getInfoForModalSendKardex = async (id) => {
+    const getInfoForModalSendDonation = async (id) => {
         try {
             isLoadingRequest.value = true;
             const response = await axios.get(
-                `/get-info-modal-send-kardex/${id}`
+                `/get-info-modal-send-donation/${id}`
             );
             infoToSend.value.id = id
             empOptions.value = response.data.empOptions
@@ -47,39 +43,7 @@ export const useEnviarKardex = (context) => {
         }
     };
 
-    const sendReception = async (obj) => {
-        swal({
-            title: '¿Está seguro de registrar la recepcion en el kardex? Ten en cuenta que no podrás revertir los cambios.',
-            icon: 'question',
-            iconHtml: '❓',
-            confirmButtonText: 'Si, Registrar',
-            confirmButtonColor: '#141368',
-            cancelButtonText: 'Cancelar',
-            showCancelButton: true,
-            showCloseButton: true
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                saveObject(obj, '/send-goods-reception');
-            }
-        });
-    };
-
-    const saveObject = async (obj, url) => {
-        isLoadingRequest.value = true;
-        await axios
-            .post(url, obj)
-            .then((response) => {
-                handleSuccessResponse(response)
-            })
-            .catch((error) => {
-                handleErrorResponse(error)
-            })
-            .finally(() => {
-                isLoadingRequest.value = false;
-            });
-    };
-
-    const printReception = async (id) => {
+    const printDonation = async (id) => {
         swal({
             title: '¿Está seguro de imprimir el acta de recepción?.',
             icon: 'question',
@@ -92,9 +56,9 @@ export const useEnviarKardex = (context) => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    isLoadingSend.value = true;
+                    isLoadingTop.value = true;
                     const response = await axios.get(
-                        `/print-reception/${id}`
+                        `/print-donation/${id}`
                     );
                     let fecha = moment().format('DD-MM-YYYY');
                     let name = 'ACTA ' + response.data.recToPrint.acta_recepcion_pedido + ' - ' + fecha;
@@ -108,7 +72,7 @@ export const useEnviarKardex = (context) => {
                         jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' }
                         //jsPDF: { unit: 'cm', format: 'letter', orientation: 'portrait' },
                     };
-                    const app = createApp(ActaRecepcionPDFVue, {
+                    const app = createApp(ActaDonacionPDFVue, {
                         recToPrint: response.data.recToPrint,
                     });
                     const div = document.createElement('div');
@@ -147,11 +111,78 @@ export const useEnviarKardex = (context) => {
                     console.log(error);
                     showErrorMessage(error);
                 } finally {
-                    isLoadingSend.value = false;
+                    isLoadingTop.value = false;
                 }
             }
         });
     }
+
+    const changeStatusElement = async (elementId, status) => {
+        swal({
+            title: "¿Está seguro de Eliminar esta donacion?",
+            icon: "question",
+            iconHtml: "❓",
+            confirmButtonText: "Si, Eliminar",
+            confirmButtonColor: "#DC2626",
+            cancelButtonText: "Cancelar",
+            showCancelButton: true,
+            showCloseButton: true,
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                isLoadingTop.value = true;
+                try {
+                    const response = await axios.post('/change-status-donation', {
+                        id: elementId,
+                        status: status
+                    });
+                    useShowToast(toast.success, response.data.message);
+                } catch (err) {
+                    if (err.response.status === 422) {
+                        if (err.response.data.logical_error) {
+                            useShowToast(toast.error, err.response.data.logical_error);
+                        }
+                    } else {
+                        showErrorMessage(err);
+                    }
+                } finally {
+                    isLoadingTop.value = false;
+                    getDataToShow(tableData.currentPage)
+                }
+            }
+        });
+    }
+
+    const sendDonation = async (obj) => {
+        swal({
+            title: '¿Está seguro de registrar la donación en el kardex? Ten en cuenta que no podrás revertir los cambios.',
+            icon: 'question',
+            iconHtml: '❓',
+            confirmButtonText: 'Si, Registrar',
+            confirmButtonColor: '#141368',
+            cancelButtonText: 'Cancelar',
+            showCancelButton: true,
+            showCloseButton: true
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                saveObject(obj, '/send-goods-donation');
+            }
+        });
+    };
+
+    const saveObject = async (obj, url) => {
+        isLoadingRequest.value = true;
+        await axios
+            .post(url, obj)
+            .then((response) => {
+                handleSuccessResponse(response)
+            })
+            .catch((error) => {
+                handleErrorResponse(error)
+            })
+            .finally(() => {
+                isLoadingRequest.value = false;
+            });
+    };
 
     const handleErrorResponse = (err) => {
         console.log(err);
@@ -180,7 +211,7 @@ export const useEnviarKardex = (context) => {
     };
 
     return {
-        isLoadingRequest, recInfo, errors, empOptions, infoToSend, isLoadingSend,
-        getInfoForModalSendKardex, sendReception, printReception
+        isLoadingTop, isLoadingRequest, infoToSend, errors, empOptions,
+        changeStatusElement, getInfoForModalSendDonation, sendDonation, printDonation
     }
 }
