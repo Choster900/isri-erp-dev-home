@@ -262,6 +262,8 @@ class RecepcionController extends Controller
         // Convertir el objeto en una colección
         $collection = new Collection($object);
 
+        $detDoc = DetDocumentoAdquisicion::with('documento_adquisicion.proveedor')->find($request->detDocId);
+
         DB::beginTransaction();
         try {
             $codeActa = "";
@@ -280,6 +282,7 @@ class RecepcionController extends Controller
                 'id_det_doc_adquisicion'                => $request->detDocId,
                 'id_proy_financiado'                    => $request->financingSourceId,
                 'monto_recepcion_pedido'                => $request->total,
+                'id_proveedor'                          => $detDoc->documento_adquisicion->proveedor->id_proveedor,
                 'id_estado_recepcion_pedido'            => 1,
                 'factura_recepcion_pedido'              => $request->invoice,
                 'fecha_recepcion_pedido'                => Carbon::now(),
@@ -582,6 +585,20 @@ class RecepcionController extends Controller
                         'ip_det_kardex'                     => $request->ip(),
                     ]);
                     $detKardex->save();
+
+                    //We update the stock
+                    $resultados = DB::select(" SELECT FN_UPDATE_EXISTENCIA_ALMACEN(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+                        $reception->id_proy_financiado,
+                        $det->id_producto,
+                        $det->id_centro_atencion,
+                        $det->id_lt ?? null,
+                        $det->id_marca ?? null,
+                        $det->cant_det_recepcion_pedido,
+                        $det->costo_det_recepcion_pedido,
+                        Carbon::now(),
+                        $request->user()->nick_usuario,
+                        $request->ip()
+                    ]);
                 }
 
                 //Missing change status for DetDocumentoAdquisicion, if no product is missing

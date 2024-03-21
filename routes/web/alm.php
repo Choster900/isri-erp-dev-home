@@ -36,10 +36,17 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('donaciones', [DonacionController::class, 'getDonaciones'])->name('donacion.getDonaciones');
     Route::post('get-info-modal-donation', [DonacionController::class, 'getInfoModalDonation'])->name('donacion.getInfoModalDonation');
     Route::post('search-donation-product', [DonacionController::class, 'searchProduct'])->name('donacion.searchProduct');
+    Route::post('save-donation-info', [DonacionController::class, 'storeDonationInfo'])->name('donacion.storeDonationInfo');
+    Route::post('update-donation-info', [DonacionController::class, 'updateDonationInfo'])->name('donacion.updateDonationInfo');
+    Route::post('change-status-donation', [DonacionController::class, 'changeStatusDonation'])->name('donacion.changeStatusDonation');
+    //Functionality to send information to Kardex
+    Route::get('get-info-modal-send-donation/{id}', [DonacionController::class, 'getInfoModalSendDonation'])->name('donacion.getInfoModalSendDonation');
+    Route::post('send-goods-donation', [DonacionController::class, 'sendGoodsDonation'])->name('donacion.sendGoodsDonation');
+    //Print donation document
+    Route::get('print-donation/{id}', [DonacionController::class, 'printDonation'])->name('donacion.printDonation');
 
-
-    //Requerimientos
-    Route::get(
+     //Requerimientos
+     Route::get(
         '/alm/requerimientos',
         function (Request $request) {
             return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/requerimientos', 'Almacen/RequerimientoAlmacen');
@@ -48,6 +55,5 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('get-requerimiento-almacen', [RequerimientoAlmacenController::class, 'getRequerimientoAlmacen'])->name('donacion.get-object-for-requerimiento-almacen');
     Route::post('get-object-for-requerimiento-almacen', [RequerimientoAlmacenController::class, 'getObject'])->name('donacion.get-object-for-requerimiento-almacen');
     Route::post('insert-requerimiento-almacen', [RequerimientoAlmacenController::class, 'addRequerimiento'])->name('donacion.insert-requerimiento-almacen');
-
 
 });

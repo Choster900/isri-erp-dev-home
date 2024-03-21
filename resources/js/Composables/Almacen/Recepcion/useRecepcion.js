@@ -286,8 +286,9 @@ export const useRecepcion = (context) => {
 
             // Desplazar la pantalla hasta la última fila agregada
             nextTick(() => {
-                const newRowIndex = recDocument.value.prods.length - 1;
-                const newRowElement = document.getElementById(`row-${newRowIndex}`);
+                //const newRowIndex = recDocument.value.prods.length - 1;
+                //const newRowElement = document.getElementById(`row-${newRowIndex}`);
+                const newRowElement = document.getElementById(`total`);
                 if (newRowElement) {
                     newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
                 }

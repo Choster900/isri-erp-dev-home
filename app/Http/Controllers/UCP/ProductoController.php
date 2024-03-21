@@ -50,7 +50,7 @@ class ProductoController extends Controller
     {
         $prod = Producto::with(['unidad_medida', 'catalogo_unspsc'])->find($id);
 
-        $purchaseProcedures = ProcesoCompra::select('id_proceso_compra as value', 'nombre_proceso_compra as label')->get();
+        $purchaseProcedures = ProcesoCompra::selectRaw('id_proceso_compra as value, concat(id_proceso_compra," - ",nombre_proceso_compra) as label')->get();
         $budgetAccounts = CuentaPresupuestal::selectRaw("id_ccta_presupuestal as value , concat(id_ccta_presupuestal, ' - ', nombre_ccta_presupuestal) as label")
             ->where('compra_ccta_presupuestal', 1)
             ->get();
