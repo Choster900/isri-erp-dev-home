@@ -1,0 +1,149 @@
+<script lang="ts">
+import { useDatatableReqAlm } from '@/Composables/Almacen/RequerimientoAlmacen/useDatatableReqAlm';
+import { defineComponent } from 'vue'
+import Datatable from '@/Components-ISRI/Datatable.vue';
+import ModalRequerimientoAlmacen from '@/Components-ISRI/Almacen/RequerimientosAlmacen/ModalRequerimientoAlmacen.vue';
+
+export default defineComponent({
+    components: { Datatable, ModalRequerimientoAlmacen },
+    setup() {
+        const {
+            links,
+            sortBy,
+            columns,
+            sortKey,
+            permits,
+            lastUrl,
+            perPage,
+            tableData,
+            sortOrders,
+            pagination,
+            handleData,
+            emptyObject,
+            isLoadinRequest,
+            objectRequerimientos,
+            getRequerimientosAlmacen,
+            showModalRequerimientoAlmacen,objectRequerimientoToSendModal,
+        } = useDatatableReqAlm();
+
+        return {
+            links,
+            sortBy,
+            columns,
+            sortKey,
+            permits,
+            lastUrl,
+            perPage,
+            tableData,
+            sortOrders,
+            pagination,
+            handleData,
+            emptyObject,
+            isLoadinRequest,
+            objectRequerimientos,
+            useDatatableReqAlm,
+            getRequerimientosAlmacen,
+            showModalRequerimientoAlmacen,objectRequerimientoToSendModal,
+        }
+    }
+})
+</script>
+<template>
+
+    <Head title="Producto - Requerimiento" />
+    <AppLayoutVue nameSubModule="Almacen - Requerimiento">
+
+        <div class="sm:flex sm:justify-end sm:items-center mb-2">
+            <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
+                <GeneralButton @click="showModalRequerimientoAlmacen = true;" color="bg-green-700  hover:bg-green-800"
+                    text="Agregar requerimiento" icon="add" />
+            </div>
+        </div>
+
+        <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
+            <header class="px-5 py-4">
+                <div class="mb-4 md:flex flex-row justify-items-start">
+                    <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
+                        <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
+                            <Multiselect
+
+                                placeholder="Cantidad a mostrar" />
+                            <LabelToInput icon="list2" />
+                        </div>
+                    </div>
+                    <h2 class="font-semibold text-slate-800 pt-1">Documentos adquisiciones: <span
+                            class="text-slate-400 font-medium"></span></h2>
+                </div>
+            </header>
+            <div class="overflow-x-auto">
+                <Datatable :columns="columns" :sortKey="sortKey" :sortOrders="sortOrders" :searchButton="true"
+                    @sort="sortBy" @datos-enviados="handleData($event)" @execute-search="getRequerimientosAlmacen()">
+                    <tbody class="text-sm divide-y divide-slate-200" v-if="!isLoadinRequest">
+                        <tr v-for="(requ, i) in objectRequerimientos" :key="i" class="hover:bg-gray-200 *:text-[10pt]">
+                            <td class="px-2 first:pl-5 last:pr-5 max-w-[22%]">
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{ requ.id_requerimiento }}
+                                </div>
+                            </td>
+                            <td class="first:pl-5 last:pr-5">
+                                <div class="space-x-1">
+                                    <DropDownOptions>
+                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                            @click.stop="objectRequerimientoToSendModal = requ; showModalRequerimientoAlmacen = !showModalRequerimientoAlmacen">
+                                            <div class="w-8 text-blue-900">
+                                                <span class="text-xs">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                        class="w-6 h-6">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                    </svg>
+
+                                                </span>
+                                            </div>
+                                            <div class="font-semibold">Ver</div>
+                                        </div>
+
+                                    </DropDownOptions>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody v-else>
+                        <tr>
+                            <td colspan="9" class="text-center">
+                                <img src="../../../img/IsSearching.gif" alt="" class="w-60 h-60 mx-auto">
+                                <h1 class="font-medium text-xl mt-4">Cargando!!!</h1>
+                                <p class="text-sm text-gray-600 mt-2 pb-10">Por favor espera un momento mientras se
+                                    carga la
+                                    información.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody v-if="emptyObject && !isLoadinRequest">
+                        <tr>
+                            <td colspan="9" class="text-center">
+                                <img src="../../../img/NoData.gif" alt="" class="w-60 h-60 mx-auto">
+                                <h1 class="font-medium text-xl mt-4">No se encontraron resultados!</h1>
+                                <p class="text-sm text-gray-600 mt-2 pb-10">Parece que no hay registros disponibles en
+                                    este
+                                    momento.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </Datatable>
+
+            </div>
+
+<!-- {{ objectRequerimientos }} -->
+        </div>
+        <ModalRequerimientoAlmacen :showModal="showModalRequerimientoAlmacen" :objectRequerimientoToSendModal="objectRequerimientoToSendModal"
+            @cerrar-modal="showModalRequerimientoAlmacen = false;"></ModalRequerimientoAlmacen>
+    </AppLayoutVue>
+
+
+</template>
+
+<style scoped></style>
