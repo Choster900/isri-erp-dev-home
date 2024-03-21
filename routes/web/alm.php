@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Almacen\DonacionController;
 use App\Http\Controllers\Almacen\RecepcionController;
+use App\Http\Controllers\Almacen\RequerimientoAlmacenController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
@@ -35,4 +36,18 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('donaciones', [DonacionController::class, 'getDonaciones'])->name('donacion.getDonaciones');
     Route::post('get-info-modal-donation', [DonacionController::class, 'getInfoModalDonation'])->name('donacion.getInfoModalDonation');
     Route::post('search-donation-product', [DonacionController::class, 'searchProduct'])->name('donacion.searchProduct');
+
+
+    //Requerimientos
+    Route::get(
+        '/alm/requerimientos',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/requerimientos', 'Almacen/RequerimientoAlmacen');
+        }
+    )->name('alm.requerimientos');
+    Route::post('get-requerimiento-almacen', [RequerimientoAlmacenController::class, 'getRequerimientoAlmacen'])->name('donacion.get-object-for-requerimiento-almacen');
+    Route::post('get-object-for-requerimiento-almacen', [RequerimientoAlmacenController::class, 'getObject'])->name('donacion.get-object-for-requerimiento-almacen');
+    Route::post('insert-requerimiento-almacen', [RequerimientoAlmacenController::class, 'addRequerimiento'])->name('donacion.insert-requerimiento-almacen');
+
+
 });
