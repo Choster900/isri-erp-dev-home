@@ -55,7 +55,7 @@ export default defineComponent({
 
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="showModalRequerimientoAlmacen = true;" color="bg-green-700  hover:bg-green-800"
+                <GeneralButton @click="showModalRequerimientoAlmacen = true; objectRequerimientoToSendModal = []" color="bg-green-700  hover:bg-green-800"
                     text="Agregar requerimiento" icon="add" />
             </div>
         </div>
@@ -83,6 +83,31 @@ export default defineComponent({
                             <td class="px-2 first:pl-5 last:pr-5 max-w-[22%]">
                                 <div class="font-medium text-slate-800 text-center">
                                     {{ requ.id_requerimiento }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5 max-w-[22%]">
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{ requ.centro_atencion.nombre_centro_atencion }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5 max-w-[22%]">
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{ requ.proyecto_financiado.nombre_proy_financiado }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5 max-w-[22%]">
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{ requ.num_requerimiento }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5 max-w-[22%]">
+                                <div class="font-medium text-slate-800 text-center">
+                                    DESPUES ESTO
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5 max-w-[22%]">
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{ requ.estado_requerimiento.nombre_estado_req}}
                                 </div>
                             </td>
                             <td class="first:pl-5 last:pr-5">
@@ -136,11 +161,57 @@ export default defineComponent({
                 </Datatable>
 
             </div>
+            <div v-if="!emptyObject" class="px-6 py-4 bg-white shadow-lg rounded-sm border-slate-200 relative">
+            <div>
+                <nav class="flex justify-between" role="navigation" aria-label="Navigation">
+                    <div class="grow text-center">
+                        <ul class="inline-flex text-sm font-medium -space-x-px">
+                            <li v-for="link in links" :key="link.label">
+                                <span v-if="link.label === 'Anterior'"
+                                    :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
+                                    <a @click="getRequerimientosAlmacen(link.url)"
+                                        class="btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer text-indigo-500">
+                                        <div class="flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M6.75 15.75L3 12m0 0l3.75-3.75M3 12h18" />
+                                            </svg>
+                                            <span class="hidden sm:inline ml-1">Anterior</span>
+                                        </div>
+                                    </a>
+                                </span>
+                                <span v-else-if="(link.label == 'Siguiente')"
+                                    :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
+                                    <div class="flex-1 text-right ml-2">
+                                        <a @click="getRequerimientosAlmacen(link.url)"
+                                            class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer text-indigo-500">
 
+                                            <div class="flex items-center">
+                                                <span class="hidden sm:inline">Siguiente&nbsp;</span> <svg
+                                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                    stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+                                                </svg>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </span>
+                                <span class="cursor-pointer mt-3" v-else @click="getRequerimientosAlmacen(link.url)"
+                                    :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
+                                        class=" w-5">{{ link.label }}</span>
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </div>
 <!-- {{ objectRequerimientos }} -->
         </div>
         <ModalRequerimientoAlmacen :showModal="showModalRequerimientoAlmacen" :objectRequerimientoToSendModal="objectRequerimientoToSendModal"
-            @cerrar-modal="showModalRequerimientoAlmacen = false;"></ModalRequerimientoAlmacen>
+            @cerrar-modal="showModalRequerimientoAlmacen = false;" @actualizar-datatable="getRequerimientosAlmacen(); showModalRequerimientoAlmacen = false"></ModalRequerimientoAlmacen>
     </AppLayoutVue>
 
 

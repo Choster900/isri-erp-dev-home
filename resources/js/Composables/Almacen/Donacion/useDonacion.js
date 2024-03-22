@@ -216,6 +216,10 @@ export const useDonacion = (context) => {
             } else {
                 useShowToast(toast.warning, "Tienes errores en tus datos, por favor verifica e intenta nuevamente.");
                 errors.value = err.response.data.errors;
+                // Limpiar los errores después de 5 segundos
+                setTimeout(() => {
+                    errors.value = [];
+                }, 5000);
             }
         } else {
             showErrorMessage(err);
