@@ -192,6 +192,10 @@ export const useEnviarDonacion = (context, getDataToShow, tableData) => {
             } else {
                 useShowToast(toast.warning, "Tienes algunos errores, por favor verifica los datos enviados.");
                 errors.value = err.response.data.errors;
+                // Limpiar los errores después de 5 segundos
+                setTimeout(() => {
+                    errors.value = [];
+                }, 5000);
             }
         } else {
             showErrorMessage(err);

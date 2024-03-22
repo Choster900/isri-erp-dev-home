@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Almacen;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Almacen\RequerimientoRequest;
 use App\Models\CentroAtencion;
 use App\Models\CentroProduccion;
 use App\Models\DetalleRequerimiento;
@@ -12,6 +13,7 @@ use App\Models\ProyectoFinanciado;
 use App\Models\Requerimiento;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use PhpParser\Node\Stmt\Else_;
 
 class RequerimientoAlmacenController extends Controller
 {
@@ -20,14 +22,10 @@ class RequerimientoAlmacenController extends Controller
     {
         $v_columns = [
             'id_requerimiento',
-            /*  'dui_proveedor',
-            'nrc_proveedor',
-            'nit_proveedor',
-            'id_tipo_contribuyente',
-            'id_sujeto_retencion',
-            'razon_social_proveedor',
-            'estado_proveedor',
-            'nombre_comercial_proveedor', */
+            'id_centro_atencion',
+            'id_proy_financiado',
+            'id_estado_req',
+            'num_requerimiento',
         ];
 
         $v_length = $request->input('length');
@@ -38,6 +36,10 @@ class RequerimientoAlmacenController extends Controller
 
         $v_query = Requerimiento::with([
             "detalles_requerimiento.producto",
+            "centro_atencion",
+            "proyecto_financiado",
+            "estado_requerimiento"
+
         ])->orderBy($v_columns[$v_column], $v_dir);
 
         if ($data) {
@@ -54,7 +56,6 @@ class RequerimientoAlmacenController extends Controller
             'draw' => $request->input('draw'),
         ];
     }
-    //Big L - "Work, Pt. II" (feat. Gang Starr)
 
     function getObject(): array
     {
@@ -81,44 +82,132 @@ class RequerimientoAlmacenController extends Controller
         ];
     }
 
-    function addRequerimiento(Request $request)
+    function getProductByNameOrCode(Request $request)
+    {
+        $stringBusqueda = $request->nombre;
+        $data = Producto::where('nombre_producto', 'like', '%' . $stringBusqueda . '%')->get();
+
+        return $data->map(function ($item) {
+            return [
+                'value'           => $item->id_producto,
+                'label'           => $item->codigo_producto . ' - ' . $item->nombre_producto,
+                'allDataPersonas' => $item,
+            ];
+        });
+    }
+
+    function addRequerimiento(RequerimientoRequest $request)
+    {
+        //     $requerimiento = [];
+        $requerimiento = [
+            'id_lt'                       => $request->idLt,
+            'id_centro_atencion'          => $request->idCentroAtencion,
+            'id_proy_financiado'          => $request->idProyFinanciado,
+            'id_estado_req'               => 1,
+            'num_requerimiento'           => $request->numRequerimiento,
+            'cant_personal_requerimiento' => $request->cantPersonalRequerimiento,
+            'fecha_requerimiento'         => Carbon::now(),
+            'observacion_requerimiento'   => $request->observacionRequerimiento,
+            'fecha_reg_requerimiento'     => Carbon::now(),
+            'usuario_requerimiento'       => $request->user()->nick_usuario,
+            'ip_requerimiento'            => $request->ip(),
+
+        ];
+        $requerimientoId = Requerimiento::insertGetId($requerimiento);
+
+        foreach ( $request->dataDetalleRequerimiento as $key => $value ) {
+
+            foreach ( $value["productos"] as $key => $value2 ) {
+
+                DetalleRequerimiento::insert(
+                    [
+                        'id_producto'                 => $value2["idProducto"],
+                        'id_centro_produccion'        => $value["idCentroProduccion"],
+                        'id_requerimiento'            => $requerimientoId,
+                        'cant_det_requerimiento'      => $value2["cantDetRequerimiento"],
+                        'costo_det_requerimiento'     => 0,
+                        'fecha_reg_det_requerimiento' => Carbon::now(),
+                        'usuario_det_requerimiento'   => $request->user()->nick_usuario,
+                        'ip_det_requerimiento'        => $request->ip(),
+                    ]
+                );
+            }
+        }
+    }
+
+    function updateRequerimientoAlmacen(Request $request)
     {
 
 
         //     $requerimiento = [];
         $requerimiento = [
-            'id_lt' => $request->idLt,
-            'id_centro_atencion' =>  $request->idCentroAtencion,
-            'id_proy_financiado' => $request->idProyFinanciado,
-            'id_estado_req' => 1,
-            'num_requerimiento' => $request->numRequerimiento,
+            'id_requerimiento'            => $request->idRequerimiento,
+            'id_lt'                       => $request->idLt,
+            'id_centro_atencion'          => $request->idCentroAtencion,
+            'id_proy_financiado'          => $request->idProyFinanciado,
+            'id_estado_req'               => 1,
+            'num_requerimiento'           => $request->numRequerimiento,
             'cant_personal_requerimiento' => $request->cantPersonalRequerimiento,
-            'fecha_requerimiento' => Carbon::now(),
-            'observacion_requerimiento' => $request->observacionRequerimiento,
-            'fecha_reg_requerimiento' => Carbon::now(),
-            'usuario_requerimiento' =>  $request->user()->nick_usuario,
-            'ip_requerimiento' => $request->ip(),
+            'fecha_requerimiento'         => Carbon::now(),
+            'observacion_requerimiento'   => $request->observacionRequerimiento,
+            'fecha_reg_requerimiento'     => Carbon::now(),
+            'usuario_requerimiento'       => $request->user()->nick_usuario,
+            'ip_requerimiento'            => $request->ip(),
 
         ];
-        $requerimientoId = Requerimiento::insertGetId($requerimiento);
 
-        foreach ($request->dataDetalleRequerimiento as $key => $value) {
+        Requerimiento::where("id_requerimiento", $request->idRequerimiento)->update($requerimiento);
 
-            foreach ($value["productos"] as $key => $value2) {
 
-                DetalleRequerimiento::insert(
-                    [
-                        'id_producto' =>  $value2["idProducto"],
-                        'id_centro_produccion' => $value["idCentroProduccion"],
-                        'id_requerimiento' => $requerimientoId,
-                        'cant_det_requerimiento' => $value2["cantDetRequerimiento"],
-                        'costo_det_requerimiento' => 0,
-                        'fecha_reg_det_requerimiento' => Carbon::now(),
-                        'usuario_det_requerimiento' => $request->user()->nick_usuario,
-                        'ip_det_requerimiento' =>  $request->ip(),
-                    ]
-                );
+        foreach ( $request->dataDetalleRequerimiento as $key => $value ) {
+
+
+            foreach ( $value["productos"] as $key => $value2 ) {
+
+                if ($value2["idDetRequerimiento"]) {
+                    if ($value2["stateProducto"] == 1) {
+                        DetalleRequerimiento::where("id_det_requerimiento", $value2["idDetRequerimiento"])->update(
+                            [
+                                'id_producto'                 => $value2["idProducto"],
+                                'id_centro_produccion'        => $value["idCentroProduccion"],
+                                'id_requerimiento'            => $request->idRequerimiento,
+                                'cant_det_requerimiento'      => $value2["cantDetRequerimiento"],
+                                'costo_det_requerimiento'     => 0,
+                                'fecha_reg_det_requerimiento' => Carbon::now(),
+                                'usuario_det_requerimiento'   => $request->user()->nick_usuario,
+                                'ip_det_requerimiento'        => $request->ip(),
+                            ]
+                        );
+                    } else {
+                        // eliminar
+                        DetalleRequerimiento::where("id_det_requerimiento", $value2["idDetRequerimiento"])->delete();
+
+                    }
+
+                } else {
+
+                    if ($value2["stateProducto"] == 1) {
+
+                        // Agregar
+                        DetalleRequerimiento::insert(
+                            [
+                                'id_producto'                 => $value2["idProducto"],
+                                'id_centro_produccion'        => $value["idCentroProduccion"],
+                                'id_requerimiento'            => $request->idRequerimiento,
+                                'cant_det_requerimiento'      => $value2["cantDetRequerimiento"],
+                                'costo_det_requerimiento'     => 0,
+                                'fecha_reg_det_requerimiento' => Carbon::now(),
+                                'usuario_det_requerimiento'   => $request->user()->nick_usuario,
+                                'ip_det_requerimiento'        => $request->ip(),
+                            ]
+                        );
+
+                    }
+                }
             }
         }
+
+
+        return $request;
     }
 }

@@ -98,7 +98,7 @@
             <!-- Producto -->
             <div class="w-[35%] flex justify-center items-center border-r border-gray-500">
                 <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[11px] px-0.5">
-                    {{ prod.producto.nombre_producto }}
+                    {{ prod.producto.nombre_completo_producto }}
                 </p>
             </div>
             <!-- Unidad -->

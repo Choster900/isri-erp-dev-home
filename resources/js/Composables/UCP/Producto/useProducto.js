@@ -14,6 +14,9 @@ export const useProducto = (context) => {
     const catUnspsc = ref([])
     const budgetAccounts = ref([])
     const unitsMeasmt = ref([])
+    const catPerc = ref([])
+    const catNicsp = ref([])
+    const baseOption = ref([])
 
     const prod = ref({
         id: '',
@@ -24,8 +27,10 @@ export const useProducto = (context) => {
         budgetAccountId: '',
         purchaseProcedureId: '',
         unspscId: '',
+        catPercId: '',
+        catNicspId: '',
         perishable: -1,
-        gAndS:-1
+        gAndS: -1
     })
 
     const getInfoForModalProd = async (id) => {
@@ -37,6 +42,8 @@ export const useProducto = (context) => {
             purchaseProcedures.value = response.data.purchaseProcedures
             budgetAccounts.value = response.data.budgetAccounts
             unitsMeasmt.value = response.data.unitsMeasmt
+            catNicsp.value = response.data.catNicsp
+            catPerc.value = response.data.catPerc
             id > 0 ? setModalValues(response.data.prod) : ''
         } catch (err) {
             if (err.response.data.logical_error) {
@@ -73,19 +80,22 @@ export const useProducto = (context) => {
         if (product.catalogo_unspsc) {
             let array = {
                 value: product.catalogo_unspsc.id_catalogo_unspsc,
-                label: product.catalogo_unspsc.nombre_catalogo_unspsc,
+                label: product.catalogo_unspsc.codigo_catalogo_unspsc + " - " + product.catalogo_unspsc.nombre_catalogo_unspsc,
             };
             catUnspsc.value.push(array);
+            baseOption.value = catUnspsc.value
         }
 
         prod.value.id = product.id_producto
         prod.value.name = product.nombre_producto
         prod.value.description = product.descripcion_producto
         prod.value.mUnitId = product.unidad_medida.id_unidad_medida
-        prod.value.price = '$'+product.precio_producto
+        prod.value.price = '$' + product.precio_producto
         prod.value.budgetAccountId = product.id_ccta_presupuestal
         prod.value.purchaseProcedureId = product.id_proceso_compra
         prod.value.unspscId = product.id_catalogo_unspsc
+        prod.value.catPercId = product.id_catalogo_perc
+        prod.value.catNicspId = product.id_ccta_nicsp
         prod.value.perishable = product.perecedero_producto
         prod.value.gAndS = product.basico_producto
     }
@@ -139,14 +149,18 @@ export const useProducto = (context) => {
             });
     };
 
-
     const handleErrorResponse = (err) => {
         if (err.response.status === 422) {
             if (err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
             } else {
+                catUnspsc.value = baseOption.value //refresh the unspsc options
                 useShowToast(toast.warning, "Tienes algunos errores, por favor verifica los datos enviados.");
                 errors.value = err.response.data.errors;
+                // Limpiar los errores después de 5 segundos
+                setTimeout(() => {
+                    errors.value = [];
+                }, 5000);
             }
         } else {
             showErrorMessage(err);
@@ -160,6 +174,15 @@ export const useProducto = (context) => {
         context.emit("get-table")
     }
 
+    const openUnspsc = () => {
+        catUnspsc.value = baseOption.value
+    }
+
+    const selectUnspsc = (id) => {
+        const selectedUnspsc = catUnspsc.value.filter((e) => e.value == id)
+        baseOption.value = selectedUnspsc
+    }
+
     const showErrorMessage = (err) => {
         const { title, text, icon } = useHandleError(err);
         swal({ title: title, text: text, icon: icon, timer: 5000 });
@@ -167,7 +190,7 @@ export const useProducto = (context) => {
 
     return {
         errors, isLoadingRequest, prod, purchaseProcedures, catUnspsc, isLoadingUnspsc,
-        budgetAccounts, unitsMeasmt,
-        asyncFindUnspsc, getInfoForModalProd, storeProduct, updateProduct
+        budgetAccounts, unitsMeasmt, catPerc, catNicsp, baseOption,
+        asyncFindUnspsc, getInfoForModalProd, storeProduct, updateProduct, openUnspsc, selectUnspsc
     }
 }
