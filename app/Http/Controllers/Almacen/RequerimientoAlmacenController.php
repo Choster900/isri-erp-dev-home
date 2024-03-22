@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Almacen;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Almacen\RequerimientoRequest;
 use App\Models\CentroAtencion;
 use App\Models\CentroProduccion;
 use App\Models\DetalleRequerimiento;
@@ -55,7 +56,6 @@ class RequerimientoAlmacenController extends Controller
             'draw' => $request->input('draw'),
         ];
     }
-    //Big L - "Work, Pt. II" (feat. Gang Starr)
 
     function getObject(): array
     {
@@ -96,7 +96,7 @@ class RequerimientoAlmacenController extends Controller
         });
     }
 
-    function addRequerimiento(Request $request)
+    function addRequerimiento(RequerimientoRequest $request)
     {
         //     $requerimiento = [];
         $requerimiento = [
