@@ -35,7 +35,7 @@ class RecepcionController extends Controller
                 'det_doc_adquisicion.documento_adquisicion.tipo_documento_adquisicion',
                 'estado_recepcion'
             ])
-            ->where('id_proy_financiado',"!=",4);
+            ->where('id_proy_financiado', "!=", 4);
 
         if ($column == 2) { //Order by document type
             $query->orderByRaw('
@@ -601,7 +601,37 @@ class RecepcionController extends Controller
                     ]);
                 }
 
-                //Missing change status for DetDocumentoAdquisicion, if no product is missing
+                $pendientes = DB::table('producto_adquisicion AS dc') //We check if it's missing some products
+                    ->select('dc.id_prod_adquisicion', 'dc.id_producto', 'dc.cant_prod_adquisicion')
+                    ->addSelect(DB::raw('COALESCE(SUM(dr.cantidad_recibida), 0) AS cantidad_recibida'))
+                    ->addSelect(DB::raw('(dc.cant_prod_adquisicion - COALESCE(SUM(dr.cantidad_recibida), 0)) AS cantidad_pendiente'))
+                    ->leftJoinSub(
+                        DB::table('detalle_recepcion_pedido AS drp')
+                            ->selectRaw('drp.id_prod_adquisicion, SUM(drp.cant_det_recepcion_pedido) AS cantidad_recibida')
+                            ->join('recepcion_pedido AS rp', 'drp.id_recepcion_pedido', '=', 'rp.id_recepcion_pedido')
+                            ->where('rp.id_estado_recepcion_pedido', 2)
+                            ->where('drp.estado_det_recepcion_pedido', 1)
+                            ->groupBy('drp.id_prod_adquisicion'),
+                        'dr',
+                        'dc.id_prod_adquisicion',
+                        '=',
+                        'dr.id_prod_adquisicion'
+                    )
+                    ->where('dc.id_det_doc_adquisicion', $reception->id_det_doc_adquisicion)
+                    ->where('dc.estado_prod_adquisicion', 1)
+                    ->groupBy('dc.id_prod_adquisicion', 'dc.id_producto', 'dc.cant_prod_adquisicion')
+                    ->havingRaw('cantidad_pendiente > 0')
+                    ->get();
+
+                if ($pendientes->isEmpty()) {
+                    $item = DetDocumentoAdquisicion::find($reception->id_det_doc_adquisicion);
+                    $item->update([
+                        'id_estado_doc_adquisicion'         => 3,
+                        'fecha_mod_det_doc_adquisicion'     => Carbon::now(),
+                        'usuario_det_doc_adquisicion'       => $request->user()->nick_usuario,
+                        'ip_det_doc_adquisicion'            => $request->ip()
+                    ]);
+                }
 
                 DB::commit(); // Confirma las operaciones en la base de datos
                 return response()->json([
