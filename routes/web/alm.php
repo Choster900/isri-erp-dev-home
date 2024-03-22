@@ -45,15 +45,17 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     //Print donation document
     Route::get('print-donation/{id}', [DonacionController::class, 'printDonation'])->name('donacion.printDonation');
 
-     //Requerimientos
-     Route::get(
+    //Requerimientos
+    Route::get(
         '/alm/requerimientos',
         function (Request $request) {
             return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/requerimientos', 'Almacen/RequerimientoAlmacen');
         }
     )->name('alm.requerimientos');
-    Route::post('get-requerimiento-almacen', [RequerimientoAlmacenController::class, 'getRequerimientoAlmacen'])->name('donacion.get-object-for-requerimiento-almacen');
-    Route::post('get-object-for-requerimiento-almacen', [RequerimientoAlmacenController::class, 'getObject'])->name('donacion.get-object-for-requerimiento-almacen');
-    Route::post('insert-requerimiento-almacen', [RequerimientoAlmacenController::class, 'addRequerimiento'])->name('donacion.insert-requerimiento-almacen');
+    Route::post('get-requerimiento-almacen', [RequerimientoAlmacenController::class, 'getRequerimientoAlmacen'])->name('donacion.getObjectForRequerimientoAlmacen');
+    Route::post('get-object-for-requerimiento-almacen', [RequerimientoAlmacenController::class, 'getObject'])->name('donacion.getObjectForRequerimientoAlmacen');
+    Route::post('insert-requerimiento-almacen', [RequerimientoAlmacenController::class, 'addRequerimiento'])->name('donacion.insertRequerimientoAlmacen');
+    Route::post('update-requerimiento-almacen', [RequerimientoAlmacenController::class, 'updateRequerimientoAlmacen'])->name('donacion.updateRequerimientoAlmacen');
+    Route::post('get-product-searched-almacen', [RequerimientoAlmacenController::class, 'getProductByNameOrCode'])->name('donacion.productSearchedAlmacen');
 
 });

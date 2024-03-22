@@ -44,13 +44,15 @@ export const useRequerimientoAlmacen = () => {
             idCentroProduccion: '',
             productos: [
                 {
+                    idDetRequerimiento: '',
                     idProducto: '',
                     descripcionProducto: '',
                     cantDetRequerimiento: '',
                     costoDetRequerimiento: '',
+                    stateProducto: 1,
                 }
             ],
-            stateDetalle: 1,
+            stateCentroProduccion: 1,
             isHidden: false,
         })
     }
@@ -58,9 +60,12 @@ export const useRequerimientoAlmacen = () => {
     const appendProduct = (i) => {
         /*  alert("dasda") */
         dataDetalleRequerimiento.value[i].productos.push({
+            idDetRequerimiento: '',
             idProducto: '',
+            descripcionProducto: '',
             cantDetRequerimiento: '',
             costoDetRequerimiento: '',
+            stateProducto: 1,
         })
     }
 
@@ -101,7 +106,7 @@ export const useRequerimientoAlmacen = () => {
                 return { value: index.id_lt, label: `${index.codigo_up_lt} - ${index.nombre_lt}`, completeData: index };
             })
             productosArray.value = data.productos.map(index => {
-                return { value: index.id_producto, label: `${index.codigo_producto}`, completeData: index };
+                return { value: index.id_producto, label: `${index.codigo_producto} - ${index.nombre_producto}`, completeData: index };
             })
             proyectoFinanciados.value = data.proyectosFinanciados.map(index => {
                 return { value: index.id_proy_financiado, label: `${index.nombre_proy_financiado}`, completeData: index };
@@ -117,12 +122,108 @@ export const useRequerimientoAlmacen = () => {
         }
 
     };
+
+
+    /**
+     * Guarda productos adquisición en el servidor.
+     *
+     * @returns {Promise<object>} - Promesa que se resuelve con la respuesta exitosa o se rechaza con el error.
+     */
+    const saveRequerimientoAlmacenRequest = () => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                // Hace una solicitud POST a la ruta "/save-prod-adquicicion" con los datos necesarios
+                const resp = await axios.post("/insert-requerimiento-almacen", {
+                    idLt: idLt.value,
+                    idCentroAtencion: idCentroAtencion.value,
+                    idProyFinanciado: idProyFinanciado.value,
+                    idEstadoReq: idEstadoReq.value,
+                    numRequerimiento: numRequerimiento.value,
+                    cantPersonalRequerimiento: cantPersonalRequerimiento.value,
+                    fechaRequerimiento: fechaRequerimiento.value,
+                    observacionRequerimiento: observacionRequerimiento.value,
+                    dataDetalleRequerimiento: dataDetalleRequerimiento.value,
+                });
+                console.log(resp);
+                // Se resuelve la promesa con la respuesta exitosa de la solicitud
+                resolve(resp);
+            } catch (error) {
+                console.log(error);
+                // Si hay un error y el código de respuesta es 422 (Unprocessable Entity), maneja los errores de validación
+                if (error.response.status === 422) {
+                    // Obtiene los errores del cuerpo de la respuesta y los transforma a un formato más manejable
+                    let data = error.response.data.errors;
+                    var myData = new Object();
+                    for (const errorBack in data) {
+                        myData[errorBack] = data[errorBack][0];
+                    }
+                    // Actualiza el estado "errorsValidation" con los errores y los limpia después de 5 segundos
+                    errorsValidation.value = myData;
+                    setTimeout(() => {
+                        errorsValidation.value = [];
+                    }, 5000);
+                    console.error("Error en guardar los datos:", error);
+                }
+                // Rechaza la promesa en caso de excepción
+                reject(error);
+            }
+        });
+    }
+/**
+     * Guarda productos adquisición en el servidor.
+     *
+     * @returns {Promise<object>} - Promesa que se resuelve con la respuesta exitosa o se rechaza con el error.
+     */
+const updateRequerimientoAlmacenRequest = () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            // Hace una solicitud POST a la ruta "/save-prod-adquicicion" con los datos necesarios
+            const resp = await axios.post("/update-requerimiento-almacen", {
+                idRequerimiento: idRequerimiento.value,
+                idLt: idLt.value,
+                idCentroAtencion: idCentroAtencion.value,
+                idProyFinanciado: idProyFinanciado.value,
+                idEstadoReq: idEstadoReq.value,
+                numRequerimiento: numRequerimiento.value,
+                cantPersonalRequerimiento: cantPersonalRequerimiento.value,
+                fechaRequerimiento: fechaRequerimiento.value,
+                observacionRequerimiento: observacionRequerimiento.value,
+                dataDetalleRequerimiento: dataDetalleRequerimiento.value,
+            });
+            console.log(resp);
+
+            // Se resuelve la promesa con la respuesta exitosa de la solicitud
+            resolve(resp);
+        } catch (error) {
+            console.log(error);
+            // Si hay un error y el código de respuesta es 422 (Unprocessable Entity), maneja los errores de validación
+            if (error.response.status === 422) {
+                // Obtiene los errores del cuerpo de la respuesta y los transforma a un formato más manejable
+                let data = error.response.data.errors;
+                var myData = new Object();
+                for (const errorBack in data) {
+                    myData[errorBack] = data[errorBack][0];
+                }
+                // Actualiza el estado "errorsValidation" con los errores y los limpia después de 5 segundos
+                errorsValidation.value = myData;
+                setTimeout(() => {
+                    errorsValidation.value = [];
+                }, 5000);
+                console.error("Error en guardar los datos:", error);
+            }
+            // Rechaza la promesa en caso de excepción
+            reject(error);
+        }
+    });
+}
+
+
     /**
     * Obtener Arrays de objetos para multiselect
     *
     * @returns {Promise<object>} - Promesa que se resuelve con la respuesta del servidor.
     */
-    const insertRequerimiento = async () => {
+   /*  const insertRequerimiento = async () => {
         alert("alerta")
         try {
             const resp = await axios.post("/insert-requerimiento-almacen", {
@@ -134,7 +235,7 @@ export const useRequerimientoAlmacen = () => {
                 cantPersonalRequerimiento: cantPersonalRequerimiento.value,
                 fechaRequerimiento: fechaRequerimiento.value,
                 observacionRequerimiento: observacionRequerimiento.value,
-                dataDetalleRequerimiento:dataDetalleRequerimiento.value,
+                dataDetalleRequerimiento: dataDetalleRequerimiento.value,
             });
             console.log(resp);
 
@@ -144,6 +245,66 @@ export const useRequerimientoAlmacen = () => {
             throw new Error("Error en la creación de la evaluación personal");
         }
 
+    }; */
+
+    /**
+    * Obtener Arrays de objetos para multiselect
+    *
+    * @returns {Promise<object>} - Promesa que se resuelve con la respuesta del servidor.
+    */
+   /*  const updateRequerimiento = async () => {
+        alert("alerta")
+        try {
+            const resp = await axios.post("/update-requerimiento-almacen", {
+                idRequerimiento: idRequerimiento.value,
+                idLt: idLt.value,
+                idCentroAtencion: idCentroAtencion.value,
+                idProyFinanciado: idProyFinanciado.value,
+                idEstadoReq: idEstadoReq.value,
+                numRequerimiento: numRequerimiento.value,
+                cantPersonalRequerimiento: cantPersonalRequerimiento.value,
+                fechaRequerimiento: fechaRequerimiento.value,
+                observacionRequerimiento: observacionRequerimiento.value,
+                dataDetalleRequerimiento: dataDetalleRequerimiento.value,
+            });
+            console.log(resp);
+
+        } catch (error) {
+            reject(error);
+            console.error("Error en la creación de la evaluación personal:", error);
+            throw new Error("Error en la creación de la evaluación personal");
+        }
+
+    }; */
+    /**
+       * Busca empleados por nombre para evaluaciones.
+       *
+       * @param {string} nombreProductToSearch - Nombre a buscar.
+       * @returns {Promise<object>} - Objeto con los datos de la respuesta.
+       * @throws {Error} - Error al obtener empleados por nombre.
+       */
+
+    const handleProductSearch = async (nombreProductToSearch) => {
+
+        try {
+            // Realiza la búsqueda de empleados
+            const response = await axios.post(
+                "/get-product-searched-almacen",
+                {
+                    nombre: nombreProductToSearch,
+                }
+            );
+
+            // Devuelve los datos de la respuesta
+            console.log(response);
+            return response.data;
+        } catch (error) {
+            // Manejo de errores específicos
+            console.error("Error al obtener empleados por nombre:", error);
+            // Lanza el error para que pueda ser manejado por el componente que utiliza este composable
+            throw new Error("Error en la búsqueda de empleados");
+        }
+
     };
 
     onMounted(() => {
@@ -151,8 +312,9 @@ export const useRequerimientoAlmacen = () => {
     })
     return {
         appendProduct,
-        insertRequerimiento,
+        saveRequerimientoAlmacenRequest,
         appendDetalleRequerimiento,
+        updateRequerimientoAlmacenRequest,
         dataDetalleRequerimiento,
         idRequerimiento,
         idLt,
@@ -163,7 +325,7 @@ export const useRequerimientoAlmacen = () => {
         cantPersonalRequerimiento,
         fechaRequerimiento,
         observacionRequerimiento,
-
+        handleProductSearch,
         proyectoFinanciados,
         productosArray,
         centroAtenionArray,

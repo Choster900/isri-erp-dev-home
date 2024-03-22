@@ -6,7 +6,13 @@ export const useDatatableReqAlm = () => {
 
     const sortOrders = ref({});
     const columns = [
-        { width: "22%", label: "ID", name: "id_requerimiento", type: "text" },
+        { width: "5%", label: "ID", name: "id_requerimiento", type: "text" },
+        { width: "22%", label: "Centro de atencion", name: "id_centro_atencion", type: "text" },
+        { width: "22%", label: "Proyecto financiado", name: "id_proy_financiado", type: "text" },
+        { width: "22%", label: "Numero requerimiento", name: "num_requerimiento", type: "text" },
+        { width: "22%", label: "Detalle requerimiento", name: "detalle_red", type: "text" },
+        { width: "22%", label: "Estado", name: "id_estado_req", type: "text" },
+        { width: "22%", label: "Acciones", name: "", type: "text" },
 
     ];
     const isLoadinRequest = ref(false);
