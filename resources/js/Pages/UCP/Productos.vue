@@ -136,41 +136,7 @@
             </div>
 
         </div>
-        <div v-if="!emptyObject" class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
-            <div>
-                <nav class="flex justify-between" role="navigation" aria-label="Navigation">
-                    <div class="grow text-center">
-                        <ul class="inline-flex text-sm font-medium -space-x-px">
-                            <li v-for="link in links" :key="link.label">
-                                <span v-if="(link.label == 'Anterior')"
-                                    :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-[#29303C] shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
-
-                                    <div class="flex-1 text-right ml-2">
-                                        <a @click="link.url ? getDataToShow(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer hover:text-indigo-500
-                                  text-[#3c4557]">
-                                            &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
-                                        </a>
-                                    </div>
-                                </span>
-                                <span v-else-if="(link.label == 'Siguiente')"
-                                    :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-[#29303C] shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
-                                    <div class="flex-1 text-right">
-                                        <a @click="link.url ? getDataToShow(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer hover:text-indigo-500
-                                        text-[#3c4557]">
-                                            <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
-                                        </a>
-                                    </div>
-                                </span>
-                                <span class="cursor-pointer mt-2" v-else @click="link.url ? getDataToShow(link.url) : ''"
-                                    :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-[#29303C] text-[#29303C] shadow-sm hover:text-indigo-500 hover:border-indigo-500' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
-                                        class="min-w-[20px]">{{ link.label }}</span>
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-                </nav>
-            </div>
-        </div>
+        <pagination :emptyObject="emptyObject" :links="links" @get-data="getDataToShow" />
 
         <modal-productos-vue v-if="showModalProd" :showModalProd="showModalProd" :prodId="prodId"
             @cerrar-modal="showModalProd = false" @get-table="getDataToShow(tableData.currentPage)" />
@@ -182,6 +148,7 @@
 import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
+import Pagination from "@/Components-ISRI/Pagination.vue";
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
 import ModalProductosVue from '@/Components-ISRI/UCP/ModalProductos.vue';
 
@@ -190,7 +157,7 @@ import { usePermissions } from '@/Composables/General/usePermissions.js';
 import { useToDataTable } from '@/Composables/General/useToDataTable.js';
 
 export default {
-    components: { Head, AppLayoutVue, Datatable, IconM, ModalProductosVue },
+    components: { Head, AppLayoutVue, Datatable, IconM, ModalProductosVue, Pagination },
     props: {
         menu: {
             type: Object,
@@ -207,8 +174,8 @@ export default {
 
         const columns = [
             { width: "8%", label: "ID", name: "id_producto", type: "text" },
-            { width: "24%", label: "Nombre", name: "nombre_producto", type: "text" },
-            { width: "20%", label: "Descripcion", name: "descripcion_producto", type: "text" },
+            { width: "22%", label: "Nombre", name: "nombre_producto", type: "text" },
+            { width: "22%", label: "Descripcion", name: "descripcion_producto", type: "text" },
             { width: "8%", label: "Especifico", name: "id_ccta_presupuestal", type: "text" },
             { width: "13%", label: "Medida", name: "unidad_medida", type: "text" },
             { width: "10%", label: "Precio", name: "precio_producto", type: "text" },

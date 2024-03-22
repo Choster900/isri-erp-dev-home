@@ -29,6 +29,8 @@ class ProductoRequest extends FormRequest
             'budgetAccountId'       => ['required'],
             'purchaseProcedureId'   => ['required'],
             'unspscId'              => ['required'],
+            'catPercId'             => ['required'],
+            'catNicspId'            => ['required'],
             'perishable'            => ['not_in:-1'],
             'gAndS'                 => ['not_in:-1'],
 
@@ -45,6 +47,8 @@ class ProductoRequest extends FormRequest
             'budgetAccountId.required' => 'Debe seleccionar el especifico.',
             'purchaseProcedureId.required' => 'Debe seleccionar el proceso de compra.',
             'unspscId.required' => 'Debe seleccionar catalogo Unspsc.',
+            'catPercId.required' => 'Debe seleccionar codigo perc.',
+            'catNicspId.required' => 'Debe seleccionar nicsp.',
             'perishable.not_in' => 'Debe seleccionar si es perecedero o no.',
             'gAndS.not_in' => 'Debe seleccionar si el producto es necesario en el cuadro de bienes o no.',
         ];

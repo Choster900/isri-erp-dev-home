@@ -198,7 +198,7 @@
                     </div>
                     <div class="w-[50%] flex justify-center">
                         <p class="mb-[6px] text-[12px] font-[MuseoSans] font-bold mt-[-5px] mr-1">
-                            {{ recToPrint.guarda_almacen.persona.nombre_apellido }}
+                            {{ recToPrint.administrador_contrato.persona.nombre_apellido }}
                         </p>
                     </div>
                 </div>
@@ -210,7 +210,7 @@
                     </div>
                     <div class="w-[50%] flex justify-center">
                         <p class="mb-[6px] text-[12px] font-[MuseoSans] mt-[-5px]">
-                            Recibe guarda almacen
+                            Administrador de contrato
                         </p>
                     </div>
                 </div>
@@ -225,14 +225,14 @@
                 <div class="flex w-full mb-0.5">
                     <div class="w-full flex justify-center">
                         <p class="mb-[6px] text-[12px] font-[MuseoSans] font-bold mt-[-5px] mr-1">
-                            {{ recToPrint.administrador_contrato.persona.nombre_apellido }}
+                            {{ recToPrint.guarda_almacen.persona.nombre_apellido }}
                         </p>
                     </div>
                 </div>
                 <div class="flex w-full">
                     <div class="w-full flex justify-center">
                         <p class="mb-[6px] text-[12px] font-[MuseoSans] mt-[-5px]">
-                            Administrador de contrato
+                            Guardaalmacen
                         </p>
                     </div>
                 </div>
