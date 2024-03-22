@@ -33,6 +33,7 @@ class Producto extends Model
         'fecha_mod_producto',
         'usuario_producto',
         'ip_producto',
+        'nombre_completo_producto'
     ];
 
     public function unidad_medida()

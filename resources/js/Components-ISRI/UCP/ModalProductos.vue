@@ -38,23 +38,7 @@
                     <InputError v-for="(item, index) in errors.purchaseProcedureId" :key="index" class="mt-2"
                         :message="item" />
                 </div>
-                <div class="mb-4 md:mr-0 md:mb-0 basis-1/2" :class="{ 'selected-opt': prod.unspscId > 0, }">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Catalogo Unspsc
-                        <span class="text-red-600 font-extrabold">*</span>
-                    </label>
-                    <div class="relative font-semibold flex h-[35px] w-full">
-                        <Multiselect v-model="prod.unspscId" :options="catUnspsc" :searchable="true"
-                            :loading="isLoadingUnspsc" :internal-search="false"
-                            @search-change="handleSearchChange($event)" :clear-on-search="true" :filter-results="false"
-                            :resolve-on-load="true" :noOptionsText="'Escriba para buscar...'" ref="selectCatUn"
-                            placeholder="Seleccione catalogo unspsc" />
-                    </div>
-                    <InputError v-for="(item, index) in errors.unspscId" :key="index" class="mt-2" :message="item" />
-                </div>
-            </div>
-
-            <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
-                <div class="mb-4 md:mr-2 md:mb-0 basis-1/2 pr-1" :class="{ 'selected-opt': prod.budgetAccountId > 0, }">
+                <div class="mb-4 md:mr-0 md:mb-0 basis-1/2" :class="{ 'selected-opt': prod.budgetAccountId > 0, }">
                     <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Especifico
                         <span class="text-red-600 font-extrabold">*</span>
                     </label>
@@ -64,6 +48,43 @@
                     </div>
                     <InputError v-for="(item, index) in errors.budgetAccountId" :key="index" class="mt-2"
                         :message="item" />
+                </div>
+            </div>
+
+            <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
+                <div class="mb-4 md:mr-2 md:mb-0 basis-1/3" :class="{ 'selected-opt': prod.unspscId > 0, }">
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Catalogo Unspsc
+                        <span class="text-red-600 font-extrabold">*</span>
+                    </label>
+                    <div class="relative font-semibold flex h-[35px] w-full">
+                        <Multiselect v-model="prod.unspscId" :options="catUnspsc" :searchable="true"
+                            :loading="isLoadingUnspsc" :internal-search="false" @open="openUnspsc()" @select="selectUnspsc($event)"
+                            @clear="baseOption = []" @deselect="baseOption = []"
+                            @search-change="handleSearchChange($event)" :clear-on-search="true" :filter-results="false"
+                            :resolve-on-load="true" :noOptionsText="'Escriba para buscar...'" ref="selectCatUn"
+                            placeholder="Seleccione unspsc" />
+                    </div>
+                    <InputError v-for="(item, index) in errors.unspscId" :key="index" class="mt-2" :message="item" />
+                </div>
+                <div class="mb-4 md:mr-2 md:mb-0 basis-1/3" :class="{ 'selected-opt': prod.catPercId > 0, }">
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Código perc
+                        <span class="text-red-600 font-extrabold">*</span>
+                    </label>
+                    <div class="relative font-semibold flex h-[35px] w-full">
+                        <Multiselect v-model="prod.catPercId" :options="catPerc" :searchable="true"
+                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione perc" />
+                    </div>
+                    <InputError v-for="(item, index) in errors.catPercId" :key="index" class="mt-2" :message="item" />
+                </div>
+                <div class="mb-4 md:mr-0 md:mb-0 basis-1/3" :class="{ 'selected-opt': prod.catNicspId > 0, }">
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Cuenta Nicsp
+                        <span class="text-red-600 font-extrabold">*</span>
+                    </label>
+                    <div class="relative font-semibold flex h-[35px] w-full">
+                        <Multiselect v-model="prod.catNicspId" :options="catNicsp" :searchable="true"
+                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione nicsp" />
+                    </div>
+                    <InputError v-for="(item, index) in errors.catNicspId" :key="index" class="mt-2" :message="item" />
                 </div>
             </div>
 
@@ -84,6 +105,21 @@
                             :noOptionsText="'Lista vacía.'" placeholder="Seleccione unidad" />
                     </div>
                     <InputError v-for="(item, index) in errors.mUnitId" :key="index" class="mt-2" :message="item" />
+                </div>
+            </div>
+
+            <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
+                <div class="mb-4 md:mr-0 md:mb-0 basis-full" style="border: none; background-color: transparent;">
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Concepto adicional
+                        <span class="text-red-600 font-extrabold">*</span>
+                    </label>
+                    <textarea v-model="prod.description" id="descripcion" name="descripcion"
+                        placeholder="Escriba concepto adicional"
+                        :class="prod.description != '' ? 'bg-gray-200' : ''"
+                        class="w-full h-14 overflow-y-auto peer placeholder-gray-400 text-xs font-semibold border border-gray-300 hover:border-gray-400 px-2 text-slate-900 transition-colors duration-300 focus:ring-blue-500 focus:border-blue-500"
+                        @input="handleValidation('description', { limit: 290 })" style="border-radius: 4px;">
+                    </textarea>
+                    <InputError v-for="(item, index) in errors.description" :key="index" class="mt-2" :message="item" />
                 </div>
             </div>
 
@@ -123,21 +159,6 @@
                         @click="(prod.gAndS == 1 || prod.gAndS == -1) ? prod.gAndS = 0 : prod.gAndS = -1" class="mr-3"
                         id="checbox4" />
                     <InputError v-for="(item, index) in errors.gAndS" :key="index" class="mt-2" :message="item" />
-                </div>
-            </div>
-
-            <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
-                <div class="mb-4 md:mr-0 md:mb-0 basis-full" style="border: none; background-color: transparent;">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Descripción
-                        <span class="text-red-600 font-extrabold">*</span>
-                    </label>
-                    <textarea v-model="prod.description" id="descripcion" name="descripcion"
-                        placeholder="Escriba descripción del producto"
-                        :class="prod.description != '' ? 'bg-gray-200' : ''"
-                        class="w-full h-14 overflow-y-auto peer placeholder-gray-400 text-xs font-semibold border border-gray-300 hover:border-gray-400 px-2 text-slate-900 transition-colors duration-300 focus:ring-blue-500 focus:border-blue-500"
-                        @input="handleValidation('description', { limit: 290 })" style="border-radius: 4px;">
-                    </textarea>
-                    <InputError v-for="(item, index) in errors.description" :key="index" class="mt-2" :message="item" />
                 </div>
             </div>
 
@@ -186,8 +207,8 @@ export default {
 
         const {
             isLoadingRequest, prod, errors, purchaseProcedures, catUnspsc, isLoadingUnspsc,
-            budgetAccounts, unitsMeasmt,
-            asyncFindUnspsc, getInfoForModalProd, storeProduct, updateProduct
+            budgetAccounts, unitsMeasmt, catPerc, catNicsp, baseOption,
+            asyncFindUnspsc, getInfoForModalProd, storeProduct, updateProduct, openUnspsc, selectUnspsc
         } = useProducto(context);
 
         const {
@@ -211,8 +232,8 @@ export default {
 
         return {
             isLoadingRequest, prod, errors, purchaseProcedures, catUnspsc, isLoadingUnspsc,
-            budgetAccounts, unitsMeasmt,
-            handleSearchChange, handleValidation, storeProduct, updateProduct
+            budgetAccounts, unitsMeasmt, catPerc, catNicsp, baseOption,
+            handleSearchChange, handleValidation, storeProduct, updateProduct, openUnspsc, selectUnspsc
         }
     }
 }

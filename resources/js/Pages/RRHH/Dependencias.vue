@@ -197,41 +197,7 @@
             </div>
 
         </div>
-        <div v-if="!emptyObject" class="px-6 py-8 bg-white shadow-lg rounded-sm border-slate-200 relative">
-            <div>
-                <nav class="flex justify-between" role="navigation" aria-label="Navigation">
-                    <div class="grow text-center">
-                        <ul class="inline-flex text-sm font-medium -space-x-px">
-                            <li v-for="link in links" :key="link.label">
-                                <span v-if="(link.label == 'Anterior')"
-                                    :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
-
-                                    <div class="flex-1 text-right ml-2">
-                                        <a @click="link.url ? getDataToShow(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                  text-indigo-500">
-                                            &lt;-<span class="hidden sm:inline">&nbsp;Anterior</span>
-                                        </a>
-                                    </div>
-                                </span>
-                                <span v-else-if="(link.label == 'Siguiente')"
-                                    :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')">
-                                    <div class="flex-1 text-right ml-2">
-                                        <a @click="link.url ? getDataToShow(link.url) : ''" class=" btn bg-white border-slate-200 hover:border-slate-300 cursor-pointer
-                                  text-indigo-500">
-                                            <span class="hidden sm:inline">Siguiente&nbsp;</span>-&gt;
-                                        </a>
-                                    </div>
-                                </span>
-                                <span class="cursor-pointer mt-2" v-else @click="link.url ? getDataToShow(link.url) : ''"
-                                    :class="(link.active ? 'inline-flex items-center justify-center rounded-full leading-5 px-2 py-2 bg-white border border-slate-200 text-indigo-500 shadow-sm' : 'inline-flex items-center justify-center leading-5 px-2 py-2 text-slate-600 hover:text-indigo-500 border border-transparent')"><span
-                                        class=" w-5">{{ link.label }}</span>
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-                </nav>
-            </div>
-        </div>
+        <pagination :emptyObject="emptyObject" :links="links" @get-data="getDataToShow" />
 
         <modal-dependencias-vue v-if="showModalDependencies" :showModalDependencies="showModalDependencies"
             :dependencyId="dependencyId" @cerrar-modal="showModalDependencies = false"
@@ -250,6 +216,7 @@
 import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
+import Pagination from "@/Components-ISRI/Pagination.vue";
 import ModalDependenciasVue from '@/Components-ISRI/RRHH/ModalDependencias.vue';
 import ModalShowDependenciaVue from '@/Components-ISRI/RRHH/ModalShowDependencia.vue';
 import ModalDepJefaturaVue from '@/Components-ISRI/RRHH/ModalDepJefatura.vue';
@@ -263,7 +230,7 @@ import { ref, toRefs } from 'vue';
 
 
 export default {
-    components: { Head, AppLayoutVue, Datatable, ModalDependenciasVue, ModalShowDependenciaVue, ModalDepJefaturaVue },
+    components: { Head, AppLayoutVue, Datatable, ModalDependenciasVue, ModalShowDependenciaVue, ModalDepJefaturaVue, Pagination },
     props: {
         menu: {
             type: Object,
