@@ -104,8 +104,8 @@
             <!-- Producto -->
             <div class="w-[35%] flex justify-center items-center border-r border-gray-500">
                 <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[11px] px-0.5">
-                    {{ prod.producto_adquisicion.producto.nombre_producto + " - " +
-                        prod.producto_adquisicion.descripcion_prod_adquisicion + " - " +
+                    {{ prod.producto_adquisicion.producto.nombre_completo_producto + " — " +
+                        prod.producto_adquisicion.descripcion_prod_adquisicion + " — " +
                         prod.producto_adquisicion.marca.nombre_marca ?? "Sin marca" }}
                 </p>
             </div>

@@ -191,8 +191,8 @@ export const useRecepcion = (context) => {
                 return element.value === paId; // Adding a return statement here
             });
             recDocument.value.prods[index].desc =
-                selectedProd.nombre_producto + ' -- ' +
-                selectedProd.nombre_unidad_medida + ' -- ' +
+                selectedProd.nombre_completo_producto + ' — ' +
+                selectedProd.nombre_unidad_medida + ' — ' +
                 selectedProd.descripcion_prod_adquisicion
 
             recDocument.value.prods[index].perishable = recepId ? recDocument.value.prods[index].perishable : ''
