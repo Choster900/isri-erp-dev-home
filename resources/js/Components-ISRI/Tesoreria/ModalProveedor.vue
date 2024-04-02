@@ -8,6 +8,7 @@ moment.locale('es', localeData)
 </script>
 <template>
     <div class="m-1.5">
+    <!-- TODO: SUJERO RETENCION AL SELECCIONAR NO HACER PETICION HTTP SI NO QUE UTILIZAR LA DATA INICIAL Y AGREGAR ANIMACION DE CAMBIO AL CAMBIAR0 -->
         <Modal :show="ModalIsOpen" @close="$emit('close-modal')" modal-title="Proveedores" maxWidth="3xl">
             <div class="px-5 py-4">
                 <div class="space-y-1">

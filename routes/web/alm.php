@@ -3,6 +3,8 @@
 use App\Http\Controllers\Almacen\DonacionController;
 use App\Http\Controllers\Almacen\RecepcionController;
 use App\Http\Controllers\Almacen\RequerimientoAlmacenController;
+use App\Models\ExistenciaAlmacen;
+use App\Models\PlazaAsignada;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
@@ -57,5 +59,33 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('insert-requerimiento-almacen', [RequerimientoAlmacenController::class, 'addRequerimiento'])->name('donacion.insertRequerimientoAlmacen');
     Route::post('update-requerimiento-almacen', [RequerimientoAlmacenController::class, 'updateRequerimientoAlmacen'])->name('donacion.updateRequerimientoAlmacen');
     Route::post('get-product-searched-almacen', [RequerimientoAlmacenController::class, 'getProductByNameOrCode'])->name('donacion.productSearchedAlmacen');
+    Route::post(
+        'get-centro-by-user',
+        function (Request $request) {
+            $plazasAsignadas = PlazaAsignada::where("id_empleado", $request->user()->id_persona)->with("centro_atencion")->get();
+            // Crear una colección para almacenar los centros de atención únicos
+            $centrosUnicos = collect();
+            // Iterar sobre las plazas asignadas y agregar los centros de atención únicos a la colección
+            foreach ( $plazasAsignadas as $plazaAsignada ) {
+                $centroAtencion = $plazaAsignada->centro_atencion;
+                $centrosUnicos->push($centroAtencion);
+            }
+            // Filtrar la colección para obtener solo centros de atención únicos
+            $centrosUnicos = $centrosUnicos->unique('id_centro_atencion');
+            return $centrosUnicos;
+        }
+    )->name('bieneservicios.updateProdAdquisicion');
+    Route::post(
+        'get-product-by-proy-financiado',
+        function (Request $request) {
+            return ExistenciaAlmacen::with(['detalle_existencia_almacen', 'productos'])
+                ->whereHas('detalle_existencia_almacen', function ($query) use ($request) {
+                    $query->where('id_centro_atencion', $request->idCentroAtencion);
+                    $query->where('id_lt', $request->idLt);
+                })
+                ->where('id_proy_financiado',$request->idProyFinanciado)
+                ->get();
+        }
+    )->name('bieneservicios.updateProdAdquisicion');
 
 });
