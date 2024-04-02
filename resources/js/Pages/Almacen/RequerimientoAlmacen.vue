@@ -102,9 +102,24 @@ export default defineComponent({
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 max-w-[22%]">
                                 <div class="font-medium text-slate-800 text-center">
-                                    DESPUES ESTO
+                                    <template v-for="(detalle, i) in requ.detalles_requerimiento" :key="i">
+                                        <div class="mb-2 text-center">
+                                            <p class="text-[10pt]">
+                                                <span class="font-medium">codigo producto: </span>{{
+                                                    detalle.producto.codigo_producto
+                                                }}<br>
+                                                <span class="font-medium">cantidad: </span> {{   detalle.cant_det_requerimiento
+                                                }}<br>
+                                            </p>
+                                        </div>
+                                        <template v-if="i < requ.detalles_requerimiento.length - 1">
+                                            <hr class="my-2 border-t border-gray-300">
+                                        </template>
+                                    </template>
+
                                 </div>
                             </td>
+
                             <td class="px-2 first:pl-5 last:pr-5 max-w-[22%]">
                                 <div class="font-medium text-slate-800 text-center">
                                     {{ requ.estado_requerimiento.nombre_estado_req}}

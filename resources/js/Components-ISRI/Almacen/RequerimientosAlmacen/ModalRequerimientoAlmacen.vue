@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, ref, toRefs, watch } from "vue";
+import { defineComponent, ref, toRefs, watch, onMounted } from 'vue';
 
 import ButtonCloseModal from "@/Components/ButtonCloseModal.vue";
 import ProcessModal from "@/Components-ISRI/AllModal/ProcessModal.vue";
@@ -8,9 +8,11 @@ import OnlyLabelInput from '@/Components-ISRI/ComponentsToForms/OnlyLabelInput.v
 import { useRequerimientoAlmacen } from '../../../Composables/Almacen/RequerimientoAlmacen/useRequerimientoAlmacen.js'
 import Swal from 'sweetalert2';
 import { executeRequest } from "@/plugins/requestHelpers";
+import axios from 'axios';
+import InputError from '@/Components/InputError.vue';
 
 export default defineComponent({
-    components: { ProcessModal, ButtonCloseModal, TitleModalReq, OnlyLabelInput },
+    components: { ProcessModal, ButtonCloseModal, TitleModalReq, OnlyLabelInput, InputError },
     emits: ["cerrar-modal", "actualizar-datatable"], // Cambiado a 'emits' en lugar de 'emit'
     props: {
         showModal: {
@@ -23,24 +25,23 @@ export default defineComponent({
         }
     },
     setup(props, { emit }) {
-        const { objectRequerimientoToSendModal } = toRefs(props)
+        const { objectRequerimientoToSendModal, showModal } = toRefs(props)
+        const optionsCentroAtencion = ref(null)
         const { dataDetalleRequerimiento, appendProduct, appendDetalleRequerimiento, proyectoFinanciados,
             productosArray, setDescripcionProducto,
             centroAtenionArray, centroProduccion, idRequerimiento,
             idLt,
             idCentroAtencion,
             idProyFinanciado, handleProductSearch,
-            idEstadoReq,
+            idEstadoReq, errorsValidation,
             numRequerimiento,
             cantPersonalRequerimiento,
             fechaRequerimiento, updateRequerimientoAlmacenRequest,
             observacionRequerimiento, saveRequerimientoAlmacenRequest,
-            lineaTrabajoArray, } = useRequerimientoAlmacen();
-
+            lineaTrabajoArray, } = useRequerimientoAlmacen()
 
         watch(objectRequerimientoToSendModal, (newValue, oldValue) => {
 
-            console.log(newValue);
             if (newValue !== null && newValue !== undefined && (Array.isArray(newValue) ? newValue.length > 0 : newValue !== '')) {
                 const { detalles_requerimiento, id_lt, id_centro_atencion, id_proy_financiado, id_estado_req, num_requerimiento, id_requerimiento, cant_personal_requerimiento, observacion_requerimiento } = newValue
                 idRequerimiento.value = id_requerimiento
@@ -81,33 +82,40 @@ export default defineComponent({
 
                     });
                 });
+                getProductoByDependencia()
             } else {
                 dataDetalleRequerimiento.value = [];
                 idRequerimiento.value = null
                 idLt.value = null
-                idCentroAtencion.value = null
+                /* idCentroAtencion.value = null */
                 idProyFinanciado.value = null
                 idEstadoReq.value = null
                 numRequerimiento.value = null
                 cantPersonalRequerimiento.value = null
                 observacionRequerimiento.value = null
                 appendDetalleRequerimiento()
+
             }
 
         })
 
-         /**
-          * Guarda productos adquisicion
-          *
-          * @param {string} productCode - codigo del producto a buscar.
-          * @returns {Promise<object>} - Objeto con los datos de la respuesta.
-        */
+        watch(showModal, (newValue, oldValue) => {
+            if (!newValue) {
+                productosArray.value = []
+            }
+        })
+        /**
+         * Guarda productos adquisicion
+         *
+         * @param {string} productCode - codigo del producto a buscar.
+         * @returns {Promise<object>} - Objeto con los datos de la respuesta.
+       */
         const saveRequerimientoAlmacen = async () => {
             const confirmed = await Swal.fire({
                 title: '<p class="text-[18pt] text-center">¿Esta seguro de guardar el requerimiento para almacen?</p>',
                 icon: "question",
                 iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
-                confirmButtonText: "Si, Editar",
+                confirmButtonText: "Si, Guardar",
                 confirmButtonColor: "#001b47",
                 cancelButtonText: "Cancelar",
                 showCancelButton: true,
@@ -147,14 +155,79 @@ export default defineComponent({
             }
         };
 
+        /**
+      * Obtener la dependencia por usuario.
+      *
+      * @returns {Promise<object>} - Promesa que se resuelve con la respuesta exitosa o se rechaza con el error.
+      */
+        const getDependenciaByUser = () => {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    // Hace una solicitud POST a la ruta "/save-prod-adquicicion" con los datos necesarios
+                    const resp = await axios.post("/get-centro-by-user");
+                    console.log(resp.data.length);
 
+                    if (resp.data.length == 1) {
+                        idCentroAtencion.value = resp.data[0].id_centro_atencion
+                        console.log(idCentroAtencion.value);
+
+                    }
+
+                    optionsCentroAtencion.value = resp.data.map(index => {
+                        return { value: index.id_centro_atencion, label: `${index.codigo_centro_atencion} - ${index.nombre_centro_atencion}`, disabled: false };
+                    })
+                    // Se resuelve la promesa con la respuesta exitosa de la solicitud
+                    resolve(resp);
+                } catch (error) {
+                    console.log(error);
+
+                    reject(error);
+                }
+            });
+        }
+
+        /**
+    * Obtener la dependencia por usuario.
+    *
+    * @returns {Promise<object>} - Promesa que se resuelve con la respuesta exitosa o se rechaza con el error.
+    */
+        const getProductoByDependencia = () => {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    console.log(idCentroAtencion.value);
+
+                    // Hace una solicitud POST a la ruta "/save-prod-adquicicion" con los datos necesarios
+                    const resp = await axios.post("/get-product-by-proy-financiado", {
+                        idCentroAtencion: idCentroAtencion.value,
+                        idProyFinanciado: idProyFinanciado.value,
+                        idLt: idLt.value,
+                    });
+                    console.log(resp);
+                    productosArray.value = resp.data.map(index => {
+                        return { value: index.productos.id_producto, label: `${index.productos.codigo_producto} - ${index.productos.nombre_producto}`, completeData: index.productos };
+                    })
+                    // Se resuelve la promesa con la respuesta exitosa de la solicitud
+                    resolve(resp);
+                } catch (error) {
+                    console.log(error);
+
+                    reject(error);
+                }
+            });
+        }
+
+        onMounted(() => {
+            getDependenciaByUser()
+            //getProductoByDependencia()
+        })
         return {
             dataDetalleRequerimiento, appendProduct, appendDetalleRequerimiento, proyectoFinanciados,
             productosArray, setDescripcionProducto,
             centroAtenionArray, centroProduccion, idRequerimiento,
             idLt,
             idCentroAtencion,
-            idProyFinanciado,
+            idProyFinanciado, errorsValidation,
+            optionsCentroAtencion, getProductoByDependencia,
             idEstadoReq, handleProductSearch,
             numRequerimiento,
             cantPersonalRequerimiento,
@@ -173,50 +246,79 @@ export default defineComponent({
                 <ButtonCloseModal @close="$emit('cerrar-modal')" />
                 <TitleModalReq />
                 <div id="formulario-principal">
-
+                    <pre>
+                    {{ errorsValidation }}
+                    </pre>
                     <div class="pt-4 flex justify-between space-x-2">
                         <!-- {{ dataDetalleRequerimiento }} -->
                         <div class="w-full">
                             <OnlyLabelInput textLabel="Linea de trabajo" />
-                            <Multiselect v-model="idLt"
+                            <Multiselect v-model="idLt" @select="getProductoByDependencia()"
                                 :classes='{ containerDisabled: "bg-gray-200 text-text-slate-400", container: "relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded bg-white text-base leading-snug outline-none", optionSelectedDisabled: "text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed", optionPointed: "text-gray-800 bg-gray-100", }'
                                 :filter-results="false" :searchable="true" :clear-on-search="true" :min-chars="1"
                                 :options="lineaTrabajoArray"
                                 noResultsText="<p class='text-xs'>Sin resultados de personas</p>" placeholder="-"
                                 noOptionsText="<p class='text-xs'>vacio</p>" />
+                            <InputError class="mt-2" v-if="errorsValidation && errorsValidation['idLt'] !== ''"
+                                :message="errorsValidation['idLt']" />
                         </div>
 
                         <div class="w-full">
                             <OnlyLabelInput textLabel="Proyecto financiamiento" />
 
-                            <Multiselect v-model="idProyFinanciado"
+                            <Multiselect v-model="idProyFinanciado" @select="getProductoByDependencia()"
                                 :classes='{ containerDisabled: "bg-gray-200 text-text-slate-400", container: "relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded bg-white text-base leading-snug outline-none", optionSelectedDisabled: "text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed", optionPointed: "text-gray-800 bg-gray-100", }'
                                 :filter-results="false" :searchable="true" :clear-on-search="true" :min-chars="1"
                                 :options="proyectoFinanciados"
                                 noResultsText="<p class='text-xs'>Sin resultados de personas</p>" placeholder="-"
                                 noOptionsText="<p class='text-xs'>vacio</p>" />
+                            <InputError class="mt-2"
+                                v-if="errorsValidation && errorsValidation['idProyFinanciado'] !== ''"
+                                :message="errorsValidation['idProyFinanciado']" />
+
                         </div>
                         <div class="w-full">
                             <OnlyLabelInput textLabel="Centro de atencion" />
 
-                            <Multiselect v-model="idCentroAtencion"
-                                :classes='{ containerDisabled: "bg-gray-200 text-text-slate-400", container: "relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded bg-white text-base leading-snug outline-none", optionSelectedDisabled: "text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed", optionPointed: "text-gray-800 bg-gray-100", }'
-                                :filter-results="false" :searchable="true" :clear-on-search="true" :min-chars="1"
-                                :options="centroAtenionArray"
-                                noResultsText="<p class='text-xs'>Sin resultados de personas</p>" placeholder="-"
-                                noOptionsText="<p class='text-xs'>vacio</p>" />
+                            <template v-if="optionsCentroAtencion && optionsCentroAtencion.length > 1">
+                                <Multiselect v-model="idCentroAtencion" @select="getProductoByDependencia"
+                                    :classes='{ containerDisabled: "bg-gray-200 text-text-slate-400", container: "relative mx-auto w-full h-7 flex items-center justify-end box-border border border-gray-300 rounded bg-white text-base leading-snug outline-none", optionSelectedDisabled: "text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed", optionPointed: "text-gray-800 bg-gray-100", }'
+                                    :filter-results="false" :searchable="true" :clear-on-search="true" :min-chars="1"
+                                    :options="optionsCentroAtencion"
+                                    noResultsText="<p class='text-xs'>Sin resultados de personas</p>" placeholder="-"
+                                    noOptionsText="<p class='text-xs'>vacio</p>" />
+                            </template>
+
+                            <template v-else>
+                                <div class="text-xs items-center">
+                                    <span v-if="optionsCentroAtencion && optionsCentroAtencion[0]">
+                                        {{ optionsCentroAtencion[0].label }}</span>
+                                    <span v-else>-</span>
+                                </div>
+                            </template>
+
+                            <InputError class="mt-2"
+                                v-if="errorsValidation && errorsValidation['idCentroAtencion'] !== ''"
+                                :message="errorsValidation['idCentroAtencion']" />
                         </div>
+
                     </div>
                     <div class="pt-4 flex justify-start space-x-2 items-end">
                         <div class="flex flex-col gap-1">
                             <OnlyLabelInput textLabel="Cantidad de personal" />
                             <input type="text" class="h-7 border-slate-300 text-xs" placeholder="-"
                                 v-model="cantPersonalRequerimiento">
+                            <InputError class="mt-2"
+                                v-if="errorsValidation && errorsValidation['cantPersonalRequerimiento'] !== ''"
+                                :message="errorsValidation['cantPersonalRequerimiento']" />
                         </div>
                         <div class="flex flex-col gap-1">
                             <OnlyLabelInput textLabel="Numero requerimiento" />
                             <input type="text" class="h-7 border-slate-300 text-xs" placeholder="-"
                                 v-model="numRequerimiento">
+                            <InputError class="mt-2"
+                                v-if="errorsValidation && errorsValidation['numRequerimiento'] !== ''"
+                                :message="errorsValidation['numRequerimiento']" />
                         </div>
                     </div>
                     <div class="pt-4 flex justify-start space-x-2 items-end">
@@ -249,7 +351,7 @@ export default defineComponent({
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
                                 </svg>
-                                <span @click="updateRequerimientoAlmacen ">Actualizar y cerrar</span>
+                                <span @click="updateRequerimientoAlmacen">Actualizar y cerrar</span>
                             </div>
                         </button>
                     </div>
@@ -343,7 +445,6 @@ export default defineComponent({
                                     </div>
                                 </div>
                                 <div class="text-xs py-1 ">
-                                    {{ producto.stateProducto }}
                                     <DropDownOptions>
                                         <div class="flex items-center hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                                             @click.stop="producto.stateProducto = 0">
@@ -383,10 +484,6 @@ export default defineComponent({
 
                 </div>
             </div>
-
-            <!-- <pre>
-{{ dataDetalleRequerimiento }}
-</pre> -->
 
         </ProcessModal>
     </div>

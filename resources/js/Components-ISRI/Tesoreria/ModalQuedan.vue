@@ -319,7 +319,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                         }
                                                             ">
                                                         <div class="relative flex h-8 w-full flex-row-reverse ">
-                                                            <Multiselect v-model="rowsData[rowIndex]['id_lt']" 
+                                                            <Multiselect v-model="rowsData[rowIndex]['id_lt']"
                                                                 :title="errors[`detalle_quedan.${rowIndex}.id_lt`]"
                                                                 placeholder="seleccione" :classes="{
                                                                     placeholder: 'flex items-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-black rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ',
@@ -346,8 +346,14 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                             "
                                                         @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
                                                         :title="errors[`detalle_quedan.${rowIndex}.numero_acta_det_quedan`]"
-                                                        :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true">
-                                                        {{ cell }}</td>
+                                                        :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true"> <input type="text"
+                                                                        :title="errors[`detalle_quedan.${rowIndex}.monto.producto_factura_det_quedan`]"
+                                                                        v-model="rowsData[rowIndex]['monto'].producto_factura_det_quedan"
+                                                                        maxlength="10"
+                                                                        @input="onlyNumberDecimal(rowIndex, cellIndex, $event, 'producto_factura_det_quedan')"
+                                                                        :disabled="dataQuedan.id_estado_quedan > 1 ? true : false"
+                                                                        class="peer w-full  text-sm bg-transparent text-center  border-none px-2 text-slate-900 placeholder-slate-400 transition-colors duration-300 focus:border-none focus:outline-none">
+                                                                </td>
 
 
                                                     <td v-else-if="cellIndex == 'monto'" class="border-2 border-black">
@@ -393,7 +399,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                         <button type="button"
                                                             @click="rowsData[rowIndex].reajuste = !rowsData[rowIndex].reajuste; taxesByRow()"
                                                             title="Reajustar factura"
-                                                            style="float: right;margin-right: -42px;margin-top: -1px;x;font-size: 30px;padding: 0px 10px;border: 0px;background-color: transparent;">
+                                                            style="float: right;margin-right: -42px;margin-top: -1px;font-size: 30px;padding: 0px 10px;border: 0px;background-color: transparent;">
                                                             <lord-icon src="https://cdn.lordicon.com/hwuyodym.json"
                                                                 trigger="click" colors="primary:#121331"
                                                                 style="width:24px;height:24px">
@@ -709,7 +715,7 @@ export default {
 
 
                 // Datos que se pintan en los inputs
-                this.dataInputs.giro = selectedSupplier.codigo_giro && selectedSupplier.nombre_giro ? `${selectedSupplier.codigo_giro} - ${selectedSupplier.nombre_giro}` : 'GIRO NO ESPECIFICADO!';
+                this.dataInputs.giro = selectedSupplier.codigo_giro && selectedSupplier.nombre_giro ? `${selectedSupplier.codigo_giro} - ${selectedSupplier.nombre_giro}` : '-';
                 this.dataInputs.irs = `${selectedSupplier.isrl_sujeto_retencion * 100} %`
                 this.dataInputs.iva = `${selectedSupplier.iva_sujeto_retencion * 100} %`
 

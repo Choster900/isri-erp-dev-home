@@ -12,6 +12,7 @@ export const useRequerimientoAlmacen = () => {
     const cantPersonalRequerimiento = ref(null)
     const fechaRequerimiento = ref(null)
     const observacionRequerimiento = ref(null)
+    const errorsValidation = ref(null)
 
     const dataDetalleRequerimiento = ref([/* {
         idDetRequerimiento: '',
@@ -98,16 +99,15 @@ export const useRequerimientoAlmacen = () => {
         try {
             const resp = await axios.post("/get-object-for-requerimiento-almacen", {});
             const { data } = resp
-            console.log(data);
             centroAtenionArray.value = data.centrosAtencion.map(index => {
                 return { value: index.id_centro_atencion, label: `${index.codigo_centro_atencion} - ${index.nombre_centro_atencion}`, disabled: false };
             })
             lineaTrabajoArray.value = data.lineaTrabajo.map(index => {
                 return { value: index.id_lt, label: `${index.codigo_up_lt} - ${index.nombre_lt}`, completeData: index };
             })
-            productosArray.value = data.productos.map(index => {
+         /*    productosArray.value = data.productos.map(index => {
                 return { value: index.id_producto, label: `${index.codigo_producto} - ${index.nombre_producto}`, completeData: index };
-            })
+            }) */
             proyectoFinanciados.value = data.proyectosFinanciados.map(index => {
                 return { value: index.id_proy_financiado, label: `${index.nombre_proy_financiado}`, completeData: index };
             })
@@ -159,9 +159,9 @@ export const useRequerimientoAlmacen = () => {
                     }
                     // Actualiza el estado "errorsValidation" con los errores y los limpia después de 5 segundos
                     errorsValidation.value = myData;
-                    setTimeout(() => {
+                    /* setTimeout(() => {
                         errorsValidation.value = [];
-                    }, 5000);
+                    }, 5000); */
                     console.error("Error en guardar los datos:", error);
                 }
                 // Rechaza la promesa en caso de excepción
@@ -315,6 +315,7 @@ const updateRequerimientoAlmacenRequest = () => {
         saveRequerimientoAlmacenRequest,
         appendDetalleRequerimiento,
         updateRequerimientoAlmacenRequest,
+        errorsValidation,
         dataDetalleRequerimiento,
         idRequerimiento,
         idLt,
