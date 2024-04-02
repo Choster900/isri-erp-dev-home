@@ -445,7 +445,6 @@ export default defineComponent({
                                     </div>
                                 </div>
                                 <div class="text-xs py-1 ">
-                                    {{ producto.stateProducto }}
                                     <DropDownOptions>
                                         <div class="flex items-center hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                                             @click.stop="producto.stateProducto = 0">
