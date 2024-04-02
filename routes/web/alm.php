@@ -58,4 +58,11 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('update-requerimiento-almacen', [RequerimientoAlmacenController::class, 'updateRequerimientoAlmacen'])->name('donacion.updateRequerimientoAlmacen');
     Route::post('get-product-searched-almacen', [RequerimientoAlmacenController::class, 'getProductByNameOrCode'])->name('donacion.productSearchedAlmacen');
 
+    //Financial report
+    Route::get(
+        '/alm/reporte-financiero',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/reporte-financiero', 'Almacen/ReporteFinanciero');
+        }
+    )->name('alm.reporteFinanciero');
 });
