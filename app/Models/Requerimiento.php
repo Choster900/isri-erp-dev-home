@@ -16,9 +16,13 @@ class Requerimiento extends Model
 
     protected $fillable = [
         'id_lt',
-        'id_centro_atencion',
+        'id_centro_atencion', //origin
+        'cen_id_centro_atencion', //destination
+        'id_motivo_ajuste',
+        'req_id_requerimiento', //self-reference
         'id_proy_financiado',
         'id_estado_req',
+        'id_tipo_req', //requerimiento, ajuste o traslado
         'num_requerimiento',
         'cant_personal_requerimiento',
         'fecha_requerimiento',
