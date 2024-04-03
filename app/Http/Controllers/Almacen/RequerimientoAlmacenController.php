@@ -135,7 +135,7 @@ class RequerimientoAlmacenController extends Controller
         }
     }
 
-    function updateRequerimientoAlmacen(Request $request)
+    function updateRequerimientoAlmacen(RequerimientoRequest $request)
     {
 
 
