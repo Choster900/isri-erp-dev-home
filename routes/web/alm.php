@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Almacen\AjusteEntradaController;
 use App\Http\Controllers\Almacen\DonacionController;
 use App\Http\Controllers\Almacen\RecepcionController;
 use App\Http\Controllers\Almacen\RequerimientoAlmacenController;
@@ -95,4 +96,14 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/reporte-financiero', 'Almacen/ReporteFinanciero');
         }
     )->name('alm.reporteFinanciero');
+
+    //Surplus adjustment
+    Route::get(
+        '/alm/ajuste-entrada',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/ajuste-entrada', 'Almacen/AjusteEntrada');
+        }
+    )->name('alm.ajusteEntrada');
+    Route::post('ajuste-entrada', [AjusteEntradaController::class, 'getAjusteEntrada'])->name('ajusteEntrada.getAjusteEntrada');
+    Route::post('get-info-modal-surplus-adjustment', [AjusteEntradaController::class, 'getInfoSurplusAdjustment'])->name('ajusteEntrada.getInfoSurplusAdjustment');
 });
