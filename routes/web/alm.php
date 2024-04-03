@@ -4,8 +4,10 @@ use App\Http\Controllers\Almacen\AjusteEntradaController;
 use App\Http\Controllers\Almacen\DonacionController;
 use App\Http\Controllers\Almacen\RecepcionController;
 use App\Http\Controllers\Almacen\RequerimientoAlmacenController;
+use App\Models\DetalleRequerimiento;
 use App\Models\ExistenciaAlmacen;
 use App\Models\PlazaAsignada;
+use App\Models\Requerimiento;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
@@ -67,7 +69,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             // Crear una colección para almacenar los centros de atención únicos
             $centrosUnicos = collect();
             // Iterar sobre las plazas asignadas y agregar los centros de atención únicos a la colección
-            foreach ( $plazasAsignadas as $plazaAsignada ) {
+            foreach ($plazasAsignadas as $plazaAsignada) {
                 $centroAtencion = $plazaAsignada->centro_atencion;
                 $centrosUnicos->push($centroAtencion);
             }
@@ -75,7 +77,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             $centrosUnicos = $centrosUnicos->unique('id_centro_atencion');
             return $centrosUnicos;
         }
-    )->name('bieneservicios.updateProdAdquisicion');
+    )->name('bieneservicios.get-centro-by-user');
     Route::post(
         'get-product-by-proy-financiado',
         function (Request $request) {
@@ -84,10 +86,42 @@ Route::group(['middleware' => ['auth', 'access']], function () {
                     $query->where('id_centro_atencion', $request->idCentroAtencion);
                     $query->where('id_lt', $request->idLt);
                 })
-                ->where('id_proy_financiado',$request->idProyFinanciado)
+                ->where('id_proy_financiado', $request->idProyFinanciado)
                 ->get();
         }
-    )->name('bieneservicios.updateProdAdquisicion');
+    )->name('bieneservicios.get-product-by-proy-financiad');
+    Route::post(
+        'update-state-requerimiento',
+        function (Request $request) { /* *(ID_REQUERIMIENTO,PROYECTO_FINANCIADO,ID_ESTADO) */
+
+            if ($request->idEstado == 2) {
+                $detReq = DetalleRequerimiento::where("id_requerimiento", $request->idRequerimiento)->get();
+                $existencias = [];
+
+                foreach ($detReq as $key => $value) {
+                    $existenciaAlmacen = ExistenciaAlmacen::where([
+                        "id_producto" => $value["id_producto"],
+                        "id_proy_financiado" => $request->idProyectoFinanciado
+                    ])->first();
+
+                    // Si $existenciaAlmacen no es null, agregamos al array de existencias.
+                    if ($existenciaAlmacen !== null) {
+                        $existencias[] = $existenciaAlmacen;
+                    }
+
+                    DetalleRequerimiento::where("id_det_requerimiento", $value["id_det_requerimiento"])->update([
+                        "costo_det_requerimiento" => $existenciaAlmacen["costo_existencia_almacen"]
+                    ]);
+                }
+            }
+
+            Requerimiento::where("id_requerimiento", $request->idRequerimiento)->update([
+                "id_estado_req" => $request->idEstado,
+            ]);
+
+            return true;
+        }
+    )->name('bieneservicios.get-product-by-proy-financiad');
 
     //Financial report
     Route::get(
