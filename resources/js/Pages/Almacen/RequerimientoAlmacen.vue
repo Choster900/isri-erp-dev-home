@@ -3,6 +3,9 @@ import { useDatatableReqAlm } from '@/Composables/Almacen/RequerimientoAlmacen/u
 import { defineComponent } from 'vue'
 import Datatable from '@/Components-ISRI/Datatable.vue';
 import ModalRequerimientoAlmacen from '@/Components-ISRI/Almacen/RequerimientosAlmacen/ModalRequerimientoAlmacen.vue';
+import axios from 'axios';
+import Swal from 'sweetalert2';
+import { executeRequest } from '@/plugins/requestHelpers';
 
 export default defineComponent({
     components: { Datatable, ModalRequerimientoAlmacen },
@@ -26,7 +29,53 @@ export default defineComponent({
             showModalRequerimientoAlmacen,objectRequerimientoToSendModal,
         } = useDatatableReqAlm();
 
+
+        const changeState = async ( idRequerimiento,idProyectoFinanciado,idEstado ) => {
+            try {
+                    // Hace una solicitud POST a la ruta "/save-prod-adquicicion" con los datos necesarios
+                    const resp = await axios.post("/update-state-requerimiento", {
+                        idRequerimiento: idRequerimiento,
+                        idProyectoFinanciado: idProyectoFinanciado,
+                        idEstado: idEstado,
+                    });
+                    /* console.log({ idRequerimiento,idProyectoFinanciado,idEstado  }); */
+                    console.log(resp);
+                    getRequerimientosAlmacen()
+                    // Se resuelve la promesa con la respuesta exitosa de la solicitud
+                } catch (error) {
+                    console.log(error);
+
+                }
+        }
+
+         /**
+          * Guarda productos adquisicion
+          *
+          * @param {string} productCode - codigo del producto a buscar.
+          * @returns {Promise<object>} - Objeto con los datos de la respuesta.
+        */
+        const changeStateReqAlert = async (idRequerimiento,idProyectoFinanciado,idEstado) => {
+            const confirmed = await Swal.fire({
+                title: '<p class="text-[18pt] text-center">¿Está seguro que desea cambiar de estado?</p>',
+                icon: "question",
+                iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
+                confirmButtonText: "Si, Cambiar",
+                confirmButtonColor: "#001b47",
+                cancelButtonText: "Cancelar",
+                showCancelButton: true,
+                showCloseButton: true,
+            });
+            if (confirmed.isConfirmed) {
+                await executeRequest(
+                    changeState(idRequerimiento,idProyectoFinanciado,idEstado),
+                    "¡El requerimiento ha cambiado de estado correctamente!"
+                );
+            }
+        };
+
+
         return {
+            changeState,
             links,
             sortBy,
             columns,
@@ -35,6 +84,7 @@ export default defineComponent({
             lastUrl,
             perPage,
             tableData,
+            changeStateReqAlert,
             sortOrders,
             pagination,
             handleData,
@@ -144,6 +194,58 @@ export default defineComponent({
                                                 </span>
                                             </div>
                                             <div class="font-semibold">Ver</div>
+                                        </div>
+
+                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer" v-if="requ.id_estado_req == 1"
+    @click="changeStateReqAlert( requ.id_requerimiento,requ.id_proy_financiado,2)">
+    <div class="w-8 text-blue-900">
+        <span class="text-xs">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+            </svg>
+        </span>
+    </div>
+    <div class="font-semibold">Aprobar</div>
+</div>
+
+
+                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer" v-if="requ.id_estado_req == 2"
+                                            @click="changeStateReqAlert( requ.id_requerimiento,requ.id_proy_financiado,3)">
+                                            <div class="w-8 text-blue-900">
+                                                <span class="text-xs">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                        class="w-6 h-6">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                    </svg>
+
+                                                </span>
+                                            </div>
+                                            <div class="font-semibold">Despachar</div>
+                                        </div>
+
+                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                            @click="changeStateReqAlert( requ.id_requerimiento,requ.id_proy_financiado,4)">
+                                            <div class="w-8 text-blue-900">
+                                                <span class="text-xs">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                        class="w-6 h-6">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                    </svg>
+
+                                                </span>
+                                            </div>
+                                            <div class="font-semibold">Eliminar</div>
                                         </div>
 
                                     </DropDownOptions>

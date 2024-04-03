@@ -29,7 +29,6 @@ class RequerimientoRequest extends FormRequest
         $rules['idProyFinanciado'] = ['required'];
         $rules['idProyFinanciado'] = ['required'];
         $rules['idLt'] = ['required'];
-        $rules['cantPersonalRequerimiento'] = ['required'];
 
         collect($this->input('dataDetalleRequerimiento', []))
             ->each(function ($prodReq, $key) use (&$rules) {

@@ -21,6 +21,7 @@ class Requerimiento extends Model
         'id_motivo_ajuste',
         'req_id_requerimiento', //self-reference
         'id_proy_financiado',
+        'id_tipo_mov_kardex',
         'id_estado_req',
         'id_tipo_req', //requerimiento, ajuste o traslado
         'num_requerimiento',
