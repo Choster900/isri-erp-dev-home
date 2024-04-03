@@ -80,7 +80,7 @@ export const useDonacion = (context) => {
                     //Construct the options
                     let arrayOpt = {
                         value: element.producto.id_producto,
-                        label: element.producto.id_ccta_presupuestal + " - " + element.producto.nombre_producto,
+                        label: element.producto.codigo_producto + " - " + element.producto.nombre_producto,
                     };
                     products.value.push(arrayOpt);
                     defaultProds.value.push(arrayOpt);
@@ -209,7 +209,6 @@ export const useDonacion = (context) => {
     };
 
     const handleErrorResponse = (err) => {
-        console.log(err);
         if (err.response.status === 422) {
             if (err.response && err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
