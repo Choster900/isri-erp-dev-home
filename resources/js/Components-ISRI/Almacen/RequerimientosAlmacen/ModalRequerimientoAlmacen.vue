@@ -220,6 +220,59 @@ export default defineComponent({
             getDependenciaByUser()
             //getProductoByDependencia()
         })
+
+         /**
+          * Guarda productos adquisicion
+          *
+          * @param {string} productCode - codigo del producto a buscar.
+          * @returns {Promise<object>} - Objeto con los datos de la respuesta.
+        */
+        const saveRequerimientoAlmacen = async () => {
+            const confirmed = await Swal.fire({
+                title: '<p class="text-[18pt] text-center">¿Esta seguro de guardar el requerimiento para almacen?</p>',
+                icon: "question",
+                iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
+                confirmButtonText: "Si, Editar",
+                confirmButtonColor: "#001b47",
+                cancelButtonText: "Cancelar",
+                showCancelButton: true,
+                showCloseButton: true,
+            });
+            if (confirmed.isConfirmed) {
+                await executeRequest(
+                    saveRequerimientoAlmacenRequest(),
+                    "¡El documento de adquisicion se ha guardado correctamente!"
+                );
+                emit("actualizar-datatable");
+            }
+        };
+        /**
+          * Guarda productos adquisicion
+          *
+          * @param {string} productCode - codigo del producto a buscar.
+          * @returns {Promise<object>} - Objeto con los datos de la respuesta.
+        */
+        const updateRequerimientoAlmacen = async () => {
+            const confirmed = await Swal.fire({
+                title: '<p class="text-[18pt] text-center">¿Está seguro de que desea actualizar el requerimiento para almacen?</p>',
+                icon: "question",
+                iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
+                confirmButtonText: "Si, Editar",
+                confirmButtonColor: "#001b47",
+                cancelButtonText: "Cancelar",
+                showCancelButton: true,
+                showCloseButton: true,
+            });
+            if (confirmed.isConfirmed) {
+                await executeRequest(
+                    updateRequerimientoAlmacenRequest(),
+                    "¡El documento de adquisicion se ha actualizado correctamente!"
+                );
+                emit("actualizar-datatable");
+            }
+        };
+
+
         return {
             dataDetalleRequerimiento, appendProduct, appendDetalleRequerimiento, proyectoFinanciados,
             productosArray, setDescripcionProducto,
