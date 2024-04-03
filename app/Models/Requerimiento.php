@@ -24,7 +24,6 @@ class Requerimiento extends Model
         'id_estado_req',
         'id_tipo_req', //requerimiento, ajuste o traslado
         'num_requerimiento',
-        'cant_personal_requerimiento',
         'fecha_requerimiento',
         'observacion_requerimiento',
         'fecha_reg_requerimiento',
