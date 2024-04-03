@@ -9,7 +9,6 @@ export const useRequerimientoAlmacen = () => {
     const idProyFinanciado = ref(null)
     const idEstadoReq = ref(null)
     const numRequerimiento = ref(null)
-    const cantPersonalRequerimiento = ref(null)
     const fechaRequerimiento = ref(null)
     const observacionRequerimiento = ref(null)
     const errorsValidation = ref(null)
@@ -139,7 +138,7 @@ export const useRequerimientoAlmacen = () => {
                     idProyFinanciado: idProyFinanciado.value,
                     idEstadoReq: idEstadoReq.value,
                     numRequerimiento: numRequerimiento.value,
-                    cantPersonalRequerimiento: cantPersonalRequerimiento.value,
+
                     fechaRequerimiento: fechaRequerimiento.value,
                     observacionRequerimiento: observacionRequerimiento.value,
                     dataDetalleRequerimiento: dataDetalleRequerimiento.value,
@@ -185,7 +184,6 @@ const updateRequerimientoAlmacenRequest = () => {
                 idProyFinanciado: idProyFinanciado.value,
                 idEstadoReq: idEstadoReq.value,
                 numRequerimiento: numRequerimiento.value,
-                cantPersonalRequerimiento: cantPersonalRequerimiento.value,
                 fechaRequerimiento: fechaRequerimiento.value,
                 observacionRequerimiento: observacionRequerimiento.value,
                 dataDetalleRequerimiento: dataDetalleRequerimiento.value,
@@ -323,7 +321,6 @@ const updateRequerimientoAlmacenRequest = () => {
         idProyFinanciado,
         idEstadoReq,
         numRequerimiento,
-        cantPersonalRequerimiento,
         fechaRequerimiento,
         observacionRequerimiento,
         handleProductSearch,

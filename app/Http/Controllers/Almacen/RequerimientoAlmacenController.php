@@ -40,7 +40,9 @@ class RequerimientoAlmacenController extends Controller
             "proyecto_financiado",
             "estado_requerimiento"
 
-        ])->orderBy($v_columns[$v_column], $v_dir);
+        ])
+            ->where('id_estado_req', '!=',  4)
+            ->orderBy($v_columns[$v_column], $v_dir);
 
         if ($data) {
             /*   $v_query->where('id_proveedor', 'like', '%' . $data["id_proveedor"] . '%')
@@ -115,9 +117,9 @@ class RequerimientoAlmacenController extends Controller
         ];
         $requerimientoId = Requerimiento::insertGetId($requerimiento);
 
-        foreach ( $request->dataDetalleRequerimiento as $key => $value ) {
+        foreach ($request->dataDetalleRequerimiento as $key => $value) {
 
-            foreach ( $value["productos"] as $key => $value2 ) {
+            foreach ($value["productos"] as $key => $value2) {
 
                 DetalleRequerimiento::insert(
                     [
@@ -147,7 +149,8 @@ class RequerimientoAlmacenController extends Controller
             'id_proy_financiado'          => $request->idProyFinanciado,
             'id_estado_req'               => 1,
             'num_requerimiento'           => $request->numRequerimiento,
-            'cant_personal_requerimiento' => $request->cantPersonalRequerimiento,
+
+
             'fecha_requerimiento'         => Carbon::now(),
             'observacion_requerimiento'   => $request->observacionRequerimiento,
             'fecha_reg_requerimiento'     => Carbon::now(),
@@ -159,10 +162,10 @@ class RequerimientoAlmacenController extends Controller
         Requerimiento::where("id_requerimiento", $request->idRequerimiento)->update($requerimiento);
 
 
-        foreach ( $request->dataDetalleRequerimiento as $key => $value ) {
+        foreach ($request->dataDetalleRequerimiento as $key => $value) {
 
 
-            foreach ( $value["productos"] as $key => $value2 ) {
+            foreach ($value["productos"] as $key => $value2) {
 
                 if ($value2["idDetRequerimiento"]) {
                     if ($value2["stateProducto"] == 1) {
@@ -181,9 +184,7 @@ class RequerimientoAlmacenController extends Controller
                     } else {
                         // eliminar
                         DetalleRequerimiento::where("id_det_requerimiento", $value2["idDetRequerimiento"])->delete();
-
                     }
-
                 } else {
 
                     if ($value2["stateProducto"] == 1) {
@@ -201,7 +202,6 @@ class RequerimientoAlmacenController extends Controller
                                 'ip_det_requerimiento'        => $request->ip(),
                             ]
                         );
-
                     }
                 }
             }

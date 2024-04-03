@@ -27,6 +27,7 @@ export default defineComponent({
     setup(props, { emit }) {
         const { objectRequerimientoToSendModal, showModal } = toRefs(props)
         const optionsCentroAtencion = ref(null)
+        const isLoadinProduct = ref(false)
         const { dataDetalleRequerimiento, appendProduct, appendDetalleRequerimiento, proyectoFinanciados,
             productosArray, setDescripcionProducto,
             centroAtenionArray, centroProduccion, idRequerimiento,
@@ -35,7 +36,6 @@ export default defineComponent({
             idProyFinanciado, handleProductSearch,
             idEstadoReq, errorsValidation,
             numRequerimiento,
-            cantPersonalRequerimiento,
             fechaRequerimiento, updateRequerimientoAlmacenRequest,
             observacionRequerimiento, saveRequerimientoAlmacenRequest,
             lineaTrabajoArray, } = useRequerimientoAlmacen()
@@ -50,7 +50,6 @@ export default defineComponent({
                 idProyFinanciado.value = id_proy_financiado
                 idEstadoReq.value = id_estado_req
                 numRequerimiento.value = num_requerimiento
-                cantPersonalRequerimiento.value = cant_personal_requerimiento
                 observacionRequerimiento.value = observacion_requerimiento
                 let idCentroProduccionSet = new Set();
 
@@ -91,12 +90,76 @@ export default defineComponent({
                 idProyFinanciado.value = null
                 idEstadoReq.value = null
                 numRequerimiento.value = null
-                cantPersonalRequerimiento.value = null
                 observacionRequerimiento.value = null
                 appendDetalleRequerimiento()
 
             }
+        };
 
+        /**
+      * Obtener la dependencia por usuario.
+      *
+      * @returns {Promise<object>} - Promesa que se resuelve con la respuesta exitosa o se rechaza con el error.
+      */
+        const getDependenciaByUser = () => {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    // Hace una solicitud POST a la ruta "/save-prod-adquicicion" con los datos necesarios
+                    const resp = await axios.post("/get-centro-by-user");
+                    console.log(resp.data.length);
+
+                    if (resp.data.length == 1) {
+                        idCentroAtencion.value = resp.data[0].id_centro_atencion
+                        console.log(idCentroAtencion.value);
+
+                    }
+
+                    optionsCentroAtencion.value = resp.data.map(index => {
+                        return { value: index.id_centro_atencion, label: `${index.codigo_centro_atencion} - ${index.nombre_centro_atencion}`, disabled: false };
+                    })
+                    // Se resuelve la promesa con la respuesta exitosa de la solicitud
+                    resolve(resp);
+                } catch (error) {
+                    console.log(error);
+
+                    reject(error);
+                }
+            });
+        }
+
+        /**
+    * Obtener la dependencia por usuario.
+    *
+    * @returns {Promise<object>} - Promesa que se resuelve con la respuesta exitosa o se rechaza con el error.
+    */
+        const getProductoByDependencia = () => {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    console.log(idCentroAtencion.value);
+
+                    // Hace una solicitud POST a la ruta "/save-prod-adquicicion" con los datos necesarios
+                    const resp = await axios.post("/get-product-by-proy-financiado", {
+                        idCentroAtencion: idCentroAtencion.value,
+                        idProyFinanciado: idProyFinanciado.value,
+                        idLt: idLt.value,
+                    });
+                    console.log(resp);
+                    productosArray.value = resp.data.map(index => {
+                        return { value: index.productos.id_producto, label: `${index.productos.codigo_producto} - ${index.productos.nombre_producto}`, completeData: index.productos };
+                    })
+                    // Se resuelve la promesa con la respuesta exitosa de la solicitud
+                    resolve(resp);
+                } catch (error) {
+                    console.log(error);
+
+                    reject(error);
+                }
+            });
+        }
+
+        onMounted(() => {
+            getDependenciaByUser()
+            //getProductoByDependencia()
         })
 
         watch(showModal, (newValue, oldValue) => {
@@ -195,7 +258,7 @@ export default defineComponent({
             return new Promise(async (resolve, reject) => {
                 try {
                     console.log(idCentroAtencion.value);
-
+                    isLoadinProduct.value = true;
                     // Hace una solicitud POST a la ruta "/save-prod-adquicicion" con los datos necesarios
                     const resp = await axios.post("/get-product-by-proy-financiado", {
                         idCentroAtencion: idCentroAtencion.value,
@@ -208,10 +271,13 @@ export default defineComponent({
                     })
                     // Se resuelve la promesa con la respuesta exitosa de la solicitud
                     resolve(resp);
+                    isLoadinProduct.value = false;
                 } catch (error) {
                     console.log(error);
 
                     reject(error);
+                } finally {
+                    isLoadinProduct.value = false;
                 }
             });
         }
@@ -220,58 +286,6 @@ export default defineComponent({
             getDependenciaByUser()
             //getProductoByDependencia()
         })
-
-         /**
-          * Guarda productos adquisicion
-          *
-          * @param {string} productCode - codigo del producto a buscar.
-          * @returns {Promise<object>} - Objeto con los datos de la respuesta.
-        */
-        const saveRequerimientoAlmacen = async () => {
-            const confirmed = await Swal.fire({
-                title: '<p class="text-[18pt] text-center">¿Esta seguro de guardar el requerimiento para almacen?</p>',
-                icon: "question",
-                iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
-                confirmButtonText: "Si, Editar",
-                confirmButtonColor: "#001b47",
-                cancelButtonText: "Cancelar",
-                showCancelButton: true,
-                showCloseButton: true,
-            });
-            if (confirmed.isConfirmed) {
-                await executeRequest(
-                    saveRequerimientoAlmacenRequest(),
-                    "¡El documento de adquisicion se ha guardado correctamente!"
-                );
-                emit("actualizar-datatable");
-            }
-        };
-        /**
-          * Guarda productos adquisicion
-          *
-          * @param {string} productCode - codigo del producto a buscar.
-          * @returns {Promise<object>} - Objeto con los datos de la respuesta.
-        */
-        const updateRequerimientoAlmacen = async () => {
-            const confirmed = await Swal.fire({
-                title: '<p class="text-[18pt] text-center">¿Está seguro de que desea actualizar el requerimiento para almacen?</p>',
-                icon: "question",
-                iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
-                confirmButtonText: "Si, Editar",
-                confirmButtonColor: "#001b47",
-                cancelButtonText: "Cancelar",
-                showCancelButton: true,
-                showCloseButton: true,
-            });
-            if (confirmed.isConfirmed) {
-                await executeRequest(
-                    updateRequerimientoAlmacenRequest(),
-                    "¡El documento de adquisicion se ha actualizado correctamente!"
-                );
-                emit("actualizar-datatable");
-            }
-        };
-
 
         return {
             dataDetalleRequerimiento, appendProduct, appendDetalleRequerimiento, proyectoFinanciados,
@@ -283,8 +297,7 @@ export default defineComponent({
             optionsCentroAtencion, getProductoByDependencia,
             idEstadoReq, handleProductSearch,
             numRequerimiento,
-            cantPersonalRequerimiento,
-            fechaRequerimiento, updateRequerimientoAlmacen,
+            fechaRequerimiento, updateRequerimientoAlmacen,isLoadinProduct,
             observacionRequerimiento, saveRequerimientoAlmacen,
             lineaTrabajoArray,
         }
@@ -357,14 +370,7 @@ export default defineComponent({
 
                     </div>
                     <div class="pt-4 flex justify-start space-x-2 items-end">
-                        <div class="flex flex-col gap-1">
-                            <OnlyLabelInput textLabel="Cantidad de personal" />
-                            <input type="text" class="h-7 border-slate-300 text-xs" placeholder="-"
-                                v-model="cantPersonalRequerimiento">
-                            <InputError class="mt-2"
-                                v-if="errorsValidation && errorsValidation['cantPersonalRequerimiento'] !== ''"
-                                :message="errorsValidation['cantPersonalRequerimiento']" />
-                        </div>
+
                         <div class="flex flex-col gap-1">
                             <OnlyLabelInput textLabel="Numero requerimiento" />
                             <input type="text" class="h-7 border-slate-300 text-xs" placeholder="-"
@@ -481,7 +487,7 @@ export default defineComponent({
                                     <div class="h-8 border-l-4 border-slate-500 pl-3 opacity-40"></div>
                                     <div class="flex-1">
                                         <Multiselect @select="setDescripcionProducto($event, i, j)"
-                                            v-model="producto.idProducto"
+                                            v-model="producto.idProducto" :disabled="isLoadinProduct"
                                             :classes="{ containerDisabled: ' bg-gray-200 text-text-slate-400', optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed', optionPointed: 'text-gray-800 bg-gray-100', container: `relative mx-auto w-full h-6 flex items-center justify-end box-border   border border-gray-300 rounded bg-white text-base leading-snug outline-none` }"
                                             :filter-results="false" :searchable="true" :clear-on-search="true"
                                             :min-chars="1" :options="productosArray"
