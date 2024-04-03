@@ -606,14 +606,15 @@ class RecepcionController extends Controller
                     ->addSelect(DB::raw('COALESCE(SUM(dr.cantidad_recibida), 0) AS cantidad_recibida'))
                     ->addSelect(DB::raw('(dc.cant_prod_adquisicion - COALESCE(SUM(dr.cantidad_recibida), 0)) AS cantidad_pendiente'))
                     ->leftJoinSub(
+                        // Unión con subconsulta para calcular la cantidad total recibida de cada producto.
                         DB::table('detalle_recepcion_pedido AS drp')
                             ->selectRaw('drp.id_prod_adquisicion, SUM(drp.cant_det_recepcion_pedido) AS cantidad_recibida')
                             ->join('recepcion_pedido AS rp', 'drp.id_recepcion_pedido', '=', 'rp.id_recepcion_pedido')
                             ->where('rp.id_estado_recepcion_pedido', 2)
                             ->where('drp.estado_det_recepcion_pedido', 1)
                             ->groupBy('drp.id_prod_adquisicion'),
-                        'dr',
-                        'dc.id_prod_adquisicion',
+                        'dr', 
+                        'dc.id_prod_adquisicion', //Union producto_adquisicion con detalle_recepcion_pedido
                         '=',
                         'dr.id_prod_adquisicion'
                     )

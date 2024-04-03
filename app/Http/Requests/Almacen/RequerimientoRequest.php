@@ -24,17 +24,28 @@ class RequerimientoRequest extends FormRequest
     public function rules()
     {
         $rules = [];
+        $rules['idCentroAtencion'] = ['required'];
+        $rules['numRequerimiento'] = ['required'];
+        $rules['idProyFinanciado'] = ['required'];
+        $rules['idProyFinanciado'] = ['required'];
+        $rules['idLt'] = ['required'];
+        $rules['cantPersonalRequerimiento'] = ['required'];
 
         collect($this->input('dataDetalleRequerimiento', []))
-            ->each(function ($productoAdq, $key) use (&$rules) {
+            ->each(function ($prodReq, $key) use (&$rules) {
+                if ($prodReq["stateCentroProduccion"] == 0) {
+                    return;
+                }
                 $rules["dataDetalleRequerimiento.{$key}.idCentroProduccion"] = ['required'];
+
 
                 collect($this->input("dataDetalleRequerimiento.{$key}.productos", []))
                     ->each(function ($det, $indice) use (&$rules, $key) {
                         if ($det["stateProducto"] == 0) {
                             return;
                         }
-                        $rules["productAdq.{$key}.detalleDoc.{$indice}.idMarca"] = ['required'];
+                        $rules["dataDetalleRequerimiento.{$key}.productos.{$indice}.cantDetRequerimiento"] = ['required'];
+                        $rules["dataDetalleRequerimiento.{$key}.productos.{$indice}.idProducto"] = ['required'];
                     });
             });
 
