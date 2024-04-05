@@ -28,7 +28,7 @@
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Ajustes entrada: <span
+                    <h2 class="font-semibold text-slate-800 pt-1">Ajustes por faltante: <span
                             class="text-slate-400 font-medium">{{
             tableData.total
         }}</span></h2>

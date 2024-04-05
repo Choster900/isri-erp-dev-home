@@ -17,8 +17,11 @@ class DetalleRequerimiento extends Model
         'id_producto',
         'id_centro_produccion',
         'id_requerimiento',
+        'id_marca',
         'cant_det_requerimiento',
         'costo_det_requerimiento',
+        'fecha_vcto_det_requerimiento',
+        'estado_det_requerimiento',
         'fecha_reg_det_requerimiento',
         'fecha_mod_det_requerimiento',
         'usuario_det_requerimiento',
@@ -50,5 +53,14 @@ class DetalleRequerimiento extends Model
     public function producto(): BelongsTo
     {
         return $this->belongsTo(Producto::class, 'id_producto', 'id_producto');
+    }
+    /**
+     * Get the Marca model associated with this instance.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function marca()
+    {
+        return $this->belongsTo(Marca::class, 'id_marca', 'id_marca');
     }
 }

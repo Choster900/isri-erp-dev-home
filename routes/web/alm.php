@@ -139,5 +139,5 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('alm.ajusteEntrada');
     Route::post('ajuste-entrada', [AjusteEntradaController::class, 'getAjusteEntrada'])->name('ajusteEntrada.getAjusteEntrada');
-    Route::post('get-info-modal-surplus-adjustment', [AjusteEntradaController::class, 'getInfoSurplusAdjustment'])->name('ajusteEntrada.getInfoSurplusAdjustment');
+    Route::post('get-info-modal-shortage-adjustment', [AjusteEntradaController::class, 'getInfoShortageAdjustment'])->name('ajusteEntrada.getInfoShortageAdjustment');
 });
