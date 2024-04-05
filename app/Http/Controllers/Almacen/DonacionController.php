@@ -110,7 +110,7 @@ class DonacionController extends Controller
                         ->orWhere('codigo_producto', 'like', '%' . $search . '%');
                 })
                 ->where('estado_producto', 1)
-                ->whereNotIn('id_producto', $prodIdToIgnore)
+                //->whereNotIn('id_producto', $prodIdToIgnore)
                 ->get();
 
             $products = $matchProds->map(function ($prod) {

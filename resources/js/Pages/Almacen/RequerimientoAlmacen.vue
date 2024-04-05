@@ -106,7 +106,6 @@ export default defineComponent({
 
     <Head title="Producto - Requerimiento" />
     <AppLayoutVue nameSubModule="Almacen - Requerimiento">
-    {{ isLoadinRequest }}
         <div class="sm:flex sm:justify-end sm:items-center mb-2" v-if="!canSaveReq " >
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2" v-if="!isLoadinRequest">
                 <GeneralButton @click="showModalRequerimientoAlmacen = true; objectRequerimientoToSendModal = []"
@@ -219,7 +218,7 @@ export default defineComponent({
 
 
                                         <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
-                                            v-if="requ.id_estado_req == 2"
+                                            v-if="requ.id_estado_req == 2 && canSaveReq == true"
                                             @click="changeStateReqAlert(requ.id_requerimiento, requ.id_proy_financiado, 3)">
                                             <div class="w-8 text-blue-900">
                                                 <span class="text-xs">
