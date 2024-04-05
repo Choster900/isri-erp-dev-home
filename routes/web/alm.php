@@ -59,6 +59,12 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     )->name('alm.requerimientos');
     Route::post('get-requerimiento-almacen', [RequerimientoAlmacenController::class, 'getRequerimientoAlmacen'])->name('donacion.getObjectForRequerimientoAlmacen');
     Route::post('get-object-for-requerimiento-almacen', [RequerimientoAlmacenController::class, 'getObject'])->name('donacion.getObjectForRequerimientoAlmacen');
+    Route::post(
+        'get-number-requerimiento',
+        function (Request $request) {
+            return Requerimiento::latest("fecha_reg_requerimiento")->where('id_estado_req','!=', 4)->first();
+        }
+    )->name('donacion.getObjectForRequerimientoAlmacen');
     Route::post('insert-requerimiento-almacen', [RequerimientoAlmacenController::class, 'addRequerimiento'])->name('donacion.insertRequerimientoAlmacen');
     Route::post('update-requerimiento-almacen', [RequerimientoAlmacenController::class, 'updateRequerimientoAlmacen'])->name('donacion.updateRequerimientoAlmacen');
     Route::post('get-product-searched-almacen', [RequerimientoAlmacenController::class, 'getProductByNameOrCode'])->name('donacion.productSearchedAlmacen');
@@ -90,38 +96,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
                 ->get();
         }
     )->name('bieneservicios.get-product-by-proy-financiad');
-    Route::post(
-        'update-state-requerimiento',
-        function (Request $request) { /* *(ID_REQUERIMIENTO,PROYECTO_FINANCIADO,ID_ESTADO) */
-
-            if ($request->idEstado == 2) {
-                $detReq = DetalleRequerimiento::where("id_requerimiento", $request->idRequerimiento)->get();
-                $existencias = [];
-
-                foreach ($detReq as $key => $value) {
-                    $existenciaAlmacen = ExistenciaAlmacen::where([
-                        "id_producto" => $value["id_producto"],
-                        "id_proy_financiado" => $request->idProyectoFinanciado
-                    ])->first();
-
-                    // Si $existenciaAlmacen no es null, agregamos al array de existencias.
-                    if ($existenciaAlmacen !== null) {
-                        $existencias[] = $existenciaAlmacen;
-                    }
-
-                    DetalleRequerimiento::where("id_det_requerimiento", $value["id_det_requerimiento"])->update([
-                        "costo_det_requerimiento" => $existenciaAlmacen["costo_existencia_almacen"]
-                    ]);
-                }
-            }
-
-            Requerimiento::where("id_requerimiento", $request->idRequerimiento)->update([
-                "id_estado_req" => $request->idEstado,
-            ]);
-
-            return true;
-        }
-    )->name('bieneservicios.get-product-by-proy-financiad');
+    Route::post('update-state-requerimiento', [RequerimientoAlmacenController::class, 'updateStateRequerimiento'])->name('bieneservicios.get-product-by-proy-financiad');
 
     //Financial report
     Route::get(
