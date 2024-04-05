@@ -135,9 +135,9 @@ class RequerimientoAlmacenController extends Controller
         ];
         $requerimientoId = Requerimiento::insertGetId($requerimiento);
 
-        foreach ( $request->dataDetalleRequerimiento as $key => $value ) {
+        foreach ($request->dataDetalleRequerimiento as $key => $value) {
 
-            foreach ( $value["productos"] as $key => $value2 ) {
+            foreach ($value["productos"] as $key => $value2) {
 
                 DetalleRequerimiento::insert(
                     [
@@ -179,10 +179,10 @@ class RequerimientoAlmacenController extends Controller
         Requerimiento::where("id_requerimiento", $request->idRequerimiento)->update($requerimiento);
 
 
-        foreach ( $request->dataDetalleRequerimiento as $key => $value ) {
+        foreach ($request->dataDetalleRequerimiento as $key => $value) {
 
 
-            foreach ( $value["productos"] as $key => $value2 ) {
+            foreach ($value["productos"] as $key => $value2) {
 
                 if ($value2["idDetRequerimiento"]) {
                     if ($value2["stateProducto"] == 1) {
