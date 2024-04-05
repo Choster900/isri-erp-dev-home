@@ -6,8 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Almacen\RequerimientoRequest;
 use App\Models\CentroAtencion;
 use App\Models\CentroProduccion;
+use App\Models\DetalleKardex;
+use App\Models\DetallePlaza;
 use App\Models\DetalleRequerimiento;
+use App\Models\ExistenciaAlmacen;
+use App\Models\Kardex;
 use App\Models\LineaTrabajo;
+use App\Models\Marca;
+use App\Models\Permiso;
+use App\Models\PermisoUsuario;
 use App\Models\Producto;
 use App\Models\ProyectoFinanciado;
 use App\Models\Requerimiento;
@@ -34,14 +41,20 @@ class RequerimientoAlmacenController extends Controller
         $data = $request->input('search');
 
 
+        $object = PermisoUsuario::where('id_usuario', $request->user()->id_usuario)->get();
+        $coleccion = collect($object);
+
         $v_query = Requerimiento::with([
             "detalles_requerimiento.producto",
             "centro_atencion",
             "proyecto_financiado",
             "estado_requerimiento"
 
-        ])
-            ->where('id_estado_req', '!=',  4)
+        ])->when($coleccion->contains('id_rol', 23) || $coleccion->contains('id_rol', 24), function ($query) {
+            return $query->where('id_estado_req', 2)
+                ->orWhere('id_estado_req', 3)
+                ->orWhere('id_estado_req', 4);
+        })
             ->orderBy($v_columns[$v_column], $v_dir);
 
         if ($data) {
@@ -54,8 +67,9 @@ class RequerimientoAlmacenController extends Controller
 
         $data = $v_query->paginate($v_length)->onEachSide(1);
         return [
-            'data' => $data,
-            'draw' => $request->input('draw'),
+            'data'       => $data,
+            'canSaveReq' => $coleccion->contains('id_rol', 23) || $coleccion->contains('id_rol', 24),
+            'draw'       => $request->input('draw'),
         ];
     }
 
@@ -73,10 +87,13 @@ class RequerimientoAlmacenController extends Controller
 
         $centroProduccion = CentroProduccion::all();
 
+        $marcas = Marca::all();
+
         // Obtener todos los productos
         $productos = Producto::all();
         return [
             'lineaTrabajo'         => $lineaTrabajo,
+            'marcas'               => $marcas,
             'centrosAtencion'      => $centrosAtencion,
             'proyectosFinanciados' => $proyectosFinanciados,
             'productos'            => $productos,
@@ -102,29 +119,31 @@ class RequerimientoAlmacenController extends Controller
     {
         //     $requerimiento = [];
         $requerimiento = [
-            'id_lt'                       => $request->idLt,
-            'id_centro_atencion'          => $request->idCentroAtencion,
-            'id_proy_financiado'          => $request->idProyFinanciado,
-            'id_estado_req'               => 1,
-            'num_requerimiento'           => $request->numRequerimiento,
-            'cant_personal_requerimiento' => $request->cantPersonalRequerimiento,
-            'fecha_requerimiento'         => Carbon::now(),
-            'observacion_requerimiento'   => $request->observacionRequerimiento,
-            'fecha_reg_requerimiento'     => Carbon::now(),
-            'usuario_requerimiento'       => $request->user()->nick_usuario,
-            'ip_requerimiento'            => $request->ip(),
+            'id_lt'                     => $request->idLt,
+            'id_centro_atencion'        => $request->idCentroAtencion,
+            'id_proy_financiado'        => $request->idProyFinanciado,
+            'id_estado_req'             => 1,
+            'id_tipo_mov_kardex'        => 2,
+            'id_tipo_req'               => 1,
+            'num_requerimiento'         => $request->numRequerimiento,
+            'fecha_requerimiento'       => Carbon::now(),
+            'observacion_requerimiento' => $request->observacionRequerimiento,
+            'fecha_reg_requerimiento'   => Carbon::now(),
+            'usuario_requerimiento'     => $request->user()->nick_usuario,
+            'ip_requerimiento'          => $request->ip(),
 
         ];
         $requerimientoId = Requerimiento::insertGetId($requerimiento);
 
-        foreach ($request->dataDetalleRequerimiento as $key => $value) {
+        foreach ( $request->dataDetalleRequerimiento as $key => $value ) {
 
-            foreach ($value["productos"] as $key => $value2) {
+            foreach ( $value["productos"] as $key => $value2 ) {
 
                 DetalleRequerimiento::insert(
                     [
                         'id_producto'                 => $value2["idProducto"],
                         'id_centro_produccion'        => $value["idCentroProduccion"],
+                        'id_marca'                    => $value2["idMarca"],
                         'id_requerimiento'            => $requerimientoId,
                         'cant_det_requerimiento'      => $value2["cantDetRequerimiento"],
                         'costo_det_requerimiento'     => 0,
@@ -143,35 +162,34 @@ class RequerimientoAlmacenController extends Controller
 
         //     $requerimiento = [];
         $requerimiento = [
-            'id_requerimiento'            => $request->idRequerimiento,
-            'id_lt'                       => $request->idLt,
-            'id_centro_atencion'          => $request->idCentroAtencion,
-            'id_proy_financiado'          => $request->idProyFinanciado,
-            'id_estado_req'               => 1,
-            'num_requerimiento'           => $request->numRequerimiento,
-
-
-            'fecha_requerimiento'         => Carbon::now(),
-            'observacion_requerimiento'   => $request->observacionRequerimiento,
-            'fecha_reg_requerimiento'     => Carbon::now(),
-            'usuario_requerimiento'       => $request->user()->nick_usuario,
-            'ip_requerimiento'            => $request->ip(),
+            'id_requerimiento'          => $request->idRequerimiento,
+            'id_lt'                     => $request->idLt,
+            'id_centro_atencion'        => $request->idCentroAtencion,
+            'id_proy_financiado'        => $request->idProyFinanciado,
+            'id_estado_req'             => 1,
+            'num_requerimiento'         => $request->numRequerimiento,
+            'fecha_requerimiento'       => Carbon::now(),
+            'observacion_requerimiento' => $request->observacionRequerimiento,
+            'fecha_mod_requerimiento'   => Carbon::now(),
+            'usuario_requerimiento'     => $request->user()->nick_usuario,
+            'ip_requerimiento'          => $request->ip(),
 
         ];
 
         Requerimiento::where("id_requerimiento", $request->idRequerimiento)->update($requerimiento);
 
 
-        foreach ($request->dataDetalleRequerimiento as $key => $value) {
+        foreach ( $request->dataDetalleRequerimiento as $key => $value ) {
 
 
-            foreach ($value["productos"] as $key => $value2) {
+            foreach ( $value["productos"] as $key => $value2 ) {
 
                 if ($value2["idDetRequerimiento"]) {
                     if ($value2["stateProducto"] == 1) {
                         DetalleRequerimiento::where("id_det_requerimiento", $value2["idDetRequerimiento"])->update(
                             [
                                 'id_producto'                 => $value2["idProducto"],
+                                'id_marca'                    => $value2["idMarca"],
                                 'id_centro_produccion'        => $value["idCentroProduccion"],
                                 'id_requerimiento'            => $request->idRequerimiento,
                                 'cant_det_requerimiento'      => $value2["cantDetRequerimiento"],
@@ -193,6 +211,7 @@ class RequerimientoAlmacenController extends Controller
                         DetalleRequerimiento::insert(
                             [
                                 'id_producto'                 => $value2["idProducto"],
+                                'id_marca'                    => $value2["idMarca"],
                                 'id_centro_produccion'        => $value["idCentroProduccion"],
                                 'id_requerimiento'            => $request->idRequerimiento,
                                 'cant_det_requerimiento'      => $value2["cantDetRequerimiento"],
@@ -210,4 +229,89 @@ class RequerimientoAlmacenController extends Controller
 
         return $request;
     }
+
+    /**
+     * Actualiza el estado de un requerimiento y realiza acciones adicionales según el estado.
+     *
+     * @param  Request $request - La solicitud HTTP que contiene los datos necesarios para actualizar el requerimiento.
+     * @return array            - Un arreglo vacío como respuesta.
+     */
+    function updateStateRequerimiento(Request $request): array
+    {
+        // Datos a actualizar en el requerimiento
+        $objectUpdated = [
+            "id_estado_req"           => $request->idEstado,
+            'fecha_mod_requerimiento' => Carbon::now(),
+        ];
+
+        // Si el estado es "Despachado" (idEstado == 3)
+        if ($request->idEstado == 3) {
+            // Obtener los detalles del requerimiento
+            $detReq = DetalleRequerimiento::where("id_requerimiento", $request->idRequerimiento)->get();
+            $existencias = [];
+
+            // Iterar sobre los detalles del requerimiento
+            foreach ($detReq as $key => $value) {
+                // Buscar la existencia en el almacén
+                $existenciaAlmacen = ExistenciaAlmacen::where([
+                    "id_producto"        => $value["id_producto"],
+                    "id_proy_financiado" => $request->idProyectoFinanciado
+                ])->first();
+
+                // Si se encuentra la existencia, agregarla al arreglo de existencias
+                if ($existenciaAlmacen !== null) {
+                    $existencias[] = $existenciaAlmacen;
+                }
+
+                // Actualizar el costo del detalle del requerimiento con el costo de la existencia en el almacén
+                DetalleRequerimiento::where("id_det_requerimiento", $value["id_det_requerimiento"])->update([
+                    "costo_det_requerimiento" => $existenciaAlmacen["costo_existencia_almacen"]
+                ]);
+            }
+
+            // Crear un registro en el kardex
+            $requerimiento = Requerimiento::find($request->idRequerimiento);
+            $kardexArray = [
+                'id_proy_financiado' => $requerimiento->id_proy_financiado,
+                'id_tipo_req'        => 1,
+                'id_tipo_mov_kardex' => 2,
+                'id_requerimiento'   => $request->idRequerimiento,
+                'fecha_kardex'       => Carbon::now(),
+                'observacion_kardex' => 'Despacho del requerimiento: ' . $requerimiento->num_requerimiento,
+                'fecha_reg_kardex'   => Carbon::now(),
+                'usuario_kardex'     => $request->user()->nick_usuario,
+                'ip_kardex'          => $request->ip(),
+            ];
+            $cardexId = Kardex::insertGetId($kardexArray);
+
+            // Registrar detalles en el kardex
+            $detalleRequerimiento = DetalleRequerimiento::where("id_requerimiento", $request->idRequerimiento)->get();
+            foreach ($detalleRequerimiento as $key => $value) {
+                DetalleKardex::insert([
+                    'id_kardex'                    => $cardexId,
+                    'id_producto'                  => $value['id_producto'],
+                    'id_lt'                        => $requerimiento->id_lt,
+                    'id_centro_atencion'           => $requerimiento->id_centro_atencion,
+                    'id_marca'                     => $value['id_marca'],
+                    'cant_det_kardex'              => $value['cant_det_requerimiento'],
+                    'costo_det_kardex'             => $value['costo_det_requerimiento'],
+                    'fecha_reg_det_kardex'         => Carbon::now(),
+                    'usuario_det_kardex'           => $request->user()->nick_usuario,
+                    'ip_det_kardex'                => $request->ip(),
+                ]);
+            }
+
+        // Si el estado es "Anulado" (idEstado == 4)
+        } else if ($request->idEstado == 4) {
+            // Actualizar el número de requerimiento a "(N/A)"
+            $objectUpdated["num_requerimiento"] = '(N/A)';
+        }
+
+        // Actualizar el requerimiento con los datos actualizados
+        Requerimiento::where("id_requerimiento", $request->idRequerimiento)->update($objectUpdated);
+
+        // Devolver un arreglo vacío como respuesta
+        return [];
+    }
+
 }
