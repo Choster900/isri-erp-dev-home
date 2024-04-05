@@ -29,13 +29,13 @@ export const useRequerimientoAlmacen = () => {
         isHidden: false,
     } */])
 
-
     // Variables que almacenanan los objetos para mostrar en multiselect
     const centroAtenionArray = ref(null)
     const lineaTrabajoArray = ref(null)
     const productosArray = ref(null)
     const proyectoFinanciados = ref(null)
     const centroProduccion = ref(null)
+    const marcasArray = ref(null)
 
     const appendDetalleRequerimiento = () => {
         dataDetalleRequerimiento.value.push({
@@ -46,6 +46,7 @@ export const useRequerimientoAlmacen = () => {
                 {
                     idDetRequerimiento: '',
                     idProducto: '',
+                    idMarca: '',
                     descripcionProducto: '',
                     cantDetRequerimiento: '',
                     costoDetRequerimiento: '',
@@ -62,6 +63,7 @@ export const useRequerimientoAlmacen = () => {
         dataDetalleRequerimiento.value[i].productos.push({
             idDetRequerimiento: '',
             idProducto: '',
+            idMarca: '',
             descripcionProducto: '',
             cantDetRequerimiento: '',
             costoDetRequerimiento: '',
@@ -104,9 +106,9 @@ export const useRequerimientoAlmacen = () => {
             lineaTrabajoArray.value = data.lineaTrabajo.map(index => {
                 return { value: index.id_lt, label: `${index.codigo_up_lt} - ${index.nombre_lt}`, completeData: index };
             })
-         /*    productosArray.value = data.productos.map(index => {
-                return { value: index.id_producto, label: `${index.codigo_producto} - ${index.nombre_producto}`, completeData: index };
-            }) */
+            marcasArray.value = data.marcas.map(index => {
+                return { value: index.id_marca, label: `${index.nombre_marca} `, completeData: index };
+            })
             proyectoFinanciados.value = data.proyectosFinanciados.map(index => {
                 return { value: index.id_proy_financiado, label: `${index.nombre_proy_financiado}`, completeData: index };
             })
@@ -168,112 +170,55 @@ export const useRequerimientoAlmacen = () => {
             }
         });
     }
-/**
-     * Guarda productos adquisición en el servidor.
-     *
-     * @returns {Promise<object>} - Promesa que se resuelve con la respuesta exitosa o se rechaza con el error.
-     */
-const updateRequerimientoAlmacenRequest = () => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            // Hace una solicitud POST a la ruta "/save-prod-adquicicion" con los datos necesarios
-            const resp = await axios.post("/update-requerimiento-almacen", {
-                idRequerimiento: idRequerimiento.value,
-                idLt: idLt.value,
-                idCentroAtencion: idCentroAtencion.value,
-                idProyFinanciado: idProyFinanciado.value,
-                idEstadoReq: idEstadoReq.value,
-                numRequerimiento: numRequerimiento.value,
-                fechaRequerimiento: fechaRequerimiento.value,
-                observacionRequerimiento: observacionRequerimiento.value,
-                dataDetalleRequerimiento: dataDetalleRequerimiento.value,
-            });
-            console.log(resp);
+    /**
+         * Guarda productos adquisición en el servidor.
+         *
+         * @returns {Promise<object>} - Promesa que se resuelve con la respuesta exitosa o se rechaza con el error.
+         */
+    const updateRequerimientoAlmacenRequest = () => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                // Hace una solicitud POST a la ruta "/save-prod-adquicicion" con los datos necesarios
+                const resp = await axios.post("/update-requerimiento-almacen", {
+                    idRequerimiento: idRequerimiento.value,
+                    idLt: idLt.value,
+                    idCentroAtencion: idCentroAtencion.value,
+                    idProyFinanciado: idProyFinanciado.value,
+                    idEstadoReq: idEstadoReq.value,
+                    numRequerimiento: numRequerimiento.value,
+                    fechaRequerimiento: fechaRequerimiento.value,
+                    observacionRequerimiento: observacionRequerimiento.value,
+                    dataDetalleRequerimiento: dataDetalleRequerimiento.value,
+                });
+                console.log(resp);
 
-            // Se resuelve la promesa con la respuesta exitosa de la solicitud
-            resolve(resp);
-        } catch (error) {
-            console.log(error);
-            // Si hay un error y el código de respuesta es 422 (Unprocessable Entity), maneja los errores de validación
-            if (error.response.status === 422) {
-                // Obtiene los errores del cuerpo de la respuesta y los transforma a un formato más manejable
-                let data = error.response.data.errors;
-                var myData = new Object();
-                for (const errorBack in data) {
-                    myData[errorBack] = data[errorBack][0];
+                // Se resuelve la promesa con la respuesta exitosa de la solicitud
+                resolve(resp);
+            } catch (error) {
+                console.log(error);
+                // Si hay un error y el código de respuesta es 422 (Unprocessable Entity), maneja los errores de validación
+                if (error.response.status === 422) {
+                    // Obtiene los errores del cuerpo de la respuesta y los transforma a un formato más manejable
+                    let data = error.response.data.errors;
+                    var myData = new Object();
+                    for (const errorBack in data) {
+                        myData[errorBack] = data[errorBack][0];
+                    }
+                    // Actualiza el estado "errorsValidation" con los errores y los limpia después de 5 segundos
+                    errorsValidation.value = myData;
+                    setTimeout(() => {
+                        errorsValidation.value = [];
+                    }, 5000);
+                    console.error("Error en guardar los datos:", error);
                 }
-                // Actualiza el estado "errorsValidation" con los errores y los limpia después de 5 segundos
-                errorsValidation.value = myData;
-                setTimeout(() => {
-                    errorsValidation.value = [];
-                }, 5000);
-                console.error("Error en guardar los datos:", error);
+                // Rechaza la promesa en caso de excepción
+                reject(error);
             }
-            // Rechaza la promesa en caso de excepción
-            reject(error);
-        }
-    });
-}
+        });
+    }
 
 
-    /**
-    * Obtener Arrays de objetos para multiselect
-    *
-    * @returns {Promise<object>} - Promesa que se resuelve con la respuesta del servidor.
-    */
-   /*  const insertRequerimiento = async () => {
-        alert("alerta")
-        try {
-            const resp = await axios.post("/insert-requerimiento-almacen", {
-                idLt: idLt.value,
-                idCentroAtencion: idCentroAtencion.value,
-                idProyFinanciado: idProyFinanciado.value,
-                idEstadoReq: idEstadoReq.value,
-                numRequerimiento: numRequerimiento.value,
-                cantPersonalRequerimiento: cantPersonalRequerimiento.value,
-                fechaRequerimiento: fechaRequerimiento.value,
-                observacionRequerimiento: observacionRequerimiento.value,
-                dataDetalleRequerimiento: dataDetalleRequerimiento.value,
-            });
-            console.log(resp);
 
-        } catch (error) {
-            reject(error);
-            console.error("Error en la creación de la evaluación personal:", error);
-            throw new Error("Error en la creación de la evaluación personal");
-        }
-
-    }; */
-
-    /**
-    * Obtener Arrays de objetos para multiselect
-    *
-    * @returns {Promise<object>} - Promesa que se resuelve con la respuesta del servidor.
-    */
-   /*  const updateRequerimiento = async () => {
-        alert("alerta")
-        try {
-            const resp = await axios.post("/update-requerimiento-almacen", {
-                idRequerimiento: idRequerimiento.value,
-                idLt: idLt.value,
-                idCentroAtencion: idCentroAtencion.value,
-                idProyFinanciado: idProyFinanciado.value,
-                idEstadoReq: idEstadoReq.value,
-                numRequerimiento: numRequerimiento.value,
-                cantPersonalRequerimiento: cantPersonalRequerimiento.value,
-                fechaRequerimiento: fechaRequerimiento.value,
-                observacionRequerimiento: observacionRequerimiento.value,
-                dataDetalleRequerimiento: dataDetalleRequerimiento.value,
-            });
-            console.log(resp);
-
-        } catch (error) {
-            reject(error);
-            console.error("Error en la creación de la evaluación personal:", error);
-            throw new Error("Error en la creación de la evaluación personal");
-        }
-
-    }; */
     /**
        * Busca empleados por nombre para evaluaciones.
        *
@@ -305,6 +250,9 @@ const updateRequerimientoAlmacenRequest = () => {
 
     };
 
+
+    
+
     onMounted(() => {
         getArrayObject()
     })
@@ -327,6 +275,7 @@ const updateRequerimientoAlmacenRequest = () => {
         proyectoFinanciados,
         productosArray,
         centroAtenionArray,
+        marcasArray,
         lineaTrabajoArray,
         centroProduccion,
 
