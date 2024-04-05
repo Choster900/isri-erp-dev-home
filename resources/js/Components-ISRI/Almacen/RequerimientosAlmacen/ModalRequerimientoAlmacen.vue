@@ -113,68 +113,8 @@ export default defineComponent({
                 appendDetalleRequerimiento()
 
             }
-        };
+        });
 
-        /**
-      * Obtener la dependencia por usuario.
-      *
-      * @returns {Promise<object>} - Promesa que se resuelve con la respuesta exitosa o se rechaza con el error.
-      */
-        const getDependenciaByUser = () => {
-            return new Promise(async (resolve, reject) => {
-                try {
-                    // Hace una solicitud POST a la ruta "/save-prod-adquicicion" con los datos necesarios
-                    const resp = await axios.post("/get-centro-by-user");
-                    console.log(resp.data.length);
-
-                    if (resp.data.length == 1) {
-                        idCentroAtencion.value = resp.data[0].id_centro_atencion
-                        console.log(idCentroAtencion.value);
-
-                    }
-
-                    optionsCentroAtencion.value = resp.data.map(index => {
-                        return { value: index.id_centro_atencion, label: `${index.codigo_centro_atencion} - ${index.nombre_centro_atencion}`, disabled: false };
-                    })
-                    // Se resuelve la promesa con la respuesta exitosa de la solicitud
-                    resolve(resp);
-                } catch (error) {
-                    console.log(error);
-
-                    reject(error);
-                }
-            });
-        }
-
-        /**
-    * Obtener la dependencia por usuario.
-    *
-    * @returns {Promise<object>} - Promesa que se resuelve con la respuesta exitosa o se rechaza con el error.
-    */
-        const getProductoByDependencia = () => {
-            return new Promise(async (resolve, reject) => {
-                try {
-                    console.log(idCentroAtencion.value);
-
-                    // Hace una solicitud POST a la ruta "/save-prod-adquicicion" con los datos necesarios
-                    const resp = await axios.post("/get-product-by-proy-financiado", {
-                        idCentroAtencion: idCentroAtencion.value,
-                        idProyFinanciado: idProyFinanciado.value,
-                        idLt: idLt.value,
-                    });
-                    console.log(resp);
-                    productosArray.value = resp.data.map(index => {
-                        return { value: index.productos.id_producto, label: `${index.productos.codigo_producto} - ${index.productos.nombre_producto}`, completeData: index.productos };
-                    })
-                    // Se resuelve la promesa con la respuesta exitosa de la solicitud
-                    resolve(resp);
-                } catch (error) {
-                    console.log(error);
-
-                    reject(error);
-                }
-            });
-        }
 
         onMounted(() => {
             getDependenciaByUser()
