@@ -11,8 +11,8 @@
         </div>
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="showModalDonation = true; recepId = 0;" v-if="permits.insertar == 1"
-                    color="bg-green-700  hover:bg-green-800" text="Crear Donacion" icon="add" />
+                <GeneralButton @click="showModalSurplusAdjustment = true; objId = 0;" v-if="permits.insertar == 1"
+                    color="bg-green-700  hover:bg-green-800" text="Crear Ajuste" icon="add" />
             </div>
         </div>
 
@@ -28,7 +28,7 @@
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Donaciones: <span
+                    <h2 class="font-semibold text-slate-800 pt-1">Ajustes entrada: <span
                             class="text-slate-400 font-medium">{{
             tableData.total
         }}</span></h2>
@@ -39,68 +39,73 @@
                     :sortIcons="true" :staticSelect="false" @sort="sortBy" @datos-enviados="handleData($event)"
                     @execute-search="getDataToShow()">
                     <tbody v-if="!isLoadinRequest" class="text-sm divide-y divide-slate-200">
-                        <tr v-for="reception in dataToShow" :key="reception.id_recepcion_pedido"
+                        <tr v-for="obj in dataToShow" :key="obj.id_recepcion_pedido"
                             class="hover:bg-gray-200">
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 flex items-center justify-center min-h-[40px]">
-                                    {{ reception.id_recepcion_pedido }}
+                                    {{ obj.id_requerimiento }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ reception.acta_recepcion_pedido }}
+                                    {{ obj.centro_atencion.codigo_centro_atencion }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap">
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{ obj.motivo_ajuste.nombre_motivo_ajuste }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 flex items-center justify-center text-center min-h-[40px]">
-                                    {{ reception.proveedor.razon_social_proveedor }}
+                                    {{ obj.proyecto_financiado.codigo_proy_financiado }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 flex items-center justify-center text-cente min-h-[40px]">
-                                    ${{ reception.monto_recepcion_pedido }}
+                                    {{ obj.num_requerimiento }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap">
                                 <div class="font-medium text-slate-800 flex items-center justify-center text-cente min-h-[40px]">
-                                    {{ moment(reception.fecha_recepcion_pedido, 'YYYY/MM/DD').format('D-MMM-YYYY') }}
+                                    {{ moment(obj.fecha_requerimiento, 'YYYY/MM/DD').format('D-MMM-YYYY') }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap">
                                 <div
                                     class="font-bold text-[13px] text-slate-800 flex items-center justify-center text-cente min-h-[40px]">
                                     <div :class="{
-            ' text-emerald-600 bg-emerald-100 ': reception.id_estado_recepcion_pedido == 1,
-            ' text-blue-600 bg-blue-100 ': reception.id_estado_recepcion_pedido == 2,
-            ' text-red-600 bg-red-100 ': reception.id_estado_recepcion_pedido == 3
+            ' text-emerald-600 bg-emerald-100 ': obj.id_estado_req == 1,
+            ' text-blue-600 bg-blue-100 ': obj.id_estado_req == 2,
+            ' text-red-600 bg-red-100 ': obj.id_estado_req == 4
         }" class="inline-flex font-medium rounded-full px-2.5 py-1 ">
                                         <svg class="w-3 h-3 inline-flex mr-2 my-auto">
                                             <circle class="opacity-80" cx="50%" cy="50%" r="50%" fill="currentColor" />
                                         </svg>
-                                        {{ reception.estado_recepcion.estado_recepcion_pedido }}
+                                        {{ obj.estado_requerimiento.nombre_estado_req }}
                                     </div>
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="space-x-1 text-center">
                                     <DropDownOptions>
-                                        <div v-if="permits.ejecutar === 1 && reception.id_estado_recepcion_pedido == 1"
+                                        <!-- <div v-if="permits.ejecutar === 1 && reception.id_estado_recepcion_pedido == 1"
                                             @click="showModalSendDonation = true; recepId = reception.id_recepcion_pedido"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-lime-700 w-[24px] h-[24px] mr-1">
                                                 <icon-m :iconName="'clipboard-arrow'"></icon-m>
                                             </div>
                                             <div class="font-semibold pt-0.5">Kardex</div>
-                                        </div>
-                                        <div @click="showModalDonation = true; recepId = reception.id_recepcion_pedido"
-                                            v-if="permits.actualizar === 1 && reception.id_estado_recepcion_pedido == 1"
+                                        </div> -->
+                                        <div @click="showModalSurplusAdjustment = true; objId = obj.id_requerimiento"
+                                            v-if="permits.actualizar === 1 && obj.id_estado_req == 1"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-orange-700 w-[22px] h-[22px] mr-1.5 ml-0.5">
                                                 <icon-m :iconName="'editM'"></icon-m>
                                             </div>
                                             <div class="font-semibold pt-0.5">Editar</div>
                                         </div>
-                                        <div @click="showModalDonation = true; recepId = reception.id_recepcion_pedido"
+                                        <!-- <div @click="showModalDonation = true; recepId = reception.id_recepcion_pedido"
                                             v-if="reception.id_estado_recepcion_pedido == 3"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-blue-800 w-[25px] h-[25px] mr-2">
@@ -123,7 +128,7 @@
                                                 <icon-m :iconName="'trash'"></icon-m>
                                             </div>
                                             <div class="font-semibold pt-0.5">Eliminar</div>
-                                        </div>
+                                        </div> -->
                                     </DropDownOptions>
                                 </div>
                             </td>
@@ -159,10 +164,10 @@
         
         <pagination :emptyObject="emptyObject" :links="links" @get-data="getDataToShow" />
 
-        <!-- <modal-donacion-vue v-if="showModalDonation" :showModalDonation="showModalDonation" :recepId="recepId"
-            @cerrar-modal="showModalDonation = false" @get-table="getDataToShow(tableData.currentPage)" />
+        <modal-ajuste-entrada-vue v-if="showModalSurplusAdjustment" :showModalSurplusAdjustment="showModalSurplusAdjustment" :objId="objId"
+            @cerrar-modal="showModalSurplusAdjustment = false" @get-table="getDataToShow(tableData.currentPage)" />
 
-        <modal-enviar-donacion-vue v-if="showModalSendDonation" :showModalSendDonation="showModalSendDonation" :recepId="recepId"
+        <!-- <modal-enviar-donacion-vue v-if="showModalSendDonation" :showModalSendDonation="showModalSendDonation" :recepId="recepId"
             @cerrar-modal="showModalSendDonation = false" @get-table="getDataToShow(tableData.currentPage)" />  -->
 
     </AppLayoutVue>
@@ -174,7 +179,7 @@ import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import Pagination from "@/Components-ISRI/Pagination.vue";
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
-import ModalDonacionVue from '@/Components-ISRI/Almacen/Donacion/ModalDonacion.vue';
+import ModalAjusteEntradaVue from '@/Components-ISRI/Almacen/AjusteEntrada/ModalAjusteEntrada.vue';
 import ModalEnviarDonacionVue from '@/Components-ISRI/Almacen/Donacion/ModalEnviarDonacion.vue';
 
 import moment from 'moment';
@@ -184,7 +189,7 @@ import { useToDataTable } from '@/Composables/General/useToDataTable.js';
 import { useEnviarDonacion } from '@/Composables/Almacen/Donacion/useEnviarDonacion.js';
 
 export default {
-    components: { Head, AppLayoutVue, Datatable, IconM, ModalDonacionVue, ModalEnviarDonacionVue, Pagination },
+    components: { Head, AppLayoutVue, Datatable, IconM, ModalAjusteEntradaVue, ModalEnviarDonacionVue, Pagination },
     props: {
         menu: {
             type: Object,
@@ -196,28 +201,37 @@ export default {
         const permits = usePermissions(menu.value, window.location.pathname);
 
         const showModalSurplusAdjustment = ref(false)
-        //const showModalSendDonation = ref(false)
+        const showModalSendDonation = ref(false)
 
-        const recepId = ref(0)
+        const objId = ref(0)
 
         const columns = [
-            { width: "10%", label: "Id", name: "id_recepcion_pedido", type: "text" },
-            { width: "15%", label: "acta", name: "acta_recepcion_pedido", type: "text" },
-            { width: "35%", label: "donante", name: "proveedor", type: "text" },
-            { width: "15%", label: "Monto", name: "monto_recepcion_pedido", type: "text" },
-            { width: "10%", label: "fecha", name: "fecha_recepcion_pedido", type: "date" },
+            { width: "10%", label: "Id", name: "id_requerimiento", type: "text" },
+            { width: "10%", label: "Centro", name: "centro", type: "text" },
+            { width: "20%", label: "motivo", name: "motivo", type: "text" },
             {
-                width: "13%", label: "Estado", name: "id_estado_recepcion_pedido", type: "select",
+                width: "10%", label: "Fondo", name: "id_proy_financiado", type: "select",
                 options: [
-                    { value: "1", label: "CREADO" },
-                    { value: "2", label: "PROCESADO" },
-                    { value: "3", label: "ELIMINADO" }
+                    { value: "1", label: "FG" },
+                    { value: "2", label: "FCMF" },
+                    { value: "3", label: "RP" },
+                    { value: "4", label: "D" },
                 ]
             },
-            { width: "5%", label: "Acciones", name: "Acciones" },
+            { width: "13%", label: "Numero", name: "num_requerimiento", type: "text" },
+            { width: "15%", label: "Fecha", name: "fecha_requerimiento", type: "date" },
+            {
+                width: "12%", label: "Estado", name: "id_estado_req", type: "select",
+                options: [
+                    { value: "1", label: "CREADO" },
+                    { value: "2", label: "APROBADO" },
+                    { value: "4", label: "ELIMINADO" }
+                ]
+            },
+            { width: "10%", label: "Acciones", name: "Acciones" },
         ];
         const requestUrl = "/ajuste-entrada"
-        const columntToSort = "id_recepcion_pedido"
+        const columntToSort = "id_requerimiento"
         const dir = 'desc'
 
         const {
@@ -238,7 +252,7 @@ export default {
 
 
         return {
-            permits, dataToShow, showModalSurplusAdjustment, tableData, perPage, recepId, showModalSendDonation,
+            permits, dataToShow, showModalSurplusAdjustment, tableData, perPage, objId, showModalSendDonation,
             links, sortKey, sortOrders, isLoadinRequest, isLoadingTop, emptyObject, columns,
             getDataToShow, handleData, sortBy, changeStatusElement, moment, printDonation
         };

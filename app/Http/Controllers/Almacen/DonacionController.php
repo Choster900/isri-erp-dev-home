@@ -107,7 +107,7 @@ class DonacionController extends Controller
             $matchProds = Producto::with('unidad_medida')
                 ->where(function ($query) use ($search) {
                     $query->where('nombre_producto', 'like', '%' . $search . '%')
-                        ->orWhere('id_ccta_presupuestal', 'like', '%' . $search . '%');
+                        ->orWhere('codigo_producto', 'like', '%' . $search . '%');
                 })
                 ->where('estado_producto', 1)
                 ->whereNotIn('id_producto', $prodIdToIgnore)
@@ -116,7 +116,7 @@ class DonacionController extends Controller
             $products = $matchProds->map(function ($prod) {
                 return [
                     'value'             => $prod->id_producto,
-                    'label'             => $prod->id_ccta_presupuestal . " - " . $prod->nombre_producto,
+                    'label'             => $prod->codigo_producto . " - " . $prod->nombre_producto,
                     'allInfo'           => $prod
                 ];
             });

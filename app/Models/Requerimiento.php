@@ -18,7 +18,7 @@ class Requerimiento extends Model
         'id_lt',
         'id_centro_atencion', //origin
         'cen_id_centro_atencion', //destination
-        'id_motivo_ajuste',
+        'id_motivo_ajuste', //reason
         'req_id_requerimiento', //self-reference
         'id_proy_financiado',
         'id_tipo_mov_kardex',
@@ -68,7 +68,13 @@ class Requerimiento extends Model
     {
         return $this->belongsTo(EstadoRequerimiento::class, 'id_estado_req', 'id_estado_req');
     }
-
-
-
+    /**
+     * Get the MotivoAjuste model associated with this instance.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function motivo_ajuste()
+    {
+        return $this->belongsTo(MotivoAjuste::class, 'id_motivo_ajuste', 'id_motivo_ajuste');
+    }
 }
