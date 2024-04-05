@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Almacen;
 use App\Http\Controllers\Controller;
 use App\Models\CentroAtencion;
 use App\Models\LineaTrabajo;
+use App\Models\Marca;
 use App\Models\MotivoAjuste;
 use App\Models\ProyectoFinanciado;
 use App\Models\Requerimiento;
@@ -26,7 +27,9 @@ class AjusteEntradaController extends Controller
                 'centro_atencion',
                 'proyecto_financiado',
                 'estado_requerimiento',
-                'motivo_ajuste'
+                'motivo_ajuste',
+                'detalles_requerimiento.producto.unidad_medida',
+                'detalles_requerimiento.marca'
             ])
             ->where('id_tipo_req', 2);
 
@@ -34,7 +37,7 @@ class AjusteEntradaController extends Controller
         return ['data' => $data, 'draw' => $request->input('draw')];
     }
 
-    public function getInfoSurplusAdjustment(Request $request)
+    public function getInfoShortageAdjustment(Request $request)
     {
         $idAdjustment = $request->id; //Reception id from the view, if it's 0 that means we are creating a new reception
         if ($idAdjustment > 0) { //This means we are updating an existing reception
@@ -42,7 +45,9 @@ class AjusteEntradaController extends Controller
                 'centro_atencion',
                 'proyecto_financiado',
                 'estado_requerimiento',
-                'motivo_ajuste'
+                'motivo_ajuste',
+                'detalles_requerimiento.producto.unidad_medida',
+                'detalles_requerimiento.marca'
             ])->find($idAdjustment);
 
             if (!$req) {
@@ -58,13 +63,15 @@ class AjusteEntradaController extends Controller
         $reasons = MotivoAjuste::select('id_motivo_ajuste as value', 'nombre_motivo_ajuste as label')->get();
         $financingSources = ProyectoFinanciado::select('id_proy_financiado as value', 'codigo_proy_financiado as label')->get();
         $lts = LineaTrabajo::select('id_lt as value', 'codigo_up_lt as label')->get();
+        $brands = Marca::select('id_marca as value', 'nombre_marca as label')->get();
 
         return response()->json([
             'req'                           => $req,
             'reasons'                       => $reasons,
             'centers'                       => $centers,
             'financingSources'              => $financingSources,
-            'lts'                           => $lts
+            'lts'                           => $lts,
+            'brands'                        => $brands
         ]);
     }
 }
