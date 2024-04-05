@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, ref, toRefs, watch, onMounted } from 'vue';
+import { defineComponent, ref, toRefs, watch, onMounted, h } from 'vue';
 
 import ButtonCloseModal from "@/Components/ButtonCloseModal.vue";
 import ProcessModal from "@/Components-ISRI/AllModal/ProcessModal.vue";
@@ -269,6 +269,15 @@ export default defineComponent({
                 <ButtonCloseModal @close="$emit('cerrar-modal')" />
                 <TitleModalReq />
                 <div id="formulario-principal">
+                    <div class="pt-4 flex justify-start space-x-2 items-center">
+                        <h1 class="text-xs ">Requerimiento N°: <span class="font-medium text-sm underline">{{numRequerimiento}}</span></h1>
+                        <div class="text-xs items-center">
+                        Centro:
+                                    <span class="font-medium text-sm underline"  v-if="optionsCentroAtencion && optionsCentroAtencion[0]">
+                                        {{ optionsCentroAtencion[0].label }}</span>
+                                    <span v-else>-</span>
+                                </div>
+                    </div>
                     <div class="pt-4 flex justify-between space-x-2">
                         <!-- {{ dataDetalleRequerimiento }} -->
                         <div class="w-full">
@@ -298,7 +307,7 @@ export default defineComponent({
                                 :message="errorsValidation['idProyFinanciado']" />
 
                         </div>
-                        <div class="w-full">
+                       <!--  <div class="w-full">
                             <OnlyLabelInput textLabel="Centro de atencion" />
 
                             <template v-if="optionsCentroAtencion && optionsCentroAtencion.length > 1">
@@ -322,10 +331,10 @@ export default defineComponent({
                             <InputError class="mt-2"
                                 v-if="errorsValidation && errorsValidation['idCentroAtencion'] !== ''"
                                 :message="errorsValidation['idCentroAtencion']" />
-                        </div>
+                        </div> -->
 
                     </div>
-                    <div class="pt-4 flex justify-start space-x-2 items-end">
+                    <!-- <div class="pt-4 flex justify-start space-x-2 items-end">
 
                         <div class="flex flex-col gap-1">
                             <OnlyLabelInput textLabel="Numero requerimiento" />
@@ -335,7 +344,7 @@ export default defineComponent({
                                 v-if="errorsValidation && errorsValidation['numRequerimiento'] !== ''"
                                 :message="errorsValidation['numRequerimiento']" />
                         </div>
-                    </div>
+                    </div> -->
                     <div class="pt-4 flex justify-start space-x-2 items-end">
 
                         <textarea placeholder='Observacion del requerimiento' rows="2" name=''
