@@ -10,6 +10,7 @@ import Swal from 'sweetalert2';
 import { executeRequest } from "@/plugins/requestHelpers";
 import axios from 'axios';
 import InputError from '@/Components/InputError.vue';
+import { usePage } from '@inertiajs/vue3';
 
 export default defineComponent({
     components: { ProcessModal, ButtonCloseModal, TitleModalReq, OnlyLabelInput, InputError },
@@ -22,18 +23,23 @@ export default defineComponent({
         objectRequerimientoToSendModal: {
             type: Object,
             default: () => { },
+        },
+        numeroRequerimientoSiguiente: {
+            type: String,
+            default : null,
         }
     },
     setup(props, { emit }) {
-        const { objectRequerimientoToSendModal, showModal } = toRefs(props)
+        const { objectRequerimientoToSendModal, showModal,numeroRequerimientoSiguiente } = toRefs(props)
         const optionsCentroAtencion = ref(null)
         const isLoadinProduct = ref(false)
+        const canIEdit = ref(false)
         const { dataDetalleRequerimiento, appendProduct, appendDetalleRequerimiento, proyectoFinanciados,
             productosArray, setDescripcionProducto,
             centroAtenionArray, centroProduccion, idRequerimiento,
             idLt,
             idCentroAtencion,
-            idProyFinanciado, handleProductSearch,
+            idProyFinanciado, handleProductSearch, marcasArray,
             idEstadoReq, errorsValidation,
             numRequerimiento,
             fechaRequerimiento, updateRequerimientoAlmacenRequest,
@@ -41,9 +47,10 @@ export default defineComponent({
             lineaTrabajoArray, } = useRequerimientoAlmacen()
 
         watch(objectRequerimientoToSendModal, (newValue, oldValue) => {
+            const nickUser = usePage().props.auth.user.nick_usuario
 
             if (newValue !== null && newValue !== undefined && (Array.isArray(newValue) ? newValue.length > 0 : newValue !== '')) {
-                const { detalles_requerimiento, id_lt, id_centro_atencion, id_proy_financiado, id_estado_req, num_requerimiento, id_requerimiento, cant_personal_requerimiento, observacion_requerimiento } = newValue
+                const { detalles_requerimiento, id_lt, id_centro_atencion, id_proy_financiado, id_estado_req, num_requerimiento, id_requerimiento, observacion_requerimiento, usuario_requerimiento } = newValue
                 idRequerimiento.value = id_requerimiento
                 idLt.value = id_lt
                 idCentroAtencion.value = id_centro_atencion
@@ -51,6 +58,17 @@ export default defineComponent({
                 idEstadoReq.value = id_estado_req
                 numRequerimiento.value = num_requerimiento
                 observacionRequerimiento.value = observacion_requerimiento
+
+                if (id_estado_req == 1) {
+                    if (nickUser === usuario_requerimiento) {
+                        canIEdit.value = true
+                    } else {
+                        canIEdit.value = false
+                    }
+                }
+
+
+
                 let idCentroProduccionSet = new Set();
 
                 dataDetalleRequerimiento.value = detalles_requerimiento.map(det => {
@@ -74,11 +92,11 @@ export default defineComponent({
                     dataDetalleRequerimiento.value[indice]["productos"].push({
                         idDetRequerimiento: index.id_det_requerimiento,
                         idProducto: producto.id_producto,
+                        idMarca: index.id_marca,
                         descripcionProductos: producto.descripcion_producto,
                         cantDetRequerimiento: index.cant_det_requerimiento,
                         costoDetRequerimiento: index.costo_det_requerimiento,
                         stateProducto: 1,
-
                     });
                 });
                 getProductoByDependencia()
@@ -89,73 +107,14 @@ export default defineComponent({
                 /* idCentroAtencion.value = null */
                 idProyFinanciado.value = null
                 idEstadoReq.value = null
-                numRequerimiento.value = null
+                numRequerimiento.value = numeroRequerimientoSiguiente.value
                 observacionRequerimiento.value = null
+                canIEdit.value = true
                 appendDetalleRequerimiento()
 
             }
-        };
+        });
 
-        /**
-      * Obtener la dependencia por usuario.
-      *
-      * @returns {Promise<object>} - Promesa que se resuelve con la respuesta exitosa o se rechaza con el error.
-      */
-        const getDependenciaByUser = () => {
-            return new Promise(async (resolve, reject) => {
-                try {
-                    // Hace una solicitud POST a la ruta "/save-prod-adquicicion" con los datos necesarios
-                    const resp = await axios.post("/get-centro-by-user");
-                    console.log(resp.data.length);
-
-                    if (resp.data.length == 1) {
-                        idCentroAtencion.value = resp.data[0].id_centro_atencion
-                        console.log(idCentroAtencion.value);
-
-                    }
-
-                    optionsCentroAtencion.value = resp.data.map(index => {
-                        return { value: index.id_centro_atencion, label: `${index.codigo_centro_atencion} - ${index.nombre_centro_atencion}`, disabled: false };
-                    })
-                    // Se resuelve la promesa con la respuesta exitosa de la solicitud
-                    resolve(resp);
-                } catch (error) {
-                    console.log(error);
-
-                    reject(error);
-                }
-            });
-        }
-
-        /**
-    * Obtener la dependencia por usuario.
-    *
-    * @returns {Promise<object>} - Promesa que se resuelve con la respuesta exitosa o se rechaza con el error.
-    */
-        const getProductoByDependencia = () => {
-            return new Promise(async (resolve, reject) => {
-                try {
-                    console.log(idCentroAtencion.value);
-
-                    // Hace una solicitud POST a la ruta "/save-prod-adquicicion" con los datos necesarios
-                    const resp = await axios.post("/get-product-by-proy-financiado", {
-                        idCentroAtencion: idCentroAtencion.value,
-                        idProyFinanciado: idProyFinanciado.value,
-                        idLt: idLt.value,
-                    });
-                    console.log(resp);
-                    productosArray.value = resp.data.map(index => {
-                        return { value: index.productos.id_producto, label: `${index.productos.codigo_producto} - ${index.productos.nombre_producto}`, completeData: index.productos };
-                    })
-                    // Se resuelve la promesa con la respuesta exitosa de la solicitud
-                    resolve(resp);
-                } catch (error) {
-                    console.log(error);
-
-                    reject(error);
-                }
-            });
-        }
 
         onMounted(() => {
             getDependenciaByUser()
@@ -165,6 +124,8 @@ export default defineComponent({
         watch(showModal, (newValue, oldValue) => {
             if (!newValue) {
                 productosArray.value = []
+                canIEdit.value = false
+                /*  canIEdit.value = false, */
             }
         })
         /**
@@ -228,11 +189,9 @@ export default defineComponent({
                 try {
                     // Hace una solicitud POST a la ruta "/save-prod-adquicicion" con los datos necesarios
                     const resp = await axios.post("/get-centro-by-user");
-                    console.log(resp.data.length);
 
                     if (resp.data.length == 1) {
                         idCentroAtencion.value = resp.data[0].id_centro_atencion
-                        console.log(idCentroAtencion.value);
 
                     }
 
@@ -257,7 +216,6 @@ export default defineComponent({
         const getProductoByDependencia = () => {
             return new Promise(async (resolve, reject) => {
                 try {
-                    console.log(idCentroAtencion.value);
                     isLoadinProduct.value = true;
                     // Hace una solicitud POST a la ruta "/save-prod-adquicicion" con los datos necesarios
                     const resp = await axios.post("/get-product-by-proy-financiado", {
@@ -265,7 +223,6 @@ export default defineComponent({
                         idProyFinanciado: idProyFinanciado.value,
                         idLt: idLt.value,
                     });
-                    console.log(resp);
                     productosArray.value = resp.data.map(index => {
                         return { value: index.productos.id_producto, label: `${index.productos.codigo_producto} - ${index.productos.nombre_producto}`, completeData: index.productos };
                     })
@@ -294,10 +251,10 @@ export default defineComponent({
             idLt,
             idCentroAtencion,
             idProyFinanciado, errorsValidation,
-            optionsCentroAtencion, getProductoByDependencia,
+            optionsCentroAtencion, getProductoByDependencia, marcasArray,
             idEstadoReq, handleProductSearch,
-            numRequerimiento,
-            fechaRequerimiento, updateRequerimientoAlmacen,isLoadinProduct,
+            numRequerimiento, canIEdit,
+            fechaRequerimiento, updateRequerimientoAlmacen, isLoadinProduct,
             observacionRequerimiento, saveRequerimientoAlmacen,
             lineaTrabajoArray,
         }
@@ -312,14 +269,11 @@ export default defineComponent({
                 <ButtonCloseModal @close="$emit('cerrar-modal')" />
                 <TitleModalReq />
                 <div id="formulario-principal">
-                    <pre>
-                    {{ errorsValidation }}
-                    </pre>
                     <div class="pt-4 flex justify-between space-x-2">
                         <!-- {{ dataDetalleRequerimiento }} -->
                         <div class="w-full">
                             <OnlyLabelInput textLabel="Linea de trabajo" />
-                            <Multiselect v-model="idLt" @select="getProductoByDependencia()"
+                            <Multiselect v-model="idLt" @select="getProductoByDependencia()" :disabled="!canIEdit"
                                 :classes='{ containerDisabled: "bg-gray-200 text-text-slate-400", container: "relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded bg-white text-base leading-snug outline-none", optionSelectedDisabled: "text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed", optionPointed: "text-gray-800 bg-gray-100", }'
                                 :filter-results="false" :searchable="true" :clear-on-search="true" :min-chars="1"
                                 :options="lineaTrabajoArray"
@@ -333,6 +287,7 @@ export default defineComponent({
                             <OnlyLabelInput textLabel="Proyecto financiamiento" />
 
                             <Multiselect v-model="idProyFinanciado" @select="getProductoByDependencia()"
+                                :disabled="!canIEdit"
                                 :classes='{ containerDisabled: "bg-gray-200 text-text-slate-400", container: "relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded bg-white text-base leading-snug outline-none", optionSelectedDisabled: "text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed", optionPointed: "text-gray-800 bg-gray-100", }'
                                 :filter-results="false" :searchable="true" :clear-on-search="true" :min-chars="1"
                                 :options="proyectoFinanciados"
@@ -348,6 +303,7 @@ export default defineComponent({
 
                             <template v-if="optionsCentroAtencion && optionsCentroAtencion.length > 1">
                                 <Multiselect v-model="idCentroAtencion" @select="getProductoByDependencia"
+                                    :disabled="!canIEdit"
                                     :classes='{ containerDisabled: "bg-gray-200 text-text-slate-400", container: "relative mx-auto w-full h-7 flex items-center justify-end box-border border border-gray-300 rounded bg-white text-base leading-snug outline-none", optionSelectedDisabled: "text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed", optionPointed: "text-gray-800 bg-gray-100", }'
                                     :filter-results="false" :searchable="true" :clear-on-search="true" :min-chars="1"
                                     :options="optionsCentroAtencion"
@@ -374,7 +330,7 @@ export default defineComponent({
                         <div class="flex flex-col gap-1">
                             <OnlyLabelInput textLabel="Numero requerimiento" />
                             <input type="text" class="h-7 border-slate-300 text-xs" placeholder="-"
-                                v-model="numRequerimiento">
+                                :disabled="!canIEdit" v-model="numRequerimiento">
                             <InputError class="mt-2"
                                 v-if="errorsValidation && errorsValidation['numRequerimiento'] !== ''"
                                 :message="errorsValidation['numRequerimiento']" />
@@ -383,7 +339,7 @@ export default defineComponent({
                     <div class="pt-4 flex justify-start space-x-2 items-end">
 
                         <textarea placeholder='Observacion del requerimiento' rows="2" name=''
-                            v-model="observacionRequerimiento"
+                            v-model="observacionRequerimiento" :disabled="!canIEdit"
                             class="w-full rounded-md px-4 text-xs border-slate-300 border pt-2.5 outline-[#007bff]"></textarea>
 
                     </div>
@@ -410,15 +366,16 @@ export default defineComponent({
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
                                 </svg>
-                                <span @click="updateRequerimientoAlmacen">Actualizar y cerrar</span>
+                                <span @click="canIEdit ? updateRequerimientoAlmacen() : ''">Actualizar y cerrar</span>
                             </div>
                         </button>
                     </div>
                 </div>
                 <table class="mt-4 w-[740px] ">
                     <tr class=" *:text-xs *:text-slate-700">
-                        <td class="w-[165px] text-end pr-7">CANTIDAD</td>
-                        <td class="w-[145px] text-center">CODIGO PRODUCTO</td>
+                        <td class="w-[110px] text-end pr-7">CANTIDAD</td>
+                        <td class="w-[150px] text-center">CODIGO PRODUCTO</td>
+                        <td class="w-[175px] text-center">MARCA</td>
                         <td class="w- text-center">NOMBRE DEL PRODUCTO</td>
                     </tr>
                 </table>
@@ -437,7 +394,7 @@ export default defineComponent({
                                     </svg>
                                 </div>
                                 <div class="text-xs w-[645px] py-1">
-                                    <Multiselect v-model="detalleRequerimiento.idCentroProduccion"
+                                    <Multiselect v-model="detalleRequerimiento.idCentroProduccion" :disabled="!canIEdit"
                                         :classes='{ containerDisabled: "bg-gray-200 text-text-slate-400", container: "relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded bg-white text-base leading-snug outline-none", optionSelectedDisabled: "text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed", optionPointed: "text-gray-800 bg-gray-100", }'
                                         :filter-results="false" :searchable="true" :clear-on-search="true"
                                         :min-chars="1" :options="centroProduccion"
@@ -446,32 +403,6 @@ export default defineComponent({
                                         noOptionsText="<p class='text-xs'>vacio</p>" />
                                 </div>
                             </div>
-                            <div class="flex space-x-3">
-                                <button
-                                    class="  rounded px-2 text-xs h-6 text-slate-700 hover:text-black hover:bg-white-600 ">
-                                    <div class="flex items-center space-x-1">
-                                        <DropDownOptions>
-                                            <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
-                                                <div class="w-8 text-blue-900">
-                                                    <span class="text-xs">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                                            class="w-6 h-6">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                                        </svg>
-
-                                                    </span>
-                                                </div>
-                                                <div class="font-semibold">Ver</div>
-                                            </div>
-
-                                        </DropDownOptions>
-                                    </div>
-                                </button>
-                            </div>
                         </div>
 
                         <div v-show="!detalleRequerimiento.isHidden"
@@ -479,7 +410,7 @@ export default defineComponent({
                             v-for="(producto, j ) in detalleRequerimiento.productos" :key="j">
                             <template v-if="producto.stateProducto == 1">
                                 <div class="text-xs w-20 ">
-                                    <input type="text" v-model="producto.cantDetRequerimiento"
+                                    <input type="text" v-model="producto.cantDetRequerimiento" :disabled="!canIEdit"
                                         class="bg-white text-center border-0 h-6 text-xs w-20 border-x-transparentborder-t-transparent bg-transparent focus:border-x-transparentfocus:border-t-transparent"
                                         placeholder="CANT">
                                 </div>
@@ -487,10 +418,21 @@ export default defineComponent({
                                     <div class="h-8 border-l-4 border-slate-500 pl-3 opacity-40"></div>
                                     <div class="flex-1">
                                         <Multiselect @select="setDescripcionProducto($event, i, j)"
-                                            v-model="producto.idProducto" :disabled="isLoadinProduct"
+                                            v-model="producto.idProducto" :disabled="isLoadinProduct || !canIEdit"
                                             :classes="{ containerDisabled: ' bg-gray-200 text-text-slate-400', optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed', optionPointed: 'text-gray-800 bg-gray-100', container: `relative mx-auto w-full h-6 flex items-center justify-end box-border   border border-gray-300 rounded bg-white text-base leading-snug outline-none` }"
                                             :filter-results="false" :searchable="true" :clear-on-search="true"
                                             :min-chars="1" :options="productosArray"
+                                            noResultsText="<p class='text-xs'>Sin resultados de personas</p>"
+                                            placeholder="00-0" noOptionsText="<p class='text-xs'>vacio</p>" />
+                                    </div>
+                                </div>
+                                <div class="text-xs w-64 py-1 flex items-center">
+                                    <div class="h-8 border-l-4 border-slate-500 pl-3 opacity-40"></div>
+                                    <div class="flex-1">
+                                        <Multiselect v-model="producto.idMarca" :disabled="isLoadinProduct || !canIEdit"
+                                            :classes="{ containerDisabled: ' bg-gray-200 text-text-slate-400', optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed', optionPointed: 'text-gray-800 bg-gray-100', container: `relative mx-auto w-full h-6 flex items-center justify-end box-border   border border-gray-300 rounded bg-white text-base leading-snug outline-none` }"
+                                            :filter-results="false" :searchable="true" :clear-on-search="true"
+                                            :min-chars="1" :options="marcasArray"
                                             noResultsText="<p class='text-xs'>Sin resultados de personas</p>"
                                             placeholder="00-0" noOptionsText="<p class='text-xs'>vacio</p>" />
                                     </div>
@@ -527,18 +469,20 @@ export default defineComponent({
                             </template>
 
                         </div>
-                        <div @click="appendProduct(i)"
+                        <div @click="appendProduct(i)" v-if="canIEdit"
                             class="hover:bg-slate-200 hover:border-slate-500 w-full h-10 border-4 border-dashed border-slate-400 my-4 flex items-center justify-center bg-white">
                             <span class="uppercase text-left text-xs"> <!-- Alinea el texto a la izquierda -->
                                 + agregar en: INSTRUCTORIA VOCACIONAL DE COSTURA INDUSTRIAL
                             </span>
                         </div>
                     </div>
-                    <div @click="appendDetalleRequerimiento"
+                    <div @click="appendDetalleRequerimiento" v-if="canIEdit"
                         class="hover:bg-slate-200 hover:border-slate-500 w-full h-24 border-4 border-dashed border-slate-400 my-4 flex items-center justify-center bg-white">
                         <span class="uppercase text-left text-xs"> <!-- Alinea el texto a la izquierda -->
                             + Agregar Centro de produccion
                         </span>
+                    </div>
+                    <div class="py-4" v-else>
                     </div>
 
                 </div>
