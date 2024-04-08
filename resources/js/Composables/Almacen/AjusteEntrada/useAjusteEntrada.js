@@ -24,6 +24,7 @@ export const useAjusteEntrada = (context) => {
         centerId: '',
         financingSourceId: '',
         reasonId: '',
+        brandId: '',
         idLt: '',
         number: '',
         expDate: '',
