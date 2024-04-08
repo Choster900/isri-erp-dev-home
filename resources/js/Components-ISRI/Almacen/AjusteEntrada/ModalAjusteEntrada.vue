@@ -43,17 +43,19 @@
                     </label>
                     <div class="relative font-semibold flex h-[30px] w-full">
                         <Multiselect v-model="adjustment.centerId" :options="centers" :searchable="true"
-                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione centro" />
+                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione centro" 
+                            :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }"/>
                     </div>
                     <InputError v-for="(item, index) in errors.centerId" :key="index" class="mt-2" :message="item" />
                 </div>
                 <div class="mb-2 md:mr-2 md:mb-0 basis-1/4" :class="{ 'selected-opt': adjustment.idLt > 0, }">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Uplt
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Linea de trabajo
                         <span class="text-red-600 font-extrabold">*</span>
                     </label>
                     <div class="relative font-semibold flex h-[30px] w-full">
                         <Multiselect v-model="adjustment.idLt" :options="lts" :searchable="true"
-                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione uplt" />
+                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione uplt" 
+                            :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }"/>
                     </div>
                     <InputError v-for="(item, index) in errors.idLt" :key="index" class="mt-2" :message="item" />
                 </div>
@@ -64,7 +66,8 @@
                     </label>
                     <div class="relative font-semibold flex h-[30px] w-full">
                         <Multiselect v-model="adjustment.financingSourceId" :options="financingSources"
-                            :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione fuente" />
+                            :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione fuente" 
+                            :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }"/>
                     </div>
                     <InputError v-for="(item, index) in errors.financingSourceId" :key="index" class="mt-2"
                         :message="item" />
@@ -75,7 +78,8 @@
                     </label>
                     <div class="relative font-semibold flex h-[30px] w-full">
                         <Multiselect v-model="adjustment.reasonId" :options="reasons" :searchable="true"
-                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione motivo" />
+                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione motivo" 
+                            :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }"/>
                     </div>
                     <InputError v-for="(item, index) in errors.reasonId" :key="index" class="mt-2" :message="item" />
                 </div>
@@ -102,15 +106,15 @@
                 </div>
             </div>
 
-            <div class="w-full pl-8 overflow-x-auto max-w-full mt-4 max-h-[200px] overflow-y-auto pb-2">
-                <div class="min-w-[980px]">
+            <div class="w-full pl-8 overflow-x-auto max-w-full mt-4 max-h-[215px] overflow-y-auto pb-2">
+                <div class="min-w-[970px]">
                     <div class="grid grid-cols-[100%] max-w-[96%]  border border-gray-500">
                         <div class="justify-center flex w-full bg-white">
                             <p class="font-[MuseoSans] text-[12px] py-1 font-bold">LISTADO DE PRODUCTOS</p>
                         </div>
                     </div>
                 </div>
-                <div class="min-w-[980px]">
+                <div class="min-w-[970px]">
                     <div
                         class="grid grid-cols-[18%_25%_14%_13%_10%_10%_10%] max-w-[96%] bg-[#001c48] border-b border-x border-gray-500 bg-opacity-80 text-white">
                         <!-- Table header -->
@@ -139,7 +143,7 @@
                 </div>
 
                 <template v-for="(prod, index) in adjustment.prods" :key="index">
-                    <div class="min-w-[980px] grid grid-cols-[96%_4%]">
+                    <div class="min-w-[970px] grid grid-cols-[96%_4%]">
                         <div :id="'row-' + index" v-if="prod.deleted == false"
                             class="grid grid-cols-[18%_25%_14%_13%_10%_10%_10%] max-w-full bg-white hover:bg-gray-200 text-gray-800 border-b border-x border-gray-500">
                             <div class="border-r border-gray-500 min-h-[75px] flex items-center justify-center"
@@ -161,7 +165,7 @@
                                 </div>
                             </div>
                             <div class="border-r border-gray-500 min-h-[75px] flex items-center justify-center"
-                                :class="errors['prods.' + index + '.centerId'] ? 'bg-red-300' : ''">
+                                :class="errors['prods.' + index + '.brandId'] ? 'bg-red-300' : ''">
                                 <Multiselect id="doc" v-model="prod.brandId" :options="brands"
                                     class="h-[35px] max-w-[95%]" :disabled="adjustment.status != 1" :searchable="true"
                                     :noOptionsText="'Lista vacía.'" placeholder="Marca"
@@ -211,10 +215,10 @@
                         </div>
                     </div>
                 </template>
-                <div id="total" class="w-full max-w-full grid grid-cols-[96%_4%] min-w-[980px]">
+                <div id="total" class="w-full max-w-full grid grid-cols-[96%_4%] min-w-[970px]">
                     <div class="grid grid-cols-[90%_10%] w-full max-w-full border-b border-x border-gray-500">
                         <div class="text-right border-r h-[30px] border-gray-500">
-                            <p class="font-[MuseoSans] text-[12px] py-2 mr-2 font-bold mt-[-3px]">TOTAL AJUSTE</p>
+                            <p class="font-[MuseoSans] text-[12px] py-2 mr-2 font-bold mt-[-3px]">TOTAL AJUSTE (+)</p>
                         </div>
                         <div class="text-center h-[30px] ">
                             <p class="font-[MuseoSans] text-[13px] inline-block max-w-full text-ellipsis overflow-hidden py-2 font-bold text-green-800 mt-[-3px]">${{ totalRec

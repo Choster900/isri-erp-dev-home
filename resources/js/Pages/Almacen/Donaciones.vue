@@ -177,7 +177,10 @@ import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
 import ModalDonacionVue from '@/Components-ISRI/Almacen/Donacion/ModalDonacion.vue';
 import ModalEnviarDonacionVue from '@/Components-ISRI/Almacen/Donacion/ModalEnviarDonacion.vue';
 
+import { localeData } from 'moment_spanish_locale';
 import moment from 'moment';
+moment.locale('es', localeData)
+
 import { ref, toRefs, inject } from 'vue';
 import { usePermissions } from '@/Composables/General/usePermissions.js';
 import { useToDataTable } from '@/Composables/General/useToDataTable.js';

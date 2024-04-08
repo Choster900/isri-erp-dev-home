@@ -24,7 +24,6 @@ export const useAjusteEntrada = (context) => {
         centerId: '',
         financingSourceId: '',
         reasonId: '',
-        brandId: '',
         idLt: '',
         number: '',
         expDate: '',
@@ -153,7 +152,8 @@ export const useAjusteEntrada = (context) => {
             adjustment.value.prods[index].desc = selectedProd.allInfo.codigo_producto + ' — ' + selectedProd.allInfo.nombre_producto + ' — ' + selectedProd.allInfo.descripcion_producto + ' — ' + selectedProd.allInfo.unidad_medida.nombre_unidad_medida
             adjustment.value.prods[index].perishable = selectedProd.allInfo.perecedero_producto
         } else {
-            donInfo.value.prods[index].desc = ''
+            adjustment.value.prods[index].prodId = ''
+            adjustment.value.prods[index].desc = ''
             adjustment.value.prods[index].perishable = ''
         }
         adjustment.value.prods[index].brandId = ''

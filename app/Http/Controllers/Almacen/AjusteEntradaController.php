@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Almacen;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Almacen\AjusteEntradaRequest;
 use App\Models\CentroAtencion;
 use App\Models\DetalleRequerimiento;
 use App\Models\LineaTrabajo;
@@ -78,7 +79,7 @@ class AjusteEntradaController extends Controller
         ]);
     }
 
-    public function storeShortageAdjustment(Request $request)
+    public function storeShortageAdjustment(AjusteEntradaRequest $request)
     {
         DB::beginTransaction();
         try {
@@ -141,7 +142,7 @@ class AjusteEntradaController extends Controller
         }
     }
 
-    public function updateShortageAdjustment(Request $request)
+    public function updateShortageAdjustment(AjusteEntradaRequest $request)
     {
         $req = Requerimiento::find($request->id);
         if (!$req || $req->id_estado_req != 1) {
