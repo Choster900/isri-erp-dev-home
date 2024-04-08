@@ -2,6 +2,7 @@ import { ref, inject, computed, nextTick, watch } from "vue";
 import axios from "axios";
 import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
+import { useFormatDateTime } from "@/Composables/General/useFormatDateTime.js";
 import { toast } from "vue3-toastify";
 import moment from 'moment';
 import _ from "lodash";
@@ -26,11 +27,16 @@ export const useAjusteEntrada = (context) => {
         brandId: '',
         idLt: '',
         number: '',
-        date: '',
+        expDate: '',
+        perishable: '',
         observation: '',
         status: '',
         prods: []
     })
+
+    const {
+        formatDateVue3DP
+    } = useFormatDateTime()
 
     const getInfoForModalAdjustment = async (id) => {
         try {
@@ -74,8 +80,8 @@ export const useAjusteEntrada = (context) => {
             adjustment.value.reasonId = req.id_motivo_ajuste //Set observation
             adjustment.value.idLt = req.id_lt // Set supplier
             adjustment.value.number = req.num_requerimiento
+            adjustment.value.observation = req.observacion_requerimiento
 
-            console.log(req);
 
             // Iterate over detalle_requerimiento
             req.detalles_requerimiento.forEach(element => {
@@ -94,6 +100,8 @@ export const useAjusteEntrada = (context) => {
                         prodId: element.id_producto, //id_product
                         centerId: element.id_centro_atencion, //Care center
                         brandId: element.id_marca,
+                        perishable: element.producto.perecedero_producto,
+                        expDate: formatDateVue3DP(element.fecha_vcto_det_requerimiento), //Expiry date
                         isLoadingProd: false, //Flag to manage loader for every multiselect
                         //Product description
                         desc: element.producto.codigo_producto + ' — ' + element.producto.nombre_producto + ' — ' + element.producto.descripcion_producto + ' — ' + element.producto.unidad_medida.nombre_unidad_medida ?? 'Sin marca',
@@ -117,6 +125,8 @@ export const useAjusteEntrada = (context) => {
             detId: "",
             prodId: "",
             centerId: "",
+            perishable: "",
+            expDate: "",
             isLoadingProd: false,
             desc: "",
             qty: "",
@@ -141,12 +151,15 @@ export const useAjusteEntrada = (context) => {
         if (prodId) {
             const selectedProd = products.value.find((e) => e.value === prodId)
             adjustment.value.prods[index].desc = selectedProd.allInfo.codigo_producto + ' — ' + selectedProd.allInfo.nombre_producto + ' — ' + selectedProd.allInfo.descripcion_producto + ' — ' + selectedProd.allInfo.unidad_medida.nombre_unidad_medida
+            adjustment.value.prods[index].perishable = selectedProd.allInfo.perecedero_producto
         } else {
-            donInfo.value.prods[index].desc = ''
+            adjustment.value.prods[index].prodId = ''
+            adjustment.value.prods[index].desc = ''
+            adjustment.value.prods[index].perishable = ''
         }
-        donInfo.value.prods[index].centerId = ''
-        donInfo.value.prods[index].qty = ''
-        donInfo.value.prods[index].cost = ''
+        adjustment.value.prods[index].brandId = ''
+        adjustment.value.prods[index].qty = ''
+        adjustment.value.prods[index].cost = ''
     }
 
     const asyncFindProduct = _.debounce(async (query, index, prodId) => {
@@ -198,6 +211,40 @@ export const useAjusteEntrada = (context) => {
         }
     }
 
+    const storeAdjustment = async (obj) => {
+        swal({
+            title: '¿Está seguro de guardar nuevo ajuste?',
+            icon: 'question',
+            iconHtml: '❓',
+            confirmButtonText: 'Si, Guardar',
+            confirmButtonColor: '#141368',
+            cancelButtonText: 'Cancelar',
+            showCancelButton: true,
+            showCloseButton: true
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                saveObject(obj, '/save-shortage-adjustment-info');
+            }
+        });
+    };
+
+    const updateAdjustment = async (obj) => {
+        swal({
+            title: '¿Está seguro de actualizar ajuste?',
+            icon: 'question',
+            iconHtml: '❓',
+            confirmButtonText: 'Si, Actualizar',
+            confirmButtonColor: '#141368',
+            cancelButtonText: 'Cancelar',
+            showCancelButton: true,
+            showCloseButton: true
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                saveObject(obj, '/update-shortage-adjustment-info');
+            }
+        });
+    };
+
     const saveObject = async (obj, url) => {
         isLoadingRequest.value = true;
         await axios
@@ -214,6 +261,7 @@ export const useAjusteEntrada = (context) => {
     };
 
     const handleErrorResponse = (err) => {
+        console.log(err);
         if (err.response.status === 422) {
             if (err.response && err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
@@ -270,6 +318,6 @@ export const useAjusteEntrada = (context) => {
     return {
         isLoadingRequest, errors, reasons, centers, financingSources, lts, adjustment,
         products, brands, asyncFindProduct, totalRec,
-        getInfoForModalAdjustment, selectProd, deleteRow, addNewRow
+        getInfoForModalAdjustment, selectProd, deleteRow, addNewRow, storeAdjustment, updateAdjustment
     }
 }

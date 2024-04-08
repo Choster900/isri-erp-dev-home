@@ -175,8 +175,10 @@ import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
 import ModalRecepcionVue from '@/Components-ISRI/Almacen/Recepcion/ModalRecepcion.vue';
 import ModalEnviarKardexVue from '@/Components-ISRI/Almacen/Recepcion/ModalEnviarKardex.vue';
 
+import { localeData } from 'moment_spanish_locale';
 import moment from 'moment';
-//import 'moment/locale/es';
+moment.locale('es', localeData)
+
 import { ref, toRefs, inject } from 'vue';
 import { usePermissions } from '@/Composables/General/usePermissions.js';
 import { useToDataTable } from '@/Composables/General/useToDataTable.js';
