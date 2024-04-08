@@ -62,10 +62,10 @@ class AjusteEntradaController extends Controller
             $req = [];
         }
 
-        $centers = CentroAtencion::select('id_centro_atencion as value', 'codigo_centro_atencion as label')->get();
+        $centers = CentroAtencion::selectRaw('id_centro_atencion as value, concat(codigo_centro_atencion," - ",nombre_centro_atencion) as label')->get();
         $reasons = MotivoAjuste::select('id_motivo_ajuste as value', 'nombre_motivo_ajuste as label')->get();
-        $financingSources = ProyectoFinanciado::select('id_proy_financiado as value', 'codigo_proy_financiado as label')->get();
-        $lts = LineaTrabajo::select('id_lt as value', 'codigo_up_lt as label')->get();
+        $financingSources = ProyectoFinanciado::selectRaw('id_proy_financiado as value, concat(codigo_proy_financiado," - ",nombre_proy_financiado) as label')->get();
+        $lts = LineaTrabajo::selectRaw('id_lt as value, concat(codigo_up_lt," - ",nombre_lt) as label')->get();
         $brands = Marca::select('id_marca as value', 'nombre_marca as label')->get();
 
         return response()->json([
@@ -85,7 +85,7 @@ class AjusteEntradaController extends Controller
             $codeReq = "";
             $year = Carbon::now()->year;
             $lastReq = Requerimiento::whereYear('fecha_reg_requerimiento', $year)
-                ->where('id_tipo_req',2)
+                ->where('id_tipo_req', 2)
                 ->orderBy('fecha_reg_requerimiento', 'desc')
                 ->first();
             if (!$lastReq) {
@@ -114,11 +114,10 @@ class AjusteEntradaController extends Controller
 
             foreach ($request->prods as $prod) {
                 $newDet = new DetalleRequerimiento([
-                    'id_centro_atencion'                        => $prod['centerId'],
                     'id_producto'                               => $prod['prodId'],
                     'id_marca'                                  => $prod['brandId'],
                     'fecha_vcto_det_requerimiento'              => $prod['expDate'],
-                    'id_requerimiento'                         => $req->id_requerimiento,
+                    'id_requerimiento'                          => $req->id_requerimiento,
                     'cant_det_requerimiento'                    => $prod['qty'],
                     'costo_det_requerimiento'                   => $prod['cost'],
                     'estado_det_requerimiento'                  => 1,
@@ -142,90 +141,96 @@ class AjusteEntradaController extends Controller
         }
     }
 
-    // public function updateShortageAdjustment(Request $request)
-    // {
-    //     $req = Requerimiento::find($request->id);
-    //     if (!$req || $req->id_estado_req != 1) {
-    //         return response()->json(['logical_error' => 'Error, la recepcion que intentas modificar no existe o ha sido eliminada.'], 422);
-    //     } else {
-    //         DB::beginTransaction();
-    //         try {
-    //             $req->update([
-    //                 'monto_recepcion_pedido'                => $request->total,
-    //                 'id_proveedor'                          => $request->supplierId,
-    //                 'fecha_mod_recepcion_pedido'            => Carbon::now(),
-    //                 'usuario_recepcion_pedido'              => $request->user()->nick_usuario,
-    //                 'ip_recepcion_pedido'                   => $request->ip(),
-    //             ]);
+    public function updateShortageAdjustment(Request $request)
+    {
+        $req = Requerimiento::find($request->id);
+        if (!$req || $req->id_estado_req != 1) {
+            return response()->json(['logical_error' => 'Error, el ajuste que deseas modificar ha cambiado de estado.'], 422);
+        } else {
+            DB::beginTransaction();
+            try {
+                $req->update([
+                    'id_lt'                                 => $request->idLt,
+                    'id_centro_atencion'                    => $request->centerId,
+                    'id_motivo_ajuste'                      => $request->reasonId,
+                    'id_proy_financiado'                    => $request->financingSourceId,
+                    'observacion_requerimiento'             => $request->observation,
+                    'fecha_mod_requerimiento'               => Carbon::now(),
+                    'usuario_requerimiento'                 => $request->user()->nick_usuario,
+                    'ip_requerimiento'                      => $request->ip(),
+                ]);
 
-    //             foreach ($request->prods as $prod) {
-    //                 if ($prod['detRecId'] != "" && $prod['deleted'] == false) {
-    //                     $det = DetalleRecepcionPedido::find($prod['detRecId']);
-    //                     $det->update([
-    //                         'id_centro_atencion'                        => $prod['centerId'],
-    //                         'id_producto'                               => $prod['prodId'],
-    //                         'id_recepcion_pedido'                       => $request->id,
-    //                         'cant_det_recepcion_pedido'                 => $prod['qty'],
-    //                         'costo_det_recepcion_pedido'                => $prod['cost'],
-    //                         'fecha_mod_det_recepcion_pedido'            => Carbon::now(),
-    //                         'usuario_det_recepcion_pedido'              => $request->user()->nick_usuario,
-    //                         'ip_det_recepcion_pedido'                   => $request->ip()
-    //                     ]);
-    //                 }
+                foreach ($request->prods as $prod) {
+                    $fecha = date('Y/m/d', strtotime($prod['expDate']));
+                    if ($prod['detId'] != "" && $prod['deleted'] == false) {
+                        $det = DetalleRequerimiento::find($prod['detId']);
+                        $det->update([
+                            'id_producto'                               => $prod['prodId'],
+                            'id_marca'                                  => $prod['brandId'],
+                            'fecha_vcto_det_requerimiento'              => $fecha,
+                            'cant_det_requerimiento'                    => $prod['qty'],
+                            'costo_det_requerimiento'                   => $prod['cost'],
+                            'fecha_mod_det_requerimiento'               => Carbon::now(),
+                            'usuario_det_requerimiento'                 => $request->user()->nick_usuario,
+                            'ip_det_requerimiento'                      => $request->ip()
+                        ]);
+                    }
 
-    //                 if ($prod['detRecId'] != "" && $prod['deleted'] == true) {
-    //                     $det = DetalleRecepcionPedido::find($prod['detRecId']);
-    //                     $det->update([
-    //                         'estado_det_recepcion_pedido' => 0,
-    //                         'fecha_mod_det_recepcion_pedido' => Carbon::now(),
-    //                         'usuario_det_recepcion_pedido' => $request->user()->nick_usuario,
-    //                         'ip_det_recepcion_pedido' => $request->ip()
-    //                     ]);
-    //                 }
+                    if ($prod['detId'] != "" && $prod['deleted'] == true) {
+                        $det = DetalleRequerimiento::find($prod['detId']);
+                        $det->update([
+                            'estado_det_requerimiento'                  => 0,
+                            'fecha_mod_det_requerimiento'               => Carbon::now(),
+                            'usuario_det_requerimiento'                 => $request->user()->nick_usuario,
+                            'ip_det_requerimiento'                      => $request->ip()
+                        ]);
+                    }
 
-    //                 if ($prod['detRecId'] == "" && $prod['deleted'] == false) {
-    //                     $existDetail = DetalleRecepcionPedido::where('id_recepcion_pedido', $request->id)
-    //                         ->where('id_producto', $prod['prodId'])
-    //                         ->first();
-    //                     if ($existDetail) {
-    //                         $existDetail->update([
-    //                             'id_centro_atencion'                        => $prod['centerId'],
-    //                             'id_producto'                               => $prod['prodId'],
-    //                             'cant_det_recepcion_pedido'                 => $prod['qty'],
-    //                             'costo_det_recepcion_pedido'                => $prod['cost'],
-    //                             'estado_det_recepcion_pedido'               => 1,
-    //                             'fecha_mod_det_recepcion_pedido'            => Carbon::now(),
-    //                             'usuario_det_recepcion_pedido'              => $request->user()->nick_usuario,
-    //                             'ip_det_recepcion_pedido'                   => $request->ip()
-    //                         ]);
-    //                     } else {
-    //                         $newDet = new DetalleRecepcionPedido([
-    //                             'id_centro_atencion'                        => $prod['centerId'],
-    //                             'id_producto'                               => $prod['prodId'],
-    //                             'id_recepcion_pedido'                       => $request->id,
-    //                             'cant_det_recepcion_pedido'                 => $prod['qty'],
-    //                             'costo_det_recepcion_pedido'                => $prod['cost'],
-    //                             'estado_det_recepcion_pedido'               => 1,
-    //                             'fecha_reg_det_recepcion_pedido'            => Carbon::now(),
-    //                             'usuario_det_recepcion_pedido'              => $request->user()->nick_usuario,
-    //                             'ip_det_recepcion_pedido'                   => $request->ip()
-    //                         ]);
-    //                         $newDet->save();
-    //                     }
-    //                 }
-    //             }
+                    if ($prod['detId'] == "" && $prod['deleted'] == false) {
+                        $existDetail = DetalleRequerimiento::where('id_requerimiento', $request->id)
+                            ->where('id_producto', $prod['prodId'])
+                            ->first();
+                        if ($existDetail) {
+                            $existDetail->update([
+                                'id_producto'                               => $prod['prodId'],
+                                'id_marca'                                  => $prod['brandId'],
+                                'fecha_vcto_det_requerimiento'              => $prod['expDate'],
+                                'cant_det_requerimiento'                    => $prod['qty'],
+                                'costo_det_requerimiento'                   => $prod['cost'],
+                                'estado_det_requerimiento'                  => 1,
+                                'fecha_mod_det_requerimiento'               => Carbon::now(),
+                                'usuario_det_requerimiento'                 => $request->user()->nick_usuario,
+                                'ip_det_requerimiento'                      => $request->ip()
+                            ]);
+                        } else {
+                            $newDet = new DetalleRequerimiento([
+                                'id_producto'                               => $prod['prodId'],
+                                'id_marca'                                  => $prod['brandId'],
+                                'fecha_vcto_det_requerimiento'              => $prod['expDate'],
+                                'id_requerimiento'                          => $req->id_requerimiento,
+                                'cant_det_requerimiento'                    => $prod['qty'],
+                                'costo_det_requerimiento'                   => $prod['cost'],
+                                'estado_det_requerimiento'                  => 1,
+                                'fecha_reg_det_requerimiento'               => Carbon::now(),
+                                'usuario_det_requerimiento'                 => $request->user()->nick_usuario,
+                                'ip_det_requerimiento'                      => $request->ip()
+                            ]);
+                            $newDet->save();
+                        }
+                    }
+                }
 
-    //             DB::commit(); // Confirma las operaciones en la base de datos
-    //             return response()->json([
-    //                 'message'          => 'Actualizada donacion con exito.',
-    //             ]);
-    //         } catch (\Throwable $th) {
-    //             DB::rollBack(); // En caso de error, revierte las operaciones anteriores
-    //             return response()->json([
-    //                 'logical_error' => 'Ha ocurrido un error con sus datos.',
-    //                 'error' => $th->getMessage(),
-    //             ], 422);
-    //         }
-    //     }
-    // }
+                DB::commit(); // Confirma las operaciones en la base de datos
+                return response()->json([
+                    'message'          => 'Actualizado ajuste con exito.',
+                ]);
+            } catch (\Throwable $th) {
+                DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+                return response()->json([
+                    'logical_error' => 'Ha ocurrido un error con sus datos.',
+                    'error' => $th->getMessage(),
+                ], 422);
+            }
+        }
+    }
 }

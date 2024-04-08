@@ -72,8 +72,6 @@ export const useAjusteEntrada = (context) => {
 
         adjustment.value.status = id > 0 ? req.id_estado_req : 1
 
-        console.log(req)
-
         // Check if id > 0
         if (id > 0) {
             adjustment.value.id = req.id_requerimiento //Set reception id
@@ -82,6 +80,7 @@ export const useAjusteEntrada = (context) => {
             adjustment.value.reasonId = req.id_motivo_ajuste //Set observation
             adjustment.value.idLt = req.id_lt // Set supplier
             adjustment.value.number = req.num_requerimiento
+            adjustment.value.observation = req.observacion_requerimiento
 
 
             // Iterate over detalle_requerimiento
