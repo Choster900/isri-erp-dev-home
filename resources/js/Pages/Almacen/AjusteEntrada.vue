@@ -39,7 +39,7 @@
                     :sortIcons="true" :staticSelect="false" @sort="sortBy" @datos-enviados="handleData($event)"
                     @execute-search="getDataToShow()">
                     <tbody v-if="!isLoadinRequest" class="text-sm divide-y divide-slate-200">
-                        <tr v-for="obj in dataToShow" :key="obj.id_recepcion_pedido"
+                        <tr v-for="obj in dataToShow" :key="obj.id_requerimiento"
                             class="hover:bg-gray-200">
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 flex items-center justify-center min-h-[40px]">
@@ -90,7 +90,7 @@
                                 <div class="space-x-1 text-center">
                                     <DropDownOptions>
                                         <div v-if="permits.ejecutar === 1 && obj.id_estado_req == 1"
-                                            @click="sendShortageAdjustment(obj.id_estado_req)"
+                                            @click="sendShortageAdjustment(obj.id_requerimiento)"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-lime-700 w-[24px] h-[24px] mr-1">
                                                 <icon-m :iconName="'clipboard-arrow'"></icon-m>
@@ -106,7 +106,7 @@
                                             <div class="font-semibold pt-0.5">Editar</div>
                                         </div>
                                         <div @click="showModalShortageAdjustment = true; objId = obj.id_requerimiento"
-                                            v-if="obj.id_estado_req == 4"
+                                            v-if="obj.id_estado_req == 4 || obj.id_estado_req == 2"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-blue-800 w-[25px] h-[25px] mr-2">
                                                 <icon-m :iconName="'see'"></icon-m>

@@ -199,7 +199,7 @@
                         </div>
                         <div class="max-w-full flex items-center justify-center">
                             <div class="w-full h-[30px] ">
-                                <svg v-if="adjustment.status != 4" @click="deleteRow(index, prod.detId)"
+                                <svg v-if="adjustment.status == 1" @click="deleteRow(index, prod.detId)"
                                     class="text-red-600 cursor-pointer ml-1 hover:text-red-800" width="20px"
                                     height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -228,7 +228,7 @@
                     </div>
                     <div class="w-full">
                         <div class="w-full h-[30px]">
-                            <svg v-if="adjustment.status != 4" @click="addNewRow()"
+                            <svg v-if="adjustment.status == 1" @click="addNewRow()"
                                 class="text-green-600 cursor-pointer hover:text-green-800" width="28px" height="28px"
                                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M12 6V18M6 12H18" stroke="currentColor" stroke-width="2" stroke-linecap="round"

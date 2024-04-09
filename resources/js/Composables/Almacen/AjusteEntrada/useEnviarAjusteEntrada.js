@@ -64,11 +64,12 @@ export const useEnviarAjusteEntrada = (context, getDataToShow, tableData) => {
             if (result.isConfirmed) {
                 isLoadingTop.value = true;
                 try {
-                    const response = await axios.post('/change-status-shortage-adjustment', {
+                    const response = await axios.post('/send-shortage-adjustment', {
                         id: id,
                     });
                     useShowToast(toast.success, response.data.message);
                 } catch (err) {
+                    console.log(err);
                     if (err.response.status === 422) {
                         if (err.response.data.logical_error) {
                             useShowToast(toast.error, err.response.data.logical_error);

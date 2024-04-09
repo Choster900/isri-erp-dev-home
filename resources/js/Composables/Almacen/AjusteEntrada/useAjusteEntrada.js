@@ -98,7 +98,6 @@ export const useAjusteEntrada = (context) => {
                     const array = {
                         detId: element.id_det_requerimiento, //id_det_recepcion_pedido
                         prodId: element.id_producto, //id_product
-                        centerId: element.id_centro_atencion, //Care center
                         brandId: element.id_marca,
                         perishable: element.producto.perecedero_producto,
                         expDate: formatDateVue3DP(element.fecha_vcto_det_requerimiento), //Expiry date
@@ -124,7 +123,6 @@ export const useAjusteEntrada = (context) => {
         let array = {
             detId: "",
             prodId: "",
-            centerId: "",
             perishable: "",
             expDate: "",
             isLoadingProd: false,
@@ -160,6 +158,7 @@ export const useAjusteEntrada = (context) => {
         adjustment.value.prods[index].brandId = ''
         adjustment.value.prods[index].qty = ''
         adjustment.value.prods[index].cost = ''
+        adjustment.value.prods[index].expDate = ''
     }
 
     const asyncFindProduct = _.debounce(async (query, index, prodId) => {

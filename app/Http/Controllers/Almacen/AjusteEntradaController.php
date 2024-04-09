@@ -143,10 +143,11 @@ class AjusteEntradaController extends Controller
             $req->save();
 
             foreach ($request->prods as $prod) {
+                $fecha = $prod['expDate']!= '' ? date('Y/m/d', strtotime($prod['expDate'])) : '';
                 $newDet = new DetalleRequerimiento([
                     'id_producto'                               => $prod['prodId'],
                     'id_marca'                                  => $prod['brandId'],
-                    'fecha_vcto_det_requerimiento'              => $prod['expDate'],
+                    'fecha_vcto_det_requerimiento'              => $fecha,
                     'id_requerimiento'                          => $req->id_requerimiento,
                     'cant_det_requerimiento'                    => $prod['qty'],
                     'costo_det_requerimiento'                   => $prod['cost'],
@@ -191,7 +192,7 @@ class AjusteEntradaController extends Controller
                 ]);
 
                 foreach ($request->prods as $prod) {
-                    $fecha = date('Y/m/d', strtotime($prod['expDate']));
+                    $fecha = $prod['expDate']!= '' ? date('Y/m/d', strtotime($prod['expDate'])) : '';
                     if ($prod['detId'] != "" && $prod['deleted'] == false) {
                         $det = DetalleRequerimiento::find($prod['detId']);
                         $det->update([
@@ -306,7 +307,7 @@ class AjusteEntradaController extends Controller
             try {
                 //We update the adjustment
                 $req->update([
-                    'id_estado_req'                         => 2,
+                    'id_estado_req'                         => 2, //APROBADO
                     'fecha_mod_requerimiento'               => Carbon::now(),
                     'usuario_requerimiento'                 => $request->user()->nick_usuario,
                     'ip_requerimiento'                      => $request->ip(),
@@ -315,7 +316,8 @@ class AjusteEntradaController extends Controller
                 $kardex = new Kardex([
                     'id_requerimiento'                      => $req->id_requerimiento,
                     'id_proy_financiado'                    => $req->id_proy_financiado,
-                    'id_tipo_mov_kardex'                    => 2,
+                    'id_tipo_mov_kardex'                    => 1, //INGRESO
+                    'id_tipo_req'                           => 2, //AJUSTE
                     'fecha_kardex'                          => Carbon::now(),
                     'fecha_reg_kardex'                      => Carbon::now(),
                     'usuario_kardex'                        => $request->user()->nick_usuario,
@@ -330,27 +332,29 @@ class AjusteEntradaController extends Controller
                         'id_centro_atencion'                => $req->id_centro_atencion,
                         'id_marca'                          => $det->id_marca,
                         'id_lt'                             => $req->id_lt,
-                        'cant_det_kardex'                   => $det->cant_det_recepcion_pedido,
-                        'costo_det_kardex'                  => $det->costo_det_recepcion_pedido,
+                        'cant_det_kardex'                   => $det->cant_det_requerimiento,
+                        'costo_det_kardex'                  => $det->costo_det_requerimiento,
                         'fecha_vencimiento_det_kardex'      => $det->fecha_vcto_det_requerimiento,
                         'fecha_reg_det_kardex'              => Carbon::now(),
                         'usuario_det_kardex'                => $request->user()->nick_usuario,
                         'ip_det_kardex'                     => $request->ip(),
                     ]);
                     $detKardex->save();
-                    //Pending 
                     
                     //We update the stock
-                    // $resultados = DB::select(" SELECT FN_UPDATE_EXISTENCIA_ALMACEN(?, ?, ?, NULL, NULL, ?, ?, ?, ?, ?)", [
-                    //     $req->id_proy_financiado,
-                    //     $det->producto->id_producto,
-                    //     $det->id_centro_atencion,
-                    //     $det->cant_det_recepcion_pedido,
-                    //     $det->costo_det_recepcion_pedido,
-                    //     Carbon::now(),
-                    //     $request->user()->nick_usuario,
-                    //     $request->ip()
-                    // ]);
+                    $resultados = DB::select(" SELECT FN_UPDATE_EXISTENCIA_ALMACEN(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+                        $req->id_proy_financiado,
+                        $det->id_producto,
+                        $req->id_centro_atencion,
+                        $req->id_lt,
+                        $det->id_marca,
+                        $det->cant_det_requerimiento,
+                        $det->costo_det_requerimiento,
+                        $det->fecha_vcto_det_requerimiento,
+                        Carbon::now(),
+                        $request->user()->nick_usuario,
+                        $request->ip()
+                    ]);
                 }
 
                 DB::commit(); // Confirma las operaciones en la base de datos
@@ -362,7 +366,7 @@ class AjusteEntradaController extends Controller
                 ], 422);
             }
             return response()->json([
-                'message'          => "Donacion enviada al Kardex con éxito.",
+                'message'          => "Ajuste enviado al Kardex con éxito.",
             ]);
         } else {
             return response()->json(['logical_error' => 'Error, otro usuario ha cambiado el estado de esta donacion.',], 422);
