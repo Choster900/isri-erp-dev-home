@@ -34,4 +34,13 @@ class DetalleExistenciaAlmacen extends Model
     {
         return $this->belongsTo(ExistenciaAlmacen::class, 'id_existencia_almacen', 'id_existencia_almacen');
     }
+    /**
+     * Get the marca that owns the DetalleExistenciaAlmacen
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function marca(): BelongsTo
+    {
+        return $this->belongsTo(Marca::class, 'id_marca', 'id_marca');
+    }
 }

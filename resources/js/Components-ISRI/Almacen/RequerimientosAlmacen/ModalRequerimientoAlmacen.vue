@@ -26,16 +26,16 @@ export default defineComponent({
         },
         numeroRequerimientoSiguiente: {
             type: String,
-            default : null,
+            default: null,
         }
     },
     setup(props, { emit }) {
-        const { objectRequerimientoToSendModal, showModal,numeroRequerimientoSiguiente } = toRefs(props)
+        const { objectRequerimientoToSendModal, showModal, numeroRequerimientoSiguiente } = toRefs(props)
         const optionsCentroAtencion = ref(null)
         const isLoadinProduct = ref(false)
         const canIEdit = ref(false)
         const { dataDetalleRequerimiento, appendProduct, appendDetalleRequerimiento, proyectoFinanciados,
-            productosArray, setDescripcionProducto,
+            productosArray, setIdProductoByDetalleExistenciaAlmacenId,
             centroAtenionArray, centroProduccion, idRequerimiento,
             idLt,
             idCentroAtencion,
@@ -90,13 +90,13 @@ export default defineComponent({
                     let indice = dataDetalleRequerimiento.value.findIndex(i => i.idCentroProduccion == index.id_centro_produccion);
                     const { producto } = index
                     dataDetalleRequerimiento.value[indice]["productos"].push({
-                        idDetRequerimiento: index.id_det_requerimiento,
-                        idProducto: producto.id_producto,
-                        idMarca: index.id_marca,
-                        descripcionProductos: producto.descripcion_producto,
-                        cantDetRequerimiento: index.cant_det_requerimiento,
-                        costoDetRequerimiento: index.costo_det_requerimiento,
                         stateProducto: 1,
+                        idMarca: index.id_marca,
+                        idProducto: producto.id_producto,
+                        idDetRequerimiento: index.id_det_requerimiento,
+                        cantDetRequerimiento: index.cant_det_requerimiento,
+                        idDetExistenciaAlmacen: index.id_det_existencia_almacen,
+
                     });
                 });
                 getProductoByDependencia()
@@ -223,8 +223,23 @@ export default defineComponent({
                         idProyFinanciado: idProyFinanciado.value,
                         idLt: idLt.value,
                     });
+                    /*     console.log(resp.data); */
+
+                    /*  productosArray.value = resp.data.map(index => {
+                         return {
+                             value: index.productos.id_producto,
+                             label: `${index.productos.codigo_producto}  - ${index.productos.nombre_completo_producto}`,
+                             completeData: index.productos
+                         };
+                     }) */
+
                     productosArray.value = resp.data.map(index => {
-                        return { value: index.productos.id_producto, label: `${index.productos.codigo_producto} - ${index.productos.nombre_producto}`, completeData: index.productos };
+                        return {
+                            value: index.id_det_existencia_almacen,
+                            label: `${index.existencia_almacen.productos.codigo_producto} - ${index.existencia_almacen.productos.nombre_producto}  - ${index.marca.nombre_marca} -  ${index.existencia_almacen.productos.descripcion_producto}`,
+                            completeData: index,
+                            codidoProducto: index.existencia_almacen.id_producto
+                        };
                     })
                     // Se resuelve la promesa con la respuesta exitosa de la solicitud
                     resolve(resp);
@@ -246,7 +261,7 @@ export default defineComponent({
 
         return {
             dataDetalleRequerimiento, appendProduct, appendDetalleRequerimiento, proyectoFinanciados,
-            productosArray, setDescripcionProducto,
+            productosArray, setIdProductoByDetalleExistenciaAlmacenId,
             centroAtenionArray, centroProduccion, idRequerimiento,
             idLt,
             idCentroAtencion,
@@ -270,13 +285,15 @@ export default defineComponent({
                 <TitleModalReq />
                 <div id="formulario-principal">
                     <div class="pt-4 flex justify-start space-x-2 items-center">
-                        <h1 class="text-xs ">Requerimiento N°: <span class="font-medium text-sm underline">{{numRequerimiento}}</span></h1>
+                        <h1 class="text-xs ">Requerimiento N°: <span class="font-medium text-sm underline">{{
+            numRequerimiento }}</span></h1>
                         <div class="text-xs items-center">
-                        Centro:
-                                    <span class="font-medium text-sm underline"  v-if="optionsCentroAtencion && optionsCentroAtencion[0]">
-                                        {{ optionsCentroAtencion[0].label }}</span>
-                                    <span v-else>-</span>
-                                </div>
+                            Centro:
+                            <span class="font-medium text-sm underline"
+                                v-if="optionsCentroAtencion && optionsCentroAtencion[0]">
+                                {{ optionsCentroAtencion[0].label }}</span>
+                            <span v-else>-</span>
+                        </div>
                     </div>
                     <div class="pt-4 flex justify-between space-x-2">
                         <!-- {{ dataDetalleRequerimiento }} -->
@@ -307,7 +324,7 @@ export default defineComponent({
                                 :message="errorsValidation['idProyFinanciado']" />
 
                         </div>
-                       <!--  <div class="w-full">
+                        <!--  <div class="w-full">
                             <OnlyLabelInput textLabel="Centro de atencion" />
 
                             <template v-if="optionsCentroAtencion && optionsCentroAtencion.length > 1">
@@ -320,7 +337,7 @@ export default defineComponent({
                                     noOptionsText="<p class='text-xs'>vacio</p>" />
                             </template>
 
-                            <template v-else>
+<template v-else>
                                 <div class="text-xs items-center">
                                     <span v-if="optionsCentroAtencion && optionsCentroAtencion[0]">
                                         {{ optionsCentroAtencion[0].label }}</span>
@@ -328,10 +345,9 @@ export default defineComponent({
                                 </div>
                             </template>
 
-                            <InputError class="mt-2"
-                                v-if="errorsValidation && errorsValidation['idCentroAtencion'] !== ''"
-                                :message="errorsValidation['idCentroAtencion']" />
-                        </div> -->
+<InputError class="mt-2" v-if="errorsValidation && errorsValidation['idCentroAtencion'] !== ''"
+    :message="errorsValidation['idCentroAtencion']" />
+</div> -->
 
                     </div>
                     <!-- <div class="pt-4 flex justify-start space-x-2 items-end">
@@ -382,17 +398,15 @@ export default defineComponent({
                 </div>
                 <table class="mt-4 w-[740px] ">
                     <tr class=" *:text-xs *:text-slate-700">
-                        <td class="w-[110px] text-end pr-7">CANTIDAD</td>
-                        <td class="w-[150px] text-center">CODIGO PRODUCTO</td>
-                        <td class="w-[175px] text-center">MARCA</td>
-                        <td class="w- text-center">NOMBRE DEL PRODUCTO</td>
+                        <td class="w-20 text-end pl-4">CANTIDAD</td>
+                        <td class="w-full text-center">PRODUCTO</td>
                     </tr>
                 </table>
                 <div id="secctionTableDetalleReq" class="w-[740px]">
 
                     <div v-for="(detalleRequerimiento, i) in dataDetalleRequerimiento" :key="i" class="">
                         <div
-                            class=" flex space-x-3 justify-start items-center  px-2 bg-slate-100  hover:bg-slate-400/50 cursor-pointer">
+                            class="  space-x-3 justify-start items-center  px-2 bg-slate-100  hover:bg-slate-400/50 cursor-pointer">
                             <div class="flex space-x-3 items-center">
                                 <div class="text-xs"
                                     @click="detalleRequerimiento.isHidden = !detalleRequerimiento.isHidden">
@@ -412,46 +426,42 @@ export default defineComponent({
                                         noOptionsText="<p class='text-xs'>vacio</p>" />
                                 </div>
                             </div>
+
+                            <div class="text-xs bg-slate-100 border-b-4 w-full text-center">
+                                <span class="text-red-600">
+                                    {{ errorsValidation && errorsValidation['dataDetalleRequerimiento'] &&
+            errorsValidation['dataDetalleRequerimiento'][0]['idCentroProduccion'] }}
+
+
+
+                                    <!-- dataDetalleRequerimiento.0.productos.0.cantDetRequerimiento -->
+
+                                    <!-- errors[`detalle_quedan.${rowIndex}.id_centro_atencion`] -->
+                                </span>
+                            </div>
                         </div>
 
                         <div v-show="!detalleRequerimiento.isHidden"
-                            class="border-b-4 px-2 text-xs flex justify-end  space-x-4 items-center bg-slate-100 hover:bg-slate-200"
                             v-for="(producto, j ) in detalleRequerimiento.productos" :key="j">
-                            <template v-if="producto.stateProducto == 1">
+
+                            <div v-if="producto.stateProducto == 1"
+                                class=" px-2 text-xs flex justify-end  space-x-4 items-center bg-slate-100 hover:bg-slate-200">
                                 <div class="text-xs w-20 ">
                                     <input type="text" v-model="producto.cantDetRequerimiento" :disabled="!canIEdit"
                                         class="bg-white text-center border-0 h-6 text-xs w-20 border-x-transparentborder-t-transparent bg-transparent focus:border-x-transparentfocus:border-t-transparent"
                                         placeholder="CANT">
                                 </div>
-                                <div class="text-xs w-64 py-1 flex items-center">
+                                <div class="text-xs w-full py-1 flex items-center">
                                     <div class="h-8 border-l-4 border-slate-500 pl-3 opacity-40"></div>
                                     <div class="flex-1">
-                                        <Multiselect @select="setDescripcionProducto($event, i, j)"
-                                            v-model="producto.idProducto" :disabled="isLoadinProduct || !canIEdit"
+                                        <Multiselect @select="setIdProductoByDetalleExistenciaAlmacenId($event, i, j)"
+                                            v-model="producto.idDetExistenciaAlmacen"
+                                            :disabled="isLoadinProduct || !canIEdit"
                                             :classes="{ containerDisabled: ' bg-gray-200 text-text-slate-400', optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed', optionPointed: 'text-gray-800 bg-gray-100', container: `relative mx-auto w-full h-6 flex items-center justify-end box-border   border border-gray-300 rounded bg-white text-base leading-snug outline-none` }"
                                             :filter-results="false" :searchable="true" :clear-on-search="true"
                                             :min-chars="1" :options="productosArray"
                                             noResultsText="<p class='text-xs'>Sin resultados de personas</p>"
                                             placeholder="00-0" noOptionsText="<p class='text-xs'>vacio</p>" />
-                                    </div>
-                                </div>
-                                <div class="text-xs w-64 py-1 flex items-center">
-                                    <div class="h-8 border-l-4 border-slate-500 pl-3 opacity-40"></div>
-                                    <div class="flex-1">
-                                        <Multiselect v-model="producto.idMarca" :disabled="isLoadinProduct || !canIEdit"
-                                            :classes="{ containerDisabled: ' bg-gray-200 text-text-slate-400', optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed', optionPointed: 'text-gray-800 bg-gray-100', container: `relative mx-auto w-full h-6 flex items-center justify-end box-border   border border-gray-300 rounded bg-white text-base leading-snug outline-none` }"
-                                            :filter-results="false" :searchable="true" :clear-on-search="true"
-                                            :min-chars="1" :options="marcasArray"
-                                            noResultsText="<p class='text-xs'>Sin resultados de personas</p>"
-                                            placeholder="00-0" noOptionsText="<p class='text-xs'>vacio</p>" />
-                                    </div>
-                                </div>
-                                <div class="text-xs w-96 py-1 flex uppercase">
-                                    <div class="flex">
-                                        <div class="h-full border-l-4 border-slate-500 pl-3 opacity-40"></div>
-                                    </div>
-                                    <div class="flex-1">
-                                        {{ producto.descripcionProductos }}
                                     </div>
                                 </div>
                                 <div class="text-xs py-1 ">
@@ -475,8 +485,27 @@ export default defineComponent({
                                     </DropDownOptions>
 
                                 </div>
-                            </template>
+                            </div>
+                            <div class="text-xs bg-slate-100 border-b-4 w-full text-center">
+                                <span class="text-red-600">
+                                    <!-- <pre> -->
+                                    <!--      {{ errorsValidation }}
+                                    </pre>
+                                                    <pre> -->
+                                    {{ errorsValidation &&
+            errorsValidation[`dataDetalleRequerimiento.${i}.productos.${j}.cantDetRequerimiento`]
+                                    }}
+                                    {{ errorsValidation &&
+            errorsValidation[`dataDetalleRequerimiento.${i}.productos.${j}.idDetExistenciaAlmacen`]
+                                    }}
 
+                                    <!-- </pre> -->
+
+                                    <!-- dataDetalleRequerimiento.0.productos.0.cantDetRequerimiento -->
+
+                                    <!-- errors[`detalle_quedan.${rowIndex}.id_centro_atencion`] -->
+                                </span>
+                            </div>
                         </div>
                         <div @click="appendProduct(i)" v-if="canIEdit"
                             class="hover:bg-slate-200 hover:border-slate-500 w-full h-10 border-4 border-dashed border-slate-400 my-4 flex items-center justify-center bg-white">

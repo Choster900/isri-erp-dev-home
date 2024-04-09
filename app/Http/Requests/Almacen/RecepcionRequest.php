@@ -58,7 +58,7 @@ class RecepcionRequest extends FormRequest
 
     public function messages()
     {
-        $messages = [];   
+        $messages = [];
         $messages["invoice.required"] = "Debe ingresar factura.";
         return $messages;
     }

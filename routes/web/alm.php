@@ -4,6 +4,7 @@ use App\Http\Controllers\Almacen\AjusteEntradaController;
 use App\Http\Controllers\Almacen\DonacionController;
 use App\Http\Controllers\Almacen\RecepcionController;
 use App\Http\Controllers\Almacen\RequerimientoAlmacenController;
+use App\Models\DetalleExistenciaAlmacen;
 use App\Models\DetalleRequerimiento;
 use App\Models\ExistenciaAlmacen;
 use App\Models\PlazaAsignada;
@@ -87,12 +88,20 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post(
         'get-product-by-proy-financiado',
         function (Request $request) {
-            return ExistenciaAlmacen::with(['detalle_existencia_almacen', 'productos'])
+           /*  return ExistenciaAlmacen::with(['detalle_existencia_almacen.marca', 'productos'])
                 ->whereHas('detalle_existencia_almacen', function ($query) use ($request) {
                     $query->where('id_centro_atencion', $request->idCentroAtencion);
                     $query->where('id_lt', $request->idLt);
                 })
                 ->where('id_proy_financiado', $request->idProyFinanciado)
+                ->get(); */
+
+                return DetalleExistenciaAlmacen::with(['existencia_almacen.productos','marca'])
+                ->whereHas('existencia_almacen', function ($query) use ($request) {
+                    $query->where('id_proy_financiado', $request->idProyFinanciado);
+                })
+                ->where('id_centro_atencion', $request->idCentroAtencion)
+                ->where('id_lt', $request->idLt)
                 ->get();
         }
     )->name('bieneservicios.get-product-by-proy-financiad');
@@ -117,4 +126,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('get-info-modal-shortage-adjustment', [AjusteEntradaController::class, 'getInfoShortageAdjustment'])->name('ajusteEntrada.getInfoShortageAdjustment');
     Route::post('save-shortage-adjustment-info', [AjusteEntradaController::class, 'storeShortageAdjustment'])->name('ajusteEntrada.storeShortageAdjustment');
     Route::post('update-shortage-adjustment-info', [AjusteEntradaController::class, 'updateShortageAdjustment'])->name('ajusteEntrada.updateShortageAdjustment');
+    Route::post('change-status-shortage-adjustment', [AjusteEntradaController::class, 'changeStatusShortageAdjustment'])->name('ajusteEntrada.changeStatusShortageAdjustment');
+    Route::post('send-shortage-adjustment', [AjusteEntradaController::class, 'sendShortageAdjustment'])->name('ajusteEntrada.sendShortageAdjustment');
+
 });
