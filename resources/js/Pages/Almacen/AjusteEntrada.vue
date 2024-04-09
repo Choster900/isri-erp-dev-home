@@ -11,7 +11,7 @@
         </div>
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="showModalSurplusAdjustment = true; objId = 0;" v-if="permits.insertar == 1"
+                <GeneralButton @click="showModalShortageAdjustment = true; objId = 0;" v-if="permits.insertar == 1"
                     color="bg-green-700  hover:bg-green-800" text="Crear Ajuste" icon="add" />
             </div>
         </div>
@@ -28,7 +28,7 @@
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Ajustes entrada: <span
+                    <h2 class="font-semibold text-slate-800 pt-1">Ajustes por faltante: <span
                             class="text-slate-400 font-medium">{{
             tableData.total
         }}</span></h2>
@@ -39,7 +39,7 @@
                     :sortIcons="true" :staticSelect="false" @sort="sortBy" @datos-enviados="handleData($event)"
                     @execute-search="getDataToShow()">
                     <tbody v-if="!isLoadinRequest" class="text-sm divide-y divide-slate-200">
-                        <tr v-for="obj in dataToShow" :key="obj.id_recepcion_pedido"
+                        <tr v-for="obj in dataToShow" :key="obj.id_requerimiento"
                             class="hover:bg-gray-200">
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 flex items-center justify-center min-h-[40px]">
@@ -89,15 +89,15 @@
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="space-x-1 text-center">
                                     <DropDownOptions>
-                                        <!-- <div v-if="permits.ejecutar === 1 && reception.id_estado_recepcion_pedido == 1"
-                                            @click="showModalSendDonation = true; recepId = reception.id_recepcion_pedido"
+                                        <div v-if="permits.ejecutar === 1 && obj.id_estado_req == 1"
+                                            @click="sendShortageAdjustment(obj.id_requerimiento)"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-lime-700 w-[24px] h-[24px] mr-1">
                                                 <icon-m :iconName="'clipboard-arrow'"></icon-m>
                                             </div>
                                             <div class="font-semibold pt-0.5">Kardex</div>
-                                        </div> -->
-                                        <div @click="showModalSurplusAdjustment = true; objId = obj.id_requerimiento"
+                                        </div>
+                                        <div @click="showModalShortageAdjustment = true; objId = obj.id_requerimiento"
                                             v-if="permits.actualizar === 1 && obj.id_estado_req == 1"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-orange-700 w-[22px] h-[22px] mr-1.5 ml-0.5">
@@ -105,30 +105,22 @@
                                             </div>
                                             <div class="font-semibold pt-0.5">Editar</div>
                                         </div>
-                                        <!-- <div @click="showModalDonation = true; recepId = reception.id_recepcion_pedido"
-                                            v-if="reception.id_estado_recepcion_pedido == 3"
+                                        <div @click="showModalShortageAdjustment = true; objId = obj.id_requerimiento"
+                                            v-if="obj.id_estado_req == 4 || obj.id_estado_req == 2"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-blue-800 w-[25px] h-[25px] mr-2">
                                                 <icon-m :iconName="'see'"></icon-m>
                                             </div>
                                             <div class="font-semibold pt-0.5">Ver</div>
                                         </div>
-                                        <div @click="printDonation(reception.id_recepcion_pedido)"
-                                            v-if="reception.id_estado_recepcion_pedido == 2"
-                                            class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
-                                            <div class="text-red-800 w-[23px] h-[23px] mr-1.5 ml-0.5">
-                                                <icon-m :iconName="'download-file'"></icon-m>
-                                            </div>
-                                            <div class="font-semibold pt-0.5">PDF</div>
-                                        </div>
-                                        <div @click="changeStatusElement(reception.id_recepcion_pedido, reception.id_estado_recepcion_pedido)"
-                                            v-if="permits.eliminar === 1 && reception.id_estado_recepcion_pedido == 1"
+                                        <div @click="changeStatusElement(obj.id_requerimiento, obj.id_estado_req)"
+                                            v-if="permits.eliminar === 1 && obj.id_estado_req == 1"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-red-700 w-[24px] h-[24px] mr-1">
                                                 <icon-m :iconName="'trash'"></icon-m>
                                             </div>
                                             <div class="font-semibold pt-0.5">Eliminar</div>
-                                        </div> -->
+                                        </div>
                                     </DropDownOptions>
                                 </div>
                             </td>
@@ -164,8 +156,8 @@
         
         <pagination :emptyObject="emptyObject" :links="links" @get-data="getDataToShow" />
 
-        <modal-ajuste-entrada-vue v-if="showModalSurplusAdjustment" :showModalSurplusAdjustment="showModalSurplusAdjustment" :objId="objId"
-            @cerrar-modal="showModalSurplusAdjustment = false" @get-table="getDataToShow(tableData.currentPage)" />
+        <modal-ajuste-entrada-vue v-if="showModalShortageAdjustment" :showModalShortageAdjustment="showModalShortageAdjustment" :objId="objId"
+            @cerrar-modal="showModalShortageAdjustment = false" @get-table="getDataToShow(tableData.currentPage)" />
 
         <!-- <modal-enviar-donacion-vue v-if="showModalSendDonation" :showModalSendDonation="showModalSendDonation" :recepId="recepId"
             @cerrar-modal="showModalSendDonation = false" @get-table="getDataToShow(tableData.currentPage)" />  -->
@@ -182,11 +174,14 @@ import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
 import ModalAjusteEntradaVue from '@/Components-ISRI/Almacen/AjusteEntrada/ModalAjusteEntrada.vue';
 import ModalEnviarDonacionVue from '@/Components-ISRI/Almacen/Donacion/ModalEnviarDonacion.vue';
 
+import { localeData } from 'moment_spanish_locale';
 import moment from 'moment';
+moment.locale('es', localeData)
+
 import { ref, toRefs, inject } from 'vue';
 import { usePermissions } from '@/Composables/General/usePermissions.js';
 import { useToDataTable } from '@/Composables/General/useToDataTable.js';
-import { useEnviarDonacion } from '@/Composables/Almacen/Donacion/useEnviarDonacion.js';
+import { useEnviarAjusteEntrada } from '@/Composables/Almacen/AjusteEntrada/useEnviarAjusteEntrada.js';
 
 export default {
     components: { Head, AppLayoutVue, Datatable, IconM, ModalAjusteEntradaVue, ModalEnviarDonacionVue, Pagination },
@@ -200,14 +195,28 @@ export default {
         const { menu } = toRefs(props);
         const permits = usePermissions(menu.value, window.location.pathname);
 
-        const showModalSurplusAdjustment = ref(false)
+        const showModalShortageAdjustment = ref(false)
         const showModalSendDonation = ref(false)
 
         const objId = ref(0)
 
         const columns = [
             { width: "10%", label: "Id", name: "id_requerimiento", type: "text" },
-            { width: "10%", label: "Centro", name: "centro", type: "text" },
+            {
+                width: "10%", label: "Centro", name: "id_centro_atencion", type: "select",
+                options: [
+                    { value: "1", label: "ADMON" },
+                    { value: "2", label: "CAA" },
+                    { value: "3", label: "CAL" },
+                    { value: "4", label: "CALE" },
+                    { value: "5", label: "CRC" },
+                    { value: "6", label: "UCE" },
+                    { value: "7", label: "CRINA" },
+                    { value: "8", label: "CRIO" },
+                    { value: "9", label: "CRIOR" },
+                    { value: "10", label: "CRP" },
+                ]
+            },
             { width: "20%", label: "motivo", name: "motivo", type: "text" },
             {
                 width: "10%", label: "Fondo", name: "id_proy_financiado", type: "select",
@@ -246,15 +255,14 @@ export default {
 
         const {
             isLoadingTop,
-            changeStatusElement,
-            printDonation
-        } = useEnviarDonacion(context, getDataToShow, tableData.value);
+            changeStatusElement, sendShortageAdjustment
+        } = useEnviarAjusteEntrada(context, getDataToShow, tableData.value);
 
 
         return {
-            permits, dataToShow, showModalSurplusAdjustment, tableData, perPage, objId, showModalSendDonation,
+            permits, dataToShow, showModalShortageAdjustment, tableData, perPage, objId, showModalSendDonation,
             links, sortKey, sortOrders, isLoadinRequest, isLoadingTop, emptyObject, columns,
-            getDataToShow, handleData, sortBy, changeStatusElement, moment, printDonation
+            getDataToShow, handleData, sortBy, changeStatusElement, sendShortageAdjustment, moment
         };
     },
 }

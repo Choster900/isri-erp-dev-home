@@ -21,6 +21,7 @@ class DetalleKardex extends Model
         'id_marca',
         'cant_det_kardex',
         'costo_det_kardex',
+        'fecha_vencimiento_det_kardex',
         'fecha_reg_det_kardex',
         'fecha_mod_det_kardex',
         'usuario_det_kardex',
