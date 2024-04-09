@@ -60,7 +60,7 @@
                 </div>
             </div>
 
-            <div v-if="infoToSend.nonCompliant == 1" class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
+            <div class="mb-2 mt-4 md:flex flex-row justify-items-start mx-8">
                 <div class="mb-4 md:mr-0 md:mb-0 basis-full" style="border: none; background-color: transparent;">
                     <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Observacion sobre
                         incumplimiento
