@@ -18,6 +18,7 @@ class Kardex extends Model
         'id_proy_financiado',
         'id_tipo_mov_kardex',
         'id_requerimiento',
+        'id_tipo_req',
         'fecha_kardex',
         'observacion_kardex',
         'fecha_reg_kardex',

@@ -117,4 +117,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('get-info-modal-shortage-adjustment', [AjusteEntradaController::class, 'getInfoShortageAdjustment'])->name('ajusteEntrada.getInfoShortageAdjustment');
     Route::post('save-shortage-adjustment-info', [AjusteEntradaController::class, 'storeShortageAdjustment'])->name('ajusteEntrada.storeShortageAdjustment');
     Route::post('update-shortage-adjustment-info', [AjusteEntradaController::class, 'updateShortageAdjustment'])->name('ajusteEntrada.updateShortageAdjustment');
+    Route::post('change-status-shortage-adjustment', [AjusteEntradaController::class, 'changeStatusShortageAdjustment'])->name('ajusteEntrada.changeStatusShortageAdjustment');
+    Route::post('send-shortage-adjustment', [AjusteEntradaController::class, 'sendShortageAdjustment'])->name('ajusteEntrada.sendShortageAdjustment');
+
 });

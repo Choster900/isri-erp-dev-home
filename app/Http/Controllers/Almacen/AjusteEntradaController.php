@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Almacen;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Almacen\AjusteEntradaRequest;
 use App\Models\CentroAtencion;
+use App\Models\DetalleKardex;
 use App\Models\DetalleRequerimiento;
+use App\Models\Kardex;
 use App\Models\LineaTrabajo;
 use App\Models\Marca;
 use App\Models\MotivoAjuste;
@@ -19,7 +21,7 @@ class AjusteEntradaController extends Controller
 {
     public function getAjusteEntrada(Request $request)
     {
-        $columns = ['id_requerimiento', 'centro', 'id_proy_financiado', 'num_requerimiento', 'fecha_requerimiento', 'id_estado_req'];
+        $columns = ['id_requerimiento', 'id_centro_atencion', 'motivo', 'id_proy_financiado', 'num_requerimiento', 'fecha_requerimiento', 'id_estado_req'];
 
         $length = $request->length;
         $column = $request->column; //Index
@@ -36,6 +38,33 @@ class AjusteEntradaController extends Controller
                 'detalles_requerimiento.marca'
             ])
             ->where('id_tipo_req', 2);
+
+        if ($column == 2) { //Order by reason
+            $query->orderByRaw('
+                    (SELECT nombre_motivo_ajuste FROM motivo_ajuste WHERE motivo_ajuste.id_motivo_ajuste = requerimiento.id_motivo_ajuste) ' . $dir);
+        } else {
+            $query->orderBy($columns[$column], $dir);
+        }
+
+        if ($search_value) {
+            $query->where('id_requerimiento', 'like', '%' . $search_value['id_requerimiento'] . '%') //Search by requerimiento id
+                ->where('id_centro_atencion', 'like', '%' . $search_value['id_centro_atencion'] . '%') //Search by Healthcare center
+                ->where('id_proy_financiado', 'like', '%' . $search_value['id_proy_financiado'] . '%') //Search by financing source
+                ->where('num_requerimiento', 'like', '%' . $search_value['num_requerimiento'] . '%') //Search by requerimiento code
+                ->where('fecha_requerimiento', 'like', '%' . $search_value['fecha_requerimiento'] . '%') //Search by requerimiento date
+                ->where('id_estado_req', 'like', '%' . $search_value['id_estado_req'] . '%'); //Search by requerimiento status
+            //Search by reason
+            if ($search_value['motivo']) {
+                $query->whereHas(
+                    'motivo_ajuste',
+                    function ($query) use ($search_value) {
+                        if ($search_value["motivo"] != '') {
+                            $query->where('nombre_motivo_ajuste', 'like', '%' . $search_value['motivo'] . '%');
+                        }
+                    }
+                );
+            }
+        }
 
         $data = $query->paginate($length)->onEachSide(1);
         return ['data' => $data, 'draw' => $request->input('draw')];
@@ -232,6 +261,110 @@ class AjusteEntradaController extends Controller
                     'error' => $th->getMessage(),
                 ], 422);
             }
+        }
+    }
+
+    public function changeStatusShortageAdjustment(Request $request)
+    {
+        $req = Requerimiento::find($request->id);
+        if ($req->id_estado_req == 1 && $request->status == 1) {
+            DB::beginTransaction();
+            try {
+                $req->update([
+                    'id_estado_req'                         => 4,
+                    'fecha_mod_requerimiento'               => Carbon::now(),
+                    'usuario_requerimiento'                 => $request->user()->nick_usuario,
+                    'ip_requerimiento'                      => $request->ip(),
+                ]);
+                DB::commit(); // Confirma las operaciones en la base de datos
+                return response()->json([
+                    'message'          => "Ajuste eliminado con éxito.",
+                ]);
+            } catch (\Exception $e) {
+                DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+                return response()->json([
+                    'logical_error' => 'Ha ocurrido un error con sus datos.',
+                    'error' => $e,
+                ], 422);
+            }
+        } else {
+            return response()->json(['logical_error' => 'Error, otro usuario ha cambiado el estado de este ajuste.',], 422);
+        }
+    }
+
+    public function sendShortageAdjustment(Request $request)
+    {
+        //Find the current adjustment
+        $req = Requerimiento::with([
+            'detalles_requerimiento' => function ($query) {
+                $query->where('estado_det_requerimiento', 1);
+            },
+            'detalles_requerimiento.producto'
+        ])->find($request->id);
+        if ($req->id_estado_req == 1) { //We must evaluate if the adjustment has the status 'CREADO'
+            DB::beginTransaction(); //Start the transaction
+            try {
+                //We update the adjustment
+                $req->update([
+                    'id_estado_req'                         => 2,
+                    'fecha_mod_requerimiento'               => Carbon::now(),
+                    'usuario_requerimiento'                 => $request->user()->nick_usuario,
+                    'ip_requerimiento'                      => $request->ip(),
+                ]);
+                //Create a new Kardex object
+                $kardex = new Kardex([
+                    'id_requerimiento'                      => $req->id_requerimiento,
+                    'id_proy_financiado'                    => $req->id_proy_financiado,
+                    'id_tipo_mov_kardex'                    => 2,
+                    'fecha_kardex'                          => Carbon::now(),
+                    'fecha_reg_kardex'                      => Carbon::now(),
+                    'usuario_kardex'                        => $request->user()->nick_usuario,
+                    'ip_kardex'                             => $request->ip(),
+                ]);
+                $kardex->save();
+                //Foreach 'detalles_requerimiento' we create a 'detalle_kardex' instance
+                foreach ($req->detalles_requerimiento as $det) {
+                    $detKardex = new DetalleKardex([
+                        'id_kardex'                         => $kardex->id_kardex,
+                        'id_producto'                       => $det->producto->id_producto,
+                        'id_centro_atencion'                => $req->id_centro_atencion,
+                        'id_marca'                          => $det->id_marca,
+                        'id_lt'                             => $req->id_lt,
+                        'cant_det_kardex'                   => $det->cant_det_recepcion_pedido,
+                        'costo_det_kardex'                  => $det->costo_det_recepcion_pedido,
+                        'fecha_vencimiento_det_kardex'      => $det->fecha_vcto_det_requerimiento,
+                        'fecha_reg_det_kardex'              => Carbon::now(),
+                        'usuario_det_kardex'                => $request->user()->nick_usuario,
+                        'ip_det_kardex'                     => $request->ip(),
+                    ]);
+                    $detKardex->save();
+                    //Pending 
+                    //We update the stock
+                    $resultados = DB::select(" SELECT FN_UPDATE_EXISTENCIA_ALMACEN(?, ?, ?, NULL, NULL, ?, ?, ?, ?, ?)", [
+                        $req->id_proy_financiado,
+                        $det->producto->id_producto,
+                        $det->id_centro_atencion,
+                        $det->cant_det_recepcion_pedido,
+                        $det->costo_det_recepcion_pedido,
+                        Carbon::now(),
+                        $request->user()->nick_usuario,
+                        $request->ip()
+                    ]);
+                }
+
+                DB::commit(); // Confirma las operaciones en la base de datos
+            } catch (\Exception $e) {
+                DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+                return response()->json([
+                    'logical_error' => 'Ha ocurrido un error con sus datos.',
+                    'error' => $e->getMessage(),
+                ], 422);
+            }
+            return response()->json([
+                'message'          => "Donacion enviada al Kardex con éxito.",
+            ]);
+        } else {
+            return response()->json(['logical_error' => 'Error, otro usuario ha cambiado el estado de esta donacion.',], 422);
         }
     }
 }

@@ -7,7 +7,7 @@
                 <h1 class="ml-4 font-medium text-xl text-white font-[Roboto]">Procesando...</h1>
             </div>
         </div>
-        <ProcessModal v-else :maxWidth="'5xl'" :show="showModalSurplusAdjustment" @close="$emit('cerrar-modal')">
+        <ProcessModal v-else :maxWidth="'5xl'" :show="showModalShortageAdjustment" @close="$emit('cerrar-modal')">
 
             <div class="flex items-center justify-between py-3 px-4 border-b border-gray-400 border-opacity-70">
                 <div class="flex">
@@ -43,7 +43,7 @@
                     </label>
                     <div class="relative font-semibold flex h-[30px] w-full">
                         <Multiselect v-model="adjustment.centerId" :options="centers" :searchable="true"
-                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione centro" 
+                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione centro" :disabled="adjustment.status != 1"
                             :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }"/>
                     </div>
                     <InputError v-for="(item, index) in errors.centerId" :key="index" class="mt-2" :message="item" />
@@ -54,7 +54,7 @@
                     </label>
                     <div class="relative font-semibold flex h-[30px] w-full">
                         <Multiselect v-model="adjustment.idLt" :options="lts" :searchable="true"
-                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione uplt" 
+                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione uplt" :disabled="adjustment.status != 1"
                             :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }"/>
                     </div>
                     <InputError v-for="(item, index) in errors.idLt" :key="index" class="mt-2" :message="item" />
@@ -66,7 +66,7 @@
                     </label>
                     <div class="relative font-semibold flex h-[30px] w-full">
                         <Multiselect v-model="adjustment.financingSourceId" :options="financingSources"
-                            :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione fuente" 
+                            :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione fuente" :disabled="adjustment.status != 1"
                             :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }"/>
                     </div>
                     <InputError v-for="(item, index) in errors.financingSourceId" :key="index" class="mt-2"
@@ -78,7 +78,7 @@
                     </label>
                     <div class="relative font-semibold flex h-[30px] w-full">
                         <Multiselect v-model="adjustment.reasonId" :options="reasons" :searchable="true"
-                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione motivo" 
+                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione motivo" :disabled="adjustment.status != 1"
                             :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }"/>
                     </div>
                     <InputError v-for="(item, index) in errors.reasonId" :key="index" class="mt-2" :message="item" />
@@ -90,7 +90,7 @@
                     <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Observación
                         <!-- <span class="text-red-600 font-extrabold">*</span> -->
                     </label>
-                    <textarea v-model="adjustment.observation" id="descripcion" name="descripcion"
+                    <textarea v-model="adjustment.observation" id="descripcion" name="descripcion" :disabled="adjustment.status != 1"
                         placeholder="Escriba observacion" :class="adjustment.observation != '' ? 'bg-gray-200' : ''"
                         class="w-full h-12 overflow-y-auto peer placeholder-gray-400 text-xs font-semibold border border-gray-300 hover:border-gray-400 px-2 text-slate-900 transition-colors duration-300 focus:ring-blue-500 focus:border-blue-500"
                         style="border-radius: 4px;">
@@ -199,7 +199,7 @@
                         </div>
                         <div class="max-w-full flex items-center justify-center">
                             <div class="w-full h-[30px] ">
-                                <svg v-if="adjustment.status != 3" @click="deleteRow(index, prod.detId)"
+                                <svg v-if="adjustment.status != 4" @click="deleteRow(index, prod.detId)"
                                     class="text-red-600 cursor-pointer ml-1 hover:text-red-800" width="20px"
                                     height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -228,7 +228,7 @@
                     </div>
                     <div class="w-full">
                         <div class="w-full h-[30px]">
-                            <svg v-if="adjustment.status != 3" @click="addNewRow()"
+                            <svg v-if="adjustment.status != 4" @click="addNewRow()"
                                 class="text-green-600 cursor-pointer hover:text-green-800" width="28px" height="28px"
                                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M12 6V18M6 12H18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -271,7 +271,7 @@ export default {
     emits: ["cerrar-modal", "get-table"],
     components: { ProcessModal, InputError, InputText, IconM, DateTimePickerM },
     props: {
-        showModalSurplusAdjustment: {
+        showModalShortageAdjustment: {
             type: Boolean,
             default: false,
         },
