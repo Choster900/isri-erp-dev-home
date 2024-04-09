@@ -17,6 +17,7 @@ class DetalleRequerimiento extends Model
         'id_producto',
         'id_centro_produccion',
         'id_requerimiento',
+        'id_det_existencia_almacen',
         'cant_det_requerimiento',
         'costo_det_requerimiento',
         'fecha_reg_det_requerimiento',

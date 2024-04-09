@@ -13,21 +13,7 @@ export const useRequerimientoAlmacen = () => {
     const observacionRequerimiento = ref(null)
     const errorsValidation = ref(null)
 
-    const dataDetalleRequerimiento = ref([/* {
-        idDetRequerimiento: '',
-        idRequerimiento: '',
-        idCentroProduccion: '',
-        productos: [
-            {
-                idProducto: '',
-                descripcionProductos: '',
-                cantDetRequerimiento: '',
-                costoDetRequerimiento: '',
-            }
-        ],
-        stateDetalle: 1,
-        isHidden: false,
-    } */])
+    const dataDetalleRequerimiento = ref([])
 
     // Variables que almacenanan los objetos para mostrar en multiselect
     const centroAtenionArray = ref(null)
@@ -39,52 +25,51 @@ export const useRequerimientoAlmacen = () => {
 
     const appendDetalleRequerimiento = () => {
         dataDetalleRequerimiento.value.push({
+            idRequerimiento: '',
             idDetRequerimiento: '',
             idRequerimiento: '',
             idCentroProduccion: '',
             productos: [
                 {
-                    idDetRequerimiento: '',
-                    idProducto: '',
                     idMarca: '',
-                    descripcionProducto: '',
-                    cantDetRequerimiento: '',
-                    costoDetRequerimiento: '',
+                    idProducto: '',
                     stateProducto: 1,
+                    idDetRequerimiento: '',
+                    cantDetRequerimiento: '',
+                    idDetExistenciaAlmacen: '',
                 }
             ],
-            stateCentroProduccion: 1,
             isHidden: false,
+            stateCentroProduccion: 1,
         })
     }
 
     const appendProduct = (i) => {
         /*  alert("dasda") */
         dataDetalleRequerimiento.value[i].productos.push({
-            idDetRequerimiento: '',
-            idProducto: '',
             idMarca: '',
-            descripcionProducto: '',
-            cantDetRequerimiento: '',
-            costoDetRequerimiento: '',
+            idProducto: '',
             stateProducto: 1,
+            idDetRequerimiento: '',
+            cantDetRequerimiento: '',
+            idDetExistenciaAlmacen: '',
         })
     }
 
     /**
-     * Actualiza la descripción del producto en los datos del requerimiento.
-     * @param {string} valueProd - El valor del producto.
+     * Setea IdProducto del detalle de existencia almacen.
+     * @param {string} idDetalleExistenciaAlmacen - El valor del producto.
      * @param {number} rowCentroProd - El índice de la fila del centro de producción.
      * @param {number} rowProd - El índice de la fila del producto.
      */
-    const setDescripcionProducto = (valueProd, rowCentroProd, rowProd) => {
+    const setIdProductoByDetalleExistenciaAlmacenId = (idDetalleExistenciaAlmacen, rowCentroProd, rowProd) => {
         // Encuentra el producto en el array de productos.
-        const producto = productosArray.value.find(producto => producto.value === valueProd);
+        const producto = productosArray.value.find(detExistencia => detExistencia.value === idDetalleExistenciaAlmacen);
 
         // Verifica si el producto fue encontrado.
         if (producto) {
             // Actualiza la descripción del producto en los datos del requerimiento.
-            dataDetalleRequerimiento.value[rowCentroProd].productos[rowProd].descripcionProductos = producto.completeData.descripcion_producto;
+            dataDetalleRequerimiento.value[rowCentroProd].productos[rowProd].idProducto = producto.codidoProducto;
         } else {
             console.error(`No se encontró el producto con el valor: ${valueProd}`);
         }
@@ -251,7 +236,7 @@ export const useRequerimientoAlmacen = () => {
     };
 
 
-    
+
 
     onMounted(() => {
         getArrayObject()
@@ -279,6 +264,6 @@ export const useRequerimientoAlmacen = () => {
         lineaTrabajoArray,
         centroProduccion,
 
-        setDescripcionProducto,
+        setIdProductoByDetalleExistenciaAlmacenId,
     }
 }
