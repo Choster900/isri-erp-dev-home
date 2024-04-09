@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Almacen\RequerimientoRequest;
 use App\Models\CentroAtencion;
 use App\Models\CentroProduccion;
+use App\Models\DetalleExistenciaAlmacen;
 use App\Models\DetalleKardex;
 use App\Models\DetallePlaza;
 use App\Models\DetalleRequerimiento;
@@ -20,7 +21,9 @@ use App\Models\ProyectoFinanciado;
 use App\Models\Requerimiento;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use PhpParser\Node\Stmt\Else_;
+use Illuminate\Support\Facades\Validator;
 
 class RequerimientoAlmacenController extends Controller
 {
@@ -46,6 +49,9 @@ class RequerimientoAlmacenController extends Controller
 
         $v_query = Requerimiento::with([
             "detalles_requerimiento.producto",
+            "detalles_requerimiento" => function ($query) {
+                $query->where('estado_det_requerimiento', 1);
+            },
             "centro_atencion",
             "proyecto_financiado",
             "estado_requerimiento"
@@ -115,44 +121,148 @@ class RequerimientoAlmacenController extends Controller
         });
     }
 
-    function addRequerimiento(RequerimientoRequest $request)
+
+
+    function addRequerimiento(RequerimientoRequest $request) /* addRequerimiento(Request $request) */
     {
-        //     $requerimiento = [];
-        $requerimiento = [
-            'id_lt'                     => $request->idLt,
-            'id_centro_atencion'        => $request->idCentroAtencion,
-            'id_proy_financiado'        => $request->idProyFinanciado,
-            'id_estado_req'             => 1,
-            'id_tipo_mov_kardex'        => 2,
-            'id_tipo_req'               => 1,
-            'num_requerimiento'         => $request->numRequerimiento,
-            'fecha_requerimiento'       => Carbon::now(),
-            'observacion_requerimiento' => $request->observacionRequerimiento,
-            'fecha_reg_requerimiento'   => Carbon::now(),
-            'usuario_requerimiento'     => $request->user()->nick_usuario,
-            'ip_requerimiento'          => $request->ip(),
 
-        ];
-        $requerimientoId = Requerimiento::insertGetId($requerimiento);
 
-        foreach ($request->dataDetalleRequerimiento as $key => $value) {
+        try {
+            DB::beginTransaction();
 
-            foreach ($value["productos"] as $key => $value2) {
+            $ultimoRequerimiento = Requerimiento::latest("fecha_reg_requerimiento")->first();
+            $currentNumberParts = explode('-', $ultimoRequerimiento->num_requerimiento);
 
-                DetalleRequerimiento::insert(
-                    [
-                        'id_producto'                 => $value2["idProducto"],
-                        'id_centro_produccion'        => $value["idCentroProduccion"],
-                        'id_marca'                    => $value2["idMarca"],
-                        'id_requerimiento'            => $requerimientoId,
-                        'cant_det_requerimiento'      => $value2["cantDetRequerimiento"],
-                        'costo_det_requerimiento'     => 0,
-                        'fecha_reg_det_requerimiento' => Carbon::now(),
-                        'usuario_det_requerimiento'   => $request->user()->nick_usuario,
-                        'ip_det_requerimiento'        => $request->ip(),
-                    ]
-                );
+            // Verifica si el número de requerimiento actual comienza con "REQ"
+            while ($currentNumberParts[0] !== "REQ") {
+                // Busca el requerimiento anterior
+                $requerimientoAnterior = Requerimiento::where('id_requerimiento', '<', $ultimoRequerimiento->id_requerimiento)
+                    ->latest('fecha_reg_requerimiento')
+                    ->first();
+
+                // Si no hay requerimiento anterior, rompe el bucle
+                if (!$requerimientoAnterior) {
+                    break;
+                }
+
+                // Actualiza el último requerimiento y sus partes de número actual
+                $ultimoRequerimiento = $requerimientoAnterior;
+                $currentNumberParts = explode('-', $ultimoRequerimiento->num_requerimiento);
             }
+
+            $currentYear = (int) now()->year;
+            $secuencia = (int) $currentNumberParts[2];
+
+            if ((int) $currentNumberParts[1] !== $currentYear) {
+                $currentYear += 1;
+                $secuencia = 1;
+            }
+
+            $requerimiento = [
+                'id_lt'                     => $request->idLt,
+                'id_centro_atencion'        => $request->idCentroAtencion,
+                'id_proy_financiado'        => $request->idProyFinanciado,
+                'id_estado_req'             => 1,
+                'id_tipo_mov_kardex'        => 2,
+                'id_tipo_req'               => 1,
+                'num_requerimiento'         => 'REQ-' . $currentYear . '-' . $secuencia + 1,
+                'fecha_requerimiento'       => Carbon::now(),
+                'observacion_requerimiento' => $request->observacionRequerimiento,
+                'fecha_reg_requerimiento'   => Carbon::now(),
+                'usuario_requerimiento'     => $request->user()->nick_usuario,
+                'ip_requerimiento'          => $request->ip(),
+
+            ];
+            $requerimientoId = Requerimiento::insertGetId($requerimiento);
+            foreach ($request->dataDetalleRequerimiento as $key => $value) {
+
+                foreach ($value["productos"] as $key => $value2) {
+
+
+                    $rules = [];
+
+                    collect($request->dataDetalleRequerimiento)->each(function ($prodReq, $key) use (&$rules, &$request) {
+                        if ($prodReq["stateCentroProduccion"] == 0)
+                            return;
+
+                        collect($request["dataDetalleRequerimiento.{$key}.productos"])
+                            ->each(function ($det, $indice) use (&$rules, $key, $prodReq) {
+                                if ($det["stateProducto"] == 0)
+                                    return;
+
+                                if (!empty($det["idDetExistenciaAlmacen"])) {
+
+                                    $detalleExistenciaAlmacen = DetalleExistenciaAlmacen::select("cant_det_existencia_almacen")
+                                        ->where('id_det_existencia_almacen', $det["idDetExistenciaAlmacen"])
+                                        ->first();
+
+                                    $rules["dataDetalleRequerimiento.{$key}.productos.{$indice}.cantDetRequerimiento"] = [
+                                        'required',
+                                        'numeric',
+                                        "lte:$detalleExistenciaAlmacen->cant_det_existencia_almacen",
+                                    ];
+                                }
+                            });
+                    });
+
+                    $messages = [
+                        'dataDetalleRequerimiento.*.productos.*.cantDetRequerimiento.required' => 'El campo Cantidad de Requerimiento es obligatorio.',
+                        'dataDetalleRequerimiento.*.productos.*.cantDetRequerimiento.numeric' => 'El campo Cantidad de Requerimiento debe ser numérico.',
+                        'dataDetalleRequerimiento.*.productos.*.cantDetRequerimiento.lte' => 'La cantidad de requerimiento debe ser menor o igual a :value.',
+                    ];
+                    $validator = Validator::make($request->all(), $rules, $messages);
+
+                    if ($validator->fails()) {
+                        $errors = $validator->errors()->toArray();
+                        $message = 'The given data was invalid.';
+                        return response()->json(['message' => $message, 'errors' => $errors], 422);
+                    }
+                    DetalleRequerimiento::insert(
+                        [
+                            'id_producto'                 => $value2["idProducto"],
+                            'id_det_existencia_almacen'   => $value2["idDetExistenciaAlmacen"],
+                            'id_centro_produccion'        => $value["idCentroProduccion"],
+                            'id_marca'                    => $value2["idMarca"],
+                            'id_requerimiento'            => $requerimientoId,
+                            'cant_det_requerimiento'      => $value2["cantDetRequerimiento"],
+                            'costo_det_requerimiento'     => 0,
+                            'estado_det_requerimiento'    => 1,
+                            'fecha_reg_det_requerimiento' => Carbon::now(),
+                            'usuario_det_requerimiento'   => $request->user()->nick_usuario,
+                            'ip_det_requerimiento'        => $request->ip(),
+                        ]
+                    );
+
+
+                    $detalleExistenciaAlmacen = DetalleExistenciaAlmacen::find($value2["idDetExistenciaAlmacen"]);
+
+                    if ($detalleExistenciaAlmacen) {
+                        $cantidadActualizada = max(0, $detalleExistenciaAlmacen->cant_det_existencia_almacen - $value2["cantDetRequerimiento"]);
+
+                        $detalleExistenciaAlmacen->update([
+                            'cant_det_existencia_almacen' => $cantidadActualizada
+                        ]);
+
+                        $totalNuevoStock = DetalleExistenciaAlmacen::where('id_existencia_almacen', $detalleExistenciaAlmacen->id_existencia_almacen)
+                            ->sum('cant_det_existencia_almacen');
+
+                        ExistenciaAlmacen::where("id_existencia_almacen", $detalleExistenciaAlmacen->id_existencia_almacen)->update([
+                            "cant_existencia_almacen" => $totalNuevoStock
+                        ]);
+                    }
+                }
+            }
+
+            DB::commit();
+
+            // Si llegamos aquí, todo se ejecutó correctamente, así que podemos devolver una respuesta o realizar cualquier otra acción necesaria.
+            return response()->json(['message' => 'Requerimiento agregado correctamente'], 200);
+        } catch (\Exception $e) {
+            // Si ocurre un error, hacemos rollback de la transacción
+            DB::rollback();
+
+            // Retornamos una respuesta de error
+            return response()->json($e->getMessage(), 422);
         }
     }
 
@@ -160,74 +270,185 @@ class RequerimientoAlmacenController extends Controller
     {
 
 
-        //     $requerimiento = [];
-        $requerimiento = [
-            'id_requerimiento'          => $request->idRequerimiento,
-            'id_lt'                     => $request->idLt,
-            'id_centro_atencion'        => $request->idCentroAtencion,
-            'id_proy_financiado'        => $request->idProyFinanciado,
-            'id_estado_req'             => 1,
-            'num_requerimiento'         => $request->numRequerimiento,
-            'fecha_requerimiento'       => Carbon::now(),
-            'observacion_requerimiento' => $request->observacionRequerimiento,
-            'fecha_mod_requerimiento'   => Carbon::now(),
-            'usuario_requerimiento'     => $request->user()->nick_usuario,
-            'ip_requerimiento'          => $request->ip(),
+        try {
+            DB::beginTransaction();
 
-        ];
+            $requerimiento = [
+                'id_requerimiento'          => $request->idRequerimiento,
+                'id_lt'                     => $request->idLt,
+                'id_centro_atencion'        => $request->idCentroAtencion,
+                'id_proy_financiado'        => $request->idProyFinanciado,
+                'id_estado_req'             => 1,
+                'num_requerimiento'         => $request->numRequerimiento,
+                'fecha_requerimiento'       => Carbon::now(),
+                'observacion_requerimiento' => $request->observacionRequerimiento,
+                'fecha_mod_requerimiento'   => Carbon::now(),
+                'usuario_requerimiento'     => $request->user()->nick_usuario,
+                'ip_requerimiento'          => $request->ip(),
 
-        Requerimiento::where("id_requerimiento", $request->idRequerimiento)->update($requerimiento);
+            ];
+
+            Requerimiento::where("id_requerimiento", $request->idRequerimiento)->update($requerimiento);
 
 
-        foreach ($request->dataDetalleRequerimiento as $key => $value) {
+            foreach ($request->dataDetalleRequerimiento as $key => $value) {
 
 
-            foreach ($value["productos"] as $key => $value2) {
+                foreach ($value["productos"] as $key => $value2) {
 
-                if ($value2["idDetRequerimiento"]) {
-                    if ($value2["stateProducto"] == 1) {
-                        DetalleRequerimiento::where("id_det_requerimiento", $value2["idDetRequerimiento"])->update(
-                            [
-                                'id_producto'                 => $value2["idProducto"],
-                                'id_marca'                    => $value2["idMarca"],
-                                'id_centro_produccion'        => $value["idCentroProduccion"],
-                                'id_requerimiento'            => $request->idRequerimiento,
-                                'cant_det_requerimiento'      => $value2["cantDetRequerimiento"],
-                                'costo_det_requerimiento'     => 0,
-                                'fecha_reg_det_requerimiento' => Carbon::now(),
-                                'usuario_det_requerimiento'   => $request->user()->nick_usuario,
-                                'ip_det_requerimiento'        => $request->ip(),
-                            ]
-                        );
+                    if ($value2["idDetRequerimiento"]) {
+                        if ($value2["stateProducto"] == 1) {
+
+                            $detalleExistenciaAlmacen = DetalleExistenciaAlmacen::find($value2["idDetExistenciaAlmacen"]);
+                            $detalleRequerimiento = DetalleRequerimiento::find($value2["idDetRequerimiento"]);
+
+                            if ($detalleExistenciaAlmacen) {
+                                $recalculo = max(0, $detalleExistenciaAlmacen->cant_det_existencia_almacen + $detalleRequerimiento->cant_det_requerimiento);
+
+                                $detalleExistenciaAlmacen->update([
+                                    'cant_det_existencia_almacen' => $recalculo
+                                ]);
+                            }
+
+                            $rules = [];
+
+                            collect($request->dataDetalleRequerimiento)->each(function ($prodReq, $key) use (&$rules, &$request) {
+                                if ($prodReq["stateCentroProduccion"] == 0)
+                                    return;
+
+                                collect($request["dataDetalleRequerimiento.{$key}.productos"])
+                                    ->each(function ($det, $indice) use (&$rules, $key, $prodReq) {
+                                        if ($det["stateProducto"] == 0)
+                                            return;
+
+                                        if (!empty($det["idDetExistenciaAlmacen"])) {
+                                            $detalleExistenciaAlmacen = DetalleExistenciaAlmacen::select("cant_det_existencia_almacen")
+                                                ->where('id_det_existencia_almacen', $det["idDetExistenciaAlmacen"])
+                                                ->first();
+
+                                            $rules["dataDetalleRequerimiento.{$key}.productos.{$indice}.cantDetRequerimiento"] = [
+                                                'required',
+                                                'numeric',
+                                                "lte:$detalleExistenciaAlmacen->cant_det_existencia_almacen",
+                                            ];
+                                        }
+                                    });
+                            });
+
+
+                            $request->validate($rules);
+
+
+                            DetalleRequerimiento::where("id_det_requerimiento", $value2["idDetRequerimiento"])->update(
+                                [
+                                    'id_producto'                 => $value2["idProducto"],
+                                    'id_marca'                    => $value2["idMarca"],
+                                    'id_centro_produccion'        => $value["idCentroProduccion"],
+                                    'id_det_existencia_almacen'   => $value2["idDetExistenciaAlmacen"],
+                                    'id_requerimiento'            => $request->idRequerimiento,
+                                    'cant_det_requerimiento'      => $value2["cantDetRequerimiento"],
+                                    'costo_det_requerimiento'     => 0,
+                                    'fecha_reg_det_requerimiento' => Carbon::now(),
+                                    'usuario_det_requerimiento'   => $request->user()->nick_usuario,
+                                    'ip_det_requerimiento'        => $request->ip(),
+                                ]
+                            );
+                            $detalleExistenciaAlmacen = DetalleExistenciaAlmacen::find($value2["idDetExistenciaAlmacen"]);
+
+                            if ($detalleExistenciaAlmacen) {
+
+
+                                $cantidadActualizada = max(0, $detalleExistenciaAlmacen->cant_det_existencia_almacen - $value2["cantDetRequerimiento"]);
+
+                                $detalleExistenciaAlmacen->update([
+                                    'cant_det_existencia_almacen' => $cantidadActualizada
+                                ]);
+
+                                $totalNuevoStock = DetalleExistenciaAlmacen::where('id_existencia_almacen', $detalleExistenciaAlmacen->id_existencia_almacen)
+                                    ->sum('cant_det_existencia_almacen');
+
+                                ExistenciaAlmacen::where("id_existencia_almacen", $detalleExistenciaAlmacen->id_existencia_almacen)->update([
+                                    "cant_existencia_almacen" => $totalNuevoStock
+                                ]);
+                            }
+                        } else {
+
+                            $detalleExistenciaAlmacen = DetalleExistenciaAlmacen::find($value2["idDetExistenciaAlmacen"]);
+                            $detalleRequerimiento = DetalleRequerimiento::find($value2["idDetRequerimiento"]);
+
+                            if ($detalleExistenciaAlmacen) {
+                                $recalculo = max(0, $detalleExistenciaAlmacen->cant_det_existencia_almacen + $detalleRequerimiento->cant_det_requerimiento);
+
+                                $detalleExistenciaAlmacen->update([
+                                    'cant_det_existencia_almacen' => $recalculo
+                                ]);
+
+                                $totalNuevoStock = DetalleExistenciaAlmacen::where('id_existencia_almacen', $detalleExistenciaAlmacen->id_existencia_almacen)
+                                    ->sum('cant_det_existencia_almacen');
+
+                                ExistenciaAlmacen::where("id_existencia_almacen", $detalleExistenciaAlmacen->id_existencia_almacen)->update([
+                                    "cant_existencia_almacen" => $totalNuevoStock
+                                ]);
+                            }
+
+                            // eliminar
+                            DetalleRequerimiento::where("id_det_requerimiento", $value2["idDetRequerimiento"])->update([
+                                "estado_det_requerimiento" => 0
+                            ]);
+                        }
                     } else {
-                        // eliminar
-                        DetalleRequerimiento::where("id_det_requerimiento", $value2["idDetRequerimiento"])->delete();
-                    }
-                } else {
 
-                    if ($value2["stateProducto"] == 1) {
+                        if ($value2["stateProducto"] == 1) {
 
-                        // Agregar
-                        DetalleRequerimiento::insert(
-                            [
-                                'id_producto'                 => $value2["idProducto"],
-                                'id_marca'                    => $value2["idMarca"],
-                                'id_centro_produccion'        => $value["idCentroProduccion"],
-                                'id_requerimiento'            => $request->idRequerimiento,
-                                'cant_det_requerimiento'      => $value2["cantDetRequerimiento"],
-                                'costo_det_requerimiento'     => 0,
-                                'fecha_reg_det_requerimiento' => Carbon::now(),
-                                'usuario_det_requerimiento'   => $request->user()->nick_usuario,
-                                'ip_det_requerimiento'        => $request->ip(),
-                            ]
-                        );
+                            // Agregar
+                            DetalleRequerimiento::insert(
+                                [
+                                    'id_producto'                 => $value2["idProducto"],
+                                    'id_marca'                    => $value2["idMarca"],
+                                    'id_centro_produccion'        => $value["idCentroProduccion"],
+                                    'id_requerimiento'            => $request->idRequerimiento,
+                                    'cant_det_requerimiento'      => $value2["cantDetRequerimiento"],
+                                    'costo_det_requerimiento'     => 0,
+                                    'estado_det_requerimiento'    => 1,
+                                    'id_det_existencia_almacen'   => $value2["idDetExistenciaAlmacen"],
+                                    'fecha_reg_det_requerimiento' => Carbon::now(),
+                                    'usuario_det_requerimiento'   => $request->user()->nick_usuario,
+                                    'ip_det_requerimiento'        => $request->ip(),
+                                ]
+                            );
+
+
+                            $detalleExistenciaAlmacen = DetalleExistenciaAlmacen::find($value2["idDetExistenciaAlmacen"]);
+
+                            if ($detalleExistenciaAlmacen) {
+                                $cantidadActualizada = max(0, $detalleExistenciaAlmacen->cant_det_existencia_almacen - $value2["cantDetRequerimiento"]);
+
+                                $detalleExistenciaAlmacen->update([
+                                    'cant_det_existencia_almacen' => $cantidadActualizada
+                                ]);
+
+                                $totalNuevoStock = DetalleExistenciaAlmacen::where('id_existencia_almacen', $detalleExistenciaAlmacen->id_existencia_almacen)
+                                    ->sum('cant_det_existencia_almacen');
+
+                                ExistenciaAlmacen::where("id_existencia_almacen", $detalleExistenciaAlmacen->id_existencia_almacen)->update([
+                                    "cant_existencia_almacen" => $totalNuevoStock
+                                ]);
+                            }
+                        }
                     }
                 }
             }
+
+
+            DB::commit();
+
+            // Si llegamos aquí, todo se ejecutó correctamente, así que podemos devolver una respuesta o realizar cualquier otra acción necesaria.
+            return response()->json(['message' => 'Requerimiento actualizado correctamente'], 200);
+        } catch (\Exception $e) {
+            // Si ocurre un error, hacemos rollback de la transacción
+            DB::rollback();
+            return response()->json($e->getMessage(), 422);
         }
-
-
-        return $request;
     }
 
     /**
@@ -288,24 +509,24 @@ class RequerimientoAlmacenController extends Controller
             $detalleRequerimiento = DetalleRequerimiento::where("id_requerimiento", $request->idRequerimiento)->get();
             foreach ($detalleRequerimiento as $key => $value) {
                 DetalleKardex::insert([
-                    'id_kardex'                    => $cardexId,
-                    'id_producto'                  => $value['id_producto'],
-                    'id_lt'                        => $requerimiento->id_lt,
-                    'id_centro_atencion'           => $requerimiento->id_centro_atencion,
-                    'id_marca'                     => $value['id_marca'],
-                    'cant_det_kardex'              => $value['cant_det_requerimiento'],
-                    'costo_det_kardex'             => $value['costo_det_requerimiento'],
-                    'fecha_reg_det_kardex'         => Carbon::now(),
-                    'usuario_det_kardex'           => $request->user()->nick_usuario,
-                    'ip_det_kardex'                => $request->ip(),
+                    'id_kardex'            => $cardexId,
+                    'id_producto'          => $value['id_producto'],
+                    'id_lt'                => $requerimiento->id_lt,
+                    'id_centro_atencion'   => $requerimiento->id_centro_atencion,
+                    'id_marca'             => $value['id_marca'],
+                    'cant_det_kardex'      => $value['cant_det_requerimiento'],
+                    'costo_det_kardex'     => $value['costo_det_requerimiento'],
+                    'fecha_reg_det_kardex' => Carbon::now(),
+                    'usuario_det_kardex'   => $request->user()->nick_usuario,
+                    'ip_det_kardex'        => $request->ip(),
                 ]);
             }
 
-        // Si el estado es "Anulado" (idEstado == 4)
-        } else if ($request->idEstado == 4) {
-            // Actualizar el número de requerimiento a "(N/A)"
-            $objectUpdated["num_requerimiento"] = '(N/A)';
-        }
+            // Si el estado es "Anulado" (idEstado == 4)
+        } /* else if ($request->idEstado == 4) {
+// Actualizar el número de requerimiento a "(N/A)"
+$objectUpdated["num_requerimiento"] = '(N/A)';
+} */
 
         // Actualizar el requerimiento con los datos actualizados
         Requerimiento::where("id_requerimiento", $request->idRequerimiento)->update($objectUpdated);
@@ -313,5 +534,4 @@ class RequerimientoAlmacenController extends Controller
         // Devolver un arreglo vacío como respuesta
         return [];
     }
-
 }
