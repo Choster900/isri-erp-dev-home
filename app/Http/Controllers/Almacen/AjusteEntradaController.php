@@ -339,17 +339,18 @@ class AjusteEntradaController extends Controller
                     ]);
                     $detKardex->save();
                     //Pending 
+                    
                     //We update the stock
-                    $resultados = DB::select(" SELECT FN_UPDATE_EXISTENCIA_ALMACEN(?, ?, ?, NULL, NULL, ?, ?, ?, ?, ?)", [
-                        $req->id_proy_financiado,
-                        $det->producto->id_producto,
-                        $det->id_centro_atencion,
-                        $det->cant_det_recepcion_pedido,
-                        $det->costo_det_recepcion_pedido,
-                        Carbon::now(),
-                        $request->user()->nick_usuario,
-                        $request->ip()
-                    ]);
+                    // $resultados = DB::select(" SELECT FN_UPDATE_EXISTENCIA_ALMACEN(?, ?, ?, NULL, NULL, ?, ?, ?, ?, ?)", [
+                    //     $req->id_proy_financiado,
+                    //     $det->producto->id_producto,
+                    //     $det->id_centro_atencion,
+                    //     $det->cant_det_recepcion_pedido,
+                    //     $det->costo_det_recepcion_pedido,
+                    //     Carbon::now(),
+                    //     $request->user()->nick_usuario,
+                    //     $request->ip()
+                    // ]);
                 }
 
                 DB::commit(); // Confirma las operaciones en la base de datos

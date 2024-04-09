@@ -551,7 +551,7 @@ class RecepcionController extends Controller
                 $reception->update([
                     'id_estado_recepcion_pedido'            => 2,
                     'incumple_acuerdo_recepcion_pedido'     => $request->nonCompliant,
-                    'incumplimiento_recepcion_pedido'       => $request->nonCompliant == 1 ? $request->observation : null,
+                    'incumplimiento_recepcion_pedido'       => $request->observation,
                     'id_empleado'                           => $request->conctManagerId,
                     'representante_prov_recepcion_pedido'   => $request->suppRep,
                     'emp_id_empleado'                       => $user->persona->empleado->id_empleado,
