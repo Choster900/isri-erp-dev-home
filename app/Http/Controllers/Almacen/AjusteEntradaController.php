@@ -143,7 +143,7 @@ class AjusteEntradaController extends Controller
             $req->save();
 
             foreach ($request->prods as $prod) {
-                $fecha = $prod['expDate']!= '' ? date('Y/m/d', strtotime($prod['expDate'])) : '';
+                $fecha = $prod['expDate'] != '' ? date('Y/m/d', strtotime($prod['expDate'])) : null;
                 $newDet = new DetalleRequerimiento([
                     'id_producto'                               => $prod['prodId'],
                     'id_marca'                                  => $prod['brandId'],
@@ -192,7 +192,7 @@ class AjusteEntradaController extends Controller
                 ]);
 
                 foreach ($request->prods as $prod) {
-                    $fecha = $prod['expDate']!= '' ? date('Y/m/d', strtotime($prod['expDate'])) : '';
+                    $fecha = $prod['expDate']!= '' ? date('Y/m/d', strtotime($prod['expDate'])) : null;
                     if ($prod['detId'] != "" && $prod['deleted'] == false) {
                         $det = DetalleRequerimiento::find($prod['detId']);
                         $det->update([
@@ -225,7 +225,7 @@ class AjusteEntradaController extends Controller
                             $existDetail->update([
                                 'id_producto'                               => $prod['prodId'],
                                 'id_marca'                                  => $prod['brandId'],
-                                'fecha_vcto_det_requerimiento'              => $prod['expDate'],
+                                'fecha_vcto_det_requerimiento'              => $fecha,
                                 'cant_det_requerimiento'                    => $prod['qty'],
                                 'costo_det_requerimiento'                   => $prod['cost'],
                                 'estado_det_requerimiento'                  => 1,
@@ -237,7 +237,7 @@ class AjusteEntradaController extends Controller
                             $newDet = new DetalleRequerimiento([
                                 'id_producto'                               => $prod['prodId'],
                                 'id_marca'                                  => $prod['brandId'],
-                                'fecha_vcto_det_requerimiento'              => $prod['expDate'],
+                                'fecha_vcto_det_requerimiento'              => $fecha,
                                 'id_requerimiento'                          => $req->id_requerimiento,
                                 'cant_det_requerimiento'                    => $prod['qty'],
                                 'costo_det_requerimiento'                   => $prod['cost'],

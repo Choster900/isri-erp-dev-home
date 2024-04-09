@@ -106,7 +106,7 @@
                 </div>
             </div>
 
-            <div class="w-full pl-8 overflow-x-auto max-w-full mt-4 max-h-[215px] overflow-y-auto pb-2">
+            <div class="w-full pl-8 overflow-x-auto max-w-full mt-4 max-h-[230px] overflow-y-auto pb-2">
                 <div class="min-w-[970px]">
                     <div class="grid grid-cols-[100%] max-w-[96%]  border border-gray-500">
                         <div class="justify-center flex w-full bg-white">
@@ -143,8 +143,8 @@
                 </div>
 
                 <template v-for="(prod, index) in adjustment.prods" :key="index">
-                    <div class="min-w-[970px] grid grid-cols-[96%_4%]">
-                        <div :id="'row-' + index" v-if="prod.deleted == false"
+                    <div class="min-w-[970px] grid grid-cols-[96%_4%]" v-if="prod.deleted == false">
+                        <div :id="'row-' + index" 
                             class="grid grid-cols-[18%_25%_14%_13%_10%_10%_10%] max-w-full bg-white hover:bg-gray-200 text-gray-800 border-b border-x border-gray-500">
                             <div class="border-r border-gray-500 min-h-[75px] flex items-center justify-center"
                                 :class="errors['prods.' + index + '.prodId'] ? 'bg-red-300' : ''">
@@ -155,7 +155,7 @@
                                     @change="selectProd($event, index)" :loading="prod.isLoadingProd"
                                     :clear-on-search="true" :filter-results="false" :resolve-on-load="true"
                                     :noOptionsText="'Escriba para buscar...'" placeholder="Seleccione"
-                                    @open="products = []"
+                                    @open="products = []" 
                                     :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
                             </div>
                             <div
@@ -286,7 +286,7 @@ export default {
 
         const {
             isLoadingRequest, errors, adjustment, reasons, centers, financingSources, lts,
-            products, brands, asyncFindProduct, totalRec,
+            products, brands, asyncFindProduct, totalRec, asyncProds, selectedProducts,
             getInfoForModalAdjustment, selectProd, deleteRow, addNewRow, storeAdjustment, updateAdjustment
         } = useAjusteEntrada(context);
 
@@ -310,7 +310,7 @@ export default {
 
         return {
             isLoadingRequest, errors, adjustment, reasons, centers, financingSources, lts,
-            products, brands, asyncFindProduct, totalRec,
+            products, brands, asyncFindProduct, totalRec, asyncProds, selectedProducts,
             handleValidation, selectProd, handleSearchChange, deleteRow, addNewRow, storeAdjustment, updateAdjustment
         }
     }

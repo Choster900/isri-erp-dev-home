@@ -12,6 +12,8 @@ export const useAjusteEntrada = (context) => {
     const isLoadingRequest = ref(false);
     const errors = ref([]);
     const products = ref([])
+    const asyncProds = ref([])
+    const selectedProducts = ref([])
 
     const reasons = ref([])
     const centers = ref([])
@@ -47,7 +49,6 @@ export const useAjusteEntrada = (context) => {
             });
             setModalValues(response.data, id)
         } catch (err) {
-            console.log(err);
             if (err.response && err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
                 context.emit("get-table");
@@ -92,6 +93,7 @@ export const useAjusteEntrada = (context) => {
                         value: element.producto.id_producto,
                         label: element.producto.codigo_producto + " - " + element.producto.nombre_producto,
                     };
+                    selectedProducts.value.push(arrayOpt);
                     products.value.push(arrayOpt);
 
                     // Construct array
@@ -111,6 +113,13 @@ export const useAjusteEntrada = (context) => {
                     };
                     // Push array to prods
                     adjustment.value.prods.push(array);
+                }
+            });
+            // Desplazar la pantalla hasta la última fila agregada
+            nextTick(() => {
+                const newRowElement = document.getElementById(`total`);
+                if (newRowElement) {
+                    newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
                 }
             });
         } else {
@@ -136,8 +145,6 @@ export const useAjusteEntrada = (context) => {
 
         // Desplazar la pantalla hasta la última fila agregada
         nextTick(() => {
-            //const newRowIndex = donInfo.value.prods.length - 1;
-            //const newRowElement = document.getElementById(`row-${newRowIndex}`);
             const newRowElement = document.getElementById(`total`);
             if (newRowElement) {
                 newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
@@ -150,6 +157,11 @@ export const useAjusteEntrada = (context) => {
             const selectedProd = products.value.find((e) => e.value === prodId)
             adjustment.value.prods[index].desc = selectedProd.allInfo.codigo_producto + ' — ' + selectedProd.allInfo.nombre_producto + ' — ' + selectedProd.allInfo.descripcion_producto + ' — ' + selectedProd.allInfo.unidad_medida.nombre_unidad_medida
             adjustment.value.prods[index].perishable = selectedProd.allInfo.perecedero_producto
+            let arrayOpt = {
+                value: selectedProd.allInfo.id_producto,
+                label: selectedProd.allInfo.codigo_producto + " - " + selectedProd.allInfo.nombre_producto,
+            };
+            selectedProducts.value.push(arrayOpt);
         } else {
             adjustment.value.prods[index].prodId = ''
             adjustment.value.prods[index].desc = ''
@@ -166,12 +178,12 @@ export const useAjusteEntrada = (context) => {
             adjustment.value.prods[index].isLoadingProd = true
             if (query.length >= 3) {
                 // Filtrar los elementos de defaultProds que tengan un valor diferente a prodId
-                const filteredProds = adjustment.value.prods.filter((e) => e.prodId !== prodId && e.deleted == false);
+                //const filteredProds = adjustment.value.prods.filter((e) => e.prodId !== prodId && e.deleted == false);
                 // Crear un array no asociativo con solo las propiedades 'value' de los elementos filtrados
-                const prodIdToIgnore = filteredProds.map((e) => e.prodId); //Productos que debe ignorar al momento de realizar la busqueda asincrona
+                //const prodIdToIgnore = filteredProds.map((e) => e.prodId); //Productos que debe ignorar al momento de realizar la busqueda asincrona
                 const response = await axios.post("/search-donation-product", {
                     busqueda: query,
-                    prodIdToIgnore: prodIdToIgnore
+                    //prodIdToIgnore: prodIdToIgnore
                 });
                 products.value = response.data.products;
             } else {
@@ -256,6 +268,7 @@ export const useAjusteEntrada = (context) => {
             })
             .finally(() => {
                 isLoadingRequest.value = false;
+                products.value = selectedProducts.value
             });
     };
 
@@ -312,11 +325,11 @@ export const useAjusteEntrada = (context) => {
         newValue.prods.forEach((prod) => {
             prod.total = (prod.qty * prod.cost).toFixed(2);
         });
-    }, { deep: true }); 
+    }, { deep: true });
 
     return {
         isLoadingRequest, errors, reasons, centers, financingSources, lts, adjustment,
-        products, brands, asyncFindProduct, totalRec,
+        products, brands, asyncFindProduct, totalRec, asyncProds, selectedProducts,
         getInfoForModalAdjustment, selectProd, deleteRow, addNewRow, storeAdjustment, updateAdjustment
     }
 }
