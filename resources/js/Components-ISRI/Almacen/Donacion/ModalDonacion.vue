@@ -51,7 +51,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="min-w-[970px] ">
+                <div class="min-w-[970px] bg-white">
                     <div class="grid grid-cols-[41%_34%_25%] max-w-[97%] border-gray-500 border-x py-1">
                         <div :class="{ 'select-err': errors.supplierId }"
                             class="justify-start flex-row flex items-center w-full">

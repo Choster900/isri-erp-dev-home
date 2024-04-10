@@ -388,6 +388,7 @@ class DonacionController extends Controller
                     'id_recepcion_pedido'                   => $reception->id_recepcion_pedido,
                     'id_proy_financiado'                    => $reception->id_proy_financiado,
                     'id_tipo_mov_kardex'                    => 1,
+                    'id_tipo_req'                           => 4, //DONACION
                     'fecha_kardex'                          => Carbon::now(),
                     'fecha_reg_kardex'                      => Carbon::now(),
                     'usuario_kardex'                        => $request->user()->nick_usuario,
@@ -400,6 +401,8 @@ class DonacionController extends Controller
                         'id_kardex'                         => $kardex->id_kardex,
                         'id_producto'                       => $det->producto->id_producto,
                         'id_centro_atencion'                => $det->id_centro_atencion,
+                        'id_marca'                          => $det->id_marca,
+                        'fecha_vencimiento_det_kardex'      => $det->fecha_vcto_det_requerimiento,
                         'cant_det_kardex'                   => $det->cant_det_recepcion_pedido,
                         'costo_det_kardex'                  => $det->costo_det_recepcion_pedido,
                         'fecha_reg_det_kardex'              => Carbon::now(),
@@ -408,12 +411,14 @@ class DonacionController extends Controller
                     ]);
                     $detKardex->save();
                     //We update the stock
-                    $resultados = DB::select(" SELECT FN_UPDATE_EXISTENCIA_ALMACEN(?, ?, ?, NULL, NULL, ?, ?, ?, ?, ?)", [
+                    $resultados = DB::select(" SELECT FN_UPDATE_EXISTENCIA_ALMACEN(?, ?, ?, NULL, ?, ?, ?, ?, ?, ?, ?)", [
                         $reception->id_proy_financiado,
                         $det->producto->id_producto,
                         $det->id_centro_atencion,
+                        $det->id_marca,
                         $det->cant_det_recepcion_pedido,
                         $det->costo_det_recepcion_pedido,
+                        $det->fecha_vcto_det_requerimiento,
                         Carbon::now(),
                         $request->user()->nick_usuario,
                         $request->ip()
