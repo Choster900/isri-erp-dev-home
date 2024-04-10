@@ -136,6 +136,7 @@ export const useAjusteEntrada = (context) => {
             expDate: "",
             isLoadingProd: false,
             desc: "",
+            brandId: "",
             qty: "",
             cost: "",
             total: '0.00',

@@ -22,6 +22,7 @@ class DonacionRequest extends FormRequest
     public function rules(): array
     {
         $rules["supplierId"] = ['required'];
+        $rules["centerId"] = ['required'];
         foreach ($this->input('prods', []) as $key => $prod) {
             $rules["prods.{$key}.prodId"] = [
                 function ($attribute, $value, $fail) use ($key, $prod) {
@@ -44,10 +45,17 @@ class DonacionRequest extends FormRequest
                     }
                 }
             ];
-            $rules["prods.{$key}.centerId"] = [
+            $rules["prods.{$key}.brandId"] = [
                 function ($attribute, $value, $fail) use ($key, $prod) {
                     if (!$prod['deleted'] && empty($value)) {
-                        $fail("Debe seleccionar el centro de atención.");
+                        $fail("Debe seleccionar marca.");
+                    }
+                }
+            ];
+            $rules["prods.{$key}.expDate"] = [
+                function ($attribute, $value, $fail) use ($key, $prod) {
+                    if (!$prod['deleted'] && (empty($value) && $prod['perishable'] == 1)) {
+                        $fail("Debe seleccionar la fecha de caducidad.");
                     }
                 }
             ];
@@ -58,6 +66,7 @@ class DonacionRequest extends FormRequest
     {
         $messages = [];   
         $messages["supplierId.required"] = "Debe seleccionar proveedor.";
+        $messages["centerId.required"] = "Debe seleccionar centro.";
         return $messages;
     }
 }

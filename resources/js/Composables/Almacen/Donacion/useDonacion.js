@@ -3,6 +3,7 @@ import axios from "axios";
 import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
 import { toast } from "vue3-toastify";
+import { useFormatDateTime } from "@/Composables/General/useFormatDateTime.js";
 //import { localeData } from 'moment_spanish_locale';
 import moment from 'moment';
 import _ from "lodash";
@@ -16,8 +17,9 @@ export const useDonacion = (context) => {
     const isLoadingProduct = ref(false);
     const products = ref([])
     const centers = ref([])
-    const defaultProds = ref([])
     const suppliers = ref([])
+    const brands = ref([])
+    const selectedProducts = ref([])
 
     const donInfo = ref({
         id: '', //reception id
@@ -25,12 +27,16 @@ export const useDonacion = (context) => {
         dateTime: '', //Donation date and time
         supplierId: '', //supplier
         nit: '', // supplier nit
-        invoice: '11111', //Invoice number
+        centerId: '', //Healthcare center
         observation: '', //Reception observation
         status: '', //We use this to manage some functionalities in the view, it represent the reception status
         total: '', //This is the sum of all products
         prods: [], //Array of products
     })
+
+    const {
+        formatDateVue3DP
+    } = useFormatDateTime()
 
     const getInfoForModalDonation = async (id) => {
         try {
@@ -59,6 +65,7 @@ export const useDonacion = (context) => {
 
         suppliers.value = data.suppliers
         centers.value = data.centers
+        brands.value = data.brands
 
         donInfo.value.status = id > 0 ? recepData.id_estado_recepcion_pedido : 1
         donInfo.value.dateTime = recepData ? moment(recepData.fecha_reg_recepcion_pedido).format('DD/MM/YYYY, HH:mm:ss') : ''
@@ -71,6 +78,7 @@ export const useDonacion = (context) => {
             donInfo.value.observation = recepData.observacion_recepcion_pedido //Set observation
             donInfo.value.supplierId = recepData.id_proveedor // Set supplier
             donInfo.value.nit = recepData.proveedor.nit_proveedor //Set supplier nit
+            donInfo.value.centerId = recepData.detalle_recepcion[0].id_centro_atencion //healthcare center
 
 
             // Iterate over detalle_recepcion
@@ -82,15 +90,17 @@ export const useDonacion = (context) => {
                         value: element.producto.id_producto,
                         label: element.producto.codigo_producto + " - " + element.producto.nombre_producto,
                     };
+                    selectedProducts.value.push(arrayOpt);
                     products.value.push(arrayOpt);
-                    defaultProds.value.push(arrayOpt);
 
                     // Construct array
                     const array = {
                         detRecId: element.id_det_recepcion_pedido, //id_det_recepcion_pedido
                         prodId: element.id_producto, //id_product
-                        centerId: element.id_centro_atencion, //Care center
                         isLoadingProd: false, //Flag to manage loader for every multiselect
+                        brandId: element.id_marca,
+                        perishable: element.producto.perecedero_producto,
+                        expDate: formatDateVue3DP(element.fecha_vcto_det_recepcion_pedido), //Expiry date
                         //Product description
                         desc: element.producto.codigo_producto + ' — ' + element.producto.nombre_producto + ' — ' + element.producto.descripcion_producto + ' — ' + element.producto.unidad_medida.nombre_unidad_medida,
                         qty: element.cant_det_recepcion_pedido, //Represents the the number of products the user wants to register
@@ -100,6 +110,13 @@ export const useDonacion = (context) => {
                     };
                     // Push array to prods
                     donInfo.value.prods.push(array);
+                }
+            });
+            // Desplazar la pantalla hasta la última fila agregada
+            nextTick(() => {
+                const newRowElement = document.getElementById(`total`);
+                if (newRowElement) {
+                    newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
                 }
             });
         } else {
@@ -112,8 +129,10 @@ export const useDonacion = (context) => {
         let array = {
             detRecId: "",
             prodId: "",
-            centerId: "",
             isLoadingProd: false,
+            perishable: "",
+            expDate: "",
+            brandId: "",
             desc: "",
             qty: "",
             cost: "",
@@ -205,6 +224,7 @@ export const useDonacion = (context) => {
             })
             .finally(() => {
                 isLoadingRequest.value = false;
+                products.value = selectedProducts.value
             });
     };
 
@@ -241,12 +261,12 @@ export const useDonacion = (context) => {
             donInfo.value.prods[index].isLoadingProd = true
             if (query.length >= 3) {
                 // Filtrar los elementos de defaultProds que tengan un valor diferente a prodId
-                const filteredProds = donInfo.value.prods.filter((e) => e.prodId !== prodId && e.deleted == false);
+                //const filteredProds = donInfo.value.prods.filter((e) => e.prodId !== prodId && e.deleted == false);
                 // Crear un array no asociativo con solo las propiedades 'value' de los elementos filtrados
-                const prodIdToIgnore = filteredProds.map((e) => e.prodId); //Productos que debe ignorar al momento de realizar la busqueda asincrona
+                //const prodIdToIgnore = filteredProds.map((e) => e.prodId); //Productos que debe ignorar al momento de realizar la busqueda asincrona
                 const response = await axios.post("/search-donation-product", {
                     busqueda: query,
-                    prodIdToIgnore: prodIdToIgnore
+                    //prodIdToIgnore: prodIdToIgnore
                 });
                 products.value = response.data.products;
             } else {
@@ -274,12 +294,21 @@ export const useDonacion = (context) => {
         if (prodId) {
             const selectedProd = products.value.find((e) => e.value === prodId)
             donInfo.value.prods[index].desc = selectedProd.allInfo.codigo_producto + ' — ' + selectedProd.allInfo.nombre_producto + ' — ' + selectedProd.allInfo.descripcion_producto + ' — ' + selectedProd.allInfo.unidad_medida.nombre_unidad_medida
+            donInfo.value.prods[index].perishable = selectedProd.allInfo.perecedero_producto
+            let arrayOpt = {
+                value: selectedProd.allInfo.id_producto,
+                label: selectedProd.allInfo.codigo_producto + " - " + selectedProd.allInfo.nombre_producto,
+            };
+            selectedProducts.value.push(arrayOpt);
         } else {
+            donInfo.value.prods[index].prodId = ''
             donInfo.value.prods[index].desc = ''
+            donInfo.value.prods[index].perishable = ''
         }
-        donInfo.value.prods[index].centerId = ''
+        donInfo.value.prods[index].brandId = ''
         donInfo.value.prods[index].qty = ''
         donInfo.value.prods[index].cost = ''
+        donInfo.value.prods[index].expDate = ''
     }
 
     const totalRec = computed(() => {
@@ -310,7 +339,7 @@ export const useDonacion = (context) => {
 
     return {
         isLoadingRequest, errors, donInfo, suppliers, products, centers,
-        asyncFindProduct, isLoadingProduct, totalRec,
+        asyncFindProduct, isLoadingProduct, totalRec, brands, selectedProducts,
         getInfoForModalDonation, selectProv, openAnySelect, selectProd, addNewRow,
         deleteRow, storeReception, updateReception
     }

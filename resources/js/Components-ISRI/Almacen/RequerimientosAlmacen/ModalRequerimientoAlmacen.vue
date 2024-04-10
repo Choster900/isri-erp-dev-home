@@ -236,7 +236,13 @@ export default defineComponent({
                     productosArray.value = resp.data.map(index => {
                         return {
                             value: index.id_det_existencia_almacen,
-                            label: `${index.existencia_almacen.productos.codigo_producto} - ${index.existencia_almacen.productos.nombre_producto}  - ${index.marca.nombre_marca} -  ${index.existencia_almacen.productos.descripcion_producto}`,
+                            label: `
+                                ${index.existencia_almacen.productos.codigo_producto} -
+                                ${index.existencia_almacen.productos.nombre_producto}  -
+                                Stock:${index.cant_det_existencia_almacen}  -
+                                ${index.marca.nombre_marca} -
+                                ${index.existencia_almacen.productos.descripcion_producto}
+                                `,
                             completeData: index,
                             codidoProducto: index.existencia_almacen.id_producto
                         };
@@ -488,10 +494,6 @@ export default defineComponent({
                             </div>
                             <div class="text-xs bg-slate-100 border-b-4 w-full text-center">
                                 <span class="text-red-600">
-                                    <!-- <pre> -->
-                                    <!--      {{ errorsValidation }}
-                                    </pre>
-                                                    <pre> -->
                                     {{ errorsValidation &&
             errorsValidation[`dataDetalleRequerimiento.${i}.productos.${j}.cantDetRequerimiento`]
                                     }}
@@ -499,11 +501,6 @@ export default defineComponent({
             errorsValidation[`dataDetalleRequerimiento.${i}.productos.${j}.idDetExistenciaAlmacen`]
                                     }}
 
-                                    <!-- </pre> -->
-
-                                    <!-- dataDetalleRequerimiento.0.productos.0.cantDetRequerimiento -->
-
-                                    <!-- errors[`detalle_quedan.${rowIndex}.id_centro_atencion`] -->
                                 </span>
                             </div>
                         </div>

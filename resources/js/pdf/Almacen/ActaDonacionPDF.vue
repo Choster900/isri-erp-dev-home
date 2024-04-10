@@ -10,44 +10,44 @@
             <div class="w-[77%] justify-center items-center border-y border-r border-gray-500 pb-[10px]">
                 <p class="font-[Bembo] text-center text-[12px] font-bold">ALMACEN CENTRAL</p>
                 <p class="font-[Bembo] text-center text-[12px] font-bold">
-                    RECEPCION DE BIENES&nbsp;Y SERVICIOS
+                    DONACIONES
                 </p>
                 <p class="font-[Bembo] text-center text-[12px] font-bold">
-                    DONACIONES
+                    ACTA DE RECEPCION {{ recToPrint.acta_recepcion_pedido }}
                 </p>
             </div>
         </div>
 
         <!-- Date and time, financing source and commitment number -->
         <div class="flex w-full border-x border-gray-500 pt-2">
-            <div class="w-[50%] flex justify-start items-center text-[12px] mt-[-5px] pb-[8px]">
-                <p class="ml-2 font-[MuseoSans] text-gray-800">Fecha y hora:</p>
-                <p class="ml-1 font-bold text-[11px] font-[MuseoSans]">
-                    {{ moment(recToPrint.fecha_reg_recepcion_pedido).format('DD/MM/YYYY, HH:mm:ss') }}
+            <div class="w-[55%] flex justify-start items-center text-[12px] mt-[-5px] pb-[8px]">
+                <p class="font-[MuseoSans] text-gray-800 ml-2">Centro:</p>
+                <p class="ml-1 font-bold text-[10px] font-[MuseoSans]">
+                    {{ recToPrint.detalle_recepcion[0].centro_atencion.nombre_centro_atencion }}
                 </p>
             </div>
-            <div class="w-[25%] flex justify-start items-center text-[12px] mt-[-5px] pb-[8px]">
+            <div class="w-[18%] flex justify-start items-center text-[12px] mt-[-5px] pb-[8px]">
                 <p class="font-[MuseoSans] text-gray-800">Financiamiento:</p>
                 <p class="ml-1 font-bold text-[11px] font-[MuseoSans]">
                     {{ recToPrint.fuente_financiamiento.codigo_proy_financiado }}
                 </p>
             </div>
-            <div class="w-[25%] flex justify-start items-center  text-[12px] mt-[-5px] pb-[8px]">
-                <p class="font-[MuseoSans] text-gray-800">Compromiso:</p>
+            <div class="w-[27%] flex justify-start items-center text-[12px] mt-[-5px] pb-[8px]">
+                <p class="font-[MuseoSans] text-gray-800">Fecha y hora:</p>
                 <p class="ml-1 font-bold text-[11px] font-[MuseoSans]">
-                    {{ }}
+                    {{ moment(recToPrint.fecha_reg_recepcion_pedido).format('DD/MM/YYYY, HH:mm:ss') }}
                 </p>
             </div>
         </div>
         <!-- Proveedor and NIT -->
         <div class="flex w-full border-x border-gray-500 py-2">
-            <div class="w-[75%] flex justify-start items-center  text-[12px] mt-[-5px] pb-[8px]">
+            <div class="w-[73%] flex justify-start items-center  text-[12px] mt-[-5px] pb-[8px]">
                 <p class="ml-2 font-[MuseoSans] text-gray-800">Donante:</p>
-                <p class="ml-1 font-bold text-[11px] font-[MuseoSans]">
+                <p class="ml-1 font-bold text-[10px] font-[MuseoSans]">
                     {{ recToPrint.proveedor.razon_social_proveedor }}
                 </p>
             </div>
-            <div class="w-[25%] flex justify-start items-center  text-[12px] mt-[-5px] pb-[8px]">
+            <div class="w-[27%] flex justify-start items-center  text-[12px] mt-[-5px] pb-[8px]">
                 <p class="font-[MuseoSans] text-gray-800">NIT:</p>
                 <p class="ml-1 font-bold text-[11px] font-[MuseoSans]">
                     {{ recToPrint.proveedor.nit_proveedor }}
