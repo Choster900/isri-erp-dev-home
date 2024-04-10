@@ -9,6 +9,7 @@ use App\Models\DetalleKardex;
 use App\Models\DetalleRecepcionPedido;
 use App\Models\Empleado;
 use App\Models\Kardex;
+use App\Models\Marca;
 use App\Models\Producto;
 use App\Models\Proveedor;
 use App\Models\RecepcionPedido;
@@ -90,12 +91,14 @@ class DonacionController extends Controller
                 ->where('estado_proveedor', 1)->get();
         }
 
-        $centers = CentroAtencion::select('id_centro_atencion as value', 'codigo_centro_atencion as label')->get();
+        $centers = CentroAtencion::selectRaw('id_centro_atencion as value, concat(codigo_centro_atencion," - ",nombre_centro_atencion) as label')->get();
+        $brands = Marca::select('id_marca as value', 'nombre_marca as label')->get();
 
         return response()->json([
             'recep'                         => $recep,
             'suppliers'                     => $suppliers,
-            'centers'                       => $centers
+            'centers'                       => $centers,
+            'brands'                        => $brands
         ]);
     }
 
@@ -160,10 +163,13 @@ class DonacionController extends Controller
             $rec->save();
 
             foreach ($request->prods as $prod) {
+                $fecha = $prod['expDate'] != '' ? date('Y/m/d', strtotime($prod['expDate'])) : null;
                 $newDet = new DetalleRecepcionPedido([
-                    'id_centro_atencion'                        => $prod['centerId'],
+                    'id_centro_atencion'                        => $request->centerId,
                     'id_producto'                               => $prod['prodId'],
                     'id_recepcion_pedido'                       => $rec->id_recepcion_pedido,
+                    'fecha_vcto_det_recepcion_pedido'           => $fecha,
+                    'id_marca'                                  => $prod['brandId'],
                     'cant_det_recepcion_pedido'                 => $prod['qty'],
                     'costo_det_recepcion_pedido'                => $prod['cost'],
                     'estado_det_recepcion_pedido'               => 1,
@@ -204,12 +210,15 @@ class DonacionController extends Controller
                 ]);
 
                 foreach ($request->prods as $prod) {
+                    $fecha = $prod['expDate'] != '' ? date('Y/m/d', strtotime($prod['expDate'])) : null;
                     if ($prod['detRecId'] != "" && $prod['deleted'] == false) {
                         $det = DetalleRecepcionPedido::find($prod['detRecId']);
                         $det->update([
-                            'id_centro_atencion'                        => $prod['centerId'],
+                            'id_centro_atencion'                        => $request->centerId,
                             'id_producto'                               => $prod['prodId'],
                             'id_recepcion_pedido'                       => $request->id,
+                            'fecha_vcto_det_recepcion_pedido'           => $fecha,
+                            'id_marca'                                  => $prod['brandId'],
                             'cant_det_recepcion_pedido'                 => $prod['qty'],
                             'costo_det_recepcion_pedido'                => $prod['cost'],
                             'fecha_mod_det_recepcion_pedido'            => Carbon::now(),
@@ -221,23 +230,25 @@ class DonacionController extends Controller
                     if ($prod['detRecId'] != "" && $prod['deleted'] == true) {
                         $det = DetalleRecepcionPedido::find($prod['detRecId']);
                         $det->update([
-                            'estado_det_recepcion_pedido' => 0,
-                            'fecha_mod_det_recepcion_pedido' => Carbon::now(),
-                            'usuario_det_recepcion_pedido' => $request->user()->nick_usuario,
-                            'ip_det_recepcion_pedido' => $request->ip()
+                            'id_centro_atencion'                        => $request->centerId,
+                            'estado_det_recepcion_pedido'               => 0,
+                            'fecha_mod_det_recepcion_pedido'            => Carbon::now(),
+                            'usuario_det_recepcion_pedido'              => $request->user()->nick_usuario,
+                            'ip_det_recepcion_pedido'                   => $request->ip()
                         ]);
                     }
 
                     if ($prod['detRecId'] == "" && $prod['deleted'] == false) {
                         $existDetail = DetalleRecepcionPedido::where('id_recepcion_pedido', $request->id)
                             ->where('id_producto', $prod['prodId'])
+                            ->where('id_marca', $prod['brandId'])
+                            ->where('fecha_vcto_det_recepcion_pedido', $fecha)
+                            ->where('costo_det_recepcion_pedido',$prod['cost'])
                             ->first();
                         if ($existDetail) {
                             $existDetail->update([
-                                'id_centro_atencion'                        => $prod['centerId'],
-                                'id_producto'                               => $prod['prodId'],
+                                'id_centro_atencion'                        => $request->centerId,
                                 'cant_det_recepcion_pedido'                 => $prod['qty'],
-                                'costo_det_recepcion_pedido'                => $prod['cost'],
                                 'estado_det_recepcion_pedido'               => 1,
                                 'fecha_mod_det_recepcion_pedido'            => Carbon::now(),
                                 'usuario_det_recepcion_pedido'              => $request->user()->nick_usuario,
@@ -245,11 +256,13 @@ class DonacionController extends Controller
                             ]);
                         } else {
                             $newDet = new DetalleRecepcionPedido([
-                                'id_centro_atencion'                        => $prod['centerId'],
+                                'id_centro_atencion'                        => $request->centerId,
                                 'id_producto'                               => $prod['prodId'],
                                 'id_recepcion_pedido'                       => $request->id,
                                 'cant_det_recepcion_pedido'                 => $prod['qty'],
                                 'costo_det_recepcion_pedido'                => $prod['cost'],
+                                'fecha_vcto_det_recepcion_pedido'           => $fecha,
+                                'id_marca'                                  => $prod['brandId'],
                                 'estado_det_recepcion_pedido'               => 1,
                                 'fecha_reg_det_recepcion_pedido'            => Carbon::now(),
                                 'usuario_det_recepcion_pedido'              => $request->user()->nick_usuario,

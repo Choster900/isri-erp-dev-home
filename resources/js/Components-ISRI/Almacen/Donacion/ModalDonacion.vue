@@ -28,7 +28,7 @@
                 </svg>
             </div>
             <div class="ml-8 mr-0 max-w-full overflow-x-auto mt-4 max-h-[450px] overflow-y-auto">
-                <div class="min-w-[815px]">
+                <div class="min-w-[970px]">
                     <div class="grid grid-cols-[23%_77%] max-w-[97%]">
                         <!-- Columna 1 -->
                         <div class="w-full bg-white border border-gray-500 p-2">
@@ -51,34 +51,36 @@
                         </div>
                     </div>
                 </div>
-                <div class="min-w-[815px] ">
-                    <div class="grid grid-cols-[25%_25%_50%] max-w-[97%] border-gray-500 border-x py-1">
+                <div class="min-w-[970px] ">
+                    <div class="grid grid-cols-[41%_34%_25%] max-w-[97%] border-gray-500 border-x py-1">
                         <div :class="{ 'select-err': errors.supplierId }"
                             class="justify-start flex-row flex items-center w-full">
-                            <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2">
+                            <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2 w-[18%]">
                                 CENTRO:
                             </p>
-                            <Multiselect id="doc" v-model="prod.centerId" :options="centers" class="h-[35px]"
-                                :disabled="donInfo.status != 1" :searchable="true" :noOptionsText="'Lista vacía.'"
-                                placeholder="Centro"
-                                :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', optionPointed: 'text-white bg-[#001c48] bg-opacity-40' }" />
+                            <div class="flex items-center w-[82%] ml-2">
+                                <Multiselect id="doc" v-model="donInfo.centerId" :options="centers" class="h-[30px]"
+                                    :class="{ 'bg-red-200': errors.centerId }" :disabled="donInfo.status != 1"
+                                    :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Centro"
+                                    :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', optionPointed: 'text-white bg-[#001c48] bg-opacity-40' }" />
+                            </div>
                         </div>
                         <div class="justify-start flex items-center w-full bg-white">
-                            <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1">
+                            <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-4">
                                 FINANCIAMIENTO:
                                 <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">D</span>
                             </p>
                         </div>
                         <div class="justify-start flex items-center w-full bg-white">
                             <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1">
-                                FECHA Y HORA DE RECEPCION:
+                                FECHA Y HORA:
                                 <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{ donInfo.dateTime
                                     }}</span>
                             </p>
                         </div>
                     </div>
                 </div>
-                <div class="min-w-[815px]">
+                <div class="min-w-[970px]">
                     <div
                         class="grid grid-cols-[75%_25%] max-w-[97%] w-full border-b border-x border-gray-500 py-1 bg-white">
                         <div :class="{ 'select-err': errors.supplierId }"
@@ -86,7 +88,7 @@
                             <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2">
                                 DONANTE:
                             </p>
-                            <div class="flex items-center w-[53%] ml-2">
+                            <div class="flex items-center w-[43%] ml-[13px]">
                                 <Multiselect id="doc" v-model="donInfo.supplierId" :options="suppliers" class="h-[30px]"
                                     :class="{ 'bg-red-200': errors.supplierId }" :disabled="donInfo.status != 1"
                                     :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione"
@@ -103,16 +105,16 @@
                         </div>
                     </div>
                 </div>
-                <div class="min-w-[815px]">
+                <div class="min-w-[970px]">
                     <div class="grid grid-cols-[100%] max-w-[97%] border-x border-b border-gray-500">
                         <div class="justify-center flex w-full bg-white">
                             <p class="font-[MuseoSans] text-[12px] py-1 font-bold">LISTADO DE PRODUCTOS</p>
                         </div>
                     </div>
                 </div>
-                <div class="min-w-[815px]">
+                <div class="min-w-[970px]">
                     <div
-                        class="grid grid-cols-[20%_25%_13%_12%_15%_15%] max-w-[97%] w-full bg-[#001c48] border-b border-x border-gray-500 bg-opacity-80 min-w-[800px] text-white">
+                        class="grid grid-cols-[18%_25%_14%_13%_10%_10%_10%] max-w-[97%] w-full bg-[#001c48] border-b border-x border-gray-500 bg-opacity-80 min-w-[800px] text-white">
                         <!-- Table header -->
                         <div class="w-full flex items-center justify-center border-r border-gray-500 h-[30px]">
                             <p class="text-center font-[MuseoSans] text-[11px]">PRODUCTO
@@ -123,7 +125,10 @@
                                 INFO. PRODUCTO</p>
                         </div>
                         <div class="w-full flex items-center justify-center border-r border-gray-500 h-[30px]">
-                            <p class="text-center font-[MuseoSans] text-[11px]">CENTRO</p>
+                            <p class="text-center font-[MuseoSans] text-[11px]">MARCA</p>
+                        </div>
+                        <div class="w-full flex items-center justify-center border-r border-gray-500 h-[30px]">
+                            <p class="text-center font-[MuseoSans] text-[11px]">VCTO.</p>
                         </div>
                         <div class="w-full flex items-center justify-center border-r border-gray-500 h-[30px]">
                             <p class="text-center font-[MuseoSans] text-[11px]">CANTIDAD</p>
@@ -137,9 +142,9 @@
                     </div>
                 </div>
                 <template v-for="(prod, index) in donInfo.prods" :key="index">
-                    <div class="min-w-[815px] grid grid-cols-[97%_3%]" v-if="prod.deleted == false">
+                    <div class="min-w-[970px] grid grid-cols-[97%_3%]" v-if="prod.deleted == false">
                         <div :id="'row-' + index"
-                            class="grid grid-cols-[20%_25%_13%_12%_15%_15%] max-w-full bg-white hover:bg-gray-200 text-gray-800 border-b border-x border-gray-500">
+                            class="grid grid-cols-[18%_25%_14%_13%_10%_10%_10%] max-w-full bg-white hover:bg-gray-200 text-gray-800 border-b border-x border-gray-500">
                             <div class="w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]"
                                 :class="errors['prods.' + index + '.prodId'] ? 'bg-red-300' : ''">
                                 <!-- Select for products -->
@@ -149,7 +154,7 @@
                                     @change="selectProd($event, index)" :loading="prod.isLoadingProd"
                                     :clear-on-search="true" :filter-results="false" :resolve-on-load="true"
                                     :noOptionsText="'Escriba para buscar...'" placeholder="Seleccione"
-                                    @open="openAnySelect(prod.prodId)"
+                                    @open="products = []"
                                     :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
                             </div>
 
@@ -160,23 +165,32 @@
                                 </div>
                             </div>
 
-                            <div class="w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]"
-                                :class="errors['prods.' + index + '.centerId'] ? 'bg-red-300' : ''">
-                                <Multiselect id="doc" v-model="prod.centerId" :options="centers" class="h-[35px]"
-                                    :disabled="donInfo.status != 1" :searchable="true" :noOptionsText="'Lista vacía.'"
-                                    placeholder="Centro"
+                            <div class="border-r border-gray-500 min-h-[75px] flex items-center justify-center"
+                                :class="errors['prods.' + index + '.brandId'] ? 'bg-red-300' : ''">
+                                <Multiselect id="doc" v-model="prod.brandId" :options="brands"
+                                    class="h-[35px] max-w-[95%]" :disabled="donInfo.status != 1" :searchable="true"
+                                    :noOptionsText="'Lista vacía.'" placeholder="Marca"
                                     :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', optionPointed: 'text-white bg-[#001c48] bg-opacity-40' }" />
                             </div>
+                            <div class="flex items-center justify-center border-r border-gray-500 min-h-[75px]"
+                                :class="errors['prods.' + index + '.expDate'] ? 'bg-red-300' : ''">
+                                <div v-if="prod.perishable === 1" class="max-w-[95%]">
+                                    <date-time-picker-m v-model="prod.expDate" :showIcon="false" :placeholder="'Fecha'"
+                                        :disabled="donInfo.status != 1" />
+                                </div>
+                                <p v-else class="font-[MuseoSans] text-[12px] p-1 ">N/A</p>
+                            </div>
+
                             <div class="w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]"
                                 :class="errors['prods.' + index + '.qty'] ? 'bg-red-300' : ''">
                                 <input v-model="prod.qty" :disabled="donInfo.status != 1"
-                                    class="font-bold max-w-[75%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-[13px] border-[#d1d5db]"
+                                    class="font-bold max-w-[95%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-[13px] border-[#d1d5db]"
                                     type="text" name="" id="">
                             </div>
                             <div class="w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]"
                                 :class="errors['prods.' + index + '.cost'] ? 'bg-red-300' : ''">
                                 <input v-model="prod.cost" :disabled="donInfo.status != 1"
-                                    class="font-bold max-w-[75%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-[13px] border-[#d1d5db]"
+                                    class="font-bold max-w-[95%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-[13px] border-[#d1d5db]"
                                     type="text" name="" id="">
                             </div>
                             <div class="w-full flex items-center justify-center min-h-[75px]">
@@ -204,13 +218,13 @@
                         </div>
                     </div>
                 </template>
-                <div id="total" class="w-full max-w-full grid grid-cols-[97%_3%] min-w-[815px]">
-                    <div class="grid grid-cols-[85%_15%] w-full max-w-full border-b border-x border-gray-500">
-                        <div class="text-right border-r h-[30px]  border-gray-500">
-                            <p class="font-[MuseoSans] text-[12px] py-2 mr-2 font-bold mt-[-4px]">TOTAL ACTA</p>
+                <div id="total" class="w-full max-w-full grid grid-cols-[97%_3%] min-w-[970px]">
+                    <div class="grid grid-cols-[90%_10%] w-full max-w-full border-b border-x border-gray-500">
+                        <div class="flex items-center justify-end border-r h-[30px]  border-gray-500">
+                            <p class="font-[MuseoSans] text-[12px] py-2 mr-2 font-bold">TOTAL DONACION</p>
                         </div>
-                        <div class="text-center h-[30px] ">
-                            <p class="font-[MuseoSans] text-[13px] py-2 font-bold text-green-800 mt-[-4px]">${{ totalRec
+                        <div class="flex items-center justify-center h-[30px] ">
+                            <p class="font-[MuseoSans] text-[13px] py-2 font-bold text-green-800">${{ totalRec
                                 }}
                             </p>
                         </div>
@@ -247,13 +261,13 @@ import InputError from "@/Components/InputError.vue";
 import ProcessModal from "@/Components-ISRI/AllModal/ProcessModal.vue";
 import InputText from "@/Components-ISRI/ComponentsToForms/InputText.vue";
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
-//import DateTimePickerM from "@/Components-ISRI/ComponentsToForms/DateTimePickerM.vue";
+import DateTimePickerM from "@/Components-ISRI/ComponentsToForms/DateTimePickerM.vue";
 
 import { toRefs, onMounted } from "vue";
 
 export default {
     emits: ["cerrar-modal", "get-table"],
-    components: { ProcessModal, InputError, InputText, IconM },
+    components: { ProcessModal, InputError, InputText, IconM, DateTimePickerM },
     props: {
         showModalDonation: {
             type: Boolean,
@@ -269,7 +283,7 @@ export default {
 
         const {
             isLoadingRequest, donInfo, errors, suppliers, products, centers,
-            asyncFindProduct, isLoadingProduct, totalRec,
+            asyncFindProduct, isLoadingProduct, totalRec, brands, selectedProducts,
             getInfoForModalDonation, selectProv, openAnySelect, selectProd, addNewRow,
             deleteRow, storeReception, updateReception
         } = useDonacion(context);
@@ -284,7 +298,7 @@ export default {
 
         return {
             isLoadingRequest, donInfo, errors, suppliers, products, centers,
-            isLoadingProduct, totalRec,
+            isLoadingProduct, totalRec, brands, selectedProducts,
             selectProv, handleSearchChange, openAnySelect, selectProd, addNewRow,
             deleteRow, storeReception, updateReception
         };
