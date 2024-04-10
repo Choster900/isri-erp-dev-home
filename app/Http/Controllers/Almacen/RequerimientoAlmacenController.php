@@ -60,7 +60,7 @@ class RequerimientoAlmacenController extends Controller
             return $query->where('id_estado_req', 2)
                 ->orWhere('id_estado_req', 3)
                 ->orWhere('id_estado_req', 4);
-        })
+        })->where("id_tipo_req",1)
             ->orderBy($v_columns[$v_column], $v_dir);
 
         if ($data) {
@@ -399,6 +399,41 @@ class RequerimientoAlmacenController extends Controller
                     } else {
 
                         if ($value2["stateProducto"] == 1) {
+
+
+
+                            $rules = [];
+
+                            collect($request->dataDetalleRequerimiento)->each(function ($prodReq, $key) use (&$rules, &$request) {
+                                if ($prodReq["stateCentroProduccion"] == 0)
+                                    return;
+
+                                collect($request["dataDetalleRequerimiento.{$key}.productos"])
+                                    ->each(function ($det, $indice) use (&$rules, $key, $prodReq) {
+                                        if ($det["stateProducto"] == 0)
+                                            return;
+
+                                        if (!empty($det["idDetExistenciaAlmacen"])) {
+
+                                            $detalleExistenciaAlmacen = DetalleExistenciaAlmacen::select("cant_det_existencia_almacen")
+                                                ->where('id_det_existencia_almacen', $det["idDetExistenciaAlmacen"])
+                                                ->first();
+
+                                            $rules["dataDetalleRequerimiento.{$key}.productos.{$indice}.cantDetRequerimiento"] = [
+                                                'required',
+                                                'numeric',
+                                                "lte:$detalleExistenciaAlmacen->cant_det_existencia_almacen",
+                                            ];
+                                        }
+                                    });
+                            });
+
+                            $messages = [
+                                'dataDetalleRequerimiento.*.productos.*.cantDetRequerimiento.required' => 'El campo Cantidad de Requerimiento es obligatorio.',
+                                'dataDetalleRequerimiento.*.productos.*.cantDetRequerimiento.numeric' => 'El campo Cantidad de Requerimiento debe ser numérico.',
+                                'dataDetalleRequerimiento.*.productos.*.cantDetRequerimiento.lte' => 'La cantidad de requerimiento debe ser menor o igual a :value.',
+                            ];
+                            $validator = Validator::make($request->all(), $rules, $messages);
 
                             // Agregar
                             DetalleRequerimiento::insert(
