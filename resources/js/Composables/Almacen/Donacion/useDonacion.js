@@ -25,7 +25,7 @@ export const useDonacion = (context) => {
         dateTime: '', //Donation date and time
         supplierId: '', //supplier
         nit: '', // supplier nit
-        invoice: '11111', //Invoice number
+        centerId: '', //Healthcare center
         observation: '', //Reception observation
         status: '', //We use this to manage some functionalities in the view, it represent the reception status
         total: '', //This is the sum of all products
@@ -89,7 +89,6 @@ export const useDonacion = (context) => {
                     const array = {
                         detRecId: element.id_det_recepcion_pedido, //id_det_recepcion_pedido
                         prodId: element.id_producto, //id_product
-                        centerId: element.id_centro_atencion, //Care center
                         isLoadingProd: false, //Flag to manage loader for every multiselect
                         //Product description
                         desc: element.producto.codigo_producto + ' — ' + element.producto.nombre_producto + ' — ' + element.producto.descripcion_producto + ' — ' + element.producto.unidad_medida.nombre_unidad_medida,
@@ -102,6 +101,13 @@ export const useDonacion = (context) => {
                     donInfo.value.prods.push(array);
                 }
             });
+            // Desplazar la pantalla hasta la última fila agregada
+            nextTick(() => {
+                const newRowElement = document.getElementById(`total`);
+                if (newRowElement) {
+                    newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                }
+            });
         } else {
             // Call addNewRow
             addNewRow();
@@ -112,7 +118,6 @@ export const useDonacion = (context) => {
         let array = {
             detRecId: "",
             prodId: "",
-            centerId: "",
             isLoadingProd: false,
             desc: "",
             qty: "",
