@@ -50,7 +50,7 @@ class AjusteEntradaRequest extends FormRequest
             $rules["prods.{$key}.brandId"] = [
                 function ($attribute, $value, $fail) use ($key, $prod) {
                     if (!$prod['deleted'] && empty($value)) {
-                        $fail("Debe seleccionar el centro de atención.");
+                        $fail("Debe seleccionar marca.");
                     }
                 }
             ];
