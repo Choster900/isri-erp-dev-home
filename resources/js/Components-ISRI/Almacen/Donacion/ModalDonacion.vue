@@ -13,7 +13,7 @@
             :addClases="' bg-gray-100'">
             <div class="flex items-center justify-between py-3 px-4 border-b border-gray-400 border-opacity-70">
                 <div class="flex">
-                    <span class="text-[16px] font-medium font-[Roboto] text-gray-500 text-opacity-70">Recepcion</span>
+                    <span class="text-[16px] font-medium font-[Roboto] text-gray-500 text-opacity-70">Donación</span>
                     <div class="mt-[5px] text-gray-500 text-opacity-70 w-[14px] h-[14px] mx-2">
                         <icon-m :iconName="'nextSvgVector'"></icon-m>
                     </div>
@@ -167,10 +167,11 @@
 
                             <div class="border-r border-gray-500 min-h-[75px] flex items-center justify-center"
                                 :class="errors['prods.' + index + '.brandId'] ? 'bg-red-300' : ''">
-                                <Multiselect id="doc" v-model="prod.brandId" :options="brands"
+                                <Multiselect v-if="donInfo.status == 1" id="doc" v-model="prod.brandId" :options="brands"
                                     class="h-[35px] max-w-[95%]" :disabled="donInfo.status != 1" :searchable="true"
                                     :noOptionsText="'Lista vacía.'" placeholder="Marca"
                                     :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', optionPointed: 'text-white bg-[#001c48] bg-opacity-40' }" />
+                                    <p class="font-[MuseoSans] text-[12px] p-1 " v-else>{{ prod.brandLabel }}</p>
                             </div>
                             <div class="flex items-center justify-center border-r border-gray-500 min-h-[75px]"
                                 :class="errors['prods.' + index + '.expDate'] ? 'bg-red-300' : ''">

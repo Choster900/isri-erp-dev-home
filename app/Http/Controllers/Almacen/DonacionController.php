@@ -74,6 +74,7 @@ class DonacionController extends Controller
         if ($idRec > 0) { //This means we are updating an existing reception
             $recep = RecepcionPedido::with([
                 'detalle_recepcion.producto.unidad_medida',
+                'detalle_recepcion.marca',
                 'estado_recepcion',
                 'proveedor'
             ])->find($idRec);
@@ -164,20 +165,39 @@ class DonacionController extends Controller
 
             foreach ($request->prods as $prod) {
                 $fecha = $prod['expDate'] != '' ? date('Y/m/d', strtotime($prod['expDate'])) : null;
-                $newDet = new DetalleRecepcionPedido([
-                    'id_centro_atencion'                        => $request->centerId,
-                    'id_producto'                               => $prod['prodId'],
-                    'id_recepcion_pedido'                       => $rec->id_recepcion_pedido,
-                    'fecha_vcto_det_recepcion_pedido'           => $fecha,
-                    'id_marca'                                  => $prod['brandId'],
-                    'cant_det_recepcion_pedido'                 => $prod['qty'],
-                    'costo_det_recepcion_pedido'                => $prod['cost'],
-                    'estado_det_recepcion_pedido'               => 1,
-                    'fecha_reg_det_recepcion_pedido'            => Carbon::now(),
-                    'usuario_det_recepcion_pedido'              => $request->user()->nick_usuario,
-                    'ip_det_recepcion_pedido'                   => $request->ip()
-                ]);
-                $newDet->save();
+
+                $existDetail = DetalleRecepcionPedido::where('id_recepcion_pedido', $rec->id_recepcion_pedido)
+                    ->where('id_producto', $prod['prodId'])
+                    ->where('id_marca', $prod['brandId'])
+                    ->where('fecha_vcto_det_recepcion_pedido', $fecha)
+                    ->where('costo_det_recepcion_pedido', number_format($prod['cost'], 2))
+                    ->first();
+
+                if ($existDetail) {
+                    $existDetail->update([
+                        'id_centro_atencion'                        => $request->centerId,
+                        'cant_det_recepcion_pedido'                 => $existDetail->cant_det_recepcion_pedido + $prod['qty'],
+                        'estado_det_recepcion_pedido'               => 1,
+                        'fecha_mod_det_recepcion_pedido'            => Carbon::now(),
+                        'usuario_det_recepcion_pedido'              => $request->user()->nick_usuario,
+                        'ip_det_recepcion_pedido'                   => $request->ip()
+                    ]);
+                } else {
+                    $newDet = new DetalleRecepcionPedido([
+                        'id_centro_atencion'                        => $request->centerId,
+                        'id_producto'                               => $prod['prodId'],
+                        'id_recepcion_pedido'                       => $rec->id_recepcion_pedido,
+                        'fecha_vcto_det_recepcion_pedido'           => $fecha,
+                        'id_marca'                                  => $prod['brandId'],
+                        'cant_det_recepcion_pedido'                 => $prod['qty'],
+                        'costo_det_recepcion_pedido'                => $prod['cost'],
+                        'estado_det_recepcion_pedido'               => 1,
+                        'fecha_reg_det_recepcion_pedido'            => Carbon::now(),
+                        'usuario_det_recepcion_pedido'              => $request->user()->nick_usuario,
+                        'ip_det_recepcion_pedido'                   => $request->ip()
+                    ]);
+                    $newDet->save();
+                }
             }
 
             DB::commit(); // Confirma las operaciones en la base de datos
@@ -239,16 +259,19 @@ class DonacionController extends Controller
                     }
 
                     if ($prod['detRecId'] == "" && $prod['deleted'] == false) {
-                        $existDetail = DetalleRecepcionPedido::where('id_recepcion_pedido', $request->id)
+                        $existDetail = DetalleRecepcionPedido::where('id_recepcion_pedido', $rec->id_recepcion_pedido)
                             ->where('id_producto', $prod['prodId'])
                             ->where('id_marca', $prod['brandId'])
                             ->where('fecha_vcto_det_recepcion_pedido', $fecha)
-                            ->where('costo_det_recepcion_pedido',$prod['cost'])
+                            ->where('costo_det_recepcion_pedido', number_format($prod['cost'], 2))
                             ->first();
                         if ($existDetail) {
+                            //Let's check if a detalle_recepcion_pedido exists, if it exist we update the quantity attribute
+                            //If the existing detail is inactive, we set the quantity that we are sending from the view, otherwise we add the two quantities together.
+                            $cant = $existDetail->estado_det_recepcion_pedido == 0 ? $prod['qty'] : $existDetail->cant_det_recepcion_pedido + $prod['qty'];
                             $existDetail->update([
                                 'id_centro_atencion'                        => $request->centerId,
-                                'cant_det_recepcion_pedido'                 => $prod['qty'],
+                                'cant_det_recepcion_pedido'                 => $cant,
                                 'estado_det_recepcion_pedido'               => 1,
                                 'fecha_mod_det_recepcion_pedido'            => Carbon::now(),
                                 'usuario_det_recepcion_pedido'              => $request->user()->nick_usuario,
@@ -317,15 +340,6 @@ class DonacionController extends Controller
 
     public function getInfoModalSendDonation(Request $request, $id)
     {
-        // $recInfo = RecepcionPedido::with(
-        //     [
-        //         'det_doc_adquisicion.documento_adquisicion.administradores' => function ($query) {
-        //             $query->where('estado_admon_adquisicion', 1);
-        //         },
-        //         'det_doc_adquisicion.documento_adquisicion.administradores.empleado.persona'
-        //     ]
-        // )->find($id);
-
         $empleados = Empleado::with('persona')->where('id_estado_empleado', 1)->get();
 
         $empOptions = $empleados->map(function ($e) {
@@ -336,7 +350,6 @@ class DonacionController extends Controller
         });
 
         return response()->json([
-            //'recInfo'                           => $recInfo,
             'empOptions'                        => $empOptions
         ]);
     }
@@ -388,7 +401,6 @@ class DonacionController extends Controller
                     'id_recepcion_pedido'                   => $reception->id_recepcion_pedido,
                     'id_proy_financiado'                    => $reception->id_proy_financiado,
                     'id_tipo_mov_kardex'                    => 1,
-                    'id_tipo_req'                           => 4, //DONACION
                     'fecha_kardex'                          => Carbon::now(),
                     'fecha_reg_kardex'                      => Carbon::now(),
                     'usuario_kardex'                        => $request->user()->nick_usuario,
@@ -402,7 +414,7 @@ class DonacionController extends Controller
                         'id_producto'                       => $det->producto->id_producto,
                         'id_centro_atencion'                => $det->id_centro_atencion,
                         'id_marca'                          => $det->id_marca,
-                        'fecha_vencimiento_det_kardex'      => $det->fecha_vcto_det_requerimiento,
+                        'fecha_vencimiento_det_kardex'      => $det->fecha_vcto_det_recepcion_pedido,
                         'cant_det_kardex'                   => $det->cant_det_recepcion_pedido,
                         'costo_det_kardex'                  => $det->costo_det_recepcion_pedido,
                         'fecha_reg_det_kardex'              => Carbon::now(),
@@ -418,7 +430,7 @@ class DonacionController extends Controller
                         $det->id_marca,
                         $det->cant_det_recepcion_pedido,
                         $det->costo_det_recepcion_pedido,
-                        $det->fecha_vcto_det_requerimiento,
+                        $det->fecha_vcto_det_recepcion_pedido,
                         Carbon::now(),
                         $request->user()->nick_usuario,
                         $request->ip()
@@ -448,6 +460,7 @@ class DonacionController extends Controller
                 $query->where('estado_det_recepcion_pedido', 1);
             },
             'detalle_recepcion.centro_atencion',
+            'detalle_recepcion.marca',
             'fuente_financiamiento',
             'proveedor',
             'detalle_recepcion.producto.unidad_medida',

@@ -48,7 +48,7 @@ class AjusteEntradaController extends Controller
 
         if ($search_value) {
             $query->where('id_requerimiento', 'like', '%' . $search_value['id_requerimiento'] . '%') //Search by requerimiento id
-                ->where('id_centro_atencion', 'like', '%' . $search_value['id_centro_atencion'] . '%') //Search by Healthcare center
+                ->where('id_centro_atencion', $search_value['id_centro_atencion']) //Search by Healthcare center
                 ->where('id_proy_financiado', 'like', '%' . $search_value['id_proy_financiado'] . '%') //Search by financing source
                 ->where('num_requerimiento', 'like', '%' . $search_value['num_requerimiento'] . '%') //Search by requerimiento code
                 ->where('fecha_requerimiento', 'like', '%' . $search_value['fecha_requerimiento'] . '%') //Search by requerimiento date
