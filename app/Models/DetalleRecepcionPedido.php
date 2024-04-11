@@ -30,18 +30,40 @@ class DetalleRecepcionPedido extends Model
         'ip_det_recepcion_pedido',
     ];
 
+    /**
+     * Get the Producto model associated with this instance.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function producto()
     {
-        return $this->belongsTo('App\Models\Producto', 'id_producto', 'id_producto');
+        return $this->belongsTo(Producto::class, 'id_producto', 'id_producto');
     }
-
+    /**
+     * Get the ProductoAdquisicion model associated with this instance.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function producto_adquisicion()
     {
-        return $this->belongsTo('App\Models\ProductoAdquisicion', 'id_prod_adquisicion', 'id_prod_adquisicion');
+        return $this->belongsTo(ProductoAdquisicion::class, 'id_prod_adquisicion', 'id_prod_adquisicion');
     }
-
+    /**
+     * Get the CentroAtencion model associated with this instance.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function centro_atencion()
     {
-        return $this->belongsTo('App\Models\CentroAtencion', 'id_centro_atencion', 'id_centro_atencion');
+        return $this->belongsTo(CentroAtencion::class, 'id_centro_atencion', 'id_centro_atencion');
+    }
+    /**
+     * Get the Marca model associated with this instance.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function marca()
+    {
+        return $this->belongsTo(Marca::class, 'id_marca', 'id_marca');
     }
 }

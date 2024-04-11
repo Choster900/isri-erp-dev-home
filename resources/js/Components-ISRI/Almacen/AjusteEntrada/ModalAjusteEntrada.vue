@@ -175,10 +175,11 @@
                                 </div>
                                 <div class="border-r border-gray-500 min-h-[75px] flex items-center justify-center"
                                     :class="errors['prods.' + index + '.brandId'] ? 'bg-red-300' : ''">
-                                    <Multiselect id="doc" v-model="prod.brandId" :options="brands"
+                                    <Multiselect v-if="adjustment.status == 1" id="doc" v-model="prod.brandId" :options="brands"
                                         class="h-[35px] max-w-[95%]" :disabled="adjustment.status != 1"
                                         :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Marca"
                                         :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', optionPointed: 'text-white bg-[#001c48] bg-opacity-40' }" />
+                                        <p class="font-[MuseoSans] text-[12px] p-1 " v-else>{{ prod.brandLabel }}</p>
                                 </div>
                                 <div class="flex items-center justify-center border-r border-gray-500 min-h-[75px]"
                                     :class="errors['prods.' + index + '.expDate'] ? 'bg-red-300' : ''">

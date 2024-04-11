@@ -101,10 +101,10 @@ export const useAjusteEntrada = (context) => {
                         detId: element.id_det_requerimiento, //id_det_recepcion_pedido
                         prodId: element.id_producto, //id_product
                         brandId: element.id_marca,
+                        brandLabel: element.marca.nombre_marca,
                         perishable: element.producto.perecedero_producto,
                         expDate: formatDateVue3DP(element.fecha_vcto_det_requerimiento), //Expiry date
                         isLoadingProd: false, //Flag to manage loader for every multiselect
-                        //Product description
                         desc: element.producto.codigo_producto + ' — ' + element.producto.nombre_producto + ' — ' + element.producto.descripcion_producto + ' — ' + element.producto.unidad_medida.nombre_unidad_medida ?? 'Sin marca',
                         qty: element.cant_det_requerimiento, //Represents the the number of products the user wants to register
                         cost: element.costo_det_requerimiento, //Represents the the cost of the product
@@ -137,6 +137,7 @@ export const useAjusteEntrada = (context) => {
             isLoadingProd: false,
             desc: "",
             brandId: "",
+            brandLabel: "",
             qty: "",
             cost: "",
             total: '0.00',
