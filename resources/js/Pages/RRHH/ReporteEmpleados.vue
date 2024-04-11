@@ -188,7 +188,7 @@
         <div v-if="isLoadingRequest || isLoadingExport"
             class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
             <div role="status" class="flex items-center">
-                <svg aria-hidden="true" class="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-800"
+                <svg aria-hidden="true" class="w-8 h-8 mr-2 text-gray-200 animate-spin  fill-blue-800"
                     viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
@@ -222,7 +222,7 @@
                     </div>
                     <div class="mb-4 md:flex flex-row justify-items-start mx-4">
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                            <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Centro de
+                            <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Centro de
                                 atención
                                 <span class="text-red-600 font-extrabold">*</span>
                             </label>
@@ -241,7 +241,7 @@
                                 :message="item" />
                         </div>
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                            <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Dependencia
+                            <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Dependencia
                                 jerárquica
                             </label>
                             <div class="relative font-semibold flex h-10 w-full flex-row-reverse">
@@ -259,7 +259,7 @@
                     </div>
                     <div class="mb-4 md:flex flex-row justify-center mx-4">
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                            <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Estado empleados
+                            <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Estado empleados
                                 <span class="text-red-600 font-extrabold">*</span>
                             </label>
                             <div class="relative font-semibold flex h-10 w-full flex-row-reverse">
@@ -276,7 +276,7 @@
                             <InputError v-for="(item, index) in errors.status" :key="index" class="mt-2" :message="item" />
                         </div>
                         <div class="mb-4 md:mr-2 md:mb-0 basis-1/2">
-                            <label class="block mb-2 text-[13px] font-medium text-gray-600 dark:text-white">Tipo
+                            <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Tipo
                                 contratación
                             </label>
                             <div class="relative font-semibold flex h-10 w-full flex-row-reverse">

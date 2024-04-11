@@ -47,6 +47,7 @@ export const useDonacion = (context) => {
             });
             setModalValues(response.data, id)
         } catch (err) {
+            console.log(err);
             if (err.response && err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
                 context.emit("get-table");
@@ -99,9 +100,9 @@ export const useDonacion = (context) => {
                         prodId: element.id_producto, //id_product
                         isLoadingProd: false, //Flag to manage loader for every multiselect
                         brandId: element.id_marca,
+                        brandLabel: element.marca.nombre_marca,
                         perishable: element.producto.perecedero_producto,
                         expDate: formatDateVue3DP(element.fecha_vcto_det_recepcion_pedido), //Expiry date
-                        //Product description
                         desc: element.producto.codigo_producto + ' — ' + element.producto.nombre_producto + ' — ' + element.producto.descripcion_producto + ' — ' + element.producto.unidad_medida.nombre_unidad_medida,
                         qty: element.cant_det_recepcion_pedido, //Represents the the number of products the user wants to register
                         cost: element.costo_det_recepcion_pedido, //Represents the the cost of the product
@@ -133,6 +134,7 @@ export const useDonacion = (context) => {
             perishable: "",
             expDate: "",
             brandId: "",
+            brandLabel: "",
             desc: "",
             qty: "",
             cost: "",
@@ -143,8 +145,6 @@ export const useDonacion = (context) => {
 
         // Desplazar la pantalla hasta la última fila agregada
         nextTick(() => {
-            //const newRowIndex = donInfo.value.prods.length - 1;
-            //const newRowElement = document.getElementById(`row-${newRowIndex}`);
             const newRowElement = document.getElementById(`total`);
             if (newRowElement) {
                 newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
