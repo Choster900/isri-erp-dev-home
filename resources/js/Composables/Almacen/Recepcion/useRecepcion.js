@@ -21,6 +21,8 @@ export const useRecepcion = (context) => {
     const filteredProds = ref([])
     const documents = ref([])
     const items = ref([])
+    const brands = ref([])
+
     const startRec = ref(false)
     const infoToShow = ref({ //This is an object used to show general information related to the acquisition document
         docId: '', //id_doc_adquisicion
@@ -114,6 +116,10 @@ export const useRecepcion = (context) => {
         infoToShow.value.dateTime = recepData ? moment(recepData.fecha_reg_recepcion_pedido).format('DD/MM/YYYY, HH:mm:ss') : ''
         infoToShow.value.status = id > 0 ? recepData.id_estado_recepcion_pedido : 1
 
+        brands.value = data.brands
+
+        recDocument.value.procedure = data.products
+
         recDocument.value.financingSourceId = data.itemInfo.id_proy_financiado
         recDocument.value.detDocId = data.itemInfo.id_det_doc_adquisicion
 
@@ -124,7 +130,6 @@ export const useRecepcion = (context) => {
             recDocument.value.invoice = recepData.factura_recepcion_pedido //Set invoice number
             recDocument.value.observation = recepData.observacion_recepcion_pedido
 
-            //if (recepData.id_estado_recepcion_pedido === 1) {
             // Filter products based on conditions
             const newOptions = data.products.filter(element => {
                 const rightOpt = recepData.detalle_recepcion.some(e => e.id_prod_adquisicion === element.value && e.estado_prod_adquisicion === 1);
@@ -133,10 +138,7 @@ export const useRecepcion = (context) => {
 
             // Set products to newOptions
             products.value = newOptions;
-            // } else {
-            //     filteredProds.value = products.value = data.products
-            // }
-            console.log(products.value);
+
 
             // Iterate over detalle_recepcion
             recepData.detalle_recepcion.forEach(element => {
@@ -153,6 +155,7 @@ export const useRecepcion = (context) => {
                         desc: element.producto.nombre_completo_producto + ' — '
                             + element.producto.unidad_medida.nombre_unidad_medida
                             + ' — ' + element.producto_adquisicion.descripcion_prod_adquisicion, //Acquisition product description
+                        brandId: element.id_marca,
                         expiryDate: formatDateVue3DP(element.fecha_vcto_det_recepcion_pedido),
                         perishable: element.producto.perecedero_producto, //If the product is perishable, set to true, otherwise set to false.
                         avails: "", //Represents the maximum number of products that the user can write.
@@ -179,7 +182,8 @@ export const useRecepcion = (context) => {
             const newOptions = data.products.filter(element => element.total_menos_acumulado != 0);
 
             // Set products and filteredProds to newOptions
-            products.value = filteredProds.value = newOptions;
+            products.value = newOptions;
+            console.log(products.value);
 
             // Call addNewRow
             addNewRow();
@@ -188,11 +192,12 @@ export const useRecepcion = (context) => {
         startRec.value = true
     }
 
-    const setProdItem = (paId,index) => {
+    const setProdItem = (paId, index) => {
         if (paId) {
             const selectedProd = products.value.find((element) => {
                 return element.value === paId; // Adding a return statement here
             });
+            console.log(selectedProd);
             recDocument.value.prods[index].desc =
                 selectedProd.nombre_completo_producto + ' — ' +
                 selectedProd.nombre_unidad_medida + ' — ' +
@@ -205,18 +210,16 @@ export const useRecepcion = (context) => {
             recDocument.value.prods[index].cost = selectedProd.costo_prod_adquisicion
             //recDocument.value.prods[index].qty = recepId ? recDocument.value.prods[index].qty : ''
             //recDocument.value.prods[index].total = '0.00'
-            //recDocument.value.prods[index].initial = selectedProd.total_menos_acumulado
+            recDocument.value.prods[index].initial = selectedProd.total_menos_acumulado
         } else {
             recDocument.value.prods[index].desc = ""
             recDocument.value.prods[index].perishable = ""
             recDocument.value.prods[index].cost = ""
             recDocument.value.prods[index].prodId = ""
+            //recDocument.value.prods[index].avails = ""
         }
-
-        recDocument.value.prods[index].avails = ""
         recDocument.value.prods[index].qty = ""
         recDocument.value.prods[index].total = '0.00'
-        recDocument.value.prods[index].initial = ""
     }
 
     const {
@@ -226,7 +229,7 @@ export const useRecepcion = (context) => {
     const handleValidation = (input, validation, element) => {
         if (element) {
             recDocument.value.prods[element.index][input] = validateInput(recDocument.value.prods[element.index][input], validation)
-            updateItemTotal(element.index, recDocument.value.prods[element.index][input], recDocument.value.prods[element.index].prodId)
+            //updateItemTotal(element.index, recDocument.value.prods[element.index][input], recDocument.value.prods[element.index].prodId)
         } else {
             recDocument.value[input] = validateInput(recDocument.value[input], validation)
         }
@@ -257,33 +260,20 @@ export const useRecepcion = (context) => {
         filteredProds.value = newOptions
     }
 
-    const totalRec = computed(() => {
-        let sum = 0
-        for (let i = 0; i < recDocument.value.prods.length; i++) {
-            if (recDocument.value.prods[i].deleted == false) {
-                let amount = parseFloat(recDocument.value.prods[i].total);
-                if (!isNaN(amount)) {
-                    sum += amount;
-                }
-            }
-        }
-        recDocument.value.total = sum.toFixed(2);
-        return sum.toFixed(2);
-    });
-
     const addNewRow = () => {
         let array = {
-            detRecId: "",
-            prodId: "",
-            desc: "",
+            detRecId: '',
+            prodId: '',
+            brandId: '',
+            desc: '',
             expiryDate: '',
-            perishable: "",
-            avails: "",
-            qty: "",
-            cost: "",
+            perishable: '',
+            avails: '',
+            qty: '',
+            cost: '',
             total: '0.00',
             deleted: false,
-            initial: ""
+            initial: ''
         }
         recDocument.value.prods.push(array);
 
@@ -327,6 +317,21 @@ export const useRecepcion = (context) => {
         return recDocument.value.prods.filter((detail) => detail.deleted == false)
     });
 
+
+    const totalRec = computed(() => {
+        let sum = 0
+        for (let i = 0; i < recDocument.value.prods.length; i++) {
+            if (recDocument.value.prods[i].deleted == false) {
+                let amount = parseFloat(recDocument.value.prods[i].total);
+                if (!isNaN(amount)) {
+                    sum += amount;
+                }
+            }
+        }
+        recDocument.value.total = sum.toFixed(2);
+        return sum.toFixed(2);
+    });
+
     const ordenC = computed(() => {
         const result = documents.value.filter((element) => {
             return element.id_tipo_doc_adquisicion == 2
@@ -361,6 +366,32 @@ export const useRecepcion = (context) => {
             prod.total = (prod.qty * prod.cost).toFixed(2);
         });
     }, { deep: true });
+
+    const showAvails = (prodId,index) => {
+        if(prodId){
+            const matchProds = recDocument.value.prods.filter((e) => e.prodId == prodId)
+            const prodProcedure = products.value.find((e) => e.value == prodId)
+            
+            let acumulado = 0 
+            acumulado += parseFloat(prodProcedure.acumulado)
+            matchProds.forEach((e) => {
+                if(!e.deleted){
+                    let amount = parseFloat(e.qty);
+                    if (!isNaN(amount)) {
+                        acumulado += amount;
+                    }
+                }
+            })
+            acumulado.toFixed(2)
+            
+            const qtyTotal = parseFloat(prodProcedure.cant_prod_adquisicion - acumulado)
+            recDocument.value.prods[index].avails = qtyTotal
+            return qtyTotal
+        }else{
+            recDocument.value.prods[index].avails = -1
+            return ""
+        }
+    }
 
     const storeReception = async (obj) => {
         swal({
@@ -450,8 +481,8 @@ export const useRecepcion = (context) => {
     return {
         errors, isLoadingRequest, reception, infoToShow,
         documents, ordenC, contrato, docSelected, totalRec, products,
-        filteredDoc, filteredItems, recDocument, startRec, filteredProds,
+        filteredDoc, filteredItems, recDocument, startRec, filteredProds, brands,
         getInfoForModalRecep, startReception, setProdItem, updateItemTotal, addNewRow,
-        openOption, deleteRow, handleValidation, storeReception, updateReception
+        openOption, deleteRow, handleValidation, storeReception, updateReception, showAvails
     }
 }

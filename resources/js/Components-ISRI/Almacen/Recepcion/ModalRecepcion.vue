@@ -270,14 +270,15 @@
                                 </div>
 
                                 <div
-                                    class="relative w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]">
+                                    class="relative w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]"
+                                    :class="showAvails(prod.prodId,index) < 0 || errors['prods.' + index + '.qty'] ? 'bg-red-300' : ''">
                                     <!-- Aquí se colocará el número dinámicamente -->
                                     <span
-                                        class="absolute font-[MuseoSans] text-[12px] top-1 flex items-center justify-center">MAX: {{ prod.avails }}</span>
+                                        class="absolute font-[MuseoSans] text-[12px] top-1 flex items-center justify-center">REST: {{ showAvails(prod.prodId,index) }}</span>
 
                                     <!-- El input -->
                                     <input v-model="prod.qty" :disabled="infoToShow.status != 1"
-                                        class="font-bold max-w-[75%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-sm border-[#d1d5db]"
+                                        class="font-bold max-w-[95%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-sm border-[#d1d5db]"
                                         type="text" name="" id=""
                                         @input="handleValidation('qty', { limit: 3, number: true }, { index: index, qty: prod.qty, prodId: prod.prodId })">
                                 </div>
@@ -380,10 +381,10 @@ export default {
 
         const {
             isLoadingRequest, recDocument, errors,
-            documents, ordenC, contrato, docSelected, products,
+            documents, ordenC, contrato, docSelected, products, brands,
             filteredDoc, filteredItems, startRec, filteredProds, totalRec, infoToShow,
             getInfoForModalRecep, startReception, setProdItem, updateItemTotal, addNewRow,
-            openOption, deleteRow, handleValidation, storeReception, updateReception
+            openOption, deleteRow, handleValidation, storeReception, updateReception, showAvails
         } = useRecepcion(context);
 
         onMounted(
@@ -394,10 +395,10 @@ export default {
 
         return {
             isLoadingRequest, recDocument, errors,
-            documents, ordenC, contrato, docSelected, totalRec, products,
+            documents, ordenC, contrato, docSelected, totalRec, products, brands,
             filteredDoc, filteredItems, startRec, filteredProds, infoToShow,
             handleValidation, startReception, setProdItem, updateItemTotal,
-            addNewRow, openOption, deleteRow, storeReception, updateReception
+            addNewRow, openOption, deleteRow, storeReception, updateReception, showAvails
         }
     }
 }
