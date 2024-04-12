@@ -245,6 +245,32 @@ class ReporteAlmacenController extends Controller
         $writer->save('php://output');
     }
 
+    public function getExcelDocumentConsumo(Request $request)
+    {
+
+        // Crear una instancia de Spreadsheet
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+
+        $sheet->mergeCells('A1:F1');
+        $sheet->setCellValue('A1', 'SISTEMA DE ALMACEN PARA EL CONTROL DE BIENES EN EXISTENCIA - ISRI');
+
+        // Guardar el archivo como XLSX
+        $writer = new Xlsx($spreadsheet);
+
+        // Establecer el nombre del archivo
+        $current_date = Carbon::now()->format('d_m_Y');
+        $filename = 'texto_excel_' . $current_date . '.xlsx';
+
+        // Establecer las cabeceras para descargar el archivo
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        // Guardar el archivo en la salida PHP
+        $writer->save('php://output');
+    }
 
     public function getReporteConsumo(Request $request): array
     {

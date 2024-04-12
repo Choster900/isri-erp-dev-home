@@ -116,6 +116,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('get-excel-document-reporte-financiero', [ReporteAlmacenController::class, 'createExcelReport'])->name('bieneservicios.get-proyectos');
     //TODO: FALTA EL REPORTE DE PDF DE REPORTE FINANCIERO
     Route::post('get-reporte-consumo',[ReporteAlmacenController::class,'getReporteConsumo'])->name('bieneservicios.get-reporte-consumo');
+    Route::post('get-excel-document-reporte-consumo',[ReporteAlmacenController::class,'getExcelDocumentConsumo'])->name('bieneservicios.get-excel-document-reporte-consumo');
 
     //Surplus adjustment
     Route::get(
