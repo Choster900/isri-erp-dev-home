@@ -1,4 +1,4 @@
-import { ref, inject, computed, nextTick } from "vue";
+import { ref, inject, computed, nextTick, watch } from "vue";
 import axios from "axios";
 import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
@@ -21,6 +21,8 @@ export const useRecepcion = (context) => {
     const filteredProds = ref([])
     const documents = ref([])
     const items = ref([])
+    const brands = ref([])
+
     const startRec = ref(false)
     const infoToShow = ref({ //This is an object used to show general information related to the acquisition document
         docId: '', //id_doc_adquisicion
@@ -114,6 +116,10 @@ export const useRecepcion = (context) => {
         infoToShow.value.dateTime = recepData ? moment(recepData.fecha_reg_recepcion_pedido).format('DD/MM/YYYY, HH:mm:ss') : ''
         infoToShow.value.status = id > 0 ? recepData.id_estado_recepcion_pedido : 1
 
+        brands.value = data.brands
+
+        recDocument.value.procedure = data.products
+
         recDocument.value.financingSourceId = data.itemInfo.id_proy_financiado
         recDocument.value.detDocId = data.itemInfo.id_det_doc_adquisicion
 
@@ -124,18 +130,15 @@ export const useRecepcion = (context) => {
             recDocument.value.invoice = recepData.factura_recepcion_pedido //Set invoice number
             recDocument.value.observation = recepData.observacion_recepcion_pedido
 
-            if (recepData.id_estado_recepcion_pedido === 1) {
-                // Filter products based on conditions
-                const newOptions = data.products.filter(element => {
-                    const rightOpt = recepData.detalle_recepcion.some(e => e.id_prod_adquisicion === element.value && e.estado_prod_adquisicion === 1);
-                    return rightOpt || element.total_menos_acumulado != 0;
-                });
+            // Filter products based on conditions
+            const newOptions = data.products.filter(element => {
+                const rightOpt = recepData.detalle_recepcion.some(e => e.id_prod_adquisicion === element.value && e.estado_prod_adquisicion === 1);
+                return rightOpt || element.total_menos_acumulado != 0;
+            });
 
-                // Set products and filteredProds to newOptions
-                products.value = filteredProds.value = newOptions;
-            }else{
-                filteredProds.value = products.value = data.products
-            }
+            // Set products to newOptions
+            products.value = newOptions;
+
 
             // Iterate over detalle_recepcion
             recepData.detalle_recepcion.forEach(element => {
@@ -147,14 +150,17 @@ export const useRecepcion = (context) => {
 
                     // Construct array
                     const array = {
-                        detRecId: detRecepId, //id_det_recepcion_pedido
-                        prodId: paId, //id_prod_adquisicion
-                        desc: "", //Acquisition product description
-                        //expiryDate: formatDateVue3DP(element.fecha_vencimiento_det_recepcion_pedido),
-                        perishable: "", //If the product is perishable, set to true, otherwise set to false.
+                        detRecId: element.id_det_recepcion_pedido, //id_det_recepcion_pedido
+                        prodId: element.producto_adquisicion.id_prod_adquisicion, //id_prod_adquisicion
+                        desc: element.producto.nombre_completo_producto + ' — '
+                            + element.producto.unidad_medida.nombre_unidad_medida
+                            + ' — ' + element.producto_adquisicion.descripcion_prod_adquisicion, //Acquisition product description
+                        brandId: element.id_marca,
+                        expiryDate: formatDateVue3DP(element.fecha_vcto_det_recepcion_pedido),
+                        perishable: element.producto.perecedero_producto, //If the product is perishable, set to true, otherwise set to false.
                         avails: "", //Represents the maximum number of products that the user can write.
-                        qty: cantRecep, //Represents the the number of products the user wants to register
-                        cost: "", //Represents the the cost of the product
+                        qty: element.cant_det_recepcion_pedido, //Represents the the number of products the user wants to register
+                        cost: element.producto_adquisicion.costo_prod_adquisicion, //Represents the the cost of the product
                         total: "", //Represents the result of qty x cost for every row
                         deleted: false, //This is the state of the row, it represents the logical deletion.
                         initial: "" //Represents the initial availability of a product
@@ -167,8 +173,8 @@ export const useRecepcion = (context) => {
                     const lastIndex = recDocument.value.prods.length - 1;
 
                     // Call setProdItem and updateItemTotal
-                    setProdItem(lastIndex, paId, detRecepId);
-                    updateItemTotal(lastIndex, cantRecep, paId);
+                    //setProdItem(lastIndex, paId, detRecepId);
+                    //updateItemTotal(lastIndex, cantRecep, paId);
                 }
             });
         } else {
@@ -176,7 +182,8 @@ export const useRecepcion = (context) => {
             const newOptions = data.products.filter(element => element.total_menos_acumulado != 0);
 
             // Set products and filteredProds to newOptions
-            products.value = filteredProds.value = newOptions;
+            products.value = newOptions;
+            console.log(products.value);
 
             // Call addNewRow
             addNewRow();
@@ -185,34 +192,34 @@ export const useRecepcion = (context) => {
         startRec.value = true
     }
 
-    const setProdItem = (index, paId, recepId) => {
+    const setProdItem = (paId, index) => {
         if (paId) {
             const selectedProd = products.value.find((element) => {
                 return element.value === paId; // Adding a return statement here
             });
+            console.log(selectedProd);
             recDocument.value.prods[index].desc =
                 selectedProd.nombre_completo_producto + ' — ' +
                 selectedProd.nombre_unidad_medida + ' — ' +
                 selectedProd.descripcion_prod_adquisicion
 
-            recDocument.value.prods[index].perishable = recepId ? recDocument.value.prods[index].perishable : ''
-            //recDocument.value.prods[index].expiryDate = recepId ? recDocument.value.prods[index].expiryDate : ''
-            recDocument.value.prods[index].avails = selectedProd.total_menos_acumulado
+            //recDocument.value.prods[index].perishable = recDocument.value.prods[index].perishable 
+            //recDocument.value.prods[index].expiryDate = recDocument.value.prods[index].expiryDate
+            //recDocument.value.prods[index].avails = selectedProd.total_menos_acumulado
             recDocument.value.prods[index].perishable = selectedProd.perecedero_producto
             recDocument.value.prods[index].cost = selectedProd.costo_prod_adquisicion
-            recDocument.value.prods[index].qty = recepId ? recDocument.value.prods[index].qty : ''
-            recDocument.value.prods[index].total = '0.00'
+            //recDocument.value.prods[index].qty = recepId ? recDocument.value.prods[index].qty : ''
+            //recDocument.value.prods[index].total = '0.00'
             recDocument.value.prods[index].initial = selectedProd.total_menos_acumulado
         } else {
             recDocument.value.prods[index].desc = ""
             recDocument.value.prods[index].perishable = ""
-            //recDocument.value.prods[index].expiryDate = ""
-            recDocument.value.prods[index].avails = ""
-            recDocument.value.prods[index].qty = ""
             recDocument.value.prods[index].cost = ""
-            recDocument.value.prods[index].total = '0.00'
-            recDocument.value.prods[index].initial = ""
+            recDocument.value.prods[index].prodId = ""
+            //recDocument.value.prods[index].avails = ""
         }
+        recDocument.value.prods[index].qty = ""
+        recDocument.value.prods[index].total = '0.00'
     }
 
     const {
@@ -222,7 +229,7 @@ export const useRecepcion = (context) => {
     const handleValidation = (input, validation, element) => {
         if (element) {
             recDocument.value.prods[element.index][input] = validateInput(recDocument.value.prods[element.index][input], validation)
-            updateItemTotal(element.index, recDocument.value.prods[element.index][input], recDocument.value.prods[element.index].prodId)
+            //updateItemTotal(element.index, recDocument.value.prods[element.index][input], recDocument.value.prods[element.index].prodId)
         } else {
             recDocument.value[input] = validateInput(recDocument.value[input], validation)
         }
@@ -253,49 +260,31 @@ export const useRecepcion = (context) => {
         filteredProds.value = newOptions
     }
 
-    const totalRec = computed(() => {
-        let sum = 0
-        for (let i = 0; i < recDocument.value.prods.length; i++) {
-            if (recDocument.value.prods[i].deleted == false) {
-                let amount = parseFloat(recDocument.value.prods[i].total);
-                if (!isNaN(amount)) {
-                    sum += amount;
-                }
-            }
-        }
-        recDocument.value.total = sum.toFixed(2);
-        return sum.toFixed(2);
-    });
-
     const addNewRow = () => {
-        if (activeDetails.value.length < products.value.length) {
-            let array = {
-                detRecId: "",
-                prodId: "",
-                desc: "",
-                //expiryDate: '',
-                perishable: "",
-                avails: "",
-                qty: "",
-                cost: "",
-                total: '0.00',
-                deleted: false,
-                initial: ""
-            }
-            recDocument.value.prods.push(array);
-
-            // Desplazar la pantalla hasta la última fila agregada
-            nextTick(() => {
-                //const newRowIndex = recDocument.value.prods.length - 1;
-                //const newRowElement = document.getElementById(`row-${newRowIndex}`);
-                const newRowElement = document.getElementById(`total`);
-                if (newRowElement) {
-                    newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
-                }
-            });
-        } else {
-            useShowToast(toast.warning, "Has alcanzado el maximo de filas disponibles.");
+        let array = {
+            detRecId: '',
+            prodId: '',
+            brandId: '',
+            desc: '',
+            expiryDate: '',
+            perishable: '',
+            avails: '',
+            qty: '',
+            cost: '',
+            total: '0.00',
+            deleted: false,
+            initial: ''
         }
+        recDocument.value.prods.push(array);
+
+        // Desplazar la pantalla hasta la última fila agregada
+        nextTick(() => {
+            const newRowElement = document.getElementById(`total`);
+            if (newRowElement) {
+                newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
+        });
+
     }
 
     const deleteRow = (index, detRecId) => {
@@ -328,6 +317,21 @@ export const useRecepcion = (context) => {
         return recDocument.value.prods.filter((detail) => detail.deleted == false)
     });
 
+
+    const totalRec = computed(() => {
+        let sum = 0
+        for (let i = 0; i < recDocument.value.prods.length; i++) {
+            if (recDocument.value.prods[i].deleted == false) {
+                let amount = parseFloat(recDocument.value.prods[i].total);
+                if (!isNaN(amount)) {
+                    sum += amount;
+                }
+            }
+        }
+        recDocument.value.total = sum.toFixed(2);
+        return sum.toFixed(2);
+    });
+
     const ordenC = computed(() => {
         const result = documents.value.filter((element) => {
             return element.id_tipo_doc_adquisicion == 2
@@ -355,6 +359,39 @@ export const useRecepcion = (context) => {
         });
         return result ?? [];
     });
+
+    // Observa cambios en las propiedades qty y cost de cada producto
+    watch(recDocument, (newValue) => {
+        newValue.prods.forEach((prod) => {
+            prod.total = (prod.qty * prod.cost).toFixed(2);
+        });
+    }, { deep: true });
+
+    const showAvails = (prodId,index) => {
+        if(prodId){
+            const matchProds = recDocument.value.prods.filter((e) => e.prodId == prodId)
+            const prodProcedure = products.value.find((e) => e.value == prodId)
+            
+            let acumulado = 0 
+            acumulado += parseFloat(prodProcedure.acumulado)
+            matchProds.forEach((e) => {
+                if(!e.deleted){
+                    let amount = parseFloat(e.qty);
+                    if (!isNaN(amount)) {
+                        acumulado += amount;
+                    }
+                }
+            })
+            acumulado.toFixed(2)
+            
+            const qtyTotal = parseFloat(prodProcedure.cant_prod_adquisicion - acumulado)
+            recDocument.value.prods[index].avails = qtyTotal
+            return qtyTotal
+        }else{
+            recDocument.value.prods[index].avails = -1
+            return ""
+        }
+    }
 
     const storeReception = async (obj) => {
         swal({
@@ -410,11 +447,11 @@ export const useRecepcion = (context) => {
             if (err.response && err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
                 if (err.response.data.refresh) {
-                    products.value = filteredProds.value = err.response.data.prods
-                    recDocument.value.prods.forEach((element, index) => {
-                        setProdItem(index, element.prodId, element.detRecId);
-                        updateItemTotal(index, element.qty, element.prodId);
-                    })
+                    products.value = err.response.data.prods
+                    // recDocument.value.prods.forEach((element, index) => {
+                    //     setProdItem(index, element.prodId, element.detRecId);
+                    //     updateItemTotal(index, element.qty, element.prodId);
+                    // })
                 }
             } else {
                 useShowToast(toast.warning, "Tienes errores en tus datos, por favor verifica e intenta nuevamente.");
@@ -443,9 +480,9 @@ export const useRecepcion = (context) => {
 
     return {
         errors, isLoadingRequest, reception, infoToShow,
-        documents, ordenC, contrato, docSelected, totalRec,
-        filteredDoc, filteredItems, recDocument, startRec, filteredProds,
+        documents, ordenC, contrato, docSelected, totalRec, products,
+        filteredDoc, filteredItems, recDocument, startRec, filteredProds, brands,
         getInfoForModalRecep, startReception, setProdItem, updateItemTotal, addNewRow,
-        openOption, deleteRow, handleValidation, storeReception, updateReception
+        openOption, deleteRow, handleValidation, storeReception, updateReception, showAvails
     }
 }
