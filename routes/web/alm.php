@@ -3,14 +3,20 @@
 use App\Http\Controllers\Almacen\AjusteEntradaController;
 use App\Http\Controllers\Almacen\DonacionController;
 use App\Http\Controllers\Almacen\RecepcionController;
+use App\Http\Controllers\Almacen\ReporteAlmacenController;
 use App\Http\Controllers\Almacen\RequerimientoAlmacenController;
 use App\Models\DetalleExistenciaAlmacen;
 use App\Models\DetalleRequerimiento;
 use App\Models\ExistenciaAlmacen;
 use App\Models\PlazaAsignada;
+use App\Models\ProyectoFinanciado;
 use App\Models\Requerimiento;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 Route::group(['middleware' => ['auth', 'access']], function () {
     //Normal receptions
@@ -63,7 +69,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post(
         'get-number-requerimiento',
         function (Request $request) {
-            return Requerimiento::latest("fecha_reg_requerimiento")->where('id_estado_req','!=', 4)->first();
+            return Requerimiento::latest("fecha_reg_requerimiento")->where('id_estado_req', '!=', 4)->first();
         }
     )->name('donacion.getObjectForRequerimientoAlmacen');
     Route::post('insert-requerimiento-almacen', [RequerimientoAlmacenController::class, 'addRequerimiento'])->name('donacion.insertRequerimientoAlmacen');
@@ -76,7 +82,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             // Crear una colección para almacenar los centros de atención únicos
             $centrosUnicos = collect();
             // Iterar sobre las plazas asignadas y agregar los centros de atención únicos a la colección
-            foreach ($plazasAsignadas as $plazaAsignada) {
+            foreach ( $plazasAsignadas as $plazaAsignada ) {
                 $centroAtencion = $plazaAsignada->centro_atencion;
                 $centrosUnicos->push($centroAtencion);
             }
@@ -88,21 +94,10 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post(
         'get-product-by-proy-financiado',
         function (Request $request) {
-           /*  return ExistenciaAlmacen::with(['detalle_existencia_almacen.marca', 'productos'])
-                ->whereHas('detalle_existencia_almacen', function ($query) use ($request) {
-                    $query->where('id_centro_atencion', $request->idCentroAtencion);
-                    $query->where('id_lt', $request->idLt);
-                })
-                ->where('id_proy_financiado', $request->idProyFinanciado)
-                ->get(); */
-
-                return DetalleExistenciaAlmacen::with(['existencia_almacen.productos','marca'])
+            return DetalleExistenciaAlmacen::with(['existencia_almacen.productos', 'marca'])
                 ->whereHas('existencia_almacen', function ($query) use ($request) {
                     $query->where('id_proy_financiado', $request->idProyFinanciado);
-                })
-                ->where('id_centro_atencion', $request->idCentroAtencion)
-                ->where('id_lt', $request->idLt)
-                ->get();
+                })->where('id_centro_atencion', $request->idCentroAtencion)->where('id_lt', $request->idLt)->get();
         }
     )->name('bieneservicios.get-product-by-proy-financiad');
     Route::post('update-state-requerimiento', [RequerimientoAlmacenController::class, 'updateStateRequerimiento'])->name('bieneservicios.get-product-by-proy-financiad');
@@ -114,6 +109,14 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/reporte-financiero', 'Almacen/ReporteFinanciero');
         }
     )->name('alm.reporteFinanciero');
+    Route::post('get-proyecto-financiado', function (Request $request) {
+        return ProyectoFinanciado::all();
+    })->name('bieneservicios.get-proyectos');
+    Route::post('get-reporte-financiero-almacen-bienes-existencia',[ReporteAlmacenController::class,'getReporteFinanciero'])->name('bieneservicios.get-reporte-financiero-almacen');
+    Route::post('get-excel-document-reporte-financiero', [ReporteAlmacenController::class, 'createExcelReport'])->name('bieneservicios.get-proyectos');
+    //TODO: FALTA EL REPORTE DE PDF DE REPORTE FINANCIERO
+    Route::post('get-reporte-consumo',[ReporteAlmacenController::class,'getReporteConsumo'])->name('bieneservicios.get-reporte-consumo');
+    Route::post('get-excel-document-reporte-consumo',[ReporteAlmacenController::class,'getExcelDocumentConsumo'])->name('bieneservicios.get-excel-document-reporte-consumo');
 
     //Surplus adjustment
     Route::get(
@@ -128,5 +131,10 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('update-shortage-adjustment-info', [AjusteEntradaController::class, 'updateShortageAdjustment'])->name('ajusteEntrada.updateShortageAdjustment');
     Route::post('change-status-shortage-adjustment', [AjusteEntradaController::class, 'changeStatusShortageAdjustment'])->name('ajusteEntrada.changeStatusShortageAdjustment');
     Route::post('send-shortage-adjustment', [AjusteEntradaController::class, 'sendShortageAdjustment'])->name('ajusteEntrada.sendShortageAdjustment');
-
+    Route::get(
+        '/alm/reporte-consumo',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/reporte-consumo', 'Almacen/ReporteConsumo');
+        }
+    )->name('alm.reporteConsumo');
 });

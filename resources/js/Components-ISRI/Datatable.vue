@@ -96,7 +96,7 @@ export default {
         },
         sortIcons: {
             type: Boolean,
-            default: false
+            default: true
         }
     },
     data: function () {
