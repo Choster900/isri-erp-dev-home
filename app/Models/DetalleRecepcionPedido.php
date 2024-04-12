@@ -18,6 +18,7 @@ class DetalleRecepcionPedido extends Model
         'id_centro_atencion',
         'id_producto',
         'id_marca',
+        'id_lt',
         'id_prod_adquisicion',
         'id_recepcion_pedido',
         'fecha_vcto_det_recepcion_pedido',
