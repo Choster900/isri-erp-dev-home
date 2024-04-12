@@ -3,14 +3,20 @@
 use App\Http\Controllers\Almacen\AjusteEntradaController;
 use App\Http\Controllers\Almacen\DonacionController;
 use App\Http\Controllers\Almacen\RecepcionController;
+use App\Http\Controllers\Almacen\ReporteController;
 use App\Http\Controllers\Almacen\RequerimientoAlmacenController;
 use App\Models\DetalleExistenciaAlmacen;
 use App\Models\DetalleRequerimiento;
 use App\Models\ExistenciaAlmacen;
 use App\Models\PlazaAsignada;
+use App\Models\ProyectoFinanciado;
 use App\Models\Requerimiento;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 Route::group(['middleware' => ['auth', 'access']], function () {
     //Normal receptions
@@ -63,7 +69,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post(
         'get-number-requerimiento',
         function (Request $request) {
-            return Requerimiento::latest("fecha_reg_requerimiento")->where('id_estado_req','!=', 4)->first();
+            return Requerimiento::latest("fecha_reg_requerimiento")->where('id_estado_req', '!=', 4)->first();
         }
     )->name('donacion.getObjectForRequerimientoAlmacen');
     Route::post('insert-requerimiento-almacen', [RequerimientoAlmacenController::class, 'addRequerimiento'])->name('donacion.insertRequerimientoAlmacen');
@@ -88,21 +94,10 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post(
         'get-product-by-proy-financiado',
         function (Request $request) {
-           /*  return ExistenciaAlmacen::with(['detalle_existencia_almacen.marca', 'productos'])
-                ->whereHas('detalle_existencia_almacen', function ($query) use ($request) {
-                    $query->where('id_centro_atencion', $request->idCentroAtencion);
-                    $query->where('id_lt', $request->idLt);
-                })
-                ->where('id_proy_financiado', $request->idProyFinanciado)
-                ->get(); */
-
-                return DetalleExistenciaAlmacen::with(['existencia_almacen.productos','marca'])
+            return DetalleExistenciaAlmacen::with(['existencia_almacen.productos', 'marca'])
                 ->whereHas('existencia_almacen', function ($query) use ($request) {
                     $query->where('id_proy_financiado', $request->idProyFinanciado);
-                })
-                ->where('id_centro_atencion', $request->idCentroAtencion)
-                ->where('id_lt', $request->idLt)
-                ->get();
+                })->where('id_centro_atencion', $request->idCentroAtencion)->where('id_lt', $request->idLt)->get();
         }
     )->name('bieneservicios.get-product-by-proy-financiad');
     Route::post('update-state-requerimiento', [RequerimientoAlmacenController::class, 'updateStateRequerimiento'])->name('bieneservicios.get-product-by-proy-financiad');
@@ -114,7 +109,44 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/reporte-financiero', 'Almacen/ReporteFinanciero');
         }
     )->name('alm.reporteFinanciero');
+    Route::post('get-proyecto-financiado', function (Request $request) {
+        return ProyectoFinanciado::all();
+    })->name('bieneservicios.get-proyectos');
+    Route::post('get-reporte-financiero-almacen-bienes-existencia', function (Request $request) {
+        $rules = [
+            "reportInfo.startDate"         => "required",
+            "reportInfo.endDate"           => "required",
+            "reportInfo.financingSourceId" => "required",
+        ];
+        $customMessages = [
+            'reportInfo.startDate.required'         => 'La fecha de inicio es obligatoria.',
+            'reportInfo.endDate.required'           => 'La fecha de fin es obligatoria.',
+            'reportInfo.financingSourceId.required' => 'La fuente de financiamiento es obligatorio.',
+        ];
+        $validator = Validator::make($request->all(), $rules, $customMessages);
+        if ($validator->fails()) {
+            $errors = $validator->errors()->toArray();
+            $message = 'The given data was invalid.';
+            return response()->json(['message' => $message, 'errors' => $errors], 422);
+        }
+        // Llamar al procedimiento almacenado
+        $startDate =  $request->input('reportInfo.startDate') != '' ? date('Y-m-d', strtotime($request->input('reportInfo.startDate'))) : null;
+        $endDate = $request->input('reportInfo.endDate') != '' ? date('Y-m-d', strtotime($request->input('reportInfo.endDate'))) : null;
 
+        $financingSourceId = $request->input('reportInfo.financingSourceId');
+        /*      $startDate = $request->input('reportInfo.startDate');
+        $endDate = $request->input('reportInfo.endDate'); */
+        //$result = DB::select('CALL PR_RPT_FINANCIERO (?, 541, ?, ?)', array ($financingSourceId, "2024-04-01","2024-04-11"));
+        $result = DB::select('CALL PR_RPT_FINANCIERO (?, 541, ?, ?)', array($financingSourceId, $startDate, $endDate));
+        /* [
+  "2024-04-01",
+  "2024-04-01"
+] */
+        return $result;
+
+        //return [$startDate ,$endDate];
+    })->name('bieneservicios.get-proyectos');
+    Route::post('get-excel-document-reporte-financiero', [ReporteController::class, 'createExcelReport'])->name('bieneservicios.get-proyectos');
     //Surplus adjustment
     Route::get(
         '/alm/ajuste-entrada',
@@ -128,5 +160,4 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('update-shortage-adjustment-info', [AjusteEntradaController::class, 'updateShortageAdjustment'])->name('ajusteEntrada.updateShortageAdjustment');
     Route::post('change-status-shortage-adjustment', [AjusteEntradaController::class, 'changeStatusShortageAdjustment'])->name('ajusteEntrada.changeStatusShortageAdjustment');
     Route::post('send-shortage-adjustment', [AjusteEntradaController::class, 'sendShortageAdjustment'])->name('ajusteEntrada.sendShortageAdjustment');
-
 });
