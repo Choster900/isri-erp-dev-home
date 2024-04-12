@@ -30,8 +30,34 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
-class ReporteController extends Controller
+class ReporteAlmacenController extends Controller
 {
+
+    public function getReporteFinanciero(Request $request): array
+    {
+        $rules = [
+            "reportInfo.startDate"         => "required",
+            "reportInfo.endDate"           => "required",
+            "reportInfo.financingSourceId" => "required",
+        ];
+        $customMessages = [
+            'reportInfo.startDate.required'         => 'La fecha de inicio es obligatoria.',
+            'reportInfo.endDate.required'           => 'La fecha de fin es obligatoria.',
+            'reportInfo.financingSourceId.required' => 'La fuente de financiamiento es obligatorio.',
+        ];
+        $validator = Validator::make($request->all(), $rules, $customMessages);
+        if ($validator->fails()) {
+            $errors = $validator->errors()->toArray();
+            $message = 'The given data was invalid.';
+            return response()->json(['message' => $message, 'errors' => $errors], 422);
+        }
+        $startDate = $request->input('reportInfo.startDate') != '' ? date('Y-m-d', strtotime($request->input('reportInfo.startDate'))) : null;
+        $endDate = $request->input('reportInfo.endDate') != '' ? date('Y-m-d', strtotime($request->input('reportInfo.endDate'))) : null;
+        $financingSourceId = $request->input('reportInfo.financingSourceId');
+        $result = DB::select('CALL PR_RPT_FINANCIERO (?, 541, ?, ?)', array($financingSourceId, $startDate, $endDate));
+        return $result;
+    }
+
     public function createExcelReport(Request $request)
     {
 
@@ -217,5 +243,31 @@ class ReporteController extends Controller
 
         // Guardar el archivo en la salida PHP
         $writer->save('php://output');
+    }
+
+
+    public function getReporteConsumo(Request $request): array
+    {
+        /*   $rules = [
+            "reportInfo.startDate"         => "required",
+            "reportInfo.endDate"           => "required",
+            "reportInfo.financingSourceId" => "required",
+        ];
+        $customMessages = [
+            'reportInfo.startDate.required'         => 'La fecha de inicio es obligatoria.',
+            'reportInfo.endDate.required'           => 'La fecha de fin es obligatoria.',
+            'reportInfo.financingSourceId.required' => 'La fuente de financiamiento es obligatorio.',
+        ];
+        $validator = Validator::make($request->all(), $rules, $customMessages);
+        if ($validator->fails()) {
+            $errors = $validator->errors()->toArray();
+            $message = 'The given data was invalid.';
+            return response()->json(['message' => $message, 'errors' => $errors], 422);
+        } */
+        /*  $startDate = $request->input('reportInfo.startDate') != '' ? date('Y-m-d', strtotime($request->input('reportInfo.startDate'))) : null;
+        $endDate = $request->input('reportInfo.endDate') != '' ? date('Y-m-d', strtotime($request->input('reportInfo.endDate'))) : null;
+        $financingSourceId = $request->input('reportInfo.financingSourceId'); */
+        $result = DB::select("CALL PR_RPT_CONSUMO  (?, ?, ?, ?, ?, ?, ?)", array('C', 2, 1, 1, 1, '2024-01-01', '2024-04-12'));
+        return $result;
     }
 }
