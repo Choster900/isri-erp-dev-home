@@ -401,6 +401,7 @@ class DonacionController extends Controller
                     'id_recepcion_pedido'                   => $reception->id_recepcion_pedido,
                     'id_proy_financiado'                    => $reception->id_proy_financiado,
                     'id_tipo_mov_kardex'                    => 1,
+                    'id_tipo_req'                           => 4, //DONACION
                     'fecha_kardex'                          => Carbon::now(),
                     'fecha_reg_kardex'                      => Carbon::now(),
                     'usuario_kardex'                        => $request->user()->nick_usuario,
