@@ -233,10 +233,10 @@
                                 class="grid grid-cols-[18%_25%_14%_13%_10%_10%_10%] max-w-full bg-white border-b border-x border-gray-500">
                                 <div class="w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]"
                                     :class="errors['prods.' + index + '.prodId'] ? 'bg-red-300' : ''">
-                                    <Multiselect id="doc" v-model="prod.prodId" :options="filteredProds"
+                                    <Multiselect id="doc" v-model="prod.prodId" :options="products"
                                         class="h-[35px]" :disabled="infoToShow.status != 1" :searchable="true"
                                         :noOptionsText="'Lista vacía.'" placeholder="Seleccione"
-                                        @input="setProdItem(index, $event, null)" @open="openOption(prod.prodId)"
+                                        @change="setProdItem($event, index)" 
                                         :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', }" />
                                 </div>
                                 <div
@@ -269,13 +269,19 @@
                                     <p v-else class="font-[MuseoSans] text-sm p-1 ">N/A</p>
                                 </div>
 
-                                <div class="w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]"
-                                    :class="errors['prods.' + index + '.qty'] ? 'bg-red-300' : ''">
+                                <div
+                                    class="relative w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]">
+                                    <!-- Aquí se colocará el número dinámicamente -->
+                                    <span
+                                        class="absolute font-[MuseoSans] text-[12px] top-1 flex items-center justify-center">MAX: {{ prod.avails }}</span>
+
+                                    <!-- El input -->
                                     <input v-model="prod.qty" :disabled="infoToShow.status != 1"
                                         class="font-bold max-w-[75%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-sm border-[#d1d5db]"
                                         type="text" name="" id=""
                                         @input="handleValidation('qty', { limit: 3, number: true }, { index: index, qty: prod.qty, prodId: prod.prodId })">
                                 </div>
+
                                 <div
                                     class="w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]">
                                     <p class="font-[MuseoSans] text-sm p-1 ">
@@ -374,7 +380,7 @@ export default {
 
         const {
             isLoadingRequest, recDocument, errors,
-            documents, ordenC, contrato, docSelected,
+            documents, ordenC, contrato, docSelected, products,
             filteredDoc, filteredItems, startRec, filteredProds, totalRec, infoToShow,
             getInfoForModalRecep, startReception, setProdItem, updateItemTotal, addNewRow,
             openOption, deleteRow, handleValidation, storeReception, updateReception
@@ -388,7 +394,7 @@ export default {
 
         return {
             isLoadingRequest, recDocument, errors,
-            documents, ordenC, contrato, docSelected, totalRec,
+            documents, ordenC, contrato, docSelected, totalRec, products,
             filteredDoc, filteredItems, startRec, filteredProds, infoToShow,
             handleValidation, startReception, setProdItem, updateItemTotal,
             addNewRow, openOption, deleteRow, storeReception, updateReception
