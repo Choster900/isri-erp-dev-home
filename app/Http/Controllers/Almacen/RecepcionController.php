@@ -605,7 +605,8 @@ class RecepcionController extends Controller
                         'id_producto'                       => $det->producto_adquisicion->id_producto,
                         'id_lt'                             => $det->producto_adquisicion->id_lt,
                         'id_centro_atencion'                => $det->producto_adquisicion->id_centro_atencion,
-                        'id_marca'                          => $det->producto_adquisicion->id_marca,
+                        'id_marca'                          => $det->id_marca,
+                        'fecha_vencimiento_det_kardex'      => $det->fecha_vcto_det_recepcion_pedido,
                         'cant_det_kardex'                   => $det->cant_det_recepcion_pedido,
                         'costo_det_kardex'                  => $det->costo_det_recepcion_pedido,
                         'fecha_reg_det_kardex'              => Carbon::now(),
@@ -615,7 +616,7 @@ class RecepcionController extends Controller
                     $detKardex->save();
 
                     //We update the stock
-                    $resultados = DB::select(" SELECT FN_UPDATE_EXISTENCIA_ALMACEN(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+                    $resultados = DB::select(" SELECT FN_UPDATE_EXISTENCIA_ALMACEN(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
                         $reception->id_proy_financiado,
                         $det->id_producto,
                         $det->id_centro_atencion,
@@ -623,6 +624,7 @@ class RecepcionController extends Controller
                         $det->id_marca ?? null,
                         $det->cant_det_recepcion_pedido,
                         $det->costo_det_recepcion_pedido,
+                        $det->fecha_vcto_det_recepcion_pedido,
                         Carbon::now(),
                         $request->user()->nick_usuario,
                         $request->ip()
