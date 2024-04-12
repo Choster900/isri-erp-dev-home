@@ -3,7 +3,7 @@
 use App\Http\Controllers\Almacen\AjusteEntradaController;
 use App\Http\Controllers\Almacen\DonacionController;
 use App\Http\Controllers\Almacen\RecepcionController;
-use App\Http\Controllers\Almacen\ReporteController;
+use App\Http\Controllers\Almacen\ReporteAlmacenController;
 use App\Http\Controllers\Almacen\RequerimientoAlmacenController;
 use App\Models\DetalleExistenciaAlmacen;
 use App\Models\DetalleRequerimiento;
@@ -82,7 +82,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             // Crear una colección para almacenar los centros de atención únicos
             $centrosUnicos = collect();
             // Iterar sobre las plazas asignadas y agregar los centros de atención únicos a la colección
-            foreach ($plazasAsignadas as $plazaAsignada) {
+            foreach ( $plazasAsignadas as $plazaAsignada ) {
                 $centroAtencion = $plazaAsignada->centro_atencion;
                 $centrosUnicos->push($centroAtencion);
             }
@@ -112,41 +112,11 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('get-proyecto-financiado', function (Request $request) {
         return ProyectoFinanciado::all();
     })->name('bieneservicios.get-proyectos');
-    Route::post('get-reporte-financiero-almacen-bienes-existencia', function (Request $request) {
-        $rules = [
-            "reportInfo.startDate"         => "required",
-            "reportInfo.endDate"           => "required",
-            "reportInfo.financingSourceId" => "required",
-        ];
-        $customMessages = [
-            'reportInfo.startDate.required'         => 'La fecha de inicio es obligatoria.',
-            'reportInfo.endDate.required'           => 'La fecha de fin es obligatoria.',
-            'reportInfo.financingSourceId.required' => 'La fuente de financiamiento es obligatorio.',
-        ];
-        $validator = Validator::make($request->all(), $rules, $customMessages);
-        if ($validator->fails()) {
-            $errors = $validator->errors()->toArray();
-            $message = 'The given data was invalid.';
-            return response()->json(['message' => $message, 'errors' => $errors], 422);
-        }
-        // Llamar al procedimiento almacenado
-        $startDate =  $request->input('reportInfo.startDate') != '' ? date('Y-m-d', strtotime($request->input('reportInfo.startDate'))) : null;
-        $endDate = $request->input('reportInfo.endDate') != '' ? date('Y-m-d', strtotime($request->input('reportInfo.endDate'))) : null;
+    Route::post('get-reporte-financiero-almacen-bienes-existencia',[ReporteAlmacenController::class,'getReporteFinanciero'])->name('bieneservicios.get-reporte-financiero-almacen');
+    Route::post('get-excel-document-reporte-financiero', [ReporteAlmacenController::class, 'createExcelReport'])->name('bieneservicios.get-proyectos');
+    //TODO: FALTA EL REPORTE DE PDF DE REPORTE FINANCIERO
+    Route::post('get-reporte-consumo',[ReporteAlmacenController::class,'getReporteConsumo'])->name('bieneservicios.get-reporte-consumo');
 
-        $financingSourceId = $request->input('reportInfo.financingSourceId');
-        /*      $startDate = $request->input('reportInfo.startDate');
-        $endDate = $request->input('reportInfo.endDate'); */
-        //$result = DB::select('CALL PR_RPT_FINANCIERO (?, 541, ?, ?)', array ($financingSourceId, "2024-04-01","2024-04-11"));
-        $result = DB::select('CALL PR_RPT_FINANCIERO (?, 541, ?, ?)', array($financingSourceId, $startDate, $endDate));
-        /* [
-  "2024-04-01",
-  "2024-04-01"
-] */
-        return $result;
-
-        //return [$startDate ,$endDate];
-    })->name('bieneservicios.get-proyectos');
-    Route::post('get-excel-document-reporte-financiero', [ReporteController::class, 'createExcelReport'])->name('bieneservicios.get-proyectos');
     //Surplus adjustment
     Route::get(
         '/alm/ajuste-entrada',
@@ -160,4 +130,10 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('update-shortage-adjustment-info', [AjusteEntradaController::class, 'updateShortageAdjustment'])->name('ajusteEntrada.updateShortageAdjustment');
     Route::post('change-status-shortage-adjustment', [AjusteEntradaController::class, 'changeStatusShortageAdjustment'])->name('ajusteEntrada.changeStatusShortageAdjustment');
     Route::post('send-shortage-adjustment', [AjusteEntradaController::class, 'sendShortageAdjustment'])->name('ajusteEntrada.sendShortageAdjustment');
+    Route::get(
+        '/alm/reporte-consumo',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/reporte-consumo', 'Almacen/ReporteConsumo');
+        }
+    )->name('alm.reporteConsumo');
 });

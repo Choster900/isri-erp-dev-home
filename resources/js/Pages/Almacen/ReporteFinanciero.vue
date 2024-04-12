@@ -2,7 +2,6 @@
 
     <Head title="Reporte - Empleados" />
     <AppLayoutVue nameSubModule="Almacen - Reporte financiero" :autoPadding="false" :class="'bg-gray-200'">
-        {{ reportInfo }}
         <div class="w-[95%] my-4 h-full mx-auto bg-white border border-gray-300 ">
             <div class="mb-2 mt-4 md:flex flex-row justify-around mx-4 items-end">
 
