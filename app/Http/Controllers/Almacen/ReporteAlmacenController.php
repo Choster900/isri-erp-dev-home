@@ -33,30 +33,36 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 class ReporteAlmacenController extends Controller
 {
 
-    public function getReporteFinanciero(Request $request): array
+    public function getReporteFinanciero(Request $request)
     {
-        $rules = [
-            "reportInfo.startDate"         => "required",
-            "reportInfo.endDate"           => "required",
-            "reportInfo.financingSourceId" => "required",
-        ];
-        $customMessages = [
-            'reportInfo.startDate.required'         => 'La fecha de inicio es obligatoria.',
-            'reportInfo.endDate.required'           => 'La fecha de fin es obligatoria.',
-            'reportInfo.financingSourceId.required' => 'La fuente de financiamiento es obligatorio.',
-        ];
-        $validator = Validator::make($request->all(), $rules, $customMessages);
-        if ($validator->fails()) {
-            $errors = $validator->errors()->toArray();
-            $message = 'The given data was invalid.';
-            return response()->json(['message' => $message, 'errors' => $errors], 422);
+        try {
+            $rules = [
+                "reportInfo.startDate"         => "required",
+                "reportInfo.endDate"           => "required",
+                "reportInfo.financingSourceId" => "required",
+            ];
+            $customMessages = [
+                'reportInfo.startDate.required'         => 'La fecha de inicio es obligatoria.',
+                'reportInfo.endDate.required'           => 'La fecha de fin es obligatoria.',
+                'reportInfo.financingSourceId.required' => 'La fuente de financiamiento es obligatorio.',
+            ];
+            $validator = Validator::make($request->all(), $rules, $customMessages);
+            if ($validator->fails()) {
+                $errors = $validator->errors()->toArray();
+                $message = 'The given data was invalid.';
+                return response()->json(['message' => $message, 'errors' => $errors], 422);
+            }
+            $startDate = $request->input('reportInfo.startDate') != '' ? date('Y-m-d', strtotime($request->input('reportInfo.startDate'))) : null;
+            $endDate = $request->input('reportInfo.endDate') != '' ? date('Y-m-d', strtotime($request->input('reportInfo.endDate'))) : null;
+            $financingSourceId = $request->input('reportInfo.financingSourceId');
+            $result = DB::select('CALL PR_RPT_FINANCIERO (?, 541, ?, ?)', array($financingSourceId, $startDate, $endDate));
+            return $result;
+        } catch (\Exception $e) {
+            // Manejar la excepción
+            return response()->json(['message' => 'Ha ocurrido un error al procesar la solicitud.', 'error' => $e->getMessage()], 422);
         }
-        $startDate = $request->input('reportInfo.startDate') != '' ? date('Y-m-d', strtotime($request->input('reportInfo.startDate'))) : null;
-        $endDate = $request->input('reportInfo.endDate') != '' ? date('Y-m-d', strtotime($request->input('reportInfo.endDate'))) : null;
-        $financingSourceId = $request->input('reportInfo.financingSourceId');
-        $result = DB::select('CALL PR_RPT_FINANCIERO (?, 541, ?, ?)', array($financingSourceId, $startDate, $endDate));
-        return $result;
     }
+
 
     public function createExcelReport(Request $request)
     {
