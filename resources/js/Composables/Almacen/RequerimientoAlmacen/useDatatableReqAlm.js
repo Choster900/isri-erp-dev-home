@@ -7,13 +7,46 @@ export const useDatatableReqAlm = () => {
 
     const sortOrders = ref({});
     const columns = [
-        { width: "5%", label: "ID", name: "id_requerimiento", type: "text" },
-        { width: "22%", label: "Centro de atencion", name: "id_centro_atencion", type: "text" },
-        { width: "22%", label: "Proyecto financiado", name: "id_proy_financiado", type: "text" },
-        { width: "22%", label: "Numero requerimiento", name: "num_requerimiento", type: "text" },
-        { width: "22%", label: "Detalle requerimiento", name: "detalle_red", type: "text" },
+        { width: "10%", label: "Numero requerimiento", name: "num_requerimiento", type: "text" },
         {
-            width: "22%", label: "Estado", name: "id_estado_req", type: "select", options: [
+            width: "22%", label: "Centro de atencion", name: "id_centro_atencion", type: "select", options: [
+                { value: "1", label: "ADMINISTRACION SUPERIOR" },
+                { value: "2", label: 'CENTRO DE ATENCION A ANCIANOS "SARA ZALDIVAR"' },
+                { value: "3", label: "CENTRO DEL APARATO LOCOMOTOR" },
+                { value: "4", label: "CENTRO DE AUDICION Y LENGUAJE" },
+                { value: "5", label: "CENTRO DE AUDICION Y LENGUAJE CENTRO DE REHABILITACION PARA CIEGOS EUGENIA DE DUEÑAS" },
+                { value: "6", label: "UNIDAD DE CONSULTA EXTERNA" },
+                { value: "7", label: "CENTRO DE REHABILITACION INTEGRAL PARA LA NIÑEZ Y LA ADOLESCENCIA" },
+                { value: "8", label: "CENTRO DE REHABILITACION INTEGRAL DE OCCIDENTE" },
+                { value: "9", label: "CENTRO DE REHABILITACION INTEGRAL DE ORIENTE" },
+                { value: "10", label: "CENTRO DE REHABILITACION PROFESIONAL" },
+
+            ]
+        },
+        {
+            width: "22%", label: "Linea de trabajo", name: "id_lt", type: "select", options: [
+                { value: "1", label: "DIRECCION SUPERIOR Y ADMINISTRACION" },
+                { value: "2", label: "REHABILITACION INTEGRAL" },
+                { value: "3", label: "PROGRAMA DE ELABORACION DE PROTESIS Y ORTESIS" },
+                { value: "4", label: "PROGRAMA NACIONAL DE ULCERAS, HERIDAS Y PIE DIABETICO" },
+                { value: "5", label: "PROGRAMA DE DOTACION DE PROTESIS PARA USUARIOS AMPUTADOS" },
+                { value: "6", label: "ATENCIONES DE REHABILTACION INTEGRAL A NIÑOS (AS) CON ALGUNA CONDICION DE DISCAPACIDAD" },
+                { value: "7", label: "SALAS CUNA PARA HIJOS (AS), HASTA 3 AÑOS DE EDAD DE EMPLEADOS (AS)" },
+
+            ]
+        },
+        {
+            width: "10%", label: "Proyecto financiado", name: "id_proy_financiado", type: "select",
+             options: [
+                { value: "1", label: "FONDO GENERAL" },
+                { value: "2", label: "FONDO CIRCULANTE DE MONTO FIJO" },
+                { value: "3", label: "RECURSOS PROPIOS" },
+                { value: "4", label: "DONACION" },
+            ]
+        },
+        { width: "10%", label: "Fecha", name: "fecha_requerimiento", type: "date" },
+        {
+            width: "10%", label: "Estado", name: "id_estado_req", type: "select", options: [
                 { value: "1", label: "CREADO" },
                 { value: "2", label: "APROBADO" },
                 { value: "3", label: "DESPACHADO" },
@@ -21,7 +54,7 @@ export const useDatatableReqAlm = () => {
 
             ]
         },
-        { width: "22%", label: "Acciones", name: "", type: "text" },
+        { width: "1%", label: "", name: "Acciones" },
 
     ];
     const isLoadinRequest = ref(false);
@@ -128,7 +161,7 @@ export const useDatatableReqAlm = () => {
     const generateNumberRequerimiento = async () => {
         try {
             const response = await axios.post('/get-number-requerimiento');
-
+            console.log(response);
             const currentYear = moment().year();
             const currentNumber = parseInt(response.data.num_requerimiento.split('-')[2]);
 

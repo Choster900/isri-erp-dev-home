@@ -7,7 +7,7 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { executeRequest } from '@/plugins/requestHelpers';
 
-export default defineComponent({
+export default {
     components: { Datatable, ModalRequerimientoAlmacen },
     setup() {
         const {
@@ -32,6 +32,7 @@ export default defineComponent({
         } = useDatatableReqAlm();
 
 
+
         const changeState = async (idRequerimiento, idProyectoFinanciado, idEstado) => {
             try {
                 // Hace una solicitud POST a la ruta "/save-prod-adquicicion" con los datos necesarios
@@ -40,7 +41,6 @@ export default defineComponent({
                     idProyectoFinanciado: idProyectoFinanciado,
                     idEstado: idEstado,
                 });
-                /* console.log({ idRequerimiento,idProyectoFinanciado,idEstado  }); */
                 console.log(resp);
                 getRequerimientosAlmacen()
                 // Se resuelve la promesa con la respuesta exitosa de la solicitud
@@ -100,7 +100,7 @@ export default defineComponent({
             showModalRequerimientoAlmacen, objectRequerimientoToSendModal,
         }
     }
-})
+}
 </script>
 <template>
 
@@ -118,11 +118,13 @@ export default defineComponent({
                 <div class="mb-4 md:flex flex-row justify-items-start">
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-                            <Multiselect placeholder="Cantidad a mostrar" />
-                            <LabelToInput icon="list2" />
+                            <Multiselect placeholder="Cantidad a mostrar"  v-model="tableData.length" @select="getRequerimientosAlmacen()"
+                                @deselect=" tableData.length = 5; getRequerimientosAlmacen()"
+                                @clear="tableData.length = 5; getRequerimientosAlmacen()" :options="perPage" :searchable="true"/>
+                            <LabelTovInput icon="list2" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Documentos adquisiciones: <span
+                    <h2 class="font-semibold text-slate-800 pt-1">Documentos adquisiciones: {{ pagination.total }}<span
                             class="text-slate-400 font-medium"></span></h2>
                 </div>
             </header>
@@ -133,7 +135,7 @@ export default defineComponent({
                         <tr v-for="(requ, i) in objectRequerimientos" :key="i" class="hover:bg-gray-200 *:text-[10pt]">
                             <td class="px-2 first:pl-5 last:pr-5 max-w-[22%]">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ requ.id_requerimiento }}
+                                    {{ requ.num_requerimiento }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 max-w-[22%]">
@@ -143,34 +145,20 @@ export default defineComponent({
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 max-w-[22%]">
                                 <div class="font-medium text-slate-800 text-center">
+                                    {{ requ.linea_trabajo.nombre_lt }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5 max-w-[22%]">
+                                <div class="font-medium text-slate-800 text-center">
                                     {{ requ.proyecto_financiado.nombre_proy_financiado }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 max-w-[22%]">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ requ.num_requerimiento }}
+                                    {{ requ.fecha_requerimiento }}
                                 </div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5 max-w-[22%]">
-                                <div class="font-medium text-slate-800 text-center">
-                                    <template v-for="(detalle, i) in requ.detalles_requerimiento" :key="i">
-                                        <div class="mb-2 text-center">
-                                            <p class="text-[10pt]">
-                                                <span class="font-medium">codigo producto: </span>{{
-                    detalle.producto.codigo_producto
-                }}<br>
-                                                <span class="font-medium">cantidad: </span> {{
-                        detalle.cant_det_requerimiento
-                    }}<br>
-                                            </p>
-                                        </div>
-                                        <template v-if="i < requ.detalles_requerimiento.length - 1">
-                                            <hr class="my-2 border-t border-gray-300">
-                                        </template>
-                                    </template>
 
-                                </div>
-                            </td>
 
                             <td class="px-2 first:pl-5 last:pr-5 max-w-[22%]">
                                 <div class="font-medium text-slate-800 text-center">

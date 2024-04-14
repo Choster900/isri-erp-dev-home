@@ -178,6 +178,7 @@ export default {
 
                 // Liberar la URL del blob después de la descarga
                 window.URL.revokeObjectURL(url);
+                document.body.style.cursor = 'default';
             } catch (error) {
                 console.error("Error al descargar el archivo:", error);
             }

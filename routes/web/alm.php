@@ -69,7 +69,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post(
         'get-number-requerimiento',
         function (Request $request) {
-            return Requerimiento::latest("fecha_reg_requerimiento")->where('id_estado_req', '!=', 4)->first();
+            return Requerimiento::latest("fecha_reg_requerimiento")->where('id_estado_req', '!=', 4)->OrWhere('id_tipo_req', '==', 1)->first();
         }
     )->name('donacion.getObjectForRequerimientoAlmacen');
     Route::post('insert-requerimiento-almacen', [RequerimientoAlmacenController::class, 'addRequerimiento'])->name('donacion.insertRequerimientoAlmacen');

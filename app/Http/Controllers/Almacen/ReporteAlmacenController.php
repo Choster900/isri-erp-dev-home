@@ -67,7 +67,7 @@ class ReporteAlmacenController extends Controller
     public function createExcelReport(Request $request)
     {
 
-        $fechaDesde =  $request->paramsToRequest["startDate"] != '' ? date('Y-m-d', strtotime($request->paramsToRequest["startDate"])) : null;
+        $fechaDesde = $request->paramsToRequest["startDate"] != '' ? date('Y-m-d', strtotime($request->paramsToRequest["startDate"])) : null;
         $fechaHasta = $request->paramsToRequest["endDate"] != '' ? date('Y-m-d', strtotime($request->paramsToRequest["endDate"])) : null;
 
         $proyectoFinanciadoId = $request->paramsToRequest["financingSourceId"];
@@ -148,11 +148,11 @@ class ReporteAlmacenController extends Controller
         $sheet->getColumnDimension('B')->setWidth(35);
 
         // Ajustar el texto en todas las celdas de la fila 6
-        foreach (range('A', 'L') as $column) {
+        foreach ( range('A', 'L') as $column ) {
             $sheet->getStyle($column . '6')->getAlignment()->setWrapText(true);
         }
 
-        foreach (range('A', 'L') as $column) {
+        foreach ( range('A', 'L') as $column ) {
             $sheet->getStyle($column . '6')->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
             $sheet->getStyle($column . '6')->getBorders()->getTop()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLACK));
             $sheet->getStyle($column . '6')->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
@@ -184,7 +184,7 @@ class ReporteAlmacenController extends Controller
 
 
         // Iterar sobre los resultados y escribir en la hoja de cálculo
-        foreach ($result as $filaResultado) {
+        foreach ( $result as $filaResultado ) {
             // Convertir el objeto stdClass en un array
             $filaArray = (array) $filaResultado;
 
@@ -192,7 +192,7 @@ class ReporteAlmacenController extends Controller
             $columna = 0;
 
             // Iterar sobre las columnas definidas y escribir los valores en la hoja de cálculo
-            foreach ($columnas as $nombreColumna) {
+            foreach ( $columnas as $nombreColumna ) {
                 // Obtener el valor de la columna actual
                 $valor = isset($filaArray[$nombreColumna]) ? $filaArray[$nombreColumna] : '';
 
@@ -258,10 +258,58 @@ class ReporteAlmacenController extends Controller
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
+        // Encabezados desde A6 hasta L6
+        $encabezados = [
+            'COD',
+            'NOMBRE',
+            'MARCA',
+            'UNIDAD',
+            'NUMERO',
+            'FECHA',
+            'CANTIDAD',
+            'COSTO',
+            'MONTOS'
+        ];
 
-        $sheet->mergeCells('A1:F1');
-        $sheet->setCellValue('A1', 'SISTEMA DE ALMACEN PARA EL CONTROL DE BIENES EN EXISTENCIA - ISRI');
+        $sheet->fromArray([$encabezados], null, 'A6');
+        // Ejecutar el procedimiento almacenado y obtener los resultados
+        $result = DB::select("CALL PR_RPT_CONSUMO  (?, ?, ?, ?, ?, ?, ?)", array('D', 2, 1, 1, 1, '2024-01-01', '2024-04-12'));
 
+        $sheet->getColumnDimension('B')->setWidth(35);
+
+        // Pintar los datos en el documento
+        $row = 7; // Comenzar desde la fila 2 para dejar espacio para los encabezados
+        foreach ( $result as $data ) {
+            /* $sheet->setCellValue('A' . $row, $data->COD); */
+            if ($data->id_tipo_reg_rpt_consumo == 1) {
+
+                $sheet->setCellValue('A' . $row, $data->id_ccta_presupuesto_rpt_consumo);
+                $sheet->mergeCells('B' . $row . ':I' . $row);
+                $sheet->setCellValue('B' . $row, $data->nombre_prod_rpt_consumo);
+
+            }
+
+            if ($data->id_tipo_reg_rpt_consumo == 2) {
+                $sheet->setCellValue('A' . $row, $data->codigo_uplt_rpt_consumo);
+                $sheet->setCellValue('B' . $row, $data->nombre_prod_rpt_consumo);
+                $sheet->setCellValue('C' . $row, $data->marca_rpt_consumo);
+                $sheet->setCellValue('D' . $row, $data->nombre_umedida_rpt_consumo);
+                $sheet->setCellValue('E' . $row, $data->numero_mov_rpt_consumo);
+                $sheet->setCellValue('F' . $row, $data->fecha);
+                $sheet->setCellValue('G' . $row, $data->cant_rpt_consumo);
+                $sheet->setCellValue('H' . $row, $data->costo_rpt_consumo);
+                $sheet->setCellValue('I' . $row, $data->monto_rpt_consumo);
+            }
+
+            if ($data->id_tipo_reg_rpt_consumo == 3) {
+                $sheet->mergeCells('A' . $row . ':H' . $row);
+                $sheet->setCellValue('A' . $row, $data->nombre_prod_rpt_consumo);
+                $sheet->setCellValue('I' . $row, $data->monto_rpt_consumo);
+
+            }
+
+            $row++;
+        }
         // Guardar el archivo como XLSX
         $writer = new Xlsx($spreadsheet);
 
@@ -299,7 +347,7 @@ class ReporteAlmacenController extends Controller
         /*  $startDate = $request->input('reportInfo.startDate') != '' ? date('Y-m-d', strtotime($request->input('reportInfo.startDate'))) : null;
         $endDate = $request->input('reportInfo.endDate') != '' ? date('Y-m-d', strtotime($request->input('reportInfo.endDate'))) : null;
         $financingSourceId = $request->input('reportInfo.financingSourceId'); */
-        $result = DB::select("CALL PR_RPT_CONSUMO  (?, ?, ?, ?, ?, ?, ?)", array('C', 2, 1, 1, 1, '2024-01-01', '2024-04-12'));
+        $result = DB::select("CALL PR_RPT_CONSUMO  (?, ?, ?, ?, ?, ?, ?)", array('D', 2, 1, 1, 1, '2024-01-01', '2024-04-12'));
         return $result;
     }
 }

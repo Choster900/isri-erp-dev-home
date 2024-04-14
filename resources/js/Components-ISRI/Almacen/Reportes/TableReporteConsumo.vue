@@ -59,7 +59,7 @@
                             <td class="text-center">{{ consumo.marca_rpt_consumo || '-' }}</td>
                             <td class="text-center">{{ consumo.nombre_umedida_rpt_consumo }}</td>
                             <td class="text-center font-medium">{{ consumo.numero_mov_rpt_consumo }}</td>
-                            <td class="text-center">{{ consumo.fecha_mov_rpt_consumo }}</td>
+                            <td class="text-center">{{ consumo.fecha }}</td>
                             <td class="text-center">{{ consumo.cant_rpt_consumo }}</td>
                             <td class="text-center">{{ consumo.costo_rpt_consumo }}</td>
                             <td class="text-center">{{ consumo.monto_rpt_consumo }}</td>

@@ -23,14 +23,21 @@ class BienesServiciosController extends Controller
     {
         $v_columns = [
             'id_doc_adquisicion',
-            /*  'dui_proveedor',
-            'nrc_proveedor',
-            'nit_proveedor',
-            'id_tipo_contribuyente',
-            'id_sujeto_retencion',
-            'razon_social_proveedor',
-            'estado_proveedor',
-            'nombre_comercial_proveedor', */
+            'id_prod_adquisicion',
+            'id_producto',
+            'id_det_doc_adquisicion',
+            'id_marca',
+            'id_lt',
+            'id_centro_atencion',
+            'cant_prod_adquisicion',
+            'costo_prod_adquisicion',
+            'descripcion_prod_adquisicion',
+            'estado_prod_adquisicion',
+            'fecha_reg_prod_adquisicion',
+            'fecha_mod_prod_adquisicion',
+            'usuario_prod_adquisicion',
+            'ip_prod_adquisicion',
+
         ];
 
         $v_length = $request->input('length');
@@ -54,11 +61,30 @@ class BienesServiciosController extends Controller
         ])->has('productos_adquisiciones')->orderBy($v_columns[$v_column], $v_dir);
 
         if ($data) {
-            /*   $v_query->where('id_proveedor', 'like', '%' . $data["id_proveedor"] . '%')
-                ->whereRaw('IFNULL(dui_proveedor, IFNULL(nit_proveedor, "")) like ?', '%' . $data["dui_proveedor"] . '%')
-                ->where('razon_social_proveedor', 'like', '%' . $data["razon_social_proveedor"] . '%')
-                ->where('nombre_comercial_proveedor', 'like', '%' . $data["nombre_comercial_proveedor"] . '%')
-                ->where('estado_proveedor', 'like', '%' . $data["estado_proveedor"] . '%'); */
+
+            $v_query->whereHas('documento_adquisicion.proveedor', function ($query) use ($data) {
+                $query->where('razon_social_proveedor', 'like', '%' . $data["razon_social_proveedor"] . '%');
+            });
+            $v_query->whereHas('documento_adquisicion', function ($query) use ($data) {
+                $query->where('id_tipo_doc_adquisicion', 'like', '%' . $data["id_tipo_doc_adquisicion"] . '%');
+            });
+            $v_query->whereHas('documento_adquisicion', function ($query) use ($data) {
+                $query->where('id_tipo_gestion_compra', 'like', '%' . $data["id_tipo_gestion_compra"] . '%');
+            });
+
+            $v_query->whereHas('documento_adquisicion', function ($query) use ($data) {
+                $query->where('numero_doc_adquisicion', 'like', '%' . $data["id_tipo_gestion_compra"] . '%');
+            });
+            $v_query->whereHas('documento_adquisicion', function ($query) use ($data) {
+                $query->where('numero_doc_adquisicion', 'like', '%' . $data["id_tipo_gestion_compra"] . '%');
+            });
+
+
+            $v_query->where('monto_det_doc_adquisicion', 'like', '%' . $data["monto_det_doc_adquisicion"] . '%');
+
+            $v_query->whereHas('estado_documento_adquisicion', function ($query) use ($data) {
+                $query->where('id_estado_doc_adquisicion', 'like', '%' . $data["id_estado_doc_adquisicion"] . '%');
+            });
         }
 
         $data = $v_query->paginate($v_length)->onEachSide(1);
