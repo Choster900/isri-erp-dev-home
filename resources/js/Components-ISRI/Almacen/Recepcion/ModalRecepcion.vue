@@ -98,12 +98,13 @@
             </div>
 
             <div v-else>
-                <div class="ml-8 mr-0 max-w-full overflow-x-auto mt-4 max-h-[450px] overflow-y-auto">
+                <div class="pl-8 mr-0 pb-1 max-w-full overflow-x-auto mt-4 max-h-[450px] overflow-y-auto">
                     <div class="min-w-[970px] bg-white">
                         <div class="grid grid-cols-[23%_77%] max-w-[97%] border border-gray-500">
                             <!-- Columna 1 -->
-                            <div class="w-full bg-white border-r border-gray-500 p-2">
-                                <img src="../../../../img/isri-gob.png" alt="Logo del instituto" class="w-full">
+                            <div class="w-full bg-white border-r border-gray-500 p-2 flex items-center justify-center">
+                                <img src="../../../../img/isri-gob.png" alt="Logo del instituto"
+                                    class="w-full max-w-full">
                             </div>
                             <!-- Columna 2 -->
                             <div class="w-full bg-white p-2">
@@ -165,7 +166,8 @@
                             <div class="w-full justify-start flex items-center border-x border-gray-500 bg-white">
                                 <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2">FECHA REFERENCIA
                                     DOCUMENTO DE COMPRA:
-                                    <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{ }}</span>
+                                    <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
+                infoToShow.acqDocDate }}</span>
                                 </p>
                             </div>
                         </div>
@@ -233,24 +235,19 @@
                                 class="grid grid-cols-[18%_25%_14%_13%_10%_10%_10%] max-w-full bg-white border-b border-x border-gray-500">
                                 <div class="w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]"
                                     :class="errors['prods.' + index + '.prodId'] ? 'bg-red-300' : ''">
-                                    <Multiselect id="doc" v-model="prod.prodId" :options="products"
-                                        class="h-[35px]" :disabled="infoToShow.status != 1" :searchable="true"
-                                        :noOptionsText="'Lista vacía.'" placeholder="Seleccione"
-                                        @change="setProdItem($event, index)" 
+                                    <Multiselect v-if="infoToShow.status == 1" id="doc" v-model="prod.prodId"
+                                        :options="products" class="h-[35px]" :disabled="infoToShow.status != 1"
+                                        :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione"
+                                        @change="setProdItem($event, index)"
                                         :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', }" />
+                                    <p class="font-[MuseoSans] text-[12px] p-1 " v-else>{{ prod.prodLabel }}</p>
                                 </div>
                                 <div
                                     class="w-full flex items-center justify-center border-r border-gray-500 min-h-[75px] max-h-[100px]">
                                     <div class="overflow-y-auto h-full">
-                                        <p class="font-[MuseoSans] text-sm p-1">{{ prod.desc }}</p>
+                                        <p class="font-[MuseoSans] text-[12px] p-1">{{ prod.desc }}</p>
                                     </div>
                                 </div>
-
-                                <!-- <div class="w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]"
-                                    :class="prod.avails < 0 ? 'bg-red-300' : ''">
-                                    <p class="font-[MuseoSans] text-sm p-1 ">{{ prod.avails }}</p>
-                                </div> -->
-
                                 <div class="w-full border-r border-gray-500 min-h-[75px] flex items-center justify-center"
                                     :class="errors['prods.' + index + '.brandId'] ? 'bg-red-300' : ''">
                                     <Multiselect v-if="infoToShow.status == 1" id="doc" v-model="prod.brandId"
@@ -263,34 +260,36 @@
 
                                 <div class="w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]"
                                     :class="errors['prods.' + index + '.expiryDate'] ? 'bg-red-300' : ''">
-                                    <date-time-picker-m v-if="prod.perishable === 1" v-model="prod.expiryDate"
-                                        :showIcon="false" :placeholder="'Seleccione'"
-                                        :disabled="infoToShow.status != 1" />
-                                    <p v-else class="font-[MuseoSans] text-sm p-1 ">N/A</p>
+                                    <div class="max-w-[95%]">
+                                        <date-time-picker-m v-if="prod.perishable === 1" v-model="prod.expiryDate"
+                                            :showIcon="false" :placeholder="'Seleccione'"
+                                            :disabled="infoToShow.status != 1" />
+                                        <p v-else class="font-[MuseoSans] text-[12px] p-1 ">N/A</p>
+                                    </div>
                                 </div>
 
-                                <div
-                                    class="relative w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]"
-                                    :class="showAvails(prod.prodId,index) < 0 || errors['prods.' + index + '.qty'] ? 'bg-red-300' : ''">
+                                <div class="relative w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]"
+                                    :class="showAvails(prod.prodId, index) < 0 || errors['prods.' + index + '.qty'] ? 'bg-red-300' : ''">
                                     <!-- Aquí se colocará el número dinámicamente -->
                                     <span
-                                        class="absolute font-[MuseoSans] text-[12px] top-1 flex items-center justify-center">REST: {{ showAvails(prod.prodId,index) }}</span>
+                                        class="absolute font-[MuseoSans] text-[12px] top-1 flex items-center justify-center">REST:
+                                        {{ showAvails(prod.prodId, index) }}</span>
 
                                     <!-- El input -->
                                     <input v-model="prod.qty" :disabled="infoToShow.status != 1"
-                                        class="font-bold max-w-[95%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-sm border-[#d1d5db]"
+                                        class="font-bold max-w-[95%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-[13px] border-[#d1d5db] hover:border-gray-400 transition duration-300 ease-in-out"
                                         type="text" name="" id=""
                                         @input="handleValidation('qty', { limit: 3, number: true }, { index: index, qty: prod.qty, prodId: prod.prodId })">
                                 </div>
 
                                 <div
                                     class="w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]">
-                                    <p class="font-[MuseoSans] text-sm p-1 ">
+                                    <p class="font-[MuseoSans] text-[13px] p-1 ">
                                         {{ prod.cost != '' ? '$' + prod.cost : '' }}
                                     </p>
                                 </div>
                                 <div class="w-full flex items-center justify-center min-h-[75px]">
-                                    <p class="font-[MuseoSans] text-sm p-1 font-bold">
+                                    <p class="font-[MuseoSans] text-[13px] p-1 font-bold">
                                         {{ prod.total != '' ? '$' + prod.total : '' }}
                                     </p>
                                 </div>
@@ -314,7 +313,7 @@
                             </div>
                         </div>
                     </template>
-                    <div id="total" class="w-full max-w-full grid grid-cols-[97%_3%] min-w-[970px]">
+                    <div id="total" class="w-full max-w-full grid grid-cols-[97%_3%] min-w-[970px] bg-white">
                         <div class="grid grid-cols-[90%_10%] w-full max-w-full border-b border-x border-gray-500">
                             <div class="flex items-center justify-end border-r h-[30px]  border-gray-500">
                                 <p class="font-[MuseoSans] text-[12px] py-2 mr-2 font-bold">TOTAL DONACION</p>
@@ -336,6 +335,21 @@
                             </div>
                         </div>
                     </div>
+                    <div class="min-w-[970px]">
+                        <div class="grid grid-cols-[100%] max-w-[97%] border-x border-gray-500">
+                            <p class="ml-3 text-[13px] font-[Roboto] text-gray-500">Observación sobre recepción:</p>
+                        </div>
+                    </div>
+                    <div id="observ" class="min-w-[970px]">
+                        <div class="grid grid-cols-[100%] max-w-[97%] border-x border-b border-gray-500">
+                            <div class="justify-center flex w-full bg-white">
+                                <textarea v-model="recDocument.observation" placeholder=""
+                                    class="w-full text-[12px] py-1 font-[Roboto] h-full outline-none ring-0 border-transparent focus:outline-none focus:ring-0 focus:border-transparent leading-4"
+                                    @input="handleValidation('observation', { limit: 255 })"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
                 <div class="md:flex flex md:items-center my-6 sticky flex-row justify-center mx-8">
                     <button type="button" @click="$emit('cerrar-modal')"
@@ -417,7 +431,7 @@ export default {
 }
 
 .dp__input_wrap {
-    height: 35px;
+    height: 40px;
 }
 
 .dp__theme_light {

@@ -1,7 +1,7 @@
 <template>
 
-    <Head title="Kardex - Ajuste por faltante" />
-    <AppLayoutVue nameSubModule="Almacen - Ajuste por faltante">
+    <Head title="Kardex - Ajuste de entrada" />
+    <AppLayoutVue nameSubModule="Almacen - Ajuste de entrada">
         <div v-if="isLoadingTop"
             class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-900 opacity-75 z-50">
             <div class="flex items-center justify-center my-4">
@@ -28,7 +28,7 @@
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Ajustes por faltante: <span
+                    <h2 class="font-semibold text-slate-800 pt-1">Ajustes de entrada: <span
                             class="text-slate-400 font-medium">{{
             tableData.total
         }}</span></h2>
@@ -159,9 +159,6 @@
         <modal-ajuste-entrada-vue v-if="showModalShortageAdjustment" :showModalShortageAdjustment="showModalShortageAdjustment" :objId="objId"
             @cerrar-modal="showModalShortageAdjustment = false" @get-table="getDataToShow(tableData.currentPage)" />
 
-        <!-- <modal-enviar-donacion-vue v-if="showModalSendDonation" :showModalSendDonation="showModalSendDonation" :recepId="recepId"
-            @cerrar-modal="showModalSendDonation = false" @get-table="getDataToShow(tableData.currentPage)" />  -->
-
     </AppLayoutVue>
 </template>
 
@@ -172,7 +169,6 @@ import Datatable from "@/Components-ISRI/Datatable.vue";
 import Pagination from "@/Components-ISRI/Pagination.vue";
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
 import ModalAjusteEntradaVue from '@/Components-ISRI/Almacen/AjusteEntrada/ModalAjusteEntrada.vue';
-import ModalEnviarDonacionVue from '@/Components-ISRI/Almacen/Donacion/ModalEnviarDonacion.vue';
 
 import { localeData } from 'moment_spanish_locale';
 import moment from 'moment';
@@ -184,7 +180,7 @@ import { useToDataTable } from '@/Composables/General/useToDataTable.js';
 import { useEnviarAjusteEntrada } from '@/Composables/Almacen/AjusteEntrada/useEnviarAjusteEntrada.js';
 
 export default {
-    components: { Head, AppLayoutVue, Datatable, IconM, ModalAjusteEntradaVue, ModalEnviarDonacionVue, Pagination },
+    components: { Head, AppLayoutVue, Datatable, IconM, ModalAjusteEntradaVue, Pagination },
     props: {
         menu: {
             type: Object,

@@ -65,9 +65,6 @@
             <div class="w-[12%] flex justify-center items-center border-r border-gray-500">
                 <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[10px] font-bold">MARCA</p>
             </div>
-            <!-- <div class="w-[10%] flex justify-center items-center border-r border-gray-500">
-                <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[11px] font-bold">VENC.</p>
-            </div> -->
             <div class="w-[10%] flex justify-center items-center border-r border-gray-500">
                 <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[10px] font-bold">VCTO.</p>
             </div>

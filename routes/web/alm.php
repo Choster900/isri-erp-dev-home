@@ -5,6 +5,7 @@ use App\Http\Controllers\Almacen\DonacionController;
 use App\Http\Controllers\Almacen\RecepcionController;
 use App\Http\Controllers\Almacen\ReporteAlmacenController;
 use App\Http\Controllers\Almacen\RequerimientoAlmacenController;
+use App\Models\CatalogoCtaPresupuestal;
 use App\Models\DetalleExistenciaAlmacen;
 use App\Models\DetalleRequerimiento;
 use App\Models\ExistenciaAlmacen;
@@ -69,7 +70,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post(
         'get-number-requerimiento',
         function (Request $request) {
-            return Requerimiento::latest("fecha_reg_requerimiento")->where('id_estado_req', '!=', 4)->first();
+            return Requerimiento::latest("fecha_reg_requerimiento")->where('id_estado_req', '!=', 4)->OrWhere('id_tipo_req', '==', 1)->first();
         }
     )->name('donacion.getObjectForRequerimientoAlmacen');
     Route::post('insert-requerimiento-almacen', [RequerimientoAlmacenController::class, 'addRequerimiento'])->name('donacion.insertRequerimientoAlmacen');
@@ -111,13 +112,26 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     )->name('alm.reporteFinanciero');
     Route::post('get-proyecto-financiado', function (Request $request) {
         return ProyectoFinanciado::all();
-    })->name('bieneservicios.get-proyectos');
+    })->name('reporte.get-proyectos');
     Route::post('get-reporte-financiero-almacen-bienes-existencia',[ReporteAlmacenController::class,'getReporteFinanciero'])->name('bieneservicios.get-reporte-financiero-almacen');
     Route::post('get-excel-document-reporte-financiero', [ReporteAlmacenController::class, 'createExcelReport'])->name('bieneservicios.get-proyectos');
     //TODO: FALTA EL REPORTE DE PDF DE REPORTE FINANCIERO
     Route::post('get-reporte-consumo',[ReporteAlmacenController::class,'getReporteConsumo'])->name('bieneservicios.get-reporte-consumo');
     Route::post('get-excel-document-reporte-consumo',[ReporteAlmacenController::class,'getExcelDocumentConsumo'])->name('bieneservicios.get-excel-document-reporte-consumo');
+    Route::post('get-cuenta-by-number', function (Request $request) {
 
+        $cuentas = CatalogoCtaPresupuestal::where("id_ccta_presupuestal","like",'%' . $request->numeroCuenta . '%')->get();
+
+         // Formatear resultados para respuesta JSON
+        return $cuentas->map(function ($item) {
+            return [
+                'value'           => $item->id_ccta_presupuestal,
+                'label'           => $item->id_ccta_presupuestal . '-' . $item->nombre_ccta_presupuestal,
+                'allDataPersonas' => $item,
+            ];
+        });
+
+    } )->name('reporte.get-cuenta');
     //Surplus adjustment
     Route::get(
         '/alm/ajuste-entrada',
