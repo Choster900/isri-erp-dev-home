@@ -32,10 +32,22 @@ class RequerimientoAlmacenController extends Controller
     {
         $v_columns = [
             'id_requerimiento',
+            'id_lt',
             'id_centro_atencion',
+            'cen_id_centro_atencion',
+            'id_motivo_ajuste',
+            'req_id_requerimiento',
             'id_proy_financiado',
+            'id_tipo_mov_kardex',
             'id_estado_req',
+            'id_tipo_req',
             'num_requerimiento',
+            'fecha_requerimiento',
+            'observacion_requerimiento',
+            'fecha_reg_requerimiento',
+            'fecha_mod_requerimiento',
+            'usuario_requerimiento',
+            'ip_requerimiento',
         ];
 
         $v_length = $request->input('length');
@@ -53,6 +65,7 @@ class RequerimientoAlmacenController extends Controller
                 $query->where('estado_det_requerimiento', 1);
             },
             "centro_atencion",
+            "linea_trabajo",
             "proyecto_financiado",
             "estado_requerimiento"
 
@@ -60,15 +73,16 @@ class RequerimientoAlmacenController extends Controller
             return $query->where('id_estado_req', 2)
                 ->orWhere('id_estado_req', 3)
                 ->orWhere('id_estado_req', 4);
-        })->where("id_tipo_req",1)
+        })->where("id_tipo_req", 1)
             ->orderBy($v_columns[$v_column], $v_dir);
 
         if ($data) {
-            /*   $v_query->where('id_proveedor', 'like', '%' . $data["id_proveedor"] . '%')
-                ->whereRaw('IFNULL(dui_proveedor, IFNULL(nit_proveedor, "")) like ?', '%' . $data["dui_proveedor"] . '%')
-                ->where('razon_social_proveedor', 'like', '%' . $data["razon_social_proveedor"] . '%')
-                ->where('nombre_comercial_proveedor', 'like', '%' . $data["nombre_comercial_proveedor"] . '%')
-                ->where('estado_proveedor', 'like', '%' . $data["estado_proveedor"] . '%'); */
+            $v_query->where('num_requerimiento', 'like', '%' . $data["num_requerimiento"] . '%')
+            ->where('id_centro_atencion', 'like', '%' . $data["id_centro_atencion"] . '%')
+            ->where('id_lt', 'like', '%' . $data["id_lt"] . '%')
+            ->where('id_proy_financiado', 'like', '%' . $data["id_proy_financiado"] . '%')
+            ->where('fecha_requerimiento', 'like', '%' . $data["fecha_requerimiento"] . '%')
+            ->where('id_estado_req', 'like', '%' . $data["id_estado_req"] . '%');
         }
 
         $data = $v_query->paginate($v_length)->onEachSide(1);

@@ -55,7 +55,7 @@
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ prod.id_ccta_presupuestal }}
+                                    {{ prod.codigo_producto }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 max-w-[13%]">
@@ -174,9 +174,9 @@ export default {
 
         const columns = [
             { width: "8%", label: "ID", name: "id_producto", type: "text" },
-            { width: "22%", label: "Nombre", name: "nombre_producto", type: "text" },
-            { width: "22%", label: "Descripcion", name: "descripcion_producto", type: "text" },
-            { width: "8%", label: "Especifico", name: "id_ccta_presupuestal", type: "text" },
+            { width: "21%", label: "Nombre", name: "nombre_producto", type: "text" },
+            { width: "21%", label: "Descripcion", name: "descripcion_producto", type: "text" },
+            { width: "10%", label: "Codigo", name: "codigo_producto", type: "text" },
             { width: "13%", label: "Medida", name: "unidad_medida", type: "text" },
             { width: "10%", label: "Precio", name: "precio_producto", type: "text" },
             {

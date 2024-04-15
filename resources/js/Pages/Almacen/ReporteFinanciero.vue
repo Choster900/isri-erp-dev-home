@@ -47,7 +47,8 @@
             <div class="flex justify-end px-4 gap-3">
                 <h1 class="font-medium">Reporte Financiero: </h1>
                 <div class="flex" style="display: non;">
-                    <div @click="exportExcel" class="flex items-center cursor-pointer text-slate-700 hover:text-green-600"><svg
+                    <div @click="exportExcel"
+                        class="flex items-center cursor-pointer text-slate-700 hover:text-green-600"><svg
                             class="h-4 w-4 text-green-500" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
                             xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 26 26" xml:space="preserve"
                             fill="#000000">
@@ -64,7 +65,8 @@
                                 </g>
                             </g>
                         </svg><span class="ml-2 font-semibold text-[14px]">EXPORTAR</span></div>
-                    <div class="flex ml-4 items-center cursor-pointer text-slate-700 hover:text-red-600"><svg
+                    <div @click="printPdf"
+                        class="flex ml-4 items-center cursor-pointer text-slate-700 hover:text-red-600"><svg
                             class="h-4 w-4 text-red-500" fill="currentColor" viewBox="0 0 1920 1920"
                             xmlns="http://www.w3.org/2000/svg">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -98,7 +100,8 @@ import { useReporteFinanciero } from '@/Composables/Almacen/Reportes/useReporteF
 import moment from 'moment';
 import InputError from "@/Components/InputError.vue";
 import { jsPDF } from "jspdf";
-import { ref, toRefs, computed, onMounted, watch } from 'vue';
+import html2pdf from 'html2pdf.js'
+import { ref, toRefs, computed, onMounted, watch, createApp, h } from 'vue';
 import { usePermissions } from '@/Composables/General/usePermissions.js';
 import DateTimePickerM from "@/Components-ISRI/ComponentsToForms/DateTimePickerM.vue";
 import DateSelect from "@/Components/DateSelect.vue";
@@ -118,7 +121,7 @@ export default {
     setup(props, context) {
         const { menu } = toRefs(props);
         const permits = usePermissions(menu.value, window.location.pathname);
-        const {
+        const {printPdf,
             isLoadingExport, reportInfo, errors, financingArray, dataReporteInfo
         } = useReporteFinanciero(context);
 
@@ -155,6 +158,8 @@ export default {
 
         const exportExcel = async () => {
             try {
+                // Cambia el cursor del cuerpo del documento a "wait" durante la generación del PDF
+                document.body.style.cursor = 'wait';
                 const response = await axios.post(
                     "/get-excel-document-reporte-financiero",
                     { paramsToRequest: reportInfo.value },
@@ -173,6 +178,7 @@ export default {
 
                 // Liberar la URL del blob después de la descarga
                 window.URL.revokeObjectURL(url);
+                document.body.style.cursor = 'default';
             } catch (error) {
                 console.error("Error al descargar el archivo:", error);
             }
@@ -212,7 +218,9 @@ export default {
             }
         }
 
-        return {exportExcel,
+
+        return {
+            exportExcel,printPdf,
             getOption, permits, isLoadingExport, reportInfo, errors, financingArray, dataReporteInfo, getInformacionReport
         };
     },

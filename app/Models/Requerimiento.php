@@ -77,4 +77,14 @@ class Requerimiento extends Model
     {
         return $this->belongsTo(MotivoAjuste::class, 'id_motivo_ajuste', 'id_motivo_ajuste');
     }
+    /**
+     * Get the linea_trabajo model associated with this instance.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function linea_trabajo()
+    {
+        return $this->belongsTo(LineaTrabajo::class, 'id_lt', 'id_lt');
+    }
+
 }
