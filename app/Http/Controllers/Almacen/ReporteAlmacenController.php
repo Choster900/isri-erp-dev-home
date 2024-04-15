@@ -310,16 +310,16 @@ class ReporteAlmacenController extends Controller
         $sheet->fromArray([$encabezados], null, 'A6');
 
         // Establecer estilo para encabezados
-    $styleHeader = [
-        'font' => ['bold' => true, 'size' => 9],
-    ];
+        $styleHeader = [
+            'font' => ['bold' => true, 'size' => 9],
+        ];
 
-    foreach (range('A', 'I') as $column) {
-        $sheet->getStyle($column . '6')->applyFromArray($styleHeader);
-    }
-    
+        foreach (range('A', 'I') as $column) {
+            $sheet->getStyle($column . '6')->applyFromArray($styleHeader);
+        }
+
         // Ejecutar el procedimiento almacenado y obtener los resultados
-        $result = DB::select("CALL PR_RPT_CONSUMO  (?, ?, ?, ?, ?, ?, ?)", array('D', 2, 1, 1, 1, '2024-01-01', '2024-04-12'));
+        $result = DB::select("CALL PR_RPT_CONSUMO  (?, ?, ?, ?, ?,?, ?, ?)", array('D', 2, 1, 1, 1, 54101, '2024-01-01', '2024-04-12'));
 
         $sheet->getColumnDimension('B')->setWidth(35);
 
@@ -387,7 +387,7 @@ class ReporteAlmacenController extends Controller
         $writer->save('php://output');
     }
 
-    public function getReporteConsumo(Request $request): array
+    public function getReporteConsumo(Request $request)
     {
         /*   $rules = [
             "reportInfo.startDate"         => "required",
@@ -405,10 +405,43 @@ class ReporteAlmacenController extends Controller
             $message = 'The given data was invalid.';
             return response()->json(['message' => $message, 'errors' => $errors], 422);
         } */
-        /*  $startDate = $request->input('reportInfo.startDate') != '' ? date('Y-m-d', strtotime($request->input('reportInfo.startDate'))) : null;
-        $endDate = $request->input('reportInfo.endDate') != '' ? date('Y-m-d', strtotime($request->input('reportInfo.endDate'))) : null;
-        $financingSourceId = $request->input('reportInfo.financingSourceId'); */
-        $result = DB::select("CALL PR_RPT_CONSUMO  (?, ?, ?, ?, ?, ?, ?)", array('D', 2, 1, 1, 1, '2024-01-01', '2024-04-12'));
-        return $result;
+        $startDate = $request->input('fechaDesde') != '' ? date('Y-m-d', strtotime($request->input('fechaDesde'))) : null;
+        $endDate = $request->input('fechaHasta') != '' ? date('Y-m-d', strtotime($request->input('fechaHasta'))) : null;
+
+        // Llamar al procedimiento almacenado con los parámetros proporcionados
+
+        // Obtener el tipo de transacción del request
+        $tipoTransaccion = $request->idTipoTransaccion;
+
+        // Definir un array asociativo para mapear los valores de idtipomov e idtiporeq
+        $transaccionMap = [
+            1 => ['idtipomov' => 2, 'idtiporeq' => 1],
+            2 => ['idtipomov' => 1, 'idtiporeq' => 2],
+            3 => ['idtipomov' => 2, 'idtiporeq' => 2],
+            4 => ['idtipomov' => 2, 'idtiporeq' => 3],
+            5 => ['idtipomov' => 1, 'idtiporeq' => 3],
+        ];
+
+        // Obtener los valores de idtipomov e idtiporeq según el tipo de transacción
+        $transaccionValues = $transaccionMap[$tipoTransaccion] ?? ['idtipomov' => 2, 'idtiporeq' => 1];
+
+
+        $params = [
+            'tipovista' => $request->tipoReporte,
+            'idtipomov' => $transaccionValues['idtipomov'],
+            'idtiporeq' => $transaccionValues['idtiporeq'],
+            'idproy' => $request->idProyectoFinanciamiento,
+            'idcentro' => $request->idCentroAtencion == 0 ? null : $request->idCentroAtencion,
+            'idcuenta' => $request->idCuenta,
+            'fecha_inicial' => $startDate,
+            'fecha_final' => $endDate,
+        ];
+
+        return DB::select("CALL PR_RPT_CONSUMO(:tipovista, :idtipomov, :idtiporeq, :idproy, :idcentro, :idcuenta, :fecha_inicial, :fecha_final)", $params);
+
+        #return DB::select("CALL PR_RPT_CONSUMO('D',2,1,1,NULL,NULL,'2024-01-01','2024-04-12')");
+
+        #return $endDate;
+        #return $params;
     }
 }

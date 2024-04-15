@@ -1,4 +1,5 @@
 <template>
+
     <Head title="Reporte - Empleados" />
     <AppLayoutVue nameSubModule="Almacen - Reporte financiero" :autoPadding="false" :class="'bg-gray-200'">
         <div class="w-[95%] my-4 h-full mx-auto bg-white border border-gray-300">
@@ -7,50 +8,69 @@
                     <label class="block mb-2 text-[13px] font-medium text-gray-600">Fuente Financiamiento
                         <span class="text-red-600 font-extrabold">*</span></label>
                     <div class="relative flex h-[30px] w-full">
-                        <Multiselect v-model="reportInfo.financingSourceId" :options="financingArray" :searchable="true"
+                        <Multiselect :options="[{ value: 1, label: 'FONDO GENERAL' },
+    { value: 2, label: 'FONDO CIRCULANTE DE MONTO FIJO' },
+    { value: 3, label: 'RECURSOS PROPIOS' },
+    { value: 4, label: 'DONACION' }]" :searchable="true" v-model="idProyectoFinanciamiento"
                             :noOptionsText="'Lista vacía.'" placeholder="Seleccione" />
                     </div>
-                    <InputError class="mt-2" :message="errors[`reportInfo.financingSourceId`]" />
+                    <InputError class="mt-2" />
                 </div>
                 <div class="mb-4 md:mr-0 md:mb-0 basis-[25%]">
                     <label class="block mb-2 text-[13px] font-medium text-gray-600">Centro Atencion <span
                             class="text-red-600 font-extrabold">*</span></label>
                     <div class="relative flex h-[30px] w-full">
-                        <Multiselect v-model="reportInfo.financingSourceId" :options="financingArray" :searchable="true"
-                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione" />
+                        <Multiselect :isSelected="0" :options="[
+        { value: 0, label: 'TODOS' },
+
+        { value: 1, label: 'ADMINISTRACION SUPERIOR' },
+        { value: 2, label: 'CENTRO DE ATENCION A ANCIANOS SARA ZALDIVAR' },
+        { value: 3, label: 'CENTRO DEL APARATO LOCOMOTOR' },
+        { value: 4, label: 'CENTRO DE AUDICION Y LENGUAJE' },
+        { value: 5, label: 'CENTRO DE REHABILITACION PARA CIEGOS EUGENIA DE DUEÑAS' },
+        { value: 6, label: 'UNIDAD DE CONSULTA EXTERNA' },
+        { value: 7, label: 'CENTRO DE REHABILITACION INTEGRAL PARA LA NIÑEZ Y LA ADOLESCENCIA' },
+        { value: 8, label: 'CENTRO DE REHABILITACION INTEGRAL DE OCCIDENTE' },
+        { value: 9, label: 'CENTRO DE REHABILITACION INTEGRAL DE ORIENTE' },
+        { value: 10, label: 'CENTRO DE REHABILITACION PROFESIONAL' },
+
+    ]" :searchable="true" v-model="idCentroAtencion" :noOptionsText="'Lista vacía.'" placeholder="Seleccione" />
                     </div>
-                    <InputError class="mt-2" :message="errors[`reportInfo.financingSourceId`]" />
+                    <InputError class="mt-2" />
                 </div>
                 <div class="mb-4 md:mr-0 md:mb-0 basis-[25%]">
                     <label class="block mb-2 text-[13px] font-medium text-gray-600">Tipo Transaccion <span
                             class="text-red-600 font-extrabold">*</span></label>
                     <div class="relative flex h-[30px] w-full">
-                        <Multiselect v-model="reportInfo.financingSourceId" :options="financingArray" :searchable="true"
-                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione" />
+                        <Multiselect :options="[
+        { value: 1, label: 'REQUERIMIENTO' },
+        { value: 2, label: 'AJUSTE - ENTRADA' },
+        { value: 3, label: 'AJUSTE - SALIDA' },
+        { value: 4, label: 'TRANSFERENCIA - ENTRADA' },
+        { value: 5, label: 'TRANSFERENCIA - SALIDA' },
+    ]" :searchable="true" v-model="idTipoTransaccion" :noOptionsText="'Lista vacía.'" placeholder="Seleccione" />
                     </div>
-                    <InputError class="mt-2" :message="errors[`reportInfo.financingSourceId`]" />
+                    <InputError class="mt-2" />
                 </div>
                 <div class="mb-4 md:mr-0 md:mb-0 basis-[25%]">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600">Numero <span
-                            class="text-red-600 font-extrabold">*</span></label>
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600">Numero de Cuenta </label>
                     <div class="relative flex h-[30px] w-full">
-                        <Multiselect v-model="reportInfo.financingSourceId" :options="financingArray" :searchable="true"
-                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione" />
+                        <Multiselect :options="async function (query) {
+        return await handleCuentaPresupuestalChange(query)
+    }" :searchable="true" v-model="idCuenta" :noOptionsText="'Lista vacía.'" placeholder="Seleccione" />
                     </div>
-                    <InputError class="mt-2" :message="errors[`reportInfo.financingSourceId`]" />
+                    <InputError class="mt-2" />
                 </div>
             </div>
             <div class="mb-2 mt-1 md:flex flex-row justify-start gap-2 mx-2 items-end">
                 <!-- <DateSelect @optionId="getOption" /> -->
                 <div class="w-1/4">
-                    <DateTimePickerM v-model="reportInfo.startDate" :showIcon="false" :label="'Fecha inicio'"
-                        :placeholder="'Seleccione'" :required="true" />
-                    <InputError class="mt-2" :message="errors[`reportInfo.startDate`]" />
+                    <DateTimePickerM :showIcon="false" :label="'Fecha inicio'" :placeholder="'Seleccione'"
+                        :required="true" v-model="fechaDesde" <InputError class="mt-2" />
                 </div>
                 <div class="w-1/4">
-                    <date-time-picker-m v-model="reportInfo.endDate" :showIcon="false" :label="'Fecha fin'"
-                        :placeholder="'Seleccione'" :required="true" />
-                    <InputError class="mt-2" :message="errors[`reportInfo.endDate`]" />
+                    <date-time-picker-m :showIcon="false" :label="'Fecha fin'" :placeholder="'Seleccione'"
+                        :required="true" v-model="fechaHasta" <InputError class="mt-2" />
                 </div>
 
 
@@ -59,7 +79,8 @@
                             class="text-red-600 font-extrabold">*</span></label>
                     <div class="flex gap-2">
                         <label>
-                            <input type="radio" value="1" class="peer hidden" name="framework" />
+                            <input type="radio" value="C" class="peer hidden" name="tipoReporte"
+                                v-model="tipoReporte" />
                             <div
                                 class="hover:bg-gray-50 flex items-center justify-between px-4 border-2 rounded cursor-pointer text-sm border-gray-200 group peer-checked:border-blue-500">
                                 <h2 class="font-medium text-gray-700">Consolidado</h2>
@@ -73,7 +94,8 @@
                         </label>
 
                         <label>
-                            <input type="radio" value="1" class="peer hidden" name="framework" />
+                            <input type="radio" value="D" class="peer hidden" name="tipoReporte"
+                                v-model="tipoReporte" />
                             <div
                                 class="hover:bg-gray-50 flex items-center justify-between px-4 border-2 rounded cursor-pointer text-sm border-gray-200 group peer-checked:border-blue-500">
                                 <h2 class="font-medium text-gray-700">Detallado</h2>
@@ -102,8 +124,8 @@
 
             </div>
 
-            <div class="px-2 flex gap-3">
-                <h1 class="font-medium">Reporte de consumo: 40 registros</h1>
+            <div class="px-2 flex gap-3 justify-end">
+                <h1 class="font-medium">Reporte de consumo:</h1>
                 <div class="flex" style="display: non;">
                     <div @click="exportExcel"
                         class="flex items-center cursor-pointer text-slate-700 hover:text-green-600"><svg
@@ -141,7 +163,11 @@
                         </svg><span class="ml-2 text-[14px] font-semibold">PDF</span></div>
                 </div>
             </div>
-            <TableReporteConsumo :dataReporteInfo="dataReporteInfo" />
+           <TableReporteConsumo :dataReporteInfo="dataReporteConsumo" />
+               <!-- <TableReporteConsumo :dataReporteInfo="dataReporteInfo" /> -->
+
+<!--             <pre>
+              {{ dataReporteConsumo }}</pre> -->
         </div>
     </AppLayoutVue>
 </template>
@@ -149,7 +175,6 @@
 <script>
 import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
-import { useReporteFinanciero } from "@/Composables/Almacen/Reportes/useReporteFinanciero.js";
 import moment from "moment";
 import InputError from "@/Components/InputError.vue";
 import { jsPDF } from "jspdf";
@@ -161,7 +186,7 @@ import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import TableReporteConsumo from "@/Components-ISRI/Almacen/Reportes/TableReporteConsumo.vue";
 import axios from "axios";
-
+import { useReporteConsumo } from "@/Composables/Almacen/Reportes/useReporteConsumo.js"
 export default {
     components: { Head, AppLayoutVue, DateTimePickerM, DateSelect, TableReporteConsumo },
     props: {
@@ -173,13 +198,10 @@ export default {
     setup(props, context) {
         const { menu } = toRefs(props);
         const permits = usePermissions(menu.value, window.location.pathname);
-        const {
-            isLoadingExport,
-            reportInfo,
-            errors,
-            financingArray,
-            dataReporteInfo,
-        } = useReporteFinanciero(context);
+        const { exportExcel, getInformacionReport, isLoadingExport, dataReporteConsumo,
+            idProyectoFinanciamiento, handleCuentaPresupuestalChange,
+            idCentroAtencion, idTipoTransaccion, idCuenta, fechaDesde, fechaHasta, tipoReporte,
+        } = useReporteConsumo();
 
         const getOption = (e) => {
             moment.locale("en");
@@ -221,89 +243,17 @@ export default {
         };
 
 
-        const exportExcel = async () => {
-            try {
-                try {
-                    const response = await axios.post(
-                        "/get-excel-document-reporte-consumo",
-                        null,
-                        { responseType: "blob" }
-                    );
 
-                    // Crear una URL para el blob
-                    const url = window.URL.createObjectURL(new Blob([response.data]));
 
-                    // Crear un enlace temporal y simular un clic para descargar el archivo
-                    const link = document.createElement("a");
-                    link.href = url;
-                    link.setAttribute("download", "nombre_del_archivo.xlsx"); // Nombre del archivo deseado
-                    document.body.appendChild(link);
-                    link.click();
 
-                    // Liberar la URL del blob después de la descarga
-                    window.URL.revokeObjectURL(url);
-                    document.body.style.cursor = 'default';
-
-                } catch (error) {
-                    console.error('Error al generar el PDF:', error);
-                }
-                finally {
-                    //TODO: revisar que el cursos no cambia a default
-                    // Restaurar el cursor del cuerpo del documento a "default" después de la generación del PDF
-                    document.body.style.cursor = 'default';
-                }
-
-            } catch (error) {
-                console.error("Error al descargar el archivo:", error);
-            }
-        };
-
-        const getInformacionReport = async () => {
-            try {
-                isLoadingExport.value = true;
-                const resp = await axios.post(
-                    "/get-reporte-consumo",
-                    { reportInfo: reportInfo.value }
-                );
-                const { data } = resp;
-
-                console.log(data);
-
-                dataReporteInfo.value = data;
-                isLoadingExport.value = false;
-            } catch (error) {
-                console.error("Ocurrió un error al obtener la información del reporte:", error);
-                isLoadingExport.value = false;
-
-                if (error.response.status === 422) {
-                    // Obtiene los errores del cuerpo de la respuesta y los transforma a un formato más manejable
-                    let data = error.response.data.errors;
-                    var myData = new Object();
-                    for (const errorBack in data) {
-                        myData[errorBack] = data[errorBack][0];
-                    }
-                    // Actualiza el estado "errors" con los errores y los limpia después de 5 segundos
-                    errors.value = myData;
-                    setTimeout(() => {
-                        errors.value = [];
-                    }, 5000);
-                    console.error("Error en guardar los datos:", errors.value);
-                }
-
-                // Aquí podrías mostrar un mensaje de error al usuario, o manejar el error de otra manera según sea necesario.
-            }
-        };
 
         return {
-            getOption,
-            permits,
-            isLoadingExport,
-            reportInfo,
-            exportExcel,
-            errors,
-            financingArray,
-            dataReporteInfo,
-            getInformacionReport,
+            getOption, handleCuentaPresupuestalChange,
+            permits, dataReporteConsumo,
+            exportExcel, getInformacionReport, isLoadingExport,
+            idProyectoFinanciamiento,
+            idCentroAtencion, idTipoTransaccion, idCuenta, fechaDesde, fechaHasta, tipoReporte,
+
         };
     },
 };
