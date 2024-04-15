@@ -163,11 +163,10 @@
                         </svg><span class="ml-2 text-[14px] font-semibold">PDF</span></div>
                 </div>
             </div>
-           <TableReporteConsumo :dataReporteInfo="dataReporteConsumo" />
-               <!-- <TableReporteConsumo :dataReporteInfo="dataReporteInfo" /> -->
+           <TableReporteConsumo :dataReporteInfo="dataReporteConsumo" :tipoReporte="tipoReporte"/>
 
-<!--             <pre>
-              {{ dataReporteConsumo }}</pre> -->
+
+
         </div>
     </AppLayoutVue>
 </template>

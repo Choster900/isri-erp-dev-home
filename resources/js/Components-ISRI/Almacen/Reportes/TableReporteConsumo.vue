@@ -1,6 +1,7 @@
 <template>
+   <!--  {{dataReporteInfo.map(index =>{ return index.numero_mov_rpt_consumo}) }} -->
 
-
+    {{ dataReporteInfo.some(index => index.numero_mov_rpt_consumo !== null) }}
     <div class="bg-white">
         <div class="m">
             <!-- Table -->
@@ -9,8 +10,7 @@
                     <!-- Table header -->
                     <thead
                         class="font-semibold uppercase text-slate-500 border-t border-b border-slate-200 *:text-[11px]">
-                        <tr><!-- !!!!TODO:  DEFINIR LOS ANCHOS DE LAS COLUMNAS YA QUE EL
-                         CODIGO SI LE QUITO EL PADDING LEFT SE QUEDA MAS PEQUEÑO -->
+                        <tr>
                             <th class="px-1 w-14 last:pr-5 py-1">
                                 <div class="font-semibold text-center">CODIGO</div>
                             </th>
@@ -42,8 +42,6 @@
 
                         </tr>
                     </thead>
-                    <!-- Table body -->
-
                     <tbody v-for="(consumo, i) in dataReporteInfo" :key="i">
                         <tr class="*:text-[12px] *:font-semibold *:py-1" v-if="consumo.id_tipo_reg_rpt_consumo == 0">
                           <!--   <td class="text-center border-y">{{ consumo.id_ccta_presupuesto_rpt_consumo }}</td> -->
@@ -95,7 +93,7 @@ import { toRefs } from "vue";
 
 export default {
     name: "Test",
-    props: ["dataReporteInfo", "isLoadingExport", "paramsToRequest"],
+    props: ["dataReporteInfo", "isLoadingExport", "tipoReporte"],
     setup(props) {
         const { paramsToRequest } = toRefs(props);
         /*  const exportExcel = async () => {
