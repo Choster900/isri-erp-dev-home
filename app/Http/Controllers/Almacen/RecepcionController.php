@@ -301,7 +301,7 @@ class RecepcionController extends Controller
                 'factura_recepcion_pedido'              => $request->invoice,
                 'fecha_recepcion_pedido'                => Carbon::now(),
                 'acta_recepcion_pedido'                 => $codeActa,
-                //'observacion_recepcion_pedido'          => $request->observation,
+                'observacion_recepcion_pedido'          => $request->observation,
                 'fecha_reg_recepcion_pedido'            => Carbon::now(),
                 'usuario_recepcion_pedido'              => $request->user()->nick_usuario,
                 'ip_recepcion_pedido'                   => $request->ip(),
@@ -398,8 +398,7 @@ class RecepcionController extends Controller
             try {
                 $rec->update([
                     'monto_recepcion_pedido'                => $request->total,
-                    //'factura_recepcion_pedido'              => $request->invoice,
-                    //'observacion_recepcion_pedido'          => $request->observation, Missing this part
+                    'observacion_recepcion_pedido'          => $request->observation,
                     'fecha_mod_recepcion_pedido'            => Carbon::now(),
                     'usuario_recepcion_pedido'              => $request->user()->nick_usuario,
                     'ip_recepcion_pedido'                   => $request->ip(),

@@ -277,7 +277,7 @@
 
                                     <!-- El input -->
                                     <input v-model="prod.qty" :disabled="infoToShow.status != 1"
-                                        class="font-bold max-w-[95%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-[13px] border-[#d1d5db]"
+                                        class="font-bold max-w-[95%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-[13px] border-[#d1d5db] hover:border-gray-400 transition duration-300 ease-in-out"
                                         type="text" name="" id=""
                                         @input="handleValidation('qty', { limit: 3, number: true }, { index: index, qty: prod.qty, prodId: prod.prodId })">
                                 </div>
@@ -313,7 +313,7 @@
                             </div>
                         </div>
                     </template>
-                    <div id="total" class="w-full max-w-full grid grid-cols-[97%_3%] min-w-[970px]">
+                    <div id="total" class="w-full max-w-full grid grid-cols-[97%_3%] min-w-[970px] bg-white">
                         <div class="grid grid-cols-[90%_10%] w-full max-w-full border-b border-x border-gray-500">
                             <div class="flex items-center justify-end border-r h-[30px]  border-gray-500">
                                 <p class="font-[MuseoSans] text-[12px] py-2 mr-2 font-bold">TOTAL DONACION</p>
@@ -335,6 +335,21 @@
                             </div>
                         </div>
                     </div>
+                    <div class="min-w-[970px]">
+                        <div class="grid grid-cols-[100%] max-w-[97%] border-x border-gray-500">
+                            <p class="ml-3 text-[13px] font-[Roboto] text-gray-500">Observación sobre recepción:</p>
+                        </div>
+                    </div>
+                    <div id="observ" class="min-w-[970px]">
+                        <div class="grid grid-cols-[100%] max-w-[97%] border-x border-b border-gray-500">
+                            <div class="justify-center flex w-full bg-white">
+                                <textarea v-model="recDocument.observation" placeholder=""
+                                    class="w-full text-[12px] py-1 font-[Roboto] h-full outline-none ring-0 border-transparent focus:outline-none focus:ring-0 focus:border-transparent leading-4"
+                                    @input="handleValidation('observation', { limit: 255 })"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
                 <div class="md:flex flex md:items-center my-6 sticky flex-row justify-center mx-8">
                     <button type="button" @click="$emit('cerrar-modal')"
