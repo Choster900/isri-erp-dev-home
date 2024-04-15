@@ -197,7 +197,9 @@ class RecepcionController extends Controller
         if ($idRec > 0) { //This means we are updating an existing reception
             $recep = RecepcionPedido::with([
                 'detalle_recepcion.producto.unidad_medida',
-                'detalle_recepcion.producto_adquisicion',
+                'detalle_recepcion.producto_adquisicion.linea_trabajo',
+                'detalle_recepcion.producto_adquisicion.centro_atencion',
+                'detalle_recepcion.marca',
                 'det_doc_adquisicion.documento_adquisicion.tipo_documento_adquisicion',
                 'estado_recepcion'
             ])->find($idRec);
@@ -691,6 +693,7 @@ class RecepcionController extends Controller
             'det_doc_adquisicion.fuente_financiamiento',
             'detalle_recepcion.producto_adquisicion.producto.unidad_medida',
             'detalle_recepcion.producto_adquisicion.centro_atencion',
+            'detalle_recepcion.producto_adquisicion.linea_trabajo',
             'detalle_recepcion.producto_adquisicion.marca',
             'administrador_contrato.persona',
             'guarda_almacen.persona'

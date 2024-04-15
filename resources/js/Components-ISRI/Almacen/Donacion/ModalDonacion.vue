@@ -27,12 +27,12 @@
                     </path>
                 </svg>
             </div>
-            <div class="ml-8 mr-0 max-w-full overflow-x-auto mt-4 max-h-[450px] overflow-y-auto">
+            <div class="ml-8 mr-0 pb-1 max-w-full overflow-x-auto mt-4 max-h-[450px] overflow-y-auto">
                 <div class="min-w-[970px]">
                     <div class="grid grid-cols-[23%_77%] max-w-[97%]">
                         <!-- Columna 1 -->
-                        <div class="w-full bg-white border border-gray-500 p-2">
-                            <img src="../../../../img/isri-gob.png" alt="Logo del instituto" class="w-full" />
+                        <div class="w-full bg-white border border-gray-500 p-2 flex items-center justify-center">
+                            <img src="../../../../img/isri-gob.png" alt="Logo del instituto" class="w-full max-w-full" />
                         </div>
                         <!-- Columna 2 -->
                         <div

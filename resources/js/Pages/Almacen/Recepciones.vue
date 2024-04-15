@@ -102,7 +102,7 @@
                                             <div class="font-semibold pt-0.5">Editar</div>
                                         </div>
                                         <div @click="showModalRecep = true; recepId = reception.id_recepcion_pedido"
-                                            v-if="reception.id_estado_recepcion_pedido == 3"
+                                            v-if="reception.id_estado_recepcion_pedido != 1"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-blue-800 w-[25px] h-[25px] mr-2">
                                                 <icon-m :iconName="'see'"></icon-m>
