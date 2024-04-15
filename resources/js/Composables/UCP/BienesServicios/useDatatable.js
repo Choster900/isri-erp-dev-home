@@ -7,19 +7,34 @@ export const useDatatable = () => {
     const sortOrders = ref({});
     const objectProductoAdquisicion = ref([]);
     const columns = [
-        { width: "22%", label: "Proveedor", name: "id_proveedor", type: "text" },
-        { width: "1%", label: "Tipo Adquisicion", name: "codigo_empleado", type: "text", },
-        { width: "1%", label: "Gestion Compra", name: "collecNombre", type: "text" },
-        { width: "7%", label: "Numero Adquisicion", name: "collecApellido", type: "text", },
-        { width: "22%", label: "Nombre adquisicion", name: "fecha_reg_evaluacion_personal", type: "text", },
-        { width: "1%", label: "Monto", name: "fecha_reg_evaluacion_personal", type: "text", },
-        { width: "1%", label: "Fecha", name: "fecha_reg_evaluacion_personal", type: "date", },
+        { width: "22%", label: "Proveedor", name: "razon_social_proveedor", type: "text" },
         {
-            width: "1%", label: "Estado", name: "fecha_reg_evaluacion_personal", type: "select",
+            width: "1%", label: "Tipo Adquisicion", name: "id_tipo_doc_adquisicion", type: "select",
             options: [
-                { value: "1", label: "Abierto" },
-                { value: "2", label: "Enviado" },
-                { value: "3", label: "Cerrado" }
+                { value: "1", label: "CONTRATO" },
+                { value: "2", label: "ORDEN DE COMPRA" },
+                { value: "3", label: "FACTURA" }
+            ]
+        },
+        { width: "1%", label: "Gestion Compra", name: "id_tipo_gestion_compra", type: "select",
+        options: [
+            { value: "1", label: "CONTRATACION DIRECTA" },
+            { value: "2", label: "LIBRE GESTION" },
+            { value: "3", label: "LICITACION PUBLICA" },
+            { value: "4", label: "MERCADO BURSATIL" },
+
+        ] },
+        { width: "7%", label: "Numero Adquisicion", name: "numero_doc_adquisicion", type: "text", },
+        { width: "22%", label: "Nombre adquisicion", name: "nombre_det_doc_adquisicion", type: "text", },
+
+        { width: "1%", label: "Monto", name: "monto_det_doc_adquisicion", type: "text", },
+        { width: "1%", label: "Fecha", name: "fecha_reg_prod_adquisicion", type: "date", },
+        {
+            width: "1%", label: "Estado", name: "id_estado_doc_adquisicion", type: "select",
+            options: [
+                { value: "1", label: "CREADO" },
+                { value: "2", label: "ENVIADO" },
+                { value: "3", label: "CERRADO" }
             ]
         },
         { width: "1%", label: "", name: "Acciones" },

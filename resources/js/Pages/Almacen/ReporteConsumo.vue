@@ -1,24 +1,8 @@
 <template>
-
     <Head title="Reporte - Empleados" />
     <AppLayoutVue nameSubModule="Almacen - Reporte financiero" :autoPadding="false" :class="'bg-gray-200'">
         <div class="w-[95%] my-4 h-full mx-auto bg-white border border-gray-300">
-            <div class="mt-4 md:flex flex-row justify-start mx-20 gap-1 items-center">
-                <!--
-                <DateSelect @optionId="getOption" />
-
-                <div class="">
-                    <DateTimePickerM v-model="reportInfo.startDate" :showIcon="false" :label="'Fecha inicio'"
-                        :placeholder="'Seleccione'" :required="true" />
-                    <InputError  class="mt-2" :message="errors[`reportInfo.startDate`]" />
-                </div>
-
-                <div class="">
-                    <date-time-picker-m v-model="reportInfo.endDate" :showIcon="false" :label="'Fecha fin'"
-                        :placeholder="'Seleccione'" :required="true" />
-                        <InputError  class="mt-2" :message="errors[`reportInfo.endDate`]" />
-                </div> -->
-
+            <div class="mt-4 md:flex flex-row justify-start mx-2 gap-1 items-center">
                 <div class="mb-4 md:mr-0 md:mb-0 basis-[25%]">
                     <label class="block mb-2 text-[13px] font-medium text-gray-600">Fuente Financiamiento
                         <span class="text-red-600 font-extrabold">*</span></label>
@@ -46,6 +30,30 @@
                     </div>
                     <InputError class="mt-2" :message="errors[`reportInfo.financingSourceId`]" />
                 </div>
+                <div class="mb-4 md:mr-0 md:mb-0 basis-[25%]">
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600">Numero <span
+                            class="text-red-600 font-extrabold">*</span></label>
+                    <div class="relative flex h-[30px] w-full">
+                        <Multiselect v-model="reportInfo.financingSourceId" :options="financingArray" :searchable="true"
+                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione" />
+                    </div>
+                    <InputError class="mt-2" :message="errors[`reportInfo.financingSourceId`]" />
+                </div>
+            </div>
+            <div class="mb-2 mt-1 md:flex flex-row justify-start gap-2 mx-2 items-end">
+                <!-- <DateSelect @optionId="getOption" /> -->
+                <div class="w-1/4">
+                    <DateTimePickerM v-model="reportInfo.startDate" :showIcon="false" :label="'Fecha inicio'"
+                        :placeholder="'Seleccione'" :required="true" />
+                    <InputError class="mt-2" :message="errors[`reportInfo.startDate`]" />
+                </div>
+                <div class="w-1/4">
+                    <date-time-picker-m v-model="reportInfo.endDate" :showIcon="false" :label="'Fecha fin'"
+                        :placeholder="'Seleccione'" :required="true" />
+                    <InputError class="mt-2" :message="errors[`reportInfo.endDate`]" />
+                </div>
+
+
                 <div>
                     <label class="block mb-2 text-[13px] font-medium text-gray-600">Tipo Reporte<span
                             class="text-red-600 font-extrabold">*</span></label>
@@ -80,22 +88,6 @@
                     </div>
 
                 </div>
-            </div>
-            <div class="mb-2 mt-1 md:flex flex-row justify-start gap-2 mx-20 items-end">
-                <!-- <DateSelect @optionId="getOption" /> -->
-                <div class="w-1/4">
-                    <DateTimePickerM v-model="reportInfo.startDate" :showIcon="false" :label="'Fecha inicio'"
-                        :placeholder="'Seleccione'" :required="true" />
-                    <InputError class="mt-2" :message="errors[`reportInfo.startDate`]" />
-                </div>
-                <div class="w-1/4">
-                    <date-time-picker-m v-model="reportInfo.endDate" :showIcon="false" :label="'Fecha fin'"
-                        :placeholder="'Seleccione'" :required="true" />
-                    <InputError class="mt-2" :message="errors[`reportInfo.endDate`]" />
-                </div>
-
-
-
 
 
                 <button @click="getInformacionReport()"
@@ -108,8 +100,13 @@
                     <span class="mt-0.5 text-white font-medium">Generar Reporte</span>
                 </button>
 
+            </div>
+
+            <div class="px-2 flex gap-3">
+                <h1 class="font-medium">Reporte de consumo: 40 registros</h1>
                 <div class="flex" style="display: non;">
-                    <div class="flex items-center cursor-pointer text-slate-700 hover:text-green-600"><svg
+                    <div @click="exportExcel"
+                        class="flex items-center cursor-pointer text-slate-700 hover:text-green-600"><svg
                             class="h-4 w-4 text-green-500" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
                             xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 26 26" xml:space="preserve"
                             fill="#000000">
@@ -144,7 +141,6 @@
                         </svg><span class="ml-2 text-[14px] font-semibold">PDF</span></div>
                 </div>
             </div>
-
             <TableReporteConsumo :dataReporteInfo="dataReporteInfo" />
         </div>
     </AppLayoutVue>
@@ -224,6 +220,44 @@ export default {
             }
         };
 
+
+        const exportExcel = async () => {
+            try {
+                try {
+                    const response = await axios.post(
+                        "/get-excel-document-reporte-consumo",
+                        null,
+                        { responseType: "blob" }
+                    );
+
+                    // Crear una URL para el blob
+                    const url = window.URL.createObjectURL(new Blob([response.data]));
+
+                    // Crear un enlace temporal y simular un clic para descargar el archivo
+                    const link = document.createElement("a");
+                    link.href = url;
+                    link.setAttribute("download", "nombre_del_archivo.xlsx"); // Nombre del archivo deseado
+                    document.body.appendChild(link);
+                    link.click();
+
+                    // Liberar la URL del blob después de la descarga
+                    window.URL.revokeObjectURL(url);
+                    document.body.style.cursor = 'default';
+
+                } catch (error) {
+                    console.error('Error al generar el PDF:', error);
+                }
+                finally {
+                    //TODO: revisar que el cursos no cambia a default
+                    // Restaurar el cursor del cuerpo del documento a "default" después de la generación del PDF
+                    document.body.style.cursor = 'default';
+                }
+
+            } catch (error) {
+                console.error("Error al descargar el archivo:", error);
+            }
+        };
+
         const getInformacionReport = async () => {
             try {
                 isLoadingExport.value = true;
@@ -241,7 +275,7 @@ export default {
                 console.error("Ocurrió un error al obtener la información del reporte:", error);
                 isLoadingExport.value = false;
 
-                /* if (error.response.status === 422) {
+                if (error.response.status === 422) {
                     // Obtiene los errores del cuerpo de la respuesta y los transforma a un formato más manejable
                     let data = error.response.data.errors;
                     var myData = new Object();
@@ -254,7 +288,7 @@ export default {
                         errors.value = [];
                     }, 5000);
                     console.error("Error en guardar los datos:", errors.value);
-                } */
+                }
 
                 // Aquí podrías mostrar un mensaje de error al usuario, o manejar el error de otra manera según sea necesario.
             }
@@ -265,6 +299,7 @@ export default {
             permits,
             isLoadingExport,
             reportInfo,
+            exportExcel,
             errors,
             financingArray,
             dataReporteInfo,

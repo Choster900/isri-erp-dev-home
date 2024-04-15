@@ -19,6 +19,8 @@ export const useConfigPdf = (
     totProductos
 ) => {
     const printPdf = () => {
+        document.body.style.cursor = 'wait';
+
         console.log(objectGetFromProp.value);
         let fecha = moment().format("DD-MM-YYYY");
         let name = "NOMBRE DOCUMENTO - FECHA - CODIGO";
@@ -93,6 +95,7 @@ export const useConfigPdf = (
                         date_text
                     );
                 }
+                document.body.style.cursor = 'default';
             })
             .save()
             .catch((err) => console.log(err));

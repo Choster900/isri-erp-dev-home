@@ -1,5 +1,5 @@
 <template>
-  <div class="flex px-2" v-if="dataReporteInfo != ''">
+<!--   <div class="flex px-2" v-if="dataReporteInfo != ''">
     <button class="bg-red-700 flex justify-center items-center m-1 p-0.5 rounded">
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -55,7 +55,7 @@
       </svg>
       <span class="text-white text-xs font-medium"> Imprimir </span>
     </button>
-  </div>
+  </div> -->
 
   <div class="bg-white">
     <div>
