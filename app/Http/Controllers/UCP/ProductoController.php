@@ -19,7 +19,7 @@ class ProductoController extends Controller
 {
     public function getProductos(Request $request)
     {
-        $columns = ['id_producto', 'nombre_producto', 'descripcion_producto', 'id_ccta_presupuestal', 'id_unidad_medida', 'precio_producto', 'estado_producto'];
+        $columns = ['id_producto', 'nombre_producto', 'descripcion_producto', 'codigo_producto', 'id_unidad_medida', 'precio_producto', 'estado_producto'];
 
         $length = $request->length;
         $column = $request->column; //Index
@@ -36,7 +36,7 @@ class ProductoController extends Controller
             $query->where('id_producto', 'like', '%' . $search_value['id_producto'] . '%')
                 ->where('nombre_producto', 'like', '%' . $search_value['nombre_producto'] . '%')
                 ->where('descripcion_producto', 'like', '%' . $search_value['descripcion_producto'] . '%')
-                ->where('id_ccta_presupuestal', 'like', '%' . $search_value['id_ccta_presupuestal'] . '%')
+                ->where('codigo_producto', 'like', '%' . $search_value['codigo_producto'] . '%')
                 ->where('precio_producto', 'like', '%' . $search_value['precio_producto'] . '%')
                 ->where('estado_producto', 'like', '%' . $search_value['estado_producto'] . '%')
                 ->whereHas('unidad_medida', function ($query) use ($search_value) {

@@ -197,7 +197,9 @@ class RecepcionController extends Controller
         if ($idRec > 0) { //This means we are updating an existing reception
             $recep = RecepcionPedido::with([
                 'detalle_recepcion.producto.unidad_medida',
-                'detalle_recepcion.producto_adquisicion',
+                'detalle_recepcion.producto_adquisicion.linea_trabajo',
+                'detalle_recepcion.producto_adquisicion.centro_atencion',
+                'detalle_recepcion.marca',
                 'det_doc_adquisicion.documento_adquisicion.tipo_documento_adquisicion',
                 'estado_recepcion'
             ])->find($idRec);
@@ -299,7 +301,7 @@ class RecepcionController extends Controller
                 'factura_recepcion_pedido'              => $request->invoice,
                 'fecha_recepcion_pedido'                => Carbon::now(),
                 'acta_recepcion_pedido'                 => $codeActa,
-                //'observacion_recepcion_pedido'          => $request->observation,
+                'observacion_recepcion_pedido'          => $request->observation,
                 'fecha_reg_recepcion_pedido'            => Carbon::now(),
                 'usuario_recepcion_pedido'              => $request->user()->nick_usuario,
                 'ip_recepcion_pedido'                   => $request->ip(),
@@ -396,8 +398,7 @@ class RecepcionController extends Controller
             try {
                 $rec->update([
                     'monto_recepcion_pedido'                => $request->total,
-                    //'factura_recepcion_pedido'              => $request->invoice,
-                    //'observacion_recepcion_pedido'          => $request->observation, Missing this part
+                    'observacion_recepcion_pedido'          => $request->observation,
                     'fecha_mod_recepcion_pedido'            => Carbon::now(),
                     'usuario_recepcion_pedido'              => $request->user()->nick_usuario,
                     'ip_recepcion_pedido'                   => $request->ip(),
@@ -691,6 +692,7 @@ class RecepcionController extends Controller
             'det_doc_adquisicion.fuente_financiamiento',
             'detalle_recepcion.producto_adquisicion.producto.unidad_medida',
             'detalle_recepcion.producto_adquisicion.centro_atencion',
+            'detalle_recepcion.producto_adquisicion.linea_trabajo',
             'detalle_recepcion.producto_adquisicion.marca',
             'administrador_contrato.persona',
             'guarda_almacen.persona'
