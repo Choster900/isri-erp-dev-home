@@ -148,11 +148,11 @@ class ReporteAlmacenController extends Controller
         $sheet->getColumnDimension('B')->setWidth(35);
 
         // Ajustar el texto en todas las celdas de la fila 6
-        foreach ( range('A', 'L') as $column ) {
+        foreach (range('A', 'L') as $column) {
             $sheet->getStyle($column . '6')->getAlignment()->setWrapText(true);
         }
 
-        foreach ( range('A', 'L') as $column ) {
+        foreach (range('A', 'L') as $column) {
             $sheet->getStyle($column . '6')->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
             $sheet->getStyle($column . '6')->getBorders()->getTop()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLACK));
             $sheet->getStyle($column . '6')->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
@@ -184,7 +184,7 @@ class ReporteAlmacenController extends Controller
 
 
         // Iterar sobre los resultados y escribir en la hoja de cálculo
-        foreach ( $result as $filaResultado ) {
+        foreach ($result as $filaResultado) {
             // Convertir el objeto stdClass en un array
             $filaArray = (array) $filaResultado;
 
@@ -192,7 +192,7 @@ class ReporteAlmacenController extends Controller
             $columna = 0;
 
             // Iterar sobre las columnas definidas y escribir los valores en la hoja de cálculo
-            foreach ( $columnas as $nombreColumna ) {
+            foreach ($columnas as $nombreColumna) {
                 // Obtener el valor de la columna actual
                 $valor = isset($filaArray[$nombreColumna]) ? $filaArray[$nombreColumna] : '';
 
@@ -258,6 +258,42 @@ class ReporteAlmacenController extends Controller
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
+
+
+        $sheet->mergeCells('A1:G1');
+        $sheet->setCellValue('A1', 'SISTEMA DE ALMACEN PARA EL CONTROL DE BIENES EN EXISTENCIA - ISRI');
+        $sheet->getStyle('A1')->getFont()->setSize(8);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+
+        $sheet->mergeCells('A2:C2');
+        $sheet->setCellValue('A2', 'CONSUMO POR PROGRAMA');
+        $sheet->getStyle('A2')->getFont()->setSize(20);
+        $sheet->getStyle('A2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+        $sheet->mergeCells('H3:I3');
+        $sheet->setCellValue('H3', 'DEL 01,SPTIEMBRE 2023');
+        $sheet->getStyle('H3')->getFont()->setSize(9);
+        $sheet->getStyle('H3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+        $sheet->mergeCells('A4:B4');
+        $sheet->setCellValue('A4', 'ALMACEN GENERAL');
+        $sheet->getStyle('A4')->getFont()->setSize(9);
+        $sheet->getStyle('A4')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+
+        $sheet->mergeCells('H4:I4');
+        $sheet->setCellValue('H4', 'AL 11, ABRIL 2024');
+        $sheet->getStyle('H4')->getFont()->setSize(9);
+        $sheet->getStyle('H4')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+        $sheet->setCellValue('A5', 'PRODUCTOS');
+        $sheet->getStyle('A5')->getFont()->setSize(9);
+
+        $sheet->mergeCells('H5:I5');
+        $sheet->setCellValue('H5', 'FONDO GENERAL');
+        $sheet->getStyle('H5')->getFont()->setSize(9);
+
         // Encabezados desde A6 hasta L6
         $encabezados = [
             'COD',
@@ -272,21 +308,46 @@ class ReporteAlmacenController extends Controller
         ];
 
         $sheet->fromArray([$encabezados], null, 'A6');
+
+        // Establecer estilo para encabezados
+    $styleHeader = [
+        'font' => ['bold' => true, 'size' => 9],
+    ];
+
+    foreach (range('A', 'I') as $column) {
+        $sheet->getStyle($column . '6')->applyFromArray($styleHeader);
+    }
+    
         // Ejecutar el procedimiento almacenado y obtener los resultados
         $result = DB::select("CALL PR_RPT_CONSUMO  (?, ?, ?, ?, ?, ?, ?)", array('D', 2, 1, 1, 1, '2024-01-01', '2024-04-12'));
 
         $sheet->getColumnDimension('B')->setWidth(35);
 
+
         // Pintar los datos en el documento
         $row = 7; // Comenzar desde la fila 2 para dejar espacio para los encabezados
-        foreach ( $result as $data ) {
+
+        foreach (range('A', 'I') as $column) {
+            $sheet->getStyle($column . '6')->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+            $sheet->getStyle('A6')->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+            $sheet->getStyle('I6')->getBorders()->getRight()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+            $sheet->getStyle($column . '6')->getBorders()->getTop()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLACK));
+            $sheet->getStyle($column . '6')->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+            $sheet->getStyle($column . '6')->getBorders()->getBottom()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLACK));
+        }
+
+        // Ajustar el texto en todas las celdas de la fila 6
+        foreach (range('A', 'I') as $column) {
+            $sheet->getStyle($column . '6')->getAlignment()->setWrapText(true);
+        }
+
+        foreach ($result as $data) {
             /* $sheet->setCellValue('A' . $row, $data->COD); */
             if ($data->id_tipo_reg_rpt_consumo == 1) {
 
                 $sheet->setCellValue('A' . $row, $data->id_ccta_presupuesto_rpt_consumo);
                 $sheet->mergeCells('B' . $row . ':I' . $row);
                 $sheet->setCellValue('B' . $row, $data->nombre_prod_rpt_consumo);
-
             }
 
             if ($data->id_tipo_reg_rpt_consumo == 2) {
@@ -305,8 +366,8 @@ class ReporteAlmacenController extends Controller
                 $sheet->mergeCells('A' . $row . ':H' . $row);
                 $sheet->setCellValue('A' . $row, $data->nombre_prod_rpt_consumo);
                 $sheet->setCellValue('I' . $row, $data->monto_rpt_consumo);
-
             }
+            $sheet->getStyle('A' . $row . ':I' . $row)->getFont()->setName('Calibri')->setSize(9);
 
             $row++;
         }
