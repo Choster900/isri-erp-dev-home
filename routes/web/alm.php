@@ -120,7 +120,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('get-excel-document-reporte-consumo',[ReporteAlmacenController::class,'getExcelDocumentConsumo'])->name('bieneservicios.get-excel-document-reporte-consumo');
     Route::post('get-cuenta-by-number', function (Request $request) {
 
-        $cuentas = CatalogoCtaPresupuestal::where("id_ccta_presupuestal","like",'%' . $request->numeroCuenta . '%')->get();
+        $cuentas = CatalogoCtaPresupuestal::where("id_padre_ccta_presupuestal",611)->orWhere("id_padre_ccta_presupuestal",541)->get();
 
          // Formatear resultados para respuesta JSON
         return $cuentas->map(function ($item) {

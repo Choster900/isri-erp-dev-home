@@ -3,7 +3,7 @@
     <!--     {{ tipoReporte }}
     {{ dataReporteInfo.some(index => index.numero_mov_rpt_consumo !== null) }} -->
 
- <!--    {{ isLoadinRequest }} -->
+    <!--    {{ isLoadinRequest }} -->
     <div class="bg-white ">
         <div class="m">
             <!-- Table -->
@@ -44,7 +44,8 @@
 
                         </tr>
                     </thead>
-                    <tbody v-for="(consumo, i) in dataReporteInfo" :key="i" v-if="!isLoadinRequest">
+                    <tbody v-for="(consumo, i) in dataReporteInfo" :key="i"
+                        v-if="!isLoadinRequest && dataReporteInfo != ''">
                         <tr class="*:text-[12px] *:font-semibold *:py-1" v-if="consumo.id_tipo_reg_rpt_consumo == 0">
                             <!--   <td class="text-center border-y">{{ consumo.id_ccta_presupuesto_rpt_consumo }}</td> -->
                             <td class="border-y text-left px-2" :colspan="tipoReporte === 'D' ? 9 : 6">
@@ -57,7 +58,7 @@
                             <td class="text-center border-y">{{ consumo.id_ccta_presupuesto_rpt_consumo }}</td>
                             <td class="border-y text-left px-2" :colspan="tipoReporte === 'D' ? 8 : 6">
                                 <div class="underline">
-                                    {{ consumo.nombre_prod_rpt_consumo }}
+                                    {{ consumo.nombre_prod_rpt_consumo }} - {{ consumo.nombre_prod_rpt_consumo }}
                                 </div>
                             </td>
                         </tr>
@@ -68,7 +69,7 @@
                             <td class="text-center">{{ consumo.marca_rpt_consumo || '-' }}</td>
                             <td class="text-center">{{ consumo.nombre_umedida_rpt_consumo }}</td>
                             <td class="text-center font-medium" v-if="tipoReporte == 'D'">{{
-        consumo.numero_mov_rpt_consumo }}</td>
+                                consumo.numero_mov_rpt_consumo }}</td>
                             <td class="text-center" v-if="tipoReporte == 'D'">{{ consumo.fecha }}</td>
                             <td class="text-center">{{ consumo.cant_rpt_consumo }}</td>
                             <td class="text-center" v-if="tipoReporte == 'D'">{{ consumo.costo_rpt_consumo }}</td>
@@ -87,7 +88,7 @@
                     <tbody v-if="isLoadinRequest">
                         <tr>
                             <td colspan="12">
-                                <div  class="flex items-center justify-center h-96">
+                                <div class="flex items-center justify-center h-96">
                                     <div aria-label="Loading..." role="status" class="loader">
                                         <svg class="icon" viewBox="0 0 256 256">
                                             <line x1="128" y1="32" x2="128" y2="64" stroke-linecap="round"
@@ -108,6 +109,26 @@
                                                 stroke-linejoin="round" stroke-width="24"></line>
                                         </svg>
                                         <span class="loading-text">Cargando...</span>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+
+                    <tbody v-if="dataReporteInfo == ''">
+                        <tr>
+                            <td colspan="12">
+                                <div class="w-full h-[500px] px-1 text-selection-disable">
+                                    <div class="flex flex-col items-center justify-center h-full">
+                                        <img src="../../../../img/TableReport.svg" class="h-72 mx-auto" alt="SVG Image"
+                                            draggable="false" />
+                                        <h1 class="font-medium text-center">
+                                            No se encontraron resultados
+                                        </h1>
+                                        <p class="text-[9pt] text-center">
+                                            Intenta buscar en períodos válidos o revisa tus criterios de
+                                            búsqueda.
+                                        </p>
                                     </div>
                                 </div>
                             </td>

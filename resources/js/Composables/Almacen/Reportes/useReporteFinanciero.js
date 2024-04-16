@@ -17,7 +17,8 @@ export const useReporteFinanciero = (context) => {
     const reportInfo = ref({
         startDate: '',
         endDate: '',
-        financingSourceId: ''
+        numeroCuenta: '',
+        financingSourceId: '',
     })
     /* const dataFinanciamiento = ref({}) */
 
