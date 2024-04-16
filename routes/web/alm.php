@@ -177,4 +177,11 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('ajuste-salida', [AjusteSalidaController::class, 'getAjusteSalida'])->name('ajusteSalida.getAjusteSalida');
     Route::post('get-info-modal-outgoing-adjustment', [AjusteSalidaController::class, 'getInfoOutgoingAdjustment'])->name('ajusteSalida.getInfoOutgoingAdjustment');
     Route::post('search-products-outgoing-adjustment', [AjusteSalidaController::class, 'searchProductsOutgoingAdjustment'])->name('ajusteSalida.searchProductsOutgoingAdjustment');
+    Route::get(
+        '/alm/reporte-rotacion',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/reporte-rotacion', 'Almacen/ReporteRotacion');
+        }
+    )->name('alm.reporteRotacion');
+    Route::post('get-reporte-rotacion', [ReporteAlmacenController::class, 'getReporteDonacion'])->name('ajusteSalida.getAjusteSalida');
 });
