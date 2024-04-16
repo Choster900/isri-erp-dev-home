@@ -163,7 +163,10 @@
                         </svg><span class="ml-2 text-[14px] font-semibold">PDF</span></div>
                 </div>
             </div>
-           <TableReporteConsumo :dataReporteInfo="dataReporteConsumo" :tipoReporte="tipoReporte"/>
+
+           <TableReporteConsumo
+           :dataReporteInfo="dataReporteConsumo" :tipoReporte="tipoReporteForValidate"
+           :isLoadinRequest="isLoadinRequest" />
 
 
 
@@ -197,8 +200,8 @@ export default {
     setup(props, context) {
         const { menu } = toRefs(props);
         const permits = usePermissions(menu.value, window.location.pathname);
-        const { exportExcel, getInformacionReport, isLoadingExport, dataReporteConsumo,
-            idProyectoFinanciamiento, handleCuentaPresupuestalChange,
+        const { exportExcel, getInformacionReport, isLoadingExport, dataReporteConsumo,isLoadinRequest,
+            idProyectoFinanciamiento, handleCuentaPresupuestalChange,tipoReporteForValidate,
             idCentroAtencion, idTipoTransaccion, idCuenta, fechaDesde, fechaHasta, tipoReporte,
         } = useReporteConsumo();
 
@@ -250,7 +253,7 @@ export default {
             getOption, handleCuentaPresupuestalChange,
             permits, dataReporteConsumo,
             exportExcel, getInformacionReport, isLoadingExport,
-            idProyectoFinanciamiento,
+            idProyectoFinanciamiento,tipoReporteForValidate,isLoadinRequest,
             idCentroAtencion, idTipoTransaccion, idCuenta, fechaDesde, fechaHasta, tipoReporte,
 
         };

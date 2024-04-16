@@ -5,6 +5,7 @@ export const useReporteConsumo = () => {
 
     const errors = ref([])
     const isLoadingExport = ref([])
+    const isLoadinRequest = ref(false)
     const dataReporteConsumo = ref([])
 
     //Variables a enviar para consulta
@@ -15,6 +16,7 @@ export const useReporteConsumo = () => {
     const fechaDesde = ref(null)
     const fechaHasta = ref(null)
     const tipoReporte = ref(null)
+    const tipoReporteForValidate = ref(null)
 
     //Data para multiselect
     const fuenteFinanciamientoArray = ref([])
@@ -23,7 +25,9 @@ export const useReporteConsumo = () => {
 
     const getInformacionReport = async () => {
         try {
-            isLoadingExport.value = true;
+            isLoadinRequest.value = true;
+
+            tipoReporteForValidate.value = tipoReporte.value == 'D' ? 'D' : 'C';
             const resp = await axios.post(
                 "/get-reporte-consumo",
                 {
@@ -44,7 +48,10 @@ export const useReporteConsumo = () => {
             dataReporteConsumo.value = data
         } catch (error) {
             console.error("Ocurrió un error al obtener la información del reporte:", error);
+            isLoadinRequest.value = false;
 
+        }finally {
+            isLoadinRequest.value = false;
         }
     };
 
@@ -126,9 +133,9 @@ export const useReporteConsumo = () => {
 
     return {
         exportExcel,getInformacionReport,isLoadingExport,dataReporteConsumo,
-        handleCuentaPresupuestalChange,
+        handleCuentaPresupuestalChange,isLoadinRequest,
 
-        idProyectoFinanciamiento,
+        idProyectoFinanciamiento,tipoReporteForValidate,
         idCentroAtencion,idTipoTransaccion,idCuenta,fechaDesde,fechaHasta,tipoReporte,
 
     }
