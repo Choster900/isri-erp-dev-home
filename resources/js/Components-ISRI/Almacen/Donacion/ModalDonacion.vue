@@ -153,7 +153,7 @@
                                     @search-change="handleSearchChange($event, index, prod.prodId)"
                                     @change="selectProd($event, index)" :loading="prod.isLoadingProd"
                                     :clear-on-search="true" :filter-results="false" :resolve-on-load="true"
-                                    :noOptionsText="'Escriba para buscar...'" placeholder="Seleccione"
+                                    :noOptionsText="'Sin resultados'" placeholder="Buscar producto"
                                     @open="products = []"
                                     :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
                             </div>
