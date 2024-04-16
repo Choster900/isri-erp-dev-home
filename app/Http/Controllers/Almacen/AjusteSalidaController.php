@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Almacen;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Almacen\AjusteSalidaRequest;
 use App\Models\CentroAtencion;
 use App\Models\DetalleExistenciaAlmacen;
+use App\Models\DetalleRequerimiento;
 use App\Models\ExistenciaAlmacen;
 use App\Models\LineaTrabajo;
 use App\Models\MotivoAjuste;
@@ -12,6 +14,7 @@ use App\Models\ProyectoFinanciado;
 use App\Models\Requerimiento;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class AjusteSalidaController extends Controller
 {
@@ -148,5 +151,69 @@ class AjusteSalidaController extends Controller
         return response()->json([
             'products' => $products,
         ]);
+    }
+
+    public function storeShortageAdjustment(AjusteSalidaRequest $request)
+    {
+        DB::beginTransaction();
+        try {
+            $codeReq = "";
+            $year = Carbon::now()->year;
+            $lastReq = Requerimiento::whereYear('fecha_reg_requerimiento', $year)
+                ->where('id_tipo_req', 2)
+                ->orderBy('fecha_reg_requerimiento', 'desc')
+                ->first();
+            if (!$lastReq) {
+                $codeReq = 'AJU-' . $year . '-1';
+            } else {
+                $correlative = intval(explode('-', $lastReq->num_requerimiento)[2]) + 1;
+                $codeReq = 'AJU-' . $year . '-' . $correlative;
+            }
+
+            $req = new Requerimiento([
+                'id_lt'                                 => $request->idLt,
+                'id_centro_atencion'                    => $request->centerId,
+                'id_motivo_ajuste'                      => $request->reasonId,
+                'id_proy_financiado'                    => $request->financingSourceId,
+                'id_tipo_mov_kardex'                    => 1, //INGRESO
+                'id_estado_req'                         => 1, //CREADO
+                'id_tipo_req'                           => 2, //AJUSTE
+                'num_requerimiento'                     => $codeReq,
+                'fecha_requerimiento'                   => Carbon::now(),
+                'observacion_requerimiento'             => $request->observation,
+                'fecha_reg_requerimiento'               => Carbon::now(),
+                'usuario_requerimiento'                 => $request->user()->nick_usuario,
+                'ip_requerimiento'                      => $request->ip()
+            ]);
+            $req->save();
+
+            foreach ($request->prods as $prod) {
+                $fecha = $prod['expDate'] != '' ? date('Y/m/d', strtotime($prod['expDate'])) : null;
+                $newDet = new DetalleRequerimiento([
+                    'id_producto'                               => $prod['prodId'],
+                    'id_marca'                                  => $prod['brandId'],
+                    'fecha_vcto_det_requerimiento'              => $fecha,
+                    'id_requerimiento'                          => $req->id_requerimiento,
+                    'cant_det_requerimiento'                    => $prod['qty'],
+                    'costo_det_requerimiento'                   => $prod['cost'],
+                    'estado_det_requerimiento'                  => 1,
+                    'fecha_reg_det_requerimiento'               => Carbon::now(),
+                    'usuario_det_requerimiento'                 => $request->user()->nick_usuario,
+                    'ip_det_requerimiento'                      => $request->ip()
+                ]);
+                $newDet->save();
+            }
+
+            DB::commit(); // Confirma las operaciones en la base de datos
+            return response()->json([
+                'message'          => 'Guardado nuevo ajuste con éxito.',
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+            return response()->json([
+                'logical_error' => 'Ha ocurrido un error con sus datos.',
+                'error' => $th->getMessage(),
+            ], 422);
+        }
     }
 }
