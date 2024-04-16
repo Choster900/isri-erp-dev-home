@@ -24,23 +24,43 @@ class ExistenciaAlmacen extends Model
         'usuario_existencia_almacen',
         'ip_existencia_almacen',
     ];
-   /**
-    * Get all of the detalle_existencia_almacen for the ExistenciaAlmacen
-    *
-    * @return \Illuminate\Database\Eloquent\Relations\HasMany
-    */
-   public function detalle_existencia_almacen(): HasMany
-   {
-       return $this->hasMany(DetalleExistenciaAlmacen::class, 'id_existencia_almacen', 'id_existencia_almacen');
-   }
+    /**
+     * Get all of the detalle_existencia_almacen for the ExistenciaAlmacen
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function detalle_existencia_almacen(): HasMany
+    {
+        return $this->hasMany(DetalleExistenciaAlmacen::class, 'id_existencia_almacen', 'id_existencia_almacen');
+    }
 
-   /**
-    * Get the productos that owns the ExistenciaAlmacen
-    *
-    * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-    */
-   public function productos(): BelongsTo
-   {
-       return $this->belongsTo(Producto::class, 'id_producto', 'id_producto');
-   }
+    /**
+     * Get the productos that owns the ExistenciaAlmacen
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function productos(): BelongsTo
+    {
+        return $this->belongsTo(Producto::class, 'id_producto', 'id_producto');
+    }
+
+    /**
+     * Get the Producto model associated with this instance.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function producto()
+    {
+        return $this->belongsTo(Producto::class, 'id_producto', 'id_producto');
+    }
+
+    /**
+     * Get the ProyectoFinanciado model associated with this instance.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function proyecto_financiado()
+    {
+        return $this->belongsTo(ProyectoFinanciado::class, 'id_proy_financiado', 'id_proy_financiado');
+    }
 }
