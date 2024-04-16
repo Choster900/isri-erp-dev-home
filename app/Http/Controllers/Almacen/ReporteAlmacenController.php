@@ -55,7 +55,9 @@ class ReporteAlmacenController extends Controller
             $startDate = $request->input('reportInfo.startDate') != '' ? date('Y-m-d', strtotime($request->input('reportInfo.startDate'))) : null;
             $endDate = $request->input('reportInfo.endDate') != '' ? date('Y-m-d', strtotime($request->input('reportInfo.endDate'))) : null;
             $financingSourceId = $request->input('reportInfo.financingSourceId');
-            $result = DB::select('CALL PR_RPT_FINANCIERO (?, 541, ?, ?)', array($financingSourceId, $startDate, $endDate));
+            $numeroCuenta = $request->input('reportInfo.numeroCuenta');
+
+            $result = DB::select('CALL PR_RPT_FINANCIERO (?, ?, ?, ?)', array($financingSourceId, $numeroCuenta, $startDate, $endDate));
             return $result;
         } catch (\Exception $e) {
             // Manejar la excepción

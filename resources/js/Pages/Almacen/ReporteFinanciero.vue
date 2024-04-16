@@ -35,7 +35,7 @@
                             class="text-red-600 font-extrabold">*</span></label>
                     <div class="flex gap-2">
                         <label>
-                            <input type="radio"  value="611" class="peer hidden" name="numeroCuenta"
+                            <input type="radio"  value="611" checked class="peer hidden" name="numeroCuenta"
                                 v-model="reportInfo.numeroCuenta" />
                             <div
                                 class="hover:bg-gray-50 flex items-center justify-between px-4 border-2 rounded cursor-pointer text-sm border-gray-200 group peer-checked:border-blue-500">
