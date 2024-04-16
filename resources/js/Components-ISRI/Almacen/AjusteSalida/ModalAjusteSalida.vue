@@ -66,8 +66,8 @@
                     <div class="mb-2 md:mr-2 md:mb-0 basis-1/4" :class="{ 'selected-opt': adjustment.centerId > 0, }">
                         <div class="relative font-semibold flex h-[35px] w-full">
                             <Multiselect v-model="adjustment.centerId" :options="centers" :searchable="true"
-                                :noOptionsText="'Lista vacía.'" placeholder="Seleccione centro"
-                                :disabled="adjustment.status != 1"
+                                :noOptionsText="'Lista vacía.'" :placeholder="products.length > 0 ? '' : 'Seleccione centro'"
+                                :disabled="adjustment.status != 1 || products.length > 0"
                                 :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
                         </div>
                         <InputError v-for="(item, index) in errors.centerId" :key="index" class="mt-2"
@@ -77,8 +77,8 @@
                         :class="{ 'selected-opt': adjustment.financingSourceId > 0, }">
                         <div class="relative font-semibold flex h-[35px] w-full">
                             <Multiselect v-model="adjustment.financingSourceId" :options="financingSources"
-                                :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione fuente"
-                                :disabled="adjustment.status != 1"
+                                :searchable="true" :noOptionsText="'Lista vacía.'" :placeholder="products.length > 0 ? '' : 'Seleccione fuente'"
+                                :disabled="adjustment.status != 1 || products.length > 0"
                                 :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
                         </div>
                         <InputError v-for="(item, index) in errors.financingSourceId" :key="index" class="mt-2"
@@ -87,8 +87,8 @@
                     <div class="mb-2 md:mr-2 md:mb-0 basis-1/4" :class="{ 'selected-opt': adjustment.idLt > 0, }">
                         <div class="relative font-semibold flex h-[35px] w-full">
                             <Multiselect v-model="adjustment.idLt" :options="lts" :searchable="true"
-                                :noOptionsText="'Lista vacía.'" placeholder="Seleccione uplt"
-                                :disabled="adjustment.status != 1"
+                                :noOptionsText="'Lista vacía.'" :placeholder="products.length > 0 ? 'Desactivado' : 'Seleccione uplt'"
+                                :disabled="adjustment.status != 1 || products.length > 0"
                                 :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
                         </div>
                         <InputError v-for="(item, index) in errors.idLt" :key="index" class="mt-2" :message="item" />
@@ -268,7 +268,7 @@
                             </div>
                             <div class="max-w-full flex items-center justify-center">
                                 <div class="w-full h-[30px] ">
-                                    <svg v-if="adjustment.status == 1" @click="deleteRow(index, prod.detId)"
+                                    <svg v-if="adjustment.status == 1" @click="deleteRow(index, prod.id)"
                                         class="text-red-600 cursor-pointer ml-1 hover:text-red-800" width="20px"
                                         height="20px" viewBox="0 0 24 24" fill="none"
                                         xmlns="http://www.w3.org/2000/svg">

@@ -117,12 +117,13 @@ export const useAjusteSalida = (context) => {
             });
         } else {
             // Call addNewRow
-            addNewRow();
+            //addNewRow();
         }
     }
 
     const addNewRow = () => {
         let array = {
+            id: "",
             detId: "",
             prodLabel: "",
             qty: "",
@@ -153,6 +154,7 @@ export const useAjusteSalida = (context) => {
                 idLt: adjustment.value.idLt
             });
             products.value = response.data.products
+            products.value.length > 0 ? addNewRow() : ''
         } catch (err) {
             if (err.response && err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
@@ -190,6 +192,7 @@ export const useAjusteSalida = (context) => {
             adjustment.value.prods[index].cost = ''
             adjustment.value.prods[index].avails = ''
             adjustment.value.prods[index].prevAvails = ''
+            adjustment.value.prods[index].qty = ''
         }
     }
 
@@ -222,6 +225,14 @@ export const useAjusteSalida = (context) => {
     }
 
     const resetProducts = () => {
+        for (let i = adjustment.value.prods.length - 1; i >= 0; i--) {
+            const e = adjustment.value.prods[i];
+            if (e.id !== '') {
+                e.deleted = true;
+            } else {
+                adjustment.value.prods.splice(i, 1);
+            }
+        }
         products.value = []
         load.value = 0
     }
