@@ -583,4 +583,19 @@ class ReporteAlmacenController extends Controller
         #return $endDate;
         #return $params;
     }
+
+    function getReporteDonacion(Request $request)  {
+
+
+        $params = [
+            'idproy' => 1,
+            'idcentro' => null,
+            'porcentaje' => 0.1,
+            'fecha_inicial' => '2024-04-11',
+            'fecha_final' => '2024-04-15',
+        ];
+
+        return DB::select("CALL PR_RPT_POCA_ROTACION(:idproy, :idcentro, :porcentaje, :fecha_inicial, :fecha_final)", $params);
+
+    }
 }
