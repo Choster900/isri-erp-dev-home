@@ -4,16 +4,17 @@ import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
 import { useFormatDateTime } from "@/Composables/General/useFormatDateTime.js";
 import { toast } from "vue3-toastify";
+import { useValidateInput } from '@/Composables/General/useValidateInput';
 import moment from 'moment';
 import _ from "lodash";
 
 export const useAjusteSalida = (context) => {
     const swal = inject("$swal");
     const isLoadingRequest = ref(false);
+    const isLoadingProds = ref(false);
     const errors = ref([]);
     const products = ref([])
-    const asyncProds = ref([])
-    const selectedProducts = ref([])
+    const load = ref(0)
 
     const reasons = ref([])
     const centers = ref([])
@@ -88,14 +89,6 @@ export const useAjusteSalida = (context) => {
             req.detalles_requerimiento.forEach(element => {
                 // Check estado_det_recepcion_pedido
                 if (element.estado_det_requerimiento === 1) {
-                    //Construct the options
-                    let arrayOpt = {
-                        value: element.producto.id_producto,
-                        label: element.producto.codigo_producto + " - " + element.producto.nombre_producto,
-                    };
-                    selectedProducts.value.push(arrayOpt);
-                    products.value.push(arrayOpt);
-
                     // Construct array
                     const array = {
                         detId: element.id_det_requerimiento, //id_det_recepcion_pedido
@@ -117,29 +110,26 @@ export const useAjusteSalida = (context) => {
             });
             // Desplazar la pantalla hasta la última fila agregada
             nextTick(() => {
-                const newRowElement = document.getElementById(`total`);
+                const newRowElement = document.getElementById(`observ`);
                 if (newRowElement) {
                     newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
                 }
             });
         } else {
             // Call addNewRow
-            addNewRow();
+            //addNewRow();
         }
     }
 
     const addNewRow = () => {
         let array = {
+            id: "",
             detId: "",
-            prodId: "",
-            perishable: "",
-            expDate: "",
-            isLoadingProd: false,
-            desc: "",
-            brandId: "",
-            brandLabel: "",
+            prodLabel: "",
             qty: "",
             cost: "",
+            prevAvails: "",
+            avails: "",
             total: '0.00',
             deleted: false,
         }
@@ -147,56 +137,66 @@ export const useAjusteSalida = (context) => {
 
         // Desplazar la pantalla hasta la última fila agregada
         nextTick(() => {
-            const newRowElement = document.getElementById(`total`);
+            const newRowElement = document.getElementById(`observ`);
             if (newRowElement) {
                 newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
             }
         });
     }
 
-    const selectProd = (prodId, index) => {
-        if (prodId) {
-            const selectedProd = products.value.find((e) => e.value === prodId)
-            adjustment.value.prods[index].desc = selectedProd.allInfo.codigo_producto + ' — ' + selectedProd.allInfo.nombre_producto + ' — ' + selectedProd.allInfo.descripcion_producto + ' — ' + selectedProd.allInfo.unidad_medida.nombre_unidad_medida
-            adjustment.value.prods[index].perishable = selectedProd.allInfo.perecedero_producto
-            let arrayOpt = {
-                value: selectedProd.allInfo.id_producto,
-                label: selectedProd.allInfo.codigo_producto + " - " + selectedProd.allInfo.nombre_producto,
-            };
-            selectedProducts.value.push(arrayOpt);
-        } else {
-            adjustment.value.prods[index].prodId = ''
-            adjustment.value.prods[index].desc = ''
-            adjustment.value.prods[index].perishable = ''
+    const searchProducts = async () => {
+        try {
+            isLoadingProds.value = true;
+            const response = await axios.post(
+                `/search-products-outgoing-adjustment`, {
+                financingSourceId: adjustment.value.financingSourceId,
+                centerId: adjustment.value.centerId,
+                idLt: adjustment.value.idLt
+            });
+            products.value = response.data.products
+            products.value.length > 0 ? addNewRow() : ''
+        } catch (err) {
+            if (err.response && err.response.data.logical_error) {
+                useShowToast(toast.error, err.response.data.logical_error);
+                context.emit("get-table");
+            } else {
+                showErrorMessage(err);
+                //context.emit("cerrar-modal");
+            }
+        } finally {
+            isLoadingProds.value = false;
+            load.value++
         }
-        adjustment.value.prods[index].brandId = ''
-        adjustment.value.prods[index].qty = ''
-        adjustment.value.prods[index].cost = ''
-        adjustment.value.prods[index].expDate = ''
+    };
+
+    const {
+        validateInput
+    } = useValidateInput()
+
+    const handleValidation = (input, validation, element) => {
+        if (element) {
+            adjustment.value.prods[element.index][input] = validateInput(adjustment.value.prods[element.index][input], validation)
+        } else {
+            adjustment.value[input] = validateInput(adjustment.value[input], validation)
+        }
     }
 
-    const asyncFindProduct = _.debounce(async (query, index, prodId) => {
-        try {
-            adjustment.value.prods[index].isLoadingProd = true
-            if (query.length >= 3) {
-                // Filtrar los elementos de defaultProds que tengan un valor diferente a prodId
-                //const filteredProds = adjustment.value.prods.filter((e) => e.prodId !== prodId && e.deleted == false);
-                // Crear un array no asociativo con solo las propiedades 'value' de los elementos filtrados
-                //const prodIdToIgnore = filteredProds.map((e) => e.prodId); //Productos que debe ignorar al momento de realizar la busqueda asincrona
-                const response = await axios.post("/search-donation-product", {
-                    busqueda: query,
-                    //prodIdToIgnore: prodIdToIgnore
-                });
-                products.value = response.data.products;
-            } else {
-                products.value = [];
-            }
-        } catch (errors) {
-            products.value = [];
-        } finally {
-            adjustment.value.prods[index].isLoadingProd = false
+    const selectProd = (detId, index) => {
+        if (detId) {
+            const selectedProd = products.value.find((e) => e.value === detId)
+            console.log(selectedProd);
+            adjustment.value.prods[index].cost = selectedProd.allInfo.existencia_almacen.costo_existencia_almacen
+            adjustment.value.prods[index].avails = selectedProd.allInfo.cant_det_existencia_almacen
+            adjustment.value.prods[index].prevAvails = selectedProd.allInfo.cant_det_existencia_almacen
+        } else {
+            adjustment.value.prods[index].cost = ''
+            adjustment.value.prods[index].avails = ''
+            adjustment.value.prods[index].prevAvails = ''
+            adjustment.value.prods[index].qty = ''
         }
-    }, 350);
+    }
+
+
 
     const deleteRow = (index, detRecId) => {
         if (activeDetails.value.length <= 1) {
@@ -222,6 +222,19 @@ export const useAjusteSalida = (context) => {
                 }
             });
         }
+    }
+
+    const resetProducts = () => {
+        for (let i = adjustment.value.prods.length - 1; i >= 0; i--) {
+            const e = adjustment.value.prods[i];
+            if (e.id !== '') {
+                e.deleted = true;
+            } else {
+                adjustment.value.prods.splice(i, 1);
+            }
+        }
+        products.value = []
+        load.value = 0
     }
 
     const storeAdjustment = async (obj) => {
@@ -270,12 +283,10 @@ export const useAjusteSalida = (context) => {
             })
             .finally(() => {
                 isLoadingRequest.value = false;
-                products.value = selectedProducts.value
             });
     };
 
     const handleErrorResponse = (err) => {
-        console.log(err);
         if (err.response.status === 422) {
             if (err.response && err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
@@ -304,6 +315,30 @@ export const useAjusteSalida = (context) => {
         swal({ title: title, text: text, icon: icon, timer: 5000 });
     };
 
+
+    const asyncFindProduct = _.debounce(async (query, index, prodId) => {
+        try {
+            adjustment.value.prods[index].isLoadingProd = true
+            if (query.length >= 3) {
+                // Filtrar los elementos de defaultProds que tengan un valor diferente a prodId
+                //const filteredProds = adjustment.value.prods.filter((e) => e.prodId !== prodId && e.deleted == false);
+                // Crear un array no asociativo con solo las propiedades 'value' de los elementos filtrados
+                //const prodIdToIgnore = filteredProds.map((e) => e.prodId); //Productos que debe ignorar al momento de realizar la busqueda asincrona
+                const response = await axios.post("/search-donation-product", {
+                    busqueda: query,
+                    //prodIdToIgnore: prodIdToIgnore
+                });
+                products.value = response.data.products;
+            } else {
+                products.value = [];
+            }
+        } catch (errors) {
+            products.value = [];
+        } finally {
+            adjustment.value.prods[index].isLoadingProd = false
+        }
+    }, 350);
+
     const totalRec = computed(() => {
         let sum = 0
         for (let i = 0; i < adjustment.value.prods.length; i++) {
@@ -322,16 +357,34 @@ export const useAjusteSalida = (context) => {
         return adjustment.value.prods.filter((detail) => detail.deleted == false)
     });
 
+    const showSearchButton = computed(() => {
+        return products.value.length > 0 ? false : true;
+    });
+
+    const nonSelectedProds = computed(() => {
+        // Obtener todos los IDs de productos seleccionados
+        const selectedIds = adjustment.value.prods.map(e => e.detId);
+
+        console.log(selectedIds);
+
+        // Filtrar productos que no estén en la lista de IDs seleccionados
+        return products.value.filter(product => !selectedIds.includes(product.value));
+    })
+
     // Observa cambios en las propiedades qty y cost de cada producto
     watch(adjustment, (newValue) => {
         newValue.prods.forEach((prod) => {
             prod.total = (prod.qty * prod.cost).toFixed(2);
+            if (prod.prevAvails != '') {
+                prod.avails = prod.prevAvails - prod.qty
+            }
         });
     }, { deep: true });
 
     return {
-        isLoadingRequest, errors, reasons, centers, financingSources, lts, adjustment,
-        products, brands, asyncFindProduct, totalRec, asyncProds, selectedProducts,
-        getInfoForModalAdjustment, selectProd, deleteRow, addNewRow, storeAdjustment, updateAdjustment
+        isLoadingRequest, errors, reasons, centers, financingSources, lts, adjustment, products,
+        nonSelectedProds, brands, asyncFindProduct, totalRec, isLoadingProds, load, showSearchButton,
+        getInfoForModalAdjustment, selectProd, deleteRow, addNewRow, storeAdjustment, updateAdjustment,
+        searchProducts, resetProducts, handleValidation
     }
 }

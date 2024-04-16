@@ -1,6 +1,6 @@
 <template>
 
-    <Head title="Reporte - Empleados" />
+    <Head title="Reporte - Financiero" />
     <AppLayoutVue nameSubModule="Almacen - Reporte financiero" :autoPadding="false" :class="'bg-gray-200'">
         <div class="w-[95%] my-4 h-full mx-auto bg-white border border-gray-300 ">
             <div class="mb-2 mt-4 md:flex flex-row justify-around mx- items-end gap-2">
@@ -30,7 +30,20 @@
                     <InputError class="mt-2" :message="errors[`reportInfo.financingSourceId`]" />
 
                 </div>
-                <div>
+                <div class="mb-4 md:mr-0 md:mb-0 basis-[25%]">
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Cuenta presupuestal
+                        <span class="text-red-600 font-extrabold">*</span></label>
+                    <div class="relative  flex h-[30px] w-full">
+                        <Multiselect v-model="reportInfo.numeroCuenta" :options="[
+                        {value: 541, label: '541-BIENES DE USO Y CONSUMO'},
+                        {value: 611, label: '611-BIENES MUEBLES'},
+                        ]" :searchable="true"
+                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione" />
+                    </div>
+                    <InputError class="mt-2" :message="errors[`reportInfo.financingSourceId`]" />
+
+                </div>
+                <!-- <div>
                     <label class="block mb-2 text-[13px] font-medium text-gray-600">Numero Cuenta<span
                             class="text-red-600 font-extrabold">*</span></label>
                     <div class="flex gap-2">
@@ -65,7 +78,7 @@
                         </label>
                     </div>
 
-                </div>
+                </div> -->
                 <button @click="getInformacionReport()"
                     class="bg-[#001c48] hover:bg-[#001c48]/90 flex h-[30px] items-center justify-center text-white font-medium text-[12px] px-2.5 py-0.5 rounded mr-1.5 ">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -74,7 +87,7 @@
                             d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                     </svg>
 
-                    <span class="mt-0.5 text-white font-medium">Generar Reporte</span>
+                    <span class="mt-0.5 text-white font-medium">Generar</span>
                 </button>
 
 

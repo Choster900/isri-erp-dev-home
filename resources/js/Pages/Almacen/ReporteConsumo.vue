@@ -1,7 +1,7 @@
 <template>
 
-    <Head title="Reporte - Empleados" />
-    <AppLayoutVue nameSubModule="Almacen - Reporte financiero" :autoPadding="false" :class="'bg-gray-200'">
+    <Head title="Reporte - Consumo" />
+    <AppLayoutVue nameSubModule="Almacen - Reporte Consumo" :autoPadding="false" :class="'bg-gray-200'">
         <div class="w-[95%] my-4 h-full mx-auto bg-white border border-gray-300">
             <div class="mt-4 md:flex flex-row justify-start mx-2 gap-1 items-center">
                 <div class="mb-4 md:mr-0 md:mb-0 basis-[25%]">
@@ -83,7 +83,7 @@
                                 v-model="tipoReporte" />
                             <div
                                 class="hover:bg-gray-50 flex items-center justify-between px-4 border-2 rounded cursor-pointer text-sm border-gray-200 group peer-checked:border-blue-500">
-                                <h2 class="font-medium text-gray-700">Consolidado</h2>
+                                <h2 class="font-medium text-gray-700">CONSOLIDADO</h2>
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor"
                                     class="w-7 h-7 text-blue-600 invisible group-[.peer:checked+&]:visible">
@@ -98,7 +98,7 @@
                                 v-model="tipoReporte" />
                             <div
                                 class="hover:bg-gray-50 flex items-center justify-between px-4 border-2 rounded cursor-pointer text-sm border-gray-200 group peer-checked:border-blue-500">
-                                <h2 class="font-medium text-gray-700">Detallado</h2>
+                                <h2 class="font-medium text-gray-700">DETALLADO</h2>
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor"
                                     class="w-7 h-7 text-blue-600 invisible group-[.peer:checked+&]:visible">

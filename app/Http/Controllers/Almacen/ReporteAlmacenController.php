@@ -439,12 +439,12 @@ class ReporteAlmacenController extends Controller
 
                     $sheet->mergeCells('A' . $row . ':F' . $row);
                     $sheet->setCellValue('A' . $row, $data->nombre_prod_rpt_consumo);
-                    $sheet->getStyle('A' . $row)->getFont();
+                    $sheet->getStyle('A' . $row)->getFont()->setBold(true);
                     $sheet->getStyle('A' . $row . ':F' . $row)->getFont()->setName('Calibri')->setSize(11);
                 } else {
                     $sheet->mergeCells('A' . $row . ':I' . $row);
                     $sheet->setCellValue('A' . $row, $data->nombre_prod_rpt_consumo);
-                    $sheet->getStyle('A' . $row)->getFont();
+                    $sheet->getStyle('A' . $row)->getFont()->setBold(true);
                     $sheet->getStyle('A' . $row . ':I' . $row)->getFont()->setName('Calibri')->setSize(11);
                 }
             }
@@ -466,6 +466,8 @@ class ReporteAlmacenController extends Controller
                     $sheet->setCellValue('D' . $row, $data->nombre_umedida_rpt_consumo);
                     $sheet->setCellValue('E' . $row, $data->cant_rpt_consumo);
                     $sheet->setCellValue('F' . $row, $data->monto_rpt_consumo);
+                    $sheet->getStyle('F' . $row)->getNumberFormat()->setFormatCode('_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)');
+
                 } else {
                     $sheet->setCellValue('A' . $row, $data->codigo_uplt_rpt_consumo);
                     $sheet->setCellValue('B' . $row, $data->nombre_prod_rpt_consumo);
@@ -475,7 +477,11 @@ class ReporteAlmacenController extends Controller
                     $sheet->setCellValue('F' . $row, $data->fecha);
                     $sheet->setCellValue('G' . $row, $data->cant_rpt_consumo);
                     $sheet->setCellValue('H' . $row, $data->costo_rpt_consumo);
+                    $sheet->getStyle('H' . $row)->getNumberFormat()->setFormatCode('_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)');
+
                     $sheet->setCellValue('I' . $row, $data->monto_rpt_consumo);
+                    $sheet->getStyle('I' . $row)->getNumberFormat()->setFormatCode('_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)');
+
                 }
 
                 $sheet->getStyle('A' . $row . ':I' . $row)->getFont()->setName('Calibri')->setSize(9);
@@ -488,11 +494,17 @@ class ReporteAlmacenController extends Controller
                     $sheet->setCellValue('A' . $row, $data->nombre_prod_rpt_consumo);
                     $sheet->setCellValue('F' . $row, $data->monto_rpt_consumo);
                     $sheet->getStyle('A' . $row . ':F' . $row)->getFont()->setName('Calibri')->setSize(9);
+                    $sheet->getStyle('F' . $row)->getNumberFormat()->setFormatCode('_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)');
+
                 } else {
                     $sheet->mergeCells('A' . $row . ':H' . $row);
                     $sheet->setCellValue('A' . $row, $data->nombre_prod_rpt_consumo);
                     $sheet->setCellValue('I' . $row, $data->monto_rpt_consumo);
                     $sheet->getStyle('A' . $row . ':I' . $row)->getFont()->setName('Calibri')->setSize(9);
+                    $sheet->getStyle('I' . $row)->getNumberFormat()->setFormatCode('_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)');
+
+
+
                 }
             }
 
@@ -570,5 +582,20 @@ class ReporteAlmacenController extends Controller
 
         #return $endDate;
         #return $params;
+    }
+
+    function getReporteDonacion(Request $request)  {
+
+
+        $params = [
+            'idproy' => 1,
+            'idcentro' => null,
+            'porcentaje' => 0.1,
+            'fecha_inicial' => '2024-04-11',
+            'fecha_final' => '2024-04-15',
+        ];
+
+        return DB::select("CALL PR_RPT_POCA_ROTACION(:idproy, :idcentro, :porcentaje, :fecha_inicial, :fecha_final)", $params);
+
     }
 }

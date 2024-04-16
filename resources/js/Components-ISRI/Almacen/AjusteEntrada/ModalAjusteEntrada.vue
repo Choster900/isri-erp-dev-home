@@ -129,7 +129,7 @@
                             <div class="border-r border-gray-500 flex items-center justify-center py-1">
                                 <p class="font-[MuseoSans] text-[11px]">PRODUCTO</p>
                             </div>
-                            <div class="border-r border-gray-500  flex items-center justify-center v">
+                            <div class="border-r border-gray-500  flex items-center justify-center py-1">
                                 <p class="font-[MuseoSans] text-[11px]">INFO. PRODUCTO</p>
                             </div>
                             <div class="border-r border-gray-500  flex items-center justify-center py-1">
