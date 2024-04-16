@@ -7,7 +7,7 @@ import { toast } from "vue3-toastify";
 import moment from 'moment';
 import _ from "lodash";
 
-export const useAjusteEntrada = (context) => {
+export const useAjusteSalida = (context) => {
     const swal = inject("$swal");
     const isLoadingRequest = ref(false);
     const errors = ref([]);
@@ -105,7 +105,7 @@ export const useAjusteEntrada = (context) => {
                         perishable: element.producto.perecedero_producto,
                         expDate: formatDateVue3DP(element.fecha_vcto_det_requerimiento), //Expiry date
                         isLoadingProd: false, //Flag to manage loader for every multiselect
-                        desc: element.producto.codigo_producto + ' — ' + element.producto.nombre_completo_producto + ' — ' + element.producto.unidad_medida.nombre_unidad_medida ?? 'Sin marca',
+                        desc: element.producto.codigo_producto + ' — ' + element.producto.nombre_producto + ' — ' + element.producto.descripcion_producto + ' — ' + element.producto.unidad_medida.nombre_unidad_medida ?? 'Sin marca',
                         qty: element.cant_det_requerimiento, //Represents the the number of products the user wants to register
                         cost: element.costo_det_requerimiento, //Represents the the cost of the product
                         total: "", //Represents the result of qty x cost for every row
@@ -157,11 +157,11 @@ export const useAjusteEntrada = (context) => {
     const selectProd = (prodId, index) => {
         if (prodId) {
             const selectedProd = products.value.find((e) => e.value === prodId)
-            adjustment.value.prods[index].desc = selectedProd.allInfo.codigo_producto + ' — ' + selectedProd.allInfo.nombre_completo_producto + ' — ' + selectedProd.allInfo.unidad_medida.nombre_unidad_medida
+            adjustment.value.prods[index].desc = selectedProd.allInfo.codigo_producto + ' — ' + selectedProd.allInfo.nombre_producto + ' — ' + selectedProd.allInfo.descripcion_producto + ' — ' + selectedProd.allInfo.unidad_medida.nombre_unidad_medida
             adjustment.value.prods[index].perishable = selectedProd.allInfo.perecedero_producto
             let arrayOpt = {
                 value: selectedProd.allInfo.id_producto,
-                label: selectedProd.allInfo.codigo_producto + " — " + selectedProd.allInfo.nombre_completo_producto,
+                label: selectedProd.allInfo.codigo_producto + " - " + selectedProd.allInfo.nombre_producto,
             };
             selectedProducts.value.push(arrayOpt);
         } else {

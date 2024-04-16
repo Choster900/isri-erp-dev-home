@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Almacen\AjusteEntradaController;
+use App\Http\Controllers\Almacen\AjusteSalidaController;
 use App\Http\Controllers\Almacen\DonacionController;
 use App\Http\Controllers\Almacen\RecepcionController;
 use App\Http\Controllers\Almacen\ReporteAlmacenController;
@@ -151,4 +152,29 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/reporte-consumo', 'Almacen/ReporteConsumo');
         }
     )->name('alm.reporteConsumo');
+    Route::post('get-cuenta-by-number', function (Request $request) {
+
+        $cuentas = CatalogoCtaPresupuestal::where("id_padre_ccta_presupuestal",611)->orWhere("id_padre_ccta_presupuestal",541)->get();
+
+         // Formatear resultados para respuesta JSON
+        return $cuentas->map(function ($item) {
+            return [
+                'value'           => $item->id_ccta_presupuestal,
+                'label'           => $item->id_ccta_presupuestal . '-' . $item->nombre_ccta_presupuestal,
+                'allDataPersonas' => $item,
+            ];
+        });
+
+    } )->name('reporte.get-cuenta');
+
+    //Outgoing adjustment
+    Route::get(
+        '/alm/ajuste-salida',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/ajuste-salida', 'Almacen/AjusteSalida');
+        }
+    )->name('alm.ajusteSalida');
+    Route::post('ajuste-salida', [AjusteSalidaController::class, 'getAjusteSalida'])->name('ajusteSalida.getAjusteSalida');
+    Route::post('get-info-modal-outgoing-adjustment', [AjusteSalidaController::class, 'getInfoOutgoingAdjustment'])->name('ajusteEntrada.getInfoOutgoingAdjustment');
+
 });

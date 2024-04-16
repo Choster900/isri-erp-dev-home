@@ -1,12 +1,14 @@
 <template>
-   <!--  {{dataReporteInfo.map(index =>{ return index.numero_mov_rpt_consumo}) }} -->
+    <!--  {{dataReporteInfo.map(index =>{ return index.numero_mov_rpt_consumo}) }} -->
+    <!--     {{ tipoReporte }}
+    {{ dataReporteInfo.some(index => index.numero_mov_rpt_consumo !== null) }} -->
 
-    {{ dataReporteInfo.some(index => index.numero_mov_rpt_consumo !== null) }}
-    <div class="bg-white">
+    <!--    {{ isLoadinRequest }} -->
+    <div class="bg-white ">
         <div class="m">
             <!-- Table -->
             <div class="overflow-x-auto w-full">
-                <table class="table-auto">
+                <table class="table-auto w-full">
                     <!-- Table header -->
                     <thead
                         class="font-semibold uppercase text-slate-500 border-t border-b border-slate-200 *:text-[11px]">
@@ -23,17 +25,17 @@
                             <th class="px-1 first:pl-5 last:pr-5 py-1">
                                 <div class="font-semibold text-center">UNIDAD</div>
                             </th>
-                            <th class="px-1 first:pl-5 last:pr-5 py-1 w-[100px]">
+                            <th class="px-1 first:pl-5 last:pr-5 py-1 w-[100px] " v-if="tipoReporte == 'D'">
                                 <div class="font-semibold text-center">NUMERO</div>
                             </th>
 
-                            <th class="px-1 first:pl-5 last:pr-5 py-1 w-[100px]">
+                            <th class="px-1 first:pl-5 last:pr-5 py-1 w-[100px]" v-if="tipoReporte == 'D'">
                                 <div class="font-semibold text-center ">FECHA</div>
                             </th>
                             <th class="px-1 first:pl-5 last:pr-5 py-1">
                                 <div class="font-semibold text-center">CANTIDAD</div>
                             </th>
-                            <th class="px-1 first:pl-5 last:pr-5 py-1">
+                            <th class="px-1 first:pl-5 last:pr-5 py-1" v-if="tipoReporte == 'D'">
                                 <div class="font-semibold text-center">COSTO</div>
                             </th>
                             <th class="px-1 first:pl-5 last:pr-5 py-1">
@@ -42,10 +44,11 @@
 
                         </tr>
                     </thead>
-                    <tbody v-for="(consumo, i) in dataReporteInfo" :key="i">
+                    <tbody v-for="(consumo, i) in dataReporteInfo" :key="i"
+                        v-if="!isLoadinRequest && dataReporteInfo != ''">
                         <tr class="*:text-[12px] *:font-semibold *:py-1" v-if="consumo.id_tipo_reg_rpt_consumo == 0">
-                          <!--   <td class="text-center border-y">{{ consumo.id_ccta_presupuesto_rpt_consumo }}</td> -->
-                            <td class="border-y text-left px-2" colspan="9">
+                            <!--   <td class="text-center border-y">{{ consumo.id_ccta_presupuesto_rpt_consumo }}</td> -->
+                            <td class="border-y text-left px-2" :colspan="tipoReporte === 'D' ? 9 : 6">
                                 <div class="text-base">
                                     {{ consumo.nombre_prod_rpt_consumo }}
                                 </div>
@@ -53,30 +56,82 @@
                         </tr>
                         <tr class="*:text-[12px] *:font-semibold *:py-1" v-if="consumo.id_tipo_reg_rpt_consumo == 1">
                             <td class="text-center border-y">{{ consumo.id_ccta_presupuesto_rpt_consumo }}</td>
-                            <td class="border-y text-left px-2" colspan="8">
+                            <td class="border-y text-left px-2" :colspan="tipoReporte === 'D' ? 8 : 6">
                                 <div class="underline">
-                                    {{ consumo.nombre_prod_rpt_consumo }}
+                                    {{ consumo.nombre_prod_rpt_consumo }} - {{ consumo.nombre_prod_rpt_consumo }}
                                 </div>
                             </td>
                         </tr>
-                        <tr class="*:border-y *:text-[12px] *:px-1 *:py-1 hover:bg-slate-200" v-if="consumo.id_tipo_reg_rpt_consumo === 2">
+                        <tr class="*:border-y *:text-[12px] *:px-1 *:py-1 hover:bg-slate-200"
+                            v-if="consumo.id_tipo_reg_rpt_consumo === 2">
                             <td class="text-center">{{ consumo.codigo_uplt_rpt_consumo }}</td>
                             <td class="text-left">{{ consumo.nombre_prod_rpt_consumo }}</td>
                             <td class="text-center">{{ consumo.marca_rpt_consumo || '-' }}</td>
                             <td class="text-center">{{ consumo.nombre_umedida_rpt_consumo }}</td>
-                            <td class="text-center font-medium">{{ consumo.numero_mov_rpt_consumo }}</td>
-                            <td class="text-center">{{ consumo.fecha }}</td>
+                            <td class="text-center font-medium" v-if="tipoReporte == 'D'">{{
+                                consumo.numero_mov_rpt_consumo }}</td>
+                            <td class="text-center" v-if="tipoReporte == 'D'">{{ consumo.fecha }}</td>
                             <td class="text-center">{{ consumo.cant_rpt_consumo }}</td>
-                            <td class="text-center">{{ consumo.costo_rpt_consumo }}</td>
+                            <td class="text-center" v-if="tipoReporte == 'D'">{{ consumo.costo_rpt_consumo }}</td>
                             <td class="text-center">{{ consumo.monto_rpt_consumo }}</td>
                         </tr>
                         <tr class="*:text-[12px] *:font-semibold *:py-1" v-if="consumo.id_tipo_reg_rpt_consumo == 3">
-                              <td class="text-center"></td>
-                            <td class="border-y text-right px-2" colspan="7">
+                            <td class="text-center"></td>
+                            <td class="border-y text-right px-2" :colspan="tipoReporte === 'D' ? 7 : 4">
                                 {{ consumo.nombre_prod_rpt_consumo }}
                             </td>
                             <td class="text-center">{{ consumo.monto_rpt_consumo }}</td>
 
+                        </tr>
+                    </tbody>
+
+                    <tbody v-if="isLoadinRequest">
+                        <tr>
+                            <td colspan="12">
+                                <div class="flex items-center justify-center h-96">
+                                    <div aria-label="Loading..." role="status" class="loader">
+                                        <svg class="icon" viewBox="0 0 256 256">
+                                            <line x1="128" y1="32" x2="128" y2="64" stroke-linecap="round"
+                                                stroke-linejoin="round" stroke-width="24"></line>
+                                            <line x1="195.9" y1="60.1" x2="173.3" y2="82.7" stroke-linecap="round"
+                                                stroke-linejoin="round" stroke-width="24"></line>
+                                            <line x1="224" y1="128" x2="192" y2="128" stroke-linecap="round"
+                                                stroke-linejoin="round" stroke-width="24"></line>
+                                            <line x1="195.9" y1="195.9" x2="173.3" y2="173.3" stroke-linecap="round"
+                                                stroke-linejoin="round" stroke-width="24"></line>
+                                            <line x1="128" y1="224" x2="128" y2="192" stroke-linecap="round"
+                                                stroke-linejoin="round" stroke-width="24"></line>
+                                            <line x1="60.1" y1="195.9" x2="82.7" y2="173.3" stroke-linecap="round"
+                                                stroke-linejoin="round" stroke-width="24"></line>
+                                            <line x1="32" y1="128" x2="64" y2="128" stroke-linecap="round"
+                                                stroke-linejoin="round" stroke-width="24"></line>
+                                            <line x1="60.1" y1="60.1" x2="82.7" y2="82.7" stroke-linecap="round"
+                                                stroke-linejoin="round" stroke-width="24"></line>
+                                        </svg>
+                                        <span class="loading-text">Cargando...</span>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+
+                    <tbody v-if="dataReporteInfo == ''">
+                        <tr>
+                            <td colspan="12">
+                                <div class="w-full h-[500px] px-1 text-selection-disable">
+                                    <div class="flex flex-col items-center justify-center h-full">
+                                        <img src="../../../../img/TableReport.svg" class="h-72 mx-auto" alt="SVG Image"
+                                            draggable="false" />
+                                        <h1 class="font-medium text-center">
+                                            No se encontraron resultados
+                                        </h1>
+                                        <p class="text-[9pt] text-center">
+                                            Intenta buscar en períodos válidos o revisa tus criterios de
+                                            búsqueda.
+                                        </p>
+                                    </div>
+                                </div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -84,7 +139,7 @@
         </div>
     </div>
 
-   <!--  <pre>
+    <!--  <pre>
               {{ dataReporteInfo }}</pre> -->
 </template>
 
@@ -93,7 +148,7 @@ import { toRefs } from "vue";
 
 export default {
     name: "Test",
-    props: ["dataReporteInfo", "isLoadingExport", "tipoReporte"],
+    props: ["dataReporteInfo", "isLoadinRequest", "tipoReporte"],
     setup(props) {
         const { paramsToRequest } = toRefs(props);
         /*  const exportExcel = async () => {
