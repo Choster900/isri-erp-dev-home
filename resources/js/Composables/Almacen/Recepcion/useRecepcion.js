@@ -122,6 +122,10 @@ export const useRecepcion = (context) => {
         brands.value = data.brands
         recDocument.value.procedure = data.products
 
+        brands.value = data.brands
+
+        recDocument.value.procedure = data.products
+
         recDocument.value.financingSourceId = data.itemInfo.id_proy_financiado
         recDocument.value.detDocId = data.itemInfo.id_det_doc_adquisicion
 
