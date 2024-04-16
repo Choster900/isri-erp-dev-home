@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Almacen\AjusteEntradaController;
+use App\Http\Controllers\Almacen\AjusteSalidaController;
 use App\Http\Controllers\Almacen\DonacionController;
 use App\Http\Controllers\Almacen\RecepcionController;
 use App\Http\Controllers\Almacen\ReporteAlmacenController;
@@ -118,7 +119,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('get-reporte-consumo',[ReporteAlmacenController::class,'getReporteConsumo'])->name('bieneservicios.get-reporte-consumo');
     Route::post('get-excel-document-reporte-consumo',[ReporteAlmacenController::class,'getExcelDocumentConsumo'])->name('bieneservicios.get-excel-document-reporte-consumo');
 
-    //Surplus adjustment
+    //Incoming adjustment
     Route::get(
         '/alm/ajuste-entrada',
         function (Request $request) {
@@ -137,4 +138,15 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/reporte-consumo', 'Almacen/ReporteConsumo');
         }
     )->name('alm.reporteConsumo');
+
+    //Outgoing adjustment
+    Route::get(
+        '/alm/ajuste-salida',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/ajuste-salida', 'Almacen/AjusteSalida');
+        }
+    )->name('alm.ajusteSalida');
+    Route::post('ajuste-salida', [AjusteSalidaController::class, 'getAjusteSalida'])->name('ajusteSalida.getAjusteSalida');
+    Route::post('get-info-modal-outgoing-adjustment', [AjusteSalidaController::class, 'getInfoOutgoingAdjustment'])->name('ajusteEntrada.getInfoOutgoingAdjustment');
+
 });

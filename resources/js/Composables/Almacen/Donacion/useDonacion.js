@@ -89,7 +89,7 @@ export const useDonacion = (context) => {
                     //Construct the options
                     let arrayOpt = {
                         value: element.producto.id_producto,
-                        label: element.producto.codigo_producto + " - " + element.producto.nombre_producto,
+                        label: element.producto.codigo_producto + " — " + element.producto.nombre_completo_producto,
                     };
                     selectedProducts.value.push(arrayOpt);
                     products.value.push(arrayOpt);
@@ -103,7 +103,7 @@ export const useDonacion = (context) => {
                         brandLabel: element.marca.nombre_marca,
                         perishable: element.producto.perecedero_producto,
                         expDate: formatDateVue3DP(element.fecha_vcto_det_recepcion_pedido), //Expiry date
-                        desc: element.producto.codigo_producto + ' — ' + element.producto.nombre_producto + ' — ' + element.producto.descripcion_producto + ' — ' + element.producto.unidad_medida.nombre_unidad_medida,
+                        desc: element.producto.codigo_producto + ' — ' + element.producto.nombre_completo_producto + ' — ' + element.producto.unidad_medida.nombre_unidad_medida,
                         qty: element.cant_det_recepcion_pedido, //Represents the the number of products the user wants to register
                         cost: element.costo_det_recepcion_pedido, //Represents the the cost of the product
                         total: "", //Represents the result of qty x cost for every row
@@ -293,7 +293,7 @@ export const useDonacion = (context) => {
     const selectProd = (prodId, index) => {
         if (prodId) {
             const selectedProd = products.value.find((e) => e.value === prodId)
-            donInfo.value.prods[index].desc = selectedProd.allInfo.codigo_producto + ' — ' + selectedProd.allInfo.nombre_producto + ' — ' + selectedProd.allInfo.descripcion_producto + ' — ' + selectedProd.allInfo.unidad_medida.nombre_unidad_medida
+            donInfo.value.prods[index].desc = selectedProd.allInfo.codigo_producto + ' — ' + selectedProd.allInfo.nombre_completo_producto + ' — ' + selectedProd.allInfo.unidad_medida.nombre_unidad_medida
             donInfo.value.prods[index].perishable = selectedProd.allInfo.perecedero_producto
             let arrayOpt = {
                 value: selectedProd.allInfo.id_producto,
