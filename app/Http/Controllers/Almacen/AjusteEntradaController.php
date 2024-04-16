@@ -37,7 +37,8 @@ class AjusteEntradaController extends Controller
                 'detalles_requerimiento.producto.unidad_medida',
                 'detalles_requerimiento.marca'
             ])
-            ->where('id_tipo_req', 2);
+            ->where('id_tipo_req', 2)
+            ->where('id_tipo_mov_kardex',1);
 
         if ($column == 2) { //Order by reason
             $query->orderByRaw('

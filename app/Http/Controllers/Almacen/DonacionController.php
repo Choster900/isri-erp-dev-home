@@ -110,7 +110,7 @@ class DonacionController extends Controller
         if ($search != '') {
             $matchProds = Producto::with('unidad_medida')
                 ->where(function ($query) use ($search) {
-                    $query->where('nombre_producto', 'like', '%' . $search . '%')
+                    $query->where('nombre_completo_producto', 'like', '%' . $search . '%')
                         ->orWhere('codigo_producto', 'like', '%' . $search . '%');
                 })
                 ->where('estado_producto', 1)
@@ -120,7 +120,7 @@ class DonacionController extends Controller
             $products = $matchProds->map(function ($prod) {
                 return [
                     'value'             => $prod->id_producto,
-                    'label'             => $prod->codigo_producto . " - " . $prod->nombre_producto,
+                    'label'             => $prod->codigo_producto.' — '.$prod->nombre_completo_producto,
                     'allInfo'           => $prod
                 ];
             });

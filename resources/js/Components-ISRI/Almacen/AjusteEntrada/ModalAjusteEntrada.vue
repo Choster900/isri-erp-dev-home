@@ -15,7 +15,7 @@
                     <div class="mt-[5px] text-gray-500 text-opacity-70 w-[14px] h-[14px] mx-2">
                         <icon-m :iconName="'nextSvgVector'"></icon-m>
                     </div>
-                    <span class="text-[16px] font-medium text-black font-[Roboto]">Crear ajuste</span>
+                    <span class="text-[16px] font-medium text-black font-[Roboto]">{{ objId > 0 ? 'Editar ajuste' : 'Crear ajuste'}}</span>
                 </div>
                 <svg class="h-6 w-6 text-gray-400 hover:text-gray-600 cursor-pointer" @click="$emit('cerrar-modal')"
                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -41,7 +41,7 @@
                         <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Centro
                             <span class="text-red-600 font-extrabold">*</span>
                         </label>
-                        <div class="relative font-semibold flex h-[30px] w-full">
+                        <div class="relative font-semibold flex h-[35px] w-full">
                             <Multiselect v-model="adjustment.centerId" :options="centers" :searchable="true"
                                 :noOptionsText="'Lista vacía.'" placeholder="Seleccione centro"
                                 :disabled="adjustment.status != 1"
@@ -54,7 +54,7 @@
                         <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Linea de trabajo
                             <span class="text-red-600 font-extrabold">*</span>
                         </label>
-                        <div class="relative font-semibold flex h-[30px] w-full">
+                        <div class="relative font-semibold flex h-[35px] w-full">
                             <Multiselect v-model="adjustment.idLt" :options="lts" :searchable="true"
                                 :noOptionsText="'Lista vacía.'" placeholder="Seleccione uplt"
                                 :disabled="adjustment.status != 1"
@@ -67,7 +67,7 @@
                         <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Fuente financiamiento
                             <span class="text-red-600 font-extrabold">*</span>
                         </label>
-                        <div class="relative font-semibold flex h-[30px] w-full">
+                        <div class="relative font-semibold flex h-[35px] w-full">
                             <Multiselect v-model="adjustment.financingSourceId" :options="financingSources"
                                 :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione fuente"
                                 :disabled="adjustment.status != 1"
@@ -80,7 +80,7 @@
                         <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Motivo
                             <span class="text-red-600 font-extrabold">*</span>
                         </label>
-                        <div class="relative font-semibold flex h-[30px] w-full">
+                        <div class="relative font-semibold flex h-[35px] w-full">
                             <Multiselect v-model="adjustment.reasonId" :options="reasons" :searchable="true"
                                 :noOptionsText="'Lista vacía.'" placeholder="Seleccione motivo"
                                 :disabled="adjustment.status != 1"
@@ -97,7 +97,7 @@
                             <!-- <span class="text-red-600 font-extrabold">*</span> -->
                         </label>
                         <textarea v-model="adjustment.observation" id="descripcion" name="descripcion"
-                            :disabled="adjustment.status != 1" placeholder="Escriba observacion"
+                            :disabled="adjustment.status != 1" placeholder="Escriba observación"
                             :class="adjustment.observation != '' ? 'bg-gray-200' : ''"
                             class="w-full h-12 overflow-y-auto peer placeholder-gray-400 text-xs font-semibold border border-gray-300 hover:border-gray-400 px-2 text-slate-900 transition-colors duration-300 focus:ring-blue-500 focus:border-blue-500"
                             style="border-radius: 4px;">
@@ -162,7 +162,7 @@
                                         @search-change="handleSearchChange($event, index, prod.prodId)"
                                         @change="selectProd($event, index)" :loading="prod.isLoadingProd"
                                         :clear-on-search="true" :filter-results="false" :resolve-on-load="true"
-                                        :noOptionsText="'Escriba para buscar...'" placeholder="Seleccione"
+                                        :noOptionsText="'Sin resultados'" placeholder="Buscar producto"
                                         @open="products = []"
                                         :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
                                 </div>

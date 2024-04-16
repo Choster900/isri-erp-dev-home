@@ -145,7 +145,7 @@
                                 </g>
                             </g>
                         </svg><span class="ml-2 font-semibold text-[14px]">EXPORTAR</span></div>
-                    <div class="flex ml-4 items-center cursor-pointer text-slate-700 hover:text-red-600"><svg
+                    <div @click="printPdf" class="flex ml-4 items-center cursor-pointer text-slate-700 hover:text-red-600"><svg
                             class="h-4 w-4 text-red-500" fill="currentColor" viewBox="0 0 1920 1920"
                             xmlns="http://www.w3.org/2000/svg">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -163,7 +163,10 @@
                         </svg><span class="ml-2 text-[14px] font-semibold">PDF</span></div>
                 </div>
             </div>
-           <TableReporteConsumo :dataReporteInfo="dataReporteConsumo" :tipoReporte="tipoReporte"/>
+
+           <TableReporteConsumo
+           :dataReporteInfo="dataReporteConsumo" :tipoReporte="tipoReporteForValidate"
+           :isLoadinRequest="isLoadinRequest" />
 
 
 
@@ -197,8 +200,8 @@ export default {
     setup(props, context) {
         const { menu } = toRefs(props);
         const permits = usePermissions(menu.value, window.location.pathname);
-        const { exportExcel, getInformacionReport, isLoadingExport, dataReporteConsumo,
-            idProyectoFinanciamiento, handleCuentaPresupuestalChange,
+        const { exportExcel, getInformacionReport, isLoadingExport, dataReporteConsumo,isLoadinRequest,
+            idProyectoFinanciamiento, handleCuentaPresupuestalChange,tipoReporteForValidate,printPdf,
             idCentroAtencion, idTipoTransaccion, idCuenta, fechaDesde, fechaHasta, tipoReporte,
         } = useReporteConsumo();
 
@@ -248,9 +251,9 @@ export default {
 
         return {
             getOption, handleCuentaPresupuestalChange,
-            permits, dataReporteConsumo,
+            permits, dataReporteConsumo,printPdf,
             exportExcel, getInformacionReport, isLoadingExport,
-            idProyectoFinanciamiento,
+            idProyectoFinanciamiento,tipoReporteForValidate,isLoadinRequest,
             idCentroAtencion, idTipoTransaccion, idCuenta, fechaDesde, fechaHasta, tipoReporte,
 
         };
