@@ -20,6 +20,7 @@ class DetalleExistenciaAlmacen extends Model
         'id_centro_atencion',
         'cant_det_existencia_almacen',
         'fecha_reg_det_existencia_almacen',
+        'fecha_vcto_det_existencia_almacen',
         'fecha_mod_det_existencia_almacen',
         'usuario_det_existencia_almacen',
         'ip_det_existencia_almacen',
@@ -42,5 +43,25 @@ class DetalleExistenciaAlmacen extends Model
     public function marca(): BelongsTo
     {
         return $this->belongsTo(Marca::class, 'id_marca', 'id_marca');
+    }
+
+    /**
+     * Get the CentroAtencion model associated with this instance.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function centro_atencion()
+    {
+        return $this->belongsTo(CentroAtencion::class, 'id_centro_atencion', 'id_centro_atencion');
+    }
+
+    /**
+     * Get the LineaTrabajo model associated with this instance.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function linea_trabajo()
+    {
+        return $this->belongsTo(LineaTrabajo::class, 'id_lt', 'id_lt');
     }
 }

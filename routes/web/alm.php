@@ -162,6 +162,6 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('alm.ajusteSalida');
     Route::post('ajuste-salida', [AjusteSalidaController::class, 'getAjusteSalida'])->name('ajusteSalida.getAjusteSalida');
-    Route::post('get-info-modal-outgoing-adjustment', [AjusteSalidaController::class, 'getInfoOutgoingAdjustment'])->name('ajusteEntrada.getInfoOutgoingAdjustment');
-
+    Route::post('get-info-modal-outgoing-adjustment', [AjusteSalidaController::class, 'getInfoOutgoingAdjustment'])->name('ajusteSalida.getInfoOutgoingAdjustment');
+    Route::post('search-products-outgoing-adjustment', [AjusteSalidaController::class, 'searchProductsOutgoingAdjustment'])->name('ajusteSalida.searchProductsOutgoingAdjustment');
 });
