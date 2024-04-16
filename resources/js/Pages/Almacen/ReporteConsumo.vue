@@ -1,7 +1,7 @@
 <template>
 
-    <Head title="Reporte - Empleados" />
-    <AppLayoutVue nameSubModule="Almacen - Reporte financiero" :autoPadding="false" :class="'bg-gray-200'">
+    <Head title="Reporte - Consumo" />
+    <AppLayoutVue nameSubModule="Almacen - Reporte Consumo" :autoPadding="false" :class="'bg-gray-200'">
         <div class="w-[95%] my-4 h-full mx-auto bg-white border border-gray-300">
             <div class="mt-4 md:flex flex-row justify-start mx-2 gap-1 items-center">
                 <div class="mb-4 md:mr-0 md:mb-0 basis-[25%]">
@@ -83,7 +83,7 @@
                                 v-model="tipoReporte" />
                             <div
                                 class="hover:bg-gray-50 flex items-center justify-between px-4 border-2 rounded cursor-pointer text-sm border-gray-200 group peer-checked:border-blue-500">
-                                <h2 class="font-medium text-gray-700">Consolidado</h2>
+                                <h2 class="font-medium text-gray-700">CONSOLIDADO</h2>
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor"
                                     class="w-7 h-7 text-blue-600 invisible group-[.peer:checked+&]:visible">
@@ -98,7 +98,7 @@
                                 v-model="tipoReporte" />
                             <div
                                 class="hover:bg-gray-50 flex items-center justify-between px-4 border-2 rounded cursor-pointer text-sm border-gray-200 group peer-checked:border-blue-500">
-                                <h2 class="font-medium text-gray-700">Detallado</h2>
+                                <h2 class="font-medium text-gray-700">DETALLADO</h2>
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor"
                                     class="w-7 h-7 text-blue-600 invisible group-[.peer:checked+&]:visible">
@@ -145,7 +145,7 @@
                                 </g>
                             </g>
                         </svg><span class="ml-2 font-semibold text-[14px]">EXPORTAR</span></div>
-                    <div class="flex ml-4 items-center cursor-pointer text-slate-700 hover:text-red-600"><svg
+                    <div @click="printPdf" class="flex ml-4 items-center cursor-pointer text-slate-700 hover:text-red-600"><svg
                             class="h-4 w-4 text-red-500" fill="currentColor" viewBox="0 0 1920 1920"
                             xmlns="http://www.w3.org/2000/svg">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -201,7 +201,7 @@ export default {
         const { menu } = toRefs(props);
         const permits = usePermissions(menu.value, window.location.pathname);
         const { exportExcel, getInformacionReport, isLoadingExport, dataReporteConsumo,isLoadinRequest,
-            idProyectoFinanciamiento, handleCuentaPresupuestalChange,tipoReporteForValidate,
+            idProyectoFinanciamiento, handleCuentaPresupuestalChange,tipoReporteForValidate,printPdf,
             idCentroAtencion, idTipoTransaccion, idCuenta, fechaDesde, fechaHasta, tipoReporte,
         } = useReporteConsumo();
 
@@ -251,7 +251,7 @@ export default {
 
         return {
             getOption, handleCuentaPresupuestalChange,
-            permits, dataReporteConsumo,
+            permits, dataReporteConsumo,printPdf,
             exportExcel, getInformacionReport, isLoadingExport,
             idProyectoFinanciamiento,tipoReporteForValidate,isLoadinRequest,
             idCentroAtencion, idTipoTransaccion, idCuenta, fechaDesde, fechaHasta, tipoReporte,

@@ -119,8 +119,21 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     //TODO: FALTA EL REPORTE DE PDF DE REPORTE FINANCIERO
     Route::post('get-reporte-consumo',[ReporteAlmacenController::class,'getReporteConsumo'])->name('bieneservicios.get-reporte-consumo');
     Route::post('get-excel-document-reporte-consumo',[ReporteAlmacenController::class,'getExcelDocumentConsumo'])->name('bieneservicios.get-excel-document-reporte-consumo');
+    Route::post('get-cuenta-by-number', function (Request $request) {
 
-    //Incoming adjustment
+        $cuentas = CatalogoCtaPresupuestal::where("id_ccta_presupuestal","like",'%' . $request->numeroCuenta . '%')->get();
+
+         // Formatear resultados para respuesta JSON
+        return $cuentas->map(function ($item) {
+            return [
+                'value'           => $item->id_ccta_presupuestal,
+                'label'           => $item->id_ccta_presupuestal . '-' . $item->nombre_ccta_presupuestal,
+                'allDataPersonas' => $item,
+            ];
+        });
+
+    } )->name('reporte.get-cuenta');
+    //Surplus adjustment
     Route::get(
         '/alm/ajuste-entrada',
         function (Request $request) {
@@ -141,7 +154,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     )->name('alm.reporteConsumo');
     Route::post('get-cuenta-by-number', function (Request $request) {
 
-        $cuentas = CatalogoCtaPresupuestal::where("id_ccta_presupuestal","like",'%' . $request->numeroCuenta . '%')->get();
+        $cuentas = CatalogoCtaPresupuestal::where("id_padre_ccta_presupuestal",611)->orWhere("id_padre_ccta_presupuestal",541)->get();
 
          // Formatear resultados para respuesta JSON
         return $cuentas->map(function ($item) {

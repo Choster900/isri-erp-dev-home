@@ -1,9 +1,9 @@
 <template>
 
-    <Head title="Reporte - Empleados" />
+    <Head title="Reporte - Financiero" />
     <AppLayoutVue nameSubModule="Almacen - Reporte financiero" :autoPadding="false" :class="'bg-gray-200'">
         <div class="w-[95%] my-4 h-full mx-auto bg-white border border-gray-300 ">
-            <div class="mb-2 mt-4 md:flex flex-row justify-around mx- items-end">
+            <div class="mb-2 mt-4 md:flex flex-row justify-around mx- items-end gap-2">
 
                 <DateSelect @optionId="getOption" />
 
@@ -30,6 +30,55 @@
                     <InputError class="mt-2" :message="errors[`reportInfo.financingSourceId`]" />
 
                 </div>
+                <div class="mb-4 md:mr-0 md:mb-0 basis-[25%]">
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Cuenta presupuestal
+                        <span class="text-red-600 font-extrabold">*</span></label>
+                    <div class="relative  flex h-[30px] w-full">
+                        <Multiselect v-model="reportInfo.numeroCuenta" :options="[
+                        {value: 541, label: '541-BIENES DE USO Y CONSUMO'},
+                        {value: 611, label: '611-BIENES MUEBLES'},
+                        ]" :searchable="true"
+                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione" />
+                    </div>
+                    <InputError class="mt-2" :message="errors[`reportInfo.financingSourceId`]" />
+
+                </div>
+                <!-- <div>
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600">Numero Cuenta<span
+                            class="text-red-600 font-extrabold">*</span></label>
+                    <div class="flex gap-2">
+                        <label>
+                            <input type="radio"  value="611" checked class="peer hidden" name="numeroCuenta"
+                                v-model="reportInfo.numeroCuenta" />
+                            <div
+                                class="hover:bg-gray-50 flex items-center justify-between px-4 border-2 rounded cursor-pointer text-sm border-gray-200 group peer-checked:border-blue-500">
+                                <h2 class="font-medium text-gray-700">611</h2>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor"
+                                    class="w-5 h-7 text-blue-600 invisible group-[.peer:checked+&]:visible">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                        </label>
+
+                        <label>
+                            <input type="radio" value="541"  class="peer hidden" name="numeroCuenta"
+                                v-model="reportInfo.numeroCuenta" />
+                            <div
+                                class="hover:bg-gray-50 flex items-center justify-between px-4 border-2 rounded cursor-pointer text-sm border-gray-200 group peer-checked:border-blue-500">
+                                <h2 class="font-medium text-gray-700">541</h2>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor"
+                                    class="w-5 h-7 text-blue-600 invisible group-[.peer:checked+&]:visible">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                        </label>
+                    </div>
+
+                </div> -->
                 <button @click="getInformacionReport()"
                     class="bg-[#001c48] hover:bg-[#001c48]/90 flex h-[30px] items-center justify-center text-white font-medium text-[12px] px-2.5 py-0.5 rounded mr-1.5 ">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -38,7 +87,7 @@
                             d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                     </svg>
 
-                    <span class="mt-0.5 text-white font-medium">Generar Reporte</span>
+                    <span class="mt-0.5 text-white font-medium">Generar</span>
                 </button>
 
 
@@ -121,7 +170,7 @@ export default {
     setup(props, context) {
         const { menu } = toRefs(props);
         const permits = usePermissions(menu.value, window.location.pathname);
-        const {printPdf,
+        const { printPdf,
             isLoadingExport, reportInfo, errors, financingArray, dataReporteInfo
         } = useReporteFinanciero(context);
 
@@ -220,7 +269,7 @@ export default {
 
 
         return {
-            exportExcel,printPdf,
+            exportExcel, printPdf,
             getOption, permits, isLoadingExport, reportInfo, errors, financingArray, dataReporteInfo, getInformacionReport
         };
     },
