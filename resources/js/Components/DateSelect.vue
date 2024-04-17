@@ -71,10 +71,10 @@ export default {
                 id: 3,
                 period: 'Ultimos 6 meses'
             },
-            {
+           /*  {
                 id: 4,
                 period: 'Todos'
-            }
+            } */
         ])
 
         // close on click outside

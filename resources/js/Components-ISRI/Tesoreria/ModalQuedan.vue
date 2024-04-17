@@ -434,7 +434,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                             REAJUSTES</span>
                                                     </div>
                                                 </th>
-                                                <th class="border-2 border-black text-sm px-3 text-gray-600" colspan="5"
+                                                <th class="border-2 border-black text-sm px-3 text-gray-600" colspan="5 "
                                                     rowspan="2"
                                                     :class="errors[`detalle_quedan.${rowIndex}.justificacion_det_quedan`] ? 'bg-red-300' : row['justificacion_det_quedan'] == '' || row['justificacion_det_quedan'] === null ? 'bg-[#fdfd96]' : ''">
 
