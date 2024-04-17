@@ -157,32 +157,31 @@ class AjusteSalidaController extends Controller
             'marca'
         ]);
 
-        if ($request->financingSourceId != '' && $request->financingSourceId != null) {
-            $matchStock->whereHas('existencia_almacen', function ($query) use ($request) {
+        $matchStock->when($request->financingSourceId, function ($query) use ($request) {
+            $query->whereHas('existencia_almacen', function ($query) use ($request) {
                 $query->where('id_proy_financiado', $request->financingSourceId);
             });
-        }
+        });
 
-        if ($request->centerId != '' && $request->centerId != null) {
-            $matchStock->where('id_centro_atencion', $request->centerId);
-        }
+        $matchStock->when($request->centerId, function ($query) use ($request) {
+            $query->where('id_centro_atencion', $request->centerId);
+        });
 
-        if ($request->idLt != '' && $request->idLt != null) {
-            $matchStock->where('id_lt', $request->idLt);
-        }
+        $matchStock->when($request->idLt, function ($query) use ($request) {
+            $query->where('id_lt', $request->idLt);
+        });
 
-        $match = $matchStock->get();
+        $products = $matchStock->get()->map(function ($detailStock) {
+            $existencia = $detailStock->existencia_almacen;
+            $producto = $existencia->producto;
+            $proyectoFinanciado = $existencia->proyecto_financiado;
+            $lineaTrabajo = $detailStock->linea_trabajo;
+            $centroAtencion = $detailStock->centro_atencion;
+            $marca = $detailStock->marca;
 
-        $products = $match->map(function ($detailStock) {
             return [
                 'value' => $detailStock->id_det_existencia_almacen,
-                'label' => $detailStock->existencia_almacen->producto->codigo_producto
-                    . ' — ' . $detailStock->existencia_almacen->proyecto_financiado->codigo_proy_financiado
-                    . ' — ' . $detailStock->existencia_almacen->producto->nombre_completo_producto
-                    . ' — UP/LT: ' . ($detailStock->linea_trabajo->codigo_up_lt ?? 'Sin UP/LT')
-                    . ' — Centro: ' . $detailStock->centro_atencion->codigo_centro_atencion
-                    . ' — Marca: ' . ($detailStock->marca->nombre_marca ?? 'Sin marca')
-                    . ' — Vencimiento: ' . ($detailStock->fecha_vcto_det_existencia_almacen ? Carbon::createFromFormat('Y-m-d', $detailStock->fecha_vcto_det_existencia_almacen)->format('d/m/Y') : 'Sin fecha.'),
+                'label' => "$producto->codigo_producto — $proyectoFinanciado->codigo_proy_financiado — $producto->nombre_completo_producto — UP/LT: " . ($lineaTrabajo->codigo_up_lt ?? 'Sin UP/LT') . " — Centro: $centroAtencion->codigo_centro_atencion — Marca: " . ($marca->nombre_marca ?? 'Sin marca') . ' — Vencimiento: ' . ($detailStock->fecha_vcto_det_existencia_almacen ? Carbon::createFromFormat('Y-m-d', $detailStock->fecha_vcto_det_existencia_almacen)->format('d/m/Y') : 'Sin fecha.'),
                 'allInfo' => $detailStock
             ];
         });
@@ -191,6 +190,7 @@ class AjusteSalidaController extends Controller
             'products' => $products,
         ]);
     }
+
 
     public function storeOutgoingAdjustment(AjusteSalidaRequest $request)
     {
