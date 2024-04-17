@@ -127,7 +127,7 @@
                     </div>
                 </div>
 
-                <div class="flex items-center justify-between w-[92%] ml-8 pb-2 mb-3 shadow-md">
+                <div class="flex items-center justify-between w-[92%] ml-8 pb-2 mb-3" :class="adjustment.status == 1 ? 'shadow-md' : ''">
                     <div class="flex items-center">
                         <span class="text-[14px] text-slate-700 font-medium font-[Roboto] underline">PRODUCTOS</span>
                     </div>
@@ -186,7 +186,7 @@
 
 
                 <div v-else class="w-full pl-8 max-w-full mt-0 pb-2">
-                    <div class="pb-1 pt-0 md:flex flex-row justify-items-start w-[96%] pl-0">
+                    <div v-if="adjustment.status == 1" class="pb-1 pt-0 md:flex flex-row justify-items-start w-[96%] pl-0">
                         <div class="mb-2 md:mr-2 md:mb-0 basis-full flex justify-end items-center ">
                             <div class="text-orange-500 flex hover:text-orange-700" @click="resetProducts()">
                                 <svg width="26px" height="26px" viewBox="0 0 24 24" fill="none"

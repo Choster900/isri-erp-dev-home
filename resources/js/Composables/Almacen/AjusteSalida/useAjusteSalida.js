@@ -33,11 +33,8 @@ export const useAjusteSalida = (context) => {
         centerId: '',
         financingSourceId: '',
         reasonId: '',
-        brandId: '',
         idLt: '',
         number: '',
-        expDate: '',
-        perishable: '',
         observation: '',
         status: '',
         prods: []
@@ -116,9 +113,6 @@ export const useAjusteSalida = (context) => {
                     newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
                 }
             });
-        } else {
-            // Call addNewRow
-            //addNewRow();
         }
     }
 
@@ -146,6 +140,7 @@ export const useAjusteSalida = (context) => {
     }
 
     const searchProducts = async () => {
+        //We look for errors first
         adjustment.value.centerId === '' ? frontErrors.value.centerId[0] = 'Debe seleccionar centro' : frontErrors.value.centerId[0] = ''
         adjustment.value.financingSourceId === '' ? frontErrors.value.financingSourceId[0] = 'Debe seleccionar fuente financiamiento' : frontErrors.value.financingSourceId[0] = ''
         if ([1, 2, 3].includes(adjustment.value.financingSourceId)) {
@@ -212,8 +207,6 @@ export const useAjusteSalida = (context) => {
         }
         adjustment.value.prods[index].qty = ''
     }
-
-
 
     const deleteRow = (index, detRecId) => {
         if (activeDetails.value.length <= 1) {

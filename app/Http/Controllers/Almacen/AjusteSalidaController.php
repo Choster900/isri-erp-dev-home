@@ -291,7 +291,7 @@ class AjusteSalidaController extends Controller
                     }
 
                     if ($prod['id'] != "" && $prod['deleted'] == true) {
-                        $det = DetalleRequerimiento::find($prod['detId']);
+                        $det = DetalleRequerimiento::find($prod['id']);
                         $det->update([
                             'estado_det_requerimiento'                  => 0,
                             'fecha_mod_det_requerimiento'               => Carbon::now(),

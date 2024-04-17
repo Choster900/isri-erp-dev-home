@@ -105,14 +105,14 @@
                                             </div>
                                             <div class="font-semibold pt-0.5">Editar</div>
                                         </div>
-                                        <!-- <div @click="showModalShortageAdjustment = true; objId = obj.id_requerimiento"
+                                        <div @click="showModalOutgoingAdjustment = true; objId = obj.id_requerimiento"
                                             v-if="obj.id_estado_req == 4 || obj.id_estado_req == 2"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-blue-800 w-[25px] h-[25px] mr-2">
                                                 <icon-m :iconName="'see'"></icon-m>
                                             </div>
                                             <div class="font-semibold pt-0.5">Ver</div>
-                                        </div> -->
+                                        </div>
                                         <div @click="changeStatusElement(obj.id_requerimiento, obj.id_estado_req)"
                                             v-if="permits.eliminar === 1 && obj.id_estado_req == 1"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
