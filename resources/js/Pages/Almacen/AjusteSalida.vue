@@ -89,14 +89,14 @@
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="space-x-1 text-center">
                                     <DropDownOptions>
-                                        <!-- <div v-if="permits.ejecutar === 1 && obj.id_estado_req == 1"
-                                            @click="sendShortageAdjustment(obj.id_requerimiento)"
+                                        <div v-if="permits.ejecutar === 1 && obj.id_estado_req == 1"
+                                            @click="sendOutgoingAdjustment(obj.id_requerimiento)"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-lime-700 w-[24px] h-[24px] mr-1">
                                                 <icon-m :iconName="'clipboard-arrow'"></icon-m>
                                             </div>
                                             <div class="font-semibold pt-0.5">Kardex</div>
-                                        </div> -->
+                                        </div>
                                         <div @click="showModalOutgoingAdjustment = true; objId = obj.id_requerimiento"
                                             v-if="permits.actualizar === 1 && obj.id_estado_req == 1"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
@@ -105,7 +105,7 @@
                                             </div>
                                             <div class="font-semibold pt-0.5">Editar</div>
                                         </div>
-                                        <!-- <div @click="showModalShortageAdjustment = true; objId = obj.id_requerimiento"
+                                        <div @click="showModalOutgoingAdjustment = true; objId = obj.id_requerimiento"
                                             v-if="obj.id_estado_req == 4 || obj.id_estado_req == 2"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-blue-800 w-[25px] h-[25px] mr-2">
@@ -120,7 +120,7 @@
                                                 <icon-m :iconName="'trash'"></icon-m>
                                             </div>
                                             <div class="font-semibold pt-0.5">Eliminar</div>
-                                        </div> -->
+                                        </div>
                                     </DropDownOptions>
                                 </div>
                             </td>
@@ -177,7 +177,7 @@ moment.locale('es', localeData)
 import { ref, toRefs, inject } from 'vue';
 import { usePermissions } from '@/Composables/General/usePermissions.js';
 import { useToDataTable } from '@/Composables/General/useToDataTable.js';
-import { useEnviarAjusteEntrada } from '@/Composables/Almacen/AjusteEntrada/useEnviarAjusteEntrada.js';
+import { useEnviarAjusteSalida } from '@/Composables/Almacen/AjusteSalida/useEnviarAjusteSalida.js';
 
 export default {
     components: { Head, AppLayoutVue, Datatable, IconM, ModalAjusteSalidaVue, Pagination },
@@ -192,7 +192,6 @@ export default {
         const permits = usePermissions(menu.value, window.location.pathname);
 
         const showModalOutgoingAdjustment = ref(false)
-        const showModalSendDonation = ref(false)
 
         const objId = ref(0)
 
@@ -251,14 +250,14 @@ export default {
 
         const {
             isLoadingTop,
-            changeStatusElement, sendShortageAdjustment
-        } = useEnviarAjusteEntrada(context, getDataToShow, tableData.value);
+            changeStatusElement, sendOutgoingAdjustment
+        } = useEnviarAjusteSalida(context, getDataToShow, tableData.value);
 
 
         return {
-            permits, dataToShow, showModalOutgoingAdjustment, tableData, perPage, objId, showModalSendDonation,
+            permits, dataToShow, showModalOutgoingAdjustment, tableData, perPage, objId,
             links, sortKey, sortOrders, isLoadinRequest, isLoadingTop, emptyObject, columns,
-            getDataToShow, handleData, sortBy, changeStatusElement, sendShortageAdjustment, moment
+            getDataToShow, handleData, sortBy, changeStatusElement, sendOutgoingAdjustment, moment
         };
     },
 }
