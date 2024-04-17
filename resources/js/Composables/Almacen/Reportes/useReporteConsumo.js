@@ -103,7 +103,7 @@ export const useReporteConsumo = () => {
         const opt = {
             //margin: [0.5, 0.1, 2, 0.5], //top, left, bottom, right,
             margin: 0.5,
-            filename: "consumo",
+            filename: "rotacion",
             //pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
             image: { type: "jpeg", quality: 0.98 },
             html2canvas: { scale: 3, useCORS: true },
