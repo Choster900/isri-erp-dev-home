@@ -609,7 +609,6 @@ class ReporteAlmacenController extends Controller
         $sheet = $spreadsheet->getActiveSheet();
 
 
-
         $sheet->mergeCells('A1:G1');
         $sheet->setCellValue('A1', 'SISTEMA DE ALMACEN PARA EL CONTROL DE BIENES EN EXISTENCIA - ISRI');
         $sheet->getStyle('A1')->getFont()->setSize(8);
