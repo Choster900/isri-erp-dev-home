@@ -242,7 +242,7 @@
                                     </div>
                                 </div>
                                 <div class="relative w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]"
-                                    :class="errors['prods.' + index + '.qty'] ? 'bg-red-300' : ''">
+                                    :class="(errors['prods.' + index + '.qty'] || prod.avails < 0) ? 'bg-red-300' : ''">
                                     <!-- Aquí se colocará el número dinámicamente -->
                                     <span
                                         class="absolute font-[MuseoSans] text-[12px] top-1 flex items-center justify-center">STOCK:
@@ -337,12 +337,12 @@
             <div id="buttons" class="md:flex flex md:items-center my-6 sticky flex-row justify-center mx-8">
                 <button type="button" @click="$emit('cerrar-modal')"
                     class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-[12px] px-2.5 py-1.5 text-center mb-2 dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
-                <!-- <div class="" v-if="adjustment.status == 1">
+                <div class="" v-if="adjustment.status == 1">
                     <button v-if="objId > 0" @click="updateAdjustment(adjustment)"
                         class="bg-orange-700 hover:bg-orange-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">ACTUALIZAR</button>
                     <button v-else @click="storeAdjustment(adjustment)"
                         class="bg-green-700 hover:bg-green-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">GUARDAR</button>
-                </div> -->
+                </div>
             </div>
 
         </ProcessModal>
