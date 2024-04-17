@@ -97,7 +97,7 @@
                                             </div>
                                             <div class="font-semibold pt-0.5">Kardex</div>
                                         </div> -->
-                                        <div @click="showModalShortageAdjustment = true; objId = obj.id_requerimiento"
+                                        <div @click="showModalOutgoingAdjustment = true; objId = obj.id_requerimiento"
                                             v-if="permits.actualizar === 1 && obj.id_estado_req == 1"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-orange-700 w-[22px] h-[22px] mr-1.5 ml-0.5">

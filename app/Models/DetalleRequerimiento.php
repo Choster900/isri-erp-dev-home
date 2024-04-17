@@ -64,4 +64,13 @@ class DetalleRequerimiento extends Model
     {
         return $this->belongsTo(Marca::class, 'id_marca', 'id_marca');
     }
+    /**
+     * Get the DetalleExistenciaAlmacen model associated with this instance.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function detalle_existencia_almacen()
+    {
+        return $this->belongsTo(DetalleExistenciaAlmacen::class, 'id_det_existencia_almacen', 'id_det_existencia_almacen');
+    }
 }

@@ -64,37 +64,47 @@
 
                 <div class="mb-4 pb-3 mt-1 md:flex flex-row justify-items-start max-w-[96%] pl-8">
                     <div class="mb-2 md:mr-2 md:mb-0 basis-1/4" :class="{ 'selected-opt': adjustment.centerId > 0, }">
+                        <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Centro
+                            <span class="text-red-600 font-extrabold">*</span>
+                        </label>
                         <div class="relative font-semibold flex h-[35px] w-full">
                             <Multiselect v-model="adjustment.centerId" :options="centers" :searchable="true"
-                                :noOptionsText="'Lista vacía.'" :placeholder="products.length > 0 ? '' : 'Seleccione centro'"
+                                :noOptionsText="'Lista vacía.'" @clear="adjustment.centerId=''" @deselect="adjustment.centerId=''"
+                                :placeholder="products.length > 0 ? '' : 'Seleccione centro'"
                                 :disabled="adjustment.status != 1 || products.length > 0"
                                 :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
                         </div>
-                        <InputError v-for="(item, index) in errors.centerId" :key="index" class="mt-2"
+                        <InputError v-for="(item, index) in frontErrors.centerId" :key="index" class="mt-2"
                             :message="item" />
                     </div>
                     <div class="mb-2 md:mr-2 md:mb-0 basis-1/4"
                         :class="{ 'selected-opt': adjustment.financingSourceId > 0, }">
+                        <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Fuente financiamiento
+                            <span class="text-red-600 font-extrabold">*</span>
+                        </label>
                         <div class="relative font-semibold flex h-[35px] w-full">
                             <Multiselect v-model="adjustment.financingSourceId" :options="financingSources"
-                                :searchable="true" :noOptionsText="'Lista vacía.'" :placeholder="products.length > 0 ? '' : 'Seleccione fuente'"
+                                :searchable="true" :noOptionsText="'Lista vacía.'" @change="changeFinancingSource($event)"
+                                :placeholder="products.length > 0 ? '' : 'Seleccione fuente'"
                                 :disabled="adjustment.status != 1 || products.length > 0"
                                 :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
                         </div>
-                        <InputError v-for="(item, index) in errors.financingSourceId" :key="index" class="mt-2"
+                        <InputError v-for="(item, index) in frontErrors.financingSourceId" :key="index" class="mt-2"
                             :message="item" />
                     </div>
                     <div class="mb-2 md:mr-2 md:mb-0 basis-1/4" :class="{ 'selected-opt': adjustment.idLt > 0, }">
+                        <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Linea de trabajo</label>
                         <div class="relative font-semibold flex h-[35px] w-full">
                             <Multiselect v-model="adjustment.idLt" :options="lts" :searchable="true"
-                                :noOptionsText="'Lista vacía.'" :placeholder="products.length > 0 ? 'Desactivado' : 'Seleccione uplt'"
-                                :disabled="adjustment.status != 1 || products.length > 0"
+                                :noOptionsText="'Lista vacía.'" @clear="adjustment.idLt=''" @deselect="adjustment.idLt=''"
+                                :placeholder="(products.length > 0 || adjustment.financingSourceId === 4) ? 'Desactivado' : 'Seleccione uplt'"
+                                :disabled="adjustment.status != 1 || products.length > 0 || adjustment.financingSourceId === 4"
                                 :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
                         </div>
-                        <InputError v-for="(item, index) in errors.idLt" :key="index" class="mt-2" :message="item" />
+                        <InputError v-for="(item, index) in frontErrors.idLt" :key="index" class="mt-2" :message="item" />
                     </div>
                     <div v-if="showSearchButton"
-                        class="mb-2 md:mr-2 md:mb-0 basis-1/4 flex justify-center items-center ">
+                        class="mb-2 md:mr-2 md:mb-0 basis-1/4 flex justify-center items-end">
                         <div class="text-indigo-600 flex hover:text-indigo-800" @click="searchProducts()">
                             <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" class="cursor-pointer"
                                 xmlns="http://www.w3.org/2000/svg">
@@ -117,7 +127,7 @@
                     </div>
                 </div>
 
-                <div class="flex items-center justify-between w-[96%] pl-8 pb-2 mb-0">
+                <div class="flex items-center justify-between w-[92%] ml-8 pb-2 mb-3 shadow-md">
                     <div class="flex items-center">
                         <span class="text-[14px] text-slate-700 font-medium font-[Roboto] underline">PRODUCTOS</span>
                     </div>
@@ -231,13 +241,13 @@
                             <div :id="'row-' + index"
                                 class="grid grid-cols-[55%_15%_15%_15%] max-w-full bg-white hover:bg-gray-200 text-gray-800 border-b border-x border-gray-500">
                                 <div class="border-r border-gray-500 min-h-[75px] flex items-center justify-center"
-                                    :class="errors['prods.' + index + '.prodId'] ? 'bg-red-300' : ''">
+                                    :class="errors['prods.' + index + '.detId'] ? 'bg-red-300' : ''">
                                     <div class="max-w-[98%] w-full">
                                         <!-- Select for products -->
-                                        <Multiselect id="doc" v-model="prod.detId" :options="nonSelectedProds" class="h-[35px]"
-                                            :disabled="adjustment.status != 1" :searchable="true"
+                                        <Multiselect id="doc" v-model="prod.detId" :options="filteredOptions"
+                                            class="h-[35px]" :disabled="adjustment.status != 1" :searchable="true"
                                             @change="selectProd($event, index)" :noOptionsText="'Sin resultados'"
-                                            placeholder="Buscar producto"
+                                            placeholder="Buscar producto" @open="openOption(prod.detId)"
                                             :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
                                     </div>
                                 </div>
@@ -326,18 +336,13 @@
                             </div>
                         </div>
                     </div>
-
-
                 </div>
-
-
             </div>
-
 
             <div id="buttons" class="md:flex flex md:items-center my-6 sticky flex-row justify-center mx-8">
                 <button type="button" @click="$emit('cerrar-modal')"
                     class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-[12px] px-2.5 py-1.5 text-center mb-2 dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
-                <div class="" v-if="adjustment.status == 1">
+                <div class="" v-if="adjustment.status == 1 && products.length > 0">
                     <button v-if="objId > 0" @click="updateAdjustment(adjustment)"
                         class="bg-orange-700 hover:bg-orange-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">ACTUALIZAR</button>
                     <button v-else @click="storeAdjustment(adjustment)"
@@ -356,7 +361,6 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 import InputText from "@/Components-ISRI/ComponentsToForms/InputText.vue";
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
 import DateTimePickerM from "@/Components-ISRI/ComponentsToForms/DateTimePickerM.vue";
-import { useValidateInput } from '@/Composables/General/useValidateInput';
 
 import { toRefs, onMounted } from 'vue';
 
@@ -379,14 +383,10 @@ export default {
 
         const {
             isLoadingRequest, errors, adjustment, reasons, centers, financingSources, lts, products,
-            nonSelectedProds, brands, asyncFindProduct, totalRec, isLoadingProds, load, showSearchButton,
+            nonSelectedProds, totalRec, isLoadingProds, load, showSearchButton, filteredOptions, frontErrors,
             getInfoForModalAdjustment, selectProd, deleteRow, addNewRow, storeAdjustment, updateAdjustment,
-            searchProducts, resetProducts, handleValidation
+            searchProducts, resetProducts, handleValidation, openOption, changeFinancingSource
         } = useAjusteSalida(context);
-
-        const handleSearchChange = async (query, index, prodId) => {
-            await asyncFindProduct(query, index, prodId);
-        }
 
         onMounted(
             async () => {
@@ -396,9 +396,9 @@ export default {
 
         return {
             isLoadingRequest, errors, adjustment, reasons, centers, financingSources, lts, products,
-            nonSelectedProds, brands, asyncFindProduct, totalRec, isLoadingProds, load, showSearchButton,
-            selectProd, handleSearchChange, deleteRow, addNewRow, storeAdjustment, updateAdjustment,
-            searchProducts, resetProducts, handleValidation
+            nonSelectedProds, totalRec, isLoadingProds, load, showSearchButton, filteredOptions, frontErrors,
+            selectProd, deleteRow, addNewRow, storeAdjustment, updateAdjustment,
+            searchProducts, resetProducts, handleValidation, openOption, changeFinancingSource
         }
     }
 }
