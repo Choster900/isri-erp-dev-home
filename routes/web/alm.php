@@ -188,4 +188,5 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('alm.reporteRotacion'); 
     Route::post('get-reporte-rotacion', [ReporteAlmacenController::class, 'getReporteDonacion'])->name('ajusteSalida.getAjusteSalida');
+    Route::post('get-excel-reporte-rotacion', [ReporteAlmacenController::class, 'getExcelReporteRotacion'])->name('ajusteSalida.getAjusteSalida');
 });

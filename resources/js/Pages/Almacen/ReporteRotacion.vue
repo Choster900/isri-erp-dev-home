@@ -7,17 +7,17 @@
 
                 <DateSelect @optionId="getOption" />
 
-                <div class="">
+                <div class="basis-[15%]">
                     <DateTimePickerM v-model="varFilteredInForm.fechaInicial" :showIcon="false" :label="'Fecha inicio'"
                         :placeholder="'Seleccione'" :required="true" />
                 </div>
 
-                <div class="">
+                <div class="basis-[15%]">
                     <date-time-picker-m v-model="varFilteredInForm.fechaFinal" :showIcon="false" :label="'Fecha fin'"
                         :placeholder="'Seleccione'" :required="true" />
                 </div>
 
-                <div class="mb-4 md:mr-0 md:mb-0 basis-[25%]">
+                <div class="mb-4 md:mr-0 md:mb-0 basis-[15%]">
                     <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Proyecto Financiado
                         <span class="text-red-600 font-extrabold">*</span></label>
                     <div class="relative  flex h-[30px] w-full">
@@ -30,13 +30,44 @@
                     </div>
 
                 </div>
+                <div class="mb-4 md:mr-0 md:mb-0 basis-[25%]">
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600">Centro Atencion <span
+                            class="text-red-600 font-extrabold">*</span></label>
+                    <div class="relative flex h-[30px] w-full">
+                        <Multiselect :isSelected="0" :options="[
+        { value: 0, label: 'TODOS' },
+
+        { value: 1, label: 'ADMINISTRACION SUPERIOR' },
+        { value: 2, label: 'CENTRO DE ATENCION A ANCIANOS SARA ZALDIVAR' },
+        { value: 3, label: 'CENTRO DEL APARATO LOCOMOTOR' },
+        { value: 4, label: 'CENTRO DE AUDICION Y LENGUAJE' },
+        { value: 5, label: 'CENTRO DE REHABILITACION PARA CIEGOS EUGENIA DE DUEÑAS' },
+        { value: 6, label: 'UNIDAD DE CONSULTA EXTERNA' },
+        { value: 7, label: 'CENTRO DE REHABILITACION INTEGRAL PARA LA NIÑEZ Y LA ADOLESCENCIA' },
+        { value: 8, label: 'CENTRO DE REHABILITACION INTEGRAL DE OCCIDENTE' },
+        { value: 9, label: 'CENTRO DE REHABILITACION INTEGRAL DE ORIENTE' },
+        { value: 10, label: 'CENTRO DE REHABILITACION PROFESIONAL' },
+
+    ]" :searchable="true" v-model="varFilteredInForm.idCentro" :noOptionsText="'Lista vacía.'"
+                            placeholder="Seleccione" />
+                    </div>
+                    <InputError class="mt-2" />
+                </div>
                 <div class="mb-4 md:mr-0 md:mb-0 basis-[10%]">
                     <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Porcentaje
                         <span class="text-red-600 font-extrabold">*</span></label>
                     <div class="relative  flex h-[30px] w-full">
                         <Multiselect v-model="varFilteredInForm.porcentaje" :options="[
-        { value: 541, label: '10%' },
-        { value: 611, label: '20%' },
+        { value: 0.1, label: '10%' },
+        { value: 0.2, label: '20%' },
+        { value: 0.3, label: '30%' },
+        { value: 0.4, label: '40%' },
+        { value: 0.5, label: '50%' },
+        { value: 0.6, label: '60%' },
+        { value: 0.7, label: '70%' },
+        { value: 0.8, label: '80%' },
+        { value: 0.9, label: '90%' },
+        { value: 1, label: '100%' },
     ]" :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="%" />
                     </div>
 
@@ -56,9 +87,10 @@
             </div>
 
             <div class="flex justify-end px-4 gap-3">
-                <h1 class="font-medium">Reporte Financiero: </h1>
+                <h1 class="font-medium">Reporte de rotación: </h1>
                 <div class="flex" style="display: non;">
-                    <div class="flex items-center cursor-pointer text-slate-700 hover:text-green-600"><svg
+                    <div @click="exportExcel"
+                        class="flex items-center cursor-pointer text-slate-700 hover:text-green-600"><svg
                             class="h-4 w-4 text-green-500" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
                             xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 26 26" xml:space="preserve"
                             fill="#000000">
@@ -75,7 +107,8 @@
                                 </g>
                             </g>
                         </svg><span class="ml-2 font-semibold text-[14px]">EXPORTAR</span></div>
-                    <div class="flex ml-4 items-center cursor-pointer text-slate-700 hover:text-red-600"><svg
+                    <div @click="printPdf"
+                        class="flex ml-4 items-center cursor-pointer text-slate-700 hover:text-red-600"><svg
                             class="h-4 w-4 text-red-500" fill="currentColor" viewBox="0 0 1920 1920"
                             xmlns="http://www.w3.org/2000/svg">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -96,13 +129,13 @@
             <!--  <div class="md:flex flex md:items-center  mb-2 sticky flex-row justify-center  border-gray-400 border-b">
             </div> -->
 
-              <TableReporteRotacion />
+            <TableReporteRotacion :dataReporteInfo="dataGetRotation" />
         </div>
 
-<pre>
+        <!-- <pre>
 
         {{ dataGetRotation }}
-</pre>
+</pre> -->
     </AppLayoutVue>
 </template>
 
@@ -134,7 +167,7 @@ export default {
     setup(props, context) {
         const { menu } = toRefs(props);
         const permits = usePermissions(menu.value, window.location.pathname);
-        const { getInformacionReport, varFilteredInForm, isLoadinRequest, dataGetRotation } = useReporteRotacion(context);
+        const { getInformacionReport, varFilteredInForm, isLoadinRequest, dataGetRotation, exportExcel, printPdf, getOption } = useReporteRotacion(context);
 
 
 
@@ -142,8 +175,8 @@ export default {
 
 
         return {
-            permits, menu,
-            getInformacionReport, varFilteredInForm, isLoadinRequest, dataGetRotation
+            permits, menu, printPdf,
+            getInformacionReport, varFilteredInForm, isLoadinRequest, dataGetRotation, exportExcel, getOption
         };
     },
 }

@@ -183,16 +183,16 @@ export default {
                     reportInfo.value.endDate = moment().format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
                     break;
                 case 1:
-                    reportInfo.value.startDate = moment().subtract(1, 'month').startOf('month').format('YYYY-MM-DD');
-                    reportInfo.value.endDate = moment().subtract(1, 'month').endOf('month').format('YYYY-MM-DD');
+                    reportInfo.value.startDate = moment().subtract(1, 'month').startOf('month').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+                    reportInfo.value.endDate = moment().subtract(1, 'month').endOf('month').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
                     break;
                 case 2:
-                    reportInfo.value.startDate = moment().startOf('year').format('YYYY-MM-DD');
-                    reportInfo.value.endDate = moment().format('YYYY-MM-DD');
+                    reportInfo.value.startDate = moment().startOf('year').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+                    reportInfo.value.endDate = moment().format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
                     break;
                 case 3:
-                    reportInfo.value.startDate = moment().subtract(6, 'months').startOf('month').format('YYYY-MM-DD');
-                    reportInfo.value.endDate = moment().format('YYYY-MM-DD');
+                    reportInfo.value.startDate = moment().subtract(6, 'months').startOf('month').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+                    reportInfo.value.endDate = moment().format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
                     break;
                 case 4:
                     reportInfo.value.startDate = ''; // Asigna el primer día de tu rango de datos

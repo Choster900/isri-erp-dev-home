@@ -467,7 +467,6 @@ class ReporteAlmacenController extends Controller
                     $sheet->setCellValue('E' . $row, $data->cant_rpt_consumo);
                     $sheet->setCellValue('F' . $row, $data->monto_rpt_consumo);
                     $sheet->getStyle('F' . $row)->getNumberFormat()->setFormatCode('_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)');
-
                 } else {
                     $sheet->setCellValue('A' . $row, $data->codigo_uplt_rpt_consumo);
                     $sheet->setCellValue('B' . $row, $data->nombre_prod_rpt_consumo);
@@ -481,7 +480,6 @@ class ReporteAlmacenController extends Controller
 
                     $sheet->setCellValue('I' . $row, $data->monto_rpt_consumo);
                     $sheet->getStyle('I' . $row)->getNumberFormat()->setFormatCode('_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)');
-
                 }
 
                 $sheet->getStyle('A' . $row . ':I' . $row)->getFont()->setName('Calibri')->setSize(9);
@@ -495,16 +493,12 @@ class ReporteAlmacenController extends Controller
                     $sheet->setCellValue('F' . $row, $data->monto_rpt_consumo);
                     $sheet->getStyle('A' . $row . ':F' . $row)->getFont()->setName('Calibri')->setSize(9);
                     $sheet->getStyle('F' . $row)->getNumberFormat()->setFormatCode('_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)');
-
                 } else {
                     $sheet->mergeCells('A' . $row . ':H' . $row);
                     $sheet->setCellValue('A' . $row, $data->nombre_prod_rpt_consumo);
                     $sheet->setCellValue('I' . $row, $data->monto_rpt_consumo);
                     $sheet->getStyle('A' . $row . ':I' . $row)->getFont()->setName('Calibri')->setSize(9);
                     $sheet->getStyle('I' . $row)->getNumberFormat()->setFormatCode('_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)');
-
-
-
                 }
             }
 
@@ -584,7 +578,95 @@ class ReporteAlmacenController extends Controller
         #return $params;
     }
 
-    function getReporteDonacion(Request $request)  {
+    function getReporteDonacion(Request $request)
+    {
+
+        $fechaInicial = $request->varFilteredInForm["fechaInicial"] != '' ? date('Y-m-d', strtotime($request->varFilteredInForm["fechaInicial"])) : null;
+        $fechaFinal = $request->varFilteredInForm["fechaFinal"] != '' ? date('Y-m-d', strtotime($request->varFilteredInForm["fechaFinal"])) : null;
+
+
+
+        /* $request->paramsToRequest["startDate"] */
+
+        $params = [
+            'idproy' => $request->varFilteredInForm["idProy"],
+            'idcentro' => $request->varFilteredInForm["idCentro"] == 0 ? null : $request->varFilteredInForm["idCentro"],
+            'porcentaje' => $request->varFilteredInForm["porcentaje"],
+            'fecha_inicial' => $fechaInicial,
+            'fecha_final' => $fechaFinal,
+        ];
+
+        return DB::select("CALL PR_RPT_POCA_ROTACION(:idproy, :idcentro, :porcentaje, :fecha_inicial, :fecha_final)", $params);
+    }
+
+    public function getExcelReporteRotacion(Request $request)
+    {
+
+
+
+        // Crear una instancia de Spreadsheet
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+
+
+        $sheet->mergeCells('A1:G1');
+        $sheet->setCellValue('A1', 'SISTEMA DE ALMACEN PARA EL CONTROL DE BIENES EN EXISTENCIA - ISRI');
+        $sheet->getStyle('A1')->getFont()->setSize(8);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+
+        $sheet->mergeCells('C2:F2');
+        $sheet->setCellValue('C2', 'INFORME ANUAL BIENES DE POCA ROTACION');
+        $sheet->getStyle('C2')->getFont()->setBold(true)->setSize(18);
+        $sheet->getStyle('F2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+
+        $sheet->mergeCells('H3:I3');
+        #$sheet->setCellValue('H3', 'DEL ' . date_format(date_create($startDate), 'd, F, Y'));
+        $sheet->setCellValue('H3', 'DEL 12 , noviembre, 2023');
+        $sheet->getStyle('H3')->getFont()->setSize(9);
+        $sheet->getStyle('H3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+        $sheet->mergeCells('H4:I4');
+        #$sheet->setCellValue('H4', 'DEL ' . date_format(date_create($endDate), 'd, F, Y'));
+        $sheet->setCellValue('H4', 'AL 16. ABRIL, 2024');
+        $sheet->getStyle('H4')->getFont()->setSize(9);
+        $sheet->getStyle('H4')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+
+
+
+
+        $encabezados = [
+            'DEPENDENCIA',
+            'COD',
+            'CONCEPTO',
+            'EXISTENCIA AL INICIO DEL PERIODO',
+            'ROTACION IDEAL (0.80 EXIST.INI.)',
+            'SALIDA DEL PERIODO',
+            'DIFERENCIA',
+            'EXISTENCIA AL FINAL DEL PERIODO',
+            'COSTO UNITA. APROXIMA',
+            'MONTO APROXIMA'
+        ];
+
+
+        $sheet->fromArray([$encabezados], null, 'A6');
+        $sheet->getRowDimension(6)->setRowHeight(37);
+        $sheet->getColumnDimension('C')->setWidth(45);
+
+        // Establecer estilo para encabezados
+        $styleHeader = [
+            'font' => ['bold' => true, 'size' => 9],
+        ];
+        $sheet->getStyle('A6:J6')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        foreach (range('A', 'J') as $column) {
+            $sheet->getStyle($column . '6')->applyFromArray($styleHeader);
+            $sheet->getStyle($column . '6')->getAlignment()->setWrapText(true);
+        }
+
 
 
         $params = [
@@ -595,7 +677,60 @@ class ReporteAlmacenController extends Controller
             'fecha_final' => '2024-04-15',
         ];
 
-        return DB::select("CALL PR_RPT_POCA_ROTACION(:idproy, :idcentro, :porcentaje, :fecha_inicial, :fecha_final)", $params);
+        $result = DB::select("CALL PR_RPT_POCA_ROTACION(:idproy, :idcentro, :porcentaje, :fecha_inicial, :fecha_final)", $params);
 
+
+        $row = 7; // Comenzar desde la fila 2 para dejar espacio para los encabezados
+
+        foreach ($result as $data) {
+
+            $sheet->setCellValue('A' . $row, $data->sigla_centro_rpt_rotacion);
+            $sheet->setCellValue('B' . $row, $data->id_prod_rpt_rotacion);
+            $sheet->setCellValue('C' . $row, $data->nombre_prod_rpt_rotacion);
+
+            if ($data->id_tipo_reg_rpt_rotacion == 1) {
+                $sheet->getStyle('C' . $row)->getFont()->setBold(true);
+            }
+
+            $sheet->setCellValue('D' . $row, $data->existencia_inicial_rtp_rotacion);
+            $sheet->setCellValue('E' . $row, $data->rotacion_ideal_rtp_rotacion);
+            $sheet->setCellValue('F' . $row, $data->rotacion_real_rtp_rotacion);
+            $sheet->setCellValue('G' . $row, $data->diferencia_rtp_rotacion);
+            $sheet->setCellValue('H' . $row, $data->existencia_final_rtp_rotacion);
+            $sheet->setCellValue('I' . $row, $data->costo_aprox_rtp_rotacion);
+            $sheet->setCellValue('J' . $row, $data->saldo_aprox_rtp_rotacion);
+            $sheet->getStyle('J' . $row)->getNumberFormat()->setFormatCode('_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)');
+
+            // Establecer la alineación centrada para todas las celdas excepto en la columna C
+            foreach (range('A', 'J') as $column) {
+                if ($column != 'C') {
+                    $sheet->getStyle($column . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                }
+            }
+
+            $sheet->getStyle('A' . $row . ':J' . $row)->getFont()->setName('Calibri')->setSize(9);
+
+
+
+            $row++;
+        }
+
+
+
+
+        // Guardar el archivo como XLSX
+        $writer = new Xlsx($spreadsheet);
+
+        // Establecer el nombre del archivo
+        $current_date = Carbon::now()->format('d_m_Y');
+        $filename = 'texto_excel_' . $current_date . '.xlsx';
+
+        // Establecer las cabeceras para descargar el archivo
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        // Guardar el archivo en la salida PHP
+        $writer->save('php://output');
     }
 }

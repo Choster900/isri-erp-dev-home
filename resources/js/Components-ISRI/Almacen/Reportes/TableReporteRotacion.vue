@@ -6,65 +6,77 @@
                 <table class="table-auto w-full">
                     <!-- Table header -->
                     <thead
-                        class="font-semibold uppercase text-slate-500 border-t border-b border-slate-200 *:text-[11px]">
+                        class="font-semibold uppercase text-slate-500 border-t border-b border-slate-200 *:text-xs">
                         <tr>
-                            <th class="px-1 first:pl-5 last:pr-5 py-1">
+                            <th class="px-1  py-1">
                                 <div class="font-semibold text-left">Dependencia</div>
                             </th>
-                            <th class="px-1 first:pl-5 last:pr-5 py-1">
-                                <div class="font-semibold text-left">Codigo</div>
+                            <th class="px-1  py-1">
+                                <div class="font-semibold text-left">cod</div>
                             </th>
-                            <th class="px-1 first:pl-5 last:pr-5 py-1">
-                                <div class="font-semibold text-center">Concepto</div>
+                            <th class="px-1  py-1">
+                                <div class="font-semibold text-center w-96">Concepto</div>
                             </th>
-                            <th class="px-1 first:pl-5 last:pr-5 py-1">
+                            <th class="px-1  py-1">
                                 <div class="font-semibold text-center">Existencia Al Inicio del Periodo</div>
                             </th>
-                            <th class="px-1 first:pl-5 last:pr-5 py-1">
+                            <th class="px-1  py-1">
                                 <div class="font-semibold text-center">Rotacion Ideal (0.80 Exist.Ini.)</div>
                             </th>
-                            <th class="px-1 first:pl-5 last:pr-5 py-1">
+                            <th class="px-1  py-1">
                                 <div class="font-semibold text-center">Salida del periodo</div>
                             </th>
-                            <th class="px-1 first:pl-5 last:pr-5 py-1">
+                            <th class="px-1  py-1">
                                 <div class="font-semibold text-center">Diferencia</div>
                             </th>
-                            <th class="px-1 first:pl-5 last:pr-5 py-1">
+                            <th class="px-1  py-1">
                                 <div class="font-semibold text-center">Existencia al final del periodo</div>
                             </th>
-                            <th class="px-1 first:pl-5 last:pr-5 py-1">
+                            <th class="px-1  py-1">
                                 <div class="font-semibold text-center">Costo Unita. Aproxima</div>
                             </th>
-                            <th class="px-1 first:pl-5 last:pr-5 py-1">
+                            <th class="px-1  py-1">
                                 <div class="font-semibold text-center">Monto Aproxima</div>
                             </th>
 
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td colspan="10">
-                                54101-PRODUCTOS ALIMENTICIOS PARA PERSONAS
+                        <tr v-for="(item, index) in dataReporteInfo" :key="index"
+                            v-show="item.id_tipo_reg_rpt_rotacion == 1">
+                            <td colspan="10" class="px-4 font-bold">
+                               {{ item.id_ccta_presupuesto_rpt_rotacion }} - {{ item.nombre_prod_rpt_rotacion }}
                             </td>
                         </tr>
                     </tbody>
                     <tbody>
-                        <tr>
-                            <td>CRINA</td>
-                            <td>1</td>
-                            <td>ACEITE  COMESTIBLE DE OLIVA, PRESENTACION: 500 ML,  VENCIMIENTO,MINIMO 1 AÑO</td>
-                            <td>60</td>
-                            <td>6</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                        <tr v-for="(item, index) in dataReporteInfo" :key="index" class="border *:text-xs *:text-center *:hover:bg-slate-200"
+                            v-show="item.id_tipo_reg_rpt_rotacion == 2">
+                            <td>{{ item.sigla_centro_rpt_rotacion }}</td>
+                            <td>{{ item.id_prod_rpt_rotacion }}</td>
+                            <td class="text-left" style="text-align: left;">{{ item.nombre_prod_rpt_rotacion }}</td>
+                            <td>{{ item.existencia_inicial_rtp_rotacion }}</td>
+                            <td>{{ item.rotacion_ideal_rtp_rotacion }}</td>
+                            <td>{{ item.rotacion_real_rtp_rotacion }}</td>
+                            <td>{{ item.diferencia_rtp_rotacion || '-' }}</td>
+                            <td>{{ item.existencia_final_rtp_rotacion }}</td>
+                            <td>{{ item.costo_aprox_rtp_rotacion || '-'}}</td>
+                            <td>${{ item.saldo_aprox_rtp_rotacion }}</td>
                         </tr>
                     </tbody>
-
+                    <tbody>
+                        <tr v-for="(item, index) in dataReporteInfo" :key="index"
+                            v-show="item.id_tipo_reg_rpt_rotacion == 3">
+                            <td colspan="10" class="px-4 font-bold">
+                                54101-PRODUCTOS ALIMENTICIOS PARA PERSONAS
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
+           <!--  <pre>
+            {{ dataReporteInfo }}
+            </pre> -->
         </div>
     </div>
 </template>
@@ -74,7 +86,7 @@ import { toRefs } from 'vue';
 
 export default {
     name: "Test",
-    // props: ["dataReporteInfo", "isLoadingExport", "paramsToRequest"],
+    props: ["dataReporteInfo", "isLoadinRequest", "paramsToRequest"],
     setup() {
 
 
