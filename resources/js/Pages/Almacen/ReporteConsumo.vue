@@ -14,7 +14,7 @@
     { value: 4, label: 'DONACION' }]" :searchable="true" v-model="idProyectoFinanciamiento"
                             :noOptionsText="'Lista vacía.'" placeholder="Seleccione" />
                     </div>
-                    <InputError class="mt-2" />
+                    <InputError class="mt-2" :message="errors[`idProyectoFinanciamiento`]" />
                 </div>
                 <div class="mb-4 md:mr-0 md:mb-0 basis-[25%]">
                     <label class="block mb-2 text-[13px] font-medium text-gray-600">Centro Atencion <span
@@ -36,7 +36,7 @@
 
     ]" :searchable="true" v-model="idCentroAtencion" :noOptionsText="'Lista vacía.'" placeholder="Seleccione" />
                     </div>
-                    <InputError class="mt-2" />
+                    <InputError class="mt-2" :message="errors[`idCentroAtencion`]" />
                 </div>
                 <div class="mb-4 md:mr-0 md:mb-0 basis-[25%]">
                     <label class="block mb-2 text-[13px] font-medium text-gray-600">Tipo Transaccion <span
@@ -50,7 +50,7 @@
         { value: 5, label: 'TRANSFERENCIA - SALIDA' },
     ]" :searchable="true" v-model="idTipoTransaccion" :noOptionsText="'Lista vacía.'" placeholder="Seleccione" />
                     </div>
-                    <InputError class="mt-2" />
+                    <InputError class="mt-2" :message="errors[`idTipoTransaccion`]" />
                 </div>
                 <div class="mb-4 md:mr-0 md:mb-0 basis-[25%]">
                     <label class="block mb-2 text-[13px] font-medium text-gray-600">Numero de Cuenta </label>
@@ -59,7 +59,7 @@
         return await handleCuentaPresupuestalChange(query)
     }" :searchable="true" v-model="idCuenta" :noOptionsText="'Lista vacía.'" placeholder="Seleccione" />
                     </div>
-                    <InputError class="mt-2" />
+                    <InputError class="mt-2" :message="errors[`idCuenta`]" />
                 </div>
             </div>
             <div class="mb-2 mt-1 md:flex flex-row justify-start gap-2 mx-2 items-end">
@@ -67,10 +67,14 @@
                 <div class="w-1/4">
                     <DateTimePickerM :showIcon="false" :label="'Fecha inicio'" :placeholder="'Seleccione'"
                         :required="true" v-model="fechaDesde" <InputError class="mt-2" />
+                    <InputError class="mt-2" :message="errors[`fechaDesde`]" />
+
                 </div>
                 <div class="w-1/4">
                     <date-time-picker-m :showIcon="false" :label="'Fecha fin'" :placeholder="'Seleccione'"
                         :required="true" v-model="fechaHasta" <InputError class="mt-2" />
+                    <InputError class="mt-2" :message="errors[`fechaHasta`]" />
+
                 </div>
 
 
@@ -78,15 +82,15 @@
                     <label class="block mb-2 text-[13px] font-medium text-gray-600">Tipo Reporte<span
                             class="text-red-600 font-extrabold">*</span></label>
                     <div class="flex gap-2">
-                        <label>
+                        <label class="">
                             <input type="radio" value="C" class="peer hidden" name="tipoReporte"
                                 v-model="tipoReporte" />
                             <div
                                 class="hover:bg-gray-50 flex items-center justify-between px-4 border-2 rounded cursor-pointer text-sm border-gray-200 group peer-checked:border-blue-500">
-                                <h2 class="font-medium text-gray-700">CONSOLIDADO</h2>
+                                <h2 class="font-medium text-gray-700 text-xs">CONSOLIDADO</h2>
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor"
-                                    class="w-7 h-7 text-blue-600 invisible group-[.peer:checked+&]:visible">
+                                    class="w-5 h-7 text-blue-600 invisible group-[.peer:checked+&]:visible">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
@@ -98,16 +102,17 @@
                                 v-model="tipoReporte" />
                             <div
                                 class="hover:bg-gray-50 flex items-center justify-between px-4 border-2 rounded cursor-pointer text-sm border-gray-200 group peer-checked:border-blue-500">
-                                <h2 class="font-medium text-gray-700">DETALLADO</h2>
+                                <h2 class="font-medium text-gray-700 text-xs">DETALLADO</h2>
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor"
-                                    class="w-7 h-7 text-blue-600 invisible group-[.peer:checked+&]:visible">
+                                    class="w-5 h-7 text-blue-600 invisible group-[.peer:checked+&]:visible">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
                         </label>
                     </div>
+                    <InputError class="mt-2" :message="errors[`tipoReporte`]" />
 
                 </div>
 
@@ -124,7 +129,7 @@
 
             </div>
 
-            <div class="px-2 flex gap-3 justify-end">
+            <div class="px-2 flex gap-3 justify-end" v-if="dataReporteConsumo != ''">
                 <h1 class="font-medium">Reporte de consumo:</h1>
                 <div class="flex" style="display: non;">
                     <div @click="exportExcel"
@@ -145,7 +150,8 @@
                                 </g>
                             </g>
                         </svg><span class="ml-2 font-semibold text-[14px]">EXPORTAR</span></div>
-                    <div @click="printPdf" class="flex ml-4 items-center cursor-pointer text-slate-700 hover:text-red-600"><svg
+                    <div @click="printPdf"
+                        class="flex ml-4 items-center cursor-pointer text-slate-700 hover:text-red-600"><svg
                             class="h-4 w-4 text-red-500" fill="currentColor" viewBox="0 0 1920 1920"
                             xmlns="http://www.w3.org/2000/svg">
                             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
@@ -163,10 +169,8 @@
                         </svg><span class="ml-2 text-[14px] font-semibold">PDF</span></div>
                 </div>
             </div>
-
-           <TableReporteConsumo
-           :dataReporteInfo="dataReporteConsumo" :tipoReporte="tipoReporteForValidate"
-           :isLoadinRequest="isLoadinRequest" />
+            <TableReporteConsumo :dataReporteInfo="dataReporteConsumo" :tipoReporte="tipoReporteForValidate"
+                :isLoadinRequest="isLoadinRequest" />
 
 
 
@@ -200,9 +204,9 @@ export default {
     setup(props, context) {
         const { menu } = toRefs(props);
         const permits = usePermissions(menu.value, window.location.pathname);
-        const { exportExcel, getInformacionReport, isLoadingExport, dataReporteConsumo,isLoadinRequest,
-            idProyectoFinanciamiento, handleCuentaPresupuestalChange,tipoReporteForValidate,printPdf,
-            idCentroAtencion, idTipoTransaccion, idCuenta, fechaDesde, fechaHasta, tipoReporte,
+        const { exportExcel, getInformacionReport, isLoadingExport, dataReporteConsumo, isLoadinRequest,
+            idProyectoFinanciamiento, handleCuentaPresupuestalChange, tipoReporteForValidate, printPdf,
+            idCentroAtencion, idTipoTransaccion, idCuenta, fechaDesde, fechaHasta, tipoReporte,errors,
         } = useReporteConsumo();
 
         const getOption = (e) => {
@@ -251,9 +255,9 @@ export default {
 
         return {
             getOption, handleCuentaPresupuestalChange,
-            permits, dataReporteConsumo,printPdf,
+            permits, dataReporteConsumo, printPdf,
             exportExcel, getInformacionReport, isLoadingExport,
-            idProyectoFinanciamiento,tipoReporteForValidate,isLoadinRequest,
+            idProyectoFinanciamiento, tipoReporteForValidate, isLoadinRequest,errors,
             idCentroAtencion, idTipoTransaccion, idCuenta, fechaDesde, fechaHasta, tipoReporte,
 
         };

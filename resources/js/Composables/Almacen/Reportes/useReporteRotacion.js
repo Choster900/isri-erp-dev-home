@@ -7,11 +7,12 @@ import ReporteRotacionPdf from "@/pdf/Almacen/ReporteRotacionPdf.vue";
 export const useReporteRotacion = (context) => {
 
     const dataGetRotation = ref([])
+    const errors = ref([])
     const isLoadinRequest = ref(false)
     const varFilteredInForm = ref({
         idProy: '',
         idCentro: '',
-        porcentaje: '',
+        porcentaje: 0.8,
         fechaInicial: '',
         fechaFinal: '',
     })
@@ -19,6 +20,7 @@ export const useReporteRotacion = (context) => {
     const getInformacionReport = async () => {
         try {
             isLoadinRequest.value = true;
+            dataGetRotation.value = [];
 
             const resp = await axios.post("/get-reporte-rotacion", { varFilteredInForm: varFilteredInForm.value });
             const { data } = resp;
@@ -29,6 +31,24 @@ export const useReporteRotacion = (context) => {
             isLoadinRequest.value = false;
         } catch (error) {
             console.error('Ocurrió un error al obtener la información del reporte:', error);
+
+
+            if (error.response.status === 422) {
+                // Obtiene los errores del cuerpo de la respuesta y los transforma a un formato más manejable
+                let data = error.response.data.errors;
+                var myData = new Object();
+                for (const errorBack in data) {
+                    myData[errorBack] = data[errorBack][0];
+                }
+                // Actualiza el estado "errors" con los errores y los limpia después de 5 segundos
+                errors.value = myData;
+                setTimeout(() => {
+                    errors.value = [];
+                }, 5000);
+                console.error("Error en guardar los datos:", errors.value);
+            }
+
+
             isLoadinRequest.value = false;
 
 
@@ -40,19 +60,21 @@ export const useReporteRotacion = (context) => {
 
 
     const printPdf = () => {
+        document.body.style.cursor = 'wait';
+
         let fecha = moment().format("DD-MM-YYYY");
         let name = "NOMBRE DOCUMENTO - FECHA - CODIGO";
         const opt = {
             //margin: [0.5, 0.1, 2, 0.5], //top, left, bottom, right,
             margin: 0.5,
-            filename: "consumo",
+            filename: "rotaciones",
             //pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
             image: { type: "jpeg", quality: 0.98 },
             html2canvas: { scale: 3, useCORS: true },
             jsPDF: { unit: "cm", format: "letter", orientation: "landscape" },
         };
         // Crear una instancia de la aplicación Vue para generar el componente quedanPDFVue
-        const app = createApp(ReporteRotacionPdf, { dataReporteInfo: dataGetRotation.value });
+        const app = createApp(ReporteRotacionPdf, { dataReporteInfo: dataGetRotation.value, dataFiltered: varFilteredInForm.value });
         // Crear un elemento div y montar la instancia de la aplicación en él
         const div = document.createElement("div");
         const pdfPrint = app.mount(div);
@@ -100,6 +122,8 @@ export const useReporteRotacion = (context) => {
                         date_text
                     );
                 }
+                document.body.style.cursor = 'default';
+
             })
             .save()
             .catch((err) => console.log(err));
@@ -108,9 +132,11 @@ export const useReporteRotacion = (context) => {
     const exportExcel = async () => {
         try {
             try {
+                document.body.style.cursor = 'wait';
+
                 const response = await axios.post(
                     "/get-excel-reporte-rotacion",
-                    null,
+                    { varFilteredInForm: varFilteredInForm.value },
                     { responseType: "blob" }
                 );
 
@@ -126,7 +152,6 @@ export const useReporteRotacion = (context) => {
 
                 // Liberar la URL del blob después de la descarga
                 window.URL.revokeObjectURL(url);
-                document.body.style.cursor = 'default';
 
             } catch (error) {
                 console.error('Error al generar el PDF:', error);
@@ -135,6 +160,7 @@ export const useReporteRotacion = (context) => {
                 //TODO: revisar que el cursos no cambia a default
                 // Restaurar el cursor del cuerpo del documento a "default" después de la generación del PDF
                 document.body.style.cursor = 'default';
+
             }
 
         } catch (error) {
@@ -172,7 +198,7 @@ export const useReporteRotacion = (context) => {
 
     }
     return {
-        getInformacionReport, varFilteredInForm, isLoadinRequest, dataGetRotation, exportExcel, printPdf, getOption
+        getInformacionReport, varFilteredInForm, isLoadinRequest, dataGetRotation, exportExcel, printPdf, getOption, errors
 
     }
 
