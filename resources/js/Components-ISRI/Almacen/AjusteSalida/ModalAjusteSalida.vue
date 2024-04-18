@@ -69,12 +69,12 @@
                         </label>
                         <div class="relative font-semibold flex h-[35px] w-full">
                             <Multiselect v-model="adjustment.centerId" :options="centers" :searchable="true"
-                                :noOptionsText="'Lista vacía.'"
+                                :noOptionsText="'Lista vacía.'" @clear="adjustment.centerId=''" @deselect="adjustment.centerId=''"
                                 :placeholder="products.length > 0 ? '' : 'Seleccione centro'"
                                 :disabled="adjustment.status != 1 || products.length > 0"
                                 :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
                         </div>
-                        <InputError v-for="(item, index) in errors.centerId" :key="index" class="mt-2"
+                        <InputError v-for="(item, index) in frontErrors.centerId" :key="index" class="mt-2"
                             :message="item" />
                     </div>
                     <div class="mb-2 md:mr-2 md:mb-0 basis-1/4"
@@ -84,24 +84,24 @@
                         </label>
                         <div class="relative font-semibold flex h-[35px] w-full">
                             <Multiselect v-model="adjustment.financingSourceId" :options="financingSources"
-                                :searchable="true" :noOptionsText="'Lista vacía.'"
+                                :searchable="true" :noOptionsText="'Lista vacía.'" @change="changeFinancingSource($event)"
                                 :placeholder="products.length > 0 ? '' : 'Seleccione fuente'"
                                 :disabled="adjustment.status != 1 || products.length > 0"
                                 :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
                         </div>
-                        <InputError v-for="(item, index) in errors.financingSourceId" :key="index" class="mt-2"
+                        <InputError v-for="(item, index) in frontErrors.financingSourceId" :key="index" class="mt-2"
                             :message="item" />
                     </div>
                     <div class="mb-2 md:mr-2 md:mb-0 basis-1/4" :class="{ 'selected-opt': adjustment.idLt > 0, }">
                         <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Linea de trabajo</label>
                         <div class="relative font-semibold flex h-[35px] w-full">
                             <Multiselect v-model="adjustment.idLt" :options="lts" :searchable="true"
-                                :noOptionsText="'Lista vacía.'"
-                                :placeholder="products.length > 0 ? 'Desactivado' : 'Seleccione uplt'"
-                                :disabled="adjustment.status != 1 || products.length > 0"
+                                :noOptionsText="'Lista vacía.'" @clear="adjustment.idLt=''" @deselect="adjustment.idLt=''"
+                                :placeholder="(products.length > 0 || adjustment.financingSourceId === 4) ? 'Desactivado' : 'Seleccione uplt'"
+                                :disabled="adjustment.status != 1 || products.length > 0 || adjustment.financingSourceId === 4"
                                 :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
                         </div>
-                        <InputError v-for="(item, index) in errors.idLt" :key="index" class="mt-2" :message="item" />
+                        <InputError v-for="(item, index) in frontErrors.idLt" :key="index" class="mt-2" :message="item" />
                     </div>
                     <div v-if="showSearchButton"
                         class="mb-2 md:mr-2 md:mb-0 basis-1/4 flex justify-center items-end">
@@ -127,7 +127,7 @@
                     </div>
                 </div>
 
-                <div class="flex items-center justify-between w-[92%] ml-8 pb-2 mb-3 shadow-md">
+                <div class="flex items-center justify-between w-[92%] ml-8 pb-2 mb-3" :class="adjustment.status == 1 ? 'shadow-md' : ''">
                     <div class="flex items-center">
                         <span class="text-[14px] text-slate-700 font-medium font-[Roboto] underline">PRODUCTOS</span>
                     </div>
@@ -186,7 +186,7 @@
 
 
                 <div v-else class="w-full pl-8 max-w-full mt-0 pb-2">
-                    <div class="pb-1 pt-0 md:flex flex-row justify-items-start w-[96%] pl-0">
+                    <div v-if="adjustment.status == 1" class="pb-1 pt-0 md:flex flex-row justify-items-start w-[96%] pl-0">
                         <div class="mb-2 md:mr-2 md:mb-0 basis-full flex justify-end items-center ">
                             <div class="text-orange-500 flex hover:text-orange-700" @click="resetProducts()">
                                 <svg width="26px" height="26px" viewBox="0 0 24 24" fill="none"
@@ -383,9 +383,9 @@ export default {
 
         const {
             isLoadingRequest, errors, adjustment, reasons, centers, financingSources, lts, products,
-            nonSelectedProds, totalRec, isLoadingProds, load, showSearchButton, filteredOptions,
+            nonSelectedProds, totalRec, isLoadingProds, load, showSearchButton, filteredOptions, frontErrors,
             getInfoForModalAdjustment, selectProd, deleteRow, addNewRow, storeAdjustment, updateAdjustment,
-            searchProducts, resetProducts, handleValidation, openOption
+            searchProducts, resetProducts, handleValidation, openOption, changeFinancingSource
         } = useAjusteSalida(context);
 
         onMounted(
@@ -396,9 +396,9 @@ export default {
 
         return {
             isLoadingRequest, errors, adjustment, reasons, centers, financingSources, lts, products,
-            nonSelectedProds, totalRec, isLoadingProds, load, showSearchButton, filteredOptions,
+            nonSelectedProds, totalRec, isLoadingProds, load, showSearchButton, filteredOptions, frontErrors,
             selectProd, deleteRow, addNewRow, storeAdjustment, updateAdjustment,
-            searchProducts, resetProducts, handleValidation, openOption
+            searchProducts, resetProducts, handleValidation, openOption, changeFinancingSource
         }
     }
 }

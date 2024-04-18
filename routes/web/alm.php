@@ -179,7 +179,8 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('search-products-outgoing-adjustment', [AjusteSalidaController::class, 'searchProductsOutgoingAdjustment'])->name('ajusteSalida.searchProductsOutgoingAdjustment');
     Route::post('save-outgoing-adjustment-info', [AjusteSalidaController::class, 'storeOutgoingAdjustment'])->name('ajusteSalida.storeOutgoingAdjustment');
     Route::post('update-outgoing-adjustment-info', [AjusteSalidaController::class, 'updateOutgoingAdjustment'])->name('ajusteSalida.updateOutgoingAdjustment');
-
+    Route::post('change-status-outgoing-adjustment', [AjusteSalidaController::class, 'changeStatusOutgoingAdjustment'])->name('ajusteSalida.changeStatusOutgoingAdjustment');
+    Route::post('send-outgoing-adjustment', [AjusteSalidaController::class, 'sendOutgoingAdjustment'])->name('ajusteSalida.sendOutgoingAdjustment');
 
     Route::get(
         '/alm/reporte-rotacion',

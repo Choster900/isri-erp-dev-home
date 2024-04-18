@@ -12,6 +12,13 @@ export const useAjusteSalida = (context) => {
     const isLoadingRequest = ref(false);
     const isLoadingProds = ref(false);
     const errors = ref([]);
+    const frontErrors = ref(
+        {
+            centerId: [],
+            financingSourceId: [],
+            idLt: []
+        }
+    )
     const products = ref([])
     const filteredOptions = ref([])
     const load = ref(0)
@@ -26,11 +33,8 @@ export const useAjusteSalida = (context) => {
         centerId: '',
         financingSourceId: '',
         reasonId: '',
-        brandId: '',
         idLt: '',
         number: '',
-        expDate: '',
-        perishable: '',
         observation: '',
         status: '',
         prods: []
@@ -109,9 +113,6 @@ export const useAjusteSalida = (context) => {
                     newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
                 }
             });
-        } else {
-            // Call addNewRow
-            //addNewRow();
         }
     }
 
@@ -139,6 +140,24 @@ export const useAjusteSalida = (context) => {
     }
 
     const searchProducts = async () => {
+        //We look for errors first
+        adjustment.value.centerId === '' ? frontErrors.value.centerId[0] = 'Debe seleccionar centro' : frontErrors.value.centerId[0] = ''
+        adjustment.value.financingSourceId === '' ? frontErrors.value.financingSourceId[0] = 'Debe seleccionar fuente financiamiento' : frontErrors.value.financingSourceId[0] = ''
+        if ([1, 2, 3].includes(adjustment.value.financingSourceId)) {
+            frontErrors.value.idLt[0] = adjustment.value.idLt === '' ? 'Debe seleccionar linea de trabajo' : '';
+        } else {
+            frontErrors.value.idLt[0] = '';
+        }
+
+        // Evalúa si todos los errores están vacíos
+        const allErrorsEmpty = Object.values(frontErrors.value).every(errors => errors[0] === '');
+
+        if(allErrorsEmpty){
+            executeSearchQuery()
+        }
+    };
+
+    const executeSearchQuery = async () => {
         try {
             isLoadingProds.value = true;
             const response = await axios.post(
@@ -156,13 +175,12 @@ export const useAjusteSalida = (context) => {
                 context.emit("get-table");
             } else {
                 showErrorMessage(err);
-                //context.emit("cerrar-modal");
             }
         } finally {
             isLoadingProds.value = false;
             load.value++
         }
-    };
+    }
 
     const {
         validateInput
@@ -189,8 +207,6 @@ export const useAjusteSalida = (context) => {
         }
         adjustment.value.prods[index].qty = ''
     }
-
-
 
     const deleteRow = (index, detRecId) => {
         if (activeDetails.value.length <= 1) {
@@ -243,6 +259,17 @@ export const useAjusteSalida = (context) => {
                 load.value = 0
             }
         });
+    }
+
+    const changeFinancingSource = (id) => {
+        if (id) {
+            if (id === 4)//DONACION
+            {
+                adjustment.value.idLt = ''
+            }
+        } else {
+            adjustment.value.financingSourceId = ''
+        }
     }
 
     const storeAdjustment = async (obj) => {
@@ -381,8 +408,8 @@ export const useAjusteSalida = (context) => {
 
     return {
         isLoadingRequest, errors, reasons, centers, financingSources, lts, adjustment, products,
-        nonSelectedProds, totalRec, isLoadingProds, load, showSearchButton, filteredOptions,
+        nonSelectedProds, totalRec, isLoadingProds, load, showSearchButton, filteredOptions, frontErrors,
         getInfoForModalAdjustment, selectProd, deleteRow, addNewRow, storeAdjustment, updateAdjustment,
-        searchProducts, resetProducts, handleValidation, openOption
+        searchProducts, resetProducts, handleValidation, openOption, changeFinancingSource
     }
 }
