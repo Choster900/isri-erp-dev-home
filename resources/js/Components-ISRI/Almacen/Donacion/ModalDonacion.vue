@@ -88,7 +88,7 @@
                             <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2">
                                 DONANTE:
                             </p>
-                            <div class="flex items-center w-[43%] ml-[13px]">
+                            <div class="flex items-center w-[43%] ml-[14px]">
                                 <Multiselect id="doc" v-model="donInfo.supplierId" :options="suppliers" class="h-[30px]"
                                     :class="{ 'bg-red-200': errors.supplierId }" :disabled="donInfo.status != 1"
                                     :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione"
