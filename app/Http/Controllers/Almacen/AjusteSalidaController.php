@@ -49,12 +49,17 @@ class AjusteSalidaController extends Controller
         }
 
         if ($search_value) {
-            $query->where('id_requerimiento', 'like', '%' . $search_value['id_requerimiento'] . '%') //Search by requerimiento id
-                ->where('id_centro_atencion', $search_value['id_centro_atencion']) //Search by Healthcare center
-                ->where('id_proy_financiado', 'like', '%' . $search_value['id_proy_financiado'] . '%') //Search by financing source
-                ->where('num_requerimiento', 'like', '%' . $search_value['num_requerimiento'] . '%') //Search by requerimiento code
-                ->where('fecha_requerimiento', 'like', '%' . $search_value['fecha_requerimiento'] . '%') //Search by requerimiento date
-                ->where('id_estado_req', 'like', '%' . $search_value['id_estado_req'] . '%'); //Search by requerimiento status
+            $query->where('id_requerimiento', 'like', '%' . $search_value['id_requerimiento'] . '%')
+                ->where('id_proy_financiado', 'like', '%' . $search_value['id_proy_financiado'] . '%')
+                ->where('num_requerimiento', 'like', '%' . $search_value['num_requerimiento'] . '%')
+                ->where('fecha_requerimiento', 'like', '%' . $search_value['fecha_requerimiento'] . '%')
+                ->where('id_estado_req', 'like', '%' . $search_value['id_estado_req'] . '%');
+
+            //Search by Healthcare center
+            if ($search_value['id_centro_atencion']) {
+                $query->where('id_centro_atencion', $search_value['id_centro_atencion']);
+            }
+
             //Search by reason
             if ($search_value['motivo']) {
                 $query->whereHas(
@@ -68,6 +73,7 @@ class AjusteSalidaController extends Controller
             }
         }
 
+
         $data = $query->paginate($length)->onEachSide(1);
         return ['data' => $data, 'draw' => $request->input('draw')];
     }
@@ -80,6 +86,7 @@ class AjusteSalidaController extends Controller
                 'centro_atencion',
                 'proyecto_financiado',
                 'estado_requerimiento',
+                'linea_trabajo',
                 'motivo_ajuste',
                 'detalles_requerimiento.producto.unidad_medida',
                 'detalles_requerimiento.marca',

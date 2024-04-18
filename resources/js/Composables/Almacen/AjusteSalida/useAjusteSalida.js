@@ -90,6 +90,9 @@ export const useAjusteSalida = (context) => {
             req.detalles_requerimiento.forEach(element => {
                 // Check estado_det_recepcion_pedido
                 if (element.estado_det_requerimiento === 1) {
+
+                    const selectedProd = products.value.find((e) => e.value === element.id_det_existencia_almacen)
+
                     // Construct array
                     const array = {
                         id: element.id_det_requerimiento, //id_det_recepcion_pedido
@@ -97,6 +100,7 @@ export const useAjusteSalida = (context) => {
                         qty: element.cant_det_requerimiento, //Represents the the number of products the user wants to register
                         cost: element.detalle_existencia_almacen.existencia_almacen.costo_existencia_almacen, //Represents the the cost of the product
                         prevAvails: element.detalle_existencia_almacen.cant_det_existencia_almacen,
+                        prodLabel: selectedProd.label,
                         avails: "",
                         total: "", //Represents the result of qty x cost for every row
                         deleted: false, //This is the state of the row, it represents the logical deletion.
@@ -152,7 +156,7 @@ export const useAjusteSalida = (context) => {
         // Evalúa si todos los errores están vacíos
         const allErrorsEmpty = Object.values(frontErrors.value).every(errors => errors[0] === '');
 
-        if(allErrorsEmpty){
+        if (allErrorsEmpty) {
             executeSearchQuery()
         }
     };
@@ -200,10 +204,12 @@ export const useAjusteSalida = (context) => {
             adjustment.value.prods[index].cost = selectedProd.allInfo.existencia_almacen.costo_existencia_almacen
             adjustment.value.prods[index].avails = selectedProd.allInfo.cant_det_existencia_almacen
             adjustment.value.prods[index].prevAvails = selectedProd.allInfo.cant_det_existencia_almacen
+            adjustment.value.prods[index].prodLabel = selectedProd.label
         } else {
             adjustment.value.prods[index].cost = ''
             adjustment.value.prods[index].avails = ''
             adjustment.value.prods[index].prevAvails = ''
+            adjustment.value.prods[index].prodLabel = ''
         }
         adjustment.value.prods[index].qty = ''
     }
@@ -400,9 +406,7 @@ export const useAjusteSalida = (context) => {
     watch(adjustment, (newValue) => {
         newValue.prods.forEach((prod) => {
             prod.total = (prod.qty * prod.cost).toFixed(2);
-            if (prod.prevAvails != '') {
-                prod.avails = prod.prevAvails - prod.qty
-            }
+            prod.avails = prod.prevAvails - prod.qty
         });
     }, { deep: true });
 

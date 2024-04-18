@@ -242,19 +242,19 @@
                                 class="grid grid-cols-[55%_15%_15%_15%] max-w-full bg-white hover:bg-gray-200 text-gray-800 border-b border-x border-gray-500">
                                 <div class="border-r border-gray-500 min-h-[75px] flex items-center justify-center"
                                     :class="errors['prods.' + index + '.detId'] ? 'bg-red-300' : ''">
-                                    <div class="max-w-[98%] w-full">
+                                    <div v-if="adjustment.status == 1" class="max-w-[98%] w-full">
                                         <!-- Select for products -->
                                         <Multiselect id="doc" v-model="prod.detId" :options="filteredOptions"
-                                            class="h-[35px]" :disabled="adjustment.status != 1" :searchable="true"
-                                            @change="selectProd($event, index)" :noOptionsText="'Sin resultados'"
+                                            class="h-[35px]" :searchable="true" @change="selectProd($event, index)" :noOptionsText="'Sin resultados'"
                                             placeholder="Buscar producto" @open="openOption(prod.detId)"
                                             :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
                                     </div>
+                                    <p v-else class="font-[MuseoSans] text-[12px] p-1">{{ prod.prodLabel }}</p>
                                 </div>
                                 <div class="relative w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]"
-                                    :class="(errors['prods.' + index + '.qty'] || prod.avails < 0) ? 'bg-red-300' : ''">
+                                    :class="((errors['prods.' + index + '.qty'] || prod.avails < 0) && adjustment.status == 1) ? 'bg-red-300' : ''">
                                     <!-- Aquí se colocará el número dinámicamente -->
-                                    <span
+                                    <span v-if="adjustment.status == 1"
                                         class="absolute font-[MuseoSans] text-[12px] top-1 flex items-center justify-center">STOCK:
                                         {{ prod.avails }}</span>
                                     <!-- El input -->
