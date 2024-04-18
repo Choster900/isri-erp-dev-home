@@ -3,6 +3,7 @@ import axios from "axios";
 import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
 import { useFormatDateTime } from "@/Composables/General/useFormatDateTime.js";
+import { useValidateInput } from '@/Composables/General/useValidateInput';
 import { toast } from "vue3-toastify";
 import moment from 'moment';
 import _ from "lodash";
@@ -39,6 +40,18 @@ export const useAjusteEntrada = (context) => {
     const {
         formatDateVue3DP
     } = useFormatDateTime()
+
+    const {
+        validateInput
+    } = useValidateInput()
+
+    const handleValidation = (input, validation, element) => {
+        if (element) {
+            adjustment.value.prods[element.index][input] = validateInput(adjustment.value.prods[element.index][input], validation)
+        } else {
+            adjustment.value[input] = validateInput(adjustment.value[input], validation)
+        }
+    }
 
     const getInfoForModalAdjustment = async (id) => {
         try {
@@ -332,6 +345,6 @@ export const useAjusteEntrada = (context) => {
     return {
         isLoadingRequest, errors, reasons, centers, financingSources, lts, adjustment,
         products, brands, asyncFindProduct, totalRec, asyncProds, selectedProducts,
-        getInfoForModalAdjustment, selectProd, deleteRow, addNewRow, storeAdjustment, updateAdjustment
+        getInfoForModalAdjustment, selectProd, deleteRow, addNewRow, storeAdjustment, updateAdjustment, handleValidation
     }
 }

@@ -186,13 +186,15 @@
                                 :class="errors['prods.' + index + '.qty'] ? 'bg-red-300' : ''">
                                 <input v-model="prod.qty" :disabled="donInfo.status != 1"
                                     class="font-bold max-w-[95%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-[13px] border-[#d1d5db]"
-                                    type="text" name="" id="">
+                                    type="text" name="" id=""
+                                    @input="handleValidation('qty', { limit: 3, number: true }, { index: index })">
                             </div>
                             <div class="w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]"
                                 :class="errors['prods.' + index + '.cost'] ? 'bg-red-300' : ''">
                                 <input v-model="prod.cost" :disabled="donInfo.status != 1"
                                     class="font-bold max-w-[95%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-[13px] border-[#d1d5db]"
-                                    type="text" name="" id="">
+                                    type="text" name="" id=""
+                                    @input="handleValidation('cost', { limit: 8, amount: true }, { index: index })">
                             </div>
                             <div class="w-full flex items-center justify-center min-h-[75px]">
                                 <p class="font-[MuseoSans] text-[13px] p-1 font-bold">
@@ -285,7 +287,7 @@ export default {
             isLoadingRequest, donInfo, errors, suppliers, products, centers,
             asyncFindProduct, isLoadingProduct, totalRec, brands, selectedProducts,
             getInfoForModalDonation, selectProv, openAnySelect, selectProd, addNewRow,
-            deleteRow, storeReception, updateReception
+            deleteRow, storeReception, updateReception, handleValidation
         } = useDonacion(context);
 
         const handleSearchChange = async (query, index, prodId) => {
@@ -300,7 +302,7 @@ export default {
             isLoadingRequest, donInfo, errors, suppliers, products, centers,
             isLoadingProduct, totalRec, brands, selectedProducts,
             selectProv, handleSearchChange, openAnySelect, selectProd, addNewRow,
-            deleteRow, storeReception, updateReception
+            deleteRow, storeReception, updateReception, handleValidation
         };
     },
 };

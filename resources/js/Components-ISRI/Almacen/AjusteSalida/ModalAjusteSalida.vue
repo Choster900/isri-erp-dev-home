@@ -34,7 +34,7 @@
                             GENERAL</span>
                     </div>
                     <div v-if="adjustment.id"
-                        class="border border-slate-400 py-1 text-slate-700 px-2 rounded-xl hover:text-white hover:bg-slate-700">
+                        class="border border-slate-400 py-1 text-slate-700 px-2 rounded-xl hover:text-white hover:bg-slate-700 cursor-pointer">
                         <span class="text-[14px] font-medium text-center font-[Roboto]">{{ adjustment.number }}</span>
                     </div>
                 </div>
@@ -332,7 +332,8 @@
                         <div class="grid grid-cols-[100%] max-w-[96%] border-x border-b border-gray-500">
                             <div class="justify-center flex w-full bg-white">
                                 <textarea v-model="adjustment.observation" placeholder=""
-                                    class="w-full text-[12px] py-1 font-[Roboto] h-full  outline-none ring-0 border-transparent focus:outline-none focus:ring-0 focus:border-transparent leading-4"></textarea>
+                                    class="w-full text-[12px] py-1 font-[Roboto] h-full  outline-none ring-0 border-transparent focus:outline-none focus:ring-0 focus:border-transparent leading-4"
+                                    @input="handleValidation('observation', { limit: 255 })"></textarea>
                             </div>
                         </div>
                     </div>

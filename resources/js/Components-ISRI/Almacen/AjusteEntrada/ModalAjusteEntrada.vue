@@ -31,7 +31,7 @@
                             GENERAL</span>
                     </div>
                     <div v-if="adjustment.id"
-                        class="border border-slate-400 py-1 text-slate-700 px-2 rounded-xl hover:text-white hover:bg-slate-700">
+                        class="border border-slate-400 py-1 text-slate-700 px-2 rounded-xl hover:text-white hover:bg-slate-700 cursor-pointer">
                         <span class="text-[14px] font-medium text-center font-[Roboto]">{{ adjustment.number }}</span>
                     </div>
                 </div>
@@ -100,7 +100,8 @@
                             :disabled="adjustment.status != 1" placeholder="Escriba observación"
                             :class="adjustment.observation != '' ? 'bg-gray-200' : ''"
                             class="w-full h-12 overflow-y-auto peer placeholder-gray-400 text-xs font-semibold border border-gray-300 hover:border-gray-400 px-2 text-slate-900 transition-colors duration-300 focus:ring-blue-500 focus:border-blue-500"
-                            style="border-radius: 4px;">
+                            style="border-radius: 4px;"
+                            @input="handleValidation('observation', { limit: 255 })">
                     </textarea>
                         <InputError v-for="(item, index) in errors.observation" :key="index" class="mt-2"
                             :message="item" />
@@ -192,13 +193,15 @@
                                     :class="errors['prods.' + index + '.qty'] ? 'bg-red-300' : ''">
                                     <input v-model="prod.qty" :disabled="adjustment.status != 1"
                                         class="font-bold max-w-[95%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-[13px] border-[#d1d5db]"
-                                        type="text" name="" id="">
+                                        type="text" name="" id=""
+                                        @input="handleValidation('qty', { limit: 3, number: true }, { index: index })">
                                 </div>
                                 <div class="border-r border-gray-500 min-h-[75px] flex items-center justify-center"
                                     :class="errors['prods.' + index + '.cost'] ? 'bg-red-300' : ''">
                                     <input v-model="prod.cost" :disabled="adjustment.status != 1"
                                         class="font-bold max-w-[95%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-[13px] border-[#d1d5db]"
-                                        type="text" name="" id="">
+                                        type="text" name="" id=""
+                                        @input="handleValidation('cost', { limit: 8, amount: true }, { index: index })">
                                 </div>
                                 <div class="min-h-[75px] flex items-center justify-center">
                                     <p
@@ -280,7 +283,6 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 import InputText from "@/Components-ISRI/ComponentsToForms/InputText.vue";
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
 import DateTimePickerM from "@/Components-ISRI/ComponentsToForms/DateTimePickerM.vue";
-import { useValidateInput } from '@/Composables/General/useValidateInput';
 
 import { toRefs, onMounted } from 'vue';
 
@@ -304,16 +306,8 @@ export default {
         const {
             isLoadingRequest, errors, adjustment, reasons, centers, financingSources, lts,
             products, brands, asyncFindProduct, totalRec, asyncProds, selectedProducts,
-            getInfoForModalAdjustment, selectProd, deleteRow, addNewRow, storeAdjustment, updateAdjustment
+            getInfoForModalAdjustment, selectProd, deleteRow, addNewRow, storeAdjustment, updateAdjustment, handleValidation
         } = useAjusteEntrada(context);
-
-        const {
-            validateInput
-        } = useValidateInput()
-
-        const handleValidation = (input, validation) => {
-            adjustment.value[input] = validateInput(adjustment.value[input], validation)
-        }
 
         const handleSearchChange = async (query, index, prodId) => {
             await asyncFindProduct(query, index, prodId);
