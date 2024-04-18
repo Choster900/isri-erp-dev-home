@@ -186,7 +186,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         function (Request $request) {
             return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/reporte-rotacion', 'Almacen/ReporteRotacion');
         }
-    )->name('alm.reporteRotacion'); 
+    )->name('alm.reporteRotacion');
     Route::post('get-reporte-rotacion', [ReporteAlmacenController::class, 'getReporteDonacion'])->name('ajusteSalida.getAjusteSalida');
     Route::post('get-excel-reporte-rotacion', [ReporteAlmacenController::class, 'getExcelReporteRotacion'])->name('ajusteSalida.getAjusteSalida');
 });
