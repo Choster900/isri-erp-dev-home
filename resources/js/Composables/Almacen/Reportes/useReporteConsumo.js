@@ -52,6 +52,22 @@ export const useReporteConsumo = () => {
             dataReporteConsumo.value = data
         } catch (error) {
             console.error("Ocurrió un error al obtener la información del reporte:", error);
+
+            if (error.response.status === 422) {
+                // Obtiene los errores del cuerpo de la respuesta y los transforma a un formato más manejable
+                let data = error.response.data.errors;
+                var myData = new Object();
+                for (const errorBack in data) {
+                    myData[errorBack] = data[errorBack][0];
+                }
+                // Actualiza el estado "errors" con los errores y los limpia después de 5 segundos
+                errors.value = myData;
+                setTimeout(() => {
+                    errors.value = [];
+                }, 5000);
+                console.error("Error en guardar los datos:", errors.value);
+            }
+
             isLoadinRequest.value = false;
 
         } finally {
@@ -98,6 +114,8 @@ export const useReporteConsumo = () => {
     })
 
     const printPdf = () => {
+        document.body.style.cursor = 'wait';
+
         let fecha = moment().format("DD-MM-YYYY");
         let name = "NOMBRE DOCUMENTO - FECHA - CODIGO";
         const opt = {
@@ -164,6 +182,8 @@ export const useReporteConsumo = () => {
                         date_text
                     );
                 }
+                document.body.style.cursor = 'default';
+
             })
             .save()
             .catch((err) => console.log(err));
@@ -172,6 +192,8 @@ export const useReporteConsumo = () => {
     const exportExcel = async () => {
         try {
             try {
+                document.body.style.cursor = 'wait';
+
                 const response = await axios.post(
                     "/get-excel-document-reporte-consumo",
                     {
@@ -217,7 +239,7 @@ export const useReporteConsumo = () => {
     return {
         exportExcel, getInformacionReport, isLoadingExport, dataReporteConsumo,
         handleCuentaPresupuestalChange, isLoadinRequest, printPdf,
-
+        errors,
         idProyectoFinanciamiento, tipoReporteForValidate,
         idCentroAtencion, idTipoTransaccion, idCuenta, fechaDesde, fechaHasta, tipoReporte,
 

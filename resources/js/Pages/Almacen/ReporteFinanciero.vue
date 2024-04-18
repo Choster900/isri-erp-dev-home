@@ -35,10 +35,9 @@
                         <span class="text-red-600 font-extrabold">*</span></label>
                     <div class="relative  flex h-[30px] w-full">
                         <Multiselect v-model="reportInfo.numeroCuenta" :options="[
-                        {value: 541, label: '541-BIENES DE USO Y CONSUMO'},
-                        {value: 611, label: '611-BIENES MUEBLES'},
-                        ]" :searchable="true"
-                            :noOptionsText="'Lista vacía.'" placeholder="Seleccione" />
+        { value: 541, label: '541-BIENES DE USO Y CONSUMO' },
+        { value: 611, label: '611-BIENES MUEBLES' },
+    ]" :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione" />
                     </div>
                     <InputError class="mt-2" :message="errors[`reportInfo.financingSourceId`]" />
 
@@ -133,6 +132,24 @@
                         </svg><span class="ml-2 text-[14px] font-semibold">PDF</span></div>
                 </div>
             </div>
+
+           <!--  {{isLoadinDownloaded}} -->
+            <div class="mx-4" v-show="isLoadinDownloaded == true">
+                <div class="w-full  bg-gray-200 rounded-full dark:bg-gray-700">
+                    <div class="bg-blue-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full"
+                        :style="{ width: progress + '%' }"> {{progress}}%</div>
+                </div>
+            </div>
+
+           <!--  <div>
+                {{ progress }}
+                <div class="progress-bar-container">
+                    <div class="progress-bar" :style="{ width: progress + '%' }"></div>
+                </div>
+                <p>{{ counter }}</p>
+                <button @click="startDownload">Descargar</button>
+                <button @click="increaseSpeed">increase</button>
+            </div> -->
             <!--  <div class="md:flex flex md:items-center  mb-2 sticky flex-row justify-center  border-gray-400 border-b">
             </div> -->
 
@@ -174,6 +191,48 @@ export default {
             isLoadingExport, reportInfo, errors, financingArray, dataReporteInfo
         } = useReporteFinanciero(context);
 
+        const counter = ref(0);
+        const progress = ref(0);
+        const isLoadinDownloaded = ref(false);
+        let intervalId = null;
+
+        const startDownload = () => {
+            counter.value = 0
+            progress.value = 0
+            // Simular la descarga del archivo
+            intervalId = setInterval(() => {
+                if (counter.value < 100) {
+                    counter.value++;
+                    progress.value++;
+                } else {
+                    // Cuando la descarga termina, aumenta la velocidad del contador
+                    clearInterval(intervalId);
+                    intervalId = setInterval(() => {
+                        if (counter.value < 100) {
+                            counter.value++;
+                        } else {
+                            clearInterval(intervalId);
+                        }
+                    }, 50); // Aumenta la velocidad del contador (50 ms)
+                }
+            }, 70); // Simula el tiempo de descarga (100 ms)
+        };
+
+        const increaseSpeed = () => {
+            clearInterval(intervalId); // Detener el intervalo actual
+            intervalId = setInterval(() => {
+                if (counter.value < 100) {
+                    counter.value += 2;
+                    progress.value += 2; // Aumentar el progreso de la barra más rápido
+                } else {
+                    clearInterval(intervalId);
+                    progress.value = 100; // Asegurar que el progreso de la barra esté en 100 cuando el contador llegue a 100
+
+                }
+            }, 20); // Aumenta la velocidad del contador (20 ms)
+        };
+
+
 
         const getOption = (e) => {
             moment.locale('en');
@@ -207,6 +266,8 @@ export default {
 
         const exportExcel = async () => {
             try {
+                isLoadinDownloaded.value = true;
+                startDownload()
                 // Cambia el cursor del cuerpo del documento a "wait" durante la generación del PDF
                 document.body.style.cursor = 'wait';
                 const response = await axios.post(
@@ -214,7 +275,7 @@ export default {
                     { paramsToRequest: reportInfo.value },
                     { responseType: "blob" }
                 );
-
+                increaseSpeed()
                 // Crear una URL para el blob
                 const url = window.URL.createObjectURL(new Blob([response.data]));
 
@@ -224,10 +285,16 @@ export default {
                 link.setAttribute("download", "nombre_del_archivo.xlsx"); // Nombre del archivo deseado
                 document.body.appendChild(link);
                 link.click();
-
                 // Liberar la URL del blob después de la descarga
                 window.URL.revokeObjectURL(url);
                 document.body.style.cursor = 'default';
+
+
+                setTimeout(() => {
+
+                    isLoadinDownloaded.value = false;
+                }, 1000);
+
             } catch (error) {
                 console.error("Error al descargar el archivo:", error);
             }
@@ -268,8 +335,8 @@ export default {
         }
 
 
-        return {
-            exportExcel, printPdf,
+        return {isLoadinDownloaded,
+            exportExcel, printPdf, counter, progress, startDownload, increaseSpeed,
             getOption, permits, isLoadingExport, reportInfo, errors, financingArray, dataReporteInfo, getInformacionReport
         };
     },
@@ -277,6 +344,18 @@ export default {
 </script>
 
 <style>
+.progress-bar-container {
+    width: 100%;
+    height: 20px;
+    background-color: #ddd;
+    margin-bottom: 10px;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #4caf50;
+}
+
 .sin-scroll {
     overflow: auto;
 }

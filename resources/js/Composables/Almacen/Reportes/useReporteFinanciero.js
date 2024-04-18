@@ -36,6 +36,8 @@ export const useReporteFinanciero = (context) => {
 
 
     const printPdf = () => {
+        document.body.style.cursor = 'wait';
+
         let fecha = moment().format("DD-MM-YYYY");
         let name = "NOMBRE DOCUMENTO - FECHA - CODIGO";
         const opt = {
@@ -97,6 +99,8 @@ export const useReporteFinanciero = (context) => {
                         date_text
                     );
                 }
+                document.body.style.cursor = 'default';
+
             })
             .save()
             .catch((err) => console.log(err));
