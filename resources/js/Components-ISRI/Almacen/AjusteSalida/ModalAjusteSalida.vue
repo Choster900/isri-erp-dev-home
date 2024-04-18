@@ -103,7 +103,7 @@
                         </div>
                         <InputError v-for="(item, index) in frontErrors.idLt" :key="index" class="mt-2" :message="item" />
                     </div>
-                    <div v-if="showSearchButton"
+                    <div v-if="showSearchButton && !isLoadingProds"
                         class="mb-2 md:mr-2 md:mb-0 basis-1/4 flex justify-center items-end">
                         <div class="text-indigo-600 flex hover:text-indigo-800" @click="searchProducts()">
                             <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" class="cursor-pointer"

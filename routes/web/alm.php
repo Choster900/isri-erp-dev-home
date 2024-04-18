@@ -6,6 +6,7 @@ use App\Http\Controllers\Almacen\DonacionController;
 use App\Http\Controllers\Almacen\RecepcionController;
 use App\Http\Controllers\Almacen\ReporteAlmacenController;
 use App\Http\Controllers\Almacen\RequerimientoAlmacenController;
+use App\Http\Controllers\Almacen\TransferenciaController;
 use App\Models\CatalogoCtaPresupuestal;
 use App\Models\DetalleExistenciaAlmacen;
 use App\Models\DetalleRequerimiento;
@@ -181,7 +182,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('update-outgoing-adjustment-info', [AjusteSalidaController::class, 'updateOutgoingAdjustment'])->name('ajusteSalida.updateOutgoingAdjustment');
     Route::post('change-status-outgoing-adjustment', [AjusteSalidaController::class, 'changeStatusOutgoingAdjustment'])->name('ajusteSalida.changeStatusOutgoingAdjustment');
     Route::post('send-outgoing-adjustment', [AjusteSalidaController::class, 'sendOutgoingAdjustment'])->name('ajusteSalida.sendOutgoingAdjustment');
-
+    //
     Route::get(
         '/alm/reporte-rotacion',
         function (Request $request) {
@@ -190,4 +191,13 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     )->name('alm.reporteRotacion');
     Route::post('get-reporte-rotacion', [ReporteAlmacenController::class, 'getReporteDonacion'])->name('ajusteSalida.getAjusteSalida');
     Route::post('get-excel-reporte-rotacion', [ReporteAlmacenController::class, 'getExcelReporteRotacion'])->name('ajusteSalida.getAjusteSalida');
+
+    //Transfers
+    Route::get(
+        '/alm/transferencias',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/transferencias', 'Almacen/Transferencias');
+        }
+    )->name('alm.transferencias');
+    Route::post('transferencias-almacen', [TransferenciaController::class, 'getTransferencias'])->name('transferencia.getTransferencias');
 });

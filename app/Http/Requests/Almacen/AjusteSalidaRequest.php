@@ -39,6 +39,13 @@ class AjusteSalidaRequest extends FormRequest
                     }
                 }
             ];
+            $rules["prods.{$key}.avails"] = [
+                function ($attribute, $value, $fail) use ($key, $prod) {
+                    if (!$prod['deleted'] && ($value < 0)) {
+                        $fail("Ha excedido la cantidad de productos.");
+                    }
+                }
+            ];
         }
         return $rules;
     }
