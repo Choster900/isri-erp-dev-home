@@ -257,6 +257,7 @@ class ReporteAlmacenController extends Controller
     public function getExcelDocumentConsumo(Request $request)
     {
 
+
         $startDate = $request->input('fechaDesde') != '' ? date('Y-m-d', strtotime($request->input('fechaDesde'))) : null;
         $endDate = $request->input('fechaHasta') != '' ? date('Y-m-d', strtotime($request->input('fechaHasta'))) : null;
 
@@ -279,14 +280,14 @@ class ReporteAlmacenController extends Controller
 
 
         $params = [
-            'tipovista' => $request->tipoReporte,
-            'idtipomov' => $transaccionValues['idtipomov'],
-            'idtiporeq' => $transaccionValues['idtiporeq'],
-            'idproy' => $request->idProyectoFinanciamiento,
-            'idcentro' => $request->idCentroAtencion == 0 ? null : $request->idCentroAtencion,
-            'idcuenta' => $request->idCuenta,
+            'tipovista'     => $request->tipoReporte,
+            'idtipomov'     => $transaccionValues['idtipomov'],
+            'idtiporeq'     => $transaccionValues['idtiporeq'],
+            'idproy'        => $request->idProyectoFinanciamiento,
+            'idcentro'      => $request->idCentroAtencion == 0 ? null : $request->idCentroAtencion,
+            'idcuenta'      => $request->idCuenta,
             'fecha_inicial' => $startDate,
-            'fecha_final' => $endDate,
+            'fecha_final'   => $endDate,
         ];
 
 
@@ -522,22 +523,31 @@ class ReporteAlmacenController extends Controller
 
     public function getReporteConsumo(Request $request)
     {
-        /*   $rules = [
-            "reportInfo.startDate"         => "required",
-            "reportInfo.endDate"           => "required",
-            "reportInfo.financingSourceId" => "required",
+        $rules = [
+            "fechaDesde"               => "required",
+            "fechaHasta"               => "required",
+            "idCentroAtencion"         => "required",
+            "idProyectoFinanciamiento" => "required",
+            "idTipoTransaccion"        => "required",
+            "tipoReporte"              => "required",
+
         ];
         $customMessages = [
-            'reportInfo.startDate.required'         => 'La fecha de inicio es obligatoria.',
-            'reportInfo.endDate.required'           => 'La fecha de fin es obligatoria.',
-            'reportInfo.financingSourceId.required' => 'La fuente de financiamiento es obligatorio.',
+            "fechaDesde.required"               => "La Fecha inicio es obligatorioa.",
+            "fechaHasta.required"               => "La Fecha fin es obligatoria.",
+            "idCentroAtencion.required"         => "El centro de atención es obligatorio.",
+            "idProyectoFinanciamiento.required" => "La fuente de F. es obligatorio.",
+            "idTipoTransaccion.required"        => "El tipo de transacción es obligatorio.",
+            "tipoReporte.required"              => "El tipo de reporte es obligatorio.",
         ];
+
         $validator = Validator::make($request->all(), $rules, $customMessages);
         if ($validator->fails()) {
             $errors = $validator->errors()->toArray();
             $message = 'The given data was invalid.';
             return response()->json(['message' => $message, 'errors' => $errors], 422);
-        } */
+        }
+
         $startDate = $request->input('fechaDesde') != '' ? date('Y-m-d', strtotime($request->input('fechaDesde'))) : null;
         $endDate = $request->input('fechaHasta') != '' ? date('Y-m-d', strtotime($request->input('fechaHasta'))) : null;
 
@@ -560,14 +570,14 @@ class ReporteAlmacenController extends Controller
 
 
         $params = [
-            'tipovista' => $request->tipoReporte,
-            'idtipomov' => $transaccionValues['idtipomov'],
-            'idtiporeq' => $transaccionValues['idtiporeq'],
-            'idproy' => $request->idProyectoFinanciamiento,
-            'idcentro' => $request->idCentroAtencion == 0 ? null : $request->idCentroAtencion,
-            'idcuenta' => $request->idCuenta,
+            'tipovista'     => $request->tipoReporte,
+            'idtipomov'     => $transaccionValues['idtipomov'],
+            'idtiporeq'     => $transaccionValues['idtiporeq'],
+            'idproy'        => $request->idProyectoFinanciamiento,
+            'idcentro'      => $request->idCentroAtencion == 0 ? null : $request->idCentroAtencion,
+            'idcuenta'      => $request->idCuenta,
             'fecha_inicial' => $startDate,
-            'fecha_final' => $endDate,
+            'fecha_final'   => $endDate,
         ];
 
         return DB::select("CALL PR_RPT_CONSUMO(:tipovista, :idtipomov, :idtiporeq, :idproy, :idcentro, :idcuenta, :fecha_inicial, :fecha_final)", $params);
@@ -581,6 +591,32 @@ class ReporteAlmacenController extends Controller
     function getReporteDonacion(Request $request)
     {
 
+        $rules = [
+            "varFilteredInForm.idProy"       => "required",
+            "varFilteredInForm.fechaFinal"   => "required",
+            "varFilteredInForm.fechaInicial" => "required",
+            "varFilteredInForm.idCentro"     => "required",
+            "varFilteredInForm.porcentaje"   => "required",
+
+
+        ];
+        $customMessages = [
+            "varFilteredInForm.idProy.required"       => "El proyecto F. es obligatorio.",
+            "varFilteredInForm.fechaFinal.required"   => "La fecha final es obligatoria.",
+            "varFilteredInForm.fechaInicial.required" => "La fecha inicial es obligatoria.",
+            "varFilteredInForm.idCentro.required"     => "El centro es obligatorio.",
+            "varFilteredInForm.porcentaje.required"   => "El porcentaje es obligatorio.",
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $customMessages);
+        if ($validator->fails()) {
+            $errors = $validator->errors()->toArray();
+            $message = 'The given data was invalid.';
+            return response()->json(['message' => $message, 'errors' => $errors], 422);
+        }
+
+
+
         $fechaInicial = $request->varFilteredInForm["fechaInicial"] != '' ? date('Y-m-d', strtotime($request->varFilteredInForm["fechaInicial"])) : null;
         $fechaFinal = $request->varFilteredInForm["fechaFinal"] != '' ? date('Y-m-d', strtotime($request->varFilteredInForm["fechaFinal"])) : null;
 
@@ -589,11 +625,11 @@ class ReporteAlmacenController extends Controller
         /* $request->paramsToRequest["startDate"] */
 
         $params = [
-            'idproy' => $request->varFilteredInForm["idProy"],
-            'idcentro' => $request->varFilteredInForm["idCentro"] == 0 ? null : $request->varFilteredInForm["idCentro"],
-            'porcentaje' => $request->varFilteredInForm["porcentaje"],
+            'idproy'        => $request->varFilteredInForm["idProy"],
+            'idcentro'      => $request->varFilteredInForm["idCentro"] == 0 ? null : $request->varFilteredInForm["idCentro"],
+            'porcentaje'    => $request->varFilteredInForm["porcentaje"],
             'fecha_inicial' => $fechaInicial,
-            'fecha_final' => $fechaFinal,
+            'fecha_final'   => $fechaFinal,
         ];
 
         return DB::select("CALL PR_RPT_POCA_ROTACION(:idproy, :idcentro, :porcentaje, :fecha_inicial, :fecha_final)", $params);
@@ -602,12 +638,24 @@ class ReporteAlmacenController extends Controller
     public function getExcelReporteRotacion(Request $request)
     {
 
+        $fechaInicial = $request->varFilteredInForm["fechaInicial"] != '' ? date('Y-m-d', strtotime($request->varFilteredInForm["fechaInicial"])) : null;
+        $fechaFinal = $request->varFilteredInForm["fechaFinal"] != '' ? date('Y-m-d', strtotime($request->varFilteredInForm["fechaFinal"])) : null;
+
+
+        $params = [
+            'idproy'        => $request->varFilteredInForm["idProy"],
+            'idcentro'      => $request->varFilteredInForm["idCentro"] == 0 ? null : $request->varFilteredInForm["idCentro"],
+            'porcentaje'    => $request->varFilteredInForm["porcentaje"],
+            'fecha_inicial' => $fechaInicial,
+            'fecha_final'   => $fechaFinal,
+        ];
+
+        $result = DB::select("CALL PR_RPT_POCA_ROTACION(:idproy, :idcentro, :porcentaje, :fecha_inicial, :fecha_final)", $params);
 
 
         // Crear una instancia de Spreadsheet
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-
 
         $sheet->mergeCells('A1:G1');
         $sheet->setCellValue('A1', 'SISTEMA DE ALMACEN PARA EL CONTROL DE BIENES EN EXISTENCIA - ISRI');
@@ -622,19 +670,16 @@ class ReporteAlmacenController extends Controller
 
 
         $sheet->mergeCells('H3:I3');
-        #$sheet->setCellValue('H3', 'DEL ' . date_format(date_create($startDate), 'd, F, Y'));
-        $sheet->setCellValue('H3', 'DEL 12 , noviembre, 2023');
+        $sheet->setCellValue('H3', 'DEL ' . date_format(date_create($fechaInicial), 'd, F, Y'));
+        #$sheet->setCellValue('H3', 'DEL 12 , noviembre, 2023');
         $sheet->getStyle('H3')->getFont()->setSize(9);
         $sheet->getStyle('H3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
 
         $sheet->mergeCells('H4:I4');
-        #$sheet->setCellValue('H4', 'DEL ' . date_format(date_create($endDate), 'd, F, Y'));
-        $sheet->setCellValue('H4', 'AL 16. ABRIL, 2024');
+        $sheet->setCellValue('H4', 'DEL ' . date_format(date_create($fechaFinal), 'd, F, Y'));
+        #$sheet->setCellValue('H4', 'AL 16. ABRIL, 2024');
         $sheet->getStyle('H4')->getFont()->setSize(9);
         $sheet->getStyle('H4')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
-
-
-
 
 
         $encabezados = [
@@ -667,16 +712,6 @@ class ReporteAlmacenController extends Controller
         }
 
 
-
-        $params = [
-            'idproy' => 1,
-            'idcentro' => null,
-            'porcentaje' => 0.1,
-            'fecha_inicial' => '2024-04-11',
-            'fecha_final' => '2024-04-15',
-        ];
-
-        $result = DB::select("CALL PR_RPT_POCA_ROTACION(:idproy, :idcentro, :porcentaje, :fecha_inicial, :fecha_final)", $params);
 
 
         $row = 7; // Comenzar desde la fila 2 para dejar espacio para los encabezados
