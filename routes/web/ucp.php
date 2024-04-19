@@ -42,7 +42,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         $formattedResults = $product->map(function ($item) {
             return [
                 'value'           => $item->id_producto,
-                'label'           => $item->codigo_producto,
+                'label'           => $item->codigo_producto . ' - ' . $item->nombre_producto,
                 'allDataProducto' => $item,
             ];
         });
@@ -56,7 +56,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         $formattedResults = $product->map(function ($item) {
             return [
                 'value'           => $item->id_producto,
-                'label'           => $item->codigo_producto,
+                'label'           => $item->codigo_producto . ' - ' . $item->nombre_producto,
                 'allDataProducto' => $item,
             ];
         });
@@ -78,7 +78,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             $numbersToLetters = new NumeroALetras();
             $numero = $request->number;
             $amountLetter =  $numbersToLetters->toInvoice($numero, 2, 'DÓLARES');
-            
+
 
             return $amountLetter;
         }

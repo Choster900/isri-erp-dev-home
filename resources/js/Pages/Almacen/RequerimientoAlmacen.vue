@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
 import { useDatatableReqAlm } from '@/Composables/Almacen/RequerimientoAlmacen/useDatatableReqAlm';
 import { defineComponent } from 'vue'
 import Datatable from '@/Components-ISRI/Datatable.vue';
@@ -145,7 +145,10 @@ export default {
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 max-w-[22%]">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ requ.linea_trabajo.nombre_lt }}
+
+                                <!--     {{ requ.linea_trabajo["nombre_lt"] }} -->
+                                    {{ requ.linea_trabajo?.nombre_lt }}
+
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5 max-w-[22%]">
@@ -270,7 +273,6 @@ export default {
                         </tr>
                     </tbody>
                 </Datatable>
-
             </div>
             <div v-if="!emptyObject" class="px-6 py-4 bg-white shadow-lg rounded-sm border-slate-200 relative">
                 <div>
