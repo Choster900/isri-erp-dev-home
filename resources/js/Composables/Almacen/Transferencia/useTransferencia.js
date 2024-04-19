@@ -7,7 +7,7 @@ import { useValidateInput } from '@/Composables/General/useValidateInput';
 import moment from 'moment';
 import _ from "lodash";
 
-export const useAjusteSalida = (context) => {
+export const useTransferencia = (context) => {
     const swal = inject("$swal");
     const isLoadingRequest = ref(false);
     const isLoadingProds = ref(false);
@@ -31,6 +31,7 @@ export const useAjusteSalida = (context) => {
     const adjustment = ref({
         id: '',
         centerId: '',
+        destCenterId: '',
         financingSourceId: '',
         reasonId: '',
         idLt: '',
@@ -40,11 +41,11 @@ export const useAjusteSalida = (context) => {
         prods: []
     })
 
-    const getInfoForModalAdjustment = async (id) => {
+    const getInfoForModalTransfers = async (id) => {
         try {
             isLoadingRequest.value = true;
             const response = await axios.post(
-                `/get-info-modal-outgoing-adjustment`, {
+                `/get-info-modal-warehouse-transfer`, {
                 id: id,
             });
             setModalValues(response.data, id)
@@ -81,6 +82,7 @@ export const useAjusteSalida = (context) => {
             adjustment.value.idLt = req.id_lt // Set supplier
             adjustment.value.number = req.num_requerimiento
             adjustment.value.observation = req.observacion_requerimiento
+            adjustment.value.destCenterId = req.cen_id_centro_atencion
 
             load.value++
             products.value = data.products
@@ -278,9 +280,15 @@ export const useAjusteSalida = (context) => {
         }
     }
 
+    const changeCenter = (id) => {
+        if(id != '' && id === adjustment.value.destCenterId){
+            adjustment.value.destCenterId = ''
+        }
+    }
+
     const storeAdjustment = async (obj) => {
         swal({
-            title: '¿Está seguro de guardar nuevo ajuste?',
+            title: '¿Está seguro de guardar nueva transferencia?',
             icon: 'question',
             iconHtml: '❓',
             confirmButtonText: 'Si, Guardar',
@@ -290,7 +298,7 @@ export const useAjusteSalida = (context) => {
             showCloseButton: true
         }).then(async (result) => {
             if (result.isConfirmed) {
-                saveObject(obj, '/save-outgoing-adjustment-info');
+                saveObject(obj, '/save-warehouse-transfer-info');
             }
         });
     };
@@ -394,6 +402,10 @@ export const useAjusteSalida = (context) => {
         return products.value.length > 0 ? false : true;
     });
 
+    const filteredCenters = computed(() => {
+        return centers.value.filter((center) => adjustment.value.centerId != center.value)
+    });
+
     const nonSelectedProds = computed(() => {
         // Obtener todos los IDs de productos seleccionados
         const selectedIds = adjustment.value.prods.map(e => e.detId);
@@ -413,7 +425,8 @@ export const useAjusteSalida = (context) => {
     return {
         isLoadingRequest, errors, reasons, centers, financingSources, lts, adjustment, products,
         nonSelectedProds, totalRec, isLoadingProds, load, showSearchButton, filteredOptions, frontErrors,
-        getInfoForModalAdjustment, selectProd, deleteRow, addNewRow, storeAdjustment, updateAdjustment,
-        searchProducts, resetProducts, handleValidation, openOption, changeFinancingSource
+        filteredCenters,
+        getInfoForModalTransfers, selectProd, deleteRow, addNewRow, storeAdjustment, updateAdjustment,
+        searchProducts, resetProducts, handleValidation, openOption, changeFinancingSource, changeCenter
     }
 }

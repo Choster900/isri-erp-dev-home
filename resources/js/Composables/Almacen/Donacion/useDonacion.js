@@ -4,6 +4,7 @@ import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
 import { toast } from "vue3-toastify";
 import { useFormatDateTime } from "@/Composables/General/useFormatDateTime.js";
+import { useValidateInput } from '@/Composables/General/useValidateInput';
 //import { localeData } from 'moment_spanish_locale';
 import moment from 'moment';
 import _ from "lodash";
@@ -37,6 +38,18 @@ export const useDonacion = (context) => {
     const {
         formatDateVue3DP
     } = useFormatDateTime()
+
+    const {
+        validateInput
+    } = useValidateInput()
+
+    const handleValidation = (input, validation, element) => {
+        if (element) {
+            donInfo.value.prods[element.index][input] = validateInput(donInfo.value.prods[element.index][input], validation)
+        } else {
+            donInfo.value[input] = validateInput(donInfo.value[input], validation)
+        }
+    }
 
     const getInfoForModalDonation = async (id) => {
         try {
@@ -341,6 +354,6 @@ export const useDonacion = (context) => {
         isLoadingRequest, errors, donInfo, suppliers, products, centers,
         asyncFindProduct, isLoadingProduct, totalRec, brands, selectedProducts,
         getInfoForModalDonation, selectProv, openAnySelect, selectProd, addNewRow,
-        deleteRow, storeReception, updateReception
+        deleteRow, storeReception, updateReception, handleValidation
     }
 }
