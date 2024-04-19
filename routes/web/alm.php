@@ -84,7 +84,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             // Crear una colección para almacenar los centros de atención únicos
             $centrosUnicos = collect();
             // Iterar sobre las plazas asignadas y agregar los centros de atención únicos a la colección
-            foreach ( $plazasAsignadas as $plazaAsignada ) {
+            foreach ($plazasAsignadas as $plazaAsignada) {
                 $centroAtencion = $plazaAsignada->centro_atencion;
                 $centrosUnicos->push($centroAtencion);
             }
@@ -96,10 +96,43 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post(
         'get-product-by-proy-financiado',
         function (Request $request) {
-            return DetalleExistenciaAlmacen::with(['existencia_almacen.productos', 'marca'])
+
+            /* $totalDetalleRequerimiento = DetalleRequerimiento::where('id_det_existencia_almacen', $det["idDetExistenciaAlmacen"])
+                                        ->sum('cant_det_requerimiento');
+                                         */
+            /*   return DetalleExistenciaAlmacen::with(['existencia_almacen.productos', 'marca'])
+                  ->whereHas('existencia_almacen', function ($query) use ($request) {
+                      $query->where('id_proy_financiado', $request->idProyFinanciado);
+                  })->where('id_centro_atencion', $request->idCentroAtencion)->where('id_lt', $request->idLt)->get(); */
+
+            /* return DetalleExistenciaAlmacen::with(['existencia_almacen.productos', 'marca'])
+                ->select(
+                    'detalle_existencia_almacen.*',
+                    DB::raw('(SELECT SUM(cant_det_requerimiento) FROM detalle_requerimiento WHERE detalle_requerimiento.id_det_existencia_almacen = detalle_existencia_almacen.id_det_existencia_almacen) AS solicitado_en_req')
+                )
                 ->whereHas('existencia_almacen', function ($query) use ($request) {
                     $query->where('id_proy_financiado', $request->idProyFinanciado);
-                })->where('id_centro_atencion', $request->idCentroAtencion)->where('id_lt', $request->idLt)->get();
+                })
+                ->where('id_centro_atencion', $request->idCentroAtencion)
+                ->where('id_lt', $request->idLt)
+                ->get();
+ */
+
+            return DetalleExistenciaAlmacen::with(['existencia_almacen.productos', 'marca'])
+                ->select(
+                    'detalle_existencia_almacen.*',
+                    DB::raw('(SELECT SUM(detalle_requerimiento.cant_det_requerimiento) FROM detalle_requerimiento
+                    INNER JOIN requerimiento ON detalle_requerimiento.id_requerimiento = requerimiento.id_requerimiento
+                    WHERE detalle_requerimiento.id_det_existencia_almacen = detalle_existencia_almacen.id_det_existencia_almacen
+                    AND requerimiento.id_estado_req IN (1, 2)
+                    AND requerimiento.id_tipo_req = 1) AS solicitado_en_req')
+                )
+                ->whereHas('existencia_almacen', function ($query) use ($request) {
+                    $query->where('id_proy_financiado', $request->idProyFinanciado);
+                })
+                ->where('id_centro_atencion', $request->idCentroAtencion)
+                ->where('id_lt', $request->idLt)
+                ->get();
         }
     )->name('bieneservicios.get-product-by-proy-financiad');
     Route::post('update-state-requerimiento', [RequerimientoAlmacenController::class, 'updateStateRequerimiento'])->name('bieneservicios.get-product-by-proy-financiad');
@@ -114,16 +147,16 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('get-proyecto-financiado', function (Request $request) {
         return ProyectoFinanciado::all();
     })->name('reporte.get-proyectos');
-    Route::post('get-reporte-financiero-almacen-bienes-existencia',[ReporteAlmacenController::class,'getReporteFinanciero'])->name('bieneservicios.get-reporte-financiero-almacen');
+    Route::post('get-reporte-financiero-almacen-bienes-existencia', [ReporteAlmacenController::class, 'getReporteFinanciero'])->name('bieneservicios.get-reporte-financiero-almacen');
     Route::post('get-excel-document-reporte-financiero', [ReporteAlmacenController::class, 'createExcelReport'])->name('bieneservicios.get-proyectos');
     //TODO: FALTA EL REPORTE DE PDF DE REPORTE FINANCIERO
-    Route::post('get-reporte-consumo',[ReporteAlmacenController::class,'getReporteConsumo'])->name('bieneservicios.get-reporte-consumo');
-    Route::post('get-excel-document-reporte-consumo',[ReporteAlmacenController::class,'getExcelDocumentConsumo'])->name('bieneservicios.get-excel-document-reporte-consumo');
+    Route::post('get-reporte-consumo', [ReporteAlmacenController::class, 'getReporteConsumo'])->name('bieneservicios.get-reporte-consumo');
+    Route::post('get-excel-document-reporte-consumo', [ReporteAlmacenController::class, 'getExcelDocumentConsumo'])->name('bieneservicios.get-excel-document-reporte-consumo');
     Route::post('get-cuenta-by-number', function (Request $request) {
 
-        $cuentas = CatalogoCtaPresupuestal::where("id_ccta_presupuestal","like",'%' . $request->numeroCuenta . '%')->get();
+        $cuentas = CatalogoCtaPresupuestal::where("id_ccta_presupuestal", "like", '%' . $request->numeroCuenta . '%')->get();
 
-         // Formatear resultados para respuesta JSON
+        // Formatear resultados para respuesta JSON
         return $cuentas->map(function ($item) {
             return [
                 'value'           => $item->id_ccta_presupuestal,
@@ -131,8 +164,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
                 'allDataPersonas' => $item,
             ];
         });
-
-    } )->name('reporte.get-cuenta');
+    })->name('reporte.get-cuenta');
     //Surplus adjustment
     Route::get(
         '/alm/ajuste-entrada',
@@ -154,9 +186,9 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     )->name('alm.reporteConsumo');
     Route::post('get-cuenta-by-number', function (Request $request) {
 
-        $cuentas = CatalogoCtaPresupuestal::where("id_padre_ccta_presupuestal",611)->orWhere("id_padre_ccta_presupuestal",541)->get();
+        $cuentas = CatalogoCtaPresupuestal::where("id_padre_ccta_presupuestal", 611)->orWhere("id_padre_ccta_presupuestal", 541)->get();
 
-         // Formatear resultados para respuesta JSON
+        // Formatear resultados para respuesta JSON
         return $cuentas->map(function ($item) {
             return [
                 'value'           => $item->id_ccta_presupuestal,
@@ -164,8 +196,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
                 'allDataPersonas' => $item,
             ];
         });
-
-    } )->name('reporte.get-cuenta');
+    })->name('reporte.get-cuenta');
 
     //Outgoing adjustment
     Route::get(
