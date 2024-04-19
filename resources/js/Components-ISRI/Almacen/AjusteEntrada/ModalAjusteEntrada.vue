@@ -11,11 +11,13 @@
 
             <div class="flex items-center justify-between py-3 px-4 border-b border-gray-400 border-opacity-70">
                 <div class="flex">
-                    <span class="text-[16px] font-medium font-[Roboto] text-gray-500 text-opacity-70">Ajuste de entrada</span>
+                    <span class="text-[16px] font-medium font-[Roboto] text-gray-500 text-opacity-70">Ajuste de
+                        entrada</span>
                     <div class="mt-[5px] text-gray-500 text-opacity-70 w-[14px] h-[14px] mx-2">
                         <icon-m :iconName="'nextSvgVector'"></icon-m>
                     </div>
-                    <span class="text-[16px] font-medium text-black font-[Roboto]">{{ objId > 0 ? 'Editar ajuste' : 'Crear ajuste'}}</span>
+                    <span class="text-[16px] font-medium text-black font-[Roboto]">{{ objId > 0 ? 'Editar ajuste' :
+                        'Crear ajuste'}}</span>
                 </div>
                 <svg class="h-6 w-6 text-gray-400 hover:text-gray-600 cursor-pointer" @click="$emit('cerrar-modal')"
                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -37,6 +39,19 @@
                 </div>
 
                 <div class="mb-2 mt-1 md:flex flex-row justify-items-start w-[96%] pl-8">
+                    <div class="mb-2 md:mr-2 md:mb-0 basis-1/4" :class="{ 'selected-opt': adjustment.reasonId > 0, }">
+                        <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Motivo
+                            <span class="text-red-600 font-extrabold">*</span>
+                        </label>
+                        <div class="relative font-semibold flex h-[35px] w-full">
+                            <Multiselect v-model="adjustment.reasonId" :options="reasons" :searchable="true"
+                                :noOptionsText="'Lista vacía.'" placeholder="Seleccione motivo"
+                                :disabled="adjustment.status != 1"
+                                :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
+                        </div>
+                        <InputError v-for="(item, index) in errors.reasonId" :key="index" class="mt-2"
+                            :message="item" />
+                    </div>
                     <div class="mb-2 md:mr-2 md:mb-0 basis-1/4" :class="{ 'selected-opt': adjustment.centerId > 0, }">
                         <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Centro
                             <span class="text-red-600 font-extrabold">*</span>
@@ -50,18 +65,6 @@
                         <InputError v-for="(item, index) in errors.centerId" :key="index" class="mt-2"
                             :message="item" />
                     </div>
-                    <div class="mb-2 md:mr-2 md:mb-0 basis-1/4" :class="{ 'selected-opt': adjustment.idLt > 0, }">
-                        <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Linea de trabajo
-                            <span class="text-red-600 font-extrabold">*</span>
-                        </label>
-                        <div class="relative font-semibold flex h-[35px] w-full">
-                            <Multiselect v-model="adjustment.idLt" :options="lts" :searchable="true"
-                                :noOptionsText="'Lista vacía.'" placeholder="Seleccione uplt"
-                                :disabled="adjustment.status != 1"
-                                :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
-                        </div>
-                        <InputError v-for="(item, index) in errors.idLt" :key="index" class="mt-2" :message="item" />
-                    </div>
                     <div class="mb-2 md:mr-2 md:mb-0 basis-1/4"
                         :class="{ 'selected-opt': adjustment.financingSourceId > 0, }">
                         <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Fuente financiamiento
@@ -70,24 +73,23 @@
                         <div class="relative font-semibold flex h-[35px] w-full">
                             <Multiselect v-model="adjustment.financingSourceId" :options="financingSources"
                                 :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione fuente"
-                                :disabled="adjustment.status != 1"
+                                :disabled="adjustment.status != 1" @change="changeFinancingSource($event)"
                                 :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
                         </div>
                         <InputError v-for="(item, index) in errors.financingSourceId" :key="index" class="mt-2"
                             :message="item" />
                     </div>
-                    <div class="mb-2 md:mr-0 md:mb-0 basis-1/4" :class="{ 'selected-opt': adjustment.reasonId > 0, }">
-                        <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Motivo
-                            <span class="text-red-600 font-extrabold">*</span>
+                    <div class="mb-2 md:mr-0 md:mb-0 basis-1/4" :class="{ 'selected-opt': adjustment.idLt > 0, }">
+                        <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Linea de trabajo
+                            <span v-if="adjustment.financingSourceId != 4 || adjustment.financingSourceId == ''" class="text-red-600 font-extrabold">*</span>
                         </label>
                         <div class="relative font-semibold flex h-[35px] w-full">
-                            <Multiselect v-model="adjustment.reasonId" :options="reasons" :searchable="true"
-                                :noOptionsText="'Lista vacía.'" placeholder="Seleccione motivo"
-                                :disabled="adjustment.status != 1"
+                            <Multiselect v-model="adjustment.idLt" :options="lts" :searchable="true"
+                                :noOptionsText="'Lista vacía.'" :placeholder="adjustment.financingSourceId === 4 ? 'Desactivado' : 'Seleccione uplt'"
+                                :disabled="adjustment.status != 1 || adjustment.financingSourceId === 4"
                                 :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
                         </div>
-                        <InputError v-for="(item, index) in errors.reasonId" :key="index" class="mt-2"
-                            :message="item" />
+                        <InputError v-for="(item, index) in errors.idLt" :key="index" class="mt-2" :message="item" />
                     </div>
                 </div>
 
@@ -100,8 +102,7 @@
                             :disabled="adjustment.status != 1" placeholder="Escriba observación"
                             :class="adjustment.observation != '' ? 'bg-gray-200' : ''"
                             class="w-full h-12 overflow-y-auto peer placeholder-gray-400 text-xs font-semibold border border-gray-300 hover:border-gray-400 px-2 text-slate-900 transition-colors duration-300 focus:ring-blue-500 focus:border-blue-500"
-                            style="border-radius: 4px;"
-                            @input="handleValidation('observation', { limit: 255 })">
+                            style="border-radius: 4px;" @input="handleValidation('observation', { limit: 255 })">
                     </textarea>
                         <InputError v-for="(item, index) in errors.observation" :key="index" class="mt-2"
                             :message="item" />
@@ -175,11 +176,12 @@
                                 </div>
                                 <div class="border-r border-gray-500 min-h-[75px] flex items-center justify-center"
                                     :class="errors['prods.' + index + '.brandId'] ? 'bg-red-300' : ''">
-                                    <Multiselect v-if="adjustment.status == 1" id="doc" v-model="prod.brandId" :options="brands"
-                                        class="h-[35px] max-w-[95%]" :disabled="adjustment.status != 1"
-                                        :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Marca"
+                                    <Multiselect v-if="adjustment.status == 1" id="doc" v-model="prod.brandId"
+                                        :options="brands" class="h-[35px] max-w-[95%]"
+                                        :disabled="adjustment.status != 1" :searchable="true"
+                                        :noOptionsText="'Lista vacía.'" placeholder="Marca"
                                         :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', optionPointed: 'text-white bg-[#001c48] bg-opacity-40' }" />
-                                        <p class="font-[MuseoSans] text-[12px] p-1 " v-else>{{ prod.brandLabel }}</p>
+                                    <p class="font-[MuseoSans] text-[12px] p-1 " v-else>{{ prod.brandLabel }}</p>
                                 </div>
                                 <div class="flex items-center justify-center border-r border-gray-500 min-h-[75px]"
                                     :class="errors['prods.' + index + '.expDate'] ? 'bg-red-300' : ''">
@@ -254,8 +256,6 @@
                             </div>
                         </div>
                     </div>
-
-
                 </div>
 
             </div>
@@ -306,7 +306,8 @@ export default {
         const {
             isLoadingRequest, errors, adjustment, reasons, centers, financingSources, lts,
             products, brands, asyncFindProduct, totalRec, asyncProds, selectedProducts,
-            getInfoForModalAdjustment, selectProd, deleteRow, addNewRow, storeAdjustment, updateAdjustment, handleValidation
+            getInfoForModalAdjustment, selectProd, deleteRow, addNewRow, storeAdjustment, updateAdjustment, handleValidation,
+            changeFinancingSource
         } = useAjusteEntrada(context);
 
         const handleSearchChange = async (query, index, prodId) => {
@@ -322,7 +323,8 @@ export default {
         return {
             isLoadingRequest, errors, adjustment, reasons, centers, financingSources, lts,
             products, brands, asyncFindProduct, totalRec, asyncProds, selectedProducts,
-            handleValidation, selectProd, handleSearchChange, deleteRow, addNewRow, storeAdjustment, updateAdjustment
+            handleValidation, selectProd, handleSearchChange, deleteRow, addNewRow, storeAdjustment, updateAdjustment,
+            changeFinancingSource
         }
     }
 }

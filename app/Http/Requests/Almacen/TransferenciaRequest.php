@@ -4,7 +4,7 @@ namespace App\Http\Requests\Almacen;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class AjusteEntradaRequest extends FormRequest
+class TransferenciaRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,12 +21,11 @@ class AjusteEntradaRequest extends FormRequest
      */
     public function rules(): array
     {
+        //$rules["reasonId"] = ['required'];
         $rules["centerId"] = ['required'];
-        $rules["idLt"] = ['required_if:financingSourceId,!=,4'];
         $rules["financingSourceId"] = ['required'];
-        $rules["reasonId"] = ['required'];
         foreach ($this->input('prods', []) as $key => $prod) {
-            $rules["prods.{$key}.prodId"] = [
+            $rules["prods.{$key}.detId"] = [
                 function ($attribute, $value, $fail) use ($key, $prod) {
                     if (!$prod['deleted'] && empty($value)) {
                         $fail("Debe seleccionar el producto.");
@@ -40,24 +39,10 @@ class AjusteEntradaRequest extends FormRequest
                     }
                 }
             ];
-            $rules["prods.{$key}.cost"] = [
+            $rules["prods.{$key}.avails"] = [
                 function ($attribute, $value, $fail) use ($key, $prod) {
-                    if (!$prod['deleted'] && (empty($value) || $value <= 0)) {
-                        $fail("Debe ingresar un monto mayor a cero.");
-                    }
-                }
-            ];
-            $rules["prods.{$key}.brandId"] = [
-                function ($attribute, $value, $fail) use ($key, $prod) {
-                    if (!$prod['deleted'] && empty($value)) {
-                        $fail("Debe seleccionar marca.");
-                    }
-                }
-            ];
-            $rules["prods.{$key}.expDate"] = [
-                function ($attribute, $value, $fail) use ($key, $prod) {
-                    if (!$prod['deleted'] && (empty($value) && $prod['perishable'] == 1)) {
-                        $fail("Debe seleccionar la fecha de caducidad.");
+                    if (!$prod['deleted'] && ($value < 0)) {
+                        $fail("Ha excedido la cantidad de productos.");
                     }
                 }
             ];
@@ -68,9 +53,8 @@ class AjusteEntradaRequest extends FormRequest
     {
         $messages = [];   
         $messages["centerId.required"] = "Debe seleccionar proveedor.";
-        $messages["idLt.required_if"] = "Debe seleccionar linea de trabajo.";
         $messages["financingSourceId.required"] = "Debe seleccionar fuente de financiamiento.";
-        $messages["reasonId.required"] = "Debe seleccionar motivo.";
+        //$messages["reasonId.required"] = "Debe seleccionar motivo.";
         return $messages;
     }
 }

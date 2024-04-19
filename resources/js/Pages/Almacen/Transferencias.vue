@@ -11,7 +11,7 @@
         </div>
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="showModalOutgoingAdjustment = true; objId = 0;" v-if="permits.insertar == 1"
+                <GeneralButton @click="showModalTransfers = true; objId = 0;" v-if="permits.insertar == 1"
                     color="bg-green-700  hover:bg-green-800" text="Crear Transferencia" icon="add" />
             </div>
         </div>
@@ -97,7 +97,7 @@
                                             </div>
                                             <div class="font-semibold pt-0.5">Kardex</div>
                                         </div> -->
-                                        <div @click="showModalOutgoingAdjustment = true; objId = obj.id_requerimiento"
+                                        <div @click="showModalTransfers = true; objId = obj.id_requerimiento"
                                             v-if="permits.actualizar === 1 && obj.id_estado_req == 1"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-orange-700 w-[22px] h-[22px] mr-1.5 ml-0.5">
@@ -156,8 +156,8 @@
         
         <pagination :emptyObject="emptyObject" :links="links" @get-data="getDataToShow" />
 
-        <modal-ajuste-salida-vue v-if="showModalOutgoingAdjustment" :showModalOutgoingAdjustment="showModalOutgoingAdjustment" :objId="objId"
-            @cerrar-modal="showModalOutgoingAdjustment = false" @get-table="getDataToShow(tableData.currentPage)" />
+        <modal-transferencia-vue v-if="showModalTransfers" :showModalTransfers="showModalTransfers" :objId="objId"
+            @cerrar-modal="showModalTransfers = false" @get-table="getDataToShow(tableData.currentPage)" />
 
     </AppLayoutVue>
 </template>
@@ -168,7 +168,7 @@ import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import Pagination from "@/Components-ISRI/Pagination.vue";
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
-import ModalAjusteSalidaVue from '@/Components-ISRI/Almacen/AjusteSalida/ModalAjusteSalida.vue';
+import ModalTransferenciaVue from '@/Components-ISRI/Almacen/Transferencia/ModalTransferencia.vue';
 
 import { localeData } from 'moment_spanish_locale';
 import moment from 'moment';
@@ -180,7 +180,7 @@ import { useToDataTable } from '@/Composables/General/useToDataTable.js';
 import { useEnviarAjusteSalida } from '@/Composables/Almacen/AjusteSalida/useEnviarAjusteSalida.js';
 
 export default {
-    components: { Head, AppLayoutVue, Datatable, IconM, ModalAjusteSalidaVue, Pagination },
+    components: { Head, AppLayoutVue, Datatable, IconM, ModalTransferenciaVue, Pagination },
     props: {
         menu: {
             type: Object,
@@ -191,7 +191,7 @@ export default {
         const { menu } = toRefs(props);
         const permits = usePermissions(menu.value, window.location.pathname);
 
-        const showModalOutgoingAdjustment = ref(false)
+        const showModalTransfers = ref(false)
 
         const objId = ref(0)
 
@@ -255,7 +255,7 @@ export default {
 
 
         return {
-            permits, dataToShow, showModalOutgoingAdjustment, tableData, perPage, objId,
+            permits, dataToShow, showModalTransfers, tableData, perPage, objId,
             links, sortKey, sortOrders, isLoadinRequest, isLoadingTop, emptyObject, columns,
             getDataToShow, handleData, sortBy, changeStatusElement, sendOutgoingAdjustment, moment
         };
