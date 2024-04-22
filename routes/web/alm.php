@@ -233,6 +233,6 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('transferencias-almacen', [TransferenciaController::class, 'getTransferencias'])->name('transferencia.getTransferencias');
     Route::post('get-info-modal-warehouse-transfer', [TransferenciaController::class, 'getInfoWarehouseTransfer'])->name('transferencia.getInfoWarehouseTransfer');
     Route::post('save-warehouse-transfer-info', [TransferenciaController::class, 'storeWarehouseTransfer'])->name('transferencia.storeWarehouseTransfer');
-
+    Route::post('update-warehouse-transfer-info', [TransferenciaController::class, 'updateWarehouseTransfer'])->name('transferencia.updateWarehouseTransfer');
 
 });
