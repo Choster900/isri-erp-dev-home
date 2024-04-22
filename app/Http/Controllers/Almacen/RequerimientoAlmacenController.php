@@ -69,27 +69,28 @@ class RequerimientoAlmacenController extends Controller
             "proyecto_financiado",
             "estado_requerimiento"
 
-        ])->when($coleccion->contains('id_rol', 23) || $coleccion->contains('id_rol', 24), function ($query) {
+        ])->where("id_tipo_req", 1)->when($coleccion->contains('id_rol', 23) || $coleccion->contains('id_rol', 24), function ($query) {
             return $query->where('id_estado_req', 2)
                 ->orWhere('id_estado_req', 3)
-                ->orWhere('id_estado_req', 4);
-        })->where("id_tipo_req", 1)
+                ->orWhere('id_estado_req', 4)
+                ->where('id_tipo_req', 1);
+        })
             ->orderBy($v_columns[$v_column], $v_dir);
 
         if ($data) {
             $v_query->where('num_requerimiento', 'like', '%' . $data["num_requerimiento"] . '%')
-            ->where('id_centro_atencion', 'like', '%' . $data["id_centro_atencion"] . '%')
-            ->where('id_lt', 'like', '%' . $data["id_lt"] . '%')
-            ->where('id_proy_financiado', 'like', '%' . $data["id_proy_financiado"] . '%')
-            ->where('fecha_requerimiento', 'like', '%' . $data["fecha_requerimiento"] . '%')
-            ->where('id_estado_req', 'like', '%' . $data["id_estado_req"] . '%');
+                ->where('id_centro_atencion', 'like', '%' . $data["id_centro_atencion"] . '%')
+                ->where('id_lt', 'like', '%' . $data["id_lt"] . '%')
+                ->where('id_proy_financiado', 'like', '%' . $data["id_proy_financiado"] . '%')
+                ->where('fecha_requerimiento', 'like', '%' . $data["fecha_requerimiento"] . '%')
+                ->where('id_estado_req', 'like', '%' . $data["id_estado_req"] . '%');
         }
 
         $data = $v_query->paginate($v_length)->onEachSide(1);
         return [
             'data'       => $data,
-            'canSaveReq' => $coleccion->contains('id_rol', 23) || $coleccion->contains('id_rol', 24),
             'draw'       => $request->input('draw'),
+            'canSaveReq' => $coleccion->contains('id_rol', 23) || $coleccion->contains('id_rol', 24),
         ];
     }
 
@@ -137,7 +138,7 @@ class RequerimientoAlmacenController extends Controller
 
 
 
-    function addRequerimiento(RequerimientoRequest $request) /* addRequerimiento(Request $request) */
+    function addRequerimiento(Request $request) /* addRequerimiento(Request $request) */
     {
 
 
@@ -188,10 +189,13 @@ class RequerimientoAlmacenController extends Controller
 
             ];
             $requerimientoId = Requerimiento::insertGetId($requerimiento);
-            foreach ($request->dataDetalleRequerimiento as $key => $value) {
 
-                foreach ($value["productos"] as $key => $value2) {
+            foreach ( $request->dataDetalleRequerimiento as $key => $value ) {
 
+                foreach ( $value["productos"] as $key => $value2 ) {
+
+
+                    /* //!APLICANDO REGLAS DE VALIDACIONES */
 
                     $rules = [];
 
@@ -204,16 +208,35 @@ class RequerimientoAlmacenController extends Controller
                                 if ($det["stateProducto"] == 0)
                                     return;
 
-                                if (!empty($det["idDetExistenciaAlmacen"])) {
+                                $rules["dataDetalleRequerimiento.{$key}.productos.{$indice}.cantDetRequerimiento"] = ['required'];
+                                $rules["dataDetalleRequerimiento.{$key}.productos.{$indice}.idDetExistenciaAlmacen"] = ['required'];
+
+
+                                if (!empty ($det["idDetExistenciaAlmacen"])) {
+
+                                    $cantidadTotal = 0;
 
                                     $detalleExistenciaAlmacen = DetalleExistenciaAlmacen::select("cant_det_existencia_almacen")
                                         ->where('id_det_existencia_almacen', $det["idDetExistenciaAlmacen"])
                                         ->first();
 
+                                    $cantidadDetalleExistencia = $detalleExistenciaAlmacen->cant_det_existencia_almacen; // ?esto trae 10 (se supone)
+
+
+                                    $totalDetalleRequerimiento = DetalleRequerimiento::with([
+                                        "requerimiento" => function ($query) {
+                                            $query->whereIn('id_estado_req', [1, 2]);
+                                        }
+                                    ])->where('id_det_existencia_almacen', $det["idDetExistenciaAlmacen"])
+                                        ->sum('cant_det_requerimiento'); //?La suma de esto es 9 (Se supone)
+
+                                    $cantidadTotal = $cantidadDetalleExistencia - $totalDetalleRequerimiento; // Sumamos
+
+
                                     $rules["dataDetalleRequerimiento.{$key}.productos.{$indice}.cantDetRequerimiento"] = [
                                         'required',
                                         'numeric',
-                                        "lte:$detalleExistenciaAlmacen->cant_det_existencia_almacen",
+                                        "lte:$cantidadTotal",
                                     ];
                                 }
                             });
@@ -221,8 +244,8 @@ class RequerimientoAlmacenController extends Controller
 
                     $messages = [
                         'dataDetalleRequerimiento.*.productos.*.cantDetRequerimiento.required' => 'El campo Cantidad de Requerimiento es obligatorio.',
-                        'dataDetalleRequerimiento.*.productos.*.cantDetRequerimiento.numeric' => 'El campo Cantidad de Requerimiento debe ser numérico.',
-                        'dataDetalleRequerimiento.*.productos.*.cantDetRequerimiento.lte' => 'La cantidad de requerimiento debe ser menor o igual a :value.',
+                        'dataDetalleRequerimiento.*.productos.*.cantDetRequerimiento.numeric'  => 'El campo Cantidad de Requerimiento debe ser numérico.',
+                        'dataDetalleRequerimiento.*.productos.*.cantDetRequerimiento.lte'      => 'La cantidad de requerimiento debe ser menor o igual a :value.',
                     ];
                     $validator = Validator::make($request->all(), $rules, $messages);
 
@@ -248,9 +271,10 @@ class RequerimientoAlmacenController extends Controller
                     );
 
 
+                    // Filtrando el detalle existencia para saber cual es el producto que cogio
                     $detalleExistenciaAlmacen = DetalleExistenciaAlmacen::find($value2["idDetExistenciaAlmacen"]);
 
-                    if ($detalleExistenciaAlmacen) {
+                    /*  if ($detalleExistenciaAlmacen) {
                         $cantidadActualizada = max(0, $detalleExistenciaAlmacen->cant_det_existencia_almacen - $value2["cantDetRequerimiento"]);
 
                         $detalleExistenciaAlmacen->update([
@@ -263,7 +287,7 @@ class RequerimientoAlmacenController extends Controller
                         ExistenciaAlmacen::where("id_existencia_almacen", $detalleExistenciaAlmacen->id_existencia_almacen)->update([
                             "cant_existencia_almacen" => $totalNuevoStock
                         ]);
-                    }
+                    } */
                 }
             }
 
@@ -280,7 +304,7 @@ class RequerimientoAlmacenController extends Controller
         }
     }
 
-    function updateRequerimientoAlmacen(RequerimientoRequest $request)
+    function updateRequerimientoAlmacen(Request $request)
     {
 
 
@@ -305,45 +329,47 @@ class RequerimientoAlmacenController extends Controller
             Requerimiento::where("id_requerimiento", $request->idRequerimiento)->update($requerimiento);
 
 
-            foreach ($request->dataDetalleRequerimiento as $key => $value) {
+            foreach ( $request->dataDetalleRequerimiento as $key => $value ) {
 
 
-                foreach ($value["productos"] as $key => $value2) {
+                foreach ( $value["productos"] as $key => $value2 ) {
 
                     if ($value2["idDetRequerimiento"]) {
                         if ($value2["stateProducto"] == 1) {
 
-                            $detalleExistenciaAlmacen = DetalleExistenciaAlmacen::find($value2["idDetExistenciaAlmacen"]);
-                            $detalleRequerimiento = DetalleRequerimiento::find($value2["idDetRequerimiento"]);
-
-                            if ($detalleExistenciaAlmacen) {
-                                $recalculo = max(0, $detalleExistenciaAlmacen->cant_det_existencia_almacen + $detalleRequerimiento->cant_det_requerimiento);
-
-                                $detalleExistenciaAlmacen->update([
-                                    'cant_det_existencia_almacen' => $recalculo
-                                ]);
-                            }
-
                             $rules = [];
 
-                            collect($request->dataDetalleRequerimiento)->each(function ($prodReq, $key) use (&$rules, &$request) {
+                            collect($request->dataDetalleRequerimiento)->each(function ($prodReq, $key) use (&$rules, &$request, &$value2) {
                                 if ($prodReq["stateCentroProduccion"] == 0)
                                     return;
 
                                 collect($request["dataDetalleRequerimiento.{$key}.productos"])
-                                    ->each(function ($det, $indice) use (&$rules, $key, $prodReq) {
+                                    ->each(function ($det, $indice) use (&$rules, $key, $prodReq, $value2) {
                                         if ($det["stateProducto"] == 0)
                                             return;
 
-                                        if (!empty($det["idDetExistenciaAlmacen"])) {
+                                        if (!empty ($det["idDetExistenciaAlmacen"])) {
+
+                                            $cantidadTotal = 0;
+
                                             $detalleExistenciaAlmacen = DetalleExistenciaAlmacen::select("cant_det_existencia_almacen")
                                                 ->where('id_det_existencia_almacen', $det["idDetExistenciaAlmacen"])
                                                 ->first();
 
+                                            $cantidadDetalleExistencia = $detalleExistenciaAlmacen->cant_det_existencia_almacen; // ?esto trae 10 (se supone)
+
+
+                                            $totalDetalleRequerimiento = DetalleRequerimiento::where('id_det_existencia_almacen', $det["idDetExistenciaAlmacen"])
+                                                ->whereNotIn("id_det_requerimiento", [$value2["idDetRequerimiento"]])
+                                                ->sum('cant_det_requerimiento');
+
+                                            $cantidadTotal = $cantidadDetalleExistencia - $totalDetalleRequerimiento; // Sumamos
+
+
                                             $rules["dataDetalleRequerimiento.{$key}.productos.{$indice}.cantDetRequerimiento"] = [
                                                 'required',
                                                 'numeric',
-                                                "lte:$detalleExistenciaAlmacen->cant_det_existencia_almacen",
+                                                "lte:$cantidadTotal",
                                             ];
                                         }
                                     });
@@ -367,43 +393,8 @@ class RequerimientoAlmacenController extends Controller
                                     'ip_det_requerimiento'        => $request->ip(),
                                 ]
                             );
-                            $detalleExistenciaAlmacen = DetalleExistenciaAlmacen::find($value2["idDetExistenciaAlmacen"]);
-
-                            if ($detalleExistenciaAlmacen) {
-
-
-                                $cantidadActualizada = max(0, $detalleExistenciaAlmacen->cant_det_existencia_almacen - $value2["cantDetRequerimiento"]);
-
-                                $detalleExistenciaAlmacen->update([
-                                    'cant_det_existencia_almacen' => $cantidadActualizada
-                                ]);
-
-                                $totalNuevoStock = DetalleExistenciaAlmacen::where('id_existencia_almacen', $detalleExistenciaAlmacen->id_existencia_almacen)
-                                    ->sum('cant_det_existencia_almacen');
-
-                                ExistenciaAlmacen::where("id_existencia_almacen", $detalleExistenciaAlmacen->id_existencia_almacen)->update([
-                                    "cant_existencia_almacen" => $totalNuevoStock
-                                ]);
-                            }
                         } else {
 
-                            $detalleExistenciaAlmacen = DetalleExistenciaAlmacen::find($value2["idDetExistenciaAlmacen"]);
-                            $detalleRequerimiento = DetalleRequerimiento::find($value2["idDetRequerimiento"]);
-
-                            if ($detalleExistenciaAlmacen) {
-                                $recalculo = max(0, $detalleExistenciaAlmacen->cant_det_existencia_almacen + $detalleRequerimiento->cant_det_requerimiento);
-
-                                $detalleExistenciaAlmacen->update([
-                                    'cant_det_existencia_almacen' => $recalculo
-                                ]);
-
-                                $totalNuevoStock = DetalleExistenciaAlmacen::where('id_existencia_almacen', $detalleExistenciaAlmacen->id_existencia_almacen)
-                                    ->sum('cant_det_existencia_almacen');
-
-                                ExistenciaAlmacen::where("id_existencia_almacen", $detalleExistenciaAlmacen->id_existencia_almacen)->update([
-                                    "cant_existencia_almacen" => $totalNuevoStock
-                                ]);
-                            }
 
                             // eliminar
                             DetalleRequerimiento::where("id_det_requerimiento", $value2["idDetRequerimiento"])->update([
@@ -427,16 +418,27 @@ class RequerimientoAlmacenController extends Controller
                                         if ($det["stateProducto"] == 0)
                                             return;
 
-                                        if (!empty($det["idDetExistenciaAlmacen"])) {
+                                        if (!empty ($det["idDetExistenciaAlmacen"])) {
+
+                                            $cantidadTotal = 0;
 
                                             $detalleExistenciaAlmacen = DetalleExistenciaAlmacen::select("cant_det_existencia_almacen")
                                                 ->where('id_det_existencia_almacen', $det["idDetExistenciaAlmacen"])
                                                 ->first();
 
+                                            $cantidadDetalleExistencia = $detalleExistenciaAlmacen->cant_det_existencia_almacen; // ?esto trae 10 (se supone)
+
+
+                                            $totalDetalleRequerimiento = DetalleRequerimiento::where('id_det_existencia_almacen', $det["idDetExistenciaAlmacen"])
+                                                ->sum('cant_det_requerimiento'); //?La suma de esto es 9 (Se supone)
+
+                                            $cantidadTotal = $cantidadDetalleExistencia - $totalDetalleRequerimiento; // Sumamos
+
+
                                             $rules["dataDetalleRequerimiento.{$key}.productos.{$indice}.cantDetRequerimiento"] = [
                                                 'required',
                                                 'numeric',
-                                                "lte:$detalleExistenciaAlmacen->cant_det_existencia_almacen",
+                                                "lte:$cantidadTotal",
                                             ];
                                         }
                                     });
@@ -444,8 +446,8 @@ class RequerimientoAlmacenController extends Controller
 
                             $messages = [
                                 'dataDetalleRequerimiento.*.productos.*.cantDetRequerimiento.required' => 'El campo Cantidad de Requerimiento es obligatorio.',
-                                'dataDetalleRequerimiento.*.productos.*.cantDetRequerimiento.numeric' => 'El campo Cantidad de Requerimiento debe ser numérico.',
-                                'dataDetalleRequerimiento.*.productos.*.cantDetRequerimiento.lte' => 'La cantidad de requerimiento debe ser menor o igual a :value.',
+                                'dataDetalleRequerimiento.*.productos.*.cantDetRequerimiento.numeric'  => 'El campo Cantidad de Requerimiento debe ser numérico.',
+                                'dataDetalleRequerimiento.*.productos.*.cantDetRequerimiento.lte'      => 'La cantidad de requerimiento debe ser menor o igual a :value.',
                             ];
                             $validator = Validator::make($request->all(), $rules, $messages);
 
@@ -465,24 +467,6 @@ class RequerimientoAlmacenController extends Controller
                                     'ip_det_requerimiento'        => $request->ip(),
                                 ]
                             );
-
-
-                            $detalleExistenciaAlmacen = DetalleExistenciaAlmacen::find($value2["idDetExistenciaAlmacen"]);
-
-                            if ($detalleExistenciaAlmacen) {
-                                $cantidadActualizada = max(0, $detalleExistenciaAlmacen->cant_det_existencia_almacen - $value2["cantDetRequerimiento"]);
-
-                                $detalleExistenciaAlmacen->update([
-                                    'cant_det_existencia_almacen' => $cantidadActualizada
-                                ]);
-
-                                $totalNuevoStock = DetalleExistenciaAlmacen::where('id_existencia_almacen', $detalleExistenciaAlmacen->id_existencia_almacen)
-                                    ->sum('cant_det_existencia_almacen');
-
-                                ExistenciaAlmacen::where("id_existencia_almacen", $detalleExistenciaAlmacen->id_existencia_almacen)->update([
-                                    "cant_existencia_almacen" => $totalNuevoStock
-                                ]);
-                            }
                         }
                     }
                 }
@@ -514,6 +498,14 @@ class RequerimientoAlmacenController extends Controller
             'fecha_mod_requerimiento' => Carbon::now(),
         ];
 
+        /*
+
+            idRequerimiento: idRequerimiento,
+                    idProyectoFinanciado: idProyectoFinanciado,
+                    idEstado: idEstado,
+
+                    */
+
         // Si el estado es "Despachado" (idEstado == 3)
         if ($request->idEstado == 3) {
             // Obtener los detalles del requerimiento
@@ -521,17 +513,34 @@ class RequerimientoAlmacenController extends Controller
             $existencias = [];
 
             // Iterar sobre los detalles del requerimiento
-            foreach ($detReq as $key => $value) {
+            foreach ( $detReq as $key => $value ) {
+
                 // Buscar la existencia en el almacén
                 $existenciaAlmacen = ExistenciaAlmacen::where([
                     "id_producto"        => $value["id_producto"],
                     "id_proy_financiado" => $request->idProyectoFinanciado
                 ])->first();
 
-                // Si se encuentra la existencia, agregarla al arreglo de existencias
-                if ($existenciaAlmacen !== null) {
-                    $existencias[] = $existenciaAlmacen;
-                }
+                // Buscar el detalle de existencia en el almacén
+                $detalleExistencia = DetalleExistenciaAlmacen::find($value["id_det_existencia_almacen"]);
+
+                // Restar la cantidad del detalle del requerimiento a la cantidad actual del detalle de existencia en el almacén
+                $nuevaCantidad = $detalleExistencia->cant_det_existencia_almacen - $value["cantidad_requerida"];
+
+                // Actualizar la cantidad actual del detalle de existencia en el almacén
+                $detalleExistencia->update([
+                    'cant_det_existencia_almacen' => $nuevaCantidad
+                ]);
+
+
+
+               /*  $totalNuevoStock = DetalleExistenciaAlmacen::where('id_existencia_almacen', $detalleExistencia->id_existencia_almacen)
+                    ->sum('cant_det_existencia_almacen');
+
+                ExistenciaAlmacen::where("id_existencia_almacen", $detalleExistencia->id_existencia_almacen)->update([
+                    "cant_existencia_almacen" => $totalNuevoStock
+                ]); */
+
 
                 // Actualizar el costo del detalle del requerimiento con el costo de la existencia en el almacén
                 DetalleRequerimiento::where("id_det_requerimiento", $value["id_det_requerimiento"])->update([
@@ -539,8 +548,11 @@ class RequerimientoAlmacenController extends Controller
                 ]);
             }
 
-            // Crear un registro en el kardex
+
+
+           /*  // Crear un registro en el kardex
             $requerimiento = Requerimiento::find($request->idRequerimiento);
+
             $kardexArray = [
                 'id_proy_financiado' => $requerimiento->id_proy_financiado,
                 'id_tipo_req'        => 1,
@@ -556,7 +568,8 @@ class RequerimientoAlmacenController extends Controller
 
             // Registrar detalles en el kardex
             $detalleRequerimiento = DetalleRequerimiento::where("id_requerimiento", $request->idRequerimiento)->get();
-            foreach ($detalleRequerimiento as $key => $value) {
+
+            foreach ( $detalleRequerimiento as $key => $value ) {
                 DetalleKardex::insert([
                     'id_kardex'            => $cardexId,
                     'id_producto'          => $value['id_producto'],
@@ -569,16 +582,11 @@ class RequerimientoAlmacenController extends Controller
                     'usuario_det_kardex'   => $request->user()->nick_usuario,
                     'ip_det_kardex'        => $request->ip(),
                 ]);
-            }
-
-            // Si el estado es "Anulado" (idEstado == 4)
-        } /* else if ($request->idEstado == 4) {
-// Actualizar el número de requerimiento a "(N/A)"
-$objectUpdated["num_requerimiento"] = '(N/A)';
-} */
+            } */
+        }
 
         // Actualizar el requerimiento con los datos actualizados
-        Requerimiento::where("id_requerimiento", $request->idRequerimiento)->update($objectUpdated);
+       /*  Requerimiento::where("id_requerimiento", $request->idRequerimiento)->update($objectUpdated); */
 
         // Devolver un arreglo vacío como respuesta
         return [];

@@ -4,7 +4,7 @@ namespace App\Http\Requests\Almacen;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class AjusteSalidaRequest extends FormRequest
+class TransferenciaRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,7 +21,7 @@ class AjusteSalidaRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules["reasonId"] = ['required'];
+        //$rules["reasonId"] = ['required'];
         $rules["centerId"] = ['required'];
         $rules["financingSourceId"] = ['required'];
         foreach ($this->input('prods', []) as $key => $prod) {
@@ -54,7 +54,7 @@ class AjusteSalidaRequest extends FormRequest
         $messages = [];   
         $messages["centerId.required"] = "Debe seleccionar proveedor.";
         $messages["financingSourceId.required"] = "Debe seleccionar fuente de financiamiento.";
-        $messages["reasonId.required"] = "Debe seleccionar motivo.";
+        //$messages["reasonId.required"] = "Debe seleccionar motivo.";
         return $messages;
     }
 }

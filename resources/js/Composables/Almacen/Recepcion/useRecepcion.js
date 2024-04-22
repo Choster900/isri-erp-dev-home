@@ -203,8 +203,7 @@ export const useRecepcion = (context) => {
             const selectedProd = products.value.find((element) => {
                 return element.value === paId; // Adding a return statement here
             });
-            console.log(selectedProd);
-            recDocument.value.prods[index].desc =
+            recDocument.value.prods[index].desc = selectedProd.codigo_producto + ' — ' +
                 selectedProd.nombre_completo_producto + ' — ' +
                 selectedProd.nombre_unidad_medida + ' — ' +
                 selectedProd.descripcion_prod_adquisicion
@@ -448,18 +447,10 @@ export const useRecepcion = (context) => {
                 useShowToast(toast.error, err.response.data.logical_error);
                 if (err.response.data.refresh) {
                     products.value = err.response.data.prods
-                    // recDocument.value.prods.forEach((element, index) => {
-                    //     setProdItem(index, element.prodId, element.detRecId);
-                    //     updateItemTotal(index, element.qty, element.prodId);
-                    // })
                 }
             } else {
                 useShowToast(toast.warning, "Tienes errores en tus datos, por favor verifica e intenta nuevamente.");
                 errors.value = err.response.data.errors;
-                // Limpiar los errores después de 5 segundos
-                setTimeout(() => {
-                    errors.value = [];
-                }, 5000);
             }
         } else {
             showErrorMessage(err);

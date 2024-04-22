@@ -101,12 +101,17 @@ export const useDatatableReqAlm = () => {
 
             if (tableData.value.draw === data.draw) {
                 let resultado = data.data.data;
+                
                 canSaveReq.value = data.canSaveReq
                 objectRequerimientos.value = data.data.data;
                 pagination.value.total = data.data.total;
                 links.value = data.data.links;
                 links.value[0].label = "Anterior";
                 links.value[links.value.length - 1].label = "Siguiente";
+
+
+
+
                 numeroRequerimientoSiguiente.value = await generateNumberRequerimiento()
 
             }

@@ -1,7 +1,7 @@
 <template>
 
-    <Head title="Kardex - Ajuste de salida" />
-    <AppLayoutVue nameSubModule="Almacen - Ajuste de salida">
+    <Head title="Kardex - Transferencias" />
+    <AppLayoutVue nameSubModule="Almacen - Transferencias">
         <div v-if="isLoadingTop"
             class="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-gray-900 opacity-75 z-50">
             <div class="flex items-center justify-center my-4">
@@ -11,8 +11,8 @@
         </div>
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2">
-                <GeneralButton @click="showModalOutgoingAdjustment = true; objId = 0;" v-if="permits.insertar == 1"
-                    color="bg-green-700  hover:bg-green-800" text="Crear Ajuste" icon="add" />
+                <GeneralButton @click="showModalTransfers = true; objId = 0;" v-if="permits.insertar == 1"
+                    color="bg-green-700  hover:bg-green-800" text="Crear Transferencia" icon="add" />
             </div>
         </div>
 
@@ -28,7 +28,7 @@
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
-                    <h2 class="font-semibold text-slate-800 pt-1">Ajustes de salida: <span
+                    <h2 class="font-semibold text-slate-800 pt-1">Transferencias: <span
                             class="text-slate-400 font-medium">{{
             tableData.total
         }}</span></h2>
@@ -89,15 +89,15 @@
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="space-x-1 text-center">
                                     <DropDownOptions>
-                                        <div v-if="permits.ejecutar === 1 && obj.id_estado_req == 1"
+                                        <!-- <div v-if="permits.ejecutar === 1 && obj.id_estado_req == 1"
                                             @click="sendOutgoingAdjustment(obj.id_requerimiento)"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-lime-700 w-[24px] h-[24px] mr-1">
                                                 <icon-m :iconName="'clipboard-arrow'"></icon-m>
                                             </div>
                                             <div class="font-semibold pt-0.5">Kardex</div>
-                                        </div>
-                                        <div @click="showModalOutgoingAdjustment = true; objId = obj.id_requerimiento"
+                                        </div> -->
+                                        <div @click="showModalTransfers = true; objId = obj.id_requerimiento"
                                             v-if="permits.actualizar === 1 && obj.id_estado_req == 1"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-orange-700 w-[22px] h-[22px] mr-1.5 ml-0.5">
@@ -105,7 +105,7 @@
                                             </div>
                                             <div class="font-semibold pt-0.5">Editar</div>
                                         </div>
-                                        <div @click="showModalOutgoingAdjustment = true; objId = obj.id_requerimiento"
+                                        <!-- <div @click="showModalOutgoingAdjustment = true; objId = obj.id_requerimiento"
                                             v-if="obj.id_estado_req == 4 || obj.id_estado_req == 2"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-blue-800 w-[25px] h-[25px] mr-2">
@@ -120,7 +120,7 @@
                                                 <icon-m :iconName="'trash'"></icon-m>
                                             </div>
                                             <div class="font-semibold pt-0.5">Eliminar</div>
-                                        </div>
+                                        </div> -->
                                     </DropDownOptions>
                                 </div>
                             </td>
@@ -156,8 +156,8 @@
         
         <pagination :emptyObject="emptyObject" :links="links" @get-data="getDataToShow" />
 
-        <modal-ajuste-salida-vue v-if="showModalOutgoingAdjustment" :showModalOutgoingAdjustment="showModalOutgoingAdjustment" :objId="objId"
-            @cerrar-modal="showModalOutgoingAdjustment = false" @get-table="getDataToShow(tableData.currentPage)" />
+        <modal-transferencia-vue v-if="showModalTransfers" :showModalTransfers="showModalTransfers" :objId="objId"
+            @cerrar-modal="showModalTransfers = false" @get-table="getDataToShow(tableData.currentPage)" />
 
     </AppLayoutVue>
 </template>
@@ -168,7 +168,7 @@ import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";
 import Pagination from "@/Components-ISRI/Pagination.vue";
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
-import ModalAjusteSalidaVue from '@/Components-ISRI/Almacen/AjusteSalida/ModalAjusteSalida.vue';
+import ModalTransferenciaVue from '@/Components-ISRI/Almacen/Transferencia/ModalTransferencia.vue';
 
 import { localeData } from 'moment_spanish_locale';
 import moment from 'moment';
@@ -180,7 +180,7 @@ import { useToDataTable } from '@/Composables/General/useToDataTable.js';
 import { useEnviarAjusteSalida } from '@/Composables/Almacen/AjusteSalida/useEnviarAjusteSalida.js';
 
 export default {
-    components: { Head, AppLayoutVue, Datatable, IconM, ModalAjusteSalidaVue, Pagination },
+    components: { Head, AppLayoutVue, Datatable, IconM, ModalTransferenciaVue, Pagination },
     props: {
         menu: {
             type: Object,
@@ -191,7 +191,7 @@ export default {
         const { menu } = toRefs(props);
         const permits = usePermissions(menu.value, window.location.pathname);
 
-        const showModalOutgoingAdjustment = ref(false)
+        const showModalTransfers = ref(false)
 
         const objId = ref(0)
 
@@ -234,7 +234,7 @@ export default {
             },
             { width: "10%", label: "Acciones", name: "Acciones" },
         ];
-        const requestUrl = "/ajuste-salida"
+        const requestUrl = "/transferencias-almacen"
         const columntToSort = "id_requerimiento"
         const dir = 'desc'
 
@@ -255,7 +255,7 @@ export default {
 
 
         return {
-            permits, dataToShow, showModalOutgoingAdjustment, tableData, perPage, objId,
+            permits, dataToShow, showModalTransfers, tableData, perPage, objId,
             links, sortKey, sortOrders, isLoadinRequest, isLoadingTop, emptyObject, columns,
             getDataToShow, handleData, sortBy, changeStatusElement, sendOutgoingAdjustment, moment
         };
