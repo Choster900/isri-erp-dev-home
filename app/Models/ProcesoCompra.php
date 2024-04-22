@@ -15,5 +15,17 @@ class ProcesoCompra extends Model
 
     protected $fillable = [
         'nombre_proceso_compra',
+        'id_tipo_proceso_compra',
+        'id_empleado',
     ];
+
+    /**
+     * Get the Empleado model associated with this instance.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function empleado()
+    {
+        return $this->belongsTo(Empleado::class, 'id_empleado', 'id_empleado');
+    }
 }
