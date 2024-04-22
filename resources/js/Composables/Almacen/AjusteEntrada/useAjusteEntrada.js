@@ -3,6 +3,7 @@ import axios from "axios";
 import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
 import { useFormatDateTime } from "@/Composables/General/useFormatDateTime.js";
+import { useValidateInput } from '@/Composables/General/useValidateInput';
 import { toast } from "vue3-toastify";
 import moment from 'moment';
 import _ from "lodash";
@@ -39,6 +40,18 @@ export const useAjusteEntrada = (context) => {
     const {
         formatDateVue3DP
     } = useFormatDateTime()
+
+    const {
+        validateInput
+    } = useValidateInput()
+
+    const handleValidation = (input, validation, element) => {
+        if (element) {
+            adjustment.value.prods[element.index][input] = validateInput(adjustment.value.prods[element.index][input], validation)
+        } else {
+            adjustment.value[input] = validateInput(adjustment.value[input], validation)
+        }
+    }
 
     const getInfoForModalAdjustment = async (id) => {
         try {
@@ -105,7 +118,7 @@ export const useAjusteEntrada = (context) => {
                         perishable: element.producto.perecedero_producto,
                         expDate: formatDateVue3DP(element.fecha_vcto_det_requerimiento), //Expiry date
                         isLoadingProd: false, //Flag to manage loader for every multiselect
-                        desc: element.producto.codigo_producto + ' — ' + element.producto.nombre_completo_producto + ' — ' + element.producto.unidad_medida.nombre_unidad_medida ?? 'Sin marca',
+                        desc: element.producto.codigo_producto + ' — ' + element.producto.nombre_completo_producto + ' — ' + element.producto.unidad_medida.nombre_unidad_medida,
                         qty: element.cant_det_requerimiento, //Represents the the number of products the user wants to register
                         cost: element.costo_det_requerimiento, //Represents the the cost of the product
                         total: "", //Represents the result of qty x cost for every row
@@ -179,13 +192,8 @@ export const useAjusteEntrada = (context) => {
         try {
             adjustment.value.prods[index].isLoadingProd = true
             if (query.length >= 3) {
-                // Filtrar los elementos de defaultProds que tengan un valor diferente a prodId
-                //const filteredProds = adjustment.value.prods.filter((e) => e.prodId !== prodId && e.deleted == false);
-                // Crear un array no asociativo con solo las propiedades 'value' de los elementos filtrados
-                //const prodIdToIgnore = filteredProds.map((e) => e.prodId); //Productos que debe ignorar al momento de realizar la busqueda asincrona
                 const response = await axios.post("/search-donation-product", {
                     busqueda: query,
-                    //prodIdToIgnore: prodIdToIgnore
                 });
                 products.value = response.data.products;
             } else {
@@ -197,6 +205,17 @@ export const useAjusteEntrada = (context) => {
             adjustment.value.prods[index].isLoadingProd = false
         }
     }, 350);
+
+    const changeFinancingSource = (id) => {
+        if (id) {
+            if (id === 4)//DONACION
+            {
+                adjustment.value.idLt = ''
+            }
+        } else {
+            adjustment.value.financingSourceId = ''
+        }
+    }
 
     const deleteRow = (index, detRecId) => {
         if (activeDetails.value.length <= 1) {
@@ -332,6 +351,7 @@ export const useAjusteEntrada = (context) => {
     return {
         isLoadingRequest, errors, reasons, centers, financingSources, lts, adjustment,
         products, brands, asyncFindProduct, totalRec, asyncProds, selectedProducts,
-        getInfoForModalAdjustment, selectProd, deleteRow, addNewRow, storeAdjustment, updateAdjustment
+        getInfoForModalAdjustment, selectProd, deleteRow, addNewRow, storeAdjustment, updateAdjustment, handleValidation,
+        changeFinancingSource
     }
 }

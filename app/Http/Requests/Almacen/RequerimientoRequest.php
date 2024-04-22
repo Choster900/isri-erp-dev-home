@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Almacen;
 
 use App\Models\DetalleExistenciaAlmacen;
+use App\Models\DetalleRequerimiento;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RequerimientoRequest extends FormRequest
@@ -47,19 +48,29 @@ class RequerimientoRequest extends FormRequest
                         $rules["dataDetalleRequerimiento.{$key}.productos.{$indice}.cantDetRequerimiento"] = ['required'];
                         $rules["dataDetalleRequerimiento.{$key}.productos.{$indice}.idDetExistenciaAlmacen"] = ['required'];
 
-                        if (!empty ($det["idDetExistenciaAlmacen"] && empty($det["idDetRequerimiento"]) )) {
+                        if (!empty($det["idDetExistenciaAlmacen"] && empty($det["idDetRequerimiento"]))) {
+
+                            $cantidadTotal = 0;
+
                             $detalleExistenciaAlmacen = DetalleExistenciaAlmacen::select("cant_det_existencia_almacen")
                                 ->where('id_det_existencia_almacen', $det["idDetExistenciaAlmacen"])
                                 ->first();
 
+                            $cantidadDetalleExistencia = $detalleExistenciaAlmacen->cant_det_existencia_almacen;
+
+
+                            $totalDetalleRequerimiento = DetalleRequerimiento::where('id_det_existencia_almacen', $det["idDetExistenciaAlmacen"])
+                                ->sum('cant_det_requerimiento');
+
+                            $cantidadTotal = $totalDetalleRequerimiento + $cantidadDetalleExistencia;
+
+
                             $rules["dataDetalleRequerimiento.{$key}.productos.{$indice}.cantDetRequerimiento"] = [
                                 'required',
                                 'numeric',
-                                "lte:$detalleExistenciaAlmacen->cant_det_existencia_almacen",
+                                "lte:$cantidadTotal",
                             ];
                         }
-
-
                     });
             });
 

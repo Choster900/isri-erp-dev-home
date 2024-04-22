@@ -239,7 +239,7 @@
                                         :options="products" class="h-[35px]" :disabled="infoToShow.status != 1"
                                         :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione"
                                         @change="setProdItem($event, index)"
-                                        :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', }" />
+                                        :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
                                     <p class="font-[MuseoSans] text-[12px] p-1 " v-else>{{ prod.prodLabel }}</p>
                                 </div>
                                 <div
@@ -254,7 +254,7 @@
                                         :options="brands" class="h-[35px] max-w-[95%]"
                                         :disabled="infoToShow.status != 1" :searchable="true"
                                         :noOptionsText="'Lista vacía.'" placeholder="Marca"
-                                        :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', optionPointed: 'text-white bg-[#001c48] bg-opacity-40' }" />
+                                        :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
                                     <p class="font-[MuseoSans] text-[12px] p-1 " v-else>{{ prod.brandLabel }}</p>
                                 </div>
 

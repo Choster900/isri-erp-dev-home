@@ -38,7 +38,7 @@ class AjusteEntradaController extends Controller
                 'detalles_requerimiento.marca'
             ])
             ->where('id_tipo_req', 2)
-            ->where('id_tipo_mov_kardex',1);
+            ->where('id_tipo_mov_kardex', 1);
 
         if ($column == 2) { //Order by reason
             $query->orderByRaw('
@@ -48,12 +48,17 @@ class AjusteEntradaController extends Controller
         }
 
         if ($search_value) {
-            $query->where('id_requerimiento', 'like', '%' . $search_value['id_requerimiento'] . '%') //Search by requerimiento id
-                ->where('id_centro_atencion', $search_value['id_centro_atencion']) //Search by Healthcare center
-                ->where('id_proy_financiado', 'like', '%' . $search_value['id_proy_financiado'] . '%') //Search by financing source
-                ->where('num_requerimiento', 'like', '%' . $search_value['num_requerimiento'] . '%') //Search by requerimiento code
-                ->where('fecha_requerimiento', 'like', '%' . $search_value['fecha_requerimiento'] . '%') //Search by requerimiento date
-                ->where('id_estado_req', 'like', '%' . $search_value['id_estado_req'] . '%'); //Search by requerimiento status
+            $query->where('id_requerimiento', 'like', '%' . $search_value['id_requerimiento'] . '%')
+                ->where('id_proy_financiado', 'like', '%' . $search_value['id_proy_financiado'] . '%')
+                ->where('num_requerimiento', 'like', '%' . $search_value['num_requerimiento'] . '%')
+                ->where('fecha_requerimiento', 'like', '%' . $search_value['fecha_requerimiento'] . '%')
+                ->where('id_estado_req', 'like', '%' . $search_value['id_estado_req'] . '%');
+
+            //Search by Healthcare center
+            if ($search_value['id_centro_atencion']) {
+                $query->where('id_centro_atencion', $search_value['id_centro_atencion']);
+            }
+
             //Search by reason
             if ($search_value['motivo']) {
                 $query->whereHas(
@@ -193,7 +198,7 @@ class AjusteEntradaController extends Controller
                 ]);
 
                 foreach ($request->prods as $prod) {
-                    $fecha = $prod['expDate']!= '' ? date('Y/m/d', strtotime($prod['expDate'])) : null;
+                    $fecha = $prod['expDate'] != '' ? date('Y/m/d', strtotime($prod['expDate'])) : null;
                     if ($prod['detId'] != "" && $prod['deleted'] == false) {
                         $det = DetalleRequerimiento::find($prod['detId']);
                         $det->update([
@@ -341,7 +346,7 @@ class AjusteEntradaController extends Controller
                         'ip_det_kardex'                     => $request->ip(),
                     ]);
                     $detKardex->save();
-                    
+
                     //We update the stock
                     $resultados = DB::select(" SELECT FN_UPDATE_EXISTENCIA_ALMACEN(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
                         $req->id_proy_financiado,
