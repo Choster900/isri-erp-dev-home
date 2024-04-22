@@ -53,7 +53,7 @@
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ obj.motivo_ajuste.nombre_motivo_ajuste }}
+                                    {{ obj.centro_destino.codigo_centro_atencion }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5">
@@ -196,9 +196,9 @@ export default {
         const objId = ref(0)
 
         const columns = [
-            { width: "10%", label: "Id", name: "id_requerimiento", type: "text" },
+            { width: "13%", label: "Id", name: "id_requerimiento", type: "text" },
             {
-                width: "10%", label: "Centro", name: "id_centro_atencion", type: "select",
+                width: "12%", label: "Origen", name: "id_centro_atencion", type: "select",
                 options: [
                     { value: "1", label: "ADMON" },
                     { value: "2", label: "CAA" },
@@ -212,7 +212,21 @@ export default {
                     { value: "10", label: "CRP" },
                 ]
             },
-            { width: "20%", label: "motivo", name: "motivo", type: "text" },
+            {
+                width: "12%", label: "Destino", name: "cen_id_centro_atencion", type: "select",
+                options: [
+                    { value: "1", label: "ADMON" },
+                    { value: "2", label: "CAA" },
+                    { value: "3", label: "CAL" },
+                    { value: "4", label: "CALE" },
+                    { value: "5", label: "CRC" },
+                    { value: "6", label: "UCE" },
+                    { value: "7", label: "CRINA" },
+                    { value: "8", label: "CRIO" },
+                    { value: "9", label: "CRIOR" },
+                    { value: "10", label: "CRP" },
+                ]
+            },
             {
                 width: "10%", label: "Fondo", name: "id_proy_financiado", type: "select",
                 options: [
@@ -222,7 +236,7 @@ export default {
                     { value: "4", label: "D" },
                 ]
             },
-            { width: "13%", label: "Numero", name: "num_requerimiento", type: "text" },
+            { width: "16%", label: "Numero", name: "num_requerimiento", type: "text" },
             { width: "15%", label: "Fecha", name: "fecha_requerimiento", type: "date" },
             {
                 width: "12%", label: "Estado", name: "id_estado_req", type: "select",

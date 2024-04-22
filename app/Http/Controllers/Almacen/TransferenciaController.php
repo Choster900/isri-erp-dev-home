@@ -21,7 +21,7 @@ class TransferenciaController extends Controller
 {
     public function getTransferencias(Request $request)
     {
-        $columns = ['id_requerimiento', 'id_centro_atencion', 'motivo', 'id_proy_financiado', 'num_requerimiento', 'fecha_requerimiento', 'id_estado_req'];
+        $columns = ['id_requerimiento', 'id_centro_atencion', 'cen_id_centro_atencion', 'id_proy_financiado', 'num_requerimiento', 'fecha_requerimiento', 'id_estado_req'];
 
         $length = $request->length;
         $column = $request->column; //Index
@@ -31,21 +31,34 @@ class TransferenciaController extends Controller
         $query = Requerimiento::select('*')
             ->with([
                 'centro_atencion',
+                'centro_destino',
                 'proyecto_financiado',
                 'estado_requerimiento',
-                'motivo_ajuste',
+                //'motivo_ajuste',
                 'detalles_requerimiento.producto.unidad_medida',
                 'detalles_requerimiento.marca'
             ])
             ->where('id_tipo_req', 3);
 
-        if ($column == 2) { //Order by reason
-            $query->orderByRaw('
-                        (SELECT nombre_motivo_ajuste FROM motivo_ajuste WHERE motivo_ajuste.id_motivo_ajuste = requerimiento.id_motivo_ajuste) ' . $dir);
-        } else {
-            $query->orderBy($columns[$column], $dir);
-        }
+        $query->orderBy($columns[$column], $dir);
 
+        if ($search_value) {
+            $query->where('id_requerimiento', 'like', '%' . $search_value['id_requerimiento'] . '%')
+                ->where('id_proy_financiado', 'like', '%' . $search_value['id_proy_financiado'] . '%')
+                ->where('num_requerimiento', 'like', '%' . $search_value['num_requerimiento'] . '%')
+                ->where('fecha_requerimiento', 'like', '%' . $search_value['fecha_requerimiento'] . '%')
+                ->where('id_estado_req', 'like', '%' . $search_value['id_estado_req'] . '%');
+
+            //Search by origin
+            if ($search_value['id_centro_atencion']) {
+                $query->where('id_centro_atencion', $search_value['id_centro_atencion']);
+            }
+
+            //Search by destination
+            if ($search_value['cen_id_centro_atencion']) {
+                $query->where('cen_id_centro_atencion', $search_value['cen_id_centro_atencion']);
+            }
+        }
 
         $data = $query->paginate($length)->onEachSide(1);
         return ['data' => $data, 'draw' => $request->input('draw')];
@@ -136,14 +149,14 @@ class TransferenciaController extends Controller
             $codeReq = "";
             $year = Carbon::now()->year;
             $lastReq = Requerimiento::whereYear('fecha_reg_requerimiento', $year)
-                ->where('id_tipo_req', 2)
+                ->where('id_tipo_req', 3)
                 ->orderBy('fecha_reg_requerimiento', 'desc')
                 ->first();
             if (!$lastReq) {
-                $codeReq = 'AJU-' . $year . '-1';
+                $codeReq = 'TRA-' . $year . '-1';
             } else {
                 $correlative = intval(explode('-', $lastReq->num_requerimiento)[2]) + 1;
-                $codeReq = 'AJU-' . $year . '-' . $correlative;
+                $codeReq = 'TRA-' . $year . '-' . $correlative;
             }
 
             $req = new Requerimiento([
@@ -184,7 +197,7 @@ class TransferenciaController extends Controller
 
             DB::commit(); // Confirma las operaciones en la base de datos
             return response()->json([
-                'message'          => 'Guardado nuevo ajuste con éxito.',
+                'message'          => 'Guardada nueva transferencia con éxito.',
             ]);
         } catch (\Throwable $th) {
             DB::rollBack(); // En caso de error, revierte las operaciones anteriores
