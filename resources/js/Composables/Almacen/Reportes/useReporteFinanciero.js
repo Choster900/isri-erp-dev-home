@@ -42,7 +42,7 @@ export const useReporteFinanciero = (context) => {
         let name = "NOMBRE DOCUMENTO - FECHA - CODIGO";
         const opt = {
             margin: [0.5, 0.1, 2, 0.5], //top, left, bottom, right,
-            filename: "evaluacion",
+            filename: "REPORTE_FINANCIERO_" + moment().format("L"),
             //pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
             image: { type: "jpeg", quality: 0.98 },
             html2canvas: { scale: 3, useCORS: true },

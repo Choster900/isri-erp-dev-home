@@ -67,7 +67,7 @@ export const useReporteRotacion = (context) => {
         const opt = {
             //margin: [0.5, 0.1, 2, 0.5], //top, left, bottom, right,
             margin: 0.5,
-            filename: "rotaciones",
+            filename: "REPORTE_ROTACIÓN_" + moment().format("L"),
             //pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
             image: { type: "jpeg", quality: 0.98 },
             html2canvas: { scale: 3, useCORS: true },
@@ -146,7 +146,7 @@ export const useReporteRotacion = (context) => {
                 // Crear un enlace temporal y simular un clic para descargar el archivo
                 const link = document.createElement("a");
                 link.href = url;
-                link.setAttribute("download", "nombre_del_archivo.xlsx"); // Nombre del archivo deseado
+                link.setAttribute("download", "REPORTE_ROTACIÓN_" + moment().format('L') + ".xlsx"); // Nombre del archivo deseado
                 document.body.appendChild(link);
                 link.click();
 
