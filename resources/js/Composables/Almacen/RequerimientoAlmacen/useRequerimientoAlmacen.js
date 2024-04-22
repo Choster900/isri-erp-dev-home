@@ -1,6 +1,7 @@
-import { onMounted, ref } from "vue"
+import { onMounted, ref, watch } from "vue"
+import { usePage } from '@inertiajs/vue3';
 
-export const useRequerimientoAlmacen = () => {
+export const useRequerimientoAlmacen = (objectRequerimientoToSendModal, numeroRequerimientoSiguiente, showModal) => {
 
     // Variables de tabla requerimiento
     const idRequerimiento = ref(null)
@@ -22,6 +23,11 @@ export const useRequerimientoAlmacen = () => {
     const proyectoFinanciados = ref(null)
     const centroProduccion = ref(null)
     const marcasArray = ref(null)
+    const productoArrayWithOutProductNoStock = ref([])
+
+    const canEditReq = ref(false)
+    const isLoadinProduct = ref(false)
+    const optionsCentroAtencion = ref(null)
 
     const appendDetalleRequerimiento = () => {
         dataDetalleRequerimiento.value.push({
@@ -235,11 +241,184 @@ export const useRequerimientoAlmacen = () => {
 
     };
 
+    /**
+             * Obtiene la dependencia por usuario.
+             *
+             * @returns {Promise<object>} - Promesa que se resuelve con la respuesta exitosa o se rechaza con el error.
+             */
+    const getDependenciaByUser = async () => {
+        try {
+            const resp = await axios.post("/get-centro-by-user");
+
+            if (resp.data && resp.data.length === 1) {
+                idCentroAtencion.value = resp.data[0].id_centro_atencion;
+            }
+
+            const options = resp.data.map(item => ({
+                value: item.id_centro_atencion,
+                label: `${item.codigo_centro_atencion} - ${item.nombre_centro_atencion}`,
+                disabled: false
+            }));
+
+            optionsCentroAtencion.value = options;
+
+            return resp;
+        } catch (error) {
+            console.error('Error al obtener la dependencia por usuario:', error);
+            throw error; // Propaga el error para que pueda ser manejado por el código que llama a esta función.
+        }
+    };
+
+    /**
+           * Obtener los productos en existencia almacen por centro, proyecto financiado y linea de trabajo
+           *
+           * @returns {Promise<object>} - Promesa que se resuelve con la respuesta exitosa o se rechaza con el error.
+           */
+    const getProductoByDependencia = async () => {
+        try {
+            // Indicar que se está cargando productos
+            isLoadinProduct.value = true;
+
+            // Realizar la solicitud POST para obtener los productos por centro, proyecto financiado y línea de trabajo
+            const resp = await axios.post("/get-product-by-proy-financiado", {
+                idCentroAtencion: idCentroAtencion.value,
+                idProyFinanciado: idProyFinanciado.value,
+                idLt: idLt.value,
+            });
+
+            // Limpiar los arreglos de productos
+            productosArray.value = [];
+            productoArrayWithOutProductNoStock.value = [];
+
+            // Iterar sobre los datos de respuesta para procesar cada producto
+            resp.data.forEach(index => {
+                // Calcular el stock restando la cantidad solicitada en los requerimientos
+                const stock = index.cant_det_existencia_almacen - index.solicitado_en_req;
+
+                // Obtener el nombre de la marca o establecer "Sin marca" si no está definido
+                const marca = index.marca ? index.marca.nombre_marca : "NO BRAND";
+
+                // Crear un objeto con los datos del producto
+                const productData = {
+                    value: index.id_det_existencia_almacen,
+                    label: `${index.existencia_almacen.productos.codigo_producto} -
+                ${index.existencia_almacen.productos.nombre_producto}  -
+                ${stock}  -
+                ${marca} -
+                ${index.existencia_almacen.productos.descripcion_producto}`,
+                    completeData: index,
+                    codidoProducto: index.existencia_almacen.id_producto
+                };
+
+                // Agregar el producto al arreglo de todos los productos
+                productosArray.value.push(productData);
+
+                // Agregar el producto al arreglo de productos con stock mayor que 0
+                if (stock > 0) {
+                    productoArrayWithOutProductNoStock.value.push(productData);
+                }
+            });
+
+            // Indicar que se ha completado la carga de productos
+            isLoadinProduct.value = false;
+
+            // Devolver la respuesta
+            return resp;
+        } catch (error) {
+            // Manejar errores
+            console.error('Error al obtener productos por dependencia:', error);
+            throw error;
+        } finally {
+            // Indicar que se ha completado la carga de productos, incluso en caso de error
+            isLoadinProduct.value = false;
+        }
+    };
+
+    watch(objectRequerimientoToSendModal, (newValue, oldValue) => {
+        const nickUser = usePage().props.auth.user.nick_usuario
+
+        if (newValue !== null && newValue !== undefined && (Array.isArray(newValue) ? newValue.length > 0 : newValue !== '')) {
+            console.log(newValue);
+            const { detalles_requerimiento, id_lt, id_centro_atencion, id_proy_financiado, id_estado_req, num_requerimiento, id_requerimiento, observacion_requerimiento, usuario_requerimiento } = newValue
+            idRequerimiento.value = id_requerimiento
+            idLt.value = id_lt
+            idCentroAtencion.value = id_centro_atencion
+            idProyFinanciado.value = id_proy_financiado
+            idEstadoReq.value = id_estado_req
+            numRequerimiento.value = num_requerimiento
+            observacionRequerimiento.value = observacion_requerimiento
 
 
 
+            if (idEstadoReq.value == 1) {
+                canEditReq.value = true
+                if (nickUser === usuario_requerimiento) {
+                    canEditReq.value = true
+                } else {
+                    canEditReq.value = false
+                }
+            } else {
+                canEditReq.value = false
+            }
+
+
+
+            let idCentroProduccionSet = new Set();
+
+            dataDetalleRequerimiento.value = detalles_requerimiento.map(det => {
+                let idCentroProduct = det.id_centro_produccion;
+                if (!idCentroProduccionSet.has(idCentroProduct)) {
+                    idCentroProduccionSet.add(idCentroProduct);
+                    return {
+                        idDetRequerimiento: det.id_det_requerimiento,
+                        idRequerimiento: det.id_requerimiento,
+                        idCentroProduccion: det.id_centro_produccion,
+                        productos: [],
+                        stateCentroProduccion: 1,
+                        isHidden: false,
+                    };
+                }
+            })
+                .filter(Boolean);
+            detalles_requerimiento.forEach(index => {
+                let indice = dataDetalleRequerimiento.value.findIndex(i => i.idCentroProduccion == index.id_centro_produccion);
+                const { producto } = index
+                dataDetalleRequerimiento.value[indice]["productos"].push({
+                    stateProducto: 1,
+                    idMarca: index.id_marca,
+                    idProducto: producto.id_producto,
+                    idDetRequerimiento: index.id_det_requerimiento,
+                    cantDetRequerimiento: index.cant_det_requerimiento,
+                    idDetExistenciaAlmacen: index.id_det_existencia_almacen,
+
+                });
+            });
+            getProductoByDependencia()
+        } else {
+            dataDetalleRequerimiento.value = [];
+            idRequerimiento.value = null
+            idLt.value = null
+            /* idCentroAtencion.value = null */
+            idProyFinanciado.value = null
+            idEstadoReq.value = null
+            numRequerimiento.value = numeroRequerimientoSiguiente.value
+            observacionRequerimiento.value = null
+            canEditReq.value = true
+            appendDetalleRequerimiento()
+
+        }
+    });
+
+    watch(showModal, (newValue, oldValue) => {
+        if (!newValue) {
+            productosArray.value = []
+            productoArrayWithOutProductNoStock.value = []
+            canEditReq.value = false
+        }
+    })
     onMounted(() => {
         getArrayObject()
+        getDependenciaByUser()
     })
     return {
         appendProduct,
@@ -249,6 +428,7 @@ export const useRequerimientoAlmacen = () => {
         errorsValidation,
         dataDetalleRequerimiento,
         idRequerimiento,
+        getProductoByDependencia,
         idLt,
         idCentroAtencion,
         idProyFinanciado,
@@ -262,8 +442,11 @@ export const useRequerimientoAlmacen = () => {
         centroAtenionArray,
         marcasArray,
         lineaTrabajoArray,
+        productoArrayWithOutProductNoStock,
         centroProduccion,
-
+        isLoadinProduct,
+        optionsCentroAtencion,
+        canEditReq,
         setIdProductoByDetalleExistenciaAlmacenId,
     }
 }
