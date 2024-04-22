@@ -143,6 +143,7 @@ export default defineComponent({
         watch(showModal, (newValue, oldValue) => {
             if (!newValue) {
                 productosArray.value = []
+                productoArrayWIthOutProductNoStock.value = []
                 canIEdit.value = false
             }
         })
@@ -241,15 +242,6 @@ export default defineComponent({
                         idProyFinanciado: idProyFinanciado.value,
                         idLt: idLt.value,
                     });
-                    console.log(resp.data);
-
-                    /*  productosArray.value = resp.data.map(index => {
-                         return {
-                             value: index.productos.id_producto,
-                             label: `${index.productos.codigo_producto}  - ${index.productos.nombre_completo_producto}`,
-                             completeData: index.productos
-                         };
-                     }) */
 
                     productosArray.value = resp.data.map(index => {
                         // Calcular el stock restando la cantidad solicitada en los requerimientos
@@ -309,7 +301,6 @@ export default defineComponent({
 
         onMounted(() => {
             getDependenciaByUser()
-            //getProductoByDependencia()
         })
 
         return {
@@ -353,8 +344,8 @@ export default defineComponent({
                 <TitleModalReq />
                 <div id="formulario-principal">
                     <div class="pt-4 flex justify-start space-x-2 items-center">
-                        <h1 class="text-xs ">Requerimiento N°: <span
-                                class="font-medium text-sm underline">{{ numRequerimiento }}</span></h1>
+                        <h1 class="text-xs ">Requerimiento N°: <span class="font-medium text-sm underline">{{
+            numRequerimiento }}</span></h1>
                         <div class="text-xs items-center">
                             Centro:
                             <span class="font-medium text-sm underline"
@@ -362,7 +353,7 @@ export default defineComponent({
                                 {{ optionsCentroAtencion[0].label }}</span>
                             <span v-else>-</span>
                         </div>
-                        <div role="alert"
+                        <div role="alert" v-if="!canIEdit"
                             class="relative flex w- px-1 py-1 text-base text-white bg-gray-900 rounded-lg font-regular items-center">
                             <div class="shrink-0">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
@@ -375,14 +366,17 @@ export default defineComponent({
                             <div class="mx-1 text-xs font-extralight">edición desabilitada</div>
                         </div>
                     </div>
-
-                    estado {{ canIEdit }}
                     <div class="pt-4 flex justify-between space-x-2">
                         <div class="w-full">
                             <OnlyLabelInput textLabel="Linea de trabajo" />
                             <Multiselect v-model="idLt" @select="getProductoByDependencia()" :disabled="!canIEdit"
-                                :classes='{ containerDisabled: "bg-gray-200 text-text-slate-400", container: "relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded bg-white text-base leading-snug outline-none", optionSelectedDisabled: "text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed", optionPointed: "text-gray-800 bg-gray-100", }'
-                                :filter-results="false" :searchable="true" :clear-on-search="true" :min-chars="1"
+                                :classes="{
+            containerDisabled: `bg-gray-200 text-text-slate-400`,
+            container: `relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded  text-base leading-snug outline-none
+                ${canIEdit ? 'bg-white' : ''}`,
+            optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed',
+            optionPointed: 'text-gray-800 bg-gray-100',
+        }" :filter-results="false" :searchable="true" :clear-on-search="true" :min-chars="1"
                                 :options="lineaTrabajoArray"
                                 noResultsText="<p class='text-xs'>Sin resultados de personas</p>" placeholder="-"
                                 noOptionsText="<p class='text-xs'>vacio</p>" />
@@ -395,7 +389,7 @@ export default defineComponent({
 
                             <Multiselect v-model="idProyFinanciado" @select="getProductoByDependencia()"
                                 :disabled="!canIEdit"
-                                :classes='{ containerDisabled: "bg-gray-200 text-text-slate-400", container: "relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded bg-white text-base leading-snug outline-none", optionSelectedDisabled: "text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed", optionPointed: "text-gray-800 bg-gray-100", }'
+                                :classes="{ containerDisabled: `bg-gray-200 text-text-slate-400`, container: `relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded  text-base leading-snug outline-none ${canIEdit ? 'bg-white' : ''}`, optionSelectedDisabled: `text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed`, optionPointed: `text-gray-800 bg-gray-100` }"
                                 :filter-results="false" :searchable="true" :clear-on-search="true" :min-chars="1"
                                 :options="proyectoFinanciados"
                                 noResultsText="<p class='text-xs'>Sin resultados de personas</p>" placeholder="-"
@@ -411,7 +405,8 @@ export default defineComponent({
 
                         <textarea placeholder='Observacion del requerimiento' rows="2" name=''
                             v-model="observacionRequerimiento" :disabled="!canIEdit"
-                            class="w-full rounded-md px-4 text-xs border-slate-300 border pt-2.5 outline-[#007bff]"></textarea>
+                            class="w-full rounded-md px-4 text-xs border-slate-300 border pt-2.5 outline-[#007bff]"
+                            :class="{ 'bg-slate-300': !canIEdit }"></textarea>
 
                     </div>
                     <div class="pt-4 flex justify-start space-x-2 items-end"
@@ -442,17 +437,6 @@ export default defineComponent({
                         </button>
                     </div>
                 </div>
-                {{ canIEdit }}
-                <!-- <pre>
-
-                {{
-                    productosArray.map(index => {
-                        return index.value
-
-                        })
-
-                        }}
-                </pre> -->
                 <table class="mt-4 w-[740px] ">
                     <tr class=" *:text-xs *:text-slate-700">
                         <td class="w-20 text-end pl-4">CANTIDAD</td>
@@ -475,7 +459,7 @@ export default defineComponent({
                                 </div>
                                 <div class="text-xs w-[645px] py-1">
                                     <Multiselect v-model="detalleRequerimiento.idCentroProduccion" :disabled="!canIEdit"
-                                        :classes='{ containerDisabled: "bg-gray-200 text-text-slate-400", container: "relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded bg-white text-base leading-snug outline-none", optionSelectedDisabled: "text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed", optionPointed: "text-gray-800 bg-gray-100", }'
+                                        :classes="{ containerDisabled: 'bg-gray-200 text-text-slate-400', container: `relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded  text-base leading-snug outline-none ${canIEdit ? 'bg-white' : ''}`, optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed', optionPointed: 'text-gray-800 bg-gray-100', }"
                                         :filter-results="false" :searchable="true" :clear-on-search="true"
                                         :min-chars="1" :options="centroProduccion"
                                         noResultsText="<p class='text-xs'>Sin resultados de personas</p>"
@@ -499,25 +483,22 @@ export default defineComponent({
                                 class=" px-2 text-xs flex justify-end  space-x-4 items-center bg-slate-100 hover:bg-slate-200">
                                 <div class="text-xs w-20 ">
                                     <input type="text" v-model="producto.cantDetRequerimiento" :disabled="!canIEdit"
-                                        class="bg-white text-center border-0 h-6 text-xs w-20 border-x-transparentborder-t-transparent bg-transparent focus:border-x-transparentfocus:border-t-transparent"
-                                        placeholder="CANT">
+                                        class=" text-center border-0 h-6 text-xs w-20 border-x-transparentborder-t-transparent bg-transparent focus:border-x-transparentfocus:border-t-transparent"
+                                        :class="!canIEdit ? 'bg-slate-700' : 'bg-white'" placeholder="CANT">
                                 </div>
                                 <div class="text-xs w-full py-1 flex items-center" v-if="producto.idDetRequerimiento">
                                     <div class="h-8 border-l-4 border-slate-500 pl-3 opacity-40"></div>
-                                    <!--      {{ productosArray }} -->
                                     <div class="flex-1">
-                                        {{ producto.idDetExistenciaAlmacen }}
                                         <Multiselect @select="setIdProductoByDetalleExistenciaAlmacenId($event, i, j)"
                                             v-model="producto.idDetExistenciaAlmacen"
                                             :disabled="isLoadinProduct || !canIEdit"
-                                            :classes="{ containerDisabled: ' bg-gray-200 text-text-slate-400', optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed', optionPointed: 'text-gray-800 bg-gray-100', container: `relative mx-auto w-full h-6 flex items-center justify-end box-border   border border-gray-300 rounded bg-white text-base leading-snug outline-none` }"
+                                            :classes="{ containerDisabled: 'bg-gray-200 text-text-slate-400', container: `relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded  text-base leading-snug outline-none ${canIEdit ? 'bg-white' : ''}`, optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed', optionPointed: 'text-gray-800 bg-gray-100', }"
                                             :filter-results="false" :searchable="true" :clear-on-search="true"
                                             :min-chars="1" :options="productosArray"
                                             noResultsText="<p class='text-xs'>Sin resultados de personas</p>"
                                             placeholder="TODOS LOS PRODUCTOS"
                                             noOptionsText="<p class='text-xs'>PRODUCTOS FILTRADOS POR LINEA DE TRABAJO Y PROYECTO FINANCIADO</p>" />
                                     </div>
-                                    {{ producto.idDetRequerimiento }}
                                 </div>
 
                                 <div class="text-xs w-full py-1 flex items-center" v-else>
@@ -527,18 +508,17 @@ export default defineComponent({
                                         <Multiselect @select="setIdProductoByDetalleExistenciaAlmacenId($event, i, j)"
                                             v-model="producto.idDetExistenciaAlmacen"
                                             :disabled="isLoadinProduct || !canIEdit"
-                                            :classes="{ containerDisabled: ' bg-gray-200 text-text-slate-400', optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed', optionPointed: 'text-gray-800 bg-gray-100', container: `relative mx-auto w-full h-6 flex items-center justify-end box-border   border border-gray-300 rounded bg-white text-base leading-snug outline-none` }"
+                                            :classes="{ containerDisabled: 'bg-gray-200 text-text-slate-400', container: `relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded  text-base leading-snug outline-none ${canIEdit ? 'bg-white' : ''}`, optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed', optionPointed: 'text-gray-800 bg-gray-100', }"
                                             :filter-results="false" :searchable="true" :clear-on-search="true"
                                             :min-chars="1" :options="productoArrayWIthOutProductNoStock"
                                             noResultsText="<p class='text-xs'>Sin resultados de personas</p>"
                                             placeholder="TODOS LOS PRODUCTOS"
                                             noOptionsText="<p class='text-xs'>PRODUCTOS FILTRADOS POR LINEA DE TRABAJO Y PROYECTO FINANCIADO</p>" />
                                     </div>
-                                    {{ producto.idDetRequerimiento }}
                                 </div>
 
                                 <div class="text-xs py-1 ">
-                                    <DropDownOptions>
+                                    <DropDownOptions v-if="canIEdit">
                                         <div class="flex items-center hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
                                             @click.stop="producto.stateProducto = 0">
                                             <div class="w-8 text-red-900">
@@ -567,7 +547,8 @@ export default defineComponent({
                                     }}{{
             errorsValidation
             &&
-            errorsValidation[`dataDetalleRequerimiento.${i}.productos.${j}.idDetExistenciaAlmacen`]}}
+            errorsValidation[`dataDetalleRequerimiento.${i}.productos.${j}.idDetExistenciaAlmacen`]
+                                    }}
                                 </span>
                             </div>
                         </div>
