@@ -86,5 +86,14 @@ class Requerimiento extends Model
     {
         return $this->belongsTo(LineaTrabajo::class, 'id_lt', 'id_lt');
     }
+    /**
+     * Get the CentroAtencion model associated with this instance.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function centro_destino()
+    { //                                                        FK                PK(centro_atencion)
+        return $this->belongsTo(CentroAtencion::class, 'cen_id_centro_atencion', 'id_centro_atencion');
+    }
 
 }
