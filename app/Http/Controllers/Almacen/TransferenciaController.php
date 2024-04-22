@@ -37,7 +37,7 @@ class TransferenciaController extends Controller
             ])
             ->where('id_tipo_req', 3);
 
-        
+
 
         $data = $query->paginate($length)->onEachSide(1);
         return ['data' => $data, 'draw' => $request->input('draw')];
@@ -142,7 +142,7 @@ class TransferenciaController extends Controller
                 'id_lt'                                 => $request->idLt,
                 'id_centro_atencion'                    => $request->centerId, //ORIGEN
                 'cen_id_centro_atencion'                => $request->destCenterId, //DESTINO
-                'id_motivo_ajuste'                      => $request->reasonId,
+                //'id_motivo_ajuste'                      => $request->reasonId,
                 'id_proy_financiado'                    => $request->financingSourceId,
                 'id_tipo_mov_kardex'                    => 1, //ENTRADA-SALIDA
                 'id_estado_req'                         => 1, //CREADO
@@ -185,5 +185,102 @@ class TransferenciaController extends Controller
                 'error' => $th->getMessage(),
             ], 422);
         }
+    }
+
+    public function updateWarehouseTransfer(TransferenciaRequest $request)
+    {
+        $req = Requerimiento::find($request->id);
+        if (!$req || $req->id_estado_req != 1) {
+            return response()->json(['logical_error' => 'Error, la transferencia que deseas modificar ha cambiado de estado.'], 422);
+        } else {
+            DB::beginTransaction();
+            try {
+                $req->update([
+                    'id_lt'                                 => $request->idLt,
+                    'id_centro_atencion'                    => $request->centerId,
+                    //'id_motivo_ajuste'                      => $request->reasonId,
+                    'id_proy_financiado'                    => $request->financingSourceId,
+                    'observacion_requerimiento'             => $request->observation,
+                    'fecha_mod_requerimiento'               => Carbon::now(),
+                    'usuario_requerimiento'                 => $request->user()->nick_usuario,
+                    'ip_requerimiento'                      => $request->ip(),
+                ]);
+
+                foreach ($request->prods as $prod) {
+                    $detExistencia = DetalleExistenciaAlmacen::with('existencia_almacen')->find($prod['detId']);
+                    if ($prod['id'] != "" && $prod['deleted'] == false) {
+                        $det = DetalleRequerimiento::find($prod['id']);
+                        $det->update([
+                            'id_det_existencia_almacen'                 => $prod['detId'],
+                            'cant_det_requerimiento'                    => $prod['qty'],
+                            'id_producto'                               => $detExistencia->existencia_almacen->id_producto,
+                            'costo_det_requerimiento'                   => $detExistencia->existencia_almacen->costo_existencia_almacen,
+                            'id_marca'                                  => $detExistencia->id_marca,
+                            'fecha_vcto_det_requerimiento'              => $detExistencia->fecha_vcto_det_existencia_almacen,
+                            'fecha_mod_det_requerimiento'               => Carbon::now(),
+                            'usuario_det_requerimiento'                 => $request->user()->nick_usuario,
+                            'ip_det_requerimiento'                      => $request->ip()
+                        ]);
+                    }
+
+                    if ($prod['id'] != "" && $prod['deleted'] == true) {
+                        $det = DetalleRequerimiento::find($prod['id']);
+                        $det->update([
+                            'estado_det_requerimiento'                  => 0,
+                            'fecha_mod_det_requerimiento'               => Carbon::now(),
+                            'usuario_det_requerimiento'                 => $request->user()->nick_usuario,
+                            'ip_det_requerimiento'                      => $request->ip()
+                        ]);
+                    }
+
+                    if ($prod['id'] == "" && $prod['deleted'] == false) {
+                        $existDetail = DetalleRequerimiento::where('id_requerimiento', $request->id)
+                            ->where('id_det_existencia_almacen', $prod['detId'])
+                            ->first();
+                        if ($existDetail) {
+                            $existDetail->update([
+                                'cant_det_requerimiento'                    => $prod['qty'],
+                                'estado_det_requerimiento'                  => 1,
+                                'fecha_mod_det_requerimiento'               => Carbon::now(),
+                                'usuario_det_requerimiento'                 => $request->user()->nick_usuario,
+                                'ip_det_requerimiento'                      => $request->ip()
+                            ]);
+                        } else {
+                            $detExistencia = DetalleExistenciaAlmacen::with('existencia_almacen')->find($prod['detId']);
+                            $newDet = new DetalleRequerimiento([
+                                'id_producto'                               => $detExistencia->existencia_almacen->id_producto,
+                                'id_marca'                                  => $detExistencia->id_marca,
+                                'fecha_vcto_det_requerimiento'              => $detExistencia->fecha_vcto_det_existencia_almacen,
+                                'id_requerimiento'                          => $req->id_requerimiento,
+                                'id_det_existencia_almacen'                 => $prod['detId'],
+                                'cant_det_requerimiento'                    => $prod['qty'],
+                                'costo_det_requerimiento'                   => $detExistencia->existencia_almacen->costo_existencia_almacen,
+                                'estado_det_requerimiento'                  => 1,
+                                'fecha_reg_det_requerimiento'               => Carbon::now(),
+                                'usuario_det_requerimiento'                 => $request->user()->nick_usuario,
+                                'ip_det_requerimiento'                      => $request->ip()
+                            ]);
+                            $newDet->save();
+                        }
+                    }
+                }
+
+                DB::commit(); // Confirma las operaciones en la base de datos
+                return response()->json([
+                    'message'          => 'Actualizada transferencia con exito.',
+                ]);
+            } catch (\Throwable $th) {
+                DB::rollBack(); // En caso de error, revierte las operaciones anteriores
+                return response()->json([
+                    'logical_error' => 'Ha ocurrido un error con sus datos.',
+                    'error' => $th->getMessage(),
+                ], 422);
+            }
+        }
+    }
+
+    public function sendWarehouseTransfer(Request $request)
+    {
+
     }
 }
