@@ -133,15 +133,15 @@
                 </div>
             </div>
 
-           <!--  {{isLoadinDownloaded}} -->
+            <!--  {{isLoadinDownloaded}} -->
             <div class="mx-4" v-show="isLoadinDownloaded == true">
                 <div class="w-full  bg-gray-200 rounded-full dark:bg-gray-700">
                     <div class="bg-blue-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full"
-                        :style="{ width: progress + '%' }"> {{progress}}%</div>
+                        :style="{ width: progress + '%' }"> {{ progress }}%</div>
                 </div>
             </div>
 
-           <!--  <div>
+            <!--  <div>
                 {{ progress }}
                 <div class="progress-bar-container">
                     <div class="progress-bar" :style="{ width: progress + '%' }"></div>
@@ -175,7 +175,6 @@ import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 import TableReporteFinanciero from "@/Components-ISRI/Almacen/Reportes/TableReporteFinanciero.vue"
 import axios from 'axios';
-
 export default {
     components: { Head, AppLayoutVue, DateTimePickerM, DateSelect, TableReporteFinanciero },
     props: {
@@ -279,10 +278,11 @@ export default {
                 // Crear una URL para el blob
                 const url = window.URL.createObjectURL(new Blob([response.data]));
 
+
                 // Crear un enlace temporal y simular un clic para descargar el archivo
                 const link = document.createElement("a");
                 link.href = url;
-                link.setAttribute("download", "nombre_del_archivo.xlsx"); // Nombre del archivo deseado
+                link.setAttribute("download", "REPORTE FINANCIERO_" + moment().format('L') +".xlsx"); // Nombre del archivo deseado
                 document.body.appendChild(link);
                 link.click();
                 // Liberar la URL del blob después de la descarga
@@ -335,7 +335,8 @@ export default {
         }
 
 
-        return {isLoadinDownloaded,
+        return {
+            isLoadinDownloaded,
             exportExcel, printPdf, counter, progress, startDownload, increaseSpeed,
             getOption, permits, isLoadingExport, reportInfo, errors, financingArray, dataReporteInfo, getInformacionReport
         };
