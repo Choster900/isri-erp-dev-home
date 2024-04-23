@@ -37,8 +37,10 @@ export default defineComponent({
             canEditReq,
             marcasArray,
             idEstadoReq,
+            searchProductionCenterByAtentionCenter,
             appendProduct,
             productosArray,
+            isLoadingCentrosProduccion,
             isLoadinProduct,
             idRequerimiento,
             centroProduccion,
@@ -128,8 +130,10 @@ export default defineComponent({
             fechaRequerimiento,
             proyectoFinanciados,
             handleProductSearch,
+            isLoadingCentrosProduccion,
             optionsCentroAtencion,
             dataDetalleRequerimiento,
+            searchProductionCenterByAtentionCenter,
             getProductoByDependencia,
             getProductoByDependencia,
             observacionRequerimiento,
@@ -153,11 +157,28 @@ export default defineComponent({
                     <div class="pt-4 flex justify-start space-x-2 items-center">
                         <h1 class="text-xs ">Requerimiento N°: <span class="font-medium text-sm underline">{{
                 numRequerimiento }}</span></h1>
-                        <div class="text-xs items-center">
+
+                        <div class="text-xs items-center" v-if="optionsCentroAtencion?.length == 1">
                             Centro:
                             <span class="font-medium text-sm underline" v-if="optionsCentroAtencion && optionsCentroAtencion[0]">
                                     {{ optionsCentroAtencion[0].label }}</span>
                             <span v-else>-</span>
+
+                            <!-- {{optionsCentroAtencion}} -->
+                        </div>
+                        <div class="text-xs items-center w-48" v-else>
+
+                            <OnlyLabelInput textLabel="Centro de atencion..." />
+                            <Multiselect v-model="idCentroAtencion" @select="searchProductionCenterByAtentionCenter($event)" :disabled="!canEditReq" :classes="{
+                containerDisabled: `bg-gray-200 text-text-slate-400`,
+                container: `relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded  text-base leading-snug outline-none
+                                ${canEditReq ? 'bg-white' : ''}`,
+                optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed',
+                optionPointed: 'text-gray-800 bg-gray-100',
+            }" :filter-results="false" :searchable="true" :clear-on-search="true" :min-chars="1" :options="optionsCentroAtencion" noResultsText="<p class='text-xs'>Sin resultados de personas</p>" placeholder="-" noOptionsText="<p class='text-xs'>vacio</p>"
+                            />
+                            <InputError class="mt-2" v-if="errorsValidation && errorsValidation['idLt'] !== ''" :message="errorsValidation['idLt']" />
+
                         </div>
                         <div role="alert" v-if="!canEditReq" class="relative flex w- px-1 py-1 text-base text-white bg-gray-900 rounded-lg font-regular items-center">
                             <div class="shrink-0">
@@ -176,7 +197,7 @@ export default defineComponent({
                             <Multiselect v-model="idLt" @select="getProductoByDependencia()" :disabled="!canEditReq" :classes="{
                 containerDisabled: `bg-gray-200 text-text-slate-400`,
                 container: `relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded  text-base leading-snug outline-none
-                            ${canEditReq ? 'bg-white' : ''}`,
+                                ${canEditReq ? 'bg-white' : ''}`,
                 optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed',
                 optionPointed: 'text-gray-800 bg-gray-100',
             }" :filter-results="false" :searchable="true" :clear-on-search="true" :min-chars="1" :options="lineaTrabajoArray" noResultsText="<p class='text-xs'>Sin resultados de personas</p>" placeholder="-" noOptionsText="<p class='text-xs'>vacio</p>" />
@@ -242,7 +263,7 @@ export default defineComponent({
                                         </svg>
                                 </div>
                                 <div class="text-xs w-[645px] py-1">
-                                    <Multiselect v-model="detalleRequerimiento.idCentroProduccion" :disabled="!canEditReq" :classes="{ containerDisabled: 'bg-gray-200 text-text-slate-400', container: `relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded  text-base leading-snug outline-none ${canEditReq ? 'bg-white' : ''}`, optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed', optionPointed: 'text-gray-800 bg-gray-100', }"
+                                    <Multiselect v-model="detalleRequerimiento.idCentroProduccion" :loading="isLoadingCentrosProduccion"  :disabled="!canEditReq" :classes="{ containerDisabled: 'bg-gray-200 text-text-slate-400', container: `relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded  text-base leading-snug outline-none ${canEditReq ? 'bg-white' : ''}`, optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed', optionPointed: 'text-gray-800 bg-gray-100', }"
                                         :filter-results="false" :searchable="true" :clear-on-search="true" :min-chars="1" :options="centroProduccion" noResultsText="<p class='text-xs'>Sin resultados de personas</p>" placeholder="CENTRO DE PRODUCCION" noOptionsText="<p class='text-xs'>SIN CENTROS DE PRODUCCION</p>"
                                     />
                                 </div>

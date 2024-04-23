@@ -28,6 +28,7 @@ export const useRequerimientoAlmacen = (objectRequerimientoToSendModal, numeroRe
     const canEditReq = ref(false)
     const isLoadinProduct = ref(false)
     const optionsCentroAtencion = ref(null)
+    const isLoadingCentrosProduccion = ref(false)
 
     const appendDetalleRequerimiento = () => {
         dataDetalleRequerimiento.value.push({
@@ -103,9 +104,7 @@ export const useRequerimientoAlmacen = (objectRequerimientoToSendModal, numeroRe
             proyectoFinanciados.value = data.proyectosFinanciados.map(index => {
                 return { value: index.id_proy_financiado, label: `${index.nombre_proy_financiado}`, completeData: index };
             })
-            centroProduccion.value = data.centroProduccion.map(index => {
-                return { value: index.id_centro_produccion, label: `${index.codigo_centro_produccion} - ${index.sigla_centro_produccion} - ${index.nombre_centro_produccion}`, completeData: index };
-            })
+
 
         } catch (error) {
             reject(error);
@@ -136,7 +135,6 @@ export const useRequerimientoAlmacen = (objectRequerimientoToSendModal, numeroRe
                     observacionRequerimiento: observacionRequerimiento.value,
                     dataDetalleRequerimiento: dataDetalleRequerimiento.value,
                 });
-                console.log(resp);
                 // Se resuelve la promesa con la respuesta exitosa de la solicitud
                 resolve(resp);
             } catch (error) {
@@ -181,7 +179,6 @@ export const useRequerimientoAlmacen = (objectRequerimientoToSendModal, numeroRe
                     observacionRequerimiento: observacionRequerimiento.value,
                     dataDetalleRequerimiento: dataDetalleRequerimiento.value,
                 });
-                console.log(resp);
 
                 // Se resuelve la promesa con la respuesta exitosa de la solicitud
                 resolve(resp);
@@ -230,7 +227,6 @@ export const useRequerimientoAlmacen = (objectRequerimientoToSendModal, numeroRe
             );
 
             // Devuelve los datos de la respuesta
-            console.log(response);
             return response.data;
         } catch (error) {
             // Manejo de errores específicos
@@ -261,6 +257,11 @@ export const useRequerimientoAlmacen = (objectRequerimientoToSendModal, numeroRe
             }));
 
             optionsCentroAtencion.value = options;
+            console.log(optionsCentroAtencion.value.length);
+            if (optionsCentroAtencion.value.length == 1) {
+
+                searchProductionCenterByAtentionCenter(optionsCentroAtencion.value[0].value,"/get-centro-produccion-by-users-centro")
+            }
 
             return resp;
         } catch (error) {
@@ -334,15 +335,28 @@ export const useRequerimientoAlmacen = (objectRequerimientoToSendModal, numeroRe
         }
     };
 
+    const searchProductionCenterByAtentionCenter = async (centroAtencion,URL) => {
+
+        isLoadingCentrosProduccion.value = true;
+        const resp = await axios.post(URL, {
+            idCentroAtencion: centroAtencion,
+        });
+        console.log(centroAtencion);
+        centroProduccion.value = resp.data.map(index => {
+            return { value: index.id_centro_produccion, label: `${index.codigo_centro_produccion} - ${index.sigla_centro_produccion} - ${index.nombre_centro_produccion}`, completeData: index };
+        })
+        isLoadingCentrosProduccion.value = false
+    }
+
     watch(objectRequerimientoToSendModal, (newValue, oldValue) => {
         const nickUser = usePage().props.auth.user.nick_usuario
 
         if (newValue !== null && newValue !== undefined && (Array.isArray(newValue) ? newValue.length > 0 : newValue !== '')) {
-            console.log(newValue);
             const { detalles_requerimiento, id_lt, id_centro_atencion, id_proy_financiado, id_estado_req, num_requerimiento, id_requerimiento, observacion_requerimiento, usuario_requerimiento } = newValue
             idRequerimiento.value = id_requerimiento
             idLt.value = id_lt
             idCentroAtencion.value = id_centro_atencion
+            searchProductionCenterByAtentionCenter(id_centro_atencion,"/get-centro-produccion-by-centro")
             idProyFinanciado.value = id_proy_financiado
             idEstadoReq.value = id_estado_req
             numRequerimiento.value = num_requerimiento
@@ -404,6 +418,7 @@ export const useRequerimientoAlmacen = (objectRequerimientoToSendModal, numeroRe
             numRequerimiento.value = numeroRequerimientoSiguiente.value
             observacionRequerimiento.value = null
             canEditReq.value = true
+            getDependenciaByUser()
             appendDetalleRequerimiento()
 
         }
@@ -422,9 +437,11 @@ export const useRequerimientoAlmacen = (objectRequerimientoToSendModal, numeroRe
     })
     return {
         appendProduct,
+        searchProductionCenterByAtentionCenter,
         saveRequerimientoAlmacenRequest,
         appendDetalleRequerimiento,
         updateRequerimientoAlmacenRequest,
+        isLoadingCentrosProduccion,
         errorsValidation,
         dataDetalleRequerimiento,
         idRequerimiento,

@@ -16,6 +16,7 @@ use App\Models\LineaTrabajo;
 use App\Models\Marca;
 use App\Models\Permiso;
 use App\Models\PermisoUsuario;
+use App\Models\PlazaAsignada;
 use App\Models\Producto;
 use App\Models\ProyectoFinanciado;
 use App\Models\Requerimiento;
@@ -94,7 +95,7 @@ class RequerimientoAlmacenController extends Controller
         ];
     }
 
-    function getObject(): array
+    function getObject(Request $request): array
     {
 
         // Obtener todas las líneas de trabajo
@@ -106,7 +107,31 @@ class RequerimientoAlmacenController extends Controller
         // Obtener todos los proyectos financiados
         $proyectosFinanciados = ProyectoFinanciado::all();
 
-        $centroProduccion = CentroProduccion::all();
+        $plazasAsignadas = PlazaAsignada::where("id_empleado", $request->user()->id_persona)
+            ->with(["centro_atencion.asignacion_centro_produccion"  => function ($query) {
+                $query->where("id_centro_atencion", 1);
+            }, "centro_atencion.asignacion_centro_produccion.centro_produccion"])->get();
+        // Crear una colección para almacenar los centros de atención únicos
+        $centrosUnicos = collect();
+        // Iterar sobre las plazas asignadas y agregar los centros de atención únicos a la colección
+        foreach ($plazasAsignadas as $plazaAsignada) {
+            $centroAtencion = $plazaAsignada->centro_atencion;
+            $centrosUnicos->push($centroAtencion);
+        }
+
+        $centrosUnicos = $centrosUnicos->unique('id_centro_atencion');
+
+        $centroProduccionUnicos = collect();
+
+        foreach ($centrosUnicos as $centros) {
+
+            foreach ($centros->asignacion_centro_produccion as $key => $value) {
+                $asignacion = $value->centro_produccion;
+                $centroProduccionUnicos->push($asignacion);
+            }
+        }
+
+        $centroProduccion = CentroProduccion::all();/* whereIn("id_tipo_centro_atencion",$idTipoCentroAtencionArray)->get(); */
 
         $marcas = Marca::all();
 
@@ -118,7 +143,8 @@ class RequerimientoAlmacenController extends Controller
             'centrosAtencion'      => $centrosAtencion,
             'proyectosFinanciados' => $proyectosFinanciados,
             'productos'            => $productos,
-            'centroProduccion'     => $centroProduccion,
+            'centroProduccion'     => $centroProduccionUnicos,
+            //'centroProduccionUnicos' => $centroProduccionUnicos
         ];
     }
 
@@ -537,7 +563,7 @@ class RequerimientoAlmacenController extends Controller
 
 
 
-                 $totalNuevoStock = DetalleExistenciaAlmacen::where('id_existencia_almacen', $detalleExistencia->id_existencia_almacen)
+                $totalNuevoStock = DetalleExistenciaAlmacen::where('id_existencia_almacen', $detalleExistencia->id_existencia_almacen)
                     ->sum('cant_det_existencia_almacen');
 
                 ExistenciaAlmacen::where("id_existencia_almacen", $detalleExistencia->id_existencia_almacen)->update([
@@ -546,14 +572,14 @@ class RequerimientoAlmacenController extends Controller
 
 
                 // Actualizar el costo del detalle del requerimiento con el costo de la existencia en el almacén
-                   DetalleRequerimiento::where("id_det_requerimiento", $value["id_det_requerimiento"])->update([
+                DetalleRequerimiento::where("id_det_requerimiento", $value["id_det_requerimiento"])->update([
                     "costo_det_requerimiento" => $existenciaAlmacen["costo_existencia_almacen"]
                 ]);
             }
 
 
 
-             // Crear un registro en el kardex
+            // Crear un registro en el kardex
             $requerimiento = Requerimiento::find($request->idRequerimiento);
 
             $kardexArray = [
@@ -572,7 +598,7 @@ class RequerimientoAlmacenController extends Controller
             // Registrar detalles en el kardex
             $detalleRequerimiento = DetalleRequerimiento::where("id_requerimiento", $request->idRequerimiento)->get();
 
-            foreach ( $detalleRequerimiento as $key => $value ) {
+            foreach ($detalleRequerimiento as $key => $value) {
                 DetalleKardex::insert([
                     'id_kardex'            => $cardexId,
                     'id_producto'          => $value['id_producto'],
@@ -589,7 +615,7 @@ class RequerimientoAlmacenController extends Controller
         }
 
         // Actualizar el requerimiento con los datos actualizados
-         Requerimiento::where("id_requerimiento", $request->idRequerimiento)->update($objectUpdated);
+        Requerimiento::where("id_requerimiento", $request->idRequerimiento)->update($objectUpdated);
 
         // Devolver un arreglo vacío como respuesta
         return [];
