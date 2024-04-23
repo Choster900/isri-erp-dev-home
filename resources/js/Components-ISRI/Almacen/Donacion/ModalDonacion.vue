@@ -17,9 +17,7 @@
                     <div class="mt-[5px] text-gray-500 text-opacity-70 w-[14px] h-[14px] mx-2">
                         <icon-m :iconName="'nextSvgVector'"></icon-m>
                     </div>
-                    <span class="text-[16px] font-medium text-black font-[Roboto]">{{
-            recepId > 0 ? "Editar donacion" : "Crear donacion"
-        }}</span>
+                    <span class="text-[16px] font-medium text-black font-[Roboto]">{{ recepId > 0 ? (donInfo.status != 1 ? 'Ver donación' : 'Editar donación') : 'Crear donación' }}</span>
                 </div>
                 <svg class="h-6 w-6 text-gray-400 hover:text-gray-600 cursor-pointer" @click="$emit('cerrar-modal')"
                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">

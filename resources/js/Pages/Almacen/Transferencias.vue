@@ -53,7 +53,7 @@
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap">
                                 <div class="font-medium text-slate-800 text-center">
-                                    {{ obj.motivo_ajuste.nombre_motivo_ajuste }}
+                                    {{ obj.centro_destino.codigo_centro_atencion }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5">
@@ -89,14 +89,14 @@
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="space-x-1 text-center">
                                     <DropDownOptions>
-                                        <!-- <div v-if="permits.ejecutar === 1 && obj.id_estado_req == 1"
-                                            @click="sendOutgoingAdjustment(obj.id_requerimiento)"
+                                        <div v-if="permits.ejecutar === 1 && obj.id_estado_req == 1"
+                                            @click="sendWarehouseTransfer(obj.id_requerimiento)"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-lime-700 w-[24px] h-[24px] mr-1">
                                                 <icon-m :iconName="'clipboard-arrow'"></icon-m>
                                             </div>
                                             <div class="font-semibold pt-0.5">Kardex</div>
-                                        </div> -->
+                                        </div>
                                         <div @click="showModalTransfers = true; objId = obj.id_requerimiento"
                                             v-if="permits.actualizar === 1 && obj.id_estado_req == 1"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
@@ -105,7 +105,7 @@
                                             </div>
                                             <div class="font-semibold pt-0.5">Editar</div>
                                         </div>
-                                        <!-- <div @click="showModalOutgoingAdjustment = true; objId = obj.id_requerimiento"
+                                        <div @click="showModalTransfers = true; objId = obj.id_requerimiento"
                                             v-if="obj.id_estado_req == 4 || obj.id_estado_req == 2"
                                             class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer">
                                             <div class="text-blue-800 w-[25px] h-[25px] mr-2">
@@ -120,7 +120,7 @@
                                                 <icon-m :iconName="'trash'"></icon-m>
                                             </div>
                                             <div class="font-semibold pt-0.5">Eliminar</div>
-                                        </div> -->
+                                        </div>
                                     </DropDownOptions>
                                 </div>
                             </td>
@@ -153,7 +153,7 @@
             </div>
 
         </div>
-        
+
         <pagination :emptyObject="emptyObject" :links="links" @get-data="getDataToShow" />
 
         <modal-transferencia-vue v-if="showModalTransfers" :showModalTransfers="showModalTransfers" :objId="objId"
@@ -177,7 +177,7 @@ moment.locale('es', localeData)
 import { ref, toRefs, inject } from 'vue';
 import { usePermissions } from '@/Composables/General/usePermissions.js';
 import { useToDataTable } from '@/Composables/General/useToDataTable.js';
-import { useEnviarAjusteSalida } from '@/Composables/Almacen/AjusteSalida/useEnviarAjusteSalida.js';
+import { useEnviarTransferencia } from '@/Composables/Almacen/Transferencia/useEnviarTransferencia.js';
 
 export default {
     components: { Head, AppLayoutVue, Datatable, IconM, ModalTransferenciaVue, Pagination },
@@ -196,9 +196,9 @@ export default {
         const objId = ref(0)
 
         const columns = [
-            { width: "10%", label: "Id", name: "id_requerimiento", type: "text" },
+            { width: "13%", label: "Id", name: "id_requerimiento", type: "text" },
             {
-                width: "10%", label: "Centro", name: "id_centro_atencion", type: "select",
+                width: "12%", label: "Origen", name: "id_centro_atencion", type: "select",
                 options: [
                     { value: "1", label: "ADMON" },
                     { value: "2", label: "CAA" },
@@ -212,7 +212,21 @@ export default {
                     { value: "10", label: "CRP" },
                 ]
             },
-            { width: "20%", label: "motivo", name: "motivo", type: "text" },
+            {
+                width: "12%", label: "Destino", name: "cen_id_centro_atencion", type: "select",
+                options: [
+                    { value: "1", label: "ADMON" },
+                    { value: "2", label: "CAA" },
+                    { value: "3", label: "CAL" },
+                    { value: "4", label: "CALE" },
+                    { value: "5", label: "CRC" },
+                    { value: "6", label: "UCE" },
+                    { value: "7", label: "CRINA" },
+                    { value: "8", label: "CRIO" },
+                    { value: "9", label: "CRIOR" },
+                    { value: "10", label: "CRP" },
+                ]
+            },
             {
                 width: "10%", label: "Fondo", name: "id_proy_financiado", type: "select",
                 options: [
@@ -222,7 +236,7 @@ export default {
                     { value: "4", label: "D" },
                 ]
             },
-            { width: "13%", label: "Numero", name: "num_requerimiento", type: "text" },
+            { width: "16%", label: "Numero", name: "num_requerimiento", type: "text" },
             { width: "15%", label: "Fecha", name: "fecha_requerimiento", type: "date" },
             {
                 width: "12%", label: "Estado", name: "id_estado_req", type: "select",
@@ -250,14 +264,14 @@ export default {
 
         const {
             isLoadingTop,
-            changeStatusElement, sendOutgoingAdjustment
-        } = useEnviarAjusteSalida(context, getDataToShow, tableData.value);
+            changeStatusElement, sendWarehouseTransfer
+        } = useEnviarTransferencia(context, getDataToShow, tableData.value);
 
 
         return {
             permits, dataToShow, showModalTransfers, tableData, perPage, objId,
             links, sortKey, sortOrders, isLoadinRequest, isLoadingTop, emptyObject, columns,
-            getDataToShow, handleData, sortBy, changeStatusElement, sendOutgoingAdjustment, moment
+            getDataToShow, handleData, sortBy, changeStatusElement, sendWarehouseTransfer, moment
         };
     },
 }
