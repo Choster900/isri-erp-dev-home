@@ -66,7 +66,7 @@ export const useToDataTable = (columns, requestUrl, columnToSort, dir, col = 0) 
                     }
                 } finally {
                     isLoadingTop.value = false;
-                    getDataToShow()
+                    getDataToShow(tableData.value.currentPage)
                 }
             }
         });

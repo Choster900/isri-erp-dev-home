@@ -9,6 +9,7 @@ use App\Models\Producto;
 use App\Models\UnidadMedida;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use Luecano\NumeroALetras\NumeroALetras;
 
 Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get(
@@ -34,12 +35,28 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('get-all-linea-trabajo', [BienesServiciosController::class, 'getAllLineaTrabajo'])->name('bieneservicios.getAllLineaTrabajo');
     Route::post('get-array-objects-for-multiselect', [BienesServiciosController::class, 'getArrayObjectoForMultiSelect'])->name('bieneservicios.getAllLineaTrabajo');
     Route::post('get-product-by-codigo-producto', function (Request $request) {
-        $product = Producto::with(["unidad_medida"])->where('codigo_producto', 'like', '%' . $request->codigoProducto . '%')->get();
+        $product = Producto::with(["unidad_medida"])
+            ->where('codigo_producto', 'like', '%' . $request->codigoProducto . '%')
+            ->get();
         // Formatear resultados para respuesta JSON
         $formattedResults = $product->map(function ($item) {
             return [
                 'value'           => $item->id_producto,
-                'label'           => $item->codigo_producto,
+                'label'           => $item->codigo_producto . ' - ' . $item->nombre_producto,
+                'allDataProducto' => $item,
+            ];
+        });
+        return response()->json($formattedResults);
+    })->name('bieneservicios.getProductByCodigoProducto');
+    Route::post('get-product-by-proceso', function (Request $request) {
+        $product = Producto::with(["unidad_medida"])
+            ->where('id_proceso_compra', $request->procesoId)
+            ->get();
+        // Formatear resultados para respuesta JSON
+        $formattedResults = $product->map(function ($item) {
+            return [
+                'value'           => $item->id_producto,
+                'label'           => $item->codigo_producto . ' - ' . $item->nombre_producto,
                 'allDataProducto' => $item,
             ];
         });
@@ -47,5 +64,29 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     })->name('bieneservicios.getProductByCodigoProducto');
     Route::post('save-prod-adquicicion', [BienesServiciosController::class, 'saveProductoAdquisicion'])->name('bieneservicios.saveProdAdquisicion');
     Route::post('update-prod-adquicicion', [BienesServiciosController::class, 'updateProductoAdquisicion'])->name('bieneservicios.updateProdAdquisicion');
+    Route::post(
+        'change-state-detalle-doc-adquisicion',
+        function (Request $request) {
+            return DetDocumentoAdquisicion::where('id_det_doc_adquisicion', $request->id)->update([
+                'id_estado_doc_adquisicion' => $request->idState,
+            ]);
+        }
+    )->name('bieneservicios.updateProdAdquisicion');
+    Route::post(
+        'convert-numbers-to-string',
+        function (Request $request) {
+            $numbersToLetters = new NumeroALetras();
+            $numero = $request->number;
+            $amountLetter =  $numbersToLetters->toInvoice($numero, 2, 'DÓLARES');
 
+
+            return $amountLetter;
+        }
+    )->name('bieneservicios.updateProdAdquisicion');
+    Route::get(
+        '/ucp/documento-adquisicion',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/ucp/documento-adquisicion', 'Tesoreria/DocAdquisicion');
+        }
+    )->name('ucp.documento-adquisicion-ucp');
 });

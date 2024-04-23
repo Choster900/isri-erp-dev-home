@@ -22,6 +22,7 @@ class RecepcionRequest extends FormRequest
      */
     public function rules(Request $request)
     {
+        //$rules["invoice"] = ['required'];
         foreach ($this->input('prods', []) as $key => $prod) {
             $rules["prods.{$key}.prodId"] = [
                 function ($attribute, $value, $fail) use ($key, $prod) {
@@ -34,6 +35,13 @@ class RecepcionRequest extends FormRequest
                 function ($attribute, $value, $fail) use ($key, $prod) {
                     if (!$prod['deleted'] && (empty($value) || $value <= 0)) {
                         $fail("Debe ingresar la cantidad de productos.");
+                    }
+                }
+            ];
+            $rules["prods.{$key}.brandId"] = [
+                function ($attribute, $value, $fail) use ($key, $prod) {
+                    if (!$prod['deleted'] && empty($value)) {
+                        $fail("Debe seleccionar marca.");
                     }
                 }
             ];
@@ -57,8 +65,8 @@ class RecepcionRequest extends FormRequest
 
     public function messages()
     {
-        $messages = [];   
-        // $messages["number.unique"] = "Este numero de recibo ya ha sido registrado.";
+        $messages = [];
+        //$messages["invoice.required"] = "Debe ingresar factura.";
         return $messages;
     }
 }

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\UCP;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UCP\ProductoRequest;
+use App\Models\CatalogoCtaNicsp;
+use App\Models\CatalogoPerc;
 use Illuminate\Http\Request;
 use App\Models\CatalogoUnspsc;
 use App\Models\CuentaPresupuestal;
@@ -17,7 +19,7 @@ class ProductoController extends Controller
 {
     public function getProductos(Request $request)
     {
-        $columns = ['id_producto', 'nombre_producto', 'descripcion_producto', 'id_ccta_presupuestal', 'id_unidad_medida', 'precio_producto', 'estado_producto'];
+        $columns = ['id_producto', 'nombre_producto', 'descripcion_producto', 'codigo_producto', 'id_unidad_medida', 'precio_producto', 'estado_producto'];
 
         $length = $request->length;
         $column = $request->column; //Index
@@ -34,7 +36,7 @@ class ProductoController extends Controller
             $query->where('id_producto', 'like', '%' . $search_value['id_producto'] . '%')
                 ->where('nombre_producto', 'like', '%' . $search_value['nombre_producto'] . '%')
                 ->where('descripcion_producto', 'like', '%' . $search_value['descripcion_producto'] . '%')
-                ->where('id_ccta_presupuestal', 'like', '%' . $search_value['id_ccta_presupuestal'] . '%')
+                ->where('codigo_producto', 'like', '%' . $search_value['codigo_producto'] . '%')
                 ->where('precio_producto', 'like', '%' . $search_value['precio_producto'] . '%')
                 ->where('estado_producto', 'like', '%' . $search_value['estado_producto'] . '%')
                 ->whereHas('unidad_medida', function ($query) use ($search_value) {
@@ -50,9 +52,13 @@ class ProductoController extends Controller
     {
         $prod = Producto::with(['unidad_medida', 'catalogo_unspsc'])->find($id);
 
-        $purchaseProcedures = ProcesoCompra::select('id_proceso_compra as value', 'nombre_proceso_compra as label')->get();
+        $purchaseProcedures = ProcesoCompra::selectRaw('id_proceso_compra as value, concat(id_proceso_compra," - ",nombre_proceso_compra) as label')->get();
         $budgetAccounts = CuentaPresupuestal::selectRaw("id_ccta_presupuestal as value , concat(id_ccta_presupuestal, ' - ', nombre_ccta_presupuestal) as label")
             ->where('compra_ccta_presupuestal', 1)
+            ->get();
+        $catPerc = CatalogoPerc::selectRaw('id_catalogo_perc as value, concat(codigo_catalogo_perc," - ",nombre_catalogo_perc) as label')->get();
+        $catNicsp = CatalogoCtaNicsp::selectRaw('id_ccta_nicsp as value, concat(codigo_ccta_nicsp," - ",nombre_ccta_nicsp) as label')
+            ->whereRaw('LENGTH(codigo_ccta_nicsp) >= 7')
             ->get();
         $unitsMeasmt = UnidadMedida::select('id_unidad_medida as value', 'nombre_unidad_medida as label')
             ->where('estado_unidad_medida', 1)->get();
@@ -61,7 +67,10 @@ class ProductoController extends Controller
             'prod'                      => $prod ?? [],
             'purchaseProcedures'        => $purchaseProcedures,
             'budgetAccounts'            => $budgetAccounts,
-            'unitsMeasmt'               => $unitsMeasmt
+            'unitsMeasmt'               => $unitsMeasmt,
+            'catPerc'                   => $catPerc,
+            'catNicsp'                  => $catNicsp
+
         ]);
     }
 
@@ -69,8 +78,10 @@ class ProductoController extends Controller
     {
         $search = $request->busqueda;
         if ($search != '') {
-            $catUnspsc = CatalogoUnspsc::select('id_catalogo_unspsc as value', 'nombre_catalogo_unspsc as label')
-                ->where('nombre_catalogo_unspsc', 'like', '%' . $search . '%')->get();
+            $catUnspsc = CatalogoUnspsc::selectRaw('id_catalogo_unspsc as value, concat(codigo_catalogo_unspsc," - ",nombre_catalogo_unspsc) as label')
+                ->where('nombre_catalogo_unspsc', 'like', '%' . $search . '%')
+                ->orWhere('codigo_catalogo_unspsc', 'like', '%' . $search . '%')
+                ->get();
         }
         return response()->json(
             [
@@ -97,8 +108,8 @@ class ProductoController extends Controller
 
                 // Concatenate the category part of the product code with the incremented correlative part
                 $newProductCode = $request->budgetAccountId . '-' . $newCorrelative;
-            }else{
-                $newProductCode = $request->budgetAccountId.'-1';
+            } else {
+                $newProductCode = $request->budgetAccountId . '-1';
             }
 
             $product = new Producto([
@@ -109,6 +120,7 @@ class ProductoController extends Controller
                 'codigo_producto'           => $newProductCode,
                 'nombre_producto'           => $request->name,
                 'descripcion_producto'      => $request->description,
+                'nombre_completo_producto'  => $request->name." ".$request->description,
                 'precio_producto'           => substr($request->price, 1),
                 'basico_producto'           => $request->gAndS == -1 ? null : $request->gAndS,
                 'perecedero_producto'       => $request->perishable == -1 ? null : $request->perishable,
@@ -147,6 +159,7 @@ class ProductoController extends Controller
                     'id_unidad_medida'          => $request->mUnitId,
                     'nombre_producto'           => $request->name,
                     'descripcion_producto'      => $request->description,
+                    'nombre_completo_producto'  => $request->name." ".$request->description,
                     'precio_producto'           => substr($request->price, 1),
                     'basico_producto'           => $request->gAndS == -1 ? null : $request->gAndS,
                     'perecedero_producto'       => $request->perishable == -1 ? null : $request->perishable,

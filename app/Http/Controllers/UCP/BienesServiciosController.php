@@ -23,14 +23,21 @@ class BienesServiciosController extends Controller
     {
         $v_columns = [
             'id_doc_adquisicion',
-            /*  'dui_proveedor',
-            'nrc_proveedor',
-            'nit_proveedor',
-            'id_tipo_contribuyente',
-            'id_sujeto_retencion',
-            'razon_social_proveedor',
-            'estado_proveedor',
-            'nombre_comercial_proveedor', */
+            'id_prod_adquisicion',
+            'id_producto',
+            'id_det_doc_adquisicion',
+            'id_marca',
+            'id_lt',
+            'id_centro_atencion',
+            'cant_prod_adquisicion',
+            'costo_prod_adquisicion',
+            'descripcion_prod_adquisicion',
+            'estado_prod_adquisicion',
+            'fecha_reg_prod_adquisicion',
+            'fecha_mod_prod_adquisicion',
+            'usuario_prod_adquisicion',
+            'ip_prod_adquisicion',
+
         ];
 
         $v_length = $request->input('length');
@@ -40,6 +47,7 @@ class BienesServiciosController extends Controller
 
 
         $v_query = DetDocumentoAdquisicion::with([
+            "estado_documento_adquisicion",
             "productos_adquisiciones" => function ($query) {
                 return $query->where("estado_prod_adquisicion", 1);
             },
@@ -47,20 +55,41 @@ class BienesServiciosController extends Controller
             "productos_adquisiciones.linea_trabajo",
             "productos_adquisiciones.centro_atencion",
             "productos_adquisiciones.marca",
-            "documento_adquisicion.proveedor"
+            "documento_adquisicion.proveedor",
+            "documento_adquisicion.tipo_documento_adquisicion",
+            "documento_adquisicion.tipo_gestion_compra",
         ])->has('productos_adquisiciones')->orderBy($v_columns[$v_column], $v_dir);
 
         if ($data) {
-            /*   $v_query->where('id_proveedor', 'like', '%' . $data["id_proveedor"] . '%')
-                ->whereRaw('IFNULL(dui_proveedor, IFNULL(nit_proveedor, "")) like ?', '%' . $data["dui_proveedor"] . '%')
-                ->where('razon_social_proveedor', 'like', '%' . $data["razon_social_proveedor"] . '%')
-                ->where('nombre_comercial_proveedor', 'like', '%' . $data["nombre_comercial_proveedor"] . '%')
-                ->where('estado_proveedor', 'like', '%' . $data["estado_proveedor"] . '%'); */
+
+            $v_query->whereHas('documento_adquisicion.proveedor', function ($query) use ($data) {
+                $query->where('razon_social_proveedor', 'like', '%' . $data["razon_social_proveedor"] . '%');
+            });
+            $v_query->whereHas('documento_adquisicion', function ($query) use ($data) {
+                $query->where('id_tipo_doc_adquisicion', 'like', '%' . $data["id_tipo_doc_adquisicion"] . '%');
+            });
+            $v_query->whereHas('documento_adquisicion', function ($query) use ($data) {
+                $query->where('id_tipo_gestion_compra', 'like', '%' . $data["id_tipo_gestion_compra"] . '%');
+            });
+
+            $v_query->whereHas('documento_adquisicion', function ($query) use ($data) {
+                $query->where('numero_doc_adquisicion', 'like', '%' . $data["id_tipo_gestion_compra"] . '%');
+            });
+            $v_query->whereHas('documento_adquisicion', function ($query) use ($data) {
+                $query->where('numero_doc_adquisicion', 'like', '%' . $data["id_tipo_gestion_compra"] . '%');
+            });
+
+
+            $v_query->where('monto_det_doc_adquisicion', 'like', '%' . $data["monto_det_doc_adquisicion"] . '%');
+
+            $v_query->whereHas('estado_documento_adquisicion', function ($query) use ($data) {
+                $query->where('id_estado_doc_adquisicion', 'like', '%' . $data["id_estado_doc_adquisicion"] . '%');
+            });
         }
 
-        $v_roles = $v_query->paginate($v_length)->onEachSide(1);
+        $data = $v_query->paginate($v_length)->onEachSide(1);
         return [
-            'data' => $v_roles,
+            'data' => $data,
             'draw' => $request->input('draw'),
         ];
     }
@@ -71,9 +100,13 @@ class BienesServiciosController extends Controller
             DB::beginTransaction();
             $detalles = $request->productAdq;
             $idDetDocAdquisicion = $request->idDetDocAdquisicion;
+            $notificacionDetDocAdquisicion = $request->notificacionDetDocAdquisicion;
+            $recepcionDetDocAdquisicion = $request->recepcionDetDocAdquisicion;
+            $observacionDetDocAdquisicion = $request->observacionDetDocAdquisicion;
             $usuario = $request->user()->nick_usuario;
             $ip = $request->ip();
             $fechaActual = now();
+            $totCostoProdAdquisicion = 0; // Variable para almacenar la el total
 
             foreach ($detalles as $detalle) {
                 if ($detalle["estadoLt"] != 0) {
@@ -93,6 +126,8 @@ class BienesServiciosController extends Controller
                                 'usuario_prod_adquisicion'     => $usuario,
                                 'ip_prod_adquisicion'          => $ip,
                             ];
+                            // Sumando el total
+                            $totCostoProdAdquisicion += $detalleProducto["valorTotalProduct"];
 
                             // Usar DB::insert para insertar directamente y mejorar el rendimiento
                             DB::table('producto_adquisicion')->insert($nuevoDetalle);
@@ -100,6 +135,13 @@ class BienesServiciosController extends Controller
                     }
                 }
             }
+            DetDocumentoAdquisicion::where("id_det_doc_adquisicion", $idDetDocAdquisicion)->update([
+                "monto_det_doc_adquisicion" => $totCostoProdAdquisicion,
+                "observacion_det_doc_adquisicion" => $notificacionDetDocAdquisicion,
+                "recepcion_det_doc_adquisicion" => $recepcionDetDocAdquisicion,
+                "notificacion_det_doc_adquisicion" => $observacionDetDocAdquisicion,
+            ]);
+
             DB::commit();
             return response()->json($request); // O cualquier otra respuesta que desees enviar
         } catch (\Throwable $th) {
@@ -114,9 +156,13 @@ class BienesServiciosController extends Controller
         try {
             $detalles = $request->productAdq;
             $idDetDocAdquisicion = $request->idDetDocAdquisicion;
+            $notificacionDetDocAdquisicion = $request->notificacionDetDocAdquisicion;
+            $recepcionDetDocAdquisicion = $request->recepcionDetDocAdquisicion;
+            $observacionDetDocAdquisicion = $request->observacionDetDocAdquisicion;
             $usuario = $request->user()->nick_usuario;
             $ip = $request->ip();
             $fechaActual = now();
+            $totCostoProdAdquisicion = 0; // Variable para almacenar la el total
 
             foreach ($detalles as $detalle) {
                 // Verificar si la linea de trabajo del producto adquisicion no ha sido eliminada en el front
@@ -142,6 +188,9 @@ class BienesServiciosController extends Controller
                                 'usuario_prod_adquisicion'     => $usuario,
                                 'ip_prod_adquisicion'          => $ip,
                             ]);
+
+                            // Sumando el total
+                            $totCostoProdAdquisicion += $detalleProducto["valorTotalProduct"];
                         }
                         // Insertar nuevo producto
                         else if ($detalleProducto["estadoProdAdquisicion"] == 1) {
@@ -160,6 +209,8 @@ class BienesServiciosController extends Controller
                                 'ip_prod_adquisicion'          => $ip,
                             ];
 
+                            // Sumando el total
+                            $totCostoProdAdquisicion += $detalleProducto["valorTotalProduct"];
                             // Usar DB::insert para insertar directamente y mejorar el rendimiento
                             DB::table('producto_adquisicion')->insert($nuevoDetalle);
                         }
@@ -186,6 +237,12 @@ class BienesServiciosController extends Controller
                     }
                 }
             }
+            DetDocumentoAdquisicion::where("id_det_doc_adquisicion", $idDetDocAdquisicion)->update([
+                "monto_det_doc_adquisicion" => $totCostoProdAdquisicion,
+                "observacion_det_doc_adquisicion" => $notificacionDetDocAdquisicion,
+                "recepcion_det_doc_adquisicion" => $recepcionDetDocAdquisicion,
+                "notificacion_det_doc_adquisicion" => $observacionDetDocAdquisicion,
+            ]);
 
             return response()->json(["message" => "Actualización exitosa"]);
         } catch (\Exception $e) {
@@ -200,10 +257,13 @@ class BienesServiciosController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Request
      */
-    function getArrayObjectoForMultiSelect(): array
+    function getArrayObjectoForMultiSelect(Request $request): array
     {
         // Obtener detalles de documentos de adquisición con información adicional
-        $detalleDocumentoAdquisicion = DetDocumentoAdquisicion::with(["documento_adquisicion.proveedor"])
+        $detalleDocumentoAdquisicion = DetDocumentoAdquisicion::with([
+            "documento_adquisicion.proveedor",
+            "documento_adquisicion.proceso_compra"
+        ])
             ->where("estado_det_doc_adquisicion", 1)
             ->whereDoesntHave("productos_adquisiciones")
             ->get();

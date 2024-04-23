@@ -17,7 +17,12 @@ class RecepcionPedido extends Model
         'id_det_doc_adquisicion',
         'id_proy_financiado',
         'id_estado_recepcion_pedido',
+        'id_proveedor',
+        'id_empleado', //Administrador de contrato
+        'emp_id_empleado', //Guardaalmacen
         'factura_recepcion_pedido',
+        'monto_recepcion_pedido',
+        'representante_prov_recepcion_pedido',
         'fecha_recepcion_pedido',
         'acta_recepcion_pedido',
         'incumple_acuerdo_recepcion_pedido',
@@ -42,5 +47,25 @@ class RecepcionPedido extends Model
     public function estado_recepcion()
     {
         return $this->hasOne('App\Models\EstadoRecepcionPedido','id_estado_recepcion_pedido','id_estado_recepcion_pedido');
+    }
+
+    public function administrador_contrato()
+    {
+        return $this->belongsTo('App\Models\Empleado','id_empleado','id_empleado');
+    }
+
+    public function guarda_almacen()
+    {
+        return $this->belongsTo('App\Models\Empleado','emp_id_empleado','id_empleado');
+    }
+
+    public function proveedor()
+    {
+        return $this->belongsTo('App\Models\Proveedor','id_proveedor','id_proveedor');
+    }
+
+    public function fuente_financiamiento()
+    {
+        return $this->belongsTo('App\Models\ProyectoFinanciado','id_proy_financiado','id_proy_financiado');
     }
 }

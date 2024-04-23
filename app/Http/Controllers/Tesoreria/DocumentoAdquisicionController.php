@@ -9,6 +9,7 @@ use App\Models\AdministradorAdquisicion;
 use App\Models\DetDocumentoAdquisicion;
 use App\Models\DocumentoAdquisicion;
 use App\Models\Empleado;
+use App\Models\ProcesoCompra;
 use App\Models\Proveedor;
 use App\Models\ProyectoFinanciado;
 use Carbon\Carbon;
@@ -122,6 +123,10 @@ class DocumentoAdquisicionController extends Controller
             ->where('estado_proveedor', '=', 1)
             ->orderBy('razon_social_proveedor')
             ->get();
+        $procesoCompra = ProcesoCompra::select('id_proceso_compra as value', 'nombre_proceso_compra as label','id_tipo_proceso_compra as idTipoProcesoCompra')
+
+            ->orderBy('nombre_proceso_compra')
+            ->get();
         $allEmployees = Empleado::with('persona')
             ->where('id_estado_empleado', 1)->get();
         $employees = $allEmployees->map(function ($e) {
@@ -135,6 +140,7 @@ class DocumentoAdquisicionController extends Controller
             'doc_types'                     => $doc_types,
             'management_types'              => $management_types,
             'financing_sources'             => $financing_sources,
+            'procesoCompra'                 => $procesoCompra,
             'suppliers'                     => $suppliers,
             'acqDoc'                        => $acqDoc ?? [],
             'employees'                     => $employees
@@ -148,6 +154,7 @@ class DocumentoAdquisicionController extends Controller
                 'id_tipo_gestion_compra' => $request->management_type_id,
                 'id_tipo_doc_adquisicion' => $request->type_id,
                 'id_proveedor' => $request->supplier_id,
+                'id_proceso_compra' => $request->procesoCompraId,
                 'monto_doc_adquisicion' => $request->total,
                 'numero_doc_adquisicion' => $request->number,
                 'numero_gestion_doc_adquisicion' => $request->management_number,
@@ -175,9 +182,10 @@ class DocumentoAdquisicionController extends Controller
             foreach ($request->items as $detail) {
                 $new_item = new DetDocumentoAdquisicion([
                     'id_doc_adquisicion' => $new_acq_doc->id_doc_adquisicion,
+                    'id_estado_doc_adquisicion' => 1,
                     'id_proy_financiado' => $detail['financing_source_id'],
                     'nombre_det_doc_adquisicion' => $detail['name'],
-                    'monto_det_doc_adquisicion' => $detail['amount'],
+                    'monto_det_doc_adquisicion' => isset($detail['amount']) ? $detail['amount'] : 0,
                     'compromiso_ppto_det_doc_adquisicion' => $detail['commitment_number'],
                     'admon_det_doc_adquisicion' => $detail['contract_manager'],
                     'estado_det_doc_adquisicion' => 1,
@@ -210,6 +218,7 @@ class DocumentoAdquisicionController extends Controller
             try {
                 $acq_doc->update([
                     'id_tipo_gestion_compra' => $request->management_type_id,
+                    'id_proceso_compra' => $request->procesoCompraId,
                     'id_tipo_doc_adquisicion' => $request->type_id,
                     'id_proveedor' => $request->supplier_id,
                     'monto_doc_adquisicion' => $request->total,
@@ -225,7 +234,7 @@ class DocumentoAdquisicionController extends Controller
                 //CRUD doc managers
                 $newEmpIds = $request->employees;
                 $currentEmpIds = AdministradorAdquisicion::where('id_doc_adquisicion', $acq_doc->id_doc_adquisicion)
-                    ->where('estado_admon_adquisicion',1)
+                    ->where('estado_admon_adquisicion', 1)
                     ->pluck('id_empleado')
                     ->toArray();
                 $deletedEmpIds = array_diff($currentEmpIds, $newEmpIds);
@@ -271,7 +280,7 @@ class DocumentoAdquisicionController extends Controller
                         $item->update([
                             'id_proy_financiado' => $detail['financing_source_id'],
                             'nombre_det_doc_adquisicion' => $detail['name'],
-                            'monto_det_doc_adquisicion' => $detail['amount'],
+                            'monto_det_doc_adquisicion' => is_numeric($detail['amount']) ? $detail['amount'] : 0,
                             'compromiso_ppto_det_doc_adquisicion' => $detail['commitment_number'],
                             'admon_det_doc_adquisicion' => $detail['contract_manager'],
                             'fecha_mod_det_doc_adquisicion' => Carbon::now(),
@@ -298,7 +307,7 @@ class DocumentoAdquisicionController extends Controller
                             $exist_item->update([
                                 'id_proy_financiado' => $detail['financing_source_id'],
                                 'nombre_det_doc_adquisicion' => $detail['name'],
-                                'monto_det_doc_adquisicion' => $detail['amount'],
+                                'monto_det_doc_adquisicion' => is_numeric($detail['amount']) ? $detail['amount'] : 0,
                                 'compromiso_ppto_det_doc_adquisicion' => $detail['commitment_number'],
                                 'admon_det_doc_adquisicion' => $detail['contract_manager'],
                                 'estado_det_doc_adquisicion' => 1,
@@ -309,9 +318,10 @@ class DocumentoAdquisicionController extends Controller
                         } else {
                             $new_item = new DetDocumentoAdquisicion([
                                 'id_doc_adquisicion' => $request->id,
+                                'id_estado_doc_adquisicion' => 1,
                                 'id_proy_financiado' => $detail['financing_source_id'],
                                 'nombre_det_doc_adquisicion' => $detail['name'],
-                                'monto_det_doc_adquisicion' => $detail['amount'],
+                                'monto_det_doc_adquisicion' => is_numeric($detail['amount']) ? $detail['amount'] : 0,
                                 'compromiso_ppto_det_doc_adquisicion' => $detail['commitment_number'],
                                 'admon_det_doc_adquisicion' => $detail['contract_manager'],
                                 'estado_det_doc_adquisicion' => 1,
@@ -335,82 +345,6 @@ class DocumentoAdquisicionController extends Controller
                     'error' => $th->getMessage(),
                 ], 422);
             }
-
-
-            // $acq_doc->update([
-            //     'id_tipo_gestion_compra' => $request->management_type_id,
-            //     'id_tipo_doc_adquisicion' => $request->type_id,
-            //     'id_proveedor' => $request->supplier_id,
-            //     'monto_doc_adquisicion' => $request->total,
-            //     'numero_doc_adquisicion' => $request->number,
-            //     'numero_gestion_doc_adquisicion' => $request->management_number,
-            //     'numero_adjudicacion_doc_adquisicion' => $request->award_number,
-            //     'fecha_adjudicacion_doc_adquisicion' => $request->award_date,
-            //     'fecha_mod_doc_adquisicion' => Carbon::now(),
-            //     'usuario_doc_adquisicion' => $request->user()->nick_usuario,
-            //     'ip_doc_adquisicion' => $request->ip(),
-            // ]);
-
-            // foreach ($request->items as $detail) {
-            //     if ($detail['id'] != "" && $detail['deleted'] == false) {
-            //         //Update item
-            //         $item = DetDocumentoAdquisicion::find($detail['id']);
-            //         $item->update([
-            //             'id_proy_financiado' => $detail['financing_source_id'],
-            //             'nombre_det_doc_adquisicion' => $detail['name'],
-            //             'monto_det_doc_adquisicion' => $detail['amount'],
-            //             'compromiso_ppto_det_doc_adquisicion' => $detail['commitment_number'],
-            //             'admon_det_doc_adquisicion' => $detail['contract_manager'],
-            //             'fecha_mod_det_doc_adquisicion' => Carbon::now(),
-            //             'usuario_det_doc_adquisicion' => $request->user()->nick_usuario,
-            //             'ip_det_doc_adquisicion' => $request->ip()
-            //         ]);
-            //     }
-
-            //     if ($detail['id'] != "" && $detail['deleted'] == true) {
-            //         $item = DetDocumentoAdquisicion::find($detail['id']);
-            //         $item->update([
-            //             'estado_det_doc_adquisicion' => 0,
-            //             'fecha_mod_det_doc_adquisicion' => Carbon::now(),
-            //             'usuario_det_doc_adquisicion' => $request->user()->nick_usuario,
-            //             'ip_det_doc_adquisicion' => $request->ip()
-            //         ]);
-            //     }
-
-            //     if ($detail['id'] == "" && $detail['deleted'] == false) {
-            //         $exist_item = DetDocumentoAdquisicion::where('id_doc_adquisicion', $request->id)
-            //             ->where('compromiso_ppto_det_doc_adquisicion', $detail['commitment_number'])
-            //             ->first();
-            //         if ($exist_item) {
-            //             $exist_item->update([
-            //                 'id_proy_financiado' => $detail['financing_source_id'],
-            //                 'nombre_det_doc_adquisicion' => $detail['name'],
-            //                 'monto_det_doc_adquisicion' => $detail['amount'],
-            //                 'compromiso_ppto_det_doc_adquisicion' => $detail['commitment_number'],
-            //                 'admon_det_doc_adquisicion' => $detail['contract_manager'],
-            //                 'estado_det_doc_adquisicion' => 1,
-            //                 'fecha_mod_det_doc_adquisicion' => Carbon::now(),
-            //                 'usuario_det_doc_adquisicion' => $request->user()->nick_usuario,
-            //                 'ip_det_doc_adquisicion' => $request->ip()
-            //             ]);
-            //         } else {
-            //             $new_item = new DetDocumentoAdquisicion([
-            //                 'id_doc_adquisicion' => $request->id,
-            //                 'id_proy_financiado' => $detail['financing_source_id'],
-            //                 'nombre_det_doc_adquisicion' => $detail['name'],
-            //                 'monto_det_doc_adquisicion' => $detail['amount'],
-            //                 'compromiso_ppto_det_doc_adquisicion' => $detail['commitment_number'],
-            //                 'admon_det_doc_adquisicion' => $detail['contract_manager'],
-            //                 'estado_det_doc_adquisicion' => 1,
-            //                 'fecha_reg_det_doc_adquisicion' => Carbon::now(),
-            //                 'usuario_det_doc_adquisicion' => $request->user()->nick_usuario,
-            //                 'ip_det_doc_adquisicion' => $request->ip()
-            //             ]);
-            //             $new_item->save();
-            //         }
-            //     }
-            // }
-            // return ['mensaje' => 'Actualizado documento numero ' . $acq_doc->numero_doc_adquisicion . ' con éxito.'];
         }
     }
 }

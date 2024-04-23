@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ArchivoAnexoController extends Controller
 {
-    //Controller for Anexos 
+    //Controller for Anexos
 
     function getEmployeeExpediente(Request $request)
     {
@@ -136,7 +136,8 @@ class ArchivoAnexoController extends Controller
                 $currentTimestamp = time();
                 $nameFile = $codigo_empleado . '_' . date('Y-m-d His', $currentTimestamp) . '.' . $file->getClientOriginalExtension();
                 // Store the file in the 'anexos' directory within the 'public' disk
-                $file->storeAs('anexos', $nameFile, 'public');
+// Almacenar el archivo en el directorio 'imagenes' dentro del disco 'public'
+$file->storeAs('imagenes', $nameFile, 'public');
                 // Generate a URL for the stored file
                 $imageUrl = Storage::url('anexos/' . $nameFile);
             }
@@ -157,8 +158,8 @@ class ArchivoAnexoController extends Controller
                 'descripcion_archivo_anexo' => $request->descripcionArchivoAnexo,
             ]);
             // Commit the transaction
-            
-            
+
+
             DB::commit();
 
             // Return the created ArchivoAnexo
@@ -238,7 +239,7 @@ class ArchivoAnexoController extends Controller
         }
     }
 
-    public function update(Request $request) //Metodo utilizado al momento de seleccionar proveedor y hacer los calculos 
+    public function update(Request $request) //Metodo utilizado al momento de seleccionar proveedor y hacer los calculos
     { //se hacen esta peticion por que al no existir el quedan no existen registos previos de la base de datos y no podemos ver a que provedor pertenece
         return ArchivoAnexo::where("id_quedan", $request->idArchivoAnexo)->update(["estado_archivo_anexo" => 0, "fecha_mod_archivo_anexo" => Carbon::now()]);
     }

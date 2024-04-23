@@ -498,7 +498,7 @@ export default {
 
 };
 </script>
-  
+
 <style>
 .wrap,
 .wrap2 {

@@ -1,4 +1,4 @@
-import { ref, inject, computed, nextTick } from "vue";
+import { ref, inject, computed, nextTick, watch } from "vue";
 import axios from "axios";
 import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
@@ -21,29 +21,33 @@ export const useRecepcion = (context) => {
     const filteredProds = ref([])
     const documents = ref([])
     const items = ref([])
+    const brands = ref([])
+
     const startRec = ref(false)
-    const infoToShow = ref({
-        docId: '',
-        detDocId: '',
-        docName: '',
-        itemName: '',
-        financingSource: '',
-        commitment: '',
-        supplier: '',
-        nit: '',
-        dateTime: '',
+    const infoToShow = ref({ //This is an object used to show general information related to the acquisition document
+        docId: '', //id_doc_adquisicion
+        detDocId: '', //id_det_doc_adquisicion
+        docName: '', //nombre_tipo_doc_adquisicion
+        itemName: '', //nombre_det_doc_adquisicion
+        financingSource: '', //codigo_proy_financiado
+        commitment: '', //compromiso_ppto_det_doc_adquisicion
+        supplier: '', //razon_social_proveedor
+        nit: '', //nit_proveedor
+        dateTime: '', //fecha_reg_recepcion_pedido
+        acqDocDate: '' //acquisition document reference date
     })
 
     const recDocument = ref({
-        id: '',
-        acta: '',
-        invoice: '',
+        id: '', //reception id
+        acta: '', //Acta number
+        invoice: '', //Invoice number
         financingSourceId: '',
-        observation: '',
-        detDocId: '',
-        status: '',
-        prods: [],
-        procedure: []
+        observation: '', //Reception observation
+        detDocId: '', //Identifier of the document detail related to the reception
+        status: '', //We use this to manage some functionalities in the view, it represent the reception status
+        total: '', //This is the sum of all products
+        prods: [], //Array of products
+        procedure: [] //This is the result of the query we are using to compare the quantity of each product, we are sending this to backend to compare with a updated query
     })
 
     const {
@@ -88,7 +92,8 @@ export const useRecepcion = (context) => {
                 });
                 setModalValues(response.data, id)
             } catch (err) {
-                if (err.response.data.logical_error) {
+                console.log(err);
+                if (err.response && err.response.data.logical_error) {
                     useShowToast(toast.error, err.response.data.logical_error);
                     context.emit("get-table");
                 } else {
@@ -103,7 +108,8 @@ export const useRecepcion = (context) => {
 
     const setModalValues = (data, id) => {
         const recepData = data.recep
-        infoToShow.value.docName = data.itemInfo.documento_adquisicion.tipo_documento_adquisicion.nombre_tipo_doc_adquisicion + " " + data.itemInfo.documento_adquisicion.numero_doc_adquisicion
+        //Set the general information to show in the view
+        infoToShow.value.docName = data.itemInfo.documento_adquisicion.tipo_documento_adquisicion.nombre_tipo_doc_adquisicion + ' "' + data.itemInfo.documento_adquisicion.numero_doc_adquisicion + '"'
         infoToShow.value.itemName = upperCase(data.itemInfo.nombre_det_doc_adquisicion)
         infoToShow.value.financingSource = data.itemInfo.fuente_financiamiento.codigo_proy_financiado
         infoToShow.value.commitment = data.itemInfo.compromiso_ppto_det_doc_adquisicion
@@ -111,62 +117,71 @@ export const useRecepcion = (context) => {
         infoToShow.value.nit = data.itemInfo.documento_adquisicion.proveedor.nit_proveedor
         infoToShow.value.dateTime = recepData ? moment(recepData.fecha_reg_recepcion_pedido).format('DD/MM/YYYY, HH:mm:ss') : ''
         infoToShow.value.status = id > 0 ? recepData.id_estado_recepcion_pedido : 1
+        infoToShow.value.acqDocDate = moment(data.itemInfo.documento_adquisicion.fecha_adjudicacion_doc_adquisicion).format('DD/MM/YYYY')
+
+        brands.value = data.brands
+        recDocument.value.procedure = data.products
+
+        brands.value = data.brands
+
+        recDocument.value.procedure = data.products
 
         recDocument.value.financingSourceId = data.itemInfo.id_proy_financiado
         recDocument.value.detDocId = data.itemInfo.id_det_doc_adquisicion
 
         // Check if id > 0
         if (id > 0) {
-            recDocument.value.id = recepData.id_recepcion_pedido
-            recDocument.value.acta = recepData.acta_recepcion_pedido
-            recDocument.value.invoice = recepData.factura_recepcion_pedido
-            recDocument.value.observation = recepData.observacion_recepcion_pedido
+            recDocument.value.id = recepData.id_recepcion_pedido //Set reception id
+            recDocument.value.acta = recepData.acta_recepcion_pedido //Set acta number
+            recDocument.value.invoice = recepData.factura_recepcion_pedido //Set invoice number
+            recDocument.value.observation = recepData.observacion_recepcion_pedido ?? '' //Set observation
 
-            if (recepData.id_estado_recepcion_pedido === 1) {
-                // Filter products based on conditions
-                const newOptions = data.products.filter(element => {
-                    const rightOpt = recepData.detalle_recepcion.some(e => e.id_prod_adquisicion === element.value && e.estado_prod_adquisicion === 1);
-                    return rightOpt || element.total_menos_acumulado != 0;
-                });
+            // Filter products based on conditions
+            const newOptions = data.products.filter(element => {
+                const rightOpt = recepData.detalle_recepcion.some(e => e.id_prod_adquisicion === element.value && e.estado_prod_adquisicion === 1);
+                return rightOpt || element.total_menos_acumulado != 0;
+            });
 
-                // Set products and filteredProds to newOptions
-                products.value = filteredProds.value = newOptions;
-            }else{
-                filteredProds.value = products.value = data.products
-            }
+            // Set products to newOptions
+            products.value = newOptions;
+
 
             // Iterate over detalle_recepcion
             recepData.detalle_recepcion.forEach(element => {
                 // Check estado_det_recepcion_pedido
                 if (element.estado_det_recepcion_pedido === 1) {
-                    const paId = element.producto_adquisicion.id_prod_adquisicion;
-                    const cantRecep = element.cant_det_recepcion_pedido;
-                    const detRecepId = element.id_det_recepcion_pedido;
-
                     // Construct array
                     const array = {
-                        detRecId: detRecepId,
-                        prodId: paId,
-                        desc: "",
-                        expiryDate: formatDateVue3DP(element.fecha_vencimiento_det_recepcion_pedido),
-                        perishable: "",
-                        avails: "",
-                        qty: cantRecep,
-                        cost: "",
-                        total: "",
-                        deleted: false,
-                        initial: ""
+                        detRecId: element.id_det_recepcion_pedido, //id_det_recepcion_pedido
+                        prodId: element.producto_adquisicion.id_prod_adquisicion, //id_prod_adquisicion
+                        desc: element.producto.codigo_producto + ' — ' + element.producto.nombre_completo_producto + ' — '
+                            + element.producto.unidad_medida.nombre_unidad_medida
+                            + ' — ' + element.producto_adquisicion.descripcion_prod_adquisicion, //Acquisition product description
+                        brandId: element.id_marca,
+                        brandLabel: element.marca ? element.marca.nombre_marca : 'N/A',
+                        prodLabel: element.producto_adquisicion.linea_trabajo.codigo_up_lt + ' — '
+                            + element.producto_adquisicion.centro_atencion.codigo_centro_atencion + ' — '
+                            + element.producto.codigo_producto,
+                        expiryDate: formatDateVue3DP(element.fecha_vcto_det_recepcion_pedido),
+                        perishable: element.producto.perecedero_producto, //If the product is perishable, set to true, otherwise set to false.
+                        avails: "", //Represents the maximum number of products that the user can write.
+                        qty: element.cant_det_recepcion_pedido, //Represents the the number of products the user wants to register
+                        cost: element.producto_adquisicion.costo_prod_adquisicion, //Represents the the cost of the product
+                        total: "", //Represents the result of qty x cost for every row
+                        deleted: false, //This is the state of the row, it represents the logical deletion.
+                        initial: "" //Represents the initial availability of a product
                     };
 
                     // Push array to prods
                     recDocument.value.prods.push(array);
+                }
+            });
 
-                    // Get the index of the last item in the array
-                    const lastIndex = recDocument.value.prods.length - 1;
-
-                    // Call setProdItem and updateItemTotal
-                    setProdItem(lastIndex, paId, detRecepId);
-                    updateItemTotal(lastIndex, cantRecep, paId);
+            // Desplazar la pantalla hasta la última fila agregada
+            nextTick(() => {
+                const newRowElement = document.getElementById(`observ`);
+                if (newRowElement) {
+                    newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
                 }
             });
         } else {
@@ -174,7 +189,7 @@ export const useRecepcion = (context) => {
             const newOptions = data.products.filter(element => element.total_menos_acumulado != 0);
 
             // Set products and filteredProds to newOptions
-            products.value = filteredProds.value = newOptions;
+            products.value = newOptions;
 
             // Call addNewRow
             addNewRow();
@@ -183,34 +198,26 @@ export const useRecepcion = (context) => {
         startRec.value = true
     }
 
-    const setProdItem = (index, paId, recepId) => {
+    const setProdItem = (paId, index) => {
         if (paId) {
             const selectedProd = products.value.find((element) => {
                 return element.value === paId; // Adding a return statement here
             });
-            recDocument.value.prods[index].desc =
-                selectedProd.nombre_producto + ' -- ' +
-                selectedProd.abreviatura_unidad_medida + ' -- ' +
+            recDocument.value.prods[index].desc = selectedProd.codigo_producto + ' — ' +
+                selectedProd.nombre_completo_producto + ' — ' +
+                selectedProd.nombre_unidad_medida + ' — ' +
                 selectedProd.descripcion_prod_adquisicion
-
-            recDocument.value.prods[index].perishable = recepId ? recDocument.value.prods[index].perishable : ''
-            recDocument.value.prods[index].expiryDate = recepId ? recDocument.value.prods[index].expiryDate : ''
-            recDocument.value.prods[index].avails = selectedProd.total_menos_acumulado
             recDocument.value.prods[index].perishable = selectedProd.perecedero_producto
             recDocument.value.prods[index].cost = selectedProd.costo_prod_adquisicion
-            recDocument.value.prods[index].qty = recepId ? recDocument.value.prods[index].qty : ''
-            recDocument.value.prods[index].total = '0.00'
             recDocument.value.prods[index].initial = selectedProd.total_menos_acumulado
         } else {
             recDocument.value.prods[index].desc = ""
             recDocument.value.prods[index].perishable = ""
-            recDocument.value.prods[index].expiryDate = ""
-            recDocument.value.prods[index].avails = ""
-            recDocument.value.prods[index].qty = ""
             recDocument.value.prods[index].cost = ""
-            recDocument.value.prods[index].total = '0.00'
-            recDocument.value.prods[index].initial = ""
+            recDocument.value.prods[index].prodId = ""
         }
+        recDocument.value.prods[index].qty = ""
+        recDocument.value.prods[index].total = '0.00'
     }
 
     const {
@@ -220,7 +227,6 @@ export const useRecepcion = (context) => {
     const handleValidation = (input, validation, element) => {
         if (element) {
             recDocument.value.prods[element.index][input] = validateInput(recDocument.value.prods[element.index][input], validation)
-            updateItemTotal(element.index, recDocument.value.prods[element.index][input], recDocument.value.prods[element.index].prodId)
         } else {
             recDocument.value[input] = validateInput(recDocument.value[input], validation)
         }
@@ -251,48 +257,33 @@ export const useRecepcion = (context) => {
         filteredProds.value = newOptions
     }
 
-    const totalRec = computed(() => {
-        let sum = 0
-        for (let i = 0; i < recDocument.value.prods.length; i++) {
-            if (recDocument.value.prods[i].deleted == false) {
-                let amount = parseFloat(recDocument.value.prods[i].total);
-                if (!isNaN(amount)) {
-                    sum += amount;
-                }
-            }
-        }
-        //recDocument.value.total = sum.toFixed(2);
-        return sum.toFixed(2);
-    });
-
     const addNewRow = () => {
-        if (activeDetails.value.length < products.value.length) {
-            let array = {
-                detRecId: "",
-                prodId: "",
-                desc: "",
-                expiryDate: '',
-                perishable: "",
-                avails: "",
-                qty: "",
-                cost: "",
-                total: '0.00',
-                deleted: false,
-                initial: ""
-            }
-            recDocument.value.prods.push(array);
-
-            // Desplazar la pantalla hasta la última fila agregada
-            nextTick(() => {
-                const newRowIndex = recDocument.value.prods.length - 1;
-                const newRowElement = document.getElementById(`row-${newRowIndex}`);
-                if (newRowElement) {
-                    newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
-                }
-            });
-        } else {
-            useShowToast(toast.warning, "Has alcanzado el maximo de filas disponibles.");
+        let array = {
+            detRecId: '',
+            prodId: '',
+            brandId: '',
+            brandLabel: '',
+            prodLabel: '',
+            desc: '',
+            expiryDate: '',
+            perishable: '',
+            avails: '',
+            qty: '',
+            cost: '',
+            total: '0.00',
+            deleted: false,
+            initial: ''
         }
+        recDocument.value.prods.push(array);
+
+        // Desplazar la pantalla hasta la última fila agregada
+        nextTick(() => {
+            const newRowElement = document.getElementById(`observ`);
+            if (newRowElement) {
+                newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
+        });
+
     }
 
     const deleteRow = (index, detRecId) => {
@@ -325,6 +316,21 @@ export const useRecepcion = (context) => {
         return recDocument.value.prods.filter((detail) => detail.deleted == false)
     });
 
+
+    const totalRec = computed(() => {
+        let sum = 0
+        for (let i = 0; i < recDocument.value.prods.length; i++) {
+            if (recDocument.value.prods[i].deleted == false) {
+                let amount = parseFloat(recDocument.value.prods[i].total);
+                if (!isNaN(amount)) {
+                    sum += amount;
+                }
+            }
+        }
+        recDocument.value.total = sum.toFixed(2);
+        return sum.toFixed(2);
+    });
+
     const ordenC = computed(() => {
         const result = documents.value.filter((element) => {
             return element.id_tipo_doc_adquisicion == 2
@@ -352,6 +358,39 @@ export const useRecepcion = (context) => {
         });
         return result ?? [];
     });
+
+    // Observa cambios en las propiedades qty y cost de cada producto
+    watch(recDocument, (newValue) => {
+        newValue.prods.forEach((prod) => {
+            prod.total = (prod.qty * prod.cost).toFixed(2);
+        });
+    }, { deep: true });
+
+    const showAvails = (prodId, index) => {
+        if (prodId) {
+            const matchProds = recDocument.value.prods.filter((e) => e.prodId == prodId)
+            const prodProcedure = products.value.find((e) => e.value == prodId)
+
+            let acumulado = 0
+            acumulado += parseFloat(prodProcedure.acumulado)
+            matchProds.forEach((e) => {
+                if (!e.deleted) {
+                    let amount = parseFloat(e.qty);
+                    if (!isNaN(amount)) {
+                        acumulado += amount;
+                    }
+                }
+            })
+            acumulado.toFixed(2)
+
+            const qtyTotal = parseFloat(prodProcedure.cant_prod_adquisicion - acumulado)
+            recDocument.value.prods[index].avails = qtyTotal
+            return qtyTotal
+        } else {
+            recDocument.value.prods[index].avails = -1
+            return ""
+        }
+    }
 
     const storeReception = async (obj) => {
         swal({
@@ -404,14 +443,10 @@ export const useRecepcion = (context) => {
 
     const handleErrorResponse = (err) => {
         if (err.response.status === 422) {
-            if (err.response.data.logical_error) {
+            if (err.response && err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
                 if (err.response.data.refresh) {
-                    products.value = filteredProds.value = err.response.data.prods
-                    recDocument.value.prods.forEach((element, index) => {
-                        setProdItem(index, element.prodId, element.detRecId);
-                        updateItemTotal(index, element.qty, element.prodId);
-                    })
+                    products.value = err.response.data.prods
                 }
             } else {
                 useShowToast(toast.warning, "Tienes errores en tus datos, por favor verifica e intenta nuevamente.");
@@ -436,9 +471,9 @@ export const useRecepcion = (context) => {
 
     return {
         errors, isLoadingRequest, reception, infoToShow,
-        documents, ordenC, contrato, docSelected, totalRec,
-        filteredDoc, filteredItems, recDocument, startRec, filteredProds,
+        documents, ordenC, contrato, docSelected, totalRec, products,
+        filteredDoc, filteredItems, recDocument, startRec, filteredProds, brands,
         getInfoForModalRecep, startReception, setProdItem, updateItemTotal, addNewRow,
-        openOption, deleteRow, handleValidation, storeReception, updateReception
+        openOption, deleteRow, handleValidation, storeReception, updateReception, showAvails
     }
 }

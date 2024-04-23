@@ -319,7 +319,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                         }
                                                             ">
                                                         <div class="relative flex h-8 w-full flex-row-reverse ">
-                                                            <Multiselect v-model="rowsData[rowIndex]['id_lt']" 
+                                                            <Multiselect v-model="rowsData[rowIndex]['id_lt']"
                                                                 :title="errors[`detalle_quedan.${rowIndex}.id_lt`]"
                                                                 placeholder="seleccione" :classes="{
                                                                     placeholder: 'flex items-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-black rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ',
@@ -342,14 +342,11 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                             errosDetalleQuedan[rowIndex] ? 'bg-[#fd9696]' : '',
                                                             errosrNumeroActa.includes(rowIndex) ? 'bg-[#fd9696]' : '',
                                                             dataQuedan.id_estado_quedan > 1 ? 'bg-[#dcdcdc]' : ''
-                                                        ]
-                                                            "
+                                                        ]"
                                                         @input="onCellEdit(rowIndex, cellIndex, $event.target.innerText)"
                                                         :title="errors[`detalle_quedan.${rowIndex}.numero_acta_det_quedan`]"
                                                         :contenteditable="dataQuedan.id_estado_quedan > 1 ? false : true">
-                                                        {{ cell }}</td>
-
-
+                                                        </td>
                                                     <td v-else-if="cellIndex == 'monto'" class="border-2 border-black">
                                                         <table>
                                                             <tr>
@@ -393,7 +390,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                         <button type="button"
                                                             @click="rowsData[rowIndex].reajuste = !rowsData[rowIndex].reajuste; taxesByRow()"
                                                             title="Reajustar factura"
-                                                            style="float: right;margin-right: -42px;margin-top: -1px;x;font-size: 30px;padding: 0px 10px;border: 0px;background-color: transparent;">
+                                                            style="float: right;margin-right: -42px;margin-top: -1px;font-size: 30px;padding: 0px 10px;border: 0px;background-color: transparent;">
                                                             <lord-icon src="https://cdn.lordicon.com/hwuyodym.json"
                                                                 trigger="click" colors="primary:#121331"
                                                                 style="width:24px;height:24px">
@@ -437,7 +434,7 @@ import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
                                                             REAJUSTES</span>
                                                     </div>
                                                 </th>
-                                                <th class="border-2 border-black text-sm px-3 text-gray-600" colspan="4"
+                                                <th class="border-2 border-black text-sm px-3 text-gray-600" colspan="5 "
                                                     rowspan="2"
                                                     :class="errors[`detalle_quedan.${rowIndex}.justificacion_det_quedan`] ? 'bg-red-300' : row['justificacion_det_quedan'] == '' || row['justificacion_det_quedan'] === null ? 'bg-[#fdfd96]' : ''">
 
@@ -709,7 +706,7 @@ export default {
 
 
                 // Datos que se pintan en los inputs
-                this.dataInputs.giro = selectedSupplier.codigo_giro && selectedSupplier.nombre_giro ? `${selectedSupplier.codigo_giro} - ${selectedSupplier.nombre_giro}` : 'GIRO NO ESPECIFICADO!';
+                this.dataInputs.giro = selectedSupplier.codigo_giro && selectedSupplier.nombre_giro ? `${selectedSupplier.codigo_giro} - ${selectedSupplier.nombre_giro}` : '-';
                 this.dataInputs.irs = `${selectedSupplier.isrl_sujeto_retencion * 100} %`
                 this.dataInputs.iva = `${selectedSupplier.iva_sujeto_retencion * 100} %`
 

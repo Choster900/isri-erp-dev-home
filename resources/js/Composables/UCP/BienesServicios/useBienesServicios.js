@@ -1,10 +1,13 @@
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import axios from "axios";
 import { executeRequest } from "@/plugins/requestHelpers";
 import Swal from "sweetalert2";
-export const useBienesServicios = () => {
+export const useBienesServicios = (propProdAdquisicion, showModal) => {
     const arrayProductoAdquisicion = ref([])
     const idDetDocAdquisicion = ref(null)
+    const observacionDetDocAdquisicion = ref(null)
+    const recepcionDetDocAdquisicion = ref(null)
+    const notificacionDetDocAdquisicion = ref(null)
     const idLt = ref(null)
     const arrayLineaTrabajo = ref([])
     const arrayDocAdquisicion = ref([])
@@ -13,9 +16,24 @@ export const useBienesServicios = () => {
     const arrayMarca = ref([])
     const productDataSearched = ref(null)
     const arrayWhenIsEditingDocAdq = ref([])
+    const errorsValidation = ref([]);
 
     const objectGetFromProp = ref(null)
     const arrayProductsWhenIsEditable = ref(null)
+
+    const estadoDocAdq = ref(1)
+    const tipoProcesoCompra = ref(null)
+
+    const ArrayProductFiltered = ref([])
+
+    // Se creó esta variable 'brandsUsedInDoc' para almacenar información que se enviará al documento PDF.
+    // Esto se hace con el propósito de evitar el procesamiento lento al enviar el documento completo de marcas.
+    const brandsUsedInDoc = ref(null)
+    const loader = ref(null)
+
+    const letterNumber = ref(null)
+    const totProductos = ref(null)
+
     /**
      * Agrega una nueva fila de detalle de adquisición a la matriz de productos de adquisición.
      * @param {number} i - Índice de la fila en la que se agregará el detalle de adquisición.
@@ -24,8 +42,6 @@ export const useBienesServicios = () => {
         try {
             // Verifica si hay datos en la posición i de arrayProductoAdquisicion y si hay documentos de adquisición disponibles
             if (arrayProductoAdquisicion.value[i] && arrayDocAdquisicion.value.length > 0) {
-                // Obtiene el compromiso presupuestario del documento de adquisición actual
-                //const compromisoPpto = arrayDocAdquisicion.value.find(index => index.value == idDetDocAdquisicion.value)?.dataDoc?.compromiso_ppto_det_doc_adquisicion || '';
 
                 // Agrega un nuevo objeto de detalle de adquisición a la matriz de productos
                 arrayProductoAdquisicion.value[i].detalleDoc.push({
@@ -37,11 +53,11 @@ export const useBienesServicios = () => {
                     idCentroAtencion: '',
                     detalleCentro: '',
                     idMarca: '',
-                    cantProdAdquisicion: '',
-                    costoProdAdquisicion: '',
+                    cantProdAdquisicion: 0,
+                    costoProdAdquisicion: 0,
                     descripcionProdAdquisicion: '',
                     estadoProdAdquisicion: 1,
-                    valorTotalProduct: '',
+                    valorTotalProduct: 0,
                 });
 
                 // Muestra la matriz actualizada en la consola
@@ -55,8 +71,6 @@ export const useBienesServicios = () => {
             console.error("Error al agregar filas:", error);
         }
     };
-
-
 
     /**
     * Agrega un nuevo objeto de documento de adquisición a la matriz de productos de adquisición.
@@ -81,7 +95,6 @@ export const useBienesServicios = () => {
         }
     };
 
-
     /**
      * Obtener Arrays de objetos para multiselect
      *
@@ -89,9 +102,9 @@ export const useBienesServicios = () => {
      */
     const getArrayObject = async () => {
         try {
-            const resp = await axios.post("/get-array-objects-for-multiselect");
+            const resp = await axios.post("/get-array-objects-for-multiselect", {});
             arrayLineaTrabajo.value = resp.data.lineaTrabajo.map(index => {
-                return { value: index.id_lt, label: index.nombre_lt, disabled: false };
+                return { value: index.id_lt, label: `${index.codigo_up_lt} - ${index.nombre_lt}`, disabled: false };
             })
             arrayDocAdquisicion.value = resp.data.detalleDocAdquisicion.map(index => {
                 return { value: index.id_det_doc_adquisicion, label: index.nombre_det_doc_adquisicion, dataDoc: index };
@@ -113,7 +126,6 @@ export const useBienesServicios = () => {
         }
 
     };
-
 
     /**
     * Busca producto por codigo.
@@ -139,11 +151,11 @@ export const useBienesServicios = () => {
         }
     };
 
-
     /**
      *
      * Configura la información del producto seleccionado.
-     * @param {number} productoId - El valor del producto seleccionado.
+     * Al seleccionar producto toma tuda su informacion y la setea a la fila correspoendiente
+     * @param {number} productoId - El id del producto seleccionado.
      * @param {number} rowDocAdq - Índice del documento adquisicion.
      * @param {number} rowDetalleDocAdq - Índice del detalle documento adquisicion.
      */
@@ -186,7 +198,6 @@ export const useBienesServicios = () => {
         }
     };
 
-
     /**
      * Calcula el valor total del producto en la fila especificada.
      * @param {number} docAdq - Índice del documento de adquisición.
@@ -209,172 +220,430 @@ export const useBienesServicios = () => {
             // Realiza el cálculo del valor total y asigna al producto
             const valorTotal = cantProdAdquisicion * costoProdAdquisicion;
             arrayProductoAdquisicion.value[docAdq].detalleDoc[detalleDocAdq].valorTotalProduct = valorTotal;
-
-            // Log del valor total calculado y del producto actualizado
-            // console.log(`Valor total calculado: ${valorTotal}`);
-            // console.log("Producto actualizado con el valor total:", arrayProductoAdquisicion.value[docAdq].detalleDoc[detalleDocAdq]);
+            sumatorioTotalProduct()
         } catch (error) {
             // Maneja los errores imprimiéndolos en la consola.
             console.error("Error al calcular el valor total del producto:", error);
         }
     };
-    const errorsValidation = ref([]);
+
+    const sumatorioTotalProduct = () => {
+        let suma = []
+        arrayProductoAdquisicion.value.forEach(element => {
+            element.detalleDoc.forEach(element2 => {
+                suma.push(element2)
+            });
+        });
+
+        let sumaTotal = suma.reduce((acumulador, producto) => acumulador + producto.valorTotalProduct, 0);
+        console.log("La suma total de los valores de los productos es: " + sumaTotal);
+        totProductos.value = sumaTotal
+        getTextForNumber(sumaTotal)
+    }
+
+    const loadingNumberLetter = ref(false)
+    /**
+  * Convertir numeros a letras
+  *
+  * @param {string} number - numero a convertir
+  * @returns {Promise<object>} - Objeto con los datos de la respuesta.
+  * @throws {Error} - Error al obtener empleados por nombre.
+  */
+    const getTextForNumber = async (number) => {
+        try {
+            loadingNumberLetter.value = true;
+            // Realiza la búsqueda de empleados
+            const response = await axios.post(
+                "/convert-numbers-to-string", {
+                number: number,
+            });
+            console.log(response);
+            letterNumber.value = response.data
+            //return response.data;
+        } catch (error) {
+            // Manejo de errores específicos
+            console.error("Error al obtener empleados por nombre:", error);
+            // Lanza el error para que pueda ser manejado por el componente que utiliza este composable
+            throw new Error("Error en la búsqueda de empleados");
+        } finally {
+            loadingNumberLetter.value = false;
+        }
+    };
+
+    /**
+     * Guarda productos adquisición en el servidor.
+     *
+     * @returns {Promise<object>} - Promesa que se resuelve con la respuesta exitosa o se rechaza con el error.
+     */
     const saveProductAdquisicionRequest = () => {
         return new Promise(async (resolve, reject) => {
             try {
+                // Hace una solicitud POST a la ruta "/save-prod-adquicicion" con los datos necesarios
                 const response = await axios.post(
                     "/save-prod-adquicicion", {
                     productAdq: arrayProductoAdquisicion.value,
-                    idDetDocAdquisicion: idDetDocAdquisicion.value
+                    idDetDocAdquisicion: idDetDocAdquisicion.value,
+                    notificacionDetDocAdquisicion: notificacionDetDocAdquisicion.value,
+                    recepcionDetDocAdquisicion: recepcionDetDocAdquisicion.value,
+                    observacionDetDocAdquisicion: observacionDetDocAdquisicion.value,
                 });
-                this.$emit("actualizar-table-data");
-                resolve(response); // Resolvemos la promesa con la respuesta exitosa
+                // Se resuelve la promesa con la respuesta exitosa de la solicitud
+                resolve(response);
             } catch (error) {
+                console.log(error);
+                // Si hay un error y el código de respuesta es 422 (Unprocessable Entity), maneja los errores de validación
                 if (error.response.status === 422) {
-
-                    let data = error.response.data.errors
+                    // Obtiene los errores del cuerpo de la respuesta y los transforma a un formato más manejable
+                    let data = error.response.data.errors;
                     var myData = new Object();
                     for (const errorBack in data) {
-                        myData[errorBack] = data[errorBack][0]
+                        myData[errorBack] = data[errorBack][0];
                     }
-                    errorsValidation.value = myData
+                    // Actualiza el estado "errorsValidation" con los errores y los limpia después de 5 segundos
+                    errorsValidation.value = myData;
                     setTimeout(() => {
                         errorsValidation.value = [];
                     }, 5000);
                     console.error("Error en guardar los datos:", error);
                 }
-                // Manejo de errores específicos
-                reject(error); // Rechazamos la promesa en caso de excepción
+                // Rechaza la promesa en caso de excepción
+                reject(error);
             }
         });
     }
 
     /**
-   * Guarda productos adquisicion
-   *
-   * @param {string} productCode - codigo del producto a buscar.
-   * @returns {Promise<object>} - Objeto con los datos de la respuesta.
-   * @throws {Error} - Error al obtener empleados por nombre.
-   */
-    const saveProductAdquisicion = async () => {
-        const confirmed = await Swal.fire({
-            title: '<p class="text-[18pt] text-center">¿Esta seguro de guardar el anexo?</p>',
-            icon: "question",
-            iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
-            confirmButtonText: "Si, Editar",
-            confirmButtonColor: "#001b47",
-            cancelButtonText: "Cancelar",
-            showCancelButton: true,
-            showCloseButton: true,
-        });
-        if (confirmed.isConfirmed) {
-            executeRequest(
-                saveProductAdquisicionRequest(),
-                "¡El documento de adquisicion se ha guardado correctamente!"
-            );
-        }
-    }
-
-
+     * Actualiza productos de adquisición en el servidor.
+     *
+     * @returns {Promise<object>} - Promesa que se resuelve con la respuesta exitosa o se rechaza con el error.
+     */
     const updateProductAdquisicionRequest = () => {
         return new Promise(async (resolve, reject) => {
             try {
-                const response = await axios.post(
-                    "/update-prod-adquicicion", {
+                // Hace una solicitud POST a la ruta "/update-prod-adquicicion" con los datos necesarios
+                const response = await axios.post("/update-prod-adquicicion", {
                     productAdq: arrayProductoAdquisicion.value,
-                    idDetDocAdquisicion: idDetDocAdquisicion.value
+                    idDetDocAdquisicion: idDetDocAdquisicion.value,
+                    notificacionDetDocAdquisicion: notificacionDetDocAdquisicion.value,
+                    recepcionDetDocAdquisicion: recepcionDetDocAdquisicion.value,
+                    observacionDetDocAdquisicion: observacionDetDocAdquisicion.value,
                 });
-                resolve(response); // Resolvemos la promesa con la respuesta exitosa
+                // Se resuelve la promesa con la respuesta exitosa de la solicitud
+                resolve(response);
             } catch (error) {
+                // Si hay un error y el código de respuesta es 422 (Unprocessable Entity), maneja los errores de validación
                 if (error.response.status === 422) {
-
-                    let data = error.response.data.errors
+                    // Obtiene los errores del cuerpo de la respuesta y los transforma a un formato más manejable
+                    let data = error.response.data.errors;
                     var myData = new Object();
                     for (const errorBack in data) {
-                        myData[errorBack] = data[errorBack][0]
+                        myData[errorBack] = data[errorBack][0];
                     }
-                    errorsValidation.value = myData
+                    // Actualiza el estado "errorsValidation" con los errores y los limpia después de 5 segundos
+                    errorsValidation.value = myData;
                     setTimeout(() => {
                         errorsValidation.value = [];
                     }, 5000);
                     console.error("Error en guardar los datos:", error);
                 }
-                // Manejo de errores específicos
-                reject(error); // Rechazamos la promesa en caso de excepción
+                // Rechaza la promesa en caso de excepción
+                reject(error);
             }
         });
     };
 
     /**
-     * Edita productos adquisicion
+     * Deshabilita una línea de trabajo específica y habilita las demás en el array.
      *
-     * @param {string} productCode - codigo del producto a buscar.
-     * @returns {Promise<object>} - Objeto con los datos de la respuesta.
-     * @throws {Error} - Error al obtener empleados por nombre.
+     * @param {number} e - Índice de la línea de trabajo a deshabilitar (opcional).
      */
-    const updateProductAdquisicion = async () => {
-        const confirmed = await Swal.fire({
-            title: '<p class="text-[18pt] text-center">¿Esta seguro de editar?</p>',
-            icon: "question",
-            iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
-            confirmButtonText: "Si, Editar",
-            confirmButtonColor: "#001b47",
-            cancelButtonText: "Cancelar",
-            showCancelButton: true,
-            showCloseButton: true,
-        });
-        if (confirmed.isConfirmed) {
-            executeRequest(
-                updateProductAdquisicionRequest(),
-                "¡El documento de adquisicion se ha actualizado correctamente!"
-            );
-        }
-    }
-
     const disableLt = (e = null) => {
         // Obtener la línea de trabajo seleccionada
         const selectedLineaTrabajo = arrayLineaTrabajo.value[e - 1];
 
+        // Si la línea de trabajo seleccionada existe, la deshabilita
         if (selectedLineaTrabajo) {
-
             selectedLineaTrabajo.disabled = true;
         }
 
-        // Si no existe, habilitar todas las opciones y deshabilitar la seleccionada
+        // Recorre todas las líneas de trabajo en el array
         arrayLineaTrabajo.value.forEach((item) => {
+            // Verifica si la línea de trabajo actual existe en el arrayProductoAdquisicion
             const existe = arrayProductoAdquisicion.value.some((index) => item.value === index.idLt);
+
+            // Si no existe en el arrayProductoAdquisicion, habilita la línea de trabajo
             if (!existe) {
                 item.disabled = false;
             } else {
+                // Si existe, la deshabilita
                 item.disabled = true;
             }
         });
-
     };
 
+    /**
+     * Función para eliminar temporalmente un producto de adquisición.
+     *
+     * @param {number} indexDdLT - Índice de la línea de trabajo a la que pertenece el producto.
+     * @param {number} indexProdAdq - Índice del producto de adquisición a eliminar.
+     * @returns {Promise<void>} - Promesa que indica si el producto fue eliminado o no.
+     */
+    const deleteProductAdq = async (indexDdLT, indexProdAdq) => {
+        // Muestra un cuadro de diálogo de confirmación usando la biblioteca Swal
+        const confirmedEliminarProd = await Swal.fire({
+            title: '<p class="text-[15pt]">¿Eliminar producto adquisicion?. </p>',
+            text: "Al confirmar esta acción, el producto de adquisición se eliminará temporalmente. Recuerde que los cambios serán permanentes una vez que guarde.",
+            icon: "question",
+            iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
+            confirmButtonText: `<p class="text-[10pt] text-center">Si, Eliminar</p>`,
+            confirmButtonColor: "#D2691E",
+            cancelButtonText: `<p class="text-[10pt] text-center">Cancelar</p>`,
+            showCancelButton: true,
+            showCloseButton: true,
+        });
+
+        // Verifica si el usuario confirmó la eliminación
+        if (confirmedEliminarProd.isConfirmed) {
+            // Accede al array de productos de adquisición y actualiza el estado del producto a "eliminado" (estadoProdAdquisicion = 0)
+            arrayProductoAdquisicion.value.find(index => index.idLt == indexDdLT).detalleDoc[indexProdAdq].estadoProdAdquisicion = 0;
+        }
+    };
+
+    /**
+     * Función para eliminar de forma permanente una línea de trabajo y sus productos de adquisición asociados.
+     *
+     * @param {number} indexDdLT - Índice de la línea de trabajo a eliminar.
+     * @returns {Promise<void>} - Promesa que indica si la línea de trabajo fue eliminada o no.
+     */
+    const deletLineaTrabajo = async (indexDdLT) => {
+        // Muestra un cuadro de diálogo de confirmación usando la biblioteca Swal
+        const confirmedEliminarLinea = await Swal.fire({
+            title: '<p class="text-[18pt] text-center">¿Eliminar linea de trabajo?.</p>',
+            text: 'Al confirmar esta acción, se eliminará de manera permanente la línea y cada producto de adquisición asociado a esta línea será eliminado de forma irreversible.',
+            icon: "question",
+            iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
+            confirmButtonText: `<p class="text-[10pt] text-center">Si, Eliminar</p>`,
+            confirmButtonColor: "#D2691E",
+            cancelButtonText: `<p class="text-[10pt] text-center">Cancelar</p>`,
+            showCancelButton: true,
+            showCloseButton: true,
+        });
+
+        // Verifica si el usuario confirmó la eliminación
+        if (confirmedEliminarLinea.isConfirmed) {
+            // Accede al array de productos de adquisición y actualiza el estado de la línea de trabajo a "eliminado" (estadoLt = 0)
+            arrayProductoAdquisicion.value[indexDdLT].estadoLt = 0;
+        }
+    };
+
+    /**
+     *
+     * @description Funcion para obtener los productos por proceso del item seleccionado.
+     * @param {number} valueDocument - El valor del documento de adquisición seleccionado.
+     * @returns {Promise<void>} - Una promesa que se resuelve después de completar la operación.
+     */
+    const onSelectDocAdquisicion = async (valueDocument) => {
+        console.log({ valueDocument });
+        console.log(arrayDocAdquisicion.value);
+
+        try {
+            loader.value = true;
+            productDataSearched.value = []
+            // Obtiene el ID del proceso de compra asociado al documento de adquisición seleccionado.
+            const procesoId = arrayDocAdquisicion.value.find(d => d.value === valueDocument)?.dataDoc?.documento_adquisicion?.id_proceso_compra;
+            console.log(procesoId);
+            console.log(arrayDocAdquisicion.value);
+            if (!procesoId) {
+                throw new Error("ID del proceso de compra no encontrado");
+            }
+
+            // Realiza una solicitud para obtener los productos asociados al proceso de compra.
+            const resp = await axios.post("/get-product-by-proceso", { procesoId });
+
+            // Actualiza el valor de productDataSearched con la información obtenida.
+            productDataSearched.value = resp.data;
+        } catch (error) {
+            // Manejo de errores: rechaza la promesa, muestra un mensaje de error en la consola y lanza una excepción.
+            console.error("Error en la obtención de productos por proceso de adquisicion:", error);
+            throw new Error("Error en obtener los productos por proceso de adquisicion: " + error.message);
+        } finally {
+            loader.value = false;
+        }
+    };
+
+
+
+    // Se llama a la función getArrayObject() cuando el componente se monta para realizar alguna lógica específica.
     onMounted(() => {
-        getArrayObject()
-    })
+        getArrayObject();
+    });
+
+
+    watch(showModal, (newValue, oldValue) => {
+        // Verifica si showModal se ha establecido en falso (se cerró el modal)
+        if (!newValue) {
+            // Restablecer los valores a nulos o vacíos
+            objectGetFromProp.value = []
+            arrayProductoAdquisicion.value = []
+            arrayWhenIsEditingDocAdq.value = []
+            productDataSearched.value = []
+            // Encuentra el índice del objeto que tiene el valor específico en la propiedad "value"
+            const indexAEliminar = arrayDocAdquisicion.value.findIndex(item => item.value === idDetDocAdquisicion.value);
+            // Si el índice es encontrado (diferente de -1), elimina ese elemento del array
+            if (indexAEliminar !== -1) {
+                arrayDocAdquisicion.value.splice(indexAEliminar, 1);
+            }
+            observacionDetDocAdquisicion.value = ''
+            recepcionDetDocAdquisicion.value = ''
+            notificacionDetDocAdquisicion.value = ''
+            idDetDocAdquisicion.value = null
+            estadoDocAdq.value = 1
+            arrayLineaTrabajo.value.forEach((item) => {
+                item.disabled = false;
+            });
+            totProductos.value = null
+            letterNumber.value = null
+        }
+    });
+
+    watch(propProdAdquisicion, (newValue, oldValue) => {
+        // Verifica si showModal se ha establecido en falso (se cerró el modal)
+        if (newValue !== null && newValue !== undefined && (Array.isArray(newValue) ? newValue.length > 0 : newValue !== '')) {
+            // Utiliza el patrón de objeto "guard" para simplificar las verificaciones
+            objectGetFromProp.value = newValue;
+
+            observacionDetDocAdquisicion.value = objectGetFromProp.value.observacion_det_doc_adquisicion
+            recepcionDetDocAdquisicion.value = objectGetFromProp.value.recepcion_det_doc_adquisicion
+            notificacionDetDocAdquisicion.value = objectGetFromProp.value.notificacion_det_doc_adquisicion
+
+            let productosAdquisiciones = objectGetFromProp.value.productos_adquisiciones;
+            console.log(productosAdquisiciones);
+            // Utilizando un conjunto para rastrear los id_lt únicos
+            let idLtSet = new Set();
+            let productArray = new Set();
+            let brandArray = new Set();
+
+            estadoDocAdq.value = objectGetFromProp.value.id_estado_doc_adquisicion
+
+            arrayDocAdquisicion.value.push({
+                value: objectGetFromProp.value.id_det_doc_adquisicion,
+                label: objectGetFromProp.value.nombre_det_doc_adquisicion,
+                dataDoc: objectGetFromProp.value
+            })
+
+            // Utiliza map en lugar de reduce para simplificar la lógica
+            brandsUsedInDoc.value = productosAdquisiciones.map(producto => {
+                let idMarca = producto.id_marca;
+
+                if (!brandArray.has(idMarca)) {
+                    brandArray.add(idMarca);
+                    const marca = producto.marca;
+                    return {
+                        value: marca.id_marca,
+                        label: marca.nombre_marca
+                    };
+                }
+            }).filter(Boolean)  // Filtra los elementos nulos o indefinidos
+            /*  console.log(brandsUsedInDoc.value); */
+            // Utiliza map en lugar de reduce para simplificar la lógica
+            arrayProductsWhenIsEditable.value = productosAdquisiciones.map(producto => {
+                let idProduct = producto.id_producto;
+
+                if (!productArray.has(idProduct)) {
+                    productArray.add(idProduct);
+                    const product = producto.producto;
+                    return {
+                        value: product.id_producto,
+                        label: product.codigo_producto
+                    };
+                }
+            }).filter(Boolean)  // Filtra los elementos nulos o indefinidos
+
+
+            // Utiliza map y filter para mejorar la legibilidad y reducir código duplicado
+            arrayProductoAdquisicion.value = productosAdquisiciones
+                .map(producto => {
+                    let idLt = producto.id_lt;
+                    if (!idLtSet.has(idLt)) {
+                        idLtSet.add(idLt);
+                        return {
+                            idProdAdquisicion: producto.id_prod_adquisicion,
+                            idLt: idLt,
+                            vShowLt: true,
+                            hoverToDelete: false,
+                            estadoLt: 2, // [Comment: Estado manejado en 0 => deleted,1 => created,2 =>edited]
+                            detalleDoc: []
+                        };
+                    }
+                })
+                .filter(Boolean);
+
+            // Utiliza forEach en lugar de map cuando no necesitas un nuevo arreglo resultante
+            productosAdquisiciones.forEach(index => {
+                let indice = arrayProductoAdquisicion.value.findIndex(i => i.idLt == index.id_lt);
+                const { producto } = index;
+                idDetDocAdquisicion.value = index.id_det_doc_adquisicion
+
+                arrayProductoAdquisicion.value[indice]["detalleDoc"].push({
+                    idProdAdquisicion: index.id_prod_adquisicion,
+                    especifico: producto.id_ccta_presupuestal,
+                    idProducto: producto.id_producto,
+                    detalleProducto: producto.nombre_producto,
+                    pesoProducto: producto.unidad_medida.id_unidad_medida,
+                    idCentroAtencion: index.id_centro_atencion,
+                    detalleCentro: index.centro_atencion.nombre_centro_atencion,
+                    idMarca: index.id_marca,
+                    cantProdAdquisicion: index.cant_prod_adquisicion,
+                    costoProdAdquisicion: index.costo_prod_adquisicion,
+                    descripcionProdAdquisicion: index.descripcion_prod_adquisicion,
+                    estadoProdAdquisicion: 2, // [Comment: Estado manejado en 0 => deleted,1 => created,2 =>edited]
+                    valorTotalProduct: index.cant_prod_adquisicion * index.costo_prod_adquisicion,
+                });
+            });
+            onSelectDocAdquisicion(idDetDocAdquisicion.value)
+            sumatorioTotalProduct()
+            disableLt()
+        } else {
+            objectGetFromProp.value = [];
+            arrayProductoAdquisicion.value = []
+            addinDocAdquisicion()
+        }
+    });
+
     return {
+        deleteProductAdq,
+        totProductos,
+        letterNumber,
+        onSelectDocAdquisicion,
+        deletLineaTrabajo,
         disableLt,
-        updateProductAdquisicion,
+        ArrayProductFiltered,
+        loader,
         errorsValidation,
         addinDocAdquisicion,
-        saveProductAdquisicion,
         arrayProductoAdquisicion,
         calculateTotal,
         idDetDocAdquisicion,
         idLt,
         arrayProductsWhenIsEditable,
+        saveProductAdquisicionRequest,
+        estadoDocAdq,
         arrayLineaTrabajo,
+        notificacionDetDocAdquisicion,
+        recepcionDetDocAdquisicion,
+        observacionDetDocAdquisicion,
         arrayDocAdquisicion,
         objectGetFromProp,
         arrayUnidadMedida,
         arrayMarca,
+        updateProductAdquisicionRequest,
         arrayCentroAtencion,
         productDataSearched,
         addingRows,
         arrayWhenIsEditingDocAdq,
+        sumatorioTotalProduct,
+        brandsUsedInDoc,
+        loadingNumberLetter,
         handleProductoSearchByCodigo,
         setInformacionProduct,
     }

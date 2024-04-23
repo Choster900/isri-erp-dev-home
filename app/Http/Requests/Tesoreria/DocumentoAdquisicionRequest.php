@@ -25,24 +25,27 @@ class DocumentoAdquisicionRequest extends FormRequest
      */
     public function rules()
     {
+        // Validación para el campo id_empleados
+        $rules["employees"] = ['required'];
+
         foreach ($this->input('items', []) as $key => $items) {
-            $rules["number"] = [Rule::unique('documento_adquisicion','numero_doc_adquisicion')
-            ->ignore($this->input('id'), 'id_doc_adquisicion')];
+            $rules["number"] = [Rule::unique('documento_adquisicion', 'numero_doc_adquisicion')
+                ->ignore($this->input('id'), 'id_doc_adquisicion')];
             $rules["items.{$key}.commitment_number"] = [
                 function ($attribute, $value, $fail) use ($key, $items) {
                     if (!$items['deleted'] && !empty($value)) {
                         $year = date('Y'); // Obtener el año actual
-                        if($items['id']!=''){
+                        if ($items['id'] != '') {
                             $db_commitment = DetDocumentoAdquisicion::where('id_det_doc_adquisicion', '!=', $items['id'])
-                            ->where('estado_det_doc_adquisicion',1)
-                            ->where('compromiso_ppto_det_doc_adquisicion', $items['commitment_number'])
-                            ->whereRaw("YEAR(fecha_reg_det_doc_adquisicion) = ?", $year)
-                            ->first();
-                        }else{
+                                ->where('estado_det_doc_adquisicion', 1)
+                                ->where('compromiso_ppto_det_doc_adquisicion', $items['commitment_number'])
+                                ->whereRaw("YEAR(fecha_reg_det_doc_adquisicion) = ?", $year)
+                                ->first();
+                        } else {
                             $db_commitment = DetDocumentoAdquisicion::where('compromiso_ppto_det_doc_adquisicion', $items['commitment_number'])
-                            ->where('estado_det_doc_adquisicion',1)
-                            ->whereRaw("YEAR(fecha_reg_det_doc_adquisicion) = ?", $year)
-                            ->first();
+                                ->where('estado_det_doc_adquisicion', 1)
+                                ->whereRaw("YEAR(fecha_reg_det_doc_adquisicion) = ?", $year)
+                                ->first();
                         }
                         if ($db_commitment) {
                             $fail("Este compromiso ya fue registrado para el presente año.");
@@ -53,15 +56,15 @@ class DocumentoAdquisicionRequest extends FormRequest
             $rules["items.{$key}.amount"] = [
                 function ($attribute, $value, $fail) use ($key, $items) {
                     if (!$items['deleted'] && !empty($value)) {
-                        if($items['id']!=''){
+                        if ($items['id'] != '') {
                             $db_amount = DetDocumentoAdquisicion::find($items['id']);
                             if ($db_amount->quedan->isNotEmpty()) {
-                                $total=0;
-                                foreach($db_amount->quedan as $quedan){
+                                $total = 0;
+                                foreach ($db_amount->quedan as $quedan) {
                                     $total = $total + $quedan->monto_liquido_quedan;
                                 }
-                                if($items['amount']<$total){
-                                    $fail("No puedes reducir el monto a una cantidad menor a la ya asignada en quedan: $".$total);
+                                if ($items['amount'] < $total) {
+                                    $fail("No puedes reducir el monto a una cantidad menor a la ya asignada en quedan: $" . $total);
                                 }
                             }
                         }
@@ -73,8 +76,9 @@ class DocumentoAdquisicionRequest extends FormRequest
     }
     public function messages()
     {
-        $messages = [];   
+        $messages = [];
         $messages["number.unique"] = "Este numero de documento ya fue registrado";
+        $messages["employees.required"] = "Debe seleccionar al menos un administrador de contrato.";
         return $messages;
     }
 }
