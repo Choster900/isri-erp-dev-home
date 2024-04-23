@@ -11,6 +11,7 @@ use App\Models\Kardex;
 use App\Models\Marca;
 use App\Models\ProductoAdquisicion;
 use App\Models\RecepcionPedido;
+use App\Models\Rol;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -30,14 +31,27 @@ class RecepcionController extends Controller
         $dir = $request->dir;
         $search_value = $request->search;
 
+        $rol = Rol::find(session()->get('id_rol')); //rol from the view
+
+        $user = $request->user(); //Logged user
+        $id_empleado = $user->persona->empleado->id_empleado;
+
         $query = RecepcionPedido::select('*')
             ->with([
                 'detalle_recepcion',
+                'det_doc_adquisicion.documento_adquisicion.proceso_compra.empleado',
                 'det_doc_adquisicion.documento_adquisicion.tipo_documento_adquisicion',
                 'estado_recepcion'
             ])
             ->where('id_proy_financiado', "!=", 4);
 
+        if ($rol->nombre_rol != 'Administrador ALM') { //Filter if the user is not an admin
+            $query->whereHas('det_doc_adquisicion.documento_adquisicion.proceso_compra.empleado', function ($query) use ($id_empleado) {
+                $query->where('id_empleado', $id_empleado);
+            });
+        }
+
+        //Sorting
         if ($column == 2) { //Order by document type
             $query->orderByRaw('
                 (SELECT id_tipo_doc_adquisicion FROM documento_adquisicion WHERE documento_adquisicion.id_doc_adquisicion = 
@@ -54,54 +68,7 @@ class RecepcionController extends Controller
             }
         }
 
-
-        if ($search_value) {
-            $query->where('id_recepcion_pedido', 'like', '%' . $search_value['id_recepcion_pedido'] . '%') //Search by reception id
-                ->where('acta_recepcion_pedido', 'like', '%' . $search_value['acta_recepcion_pedido'] . '%') //Search by Acta
-                ->where('id_estado_recepcion_pedido', 'like', '%' . $search_value['id_estado_recepcion_pedido'] . '%') //Search by reception status
-                ->where('fecha_recepcion_pedido', 'like', '%' . $search_value['fecha_recepcion_pedido'] . '%') //Search by reception date
-                ->where('monto_recepcion_pedido', 'like', '%' . $search_value['monto_recepcion_pedido'] . '%'); //Search by reception amount
-            //Search by document type
-            if ($search_value['tipo_documento']) {
-                $query->whereHas(
-                    'det_doc_adquisicion.documento_adquisicion',
-                    function ($query) use ($search_value) {
-                        if ($search_value["tipo_documento"] != '') {
-                            $query->where('id_tipo_doc_adquisicion', 'like', '%' . $search_value['tipo_documento'] . '%');
-                        }
-                    }
-                );
-            }
-            //Search by document number
-            if ($search_value['numero_documento']) {
-                $query->whereHas(
-                    'det_doc_adquisicion.documento_adquisicion',
-                    function ($query) use ($search_value) {
-                        if ($search_value["numero_documento"] != '') {
-                            $query->where('numero_doc_adquisicion', 'like', '%' . $search_value['numero_documento'] . '%');
-                        }
-                    }
-                );
-            }
-        }
-
-        if ($column == 2) { //Order by document type
-            $query->orderByRaw('
-                (SELECT id_tipo_doc_adquisicion FROM documento_adquisicion WHERE documento_adquisicion.id_doc_adquisicion = 
-                (SELECT id_doc_adquisicion FROM detalle_documento_adquisicion WHERE detalle_documento_adquisicion.id_det_doc_adquisicion = recepcion_pedido.id_det_doc_adquisicion) 
-            ) ' . $dir);
-        } else {
-            if ($column == 3) { //Order by document number
-                $query->orderByRaw('
-                (SELECT numero_doc_adquisicion FROM documento_adquisicion WHERE documento_adquisicion.id_doc_adquisicion = 
-                (SELECT id_doc_adquisicion FROM detalle_documento_adquisicion WHERE detalle_documento_adquisicion.id_det_doc_adquisicion = recepcion_pedido.id_det_doc_adquisicion) 
-            ) ' . $dir);
-            } else {
-                $query->orderBy($columns[$column], $dir);
-            }
-        }
-
-
+        //Searching parameters
         if ($search_value) {
             $query->where('id_recepcion_pedido', 'like', '%' . $search_value['id_recepcion_pedido'] . '%') //Search by reception id
                 ->where('acta_recepcion_pedido', 'like', '%' . $search_value['acta_recepcion_pedido'] . '%') //Search by Acta
@@ -138,6 +105,11 @@ class RecepcionController extends Controller
 
     public function getInitialInfoDoc(Request $request)
     {
+        $user = $request->user(); //Logged user
+        $id_empleado = $user->persona->empleado->id_empleado;
+
+        $rol = Rol::find(session()->get('id_rol')); //rol from the view
+
         //It returns all the documents that has pending products
         $pendingItems = DB::table(DB::raw('(
             SELECT
@@ -145,10 +117,12 @@ class RecepcionController extends Controller
                 dda.id_det_doc_adquisicion,
                 da.numero_doc_adquisicion,
                 dda.nombre_det_doc_adquisicion,
+                pc.id_empleado,
                 (pa.cant_prod_adquisicion - IFNULL(ing.total_prod_recibido, 0)) AS diferencia
             FROM
                 documento_adquisicion AS da
             INNER JOIN detalle_documento_adquisicion AS dda ON da.id_doc_adquisicion = dda.id_doc_adquisicion
+            INNER JOIN proceso_compra AS pc ON pc.id_proceso_compra = da.id_proceso_compra
             INNER JOIN producto_adquisicion AS pa ON dda.id_det_doc_adquisicion = pa.id_det_doc_adquisicion
             LEFT JOIN (
                 SELECT
@@ -176,6 +150,12 @@ class RecepcionController extends Controller
             )
             ->where('pendiente.diferencia', '>', 0)
             ->groupBy('pendiente.id_doc_adquisicion');
+
+        //We evaluate if the user is not admin to apply filter
+        if ($rol->nombre_rol != 'Administrador ALM') {
+            $pendingItems->where('id_empleado', $id_empleado);
+        }
+
         //This returns the missing documents id
         $idDocs = $pendingItems->pluck('pendiente.id_doc_adquisicion')->toArray();
         //We only get the pending acquisition documents
@@ -301,7 +281,7 @@ class RecepcionController extends Controller
                 'factura_recepcion_pedido'              => $request->invoice,
                 'fecha_recepcion_pedido'                => Carbon::now(),
                 'acta_recepcion_pedido'                 => $codeActa,
-                //'observacion_recepcion_pedido'          => $request->observation,
+                'observacion_recepcion_pedido'          => $request->observation,
                 'fecha_reg_recepcion_pedido'            => Carbon::now(),
                 'usuario_recepcion_pedido'              => $request->user()->nick_usuario,
                 'ip_recepcion_pedido'                   => $request->ip(),

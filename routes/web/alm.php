@@ -8,6 +8,7 @@ use App\Http\Controllers\Almacen\ReporteAlmacenController;
 use App\Http\Controllers\Almacen\RequerimientoAlmacenController;
 use App\Http\Controllers\Almacen\TransferenciaController;
 use App\Models\CatalogoCtaPresupuestal;
+use App\Models\CentroAtencion;
 use App\Models\DetalleExistenciaAlmacen;
 use App\Models\DetalleRequerimiento;
 use App\Models\ExistenciaAlmacen;
@@ -72,9 +73,67 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post(
         'get-number-requerimiento',
         function (Request $request) {
-            return Requerimiento::latest("fecha_reg_requerimiento")->where('id_estado_req', '!=', 4)->OrWhere('id_tipo_req', '==', 1)->first();
+            return Requerimiento::latest("fecha_reg_requerimiento")
+                ->where('id_estado_req', '!=', 4)->where('id_tipo_req', '==', 1)->first();
         }
     )->name('donacion.getObjectForRequerimientoAlmacen');
+    Route::post(
+        'get-centro-produccion-by-users-centro',
+        function (Request $request) {
+
+            $plazasAsignadas = PlazaAsignada::where("id_empleado", $request->user()->id_persona)
+                ->with(["centro_atencion.asignacion_centro_produccion"  => function ($query) use ($request){
+
+                    if ($request->idCentroAtencion != '') {
+
+                        $query->where("id_centro_atencion", $request->idCentroAtencion);
+                    }
+                }, "centro_atencion.asignacion_centro_produccion.centro_produccion"])->get();
+            // Crear una colección para almacenar los centros de atención únicos
+            $centrosUnicos = collect();
+            // Iterar sobre las plazas asignadas y agregar los centros de atención únicos a la colección
+            foreach ($plazasAsignadas as $plazaAsignada) {
+                $centroAtencion = $plazaAsignada->centro_atencion;
+                $centrosUnicos->push($centroAtencion);
+            }
+
+               $centrosUnicos = $centrosUnicos->unique('id_centro_atencion');
+
+            $centroProduccionUnicos = collect();
+
+            foreach ($centrosUnicos as $centros) {
+
+                foreach ($centros->asignacion_centro_produccion as $key => $value) {
+                    $asignacion = $value->centro_produccion;
+                    $centroProduccionUnicos->push($asignacion);
+                }
+            }
+
+            return $centroProduccionUnicos;
+            //!SEGUIR AQUI
+        }
+    )->name('donacion.get-centro-produccion-by-centro');
+    Route::post(
+        'get-centro-produccion-by-centro',
+        function (Request $request) {
+
+
+            $centrosInDb = CentroAtencion::where("id_centro_atencion",$request->idCentroAtencion)->with(["asignacion_centro_produccion.centro_produccion"])->get();
+
+            $centroProduccionUnicos = collect();
+
+            foreach ($centrosInDb as $centros) {
+
+                foreach ($centros->asignacion_centro_produccion as $key => $value) {
+                    $asignacion = $value->centro_produccion;
+                    $centroProduccionUnicos->push($asignacion);
+                }
+            }
+
+            return $centroProduccionUnicos;
+            //!SEGUIR AQUI
+        }
+    )->name('donacion.get-centro-produccion-by-centro');
     Route::post('insert-requerimiento-almacen', [RequerimientoAlmacenController::class, 'addRequerimiento'])->name('donacion.insertRequerimientoAlmacen');
     Route::post('update-requerimiento-almacen', [RequerimientoAlmacenController::class, 'updateRequerimientoAlmacen'])->name('donacion.updateRequerimientoAlmacen');
     Route::post('get-product-searched-almacen', [RequerimientoAlmacenController::class, 'getProductByNameOrCode'])->name('donacion.productSearchedAlmacen');
@@ -233,6 +292,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('transferencias-almacen', [TransferenciaController::class, 'getTransferencias'])->name('transferencia.getTransferencias');
     Route::post('get-info-modal-warehouse-transfer', [TransferenciaController::class, 'getInfoWarehouseTransfer'])->name('transferencia.getInfoWarehouseTransfer');
     Route::post('save-warehouse-transfer-info', [TransferenciaController::class, 'storeWarehouseTransfer'])->name('transferencia.storeWarehouseTransfer');
-
-
+    Route::post('update-warehouse-transfer-info', [TransferenciaController::class, 'updateWarehouseTransfer'])->name('transferencia.updateWarehouseTransfer');
+    Route::post('change-status-warehouse-transfer', [TransferenciaController::class, 'changeStatusWarehouseTransfer'])->name('transferencia.changeStatusWarehouseTransfer');
+    Route::post('send-warehouse-transfer', [TransferenciaController::class, 'sendWarehouseTransfer'])->name('transferencia.sendWarehouseTransfer');
 });

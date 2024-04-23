@@ -16,8 +16,7 @@
                     <div class="mt-[5px] text-gray-500 text-opacity-70 w-[14px] h-[14px] mx-2">
                         <icon-m :iconName="'nextSvgVector'"></icon-m>
                     </div>
-                    <span class="text-[16px] font-medium text-black font-[Roboto]">{{ recepId > 0 ? 'Editar recepcion' :
-            'Crear recepcion' }}</span>
+                    <span class="text-[16px] font-medium text-black font-[Roboto]">{{ recepId > 0 ? (infoToShow.status != 1 ? 'Ver recepción' : 'Editar recepción') : 'Crear recepción' }}</span>
                 </div>
                 <svg class="h-6 w-6 text-gray-400 hover:text-gray-600 cursor-pointer" @click="$emit('cerrar-modal')"
                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -172,27 +171,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- <div class="max-w-[97%] min-w-[690px] border-b border-gray-500 flex">
-                        <div class="flex w-full">
-                            <div class="justify-start flex items-center hover:bg-gray-200 w-[23%] border-x min-w-[175px] h-[65px] border-gray-500"
-                                :class="errors.invoice ? 'bg-red-300' : 'bg-white'">
-                                <p class="font-[MuseoSans] text-gray-600 text-[12px] mx-2">FACTURA:</p>
-                                <input v-model="recDocument.invoice" :disabled="infoToShow.status != 1"
-                                    @input="handleValidation('invoice', { limit: 20 })"
-                                    class="font-bold w-[55%] p-1 h-[35px] rounded-[4px] font-[MuseoSans] text-sm border-[#d1d5db]"
-                                    type="text" name="" id="">
-                            </div>
-                            <div
-                                class="justify-center flex items-center w-[77%] hover:bg-gray-200 border-r min-w-[515px] h-[65px] bg-white border-gray-500">
-                                <p class="font-[MuseoSans] text-gray-600 text-[12px] mx-2">OBSERVACION:</p>
-                                <textarea v-model="recDocument.observation"
-                                    @input="handleValidation('observation', { limit: 255 })"
-                                    :disabled="infoToShow.status != 1"
-                                    class="max-h-[50px] font-[MuseoSans] w-[70%] overflow-y-hidden resize-none peer placeholder-gray-400 rounded-[4px] text-xs font-semibold border-gray-300 focus:border-transparent px-2 text-slate-900"></textarea>
-                            </div>
-                        </div>
-                    </div> -->
                     <div class="min-w-[970px]">
                         <div class="grid grid-cols-[100%] max-w-[97%] border-x border-b border-gray-500">
                             <div class="justify-center flex w-full bg-white">
@@ -316,7 +294,7 @@
                     <div id="total" class="w-full max-w-full grid grid-cols-[97%_3%] min-w-[970px] bg-white">
                         <div class="grid grid-cols-[90%_10%] w-full max-w-full border-b border-x border-gray-500">
                             <div class="flex items-center justify-end border-r h-[30px]  border-gray-500">
-                                <p class="font-[MuseoSans] text-[12px] py-2 mr-2 font-bold">TOTAL DONACION</p>
+                                <p class="font-[MuseoSans] text-[12px] py-2 mr-2 font-bold">TOTAL RECEPCION</p>
                             </div>
                             <div class="flex items-center justify-center h-[30px] ">
                                 <p class="font-[MuseoSans] text-[13px] py-2 font-bold text-green-800">${{ totalRec
@@ -343,7 +321,7 @@
                     <div id="observ" class="min-w-[970px]">
                         <div class="grid grid-cols-[100%] max-w-[97%] border-x border-b border-gray-500">
                             <div class="justify-center flex w-full bg-white">
-                                <textarea v-model="recDocument.observation" placeholder=""
+                                <textarea v-model="recDocument.observation" placeholder="" :disabled="infoToShow.status != 1"
                                     class="w-full text-[12px] py-1 font-[Roboto] h-full outline-none ring-0 border-transparent focus:outline-none focus:ring-0 focus:border-transparent leading-4"
                                     @input="handleValidation('observation', { limit: 255 })"></textarea>
                             </div>

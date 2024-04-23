@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CentroProduccion extends Model
@@ -31,6 +32,15 @@ class CentroProduccion extends Model
     public function detalles_requerimientos(): HasMany
     {
         return $this->hasMany(DetalleRequerimiento::class, 'id_centro_produccion', 'id_centro_produccion');
+    }
+    /**
+     * Get the tipo_centro_atencion that owns the CentroProduccion
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function tipo_centro_atencion(): BelongsTo
+    {
+        return $this->belongsTo(TipoCentroAtencion::class, 'id_tipo_centro_atencion', 'id_tipo_centro_atencion');
     }
 
 }

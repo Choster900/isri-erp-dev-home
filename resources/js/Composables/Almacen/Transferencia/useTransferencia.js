@@ -315,7 +315,7 @@ export const useTransferencia = (context) => {
             showCloseButton: true
         }).then(async (result) => {
             if (result.isConfirmed) {
-                saveObject(obj, '/update-outgoing-adjustment-info');
+                saveObject(obj, '/update-warehouse-transfer-info');
             }
         });
     };
