@@ -286,11 +286,16 @@ class AjusteSalidaController extends Controller
                 ]);
 
                 foreach ($request->prods as $prod) {
+                    $detExistencia = DetalleExistenciaAlmacen::with('existencia_almacen')->find($prod['detId']);
                     if ($prod['id'] != "" && $prod['deleted'] == false) {
                         $det = DetalleRequerimiento::find($prod['id']);
                         $det->update([
+                            'id_producto'                               => $detExistencia->existencia_almacen->id_producto,
+                            'id_marca'                                  => $detExistencia->id_marca,
+                            'fecha_vcto_det_requerimiento'              => $detExistencia->fecha_vcto_det_existencia_almacen,
+                            'id_det_existencia_almacen'                 => $prod['detId'],
                             'cant_det_requerimiento'                    => $prod['qty'],
-                            'costo_det_requerimiento'                   => $prod['cost'],
+                            'costo_det_requerimiento'                   => $detExistencia->existencia_almacen->costo_existencia_almacen,
                             'fecha_mod_det_requerimiento'               => Carbon::now(),
                             'usuario_det_requerimiento'                 => $request->user()->nick_usuario,
                             'ip_det_requerimiento'                      => $request->ip()
@@ -313,8 +318,11 @@ class AjusteSalidaController extends Controller
                             ->first();
                         if ($existDetail) {
                             $existDetail->update([
+                                'id_producto'                               => $detExistencia->existencia_almacen->id_producto,
+                                'id_marca'                                  => $detExistencia->id_marca,
+                                'fecha_vcto_det_requerimiento'              => $detExistencia->fecha_vcto_det_existencia_almacen,
                                 'cant_det_requerimiento'                    => $prod['qty'],
-                                'costo_det_requerimiento'                   => $prod['cost'],
+                                'costo_det_requerimiento'                   => $detExistencia->existencia_almacen->costo_existencia_almacen,
                                 'estado_det_requerimiento'                  => 1,
                                 'fecha_mod_det_requerimiento'               => Carbon::now(),
                                 'usuario_det_requerimiento'                 => $request->user()->nick_usuario,

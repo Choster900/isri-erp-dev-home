@@ -101,7 +101,7 @@ export const useDatatableReqAlm = () => {
 
             if (tableData.value.draw === data.draw) {
                 let resultado = data.data.data;
-                
+
                 canSaveReq.value = data.canSaveReq
                 objectRequerimientos.value = data.data.data;
                 pagination.value.total = data.data.total;
@@ -166,7 +166,7 @@ export const useDatatableReqAlm = () => {
     const generateNumberRequerimiento = async () => {
         try {
             const response = await axios.post('/get-number-requerimiento');
-            console.log(response);
+         /*    console.log(response); */
             const currentYear = moment().year();
             const currentNumber = parseInt(response.data.num_requerimiento.split('-')[2]);
 
