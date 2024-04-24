@@ -249,7 +249,7 @@
                                 <div class="relative w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]"
                                     :class="showAvails(prod.prodId, index) < 0 || errors['prods.' + index + '.qty'] ? 'bg-red-300' : ''">
                                     <!-- Aquí se colocará el número dinámicamente -->
-                                    <span
+                                    <span v-if="infoToShow.status == 1"
                                         class="absolute font-[MuseoSans] text-[12px] top-1 flex items-center justify-center">REST:
                                         {{ showAvails(prod.prodId, index) }}</span>
 
@@ -314,7 +314,7 @@
                         </div>
                     </div>
                     <div class="min-w-[970px]">
-                        <div class="grid grid-cols-[100%] max-w-[97%] border-x border-gray-500">
+                        <div class="grid grid-cols-[100%] max-w-[97%] border-x border-gray-500 bg-white">
                             <p class="ml-3 text-[13px] font-[Roboto] text-gray-500">Observación sobre recepción:</p>
                         </div>
                     </div>
