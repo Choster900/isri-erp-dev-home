@@ -27,10 +27,10 @@ class DocumentoAdquisicionRequest extends FormRequest
     {
         // Validación para el campo id_empleados
         $rules["employees"] = ['required'];
+        $rules["number"] = [Rule::unique('documento_adquisicion', 'numero_doc_adquisicion')
+        ->ignore($this->input('id'), 'id_doc_adquisicion')];
 
         foreach ($this->input('items', []) as $key => $items) {
-            $rules["number"] = [Rule::unique('documento_adquisicion', 'numero_doc_adquisicion')
-                ->ignore($this->input('id'), 'id_doc_adquisicion')];
             $rules["items.{$key}.commitment_number"] = [
                 function ($attribute, $value, $fail) use ($key, $items) {
                     if (!$items['deleted'] && !empty($value)) {
