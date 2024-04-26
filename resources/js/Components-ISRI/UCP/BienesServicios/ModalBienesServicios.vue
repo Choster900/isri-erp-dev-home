@@ -161,7 +161,7 @@
                             </tr>
                             <tr class="*:border-black cursor-pointer" :class="{ 'custom-pulse': docAdq.hoverToDelete }">
                                 <td colspan="6" class="border border-t-black ">
-                                    <Multiselect :filter-results="false" :searchable="true" :clear-on-search="true"
+                                    <Multiselect :filter-results="false" :searchable="true" :clear-on-search="true" :canClear="false" :canDeselect="true"
                                         :disabled="estadoDocAdq !== 1" @select="disableLt($event)" v-model="docAdq.idLt"
                                         :min-chars="1" placeholder="-"
                                         noOptionsText="<p class='text-xs'>Lista vacía</p>"
