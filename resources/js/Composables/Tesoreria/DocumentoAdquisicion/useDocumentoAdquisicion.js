@@ -370,6 +370,7 @@ export const useDocumentoAdquisicion = (context) => {
             number: 'Numero documento',
             management_number: 'Numero gestion',
             award_date: 'Fecha adjudicacion',
+            procesoCompraId: 'Proceso de compra'
         };
 
         if (currentPage.value === 1) {
@@ -379,7 +380,8 @@ export const useDocumentoAdquisicion = (context) => {
                 'supplier_id',
                 'number',
                 'management_number',
-                'award_date'
+                'award_date',
+                'procesoCompraId'
             ];
 
             let page_with_errors = '';
