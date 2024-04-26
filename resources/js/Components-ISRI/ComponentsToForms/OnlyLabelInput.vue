@@ -19,7 +19,8 @@ export default {
 </script>
 
 <template>
-    <label for="" class="text-xs">{{ textLabel }} <span v-if="required" class="text-red-600 font-extrabold">*</span></label>
+
+    <label for="" class="text-xs flex">{{ textLabel }} <span v-if="required" class="text-red-600 font-extrabold">*</span></label>
 </template>
 
 <style lang="scss" scoped></style>

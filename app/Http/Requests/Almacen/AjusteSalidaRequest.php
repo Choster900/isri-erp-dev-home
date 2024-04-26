@@ -51,7 +51,7 @@ class AjusteSalidaRequest extends FormRequest
     }
     public function messages()
     {
-        $messages = [];   
+        $messages = [];
         $messages["centerId.required"] = "Debe seleccionar proveedor.";
         $messages["financingSourceId.required"] = "Debe seleccionar fuente de financiamiento.";
         $messages["reasonId.required"] = "Debe seleccionar motivo.";

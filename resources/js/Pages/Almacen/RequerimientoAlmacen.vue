@@ -33,22 +33,30 @@ export default {
 
 
 
-        const changeState = async (idRequerimiento, idProyectoFinanciado, idEstado) => {
-            try {
-                // Hace una solicitud POST a la ruta "/save-prod-adquicicion" con los datos necesarios
-                const resp = await axios.post("/update-state-requerimiento", {
-                    idRequerimiento: idRequerimiento,
-                    idProyectoFinanciado: idProyectoFinanciado,
-                    idEstado: idEstado,
-                });
-                console.log(resp);
-                getRequerimientosAlmacen()
-                // Se resuelve la promesa con la respuesta exitosa de la solicitud
-            } catch (error) {
-                console.log(error);
+        const changeState = (idRequerimiento, idProyectoFinanciado, idEstado) => {
 
-            }
+            return new Promise(async (resolve, reject) => {
+
+                try {
+                    // Hace una solicitud POST a la ruta "/save-prod-adquicicion" con los datos necesarios
+                    const resp = await axios.post("/update-state-requerimiento", {
+                        idRequerimiento: idRequerimiento,
+                        idProyectoFinanciado: idProyectoFinanciado,
+                        idEstado: idEstado,
+                    });
+                    console.log(resp);
+                    getRequerimientosAlmacen()
+                    resolve(resp);
+
+                    // Se resuelve la promesa con la respuesta exitosa de la solicitud
+                } catch (error) {
+                    console.log(error);
+                    reject(error);
+
+                }
+            })
         }
+
 
         /**
          * Guarda productos adquisicion
@@ -70,7 +78,8 @@ export default {
             if (confirmed.isConfirmed) {
                 await executeRequest(
                     changeState(idRequerimiento, idProyectoFinanciado, idEstado),
-                    "¡El requerimiento ha cambiado de estado correctamente!"
+                    "¡El requerimiento ha cambiado de estado correctamente!",
+                    "Ha ocurrido un error. Por favor, revisa cuidadosamente el requerimiento."
                 );
             }
         };
@@ -106,21 +115,22 @@ export default {
 
     <Head title="Producto - Requerimiento" />
     <AppLayoutVue nameSubModule="Almacen - Requerimiento">.
-        <div class="sm:flex sm:justify-end sm:items-center mb-2" v-if="!canSaveReq " >
+        <div class="sm:flex sm:justify-end sm:items-center mb-2" v-if="!canSaveReq">
             <div class="grid grid-flow-col sm:auto-cols-max sm:justify-end gap-2" v-if="!isLoadinRequest">
                 <GeneralButton @click="showModalRequerimientoAlmacen = true; objectRequerimientoToSendModal = []"
                     color="bg-green-700  hover:bg-green-800" text="Agregar requerimiento" icon="add" />
             </div>
         </div>
-
         <div class="bg-white shadow-lg rounded-sm border border-slate-200 relative">
             <header class="px-5 py-4">
                 <div class="mb-4 md:flex flex-row justify-items-start">
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-                            <Multiselect placeholder="Cantidad a mostrar"  v-model="tableData.length" @select="getRequerimientosAlmacen()"
+                            <Multiselect placeholder="Cantidad a mostrar" v-model="tableData.length"
+                                @select="getRequerimientosAlmacen()"
                                 @deselect=" tableData.length = 5; getRequerimientosAlmacen()"
-                                @clear="tableData.length = 5; getRequerimientosAlmacen()" :options="perPage" :searchable="true"/>
+                                @clear="tableData.length = 5; getRequerimientosAlmacen()" :options="perPage"
+                                :searchable="true" />
                             <LabelTovInput icon="list2" />
                         </div>
                     </div>
@@ -146,7 +156,7 @@ export default {
                             <td class="px-2 first:pl-5 last:pr-5 max-w-[22%]">
                                 <div class="font-medium text-slate-800 text-center">
 
-                                <!--     {{ requ.linea_trabajo["nombre_lt"] }} -->
+                                    <!--     {{ requ.linea_trabajo["nombre_lt"] }} -->
                                     {{ requ.linea_trabajo?.nombre_lt }}
 
                                 </div>
@@ -227,7 +237,8 @@ export default {
                                             <div class="font-semibold">Despachar</div>
                                         </div>
 
-                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"  v-if="requ.id_estado_req == 1 || requ.id_estado_req == 2"
+                                        <div class="flex hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                            v-if="requ.id_estado_req == 1 || requ.id_estado_req == 2"
                                             @click="changeStateReqAlert(requ.id_requerimiento, requ.id_proy_financiado, 4)">
                                             <div class="w-8 text-blue-900">
                                                 <span class="text-xs">
@@ -261,6 +272,7 @@ export default {
                             </td>
                         </tr>
                     </tbody>
+
                     <tbody v-if="emptyObject && !isLoadinRequest">
                         <tr>
                             <td colspan="9" class="text-center">
@@ -325,7 +337,7 @@ export default {
             <!-- {{ objectRequerimientos }} -->
         </div>
         <ModalRequerimientoAlmacen :showModal="showModalRequerimientoAlmacen"
-        :numeroRequerimientoSiguiente="numeroRequerimientoSiguiente"
+            :numeroRequerimientoSiguiente="numeroRequerimientoSiguiente"
             :objectRequerimientoToSendModal="objectRequerimientoToSendModal"
             @cerrar-modal="showModalRequerimientoAlmacen = false;"
             @actualizar-datatable="getRequerimientosAlmacen(); showModalRequerimientoAlmacen = false">

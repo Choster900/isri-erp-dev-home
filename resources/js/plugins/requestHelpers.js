@@ -1,7 +1,7 @@
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 
-export async function executeRequest(requestMethod, successMessage) {
+export async function executeRequest(requestMethod, successMessage, errorMessageCustom = 'Se encontraron errores de validación en los datos enviados. Por favor, verifica e intenta nuevamente.') {
     try {
         const response = await toast.promise(requestMethod, {
             pending: {
@@ -56,11 +56,11 @@ export async function executeRequest(requestMethod, successMessage) {
                         "El recurso solicitado no se encontró. Verifica la URL o inténtalo nuevamente más tarde.";
                     errorCode = "NOT_FOUND";
                     break;
-                case 422:
+               /*  case 422:
                     errorMessage =
                         "Se encontraron errores de validación en los datos enviados. Por favor, verifica e intenta nuevamente.";
                     errorCode = "VALIDATION_ERROR";
-                    break;
+                    break; */
                 case 500:
                     errorMessage =
                         "Se produjo un error en el servidor. Por favor, inténtalo nuevamente más tarde.";
@@ -76,6 +76,11 @@ export async function executeRequest(requestMethod, successMessage) {
                         "Se agotó el tiempo de espera para la respuesta del servidor. Por favor, inténtalo nuevamente más tarde.";
                     errorCode = "GATEWAY_TIMEOUT";
                     break;
+                case 422:
+                    errorMessage = errorMessageCustom
+                    errorCode = "VALIDATION_ERROR";
+                    break;
+
                 default:
                     errorMessage =
                         "Se produjo un error desconocido. Por favor, inténtalo nuevamente más tarde.";
