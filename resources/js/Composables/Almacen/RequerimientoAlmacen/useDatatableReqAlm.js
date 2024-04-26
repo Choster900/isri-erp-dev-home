@@ -37,7 +37,7 @@ export const useDatatableReqAlm = () => {
         },
         {
             width: "10%", label: "Proyecto financiado", name: "id_proy_financiado", type: "select",
-             options: [
+            options: [
                 { value: "1", label: "FONDO GENERAL" },
                 { value: "2", label: "FONDO CIRCULANTE DE MONTO FIJO" },
                 { value: "3", label: "RECURSOS PROPIOS" },
@@ -99,6 +99,7 @@ export const useDatatableReqAlm = () => {
             const response = await axios.post(url, tableData.value);
             const data = response.data;
 
+
             if (tableData.value.draw === data.draw) {
                 let resultado = data.data.data;
 
@@ -109,14 +110,12 @@ export const useDatatableReqAlm = () => {
                 links.value[0].label = "Anterior";
                 links.value[links.value.length - 1].label = "Siguiente";
 
-
-
-
-                numeroRequerimientoSiguiente.value = await generateNumberRequerimiento()
+                emptyObject.value = objectRequerimientos.value.length === 0;
 
             }
+            generateNumberRequerimiento()
 
-            emptyObject.value = evaluaciones.value.length === 0;
+
         } catch (error) {
             // Manejo de errores aquí
         } finally {
@@ -166,29 +165,41 @@ export const useDatatableReqAlm = () => {
     const generateNumberRequerimiento = async () => {
         try {
             const response = await axios.post('/get-number-requerimiento');
-         /*    console.log(response); */
+
+            // Obtener el año actual
             const currentYear = moment().year();
-            const currentNumber = parseInt(response.data.num_requerimiento.split('-')[2]);
 
             let nextNumber;
-            if (parseInt(response.data.num_requerimiento.split('-')[1]) !== currentYear) {
-                nextNumber = 1;
+
+            // Verificar si se recibió el número actual en la respuesta
+            if (response.data.num_requerimiento) {
+                const currentNumber = parseInt(response.data.num_requerimiento.split('-')[2]);
+
+                // Verificar si el número recibido corresponde al año actual
+                if (parseInt(response.data.num_requerimiento.split('-')[1]) !== currentYear) {
+                    nextNumber = 1; // Si no corresponde, comenzar desde 1
+                } else {
+                    nextNumber = currentNumber + 1; // Si corresponde, incrementar el número actual
+                }
             } else {
-                nextNumber = currentNumber + 1;
+                nextNumber = 1; // Si no se recibe el número actual, asumir que es el primero del año
             }
 
+            // Construir el nuevo número de requerimiento
             const newNumberString = `REQ-${currentYear}-${nextNumber}`;
             console.log('Nuevo número de requerimiento:', newNumberString);
-            return newNumberString;
+
+            numeroRequerimientoSiguiente.value = newNumberString;
         } catch (error) {
             console.error('Error al generar el número de requerimiento:', error);
-            throw new Error('No se pudo generar el número de requerimiento.'); // Re-lanza el error para que sea manejado por el código que llama a esta función
+            throw new Error('No se pudo generar el número de requerimiento.');
         }
     };
 
+
     onMounted(async () => {
         getRequerimientosAlmacen();
-        numeroRequerimientoSiguiente.value = await generateNumberRequerimiento()
+        // numeroRequerimientoSiguiente.value = await generateNumberRequerimiento()
     });
 
     return {

@@ -22,7 +22,7 @@ export default defineComponent({
         },
         objectRequerimientoToSendModal: {
             type: Object,
-            default: () => {},
+            default: () => { },
         },
         numeroRequerimientoSiguiente: {
             type: String,
@@ -150,186 +150,214 @@ export default defineComponent({
 <template>
     <div class="m-1.5">
         <ProcessModal maxWidth="3xl" :show="showModal" @close="$emit('cerrar-modal')">
-            <div class="py-4 px-3 ">
+            <div class="py-4 px-3 border-4 m-4">
                 <ButtonCloseModal @close="$emit('cerrar-modal')" />
                 <TitleModalReq />
                 <div id="formulario-principal">
                     <div class="pt-4 flex justify-start space-x-2 items-center">
                         <h1 class="text-xs ">Requerimiento N°: <span class="font-medium text-sm underline">{{
-                numRequerimiento }}</span></h1>
+            numRequerimiento }}</span></h1>
 
-                        <div class="text-xs items-center" v-if="optionsCentroAtencion?.length == 1">
-                            Centro:
-                            <span class="font-medium text-sm underline" v-if="optionsCentroAtencion && optionsCentroAtencion[0]">
-                                    {{ optionsCentroAtencion[0].label }}</span>
-                            <span v-else>-</span>
-
-                            <!-- {{optionsCentroAtencion}} -->
+                        <div class="text-xs items-center flex gap-1 "
+                            v-if="optionsCentroAtencion?.length == 1 && !isLoadingCentrosProduccion">
+                            <span>Centro:</span>
+                            <!-- <div v-if="optionsCentroAtencion == true" class="w-96 h-5 bg-gray-300 rounded mb-2 animate-pulse"></div> -->
+                            <span class="font-medium text-sm underline"
+                                v-if="optionsCentroAtencion && optionsCentroAtencion[0]">
+                                {{ optionsCentroAtencion[0].label }}
+                            </span>
                         </div>
-                        <div class="text-xs items-center w-48" v-else>
 
-                            <OnlyLabelInput textLabel="Centro de atencion..." />
-                            <Multiselect v-model="idCentroAtencion" @select="searchProductionCenterByAtentionCenter($event)" :disabled="!canEditReq" :classes="{
-                containerDisabled: `bg-gray-200 text-text-slate-400`,
-                container: `relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded  text-base leading-snug outline-none
-                                ${canEditReq ? 'bg-white' : ''}`,
-                optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed',
-                optionPointed: 'text-gray-800 bg-gray-100',
-            }" :filter-results="false" :searchable="true" :clear-on-search="true" :min-chars="1" :options="optionsCentroAtencion" noResultsText="<p class='text-xs'>Sin resultados de personas</p>" placeholder="-" noOptionsText="<p class='text-xs'>vacio</p>"
-                            />
-                            <InputError class="mt-2" v-if="errorsValidation && errorsValidation['idLt'] !== ''" :message="errorsValidation['idLt']" />
+                        <div class="text-xs items-center w-96 flex gap-2"
+                            v-else-if="optionsCentroAtencion?.length > 1 && !isLoadingCentrosProduccion">
+
+                            <OnlyLabelInput textLabel="Centro:" />
+                            <Multiselect v-model="idCentroAtencion"
+                                @select="searchProductionCenterByAtentionCenter($event, '/get-centro-produccion-by-centro')"
+                                :disabled="!canEditReq" :classes="{
+            containerDisabled: `bg-gray-200 text-text-slate-400`,
+            container: `relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded  text-base leading-snug outline-none
+                                        ${canEditReq ? 'bg-white' : ''}`,
+            optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed',
+            optionPointed: 'text-gray-800 bg-gray-100',
+        }" :filter-results="false" :searchable="true" :clear-on-search="true" :min-chars="1"
+                                :options="optionsCentroAtencion"
+                                noResultsText="<p class='text-xs'>Sin resultados de personas</p>" placeholder="-"
+                                noOptionsText="<p class='text-xs'>vacio</p>" />
+                            <InputError class="mt-2"
+                                v-if="errorsValidation && errorsValidation['idCentroAtencion'] !== ''"
+                                :message="errorsValidation['idCentroAtencion']" />
 
                         </div>
-                        <div role="alert" v-if="!canEditReq" class="relative flex w- px-1 py-1 text-base text-white bg-gray-900 rounded-lg font-regular items-center">
-                            <div class="shrink-0">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-4">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z">
-                                        </path>
-                                    </svg>
-                            </div>
-                            <div class="mx-1 text-xs font-extralight">edición desabilitada</div>
-                        </div>
+
+                        <div class="w-96 h-5 bg-gray-300 rounded mb-2 animate-pulse"
+                            v-else-if="isLoadingCentrosProduccion"></div>
                     </div>
-
-                    estado {{ canIEdit }}
                     <div class="pt-4 flex justify-between space-x-2">
-                        <div class="w-full">
-                            <OnlyLabelInput textLabel="Linea de trabajo" />
-                            <Multiselect v-model="idLt" @select="getProductoByDependencia()" :disabled="!canEditReq" :classes="{
-                containerDisabled: `bg-gray-200 text-text-slate-400`,
-                container: `relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded  text-base leading-snug outline-none
-                                ${canEditReq ? 'bg-white' : ''}`,
-                optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed',
-                optionPointed: 'text-gray-800 bg-gray-100',
-            }" :filter-results="false" :searchable="true" :clear-on-search="true" :min-chars="1" :options="lineaTrabajoArray" noResultsText="<p class='text-xs'>Sin resultados de personas</p>" placeholder="-" noOptionsText="<p class='text-xs'>vacio</p>" />
-                            <InputError class="mt-2" v-if="errorsValidation && errorsValidation['idLt'] !== ''" :message="errorsValidation['idLt']" />
-                        </div>
+
 
                         <div class="w-full">
                             <OnlyLabelInput textLabel="Proyecto financiamiento" />
 
-                            <Multiselect v-model="idProyFinanciado" @select="getProductoByDependencia()" :disabled="!canEditReq" :classes="{ containerDisabled: `bg-gray-200 text-text-slate-400`, container: `relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded  text-base leading-snug outline-none ${canEditReq ? 'bg-white' : ''}`, optionSelectedDisabled: `text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed`, optionPointed: `text-gray-800 bg-gray-100` }"
-                                :filter-results="false" :searchable="true" :clear-on-search="true" :min-chars="1" :options="proyectoFinanciados" noResultsText="<p class='text-xs'>Sin resultados de personas</p>" placeholder="-" noOptionsText="<p class='text-xs'>vacio</p>"
-                            />
-                            <InputError class="mt-2" v-if="errorsValidation && errorsValidation['idProyFinanciado'] !== ''" :message="errorsValidation['idProyFinanciado']" />
+                            <Multiselect v-model="idProyFinanciado" @select="getProductoByDependencia()"
+                                :disabled="!canEditReq"
+                                :classes="{ containerDisabled: `bg-gray-200 text-text-slate-400`, container: `relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded  text-base leading-snug outline-none ${canEditReq ? 'bg-white' : ''}`, optionSelectedDisabled: `text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed`, optionPointed: `text-gray-800 bg-gray-100` }"
+                                :filter-results="false" :searchable="true" :clear-on-search="true" :min-chars="1"
+                                :options="proyectoFinanciados"
+                                noResultsText="<p class='text-xs'>Sin resultados de personas</p>" placeholder="-"
+                                noOptionsText="<p class='text-xs'>vacio</p>" />
+                            <InputError class="mt-2"
+                                v-if="errorsValidation && errorsValidation['idProyFinanciado'] !== ''"
+                                :message="errorsValidation['idProyFinanciado']" />
 
                         </div>
-
+                        <div class="w-full" v-if="idProyFinanciado != 4">
+                            <OnlyLabelInput textLabel="Linea de trabajo" />
+                            <Multiselect v-model="idLt" @select="getProductoByDependencia()" :disabled="!canEditReq"
+                                :classes="{
+            containerDisabled: `bg-gray-200 text-text-slate-400`,
+            container: `relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded  text-base leading-snug outline-none
+                                        ${canEditReq ? 'bg-white' : ''}`,
+            optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed',
+            optionPointed: 'text-gray-800 bg-gray-100',
+        }" :filter-results="false" :searchable="true" :clear-on-search="true" :min-chars="1"
+                                :options="lineaTrabajoArray"
+                                noResultsText="<p class='text-xs'>Sin resultados de personas</p>" placeholder="-"
+                                noOptionsText="<p class='text-xs'>vacio</p>" />
+                            <InputError class="mt-2" v-if="errorsValidation && errorsValidation['idLt'] !== ''"
+                                :message="errorsValidation['idLt']" />
+                        </div>
                     </div>
                     <div class="pt-4 flex justify-start space-x-2 items-end">
 
-                        <textarea placeholder='Observacion del requerimiento' rows="2" name='' v-model="observacionRequerimiento" :disabled="!canEditReq" class="w-full rounded-md px-4 text-xs border-slate-300 border pt-2.5 outline-[#007bff]" :class="{ 'bg-slate-300': !canEditReq }"></textarea>
+                        <textarea placeholder='Observacion del requerimiento' rows="2" name=''
+                            v-model="observacionRequerimiento" :disabled="!canEditReq"
+                            class="w-full rounded-md px-4 text-xs border-slate-300 border pt-2.5 outline-[#007bff]"
+                            :class="{ 'bg-slate-300': !canEditReq }"></textarea>
 
                     </div>
-                    <div class="pt-4 flex justify-start space-x-2 items-end" v-if="objectRequerimientoToSendModal == ''">
-                        <button class=" bg-green-700 rounded px-2 text-xs h-6 text-slate-200 hover:text-white hover:bg-green-600 ">
-                                <div class="flex items-center space-x-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                        stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
-                                    </svg>
-                                    <span @click="saveRequerimientoAlmacen">Guardar y cerrar</span>
-                                </div>
-                            </button>
+                    <div class="pt-4 flex justify-start space-x-2 items-end"
+                        v-if="objectRequerimientoToSendModal == ''">
+                        <button
+                            class=" bg-green-700 rounded px-2 text-xs h-6 text-slate-200 hover:text-white hover:bg-green-600 ">
+                            <div class="flex items-center space-x-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+                                </svg>
+                                <span @click="saveRequerimientoAlmacen">Guardar y cerrar</span>
+                            </div>
+                        </button>
                     </div>
                     <div class="pt-4 flex justify-start space-x-2 items-end" v-else v-show="canEditReq">
-                        <button class=" bg-indigo-700 rounded px-2 text-xs h-6 text-slate-200 hover:text-white hover:bg-indigo-600 ">
-                                <div class="flex items-center space-x-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                        stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
-                                    </svg>
-                                    <span @click="canEditReq ? updateRequerimientoAlmacen() : ''">Actualizar y cerrar</span>
-                                </div>
-                            </button>
+                        <button
+                            class=" bg-indigo-700 rounded px-2 text-xs h-6 text-slate-200 hover:text-white hover:bg-indigo-600 ">
+                            <div class="flex items-center space-x-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+                                </svg>
+                                <span @click="canEditReq ? updateRequerimientoAlmacen() : ''">Actualizar y cerrar</span>
+                            </div>
+                        </button>
                     </div>
                 </div>
-                {{ canIEdit }}
-                <!-- <pre>
-
-                {{
-                    productosArray.map(index => {
-                        return index.value
-
-                        })
-
-                        }}
-                </pre> -->
                 <table class="mt-4 w-[740px] ">
                     <tr class=" *:text-xs *:text-slate-700">
                         <td class="w-20 text-end pl-4">CANTIDAD</td>
                         <td class="w-full text-center">PRODUCTO</td>
                     </tr>
                 </table>
-                <div id="secctionTableDetalleReq" class="w-[740px]">
+                <div id="secctionTableDetalleReq" class="w-[700px]">
 
                     <div v-for="(detalleRequerimiento, i) in dataDetalleRequerimiento" :key="i" class="">
-                        <div class="  space-x-3 justify-start items-center  px-2 bg-slate-100  hover:bg-slate-400/50 cursor-pointer">
-                            <div class="flex space-x-3 items-center">
-                                <div class="text-xs" @click="detalleRequerimiento.isHidden = !detalleRequerimiento.isHidden">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-slate-700 ">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                                        </svg>
+                        <div class=" justify-start items-center  bg-slate-100  hover:bg-slate-400/50 cursor-pointer">
+                            <div class="flex space-x-3 items-center px-2">
+                                <div class="text-xs"
+                                    @click="detalleRequerimiento.isHidden = !detalleRequerimiento.isHidden">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="2" stroke="currentColor" class="w-6 h-6 text-slate-700 ">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                    </svg>
                                 </div>
                                 <div class="text-xs w-[645px] py-1">
-                                    <Multiselect v-model="detalleRequerimiento.idCentroProduccion" :loading="isLoadingCentrosProduccion"  :disabled="!canEditReq" :classes="{ containerDisabled: 'bg-gray-200 text-text-slate-400', container: `relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded  text-base leading-snug outline-none ${canEditReq ? 'bg-white' : ''}`, optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed', optionPointed: 'text-gray-800 bg-gray-100', }"
-                                        :filter-results="false" :searchable="true" :clear-on-search="true" :min-chars="1" :options="centroProduccion" noResultsText="<p class='text-xs'>Sin resultados de personas</p>" placeholder="CENTRO DE PRODUCCION" noOptionsText="<p class='text-xs'>SIN CENTROS DE PRODUCCION</p>"
-                                    />
+                                    <Multiselect v-model="detalleRequerimiento.idCentroProduccion"
+                                        :loading="isLoadingCentrosProduccion" :disabled="!canEditReq"
+                                        :classes="{ containerDisabled: 'bg-gray-200 text-text-slate-400', container: `relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded  text-base leading-snug outline-none ${canEditReq ? 'bg-white' : ''}`, optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed', optionPointed: 'text-gray-800 bg-gray-100', }"
+                                        :filter-results="false" :searchable="true" :clear-on-search="true"
+                                        :min-chars="1" :options="centroProduccion"
+                                        noResultsText="<p class='text-xs'>Sin resultados de personas</p>"
+                                        placeholder="CENTRO DE PRODUCCION"
+                                        noOptionsText="<p class='text-xs'>SIN CENTROS DE PRODUCCION</p>" />
                                 </div>
                             </div>
 
-                            <div class="text-xs bg-slate-100 border-b-4 w-full text-center">
+                            <div class="text-xs bg-slate-100 border-b-4 border-slate-400  w-full text-center">
                                 <span class="text-red-600">
-                                        {{ errorsValidation && errorsValidation['dataDetalleRequerimiento'] &&
-                errorsValidation['dataDetalleRequerimiento'][0]['idCentroProduccion'] }}
-                                    </span>
+                                    {{ errorsValidation && errorsValidation['dataDetalleRequerimiento'] &&
+            errorsValidation['dataDetalleRequerimiento'][0]['idCentroProduccion'] }}
+                                </span>
                             </div>
                         </div>
 
-                        <div v-show="!detalleRequerimiento.isHidden" v-for="(producto, j ) in detalleRequerimiento.productos" :key="j">
+                        <div v-show="!detalleRequerimiento.isHidden"
+                            v-for="(producto, j ) in detalleRequerimiento.productos" :key="j">
 
-                            <div v-if="producto.stateProducto == 1" class=" px-2 text-xs flex justify-end  space-x-4 items-center bg-slate-100 hover:bg-slate-200">
+                            <div v-if="producto.stateProducto == 1"
+                                class=" px-2 text-xs flex justify-end  space-x-4 items-center bg-slate-100 hover:bg-slate-200">
+
                                 <div class="text-xs w-20 ">
-                                    <input type="text" v-model="producto.cantDetRequerimiento" :disabled="!canEditReq" class=" text-center border-0 h-6 text-xs w-20 border-x-transparentborder-t-transparent bg-transparent focus:border-x-transparentfocus:border-t-transparent" :class="!canEditReq ? 'bg-slate-700' : 'bg-white'"
-                                        placeholder="CANT">
+                                    <input type="text" v-model="producto.cantDetRequerimiento" :disabled="!canEditReq"
+                                        class=" text-center border-0 h-6 text-xs w-20 border-x-transparentborder-t-transparent bg-transparent focus:border-x-transparentfocus:border-t-transparent"
+                                        :class="!canEditReq ? 'bg-slate-700' : 'bg-white'" placeholder="CANT">
                                 </div>
                                 <div class="text-xs w-full py-1 flex items-center" v-if="producto.idDetRequerimiento">
                                     <div class="h-8 border-l-4 border-slate-500 pl-3 opacity-40"></div>
                                     <div class="flex-1">
-                                        <Multiselect @select="setIdProductoByDetalleExistenciaAlmacenId($event, i, j)" v-model="producto.idDetExistenciaAlmacen" :loading="isLoadinProduct" :disabled="isLoadinProduct || !canEditReq" :classes="{ containerDisabled: 'bg-gray-200 text-text-slate-400', container: `relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded  text-base leading-snug outline-none ${canEditReq ? 'bg-white' : ''}`, optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed', optionPointed: 'text-gray-800 bg-gray-100', }"
-                                            :filter-results="false" :searchable="true" :clear-on-search="true" :min-chars="1" :options="productosArray" noResultsText="<p class='text-xs'>Sin resultados de personas</p>" placeholder="TODOS LOS PRODUCTOS" noOptionsText="<p class='text-xs'>PRODUCTOS FILTRADOS POR LINEA DE TRABAJO Y PROYECTO FINANCIADO</p>"
-                                        />
+                                        <Multiselect @select="setIdProductoByDetalleExistenciaAlmacenId($event, i, j)"
+                                            v-model="producto.idDetExistenciaAlmacen" :loading="isLoadinProduct"
+                                            :disabled="isLoadinProduct || !canEditReq"
+                                            :classes="{ containerDisabled: 'bg-gray-200 text-text-slate-400', container: `relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded  text-base leading-snug outline-none ${canEditReq ? 'bg-white' : ''}`, optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed', optionPointed: 'text-gray-800 bg-gray-100', }"
+                                            :filter-results="false" :searchable="true" :clear-on-search="true"
+                                            :min-chars="1" :options="productosArray"
+                                            noResultsText="<p class='text-xs'>Sin resultados de personas</p>"
+                                            placeholder="TODOS LOS PRODUCTOS"
+                                            noOptionsText="<p class='text-xs'>PRODUCTOS FILTRADOS POR LINEA DE TRABAJO Y PROYECTO FINANCIADO</p>" />
                                     </div>
                                 </div>
 
                                 <div class="text-xs w-full py-1 flex items-center" v-else>
                                     <div class="h-8 border-l-4 border-slate-500 pl-3 opacity-40"></div>
-                                    <!--      {{ productosArray }} -->
                                     <div class="flex-1">
-                                        <Multiselect @select="setIdProductoByDetalleExistenciaAlmacenId($event, i, j)" v-model="producto.idDetExistenciaAlmacen" :loading="isLoadinProduct" :disabled="isLoadinProduct || !canEditReq" :classes="{ containerDisabled: 'bg-gray-200 text-text-slate-400', container: `relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded  text-base leading-snug outline-none ${canEditReq ? 'bg-white' : ''}`, optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed', optionPointed: 'text-gray-800 bg-gray-100', }"
-                                            :filter-results="false" :searchable="true" :clear-on-search="true" :min-chars="1" :options="productoArrayWithOutProductNoStock" noResultsText="<p class='text-xs'>Sin resultados de personas</p>" placeholder="TODOS LOS PRODUCTOS"
+                                        <Multiselect @select="setIdProductoByDetalleExistenciaAlmacenId($event, i, j)"
+                                            v-model="producto.idDetExistenciaAlmacen" :loading="isLoadinProduct"
+                                            :disabled="isLoadinProduct || !canEditReq"
+                                            :classes="{ containerDisabled: 'bg-gray-200 text-text-slate-400', container: `relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded  text-base leading-snug outline-none ${canEditReq ? 'bg-white' : ''}`, optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed', optionPointed: 'text-gray-800 bg-gray-100', }"
+                                            :filter-results="false" :searchable="true" :clear-on-search="true"
+                                            :min-chars="1" :options="productoArrayWithOutProductNoStock"
+                                            noResultsText="<p class='text-xs'>Sin resultados de personas</p>"
+                                            placeholder="TODOS LOS PRODUCTOS"
                                             noOptionsText="<p class='text-xs'>PRODUCTOS FILTRADOS POR LINEA DE TRABAJO Y PROYECTO FINANCIADO</p>" />
                                     </div>
-                                    {{ producto.idDetRequerimiento }}
                                 </div>
 
                                 <div class="text-xs py-1 ">
                                     <DropDownOptions v-if="canEditReq">
-                                        <div class="flex items-center hover:bg-gray-100 py-1 px-2 rounded cursor-pointer" @click.stop="producto.stateProducto = 0">
+                                        <div class="flex items-center hover:bg-gray-100 py-1 px-2 rounded cursor-pointer"
+                                            @click.stop="producto.stateProducto = 0">
                                             <div class="w-8 text-red-900">
                                                 <span class="text-xs">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                                            class="w-6 h-6">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                d="M12 9.75 14.25 12m0 0 2.25 2.25M14.25 12l2.25-2.25M14.25 12 12 14.25m-2.58 4.92-6.374-6.375a1.125 1.125 0 0 1 0-1.59L9.42 4.83c.21-.211.497-.33.795-.33H19.5a2.25 2.25 0 0 1 2.25 2.25v10.5a2.25 2.25 0 0 1-2.25 2.25h-9.284c-.298 0-.585-.119-.795-.33Z" />
-                                                        </svg>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                        class="w-6 h-6">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M12 9.75 14.25 12m0 0 2.25 2.25M14.25 12l2.25-2.25M14.25 12 12 14.25m-2.58 4.92-6.374-6.375a1.125 1.125 0 0 1 0-1.59L9.42 4.83c.21-.211.497-.33.795-.33H19.5a2.25 2.25 0 0 1 2.25 2.25v10.5a2.25 2.25 0 0 1-2.25 2.25h-9.284c-.298 0-.585-.119-.795-.33Z" />
+                                                    </svg>
 
-                                                    </span>
+                                                </span>
                                             </div>
                                             <div class="font-semibold">Eliminar</div>
                                         </div>
@@ -338,23 +366,63 @@ export default defineComponent({
 
                                 </div>
                             </div>
-                            <div class="text-xs bg-slate-100 border-b-4 w-full text-center">
-                                <span class="text-red-600">
-                                        {{ errorsValidation
-                &&
-                errorsValidation[`dataDetalleRequerimiento.${i}.productos.${j}.cantDetRequerimiento`]
-                                        }}{{
-                errorsValidation
-                &&
+                            <div class="text-xs bg-slate-100 border-b-4 border-slate-400  w-full text-center"
+                                id="seccion-error">
+
+                                <div v-if="errorsValidation &&
+            errorsValidation[`dataDetalleRequerimiento.${i}.productos.${j}.cantDetRequerimiento`] || errorsValidation &&
+            errorsValidation[`dataDetalleRequerimiento.${i}.productos.${j}.idDetExistenciaAlmacen`]"
+                                    class="flex justify-center items-center m-1 font-medium py-1 px-2  rounded-md text-red-700 bg-red-100 border border-red-300 ">
+                                    <div slot="avatar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round" class="feather feather-alert-octagon w-4 h-4 mx-2">
+                                            <polygon
+                                                points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2">
+                                            </polygon>
+                                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                        </svg>
+                                    </div>
+                                    <div class="text-[8pt] text-black font-normal  max-w-full flex-initial"> {{
+            errorsValidation &&
+            errorsValidation[`dataDetalleRequerimiento.${i}.productos.${j}.cantDetRequerimiento`]
+        }}
+                                    </div>
+                                    <div class="text-[8pt] text-black font-normal  max-w-full flex-initial"> {{
+                errorsValidation &&
                 errorsValidation[`dataDetalleRequerimiento.${i}.productos.${j}.idDetExistenciaAlmacen`]
-                                        }}
-                                    </span>
+            }}
+
+                                    </div>
+
+                                </div>
                             </div>
+                            <div class="text-xs bg-slate-100 border-b-4 border-slate-400  w-full text-center"
+                                id="seccion-error" v-if="productosArray?.find(index => index.value ==
+                producto.idDetExistenciaAlmacen)?.stock < 0">
+
+                                <div
+                                    class="flex justify-center items-center m-1 font-medium py-1 px-2  rounded-md text-yellow-700 bg-yellow-100 border border-yellow-300 ">
+
+                                    <div class="text-base font-normal  max-w-full flex-initial">
+                                        <div class="py-2">Producto agotado:
+                                            <div class="text-sm font-base">El almacen no tiene disponible este producto
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
-                        <div @click="appendProduct(i)" v-if="canEditReq" class="hover:bg-slate-200 hover:border-slate-500 w-full h-20 border-4 border-dashed border-slate-400 my-4 flex items-center justify-center bg-white">
+                        <div @click="appendProduct(i)" v-if="canEditReq"
+                            class="hover:bg-slate-200 hover:border-slate-500 w-full h-20 border-4 border-dashed border-slate-400 my-4 flex items-center justify-center bg-white">
                             <span class="uppercase text-left text-xs">
-                                    + agregar en: INSTRUCTORIA VOCACIONAL DE COSTURA INDUSTRIAL
-                                </span>
+                                + agregar en: {{ centroProduccion?.find(index => index.value ==
+                                detalleRequerimiento.idCentroProduccion)?.label || 'N/A' }}
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -363,6 +431,4 @@ export default defineComponent({
     </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
