@@ -124,13 +124,10 @@
                                 <div class="relative font-semibold flex h-8 w-full flex-row-reverse">
                                     <Multiselect v-model="acq_doc.procesoCompraId" :options="procesoCompra"
                                         @select="onSelectMultiSelectProcesoCompra($event)"
-                                        placeholder="Seleccione proveedor" :searchable="true" />
+                                        placeholder="Seleccione proceso" :searchable="true" />
                                     <LabelToInput icon="list" />
                                 </div>
-                                <!-- !MODIFICAR -->
-                                <!-- <InputError class="mt-2" :message="errors.supplier_id" /> -->
-                                <!--    {{ procesoCompra }} -->
-                                <!--        tipo: {{ tipoProcesoCompraValue }} -->
+                                <InputError class="mt-2" :message="errors.procesoCompraId" />
                             </div>
 
                         </div>
