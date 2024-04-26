@@ -29,6 +29,7 @@ class Producto extends Model
         'perecedero_producto',
         'estado_producto',
         'critico_producto',
+        'fraccionado_producto',
         'fecha_reg_producto',
         'fecha_mod_producto',
         'usuario_producto',

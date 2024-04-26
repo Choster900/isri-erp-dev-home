@@ -40,6 +40,7 @@ export const useRecepcion = (context) => {
     const recDocument = ref({
         id: '', //reception id
         acta: '', //Acta number
+        detStockId: '',
         invoice: '', //Invoice number
         financingSourceId: '',
         observation: '', //Reception observation
@@ -146,36 +147,59 @@ export const useRecepcion = (context) => {
             products.value = newOptions;
 
 
-            // Iterate over detalle_recepcion
+            // Arreglo para almacenar los grupos de productos
+            const groupedProducts = [];
+
+            // Iterar sobre los detalles de recepción
             recepData.detalle_recepcion.forEach(element => {
-                // Check estado_det_recepcion_pedido
-                if (element.estado_det_recepcion_pedido === 1) {
-                    // Construct array
-                    const array = {
-                        detRecId: element.id_det_recepcion_pedido, //id_det_recepcion_pedido
-                        prodId: element.producto_adquisicion.id_prod_adquisicion, //id_prod_adquisicion
-                        desc: element.producto.codigo_producto + ' — ' + element.producto.nombre_completo_producto + ' — '
-                            + element.producto.unidad_medida.nombre_unidad_medida
-                            + ' — ' + element.producto_adquisicion.descripcion_prod_adquisicion, //Acquisition product description
+                if (element.estado_det_recepcion_pedido == 1) {
+                    // Obtener el código_up_lt y el id_lt del producto
+                    const codigo_up_lt = element.producto_adquisicion.linea_trabajo.codigo_up_lt;
+                    const id_lt = element.producto_adquisicion.id_lt;
+
+                    // Buscar si ya existe un grupo para este código_up_lt
+                    let groupIndex = groupedProducts.findIndex(group => group.codigo_up_lt === codigo_up_lt);
+
+                    // Si no existe un grupo, crear uno nuevo
+                    if (groupIndex === -1) {
+                        groupedProducts.push({
+                            id_lt: id_lt,
+                            codigo_up_lt: codigo_up_lt,
+                            isOpen: true,
+                            productos: []
+                        });
+                        // Ordenar el arreglo de grupos por id_lt
+                        groupedProducts.sort((a, b) => a.id_lt - b.id_lt);
+                        groupIndex = groupedProducts.findIndex(group => group.codigo_up_lt === codigo_up_lt);
+                    }
+
+                    // Agregar el producto al arreglo de productos del grupo correspondiente
+                    groupedProducts[groupIndex].productos.push({
+                        detRecId: element.id_det_recepcion_pedido,
+                        prodId: element.producto_adquisicion.id_prod_adquisicion,
+                        desc: element.producto_adquisicion.linea_trabajo.codigo_up_lt + ' — ' +
+                            element.producto_adquisicion.centro_atencion.codigo_centro_atencion + ' — ' +
+                            element.producto.codigo_producto + ' — ' + element.producto.nombre_completo_producto + ' — ' +
+                            element.producto.unidad_medida.nombre_unidad_medida + ' — ' + element.producto_adquisicion.descripcion_prod_adquisicion,
                         brandId: element.id_marca,
                         brandLabel: element.marca ? element.marca.nombre_marca : 'N/A',
-                        prodLabel: element.producto_adquisicion.linea_trabajo.codigo_up_lt + ' — '
-                            + element.producto_adquisicion.centro_atencion.codigo_centro_atencion + ' — '
-                            + element.producto.codigo_producto,
+                        prodLabel: element.producto_adquisicion.linea_trabajo.codigo_up_lt + ' — ' +
+                            element.producto_adquisicion.centro_atencion.codigo_centro_atencion + ' — ' + element.producto.codigo_producto,
                         expiryDate: formatDateVue3DP(element.fecha_vcto_det_recepcion_pedido),
-                        perishable: element.producto.perecedero_producto, //If the product is perishable, set to true, otherwise set to false.
-                        avails: "", //Represents the maximum number of products that the user can write.
-                        qty: element.cant_det_recepcion_pedido, //Represents the the number of products the user wants to register
-                        cost: element.producto_adquisicion.costo_prod_adquisicion, //Represents the the cost of the product
-                        total: "", //Represents the result of qty x cost for every row
-                        deleted: false, //This is the state of the row, it represents the logical deletion.
-                        initial: "" //Represents the initial availability of a product
-                    };
-
-                    // Push array to prods
-                    recDocument.value.prods.push(array);
+                        perishable: element.producto.perecedero_producto,
+                        fractionated: element.producto.fraccionado_producto,
+                        avails: "",
+                        qty: element.cant_det_recepcion_pedido,
+                        cost: element.producto_adquisicion.costo_prod_adquisicion,
+                        total: "",
+                        deleted: false,
+                        initial: ""
+                    });
                 }
             });
+
+            // Ahora groupedProducts contiene los grupos de productos como arreglos
+            recDocument.value.prods = groupedProducts;
 
             // Desplazar la pantalla hasta la última fila agregada
             nextTick(() => {
@@ -190,34 +214,96 @@ export const useRecepcion = (context) => {
 
             // Set products and filteredProds to newOptions
             products.value = newOptions;
-
-            // Call addNewRow
-            addNewRow();
         }
 
         startRec.value = true
     }
 
-    const setProdItem = (paId, index) => {
-        if (paId) {
+    const setProdItem = (paId) => {
+        if (!paId) {
+            useShowToast(toast.info, "Debes elegir un producto de la lista.");
+        } else {
             const selectedProd = products.value.find((element) => {
                 return element.value === paId; // Adding a return statement here
             });
-            recDocument.value.prods[index].desc = selectedProd.codigo_producto + ' — ' +
-                selectedProd.nombre_completo_producto + ' — ' +
-                selectedProd.nombre_unidad_medida + ' — ' +
-                selectedProd.descripcion_prod_adquisicion
-            recDocument.value.prods[index].perishable = selectedProd.perecedero_producto
-            recDocument.value.prods[index].cost = selectedProd.costo_prod_adquisicion
-            recDocument.value.prods[index].initial = selectedProd.total_menos_acumulado
-        } else {
-            recDocument.value.prods[index].desc = ""
-            recDocument.value.prods[index].perishable = ""
-            recDocument.value.prods[index].cost = ""
-            recDocument.value.prods[index].prodId = ""
+
+            // Construct array
+            const array = {
+                detRecId: '', //id_det_recepcion_pedido
+                prodId: paId, //id_prod_adquisicion
+                desc: selectedProd.codigo_up_lt + ' — ' + selectedProd.codigo_centro_atencion + ' — ' +
+                    selectedProd.codigo_producto + ' — ' + selectedProd.nombre_completo_producto + ' — '
+                    + selectedProd.nombre_unidad_medida
+                    + ' — ' + selectedProd.descripcion_prod_adquisicion, //Acquisition product description
+                brandId: '',
+                brandLabel: '',
+                prodLabel: '',
+                expiryDate: '',
+                perishable: selectedProd.perecedero_producto, //If the product is perishable, set to true, otherwise set to false.
+                fractionated: selectedProd.fraccionado_producto,
+                avails: '', //Represents the maximum number of products that the user can write.
+                qty: '', //Represents the the number of products the user wants to register
+                cost: selectedProd.costo_prod_adquisicion, //Represents the the cost of the product
+                total: '', //Represents the result of qty x cost for every row
+                deleted: false, //This is the state of the row, it represents the logical deletion.
+                initial: selectedProd.total_menos_acumulado //Represents the initial availability of a product
+            };
+
+            // Buscar si existe un elemento de línea de trabajo con el id_lt correspondiente
+            const lineOfWork = recDocument.value.prods.find(group => group.id_lt === selectedProd.id_lt);
+
+            let indexLt, index;
+
+            if (lineOfWork) {
+                // Si la línea de trabajo existe, insertar el producto en ella
+                lineOfWork.productos.push(array);
+                // Actualizar los índices para la fila insertada
+                indexLt = recDocument.value.prods.findIndex(group => group.id_lt === selectedProd.id_lt);
+                index = lineOfWork.productos.length - 1; // Índice del producto dentro del grupo
+            } else {
+                // Si la línea de trabajo no existe, crear un nuevo grupo y luego insertar el producto
+                recDocument.value.prods.push({
+                    id_lt: selectedProd.id_lt,
+                    codigo_up_lt: selectedProd.codigo_up_lt, // Si necesitas esta propiedad
+                    isOpen: true,
+                    productos: [array]
+                });
+                // Actualizar los índices para la fila insertada
+                indexLt = recDocument.value.prods.length - 1;
+                index = 0; // Como es el primer producto en un nuevo grupo, el índice del producto es 0
+            }
+
+            // Ordenar nuevamente el arreglo por id_lt
+            recDocument.value.prods.sort((a, b) => a.id_lt - b.id_lt);
+
+            // Desplazar la pantalla hasta la última fila agregada
+            nextTick(() => {
+                const newRowId = `lt-${indexLt}prod-${index}`;
+                const newRowElement = document.getElementById(newRowId);
+                if (newRowElement) {
+                    newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                    // Aplicar la clase de animación temporalmente
+                    newRowElement.classList.add('blinking');
+                    // Eliminar la clase después de un período de tiempo
+                    setTimeout(() => {
+                        newRowElement.classList.remove('blinking');
+                    }, 3000); // 3000 milisegundos (3 segundos) en este ejemplo
+                }
+            });
+
+            //Clean the select
+            recDocument.value.detStockId = ''
         }
-        recDocument.value.prods[index].qty = ""
-        recDocument.value.prods[index].total = '0.00'
+    }
+
+    const returnToTop = () => {
+        // Desplazar la pantalla a la parte superior
+        nextTick(() => {
+            const newRowElement = document.getElementById(`headerFormat`);
+            if (newRowElement) {
+                newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
+        });
     }
 
     const {
@@ -226,7 +312,7 @@ export const useRecepcion = (context) => {
 
     const handleValidation = (input, validation, element) => {
         if (element) {
-            recDocument.value.prods[element.index][input] = validateInput(recDocument.value.prods[element.index][input], validation)
+            recDocument.value.prods[element.indexLt].productos[element.index][input] = validateInput(recDocument.value.prods[element.indexLt].productos[element.index][input], validation)
         } else {
             recDocument.value[input] = validateInput(recDocument.value[input], validation)
         }
@@ -245,45 +331,19 @@ export const useRecepcion = (context) => {
         }
     }
 
-    const openOption = (option) => {
-        const newOptions = []
-        products.value.map((element) => {
-            const isSelected = recDocument.value.prods.some((e) => e.prodId === element.value && e.deleted === false);
-            const isClicked = element.value === option
-            if ((!isSelected || isClicked) && element.total_menos_acumulado != 0) {
-                newOptions.push(element)
+    const calculateLtTotal = (indexLt) => {
+        const matchProds = recDocument.value.prods[indexLt];
+        let acumulado = 0
+        matchProds.productos.forEach((e) => {
+            if (!e.deleted) {
+                let amount = parseFloat(e.total);
+                if (!isNaN(amount)) {
+                    acumulado += amount;
+                }
             }
-        });
-        filteredProds.value = newOptions
-    }
-
-    const addNewRow = () => {
-        let array = {
-            detRecId: '',
-            prodId: '',
-            brandId: '',
-            brandLabel: '',
-            prodLabel: '',
-            desc: '',
-            expiryDate: '',
-            perishable: '',
-            avails: '',
-            qty: '',
-            cost: '',
-            total: '0.00',
-            deleted: false,
-            initial: ''
-        }
-        recDocument.value.prods.push(array);
-
-        // Desplazar la pantalla hasta la última fila agregada
-        nextTick(() => {
-            const newRowElement = document.getElementById(`observ`);
-            if (newRowElement) {
-                newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
-            }
-        });
-
+        })
+        acumulado.toFixed(2)
+        return acumulado
     }
 
     const deleteRow = (index, detRecId) => {
@@ -313,23 +373,34 @@ export const useRecepcion = (context) => {
     }
 
     const activeDetails = computed(() => {
-        return recDocument.value.prods.filter((detail) => detail.deleted == false)
+        // Filtrar los grupos de productos que contengan al menos un producto no eliminado
+        const activeGroups = recDocument.value.prods.filter(group => {
+            // Filtrar los productos no eliminados dentro de cada grupo
+            const activeProducts = group.productos.filter(producto => !producto.deleted);
+            // Retornar true si el grupo contiene al menos un producto no eliminado
+            return activeProducts.length > 0;
+        });
+
+        return activeGroups;
     });
 
 
     const totalRec = computed(() => {
-        let sum = 0
+        let sum = 0;
         for (let i = 0; i < recDocument.value.prods.length; i++) {
-            if (recDocument.value.prods[i].deleted == false) {
-                let amount = parseFloat(recDocument.value.prods[i].total);
-                if (!isNaN(amount)) {
-                    sum += amount;
+            for (let j = 0; j < recDocument.value.prods[i].productos.length; j++) { // <- Corregido aquí
+                if (recDocument.value.prods[i].productos[j].deleted == false) {
+                    let amount = parseFloat(recDocument.value.prods[i].productos[j].total);
+                    if (!isNaN(amount)) {
+                        sum += amount;
+                    }
                 }
             }
         }
         recDocument.value.total = sum.toFixed(2);
         return sum.toFixed(2);
     });
+
 
     const ordenC = computed(() => {
         const result = documents.value.filter((element) => {
@@ -361,14 +432,16 @@ export const useRecepcion = (context) => {
 
     // Observa cambios en las propiedades qty y cost de cada producto
     watch(recDocument, (newValue) => {
-        newValue.prods.forEach((prod) => {
-            prod.total = (prod.qty * prod.cost).toFixed(2);
+        newValue.prods.forEach((lts) => {
+            lts.productos.forEach((prod) => {
+                prod.total = (prod.qty * prod.cost).toFixed(2);
+            })
         });
     }, { deep: true });
 
-    const showAvails = (prodId, index) => {
+    const showAvails = (prodId, indexLt, index) => {
         if (prodId) {
-            const matchProds = recDocument.value.prods.filter((e) => e.prodId == prodId)
+            const matchProds = recDocument.value.prods[indexLt].productos.filter((e) => e.prodId == prodId)
             const prodProcedure = products.value.find((e) => e.value == prodId)
 
             let acumulado = 0
@@ -384,10 +457,10 @@ export const useRecepcion = (context) => {
             acumulado.toFixed(2)
 
             const qtyTotal = parseFloat(prodProcedure.cant_prod_adquisicion - acumulado)
-            recDocument.value.prods[index].avails = qtyTotal
+            recDocument.value.prods[indexLt].productos[index].avails = qtyTotal
             return qtyTotal
         } else {
-            recDocument.value.prods[index].avails = -1
+            recDocument.value.prods[indexLt].productos[index].avails = -1
             return ""
         }
     }
@@ -470,10 +543,10 @@ export const useRecepcion = (context) => {
     };
 
     return {
-        errors, isLoadingRequest, reception, infoToShow,
+        errors, isLoadingRequest, reception, infoToShow, activeDetails,
         documents, ordenC, contrato, docSelected, totalRec, products,
         filteredDoc, filteredItems, recDocument, startRec, filteredProds, brands,
-        getInfoForModalRecep, startReception, setProdItem, updateItemTotal, addNewRow,
-        openOption, deleteRow, handleValidation, storeReception, updateReception, showAvails
+        getInfoForModalRecep, startReception, setProdItem, updateItemTotal, calculateLtTotal,
+        deleteRow, handleValidation, storeReception, updateReception, showAvails, returnToTop
     }
 }

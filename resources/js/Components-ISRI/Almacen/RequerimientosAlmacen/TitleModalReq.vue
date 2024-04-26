@@ -10,7 +10,7 @@ export default {
             <h1 class="text-2xl font-medium text-indigo-900">Agrega tu requerimiento!</h1>
             <p class="text-[10pt]">
                 Te invitamos a añadir los productos que necesites. Recuerda seleccionar únicamente aquellos
-                que sean indispensables y planifica cuidadosamente tu pedido.
+                que sean indispensables.
             </p>
         </div>
         <img src="../../../../img/Collab-pana.svg" alt="" class="h-48  top-0 mt-[-5rem]">
