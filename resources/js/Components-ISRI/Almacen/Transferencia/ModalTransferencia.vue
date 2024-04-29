@@ -332,12 +332,12 @@
                         <div
                             class="grid grid-cols-[85%_15%] w-full max-w-full border-b border-x border-gray-500 bg-white hover:bg-gray-200">
                             <div class="text-right border-r h-[30px] border-gray-500">
-                                <p class="font-[MuseoSans] text-[12px] py-2 mr-2 font-bold mt-[-3px]">TOTAL AJUSTE (-)
+                                <p class="font-[MuseoSans] text-[12px] py-2 mr-2 font-bold mt-[-3px]">TOTAL TRANSFERENCIA
                                 </p>
                             </div>
                             <div class="text-center h-[30px] ">
                                 <p
-                                    class="font-[MuseoSans] text-[13px] inline-block max-w-full text-ellipsis overflow-hidden py-2 font-bold text-red-800 mt-[-3px]">
+                                    class="font-[MuseoSans] text-[13px] inline-block max-w-full text-ellipsis overflow-hidden py-2 font-bold text-green-800 mt-[-3px]">
                                     ${{ totalRec
                                     }}
                                 </p>
