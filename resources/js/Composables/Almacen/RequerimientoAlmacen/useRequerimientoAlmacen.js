@@ -260,7 +260,7 @@ export const useRequerimientoAlmacen = (objectRequerimientoToSendModal, numeroRe
 
             optionsCentroAtencion.value = options;
             if (optionsCentroAtencion.value.length == 1) {
-
+                console.log(optionsCentroAtencion.value[0].value);
                 searchProductionCenterByAtentionCenter(optionsCentroAtencion.value[0].value, "/get-centro-produccion-by-users-centro")
             }
             isLoadingCentrosProduccion.value = false
@@ -338,10 +338,13 @@ export const useRequerimientoAlmacen = (objectRequerimientoToSendModal, numeroRe
         }
     };
 
-    const searchProductionCenterByAtentionCenter = async (centroAtencion, URL) => {
+    const searchProductionCenterByAtentionCenter = async (centroAtencion, URL, isAddingOne = true) => {
 
-        isLoadingCentrosProduccion.value = true;
-        optionsCentroAtencion.value = []
+        if (isAddingOne == true) {
+
+            isLoadingCentrosProduccion.value = true;
+        }
+        /* optionsCentroAtencion.value = [] */
       /*   idCentroAtencion.value = null; */
 
         const resp = await axios.post(URL, {
@@ -349,17 +352,33 @@ export const useRequerimientoAlmacen = (objectRequerimientoToSendModal, numeroRe
         });
         console.log(resp);
 
-        const options = resp.data?.centrosAtencion?.map(item => ({
-            value: item.id_centro_atencion,
-            label: `${item.codigo_centro_atencion} - ${item.nombre_centro_atencion}`,
-            disabled: false
-        }));
-        optionsCentroAtencion.value = options;
 
-        centroProduccion.value = resp.data.centroProduccion.map(index => {
-            return { value: index.id_centro_produccion, label: `${index.codigo_centro_produccion} - ${index.sigla_centro_produccion} - ${index.nombre_centro_produccion}`, completeData: index };
-        })
-        isLoadingCentrosProduccion.value = false
+
+        if (URL == '/get-centro-produccion-by-centro') {
+
+
+            if (isAddingOne == true) {
+
+                const options = resp.data?.centrosAtencion?.map(item => ({
+                    value: item.id_centro_atencion,
+                    label: `${item.codigo_centro_atencion} - ${item.nombre_centro_atencion}`,
+                    disabled: false
+                }));
+                optionsCentroAtencion.value = options;
+            }
+
+            centroProduccion.value = resp.data.centroProduccion.map(index => {
+                return { value: index.id_centro_produccion, label: `${index.codigo_centro_produccion} - ${index.sigla_centro_produccion} - ${index.nombre_centro_produccion}`, completeData: index };
+            })
+        } else {
+            centroProduccion.value = resp.data.map(index => {
+                return { value: index.id_centro_produccion, label: `${index.codigo_centro_produccion} - ${index.sigla_centro_produccion} - ${index.nombre_centro_produccion}`, completeData: index };
+            })
+        }
+
+        if (isAddingOne == true) {
+            isLoadingCentrosProduccion.value = false
+        }
     }
 
     const canThisUserEdit = (estadoReq, usuarioRq) => {
