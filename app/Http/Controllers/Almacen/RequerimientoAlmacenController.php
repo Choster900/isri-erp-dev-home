@@ -739,4 +739,68 @@ class RequerimientoAlmacenController extends Controller
             return response()->json(['error' => 'Error al actualizar el estado del requerimiento: ' . $e->getMessage()], 500);
         }
     }
+
+    function getCentroProduccionByUsersCentro(Request $request)
+    {
+        $plazasAsignadas = PlazaAsignada::where("id_empleado", $request->user()->id_persona)
+            ->with([
+                "centro_atencion.asignacion_centro_produccion" => function ($query) use ($request) {
+                    if ($request->idCentroAtencion != '') {
+                        $query->where("id_centro_atencion", $request->idCentroAtencion);
+                    }
+                },
+                "centro_atencion.asignacion_centro_produccion.centro_produccion"
+            ])->get();
+        // Crear una colección para almacenar los centros de atención únicos
+        $centrosUnicos = collect();
+        // Iterar sobre las plazas asignadas y agregar los centros de atención únicos a la colección
+        foreach ($plazasAsignadas as $plazaAsignada) {
+            $centroAtencion = $plazaAsignada->centro_atencion;
+            $centrosUnicos->push($centroAtencion);
+        }
+        $centrosUnicos = $centrosUnicos->unique('id_centro_atencion');
+        $centroProduccionUnicos = collect();
+        foreach ($centrosUnicos as $centros) {
+            foreach ($centros->asignacion_centro_produccion as $key => $value) {
+                $asignacion = $value->centro_produccion;
+                $centroProduccionUnicos->push($asignacion);
+            }
+        }
+        return $centroProduccionUnicos;
+    }
+
+    /*
+
+     Route::post(
+        'get-centro-produccion-by-users-centro',
+        function (Request $request) {
+            $plazasAsignadas = PlazaAsignada::where("id_empleado", $request->user()->id_persona)
+                ->with([
+                    "centro_atencion.asignacion_centro_produccion" => function ($query) use ($request) {
+                        if ($request->idCentroAtencion != '') {
+                            $query->where("id_centro_atencion", $request->idCentroAtencion);
+                        }
+                    },
+                    "centro_atencion.asignacion_centro_produccion.centro_produccion"
+                ])->get();
+            // Crear una colección para almacenar los centros de atención únicos
+            $centrosUnicos = collect();
+            // Iterar sobre las plazas asignadas y agregar los centros de atención únicos a la colección
+            foreach ( $plazasAsignadas as $plazaAsignada ) {
+                $centroAtencion = $plazaAsignada->centro_atencion;
+                $centrosUnicos->push($centroAtencion);
+            }
+            $centrosUnicos = $centrosUnicos->unique('id_centro_atencion');
+            $centroProduccionUnicos = collect();
+            foreach ( $centrosUnicos as $centros ) {
+                foreach ( $centros->asignacion_centro_produccion as $key => $value ) {
+                    $asignacion = $value->centro_produccion;
+                    $centroProduccionUnicos->push($asignacion);
+                }
+            }
+            return $centroProduccionUnicos;
+        }
+    )->name('donacion.get-centro-produccion-by-centro');
+
+    */
 }
