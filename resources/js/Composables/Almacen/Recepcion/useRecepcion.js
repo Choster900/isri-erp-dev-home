@@ -165,7 +165,8 @@ export const useRecepcion = (context) => {
                         groupedProducts.push({
                             id_lt: id_lt,
                             codigo_up_lt: codigo_up_lt,
-                            isOpen: true,
+                            hover: false,
+                            isOpen: false,
                             productos: []
                         });
                         // Ordenar el arreglo de grupos por id_lt
@@ -189,7 +190,8 @@ export const useRecepcion = (context) => {
                         perishable: element.producto.perecedero_producto,
                         fractionated: element.producto.fraccionado_producto,
                         avails: "",
-                        qty: element.cant_det_recepcion_pedido,
+                        //Aca quiero hacer la conversion
+                        qty: element.producto.fraccionado_producto == 0 ? floatToInt(element.cant_det_recepcion_pedido) : element.cant_det_recepcion_pedido,
                         cost: element.producto_adquisicion.costo_prod_adquisicion,
                         total: "",
                         deleted: false,
@@ -255,6 +257,7 @@ export const useRecepcion = (context) => {
             let indexLt, index;
 
             if (lineOfWork) {
+                lineOfWork.isOpen = true
                 // Si la línea de trabajo existe, insertar el producto en ella
                 lineOfWork.productos.push(array);
                 // Actualizar los índices para la fila insertada
@@ -265,16 +268,18 @@ export const useRecepcion = (context) => {
                 recDocument.value.prods.push({
                     id_lt: selectedProd.id_lt,
                     codigo_up_lt: selectedProd.codigo_up_lt, // Si necesitas esta propiedad
+                    hover: false,
                     isOpen: true,
                     productos: [array]
                 });
+
+                // Ordenar nuevamente el arreglo por id_lt
+                recDocument.value.prods.sort((a, b) => a.id_lt - b.id_lt);
+
                 // Actualizar los índices para la fila insertada
-                indexLt = recDocument.value.prods.length - 1;
+                indexLt = recDocument.value.prods.findIndex(e => e.id_lt === selectedProd.id_lt);
                 index = 0; // Como es el primer producto en un nuevo grupo, el índice del producto es 0
             }
-
-            // Ordenar nuevamente el arreglo por id_lt
-            recDocument.value.prods.sort((a, b) => a.id_lt - b.id_lt);
 
             // Desplazar la pantalla hasta la última fila agregada
             nextTick(() => {
@@ -304,6 +309,16 @@ export const useRecepcion = (context) => {
                 newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
             }
         });
+    }
+
+    // Método para convertir un valor flotante con dos decimales a entero
+    const floatToInt = (value) => {
+        // Primero, convertimos el valor a un número flotante
+        const floatValue = parseFloat(value);
+        // Luego, lo redondeamos al entero más cercano
+        const roundedValue = Math.round(floatValue);
+        // Devolvemos el resultado como un número entero
+        return roundedValue;
     }
 
     const {
@@ -342,11 +357,14 @@ export const useRecepcion = (context) => {
                 }
             }
         })
-        acumulado.toFixed(2)
-        return acumulado
+        return acumulado.toFixed(2)
     }
 
-    const deleteRow = (index, detRecId) => {
+    const hasActiveProds = (indexLt) => {
+        return recDocument.value.prods[indexLt].productos.some((element) => !element.deleted);
+    };
+
+    const deleteRow = (indexLt, index, detRecId) => {
         if (activeDetails.value.length <= 1) {
             useShowToast(toast.warning, "No puedes eliminar todas las filas.");
         } else {
@@ -363,9 +381,9 @@ export const useRecepcion = (context) => {
                 if (result.isConfirmed) {
                     useShowToast(toast.success, "Producto eliminado temporalmente.");
                     if (detRecId === "") {
-                        recDocument.value.prods.splice(index, 1);
+                        recDocument.value.prods[indexLt].productos.splice(index, 1);
                     } else {
-                        recDocument.value.prods[index].deleted = true
+                        recDocument.value.prods[indexLt].productos[index].deleted = true
                     }
                 }
             });
@@ -515,6 +533,7 @@ export const useRecepcion = (context) => {
     };
 
     const handleErrorResponse = (err) => {
+        console.log(err);
         if (err.response.status === 422) {
             if (err.response && err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
@@ -547,6 +566,6 @@ export const useRecepcion = (context) => {
         documents, ordenC, contrato, docSelected, totalRec, products,
         filteredDoc, filteredItems, recDocument, startRec, filteredProds, brands,
         getInfoForModalRecep, startReception, setProdItem, updateItemTotal, calculateLtTotal,
-        deleteRow, handleValidation, storeReception, updateReception, showAvails, returnToTop
+        deleteRow, handleValidation, storeReception, updateReception, showAvails, returnToTop, hasActiveProds
     }
 }
