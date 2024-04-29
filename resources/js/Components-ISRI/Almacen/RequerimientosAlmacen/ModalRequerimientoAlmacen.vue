@@ -154,9 +154,9 @@ export default defineComponent({
                 <ButtonCloseModal @close="$emit('cerrar-modal')" />
                 <TitleModalReq />
                 <div id="formulario-principal">
-                <pre class="text-[8pt]">
+<!--                 <pre class="text-[8pt]">
                 {{optionsCentroAtencion}}
-                </pre>
+                </pre> -->
                     <div class="pt-4 flex justify-start space-x-2 items-center">
                         <h1 class="text-xs ">Requerimiento N°: <span class="font-medium text-sm underline">{{ numRequerimiento }}</span></h1>
 
