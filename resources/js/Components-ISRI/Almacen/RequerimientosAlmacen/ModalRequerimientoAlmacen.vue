@@ -154,14 +154,15 @@ export default defineComponent({
                 <ButtonCloseModal @close="$emit('cerrar-modal')" />
                 <TitleModalReq />
                 <div id="formulario-principal">
+                <pre class="text-[8pt]">
+                {{optionsCentroAtencion}}
+                </pre>
                     <div class="pt-4 flex justify-start space-x-2 items-center">
-                        <h1 class="text-xs ">Requerimiento N°: <span class="font-medium text-sm underline">{{
-            numRequerimiento }}</span></h1>
+                        <h1 class="text-xs ">Requerimiento N°: <span class="font-medium text-sm underline">{{ numRequerimiento }}</span></h1>
 
                         <div class="text-xs items-center flex gap-1 "
                             v-if="optionsCentroAtencion?.length == 1 && !isLoadingCentrosProduccion">
                             <span>Centro:</span>
-                            <!-- <div v-if="optionsCentroAtencion == true" class="w-96 h-5 bg-gray-300 rounded mb-2 animate-pulse"></div> -->
                             <span class="font-medium text-sm underline"
                                 v-if="optionsCentroAtencion && optionsCentroAtencion[0]">
                                 {{ optionsCentroAtencion[0].label }}
@@ -173,21 +174,20 @@ export default defineComponent({
 
                             <OnlyLabelInput textLabel="Centro:" />
                             <Multiselect v-model="idCentroAtencion"
-                                @select="searchProductionCenterByAtentionCenter($event, '/get-centro-produccion-by-centro')"
+                                @select="searchProductionCenterByAtentionCenter($event, '/get-centro-produccion-by-centro',false)"
                                 :disabled="!canEditReq" :classes="{
-            containerDisabled: `bg-gray-200 text-text-slate-400`,
-            container: `relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded  text-base leading-snug outline-none
-                                        ${canEditReq ? 'bg-white' : ''}`,
-            optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed',
-            optionPointed: 'text-gray-800 bg-gray-100',
-        }" :filter-results="false" :searchable="true" :clear-on-search="true" :min-chars="1"
+                                    containerDisabled: `bg-gray-200 text-text-slate-400`,
+                                    container: `relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded  text-base leading-snug outline-none
+                                    ${canEditReq ? 'bg-white' : ''}`,
+                                    optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed',
+                                    optionPointed: 'text-gray-800 bg-gray-100',
+                                }" :filter-results="false" :searchable="true" :clear-on-search="true" :min-chars="1"
                                 :options="optionsCentroAtencion"
                                 noResultsText="<p class='text-xs'>Sin resultados de personas</p>" placeholder="-"
                                 noOptionsText="<p class='text-xs'>vacio</p>" />
                             <InputError class="mt-2"
                                 v-if="errorsValidation && errorsValidation['idCentroAtencion'] !== ''"
                                 :message="errorsValidation['idCentroAtencion']" />
-
                         </div>
 
                         <div class="w-96 h-5 bg-gray-300 rounded mb-2 animate-pulse"
