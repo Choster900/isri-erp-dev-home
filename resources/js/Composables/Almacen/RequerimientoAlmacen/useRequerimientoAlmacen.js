@@ -399,24 +399,6 @@ export const useRequerimientoAlmacen = (objectRequerimientoToSendModal, numeroRe
         }
     }
 
-    const canThisUserEdit = (estadoReq, usuarioRq) => {
-        const nickUser = usePage().props.auth.user.nick_usuario
-        canEditReq.value = true
-        // Verificar si el usuario actual coincide con el usuario asociado al requerimiento
-        if (nickUser === usuarioRq) {
-            // Si el estado del requerimiento es 2 o 3, el usuario no puede editar
-            if (estadoReq === 2 || estadoReq === 3) {
-                canEditReq.value = false
-            } else {
-                // En cualquier otro caso, el usuario puede editar
-                canEditReq.value = true
-            }
-        } else {
-            // Si el usuario actual no coincide con el usuario asociado al requerimiento, no puede editar
-            canEditReq.value = false
-        }
-    }
-
     watch(objectRequerimientoToSendModal, (newValue, oldValue) => {
         const nickUser = usePage().props.auth.user.nick_usuario
 
