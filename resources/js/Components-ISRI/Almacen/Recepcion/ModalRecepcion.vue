@@ -156,7 +156,7 @@
                                 <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1">NIT:
                                     <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
                                         infoToShow.nit
-                                        }}</span>
+                                    }}</span>
                                 </p>
                             </div>
                         </div>
@@ -173,14 +173,15 @@
                         </div>
                     </div>
                     <div class="min-w-[970px]">
-                        <div class="grid grid-cols-[100%] max-w-[97%] border-x border-b border-gray-500">
+                        <div v-if="infoToShow.status == 1"
+                            class="grid grid-cols-[100%] max-w-[97%] border-x border-b border-gray-500">
                             <div class="justify-center flex w-full bg-white py-2">
                                 <p class="font-[MuseoSans] text-[12px] py-1.5 font-bold mr-2">PRODUCTOS: </p>
                                 <div class="w-[50%] flex items-center justify-center mr-2"
                                     :class="errors['prods.' + index + '.prodId'] ? 'bg-red-300' : ''">
-                                    <Multiselect v-if="infoToShow.status == 1" id="doc" v-model="recDocument.detStockId"
-                                        :options="products" class="h-[30px]" :disabled="infoToShow.status != 1"
-                                        :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione"
+                                    <Multiselect id="doc" v-model="recDocument.detStockId" :options="products"
+                                        class="h-[30px]" :disabled="infoToShow.status != 1" :searchable="true"
+                                        :noOptionsText="'Lista vacía.'" placeholder="Seleccione"
                                         :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
                                 </div>
                                 <button @click="setProdItem(recDocument.detStockId)"
@@ -193,6 +194,11 @@
                                     <span class="font-[Roboto] text-[12px]">AGREGAR</span>
                                 </button>
 
+                            </div>
+                        </div>
+                        <div v-else class="grid grid-cols-[100%] max-w-[97%] border-x border-b border-gray-500">
+                            <div class="justify-center flex w-full bg-white">
+                                <p class="font-[MuseoSans] text-[12px] py-1 font-bold">LISTADO DE PRODUCTOS</p>
                             </div>
                         </div>
                     </div>
@@ -222,30 +228,38 @@
                         </div>
                     </div>
 
-                    <template v-for="(lts, indexLt) in recDocument.prods" :key="indexLt">
-                        <div class="min-w-[970px]">
-                            <div @click="lts.isOpen = !lts.isOpen"
-                                class="flex items-center justify-center max-w-[97%] border-x border-b border-gray-500 py-2 cursor-pointer hover:bg-gray-300 relative">
-                                <!-- Texto centrado verticalmente -->
-                                <p class="font-[MuseoSans] text-[12px] text-green-700 font-semibold">{{ lts.codigo_up_lt
-                                    }} - ${{ calculateLtTotal(indexLt) }}
-                                    </p>
-                                <!-- Icono de flecha a la derecha del todo del div -->
-                                <svg class="w-5 h-5 absolute right-2 top-1/2 -translate-y-1/2 transform origin-center transition-transform text-slate-700"
-                                    :class="{ 'rotate-180': !lts.isOpen }" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 9l-7 7-7-7">
-                                    </path>
-                                </svg>
+                    <template v-for="(lts, indexLt) in recDocument.prods" :key="indexLt"> <!-- Lineas de trabajo -->
+                        <div v-if="hasActiveProds(indexLt)" class="min-w-[970px]">
+                            <div @click="lts.isOpen = !lts.isOpen" @mouseover="lts.hover = true"
+                            @mouseleave="lts.hover = false"
+                                class="max-w-[97%] bg-white border-x border-b flex border-gray-500 py-2 cursor-pointer hover:bg-gray-300">
+                                <!-- Icono de flecha a la izquierda -->
+                                <div class="w-1/3 flex items-center justify-start">
+                                    <svg class="w-5 h-5 text-green-800 ml-2"
+                                        :class="{ 'rotate-180': !lts.isOpen }" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <div class="w-1/3 flex items-center justify-center">
+                                    <p class="font-[MuseoSans] text-[13px] text-green-800 font-semibold mr-1">{{ lts.codigo_up_lt }}
+                                </p>
+                                </div>
+                                <div class="w-1/3 flex items-center justify-end">
+                                    <p class="font-[MuseoSans] text-[13px] text-green-800 font-semibold mr-1">${{ calculateLtTotal(indexLt) }}
+                                </p>
+                                </div>
                             </div>
                         </div>
 
-
-                        <template v-for="(prod, index) in lts.productos" :key="index">
-                            <div class="min-w-[970px] grid grid-cols-[97%_3%] max-w-full" v-if="prod.deleted == false && lts.isOpen">
+                        <template v-for="(prod, index) in lts.productos" :key="index"> <!-- Productos -->
+                            <div class="min-w-[970px] grid grid-cols-[97%_3%] max-w-full"
+                                v-if="prod.deleted == false && lts.isOpen">
                                 <div :id="'lt-' + indexLt + 'prod-' + index"
-                                    class="grid grid-cols-[37%_14%_13%_12%_12%_12%] max-w-full bg-white border-b border-x border-gray-500 hover:bg-gray-200">
+                                    class="grid grid-cols-[37%_14%_13%_12%_12%_12%] max-w-full border-b border-x border-gray-500 hover:bg-gray-200"
+                                    :class="(lts.hover && lts.isOpen) ? 'bg-gray-200' : 'bg-white'">
                                     <div
                                         class="w-full flex items-center justify-center border-r border-gray-500 min-h-[75px] max-h-[100px]">
                                         <div class="overflow-y-auto h-full flex items-center justify-center">
@@ -292,7 +306,7 @@
                                             {{ prod.cost != '' ? '$' + prod.cost : '' }}
                                         </p>
                                     </div>
-                                    <div class="w-full flex items-center justify-center min-h-[75px]">
+                                    <div class="w-full flex items-center justify-end min-h-[75px]">
                                         <p class="font-[MuseoSans] text-[13px] p-1 font-bold">
                                             {{ prod.total != '' ? '$' + prod.total : '' }}
                                         </p>
@@ -300,7 +314,7 @@
                                 </div>
                                 <div class="w-full flex items-center justify-center">
                                     <div class="max-w-full h-[30px]">
-                                        <svg v-if="infoToShow.status == 1" @click="deleteRow(index, prod.detRecId)"
+                                        <svg v-if="infoToShow.status == 1" @click="deleteRow(indexLt, index, prod.detRecId)"
                                             class="text-red-600 cursor-pointer ml-1 hover:text-red-800" width="20px"
                                             height="20px" viewBox="0 0 24 24" fill="none"
                                             xmlns="http://www.w3.org/2000/svg">
@@ -321,7 +335,7 @@
                     </template>
                     <div v-if="recDocument.prods.length == 0" class="min-w-[970px]">
                         <div
-                            class="flex items-center justify-center max-w-[97%] border-x border-b border-gray-500 py-5">
+                            class="flex items-center bg-white justify-center max-w-[97%] border-x border-b border-gray-500 py-5">
                             <p class="font-[MuseoSans] text-[12px] text-red-500 font-semibold"> SIN PRODUCTOS
                                 SELECCIONADOS</p>
                         </div>
@@ -331,8 +345,8 @@
                             <div class="flex items-center justify-end border-r h-[30px]  border-gray-500">
                                 <p class="font-[MuseoSans] text-[12px] py-2 mr-2 font-bold">TOTAL RECEPCION</p>
                             </div>
-                            <div class="flex items-center justify-center h-[30px] ">
-                                <p class="font-[MuseoSans] text-[13px] py-2 font-bold text-green-800">${{ totalRec
+                            <div class="flex items-center justify-end h-[30px] ">
+                                <p class="font-[MuseoSans] text-[13px] py-2 font-bold text-green-800 mr-1">${{ totalRec
                                     }}
                                 </p>
                             </div>
@@ -413,7 +427,7 @@ export default {
             documents, ordenC, contrato, docSelected, products, brands,
             filteredDoc, filteredItems, startRec, filteredProds, totalRec, infoToShow,
             getInfoForModalRecep, startReception, setProdItem, updateItemTotal, calculateLtTotal,
-            deleteRow, handleValidation, storeReception, updateReception, showAvails, returnToTop
+            deleteRow, handleValidation, storeReception, updateReception, showAvails, returnToTop, hasActiveProds
         } = useRecepcion(context);
 
         onMounted(
@@ -427,7 +441,7 @@ export default {
             documents, ordenC, contrato, docSelected, totalRec, products, brands,
             filteredDoc, filteredItems, startRec, filteredProds, infoToShow,
             handleValidation, startReception, setProdItem, updateItemTotal, calculateLtTotal,
-            deleteRow, storeReception, updateReception, showAvails, returnToTop
+            deleteRow, storeReception, updateReception, showAvails, returnToTop, hasActiveProds
         }
     }
 }

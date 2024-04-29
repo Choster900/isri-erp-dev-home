@@ -51,6 +51,7 @@ export default {
                     // Se resuelve la promesa con la respuesta exitosa de la solicitud
                 } catch (error) {
                     console.log(error);
+                    getRequerimientosAlmacen()
                     reject(error);
 
                 }
