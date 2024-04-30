@@ -536,7 +536,6 @@ export const useRecepcion = (context) => {
     };
 
     const handleErrorResponse = (err) => {
-        console.log(err);
         if (err.response.status === 422) {
             if (err.response && err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
@@ -554,7 +553,6 @@ export const useRecepcion = (context) => {
     };
 
     const handleSuccessResponse = (response) => {
-        console.log(response);
         useShowToast(toast.success, response.data.message);
         context.emit("cerrar-modal")
         context.emit("get-table")

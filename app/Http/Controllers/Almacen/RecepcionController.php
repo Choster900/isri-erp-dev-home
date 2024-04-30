@@ -118,7 +118,9 @@ class RecepcionController extends Controller
                 da.numero_doc_adquisicion,
                 dda.nombre_det_doc_adquisicion,
                 pc.id_empleado,
-                (pa.cant_prod_adquisicion - IFNULL(ing.total_prod_recibido, 0)) AS diferencia
+                pc.id_proceso_compra,
+                (pa.cant_prod_adquisicion - IFNULL(ing.total_prod_recibido, 0)) AS diferencia,
+                ROUND((pa.cant_prod_adquisicion * pa.costo_prod_adquisicion) - IFNULL(ing.total_monto_recibido, 0), 2) AS diferencia_monto
             FROM
                 documento_adquisicion AS da
             INNER JOIN detalle_documento_adquisicion AS dda ON da.id_doc_adquisicion = dda.id_doc_adquisicion
@@ -127,12 +129,13 @@ class RecepcionController extends Controller
             LEFT JOIN (
                 SELECT
                     drp.id_prod_adquisicion,
-                    SUM(drp.cant_det_recepcion_pedido) AS total_prod_recibido
+                    SUM(drp.cant_det_recepcion_pedido) AS total_prod_recibido,
+                    SUM(drp.cant_det_recepcion_pedido * drp.costo_det_recepcion_pedido) AS total_monto_recibido
                 FROM
                     recepcion_pedido AS rp
                 INNER JOIN detalle_recepcion_pedido AS drp ON rp.id_recepcion_pedido = drp.id_recepcion_pedido
                 WHERE
-                    drp.estado_det_recepcion_pedido = 1 
+                    drp.estado_det_recepcion_pedido = 1
                     AND rp.id_estado_recepcion_pedido != 3
                 GROUP BY
                     drp.id_prod_adquisicion
@@ -145,10 +148,10 @@ class RecepcionController extends Controller
             ->select(
                 'pendiente.id_doc_adquisicion',
                 'pendiente.numero_doc_adquisicion',
-                'pendiente.nombre_det_doc_adquisicion as label',
-                'pendiente.id_det_doc_adquisicion as value'
+                DB::raw('pendiente.nombre_det_doc_adquisicion as label'),
+                DB::raw('pendiente.id_det_doc_adquisicion as value')
             )
-            ->where('pendiente.diferencia', '>', 0)
+            ->whereRaw('(pendiente.diferencia_monto > 0 AND pendiente.id_proceso_compra = 5) OR (pendiente.id_proceso_compra != 5 AND pendiente.diferencia > 0)')
             ->groupBy('pendiente.id_doc_adquisicion');
 
         //We evaluate if the user is not admin to apply filter
@@ -547,6 +550,7 @@ class RecepcionController extends Controller
         //Find the current products reception
         $reception = RecepcionPedido::with([
             'det_doc_adquisicion.fuente_financiamiento',
+            'det_doc_adquisicion.documento_adquisicion.proceso_compra',
             'detalle_recepcion' => function ($query) {
                 $query->where('estado_det_recepcion_pedido', 1);
             },
@@ -614,28 +618,11 @@ class RecepcionController extends Controller
                     ]);
                 }
 
-                $pendientes = DB::table('producto_adquisicion AS dc') //We check if it's missing some products
-                    ->select('dc.id_prod_adquisicion', 'dc.id_producto', 'dc.cant_prod_adquisicion')
-                    ->addSelect(DB::raw('COALESCE(SUM(dr.cantidad_recibida), 0) AS cantidad_recibida'))
-                    ->addSelect(DB::raw('(dc.cant_prod_adquisicion - COALESCE(SUM(dr.cantidad_recibida), 0)) AS cantidad_pendiente'))
-                    ->leftJoinSub(
-                        // Union with subquery to calculate the total quantity received of each product.
-                        DB::table('detalle_recepcion_pedido AS drp')
-                            ->selectRaw('drp.id_prod_adquisicion, SUM(drp.cant_det_recepcion_pedido) AS cantidad_recibida')
-                            ->join('recepcion_pedido AS rp', 'drp.id_recepcion_pedido', '=', 'rp.id_recepcion_pedido')
-                            ->where('rp.id_estado_recepcion_pedido', 2)
-                            ->where('drp.estado_det_recepcion_pedido', 1)
-                            ->groupBy('drp.id_prod_adquisicion'),
-                        'dr',
-                        'dc.id_prod_adquisicion', //Union producto_adquisicion with detalle_recepcion_pedido
-                        '=',
-                        'dr.id_prod_adquisicion'
-                    )
-                    ->where('dc.id_det_doc_adquisicion', $reception->id_det_doc_adquisicion)
-                    ->where('dc.estado_prod_adquisicion', 1)
-                    ->groupBy('dc.id_prod_adquisicion', 'dc.id_producto', 'dc.cant_prod_adquisicion')
-                    ->havingRaw('cantidad_pendiente > 0')
-                    ->get();
+                if ($reception->det_doc_adquisicion->documento_adquisicion->proceso_compra->nombre_proceso_compra == 'GAS LICUADO DE PETROLEO') {
+                    $pendientes = $this->getPendingItems(true, $reception);
+                } else {
+                    $pendientes = $this->getPendingItems(false, $reception);
+                }
 
                 if ($pendientes->isEmpty()) {
                     $item = DetDocumentoAdquisicion::find($reception->id_det_doc_adquisicion);
@@ -690,5 +677,38 @@ class RecepcionController extends Controller
         } else {
             return response()->json(['logical_error' => 'Error, la recepcion ha cambiado de estado.',], 422);
         }
+    }
+
+    function getPendingItems($byMonto, $reception)
+    {
+        $query = DB::table('producto_adquisicion AS dc')
+            ->select('dc.id_prod_adquisicion', 'dc.id_producto', 'dc.cant_prod_adquisicion', 'dc.costo_prod_adquisicion')
+            ->leftJoinSub(
+                DB::table('detalle_recepcion_pedido AS drp')
+                    ->selectRaw('drp.id_prod_adquisicion, SUM(drp.cant_det_recepcion_pedido' . ($byMonto ? ' * drp.costo_det_recepcion_pedido' : '') . ') AS recibido')
+                    ->join('recepcion_pedido AS rp', 'drp.id_recepcion_pedido', '=', 'rp.id_recepcion_pedido')
+                    ->where('rp.id_estado_recepcion_pedido', 2)
+                    ->where('drp.estado_det_recepcion_pedido', 1)
+                    ->groupBy('drp.id_prod_adquisicion'),
+                'dr',
+                'dc.id_prod_adquisicion',
+                '=',
+                'dr.id_prod_adquisicion'
+            )
+            ->where('dc.id_det_doc_adquisicion', $reception->id_det_doc_adquisicion)
+            ->where('dc.estado_prod_adquisicion', 1)
+            ->groupBy('dc.id_prod_adquisicion', 'dc.id_producto', 'dc.cant_prod_adquisicion', 'dc.costo_prod_adquisicion');
+
+        if ($byMonto) {
+            $query->addSelect(DB::raw('COALESCE(SUM(dr.recibido), 0) AS monto_recibido'))
+                ->addSelect(DB::raw('ROUND(((dc.cant_prod_adquisicion * dc.costo_prod_adquisicion) - COALESCE(SUM(dr.recibido), 0)), 2) AS monto_pendiente'))
+                ->havingRaw('monto_pendiente > 0');
+        } else {
+            $query->addSelect(DB::raw('COALESCE(SUM(dr.recibido), 0) AS cantidad_recibida'))
+                ->addSelect(DB::raw('(dc.cant_prod_adquisicion - COALESCE(SUM(dr.recibido), 0)) AS cantidad_pendiente'))
+                ->havingRaw('cantidad_pendiente > 0');
+        }
+
+        return $query->get();
     }
 }
