@@ -183,7 +183,7 @@ class RecepcionController extends Controller
                 'det_doc_adquisicion.documento_adquisicion.tipo_documento_adquisicion',
                 'estado_recepcion'
             ])->find($idRec);
-            $item = DetDocumentoAdquisicion::with(['documento_adquisicion.proveedor', 'fuente_financiamiento', 'documento_adquisicion.tipo_documento_adquisicion'])->find($recep->det_doc_adquisicion->id_det_doc_adquisicion);
+            $item = DetDocumentoAdquisicion::with(['documento_adquisicion.proveedor', 'fuente_financiamiento', 'documento_adquisicion.tipo_documento_adquisicion', 'documento_adquisicion.proceso_compra'])->find($recep->det_doc_adquisicion->id_det_doc_adquisicion);
             if (!$recep || !$item) {
                 return response()->json([
                     'logical_error' => 'Error, no fue posible obtener la recepción consultada. Consulte con el administrador.',
@@ -191,7 +191,7 @@ class RecepcionController extends Controller
             }
         } else {
             $recep = [];
-            $item = DetDocumentoAdquisicion::with(['documento_adquisicion.proveedor', 'fuente_financiamiento', 'documento_adquisicion.tipo_documento_adquisicion'])->find($request->detId);
+            $item = DetDocumentoAdquisicion::with(['documento_adquisicion.proveedor', 'fuente_financiamiento', 'documento_adquisicion.tipo_documento_adquisicion', 'documento_adquisicion.proceso_compra'])->find($request->detId);
         }
 
         if ($item->estado_det_doc_adquisicion == 0 && $recep != []) {
@@ -242,10 +242,10 @@ class RecepcionController extends Controller
         );
 
         // Obtener el valor de total_menos_acumulado de todos los elementos de $procedure
-        $totalMenosAcumuladoProcedure = array_column($procedure, 'total_menos_acumulado');
+        $totalMenosAcumuladoProcedure = array_column($procedure, $request->isGas ? 'total_menos_acumulado_monto' : 'total_menos_acumulado');
 
         // Obtener el valor de total_menos_acumulado de todos los elementos de $request->procedure
-        $totalMenosAcumuladoRequest = array_column($request->procedure, 'total_menos_acumulado');
+        $totalMenosAcumuladoRequest = array_column($request->procedure, $request->isGas ? 'total_menos_acumulado_monto' : 'total_menos_acumulado');
 
         // Comparar los valores
         if ($totalMenosAcumuladoProcedure !== $totalMenosAcumuladoRequest) {
@@ -318,7 +318,7 @@ class RecepcionController extends Controller
                             'id_lt'                                     => $prodAdq->id_lt,
                             'id_prod_adquisicion'                       => $prod['prodId'],
                             'cant_det_recepcion_pedido'                 => $prod['qty'],
-                            'costo_det_recepcion_pedido'                => $prodAdq->costo_prod_adquisicion,
+                            'costo_det_recepcion_pedido'                => $request->isGas ? $prod['cost'] : $prodAdq->costo_prod_adquisicion,
                             'fecha_vcto_det_recepcion_pedido'           => $fecha,
                             'estado_det_recepcion_pedido'               => 1,
                             'fecha_reg_det_recepcion_pedido'            => Carbon::now(),
@@ -332,7 +332,7 @@ class RecepcionController extends Controller
 
             DB::commit(); // Confirma las operaciones en la base de datos
             return response()->json([
-                'message'          => 'Guardado nueva recepcion con éxito.',
+                'message'           => 'Guardado nueva recepcion con éxito.',
             ]);
         } catch (\Throwable $th) {
             DB::rollBack(); // En caso de error, revierte las operaciones anteriores
@@ -356,10 +356,10 @@ class RecepcionController extends Controller
         );
 
         // Obtener el valor de total_menos_acumulado de todos los elementos de $procedure
-        $totalMenosAcumuladoProcedure = array_column($procedure, 'total_menos_acumulado');
+        $totalMenosAcumuladoProcedure = array_column($procedure, $request->isGas ? 'total_menos_acumulado_monto' : 'total_menos_acumulado');
 
         // Obtener el valor de total_menos_acumulado de todos los elementos de $request->procedure
-        $totalMenosAcumuladoRequest = array_column($request->procedure, 'total_menos_acumulado');
+        $totalMenosAcumuladoRequest = array_column($request->procedure, $request->isGas ? 'total_menos_acumulado_monto' : 'total_menos_acumulado');
 
         // Comparar los valores
         if ($totalMenosAcumuladoProcedure !== $totalMenosAcumuladoRequest) {
@@ -400,7 +400,7 @@ class RecepcionController extends Controller
                                 'id_recepcion_pedido'                       => $request->id,
                                 'id_prod_adquisicion'                       => $prod['prodId'],
                                 'cant_det_recepcion_pedido'                 => $prod['qty'],
-                                'costo_det_recepcion_pedido'                => $prodAdq->costo_prod_adquisicion,
+                                'costo_det_recepcion_pedido'                => $request->isGas ? $prod['cost'] : $prodAdq->costo_prod_adquisicion,
                                 'fecha_vcto_det_recepcion_pedido'           => $fecha,
                                 'fecha_mod_det_recepcion_pedido'            => Carbon::now(),
                                 'usuario_det_recepcion_pedido'              => $request->user()->nick_usuario,
@@ -424,7 +424,7 @@ class RecepcionController extends Controller
                                 ->where('id_prod_adquisicion', $prodAdq->id_prod_adquisicion)
                                 ->where('id_marca', $prod['brandId'])
                                 ->where('fecha_vcto_det_recepcion_pedido', $fecha)
-                                ->where('costo_det_recepcion_pedido', number_format($prod['cost'], 2))
+                                ->where('costo_det_recepcion_pedido', number_format($prod['cost'], 6))
                                 ->first();
 
                             if ($existDetail) {
@@ -448,7 +448,7 @@ class RecepcionController extends Controller
                                     'id_prod_adquisicion'                       => $prod['prodId'],
                                     'cant_det_recepcion_pedido'                 => $prod['qty'],
                                     'estado_det_recepcion_pedido'               => 1,
-                                    'costo_det_recepcion_pedido'                => $prodAdq->costo_prod_adquisicion,
+                                    'costo_det_recepcion_pedido'                => $request->isGas ? $prod['cost'] : $prodAdq->costo_prod_adquisicion,
                                     'fecha_vcto_det_recepcion_pedido'           => $fecha,
                                     'fecha_reg_det_recepcion_pedido'            => Carbon::now(),
                                     'usuario_det_recepcion_pedido'              => $request->user()->nick_usuario,
