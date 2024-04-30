@@ -67,4 +67,13 @@ class DetalleRecepcionPedido extends Model
     {
         return $this->belongsTo(Marca::class, 'id_marca', 'id_marca');
     }
+    /**
+     * Get the LineaTrabajo model associated with this instance.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function linea_trabajo()
+    {
+        return $this->belongsTo(LineaTrabajo::class, 'id_lt', 'id_lt');
+    }
 }
