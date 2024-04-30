@@ -659,10 +659,11 @@ class RecepcionController extends Controller
             'det_doc_adquisicion.documento_adquisicion.tipo_documento_adquisicion',
             'det_doc_adquisicion.documento_adquisicion.proveedor',
             'det_doc_adquisicion.fuente_financiamiento',
-            'detalle_recepcion.producto_adquisicion.producto.unidad_medida',
-            'detalle_recepcion.producto_adquisicion.centro_atencion',
-            'detalle_recepcion.producto_adquisicion.linea_trabajo',
-            'detalle_recepcion.producto_adquisicion.marca',
+            'detalle_recepcion.producto.unidad_medida',
+            'detalle_recepcion.centro_atencion',
+            'detalle_recepcion.linea_trabajo',
+            'detalle_recepcion.marca',
+            'detalle_recepcion.producto_adquisicion',
             'administrador_contrato.persona',
             'guarda_almacen.persona'
         ])->find($id);
@@ -671,8 +672,36 @@ class RecepcionController extends Controller
             $monto_letras = $numeroLetras->toInvoice($recToPrint['monto_recepcion_pedido'], 2, 'DÓLARES');
 
             $recToPrint->monto_letras = $monto_letras;
+
+            // Agrupar los detalles de recepción por línea de trabajo
+            $detallesAgrupados = $recToPrint->detalle_recepcion->groupBy('linea_trabajo');
+
+            // Convertir la colección agrupada a un formato más legible
+            $detallesFormateados = [];
+            foreach ($detallesAgrupados as $lineaTrabajo => $detalles) {
+                // Obtener el primer detalle para obtener los campos comunes como 'codigo_up_lt' e 'id_lt'
+                $primerDetalle = $detalles->first();
+
+                // Calcular la suma de las cantidades multiplicadas por el costo de los detalles
+                $total = $detalles->sum(function ($detalle) {
+                    return $detalle->cant_det_recepcion_pedido * $detalle->costo_det_recepcion_pedido;
+                });
+
+                // Agregar los campos comunes
+                $detallesFormateados[] = [
+                    'codigo_up_lt' => $primerDetalle->linea_trabajo->codigo_up_lt,
+                    'nombre_up_lt' => $primerDetalle->linea_trabajo->nombre_lt,
+                    'id_lt' => $primerDetalle->id_lt,
+                    'total' => number_format($total, 2), //Formatear total
+                    'productos' => $detalles->toArray(),
+                ];
+            }
+
+            // Asignar los detalles formateados a $recToPrint
+            $recToPrint->detalles_agrupados = $detallesFormateados;
+
             return response()->json([
-                'recToPrint'                        => $recToPrint,
+                'recToPrint' => $recToPrint,
             ]);
         } else {
             return response()->json(['logical_error' => 'Error, la recepcion ha cambiado de estado.',], 422);
