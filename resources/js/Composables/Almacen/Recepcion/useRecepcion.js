@@ -94,7 +94,6 @@ export const useRecepcion = (context) => {
                 });
                 setModalValues(response.data, id)
             } catch (err) {
-                console.log(err);
                 if (err.response && err.response.data.logical_error) {
                     useShowToast(toast.error, err.response.data.logical_error);
                     context.emit("get-table");
@@ -215,7 +214,13 @@ export const useRecepcion = (context) => {
             });
         } else {
             // Filter products based on condition
-            const newOptions = data.products.filter(element => element.total_menos_acumulado != 0);
+            const newOptions = data.products.filter((element ) => {
+                if(recDocument.value.isGas){
+                    return element.total_menos_acumulado_monto > 0
+                }else{
+                    return element.total_menos_acumulado > 0
+                }
+            });
 
             // Set products and filteredProds to newOptions
             products.value = newOptions;

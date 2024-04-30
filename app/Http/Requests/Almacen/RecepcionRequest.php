@@ -23,6 +23,7 @@ class RecepcionRequest extends FormRequest
     public function rules(Request $request)
     {
         $rules = [];
+        $isGas = $request->input('isGas', '');
 
         foreach ($this->input('prods', []) as $key => $prodGroup) {
             foreach ($prodGroup['productos'] as $prodKey => $prod) {
@@ -69,8 +70,8 @@ class RecepcionRequest extends FormRequest
                 ];
 
                 $rules["prods.{$groupKey}.total"] = [
-                    function ($attribute, $value, $fail) use ($prodKey, $prod) {
-                        if (!$prod['deleted'] && ($value < 0) && ($this->input('isGas', false))) {
+                    function ($attribute, $value, $fail) use ($prodKey, $prod, $isGas) {
+                        if (!$prod['deleted'] && (empty($value) || ($value < 0)) && $isGas) {
                             $fail("Debe digitar monto.");
                         }
                     }
