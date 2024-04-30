@@ -287,7 +287,7 @@
                                     </div>
 
                                     <div class="relative w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]"
-                                        :class="(((errors['prods.' + indexLt + '.productos.'+ index + '.qty'] && !prod.qty ) || showAvails(prod.prodId, indexLt, index, recDocument.isGas) < 0) && (!recDocument.isGas)) ? 'bg-red-300' : ''">
+                                        :class="((errors['prods.' + indexLt + '.productos.'+ index + '.qty'] && (!prod.qty || prod.qty <= 0)) || (showAvails(prod.prodId, indexLt, index, recDocument.isGas) < 0 && !recDocument.isGas)) ? 'bg-red-300' : ''">
                                         <!-- Aquí se colocará el número dinámicamente -->
                                         <span v-if="infoToShow.status == 1 && !(recDocument.isGas)"
                                             class="absolute font-[MuseoSans] text-[12px] top-1 flex items-center justify-center">REST:
@@ -309,7 +309,7 @@
 
                                     <!-- Gas -->
                                     <div v-if="recDocument.isGas" class="relative w-full flex items-center justify-center min-h-[75px]"
-                                        :class="(((errors['prods.' + index + '.total'] && !prod.total) || showAvails(prod.prodId, indexLt, index, recDocument.isGas) < 0)) ? 'bg-red-300' : ''">
+                                        :class="(((errors['prods.' + indexLt + '.productos.'+ index +'.total'] && !prod.total) || showAvails(prod.prodId, indexLt, index, recDocument.isGas) < 0)) ? 'bg-red-300' : ''">
                                         <!-- Aquí se colocará el número dinámicamente -->
                                         <span v-if="infoToShow.status == 1"
                                             class="absolute font-[MuseoSans] text-[12px] top-1 flex items-center justify-center">
