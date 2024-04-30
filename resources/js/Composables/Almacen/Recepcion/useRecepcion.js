@@ -41,6 +41,7 @@ export const useRecepcion = (context) => {
         id: '', //reception id
         acta: '', //Acta number
         detStockId: '',
+        isGas: '',
         invoice: '', //Invoice number
         financingSourceId: '',
         observation: '', //Reception observation
@@ -93,7 +94,6 @@ export const useRecepcion = (context) => {
                 });
                 setModalValues(response.data, id)
             } catch (err) {
-                console.log(err);
                 if (err.response && err.response.data.logical_error) {
                     useShowToast(toast.error, err.response.data.logical_error);
                     context.emit("get-table");
@@ -129,6 +129,7 @@ export const useRecepcion = (context) => {
 
         recDocument.value.financingSourceId = data.itemInfo.id_proy_financiado
         recDocument.value.detDocId = data.itemInfo.id_det_doc_adquisicion
+        recDocument.value.isGas = data.itemInfo.documento_adquisicion.proceso_compra.nombre_proceso_compra === 'GAS LICUADO DE PETROLEO' ? true : false
 
         // Check if id > 0
         if (id > 0) {
@@ -193,9 +194,10 @@ export const useRecepcion = (context) => {
                         //Aca quiero hacer la conversion
                         qty: element.producto.fraccionado_producto == 0 ? floatToInt(element.cant_det_recepcion_pedido) : element.cant_det_recepcion_pedido,
                         cost: element.producto_adquisicion.costo_prod_adquisicion,
-                        total: "",
+                        total: recDocument.value.isGas ? (element.cant_det_recepcion_pedido * element.costo_det_recepcion_pedido).toFixed(2) : '',
                         deleted: false,
-                        initial: ""
+                        initial: "",
+                        initialAmount: "",
                     });
                 }
             });
@@ -212,7 +214,13 @@ export const useRecepcion = (context) => {
             });
         } else {
             // Filter products based on condition
-            const newOptions = data.products.filter(element => element.total_menos_acumulado != 0);
+            const newOptions = data.products.filter((element ) => {
+                if(recDocument.value.isGas){
+                    return element.total_menos_acumulado_monto > 0
+                }else{
+                    return element.total_menos_acumulado > 0
+                }
+            });
 
             // Set products and filteredProds to newOptions
             products.value = newOptions;
@@ -248,7 +256,8 @@ export const useRecepcion = (context) => {
                 cost: selectedProd.costo_prod_adquisicion, //Represents the the cost of the product
                 total: '', //Represents the result of qty x cost for every row
                 deleted: false, //This is the state of the row, it represents the logical deletion.
-                initial: selectedProd.total_menos_acumulado //Represents the initial availability of a product
+                initial: selectedProd.total_menos_acumulado, //Represents the initial availability of a product
+                initialAmount: selectedProd.total_menos_acumulado_monto, //Represents available money
             };
 
             // Buscar si existe un elemento de línea de trabajo con el id_lt correspondiente
@@ -333,19 +342,6 @@ export const useRecepcion = (context) => {
         }
     }
 
-    const updateItemTotal = (index, qty, paId) => {
-        if (paId != '') {
-            const selectedProd = products.value.find((element) => {
-                return element.value === paId; // Adding a return statement here
-            });
-            recDocument.value.prods[index].avails = qty === '' ?
-                selectedProd.total_menos_acumulado : selectedProd.total_menos_acumulado - qty
-            recDocument.value.prods[index].total = (selectedProd.costo_prod_adquisicion * qty).toFixed(2)
-        } else {
-            recDocument.value.prods[index].total = ''
-        }
-    }
-
     const calculateLtTotal = (indexLt) => {
         const matchProds = recDocument.value.prods[indexLt];
         let acumulado = 0
@@ -391,15 +387,10 @@ export const useRecepcion = (context) => {
     }
 
     const activeDetails = computed(() => {
-        // Filtrar los grupos de productos que contengan al menos un producto no eliminado
-        const activeGroups = recDocument.value.prods.filter(group => {
-            // Filtrar los productos no eliminados dentro de cada grupo
-            const activeProducts = group.productos.filter(producto => !producto.deleted);
-            // Retornar true si el grupo contiene al menos un producto no eliminado
-            return activeProducts.length > 0;
-        });
+        // Filtrar los productos no eliminados dentro de todos los grupos
+        const activeProducts = recDocument.value.prods.flatMap(group => group.productos.filter(producto => !producto.deleted));
 
-        return activeGroups;
+        return activeProducts;
     });
 
 
@@ -452,21 +443,33 @@ export const useRecepcion = (context) => {
     watch(recDocument, (newValue) => {
         newValue.prods.forEach((lts) => {
             lts.productos.forEach((prod) => {
-                prod.total = (prod.qty * prod.cost).toFixed(2);
+                if (recDocument.value.isGas) {
+                    if (prod.total && prod.qty) {
+                        if (prod.total > 0 && prod.qty > 0) {
+                            prod.cost = (prod.total / prod.qty).toFixed(6)
+                        } else {
+                            prod.cost = '0.00'
+                        }
+                    } else {
+                        prod.cost = '0.00'
+                    }
+                } else {
+                    prod.total = (prod.qty * prod.cost).toFixed(2)
+                }
             })
         });
     }, { deep: true });
 
-    const showAvails = (prodId, indexLt, index) => {
+    const showAvails = (prodId, indexLt, index, isGas) => {
         if (prodId) {
             const matchProds = recDocument.value.prods[indexLt].productos.filter((e) => e.prodId == prodId)
             const prodProcedure = products.value.find((e) => e.value == prodId)
 
             let acumulado = 0
-            acumulado += parseFloat(prodProcedure.acumulado)
+            acumulado += parseFloat(isGas ? prodProcedure.acumulado_monto : prodProcedure.acumulado)
             matchProds.forEach((e) => {
                 if (!e.deleted) {
-                    let amount = parseFloat(e.qty);
+                    let amount = parseFloat(isGas ? e.total : e.qty);
                     if (!isNaN(amount)) {
                         acumulado += amount;
                     }
@@ -474,9 +477,9 @@ export const useRecepcion = (context) => {
             })
             acumulado.toFixed(2)
 
-            const qtyTotal = parseFloat(prodProcedure.cant_prod_adquisicion - acumulado)
-            recDocument.value.prods[indexLt].productos[index].avails = qtyTotal
-            return qtyTotal
+            const qtyTotal = isGas ? parseFloat((prodProcedure.cant_prod_adquisicion * prodProcedure.costo_prod_adquisicion) - acumulado) : parseFloat(prodProcedure.cant_prod_adquisicion - acumulado)
+            recDocument.value.prods[indexLt].productos[index].avails = isGas ? qtyTotal.toFixed(2) : qtyTotal
+            return isGas ? qtyTotal.toFixed(2) : qtyTotal
         } else {
             recDocument.value.prods[indexLt].productos[index].avails = -1
             return ""
@@ -533,7 +536,6 @@ export const useRecepcion = (context) => {
     };
 
     const handleErrorResponse = (err) => {
-        console.log(err);
         if (err.response.status === 422) {
             if (err.response && err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
@@ -565,7 +567,8 @@ export const useRecepcion = (context) => {
         errors, isLoadingRequest, reception, infoToShow, activeDetails,
         documents, ordenC, contrato, docSelected, totalRec, products,
         filteredDoc, filteredItems, recDocument, startRec, filteredProds, brands,
-        getInfoForModalRecep, startReception, setProdItem, updateItemTotal, calculateLtTotal,
-        deleteRow, handleValidation, storeReception, updateReception, showAvails, returnToTop, hasActiveProds
+        getInfoForModalRecep, startReception, setProdItem, calculateLtTotal,
+        deleteRow, handleValidation, storeReception, updateReception, showAvails, returnToTop,
+        hasActiveProds
     }
 }

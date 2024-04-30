@@ -244,7 +244,7 @@
                                     </svg>
                                 </div>
                                 <div class="w-1/3 flex items-center justify-center">
-                                    <p class="font-[MuseoSans] text-[13px] text-green-800 font-semibold mr-1">{{ lts.codigo_up_lt }}
+                                    <p class="font-[MuseoSans] text-[13px] text-green-800 font-semibold mr-1">UP/LT = {{ lts.codigo_up_lt }}
                                 </p>
                                 </div>
                                 <div class="w-1/3 flex items-center justify-end">
@@ -267,7 +267,7 @@
                                         </div>
                                     </div>
                                     <div class="w-full border-r border-gray-500 min-h-[75px] flex items-center justify-center"
-                                        :class="(errors['prods.' + index + '.brandId'] && prod.brandId == '') ? 'bg-red-300' : ''">
+                                        :class="errors['prods.' + indexLt + '.productos.'+ index +'.brandId'] && !prod.brandId ? 'bg-red-300' : ''">
                                         <Multiselect v-if="infoToShow.status == 1" id="doc" v-model="prod.brandId"
                                             :options="brands" class="h-[35px] max-w-[95%]"
                                             :disabled="infoToShow.status != 1" :searchable="true"
@@ -277,7 +277,7 @@
                                     </div>
 
                                     <div class="w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]"
-                                        :class="(errors['prods.' + index + '.expiryDate'] && prod.expiryDate == '') ? 'bg-red-300' : ''">
+                                        :class="(errors['prods.' + indexLt + '.productos.'+ index + '.expiryDate'] && !prod.expiryDate) ? 'bg-red-300' : ''">
                                         <div class="max-w-[95%]">
                                             <date-time-picker-m v-if="prod.perishable === 1" v-model="prod.expiryDate"
                                                 :showIcon="false" :placeholder="'Seleccione'"
@@ -287,26 +287,42 @@
                                     </div>
 
                                     <div class="relative w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]"
-                                        :class="(((errors['prods.' + index + '.qty'] && prod.qty == '') || showAvails(prod.prodId, indexLt, index) < 0)) ? 'bg-red-300' : ''">
+                                        :class="((errors['prods.' + indexLt + '.productos.'+ index + '.qty'] && (!prod.qty || prod.qty <= 0)) || (showAvails(prod.prodId, indexLt, index, recDocument.isGas) < 0 && !recDocument.isGas)) ? 'bg-red-300' : ''">
                                         <!-- Aquí se colocará el número dinámicamente -->
-                                        <span v-if="infoToShow.status == 1"
+                                        <span v-if="infoToShow.status == 1 && !(recDocument.isGas)"
                                             class="absolute font-[MuseoSans] text-[12px] top-1 flex items-center justify-center">REST:
-                                            {{ showAvails(prod.prodId, indexLt, index) }}</span>
+                                            {{ showAvails(prod.prodId, indexLt, index, recDocument.isGas) }}</span>
 
                                         <!-- El input -->
                                         <input v-model="prod.qty" :disabled="infoToShow.status != 1"
                                             class="font-bold max-w-[95%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-[13px] border-[#d1d5db] hover:border-gray-400 transition duration-300 ease-in-out"
                                             type="text" name="" id=""
-                                            @input="handleValidation('qty', prod.fractionated ? { limit: 6, amount: true } : { limit: 3, number: true }, { indexLt: indexLt, index: index })">
+                                            @input="handleValidation('qty', prod.fractionated ? { limit: 7, amount: true } : { limit: 4, number: true }, { indexLt: indexLt, index: index })">
                                     </div>
 
                                     <div
                                         class="w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]">
                                         <p class="font-[MuseoSans] text-[13px] p-1 ">
-                                            {{ prod.cost != '' ? '$' + prod.cost : '' }}
+                                            ${{ prod.cost }}
                                         </p>
                                     </div>
-                                    <div class="w-full flex items-center justify-end min-h-[75px]">
+
+                                    <!-- Gas -->
+                                    <div v-if="recDocument.isGas" class="relative w-full flex items-center justify-center min-h-[75px]"
+                                        :class="(((errors['prods.' + indexLt + '.productos.'+ index +'.total'] && !prod.total) || showAvails(prod.prodId, indexLt, index, recDocument.isGas) < 0)) ? 'bg-red-300' : ''">
+                                        <!-- Aquí se colocará el número dinámicamente -->
+                                        <span v-if="infoToShow.status == 1"
+                                            class="absolute font-[MuseoSans] text-[12px] top-1 flex items-center justify-center">
+                                            ${{ showAvails(prod.prodId, indexLt, index, recDocument.isGas) }}</span>
+
+                                        <!-- Input -->
+                                        <input v-model="prod.total" :disabled="infoToShow.status != 1"
+                                            class="font-bold max-w-[95%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-[13px] border-[#d1d5db] hover:border-gray-400 transition duration-300 ease-in-out"
+                                            type="text" name="" id=""
+                                            @input="handleValidation('total', { limit: 8, amount: true }, { indexLt: indexLt, index: index })">
+                                    </div>
+
+                                    <div v-else class="w-full flex items-center justify-end min-h-[75px]">
                                         <p class="font-[MuseoSans] text-[13px] p-1 font-bold">
                                             {{ prod.total != '' ? '$' + prod.total : '' }}
                                         </p>
@@ -343,7 +359,7 @@
                     <div id="total" class="w-full max-w-full grid grid-cols-[97%_3%] min-w-[970px] bg-white">
                         <div class="grid grid-cols-[88%_12%] w-full max-w-full border-b border-x border-gray-500">
                             <div class="flex items-center justify-end border-r h-[30px]  border-gray-500">
-                                <p class="font-[MuseoSans] text-[12px] py-2 mr-2 font-bold">TOTAL RECEPCION</p>
+                                <p class="font-[MuseoSans] text-[12px] py-2 mr-2 font-bold">TOTAL ACTA</p>
                             </div>
                             <div class="flex items-center justify-end h-[30px] ">
                                 <p class="font-[MuseoSans] text-[13px] py-2 font-bold text-green-800 mr-1">${{ totalRec
@@ -426,8 +442,9 @@ export default {
             isLoadingRequest, recDocument, errors, activeDetails,
             documents, ordenC, contrato, docSelected, products, brands,
             filteredDoc, filteredItems, startRec, filteredProds, totalRec, infoToShow,
-            getInfoForModalRecep, startReception, setProdItem, updateItemTotal, calculateLtTotal,
-            deleteRow, handleValidation, storeReception, updateReception, showAvails, returnToTop, hasActiveProds
+            getInfoForModalRecep, startReception, setProdItem, calculateLtTotal,
+            deleteRow, handleValidation, storeReception, updateReception, showAvails, returnToTop, 
+            hasActiveProds
         } = useRecepcion(context);
 
         onMounted(
@@ -440,8 +457,9 @@ export default {
             isLoadingRequest, recDocument, errors, activeDetails,
             documents, ordenC, contrato, docSelected, totalRec, products, brands,
             filteredDoc, filteredItems, startRec, filteredProds, infoToShow,
-            handleValidation, startReception, setProdItem, updateItemTotal, calculateLtTotal,
-            deleteRow, storeReception, updateReception, showAvails, returnToTop, hasActiveProds
+            handleValidation, startReception, setProdItem, calculateLtTotal,
+            deleteRow, storeReception, updateReception, showAvails, returnToTop, 
+            hasActiveProds
         }
     }
 }

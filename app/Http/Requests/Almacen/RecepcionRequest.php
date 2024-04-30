@@ -22,51 +22,69 @@ class RecepcionRequest extends FormRequest
      */
     public function rules(Request $request)
     {
-        //$rules["invoice"] = ['required'];
-        foreach ($this->input('prods', []) as $key => $prod) {
-            $rules["prods.{$key}.prodId"] = [
-                function ($attribute, $value, $fail) use ($key, $prod) {
-                    if (!$prod['deleted'] && empty($value)) {
-                        $fail("Debe seleccionar el producto.");
+        $rules = [];
+        $isGas = $request->input('isGas', '');
+
+        foreach ($this->input('prods', []) as $key => $prodGroup) {
+            foreach ($prodGroup['productos'] as $prodKey => $prod) {
+                $groupKey = "{$key}.productos.{$prodKey}";
+
+                $rules["prods.{$groupKey}.prodId"] = [
+                    function ($attribute, $value, $fail) use ($prodKey, $prod) {
+                        if (!$prod['deleted'] && empty($value)) {
+                            $fail("Debe seleccionar el producto.");
+                        }
                     }
-                }
-            ];
-            $rules["prods.{$key}.qty"] = [
-                function ($attribute, $value, $fail) use ($key, $prod) {
-                    if (!$prod['deleted'] && (empty($value) || $value <= 0)) {
-                        $fail("Debe ingresar la cantidad de productos.");
+                ];
+
+                $rules["prods.{$groupKey}.qty"] = [
+                    function ($attribute, $value, $fail) use ($prodKey, $prod) {
+                        if (!$prod['deleted'] && (empty($value) || $value <= 0)) {
+                            $fail("Debe ingresar la cantidad de productos.");
+                        }
                     }
-                }
-            ];
-            $rules["prods.{$key}.brandId"] = [
-                function ($attribute, $value, $fail) use ($key, $prod) {
-                    if (!$prod['deleted'] && empty($value)) {
-                        $fail("Debe seleccionar marca.");
+                ];
+
+                $rules["prods.{$groupKey}.brandId"] = [
+                    function ($attribute, $value, $fail) use ($prodKey, $prod) {
+                        if (!$prod['deleted'] && empty($value)) {
+                            $fail("Debe seleccionar marca.");
+                        }
                     }
-                }
-            ];
-            $rules["prods.{$key}.expiryDate"] = [
-                function ($attribute, $value, $fail) use ($key, $prod) {
-                    if (!$prod['deleted'] && (empty($value) && $prod['perishable'] == 1)) {
-                        $fail("Debe seleccionar la fecha de caducidad.");
+                ];
+
+                $rules["prods.{$groupKey}.expiryDate"] = [
+                    function ($attribute, $value, $fail) use ($prodKey, $prod) {
+                        if (!$prod['deleted'] && (empty($value) && $prod['perishable'] == 1)) {
+                            $fail("Debe seleccionar la fecha de caducidad.");
+                        }
                     }
-                }
-            ];
-            $rules["prods.{$key}.avails"] = [
-                function ($attribute, $value, $fail) use ($key, $prod) {
-                    if (!$prod['deleted'] && ($value < 0)) {
-                        $fail("Ha excedido la cantidad de productos.");
+                ];
+
+                $rules["prods.{$groupKey}.avails"] = [
+                    function ($attribute, $value, $fail) use ($prodKey, $prod) {
+                        if (!$prod['deleted'] && ($value < 0)) {
+                            $fail("Ha excedido la cantidad de productos.");
+                        }
                     }
-                }
-            ];
+                ];
+
+                $rules["prods.{$groupKey}.total"] = [
+                    function ($attribute, $value, $fail) use ($prodKey, $prod, $isGas) {
+                        if (!$prod['deleted'] && (empty($value) || ($value < 0)) && $isGas) {
+                            $fail("Debe digitar monto.");
+                        }
+                    }
+                ];
+            }
         }
+
         return $rules;
     }
 
     public function messages()
     {
         $messages = [];
-        //$messages["invoice.required"] = "Debe ingresar factura.";
         return $messages;
     }
 }
