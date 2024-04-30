@@ -553,6 +553,7 @@ export const useRecepcion = (context) => {
     };
 
     const handleSuccessResponse = (response) => {
+        console.log(response);
         useShowToast(toast.success, response.data.message);
         context.emit("cerrar-modal")
         context.emit("get-table")
