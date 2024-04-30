@@ -96,6 +96,7 @@ export const useEnviarKardex = (context) => {
                     const response = await axios.get(
                         `/print-reception/${id}`
                     );
+                    console.log(response);
                     let fecha = moment().format('DD-MM-YYYY');
                     let name = 'ACTA ' + response.data.recToPrint.acta_recepcion_pedido + ' - ' + fecha;
                     const opt = {
@@ -144,7 +145,6 @@ export const useEnviarKardex = (context) => {
                         .catch(err => console.log(err));
 
                 } catch (error) {
-                    console.log(error);
                     showErrorMessage(error);
                 } finally {
                     isLoadingSend.value = false;
@@ -154,7 +154,6 @@ export const useEnviarKardex = (context) => {
     }
 
     const handleErrorResponse = (err) => {
-        console.log(err);
         if (err.response.status === 422) {
             if (err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
