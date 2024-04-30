@@ -220,4 +220,15 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('update-warehouse-transfer-info', [TransferenciaController::class, 'updateWarehouseTransfer'])->name('transferencia.updateWarehouseTransfer');
     Route::post('change-status-warehouse-transfer', [TransferenciaController::class, 'changeStatusWarehouseTransfer'])->name('transferencia.changeStatusWarehouseTransfer');
     Route::post('send-warehouse-transfer', [TransferenciaController::class, 'sendWarehouseTransfer'])->name('transferencia.sendWarehouseTransfer');
+    Route::get(
+        '/alm/reporte-existencia',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/reporte-rotacion', 'Almacen/ReporteExistencia');
+        }
+    )->name('alm.reporteExistencia');
+    Route::post('get-reporte-existencia-almacen', [ReporteAlmacenController::class, 'getReporteExistencia'])->name('reporte.AlmacenExistencia');
+    Route::post('get-reporte-existencia-almacen-excel', [ReporteAlmacenController::class, 'getExcelReporteExistencia'])->name('reporte.getReporteAlmacenExistenciaExcel');
+
+
+
 });
