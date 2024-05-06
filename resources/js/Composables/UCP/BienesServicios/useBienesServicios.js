@@ -588,7 +588,7 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
                     idProdAdquisicion: index.id_prod_adquisicion,
                     especifico: producto.id_ccta_presupuestal,
                     idProducto: producto.id_producto,
-                    detalleProducto: producto.nombre_producto,
+                    detalleProducto: producto.nombre_completo_producto,
                     pesoProducto: producto.unidad_medida.id_unidad_medida,
                     idCentroAtencion: index.id_centro_atencion,
                     detalleCentro: index.centro_atencion.nombre_centro_atencion,
