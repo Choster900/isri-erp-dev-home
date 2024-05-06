@@ -17,7 +17,8 @@
                     <div class="mt-[5px] text-gray-500 text-opacity-70 w-[14px] h-[14px] mx-2">
                         <icon-m :iconName="'nextSvgVector'"></icon-m>
                     </div>
-                    <span class="text-[16px] font-medium text-black font-[Roboto]">{{ recepId > 0 ? (donInfo.status != 1 ? 'Ver donación' : 'Editar donación') : 'Crear donación' }}</span>
+                    <span class="text-[16px] font-medium text-black font-[Roboto]">{{ recepId > 0 ? (donInfo.status != 1
+                        ? 'Ver donación' : 'Editar donación') : 'Crear donación' }}</span>
                 </div>
                 <svg class="h-6 w-6 text-gray-400 hover:text-gray-600 cursor-pointer" @click="$emit('cerrar-modal')"
                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -26,11 +27,12 @@
                 </svg>
             </div>
             <div class="ml-8 mr-0 pb-1 max-w-full overflow-x-auto mt-4 max-h-[450px] overflow-y-auto">
-                <div class="min-w-[970px]">
+                <div class="min-w-[970px]" id="headerFormat">
                     <div class="grid grid-cols-[23%_77%] max-w-[97%]">
                         <!-- Columna 1 -->
                         <div class="w-full bg-white border border-gray-500 p-2 flex items-center justify-center">
-                            <img src="../../../../img/isri-gob.png" alt="Logo del instituto" class="w-full max-w-full" />
+                            <img src="../../../../img/isri-gob.png" alt="Logo del instituto"
+                                class="w-full max-w-full" />
                         </div>
                         <!-- Columna 2 -->
                         <div
@@ -104,7 +106,31 @@
                     </div>
                 </div>
                 <div class="min-w-[970px]">
-                    <div class="grid grid-cols-[100%] max-w-[97%] border-x border-b border-gray-500">
+                    <div v-if="donInfo.status == 1"
+                        class="grid grid-cols-[100%] max-w-[97%] border-x border-b border-gray-500">
+                        <div class="justify-center flex items-center w-full bg-white py-2">
+                            <p class="font-[MuseoSans] text-[12px] py-1.5 font-bold mr-2">PRODUCTOS: </p>
+                            <div class="w-[50%] flex items-center justify-center mr-2">
+                                <Multiselect id="doc" v-model="donInfo.prodId" :options="products" class="h-[35px]"
+                                    :internal-search="false" @search-change="handleSearchChange($event)"
+                                    :loading="isLoadingProduct" :clear-on-search="true" :filter-results="false"
+                                    :resolve-on-load="true" :disabled="donInfo.status != 1" :searchable="true"
+                                    :noOptionsText="'Sin resultados'" placeholder="Buscar producto"
+                                    :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
+                            </div>
+                            <button @click="selectProd(donInfo.prodId)"
+                                class="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-4 rounded">
+                                <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 4v16m8-8H4"></path>
+                                </svg>
+                                <span class="font-[Roboto] text-[12px]">AGREGAR</span>
+                            </button>
+
+                        </div>
+                    </div>
+                    <div v-else class="grid grid-cols-[100%] max-w-[97%] border-x border-b border-gray-500">
                         <div class="justify-center flex w-full bg-white">
                             <p class="font-[MuseoSans] text-[12px] py-1 font-bold">LISTADO DE PRODUCTOS</p>
                         </div>
@@ -112,15 +138,11 @@
                 </div>
                 <div class="min-w-[970px]">
                     <div
-                        class="grid grid-cols-[18%_25%_14%_13%_10%_10%_10%] max-w-[97%] w-full bg-[#001c48] border-b border-x border-gray-500 bg-opacity-80 min-w-[800px] text-white">
+                        class="grid grid-cols-[37%_14%_13%_12%_12%_12%] max-w-[97%] w-full bg-[#001c48] border-b border-x border-gray-500 bg-opacity-80 min-w-[800px] text-white">
                         <!-- Table header -->
                         <div class="w-full flex items-center justify-center border-r border-gray-500 h-[30px]">
                             <p class="text-center font-[MuseoSans] text-[11px]">PRODUCTO
                             </p>
-                        </div>
-                        <div class="w-full flex items-center justify-center border-r border-gray-500 h-[30px]">
-                            <p class="text-center font-[MuseoSans] text-[11px]">
-                                INFO. PRODUCTO</p>
                         </div>
                         <div class="w-full flex items-center justify-center border-r border-gray-500 h-[30px]">
                             <p class="text-center font-[MuseoSans] text-[11px]">MARCA</p>
@@ -142,19 +164,7 @@
                 <template v-for="(prod, index) in donInfo.prods" :key="index">
                     <div class="min-w-[970px] grid grid-cols-[97%_3%]" v-if="prod.deleted == false">
                         <div :id="'row-' + index"
-                            class="grid grid-cols-[18%_25%_14%_13%_10%_10%_10%] max-w-full bg-white hover:bg-gray-200 text-gray-800 border-b border-x border-gray-500">
-                            <div class="w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]"
-                                :class="errors['prods.' + index + '.prodId'] ? 'bg-red-300' : ''">
-                                <!-- Select for products -->
-                                <Multiselect id="doc" v-model="prod.prodId" :options="products" class="h-[35px]"
-                                    :disabled="donInfo.status != 1" :searchable="true" :internal-search="false"
-                                    @search-change="handleSearchChange($event, index, prod.prodId)"
-                                    @change="selectProd($event, index)" :loading="prod.isLoadingProd"
-                                    :clear-on-search="true" :filter-results="false" :resolve-on-load="true"
-                                    :noOptionsText="'Sin resultados'" placeholder="Buscar producto"
-                                    @open="products = []"
-                                    :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
-                            </div>
+                            class="grid grid-cols-[37%_14%_13%_12%_12%_12%] max-w-full bg-white hover:bg-gray-200 text-gray-800 border-b border-x border-gray-500">
 
                             <div
                                 class="w-full flex items-center justify-center border-r border-gray-500 min-h-[75px] max-h-[100px]">
@@ -165,11 +175,11 @@
 
                             <div class="border-r border-gray-500 min-h-[75px] flex items-center justify-center"
                                 :class="errors['prods.' + index + '.brandId'] ? 'bg-red-300' : ''">
-                                <Multiselect v-if="donInfo.status == 1" id="doc" v-model="prod.brandId" :options="brands"
-                                    class="h-[35px] max-w-[95%]" :disabled="donInfo.status != 1" :searchable="true"
-                                    :noOptionsText="'Lista vacía.'" placeholder="Marca"
+                                <Multiselect v-if="donInfo.status == 1" id="doc" v-model="prod.brandId"
+                                    :options="brands" class="h-[35px] max-w-[95%]" :disabled="donInfo.status != 1"
+                                    :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Marca"
                                     :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', optionPointed: 'text-white bg-[#001c48] bg-opacity-40' }" />
-                                    <p class="font-[MuseoSans] text-[12px] p-1 " v-else>{{ prod.brandLabel }}</p>
+                                <p class="font-[MuseoSans] text-[12px] p-1 " v-else>{{ prod.brandLabel }}</p>
                             </div>
                             <div class="flex items-center justify-center border-r border-gray-500 min-h-[75px]"
                                 :class="errors['prods.' + index + '.expDate'] ? 'bg-red-300' : ''">
@@ -185,7 +195,7 @@
                                 <input v-model="prod.qty" :disabled="donInfo.status != 1"
                                     class="font-bold max-w-[95%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-[13px] border-[#d1d5db]"
                                     type="text" name="" id=""
-                                    @input="handleValidation('qty', { limit: 3, number: true }, { index: index })">
+                                    @input="handleValidation('qty', prod.fractionated ? { limit: 7, amount: true } : { limit: 4, number: true }, { index: index })">
                             </div>
                             <div class="w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]"
                                 :class="errors['prods.' + index + '.cost'] ? 'bg-red-300' : ''">
@@ -218,8 +228,17 @@
                         </div>
                     </div>
                 </template>
+
+                <div v-if="activeDetails.length <= 0" class="min-w-[970px]">
+                    <div
+                        class="flex items-center bg-white justify-center max-w-[97%] border-x border-b border-gray-500 py-5">
+                        <p class="font-[MuseoSans] text-[12px] text-red-500 font-semibold"> SIN PRODUCTOS
+                            SELECCIONADOS</p>
+                    </div>
+                </div>
+
                 <div id="total" class="w-full max-w-full grid grid-cols-[97%_3%] min-w-[970px]">
-                    <div class="grid grid-cols-[90%_10%] w-full max-w-full border-b border-x border-gray-500">
+                    <div class="grid grid-cols-[88%_12%] w-full max-w-full border-b border-x border-gray-500">
                         <div class="flex items-center justify-end border-r h-[30px]  border-gray-500">
                             <p class="font-[MuseoSans] text-[12px] py-2 mr-2 font-bold">TOTAL DONACION</p>
                         </div>
@@ -231,11 +250,12 @@
                     </div>
                     <div class="w-full">
                         <div class="w-full h-[30px]">
-                            <svg v-if="donInfo.status == 1" @click="addNewRow()"
-                                class="text-green-600 cursor-pointer hover:text-green-800" width="28px" height="28px"
-                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 6V18M6 12H18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" />
+                            <svg @click="returnToTop" xmlns="http://www.w3.org/2000/svg"
+                                class="w-6 h-6 text-blue-700 inline rotate-180 cursor-pointer" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M10 3a1 1 0 0 1 1 1v10.586l2.293-2.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4a1 1 0 0 1 1.414-1.414L9 14.586V4a1 1 0 0 1 1-1z"
+                                    clip-rule="evenodd" />
                             </svg>
                         </div>
                     </div>
@@ -283,13 +303,13 @@ export default {
 
         const {
             isLoadingRequest, donInfo, errors, suppliers, products, centers,
-            asyncFindProduct, isLoadingProduct, totalRec, brands, selectedProducts,
-            getInfoForModalDonation, selectProv, openAnySelect, selectProd, addNewRow,
+            asyncFindProduct, isLoadingProduct, totalRec, brands, activeDetails,
+            getInfoForModalDonation, selectProv, selectProd, returnToTop,
             deleteRow, storeReception, updateReception, handleValidation
         } = useDonacion(context);
 
-        const handleSearchChange = async (query, index, prodId) => {
-            await asyncFindProduct(query, index, prodId);
+        const handleSearchChange = async (query) => {
+            await asyncFindProduct(query);
         }
 
         onMounted(async () => {
@@ -298,8 +318,8 @@ export default {
 
         return {
             isLoadingRequest, donInfo, errors, suppliers, products, centers,
-            isLoadingProduct, totalRec, brands, selectedProducts,
-            selectProv, handleSearchChange, openAnySelect, selectProd, addNewRow,
+            isLoadingProduct, totalRec, brands, activeDetails,
+            selectProv, handleSearchChange, selectProd, returnToTop,
             deleteRow, storeReception, updateReception, handleValidation
         };
     },
@@ -316,6 +336,24 @@ export default {
     /* Establece el estilo del borde como una línea sólida */
     outline: none;
     /* Elimina el contorno del input */
+}
+
+@keyframes blink {
+    0% {
+        background-color: transparent;
+    }
+
+    50% {
+        background-color: rgb(251 146 60);
+    }
+
+    100% {
+        background-color: transparent;
+    }
+}
+
+.blinking {
+    animation: blink 1s infinite;
 }
 
 .dp__input_wrap {

@@ -20,12 +20,12 @@ export const useDonacion = (context) => {
     const centers = ref([])
     const suppliers = ref([])
     const brands = ref([])
-    const selectedProducts = ref([])
 
     const donInfo = ref({
         id: '', //reception id
         acta: '', //Acta number
         dateTime: '', //Donation date and time
+        prodId: '', //product identifier for global search
         supplierId: '', //supplier
         nit: '', // supplier nit
         centerId: '', //Healthcare center
@@ -99,26 +99,18 @@ export const useDonacion = (context) => {
             recepData.detalle_recepcion.forEach(element => {
                 // Check estado_det_recepcion_pedido
                 if (element.estado_det_recepcion_pedido === 1) {
-                    //Construct the options
-                    let arrayOpt = {
-                        value: element.producto.id_producto,
-                        label: element.producto.codigo_producto + " — " + element.producto.nombre_completo_producto,
-                    };
-                    selectedProducts.value.push(arrayOpt);
-                    products.value.push(arrayOpt);
-
                     // Construct array
                     const array = {
                         detRecId: element.id_det_recepcion_pedido, //id_det_recepcion_pedido
                         prodId: element.id_producto, //id_product
-                        isLoadingProd: false, //Flag to manage loader for every multiselect
                         brandId: element.id_marca,
                         brandLabel: element.marca.nombre_marca,
                         perishable: element.producto.perecedero_producto,
                         expDate: formatDateVue3DP(element.fecha_vcto_det_recepcion_pedido), //Expiry date
+                        fractionated: element.producto.fraccionado_producto,
                         desc: element.producto.codigo_producto + ' — ' + element.producto.nombre_completo_producto + ' — ' + element.producto.unidad_medida.nombre_unidad_medida,
-                        qty: element.cant_det_recepcion_pedido, //Represents the the number of products the user wants to register
-                        cost: element.costo_det_recepcion_pedido, //Represents the the cost of the product
+                        qty: element.producto.fraccionado_producto == 0 ? floatToInt(element.cant_det_recepcion_pedido) : element.cant_det_recepcion_pedido, //Represents the the number of products the user wants to register
+                        cost: parseFloat(element.costo_det_recepcion_pedido).toFixed(2), //Represents the the cost of the product
                         total: "", //Represents the result of qty x cost for every row
                         deleted: false, //This is the state of the row, it represents the logical deletion.
                     };
@@ -133,36 +125,27 @@ export const useDonacion = (context) => {
                     newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
                 }
             });
-        } else {
-            // Call addNewRow
-            addNewRow();
         }
     }
 
-    const addNewRow = () => {
-        let array = {
-            detRecId: "",
-            prodId: "",
-            isLoadingProd: false,
-            perishable: "",
-            expDate: "",
-            brandId: "",
-            brandLabel: "",
-            desc: "",
-            qty: "",
-            cost: "",
-            total: '0.00',
-            deleted: false,
-        }
-        donInfo.value.prods.push(array);
-
-        // Desplazar la pantalla hasta la última fila agregada
+    const returnToTop = () => {
+        // Desplazar la pantalla a la parte superior
         nextTick(() => {
-            const newRowElement = document.getElementById(`total`);
+            const newRowElement = document.getElementById(`headerFormat`);
             if (newRowElement) {
                 newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
             }
         });
+    }
+
+    // Método para convertir un valor flotante con dos decimales a entero
+    const floatToInt = (value) => {
+        // Primero, convertimos el valor a un número flotante
+        const floatValue = parseFloat(value);
+        // Luego, lo redondeamos al entero más cercano
+        const roundedValue = Math.round(floatValue);
+        // Devolvemos el resultado como un número entero
+        return roundedValue;
     }
 
     const deleteRow = (index, detRecId) => {
@@ -237,7 +220,6 @@ export const useDonacion = (context) => {
             })
             .finally(() => {
                 isLoadingRequest.value = false;
-                products.value = selectedProducts.value
             });
     };
 
@@ -269,59 +251,69 @@ export const useDonacion = (context) => {
         return donInfo.value.prods.filter((detail) => detail.deleted == false)
     });
 
-    const asyncFindProduct = _.debounce(async (query, index, prodId) => {
+    const asyncFindProduct = _.debounce(async (query) => {
         try {
-            donInfo.value.prods[index].isLoadingProd = true
+            isLoadingProduct.value = true
             if (query.length >= 3) {
-                // Filtrar los elementos de defaultProds que tengan un valor diferente a prodId
-                //const filteredProds = donInfo.value.prods.filter((e) => e.prodId !== prodId && e.deleted == false);
-                // Crear un array no asociativo con solo las propiedades 'value' de los elementos filtrados
-                //const prodIdToIgnore = filteredProds.map((e) => e.prodId); //Productos que debe ignorar al momento de realizar la busqueda asincrona
                 const response = await axios.post("/search-donation-product", {
                     busqueda: query,
-                    //prodIdToIgnore: prodIdToIgnore
                 });
                 products.value = response.data.products;
-            } else {
-                products.value = [];
             }
         } catch (errors) {
             products.value = [];
         } finally {
-            donInfo.value.prods[index].isLoadingProd = false
+            isLoadingProduct.value = false
         }
     }, 350);
-
-    const openAnySelect = (prodId) => {
-        // const selectedProd = defaultProds.value.filter((e) => e.value === prodId)
-        // products.value = selectedProd
-        products.value = []
-    }
 
     const selectProv = (id) => {
         const selectedProv = suppliers.value.find((e) => e.value == id);
         donInfo.value.nit = selectedProv.nit_proveedor
     }
 
-    const selectProd = (prodId, index) => {
-        if (prodId) {
-            const selectedProd = products.value.find((e) => e.value === prodId)
-            donInfo.value.prods[index].desc = selectedProd.allInfo.codigo_producto + ' — ' + selectedProd.allInfo.nombre_completo_producto + ' — ' + selectedProd.allInfo.unidad_medida.nombre_unidad_medida
-            donInfo.value.prods[index].perishable = selectedProd.allInfo.perecedero_producto
-            let arrayOpt = {
-                value: selectedProd.allInfo.id_producto,
-                label: selectedProd.allInfo.codigo_producto + " - " + selectedProd.allInfo.nombre_producto,
-            };
-            selectedProducts.value.push(arrayOpt);
+    const selectProd = (prodId) => {
+        if (!prodId) {
+            useShowToast(toast.info, "Debes elegir un producto de la lista.");
         } else {
-            donInfo.value.prods[index].prodId = ''
-            donInfo.value.prods[index].desc = ''
-            donInfo.value.prods[index].perishable = ''
+            const selectedProd = products.value.find((e) => e.value === prodId)
+            // Construct array
+            const array = {
+                detRecId: '', //id_det_recepcion_pedido
+                prodId: prodId, //id_prod_adquisicion
+                desc: selectedProd.allInfo.codigo_producto + ' — ' + selectedProd.allInfo.nombre_completo_producto + ' — ' + selectedProd.allInfo.unidad_medida.nombre_unidad_medida,
+                brandId: '',
+                brandLabel: '',
+                prodLabel: '',
+                expDate: '',
+                fractionated: selectedProd.allInfo.fraccionado_producto,
+                perishable: selectedProd.allInfo.perecedero_producto, //If the product is perishable, set to true, otherwise set to false.
+                fractionated: selectedProd.allInfo.perecedero_producto,
+                qty: '', //Represents the the number of products the user wants to register
+                cost: '', //Represents the the cost of the product
+                total: '', //Represents the result of qty x cost for every row
+                deleted: false, //This is the state of the row, it represents the logical deletion.
+            };
+            donInfo.value.prods.push(array);
+
+            // Desplazar la pantalla hasta la última fila agregada
+            nextTick(() => {
+                const newRowId = `row-${donInfo.value.prods.length-1}`;
+                const newRowElement = document.getElementById(newRowId);
+                if (newRowElement) {
+                    newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                    // Aplicar la clase de animación temporalmente
+                    newRowElement.classList.add('blinking');
+                    // Eliminar la clase después de un período de tiempo
+                    setTimeout(() => {
+                        newRowElement.classList.remove('blinking');
+                    }, 3000); // 3000 milisegundos (3 segundos) en este ejemplo
+                }
+            });
+
+            //Clean the select
+            donInfo.value.prodId = ''
         }
-        donInfo.value.prods[index].brandId = ''
-        donInfo.value.prods[index].qty = ''
-        donInfo.value.prods[index].cost = ''
-        donInfo.value.prods[index].expDate = ''
     }
 
     const totalRec = computed(() => {
@@ -352,8 +344,8 @@ export const useDonacion = (context) => {
 
     return {
         isLoadingRequest, errors, donInfo, suppliers, products, centers,
-        asyncFindProduct, isLoadingProduct, totalRec, brands, selectedProducts,
-        getInfoForModalDonation, selectProv, openAnySelect, selectProd, addNewRow,
+        asyncFindProduct, isLoadingProduct, totalRec, brands, activeDetails, 
+        getInfoForModalDonation, selectProv, selectProd, returnToTop,
         deleteRow, storeReception, updateReception, handleValidation
     }
 }
