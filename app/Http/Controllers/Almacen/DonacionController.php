@@ -106,7 +106,6 @@ class DonacionController extends Controller
     public function searchProduct(Request $request)
     {
         $search = $request->busqueda;
-        $prodIdToIgnore = $request->prodIdToIgnore;
         if ($search != '') {
             $matchProds = Producto::with('unidad_medida')
                 ->where(function ($query) use ($search) {
