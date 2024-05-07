@@ -28,6 +28,7 @@ export const useDonacion = (context) => {
         prodId: '', //product identifier for global search
         supplierId: '', //supplier
         nit: '', // supplier nit
+        dui: '',
         centerId: '', //Healthcare center
         observation: '', //Reception observation
         status: '', //We use this to manage some functionalities in the view, it represent the reception status
@@ -60,7 +61,6 @@ export const useDonacion = (context) => {
             });
             setModalValues(response.data, id)
         } catch (err) {
-            console.log(err);
             if (err.response && err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
                 context.emit("get-table");
@@ -92,6 +92,7 @@ export const useDonacion = (context) => {
             donInfo.value.observation = recepData.observacion_recepcion_pedido //Set observation
             donInfo.value.supplierId = recepData.id_proveedor // Set supplier
             donInfo.value.nit = recepData.proveedor.nit_proveedor //Set supplier nit
+            donInfo.value.dui = recepData.proveedor.dui_proveedor //Set supplier nit
             donInfo.value.centerId = recepData.detalle_recepcion[0].id_centro_atencion //healthcare center
 
 
@@ -270,6 +271,7 @@ export const useDonacion = (context) => {
     const selectProv = (id) => {
         const selectedProv = suppliers.value.find((e) => e.value == id);
         donInfo.value.nit = selectedProv.nit_proveedor
+        donInfo.value.dui = selectedProv.dui_proveedor
     }
 
     const selectProd = (prodId) => {
@@ -288,7 +290,6 @@ export const useDonacion = (context) => {
                 expDate: '',
                 fractionated: selectedProd.allInfo.fraccionado_producto,
                 perishable: selectedProd.allInfo.perecedero_producto, //If the product is perishable, set to true, otherwise set to false.
-                fractionated: selectedProd.allInfo.perecedero_producto,
                 qty: '', //Represents the the number of products the user wants to register
                 cost: '', //Represents the the cost of the product
                 total: '', //Represents the result of qty x cost for every row

@@ -52,13 +52,13 @@
                     </div>
                 </div>
                 <div class="min-w-[970px] bg-white">
-                    <div class="grid grid-cols-[41%_34%_25%] max-w-[97%] border-gray-500 border-x py-1">
+                    <div class="grid grid-cols-[65%_35%] max-w-[97%] border-gray-500 border-x py-1">
                         <div :class="{ 'select-err': errors.supplierId }"
                             class="justify-start flex-row flex items-center w-full">
                             <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2 w-[18%]">
-                                CENTRO:
+                                Centro:
                             </p>
-                            <div class="flex items-center w-[82%] ml-2">
+                            <div class="flex items-center w-[60%] ml-2">
                                 <Multiselect id="doc" v-model="donInfo.centerId" :options="centers" class="h-[30px]"
                                     :class="{ 'bg-red-200': errors.centerId }" :disabled="donInfo.status != 1"
                                     :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Centro"
@@ -66,14 +66,8 @@
                             </div>
                         </div>
                         <div class="justify-start flex items-center w-full bg-white">
-                            <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-4">
-                                FINANCIAMIENTO:
-                                <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">D</span>
-                            </p>
-                        </div>
-                        <div class="justify-start flex items-center w-full bg-white">
                             <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1">
-                                FECHA Y HORA:
+                                Fecha y hora:
                                 <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{ donInfo.dateTime
                                     }}</span>
                             </p>
@@ -82,13 +76,13 @@
                 </div>
                 <div class="min-w-[970px]">
                     <div
-                        class="grid grid-cols-[75%_25%] max-w-[97%] w-full border-b border-x border-gray-500 py-1 bg-white">
+                        class="grid grid-cols-[65%_35%] max-w-[97%] w-full border-b border-x border-gray-500 py-1 bg-white">
                         <div :class="{ 'select-err': errors.supplierId }"
                             class="justify-start flex-row flex items-center w-full">
-                            <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2">
-                                DONANTE:
+                            <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2 w-[18%]">
+                                Donante:
                             </p>
-                            <div class="flex items-center w-[43%] ml-[14px]">
+                            <div class="flex items-center w-[60%] ml-2">
                                 <Multiselect id="doc" v-model="donInfo.supplierId" :options="suppliers" class="h-[30px]"
                                     :class="{ 'bg-red-200': errors.supplierId }" :disabled="donInfo.status != 1"
                                     :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione"
@@ -98,9 +92,8 @@
                         </div>
                         <div class="justify-start flex items-center w-full bg-white">
                             <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1">
-                                NIT:
-                                <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{ donInfo.nit
-                                    }}</span>
+                                {{ donInfo.dui  ?  'DUI:' : 'NIT:'}}
+                                <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{ donInfo.dui ? donInfo.dui : donInfo.nit }}</span>
                             </p>
                         </div>
                     </div>
@@ -115,7 +108,7 @@
                                     :internal-search="false" @search-change="handleSearchChange($event)"
                                     :loading="isLoadingProduct" :clear-on-search="true" :filter-results="false"
                                     :resolve-on-load="true" :disabled="donInfo.status != 1" :searchable="true"
-                                    :noOptionsText="'Sin resultados'" placeholder="Buscar producto"
+                                    :noOptionsText="'Sin resultados'" placeholder="Escribe para buscar producto"
                                     :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
                             </div>
                             <button @click="selectProd(donInfo.prodId)"
@@ -264,7 +257,7 @@
             <div id="buttons" class="md:flex flex md:items-center my-6 sticky flex-row justify-center mx-8">
                 <button type="button" @click="$emit('cerrar-modal')"
                     class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-[12px] px-2.5 py-1.5 text-center mb-2 dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
-                <div class="" v-if="donInfo.status == 1">
+                <div class="" v-if="donInfo.status == 1 && activeDetails.length > 0">
                     <button v-if="recepId > 0" @click="updateReception(donInfo)"
                         class="bg-orange-700 hover:bg-orange-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">ACTUALIZAR</button>
                     <button v-else @click="storeReception(donInfo)"

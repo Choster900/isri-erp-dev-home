@@ -100,7 +100,7 @@
             <div v-else>
                 <div class="pl-8 mr-0 pb-1 max-w-full overflow-x-auto mt-4 max-h-[450px] overflow-y-auto">
                     <div class="min-w-[970px] bg-white" id="headerFormat">
-                        <div class="grid grid-cols-[23%_77%] max-w-[97%] border border-gray-500">
+                        <div class="grid grid-cols-[23%_77%] max-w-[96%] border border-gray-500">
                             <!-- Columna 1 -->
                             <div class="w-full bg-white border-r border-gray-500 p-2 flex items-center justify-center">
                                 <img src="../../../../img/isri-gob.png" alt="Logo del instituto"
@@ -122,22 +122,21 @@
                         </div>
                     </div>
                     <div class="min-w-[970px] bg-white">
-                        <div class="grid grid-cols-[50%_25%_25%] max-w-[97%]">
+                        <div class="grid grid-cols-[40%_35%_25%] max-w-[96%]">
                             <div class="w-full justify-start flex items-center border-l border-gray-500 bg-white">
-                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2">FECHA Y HORA DE
-                                    RECEPCION:
+                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2">Fecha y hora de recepción:
                                     <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
                                         infoToShow.dateTime }}</span>
                                 </p>
                             </div>
                             <div class=" w-full justify-start flex items-center bg-white">
-                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1">FINANCIAMIENTO:
+                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1">Financiamiento:
                                     <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
                                         infoToShow.financingSource }}</span>
                                 </p>
                             </div>
                             <div class="w-full justify-start flex items-center border-r border-gray-500 bg-white">
-                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1">COMPROMISO:
+                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1">Compromiso:
                                     <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
                                         infoToShow.commitment }}</span>
                                 </p>
@@ -145,27 +144,26 @@
                         </div>
                     </div>
                     <div class="min-w-[970px]">
-                        <div class="grid grid-cols-[75%_25%] max-w-[97%]">
+                        <div class="grid grid-cols-[75%_25%] max-w-[96%]">
                             <div class="w-full justify-start flex items-center border-l border-gray-500 bg-white">
-                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2">PROVEEDOR:
+                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2">Proveedor:
                                     <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
                                         infoToShow.supplier }}</span>
                                 </p>
                             </div>
                             <div class="w-full justify-start flex items-center border-r border-gray-500 bg-white">
-                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1">NIT:
+                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1"> {{ infoToShow.dui ? 'DUI:' : 'NIT:' }}
                                     <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
-                                        infoToShow.nit
+                                        infoToShow.dui ? infoToShow.dui : infoToShow.nit
                                     }}</span>
                                 </p>
                             </div>
                         </div>
                     </div>
                     <div class="min-w-[970px]">
-                        <div class="grid grid-cols-[100%] max-w-[97%] bg-white border-b border-gray-500">
+                        <div class="grid grid-cols-[100%] max-w-[96%] bg-white border-b border-gray-500">
                             <div class="w-full justify-start flex items-center border-x border-gray-500 bg-white">
-                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2">FECHA REFERENCIA
-                                    DOCUMENTO DE COMPRA:
+                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2">Fecha referencia documento de compra:
                                     <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
                                         infoToShow.acqDocDate }}</span>
                                 </p>
@@ -174,7 +172,7 @@
                     </div>
                     <div class="min-w-[970px]">
                         <div v-if="infoToShow.status == 1"
-                            class="grid grid-cols-[100%] max-w-[97%] border-x border-b border-gray-500">
+                            class="grid grid-cols-[100%] max-w-[96%] border-x border-b border-gray-500">
                             <div class="justify-center flex w-full bg-white py-2">
                                 <p class="font-[MuseoSans] text-[12px] py-1.5 font-bold mr-2">PRODUCTOS: </p>
                                 <div class="w-[50%] flex items-center justify-center mr-2"
@@ -196,7 +194,7 @@
 
                             </div>
                         </div>
-                        <div v-else class="grid grid-cols-[100%] max-w-[97%] border-x border-b border-gray-500">
+                        <div v-else class="grid grid-cols-[100%] max-w-[96%] border-x border-b border-gray-500">
                             <div class="justify-center flex w-full bg-white">
                                 <p class="font-[MuseoSans] text-[12px] py-1 font-bold">LISTADO DE PRODUCTOS</p>
                             </div>
@@ -204,7 +202,7 @@
                     </div>
                     <div class="min-w-[970px]">
                         <div
-                            class="grid grid-cols-[37%_14%_13%_12%_12%_12%] max-w-[97%] w-full bg-[#001c48] border-b border-x border-gray-500 bg-opacity-80 min-w-[800px] text-white">
+                            class="grid grid-cols-[37%_14%_13%_12%_12%_12%] max-w-[96%] w-full bg-[#001c48] border-b border-x border-gray-500 bg-opacity-80 min-w-[800px] text-white">
                             <!-- Table header -->
                             <div class="w-full flex items-center justify-center border-r border-gray-500 h-[30px]">
                                 <p class="text-center font-[MuseoSans] text-[11px]">PRODUCTO
@@ -232,7 +230,7 @@
                         <div v-if="hasActiveProds(indexLt)" class="min-w-[970px]">
                             <div @click="lts.isOpen = !lts.isOpen" @mouseover="lts.hover = true"
                             @mouseleave="lts.hover = false"
-                                class="max-w-[97%] bg-white border-x border-b flex border-gray-500 py-2 cursor-pointer hover:bg-gray-300">
+                                class="max-w-[96%] bg-white border-x border-b flex border-gray-500 py-2 cursor-pointer hover:bg-gray-300">
                                 <!-- Icono de flecha a la izquierda -->
                                 <div class="w-1/3 flex items-center justify-start">
                                     <svg class="w-5 h-5 text-green-800 ml-2"
@@ -255,7 +253,7 @@
                         </div>
 
                         <template v-for="(prod, index) in lts.productos" :key="index"> <!-- Productos -->
-                            <div class="min-w-[970px] grid grid-cols-[97%_3%] max-w-full"
+                            <div class="min-w-[970px] grid grid-cols-[96%_4%] max-w-full"
                                 v-if="prod.deleted == false && lts.isOpen">
                                 <div :id="'lt-' + indexLt + 'prod-' + index"
                                     class="grid grid-cols-[37%_14%_13%_12%_12%_12%] max-w-full border-b border-x border-gray-500 hover:bg-gray-200"
@@ -351,12 +349,12 @@
                     </template>
                     <div v-if="recDocument.prods.length == 0" class="min-w-[970px]">
                         <div
-                            class="flex items-center bg-white justify-center max-w-[97%] border-x border-b border-gray-500 py-5">
+                            class="flex items-center bg-white justify-center max-w-[96%] border-x border-b border-gray-500 py-5">
                             <p class="font-[MuseoSans] text-[12px] text-red-500 font-semibold"> SIN PRODUCTOS
                                 SELECCIONADOS</p>
                         </div>
                     </div>
-                    <div id="total" class="w-full max-w-full grid grid-cols-[97%_3%] min-w-[970px] bg-white">
+                    <div id="total" class="w-full max-w-full grid grid-cols-[96%_4%] min-w-[970px] bg-white">
                         <div class="grid grid-cols-[88%_12%] w-full max-w-full border-b border-x border-gray-500">
                             <div class="flex items-center justify-end border-r h-[30px]  border-gray-500">
                                 <p class="font-[MuseoSans] text-[12px] py-2 mr-2 font-bold">TOTAL ACTA</p>
@@ -380,12 +378,12 @@
                         </div>
                     </div>
                     <div class="min-w-[970px]">
-                        <div class="grid grid-cols-[100%] max-w-[97%] border-x border-gray-500 bg-white">
+                        <div class="grid grid-cols-[100%] max-w-[96%] border-x border-gray-500 bg-white">
                             <p class="ml-3 text-[13px] font-[Roboto] text-gray-500">Observación sobre recepción:</p>
                         </div>
                     </div>
                     <div id="observ" class="min-w-[970px]">
-                        <div class="grid grid-cols-[100%] max-w-[97%] border-x border-b border-gray-500">
+                        <div class="grid grid-cols-[100%] max-w-[96%] border-x border-b border-gray-500">
                             <div class="justify-center flex w-full bg-white">
                                 <textarea v-model="recDocument.observation" placeholder=""
                                     :disabled="infoToShow.status != 1"

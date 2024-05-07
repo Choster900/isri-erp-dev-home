@@ -33,6 +33,7 @@ export const useRecepcion = (context) => {
         commitment: '', //compromiso_ppto_det_doc_adquisicion
         supplier: '', //razon_social_proveedor
         nit: '', //nit_proveedor
+        dui: '', //dui_proveedor
         dateTime: '', //fecha_reg_recepcion_pedido
         acqDocDate: '' //acquisition document reference date
     })
@@ -112,10 +113,11 @@ export const useRecepcion = (context) => {
         //Set the general information to show in the view
         infoToShow.value.docName = data.itemInfo.documento_adquisicion.tipo_documento_adquisicion.nombre_tipo_doc_adquisicion + ' "' + data.itemInfo.documento_adquisicion.numero_doc_adquisicion + '"'
         infoToShow.value.itemName = upperCase(data.itemInfo.nombre_det_doc_adquisicion)
-        infoToShow.value.financingSource = data.itemInfo.fuente_financiamiento.codigo_proy_financiado
+        infoToShow.value.financingSource = data.itemInfo.fuente_financiamiento.nombre_proy_financiado
         infoToShow.value.commitment = data.itemInfo.compromiso_ppto_det_doc_adquisicion
         infoToShow.value.supplier = data.itemInfo.documento_adquisicion.proveedor.razon_social_proveedor
         infoToShow.value.nit = data.itemInfo.documento_adquisicion.proveedor.nit_proveedor
+        infoToShow.value.dui = data.itemInfo.documento_adquisicion.proveedor.dui_proveedor
         infoToShow.value.dateTime = recepData ? moment(recepData.fecha_reg_recepcion_pedido).format('DD/MM/YYYY, HH:mm:ss') : ''
         infoToShow.value.status = id > 0 ? recepData.id_estado_recepcion_pedido : 1
         infoToShow.value.acqDocDate = moment(data.itemInfo.documento_adquisicion.fecha_adjudicacion_doc_adquisicion).format('DD/MM/YYYY')
