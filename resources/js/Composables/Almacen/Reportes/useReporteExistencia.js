@@ -12,12 +12,14 @@ export const useReporteExistencia = () => {
     const idFuenteFinanciamiento = ref(null);
     const idCentroAtencion = ref(null);
     const idSubAlmacen = ref(null);
+    const isLoaderRequest = ref(false);
 
     /**
      * Función para realizar una búsqueda de reporte de existencia en el almacén.
      */
     const searchReportExistencia = async () => {
         try {
+            isLoaderRequest.value = true
             // Realiza una solicitud POST para obtener el reporte de existencia en el almacén
             const resp = await axios.post("/get-reporte-existencia-almacen", {
                 idSubAlmacen: idSubAlmacen.value,
@@ -37,6 +39,7 @@ export const useReporteExistencia = () => {
             // Maneja cualquier error que ocurra
             console.error('Ocurrió un error al obtener la información del reporte:', error);
         } finally {
+            isLoaderRequest.value = false;
             // Código a ejecutar después de la solicitud, independientemente de si fue exitosa o no
             // Aquí puedes agregar cualquier limpieza de estado o finalización de tareas que necesites realizar
         }
@@ -162,6 +165,7 @@ export const useReporteExistencia = () => {
         idSubAlmacen,
         idCentroAtencion,
         idFuenteFinanciamiento,
+        isLoaderRequest,
     }
 
 }

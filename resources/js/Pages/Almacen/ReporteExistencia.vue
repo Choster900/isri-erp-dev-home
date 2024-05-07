@@ -107,7 +107,7 @@
                 </button>
               </div>
 
-              <div class="flex justify-end px-4 gap-3" v-if="dataGetRotation != ''">
+              <div class="flex justify-end px-4 gap-3" v-if="dataReporteExistencia != ''">
                 <h1 class="font-medium">Reporte de rotación:</h1>
                 <div class="flex" style="display: non">
                   <div
@@ -176,8 +176,7 @@
               </div>
               <!--  <div class="md:flex flex md:items-center  mb-2 sticky flex-row justify-center  border-gray-400 border-b">
                                     </div> -->
-
-              <TablaReporteExistencia :dataReporteExistencia="dataReporteExistencia"/>
+              <TablaReporteExistencia :dataReporteExistencia="dataReporteExistencia" :isLoadinRequest="isLoaderRequest"/>
 
             </div>
           </AppLayoutVue>
@@ -218,8 +217,9 @@ export default {
             printPdf,
 
             idSubAlmacen,
-        idCentroAtencion,
-        idFuenteFinanciamiento,
+            idCentroAtencion,
+            idFuenteFinanciamiento,
+            isLoaderRequest,
         } = useReporteExistencia();
 
         return {
@@ -229,7 +229,7 @@ export default {
             dataReporteExistencia,
             exportExcel,
             printPdf,
-
+            isLoaderRequest,
 
             idSubAlmacen,
         idCentroAtencion,

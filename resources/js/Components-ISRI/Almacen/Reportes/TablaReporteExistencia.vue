@@ -59,6 +59,56 @@
                             <td>{{ item.id_prod_rpt_existencia }}</td>
                         </tr>
                     </tbody>
+
+                    <tbody v-if="isLoadinRequest">
+                        <tr>
+                            <td colspan="12">
+                                <div class="flex items-center justify-center h-96">
+                                    <div aria-label="Loading..." role="status" class="loader">
+                                        <svg class="icon" viewBox="0 0 256 256">
+                                            <line x1="128" y1="32" x2="128" y2="64" stroke-linecap="round"
+                                                stroke-linejoin="round" stroke-width="24"></line>
+                                            <line x1="195.9" y1="60.1" x2="173.3" y2="82.7" stroke-linecap="round"
+                                                stroke-linejoin="round" stroke-width="24"></line>
+                                            <line x1="224" y1="128" x2="192" y2="128" stroke-linecap="round"
+                                                stroke-linejoin="round" stroke-width="24"></line>
+                                            <line x1="195.9" y1="195.9" x2="173.3" y2="173.3" stroke-linecap="round"
+                                                stroke-linejoin="round" stroke-width="24"></line>
+                                            <line x1="128" y1="224" x2="128" y2="192" stroke-linecap="round"
+                                                stroke-linejoin="round" stroke-width="24"></line>
+                                            <line x1="60.1" y1="195.9" x2="82.7" y2="173.3" stroke-linecap="round"
+                                                stroke-linejoin="round" stroke-width="24"></line>
+                                            <line x1="32" y1="128" x2="64" y2="128" stroke-linecap="round"
+                                                stroke-linejoin="round" stroke-width="24"></line>
+                                            <line x1="60.1" y1="60.1" x2="82.7" y2="82.7" stroke-linecap="round"
+                                                stroke-linejoin="round" stroke-width="24"></line>
+                                        </svg>
+                                        <span class="loading-text">Cargando...</span>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+
+                    <tbody v-if="dataReporteExistencia == '' && isLoadinRequest == false">
+                        <tr>
+                            <td colspan="12">
+                                <div class="w-full h-[500px] px-1 text-selection-disable">
+                                    <div class="flex flex-col items-center justify-center h-full">
+                                        <img src="../../../../img/TableReport.svg" class="h-72 mx-auto" alt="SVG Image"
+                                            draggable="false" />
+                                        <h1 class="font-medium text-center">
+                                            No se encontraron resultados
+                                        </h1>
+                                        <p class="text-[9pt] text-center">
+                                            Intenta buscar en períodos válidos o revisa tus criterios de
+                                            búsqueda.
+                                        </p>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -70,7 +120,7 @@ import { toRefs } from 'vue';
 
 export default {
     name: "Test",
-    props: ["dataReporteExistencia"],
+    props: ["dataReporteExistencia","isLoadinRequest"],
     setup() {
 
 
