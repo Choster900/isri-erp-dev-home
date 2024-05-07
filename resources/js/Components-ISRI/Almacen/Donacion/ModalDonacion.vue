@@ -115,7 +115,7 @@
                                     :internal-search="false" @search-change="handleSearchChange($event)"
                                     :loading="isLoadingProduct" :clear-on-search="true" :filter-results="false"
                                     :resolve-on-load="true" :disabled="donInfo.status != 1" :searchable="true"
-                                    :noOptionsText="'Sin resultados'" placeholder="Buscar producto"
+                                    :noOptionsText="'Sin resultados'" placeholder="Escribe para buscar producto"
                                     :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
                             </div>
                             <button @click="selectProd(donInfo.prodId)"
@@ -264,7 +264,7 @@
             <div id="buttons" class="md:flex flex md:items-center my-6 sticky flex-row justify-center mx-8">
                 <button type="button" @click="$emit('cerrar-modal')"
                     class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-[12px] px-2.5 py-1.5 text-center mb-2 dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
-                <div class="" v-if="donInfo.status == 1">
+                <div class="" v-if="donInfo.status == 1 && activeDetails.length > 0">
                     <button v-if="recepId > 0" @click="updateReception(donInfo)"
                         class="bg-orange-700 hover:bg-orange-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">ACTUALIZAR</button>
                     <button v-else @click="storeReception(donInfo)"

@@ -60,7 +60,6 @@ export const useDonacion = (context) => {
             });
             setModalValues(response.data, id)
         } catch (err) {
-            console.log(err);
             if (err.response && err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
                 context.emit("get-table");
@@ -288,7 +287,6 @@ export const useDonacion = (context) => {
                 expDate: '',
                 fractionated: selectedProd.allInfo.fraccionado_producto,
                 perishable: selectedProd.allInfo.perecedero_producto, //If the product is perishable, set to true, otherwise set to false.
-                fractionated: selectedProd.allInfo.perecedero_producto,
                 qty: '', //Represents the the number of products the user wants to register
                 cost: '', //Represents the the cost of the product
                 total: '', //Represents the result of qty x cost for every row
