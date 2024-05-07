@@ -28,6 +28,7 @@ export const useDonacion = (context) => {
         prodId: '', //product identifier for global search
         supplierId: '', //supplier
         nit: '', // supplier nit
+        dui: '',
         centerId: '', //Healthcare center
         observation: '', //Reception observation
         status: '', //We use this to manage some functionalities in the view, it represent the reception status
@@ -91,6 +92,7 @@ export const useDonacion = (context) => {
             donInfo.value.observation = recepData.observacion_recepcion_pedido //Set observation
             donInfo.value.supplierId = recepData.id_proveedor // Set supplier
             donInfo.value.nit = recepData.proveedor.nit_proveedor //Set supplier nit
+            donInfo.value.dui = recepData.proveedor.dui_proveedor //Set supplier nit
             donInfo.value.centerId = recepData.detalle_recepcion[0].id_centro_atencion //healthcare center
 
 
@@ -269,6 +271,7 @@ export const useDonacion = (context) => {
     const selectProv = (id) => {
         const selectedProv = suppliers.value.find((e) => e.value == id);
         donInfo.value.nit = selectedProv.nit_proveedor
+        donInfo.value.dui = selectedProv.dui_proveedor
     }
 
     const selectProd = (prodId) => {

@@ -52,24 +52,18 @@
                     </div>
                 </div>
                 <div class="min-w-[970px] bg-white">
-                    <div class="grid grid-cols-[41%_34%_25%] max-w-[97%] border-gray-500 border-x py-1">
+                    <div class="grid grid-cols-[65%_35%] max-w-[97%] border-gray-500 border-x py-1">
                         <div :class="{ 'select-err': errors.supplierId }"
                             class="justify-start flex-row flex items-center w-full">
                             <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2 w-[18%]">
                                 CENTRO:
                             </p>
-                            <div class="flex items-center w-[82%] ml-2">
+                            <div class="flex items-center w-[60%] ml-2">
                                 <Multiselect id="doc" v-model="donInfo.centerId" :options="centers" class="h-[30px]"
                                     :class="{ 'bg-red-200': errors.centerId }" :disabled="donInfo.status != 1"
                                     :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Centro"
                                     :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', optionPointed: 'text-white bg-[#001c48] bg-opacity-40' }" />
                             </div>
-                        </div>
-                        <div class="justify-start flex items-center w-full bg-white">
-                            <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-4">
-                                FINANCIAMIENTO:
-                                <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">D</span>
-                            </p>
                         </div>
                         <div class="justify-start flex items-center w-full bg-white">
                             <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1">
@@ -82,13 +76,13 @@
                 </div>
                 <div class="min-w-[970px]">
                     <div
-                        class="grid grid-cols-[75%_25%] max-w-[97%] w-full border-b border-x border-gray-500 py-1 bg-white">
+                        class="grid grid-cols-[65%_35%] max-w-[97%] w-full border-b border-x border-gray-500 py-1 bg-white">
                         <div :class="{ 'select-err': errors.supplierId }"
                             class="justify-start flex-row flex items-center w-full">
-                            <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2">
+                            <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2 w-[18%]">
                                 DONANTE:
                             </p>
-                            <div class="flex items-center w-[43%] ml-[14px]">
+                            <div class="flex items-center w-[60%] ml-2">
                                 <Multiselect id="doc" v-model="donInfo.supplierId" :options="suppliers" class="h-[30px]"
                                     :class="{ 'bg-red-200': errors.supplierId }" :disabled="donInfo.status != 1"
                                     :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione"
@@ -98,9 +92,8 @@
                         </div>
                         <div class="justify-start flex items-center w-full bg-white">
                             <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1">
-                                NIT:
-                                <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{ donInfo.nit
-                                    }}</span>
+                                {{ donInfo.dui  ?  'DUI:' : 'NIT:'}}
+                                <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{ donInfo.dui ? donInfo.dui : donInfo.nit }}</span>
                             </p>
                         </div>
                     </div>
