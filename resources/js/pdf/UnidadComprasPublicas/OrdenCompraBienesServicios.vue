@@ -36,7 +36,25 @@
                     <div style="margin-top: -9px">RAZON SOCIAL DEL SUMINISTRANTE</div>
                 </td>
                 <td class="border border-black bg-black h-5 text-white text-center text-[9pt]">
-                    <div style="margin-top: -9px">NIT</div>
+                    <div style="margin-top: -9px">
+
+                        {{
+        arrayDocAdquisicion != '' && idDetDocAdquisicion != null &&
+            arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion) &&
+            arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion).dataDoc &&
+            (
+                arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.nit_proveedor !== null ||
+                arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.dui_proveedor !== null
+            )
+        ? (
+            arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.nit_proveedor
+            ? "NIT"
+            : "DUI"
+        )
+        : ''
+    }}
+
+    </div>
                 </td>
             </tr>
             <tr>
@@ -110,7 +128,7 @@
     <table class="w-full" border="0" cellpadding="0" cellspacing="0">
         <thead>
             <tr class="*:text-[7pt] *:bg-black *:text-white *:px-2 *:py-0.5 *:font-normal *:border--white">
-                <th class="border border-black border-r-white border-b-white h-9 w-[90px]">
+                <th class="border border-black border-r-white border-b-white h-9 w-[250px]">
                     <div style="margin-top: -9px">
                         PRODUCTO
                     </div>
@@ -125,7 +143,7 @@
                         DESCRIPCION
                     </div>
                 </th>
-                <th class="border border-black border-r-white border-b-white  w-10" colspan="1">
+               <!--  <th class="border border-black border-r-white border-b-white  w-10" colspan="1">
                     <div style="margin-top: -9px">
                         U/MEDIDAS
                     </div>
@@ -135,7 +153,7 @@
                     <div style="margin-top: -9px">
                         ESPECIFICO
                     </div>
-                </th>
+                </th> -->
                 <th class="border border-black border-r-white w-10 border-b-white">
                     <div style="margin-top: -9px">
                         DEPENDENCIA
@@ -160,14 +178,14 @@
         </thead>
         <tbody v-for="(docAdq, i) in arrayProductoAdquisicion" :key="i">
             <tr class="" style="page-break-inside: avoid;">
-                <td colspan="5"
+                <td colspan="2"
                     class="uppercase border py-1 bg-black text-[8pt] text-white border-black border-r-white  text-center ">
                     <div style="margin-top: -10px">
                         Linea de trabajo:
                     </div>
                 </td>
 
-                <td colspan="5" class="uppercase border py-1 bg-black text-[8pt] text-white border-black text-center ">
+                <td colspan="6" class="uppercase border py-1 bg-black text-[8pt] text-white border-black text-center ">
                     <div style="margin-top: -10px">
                         Documento de adquisicion:
                     </div>
@@ -176,13 +194,13 @@
             </tr>
             <tr class="" style="page-break-inside: avoid;">
 
-                <td colspan="5" class="border border-y-black border-l-black border-r-black">
+                <td colspan="2" class="border border-y-black border-l-black border-r-black">
                     <div style="margin-top: -4px" class="text-[6pt] pb-2 px-1">
                         {{ arrayLineaTrabajo.find(d => d.value === docAdq.idLt)?.label }}
                     </div>
                 </td>
 
-                <td colspan="5" class="border border-y-black border-l-0 border-r-black">
+                <td colspan="6" class="border border-y-black border-l-0 border-r-black">
                     <div style="margin-top: -4px" class="text-[6pt] pb-2 px-1   ">
                         {{ arrayDocAdquisicion.find(d => d.value === idDetDocAdquisicion)?.label ||
                             '' }}
@@ -210,7 +228,7 @@
                         {{ detalle.descripcionProdAdquisicion }}
                     </div>
                 </td>
-                <td class="relative  align-top" colspan="1">
+               <!--  <td class="relative  align-top" colspan="1">
                     <div class="text-[6pt]  text-center">
                         {{
                             arrayUnidadMedida
@@ -224,7 +242,7 @@
                         {{ detalle.especifico }}
 
                     </div>
-                </td>
+                </td> -->
                 <td class="relative  w-[100px] align-top">
 
                     <div class="text-[6pt]  text-center">
@@ -259,7 +277,7 @@
         </tbody>
         <tbody style="page-break-inside: avoid;">
             <tr class="" style="page-break-inside: avoid;">
-                <td colspan="9"
+                <td colspan="7"
                     class="px-1 uppercase border py-1  text-[8pt]  border-x-black border-t-black border-b-0   text-start ">
                     <div style="margin-top: -10px">
                         total
@@ -275,7 +293,7 @@
 
             </tr>
             <tr class="" style="page-break-inside: avoid;">
-                <td colspan="10"
+                <td colspan="8"
                     class="uppercase border py-1  text-[8pt] font-bold border-x-black border-t-black border-r-black border-b-black text-center ">
                     <div style="margin-top: -10px">
                         SON: {{ letterNumber }}
@@ -284,7 +302,7 @@
             </tr>
             <!-- !NUEVO -->
             <tr class="" style="page-break-inside: avoid;">
-                <td colspan="10"
+                <td colspan="8"
                     class="uppercase relative  align-top border py-1 h-20 text-[7pt] px-1  border-x-black border-t-black border-t-0 border-r-black border-b-black text-start ">
                     <div style="margin-top: -10px">
                         {{ observacionDetDocAdquisicion }}
@@ -292,7 +310,7 @@
                 </td>
             </tr>
             <tr class="" style="page-break-inside: avoid;">
-                <td colspan="10"
+                <td colspan="8"
                     class="uppercase border py-1  relative h-8 align-top text-[7pt] px-1 border-x-black border-t-black border-t-0 border-r-black border-b-black text-start ">
                     <div style="margin-top: -10px">
                         {{ recepcionDetDocAdquisicion }}
@@ -300,7 +318,7 @@
                 </td>
             </tr>
             <tr class="" style="page-break-inside: avoid;">
-                <td colspan="10"
+                <td colspan="8"
                     class="uppercase border py-1 h-14 relative  align-top text-[7pt] px-1 border-x-black border-t-black border-t-0 border-r-black border-b-black text-start ">
                     <div style="margin-top: -10px">
                         {{ notificacionDetDocAdquisicion }}
@@ -331,14 +349,14 @@
         </tr>
         <tr class="" style="page-break-inside: avoid;">
             <td colspan="5"
-                class="uppercase border py-1 h-24 relative  align-bottom text-[7pt] px-1 border-x-black border-t-black border-t-0 border-r-black border-b-black text-start ">
+                class="uppercase border py-1 h-24 relative  align-bottom text-[7pt] px-1 border-x-black border-t-black border-r-black border-b-black text-start ">
                 <div class="flex flex-col items-center justify-center" style="margin-top: -20px">
                     <hr class="w-[50%] border-1 border-black">
                    <!--  <span class="block">titular o designado</span> -->
                 </div>
             </td>
             <td colspan="5"
-                class="uppercase border py-1 h-24 relative  align-bottom text-[7pt] px-1 border-x-black border-t-black border-t-0 border-r-black border-b-black text-start ">
+                class="uppercase border py-1 h-24 relative  align-bottom text-[7pt] px-1 border-x-black border-t-black  border-r-black border-b-black text-start ">
                 <div class="flex flex-col items-center justify-center" style="margin-top: -20px">
                     <hr class="w-[50%] border-1 border-black">
                     <span class="block">Suministrante</span>

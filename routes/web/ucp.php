@@ -42,7 +42,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         $formattedResults = $product->map(function ($item) {
             return [
                 'value'           => $item->id_producto,
-                'label'           => $item->codigo_producto . ' - ' . $item->nombre_completo_producto,
+                'label'           => $item->codigo_producto . ' - ' . $item->nombre_completo_producto . ' - ' . $item->unidad_medida->nombre_unidad_medida,
                 'allDataProducto' => $item,
             ];
         });
@@ -56,7 +56,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         $formattedResults = $product->map(function ($item) {
             return [
                 'value'           => $item->id_producto,
-                'label'           => $item->codigo_producto . ' - ' . $item->nombre_producto,
+                'label'           => $item->codigo_producto . ' - ' . $item->nombre_completo_producto . ' - ' . $item->unidad_medida->nombre_unidad_medida,
                 'allDataProducto' => $item,
             ];
         });
