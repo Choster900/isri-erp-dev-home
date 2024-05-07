@@ -26,7 +26,7 @@ export const useConfigPdf = (
         let name = "NOMBRE DOCUMENTO - FECHA - CODIGO";
         const opt = {
             margin: [0.5, 0.5, 2, 0.5], //top, left, bottom, right,
-            filename: "evaluacion",
+            filename: "ORDEN DE COMPRA BIENES Y SERVICIOS",
             //pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
             image: { type: "jpeg", quality: 0.98 },
             html2canvas: { scale: 3, useCORS: true },
