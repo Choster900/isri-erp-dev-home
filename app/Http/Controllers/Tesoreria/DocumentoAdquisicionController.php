@@ -117,6 +117,7 @@ class DocumentoAdquisicionController extends Controller
             ->get();
         $financing_sources = ProyectoFinanciado::select('id_proy_financiado as value', 'nombre_proy_financiado as label', 'codigo_proy_financiado')
             ->where('estado_proy_financiado', '=', 1)
+            ->whereIn('id_proy_financiado',[1,3]) //FG y RP
             ->orderBy('nombre_proy_financiado')
             ->get();
         $suppliers = Proveedor::select('id_proveedor as value', 'razon_social_proveedor as label')

@@ -56,7 +56,7 @@
                         <div :class="{ 'select-err': errors.supplierId }"
                             class="justify-start flex-row flex items-center w-full">
                             <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2 w-[18%]">
-                                CENTRO:
+                                Centro:
                             </p>
                             <div class="flex items-center w-[60%] ml-2">
                                 <Multiselect id="doc" v-model="donInfo.centerId" :options="centers" class="h-[30px]"
@@ -67,7 +67,7 @@
                         </div>
                         <div class="justify-start flex items-center w-full bg-white">
                             <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1">
-                                FECHA Y HORA:
+                                Fecha y hora:
                                 <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{ donInfo.dateTime
                                     }}</span>
                             </p>
@@ -80,7 +80,7 @@
                         <div :class="{ 'select-err': errors.supplierId }"
                             class="justify-start flex-row flex items-center w-full">
                             <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2 w-[18%]">
-                                DONANTE:
+                                Donante:
                             </p>
                             <div class="flex items-center w-[60%] ml-2">
                                 <Multiselect id="doc" v-model="donInfo.supplierId" :options="suppliers" class="h-[30px]"
