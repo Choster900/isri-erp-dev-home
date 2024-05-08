@@ -30,25 +30,20 @@
 
         <!-- Fecha referencia -->
         <div class="flex w-full border-x border-black pb-1">
-            <div class="w-[50%] flex justify-start items-center">
-                <p class="ml-2 font-[MuseoSans] text-gray-800 text-[11px]">FECHA REFERENCIA <span
-                        class="text-[11px] font-[MuseoSans] text-gray-800">{{
-                            recToPrint.det_doc_adquisicion.documento_adquisicion.tipo_documento_adquisicion.nombre_tipo_doc_adquisicion
-                        }}</span>:</p>
+            <div class="w-[40%] flex justify-start items-center">
+                <p class="ml-2 font-[MuseoSans] text-gray-800 text-[11px]">Fecha y hora de recepción:</p>
                 <p class="ml-1 font-bold text-[11px] font-[MuseoSans]">
-                    {{ moment(
-                        recToPrint.det_doc_adquisicion.documento_adquisicion.fecha_adjudicacion_doc_adquisicion).format('DD/MM/YYYY')
-                    }}
+                    {{ moment(recToPrint.fecha_reg_recepcion_pedido).format('DD/MM/YYYY, HH:mm:ss') }}
+                </p>
+            </div>
+            <div class="w-[35%] flex justify-start items-center">
+                <p class="font-[MuseoSans] text-gray-800 text-[11px]">Financiamiento:</p>
+                <p class="ml-1 font-bold text-[11px] font-[MuseoSans]">
+                    {{ recToPrint.det_doc_adquisicion.fuente_financiamiento.nombre_proy_financiado }}
                 </p>
             </div>
             <div class="w-[25%] flex justify-start items-center">
-                <p class="font-[MuseoSans] text-gray-800 text-[11px]">FINANCIAMIENTO:</p>
-                <p class="ml-1 font-bold text-[11px] font-[MuseoSans]">
-                    {{ recToPrint.det_doc_adquisicion.fuente_financiamiento.codigo_proy_financiado }}
-                </p>
-            </div>
-            <div class="w-[25%] flex justify-start items-center">
-                <p class="font-[MuseoSans] text-gray-800 text-[11px]">COMPROMISO:</p>
+                <p class="font-[MuseoSans] text-gray-800 text-[11px]">Compromiso:</p>
                 <p class="ml-1 font-bold text-[11px] font-[MuseoSans]">
                     {{ recToPrint.det_doc_adquisicion.compromiso_ppto_det_doc_adquisicion }}
                 </p>
@@ -58,15 +53,18 @@
         <!-- Proveedor and NIT -->
         <div class="flex w-full border-x border-black pb-1">
             <div class="w-[75%] flex justify-start items-center">
-                <p class="ml-2 font-[MuseoSans] text-[11px] text-gray-800">PROVEEDOR:</p>
+                <p class="ml-2 font-[MuseoSans] text-[11px] text-gray-800">Proveedor:</p>
                 <p class="ml-1 font-bold text-[11px] font-[MuseoSans]">
                     {{ recToPrint.det_doc_adquisicion.documento_adquisicion.proveedor.razon_social_proveedor }}
                 </p>
             </div>
             <div class="w-[25%] flex justify-start items-center">
-                <p class="font-[MuseoSans] text-gray-800 text-[11px]">NIT:</p>
+                <p class="font-[MuseoSans] text-gray-800 text-[11px]">{{
+                    recToPrint.det_doc_adquisicion.documento_adquisicion.proveedor.dui_proveedor ? 'DUI:' : 'NIT:' }}
+                </p>
                 <p class="ml-1 font-bold text-[11px] font-[MuseoSans]">
-                    {{ recToPrint.det_doc_adquisicion.documento_adquisicion.proveedor.nit_proveedor }}
+                    {{ recToPrint.det_doc_adquisicion.documento_adquisicion.proveedor.dui_proveedor ??
+                        recToPrint.det_doc_adquisicion.documento_adquisicion.proveedor.nit_proveedor }}
                 </p>
             </div>
         </div>
@@ -74,9 +72,11 @@
         <!-- Date and time, financing source and commitment number -->
         <div class="flex w-full border-x border-black pb-3">
             <div class="w-[50%] flex justify-start items-center">
-                <p class="ml-2 font-[MuseoSans] text-gray-800 text-[11px]">FECHA Y HORA DE RECEPCION:</p>
+                <p class="ml-2 font-[MuseoSans] text-gray-800 text-[11px]">Fecha referencia documento de compra:</p>
                 <p class="ml-1 font-bold text-[11px] font-[MuseoSans]">
-                    {{ moment(recToPrint.fecha_reg_recepcion_pedido).format('DD/MM/YYYY, HH:mm:ss') }}
+                    {{ moment(
+                        recToPrint.det_doc_adquisicion.documento_adquisicion.fecha_adjudicacion_doc_adquisicion).format('DD/MM/YYYY')
+                    }}
                 </p>
             </div>
 
@@ -123,11 +123,11 @@
                     <div class="w-[35%] flex justify-center items-center border-r border-black">
                         <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[10px] px-0.5">
                             {{ prod.producto.codigo_producto + " — " +
-                            prod.producto.nombre_completo_producto + " — " +
+                                prod.producto.nombre_completo_producto + " — " +
                                 prod.producto.unidad_medida.nombre_unidad_medida + " — " +
                                 prod.producto_adquisicion.descripcion_prod_adquisicion }}
                             {{ " — " + (prod.marca.nombre_marca ? "Marca: " +
-                                prod.marca.nombre_marca : +"N/A" )}}
+                                prod.marca.nombre_marca : +"N/A") }}
                         </p>
                     </div>
                     <!-- Vencimiento -->
@@ -146,13 +146,15 @@
                     <!-- Cantidad -->
                     <div class="w-[12%] flex justify-center items-center border-r border-black">
                         <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[10px]">
-                            {{ prod.cant_det_recepcion_pedido }}
+                            {{ prod.producto.fraccionado_producto == 0 ? floatToInt(prod.cant_det_recepcion_pedido) : prod.cant_det_recepcion_pedido }}
                         </p>
                     </div>
                     <!-- Costo -->
                     <div class="w-[16%] flex justify-center items-center border-r border-black">
                         <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[10px]">
-                            ${{ prod.costo_det_recepcion_pedido }}
+                            ${{ recToPrint.det_doc_adquisicion.documento_adquisicion.id_proceso_compra == 5 ? 
+                            prod.costo_det_recepcion_pedido : 
+                            parseFloat(prod.costo_det_recepcion_pedido).toFixed(2) }}
                         </p>
                     </div>
                     <!-- Total -->
@@ -274,6 +276,16 @@ export default {
             type: Object,
             default: {},
         }
+    },
+    methods: {
+        floatToInt(value) {
+            // Primero, convertimos el valor a un número flotante
+            const floatValue = parseFloat(value);
+            // Luego, lo redondeamos al entero más cercano
+            const roundedValue = Math.round(floatValue);
+            // Devolvemos el resultado como un número entero
+            return roundedValue;
+        },
     },
     setup() {
         return {

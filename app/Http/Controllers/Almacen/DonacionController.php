@@ -84,11 +84,11 @@ class DonacionController extends Controller
                     'logical_error' => 'Error, no fue posible obtener la recepción consultada. Consulte con el administrador.',
                 ], 422);
             }
-            $suppliers = Proveedor::select('id_proveedor as value', 'razon_social_proveedor as label', 'nit_proveedor')
+            $suppliers = Proveedor::select('id_proveedor as value', 'razon_social_proveedor as label', 'nit_proveedor', 'dui_proveedor')
                 ->where('estado_proveedor', 1)->orWhere('id_proveedor', $recep->id_proveedor)->get();
         } else { //Creating a new one
             $recep = [];
-            $suppliers = Proveedor::select('id_proveedor as value', 'razon_social_proveedor as label', 'nit_proveedor')
+            $suppliers = Proveedor::select('id_proveedor as value', 'razon_social_proveedor as label', 'nit_proveedor', 'dui_proveedor')
                 ->where('estado_proveedor', 1)->get();
         }
 

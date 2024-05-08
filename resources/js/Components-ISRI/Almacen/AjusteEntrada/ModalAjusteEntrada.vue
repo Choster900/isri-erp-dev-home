@@ -16,7 +16,8 @@
                     <div class="mt-[5px] text-gray-500 text-opacity-70 w-[14px] h-[14px] mx-2">
                         <icon-m :iconName="'nextSvgVector'"></icon-m>
                     </div>
-                    <span class="text-[16px] font-medium text-black font-[Roboto]">{{ objId > 0 ? (adjustment.status != 1 ? 'Ver ajuste' : 'Editar ajuste') : 'Crear ajuste' }}</span>
+                    <span class="text-[16px] font-medium text-black font-[Roboto]">{{ objId > 0 ? (adjustment.status !=
+                        1 ? 'Ver ajuste' : 'Editar ajuste') : 'Crear ajuste' }}</span>
                 </div>
                 <svg class="h-6 w-6 text-gray-400 hover:text-gray-600 cursor-pointer" @click="$emit('cerrar-modal')"
                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -26,7 +27,7 @@
             </div>
 
             <div class="max-h-[450px] overflow-x-auto overflow-y-auto">
-                <div class="flex items-center justify-between pt-2 pb-1 w-[96%]  pl-8">
+                <div id="headerFormat" class="flex items-center justify-between pt-2 pb-1 w-[96%]  pl-8">
                     <div class="flex items-center">
                         <span class="text-[14px] text-slate-700 font-medium font-[Roboto] underline">INFORMACION
                             GENERAL</span>
@@ -80,11 +81,13 @@
                     </div>
                     <div class="mb-2 md:mr-0 md:mb-0 basis-1/4" :class="{ 'selected-opt': adjustment.idLt > 0, }">
                         <label class="block mb-2 text-[13px] font-medium text-gray-600 ">Linea de trabajo
-                            <span v-if="adjustment.financingSourceId != 4 || adjustment.financingSourceId == ''" class="text-red-600 font-extrabold">*</span>
+                            <span v-if="adjustment.financingSourceId != 4 || adjustment.financingSourceId == ''"
+                                class="text-red-600 font-extrabold">*</span>
                         </label>
                         <div class="relative font-semibold flex h-[35px] w-full">
                             <Multiselect v-model="adjustment.idLt" :options="lts" :searchable="true"
-                                :noOptionsText="'Lista vacía.'" :placeholder="adjustment.financingSourceId === 4 ? 'Desactivado' : 'Seleccione uplt'"
+                                :noOptionsText="'Lista vacía.'"
+                                :placeholder="adjustment.financingSourceId === 4 ? 'Desactivado' : 'Seleccione uplt'"
                                 :disabled="adjustment.status != 1 || adjustment.financingSourceId === 4"
                                 :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
                         </div>
@@ -115,9 +118,35 @@
                     </div>
                 </div>
 
+
                 <div class="w-full pl-8 max-w-full mt-4 pb-2">
                     <div class="min-w-[970px]">
-                        <div class="grid grid-cols-[100%] max-w-[96%]  border border-gray-500">
+                        <div v-if="adjustment.status == 1"
+                            class="grid grid-cols-[100%] max-w-[96%] border border-gray-500">
+                            <div class="justify-center flex items-center w-full bg-white py-2">
+                                <p class="font-[MuseoSans] text-[12px] py-1.5 font-bold mr-2">PRODUCTOS: </p>
+                                <div class="w-[50%] flex items-center justify-center mr-2">
+                                    <Multiselect id="doc" v-model="adjustment.prodId" :options="products"
+                                        class="h-[35px]" :internal-search="false"
+                                        @search-change="handleSearchChange($event)" :loading="isLoadingProduct"
+                                        :clear-on-search="true" :filter-results="false" :resolve-on-load="true"
+                                        :disabled="adjustment.status != 1" :searchable="true"
+                                        :noOptionsText="'Sin resultados'" placeholder="Escribe para buscar producto"
+                                        :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
+                                </div>
+                                <button @click="selectProd(adjustment.prodId)"
+                                    class="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-4 rounded">
+                                    <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 4v16m8-8H4"></path>
+                                    </svg>
+                                    <span class="font-[Roboto] text-[12px]">AGREGAR</span>
+                                </button>
+
+                            </div>
+                        </div>
+                        <div v-else class="grid grid-cols-[100%] max-w-[96%] border border-gray-500">
                             <div class="justify-center flex w-full bg-white">
                                 <p class="font-[MuseoSans] text-[12px] py-1 font-bold">LISTADO DE PRODUCTOS</p>
                             </div>
@@ -125,28 +154,26 @@
                     </div>
                     <div class="min-w-[970px]">
                         <div
-                            class="grid grid-cols-[18%_25%_14%_13%_10%_10%_10%] max-w-[96%] bg-[#001c48] border-b border-x border-gray-500 bg-opacity-80 text-white">
+                            class="grid grid-cols-[37%_14%_13%_12%_12%_12%] max-w-[96%] w-full bg-[#001c48] border-b border-x border-gray-500 bg-opacity-80 min-w-[800px] text-white">
                             <!-- Table header -->
-                            <div class="border-r border-gray-500 flex items-center justify-center py-1">
-                                <p class="font-[MuseoSans] text-[11px]">PRODUCTO</p>
+                            <div class="w-full flex items-center justify-center border-r border-gray-500 h-[30px]">
+                                <p class="text-center font-[MuseoSans] text-[11px]">PRODUCTO
+                                </p>
                             </div>
-                            <div class="border-r border-gray-500  flex items-center justify-center py-1">
-                                <p class="font-[MuseoSans] text-[11px]">INFO. PRODUCTO</p>
+                            <div class="w-full flex items-center justify-center border-r border-gray-500 h-[30px]">
+                                <p class="text-center font-[MuseoSans] text-[11px]">MARCA</p>
                             </div>
-                            <div class="border-r border-gray-500  flex items-center justify-center py-1">
-                                <p class="font-[MuseoSans] text-[11px]">MARCA</p>
+                            <div class="w-full flex items-center justify-center border-r border-gray-500 h-[30px]">
+                                <p class="text-center font-[MuseoSans] text-[11px]">VCTO.</p>
                             </div>
-                            <div class="border-r border-gray-500  flex items-center justify-center py-1">
-                                <p class="font-[MuseoSans] text-[11px]">VCTO.</p>
+                            <div class="w-full flex items-center justify-center border-r border-gray-500 h-[30px]">
+                                <p class="text-center font-[MuseoSans] text-[11px]">CANTIDAD</p>
                             </div>
-                            <div class="border-r border-gray-500  flex items-center justify-center py-1">
-                                <p class="font-[MuseoSans] text-[11px]">CANTIDAD</p>
+                            <div class="w-full flex items-center justify-center border-r border-gray-500 h-[30px]">
+                                <p class="text-center font-[MuseoSans] text-[11px]">C. UNITARIO</p>
                             </div>
-                            <div class="border-r border-gray-500  flex items-center justify-center py-1">
-                                <p class="font-[MuseoSans] text-[11px]">C. UNITARIO</p>
-                            </div>
-                            <div class="flex items-center justify-center py-1">
-                                <p class="font-[MuseoSans] text-[11px]">TOTAL</p>
+                            <div class="w-full flex items-center justify-center border-gray-500 h-[30px]">
+                                <p class="text-center font-[MuseoSans] text-[11px]">TOTAL</p>
                             </div>
                         </div>
                     </div>
@@ -154,31 +181,20 @@
                     <template v-for="(prod, index) in adjustment.prods" :key="index">
                         <div class="min-w-[970px] grid grid-cols-[96%_4%]" v-if="prod.deleted == false">
                             <div :id="'row-' + index"
-                                class="grid grid-cols-[18%_25%_14%_13%_10%_10%_10%] max-w-full bg-white hover:bg-gray-200 text-gray-800 border-b border-x border-gray-500">
-                                <div class="border-r border-gray-500 min-h-[75px] flex items-center justify-center"
-                                    :class="errors['prods.' + index + '.prodId'] ? 'bg-red-300' : ''">
-                                    <!-- Select for products -->
-                                    <Multiselect id="doc" v-model="prod.prodId" :options="products" class="h-[35px]"
-                                        :disabled="adjustment.status != 1" :searchable="true" :internal-search="false"
-                                        @search-change="handleSearchChange($event, index, prod.prodId)"
-                                        @change="selectProd($event, index)" :loading="prod.isLoadingProd"
-                                        :clear-on-search="true" :filter-results="false" :resolve-on-load="true"
-                                        :noOptionsText="'Sin resultados'" placeholder="Buscar producto"
-                                        @open="products = []"
-                                        :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', noOptions: 'py-2 px-3 text-[12px] text-gray-600 bg-white text-left rtl:text-right', search: 'w-full absolute uppercase inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', optionPointed: 'text-white bg-[#001c48] bg-opacity-40', }" />
-                                </div>
+                                class="grid grid-cols-[37%_14%_13%_12%_12%_12%] max-w-full bg-white hover:bg-gray-200 text-gray-800 border-b border-x border-gray-500">
+
                                 <div
-                                    class="border-r border-gray-500 min-h-[75px] max-h-[100px] flex items-center justify-center">
+                                    class="w-full flex items-center justify-center border-r border-gray-500 min-h-[75px] max-h-[100px]">
                                     <div class="overflow-y-auto h-full">
                                         <p class="font-[MuseoSans] text-[12px] p-1">{{ prod.desc }}</p>
                                     </div>
                                 </div>
+
                                 <div class="border-r border-gray-500 min-h-[75px] flex items-center justify-center"
                                     :class="errors['prods.' + index + '.brandId'] ? 'bg-red-300' : ''">
                                     <Multiselect v-if="adjustment.status == 1" id="doc" v-model="prod.brandId"
-                                        :options="brands" class="h-[35px] max-w-[95%]"
-                                        :disabled="adjustment.status != 1" :searchable="true"
-                                        :noOptionsText="'Lista vacía.'" placeholder="Marca"
+                                        :options="brands" class="h-[35px] max-w-[95%]" :disabled="adjustment.status != 1"
+                                        :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Marca"
                                         :classes="{ optionSelected: 'text-white bg-[#001c48] bg-opacity-80', optionSelectedPointed: 'text-white bg-[#001c48] opacity-90', optionPointed: 'text-white bg-[#001c48] bg-opacity-40' }" />
                                     <p class="font-[MuseoSans] text-[12px] p-1 " v-else>{{ prod.brandLabel }}</p>
                                 </div>
@@ -190,23 +206,23 @@
                                     </div>
                                     <p v-else class="font-[MuseoSans] text-[12px] p-1 ">N/A</p>
                                 </div>
-                                <div class="border-r border-gray-500 min-h-[75px] flex items-center justify-center"
+
+                                <div class="w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]"
                                     :class="errors['prods.' + index + '.qty'] ? 'bg-red-300' : ''">
                                     <input v-model="prod.qty" :disabled="adjustment.status != 1"
                                         class="font-bold max-w-[95%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-[13px] border-[#d1d5db]"
                                         type="text" name="" id=""
-                                        @input="handleValidation('qty', { limit: 3, number: true }, { index: index })">
+                                        @input="handleValidation('qty', prod.fractionated ? { limit: 7, amount: true } : { limit: 4, number: true }, { index: index })">
                                 </div>
-                                <div class="border-r border-gray-500 min-h-[75px] flex items-center justify-center"
+                                <div class="w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]"
                                     :class="errors['prods.' + index + '.cost'] ? 'bg-red-300' : ''">
                                     <input v-model="prod.cost" :disabled="adjustment.status != 1"
                                         class="font-bold max-w-[95%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-[13px] border-[#d1d5db]"
                                         type="text" name="" id=""
                                         @input="handleValidation('cost', { limit: 8, amount: true }, { index: index })">
                                 </div>
-                                <div class="min-h-[75px] flex items-center justify-center">
-                                    <p
-                                        class="font-[MuseoSans] inline-block max-w-full text-ellipsis overflow-hidden text-[13px] p-1 font-bold">
+                                <div class="w-full flex items-center justify-center min-h-[75px]">
+                                    <p class="font-[MuseoSans] text-[13px] p-1 font-bold">
                                         {{ prod.total != '' ? '$' + prod.total : '' }}
                                     </p>
                                 </div>
@@ -230,8 +246,17 @@
                             </div>
                         </div>
                     </template>
+
+                    <div v-if="activeDetails.length <= 0" class="min-w-[970px]">
+                        <div
+                            class="flex items-center bg-white justify-center max-w-[96%] border-x border-b border-gray-500 py-5">
+                            <p class="font-[MuseoSans] text-[12px] text-red-500 font-semibold"> SIN PRODUCTOS
+                                SELECCIONADOS</p>
+                        </div>
+                    </div>
+
                     <div id="total" class="w-full max-w-full grid grid-cols-[96%_4%] min-w-[970px]">
-                        <div class="grid grid-cols-[90%_10%] w-full max-w-full border-b border-x border-gray-500">
+                        <div class="grid grid-cols-[88%_12%] w-full max-w-full border-b border-x border-gray-500">
                             <div class="text-right border-r h-[30px] border-gray-500">
                                 <p class="font-[MuseoSans] text-[12px] py-2 mr-2 font-bold mt-[-3px]">TOTAL AJUSTE (+)
                                 </p>
@@ -246,11 +271,12 @@
                         </div>
                         <div class="w-full">
                             <div class="w-full h-[30px]">
-                                <svg v-if="adjustment.status == 1" @click="addNewRow()"
-                                    class="text-green-600 cursor-pointer hover:text-green-800" width="28px"
-                                    height="28px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 6V18M6 12H18" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round" />
+                                <svg @click="returnToTop" xmlns="http://www.w3.org/2000/svg"
+                                    class="w-6 h-6 text-blue-700 inline rotate-180 cursor-pointer" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                        d="M10 3a1 1 0 0 1 1 1v10.586l2.293-2.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4a1 1 0 0 1 1.414-1.414L9 14.586V4a1 1 0 0 1 1-1z"
+                                        clip-rule="evenodd" />
                                 </svg>
                             </div>
                         </div>
@@ -263,7 +289,7 @@
             <div id="buttons" class="md:flex flex md:items-center my-6 sticky flex-row justify-center mx-8">
                 <button type="button" @click="$emit('cerrar-modal')"
                     class="mr-2 text-gray-600 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-[12px] px-2.5 py-1.5 text-center mb-2 dark:border-gray-500 dark:text-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800">CANCELAR</button>
-                <div class="" v-if="adjustment.status == 1">
+                <div class="" v-if="adjustment.status == 1 && activeDetails.length > 0">
                     <button v-if="objId > 0" @click="updateAdjustment(adjustment)"
                         class="bg-orange-700 hover:bg-orange-800 text-white font-medium text-[12px] px-2.5 py-1.5 rounded-lg mr-1.5 mb-2">ACTUALIZAR</button>
                     <button v-else @click="storeAdjustment(adjustment)"
@@ -304,9 +330,9 @@ export default {
 
         const {
             isLoadingRequest, errors, adjustment, reasons, centers, financingSources, lts,
-            products, brands, asyncFindProduct, totalRec, asyncProds, selectedProducts,
-            getInfoForModalAdjustment, selectProd, deleteRow, addNewRow, storeAdjustment, updateAdjustment, handleValidation,
-            changeFinancingSource
+            products, brands, asyncFindProduct, totalRec, asyncProds, activeDetails, isLoadingProduct,
+            getInfoForModalAdjustment, selectProd, deleteRow, storeAdjustment, updateAdjustment, handleValidation,
+            changeFinancingSource, returnToTop
         } = useAjusteEntrada(context);
 
         const handleSearchChange = async (query, index, prodId) => {
@@ -321,9 +347,9 @@ export default {
 
         return {
             isLoadingRequest, errors, adjustment, reasons, centers, financingSources, lts,
-            products, brands, asyncFindProduct, totalRec, asyncProds, selectedProducts,
-            handleValidation, selectProd, handleSearchChange, deleteRow, addNewRow, storeAdjustment, updateAdjustment,
-            changeFinancingSource
+            products, brands, asyncFindProduct, totalRec, asyncProds, activeDetails, isLoadingProduct,
+            handleValidation, selectProd, handleSearchChange, deleteRow, storeAdjustment, updateAdjustment,
+            changeFinancingSource, returnToTop
         }
     }
 }
@@ -332,6 +358,24 @@ export default {
 <style>
 .dp__input_wrap {
     height: 35px;
+}
+
+@keyframes blink {
+    0% {
+        background-color: transparent;
+    }
+
+    50% {
+        background-color: rgb(251 146 60);
+    }
+
+    100% {
+        background-color: transparent;
+    }
+}
+
+.blinking {
+    animation: blink 1s infinite;
 }
 
 .dp__theme_light {

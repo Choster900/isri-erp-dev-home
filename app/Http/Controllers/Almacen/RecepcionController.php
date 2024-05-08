@@ -657,6 +657,7 @@ class RecepcionController extends Controller
                 $query->where('estado_det_recepcion_pedido', 1);
             },
             'det_doc_adquisicion.documento_adquisicion.tipo_documento_adquisicion',
+            'det_doc_adquisicion.documento_adquisicion.proceso_compra',
             'det_doc_adquisicion.documento_adquisicion.proveedor',
             'det_doc_adquisicion.fuente_financiamiento',
             'detalle_recepcion.producto.unidad_medida',
