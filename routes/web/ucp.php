@@ -26,9 +26,9 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('change-status-product', [ProductoController::class, 'changeStatusProduct'])->name('producto.changeStatusProduct');
 
     Route::get(
-        '/ucp/bienes-servicvios',
+        '/ucp/bienes-servicios',
         function (Request $request) {
-            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/ucp/bienes-servicvios', 'UCP/BienesServicios');
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/ucp/bienes-servicios', 'UCP/BienesServicios');
         }
     )->name('ucp.bienes-servicios');
     Route::post('producto-adquisiciono', [BienesServiciosController::class, 'getProductoAdquisicionByDocumentoAdquisicion'])->name('bieneservicios.productioAdquisicion');
