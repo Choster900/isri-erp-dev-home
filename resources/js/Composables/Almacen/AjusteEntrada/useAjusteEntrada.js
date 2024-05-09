@@ -190,7 +190,7 @@ export const useAjusteEntrada = (context) => {
             expDate: formatDateVue3DP(element.fecha_vcto_det_requerimiento),
             desc: `${element.producto.codigo_producto} — ${element.producto.nombre_completo_producto} — ${element.producto.unidad_medida.nombre_unidad_medida}`,
             qty: element.producto.fraccionado_producto === 0 ? floatToInt(element.cant_det_requerimiento) : element.cant_det_requerimiento,
-            cost: parseFloat(element.costo_det_requerimiento).toFixed(2),
+            cost: element.costo_det_requerimiento,
             total: "",
             deleted: false,
         };
@@ -339,43 +339,6 @@ export const useAjusteEntrada = (context) => {
             element.classList.remove('blinking');
         }, 3000); // 3000 milliseconds (3 seconds)
     }
-    
-    const constructArrayFromProduct = (productInfo, prodId) => {
-        return {
-            detId: '',
-            prodId: prodId,
-            desc: `${productInfo.codigo_producto} — ${productInfo.nombre_completo_producto} — ${productInfo.unidad_medida.nombre_unidad_medida}`,
-            brandId: '',
-            brandLabel: '',
-            prodLabel: '',
-            expDate: '',
-            fractionated: productInfo.fraccionado_producto,
-            perishable: productInfo.perecedero_producto,
-            qty: '',
-            cost: '',
-            total: '',
-            deleted: false,
-        };
-    }
-    
-    const scrollToLastRowWhenInsert = () => {
-        nextTick(() => {
-            const newRowId = `row-${adjustment.value.prods.length - 1}`;
-            const newRowElement = document.getElementById(newRowId);
-            if (newRowElement) {
-                newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
-                applyBlinkingAnimation(newRowElement);
-            }
-        });
-    }
-    
-    const applyBlinkingAnimation = (element) => {
-        element.classList.add('blinking');
-        setTimeout(() => {
-            element.classList.remove('blinking');
-        }, 3000); // 3000 milisegundos (3 segundos)
-    }
-    
 
     /**
     * Performs an asynchronous search for products with debounce functionality.

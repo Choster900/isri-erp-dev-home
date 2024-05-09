@@ -24,9 +24,18 @@ export const useValidateInput = () => {
             }
         }
 
+        if (validation.amountx6) {
+            let x = validatedInput.replace(/^\./, '').replace(/[^0-9.]/g, '');
+            validatedInput = x;
+            const regex = /^(\d+)?([.]?\d{0,6})?$/; // Modificado para permitir hasta 6 dígitos después del punto
+            if (!regex.test(validatedInput)) {
+                validatedInput = validatedInput.match(regex) || x.substring(0, x.length - 1);
+            }
+        }
+
         // Si la validación de no empezar con cero está habilitada
         if (validation.noBeginZero) {
-            validatedInput = validatedInput.replace(/^0*(?!$)[0-9]+/, ''); 
+            validatedInput = validatedInput.replace(/^0*(?!$)[0-9]+/, '');
         }
 
         if (validation.number) {
