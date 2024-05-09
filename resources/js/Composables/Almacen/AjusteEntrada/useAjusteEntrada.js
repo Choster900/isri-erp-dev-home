@@ -190,7 +190,7 @@ export const useAjusteEntrada = (context) => {
             expDate: formatDateVue3DP(element.fecha_vcto_det_requerimiento),
             desc: `${element.producto.codigo_producto} — ${element.producto.nombre_completo_producto} — ${element.producto.unidad_medida.nombre_unidad_medida}`,
             qty: element.producto.fraccionado_producto === 0 ? floatToInt(element.cant_det_requerimiento) : element.cant_det_requerimiento,
-            cost: parseFloat(element.costo_det_requerimiento).toFixed(2),
+            cost: element.costo_det_requerimiento,
             total: "",
             deleted: false,
         };
