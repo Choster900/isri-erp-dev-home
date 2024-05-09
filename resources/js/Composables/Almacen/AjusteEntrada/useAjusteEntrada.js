@@ -196,7 +196,6 @@ export const useAjusteEntrada = (context) => {
         };
     }
 
-
     /**
     * Scrolls the page to a specific element identified by its ID.
     *
@@ -527,7 +526,7 @@ export const useAjusteEntrada = (context) => {
             if (err.response && err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
             } else {
-                useShowToast(toast.warning, "You have errors in your data, please verify and try again.");
+                useShowToast(toast.warning, "Tienes errores en tus datos, por favor verifica e intenta nuevamente.");
                 errors.value = err.response.data.errors;
                 // Clear errors after 5 seconds
                 setTimeout(() => {
@@ -616,7 +615,6 @@ export const useAjusteEntrada = (context) => {
             prod.total = (prod.qty * prod.cost).toFixed(2);
         });
     }, { deep: true });
-
 
     return {
         isLoadingRequest, errors, reasons, centers, financingSources, lts, adjustment,

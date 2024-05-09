@@ -661,6 +661,7 @@ class RecepcionController extends Controller
             'det_doc_adquisicion.documento_adquisicion.proveedor',
             'det_doc_adquisicion.fuente_financiamiento',
             'detalle_recepcion.producto.unidad_medida',
+            'detalle_recepcion.producto.catalogo_cta_presupuestal',
             'detalle_recepcion.centro_atencion',
             'detalle_recepcion.linea_trabajo',
             'detalle_recepcion.marca',
@@ -668,6 +669,7 @@ class RecepcionController extends Controller
             'administrador_contrato.persona',
             'guarda_almacen.persona'
         ])->find($id);
+
         if ($recToPrint->id_estado_recepcion_pedido == 2) {
             $numeroLetras = new NumeroALetras();
             $monto_letras = $numeroLetras->toInvoice($recToPrint['monto_recepcion_pedido'], 2, 'DÓLARES');
@@ -679,37 +681,61 @@ class RecepcionController extends Controller
 
             // Convertir la colección agrupada a un formato más legible
             $detallesFormateados = [];
-            //Group by id_ccta_presupuestal
-            $detallesFormateados2 = $recToPrint->detalle_recepcion->groupBy('producto.id_ccta_presupuestal');;
             foreach ($detallesAgrupados as $lineaTrabajo => $detalles) {
-                // Obtener el primer detalle para obtener los campos comunes como 'codigo_up_lt' e 'id_lt'
-                $primerDetalle = $detalles->first();
-
-                // Calcular la suma de las cantidades multiplicadas por el costo de los detalles
-                $total = $detalles->sum(function ($detalle) {
-                    return $detalle->cant_det_recepcion_pedido * $detalle->costo_det_recepcion_pedido;
-                });
-
+                $total = 0;
+                foreach ($detalles as $detalle) {
+                    $total += $detalle->cant_det_recepcion_pedido * $detalle->costo_det_recepcion_pedido;
+                }
                 // Agregar los campos comunes
                 $detallesFormateados[] = [
-                    'codigo_up_lt' => $primerDetalle->linea_trabajo->codigo_up_lt,
-                    'nombre_up_lt' => $primerDetalle->linea_trabajo->nombre_lt,
-                    'id_lt' => $primerDetalle->id_lt,
-                    'total' => number_format($total, 2), //Formatear total
+                    'codigo_up_lt' => $detalles->first()->linea_trabajo->codigo_up_lt,
+                    'nombre_up_lt' => $detalles->first()->linea_trabajo->nombre_lt,
+                    'id_lt' => $detalles->first()->id_lt,
+                    'total' => number_format($total, 2), // Formatear total
                     'productos' => $detalles->toArray(),
                 ];
             }
 
+            //Codigo para agrupar por linea y especifico
+            $detallesFormateadosByEsp = [];
+            //Group by id_ccta_presupuestal
+            $detallesAgrupadosByEsp = $recToPrint->detalle_recepcion->groupBy(['id_lt', 'producto.id_ccta_presupuestal']);
+            // Convertir la colección agrupada a un formato más legible
+            foreach ($detallesAgrupadosByEsp as $lineaTrabajo => $detalles) {
+                foreach ($detalles as $especifico => $det) {
+                    // Obtener el primer detalle para obtener los campos comunes como 'codigo_up_lt' e 'id_lt'
+                    $primerDetalle = $det->first();
+
+                    // Calcular la suma de las cantidades multiplicadas por el costo de los detalles
+                    $total = $det->sum(function ($detalle) {
+                        return $detalle->cant_det_recepcion_pedido * $detalle->costo_det_recepcion_pedido;
+                    });
+
+                    // Agregar los campos comunes
+                    $detallesFormateadosByEsp[] = [
+                        'codigo_up_lt' => $primerDetalle->linea_trabajo->codigo_up_lt,
+                        'nombre_up_lt' => $primerDetalle->linea_trabajo->nombre_lt,
+                        'id_ccta_presupuestal' => $primerDetalle->producto->id_ccta_presupuestal,
+                        'nombre_ccta_presupuestal' => $primerDetalle->producto->catalogo_cta_presupuestal->nombre_ccta_presupuestal,
+                        'id_lt' => $primerDetalle->id_lt,
+                        'total' => number_format($total, 2), //Formatear total
+                        //'productos' => $det->toArray(),
+                    ];
+                }
+            }
+
             // Asignar los detalles formateados a $recToPrint
             $recToPrint->detalles_agrupados = $detallesFormateados;
+            $recToPrint->groupByEsp = collect($detallesFormateadosByEsp)->groupBy('codigo_up_lt')->toArray();
 
             return response()->json([
-                'recToPrint' => $recToPrint,
+                'recToPrint'        => $recToPrint,
             ]);
         } else {
-            return response()->json(['logical_error' => 'Error, la recepcion ha cambiado de estado.',], 422);
+            return response()->json(['logical_error' => 'Error, la recepcion ha cambiado de estado.'], 422);
         }
     }
+
 
     function getPendingItems($byMonto, $reception)
     {
