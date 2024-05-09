@@ -330,7 +330,7 @@ export default {
 
         const {
             isLoadingRequest, errors, adjustment, reasons, centers, financingSources, lts,
-            products, brands, asyncFindProduct, totalRec, asyncProds, activeDetails, isLoadingProduct,
+            products, brands, asyncFindProduct, totalRec, activeDetails, isLoadingProduct,
             getInfoForModalAdjustment, selectProd, deleteRow, storeAdjustment, updateAdjustment, handleValidation,
             changeFinancingSource, returnToTop
         } = useAjusteEntrada(context);
@@ -347,7 +347,7 @@ export default {
 
         return {
             isLoadingRequest, errors, adjustment, reasons, centers, financingSources, lts,
-            products, brands, asyncFindProduct, totalRec, asyncProds, activeDetails, isLoadingProduct,
+            products, brands, asyncFindProduct, totalRec, activeDetails, isLoadingProduct,
             handleValidation, selectProd, handleSearchChange, deleteRow, storeAdjustment, updateAdjustment,
             changeFinancingSource, returnToTop
         }
