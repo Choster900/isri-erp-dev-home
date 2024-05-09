@@ -679,6 +679,8 @@ class RecepcionController extends Controller
 
             // Convertir la colección agrupada a un formato más legible
             $detallesFormateados = [];
+            //Group by id_ccta_presupuestal
+            $detallesFormateados2 = $recToPrint->detalle_recepcion->groupBy('producto.id_ccta_presupuestal');;
             foreach ($detallesAgrupados as $lineaTrabajo => $detalles) {
                 // Obtener el primer detalle para obtener los campos comunes como 'codigo_up_lt' e 'id_lt'
                 $primerDetalle = $detalles->first();
