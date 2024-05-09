@@ -170,7 +170,7 @@
                                 <p class="text-center font-[MuseoSans] text-[11px]">CANTIDAD</p>
                             </div>
                             <div class="w-full flex items-center justify-center border-r border-gray-500 h-[30px]">
-                                <p class="text-center font-[MuseoSans] text-[11px]">C. UNITARIO</p>
+                                <p class="text-center font-[MuseoSans] text-[11px]">COSTO UNIT.</p>
                             </div>
                             <div class="w-full flex items-center justify-center border-gray-500 h-[30px]">
                                 <p class="text-center font-[MuseoSans] text-[11px]">TOTAL</p>
@@ -219,7 +219,7 @@
                                     <input v-model="prod.cost" :disabled="adjustment.status != 1"
                                         class="font-bold max-w-[95%] p-0 text-center h-[35px] rounded-[4px] font-[MuseoSans] text-[13px] border-[#d1d5db]"
                                         type="text" name="" id=""
-                                        @input="handleValidation('cost', { limit: 8, amount: true }, { index: index })">
+                                        @input="handleValidation('cost', { limit: 12, amountx6: true }, { index: index })">
                                 </div>
                                 <div class="w-full flex items-center justify-center min-h-[75px]">
                                     <p class="font-[MuseoSans] text-[13px] p-1 font-bold">
@@ -330,7 +330,7 @@ export default {
 
         const {
             isLoadingRequest, errors, adjustment, reasons, centers, financingSources, lts,
-            products, brands, asyncFindProduct, totalRec, asyncProds, activeDetails, isLoadingProduct,
+            products, brands, asyncFindProduct, totalRec, activeDetails, isLoadingProduct,
             getInfoForModalAdjustment, selectProd, deleteRow, storeAdjustment, updateAdjustment, handleValidation,
             changeFinancingSource, returnToTop
         } = useAjusteEntrada(context);
@@ -347,7 +347,7 @@ export default {
 
         return {
             isLoadingRequest, errors, adjustment, reasons, centers, financingSources, lts,
-            products, brands, asyncFindProduct, totalRec, asyncProds, activeDetails, isLoadingProduct,
+            products, brands, asyncFindProduct, totalRec, activeDetails, isLoadingProduct,
             handleValidation, selectProd, handleSearchChange, deleteRow, storeAdjustment, updateAdjustment,
             changeFinancingSource, returnToTop
         }

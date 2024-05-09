@@ -22,7 +22,7 @@ class AjusteEntradaRequest extends FormRequest
     public function rules(): array
     {
         $rules["centerId"] = ['required'];
-        $rules["idLt"] = ['required_if:financingSourceId,!=,4'];
+        $rules["idLt"] = 'required_unless:financingSourceId,4';
         $rules["financingSourceId"] = ['required'];
         $rules["reasonId"] = ['required'];
         foreach ($this->input('prods', []) as $key => $prod) {
@@ -68,7 +68,7 @@ class AjusteEntradaRequest extends FormRequest
     {
         $messages = [];   
         $messages["centerId.required"] = "Debe seleccionar proveedor.";
-        $messages["idLt.required_if"] = "Debe seleccionar linea de trabajo.";
+        $messages["idLt.required_unless"] = "Debe seleccionar linea de trabajo.";
         $messages["financingSourceId.required"] = "Debe seleccionar fuente de financiamiento.";
         $messages["reasonId.required"] = "Debe seleccionar motivo.";
         return $messages;
