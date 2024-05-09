@@ -228,6 +228,15 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     )->name('alm.reporteExistencia');
     Route::post('get-reporte-existencia-almacen', [ReporteAlmacenController::class, 'getReporteExistencia'])->name('reporte.AlmacenExistencia');
     Route::post('get-reporte-existencia-almacen-excel', [ReporteAlmacenController::class, 'getExcelReporteExistencia'])->name('reporte.getReporteAlmacenExistenciaExcel');
+    Route::get(
+        '/alm/reporte-requisicion',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/reporte-requisicion', 'Almacen/ReporteRequisicion');
+        }
+    )->name('alm.reporteRequisicion');
+    Route::post('get-reporte-requisicion-almacen', [ReporteAlmacenController::class, 'getReporteRequisicionAlmacen'])->name('reporte.AlmacenExistencia');
+    Route::post('get-reporte-excel-requisicion', [ReporteAlmacenController::class, 'getExcelRequisicion'])->name('reporte.AlmacenExistencia');
+
 
 
 
