@@ -151,11 +151,11 @@ class ReporteAlmacenController extends Controller
         $sheet->getColumnDimension('B')->setWidth(35);
 
         // Ajustar el texto en todas las celdas de la fila 6
-        foreach ( range('A', 'L') as $column ) {
+        foreach (range('A', 'L') as $column) {
             $sheet->getStyle($column . '6')->getAlignment()->setWrapText(true);
         }
 
-        foreach ( range('A', 'L') as $column ) {
+        foreach (range('A', 'L') as $column) {
             $sheet->getStyle($column . '6')->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
             $sheet->getStyle($column . '6')->getBorders()->getTop()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLACK));
             $sheet->getStyle($column . '6')->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
@@ -187,7 +187,7 @@ class ReporteAlmacenController extends Controller
 
 
         // Iterar sobre los resultados y escribir en la hoja de cálculo
-        foreach ( $result as $filaResultado ) {
+        foreach ($result as $filaResultado) {
             // Convertir el objeto stdClass en un array
             $filaArray = (array) $filaResultado;
 
@@ -195,7 +195,7 @@ class ReporteAlmacenController extends Controller
             $columna = 0;
 
             // Iterar sobre las columnas definidas y escribir los valores en la hoja de cálculo
-            foreach ( $columnas as $nombreColumna ) {
+            foreach ($columnas as $nombreColumna) {
                 // Obtener el valor de la columna actual
                 $valor = isset($filaArray[$nombreColumna]) ? $filaArray[$nombreColumna] : '';
 
@@ -388,7 +388,7 @@ class ReporteAlmacenController extends Controller
             'font' => ['bold' => true, 'size' => 9],
         ];
 
-        foreach ( range('A', 'I') as $column ) {
+        foreach (range('A', 'I') as $column) {
             $sheet->getStyle($column . '6')->applyFromArray($styleHeader);
         }
 
@@ -403,7 +403,7 @@ class ReporteAlmacenController extends Controller
 
 
         if ($params['tipovista'] === 'C') {
-            foreach ( range('A', 'F') as $column ) {
+            foreach (range('A', 'F') as $column) {
 
                 $sheet->getStyle($column . '6')->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
                 $sheet->getStyle('A6')->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
@@ -413,7 +413,7 @@ class ReporteAlmacenController extends Controller
                 $sheet->getStyle($column . '6')->getBorders()->getBottom()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLACK));
             }
         } else {
-            foreach ( range('A', 'I') as $column ) {
+            foreach (range('A', 'I') as $column) {
 
                 $sheet->getStyle($column . '6')->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
                 $sheet->getStyle('A6')->getBorders()->getLeft()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
@@ -426,12 +426,12 @@ class ReporteAlmacenController extends Controller
 
 
         // Ajustar el texto en todas las celdas de la fila 6
-        foreach ( range('A', 'I') as $column ) {
+        foreach (range('A', 'I') as $column) {
 
             $sheet->getStyle($column . '6')->getAlignment()->setWrapText(true);
         }
 
-        foreach ( $result as $data ) {
+        foreach ($result as $data) {
             /* $sheet->setCellValue('A' . $row, $data->COD); */
 
             if ($data->id_tipo_reg_rpt_consumo == 0) {
@@ -706,7 +706,7 @@ class ReporteAlmacenController extends Controller
         ];
         $sheet->getStyle('A6:J6')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
-        foreach ( range('A', 'J') as $column ) {
+        foreach (range('A', 'J') as $column) {
             $sheet->getStyle($column . '6')->applyFromArray($styleHeader);
             $sheet->getStyle($column . '6')->getAlignment()->setWrapText(true);
         }
@@ -716,7 +716,7 @@ class ReporteAlmacenController extends Controller
 
         $row = 7; // Comenzar desde la fila 2 para dejar espacio para los encabezados
 
-        foreach ( $result as $data ) {
+        foreach ($result as $data) {
 
             $sheet->setCellValue('A' . $row, $data->sigla_centro_rpt_rotacion);
             $sheet->setCellValue('B' . $row, $data->id_prod_rpt_rotacion);
@@ -736,7 +736,7 @@ class ReporteAlmacenController extends Controller
             $sheet->getStyle('J' . $row)->getNumberFormat()->setFormatCode('_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)');
 
             // Establecer la alineación centrada para todas las celdas excepto en la columna C
-            foreach ( range('A', 'J') as $column ) {
+            foreach (range('A', 'J') as $column) {
                 if ($column != 'C') {
                     $sheet->getStyle($column . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 }
@@ -865,7 +865,7 @@ class ReporteAlmacenController extends Controller
         ];
         $sheet->getStyle('A6:K6')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
-        foreach ( range('A', 'K') as $column ) {
+        foreach (range('A', 'K') as $column) {
             $sheet->getStyle($column . '6')->applyFromArray($styleHeader);
             $sheet->getStyle($column . '6')->getAlignment()->setWrapText(true);
         }
@@ -875,7 +875,7 @@ class ReporteAlmacenController extends Controller
 
         $row = 7; // Comenzar desde la fila 2 para dejar espacio para los encabezados
 
-        foreach ( $result as $data ) {
+        foreach ($result as $data) {
 
             $sheet->setCellValue('A' . $row, $data->codigo_proy_rpt_existencia);
             $sheet->setCellValue('B' . $row, $data->nombre_prod_rpt_existencia);
@@ -897,6 +897,209 @@ class ReporteAlmacenController extends Controller
 
 
             $sheet->getStyle('A' . $row . ':K' . $row)->getFont()->setName('Calibri')->setSize(9);
+
+
+
+            $row++;
+        }
+
+
+
+
+        // Guardar el archivo como XLSX
+        $writer = new Xlsx($spreadsheet);
+
+        // Establecer el nombre del archivo
+        $current_date = Carbon::now()->format('d_m_Y');
+        $filename = 'texto_excel_' . $current_date . '.xlsx';
+
+        // Establecer las cabeceras para descargar el archivo
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        // Guardar el archivo en la salida PHP
+        $writer->save('php://output');
+    }
+
+
+
+    function getReporteRequisicionAlmacen(Request $request)
+    {
+
+        /*   $rules = [
+            "idFuenteFinanciamiento"       => "required",
+        ];
+        $customMessages = [
+            "idFuenteFinanciamiento.required"       => "La fuente financiamiento es obligatoria.",
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $customMessages);
+        if ($validator->fails()) {
+            $errors = $validator->errors()->toArray();
+            $message = 'The given data was invalid.';
+            return response()->json(['message' => $message, 'errors' => $errors], 422);
+        }
+ */
+        $params = [
+            'idcentro'    => null,
+            'idestado'    => 1,
+            'fecha_inicial'  => '2024-01-01',
+            'fecha_final' =>  '2024-05-07'
+        ];
+
+        return DB::select("CALL PR_RPT_REQUISICION(:idcentro, :idestado, :fecha_inicial, :fecha_final)", $params);
+    }
+
+    public function getExcelRequisicion(Request $request)
+    {
+
+        /* $fechaInicial = $request->varFilteredInForm["fechaInicial"] != '' ? date('Y-m-d', strtotime($request->varFilteredInForm["fechaInicial"])) : null;
+        $fechaFinal = $request->varFilteredInForm["fechaFinal"] != '' ? date('Y-m-d', strtotime($request->varFilteredInForm["fechaFinal"])) : null;
+
+        $params = [
+            'idproy'        => $request->varFilteredInForm["idProy"],
+            'idcentro'      => $request->varFilteredInForm["idCentro"] == 0 ? null : $request->varFilteredInForm["idCentro"],
+            'porcentaje'    => $request->varFilteredInForm["porcentaje"],
+            'fecha_inicial' => $fechaInicial,
+            'fecha_final'   => $fechaFinal,
+        ]; */
+
+        $params = [
+            'idcentro'    => null,
+            'idestado'    => 1,
+            'fecha_inicial'  => '2024-01-01',
+            'fecha_final' =>  '2024-05-07'
+        ];
+
+        $result =  DB::select("CALL PR_RPT_REQUISICION(:idcentro, :idestado, :fecha_inicial, :fecha_final)", $params);
+
+
+        // Crear una instancia de Spreadsheet
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->mergeCells('A1:D1');
+        $sheet->setCellValue('A1', 'SISTEMA DE ALMACEN PARA EL CONTROL DE BIENES EN EXISTENCIA - ISRI');
+        $sheet->getStyle('A1')->getFont()->setSize(8);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+
+        $sheet->mergeCells('B2:F2');
+        $sheet->setCellValue('B2', 'REQUISICIONES');
+        $sheet->getStyle('B2')->getFont()->setBold(true)->setSize(18);
+        $sheet->getStyle('B2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+
+        $sheet->mergeCells('F3:H3');
+        #$sheet->setCellValue('H3', 'DEL ' . date_format(date_create($fechaInicial), 'd, F, Y'));
+        $sheet->setCellValue('F3', 'DEL 12 , noviembre, 2023');
+        $sheet->getStyle('F3')->getFont()->setSize(9);
+        $sheet->getStyle('F3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+        $sheet->mergeCells('A4:B4');
+        #$sheet->setCellValue('H4', 'DEL ' . date_format(date_create($fechaFinal), 'd, F, Y'));
+        $sheet->setCellValue('A4', 'ALMACEN GENERAL');
+        $sheet->getStyle('A4')->getFont()->setSize(9);
+        $sheet->getStyle('B4')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+
+        $sheet->mergeCells('F4:H4');
+        #$sheet->setCellValue('H4', 'DEL ' . date_format(date_create($fechaFinal), 'd, F, Y'));
+        $sheet->setCellValue('F4', 'AL 16. ABRIL, 2024');
+        $sheet->getStyle('F4')->getFont()->setSize(9);
+        $sheet->getStyle('F4')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+
+        $encabezados = [
+            'CODIGO',
+            'PRODUCTO',
+            'MARCA',
+            'UNIDAD MEDIDA',
+            'FECHA DE VENCIMIENTO',
+            'CANT. REQ',
+            'COSTO',
+            'MONTO/TOTAL',
+        ];
+
+
+        $sheet->fromArray([$encabezados], null, 'A5');
+        $sheet->getRowDimension(5)->setRowHeight(25);
+        $sheet->getColumnDimension('B')->setWidth(45);
+        $sheet->getColumnDimension('E')->setWidth(11);
+
+        // Establecer estilo para encabezados
+        $styleHeader = [
+            'font' => ['bold' => true, 'size' => 9],
+        ];
+        $sheet->getStyle('A5:J5')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        foreach (range('A', 'J') as $column) {
+            $sheet->getStyle($column . '5')->applyFromArray($styleHeader);
+            $sheet->getStyle($column . '5')->getAlignment()->setWrapText(true);
+        }
+
+        foreach (range('A', 'H') as $column) {
+            $sheet->getStyle($column . '5')->getBorders()->getTop()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+            $sheet->getStyle($column . '5')->getBorders()->getTop()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLACK));
+            $sheet->getStyle($column . '5')->getBorders()->getBottom()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+            $sheet->getStyle($column . '5')->getBorders()->getBottom()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLACK));
+        }
+
+
+
+
+        $row = 6; // Comenzar desde la fila 2 para dejar espacio para los encabezados
+
+        foreach ($result as $data) {
+
+            /* $sheet->setCellValue('A' . $row, $data->id_tipo_reg_rpt_requisicion);
+            $sheet->setCellValue('B' . $row, $data->id_prod_rpt_rotacion);
+            $sheet->setCellValue('C' . $row, $data->nombre_prod_rpt_rotacion); */
+
+            if ($data->id_tipo_reg_rpt_requisicion == 1) {
+                $sheet->mergeCells('A' . $row . ':C' . $row);
+                $sheet->setCellValue('A' . $row, $data->marca_rpt_requisicion . ',' . $data->producto_rpt_requisicion);
+                $sheet->getStyle('A' . $row)->getFont()->setBold(true)->setSize(10);
+                $sheet->getStyle('A' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+            }
+
+            if ($data->id_tipo_reg_rpt_requisicion == 2) {
+                $sheet->getRowDimension($row)->setRowHeight(25);
+
+                $sheet->setCellValue('A' . $row, $data->id_prod_rpt_requisicion);
+                $sheet->setCellValue('B' . $row, $data->producto_rpt_requisicion);
+                $sheet->getStyle('B'. $row)->getAlignment()->setWrapText(true);
+
+
+                $sheet->setCellValue('C' . $row, $data->marca_rpt_requisicion);
+                $sheet->setCellValue('D' . $row, $data->umedida_rpt_requisicion);
+                $sheet->setCellValue('E' . $row, $data->fecha_vcto_rpt_requisicion);
+                $sheet->setCellValue('F' . $row, $data->cant_rpt_requisicion);
+                $sheet->setCellValue('G' . $row, $data->monto_rpt_requisicion);
+                $sheet->getStyle('G' . $row)->getNumberFormat()->setFormatCode('_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)');
+
+                $sheet->setCellValue('H' . $row, $data->costo_rpt_requisicion);
+                $sheet->getStyle('H' . $row)->getNumberFormat()->setFormatCode('_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)');
+            }
+
+            if ($data->id_tipo_reg_rpt_requisicion == 3) {
+                $sheet->mergeCells('A' . $row . ':G' . $row);
+                $sheet->setCellValue('A' . $row, $data->producto_rpt_requisicion);
+
+                $sheet->getStyle('A' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $sheet->setCellValue('H' . $row, $data->monto_rpt_requisicion);
+                $sheet->getStyle('H' . $row)->getNumberFormat()->setFormatCode('_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)');
+            }
+
+            // Establecer la alineación centrada para todas las celdas excepto en la columna C
+            foreach (range('A', 'J') as $column) {
+                /* if ($column != 'C') { */
+                //$sheet->getStyle($column . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                /* } */
+            }
+
+            $sheet->getStyle('A' . $row . ':J' . $row)->getFont()->setName('Calibri')->setSize(9);
 
 
 

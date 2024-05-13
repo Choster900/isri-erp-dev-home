@@ -46,4 +46,9 @@ class Producto extends Model
     {
         return $this->belongsTo('App\Models\CatalogoUnspsc','id_catalogo_unspsc','id_catalogo_unspsc');
     }
+
+    public function catalogo_cta_presupuestal()
+    {
+        return $this->belongsTo('App\Models\CatalogoCtaPresupuestal','id_ccta_presupuestal','id_ccta_presupuestal');
+    }
 }
