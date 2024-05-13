@@ -11,41 +11,35 @@
                             class="text-red-600 font-extrabold">*</span></label>
                     <div class="relative flex h-[30px] w-full">
                         <Multiselect v-model="idFuenteFinanciamiento" :options="[
-        { value: 1, label: 'FONDO GENERAL' },
-        { value: 2, label: 'FONDO CIRCULANTE DE MONTO FIJO' },
-        { value: 3, label: 'RECURSOS PROPIOS' },
-        { value: 4, label: 'DONACION' },
-    ]" :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione" />
+                            { value: 1, label: 'FONDO GENERAL' },
+                            { value: 2, label: 'FONDO CIRCULANTE DE MONTO FIJO' },
+                            { value: 3, label: 'RECURSOS PROPIOS' },
+                            { value: 4, label: 'DONACION' },
+                        ]" :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione" />
                     </div>
-                    <!--  <InputError class="mt-2" :message="errors[`varFilteredInForm.idProy`]" /> -->
+                     <InputError class="mt-2" :message="errors[`idFuenteFinanciamiento`]" />
                 </div>
+                <!-- {{errors}} -->
                 <div class="mb-4 md:mr-0 md:mb-0 basis-[25%]">
                     <label class="block mb-2 text-[13px] font-medium text-gray-600">Centro Atencion <span
                             class="text-red-600 font-extrabold">*</span></label>
                     <div class="relative flex h-[30px] w-full">
                         <Multiselect v-model="idCentroAtencion" :isSelected="0" :options="[
-        { value: 0, label: 'TODOS' },
-
-        { value: 1, label: 'ADMON-ADMINISTRACION SUPERIOR' },
-        { value: 2, label: 'CAA-CENTRO DE ATENCION A ANCIANOS SARA ZALDIVAR' },
-        { value: 3, label: 'CAL-CENTRO DEL APARATO LOCOMOTOR' },
-        { value: 4, label: 'CALE-CENTRO DE AUDICION Y LENGUAJE' },
-        {
-            value: 5,
-            label: 'CRC-CENTRO DE REHABILITACION PARA CIEGOS EUGENIA DE DUEÑAS',
-        },
-        { value: 6, label: 'UCE-UNIDAD DE CONSULTA EXTERNA' },
-        {
-            value: 7,
-            label:
-                'CRINA+CENTRO DE REHABILITACION INTEGRAL PARA LA NIÑEZ Y LA ADOLESCENCIA',
-        },
-        { value: 8, label: 'CRIO-CENTRO DE REHABILITACION INTEGRAL DE OCCIDENTE' },
-        { value: 9, label: 'CRIOR-CENTRO DE REHABILITACION INTEGRAL DE ORIENTE' },
-        { value: 10, label: 'CRP-CENTRO DE REHABILITACION PROFESIONAL' },
-    ]" :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione" />
+                            { value: 0, label: 'TODOS' },
+                            { value: 1, label: 'ADMON-ADMINISTRACION SUPERIOR' },
+                            { value: 2, label: 'CAA-CENTRO DE ATENCION A ANCIANOS SARA ZALDIVAR' },
+                            { value: 3, label: 'CAL-CENTRO DEL APARATO LOCOMOTOR' },
+                            { value: 4, label: 'CALE-CENTRO DE AUDICION Y LENGUAJE' },
+                            { value: 5, label: 'CRC-CENTRO DE REHABILITACION PARA CIEGOS EUGENIA DE DUEÑAS',},
+                            { value: 6, label: 'UCE-UNIDAD DE CONSULTA EXTERNA' },
+                            { value: 7, label: 'CRINA+CENTRO DE REHABILITACION INTEGRAL PARA LA NIÑEZ Y LA ADOLESCENCIA', },
+                            { value: 8, label: 'CRIO-CENTRO DE REHABILITACION INTEGRAL DE OCCIDENTE' },
+                            { value: 9, label: 'CRIOR-CENTRO DE REHABILITACION INTEGRAL DE ORIENTE' },
+                            { value: 10, label: 'CRP-CENTRO DE REHABILITACION PROFESIONAL' },
+                        ]" :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione" />
                     </div>
-                    <!--  <InputError class="mt-2" :message="errors[`varFilteredInForm.idCentro`]" /> -->
+                    <InputError class="mt-2" :message="errors[`idCentroAtencion`]" />
+
                 </div>
                 <div class="mb-4 md:mr-0 md:mb-0 basis-[25%]">
                     <label class="block mb-2 text-[13px] font-medium text-gray-600">Sub Almacen <span
@@ -61,7 +55,7 @@
         { value: 7, label: 'INSUMOS BIOSEGURIDAD' },
     ]" :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="seleccione" />
                     </div>
-                    <!--  <InputError class="mt-2" :message="errors[`varFilteredInForm.porcentaje`]" /> -->
+                    <InputError class="mt-2" :message="errors[`idSubAlmacen`]" />
                 </div>
                 <button @click="searchReportExistencia()"
                     class="bg-[#001c48] hover:bg-[#001c48]/90 flex h-[30px] items-center justify-center text-white font-medium text-[12px] px-2.5 py-0.5 rounded mr-1.5">
@@ -157,7 +151,7 @@ export default {
             dataReporteExistencia,
             exportExcel,
             printPdf,
-
+            errors,
             idSubAlmacen,
             idCentroAtencion,
             idFuenteFinanciamiento,
@@ -172,7 +166,7 @@ export default {
             exportExcel,
             printPdf,
             isLoaderRequest,
-
+            errors,
             idSubAlmacen,
             idCentroAtencion,
             idFuenteFinanciamiento,

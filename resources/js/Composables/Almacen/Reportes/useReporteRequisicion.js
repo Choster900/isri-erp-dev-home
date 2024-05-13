@@ -36,8 +36,7 @@ export const useReporteRequisicion = (context) => {
             dataGetRequisicion.value = data;
             isLoadinRequest.value = false;
         } catch (error) {
-            console.error('Ocurrió un error al obtener la información del reporte:', error);
-
+            console.error("Ocurrió un error al obtener la información del reporte:", error);
 
             if (error.response.status === 422) {
                 // Obtiene los errores del cuerpo de la respuesta y los transforma a un formato más manejable
@@ -53,7 +52,6 @@ export const useReporteRequisicion = (context) => {
                 }, 5000);
                 console.error("Error en guardar los datos:", errors.value);
             }
-
 
             isLoadinRequest.value = false;
 
@@ -180,6 +178,7 @@ export const useReporteRequisicion = (context) => {
 
     const getOption = (e) => {
         moment.locale('en');
+        console.log(e);
         switch (e) {
             case 0:
                 fechaInicial.value = moment().startOf('month').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');

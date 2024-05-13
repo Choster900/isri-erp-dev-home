@@ -3,32 +3,12 @@
 namespace App\Http\Controllers\Almacen;
 
 use App\Http\Controllers\Controller;
-use App\Models\Empleado;
 use Illuminate\Support\Facades\Validator;
-use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
-use App\Http\Requests\Tesoreria\ReporteFacturaRequest;
-use App\Http\Requests\Tesoreria\ReporteIngresoDiarioRequest;
-use App\Http\Requests\Tesoreria\ReporteIngresoRequest;
-use App\Http\Requests\Tesoreria\ReporteQuedanRequest;
-use App\Http\Requests\Tesoreria\RetencionISRRequest;
-use App\Models\CentroAtencion;
-use App\Models\ConceptoIngreso;
-use App\Models\CuentaPresupuestal;
-use App\Models\Dependencia;
-use App\Models\EstadoQuedan;
-use App\Models\Proveedor;
-use App\Models\ProyectoFinanciado;
-use App\Models\ReciboIngreso;
-use App\Models\RequerimientoPago;
 use Carbon\Carbon;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
-use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ReporteAlmacenController extends Controller
 {
@@ -776,9 +756,13 @@ class ReporteAlmacenController extends Controller
 
         $rules = [
             "idFuenteFinanciamiento"       => "required",
+            "idCentroAtencion" => "required",
+            "idSubAlmacen" => "required",
         ];
         $customMessages = [
             "idFuenteFinanciamiento.required"       => "La fuente financiamiento es obligatoria.",
+            "idCentroAtencion.required"       => "El centro es obligatoria.",
+            "idSubAlmacen.required"       => "El Sub  es obligatoria.",
         ];
 
         $validator = Validator::make($request->all(), $rules, $customMessages);

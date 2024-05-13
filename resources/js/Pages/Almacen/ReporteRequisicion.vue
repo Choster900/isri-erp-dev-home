@@ -10,11 +10,15 @@
                 <div class="">
                     <DateTimePickerM :showIcon="false" v-model="fechaInicial" :label="'Fecha inicio'"
                         :placeholder="'Seleccione'" :required="true" />
+                    <InputError class="mt-2" :message="errors[`fechaInicial`]" />
+
                 </div>
 
                 <div class="">
                     <date-time-picker-m :showIcon="false" v-model="fechaFinal" :label="'Fecha fin'"
                         :placeholder="'Seleccione'" :required="true" />
+                    <InputError class="mt-2" :message="errors[`fechaFinal`]" />
+
                 </div>
 
                 <div class="mb-4 md:mr-0 md:mb-0 basis-[25%]">
@@ -45,7 +49,10 @@
         { value: 9, label: 'CRIOR-CENTRO DE REHABILITACION INTEGRAL DE ORIENTE' },
         { value: 10, label: 'CRP-CENTRO DE REHABILITACION PROFESIONAL' },
     ]" :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione" />
+
+
                     </div>
+                    <InputError class="mt-2" :message="errors[`idCentro`]" />
                     <!--  <InputError class="mt-2" :message="errors[`varFilteredInForm.idCentro`]" /> -->
                 </div>
 
@@ -60,6 +67,8 @@
         { value: 4, label: 'ELIMINADO' },
     ]" :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione" />
                     </div>
+    <InputError class="mt-2" :message="errors[`idEstado`]" />
+
                     <!--  <InputError class="mt-2" :message="errors[`varFilteredInForm.idProy`]" /> -->
                 </div>
 
@@ -165,7 +174,7 @@ export default {
             isLoadinRequest,
             getOption,
             idEstado,idCentro,
-            fechaInicial, fechaFinal,
+            fechaInicial, fechaFinal,errors,
         } = useReporteRequisicion();
         return {
             permits,
@@ -175,7 +184,7 @@ export default {
             printPdf,
             isLoadinRequest,
             dataGetRequisicion,
-            exportExcel,
+            exportExcel,errors,
             idEstado,idCentro,
             fechaInicial, fechaFinal,
         };
