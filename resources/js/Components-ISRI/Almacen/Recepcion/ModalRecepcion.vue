@@ -108,7 +108,7 @@
                             </div>
                             <!-- Columna 2 -->
                             <div class="w-full bg-white p-2">
-                                <p class="font-[Bembo] text-center text-[14px] font-bold">ALMACEN CENTRAL</p>
+                                <p class="font-[Bembo] text-center text-[14px] font-bold">ALMACEN GENERAL</p>
                                 <p class="font-[Bembo] text-center text-[14px] font-bold">
                                     {{ infoToShow.docName }}
                                 </p>
