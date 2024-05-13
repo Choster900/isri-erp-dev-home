@@ -39,7 +39,7 @@
                             class="w-full bg-white border-y border-r border-gray-500 p-2 flex items-center justify-center h-full">
                             <div class="flex flex-col items-center">
                                 <p class="font-[Bembo] text-center text-[14px] font-bold">
-                                    ALMACEN CENTRAL
+                                    ALMACEN GENERAL
                                 </p>
                                 <p class="font-[Bembo] text-center text-[14px] font-bold">
                                     DONACIONES

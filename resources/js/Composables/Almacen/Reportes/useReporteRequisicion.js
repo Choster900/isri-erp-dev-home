@@ -21,7 +21,14 @@ export const useReporteRequisicion = (context) => {
             isLoadinRequest.value = true;
             dataGetRequisicion.value = [];
 
-            const resp = await axios.post("/get-reporte-requisicion-almacen");
+            const resp = await axios.post("/get-reporte-requisicion-almacen",
+                {
+                    idCentro: idCentro.value,
+                    idEstado: idEstado.value,
+                    fechaInicial: fechaInicial.value,
+                    fechaFinal: fechaFinal.value,
+                }
+            );
             const { data } = resp;
 
             console.log(data);
@@ -29,8 +36,7 @@ export const useReporteRequisicion = (context) => {
             dataGetRequisicion.value = data;
             isLoadinRequest.value = false;
         } catch (error) {
-            console.error('Ocurrió un error al obtener la información del reporte:', error);
-
+            console.error("Ocurrió un error al obtener la información del reporte:", error);
 
             if (error.response.status === 422) {
                 // Obtiene los errores del cuerpo de la respuesta y los transforma a un formato más manejable
@@ -46,7 +52,6 @@ export const useReporteRequisicion = (context) => {
                 }, 5000);
                 console.error("Error en guardar los datos:", errors.value);
             }
-
 
             isLoadinRequest.value = false;
 
@@ -74,7 +79,7 @@ export const useReporteRequisicion = (context) => {
         };
         console.log(dataGetRequisicion.value);
         // Crear una instancia de la aplicación Vue para generar el componente quedanPDFVue
-        const app = createApp(ReporteRequisicionPdf,{
+        const app = createApp(ReporteRequisicionPdf, {
             dataRequisicion: dataGetRequisicion.value
         });
         // Crear un elemento div y montar la instancia de la aplicación en él
@@ -173,26 +178,27 @@ export const useReporteRequisicion = (context) => {
 
     const getOption = (e) => {
         moment.locale('en');
+        console.log(e);
         switch (e) {
             case 0:
-                varFilteredInForm.value.fechaInicial = moment().startOf('month').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
-                varFilteredInForm.value.fechaFinal = moment().format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+                fechaInicial.value = moment().startOf('month').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+                fechaFinal.value = moment().format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
                 break;
             case 1:
-                varFilteredInForm.value.fechaInicial = moment().subtract(1, 'month').startOf('month').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
-                varFilteredInForm.value.fechaFinal = moment().subtract(1, 'month').endOf('month').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+                fechaInicial.value = moment().subtract(1, 'month').startOf('month').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+                fechaFinal.value = moment().subtract(1, 'month').endOf('month').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
                 break;
             case 2:
-                varFilteredInForm.value.fechaInicial = moment().startOf('year').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
-                varFilteredInForm.value.fechaFinal = moment().format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+                fechaInicial.value = moment().startOf('year').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+                fechaFinal.value = moment().format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
                 break;
             case 3:
-                varFilteredInForm.value.fechaInicial = moment().subtract(6, 'months').startOf('month').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
-                varFilteredInForm.value.fechaFinal = moment().format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+                fechaInicial.value = moment().subtract(6, 'months').startOf('month').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+                fechaFinal.value = moment().format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
                 break;
             case 4:
-                varFilteredInForm.value.fechaInicial = ''; // Asigna el primer día de tu rango de datos
-                varFilteredInForm.value.fechaFinal = ''; // Asigna el último día de tu rango de datos
+                fechaInicial.value = ''; // Asigna el primer día de tu rango de datos
+                fechaFinal.value = ''; // Asigna el último día de tu rango de datos
                 break;
             default:
                 break;
@@ -201,6 +207,7 @@ export const useReporteRequisicion = (context) => {
 
     }
     return {
+        fechaInicial, fechaFinal, idEstado, idCentro,
         getInformacionReport, isLoadinRequest, dataGetRequisicion, exportExcel, printPdf, getOption, errors
 
     }

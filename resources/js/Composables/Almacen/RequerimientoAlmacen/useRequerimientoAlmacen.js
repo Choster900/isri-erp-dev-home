@@ -44,6 +44,7 @@ export const useRequerimientoAlmacen = (objectRequerimientoToSendModal, numeroRe
                     idDetRequerimiento: '',
                     cantDetRequerimiento: '',
                     idDetExistenciaAlmacen: '',
+                    fraccionProducto: 0,
                 }
             ],
             isHidden: false,
@@ -77,6 +78,9 @@ export const useRequerimientoAlmacen = (objectRequerimientoToSendModal, numeroRe
         if (producto) {
             // Actualiza la descripción del producto en los datos del requerimiento.
             dataDetalleRequerimiento.value[rowCentroProd].productos[rowProd].idProducto = producto.codidoProducto;
+
+            console.log(producto);
+            //dataDetalleRequerimiento.value[rowCentroProd].productos[rowProd].fraccionProducto = producto.codidoProducto;
         } else {
             console.error(`No se encontró el producto con el valor: ${valueProd}`);
         }
@@ -204,38 +208,6 @@ export const useRequerimientoAlmacen = (objectRequerimientoToSendModal, numeroRe
         });
     }
 
-
-
-    /**
-       * Busca empleados por nombre para evaluaciones.
-       *
-       * @param {string} nombreProductToSearch - Nombre a buscar.
-       * @returns {Promise<object>} - Objeto con los datos de la respuesta.
-       * @throws {Error} - Error al obtener empleados por nombre.
-       */
-
-    const handleProductSearch = async (nombreProductToSearch) => {
-
-        try {
-            // Realiza la búsqueda de empleados
-            const response = await axios.post(
-                "/get-product-searched-almacen",
-                {
-                    nombre: nombreProductToSearch,
-                }
-            );
-
-            // Devuelve los datos de la respuesta
-            return response.data;
-        } catch (error) {
-            // Manejo de errores específicos
-            console.error("Error al obtener empleados por nombre:", error);
-            // Lanza el error para que pueda ser manejado por el componente que utiliza este composable
-            throw new Error("Error en la búsqueda de empleados");
-        }
-
-    };
-
     /**
              * Obtiene la dependencia por usuario.
              *
@@ -305,13 +277,14 @@ export const useRequerimientoAlmacen = (objectRequerimientoToSendModal, numeroRe
                 const productData = {
                     value: index.id_det_existencia_almacen,
                     label: `${index.existencia_almacen.productos.codigo_producto} -
-                ${index.existencia_almacen.productos.nombre_producto}  -
-                ${stock < 0 ? 'NO DISPONIBLE':stock}  -
-                ${marca} -
-                ${index.existencia_almacen.productos.descripcion_producto}`,
+                    ${index.existencia_almacen.productos.nombre_producto}  -
+                    ${stock < 0 ? 'NO DISPONIBLE':stock}  -
+                    ${marca} -
+                    ${index.existencia_almacen.productos.descripcion_producto}`,
                     completeData: index,
                     stock: stock,
-                    codidoProducto: index.existencia_almacen.id_producto
+                    codidoProducto: index.existencia_almacen.id_producto,
+                    isFraction: index.existencia_almacen.productos.fraccionado_producto
                 };
 
                 // Agregar el producto al arreglo de todos los productos
@@ -322,7 +295,7 @@ export const useRequerimientoAlmacen = (objectRequerimientoToSendModal, numeroRe
                     productoArrayWithOutProductNoStock.value.push(productData);
                 }
             });
-
+            console.log(productosArray.value);
             // Indicar que se ha completado la carga de productos
             isLoadinProduct.value = false;
 
@@ -350,9 +323,6 @@ export const useRequerimientoAlmacen = (objectRequerimientoToSendModal, numeroRe
         const resp = await axios.post(URL, {
             idCentroAtencion: centroAtencion,
         });
-        console.log(resp);
-
-
 
         if (URL == '/get-centro-produccion-by-centro') {
 
@@ -496,7 +466,6 @@ export const useRequerimientoAlmacen = (objectRequerimientoToSendModal, numeroRe
         numRequerimiento,
         fechaRequerimiento,
         observacionRequerimiento,
-        handleProductSearch,
         proyectoFinanciados,
         productosArray,
         centroAtenionArray,

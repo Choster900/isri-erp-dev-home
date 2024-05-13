@@ -53,8 +53,8 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
                     idCentroAtencion: '',
                     detalleCentro: '',
                     idMarca: '',
-                    cantProdAdquisicion: 0,
-                    costoProdAdquisicion: 0,
+                    cantProdAdquisicion: null,
+                    costoProdAdquisicion: null,
                     descripcionProdAdquisicion: '',
                     estadoProdAdquisicion: 1,
                     valorTotalProduct: 0,
@@ -198,6 +198,14 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
         }
     };
 
+    let timer = null;
+    const handleInput = (docAdq, detalleDocAdq) => {
+        clearTimeout(timer); // Reinicia el temporizador en cada entrada de texto
+        timer = setTimeout(() => {
+          calculateTotal(docAdq, detalleDocAdq); // Ejecuta la función después de 2 segundos
+        }, 2000);
+      };
+
     /**
      * Calcula el valor total del producto en la fila especificada.
      * @param {number} docAdq - Índice del documento de adquisición.
@@ -227,6 +235,7 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
         }
     };
 
+
     const sumatorioTotalProduct = () => {
         let suma = []
         arrayProductoAdquisicion.value.forEach(element => {
@@ -237,7 +246,7 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
 
         let sumaTotal = suma.reduce((acumulador, producto) => acumulador + producto.valorTotalProduct, 0);
         console.log("La suma total de los valores de los productos es: " + sumaTotal);
-        totProductos.value = sumaTotal
+        totProductos.value = sumaTotal.toFixed(2)
         getTextForNumber(sumaTotal)
     }
 
@@ -635,6 +644,7 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
         arrayDocAdquisicion,
         objectGetFromProp,
         arrayUnidadMedida,
+        handleInput,
         arrayMarca,
         updateProductAdquisicionRequest,
         arrayCentroAtencion,

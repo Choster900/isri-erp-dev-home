@@ -154,28 +154,7 @@
 
                 </tr>
             </tbody>
-            <!--  <tbody>
-                <tr v-for="(item, index) in dataRequisicion" :key="index" class="border-b *:text-[8pt] *:text-center *:hover:bg-slate-200" v-show="item.id_tipo_reg_rpt_requisicion == 2">
-
-                    <td>
-                        <div class="text-center py-2" style="margin-top: -12px; font-family: Arial, Helvetica, sans-serif;">
-
-                            {{ item.id_prod_rpt_requisicion }}
-                        </div>
-
-                    </td>
-                    <td>
-                        <div class="text-center py-2" style="margin-top: -12px; font-family: Arial, Helvetica, sans-serif;">
-                            {{ item.producto_rpt_requisicion }}
-                        </div>
-                    </td>
-                    <td class="text-left" style="text-align: left;">
-                        <div class="text-left py-1" style="margin-top: -12px; font-family: Arial, Helvetica, sans-serif;">
-                            {{ item.marca_rpt_requisicion }}
-                        </div>
-                    </td>
-                </tr>
-            </tbody> -->
+           
         </table>
     </div>
 
