@@ -145,6 +145,7 @@ export const useEnviarKardex = (context) => {
                         .catch(err => console.log(err));
 
                 } catch (error) {
+                    console.log(error);
                     showErrorMessage(error);
                 } finally {
                     isLoadingSend.value = false;

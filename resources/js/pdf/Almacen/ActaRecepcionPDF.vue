@@ -290,40 +290,40 @@
             <p class="py-4 font-bold font-[Roboto] text-[14px]">{{ lts[0].codigo_up_lt }} - {{ lts[0].nombre_up_lt }}
             </p>
             <div class="grid grid-cols-[10%_75%_15%] border border-black">
-                <div class="w-full flex items-center justify-center border-r border-black h-[30px]">
-                    <p class="text-center font-[Roboto] text-[11px]">ESPECIFICO
+                <div class="w-full flex items-center justify-center border-r border-black pb-2">
+                    <p class="text-center font-[Roboto] text-[11px] mb-[3px] font-bold">ESPECIFICO
                     </p>
                 </div>
-                <div class="w-full flex items-center justify-center border-r border-black h-[30px]">
-                    <p class="text-center font-[Roboto] text-[11px]">DESCRIPCION</p>
+                <div class="w-full flex items-center justify-center border-r border-black pb-2">
+                    <p class="text-center font-[Roboto] text-[11px] mb-[3px] font-bold">DESCRIPCION</p>
                 </div>
-                <div class="w-full flex items-center justify-center h-[30px]">
-                    <p class="text-center font-[Roboto] text-[11px]">MONTO</p>
+                <div class="w-full flex items-center justify-center pb-2">
+                    <p class="text-center font-[Roboto] text-[11px] mb-[3px] font-bold">MONTO</p>
                 </div>
             </div>
-            <template v-for="(esp, index) in lts" :key="indexEsp">
+            <template v-for="(esp, indexEsp) in lts" :key="indexEsp">
                 <div class="grid grid-cols-[10%_75%_15%] border-b border-x border-black">
-                    <div class="w-full flex items-center justify-center border-r border-black h-[30px]">
-                        <p class="text-center font-[Roboto] text-[11px]"> {{ esp.id_ccta_presupuestal }}
+                    <div class="w-full flex items-center justify-center border-r border-black pb-2">
+                        <p class="text-center font-[Roboto] text-[11px] mb-[3px]"> {{ esp.id_ccta_presupuestal }}
                         </p>
                     </div>
-                    <div class="w-full flex items-center justify-center border-r border-black h-[30px]">
-                        <p class="text-center font-[Roboto] text-[11px]">{{ esp.nombre_ccta_presupuestal }}</p>
+                    <div class="w-full flex items-center justify-center border-r border-black pb-2">
+                        <p class="text-center font-[Roboto] text-[11px] mb-[3px]">{{ esp.nombre_ccta_presupuestal }}</p>
                     </div>
-                    <div class="w-full flex items-center justify-center h-[30px]">
-                        <p class="text-center font-[Roboto] text-[11px]">${{ esp.total }}</p>
+                    <div class="w-full flex items-center justify-end pb-2">
+                        <p class="text-center font-[Roboto] text-[11px] mr-2 mb-[3px]">${{ esp.total }}</p>
                     </div>
                 </div>
             </template>
             <div class="grid grid-cols-[10%_75%_15%] border-r border-black">
-                <div class="w-full flex items-center justify-center h-[30px]">
+                <div class="w-full flex items-center justify-center ">
                     
                 </div>
-                <div class="w-full flex items-center justify-center border-r border-black h-[30px]">
-                    <p class="text-center font-[Roboto] text-[11px]">TOTAL</p>
+                <div class="w-full flex items-center justify-end border-r border-black pb-2">
+                    <p class="text-center font-[Roboto] text-[11px] mr-1 mb-[3px] font-bold">TOTAL</p>
                 </div>
-                <div class="w-full flex items-center justify-center border-b border-black h-[30px]">
-                    <p class="text-center font-[Roboto] text-[11px]">256</p>
+                <div class="w-full flex items-center justify-end border-b border-black pb-2">
+                    <p class="text-center font-[Roboto] text-[11px] mr-2 mb-[3px] font-bold">${{ calculateTotal(index) }}</p>
                 </div>
             </div>
         </template>
@@ -352,6 +352,19 @@ export default {
             // Devolvemos el resultado como un número entero
             return roundedValue;
         },
+        calculateTotal(index) {
+            let sum = 0
+            const lts = this.recToPrint.groupByEsp[index]
+            lts.forEach((e) => {
+                let amount = parseFloat(e.total);
+                // Check if the total amount is a valid number
+                if (!isNaN(amount)) {
+                    // Add the amount to the sum
+                    sum += amount;
+                }
+            })
+            return sum.toFixed(2)
+        }
     },
     setup() {
         return {
