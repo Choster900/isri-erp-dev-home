@@ -8,7 +8,7 @@
             </div>
             <!-- Columna 2 -->
             <div class="w-[77%] justify-center items-center border-y border-r border-black pb-[10px]">
-                <p class="font-[Bembo] text-center text-[12px] font-bold">ALMACEN CENTRAL</p>
+                <p class="font-[Bembo] text-center text-[12px] font-bold">ALMACEN GENERAL</p>
                 <p class="font-[Bembo] text-center text-[12px] font-bold">
                     DONACIONES
                 </p>

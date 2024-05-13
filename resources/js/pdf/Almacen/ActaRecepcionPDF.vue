@@ -10,7 +10,7 @@
             <div
                 class="w-[77%] justify-center items-center border-y border-r border-black pb-[10px] flex flex-col min-h-full">
                 <div class="flex flex-col justify-center items-center h-full">
-                    <p class="font-[Bembo] text-center text-[12px] font-bold">ALMACEN CENTRAL</p>
+                    <p class="font-[Bembo] text-center text-[12px] font-bold">ALMACEN GENERAL</p>
                     <p class="font-[Bembo] text-center text-[12px] font-bold">
                         RECEPCION DE BIENES
                         {{
