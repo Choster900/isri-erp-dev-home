@@ -311,19 +311,20 @@
                         <p class="text-center font-[Roboto] text-[11px] mb-[3px]">{{ esp.nombre_ccta_presupuestal }}</p>
                     </div>
                     <div class="w-full flex items-center justify-end pb-2">
-                        <p class="text-center font-[Roboto] text-[11px] mr-2 mb-[3px]">${{ esp.total }}</p>
+                        <p class="text-center font-[Roboto] text-[11px] mr-2 mb-[3px]">${{ esp.total.replace(/,/g, '') }}</p>
                     </div>
                 </div>
             </template>
             <div class="grid grid-cols-[10%_75%_15%] border-r border-black">
                 <div class="w-full flex items-center justify-center ">
-                    
+
                 </div>
                 <div class="w-full flex items-center justify-end border-r border-black pb-2">
                     <p class="text-center font-[Roboto] text-[11px] mr-1 mb-[3px] font-bold">TOTAL</p>
                 </div>
                 <div class="w-full flex items-center justify-end border-b border-black pb-2">
-                    <p class="text-center font-[Roboto] text-[11px] mr-2 mb-[3px] font-bold">${{ calculateTotal(index) }}</p>
+                    <p class="text-center font-[Roboto] text-[11px] mr-2 mb-[3px] font-bold">${{ calculateTotal(lts) }}
+                    </p>
                 </div>
             </div>
         </template>
@@ -352,18 +353,9 @@ export default {
             // Devolvemos el resultado como un número entero
             return roundedValue;
         },
-        calculateTotal(index) {
-            let sum = 0
-            const lts = this.recToPrint.groupByEsp[index]
-            lts.forEach((e) => {
-                let amount = parseFloat(e.total);
-                // Check if the total amount is a valid number
-                if (!isNaN(amount)) {
-                    // Add the amount to the sum
-                    sum += amount;
-                }
-            })
-            return sum.toFixed(2)
+        calculateTotal(lts) {
+            const total = lts.reduce((acc, e) => acc + parseFloat(e.total.replace(/,/g, '')), 0)
+            return total.toFixed(2)
         }
     },
     setup() {
