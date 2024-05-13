@@ -289,13 +289,13 @@
                                                 :class="estadoDocAdq !== 1 ? 'cursor-not-allowed' : 'cursor-pointer '"
                                                 @input="handleInput(i, j); detalle.costoProdAdquisicion = detalle.costoProdAdquisicion.replace(/[^\d.]/g, '').replace(/(\.\d{2})\d+$/, '$1')"
                                                 class="w-full bg-transparent border-none  text-center text-[8pt] p-0 outline-none focus:outline-none focus:ring focus:ring-transparent"
-                                                placeholder="$00.00" min="0" max="1000" />
+                                                placeholder="0.00" min="0" max="1000" />
                                         </div>
 
                                     </td>
                                     <td class="relative text-center w-20">
                                         <span class="absolute top-1 left-0 w-full flex flex-col items-center">
-                                            ${{ detalle.valorTotalProduct !== undefined ?
+                                            {{ detalle.valorTotalProduct !== undefined ?
                                                 detalle.valorTotalProduct.toLocaleString('en-US', {
                                                     minimumFractionDigits: 2,
                                                     maximumFractionDigits: 2
