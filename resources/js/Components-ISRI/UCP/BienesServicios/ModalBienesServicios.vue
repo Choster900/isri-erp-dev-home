@@ -63,20 +63,24 @@
                                 </td>
                                 <td class="border border-black bg-black h-5 text-white text-center text-[9pt]">
                                     {{
-                                        arrayDocAdquisicion != '' && idDetDocAdquisicion != null &&
-                                            arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion) &&
-                                            arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion).dataDoc &&
-                                            (
-                                                arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.nit_proveedor !== null ||
-                                                arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.dui_proveedor !== null
-                                            )
-                                        ? (
-                                            arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.nit_proveedor
-                                            ? "NIT"
-                                            : "DUI"
-                                        )
-                                        : ''
-                                    }}
+                arrayDocAdquisicion != '' && idDetDocAdquisicion != null &&
+                    arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion) &&
+                    arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion).dataDoc &&
+                    (
+                        arrayDocAdquisicion.find(index => index.value ==
+                            idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.nit_proveedor !== null
+                        ||
+                        arrayDocAdquisicion.find(index => index.value ==
+                            idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.dui_proveedor !== null
+                    )
+                    ? (
+                        arrayDocAdquisicion.find(index => index.value ==
+                            idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.nit_proveedor
+                            ? "NIT"
+                            : "DUI"
+                    )
+                    : ''
+            }}
                                 </td>
                             </tr>
                             <tr>
@@ -146,13 +150,9 @@
                         <thead>
                             <tr
                                 class="*:text-[8pt] *:bg-black *:text-white *:px-2 *:py-0.5 *:font-normal *:border--white">
-                                <th class="border border-black border-r-white border-b-white h-9 w-[300px]">PRODUCTO
-                                </th>
-                                <th class="border border-black border-r-white border-b-white w-[110px]">MARCA</th>
-                                <th class="border border-black border-r-white w-40 border-b-white" colspan="2">
-                                    DESCRIPCION</th>
-                                <!-- <th class="border border-black border-r-white border-b-white" colspan="2">U/MEDIDAS</th>
-                                <th class="border border-black border-r-white border-b-white">ESPECIFICO</th> -->
+                                <th class="border border-black border-r-white border-b-white h-9 w-[300px]">PRODUCTO</th>
+                                <th class="border border-black border-r-white border-b-white w-[10px]">MARCA</th>
+                                <th class="border border-black border-r-white  border-b-white w-96" colspan="2">DESCRIPCIÓN</th>
                                 <th class="border border-black border-r-white border-b-white">DEPENDENCIA</th>
                                 <th class="border border-black border-r-white border-b-white">CANTIDAD</th>
                                 <th class="border border-black border-r-white border-b-white">PRECIO UNITARIO</th>
@@ -175,9 +175,9 @@
                             </tr>
                             <tr class="*:border-black cursor-pointer" :class="{ 'custom-pulse': docAdq.hoverToDelete }">
                                 <td colspan="2" class="border border-t-black ">
-                                    <Multiselect :filter-results="false" :searchable="true" :clear-on-search="true" :canClear="false" :canDeselect="true"
-                                        :disabled="estadoDocAdq !== 1" @select="disableLt($event)" v-model="docAdq.idLt"
-                                        :min-chars="1" placeholder="-"
+                                    <Multiselect :filter-results="false" :searchable="true" :clear-on-search="true"
+                                        :canClear="false" :canDeselect="true" :disabled="estadoDocAdq !== 1"
+                                        @select="disableLt($event)" v-model="docAdq.idLt" :min-chars="1" placeholder="-"
                                         noOptionsText="<p class='text-xs'>Lista vacía</p>"
                                         noResultsText="<p class='text-xs'>Sin resultados de personas</p>"
                                         :options="arrayLineaTrabajo"
@@ -211,11 +211,12 @@
                                                 noOptionsText="<p class='text-xs'>Lista vacia<p>"
                                                 noResultsText="<p class='text-xs'>Sin resultados de producto <p>"
                                                 :options="productDataSearched" />
-                                                <div class="overflow-auto text-center">
-            <span class="">{{ detalle.detalleProducto }}</span>
-        </div>                                        </div>
+                                            <div class="overflow-auto text-center">
+                                                <span class="">{{ detalle.detalleProducto }}</span>
+                                            </div>
+                                        </div>
                                     </td>
-                                    <td class=" relative  w-28"
+                                    <td class=" relative  w-24"
                                         :class="{ 'bg-red-500': errorsValidation[`productAdq.${i}.detalleDoc.${j}.idMarca`] }"
                                         style="padding-left: 0 !important; padding-right: 0 !important; ">
                                         <div class="absolute top-0 w-full flex flex-col items-center">
@@ -243,41 +244,13 @@
                                             </span>
                                         </div>
                                     </td>
-                                    <td class="w-72 p-0 uppercase align-top" colspan="2">
+                                    <td class=" p-0 uppercase align-top" colspan="2">
                                         <textarea v-model="detalle.descripcionProdAdquisicion" rows="9" maxlength="255"
                                             :disabled="estadoDocAdq !== 1"
                                             :class="estadoDocAdq !== 1 ? 'cursor-not-allowed' : 'cursor-pointer '"
                                             class=" uppercase text-[8pt] p-0 border-none bg-transparent outline-none focus:outline-none focus:ring focus:ring-transparent leading-tight w-full"></textarea>
                                     </td>
 
-                                    <!-- <td class=" relative"
-                                        style="padding-left: 0 !important; padding-right: 0 !important; " colspan="2">
-                                        <div class="absolute top-0 w-full flex flex-col items-center">
-                                            <Multiselect :filter-results="false" :searchable="false" :canClear="false"
-                                                :disabled="estadoDocAdq !== 1" v-model="detalle.pesoProducto"
-                                                :clear-on-search="true" :min-chars="1"
-                                                :classes="{ wrapper: `relative mx-auto w-full flex items-center justify-end box-border  outline-none ${estadoDocAdq !== 1 ? 'cursor-not-allowed' : ''}`, placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5', search: 'w-full absolute text-center inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans bg-white rounded pl-3.5 rtl:pl-0 rtl:pr-3.5', container: 'relative mx-auto w-full h-7  flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none', singleLabel: ' text-[8pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5  box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5', option: 'flex items-center justify-start box-border text-left cursor-pointer text-[7.5pt] leading-snug py-2 px-3', optionSelected: 'text-white bg-[#001c48]', optionPointed: 'text-gray-800 bg-gray-100', }"
-                                                noOptionsText="<p class='text-xs'>Lista vacia<p>"
-                                                noResultsText="<p class='text-xs'>Sin resultados de personas <p>"
-                                                :options="arrayUnidadMedida" />
-                                            <span class="text-center">
-                                                {{
-                arrayUnidadMedida.length > 0 &&
-                    arrayUnidadMedida.find(index => index.value ==
-                        detalle.pesoProducto)?.dataUnidad
-                    ?
-                    arrayUnidadMedida.find(index => index.value ==
-                        detalle.pesoProducto).dataUnidad.nombre_unidad_medida :
-                    '-'
-            }}
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <td class=" relative text-center">
-                                        <span class="absolute top-1 left-0 w-full flex flex-col items-center">
-                                            {{ detalle.especifico }}
-                                        </span>
-                                    </td> -->
                                     <td class=" relative  w-24"
                                         :class="{ 'bg-red-500': errorsValidation[`productAdq.${i}.detalleDoc.${j}.idCentroAtencion`] }"
                                         style="padding-left: 0 !important; padding-right: 0 !important; ">
@@ -291,17 +264,19 @@
                                                 :options="arrayCentroAtencion" />
                                             <span class="text-center">
                                                 {{ arrayCentroAtencion.length > 0 && arrayCentroAtencion.find(index =>
-                index.value == detalle.idCentroAtencion)?.dataCentro ?
-                arrayCentroAtencion.find(index => index.value ==
-                    detalle.idCentroAtencion).dataCentro.nombre_centro_atencion : '-' }}
+                                                index.value == detalle.idCentroAtencion)?.dataCentro ?
+                                                arrayCentroAtencion.find(index => index.value ==
+                                                    detalle.idCentroAtencion).dataCentro.nombre_centro_atencion : '-' }}
                                             </span>
                                         </div>
                                     </td>
 
                                     <td class=" w-12 relative "
                                         :class="{ 'bg-red-500': errorsValidation[`productAdq.${i}.detalleDoc.${j}.cantProdAdquisicion`] }">
-                                        <input type="number" v-model="detalle.cantProdAdquisicion"
-                                            :disabled="estadoDocAdq !== 1" @change="calculateTotal(i, j)"
+                                        <input type="text" v-model="detalle.cantProdAdquisicion"
+                                            :disabled="estadoDocAdq !== 1"
+                                            @input="handleInput(i, j); detalle.cantProdAdquisicion = detalle.cantProdAdquisicion.replace(/\D/g, '')"
+                                            inputmode="numeric"
                                             :class="estadoDocAdq !== 1 ? 'cursor-not-allowed' : 'cursor-pointer '"
                                             class="absolute top-0 left-0 w-full bg-transparent border-none pl-2 text-center text-[8pt] p-0 outline-none focus:outline-none focus:ring focus:ring-transparent"
                                             placeholder="0" min="0" max="1000" />
@@ -312,18 +287,19 @@
                                             <input type="text" v-model="detalle.costoProdAdquisicion"
                                                 :disabled="estadoDocAdq !== 1"
                                                 :class="estadoDocAdq !== 1 ? 'cursor-not-allowed' : 'cursor-pointer '"
-                                                @input="calculateTotal(i, j);"
+                                                @input="handleInput(i, j); detalle.costoProdAdquisicion = detalle.costoProdAdquisicion.replace(/[^\d.]/g, '').replace(/(\.\d{2})\d+$/, '$1')"
                                                 class="w-full bg-transparent border-none  text-center text-[8pt] p-0 outline-none focus:outline-none focus:ring focus:ring-transparent"
                                                 placeholder="$00.00" min="0" max="1000" />
                                         </div>
+
                                     </td>
                                     <td class="relative text-center w-20">
                                         <span class="absolute top-1 left-0 w-full flex flex-col items-center">
                                             ${{ detalle.valorTotalProduct !== undefined ?
-                                            detalle.valorTotalProduct.toLocaleString('en-US', {
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2
-                                            }) : '00.00' }}
+                                                detalle.valorTotalProduct.toLocaleString('en-US', {
+                                                    minimumFractionDigits: 2,
+                                                    maximumFractionDigits: 2
+                                                }) : '00.00' }}
                                         </span>
                                     </td>
 
@@ -337,8 +313,7 @@
                                         <div class="flex flex-col items-center justify-center">
                                             <div class="text-xs py-3">Ocultando linea:
                                                 <span class="font-medium">
-                                                    {{ arrayLineaTrabajo.find(index =>
-                                                    index.value == docAdq.idLt)?.label || '' }}
+                                                    {{ arrayLineaTrabajo.find(index => index.value == docAdq.idLt)?.label || '' }}
                                                 </span>
                                             </div>
                                         </div>
@@ -355,8 +330,7 @@
                                             <span class="text-xs pt-0.5 text-slate-600">
                                                 NUEVO PRODUCTO ADQUISICION EN:
                                                 <br>
-                                                {{ arrayLineaTrabajo.find(index => index.value == docAdq.idLt)?.label
-                                                || '' }}
+                                                {{ arrayLineaTrabajo.find(index => index.value == docAdq.idLt)?.label || '' }}
                                             </span>
                                         </div>
                                     </button>
@@ -483,7 +457,7 @@
 <script>
 // Importa el componente ProcessModal desde la ruta relativa '@/Components-ISRI/AllModal/ProcessModal.vue'
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue';
-import {toRefs } from 'vue';
+import { toRefs } from 'vue';
 import { useBienesServicios } from '@/Composables/UCP/BienesServicios/useBienesServicios.js';
 import Swal from 'sweetalert2';
 import Tooltip from '@/Components-ISRI/Tooltip.vue';
@@ -555,6 +529,7 @@ export default {
             notificacionDetDocAdquisicion,
             saveProductAdquisicionRequest,
             updateProductAdquisicionRequest,
+            handleInput,
         } = useBienesServicios(propProdAdquisicion, showModal)
 
         /**
@@ -629,6 +604,7 @@ export default {
         return {
             idLt,
             loader,
+            handleInput,
             moment,
             printPdf,
             disableLt,

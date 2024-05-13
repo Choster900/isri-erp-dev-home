@@ -198,6 +198,14 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
         }
     };
 
+    let timer = null;
+    const handleInput = (docAdq, detalleDocAdq) => {
+        clearTimeout(timer); // Reinicia el temporizador en cada entrada de texto
+        timer = setTimeout(() => {
+          calculateTotal(docAdq, detalleDocAdq); // Ejecuta la función después de 2 segundos
+        }, 2000);
+      };
+
     /**
      * Calcula el valor total del producto en la fila especificada.
      * @param {number} docAdq - Índice del documento de adquisición.
@@ -226,6 +234,7 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
             console.error("Error al calcular el valor total del producto:", error);
         }
     };
+
 
     const sumatorioTotalProduct = () => {
         let suma = []
@@ -635,6 +644,7 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
         arrayDocAdquisicion,
         objectGetFromProp,
         arrayUnidadMedida,
+        handleInput,
         arrayMarca,
         updateProductAdquisicionRequest,
         arrayCentroAtencion,
