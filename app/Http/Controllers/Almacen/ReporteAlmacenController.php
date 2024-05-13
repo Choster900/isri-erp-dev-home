@@ -3,32 +3,12 @@
 namespace App\Http\Controllers\Almacen;
 
 use App\Http\Controllers\Controller;
-use App\Models\Empleado;
 use Illuminate\Support\Facades\Validator;
-use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
-use App\Http\Requests\Tesoreria\ReporteFacturaRequest;
-use App\Http\Requests\Tesoreria\ReporteIngresoDiarioRequest;
-use App\Http\Requests\Tesoreria\ReporteIngresoRequest;
-use App\Http\Requests\Tesoreria\ReporteQuedanRequest;
-use App\Http\Requests\Tesoreria\RetencionISRRequest;
-use App\Models\CentroAtencion;
-use App\Models\ConceptoIngreso;
-use App\Models\CuentaPresupuestal;
-use App\Models\Dependencia;
-use App\Models\EstadoQuedan;
-use App\Models\Proveedor;
-use App\Models\ProyectoFinanciado;
-use App\Models\ReciboIngreso;
-use App\Models\RequerimientoPago;
 use Carbon\Carbon;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
-use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ReporteAlmacenController extends Controller
 {
@@ -776,9 +756,13 @@ class ReporteAlmacenController extends Controller
 
         $rules = [
             "idFuenteFinanciamiento"       => "required",
+            "idCentroAtencion" => "required",
+            "idSubAlmacen" => "required",
         ];
         $customMessages = [
             "idFuenteFinanciamiento.required"       => "La fuente financiamiento es obligatoria.",
+            "idCentroAtencion.required"       => "El centro es obligatoria.",
+            "idSubAlmacen.required"       => "El almacen  es obligatoria.",
         ];
 
         $validator = Validator::make($request->all(), $rules, $customMessages);
@@ -927,11 +911,18 @@ class ReporteAlmacenController extends Controller
     function getReporteRequisicionAlmacen(Request $request)
     {
 
-        /*   $rules = [
-            "idFuenteFinanciamiento"       => "required",
+        $rules = [
+            "idCentro"       => "required",
+            "idEstado"       => "required",
+            "fechaInicial"       => "required",
+            "fechaFinal"       => "required",
         ];
+
         $customMessages = [
-            "idFuenteFinanciamiento.required"       => "La fuente financiamiento es obligatoria.",
+            "idCentro.required" => "El campo Centro es obligatorio.",
+            "idEstado.required" => "El campo Estado es obligatorio.",
+            "fechaInicial.required" => "El campo Fecha Inicial es obligatorio.",
+            "fechaFinal.required" => "El campo Fecha Final es obligatorio.",
         ];
 
         $validator = Validator::make($request->all(), $rules, $customMessages);
@@ -940,13 +931,19 @@ class ReporteAlmacenController extends Controller
             $message = 'The given data was invalid.';
             return response()->json(['message' => $message, 'errors' => $errors], 422);
         }
- */
+
+
+        $fechaInicial = $request->fechaInicial != '' ? date('Y-m-d', strtotime($request->fechaInicial)) : null;
+        $fechaFinal = $request->fechaFinal != '' ? date('Y-m-d', strtotime($request->fechaFinal)) : null;
+
+
         $params = [
-            'idcentro'    => null,
-            'idestado'    => 1,
-            'fecha_inicial'  => '2024-01-01',
-            'fecha_final' =>  '2024-05-07'
+            'idcentro'    => $request->idCentro,
+            'idestado'    => $request->idEstado,
+            'fecha_inicial'  => $fechaInicial,
+            'fecha_final' =>  $fechaFinal
         ];
+
 
         return DB::select("CALL PR_RPT_REQUISICION(:idcentro, :idestado, :fecha_inicial, :fecha_final)", $params);
     }
@@ -954,22 +951,15 @@ class ReporteAlmacenController extends Controller
     public function getExcelRequisicion(Request $request)
     {
 
-        /* $fechaInicial = $request->varFilteredInForm["fechaInicial"] != '' ? date('Y-m-d', strtotime($request->varFilteredInForm["fechaInicial"])) : null;
-        $fechaFinal = $request->varFilteredInForm["fechaFinal"] != '' ? date('Y-m-d', strtotime($request->varFilteredInForm["fechaFinal"])) : null;
+        $fechaInicial = $request->fechaInicial != '' ? date('Y-m-d', strtotime($request->fechaInicial)) : null;
+        $fechaFinal = $request->fechaFinal != '' ? date('Y-m-d', strtotime($request->fechaFinal)) : null;
+
 
         $params = [
-            'idproy'        => $request->varFilteredInForm["idProy"],
-            'idcentro'      => $request->varFilteredInForm["idCentro"] == 0 ? null : $request->varFilteredInForm["idCentro"],
-            'porcentaje'    => $request->varFilteredInForm["porcentaje"],
-            'fecha_inicial' => $fechaInicial,
-            'fecha_final'   => $fechaFinal,
-        ]; */
-
-        $params = [
-            'idcentro'    => null,
-            'idestado'    => 1,
-            'fecha_inicial'  => '2024-01-01',
-            'fecha_final' =>  '2024-05-07'
+            'idcentro'    => $request->idCentro,
+            'idestado'    => $request->idEstado,
+            'fecha_inicial'  => $fechaInicial,
+            'fecha_final' =>  $fechaFinal
         ];
 
         $result =  DB::select("CALL PR_RPT_REQUISICION(:idcentro, :idestado, :fecha_inicial, :fecha_final)", $params);
@@ -1069,7 +1059,7 @@ class ReporteAlmacenController extends Controller
 
                 $sheet->setCellValue('A' . $row, $data->id_prod_rpt_requisicion);
                 $sheet->setCellValue('B' . $row, $data->producto_rpt_requisicion);
-                $sheet->getStyle('B'. $row)->getAlignment()->setWrapText(true);
+                $sheet->getStyle('B' . $row)->getAlignment()->setWrapText(true);
 
 
                 $sheet->setCellValue('C' . $row, $data->marca_rpt_requisicion);

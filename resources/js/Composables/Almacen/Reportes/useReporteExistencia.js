@@ -12,6 +12,7 @@ export const useReporteExistencia = () => {
     const idFuenteFinanciamiento = ref(null);
     const idCentroAtencion = ref(null);
     const idSubAlmacen = ref(null);
+    const errors = ref([]);
     const isLoaderRequest = ref(false);
 
     /**
@@ -36,8 +37,25 @@ export const useReporteExistencia = () => {
             dataReporteExistencia.value = data;
 
         } catch (error) {
-            // Maneja cualquier error que ocurra
-            console.error('Ocurrió un error al obtener la información del reporte:', error);
+            console.error("Ocurrió un error al obtener la información del reporte:", error);
+
+            if (error.response.status === 422) {
+                // Obtiene los errores del cuerpo de la respuesta y los transforma a un formato más manejable
+                let data = error.response.data.errors;
+                var myData = new Object();
+                for (const errorBack in data) {
+                    myData[errorBack] = data[errorBack][0];
+                }
+                // Actualiza el estado "errors" con los errores y los limpia después de 5 segundos
+                errors.value = myData;
+                setTimeout(() => {
+                    errors.value = [];
+                }, 5000);
+                console.error("Error en guardar los datos:", errors.value);
+            }
+
+            isLoaderRequest.value = false;
+
         } finally {
             isLoaderRequest.value = false;
             // Código a ejecutar después de la solicitud, independientemente de si fue exitosa o no
@@ -163,6 +181,8 @@ export const useReporteExistencia = () => {
         exportExcel,
         printPdf,
         idSubAlmacen,
+
+        errors,
         idCentroAtencion,
         idFuenteFinanciamiento,
         isLoaderRequest,
