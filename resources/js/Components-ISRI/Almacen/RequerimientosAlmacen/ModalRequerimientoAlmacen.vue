@@ -52,7 +52,6 @@ export default defineComponent({
             centroAtenionArray,
             fechaRequerimiento,
             proyectoFinanciados,
-            handleProductSearch,
             optionsCentroAtencion,
             dataDetalleRequerimiento,
             getProductoByDependencia,
@@ -129,12 +128,10 @@ export default defineComponent({
             centroAtenionArray,
             fechaRequerimiento,
             proyectoFinanciados,
-            handleProductSearch,
             isLoadingCentrosProduccion,
             optionsCentroAtencion,
             dataDetalleRequerimiento,
             searchProductionCenterByAtentionCenter,
-            getProductoByDependencia,
             getProductoByDependencia,
             observacionRequerimiento,
             saveRequerimientoAlmacen,
@@ -154,11 +151,12 @@ export default defineComponent({
                 <ButtonCloseModal @close="$emit('cerrar-modal')" />
                 <TitleModalReq />
                 <div id="formulario-principal">
-<!--                 <pre class="text-[8pt]">
+                    <!--                 <pre class="text-[8pt]">
                 {{optionsCentroAtencion}}
                 </pre> -->
                     <div class="pt-4 flex justify-start space-x-2 items-center">
-                        <h1 class="text-xs ">Requerimiento N°: <span class="font-medium text-sm underline">{{ numRequerimiento }}</span></h1>
+                        <h1 class="text-xs ">Requerimiento N°: <span class="font-medium text-sm underline">{{
+            numRequerimiento }}</span></h1>
 
                         <div class="text-xs items-center flex gap-1 "
                             v-if="optionsCentroAtencion?.length == 1 && !isLoadingCentrosProduccion">
@@ -174,14 +172,14 @@ export default defineComponent({
 
                             <OnlyLabelInput textLabel="Centro:" />
                             <Multiselect v-model="idCentroAtencion"
-                                @select="searchProductionCenterByAtentionCenter($event, '/get-centro-produccion-by-centro',false)"
+                                @select="searchProductionCenterByAtentionCenter($event, '/get-centro-produccion-by-centro', false), getProductoByDependencia()"
                                 :disabled="!canEditReq" :classes="{
-                                    containerDisabled: `bg-gray-200 text-text-slate-400`,
-                                    container: `relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded  text-base leading-snug outline-none
+            containerDisabled: `bg-gray-200 text-text-slate-400`,
+            container: `relative mx-auto w-full h-7 flex items-center justify-end box-border   border border-gray-300 rounded  text-base leading-snug outline-none
                                     ${canEditReq ? 'bg-white' : ''}`,
-                                    optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed',
-                                    optionPointed: 'text-gray-800 bg-gray-100',
-                                }" :filter-results="false" :searchable="true" :clear-on-search="true" :min-chars="1"
+            optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed',
+            optionPointed: 'text-gray-800 bg-gray-100',
+        }" :filter-results="false" :searchable="true" :clear-on-search="true" :min-chars="1"
                                 :options="optionsCentroAtencion"
                                 noResultsText="<p class='text-xs'>Sin resultados de personas</p>" placeholder="-"
                                 noOptionsText="<p class='text-xs'>vacio</p>" />
@@ -310,9 +308,20 @@ export default defineComponent({
                                 class=" px-2 text-xs flex justify-end  space-x-4 items-center bg-slate-100 hover:bg-slate-200">
 
                                 <div class="text-xs w-20 ">
-                                    <input type="text" v-model="producto.cantDetRequerimiento" :disabled="!canEditReq"
-                                        class=" text-center border-0 h-6 text-xs w-20 border-x-transparentborder-t-transparent bg-transparent focus:border-x-transparentfocus:border-t-transparent"
-                                        :class="!canEditReq ? 'bg-slate-700' : 'bg-white'" placeholder="CANT">
+                                    <input type="text"
+                                        v-if="productosArray?.find(index => index.value == producto.idDetExistenciaAlmacen)?.isFraction == 0"
+                                        v-model="producto.cantDetRequerimiento" :disabled="!canEditReq || isLoadinProduct == true"
+                                        class="text-center border-0 h-6 text-xs w-20 border-x-transparent border-t-transparent bg-transparent focus:border-x-transparent focus:border-t-transparent"
+                                        :class="!canEditReq ? 'bg-slate-700' : 'bg-white'" placeholder="CANT"
+                                        @input="producto.cantDetRequerimiento = producto.cantDetRequerimiento.replace(/\D/g, '')"
+                                        inputmode="numeric">
+
+                                    <input type="text" v-else v-model="producto.cantDetRequerimiento"
+                                    :disabled="!canEditReq || isLoadinProduct == true"
+                                        class="text-center border-0 h-6 text-xs w-20 border-x-transparent border-t-transparent bg-transparent focus:border-x-transparent focus:border-t-transparent"
+                                        :class="!canEditReq ? 'bg-slate-700' : 'bg-white'" placeholder="CANT"
+                                        @input="producto.cantDetRequerimiento = producto.cantDetRequerimiento.replace(/[^\d.]/g, '').replace(/(\.\d{2})\d+$/, '$1')"
+                                        inputmode="decimal">
                                 </div>
                                 <div class="text-xs w-full py-1 flex items-center" v-if="producto.idDetRequerimiento">
                                     <div class="h-8 border-l-4 border-slate-500 pl-3 opacity-40"></div>
