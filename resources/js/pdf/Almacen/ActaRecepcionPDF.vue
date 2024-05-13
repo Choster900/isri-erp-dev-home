@@ -23,9 +23,6 @@
                     </p>
                 </div>
             </div>
-
-
-
         </div>
 
         <!-- Fecha referencia -->
@@ -146,15 +143,16 @@
                     <!-- Cantidad -->
                     <div class="w-[12%] flex justify-center items-center border-r border-black">
                         <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[10px]">
-                            {{ prod.producto.fraccionado_producto == 0 ? floatToInt(prod.cant_det_recepcion_pedido) : prod.cant_det_recepcion_pedido }}
+                            {{ prod.producto.fraccionado_producto == 0 ? floatToInt(prod.cant_det_recepcion_pedido) :
+                                prod.cant_det_recepcion_pedido }}
                         </p>
                     </div>
                     <!-- Costo -->
                     <div class="w-[16%] flex justify-center items-center border-r border-black">
                         <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[10px]">
-                            ${{ recToPrint.det_doc_adquisicion.documento_adquisicion.id_proceso_compra == 5 ? 
-                            prod.costo_det_recepcion_pedido : 
-                            parseFloat(prod.costo_det_recepcion_pedido).toFixed(2) }}
+                            ${{ recToPrint.det_doc_adquisicion.documento_adquisicion.id_proceso_compra == 5 ?
+                                prod.costo_det_recepcion_pedido :
+                                parseFloat(prod.costo_det_recepcion_pedido).toFixed(2) }}
                         </p>
                     </div>
                     <!-- Total -->
@@ -264,6 +262,74 @@
         </div>
 
     </div>
+
+    <!-- Summary by ESPECIFICO -->
+    <div class="py-2 px-2 mb-2 " style="page-break-before: always;">
+        <p class="text-left text-[18px] font-[Roboto] mb-4">RESUMEN POR ESPECIFICO DEL ACTA No. <span
+                class="font-bold font-[Roboto]"> {{ recToPrint.acta_recepcion_pedido }}</span></p>
+
+        <div class="flex w-full mb-4">
+            <div class="w-[50%] flex justify-start ">
+                <p class="text-[14px] font-[Roboto] mr-1">FECHA DEL ACTA: <span class="font-bold font-[Roboto]">{{
+                    moment(recToPrint.fecha_recepcion_pedido).format('DD-MMM-YY').toUpperCase() }}</span> </p>
+            </div>
+            <div class="w-[50%] flex justify-end">
+                <p class="text-[14px] mr-1 font-[Roboto]">{{
+                    recToPrint.det_doc_adquisicion.documento_adquisicion.tipo_documento_adquisicion.nombre_tipo_doc_adquisicion
+                }} No. <span class="font-bold font-[Roboto]">{{
+                        recToPrint.det_doc_adquisicion.documento_adquisicion.numero_doc_adquisicion }}</span> </p>
+            </div>
+        </div>
+
+        <div class="flex w-full mb-4">
+            <p class="text-[14px] mr-1 font-[Roboto]">PROVEEDOR: <span class="font-bold font-[Roboto]">{{
+                recToPrint.det_doc_adquisicion.documento_adquisicion.proveedor.razon_social_proveedor }}</span> </p>
+        </div>
+
+        <template v-for="(lts, index) in recToPrint.groupByEsp" :key="index">
+            <p class="py-4 font-bold font-[Roboto] text-[14px]">{{ lts[0].codigo_up_lt }} - {{ lts[0].nombre_up_lt }}
+            </p>
+            <div class="grid grid-cols-[10%_75%_15%] border border-black">
+                <div class="w-full flex items-center justify-center border-r border-black pb-2">
+                    <p class="text-center font-[Roboto] text-[11px] mb-[3px] font-bold">ESPECIFICO
+                    </p>
+                </div>
+                <div class="w-full flex items-center justify-center border-r border-black pb-2">
+                    <p class="text-center font-[Roboto] text-[11px] mb-[3px] font-bold">DESCRIPCION</p>
+                </div>
+                <div class="w-full flex items-center justify-center pb-2">
+                    <p class="text-center font-[Roboto] text-[11px] mb-[3px] font-bold">MONTO</p>
+                </div>
+            </div>
+            <template v-for="(esp, indexEsp) in lts" :key="indexEsp">
+                <div class="grid grid-cols-[10%_75%_15%] border-b border-x border-black">
+                    <div class="w-full flex items-center justify-center border-r border-black pb-2">
+                        <p class="text-center font-[Roboto] text-[11px] mb-[3px]"> {{ esp.id_ccta_presupuestal }}
+                        </p>
+                    </div>
+                    <div class="w-full flex items-center justify-center border-r border-black pb-2">
+                        <p class="text-center font-[Roboto] text-[11px] mb-[3px]">{{ esp.nombre_ccta_presupuestal }}</p>
+                    </div>
+                    <div class="w-full flex items-center justify-end pb-2">
+                        <p class="text-center font-[Roboto] text-[11px] mr-2 mb-[3px]">${{ esp.total }}</p>
+                    </div>
+                </div>
+            </template>
+            <div class="grid grid-cols-[10%_75%_15%] border-r border-black">
+                <div class="w-full flex items-center justify-center ">
+                    
+                </div>
+                <div class="w-full flex items-center justify-end border-r border-black pb-2">
+                    <p class="text-center font-[Roboto] text-[11px] mr-1 mb-[3px] font-bold">TOTAL</p>
+                </div>
+                <div class="w-full flex items-center justify-end border-b border-black pb-2">
+                    <p class="text-center font-[Roboto] text-[11px] mr-2 mb-[3px] font-bold">${{ calculateTotal(index) }}</p>
+                </div>
+            </div>
+        </template>
+
+    </div>
+
 </template>
 
 <script>
@@ -286,6 +352,19 @@ export default {
             // Devolvemos el resultado como un número entero
             return roundedValue;
         },
+        calculateTotal(index) {
+            let sum = 0
+            const lts = this.recToPrint.groupByEsp[index]
+            lts.forEach((e) => {
+                let amount = parseFloat(e.total);
+                // Check if the total amount is a valid number
+                if (!isNaN(amount)) {
+                    // Add the amount to the sum
+                    sum += amount;
+                }
+            })
+            return sum.toFixed(2)
+        }
     },
     setup() {
         return {
