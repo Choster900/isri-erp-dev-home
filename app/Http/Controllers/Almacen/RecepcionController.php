@@ -571,6 +571,7 @@ class RecepcionController extends Controller
                     'representante_prov_recepcion_pedido'   => $request->suppRep,
                     'emp_id_empleado'                       => $user->persona->empleado->id_empleado,
                     'fecha_reg_recepcion_pedido'            => Carbon::now(),
+                    'fecha_recepcion_pedido'                => Carbon::now(),
                     'usuario_recepcion_pedido'              => $request->user()->nick_usuario,
                     'ip_recepcion_pedido'                   => $request->ip(),
                 ]);
