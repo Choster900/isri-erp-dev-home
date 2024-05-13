@@ -762,7 +762,7 @@ class ReporteAlmacenController extends Controller
         $customMessages = [
             "idFuenteFinanciamiento.required"       => "La fuente financiamiento es obligatoria.",
             "idCentroAtencion.required"       => "El centro es obligatoria.",
-            "idSubAlmacen.required"       => "El Sub  es obligatoria.",
+            "idSubAlmacen.required"       => "El almacen  es obligatoria.",
         ];
 
         $validator = Validator::make($request->all(), $rules, $customMessages);
@@ -917,8 +917,12 @@ class ReporteAlmacenController extends Controller
             "fechaInicial"       => "required",
             "fechaFinal"       => "required",
         ];
+
         $customMessages = [
-            "idCentro.required"       => "El centro es obligatoria.",
+            "idCentro.required" => "El campo Centro es obligatorio.",
+            "idEstado.required" => "El campo Estado es obligatorio.",
+            "fechaInicial.required" => "El campo Fecha Inicial es obligatorio.",
+            "fechaFinal.required" => "El campo Fecha Final es obligatorio.",
         ];
 
         $validator = Validator::make($request->all(), $rules, $customMessages);
