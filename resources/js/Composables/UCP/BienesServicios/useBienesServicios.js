@@ -246,7 +246,7 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
 
         let sumaTotal = suma.reduce((acumulador, producto) => acumulador + producto.valorTotalProduct, 0);
         console.log("La suma total de los valores de los productos es: " + sumaTotal);
-        totProductos.value = sumaTotal
+        totProductos.value = sumaTotal.toFixed(2)
         getTextForNumber(sumaTotal)
     }
 
