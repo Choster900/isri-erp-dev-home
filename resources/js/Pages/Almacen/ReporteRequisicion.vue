@@ -8,20 +8,20 @@
                 <DateSelect @optionId="getOption" />
 
                 <div class="">
-                    <DateTimePickerM :showIcon="false" :label="'Fecha inicio'" :placeholder="'Seleccione'"
-                        :required="true" />
+                    <DateTimePickerM :showIcon="false" v-model="fechaInicial" :label="'Fecha inicio'"
+                        :placeholder="'Seleccione'" :required="true" />
                 </div>
 
                 <div class="">
-                    <date-time-picker-m :showIcon="false" :label="'Fecha fin'" :placeholder="'Seleccione'"
-                        :required="true" />
+                    <date-time-picker-m :showIcon="false" v-model="fechaFinal" :label="'Fecha fin'"
+                        :placeholder="'Seleccione'" :required="true" />
                 </div>
 
                 <div class="mb-4 md:mr-0 md:mb-0 basis-[25%]">
                     <label class="block mb-2 text-[13px] font-medium text-gray-600">Centro Atencion <span
                             class="text-red-600 font-extrabold">*</span></label>
                     <div class="relative flex h-[30px] w-full">
-                        <Multiselect v-model="idCentroAtencion" :isSelected="0" :options="[
+                        <Multiselect v-model="idCentro" :isSelected="0" :options="[
         { value: 0, label: 'TODOS' },
 
         { value: 1, label: 'ADMON-ADMINISTRACION SUPERIOR' },
@@ -53,7 +53,7 @@
                     <label class="block mb-2 text-[13px] font-medium text-gray-600">Fuente Financiamiento
                         <span class="text-red-600 font-extrabold">*</span></label>
                     <div class="relative flex h-[30px] w-full">
-                        <Multiselect v-model="idFuenteFinanciamiento" :options="[
+                        <Multiselect v-model="idEstado" :options="[
         { value: 1, label: 'ABIERTO' },
         { value: 2, label: 'ENVIADO' },
         { value: 3, label: 'DESPACHADO' },
@@ -163,15 +163,21 @@ export default {
             exportExcel,
             printPdf,
             isLoadinRequest,
+            getOption,
+            idEstado,idCentro,
+            fechaInicial, fechaFinal,
         } = useReporteRequisicion();
         return {
             permits,
             menu,
+            getOption,
             getInformacionReport,
             printPdf,
             isLoadinRequest,
             dataGetRequisicion,
             exportExcel,
+            idEstado,idCentro,
+            fechaInicial, fechaFinal,
         };
     },
 };
