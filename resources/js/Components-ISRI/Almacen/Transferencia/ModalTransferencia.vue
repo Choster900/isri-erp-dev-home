@@ -14,7 +14,7 @@
                     <span
                         class="text-[16px] font-medium font-[Roboto] text-gray-500 text-opacity-70">Transferencias</span>
                     <div class="mt-[5px] text-gray-500 text-opacity-70 w-[14px] h-[14px] mx-2">
-                        <icon-m :iconName="'nextSvgVector'"></icon-m>
+                        <IconM :iconName="'nextSvgVector'"></IconM>
                     </div>
                     <span class="text-[16px] font-medium text-black font-[Roboto]">{{ objId > 0 ? (adjustment.status != 1 ? 'Ver transferencia' : 'Editar transferencia') : 'Crear transferencia' }}</span>
                 </div>
@@ -391,16 +391,14 @@
 <script>
 import { useTransferencia } from '@/Composables/Almacen/Transferencia/useTransferencia.js';
 import InputError from "@/Components/InputError.vue";
-import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
-import InputText from "@/Components-ISRI/ComponentsToForms/InputText.vue";
+import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue';
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
-import DateTimePickerM from "@/Components-ISRI/ComponentsToForms/DateTimePickerM.vue";
 
 import { toRefs, onMounted } from 'vue';
 
 export default {
     emits: ["cerrar-modal", "get-table"],
-    components: { ProcessModal, InputError, InputText, IconM, DateTimePickerM },
+    components: { ProcessModal, InputError, IconM },
     props: {
         showModalTransfers: {
             type: Boolean,

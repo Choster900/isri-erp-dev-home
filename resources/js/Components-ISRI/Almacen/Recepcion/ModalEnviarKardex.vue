@@ -14,7 +14,7 @@
                 <div class="flex">
                     <span class="text-[16px] font-medium font-[Roboto] text-gray-500 text-opacity-70">Recepcion</span>
                     <div class="mt-[5px] text-gray-500 text-opacity-70 w-[14px] h-[14px] mx-2">
-                        <icon-m :iconName="'nextSvgVector'"></icon-m>
+                        <IconM :iconName="'nextSvgVector'"></IconM>
                     </div>
                     <span class="text-[16px] font-medium text-black font-[Roboto]">Enviar Kardex</span>
                 </div>
@@ -78,10 +78,10 @@
 
             <div class="mb-2 mt-2 md:flex flex-row justify-items-start mx-8">
                 <div class="mb-4 md:mr-0 md:mb-0 basis-full">
-                    <input-text label="Representante proveedor" :withIcon="false" id="price" v-model="infoToSend.suppRep" type="text"
-                        placeholder="Escriba nombre representante" :required="true" :addClases="'h-[35px]'" :dSign="true"
+                    <InputText label="Representante proveedor" :withIcon="false" id="price" v-model="infoToSend.suppRep" type="text"
+                        placeholder="Escriba nombre representante" :required="true" :addClases="'h-[35px]'"
                         :validation="{ limit: 100, upper : true }">
-                    </input-text>
+                    </InputText>
                     <InputError v-for="(item, index) in errors.suppRep" :key="index" class="mt-2" :message="item" />
                 </div>
             </div>
@@ -121,14 +121,13 @@ import InputError from "@/Components/InputError.vue";
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
 import InputText from "@/Components-ISRI/ComponentsToForms/InputText.vue";
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
-import DateTimePickerM from "@/Components-ISRI/ComponentsToForms/DateTimePickerM.vue";
 import { useValidateInput } from '@/Composables/General/useValidateInput';
 
 import { toRefs, onMounted } from 'vue';
 
 export default {
     emits: ["cerrar-modal", "get-table"],
-    components: { ProcessModal, InputError, InputText, IconM, DateTimePickerM },
+    components: { ProcessModal, InputError, InputText, IconM },
     props: {
         showModalKardex: {
             type: Boolean,
