@@ -68,7 +68,7 @@ class RequerimientoAlmacenController extends Controller
         // Crear una colección para almacenar los centros de atención únicos
         $centrosUnicos = collect();
         // Iterar sobre las plazas asignadas y agregar los centros de atención únicos a la colección
-        foreach ($plazasAsignadas as $plazaAsignada) {
+        foreach ( $plazasAsignadas as $plazaAsignada ) {
             $centroAtencion = $plazaAsignada->centro_atencion;
             $centrosUnicos->push($centroAtencion);
         }
@@ -139,7 +139,7 @@ class RequerimientoAlmacenController extends Controller
         // Crear una colección para almacenar los centros de atención únicos
         $centrosUnicos = collect();
         // Iterar sobre las plazas asignadas y agregar los centros de atención únicos a la colección
-        foreach ($plazasAsignadas as $plazaAsignada) {
+        foreach ( $plazasAsignadas as $plazaAsignada ) {
             $centroAtencion = $plazaAsignada->centro_atencion;
             $centrosUnicos->push($centroAtencion);
         }
@@ -148,9 +148,9 @@ class RequerimientoAlmacenController extends Controller
 
         $centroProduccionUnicos = collect();
 
-        foreach ($centrosUnicos as $centros) {
+        foreach ( $centrosUnicos as $centros ) {
 
-            foreach ($centros->asignacion_centro_produccion as $key => $value) {
+            foreach ( $centros->asignacion_centro_produccion as $key => $value ) {
                 $asignacion = $value->centro_produccion;
                 $centroProduccionUnicos->push($asignacion);
             }
@@ -267,9 +267,9 @@ class RequerimientoAlmacenController extends Controller
             ];
             $requerimientoId = Requerimiento::insertGetId($requerimiento);
 
-            foreach ($request->dataDetalleRequerimiento as $key => $value) {
+            foreach ( $request->dataDetalleRequerimiento as $key => $value ) {
 
-                foreach ($value["productos"] as $key => $value2) {
+                foreach ( $value["productos"] as $key => $value2 ) {
 
                     collect($request->dataDetalleRequerimiento)->each(function ($prodReq, $key) use (&$rules, &$request) {
                         if ($prodReq["stateCentroProduccion"] == 0)
@@ -284,7 +284,7 @@ class RequerimientoAlmacenController extends Controller
                                 $rules["dataDetalleRequerimiento.{$key}.productos.{$indice}.idDetExistenciaAlmacen"] = ['required'];
 
 
-                                if (!empty($det["idDetExistenciaAlmacen"])) {
+                                if (!empty ($det["idDetExistenciaAlmacen"])) {
 
                                     $cantidadTotal = 0;
 
@@ -411,10 +411,10 @@ class RequerimientoAlmacenController extends Controller
             Requerimiento::where("id_requerimiento", $request->idRequerimiento)->update($requerimiento);
 
 
-            foreach ($request->dataDetalleRequerimiento as $key => $value) {
+            foreach ( $request->dataDetalleRequerimiento as $key => $value ) {
 
 
-                foreach ($value["productos"] as $key => $value2) {
+                foreach ( $value["productos"] as $key => $value2 ) {
 
                     if (!isset($value2["idDetRequerimiento"]) || !empty($value2["idDetRequerimiento"])) {
 
@@ -436,7 +436,7 @@ class RequerimientoAlmacenController extends Controller
                                         $rules["dataDetalleRequerimiento.{$key}.productos.{$indice}.idDetExistenciaAlmacen"] = ['required'];
 
 
-                                        if (!empty($det["idDetExistenciaAlmacen"])) {
+                                        if (!empty ($det["idDetExistenciaAlmacen"])) {
 
                                             $cantidadTotal = 0;
 
@@ -518,7 +518,7 @@ class RequerimientoAlmacenController extends Controller
                                         $rules["dataDetalleRequerimiento.{$key}.productos.{$indice}.cantDetRequerimiento"] = ['required'];
                                         $rules["dataDetalleRequerimiento.{$key}.productos.{$indice}.idDetExistenciaAlmacen"] = ['required'];
 
-                                        if (!empty($det["idDetExistenciaAlmacen"])) {
+                                        if (!empty ($det["idDetExistenciaAlmacen"])) {
 
                                             $cantidadTotal = 0;
 
@@ -625,7 +625,7 @@ class RequerimientoAlmacenController extends Controller
                 $existencias = [];
 
                 // Iterar sobre los detalles del requerimiento
-                foreach ($detReq as $key => $value) {
+                foreach ( $detReq as $key => $value ) {
 
 
                     $cantidadTotal = 0;
@@ -712,7 +712,7 @@ class RequerimientoAlmacenController extends Controller
                     // Registrar detalles en el kardex
                     $detalleRequerimiento = DetalleRequerimiento::where("id_requerimiento", $request->idRequerimiento)->get();
 
-                    foreach ($detalleRequerimiento as $key => $value) {
+                    foreach ( $detalleRequerimiento as $key => $value ) {
                         DetalleKardex::insert([
                             'id_kardex'            => $cardexId,
                             'id_producto'          => $value['id_producto'],
@@ -754,14 +754,14 @@ class RequerimientoAlmacenController extends Controller
         // Crear una colección para almacenar los centros de atención únicos
         $centrosUnicos = collect();
         // Iterar sobre las plazas asignadas y agregar los centros de atención únicos a la colección
-        foreach ($plazasAsignadas as $plazaAsignada) {
+        foreach ( $plazasAsignadas as $plazaAsignada ) {
             $centroAtencion = $plazaAsignada->centro_atencion;
             $centrosUnicos->push($centroAtencion);
         }
         $centrosUnicos = $centrosUnicos->unique('id_centro_atencion');
         $centroProduccionUnicos = collect();
-        foreach ($centrosUnicos as $centros) {
-            foreach ($centros->asignacion_centro_produccion as $key => $value) {
+        foreach ( $centrosUnicos as $centros ) {
+            foreach ( $centros->asignacion_centro_produccion as $key => $value ) {
                 $asignacion = $value->centro_produccion;
                 $centroProduccionUnicos->push($asignacion);
             }
@@ -769,38 +769,51 @@ class RequerimientoAlmacenController extends Controller
         return $centroProduccionUnicos;
     }
 
-    /*
+    function getProductByFundedProjectCenterAndWorkLine(Request $request): object
+    {
+        return DetalleExistenciaAlmacen::with(['existencia_almacen.productos', 'marca'])
+            ->select(
+                'detalle_existencia_almacen.*',
+                DB::raw('(SELECT SUM(detalle_requerimiento.cant_det_requerimiento) FROM detalle_requerimiento
+            INNER JOIN requerimiento ON detalle_requerimiento.id_requerimiento = requerimiento.id_requerimiento
+            WHERE detalle_requerimiento.id_det_existencia_almacen = detalle_existencia_almacen.id_det_existencia_almacen
+            AND requerimiento.id_estado_req IN (1, 2)
+            AND detalle_requerimiento.estado_det_requerimiento = 1
+            AND requerimiento.id_tipo_req = 1) AS solicitado_en_req')
+            )
+            ->whereHas('existencia_almacen', function ($query) use ($request) {
+                $query->where('id_proy_financiado', $request->idProyFinanciado);
+            })
+            ->where('id_centro_atencion', $request->idCentroAtencion)
+            ->where('id_lt', $request->idLt)
+            ->get();
+    }
 
-     Route::post(
-        'get-centro-produccion-by-users-centro',
-        function (Request $request) {
-            $plazasAsignadas = PlazaAsignada::where("id_empleado", $request->user()->id_persona)
-                ->with([
-                    "centro_atencion.asignacion_centro_produccion" => function ($query) use ($request) {
-                        if ($request->idCentroAtencion != '') {
-                            $query->where("id_centro_atencion", $request->idCentroAtencion);
-                        }
-                    },
-                    "centro_atencion.asignacion_centro_produccion.centro_produccion"
-                ])->get();
-            // Crear una colección para almacenar los centros de atención únicos
-            $centrosUnicos = collect();
-            // Iterar sobre las plazas asignadas y agregar los centros de atención únicos a la colección
-            foreach ( $plazasAsignadas as $plazaAsignada ) {
-                $centroAtencion = $plazaAsignada->centro_atencion;
-                $centrosUnicos->push($centroAtencion);
+    function getProductionCenterByCenter(Request $request): array
+    {
+        $centrosInDb = CentroAtencion::where("id_centro_atencion", $request->idCentroAtencion)->with(["asignacion_centro_produccion.centro_produccion"])->get();
+        $centroProduccionUnicos = collect();
+        foreach ( $centrosInDb as $centros ) {
+            foreach ( $centros->asignacion_centro_produccion as $key => $value ) {
+                $asignacion = $value->centro_produccion;
+                $centroProduccionUnicos->push($asignacion);
             }
-            $centrosUnicos = $centrosUnicos->unique('id_centro_atencion');
-            $centroProduccionUnicos = collect();
-            foreach ( $centrosUnicos as $centros ) {
-                foreach ( $centros->asignacion_centro_produccion as $key => $value ) {
-                    $asignacion = $value->centro_produccion;
-                    $centroProduccionUnicos->push($asignacion);
-                }
-            }
-            return $centroProduccionUnicos;
         }
-    )->name('donacion.get-centro-produccion-by-centro');
+        return ["centroProduccion" => $centroProduccionUnicos, "centrosAtencion" => $centrosInDb];
+    }
+    function getAttentionCentersByUser(Request $request): object
+    {
+        $plazasAsignadas = PlazaAsignada::where("id_empleado", $request->user()->id_persona)->with("centro_atencion")->get();
+        // Crear una colección para almacenar los centros de atención únicos
+        $centrosUnicos = collect();
+        // Iterar sobre las plazas asignadas y agregar los centros de atención únicos a la colección
+        foreach ( $plazasAsignadas as $plazaAsignada ) {
+            $centroAtencion = $plazaAsignada->centro_atencion;
+            $centrosUnicos->push($centroAtencion);
+        }
+        // Filtrar la colección para obtener solo centros de atención únicos
+        $centrosUnicos = $centrosUnicos->unique('id_centro_atencion');
+        return $centrosUnicos;
 
-    */
+    }
 }

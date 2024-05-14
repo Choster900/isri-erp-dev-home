@@ -71,64 +71,15 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post(
         'get-number-requerimiento',
         function (Request $request) {
-            return Requerimiento::latest("fecha_reg_requerimiento")->where('id_tipo_req', 1)->first();
-        }
+            return Requerimiento::latest("fecha_reg_requerimiento")->where('id_tipo_req', 1)->first(); }
     )->name('donacion.getObjectForRequerimientoAlmacen');
-    Route::post('get-centro-produccion-by-users-centro',[RequerimientoAlmacenController::class,'getCentroProduccionByUsersCentro'])->name('donacion.get-centro-produccion-by-centro');
-    Route::post(
-        'get-centro-produccion-by-centro',
-        function (Request $request) {
-            $centrosInDb = CentroAtencion::where("id_centro_atencion", $request->idCentroAtencion)->with(["asignacion_centro_produccion.centro_produccion"])->get();
-            $centroProduccionUnicos = collect();
-            foreach ( $centrosInDb as $centros ) {
-                foreach ( $centros->asignacion_centro_produccion as $key => $value ) {
-                    $asignacion = $value->centro_produccion;
-                    $centroProduccionUnicos->push($asignacion);
-                }
-            }
-            return ["centroProduccion" => $centroProduccionUnicos, "centrosAtencion" => $centrosInDb];
-        }
-    )->name('donacion.get-centro-produccion-by-centro');
+    Route::post('get-centro-produccion-by-users-centro', [RequerimientoAlmacenController::class, 'getCentroProduccionByUsersCentro'])->name('donacion.get-centro-produccion-by-centro');
+    Route::post('get-centro-produccion-by-centro',[RequerimientoAlmacenController::class,'getProductionCenterByCenter'] )->name('donacion.get-centro-produccion-by-centro');
     Route::post('insert-requerimiento-almacen', [RequerimientoAlmacenController::class, 'addRequerimiento'])->name('donacion.insertRequerimientoAlmacen');
     Route::post('update-requerimiento-almacen', [RequerimientoAlmacenController::class, 'updateRequerimientoAlmacen'])->name('donacion.updateRequerimientoAlmacen');
     Route::post('get-product-searched-almacen', [RequerimientoAlmacenController::class, 'getProductByNameOrCode'])->name('donacion.productSearchedAlmacen');
-    Route::post(
-        'get-centro-by-user',
-        function (Request $request) {
-            $plazasAsignadas = PlazaAsignada::where("id_empleado", $request->user()->id_persona)->with("centro_atencion")->get();
-            // Crear una colección para almacenar los centros de atención únicos
-            $centrosUnicos = collect();
-            // Iterar sobre las plazas asignadas y agregar los centros de atención únicos a la colección
-            foreach ( $plazasAsignadas as $plazaAsignada ) {
-                $centroAtencion = $plazaAsignada->centro_atencion;
-                $centrosUnicos->push($centroAtencion);
-            }
-            // Filtrar la colección para obtener solo centros de atención únicos
-            $centrosUnicos = $centrosUnicos->unique('id_centro_atencion');
-            return $centrosUnicos;
-        }
-    )->name('bieneservicios.get-centro-by-user');
-    Route::post(
-        'get-product-by-proy-financiado',
-        function (Request $request) {
-            return DetalleExistenciaAlmacen::with(['existencia_almacen.productos', 'marca'])
-                ->select(
-                    'detalle_existencia_almacen.*',
-                    DB::raw('(SELECT SUM(detalle_requerimiento.cant_det_requerimiento) FROM detalle_requerimiento
-                    INNER JOIN requerimiento ON detalle_requerimiento.id_requerimiento = requerimiento.id_requerimiento
-                    WHERE detalle_requerimiento.id_det_existencia_almacen = detalle_existencia_almacen.id_det_existencia_almacen
-                    AND requerimiento.id_estado_req IN (1, 2)
-                    AND detalle_requerimiento.estado_det_requerimiento = 1
-                    AND requerimiento.id_tipo_req = 1) AS solicitado_en_req')
-                )
-                ->whereHas('existencia_almacen', function ($query) use ($request) {
-                    $query->where('id_proy_financiado', $request->idProyFinanciado);
-                })
-                ->where('id_centro_atencion', $request->idCentroAtencion)
-                ->where('id_lt', $request->idLt)
-                ->get();
-        }
-    )->name('bieneservicios.get-product-by-proy-financiad');
+    Route::post('get-centro-by-user',[RequerimientoAlmacenController::class,'getAttentionCentersByUser']  )->name('bieneservicios.get-centro-by-user');
+    Route::post('get-product-by-proy-financiado', [RequerimientoAlmacenController::class, 'getProductByFundedProjectCenterAndWorkLine'])->name('bieneservicios.get-product-by-proy-financiad');
     Route::post('update-state-requerimiento', [RequerimientoAlmacenController::class, 'updateStateRequerimiento'])->name('bieneservicios.get-product-by-proy-financiad');
     //Financial report
     Route::get(
@@ -144,7 +95,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('get-excel-document-reporte-financiero', [ReporteAlmacenController::class, 'createExcelReport'])->name('bieneservicios.get-proyectos');
     Route::post('get-reporte-consumo', [ReporteAlmacenController::class, 'getReporteConsumo'])->name('bieneservicios.get-reporte-consumo');
     Route::post('get-excel-document-reporte-consumo', [ReporteAlmacenController::class, 'getExcelDocumentConsumo'])->name('bieneservicios.get-excel-document-reporte-consumo');
-    Route::post('get-cuenta-by-number', function (Request $request) {
+   /*  Route::post('get-cuenta-by-number', function (Request $request) {
         $cuentas = CatalogoCtaPresupuestal::where("id_ccta_presupuestal", "like", '%' . $request->numeroCuenta . '%')->get();
         // Formatear resultados para respuesta JSON
         return $cuentas->map(function ($item) {
@@ -154,7 +105,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
                 'allDataPersonas' => $item,
             ];
         });
-    })->name('reporte.get-cuenta');
+    })->name('reporte.get-cuenta'); */
     //Surplus adjustment
     Route::get(
         '/alm/ajuste-entrada',
@@ -173,18 +124,9 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         function (Request $request) {
             return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/reporte-consumo', 'Almacen/ReporteConsumo');
         }
-    )->name('alm.reporteConsumo');
-    Route::post('get-cuenta-by-number', function (Request $request) {
-        $cuentas = CatalogoCtaPresupuestal::where("id_padre_ccta_presupuestal", 611)->orWhere("id_padre_ccta_presupuestal", 541)->get();
-        // Formatear resultados para respuesta JSON
-        return $cuentas->map(function ($item) {
-            return [
-                'value'           => $item->id_ccta_presupuestal,
-                'label'           => $item->id_ccta_presupuestal . '-' . $item->nombre_ccta_presupuestal,
-                'allDataPersonas' => $item,
-            ];
-        });
-    })->name('reporte.get-cuenta');
+    )->name('alm.
+    ');
+    Route::post('get-cuenta-by-number',[ReporteAlmacenController::class,'getBudgetaryAccountsByAccountNumber'])->name('reporte.get-cuenta');
     //Outgoing adjustment
     Route::get(
         '/alm/ajuste-salida',

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Almacen;
 
 use App\Http\Controllers\Controller;
+use App\Models\CatalogoCtaPresupuestal;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -13,6 +14,18 @@ use Illuminate\Support\Facades\DB;
 class ReporteAlmacenController extends Controller
 {
 
+
+    function getBudgetaryAccountsByAccountNumber() : object {
+        $cuentas = CatalogoCtaPresupuestal::where("id_padre_ccta_presupuestal", 611)->orWhere("id_padre_ccta_presupuestal", 541)->get();
+        // Formatear resultados para respuesta JSON
+        return $cuentas->map(function ($item) {
+            return [
+                'value'           => $item->id_ccta_presupuestal,
+                'label'           => $item->id_ccta_presupuestal . '-' . $item->nombre_ccta_presupuestal,
+                'allDataPersonas' => $item,
+            ];
+        });
+    }
     public function getReporteFinanciero(Request $request)
     {
         try {
