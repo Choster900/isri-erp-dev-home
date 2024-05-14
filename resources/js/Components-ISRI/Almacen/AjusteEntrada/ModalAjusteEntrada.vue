@@ -305,15 +305,12 @@
 import { useAjusteEntrada } from '@/Composables/Almacen/AjusteEntrada/useAjusteEntrada.js';
 import InputError from "@/Components/InputError.vue";
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
-import InputText from "@/Components-ISRI/ComponentsToForms/InputText.vue";
-import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
-import DateTimePickerM from "@/Components-ISRI/ComponentsToForms/DateTimePickerM.vue";
 
 import { toRefs, onMounted } from 'vue';
 
 export default {
     emits: ["cerrar-modal", "get-table"],
-    components: { ProcessModal, InputError, InputText, IconM, DateTimePickerM },
+    components: { ProcessModal, InputError },
     props: {
         showModalShortageAdjustment: {
             type: Boolean,
