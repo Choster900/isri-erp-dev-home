@@ -14,7 +14,7 @@
                 <div class="flex">
                     <span class="text-[16px] font-medium font-[Roboto] text-gray-500 text-opacity-70">Recepcion</span>
                     <div class="mt-[5px] text-gray-500 text-opacity-70 w-[14px] h-[14px] mx-2">
-                        <icon-m :iconName="'nextSvgVector'"></icon-m>
+                        <IconM :iconName="'nextSvgVector'"></IconM>
                     </div>
                     <span class="text-[16px] font-medium text-black font-[Roboto]">{{ recepId > 0 ? (infoToShow.status
                         != 1 ? 'Ver recepción' : 'Editar recepción') : 'Crear recepción' }}</span>
@@ -277,7 +277,7 @@
                                     <div class="w-full flex items-center justify-center border-r border-gray-500 min-h-[75px]"
                                         :class="(errors['prods.' + indexLt + '.productos.'+ index + '.expiryDate'] && !prod.expiryDate) ? 'bg-red-300' : ''">
                                         <div class="max-w-[95%]">
-                                            <date-time-picker-m v-if="prod.perishable === 1" v-model="prod.expiryDate"
+                                            <DateTimePickerM v-if="prod.perishable === 1" v-model="prod.expiryDate"
                                                 :showIcon="false" :placeholder="'Seleccione'"
                                                 :disabled="infoToShow.status != 1" />
                                             <p v-else class="font-[MuseoSans] text-[12px] p-1 ">N/A</p>
@@ -413,7 +413,6 @@
 import { useRecepcion } from '@/Composables/Almacen/Recepcion/useRecepcion.js';
 import InputError from "@/Components/InputError.vue";
 import ProcessModal from '@/Components-ISRI/AllModal/ProcessModal.vue'
-import InputText from "@/Components-ISRI/ComponentsToForms/InputText.vue";
 import IconM from "@/Components-ISRI/ComponentsToForms/IconM.vue";
 import DateTimePickerM from "@/Components-ISRI/ComponentsToForms/DateTimePickerM.vue";
 
@@ -421,7 +420,7 @@ import { toRefs, onMounted } from 'vue';
 
 export default {
     emits: ["cerrar-modal", "get-table"],
-    components: { ProcessModal, InputError, InputText, IconM, DateTimePickerM },
+    components: { ProcessModal, InputError, IconM, DateTimePickerM },
     props: {
         showModalRecep: {
             type: Boolean,

@@ -4,7 +4,6 @@ import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
 import { toast } from "vue3-toastify";
 import { useValidateInput } from '@/Composables/General/useValidateInput';
-import moment from 'moment';
 import _ from "lodash";
 
 export const useTransferencia = (context) => {

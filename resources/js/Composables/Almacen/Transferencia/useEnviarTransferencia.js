@@ -1,19 +1,12 @@
-import { createApp, ref, inject } from "vue";
-import html2pdf from 'html2pdf.js';
-import ActaDonacionPDFVue from '@/pdf/Almacen/ActaDonacionPDF.vue';
-
+import { ref, inject } from "vue";
 import axios from "axios";
 import { useHandleError } from "@/Composables/General/useHandleError.js";
 import { useShowToast } from "@/Composables/General/useShowToast.js";
 import { toast } from "vue3-toastify";
-import moment from 'moment';
 
 export const useEnviarTransferencia = (context, getDataToShow, tableData) => {
     const swal = inject("$swal");
-    const isLoadingRequest = ref(false);
-    const errors = ref([]);
     const isLoadingTop = ref(false)
-    const empOptions = ref([])
 
     const changeStatusElement = async (elementId, status) => {
         swal({
@@ -69,7 +62,6 @@ export const useEnviarTransferencia = (context, getDataToShow, tableData) => {
                     });
                     useShowToast(toast.success, response.data.message);
                 } catch (err) {
-                    console.log(err);
                     if (err.response.status === 422) {
                         if (err.response.data.logical_error) {
                             useShowToast(toast.error, err.response.data.logical_error);
