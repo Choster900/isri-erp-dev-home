@@ -147,7 +147,7 @@
                 <td class="border border-b-black border-x-transparent border-t-transparent w-[170px]">
                     <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
                         <span style="font-family:  Arial, Helvetica, sans-serif;">{{
-                            dataQuedan.numero_doc_adquisicion
+                            dataQuedan.numero_acuerdo_quedan
                         }}</span>
                     </div>
                 </td>
@@ -388,8 +388,7 @@
                 <td class="border border-b-black border-x-transparent border-t-transparent w-[170px]">
                     <div style="margin-top: -12px;" class="pl-2 pt-2 text-[9pt]">
                         <span style="font-family:  Arial, Helvetica, sans-serif;">{{
-                            dataQuedan.numero_doc_adquisicion
-                        }}</span>
+                            dataQuedan.numero_acuerdo_quedan                   }}</span>
                     </div>
                 </td>
             </tr>
