@@ -124,8 +124,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         function (Request $request) {
             return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/reporte-consumo', 'Almacen/ReporteConsumo');
         }
-    )->name('alm.
-    ');
+    )->name('alm.reporteConsumo');
     Route::post('get-cuenta-by-number',[ReporteAlmacenController::class,'getBudgetaryAccountsByAccountNumber'])->name('reporte.get-cuenta');
     //Outgoing adjustment
     Route::get(
