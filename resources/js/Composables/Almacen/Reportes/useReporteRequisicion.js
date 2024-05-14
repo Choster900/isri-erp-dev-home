@@ -143,8 +143,12 @@ export const useReporteRequisicion = (context) => {
 
                 const response = await axios.post(
                     "/get-reporte-excel-requisicion",
-                    //{ varFilteredInForm: varFilteredInForm.value },
-                    null,
+                    {
+                        idCentro: idCentro.value,
+                        idEstado: idEstado.value,
+                        fechaInicial: fechaInicial.value,
+                        fechaFinal: fechaFinal.value,
+                    },
                     { responseType: "blob" }
                 );
 
