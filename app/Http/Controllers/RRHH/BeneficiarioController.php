@@ -7,6 +7,7 @@ use App\Http\Requests\RRHH\BeneficiariosRequest;
 use App\Models\Familiar;
 use App\Models\Persona;
 use Carbon\Carbon;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -114,17 +115,18 @@ class BeneficiarioController extends Controller
 
         if (!empty($request->nombre)) {
 
-            $query->join('profesion', 'profesion.id_profesion', '=', 'persona.id_profesion')
-                ->join('nivel_educativo', 'nivel_educativo.id_nivel_educativo', '=', 'persona.id_nivel_educativo')
-                ->join('genero', 'genero.id_genero', '=', 'persona.id_genero')
-                ->join('estado_civil', 'estado_civil.id_estado_civil', '=', 'persona.id_estado_civil')
-                ->join('municipio', 'municipio.id_municipio', '=', 'persona.id_municipio')
-                ->join('departamento', 'departamento.id_departamento', '=', 'municipio.id_departamento')
-                ->join('pais', 'pais.id_pais', '=', 'departamento.id_pais')->where('estado_persona', 1)->where(function ($query) {
-                    $query->doesntHave('familiar')
-                        ->orWhereHas('familiar', function ($query) {
-                            $query->where('estado_familiar', 0);
-                        });
+            $query->leftJoin('profesion', 'profesion.id_profesion', '=', 'persona.id_profesion')
+                ->leftJoin('nivel_educativo', 'nivel_educativo.id_nivel_educativo', '=', 'persona.id_nivel_educativo')
+                ->leftJoin('genero', 'genero.id_genero', '=', 'persona.id_genero')
+                ->leftJoin('estado_civil', 'estado_civil.id_estado_civil', '=', 'persona.id_estado_civil')
+                ->leftJoin('municipio', 'municipio.id_municipio', '=', 'persona.id_municipio')
+                ->leftJoin('departamento', 'departamento.id_departamento', '=', 'municipio.id_departamento')
+                ->leftJoin('pais', 'pais.id_pais', '=', 'departamento.id_pais')->where('estado_persona', 1)
+                ->where(function ($query) {
+                    $query->whereDoesntHave('familiar', function ($query1) {
+                        $query1->where('estado_familiar', '0');
+                    });
+
                 })->where(function ($query) use ($request) {
                     $query->whereRaw("MATCH ( pnombre_persona,snombre_persona,tnombre_persona, papellido_persona,sapellido_persona,tapellido_persona ) AGAINST ( '" . $request->nombre . "')");
                 });
