@@ -136,8 +136,8 @@ class ArchivoAnexoController extends Controller
                 $currentTimestamp = time();
                 $nameFile = $codigo_empleado . '_' . date('Y-m-d His', $currentTimestamp) . '.' . $file->getClientOriginalExtension();
                 // Store the file in the 'anexos' directory within the 'public' disk
-// Almacenar el archivo en el directorio 'imagenes' dentro del disco 'public'
-$file->storeAs('imagenes', $nameFile, 'public');
+                // Almacenar el archivo en el directorio 'imagenes' dentro del disco 'public'
+                $file->storeAs('anexos', $nameFile, 'public');
                 // Generate a URL for the stored file
                 $imageUrl = Storage::url('anexos/' . $nameFile);
             }
