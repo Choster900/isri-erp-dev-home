@@ -57,7 +57,7 @@
                 </div>
 
                 <div class="mb-4 md:mr-0 md:mb-0 basis-[25%]">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600">Fuente Financiamiento
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600">Estado
                         <span class="text-red-600 font-extrabold">*</span></label>
                     <div class="relative flex h-[30px] w-full">
                         <Multiselect v-model="idEstado" :options="[
