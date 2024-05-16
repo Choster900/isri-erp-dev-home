@@ -90,7 +90,7 @@ export const useReciboFormat = (context) => {
     })
 
     const fecha_recibo = computed(() => {
-        return receipt_to_print.cuenta_presupuestal ? moment(receipt_to_print.fecha_recibo_ingreso, 'Y-M-D').format('DD/MM/Y') : ''
+        return moment(receipt_to_print.value.fecha_recibo_ingreso).format('DD/MM/YYYY')
     })
 
     const showErrorMessage = (err) => {
