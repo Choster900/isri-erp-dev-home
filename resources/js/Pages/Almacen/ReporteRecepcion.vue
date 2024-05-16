@@ -1,8 +1,8 @@
 <template>
 
-    <Head title="Reporte - Requisicion" />
+    <Head title="Reporte - Compras" />
 
-    <AppLayoutVue nameSubModule="Almacen - Reporte Requisicion" :autoPadding="false" :class="'bg-gray-200'">
+    <AppLayoutVue nameSubModule="Almacen - Reporte Compras" :autoPadding="false" :class="'bg-gray-200'">
         <div class="w-[95%] my-4 h-full mx-auto bg-white border border-gray-300">
             <div class="mb-2 mt-4 md:flex flex-row justify-around mx- items-end gap-2">
                 <DateSelect @optionId="getOption" />
@@ -22,38 +22,20 @@
                 </div>
 
                 <div class="mb-4 md:mr-0 md:mb-0 basis-[25%]">
-                    <label class="block mb-2 text-[13px] font-medium text-gray-600">Centro Atencion <span
+                    <label class="block mb-2 text-[13px] font-medium text-gray-600">Proyecto financiado <span
                             class="text-red-600 font-extrabold">*</span></label>
                     <div class="relative flex h-[30px] w-full">
-                        <Multiselect v-model="idCentro" :isSelected="0" :options="[
-        { value: 0, label: 'TODOS' },
-
-        { value: 1, label: 'ADMON-ADMINISTRACION SUPERIOR' },
-        { value: 2, label: 'CAA-CENTRO DE ATENCION A ANCIANOS SARA ZALDIVAR' },
-        { value: 3, label: 'CAL-CENTRO DEL APARATO LOCOMOTOR' },
-        { value: 4, label: 'CALE-CENTRO DE AUDICION Y LENGUAJE' },
-        {
-            value: 5,
-            label: 'CRC-CENTRO DE REHABILITACION PARA CIEGOS EUGENIA DE DUEÑAS',
-        },
-        { value: 6, label: 'UCE-UNIDAD DE CONSULTA EXTERNA' },
-        {
-            value: 7,
-            label:
-                'CRINA+CENTRO DE REHABILITACION INTEGRAL PARA LA NIÑEZ Y LA ADOLESCENCIA',
-        },
-        {
-            value: 8,
-            label: 'CRIO-CENTRO DE REHABILITACION INTEGRAL DE OCCIDENTE',
-        },
-        { value: 9, label: 'CRIOR-CENTRO DE REHABILITACION INTEGRAL DE ORIENTE' },
-        { value: 10, label: 'CRP-CENTRO DE REHABILITACION PROFESIONAL' },
+                        <Multiselect v-model="idProy" :isSelected="0" :options="[
+        { value: 1, label: 'FONDO GENERAL' },
+        { value: 2, label: 'FONDO CIRCULANTE DE MONTO FIJO' },
+        { value: 3, label: 'RECURSOS PROPIOS' },
+        { value: 4, label: 'DONACION' },
     ]" :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione" />
 
 
                     </div>
-                    <InputError class="mt-2" :message="errors[`idCentro`]" />
-                    <!--  <InputError class="mt-2" :message="errors[`varFilteredInForm.idCentro`]" /> -->
+                    <InputError class="mt-2" :message="errors[`idProy`]" />
+                    <!--  <InputError class="mt-2" :message="errors[`varFilteredInForm.idProy`]" /> -->
                 </div>
 
                 <div class="mb-4 md:mr-0 md:mb-0 basis-[25%]">
@@ -61,13 +43,13 @@
                         <span class="text-red-600 font-extrabold">*</span></label>
                     <div class="relative flex h-[30px] w-full">
                         <Multiselect v-model="idEstado" :options="[
-        { value: 1, label: 'ABIERTO' },
-        { value: 2, label: 'ENVIADO' },
-        { value: 3, label: 'DESPACHADO' },
-        { value: 4, label: 'ELIMINADO' },
+        { value: 1, label: 'CREADO' },
+        { value: 2, label: 'PROCESADO' },
+        { value: 3, label: 'ELIMINADO' },
+
     ]" :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione" />
                     </div>
-    <InputError class="mt-2" :message="errors[`idEstado`]" />
+                    <InputError class="mt-2" :message="errors[`idEstado`]" />
 
                     <!--  <InputError class="mt-2" :message="errors[`varFilteredInForm.idProy`]" /> -->
                 </div>
@@ -84,7 +66,7 @@
                 </button>
             </div>
 
-            <div class="flex justify-end px-4 gap-3" v-if="dataGetRequisicion != ''">
+            <div class="flex justify-end px-4 gap-3" v-if="dateGetRecepcion != ''">
                 <h1 class="font-medium">Reporte de requisición:</h1>
                 <div class="flex" style="display: non">
                     <div @click="exportExcel"
@@ -126,8 +108,7 @@
                     </div>
                 </div>
             </div>
-
-            <TablaReporteRequisicion :dataGetRequisicion="dataGetRequisicion" :isLoadinRequest="isLoadinRequest" />
+            <TablaReporteRecepcion :dateGetRecepcion="dateGetRecepcion" :isLoadinRequest="isLoadinRequest" />
         </div>
     </AppLayoutVue>
 </template>
@@ -135,7 +116,7 @@
 <script>
 import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
-import { useReporteRequisicion } from "@/Composables/Almacen/Reportes/useReporteRequisicion.js";
+import { useReporteRecepcion } from "@/Composables/Almacen/Reportes/useReporteRecepcion.js";
 import moment from "moment";
 import InputError from "@/Components/InputError.vue";
 import { jsPDF } from "jspdf";
@@ -146,7 +127,7 @@ import DateTimePickerM from "@/Components-ISRI/ComponentsToForms/DateTimePickerM
 import DateSelect from "@/Components/DateSelect.vue";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
-import TablaReporteRequisicion from "@/Components-ISRI/Almacen/Reportes/TablaReporteRequisicion.vue";
+import TablaReporteRecepcion from "@/Components-ISRI/Almacen/Reportes/TablaReporteRecepcion.vue";
 import axios from "axios";
 
 export default {
@@ -155,7 +136,7 @@ export default {
         AppLayoutVue,
         DateTimePickerM,
         DateSelect,
-        TablaReporteRequisicion,
+        TablaReporteRecepcion,
     },
     props: {
         menu: {
@@ -168,14 +149,14 @@ export default {
         const permits = usePermissions(menu.value, window.location.pathname);
         const {
             getInformacionReport,
-            dataGetRequisicion,
+            dateGetRecepcion,
             exportExcel,
             printPdf,
             isLoadinRequest,
             getOption,
-            idEstado,idCentro,
-            fechaInicial, fechaFinal,errors,
-        } = useReporteRequisicion();
+            idEstado, idProy,
+            fechaInicial, fechaFinal, errors,
+        } = useReporteRecepcion();
         return {
             permits,
             menu,
@@ -183,9 +164,9 @@ export default {
             getInformacionReport,
             printPdf,
             isLoadinRequest,
-            dataGetRequisicion,
-            exportExcel,errors,
-            idEstado,idCentro,
+            dateGetRecepcion,
+            exportExcel, errors,
+            idEstado, idProy,
             fechaInicial, fechaFinal,
         };
     },
