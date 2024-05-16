@@ -26,11 +26,11 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('change-status-product', [ProductoController::class, 'changeStatusProduct'])->name('producto.changeStatusProduct');
 
     Route::get(
-        '/ucp/bienes-servicios',
+        '/ucp/orden-compra',
         function (Request $request) {
-            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/ucp/bienes-servicios', 'UCP/BienesServicios');
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/ucp/orden-compra', 'UCP/BienesServicios');
         }
-    )->name('ucp.bienes-servicios');
+    )->name('ucp.orden-compra');
     Route::post('producto-adquisiciono', [BienesServiciosController::class, 'getProductoAdquisicionByDocumentoAdquisicion'])->name('bieneservicios.productioAdquisicion');
     Route::post('get-all-linea-trabajo', [BienesServiciosController::class, 'getAllLineaTrabajo'])->name('bieneservicios.getAllLineaTrabajo');
     Route::post('get-array-objects-for-multiselect', [BienesServiciosController::class, 'getArrayObjectoForMultiSelect'])->name('bieneservicios.getAllLineaTrabajo');
@@ -89,4 +89,11 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             return checkModuleAccessAndRedirect($request->user()->id_usuario, '/ucp/documento-adquisicion', 'Tesoreria/DocAdquisicion');
         }
     )->name('ucp.documento-adquisicion-ucp');
+
+    Route::get(
+        '/ucp/contrato',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/ucp/contrato', 'UCP/BienesServicios');
+        }
+    )->name('ucp.contrato');
 });
