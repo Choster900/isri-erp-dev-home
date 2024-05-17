@@ -199,10 +199,15 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
     };
 
     let timer = null;
-    const handleInput = (docAdq, detalleDocAdq) => {
+    /**
+    * Calcula el valor total del producto en la fila especificada.
+    * @param {number} lineaTrabajo - Índice del documento de adquisición.
+    * @param {number} producto - Índice del detalle (producto) del documento de adquisición.
+    */
+    const handleInput = (lineaTrabajo, producto) => {
         clearTimeout(timer); // Reinicia el temporizador en cada entrada de texto
         timer = setTimeout(() => {
-            calculateTotal(docAdq, detalleDocAdq); // Ejecuta la función después de 2 segundos
+            calculateTotal(lineaTrabajo, producto); // Ejecuta la función después de 2 segundos
         }, 2000);
     };
 
@@ -662,15 +667,40 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
     const getBrandName = (idMarca) => {
         const marca = arrayMarca.value.find(index => index.value == idMarca);
         return marca?.dataMarca?.nombre_marca || '-';
-      };
+    };
 
 
-      const getCenterName = (idCentroAtencion) => {
+    const getCenterName = (idCentroAtencion) => {
         const centro = arrayCentroAtencion.value.find(index => index.value == idCentroAtencion);
         return centro?.dataCentro?.nombre_centro_atencion || '-';
-      };
+    };
+
+
+    const handleDataCalendarUpdate = (updatedDataCalendar, lineaTrabajoIndex, productoIndex) => {
+        // Calcula la suma de todas las cantidades de los meses
+        const totalCantidad = Object.values(updatedDataCalendar)
+            .map(cantidad => parseFloat(cantidad))
+            .reduce((total, cantidad) => total + cantidad, 0);
+
+        console.log('Total de cantidades:', totalCantidad);
+
+        // Obtiene el producto en la fila especificada
+        const producto = arrayProductoAdquisicion.value[lineaTrabajoIndex].detalleDoc[productoIndex];
+
+        // Actualiza la propiedad cantProdAdquisicion con la suma total
+        producto.cantProdAdquisicion = totalCantidad;
+
+        console.log('Producto actualizado:', producto);
+
+        handleInput(lineaTrabajoIndex, productoIndex);
+
+    };
+
+
+
 
     return {
+        handleDataCalendarUpdate,
         getCenterName,
         getBrandName,
         documentType,
