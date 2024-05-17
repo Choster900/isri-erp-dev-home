@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PlazaAsignada extends Model
@@ -73,6 +72,19 @@ class PlazaAsignada extends Model
     public function plaza_evaluada(): HasMany
     {
         return $this->hasMany(PlazaEvaluada::class, 'id_plaza_asignada', 'id_plaza_asignada');
+    }
+
+    /**
+     * Accesores para formatear fechas
+     */
+    public function getFechaPlazaAsignadaFormateadaAttribute()
+    {
+        return $this->attributes['fecha_plaza_asignada'] ? date('d/m/Y', strtotime($this->attributes['fecha_plaza_asignada'])) : null;
+    }
+
+    public function getFechaRenunciaPlazaAsignadaFormateadaAttribute()
+    {
+        return $this->attributes['fecha_renuncia_plaza_asignada'] ? date('d/m/Y', strtotime($this->attributes['fecha_renuncia_plaza_asignada'])) : null;
     }
 
 }

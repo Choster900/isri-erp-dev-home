@@ -85,19 +85,17 @@ export const useReporteEmpleado = (context) => {
                     const currentDateTime = moment().format('DD/MM/YYYY, HH:mm:ss');
                     let fecha = moment().format('DD-MM-YYYY');
 
-                    html2pdf()
+                    await html2pdf()
                         .set({
-                            //margin: [0.2, 0.2, 0.6, 0.2], //top, left, buttom, right,
-                            //margin: [0.2, 0.2, 0.7, 0.2],
-                            margin: [1,1.5,1.3,1],
+                            margin: [1,1.5,1.3,1], //top, left, buttom, right,
                             //pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
                             filename: 'RPT-EMPLEADOS-' + fecha,
                             image: {
                                 type: 'jpeg',
-                                quality: 0.98
+                                quality: 0.8
                             },
                             html2canvas: {
-                                scale: 3, // A mayor escala, mejores gráficos, pero más peso
+                                scale: 2, // A mayor escala, mejores gráficos, pero más peso
                                 //letterRendering: true,
                                 useCORS: true
                             },
