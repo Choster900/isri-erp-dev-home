@@ -1,14 +1,10 @@
-import { ref, inject, computed } from "vue";
+import { ref, inject } from "vue";
 import axios from "axios";
 import { useHandleError } from "@/Composables/General/useHandleError.js";
 import moment from 'moment';
 import EmpleadosPDF from '@/pdf/RRHH/EmpleadosPDF.vue';
 import { createApp, h } from 'vue'
-//import { jsPDF } from "jspdf";
 import html2pdf from 'html2pdf.js'
-
-
-//import FileSaver from 'file-saver';
 
 export const useReporteEmpleado = (context) => {
 
@@ -17,6 +13,7 @@ export const useReporteEmpleado = (context) => {
 
 
     const exportExcel = async (queryResult, depInfo, title, date) => {
+        console.log(queryResult);
         swal({
             title: "¿Está seguro de exportar este reporte a Excel?",
             icon: "question",
