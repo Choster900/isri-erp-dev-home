@@ -277,7 +277,9 @@ class ReporteRRHHController extends Controller
         //     foreach ($row->getCellIterator() as $cell) {
         //         $cell->setValueExplicit($cell->getValue(), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
         //     }
-        // }
+        // } 
+
+        //REVISAR PORQUE EL PDF DE TODOS LOS EMPLEADOS NO SE VE
 
         $lastRow = $sheet->getHighestDataRow(); // obtiene el número de la última fila con datos
         $sheet->setCellValue('B' . ($lastRow + 1), 'TOTAL Empleados: ' . $total);

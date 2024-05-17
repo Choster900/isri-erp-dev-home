@@ -13,7 +13,6 @@ export const useReporteEmpleado = (context) => {
 
 
     const exportExcel = async (queryResult, depInfo, title, date) => {
-        console.log(queryResult);
         swal({
             title: "¿Está seguro de exportar este reporte a Excel?",
             icon: "question",
@@ -88,9 +87,10 @@ export const useReporteEmpleado = (context) => {
 
                     html2pdf()
                         .set({
-                            //margin: [0.2, 0.2, 0.6, 0.2],
-                            margin: [0.2, 0.2, 0.7, 0.2],
-                            pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+                            //margin: [0.2, 0.2, 0.6, 0.2], //top, left, buttom, right,
+                            //margin: [0.2, 0.2, 0.7, 0.2],
+                            margin: [1,1.5,1.3,1],
+                            //pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
                             filename: 'RPT-EMPLEADOS-' + fecha,
                             image: {
                                 type: 'jpeg',
@@ -98,11 +98,11 @@ export const useReporteEmpleado = (context) => {
                             },
                             html2canvas: {
                                 scale: 3, // A mayor escala, mejores gráficos, pero más peso
-                                letterRendering: true,
+                                //letterRendering: true,
                                 useCORS: true
                             },
                             jsPDF: {
-                                unit: "in",
+                                unit: "cm",
                                 format: "letter",
                                 orientation: 'landscape' // landscape o portrait
                             },
@@ -121,13 +121,13 @@ export const useReporteEmpleado = (context) => {
                                 //Get the middle position including the text width
                                 const textX = centerX - (textWidth1 / 2);
                                 //Write the text in the desired coordinates.
-                                pdf.text(textX, (pdf.internal.pageSize.getHeight() - 0.4), text);
+                                pdf.text(textX, (pdf.internal.pageSize.getHeight() - 0.6), text);
                                 //Text for the date and time.
                                 let date_text = 'Generado: ' + currentDateTime
                                 //Get the text width
                                 const textWidth = pdf.getStringUnitWidth(date_text) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
                                 //Write the text in the desired coordinates.
-                                pdf.text(pdf.internal.pageSize.getWidth() - textWidth - 0.2, pdf.internal.pageSize.getHeight() - 0.4, date_text);
+                                pdf.text(pdf.internal.pageSize.getWidth() - textWidth - 1, pdf.internal.pageSize.getHeight() - 0.6, date_text);
                             }
 
                         })
