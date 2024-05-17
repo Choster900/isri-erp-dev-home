@@ -28,7 +28,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get(
         '/ucp/orden-compra',
         function (Request $request) {
-            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/ucp/orden-compra', 'UCP/BienesServicios');
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/ucp/orden-compra', 'UCP/OrdenCompra');
         }
     )->name('ucp.orden-compra');
     Route::post('producto-adquisiciono', [BienesServiciosController::class, 'getProductoAdquisicionByDocumentoAdquisicion'])->name('bieneservicios.productioAdquisicion');
@@ -93,7 +93,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get(
         '/ucp/contrato',
         function (Request $request) {
-            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/ucp/contrato', 'UCP/BienesServicios');
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/ucp/contrato', 'UCP/Contratos');
         }
     )->name('ucp.contrato');
 });

@@ -1,4 +1,4 @@
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import axios from "axios";
 import { executeRequest } from "@/plugins/requestHelpers";
 import Swal from "sweetalert2";
@@ -202,9 +202,9 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
     const handleInput = (docAdq, detalleDocAdq) => {
         clearTimeout(timer); // Reinicia el temporizador en cada entrada de texto
         timer = setTimeout(() => {
-          calculateTotal(docAdq, detalleDocAdq); // Ejecuta la función después de 2 segundos
+            calculateTotal(docAdq, detalleDocAdq); // Ejecuta la función después de 2 segundos
         }, 2000);
-      };
+    };
 
     /**
      * Calcula el valor total del producto en la fila especificada.
@@ -619,7 +619,63 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
         }
     });
 
+    /* // ESTO ES NUEVO. POR FAVOR MODER A MODAL BIENES Y SERVICIOS (QUE ES EL MODAL DE COMPRAS) //*/
+
+    //!PROPIEDADES COMPUTADAS
+    const documentType = computed(() => {
+        if (arrayDocAdquisicion.value !== '' && idDetDocAdquisicion.value != null) {
+            const doc = arrayDocAdquisicion.value.find(index => index.value == idDetDocAdquisicion.value);
+            if (doc && doc.dataDoc) {
+                const proveedor = doc.dataDoc.documento_adquisicion.proveedor;
+                if (proveedor.nit_proveedor !== null || proveedor.dui_proveedor !== null) {
+                    return proveedor.nit_proveedor ? "NIT" : "DUI";
+                }
+            }
+        }
+        return '';
+    });
+
+    const providerBusinessName = computed(() => {
+        if (arrayDocAdquisicion.value !== '' && idDetDocAdquisicion.value != null) {
+            const doc = arrayDocAdquisicion.value.find(index => index.value == idDetDocAdquisicion.value);
+            if (doc && doc.dataDoc && doc.dataDoc.documento_adquisicion.proveedor.razon_social_proveedor) {
+                return doc.dataDoc.documento_adquisicion.proveedor.razon_social_proveedor;
+            }
+        }
+        return '';
+    });
+
+    const documentNumber = computed(() => {
+        if (arrayDocAdquisicion.value !== '' && idDetDocAdquisicion.value != null) {
+            const doc = arrayDocAdquisicion.value.find(index => index.value == idDetDocAdquisicion.value);
+            if (doc && doc.dataDoc) {
+                const proveedor = doc.dataDoc.documento_adquisicion.proveedor;
+                if (proveedor.nit_proveedor !== null || proveedor.dui_proveedor !== null) {
+                    return proveedor.nit_proveedor || proveedor.dui_proveedor;
+                }
+            }
+        }
+        return '';
+    });
+
+    //!FUNCIONES QUE RETORNAN INFORMACION SELECCIONADA EN SELECT (VALGA LA REDUNDANCIA)
+    const getBrandName = (idMarca) => {
+        const marca = arrayMarca.value.find(index => index.value == idMarca);
+        return marca?.dataMarca?.nombre_marca || '-';
+      };
+
+
+      const getCenterName = (idCentroAtencion) => {
+        const centro = arrayCentroAtencion.value.find(index => index.value == idCentroAtencion);
+        return centro?.dataCentro?.nombre_centro_atencion || '-';
+      };
+
     return {
+        getCenterName,
+        getBrandName,
+        documentType,
+        documentNumber,
+        providerBusinessName,
         deleteProductAdq,
         totProductos,
         letterNumber,
