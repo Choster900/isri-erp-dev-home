@@ -19,6 +19,9 @@ module.exports = {
                 7:'repeat(7, minmax(0, 1fr))',
                 layout: '200px minmax(900px, 1fr) 100px',
             },
+            maxWidth: {
+                '8xl': '83rem', // Agregando el nuevo tamaño de ancho máximo 8xl
+            },
         },
     },
 

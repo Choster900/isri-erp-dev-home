@@ -10,33 +10,38 @@
         </div>
         <div class="flex *:border-slate-300 *:border *:h-[46.5px] hover:bg-slate-200">
             <div class="w-1/6 text-center">
-                <input type="text"  v-model="dataCalendar.January"
-                @input="dataCalendar.January = dataCalendar.January.replace(/[^\d.]/g, '').replace(/(\.\d{2})\d+$/, '$1')"
+                <input type="text" v-model="dataCalendar.January"
+                    @input="handleInput(); dataCalendar.January = dataCalendar.January.replace(/[^\d.]/g, '').replace(/(\.\d{2})\d+$/, '$1')"
                     class="w-full h-full bg-transparent border-none text-center text-[8pt] p-0 outline-none focus:outline-none focus:ring focus:ring-transparent"
                     placeholder="0" min="0" />
             </div>
             <div class="w-1/6 text-center">
-                <input type="text"  v-model.number="dataCalendar.March"
+                <input type="text" v-model="dataCalendar.March"
+                    @input="handleInput(); dataCalendar.March = dataCalendar.March.replace(/[^\d.]/g, '').replace(/(\.\d{2})\d+$/, '$1')"
                     class="w-full h-full bg-transparent border-none text-center text-[8pt] p-0 outline-none focus:outline-none focus:ring focus:ring-transparent"
                     placeholder="0" min="0" />
             </div>
             <div class="w-1/6 text-center">
-                <input type="text"  v-model.number="dataCalendar.May"
+                <input type="text" v-model="dataCalendar.May"
+                    @input="handleInput(); dataCalendar.May = dataCalendar.May.replace(/[^\d.]/g, '').replace(/(\.\d{2})\d+$/, '$1')"
                     class="w-full h-full bg-transparent border-none text-center text-[8pt] p-0 outline-none focus:outline-none focus:ring focus:ring-transparent"
                     placeholder="0" min="0" />
             </div>
             <div class="w-1/6 text-center">
-                <input type="text"  v-model.number="dataCalendar.July"
+                <input type="text" v-model="dataCalendar.July"
+                    @input="handleInput(); dataCalendar.July = dataCalendar.July.replace(/[^\d.]/g, '').replace(/(\.\d{2})\d+$/, '$1')"
                     class="w-full h-full bg-transparent border-none text-center text-[8pt] p-0 outline-none focus:outline-none focus:ring focus:ring-transparent"
                     placeholder="0" min="0" />
             </div>
             <div class="w-1/6 text-center">
-                <input type="text"  v-model.number="dataCalendar.September"
+                <input type="text" v-model="dataCalendar.September"
+                    @input="handleInput(); dataCalendar.September = dataCalendar.September.replace(/[^\d.]/g, '').replace(/(\.\d{2})\d+$/, '$1')"
                     class="w-full h-full bg-transparent border-none text-center text-[8pt] p-0 outline-none focus:outline-none focus:ring focus:ring-transparent"
                     placeholder="0" min="0" />
             </div>
             <div class="w-1/6 text-center">
-                <input type="text"  v-model.number="dataCalendar.November"
+                <input type="text" v-model="dataCalendar.November"
+                    @input="handleInput(); dataCalendar.November = dataCalendar.November.replace(/[^\d.]/g, '').replace(/(\.\d{2})\d+$/, '$1')"
                     class="w-full h-full bg-transparent border-none text-center text-[8pt] p-0 outline-none focus:outline-none focus:ring focus:ring-transparent"
                     placeholder="0" min="0" />
             </div>
@@ -51,32 +56,38 @@
         </div>
         <div class="flex *:border-slate-300 *:border *:h-[46.5px] hover:bg-slate-200">
             <div class="w-1/6 text-center">
-                <input type="text"  v-model.number="dataCalendar.February"
+                <input type="text" v-model="dataCalendar.February"
+                    @input="handleInput(); dataCalendar.February = dataCalendar.February.replace(/[^\d.]/g, '').replace(/(\.\d{2})\d+$/, '$1')"
                     class="w-full h-full bg-transparent border-none text-center text-[8pt] p-0 outline-none focus:outline-none focus:ring focus:ring-transparent"
                     placeholder="0" min="0" />
             </div>
             <div class="w-1/6 text-center">
-                <input type="text"  v-model.number="dataCalendar.April"
+                <input type="text" v-model="dataCalendar.April"
+                    @input="handleInput(); dataCalendar.April = dataCalendar.April.replace(/[^\d.]/g, '').replace(/(\.\d{2})\d+$/, '$1')"
                     class="w-full h-full bg-transparent border-none text-center text-[8pt] p-0 outline-none focus:outline-none focus:ring focus:ring-transparent"
                     placeholder="0" min="0" />
             </div>
             <div class="w-1/6 text-center">
-                <input type="text"  v-model.number="dataCalendar.June"
+                <input type="text" v-model="dataCalendar.June"
+                    @input="handleInput(); dataCalendar.June = dataCalendar.June.replace(/[^\d.]/g, '').replace(/(\.\d{2})\d+$/, '$1')"
                     class="w-full h-full bg-transparent border-none text-center text-[8pt] p-0 outline-none focus:outline-none focus:ring focus:ring-transparent"
                     placeholder="0" min="0" />
             </div>
             <div class="w-1/6 text-center">
-                <input type="text"  v-model.number="dataCalendar.August"
+                <input type="text" v-model="dataCalendar.August"
+                    @input="handleInput(); dataCalendar.August = dataCalendar.August.replace(/[^\d.]/g, '').replace(/(\.\d{2})\d+$/, '$1')"
                     class="w-full h-full bg-transparent border-none text-center text-[8pt] p-0 outline-none focus:outline-none focus:ring focus:ring-transparent"
                     placeholder="0" min="0" />
             </div>
             <div class="w-1/6 text-center">
-                <input type="text"  v-model.number="dataCalendar.October"
+                <input type="text" v-model="dataCalendar.October"
+                    @input="handleInput(); dataCalendar.October = dataCalendar.October.replace(/[^\d.]/g, '').replace(/(\.\d{2})\d+$/, '$1')"
                     class="w-full h-full bg-transparent border-none text-center text-[8pt] p-0 outline-none focus:outline-none focus:ring focus:ring-transparent"
                     placeholder="0" min="0" />
             </div>
             <div class="w-1/6 text-center">
-                <input type="text"  v-model.number="dataCalendar.December"
+                <input type="text" v-model="dataCalendar.December"
+                    @input="handleInput(); dataCalendar.December = dataCalendar.December.replace(/[^\d.]/g, '').replace(/(\.\d{2})\d+$/, '$1')"
                     class="w-full h-full bg-transparent border-none text-center text-[8pt] p-0 outline-none focus:outline-none focus:ring focus:ring-transparent"
                     placeholder="0" min="0" />
             </div>
@@ -86,17 +97,18 @@
 
 <script>
 import { ref } from 'vue';
+import { defineComponent, reactive } from 'vue';
 
 export default {
-    setup() {
+    setup(_, { emit }) {
 
-        const dataCalendar = ref(
+        const dataCalendar = reactive(
             {
                 January: 0,
                 February: 0,
                 March: 0,
                 April: 0,
-                May: 0, 
+                May: 0,
                 June: 0,
                 July: 0,
                 August: 0,
@@ -106,7 +118,15 @@ export default {
                 December: 0,
             }
         )
+        const months = Object.keys(dataCalendar);
+
+        const handleInput = (month) => {
+
+            emit('update:dataCalendar', dataCalendar);
+        };
+
         return {
+            handleInput,
             dataCalendar
         };
     },
