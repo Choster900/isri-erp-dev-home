@@ -180,7 +180,7 @@ class ReporteRRHHController extends Controller
                 $period = ' (' . $startDate . $fechaRenuncia . $estadoEmpleado . ')';
 
                 $sirh = $plaza['detalle_plaza']['id_puesto_sirhi_det_plaza'] ?
-                    'SIRH = ' . $plaza['detalle_plaza']['id_puesto_sirhi_det_plaza'].' -- '
+                    'SIRH = ' . $plaza['detalle_plaza']['id_puesto_sirhi_det_plaza'] . ' -- '
                     : '';
 
                 $textRun = $richText->createTextRun(
@@ -265,21 +265,22 @@ class ReporteRRHHController extends Controller
 
         $sheet->getStyle('5')->getFont()->setBold(true);
 
-        // $columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U'];
-        // foreach ($columns as $column) {
-        //     $sheet->getColumnDimension($column)->setAutoSize(true);
-        // }
+        $columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U'];
+        foreach ($columns as $column) {
+            $sheet->getColumnDimension($column)->setAutoSize(true);
+        }
 
         $sheet->fromArray($selectedData, NULL, 'A5');
 
-        // Recorrer todas las celdas y establecer el formato como texto
-        // foreach ($sheet->getRowIterator() as $row) {
-        //     foreach ($row->getCellIterator() as $cell) {
-        //         $cell->setValueExplicit($cell->getValue(), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-        //     }
-        // } 
-
-        //REVISAR PORQUE EL PDF DE TODOS LOS EMPLEADOS NO SE VE
+        // Recorrer todas las celdas y establecer el formato como texto para todas las celdas excepto las columna J
+        foreach ($sheet->getRowIterator() as $row) {
+            foreach ($row->getCellIterator() as $cell) {
+                $column = $cell->getColumn();
+                if ($column !== 'J') {
+                    $cell->setValueExplicit($cell->getValue(), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                }
+            }
+        }
 
         $lastRow = $sheet->getHighestDataRow(); // obtiene el número de la última fila con datos
         $sheet->setCellValue('B' . ($lastRow + 1), 'TOTAL Empleados: ' . $total);
