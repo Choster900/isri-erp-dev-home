@@ -16,6 +16,9 @@ use Maatwebsite\Excel\Facades\Excel;
 
 use Barryvdh\DomPDF\Facade\Pdf;
 
+use Dompdf\Dompdf;
+use Dompdf\Options;
+
 class ReporteRRHHController extends Controller
 {
     public function getInfoForReports(Request $request)
@@ -154,7 +157,7 @@ class ReporteRRHHController extends Controller
         });
 
         return response()->json([
-            'query'          => $query->get(),
+            'query'          => $query->orderBy('codigo_empleado', 'asc')->get(),
         ]);
     }
     public function createExcelEmployees(Request $request)
@@ -317,10 +320,22 @@ class ReporteRRHHController extends Controller
             'queryResult'   => $request->input('queryResult')
         ];
 
+        $dompdf = new Dompdf();
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isRemoteEnabled', true);
+        $dompdf->setOptions($options);
+
+        $html = view('RRHH/PDF/test-library')->render();
+        $dompdf->loadHtml($html);
+        $dompdf->render();
+
+        $dompdf->stream('nombre_del_archivo.pdf');
+
         // Crear el PDF con orientación horizontal
-        $pdf = PDF::loadView('RRHH/PDF/empleados-report', $data)->setPaper('letter', 'landscape');
+        //$pdf = PDF::loadView('RRHH/PDF/test-library', $data)->setPaper('letter', 'landscape');
 
         // Descargar el PDF
-        return $pdf->download('reporte-empleados.pdf');
+        //return $pdf->download('reporte-empleados.pdf');
     }
 }
