@@ -202,6 +202,18 @@ class BienesServiciosController extends Controller
                                 'fecha_reg_prod_adquisicion'   => $fechaActual,
                                 'usuario_prod_adquisicion'     => $usuario,
                                 'ip_prod_adquisicion'          => $ip,
+                                'cant_ene_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["January"],
+                                'cant_feb_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["February"],
+                                'cant_mar_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["March"],
+                                'cant_abr_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["April"],
+                                'cant_may_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["May"],
+                                'cant_jun_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["June"],
+                                'cant_jul_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["July"],
+                                'cant_ago_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["August"],
+                                'cant_sept_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["September"],
+                                'cant_oct_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["October"],
+                                'cant_nov_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["November"],
+                                'cant_dic_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["December"],
                             ]);
 
                             // Sumando el total
