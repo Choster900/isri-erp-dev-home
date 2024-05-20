@@ -3,7 +3,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { onMounted, ref } from "vue";
 
-export const useDatatable = () => {
+export const useDatatable = (type) => {
     const sortOrders = ref({});
     const objectProductoAdquisicion = ref([]);
     const columns = [
@@ -60,6 +60,7 @@ export const useDatatable = () => {
         column: 0,
         dir: "desc",
         search: {},
+        docType : type
     });
     const pagination = ref({
         lastPage: "",

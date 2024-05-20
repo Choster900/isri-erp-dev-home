@@ -257,7 +257,7 @@
                                 v-if="prod.deleted == false && lts.isOpen">
                                 <div :id="'lt-' + indexLt + 'prod-' + index"
                                     class="grid grid-cols-[37%_14%_13%_12%_12%_12%] max-w-full border-b border-x border-gray-500 hover:bg-gray-200"
-                                    :class="(lts.hover && lts.isOpen) ? 'bg-gray-200' : 'bg-white'">
+                                    :class="(lts.hover && lts.isOpen && !checkBlinkingClass(indexLt,index)) ? 'bg-gray-200' : 'bg-white'">
                                     <div
                                         class="w-full flex items-center justify-center border-r border-gray-500 min-h-[75px] max-h-[100px]">
                                         <div class="overflow-y-auto h-full flex items-center justify-center">
@@ -439,7 +439,7 @@ export default {
             isLoadingRequest, recDocument, errors, activeDetails,
             documents, ordenC, contrato, docSelected, products, brands,
             filteredDoc, filteredItems, startRec, filteredProds, totalRec, infoToShow,
-            getInfoForModalRecep, startReception, setProdItem, calculateLtTotal,
+            getInfoForModalRecep, startReception, setProdItem, calculateLtTotal, checkBlinkingClass,
             deleteRow, handleValidation, storeReception, updateReception, showAvails, returnToTop, 
             hasActiveProds
         } = useRecepcion(context);
@@ -454,7 +454,7 @@ export default {
             isLoadingRequest, recDocument, errors, activeDetails,
             documents, ordenC, contrato, docSelected, totalRec, products, brands,
             filteredDoc, filteredItems, startRec, filteredProds, infoToShow,
-            handleValidation, startReception, setProdItem, calculateLtTotal,
+            handleValidation, startReception, setProdItem, calculateLtTotal, checkBlinkingClass,
             deleteRow, storeReception, updateReception, showAvails, returnToTop, 
             hasActiveProds
         }
