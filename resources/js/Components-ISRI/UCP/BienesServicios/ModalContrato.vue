@@ -249,16 +249,17 @@
                                     <td class="relative text-center w-20 bg-slate-200">
                                         <span class="absolute top-1 left-0 w-full flex flex-col items-center ">
                                             {{ detalle.valorTotalProduct !== undefined ?
-                                                detalle.valorTotalProduct.toLocaleString('en-US', {
-                                                    minimumFractionDigits: 2,
-                                                    maximumFractionDigits: 2
-                                                }) : '00.00' }}
+                detalle.valorTotalProduct.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }) : '00.00' }}
                                         </span>
                                     </td>
                                     <!-- //!NUEVO -->
                                     <td class="relative p-0 bg-white"
                                         style="padding-left: 0 !important; padding-right: 0 !important; ">
-                                        <CalendarAcuerdoComponent @update:dataCalendar="handleDataCalendarUpdate($event, i, j)" />
+                                        <CalendarAcuerdoComponent v-if="showModal":dataInserted="detalle.amountsPerMonthList"
+                                            @update:dataCalendar="handleDataCalendarUpdate($event, i, j)"  />
                                     </td>
                                 </tr>
                             </template>
@@ -523,7 +524,7 @@ export default {
                     saveProductAdquisicionRequest(),
                     "¡El documento de adquisicion se ha guardado correctamente!"
                 );
-                emit("actualizar-datatable");
+                /* emit("actualizar-datatable"); */
             }
         };
 
