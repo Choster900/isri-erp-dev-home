@@ -15,7 +15,6 @@ class ProductoAdquisicion extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'id_prod_adquisicion',
         'id_producto',
         'id_det_doc_adquisicion',
         'id_marca',
@@ -29,6 +28,18 @@ class ProductoAdquisicion extends Model
         'fecha_mod_prod_adquisicion',
         'usuario_prod_adquisicion',
         'ip_prod_adquisicion',
+        'cant_ene_prod_adquisicion',
+        'cant_feb_prod_adquisicion',
+        'cant_mar_prod_adquisicion',
+        'cant_abr_prod_adquisicion',
+        'cant_may_prod_adquisicion',
+        'cant_jun_prod_adquisicion',
+        'cant_jul_prod_adquisicion',
+        'cant_ago_prod_adquisicion',
+        'cant_sept_prod_adquisicion',
+        'cant_oct_prod_adquisicion',
+        'cant_nov_prod_adquisicion',
+        'cant_dic_prod_adquisicion',
     ];
     /**
      * Get the marca that owns the ProductoAdquisicion

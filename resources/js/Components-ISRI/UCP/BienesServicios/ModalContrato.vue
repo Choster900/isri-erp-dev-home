@@ -2,7 +2,7 @@
     <template>
         <div class="m-1.5">
             <!-- Componente del modal ProcessModal -->
-            <ProcessModal maxWidth="4xl" :show="showModal" @close="$emit('cerrar-modal')">
+            <ProcessModal maxWidth="8xl" :show="showModal" @close="$emit('cerrar-modal')">
                 <div class=" flex  justify-center pt-2 content-between">
                     <svg class="h-7 w-7 absolute top-0 right-0 mt-2 cursor-pointer" viewBox="0 0 25 25"
                         @click="$emit('cerrar-modal')">
@@ -13,7 +13,7 @@
                 </div>
                 <div class="mx-6 mt-2"></div>
                 <div class="mx-4 overflow-y-auto h-[650px] py-3 pl-2 pr-4 mt-4">
-                    <table class="w-[830px] sheet0 " border="0" cellpadding="0" cellspacing="0">
+                    <table class="w-full sheet0 " border="0" cellpadding="0" cellspacing="0">
                         <col class="col0">
                         <col class="col1">
                         <col class="col2">
@@ -62,63 +62,18 @@
                                     RAZON SOCIAL DEL SUMINISTRANTE
                                 </td>
                                 <td class="border border-black bg-black h-5 text-white text-center text-[9pt]">
-                                    {{
-                arrayDocAdquisicion != '' && idDetDocAdquisicion != null &&
-                    arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion) &&
-                    arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion).dataDoc &&
-                    (
-                        arrayDocAdquisicion.find(index => index.value ==
-                            idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.nit_proveedor !== null
-                        ||
-                        arrayDocAdquisicion.find(index => index.value ==
-                            idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.dui_proveedor !== null
-                    )
-                    ? (
-                        arrayDocAdquisicion.find(index => index.value ==
-                            idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.nit_proveedor
-                            ? "NIT"
-                            : "DUI"
-                    )
-                    : ''
-            }}
+                                    {{ documentType }}
                                 </td>
                             </tr>
                             <tr>
                                 <td class="border border-black h-5" colspan="3">
                                     <h1 class="text-xs font-medium text-center">
-                                        {{ arrayDocAdquisicion != '' && idDetDocAdquisicion != null
-                && arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion)
-                && arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion).dataDoc
-                && arrayDocAdquisicion.find(index => index.value
-                    ==
-                    idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.razon_social_proveedor
-                ?
-                arrayDocAdquisicion.find(index => index.value
-                    ==
-                    idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.razon_social_proveedor
-                :
-                '' }}
-
+                                        {{ providerBusinessName }}
                                     </h1>
                                 </td>
                                 <td class="border border-black  h-5  text-center text-[9pt] ">
                                     <h1 class="text-xs font-medium text-center">
-                                        {{
-                arrayDocAdquisicion != '' && idDetDocAdquisicion != null &&
-                    arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion) &&
-                    arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion).dataDoc &&
-                    (arrayDocAdquisicion.find(index => index.value ==
-                        idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.nit_proveedor !==
-                        null
-                        ||
-                        arrayDocAdquisicion.find(index => index.value ==
-                            idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.dui_proveedor !==
-                        null)
-                    ? (arrayDocAdquisicion.find(index => index.value ==
-                        idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.nit_proveedor ||
-                        arrayDocAdquisicion.find(index => index.value ==
-                            idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.dui_proveedor)
-                    : '' }}
+                                        {{ documentNumber }}
                                     </h1>
                                 </td>
                             </tr>
@@ -146,55 +101,66 @@
                             </div>
                         </div>
                     </div>
-                    <table class="w-[830px]" border="0" cellpadding="0" cellspacing="0">
-                        <thead>
-                            <tr
-                                class="*:text-[8pt] *:bg-black *:text-white *:px-2 *:py-0.5 *:font-normal *:border--white">
-                                <th class="border border-black border-r-white border-b-white h-9 w-[300px]">PRODUCTO
-                                </th>
-                                <th class="border border-black border-r-white border-b-white w-[10px]">MARCA</th>
-                                <th class="border border-black border-r-white  border-b-white w-96" colspan="2">
-                                    DESCRIPCIÓN</th>
-                                <th class="border border-black border-r-white border-b-white">DEPENDENCIA</th>
-                                <th class="border border-black border-r-white border-b-white">CANTIDAD</th>
-                                <th class="border border-black border-r-white border-b-white">PRECIO UNITARIO</th>
-                                <th class="border border-black border-b-white">VALOR TOTAL</th>
-                            </tr>
-                        </thead>
-                        <tbody v-for="(docAdq, i) in arrayProductoAdquisicion" :key="i" v-show="docAdq.estadoLt != 0">
-                            <tr class="*:border-black cursor-pointer" :class="{ 'custom-pulse': docAdq.hoverToDelete }">
-                                <td colspan="2" @click="docAdq.vShowLt = !docAdq.vShowLt"
-                                    @mouseover=" docAdq.hoverToDelete = true" @mouseout=" docAdq.hoverToDelete = false"
-                                    @contextmenu.prevent="estadoDocAdq !== 1 ? '' : deletLineaTrabajo(i)"
-                                    class="uppercase border bg-black text-[8pt] text-white border-black border-t-white border-r-white text-center text-selection-disable">
+                    <table class="w-full" border="0" cellpadding="0" cellspacing="0">
+                        <template v-for="(docAdq, i) in arrayProductoAdquisicion" :key="i">
 
-                                    Linea de trabajo:</td>
-                                <td colspan="6" @mouseover="docAdq.hoverToDelete = true"
-                                    @click="docAdq.vShowLt = !docAdq.vShowLt" @mouseout="docAdq.hoverToDelete = false"
-                                    @contextmenu.prevent="deletLineaTrabajo(i)"
-                                    class="uppercase border bg-black text-[8pt] text-white border-black border-l-white text-center text-selection-disable">
-                                    Documento de adquiicion: </td>
-                            </tr>
-                            <tr class="*:border-black cursor-pointer" :class="{ 'custom-pulse': docAdq.hoverToDelete }">
-                                <td colspan="2" class="border border-t-black ">
-                                    <Multiselect :filter-results="false" :searchable="true" :clear-on-search="true"
-                                        :canClear="false" :canDeselect="true" :disabled="estadoDocAdq !== 1"
-                                        @select="disableLt($event)" v-model="docAdq.idLt" :min-chars="1" placeholder="-"
-                                        noOptionsText="<p class='text-xs'>Lista vacía</p>"
-                                        noResultsText="<p class='text-xs'>Sin resultados de personas</p>"
-                                        :options="arrayLineaTrabajo"
-                                        :classes="{ containerDisabled: ' bg-gray-200 text-text-slate-400', optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed', optionPointed: 'text-gray-800 bg-gray-100', container: `relative mx-auto w-full h-6 flex items-center justify-end box-border   border border-gray-300 rounded bg-white text-base leading-snug outline-none ${[errorsValidation[`productAdq.${i}.idLt`] ? 'bg-red-500' : ''], [estadoDocAdq !== 1 ? 'bg-slate-500/20' : '']}`, placeholder: `flex items-center text-center h-full absolute left-0 top-0 pointer-events-none leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ${errorsValidation[`productAdq.${i}.idLt`] ? 'bg-red-500' : ''}`, search: `w-full absolute text-start inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans rounded pl-3.5 rtl:pl-0 rtl:pr-3.5  ${errorsValidation[`productAdq.${i}.idLt`] ? 'bg-red-500' : ''}`, singleLabel: `pr-14 text-[8pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none leading-snug pl-3.5 box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ${errorsValidation[`productAdq.${i}.idLt`] ? 'bg-red-500' : ''}`, option: 'flex items-center justify-start box-border text-left  text-[7.5pt] leading-snug py-2 px-3', optionSelected: 'text-white bg-[#001c48]', optionDisabled: 'text-gray-300 cursor-not-allowed', wrapper: `relative mx-auto w-full flex items-center justify-end box-border  outline-none ${estadoDocAdq !== 1 ? 'cursor-not-allowed' : ''}`, }" />
-                                </td>
-                                <td colspan="6" class="border border-black">
-                                    <Multiselect :filter-results="true" :searchable="true" :clear-on-search="true"
-                                        @select="onSelectDocAdquisicion($event)" v-model="idDetDocAdquisicion"
-                                        placeholder="-" :min-chars="1"
-                                        :classes="{ container: `relative mx-auto w-full h-6 flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none ${errorsValidation.idDetDocAdquisicion ? 'bg-red-500' : ''}`, placeholder: `flex items-center text-center h-full absolute left-0 top-0 pointer-events-none leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ${errorsValidation.idDetDocAdquisicion ? 'bg-red-500' : ''}`, search: `w-full absolute text-start inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans rounded pl-3.5 rtl:pl-0 rtl:pr-3.5 ${errorsValidation.idDetDocAdquisicion ? 'bg-red-500' : ''}`, singleLabel: `pr-14 text-[8pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none leading-snug pl-3.5 box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ${errorsValidation.idDetDocAdquisicion ? 'bg-red-500' : ''}`, option: 'flex items-center justify-start box-border text-left cursor-pointer text-[7.5pt] leading-snug py-2 px-3', optionSelected: 'text-white bg-[#001c48]', optionPointed: 'text-gray-800 bg-gray-100', }"
-                                        noOptionsText="<p class='text-xs'>Lista vacia</p>"
-                                        noResultsText="<p class='text-xs'>Sin resultados de personas</p>"
-                                        :options="arrayDocAdquisicion" />
-                                </td>
-                            </tr>
+                            <thead>
+
+                                <tr
+                                    class="*:text-[8pt] *:bg-black *:text-white *:px-2 *:py-0.5 *:font-normal *:border--white">
+                                    <th class="border border-black border-r-white border-b-white h-9 w-[300px]">PRODUCTO
+                                    </th>
+                                    <th class="border border-black border-r-white border-b-white w-[20px]">MARCA</th>
+                                    <th class="border border-black border-r-white  border-b-white w-72">
+                                        DESCRIPCIÓN</th>
+                                    <th class="border border-black border-r-white border-b-white">CENTRO</th>
+                                    <th class="border border-black border-r-white border-b-white">CANTIDAD</th>
+                                    <th class="border border-black border-r-white border-b-white">PRECIO UNITARIO</th>
+                                    <th class="border border-black border-b-white border-r-white">VALOR TOTAL</th>
+                                    <th class="border border-black border-l-white border-b-white h-9 w-[400px]"
+                                        rowspan="1">
+                                        DISTRIBUCION MENSUAL DEL PRODUCTO ( SOLO NUMEROS )
+                                    </th>
+                                </tr>
+
+                                <tr class="*:border-black cursor-pointer"
+                                    :class="{ 'custom-pulse': docAdq.hoverToDelete }">
+                                    <td colspan="3" @click="docAdq.vShowLt = !docAdq.vShowLt"
+                                        @mouseover=" docAdq.hoverToDelete = true"
+                                        @mouseout=" docAdq.hoverToDelete = false"
+                                        @contextmenu.prevent="estadoDocAdq !== 1 ? '' : deletLineaTrabajo(i)"
+                                        class="uppercase border bg-black text-[8pt] text-white border-black border-t-white border-r-white text-center text-selection-disable">
+
+                                        Linea de trabajo:</td>
+                                    <td colspan="5" @mouseover="docAdq.hoverToDelete = true"
+                                        @click="docAdq.vShowLt = !docAdq.vShowLt"
+                                        @mouseout="docAdq.hoverToDelete = false"
+                                        @contextmenu.prevent="deletLineaTrabajo(i)"
+                                        class="uppercase border bg-black text-[8pt] text-white border-black border-l-white text-center text-selection-disable">
+                                        Documento de adquiicion: </td>
+                                </tr>
+                                <tr class="*:border-black cursor-pointer"
+                                    :class="{ 'custom-pulse': docAdq.hoverToDelete }">
+                                    <td colspan="3" class="border border-t-black ">
+                                        <Multiselect :filter-results="false" :searchable="true" :clear-on-search="true"
+                                            :canClear="false" :canDeselect="true" :disabled="estadoDocAdq !== 1"
+                                            @select="disableLt($event)" v-model="docAdq.idLt" :min-chars="1"
+                                            placeholder="-" noOptionsText="<p class='text-xs'>Lista vacía</p>"
+                                            noResultsText="<p class='text-xs'>Sin resultados de personas</p>"
+                                            :options="arrayLineaTrabajo"
+                                            :classes="{ containerDisabled: ' bg-gray-200 text-text-slate-400', optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed', optionPointed: 'text-gray-800 bg-gray-100', container: `relative mx-auto w-full h-6 flex items-center justify-end box-border   border border-gray-300 rounded bg-white text-base leading-snug outline-none ${[errorsValidation[`productAdq.${i}.idLt`] ? 'bg-red-500' : ''], [estadoDocAdq !== 1 ? 'bg-slate-500/20' : '']}`, placeholder: `flex items-center text-center h-full absolute left-0 top-0 pointer-events-none leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ${errorsValidation[`productAdq.${i}.idLt`] ? 'bg-red-500' : ''}`, search: `w-full absolute text-start inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans rounded pl-3.5 rtl:pl-0 rtl:pr-3.5  ${errorsValidation[`productAdq.${i}.idLt`] ? 'bg-red-500' : ''}`, singleLabel: `pr-14 text-[8pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none leading-snug pl-3.5 box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ${errorsValidation[`productAdq.${i}.idLt`] ? 'bg-red-500' : ''}`, option: 'flex items-center justify-start box-border text-left  text-[7.5pt] leading-snug py-2 px-3', optionSelected: 'text-white bg-[#001c48]', optionDisabled: 'text-gray-300 cursor-not-allowed', wrapper: `relative mx-auto w-full flex items-center justify-end box-border  outline-none ${estadoDocAdq !== 1 ? 'cursor-not-allowed' : ''}`, }" />
+                                    </td>
+                                    <td colspan="5" class="border border-black">
+                                        <Multiselect :filter-results="true" :searchable="true" :clear-on-search="true"
+                                            @select="onSelectDocAdquisicion($event)" v-model="idDetDocAdquisicion"
+                                            placeholder="-" :min-chars="1"
+                                            :classes="{ container: `relative mx-auto w-full h-6 flex items-center justify-end box-border cursor-pointer border border-gray-300 rounded bg-white text-base leading-snug outline-none ${errorsValidation.idDetDocAdquisicion ? 'bg-red-500' : ''}`, placeholder: `flex items-center text-center h-full absolute left-0 top-0 pointer-events-none leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ${errorsValidation.idDetDocAdquisicion ? 'bg-red-500' : ''}`, search: `w-full absolute text-start inset-0 outline-none focus:ring-0 appearance-none box-border border-0 text-base font-sans rounded pl-3.5 rtl:pl-0 rtl:pr-3.5 ${errorsValidation.idDetDocAdquisicion ? 'bg-red-500' : ''}`, singleLabel: `pr-14 text-[8pt] flex items-center h-full max-w-full absolute left-0 top-0 pointer-events-none leading-snug pl-3.5 box-border rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5 ${errorsValidation.idDetDocAdquisicion ? 'bg-red-500' : ''}`, option: 'flex items-center justify-start box-border text-left cursor-pointer text-[7.5pt] leading-snug py-2 px-3', optionSelected: 'text-white bg-[#001c48]', optionPointed: 'text-gray-800 bg-gray-100', }"
+                                            noOptionsText="<p class='text-xs'>Lista vacia</p>"
+                                            noResultsText="<p class='text-xs'>Sin resultados de personas</p>"
+                                            :options="arrayDocAdquisicion" />
+                                    </td>
+                                </tr>
+                            </thead>
                             <template v-if="docAdq.vShowLt">
                                 <tr class="*:text-[8pt]  *:px-2 *:py-0.5 *:font-normal *:border *:border-black  cursor-pointer"
                                     :class="{ '*:bg-emerald-100 -400/80 animate-pulse animate-infinite': docAdq.hoverToDelete && estadoDocAdq === 1, '*:bg-slate-300 -400/80 animate-pulse animate-infinite': docAdq.hoverToDelete && estadoDocAdq !== 1, 'bg-slate-200': estadoDocAdq !== 1, 'hover:bg-slate-200': estadoDocAdq === 1 }"
@@ -218,7 +184,7 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td class=" relative  w-24"
+                                    <td class=" relative  w-32"
                                         :class="{ 'bg-red-500': errorsValidation[`productAdq.${i}.detalleDoc.${j}.idMarca`] }"
                                         style="padding-left: 0 !important; padding-right: 0 !important; ">
                                         <div class="absolute top-0 w-full flex flex-col items-center">
@@ -230,30 +196,18 @@
                                                 noResultsText="<p class='text-xs'>Sin resultados de producto <p>"
                                                 :options="arrayMarca" />
                                             <span class="text-center ">
-                                                {{
-                arrayMarca.length > 0 &&
-                    arrayMarca
-                        .find(index => index.value == detalle.idMarca)
-                        ?.dataMarca
-                    ?
-                    arrayMarca
-                        .find(index => index.value ==
-                            detalle
-                                .idMarca)
-                        .dataMarca.nombre_marca :
-                    '-'
-            }}
+                                                {{ getBrandName(detalle.idMarca) }}
                                             </span>
                                         </div>
                                     </td>
-                                    <td class=" p-0 uppercase align-top" colspan="2">
+                                    <td class=" p-0 uppercase align-top" colspan="1">
                                         <textarea v-model="detalle.descripcionProdAdquisicion" rows="9" maxlength="255"
                                             :disabled="estadoDocAdq !== 1"
                                             :class="estadoDocAdq !== 1 ? 'cursor-not-allowed' : 'cursor-pointer '"
                                             class=" uppercase text-[8pt] p-0 border-none bg-transparent outline-none focus:outline-none focus:ring focus:ring-transparent leading-tight w-full"></textarea>
                                     </td>
 
-                                    <td class=" relative  w-24"
+                                    <td class=" relative  w-32"
                                         :class="{ 'bg-red-500': errorsValidation[`productAdq.${i}.detalleDoc.${j}.idCentroAtencion`] }"
                                         style="padding-left: 0 !important; padding-right: 0 !important; ">
                                         <div class="absolute top-0 w-full flex flex-col items-center">
@@ -265,25 +219,22 @@
                                                 noResultsText="<p class='text-xs'>Sin resultados de personas <p>"
                                                 :options="arrayCentroAtencion" />
                                             <span class="text-center">
-                                                {{ arrayCentroAtencion.length > 0 && arrayCentroAtencion.find(index =>
-                index.value == detalle.idCentroAtencion)?.dataCentro ?
-                arrayCentroAtencion.find(index => index.value ==
-                    detalle.idCentroAtencion).dataCentro.nombre_centro_atencion : '-' }}
+                                                {{ getCenterName(detalle.idCentroAtencion) }}
                                             </span>
                                         </div>
                                     </td>
 
-                                    <td class=" w-12 relative "
+                                    <td class=" w-12 relative bg-slate-200 cursor-not-allowed"
                                         :class="{ 'bg-red-500': errorsValidation[`productAdq.${i}.detalleDoc.${j}.cantProdAdquisicion`] }">
                                         <input type="text" v-model="detalle.cantProdAdquisicion"
                                             :disabled="estadoDocAdq !== 1"
                                             @input="handleInput(i, j); detalle.cantProdAdquisicion = detalle.cantProdAdquisicion.replace(/\D/g, '')"
                                             inputmode="numeric"
-                                            :class="estadoDocAdq !== 1 ? 'cursor-not-allowed' : 'cursor-pointer '"
-                                            class="absolute top-0 left-0 w-full bg-transparent border-none pl-2 text-center text-[8pt] p-0 outline-none focus:outline-none focus:ring focus:ring-transparent"
+                                            :class="estadoDocAdq !== 1 ? 'cursor-not-allowed' : 'cursor-not-allowed '"
+                                            class="absolute  top-0 left-0 w-full bg-transparent border-none pl-2 text-center text-[8pt] p-0 outline-none focus:outline-none focus:ring focus:ring-transparent"
                                             placeholder="0" min="0" max="1000" />
                                     </td>
-                                    <td class=" relative text-center"
+                                    <td class=" relative text-center "
                                         :class="{ 'bg-red-500': errorsValidation[`productAdq.${i}.detalleDoc.${j}.costoProdAdquisicion`] }">
                                         <div class="flex justify-center space-x-1 absolute top-0 left-0 ">
                                             <input type="text" v-model="detalle.costoProdAdquisicion"
@@ -295,8 +246,8 @@
                                         </div>
 
                                     </td>
-                                    <td class="relative text-center w-20">
-                                        <span class="absolute top-1 left-0 w-full flex flex-col items-center">
+                                    <td class="relative text-center w-20 bg-slate-200">
+                                        <span class="absolute top-1 left-0 w-full flex flex-col items-center ">
                                             {{ detalle.valorTotalProduct !== undefined ?
                 detalle.valorTotalProduct.toLocaleString('en-US', {
                     minimumFractionDigits: 2,
@@ -304,7 +255,12 @@
                 }) : '00.00' }}
                                         </span>
                                     </td>
-
+                                    <!-- //!NUEVO -->
+                                    <td class="relative p-0 bg-white"
+                                        style="padding-left: 0 !important; padding-right: 0 !important; ">
+                                        <CalendarAcuerdoComponent v-if="showModal":dataInserted="detalle.amountsPerMonthList"
+                                            @update:dataCalendar="handleDataCalendarUpdate($event, i, j)"  />
+                                    </td>
                                 </tr>
                             </template>
                             <template v-else>
@@ -316,7 +272,7 @@
                                             <div class="text-xs py-3">Ocultando linea:
                                                 <span class="font-medium">
                                                     {{ arrayLineaTrabajo.find(index => index.value ==
-                                                    docAdq.idLt)?.label || '' }}
+                docAdq.idLt)?.label || '' }}
                                                 </span>
                                             </div>
                                         </div>
@@ -333,15 +289,18 @@
                                             <span class="text-xs pt-0.5 text-slate-600">
                                                 NUEVO PRODUCTO ADQUISICION EN:
                                                 <br>
-                                                {{ arrayLineaTrabajo.find(index => index.value == docAdq.idLt)?.label ||
-                                                '' }}
+                                                {{ arrayLineaTrabajo.find(index => index.value ==
+                docAdq.idLt)?.label ||
+                '' }}
                                             </span>
                                         </div>
                                     </button>
                                 </td>
                             </tr>
 
-                        </tbody>
+
+
+                        </template>
 
 
                     </table>
@@ -362,7 +321,7 @@
                     </div>
 
 
-                    <table class="w-[830px] my-4 ">
+                    <table class="w-full my-4 ">
                         <col style="width: 550pt;">
                         <tbody>
                             <tr class="*:border *:border-black *:hover:bg-slate-200">
@@ -468,11 +427,12 @@ import Tooltip from '@/Components-ISRI/Tooltip.vue';
 import moment from 'moment';
 import { executeRequest } from '@/plugins/requestHelpers';
 import { useConfigPdf } from '@/Composables/UCP/BienesServicios/useConfigPdf';
+import CalendarAcuerdoComponent from './CalendarAcuerdoComponent.vue';
 
 
 export default {
     // Indica que este componente utiliza el componente ProcessModal
-    components: { ProcessModal, Tooltip },
+    components: { ProcessModal, Tooltip, CalendarAcuerdoComponent },
 
     // Define un array de eventos personalizados que puede emitir este componente
     emit: ["cerrar-modal", "actualizar-datatable"],
@@ -500,8 +460,11 @@ export default {
         const {
             idLt,
             loader,
+            documentNumber,
             disableLt,
             arrayMarca,
+            documentType,
+            handleDataCalendarUpdate,
             addingRows,
             totProductos,
             letterNumber,
@@ -517,12 +480,15 @@ export default {
             loadingNumberLetter,
             idDetDocAdquisicion,
             arrayDocAdquisicion,
+            getCenterName,
+            getBrandName,
             addinDocAdquisicion,
             arrayCentroAtencion,
             productDataSearched,
             ArrayProductFiltered,
             sumatorioTotalProduct,
             setInformacionProduct,
+            providerBusinessName,
             onSelectDocAdquisicion,
             arrayWhenIsEditingDocAdq,
             arrayProductoAdquisicion,
@@ -534,7 +500,7 @@ export default {
             saveProductAdquisicionRequest,
             updateProductAdquisicionRequest,
             handleInput,
-        } = useBienesServicios(propProdAdquisicion, showModal, "orden de compra")
+        } = useBienesServicios(propProdAdquisicion, showModal, "contrato")
 
         /**
           * Guarda productos adquisicion
@@ -612,15 +578,20 @@ export default {
             moment,
             printPdf,
             disableLt,
+            getBrandName,
             arrayMarca,
             addingRows,
             letterNumber,
             estadoDocAdq,
+            documentNumber,
             totProductos,
             letterNumber,
+            getCenterName,
+            handleDataCalendarUpdate,
             calculateTotal,
             deleteProductAdq,
             errorsValidation,
+            providerBusinessName,
             deletLineaTrabajo,
             objectGetFromProp,
             arrayLineaTrabajo,
@@ -638,6 +609,7 @@ export default {
             arrayWhenIsEditingDocAdq,
             updateProductAdquisicion,
             arrayProductoAdquisicion,
+            documentType,
             recepcionDetDocAdquisicion,
             arrayProductsWhenIsEditable,
             handleProductoSearchByCodigo,

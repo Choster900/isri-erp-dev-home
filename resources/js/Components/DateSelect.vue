@@ -9,7 +9,7 @@
                     <path
                         d="M15 2h-2V0h-2v2H9V0H7v2H5V0H3v2H1a1 1 0 00-1 1v12a1 1 0 001 1h14a1 1 0 001-1V3a1 1 0 00-1-1zm-1 12H2V6h12v8z" />
                 </svg>
-                <span>{{ options[selected].period }}</span>
+                <span class="text-xs">{{ options[selected].period }}</span>
             </span>
             <svg class="shrink-0 ml-1 fill-current text-slate-400" width="11" height="7" viewBox="0 0 11 7">
                 <path d="M5.4 6.8L0 1.4 1.4 0l4 4 4-4 1.4 1.4z" />
@@ -25,7 +25,7 @@
                     @focusout="dropdownOpen = false">
 
                     <button v-for="option in options" :key="option.id"
-                        class="flex items-center w-full hover:bg-slate-50 py-1 px-3 cursor-pointer"
+                        class="flex text-xs items-center w-full hover:bg-slate-50 py-1 px-3 cursor-pointer"
                         :class="option.id === selected && 'text-indigo-500'"
                         @click="selected = option.id; dropdownOpen = false; $emit('optionId',option.id)">
                         <svg class="shrink-0 mr-2 fill-current text-indigo-500"
@@ -52,12 +52,12 @@ export default {
         const dropdownOpen = ref(false)
         const trigger = ref(null)
         const dropdown = ref(null)
-        const selected = ref(2)
+        const selected = ref(0)
 
         const options = ref([
             {
                 id: 0,
-                period: `Este Mes - ${moment().format("MMMM")}`,
+                period: `Mes actual ${moment().format("MMMM")}`,
             },
             {
                 id: 1,

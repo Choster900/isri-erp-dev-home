@@ -14,6 +14,8 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Maatwebsite\Excel\Facades\Excel;
 
+use Barryvdh\DomPDF\Facade\Pdf;
+
 class ReporteRRHHController extends Controller
 {
     public function getInfoForReports(Request $request)
@@ -180,7 +182,7 @@ class ReporteRRHHController extends Controller
                 $period = ' (' . $startDate . $fechaRenuncia . $estadoEmpleado . ')';
 
                 $sirh = $plaza['detalle_plaza']['id_puesto_sirhi_det_plaza'] ?
-                    'SIRH = ' . $plaza['detalle_plaza']['id_puesto_sirhi_det_plaza'].' -- '
+                    'SIRH = ' . $plaza['detalle_plaza']['id_puesto_sirhi_det_plaza'] . ' -- '
                     : '';
 
                 $textRun = $richText->createTextRun(
@@ -272,10 +274,13 @@ class ReporteRRHHController extends Controller
 
         $sheet->fromArray($selectedData, NULL, 'A5');
 
-        // Recorrer todas las celdas y establecer el formato como texto
+        // Recorrer todas las celdas y establecer el formato como texto para todas las celdas excepto las columna J
         foreach ($sheet->getRowIterator() as $row) {
             foreach ($row->getCellIterator() as $cell) {
-                $cell->setValueExplicit($cell->getValue(), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                $column = $cell->getColumn();
+                if ($column !== 'J') {
+                    $cell->setValueExplicit($cell->getValue(), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                }
             }
         }
 
@@ -300,5 +305,22 @@ class ReporteRRHHController extends Controller
         header('Cache-Control: max-age=0');
 
         $writer->save('php://output');
+    }
+
+    public function createPdfEmployees(Request $request)
+    {
+        // Datos que deseas pasar a la vista
+        $data = [
+            'title'         => $request->input('title'),
+            'depInfo'       => $request->input('depInfo'),
+            'date'          => $request->input('date'),
+            'queryResult'   => $request->input('queryResult')
+        ];
+
+        // Crear el PDF con orientación horizontal
+        $pdf = PDF::loadView('RRHH/PDF/empleados-report', $data)->setPaper('letter', 'landscape');
+
+        // Descargar el PDF
+        return $pdf->download('reporte-empleados.pdf');
     }
 }

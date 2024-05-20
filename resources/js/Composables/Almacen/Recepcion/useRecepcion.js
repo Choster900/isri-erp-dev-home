@@ -216,10 +216,10 @@ export const useRecepcion = (context) => {
             });
         } else {
             // Filter products based on condition
-            const newOptions = data.products.filter((element ) => {
-                if(recDocument.value.isGas){
+            const newOptions = data.products.filter((element) => {
+                if (recDocument.value.isGas) {
                     return element.total_menos_acumulado_monto > 0
-                }else{
+                } else {
                     return element.total_menos_acumulado > 0
                 }
             });
@@ -310,6 +310,12 @@ export const useRecepcion = (context) => {
             //Clean the select
             recDocument.value.detStockId = ''
         }
+    }
+
+    const checkBlinkingClass = (indexLt,index) => {
+        const newRowId = `lt-${indexLt}prod-${index}`;
+        const newRowElement = document.getElementById(newRowId);
+        return newRowElement && newRowElement.classList.contains('blinking');
     }
 
     const returnToTop = () => {
@@ -570,7 +576,7 @@ export const useRecepcion = (context) => {
         errors, isLoadingRequest, reception, infoToShow, activeDetails,
         documents, ordenC, contrato, docSelected, totalRec, products,
         filteredDoc, filteredItems, recDocument, startRec, filteredProds, brands,
-        getInfoForModalRecep, startReception, setProdItem, calculateLtTotal,
+        getInfoForModalRecep, startReception, setProdItem, calculateLtTotal, checkBlinkingClass,
         deleteRow, handleValidation, storeReception, updateReception, showAvails, returnToTop,
         hasActiveProds
     }
