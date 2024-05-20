@@ -360,9 +360,9 @@ class BienesServiciosController extends Controller
         }
 
         // Si la validación pasa, actualizar el estado del documento
-        /* DetDocumentoAdquisicion::where('id_det_doc_adquisicion', $request->id)->update([
+        DetDocumentoAdquisicion::where('id_det_doc_adquisicion', $request->id)->update([
             'id_estado_doc_adquisicion' => $request->idState,
-        ]); */
+        ]);
 
         // Devolver una respuesta exitosa
         return response()->json([
