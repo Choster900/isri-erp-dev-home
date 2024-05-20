@@ -44,6 +44,7 @@ class BienesServiciosController extends Controller
         $v_column = $request->input('column'); //Index
         $v_dir = $request->input('dir');
         $data = $request->input('search');
+        $docType = $request->input('docType');
 
 
         $v_query = DetDocumentoAdquisicion::with([
@@ -58,7 +59,18 @@ class BienesServiciosController extends Controller
             "documento_adquisicion.proveedor",
             "documento_adquisicion.tipo_documento_adquisicion",
             "documento_adquisicion.tipo_gestion_compra",
-        ])->has('productos_adquisiciones')->orderBy($v_columns[$v_column], $v_dir);
+        ])
+            ->whereHas('documento_adquisicion', function ($query) use ($docType) {
+
+                if ($docType  == "contrato") {
+                    # code...
+                    $query->where('id_tipo_doc_adquisicion', 1);
+                } else if ($docType  == "orden de compra") {
+                    # code...
+                    $query->where('id_tipo_doc_adquisicion', 2);
+                }
+            })
+            ->has('productos_adquisiciones')->orderBy($v_columns[$v_column], $v_dir);
 
         if ($data) {
 
@@ -97,7 +109,7 @@ class BienesServiciosController extends Controller
     public function saveProductoAdquisicion(BienesServiciosRequest $request): object
     {
 
-       /*  return $request; */
+        /*  return $request; */
         try {
             DB::beginTransaction();
             $detalles = $request->productAdq;
@@ -287,13 +299,24 @@ class BienesServiciosController extends Controller
     function getArrayObjectoForMultiSelect(Request $request): array
     {
         // Obtener detalles de documentos de adquisición con información adicional
-        $detalleDocumentoAdquisicion = DetDocumentoAdquisicion::with([
+
+        $query = DetDocumentoAdquisicion::with([
             "documento_adquisicion.proveedor",
             "documento_adquisicion.proceso_compra"
-        ])
-            ->where("estado_det_doc_adquisicion", 1)
-            ->whereDoesntHave("productos_adquisiciones")
-            ->get();
+        ])->where("estado_det_doc_adquisicion", 1)->whereDoesntHave("productos_adquisiciones");
+
+        // Si el tipo de documento es "contrato", añadir una condición adicional a la consulta
+        if ($request->tipoDoc == "contrato") {
+            $query->whereHas('documento_adquisicion', function ($query) {
+                $query->where('id_tipo_doc_adquisicion', 1);
+            });
+        }else if ($request->tipoDoc == "orden de compra") {
+            $query->whereHas('documento_adquisicion', function ($query) {
+                $query->where('id_tipo_doc_adquisicion', 2);
+            });
+        }
+
+        $detalleDocumentoAdquisicion = $query->get();
 
 
         // Obtener todas las unidades de medida

@@ -150,9 +150,11 @@
                         <thead>
                             <tr
                                 class="*:text-[8pt] *:bg-black *:text-white *:px-2 *:py-0.5 *:font-normal *:border--white">
-                                <th class="border border-black border-r-white border-b-white h-9 w-[300px]">PRODUCTO</th>
+                                <th class="border border-black border-r-white border-b-white h-9 w-[300px]">PRODUCTO
+                                </th>
                                 <th class="border border-black border-r-white border-b-white w-[10px]">MARCA</th>
-                                <th class="border border-black border-r-white  border-b-white w-96" colspan="2">DESCRIPCIÓN</th>
+                                <th class="border border-black border-r-white  border-b-white w-96" colspan="2">
+                                    DESCRIPCIÓN</th>
                                 <th class="border border-black border-r-white border-b-white">DEPENDENCIA</th>
                                 <th class="border border-black border-r-white border-b-white">CANTIDAD</th>
                                 <th class="border border-black border-r-white border-b-white">PRECIO UNITARIO</th>
@@ -229,18 +231,18 @@
                                                 :options="arrayMarca" />
                                             <span class="text-center ">
                                                 {{
-                                                    arrayMarca.length > 0 &&
-                                                        arrayMarca
-                                                            .find(index => index.value == detalle.idMarca)
-                                                            ?.dataMarca
-                                                        ?
-                                                        arrayMarca
-                                                            .find(index => index.value ==
-                                                                detalle
-                                                                    .idMarca)
-                                                            .dataMarca.nombre_marca :
-                                                        '-'
-                                                }}
+                arrayMarca.length > 0 &&
+                    arrayMarca
+                        .find(index => index.value == detalle.idMarca)
+                        ?.dataMarca
+                    ?
+                    arrayMarca
+                        .find(index => index.value ==
+                            detalle
+                                .idMarca)
+                        .dataMarca.nombre_marca :
+                    '-'
+            }}
                                             </span>
                                         </div>
                                     </td>
@@ -264,9 +266,9 @@
                                                 :options="arrayCentroAtencion" />
                                             <span class="text-center">
                                                 {{ arrayCentroAtencion.length > 0 && arrayCentroAtencion.find(index =>
-                                                index.value == detalle.idCentroAtencion)?.dataCentro ?
-                                                arrayCentroAtencion.find(index => index.value ==
-                                                    detalle.idCentroAtencion).dataCentro.nombre_centro_atencion : '-' }}
+                index.value == detalle.idCentroAtencion)?.dataCentro ?
+                arrayCentroAtencion.find(index => index.value ==
+                    detalle.idCentroAtencion).dataCentro.nombre_centro_atencion : '-' }}
                                             </span>
                                         </div>
                                     </td>
@@ -296,10 +298,10 @@
                                     <td class="relative text-center w-20">
                                         <span class="absolute top-1 left-0 w-full flex flex-col items-center">
                                             {{ detalle.valorTotalProduct !== undefined ?
-                                                detalle.valorTotalProduct.toLocaleString('en-US', {
-                                                    minimumFractionDigits: 2,
-                                                    maximumFractionDigits: 2
-                                                }) : '00.00' }}
+                detalle.valorTotalProduct.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }) : '00.00' }}
                                         </span>
                                     </td>
 
@@ -313,7 +315,8 @@
                                         <div class="flex flex-col items-center justify-center">
                                             <div class="text-xs py-3">Ocultando linea:
                                                 <span class="font-medium">
-                                                    {{ arrayLineaTrabajo.find(index => index.value == docAdq.idLt)?.label || '' }}
+                                                    {{ arrayLineaTrabajo.find(index => index.value ==
+                                                    docAdq.idLt)?.label || '' }}
                                                 </span>
                                             </div>
                                         </div>
@@ -330,7 +333,8 @@
                                             <span class="text-xs pt-0.5 text-slate-600">
                                                 NUEVO PRODUCTO ADQUISICION EN:
                                                 <br>
-                                                {{ arrayLineaTrabajo.find(index => index.value == docAdq.idLt)?.label || '' }}
+                                                {{ arrayLineaTrabajo.find(index => index.value == docAdq.idLt)?.label ||
+                                                '' }}
                                             </span>
                                         </div>
                                     </button>
@@ -530,7 +534,7 @@ export default {
             saveProductAdquisicionRequest,
             updateProductAdquisicionRequest,
             handleInput,
-        } = useBienesServicios(propProdAdquisicion, showModal)
+        } = useBienesServicios(propProdAdquisicion, showModal, "orden de compra")
 
         /**
           * Guarda productos adquisicion

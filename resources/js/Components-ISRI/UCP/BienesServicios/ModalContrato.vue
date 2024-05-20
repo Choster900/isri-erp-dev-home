@@ -500,7 +500,7 @@ export default {
             saveProductAdquisicionRequest,
             updateProductAdquisicionRequest,
             handleInput,
-        } = useBienesServicios(propProdAdquisicion, showModal)
+        } = useBienesServicios(propProdAdquisicion, showModal, "contrato")
 
         /**
           * Guarda productos adquisicion
@@ -524,7 +524,7 @@ export default {
                     saveProductAdquisicionRequest(),
                     "¡El documento de adquisicion se ha guardado correctamente!"
                 );
-                /* emit("actualizar-datatable"); */
+                emit("actualizar-datatable");
             }
         };
 

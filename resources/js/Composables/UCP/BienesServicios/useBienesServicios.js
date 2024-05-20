@@ -2,7 +2,7 @@ import { ref, onMounted, watch, computed, reactive } from "vue";
 import axios from "axios";
 import { executeRequest } from "@/plugins/requestHelpers";
 import Swal from "sweetalert2";
-export const useBienesServicios = (propProdAdquisicion, showModal) => {
+export const useBienesServicios = (propProdAdquisicion, showModal,typeDoc) => {
     const arrayProductoAdquisicion = ref([])
     const idDetDocAdquisicion = ref(null)
     const observacionDetDocAdquisicion = ref(null)
@@ -102,7 +102,7 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
      */
     const getArrayObject = async () => {
         try {
-            const resp = await axios.post("/get-array-objects-for-multiselect", {});
+            const resp = await axios.post("/get-array-objects-for-multiselect", {tipoDoc: typeDoc});
             arrayLineaTrabajo.value = resp.data.lineaTrabajo.map(index => {
                 return { value: index.id_lt, label: `${index.codigo_up_lt} - ${index.nombre_lt}`, disabled: false };
             })
