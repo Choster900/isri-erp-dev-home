@@ -262,7 +262,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::get('get-info-for-reports', [ReporteRRHHController::class, 'getInfoForReports'])->name('reporteRRHH.getInfoForReports');
     Route::post('get-report-employees-rrhh', [ReporteRRHHController::class, 'getReportEmployeesRRHH'])->name('reporteRRHH.getReportEmployeesRRHH');
     Route::post('create-excel-employees', [ReporteRRHHController::class, 'createExcelEmployees'])->name('reporteRRHH.createExcelEmployees');
-
+    Route::post('create-pdf-employees', [ReporteRRHHController::class, 'createPdfEmployees'])->name('reporteRRHH.createPdfEmployees');
 
     Route::get(
         '/rrhh/hoja-laboral',

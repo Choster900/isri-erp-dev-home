@@ -14,6 +14,8 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Maatwebsite\Excel\Facades\Excel;
 
+use Barryvdh\DomPDF\Facade\Pdf;
+
 class ReporteRRHHController extends Controller
 {
     public function getInfoForReports(Request $request)
@@ -303,5 +305,22 @@ class ReporteRRHHController extends Controller
         header('Cache-Control: max-age=0');
 
         $writer->save('php://output');
+    }
+
+    public function createPdfEmployees(Request $request)
+    {
+        // Datos que deseas pasar a la vista
+        $data = [
+            'title'         => $request->input('title'),
+            'depInfo'       => $request->input('depInfo'),
+            'date'          => $request->input('date'),
+            'queryResult'   => $request->input('queryResult')
+        ];
+
+        // Crear el PDF con orientación horizontal
+        $pdf = PDF::loadView('RRHH/PDF/empleados-report', $data)->setPaper('letter', 'landscape');
+
+        // Descargar el PDF
+        return $pdf->download('reporte-empleados.pdf');
     }
 }
