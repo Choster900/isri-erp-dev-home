@@ -258,7 +258,7 @@ export default {
             isLoadinRequest,
             sortBy,
             getProductoAdquisicion,
-            handleData, } = useDatatable()
+            handleData, } = useDatatable("contrato")
         const { menu } = toRefs(props);
         const shoModalBienesServicios = ref(false);
         const permits = usePermissions(menu.value, window.location.pathname);

@@ -96,11 +96,22 @@
 </template>
 
 <script>
+import { watch, toRefs, onMounted } from 'vue';
+import { onBeforeUnmount } from 'vue';
 import { ref } from 'vue';
 import { defineComponent, reactive } from 'vue';
 
 export default {
-    setup(_, { emit }) {
+    props: {
+        // La propiedad dataInserted se usa para mostrar la data que esta en la base de datos a los meses actuales
+        dataInserted: {
+            type: Object,
+            default: () => null,
+        },
+    },
+    setup(props, { emit }) {
+
+        const { dataInserted } = toRefs(props)
 
         const dataCalendar = reactive(
             {
@@ -124,6 +135,39 @@ export default {
 
             emit('update:dataCalendar', dataCalendar);
         };
+
+
+        /*   watch(() => props.dataInserted, (newValue, oldValue) => {
+              // Asigna los nuevos valores a dataCalendar
+              Object.keys(dataCalendar).forEach(month => {
+                  dataCalendar[month] = newValue[month] || 0; // Si no hay valor para el mes, establece 0
+              });
+              console.log('Nuevo valor de dataInserted:', newValue);
+          }, { deep: true }); // Observa cambios profundos en el objeto */
+
+        /*   watch(dataInserted, (newValue, oldValue) => {
+              console.log(newValue);
+          }, { deep: true }) */
+
+
+        onMounted(() => {
+
+
+            Object.keys(dataCalendar).forEach(month => {
+                dataCalendar[month] = dataInserted.value[month] || 0; // Si no hay valor para el mes, establece 0
+            });
+           // console.log('Nuevo valor de dataInserted:', newValue);
+        })
+
+
+        // Método para destruir el componente
+        const destruirComponente = () => {
+            //console.log('Destruido');
+            // Realiza cualquier limpieza necesaria antes de destruir el componente
+        };
+
+        // Registra la función de destrucción del componente
+        onBeforeUnmount(destruirComponente);
 
         return {
             handleInput,

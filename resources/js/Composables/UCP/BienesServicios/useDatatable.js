@@ -3,7 +3,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { onMounted, ref } from "vue";
 
-export const useDatatable = () => {
+export const useDatatable = (type) => {
     const sortOrders = ref({});
     const objectProductoAdquisicion = ref([]);
     const columns = [
@@ -16,14 +16,16 @@ export const useDatatable = () => {
                 { value: "3", label: "FACTURA" }
             ]
         },
-        { width: "1%", label: "Gestion Compra", name: "id_tipo_gestion_compra", type: "select",
-        options: [
-            { value: "1", label: "CONTRATACION DIRECTA" },
-            { value: "2", label: "LIBRE GESTION" },
-            { value: "3", label: "LICITACION PUBLICA" },
-            { value: "4", label: "MERCADO BURSATIL" },
+        {
+            width: "1%", label: "Gestion Compra", name: "id_tipo_gestion_compra", type: "select",
+            options: [
+                { value: "1", label: "CONTRATACION DIRECTA" },
+                { value: "2", label: "LIBRE GESTION" },
+                { value: "3", label: "LICITACION PUBLICA" },
+                { value: "4", label: "MERCADO BURSATIL" },
 
-        ] },
+            ]
+        },
         { width: "7%", label: "Numero Adquisicion", name: "numero_doc_adquisicion", type: "text", },
         { width: "22%", label: "Nombre adquisicion", name: "nombre_det_doc_adquisicion", type: "text", },
 
@@ -60,6 +62,7 @@ export const useDatatable = () => {
         column: 0,
         dir: "desc",
         search: {},
+        docType: type
     });
     const pagination = ref({
         lastPage: "",
@@ -151,10 +154,12 @@ export const useDatatable = () => {
                 showCloseButton: true,
             });
             if (confirmedEliminarProd.isConfirmed) {
-                executeRequest(
+               await executeRequest(
                     updateDetDocAdquisicionRequest(idDetDoc, idState),
-                    `¡El documento de adquisicion se ha ${idState == 2 ? `Enviado` : `Cerrado`} correctamente!`
+                    `¡El documento de adquisicion se ha ${idState == 2 ? `Enviado` : `Cerrado`} correctamente!`,
+                    "El monto total de todos los productos no puede exceder el monto especificado en el detalle del documento de adquisición seleccionado."
                 );
+
                 getProductoAdquisicion(lastUrl.value)
             }
         } catch (error) {

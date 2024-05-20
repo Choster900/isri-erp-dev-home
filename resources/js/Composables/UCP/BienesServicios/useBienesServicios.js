@@ -1,8 +1,8 @@
-import { ref, onMounted, watch, computed } from "vue";
+import { ref, onMounted, watch, computed, reactive } from "vue";
 import axios from "axios";
 import { executeRequest } from "@/plugins/requestHelpers";
 import Swal from "sweetalert2";
-export const useBienesServicios = (propProdAdquisicion, showModal) => {
+export const useBienesServicios = (propProdAdquisicion, showModal,typeDoc) => {
     const arrayProductoAdquisicion = ref([])
     const idDetDocAdquisicion = ref(null)
     const observacionDetDocAdquisicion = ref(null)
@@ -58,10 +58,11 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
                     descripcionProdAdquisicion: '',
                     estadoProdAdquisicion: 1,
                     valorTotalProduct: 0,
+                    amountsPerMonthList: {}
+
                 });
 
                 // Muestra la matriz actualizada en la consola
-                //console.log("Matriz de productos de adquisición actualizada:", arrayProductoAdquisicion.value);
             } else {
                 // Muestra un mensaje de error si faltan datos para agregar filas
                 console.error("No se pueden agregar filas debido a datos faltantes.");
@@ -88,7 +89,6 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
             });
             addingRows(arrayProductoAdquisicion.value.length - 1)
             // Muestra la matriz actualizada en la consola
-            //console.log("Matriz de productos de adquisición actualizada:", arrayProductoAdquisicion.value);
         } catch (error) {
             // Maneja los errores imprimiéndolos en la consola
             console.error("Error al agregar documento de adquisición:", error);
@@ -102,7 +102,7 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
      */
     const getArrayObject = async () => {
         try {
-            const resp = await axios.post("/get-array-objects-for-multiselect", {});
+            const resp = await axios.post("/get-array-objects-for-multiselect", {tipoDoc: typeDoc});
             arrayLineaTrabajo.value = resp.data.lineaTrabajo.map(index => {
                 return { value: index.id_lt, label: `${index.codigo_up_lt} - ${index.nombre_lt}`, disabled: false };
             })
@@ -125,30 +125,6 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
             throw new Error("Error en la creación de la evaluación personal");
         }
 
-    };
-
-    /**
-    * Busca producto por codigo.
-    *
-    * @param {string} productCode - codigo del producto a buscar.
-    * @returns {Promise<object>} - Objeto con los datos de la respuesta.
-    * @throws {Error} - Error al obtener empleados por nombre.
-    */
-    const handleProductoSearchByCodigo = async (productCode) => {
-        try {
-            // Realiza la búsqueda de empleados
-            const response = await axios.post(
-                "/get-product-by-codigo-producto", {
-                codigoProducto: productCode,
-            });
-            productDataSearched.value = response.data
-            return response.data;
-        } catch (error) {
-            // Manejo de errores específicos
-            console.error("Error al obtener empleados por nombre:", error);
-            // Lanza el error para que pueda ser manejado por el componente que utiliza este composable
-            throw new Error("Error en la búsqueda de empleados");
-        }
     };
 
     /**
@@ -221,14 +197,8 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
             // Obtén el producto en la fila especificada
             const producto = arrayProductoAdquisicion.value[docAdq].detalleDoc[detalleDocAdq];
 
-            // Log de la información del producto antes del cálculo
-            console.log(`Información del producto en la fila ${docAdq}, detalle ${detalleDocAdq}:`, producto);
-
             // Desestructura las propiedades necesarias del producto
             const { cantProdAdquisicion, costoProdAdquisicion } = producto;
-
-            // Log de las cantidades y costos antes del cálculo
-            //console.log(`Cantidad: ${cantProdAdquisicion}, Costo: ${costoProdAdquisicion}`);
 
             // Realiza el cálculo del valor total y asigna al producto
             const valorTotal = cantProdAdquisicion * costoProdAdquisicion;
@@ -250,19 +220,18 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
         });
 
         let sumaTotal = suma.reduce((acumulador, producto) => acumulador + producto.valorTotalProduct, 0);
-        console.log("La suma total de los valores de los productos es: " + sumaTotal);
         totProductos.value = sumaTotal.toFixed(2)
         getTextForNumber(sumaTotal)
     }
 
     const loadingNumberLetter = ref(false)
     /**
-  * Convertir numeros a letras
-  *
-  * @param {string} number - numero a convertir
-  * @returns {Promise<object>} - Objeto con los datos de la respuesta.
-  * @throws {Error} - Error al obtener empleados por nombre.
-  */
+     * Convertir numeros a letras
+     *
+     * @param {string} number - numero a convertir
+     * @returns {Promise<object>} - Objeto con los datos de la respuesta.
+     * @throws {Error} - Error al obtener empleados por nombre.
+     */
     const getTextForNumber = async (number) => {
         try {
             loadingNumberLetter.value = true;
@@ -271,7 +240,6 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
                 "/convert-numbers-to-string", {
                 number: number,
             });
-            console.log(response);
             letterNumber.value = response.data
             //return response.data;
         } catch (error) {
@@ -457,16 +425,13 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
      * @returns {Promise<void>} - Una promesa que se resuelve después de completar la operación.
      */
     const onSelectDocAdquisicion = async (valueDocument) => {
-        console.log({ valueDocument });
-        console.log(arrayDocAdquisicion.value);
 
         try {
             loader.value = true;
             productDataSearched.value = []
             // Obtiene el ID del proceso de compra asociado al documento de adquisición seleccionado.
             const procesoId = arrayDocAdquisicion.value.find(d => d.value === valueDocument)?.dataDoc?.documento_adquisicion?.id_proceso_compra;
-            console.log(procesoId);
-            console.log(arrayDocAdquisicion.value);
+
             if (!procesoId) {
                 throw new Error("ID del proceso de compra no encontrado");
             }
@@ -531,7 +496,6 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
             notificacionDetDocAdquisicion.value = objectGetFromProp.value.notificacion_det_doc_adquisicion
 
             let productosAdquisiciones = objectGetFromProp.value.productos_adquisiciones;
-            console.log(productosAdquisiciones);
             // Utilizando un conjunto para rastrear los id_lt únicos
             let idLtSet = new Set();
             let productArray = new Set();
@@ -558,7 +522,6 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
                     };
                 }
             }).filter(Boolean)  // Filtra los elementos nulos o indefinidos
-            /*  console.log(brandsUsedInDoc.value); */
             // Utiliza map en lugar de reduce para simplificar la lógica
             arrayProductsWhenIsEditable.value = productosAdquisiciones.map(producto => {
                 let idProduct = producto.id_producto;
@@ -598,6 +561,22 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
                 const { producto } = index;
                 idDetDocAdquisicion.value = index.id_det_doc_adquisicion
 
+                let newArray = {
+                    January: parseFloat(index.cant_ene_prod_adquisicion),
+                    February: parseFloat(index.cant_feb_prod_adquisicion),
+                    March: parseFloat(index.cant_mar_prod_adquisicion),
+                    April: parseFloat(index.cant_abr_prod_adquisicion),
+                    May: parseFloat(index.cant_may_prod_adquisicion),
+                    June: parseFloat(index.cant_jun_prod_adquisicion),
+                    July: parseFloat(index.cant_jul_prod_adquisicion),
+                    August: parseFloat(index.cant_ago_prod_adquisicion),
+                    September: parseFloat(index.cant_sept_prod_adquisicion),
+                    October: parseFloat(index.cant_oct_prod_adquisicion),
+                    November: parseFloat(index.cant_nov_prod_adquisicion),
+                    December: parseFloat(index.cant_dic_prod_adquisicion),
+                };
+
+
                 arrayProductoAdquisicion.value[indice]["detalleDoc"].push({
                     idProdAdquisicion: index.id_prod_adquisicion,
                     especifico: producto.id_ccta_presupuestal,
@@ -612,6 +591,7 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
                     descripcionProdAdquisicion: index.descripcion_prod_adquisicion,
                     estadoProdAdquisicion: 2, // [Comment: Estado manejado en 0 => deleted,1 => created,2 =>edited]
                     valorTotalProduct: index.cant_prod_adquisicion * index.costo_prod_adquisicion,
+                    amountsPerMonthList: newArray
                 });
             });
             onSelectDocAdquisicion(idDetDocAdquisicion.value)
@@ -624,14 +604,24 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
         }
     });
 
-    /* // ESTO ES NUEVO. POR FAVOR MODER A MODAL BIENES Y SERVICIOS (QUE ES EL MODAL DE COMPRAS) //*/
+    /*
+     ESTO ES NUEVO. POR FAVOR MOVER A MODAL BIENES Y SERVICIOS
+     (QUE ES EL MODAL DE COMPRAS)
+    */
 
-    //!PROPIEDADES COMPUTADAS
+    //! PROPIEDADES COMPUTADAS
+
+    /**
+     * Computed property to determine the type of document (NIT or DUI) based on the provider's data.
+     * @returns {string} - Returns "NIT", "DUI", or an empty string if not available.
+     */
     const documentType = computed(() => {
         if (arrayDocAdquisicion.value !== '' && idDetDocAdquisicion.value != null) {
+            // Find the document in arrayDocAdquisicion matching idDetDocAdquisicion
             const doc = arrayDocAdquisicion.value.find(index => index.value == idDetDocAdquisicion.value);
             if (doc && doc.dataDoc) {
                 const proveedor = doc.dataDoc.documento_adquisicion.proveedor;
+                // Return "NIT" if nit_proveedor is present, otherwise "DUI"
                 if (proveedor.nit_proveedor !== null || proveedor.dui_proveedor !== null) {
                     return proveedor.nit_proveedor ? "NIT" : "DUI";
                 }
@@ -640,8 +630,13 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
         return '';
     });
 
+    /**
+     * Computed property to get the provider's business name.
+     * @returns {string} - Returns the business name or an empty string if not available.
+     */
     const providerBusinessName = computed(() => {
         if (arrayDocAdquisicion.value !== '' && idDetDocAdquisicion.value != null) {
+            // Find the document in arrayDocAdquisicion matching idDetDocAdquisicion
             const doc = arrayDocAdquisicion.value.find(index => index.value == idDetDocAdquisicion.value);
             if (doc && doc.dataDoc && doc.dataDoc.documento_adquisicion.proveedor.razon_social_proveedor) {
                 return doc.dataDoc.documento_adquisicion.proveedor.razon_social_proveedor;
@@ -650,11 +645,17 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
         return '';
     });
 
+    /**
+     * Computed property to get the document number (NIT or DUI) of the provider.
+     * @returns {string} - Returns the document number or an empty string if not available.
+     */
     const documentNumber = computed(() => {
         if (arrayDocAdquisicion.value !== '' && idDetDocAdquisicion.value != null) {
+            // Find the document in arrayDocAdquisicion matching idDetDocAdquisicion
             const doc = arrayDocAdquisicion.value.find(index => index.value == idDetDocAdquisicion.value);
             if (doc && doc.dataDoc) {
                 const proveedor = doc.dataDoc.documento_adquisicion.proveedor;
+                // Return nit_proveedor or dui_proveedor if present
                 if (proveedor.nit_proveedor !== null || proveedor.dui_proveedor !== null) {
                     return proveedor.nit_proveedor || proveedor.dui_proveedor;
                 }
@@ -663,40 +664,54 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
         return '';
     });
 
-    //!FUNCIONES QUE RETORNAN INFORMACION SELECCIONADA EN SELECT (VALGA LA REDUNDANCIA)
+    //! FUNCIONES QUE RETORNAN INFORMACIÓN SELECCIONADA EN SELECT
+
+    /**
+     * Function to get the brand name by its ID.
+     * @param {number} idMarca - The ID of the brand.
+     * @returns {string} - Returns the brand name or '-' if not found.
+     */
     const getBrandName = (idMarca) => {
+        // Find the brand in arrayMarca matching idMarca
         const marca = arrayMarca.value.find(index => index.value == idMarca);
         return marca?.dataMarca?.nombre_marca || '-';
     };
 
-
+    /**
+     * Function to get the center name by its ID.
+     * @param {number} idCentroAtencion - The ID of the attention center.
+     * @returns {string} - Returns the center name or '-' if not found.
+     */
     const getCenterName = (idCentroAtencion) => {
+        // Find the center in arrayCentroAtencion matching idCentroAtencion
         const centro = arrayCentroAtencion.value.find(index => index.value == idCentroAtencion);
         return centro?.dataCentro?.nombre_centro_atencion || '-';
     };
 
 
+    /**
+     * Maneja la actualización de los datos del calendario y calcula el total de cantidades.
+     *
+     * @param {Object} updatedDataCalendar - El objeto que contiene las cantidades actualizadas para cada mes.
+     * @param {number} lineaTrabajoIndex - El índice de la línea de trabajo en arrayProductoAdquisicion.
+     * @param {number} productoIndex - El índice del producto dentro de la línea de trabajo especificada.
+     */
     const handleDataCalendarUpdate = (updatedDataCalendar, lineaTrabajoIndex, productoIndex) => {
         // Calcula la suma de todas las cantidades de los meses
         const totalCantidad = Object.values(updatedDataCalendar)
-            .map(cantidad => parseFloat(cantidad))
-            .reduce((total, cantidad) => total + cantidad, 0);
-
-        console.log('Total de cantidades:', totalCantidad);
+            .map(cantidad => parseFloat(cantidad)) // Convierte cada valor a un número
+            .reduce((total, cantidad) => total + cantidad, 0); // Suma todos los valores
 
         // Obtiene el producto en la fila especificada
         const producto = arrayProductoAdquisicion.value[lineaTrabajoIndex].detalleDoc[productoIndex];
 
         // Actualiza la propiedad cantProdAdquisicion con la suma total
         producto.cantProdAdquisicion = totalCantidad;
+        producto.amountsPerMonthList = updatedDataCalendar; // Actualiza la lista de cantidades por mes
 
-        console.log('Producto actualizado:', producto);
-
+        // Llama a la función handleInput para hacer los calculos de cantidad * costo unitario
         handleInput(lineaTrabajoIndex, productoIndex);
-
     };
-
-
 
 
     return {
@@ -740,7 +755,6 @@ export const useBienesServicios = (propProdAdquisicion, showModal) => {
         sumatorioTotalProduct,
         brandsUsedInDoc,
         loadingNumberLetter,
-        handleProductoSearchByCodigo,
         setInformacionProduct,
     }
 }
