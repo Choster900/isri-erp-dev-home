@@ -128,30 +128,6 @@ export const useBienesServicios = (propProdAdquisicion, showModal,typeDoc) => {
     };
 
     /**
-    * Busca producto por codigo.
-    *
-    * @param {string} productCode - codigo del producto a buscar.
-    * @returns {Promise<object>} - Objeto con los datos de la respuesta.
-    * @throws {Error} - Error al obtener empleados por nombre.
-    */
-    const handleProductoSearchByCodigo = async (productCode) => {
-        try {
-            // Realiza la búsqueda de empleados
-            const response = await axios.post(
-                "/get-product-by-codigo-producto", {
-                codigoProducto: productCode,
-            });
-            productDataSearched.value = response.data
-            return response.data;
-        } catch (error) {
-            // Manejo de errores específicos
-            console.error("Error al obtener empleados por nombre:", error);
-            // Lanza el error para que pueda ser manejado por el componente que utiliza este composable
-            throw new Error("Error en la búsqueda de empleados");
-        }
-    };
-
-    /**
      *
      * Configura la información del producto seleccionado.
      * Al seleccionar producto toma tuda su informacion y la setea a la fila correspoendiente
@@ -224,9 +200,6 @@ export const useBienesServicios = (propProdAdquisicion, showModal,typeDoc) => {
             // Desestructura las propiedades necesarias del producto
             const { cantProdAdquisicion, costoProdAdquisicion } = producto;
 
-            // Log de las cantidades y costos antes del cálculo
-            //console.log(`Cantidad: ${cantProdAdquisicion}, Costo: ${costoProdAdquisicion}`);
-
             // Realiza el cálculo del valor total y asigna al producto
             const valorTotal = cantProdAdquisicion * costoProdAdquisicion;
             arrayProductoAdquisicion.value[docAdq].detalleDoc[detalleDocAdq].valorTotalProduct = valorTotal;
@@ -253,12 +226,12 @@ export const useBienesServicios = (propProdAdquisicion, showModal,typeDoc) => {
 
     const loadingNumberLetter = ref(false)
     /**
-  * Convertir numeros a letras
-  *
-  * @param {string} number - numero a convertir
-  * @returns {Promise<object>} - Objeto con los datos de la respuesta.
-  * @throws {Error} - Error al obtener empleados por nombre.
-  */
+     * Convertir numeros a letras
+     *
+     * @param {string} number - numero a convertir
+     * @returns {Promise<object>} - Objeto con los datos de la respuesta.
+     * @throws {Error} - Error al obtener empleados por nombre.
+     */
     const getTextForNumber = async (number) => {
         try {
             loadingNumberLetter.value = true;
@@ -782,7 +755,6 @@ export const useBienesServicios = (propProdAdquisicion, showModal,typeDoc) => {
         sumatorioTotalProduct,
         brandsUsedInDoc,
         loadingNumberLetter,
-        handleProductoSearchByCodigo,
         setInformacionProduct,
     }
 }

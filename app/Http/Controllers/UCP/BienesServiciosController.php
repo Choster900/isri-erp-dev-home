@@ -62,10 +62,10 @@ class BienesServiciosController extends Controller
         ])
             ->whereHas('documento_adquisicion', function ($query) use ($docType) {
 
-                if ($docType  == "contrato") {
+                if ($docType == "contrato") {
                     # code...
                     $query->where('id_tipo_doc_adquisicion', 1);
-                } else if ($docType  == "orden de compra") {
+                } else if ($docType == "orden de compra") {
                     # code...
                     $query->where('id_tipo_doc_adquisicion', 2);
                 }
@@ -140,18 +140,18 @@ class BienesServiciosController extends Controller
                                 'usuario_prod_adquisicion'     => $usuario,
                                 'ip_prod_adquisicion'          => $ip,
 
-                                'cant_ene_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["January"],
-                                'cant_feb_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["February"],
-                                'cant_mar_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["March"],
-                                'cant_abr_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["April"],
-                                'cant_may_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["May"],
-                                'cant_jun_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["June"],
-                                'cant_jul_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["July"],
-                                'cant_ago_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["August"],
-                                'cant_sept_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["September"],
-                                'cant_oct_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["October"],
-                                'cant_nov_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["November"],
-                                'cant_dic_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["December"],
+                                'cant_ene_prod_adquisicion'    => $detalleProducto["amountsPerMonthList"]["January"],
+                                'cant_feb_prod_adquisicion'    => $detalleProducto["amountsPerMonthList"]["February"],
+                                'cant_mar_prod_adquisicion'    => $detalleProducto["amountsPerMonthList"]["March"],
+                                'cant_abr_prod_adquisicion'    => $detalleProducto["amountsPerMonthList"]["April"],
+                                'cant_may_prod_adquisicion'    => $detalleProducto["amountsPerMonthList"]["May"],
+                                'cant_jun_prod_adquisicion'    => $detalleProducto["amountsPerMonthList"]["June"],
+                                'cant_jul_prod_adquisicion'    => $detalleProducto["amountsPerMonthList"]["July"],
+                                'cant_ago_prod_adquisicion'    => $detalleProducto["amountsPerMonthList"]["August"],
+                                'cant_sept_prod_adquisicion'   => $detalleProducto["amountsPerMonthList"]["September"],
+                                'cant_oct_prod_adquisicion'    => $detalleProducto["amountsPerMonthList"]["October"],
+                                'cant_nov_prod_adquisicion'    => $detalleProducto["amountsPerMonthList"]["November"],
+                                'cant_dic_prod_adquisicion'    => $detalleProducto["amountsPerMonthList"]["December"],
                             ];
                             // Sumando el total
                             $totCostoProdAdquisicion += $detalleProducto["valorTotalProduct"];
@@ -162,13 +162,13 @@ class BienesServiciosController extends Controller
                     }
                 }
             }
-            DetDocumentoAdquisicion::where("id_det_doc_adquisicion", $idDetDocAdquisicion)->update([
-                "monto_det_doc_adquisicion" => $totCostoProdAdquisicion,
-                "observacion_det_doc_adquisicion" => $notificacionDetDocAdquisicion,
-                "recepcion_det_doc_adquisicion" => $recepcionDetDocAdquisicion,
-                "notificacion_det_doc_adquisicion" => $observacionDetDocAdquisicion,
-            ]);
-
+            /*  DetDocumentoAdquisicion::where("id_det_doc_adquisicion", $idDetDocAdquisicion)->update([
+                 "monto_det_doc_adquisicion" => $totCostoProdAdquisicion,
+                 "observacion_det_doc_adquisicion" => $notificacionDetDocAdquisicion,
+                 "recepcion_det_doc_adquisicion" => $recepcionDetDocAdquisicion,
+                 "notificacion_det_doc_adquisicion" => $observacionDetDocAdquisicion,
+             ]);
+  */
             DB::commit();
             return response()->json($request); // O cualquier otra respuesta que desees enviar
         } catch (\Throwable $th) {
@@ -214,18 +214,18 @@ class BienesServiciosController extends Controller
                                 'fecha_reg_prod_adquisicion'   => $fechaActual,
                                 'usuario_prod_adquisicion'     => $usuario,
                                 'ip_prod_adquisicion'          => $ip,
-                                'cant_ene_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["January"],
-                                'cant_feb_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["February"],
-                                'cant_mar_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["March"],
-                                'cant_abr_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["April"],
-                                'cant_may_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["May"],
-                                'cant_jun_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["June"],
-                                'cant_jul_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["July"],
-                                'cant_ago_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["August"],
-                                'cant_sept_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["September"],
-                                'cant_oct_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["October"],
-                                'cant_nov_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["November"],
-                                'cant_dic_prod_adquisicion' => $detalleProducto["amountsPerMonthList"]["December"],
+                                'cant_ene_prod_adquisicion'    => $detalleProducto["amountsPerMonthList"]["January"],
+                                'cant_feb_prod_adquisicion'    => $detalleProducto["amountsPerMonthList"]["February"],
+                                'cant_mar_prod_adquisicion'    => $detalleProducto["amountsPerMonthList"]["March"],
+                                'cant_abr_prod_adquisicion'    => $detalleProducto["amountsPerMonthList"]["April"],
+                                'cant_may_prod_adquisicion'    => $detalleProducto["amountsPerMonthList"]["May"],
+                                'cant_jun_prod_adquisicion'    => $detalleProducto["amountsPerMonthList"]["June"],
+                                'cant_jul_prod_adquisicion'    => $detalleProducto["amountsPerMonthList"]["July"],
+                                'cant_ago_prod_adquisicion'    => $detalleProducto["amountsPerMonthList"]["August"],
+                                'cant_sept_prod_adquisicion'   => $detalleProducto["amountsPerMonthList"]["September"],
+                                'cant_oct_prod_adquisicion'    => $detalleProducto["amountsPerMonthList"]["October"],
+                                'cant_nov_prod_adquisicion'    => $detalleProducto["amountsPerMonthList"]["November"],
+                                'cant_dic_prod_adquisicion'    => $detalleProducto["amountsPerMonthList"]["December"],
                             ]);
 
                             // Sumando el total
@@ -276,12 +276,12 @@ class BienesServiciosController extends Controller
                     }
                 }
             }
-            DetDocumentoAdquisicion::where("id_det_doc_adquisicion", $idDetDocAdquisicion)->update([
-                "monto_det_doc_adquisicion" => $totCostoProdAdquisicion,
-                "observacion_det_doc_adquisicion" => $notificacionDetDocAdquisicion,
-                "recepcion_det_doc_adquisicion" => $recepcionDetDocAdquisicion,
-                "notificacion_det_doc_adquisicion" => $observacionDetDocAdquisicion,
-            ]);
+            /*  DetDocumentoAdquisicion::where("id_det_doc_adquisicion", $idDetDocAdquisicion)->update([
+                 "monto_det_doc_adquisicion" => $totCostoProdAdquisicion,
+                 "observacion_det_doc_adquisicion" => $notificacionDetDocAdquisicion,
+                 "recepcion_det_doc_adquisicion" => $recepcionDetDocAdquisicion,
+                 "notificacion_det_doc_adquisicion" => $observacionDetDocAdquisicion,
+             ]); */
 
             return response()->json(["message" => "Actualización exitosa"]);
         } catch (\Exception $e) {
@@ -310,7 +310,7 @@ class BienesServiciosController extends Controller
             $query->whereHas('documento_adquisicion', function ($query) {
                 $query->where('id_tipo_doc_adquisicion', 1);
             });
-        }else if ($request->tipoDoc == "orden de compra") {
+        } else if ($request->tipoDoc == "orden de compra") {
             $query->whereHas('documento_adquisicion', function ($query) {
                 $query->where('id_tipo_doc_adquisicion', 2);
             });
@@ -339,5 +339,34 @@ class BienesServiciosController extends Controller
             "centrosAtencion"       => $centrosAtencion,
             "marca"                 => $marca,
         ];
+    }
+
+    function changeStateProductoAdquisicion(Request $request)
+    {
+        // Calcular el total de los productos
+        $productoAdquisicionTotal = ProductoAdquisicion::where("id_det_doc_adquisicion", $request->id)
+            ->select(DB::raw('SUM(cant_prod_adquisicion * costo_prod_adquisicion) as total'))
+            ->value('total');
+
+        // Obtener el detalle del documento de adquisición
+        $detalleDoc = DetDocumentoAdquisicion::find($request->id);
+
+        // Comparar los totales
+        if ($productoAdquisicionTotal > $detalleDoc->monto_det_doc_adquisicion) {
+            // Devolver error 422 si el total de los productos es mayor que el monto del detalle
+            return response()->json([
+                'error' => 'El total de los productos es mayor que el monto del detalle del documento de adquisición.'
+            ], 422);
+        }
+
+        // Si la validación pasa, actualizar el estado del documento
+        /* DetDocumentoAdquisicion::where('id_det_doc_adquisicion', $request->id)->update([
+            'id_estado_doc_adquisicion' => $request->idState,
+        ]); */
+
+        // Devolver una respuesta exitosa
+        return response()->json([
+            'message' => 'Estado del documento de adquisición actualizado correctamente.',
+        ]);
     }
 }

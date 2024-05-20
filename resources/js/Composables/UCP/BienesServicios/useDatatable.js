@@ -154,7 +154,8 @@ export const useDatatable = (type) => {
             if (confirmedEliminarProd.isConfirmed) {
                 executeRequest(
                     updateDetDocAdquisicionRequest(idDetDoc, idState),
-                    `¡El documento de adquisicion se ha ${idState == 2 ? `Enviado` : `Cerrado`} correctamente!`
+                    `¡El documento de adquisicion se ha ${idState == 2 ? `Enviado` : `Cerrado`} correctamente!`,
+                    'Los montos del documento de adquisicion y el total de items no coinciden'
                 );
                 getProductoAdquisicion(lastUrl.value)
             }

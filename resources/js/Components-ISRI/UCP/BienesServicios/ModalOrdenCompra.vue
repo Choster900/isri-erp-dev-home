@@ -2,7 +2,7 @@
     <template>
         <div class="m-1.5">
             <!-- Componente del modal ProcessModal -->
-            <ProcessModal maxWidth="4xl" :show="showModal" @close="$emit('cerrar-modal')">
+            <ProcessModal maxWidth="5xl" :show="showModal" @close="$emit('cerrar-modal')">
                 <div class=" flex  justify-center pt-2 content-between">
                     <svg class="h-7 w-7 absolute top-0 right-0 mt-2 cursor-pointer" viewBox="0 0 25 25"
                         @click="$emit('cerrar-modal')">
@@ -13,7 +13,7 @@
                 </div>
                 <div class="mx-6 mt-2"></div>
                 <div class="mx-4 overflow-y-auto h-[650px] py-3 pl-2 pr-4 mt-4">
-                    <table class="w-[830px] sheet0 " border="0" cellpadding="0" cellspacing="0">
+                    <table class="w-full sheet0 " border="0" cellpadding="0" cellspacing="0">
                         <col class="col0">
                         <col class="col1">
                         <col class="col2">
@@ -62,63 +62,18 @@
                                     RAZON SOCIAL DEL SUMINISTRANTE
                                 </td>
                                 <td class="border border-black bg-black h-5 text-white text-center text-[9pt]">
-                                    {{
-                arrayDocAdquisicion != '' && idDetDocAdquisicion != null &&
-                    arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion) &&
-                    arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion).dataDoc &&
-                    (
-                        arrayDocAdquisicion.find(index => index.value ==
-                            idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.nit_proveedor !== null
-                        ||
-                        arrayDocAdquisicion.find(index => index.value ==
-                            idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.dui_proveedor !== null
-                    )
-                    ? (
-                        arrayDocAdquisicion.find(index => index.value ==
-                            idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.nit_proveedor
-                            ? "NIT"
-                            : "DUI"
-                    )
-                    : ''
-            }}
+                                    {{ documentType }}
                                 </td>
                             </tr>
                             <tr>
                                 <td class="border border-black h-5" colspan="3">
                                     <h1 class="text-xs font-medium text-center">
-                                        {{ arrayDocAdquisicion != '' && idDetDocAdquisicion != null
-                && arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion)
-                && arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion).dataDoc
-                && arrayDocAdquisicion.find(index => index.value
-                    ==
-                    idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.razon_social_proveedor
-                ?
-                arrayDocAdquisicion.find(index => index.value
-                    ==
-                    idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.razon_social_proveedor
-                :
-                '' }}
-
+                                        {{ providerBusinessName }}
                                     </h1>
                                 </td>
                                 <td class="border border-black  h-5  text-center text-[9pt] ">
                                     <h1 class="text-xs font-medium text-center">
-                                        {{
-                arrayDocAdquisicion != '' && idDetDocAdquisicion != null &&
-                    arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion) &&
-                    arrayDocAdquisicion.find(index => index.value == idDetDocAdquisicion).dataDoc &&
-                    (arrayDocAdquisicion.find(index => index.value ==
-                        idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.nit_proveedor !==
-                        null
-                        ||
-                        arrayDocAdquisicion.find(index => index.value ==
-                            idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.dui_proveedor !==
-                        null)
-                    ? (arrayDocAdquisicion.find(index => index.value ==
-                        idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.nit_proveedor ||
-                        arrayDocAdquisicion.find(index => index.value ==
-                            idDetDocAdquisicion).dataDoc.documento_adquisicion.proveedor.dui_proveedor)
-                    : '' }}
+                                        {{ documentNumber }}
                                     </h1>
                                 </td>
                             </tr>
@@ -146,7 +101,7 @@
                             </div>
                         </div>
                     </div>
-                    <table class="w-[830px]" border="0" cellpadding="0" cellspacing="0">
+                    <table class="w-full" border="0" cellpadding="0" cellspacing="0">
                         <thead>
                             <tr
                                 class="*:text-[8pt] *:bg-black *:text-white *:px-2 *:py-0.5 *:font-normal *:border--white">
@@ -230,19 +185,7 @@
                                                 noResultsText="<p class='text-xs'>Sin resultados de producto <p>"
                                                 :options="arrayMarca" />
                                             <span class="text-center ">
-                                                {{
-                arrayMarca.length > 0 &&
-                    arrayMarca
-                        .find(index => index.value == detalle.idMarca)
-                        ?.dataMarca
-                    ?
-                    arrayMarca
-                        .find(index => index.value ==
-                            detalle
-                                .idMarca)
-                        .dataMarca.nombre_marca :
-                    '-'
-            }}
+                                                {{ getBrandName(detalle.idMarca) }}
                                             </span>
                                         </div>
                                     </td>
@@ -265,10 +208,7 @@
                                                 noResultsText="<p class='text-xs'>Sin resultados de personas <p>"
                                                 :options="arrayCentroAtencion" />
                                             <span class="text-center">
-                                                {{ arrayCentroAtencion.length > 0 && arrayCentroAtencion.find(index =>
-                index.value == detalle.idCentroAtencion)?.dataCentro ?
-                arrayCentroAtencion.find(index => index.value ==
-                    detalle.idCentroAtencion).dataCentro.nombre_centro_atencion : '-' }}
+                                                {{ getCenterName(detalle.idCentroAtencion) }}
                                             </span>
                                         </div>
                                     </td>
@@ -316,7 +256,7 @@
                                             <div class="text-xs py-3">Ocultando linea:
                                                 <span class="font-medium">
                                                     {{ arrayLineaTrabajo.find(index => index.value ==
-                                                    docAdq.idLt)?.label || '' }}
+                docAdq.idLt)?.label || '' }}
                                                 </span>
                                             </div>
                                         </div>
@@ -334,7 +274,7 @@
                                                 NUEVO PRODUCTO ADQUISICION EN:
                                                 <br>
                                                 {{ arrayLineaTrabajo.find(index => index.value == docAdq.idLt)?.label ||
-                                                '' }}
+                '' }}
                                             </span>
                                         </div>
                                     </button>
@@ -362,7 +302,7 @@
                     </div>
 
 
-                    <table class="w-[830px] my-4 ">
+                    <table class="w-full my-4 ">
                         <col style="width: 550pt;">
                         <tbody>
                             <tr class="*:border *:border-black *:hover:bg-slate-200">
@@ -510,6 +450,7 @@ export default {
             brandsUsedInDoc,
             deleteProductAdq,
             errorsValidation,
+            getBrandName,
             arrayLineaTrabajo,
             objectGetFromProp,
             arrayUnidadMedida,
@@ -519,17 +460,19 @@ export default {
             arrayDocAdquisicion,
             addinDocAdquisicion,
             arrayCentroAtencion,
+            getCenterName,
             productDataSearched,
             ArrayProductFiltered,
-            sumatorioTotalProduct,
             setInformacionProduct,
             onSelectDocAdquisicion,
             arrayWhenIsEditingDocAdq,
+            documentNumber,
+            providerBusinessName,
             arrayProductoAdquisicion,
+            documentType,
             recepcionDetDocAdquisicion,
             arrayProductsWhenIsEditable,
             observacionDetDocAdquisicion,
-            handleProductoSearchByCodigo,
             notificacionDetDocAdquisicion,
             saveProductAdquisicionRequest,
             updateProductAdquisicionRequest,
@@ -611,18 +554,23 @@ export default {
             handleInput,
             moment,
             printPdf,
+            documentNumber,
+            providerBusinessName,
             disableLt,
             arrayMarca,
+            documentType,
             addingRows,
             letterNumber,
             estadoDocAdq,
             totProductos,
+            getBrandName,
             letterNumber,
             calculateTotal,
             deleteProductAdq,
             errorsValidation,
             deletLineaTrabajo,
             objectGetFromProp,
+            getCenterName,
             arrayLineaTrabajo,
             arrayUnidadMedida,
             addinDocAdquisicion,
@@ -640,7 +588,6 @@ export default {
             arrayProductoAdquisicion,
             recepcionDetDocAdquisicion,
             arrayProductsWhenIsEditable,
-            handleProductoSearchByCodigo,
             observacionDetDocAdquisicion,
             notificacionDetDocAdquisicion,
         };
