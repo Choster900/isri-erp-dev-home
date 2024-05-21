@@ -333,7 +333,7 @@ class ReporteRRHHController extends Controller
         // $dompdf->stream('nombre_del_archivo.pdf');
 
         //Crear el PDF con orientación horizontal
-        $pdf = PDF::loadView('RRHH/PDF/test-library', $data)->setPaper('letter', 'landscape');
+        $pdf = PDF::loadView('RRHH/PDF/empleados-report', $data)->setPaper('letter', 'landscape');
 
         //Descargar el PDF
         return $pdf->download('reporte-empleados.pdf');

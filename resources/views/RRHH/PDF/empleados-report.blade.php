@@ -1,108 +1,119 @@
 <!DOCTYPE html>
+<html>
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    {{-- @vite('resources/css/app.css') --}}
+    <title>Reporte de empleados</title>
+    <style>
+        .header {
+            width: 100%;
+            padding-bottom: 10px;
+        }
+
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .header-table,
+        .header-table th {
+            border: 1px solid #000;
+            border-bottom: none;
+        }
+
+        .header-table td {
+            text-align: center;
+            vertical-align: middle;
+            padding: 3px;
+            border: 1px solid #000;
+        }
+
+        .header img {
+            max-height: 75px;
+        }
+
+        .header p {
+            font-size: 12px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .jobs {
+            max-width: 100%;
+            padding: 3px;
+        }
+    </style>
 </head>
 
 <body>
-    <div id="principal" class="py-2 mb-2">
-
-        <div class="flex w-full min-h-[80px]">
-            <!-- Columna 1 -->
-            <div class="w-[23%] flex justify-center items-center border border-black p-1">
-                <img src="{{ public_path('img/isri-gob.png') }}" alt="Logo del instituto" class="w-full my-auto">
-            </div>
-            <!-- Columna 2 -->
-            <div
-                class="w-[77%] justify-center items-center border-y border-r border-black pb-[10px] flex flex-col min-h-full">
-                <div class="flex flex-col justify-center items-center h-full">
-                    <p class="font-[Bembo] text-center text-[12px] font-bold">DEPARTAMENTO DE RECURSOS HUMANOS</p>
-                    <p class="font-[Bembo] text-center text-[12px] font-bold">{{ $title }}</p>
-                    <p class="font-[Bembo] text-center text-[12px] font-bold">{{ $depInfo }}</p>
-                    <p class="font-[Bembo] text-center text-[12px] font-bold">{{ $date }}</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Encabezado de la tabla -->
-        <table class="w-full border-collapse border border-black bg-gray-200" style="page-break-inside: avoid;">
-            <thead>
-                <tr>
-                    <th class="w-[8%] border-r border-black py-1 text-center">
-                        <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[10px] font-bold">CODIGO</p>
-                    </th>
-                    <th class="w-[32%] border-r border-black py-1 text-center">
-                        <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[10px] font-bold">NOMBRE</p>
-                    </th>
-                    <th class="w-[10%] border-r border-black py-1 text-center">
-                        <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[10px] font-bold">DUI</p>
-                    </th>
-                    <th class="w-[15%] border-r border-black py-1 text-center">
-                        <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[10px] font-bold">PENSIONADO</p>
-                    </th>
-                    <th class="w-[35%] py-1 text-center">
-                        <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[10px] font-bold">PUESTO</p>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($queryResult as $index => $employee)
-                    <tr class="border-x border-y border-black" style="page-break-inside: avoid;">
-                        <!-- Code -->
-                        <td class="w-[8%] border-r border-black text-center">
-                            <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[10px] px-0.5">
-                                {{ $employee['codigo_empleado'] }}
-                            </p>
-                        </td>
-                        <!-- Name -->
-                        <td class="w-[32%] border-r border-black text-center">
-                            <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[10px]">
-                                {{ $employee['persona']['papellido_persona'] }}
-                                {{ $employee['persona']['sapellido_persona'] }}
-                                {{ $employee['persona']['tapellido_persona'] }}
-                                ,
-                                {{ $employee['persona']['pnombre_persona'] }}
-                                {{ $employee['persona']['snombre_persona'] }}
-                                {{ $employee['persona']['tnombre_persona'] }}
-                            </p>
-                        </td>
-                        <!-- ID -->
-                        <td class="w-[10%] border-r border-black text-center">
-                            <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[10px]">
-                                {{ $employee['persona']['dui_persona'] }}
-                            </p>
-                        </td>
-                        <!-- Retirement -->
-                        <td class="w-[15%] border-r border-black text-center">
-                            <p class="mb-[10px] mt-[-5px] font-[MuseoSans] text-[10px]">
-                                {{ $employee['pensionado_empleado'] === 1 ? 'SI' : 'NO' }}
-                            </p>
-                        </td>
-                        <!-- Job positions -->
-                        <td class="w-[35%] min-h-[45px]">
-                            <div class="w-full h-full flex flex-col justify-center items-center pb-1">
-                                @foreach ($employee['plazas_asignadas'] as $index => $plaza)
-                                    <p
-                                        class="font-[MuseoSans] text-[10px]{{ $index > 0 ? ' border-t border-slate-400 w-full text-center' : '' }}">
-                                        {{ $plaza['detalle_plaza']['plaza']['nombre_plaza'] }}
-                                    </p>
-                                    <p class="font-[MuseoSans] text-[10px] pb-2">
-                                        {{ $plaza['dependencia']['centro_atencion']['codigo_centro_atencion'] }} -
-                                        {{ '(' }}
-                                        {{ $plaza['fecha_plaza_asignada'] }}
-                                        {{ $plaza['fecha_renuncia_plaza_asignada'] ? ' - ' . $plaza['fecha_renuncia_plaza_asignada'] . ')' : ($employee['id_estado_empleado'] === 1 ? ')' : ' - sin registro)') }}
-                                    </p>
-                                @endforeach
+    <div class="header">
+        <table class="header-table">
+            <tr style="width: 100%;">
+                <th style="width: 22%; max-width: 23%;">
+                    <img src="{{ public_path('img/isri-gob.png') }}" alt="Logo">
+                </th>
+                <th style="width: 78%; max-width: 77%;">
+                    <p>DEPARTAMENTO DE RECURSOS HUMANOS</p>
+                    <p> {{ $title }} </p>
+                    <p> {{ $depInfo }} </p>
+                    <p> {{ $date }} </p>
+                </th>
+            </tr>
+        </table>
+        <table class="header-table">
+            <tr style="width: 100%; background: #D1D5DB;">
+                <th style="width: 8%; max-width: 8%; border: 1px solid #000; padding: 5px 0;">
+                    <p style="font-size: 11px;">CODIGO</p>
+                </th>
+                <th style="width: 32%; max-width: 32%; border: 1px solid #000; padding: 5px 0;">
+                    <p style="font-size: 11px;">NOMBRE</p>
+                </th>
+                <th style="width: 15%; max-width: 15%; border: 1px solid #000; padding: 5px 0;">
+                    <p style="font-size: 11px;">DUI</p>
+                </th>
+                <th style="width: 10%; max-width: 10%; border: 1px solid #000; padding: 5px 0;">
+                    <p style="font-size: 11px;">PENSIONADO</p>
+                </th>
+                <th style="width: 35%; max-width: 35%; border: 1px solid #000; padding: 5px 0;">
+                    <p style="font-size: 11px;">PUESTO</p>
+                </th>
+            </tr>
+            @foreach ($queryResult as $employee)
+                <tr style="width: 100%;">
+                    <td style="width: 8%; max-width: 8%; border: 1px solid #000;">
+                        <p style="font-size: 11px; font-weight: normal;">{{ $employee['codigo_empleado'] }}</p>
+                    </td>
+                    <td style="width: 32%; max-width: 32%; border: 1px solid #000;">
+                        <p style="font-size: 11px; font-weight: normal;">{{ $employee['persona']['nombre_apellido'] }}</p>
+                    </td>
+                    <td style="width: 15%; max-width: 15%; border: 1px solid #000;">
+                        <p style="font-size: 11px; font-weight: normal;">{{ $employee['persona']['dui_persona'] }}</p>
+                    </td>
+                    <td style="width: 10%; max-width: 10%; border: 1px solid #000;">
+                        <p style="font-size: 11px; font-weight: normal;">{{ $employee['pensionado_empleado'] == 1 ? 'SI' : 'NO' }}</p>
+                    </td>
+                    <td style="width: 35%; max-width: 35%; border: 1px solid #000;">
+                        @foreach ($employee['plazas_asignadas'] as $index => $plaza)
+                            <div class="jobs" style="{{ $index > 0 ? 'border-top: 1px solid #9CA3AF;' : '' }}">
+                                <p style="font-size: 11px; font-weight: normal;">
+                                    {{ $plaza['detalle_plaza']['plaza']['nombre_plaza'] }}
+                                </p>
+                                <p style="font-size: 11px; font-weight: normal;">
+                                    {{ $plaza['dependencia']['centro_atencion']['codigo_centro_atencion'] .
+                                        ' - (' .
+                                        \Carbon\Carbon::parse($plaza['fecha_plaza_asignada'])->format('d/m/Y') .
+                                        ($plaza['fecha_renuncia_plaza_asignada']
+                                            ? ' - ' . \Carbon\Carbon::parse($plaza['fecha_renuncia_plaza_asignada'])->format('d/m/Y') . ')'
+                                            : ($employee['id_estado_empleado'] === 1
+                                                ? ')'
+                                                : ' - sin registro)')) }}
+                                </p>
                             </div>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
+                        @endforeach
+                    </td>
+                </tr>
+            @endforeach
         </table>
     </div>
-
 </body>
 
 </html>

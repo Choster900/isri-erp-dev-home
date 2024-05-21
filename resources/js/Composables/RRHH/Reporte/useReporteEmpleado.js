@@ -82,8 +82,6 @@ export const useReporteEmpleado = (context) => {
                     const response = await axios.post('/create-pdf-employees', data, {
                         responseType: 'blob' // Espera una respuesta de tipo blob (archivo)
                     });
-
-                    console.log(response);
             
                     const blob = new Blob([response.data], { type: 'application/pdf' });
                     const link = document.createElement('a');
@@ -153,34 +151,6 @@ export const useReporteEmpleado = (context) => {
             }
         });
     }
-
-    // const generatePDF = async (queryResult, depInfo, title, date) => {
-    //     try {
-    //         isLoadingExport.value = true;
-    
-    //         const data = {
-    //             queryResult: queryResult,
-    //             depInfo: depInfo,
-    //             title: title,
-    //             date: date
-    //         };
-    
-    //         const response = await axios.post('/generate-pdf', data, {
-    //             responseType: 'blob' // Espera una respuesta de tipo blob (archivo)
-    //         });
-    
-    //         const blob = new Blob([response.data], { type: 'application/pdf' });
-    //         const link = document.createElement('a');
-    //         link.href = window.URL.createObjectURL(blob);
-    //         link.download = 'document.pdf';
-    //         link.click();
-    //     } catch (error) {
-    //         console.error('Error al generar el PDF:', error);
-    //     } finally {
-    //         isLoadingExport.value = false;
-    //     }
-    // };
-    
 
     return {
         exportExcel,
