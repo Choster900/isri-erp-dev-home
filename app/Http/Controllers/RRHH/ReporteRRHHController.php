@@ -320,22 +320,22 @@ class ReporteRRHHController extends Controller
             'queryResult'   => $request->input('queryResult')
         ];
 
-        $dompdf = new Dompdf();
-        $options = new Options();
-        $options->set('isHtml5ParserEnabled', true);
-        $options->set('isRemoteEnabled', true);
-        $dompdf->setOptions($options);
+        // $dompdf = new Dompdf();
+        // $options = new Options();
+        // $options->set('isHtml5ParserEnabled', true);
+        // $options->set('isRemoteEnabled', true);
+        // $dompdf->setOptions($options);
 
-        $html = view('RRHH/PDF/test-library')->render();
-        $dompdf->loadHtml($html);
-        $dompdf->render();
+        // $html = view('RRHH/PDF/test-library')->render();
+        // $dompdf->loadHtml($html);
+        // $dompdf->render();
 
-        $dompdf->stream('nombre_del_archivo.pdf');
+        // $dompdf->stream('nombre_del_archivo.pdf');
 
-        // Crear el PDF con orientación horizontal
-        //$pdf = PDF::loadView('RRHH/PDF/test-library', $data)->setPaper('letter', 'landscape');
+        //Crear el PDF con orientación horizontal
+        $pdf = PDF::loadView('RRHH/PDF/test-library', $data)->setPaper('letter', 'landscape');
 
-        // Descargar el PDF
-        //return $pdf->download('reporte-empleados.pdf');
+        //Descargar el PDF
+        return $pdf->download('reporte-empleados.pdf');
     }
 }
