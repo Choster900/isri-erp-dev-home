@@ -14,7 +14,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Maatwebsite\Excel\Facades\Excel;
 
-use Barryvdh\DomPDF\Facade\Pdf;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 
 class ReporteRRHHController extends Controller
 {
@@ -154,7 +154,7 @@ class ReporteRRHHController extends Controller
         });
 
         return response()->json([
-            'query'          => $query->get(),
+            'query'          => $query->orderBy('codigo_empleado', 'asc')->get(),
         ]);
     }
     public function createExcelEmployees(Request $request)
@@ -314,10 +314,18 @@ class ReporteRRHHController extends Controller
             'title'         => $request->input('title'),
             'depInfo'       => $request->input('depInfo'),
             'date'          => $request->input('date'),
-            'queryResult'   => $request->input('queryResult')
+            'queryResult'   => $request->input('queryResult'),
+            'totalPages'    => null  // Inicialmente nulo, se actualizará después
         ];
 
-        // Crear el PDF con orientación horizontal
+        // Crear el PDF inicialmente para contar las páginas
+        $pdf = PDF::loadView('RRHH/PDF/empleados-report', $data)->setPaper('letter', 'landscape');
+        $pageCount = $pdf->getDomPDF()->get_canvas()->get_page_count();
+
+        // Actualizar los datos con el total de páginas
+        $data['totalPages'] = $pageCount;
+
+        // Crear el PDF nuevamente con el total de páginas actualizado
         $pdf = PDF::loadView('RRHH/PDF/empleados-report', $data)->setPaper('letter', 'landscape');
 
         // Descargar el PDF
