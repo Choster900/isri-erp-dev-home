@@ -249,10 +249,10 @@
                                     <td class="relative text-center w-20 bg-slate-200">
                                         <span class="absolute top-1 left-0 w-full flex flex-col items-center ">
                                             {{ detalle.valorTotalProduct !== undefined ?
-                detalle.valorTotalProduct.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                }) : '00.00' }}
+                                            detalle.valorTotalProduct.toLocaleString('en-US', {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            }) : '00.00' }}
                                         </span>
                                     </td>
                                     <!-- //!NUEVO -->
@@ -486,7 +486,6 @@ export default {
             arrayCentroAtencion,
             productDataSearched,
             ArrayProductFiltered,
-            sumatorioTotalProduct,
             setInformacionProduct,
             providerBusinessName,
             onSelectDocAdquisicion,
@@ -495,7 +494,6 @@ export default {
             recepcionDetDocAdquisicion,
             arrayProductsWhenIsEditable,
             observacionDetDocAdquisicion,
-            handleProductoSearchByCodigo,
             notificacionDetDocAdquisicion,
             saveProductAdquisicionRequest,
             updateProductAdquisicionRequest,
@@ -612,7 +610,6 @@ export default {
             documentType,
             recepcionDetDocAdquisicion,
             arrayProductsWhenIsEditable,
-            handleProductoSearchByCodigo,
             observacionDetDocAdquisicion,
             notificacionDetDocAdquisicion,
         };

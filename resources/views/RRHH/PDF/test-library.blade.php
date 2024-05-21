@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Reporte de empleados</title>
+    <title>Documento PDF</title>
     <style>
         .header {
             width: 100%;

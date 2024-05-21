@@ -1,6 +1,17 @@
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 
+/**
+ * Executes a request and displays toast notifications for different states of the request.
+ *
+ * @async
+ * @function executeRequest
+ * @param {Function} requestMethod - The asynchronous request method to be executed.
+ * @param {string} successMessage - The message to be displayed on successful request completion.
+ * @param {string} [errorMessageCustom='Se encontraron errores de validación en los datos enviados. Por favor, verifica e intenta nuevamente.'] - Custom error message for validation errors.
+ * @returns {Promise<any>} - The result of the request method if resolved successfully.
+ * @throws {Error} - Throws an error if the request fails.
+ */
 export async function executeRequest(requestMethod, successMessage, errorMessageCustom = 'Se encontraron errores de validación en los datos enviados. Por favor, verifica e intenta nuevamente.') {
     try {
         const response = await toast.promise(requestMethod, {
@@ -56,11 +67,11 @@ export async function executeRequest(requestMethod, successMessage, errorMessage
                         "El recurso solicitado no se encontró. Verifica la URL o inténtalo nuevamente más tarde.";
                     errorCode = "NOT_FOUND";
                     break;
-               /*  case 422:
-                    errorMessage =
-                        "Se encontraron errores de validación en los datos enviados. Por favor, verifica e intenta nuevamente.";
-                    errorCode = "VALIDATION_ERROR";
-                    break; */
+                /*  case 422:
+                     errorMessage =
+                         "Se encontraron errores de validación en los datos enviados. Por favor, verifica e intenta nuevamente.";
+                     errorCode = "VALIDATION_ERROR";
+                     break; */
                 case 500:
                     errorMessage =
                         "Se produjo un error en el servidor. Por favor, inténtalo nuevamente más tarde.";

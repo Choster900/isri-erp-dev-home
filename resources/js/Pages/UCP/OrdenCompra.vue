@@ -217,7 +217,7 @@
                 </nav>
             </div>
         </div>
-        <ModalBienesServicios :propProdAdquisicion="objectProductoAdquisicion" :showModal="shoModalBienesServicios"
+        <ModalOrdenCompra :propProdAdquisicion="objectProductoAdquisicion" :showModal="shoModalBienesServicios"
             @cerrar-modal="shoModalBienesServicios = false; objectProductoAdquisicion = []"
             @actualizar-datatable="getProductoAdquisicion(lastUrl); shoModalBienesServicios = false;"
             :canEdit="permits.actualizar == 1 ? true : false" />
@@ -227,12 +227,12 @@
 <script>
 import { usePermissions } from '@/Composables/General/usePermissions';
 import { ref, toRefs } from 'vue';
-import ModalBienesServicios from '@/Components-ISRI/UCP/BienesServicios/ModalBienesServicios.vue';
+import ModalOrdenCompra from '@/Components-ISRI/UCP/BienesServicios/ModalOrdenCompra.vue';
 import { useDatatable } from '@/Composables/UCP/BienesServicios/useDatatable';
 import Datatable from '@/Components-ISRI/Datatable.vue';
 import moment from 'moment';
 export default {
-    components: { ModalBienesServicios, Datatable },
+    components: { ModalOrdenCompra, Datatable },
     props: {
         menu: {
             type: Object,
