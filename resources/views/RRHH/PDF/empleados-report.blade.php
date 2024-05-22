@@ -3,11 +3,10 @@
 
 <head>
     <title>Reporte empleados</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <style>
         .header {
             width: 100%;
-            /* padding-bottom: 10px; */
         }
 
         .header-table {
@@ -59,6 +58,23 @@
             right: 0;
             height: 40px;
             text-align: center;
+            font-size: 12px;
+        }
+
+        .footer-left {
+            position: absolute;
+            left: 0;
+        }
+
+        .footer-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .footer-right {
+            position: absolute;
+            right: 0;
         }
 
         .page-number:after {
@@ -73,7 +89,16 @@
 
 <body>
     <footer>
-        Página <span class="page-number"></span> de <span class="total-pages" data-total-pages="{{ $totalPages }}"></span>
+        <div class="footer-left">
+            <!-- Puedes dejarlo vacío si no necesitas nada aquí -->
+        </div>
+        <div class="footer-center">
+            Página <span class="page-number"></span> de <span class="total-pages"
+                data-total-pages="{{ $totalPages }}"></span>
+        </div>
+        <div class="footer-right">
+            Generado: {{ $generatedAt }}
+        </div>
     </footer>
 
     <div class="header">
@@ -147,6 +172,9 @@
                 </tr>
             @endforeach
         </table>
+        <p style="text-align: left; font-weight: bold; font-size: 14px; margin-top: 20px;">
+            TOTAL DE EMPLEADOS: {{ $totalEmployees }}
+        </p>
     </main>
 </body>
 

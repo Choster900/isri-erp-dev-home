@@ -309,13 +309,17 @@ class ReporteRRHHController extends Controller
 
     public function createPdfEmployees(Request $request)
     {
+        $queryResult = $request->input('queryResult');
+
         // Datos que deseas pasar a la vista
         $data = [
             'title'         => $request->input('title'),
             'depInfo'       => $request->input('depInfo'),
             'date'          => $request->input('date'),
-            'queryResult'   => $request->input('queryResult'),
-            'totalPages'    => 0  // Inicialmente cero, se actualizará después
+            'queryResult'   => $queryResult,
+            'totalPages'    => 0,  // Inicialmente cero, se actualizará después
+            'generatedAt'   => \Carbon\Carbon::now()->format('d-m-Y H:i:s'),  // Fecha y hora de generación
+            'totalEmployees' => count($queryResult)  // Contar el número total de empleados
         ];
 
         // Crear el PDF inicialmente para contar las páginas
@@ -326,7 +330,7 @@ class ReporteRRHHController extends Controller
 
         // Obtener el número total de páginas desde el contenido renderizado
         $dompdf = $pdf->getDomPDF();
-        $canvas = $dompdf->get_canvas();
+        $canvas = $dompdf->getCanvas();
         $totalPages = $canvas->get_page_count();
 
         // Actualizar los datos con el número total de páginas
