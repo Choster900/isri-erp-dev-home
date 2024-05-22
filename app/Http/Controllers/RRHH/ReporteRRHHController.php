@@ -315,15 +315,22 @@ class ReporteRRHHController extends Controller
             'depInfo'       => $request->input('depInfo'),
             'date'          => $request->input('date'),
             'queryResult'   => $request->input('queryResult'),
-            'totalPages'    => null  // Inicialmente nulo, se actualizará después
+            'totalPages'    => 0  // Inicialmente cero, se actualizará después
         ];
 
         // Crear el PDF inicialmente para contar las páginas
         $pdf = PDF::loadView('RRHH/PDF/empleados-report', $data)->setPaper('letter', 'landscape');
-        $pageCount = $pdf->getDomPDF()->get_canvas()->get_page_count();
 
-        // Actualizar los datos con el total de páginas
-        $data['totalPages'] = $pageCount;
+        // Renderizar el PDF inicialmente
+        $pdf->render();
+
+        // Obtener el número total de páginas desde el contenido renderizado
+        $dompdf = $pdf->getDomPDF();
+        $canvas = $dompdf->get_canvas();
+        $totalPages = $canvas->get_page_count();
+
+        // Actualizar los datos con el número total de páginas
+        $data['totalPages'] = $totalPages;
 
         // Crear el PDF nuevamente con el total de páginas actualizado
         $pdf = PDF::loadView('RRHH/PDF/empleados-report', $data)->setPaper('letter', 'landscape');
