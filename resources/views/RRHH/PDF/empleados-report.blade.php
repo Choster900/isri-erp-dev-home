@@ -97,7 +97,7 @@
                 data-total-pages="{{ $totalPages }}"></span>
         </div>
         <div class="footer-right">
-            Generado: {{ $generatedAt }}
+            SIGI - Generado: {{ $generatedAt }}
         </div>
     </footer>
 
@@ -172,8 +172,11 @@
                 </tr>
             @endforeach
         </table>
-        <p style="text-align: left; font-weight: bold; font-size: 14px; margin-top: 20px;">
+        <p style="text-align: left; font-weight: bold; font-size: 14px; margin-top: 35px;">
             TOTAL DE EMPLEADOS: {{ $totalEmployees }}
+        </p>
+        <p style="text-align: left; font-weight: bold; font-size: 14px; margin-top: 5px;">
+            PENSIONADOS: {{ $totalPensionados }}
         </p>
     </main>
 </body>

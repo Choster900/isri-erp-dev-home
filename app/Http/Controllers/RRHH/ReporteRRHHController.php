@@ -311,15 +311,24 @@ class ReporteRRHHController extends Controller
     {
         $queryResult = $request->input('queryResult');
 
+        // Contar el número total de empleados
+        $totalEmployees = count($queryResult);
+
+        // Contar el número de empleados pensionados
+        $totalPensionados = count(array_filter($queryResult, function ($employee) {
+            return $employee['pensionado_empleado'] == 1;
+        }));
+
         // Datos que deseas pasar a la vista
         $data = [
-            'title'         => $request->input('title'),
-            'depInfo'       => $request->input('depInfo'),
-            'date'          => $request->input('date'),
-            'queryResult'   => $queryResult,
-            'totalPages'    => 0,  // Inicialmente cero, se actualizará después
-            'generatedAt'   => \Carbon\Carbon::now()->format('d-m-Y H:i:s'),  // Fecha y hora de generación
-            'totalEmployees' => count($queryResult)  // Contar el número total de empleados
+            'title'                 => $request->input('title'),
+            'depInfo'               => $request->input('depInfo'),
+            'date'                  => $request->input('date'),
+            'queryResult'           => $queryResult,
+            'totalPages'            => 0,  // Inicialmente cero, se actualizará después
+            'generatedAt'           => \Carbon\Carbon::now()->format('d-m-Y H:i:s'),  // Fecha y hora de generación
+            'totalEmployees'        => $totalEmployees,
+            'totalPensionados'      => $totalPensionados
         ];
 
         // Crear el PDF inicialmente para contar las páginas
