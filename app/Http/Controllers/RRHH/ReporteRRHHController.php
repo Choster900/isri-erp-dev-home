@@ -14,10 +14,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Maatwebsite\Excel\Facades\Excel;
 
-use Barryvdh\DomPDF\Facade\Pdf;
-
-use Dompdf\Dompdf;
-use Dompdf\Options;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 
 class ReporteRRHHController extends Controller
 {
@@ -312,30 +309,46 @@ class ReporteRRHHController extends Controller
 
     public function createPdfEmployees(Request $request)
     {
+        $queryResult = $request->input('queryResult');
+
+        // Contar el número total de empleados
+        $totalEmployees = count($queryResult);
+
+        // Contar el número de empleados pensionados
+        $totalPensionados = count(array_filter($queryResult, function ($employee) {
+            return $employee['pensionado_empleado'] == 1;
+        }));
+
         // Datos que deseas pasar a la vista
         $data = [
-            'title'         => $request->input('title'),
-            'depInfo'       => $request->input('depInfo'),
-            'date'          => $request->input('date'),
-            'queryResult'   => $request->input('queryResult')
+            'title'                 => $request->input('title'),
+            'depInfo'               => $request->input('depInfo'),
+            'date'                  => $request->input('date'),
+            'queryResult'           => $queryResult,
+            'totalPages'            => 0,  // Inicialmente cero, se actualizará después
+            'generatedAt'           => \Carbon\Carbon::now()->format('d-m-Y H:i:s'),  // Fecha y hora de generación
+            'totalEmployees'        => $totalEmployees,
+            'totalPensionados'      => $totalPensionados
         ];
 
-        $dompdf = new Dompdf();
-        $options = new Options();
-        $options->set('isHtml5ParserEnabled', true);
-        $options->set('isRemoteEnabled', true);
-        $dompdf->setOptions($options);
+        // Crear el PDF inicialmente para contar las páginas
+        $pdf = PDF::loadView('RRHH/PDF/empleados-report', $data)->setPaper('letter', 'landscape');
 
-        $html = view('RRHH/PDF/test-library')->render();
-        $dompdf->loadHtml($html);
-        $dompdf->render();
+        // Renderizar el PDF inicialmente
+        $pdf->render();
 
-        $dompdf->stream('nombre_del_archivo.pdf');
+        // Obtener el número total de páginas desde el contenido renderizado
+        $dompdf = $pdf->getDomPDF();
+        $canvas = $dompdf->getCanvas();
+        $totalPages = $canvas->get_page_count();
 
-        // Crear el PDF con orientación horizontal
-        //$pdf = PDF::loadView('RRHH/PDF/test-library', $data)->setPaper('letter', 'landscape');
+        // Actualizar los datos con el número total de páginas
+        $data['totalPages'] = $totalPages;
+
+        // Crear el PDF nuevamente con el total de páginas actualizado
+        $pdf = PDF::loadView('RRHH/PDF/empleados-report', $data)->setPaper('letter', 'landscape');
 
         // Descargar el PDF
-        //return $pdf->download('reporte-empleados.pdf');
+        return $pdf->download('reporte-empleados.pdf');
     }
 }

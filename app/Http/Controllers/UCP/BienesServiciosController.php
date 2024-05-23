@@ -52,7 +52,6 @@ class BienesServiciosController extends Controller
         $data = $request->input('search');
         $docType = $request->input('docType');
 
-
         $v_query = DetDocumentoAdquisicion::with([
             "estado_documento_adquisicion",
             "productos_adquisiciones" => function ($query) {
@@ -96,7 +95,6 @@ class BienesServiciosController extends Controller
             $v_query->whereHas('documento_adquisicion', function ($query) use ($data) {
                 $query->where('numero_doc_adquisicion', 'like', '%' . $data["id_tipo_gestion_compra"] . '%');
             });
-
 
             $v_query->where('monto_det_doc_adquisicion', 'like', '%' . $data["monto_det_doc_adquisicion"] . '%');
 
@@ -296,7 +294,6 @@ class BienesServiciosController extends Controller
         }
     }
 
-
     /**
      * Obtiene arreglo de dinstintos objetos para el uso en multiselect.
      *
@@ -323,7 +320,6 @@ class BienesServiciosController extends Controller
         }
 
         $detalleDocumentoAdquisicion = $query->get();
-
 
         // Obtener todas las unidades de medida
         $unidadesMedida = UnidadMedida::all();

@@ -45,7 +45,6 @@
                                 </td>
                             </tr>
 
-
                             <tr>
                                 <td class="border text-sm border-black text-center font-medium px-8" colspan="3">
                                     <div class="flex items-center justify-center gap-1">
@@ -264,7 +263,6 @@
                                 </tr>
                             </template>
 
-
                             <tr v-if="estadoDocAdq == 1">
                                 <td colspan="11" class="">
                                     <button style="outline: none;" @click="addingRows(i); docAdq.vShowLt = true;"
@@ -283,7 +281,6 @@
 
                         </tbody>
 
-
                     </table>
 
                     <div v-if="estadoDocAdq == 1">
@@ -300,7 +297,6 @@
                             </div>
                         </button>
                     </div>
-
 
                     <table class="w-full my-4 ">
                         <col style="width: 550pt;">
@@ -408,7 +404,6 @@ import Tooltip from '@/Components-ISRI/Tooltip.vue';
 import moment from 'moment';
 import { executeRequest } from '@/plugins/requestHelpers';
 import { useConfigPdf } from '@/Composables/UCP/BienesServicios/useConfigPdf';
-
 
 export default {
     // Indica que este componente utiliza el componente ProcessModal
