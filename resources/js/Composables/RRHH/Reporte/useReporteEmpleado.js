@@ -81,10 +81,15 @@ export const useReporteEmpleado = (context) => {
                         responseType: 'blob' // Espera una respuesta de tipo blob (archivo)
                     });
 
+                    // Obtener la fecha y hora de generación desde los encabezados
+                    const generatedAt = response.headers['x-generated-at'];
+
                     const blob = new Blob([response.data], { type: 'application/pdf' });
                     const link = document.createElement('a');
                     link.href = window.URL.createObjectURL(blob);
-                    link.download = 'document.pdf';
+
+                    // Concatenar la fecha y hora de creación al nombre del archivo
+                    link.download = `reporte-empleados_${generatedAt}.pdf`;
                     link.click();
                 } catch (err) {
                     const { title, text, icon } = useHandleError(err);
@@ -94,7 +99,7 @@ export const useReporteEmpleado = (context) => {
                 }
             }
         });
-    }
+    };
 
     return {
         exportExcel,

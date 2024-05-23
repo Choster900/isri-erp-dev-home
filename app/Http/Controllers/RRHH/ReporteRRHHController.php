@@ -319,6 +319,9 @@ class ReporteRRHHController extends Controller
             return $employee['pensionado_empleado'] == 1;
         }));
 
+        // Fecha y hora de generación
+        $generatedAt = \Carbon\Carbon::now()->format('Ymd_His');  // Formato para el nombre del archivo
+
         // Datos que deseas pasar a la vista
         $data = [
             'title'                 => $request->input('title'),
@@ -326,7 +329,7 @@ class ReporteRRHHController extends Controller
             'date'                  => $request->input('date'),
             'queryResult'           => $queryResult,
             'totalPages'            => 0,  // Inicialmente cero, se actualizará después
-            'generatedAt'           => \Carbon\Carbon::now()->format('d-m-Y H:i:s'),  // Fecha y hora de generación
+            'generatedAt'           => \Carbon\Carbon::now()->format('d/m/Y H:i:s'),  // Fecha y hora de generación para el contenido del PDF
             'totalEmployees'        => $totalEmployees,
             'totalPensionados'      => $totalPensionados
         ];
@@ -348,7 +351,16 @@ class ReporteRRHHController extends Controller
         // Crear el PDF nuevamente con el total de páginas actualizado
         $pdf = PDF::loadView('RRHH/PDF/empleados-report', $data)->setPaper('letter', 'landscape');
 
-        // Descargar el PDF
-        return $pdf->download('reporte-empleados.pdf');
+        // Preparar la respuesta con el encabezado adicional
+        $response = response()->streamDownload(function () use ($pdf) {
+            echo $pdf->output();
+        }, "reporte-empleados_{$generatedAt}.pdf", [
+            'Content-Type' => 'application/pdf',
+        ]);
+
+        // Agregar encabezado adicional
+        $response->headers->set('X-Generated-At', $generatedAt);
+
+        return $response;
     }
 }
