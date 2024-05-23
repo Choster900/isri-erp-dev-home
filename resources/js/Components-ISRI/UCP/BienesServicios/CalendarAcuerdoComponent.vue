@@ -96,79 +96,59 @@
 </template>
 
 <script>
-import { watch, toRefs, onMounted } from 'vue';
-import { onBeforeUnmount } from 'vue';
-import { ref } from 'vue';
-import { defineComponent, reactive } from 'vue';
+import { toRefs, onMounted, onBeforeUnmount } from 'vue'; // Importa funciones y objetos de Vue para la reactividad
+import { reactive } from 'vue'; // Importa la función reactive de Vue para crear objetos reactivos
 
 export default {
     props: {
-        // La propiedad dataInserted se usa para mostrar la data que esta en la base de datos a los meses actuales
+        // Propiedad dataInserted para mostrar los datos actuales en el calendario
         dataInserted: {
             type: Object,
-            default: () => null,
+            default: () => null, // Valor por defecto es nulo
         },
     },
     setup(props, { emit }) {
+        // Desestructura la propiedad dataInserted de las props
+        const { dataInserted } = toRefs(props);
 
-        const { dataInserted } = toRefs(props)
+        // Objeto reactivo para almacenar los valores de cada mes del calendario
+        const dataCalendar = reactive({
+            January: 0,
+            February: 0,
+            March: 0,
+            April: 0,
+            May: 0,
+            June: 0,
+            July: 0,
+            August: 0,
+            September: 0,
+            October: 0,
+            November: 0,
+            December: 0,
+        });
 
-        const dataCalendar = reactive(
-            {
-                January: 0,
-                February: 0,
-                March: 0,
-                April: 0,
-                May: 0,
-                June: 0,
-                July: 0,
-                August: 0,
-                September: 0,
-                October: 0,
-                November: 0,
-                December: 0,
-            }
-        )
-        const months = Object.keys(dataCalendar);
-
+        // Función para manejar la entrada en el calendario
         const handleInput = (month) => {
-
-            emit('update:dataCalendar', dataCalendar);
+            emit('update:dataCalendar', dataCalendar); // Emite el evento 'update:dataCalendar' con los datos del calendario
         };
 
-
-        /*   watch(() => props.dataInserted, (newValue, oldValue) => {
-              // Asigna los nuevos valores a dataCalendar
-              Object.keys(dataCalendar).forEach(month => {
-                  dataCalendar[month] = newValue[month] || 0; // Si no hay valor para el mes, establece 0
-              });
-              console.log('Nuevo valor de dataInserted:', newValue);
-          }, { deep: true }); // Observa cambios profundos en el objeto */
-
-        /*   watch(dataInserted, (newValue, oldValue) => {
-              console.log(newValue);
-          }, { deep: true }) */
-
-
+        // Función que se ejecuta después de que el componente ha sido montado en el DOM
         onMounted(() => {
-
-
+            // Asigna los valores de dataInserted a dataCalendar
             Object.keys(dataCalendar).forEach(month => {
-                dataCalendar[month] = dataInserted.value[month] || 0; // Si no hay valor para el mes, establece 0
+                dataCalendar[month] = dataInserted.value[month] || 0; // Asigna el valor del mes o 0 si no hay valor
             });
-           // console.log('Nuevo valor de dataInserted:', newValue);
-        })
+        });
 
-
-        // Método para destruir el componente
-        const destruirComponente = () => {
-            //console.log('Destruido');
+        // Función para realizar limpieza antes de destruir el componente
+        const destroyComponent = () => {
             // Realiza cualquier limpieza necesaria antes de destruir el componente
         };
 
-        // Registra la función de destrucción del componente
-        onBeforeUnmount(destruirComponente);
+        // Registra la función de destrucción del componente antes de que se desmonte
+        onBeforeUnmount(destroyComponent);
 
+        // Retorna las funciones y datos necesarios para el componente
         return {
             handleInput,
             dataCalendar
@@ -176,5 +156,6 @@ export default {
     },
 };
 </script>
+
 
 <style lang="scss" scoped></style>

@@ -15,6 +15,12 @@ use App\Models\UnidadMedida;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Color;
 
 class BienesServiciosController extends Controller
 {
@@ -368,5 +374,185 @@ class BienesServiciosController extends Controller
         return response()->json([
             'message' => 'Estado del documento de adquisición actualizado correctamente.',
         ]);
+    }
+
+    function exportDocumentToExcel(Request $request)
+    {
+        // Crear una instancia de Spreadsheet
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Encabezado principal
+        $sheet->mergeCells('A1:U1');
+        $sheet->setCellValue('A1', 'ADENDA CONTRATO 30176');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setName('Cambria')->setSize(10)->getColor()->setARGB(Color::COLOR_WHITE);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A1')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->getStyle('A1')->getFill()->setFillType(Fill::FILL_SOLID);
+        $sheet->getStyle('A1')->getFill()->getStartColor()->setARGB('244062'); // Azul, énfasis 1, oscuro 50%
+
+        $sheet->mergeCells('A2:U2');
+        $sheet->getStyle('A2')->getFont()->setBold(true)->setName('Cambria')->setSize(10)->getColor()->setARGB(Color::COLOR_WHITE);
+        $sheet->getStyle('A2')->getFill()->setFillType(Fill::FILL_SOLID);
+        $sheet->getStyle('A2')->getFill()->getStartColor()->setARGB('244062'); // Azul, énfasis 1, oscuro 50%
+
+
+       // Obtener el número de documento de adquisición
+    $docAdquisicion = collect($request->arrayDocAdquisicion)->firstWhere('value', $request->idDetDocAdquisicion);
+    $numeroDocAdquisicion = $docAdquisicion['dataDoc']['documento_adquisicion']['numero_doc_adquisicion'] ?? '-';
+
+    $sheet->setCellValue('C4', ':' . $numeroDocAdquisicion);
+    $sheet->getStyle('C4')->getFont()->setName('Cambria')->setSize(10);
+    $sheet->getStyle('C4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+
+        // Obtener el valor correspondiente a idDetDocAdquisicion
+        $docAdquisicion = collect($request->arrayDocAdquisicion)->firstWhere('value', $request->idDetDocAdquisicion);
+        $docAdquisicionLabel = $docAdquisicion ? $docAdquisicion['label'] : '';
+
+        $sheet->mergeCells('C5:U5');
+        $sheet->setCellValue('C5', ':' . $docAdquisicionLabel);
+        $sheet->getStyle('C5')->getFont()->setName('Cambria')->setSize(10);
+        $sheet->getStyle('C5')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+
+        $sheet->mergeCells('C6:U6');
+        $sheet->setCellValue('C6', ':INSTITUTO SALVADOREÑO DE REHABILITACIÓN INTEGRAL');
+        $sheet->getStyle('C6')->getFont()->setName('Cambria')->setSize(10);
+        $sheet->getStyle('C6')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+
+        // Encabezados
+        $encabezados = [
+            'PRODUCTO', 'MARCA', 'DESCRIPCIÓN', 'CENTRO', 'CANTIDAD', 'PRECIO UNITARIO', 'VALOR TOTAL',
+            'DISTRIBUCIÓN MENSUAL', '', '', '', '', '', '', '', '', '', '', '', ''
+        ];
+
+        $sheet->fromArray([$encabezados], null, 'A8');
+
+        // Sub-encabezados para los meses
+        $meses = [
+            '', '', '', '', '', '', '',
+            'ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE',
+            'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'
+        ];
+
+        $sheet->fromArray([$meses], null, 'A9');
+
+        // Combinar celdas para "DISTRIBUCIÓN MENSUAL"
+        $sheet->mergeCells('H8:S8');
+        $sheet->getStyle('H8:S8')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('H8:S8')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+
+        // Aplicar estilo a los encabezados
+        $sheet->getStyle('A8:G9')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('A8:G9')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->getStyle('A8:G8')->getFont()->setBold(true);
+        $sheet->getStyle('H8:S8')->getFont()->setBold(true);
+        $sheet->getStyle('H9:S9')->getFont()->setBold(true);
+
+        $sheet->getColumnDimension('A')->setWidth(31);
+        $sheet->getColumnDimension('B')->setWidth(11);
+        $sheet->getColumnDimension('C')->setWidth(60);
+
+
+
+        // Establecer estilo para encabezados
+        $styleHeader = ['font' => ['bold' => true, 'size' => 9]];
+        $sheet->getStyle('A8:J8')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        foreach (range('A', 'J') as $column) {
+            $sheet->getStyle($column . '8')->applyFromArray($styleHeader);
+            $sheet->getStyle($column . '8')->getAlignment()->setWrapText(true);
+        }
+
+
+        // Combinar celdas de la columna A a la G para las filas 8 y 9
+        foreach (range('A', 'G') as $column) {
+            $sheet->mergeCells($column . '8:' . $column . '9');
+        }
+
+        // Aplicar fuente "Calibri Light" y tamaño 10 a las filas 8 y 9
+        foreach (range('A', 'S') as $column) {
+            $sheet->getStyle($column . '8:' . $column . '9')->getFont()->setName('Calibri Light')->setSize(10);
+            $sheet->getStyle($column . '8')->getFill()->setFillType(Fill::FILL_SOLID);
+            $sheet->getStyle($column . '8')->getFill()->getStartColor()->setARGB('D9E1F2'); // Azul, énfasis 1, oscuro 50%
+
+            $sheet->getStyle($column . '9')->getFill()->setFillType(Fill::FILL_SOLID);
+            $sheet->getStyle($column . '9')->getFill()->getStartColor()->setARGB('D9E1F2'); // Azul, énfasis 1, oscuro 50%
+        }
+
+        $row = 10; // Comenzar desde la fila 10 para los datos
+
+        foreach ($request->arrayProductoAdquisicion as $data) {
+            foreach ($data["detalleDoc"] as $value) {
+                $sheet->setCellValue('A' . $row, $value["detalleProducto"]);
+
+                // Encontrar la marca correspondiente
+                $marca = collect($request->arrayMarca)->firstWhere('value', $value["idMarca"]);
+                $marcaLabel = $marca ? $marca['label'] : '';
+                $sheet->setCellValue('B' . $row, $marcaLabel);
+
+                $sheet->setCellValue('C' . $row, $value["descripcionProdAdquisicion"]);
+
+                // Encontrar el centro correspondiente
+                $centro = collect($request->arrayCentroAtencion)->firstWhere('value', $value["idCentroAtencion"]);
+                $centroLabel = $centro ? $centro['label'] : '';
+                $sheet->setCellValue('D' . $row, $centroLabel);
+
+                $sheet->setCellValue('E' . $row, $value["cantProdAdquisicion"]);
+                $sheet->setCellValue('F' . $row, $value["costoProdAdquisicion"]);
+                $sheet->getStyle('F' . $row)->getNumberFormat()->setFormatCode('_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)');
+
+                $sheet->setCellValue('G' . $row, $value["valorTotalProduct"]);
+                $sheet->getStyle('G' . $row)->getNumberFormat()->setFormatCode('_("$"* #,##0.00_);_("$"* \(#,##0.00\);_("$"* "-"??_);_(@_)');
+
+                // Acceder a los meses
+                $sheet->setCellValue('H' . $row, $value["amountsPerMonthList"]["January"]);
+                $sheet->setCellValue('I' . $row, $value["amountsPerMonthList"]["February"]);
+                $sheet->setCellValue('J' . $row, $value["amountsPerMonthList"]["March"]);
+                $sheet->setCellValue('K' . $row, $value["amountsPerMonthList"]["April"]);
+                $sheet->setCellValue('L' . $row, $value["amountsPerMonthList"]["May"]);
+                $sheet->setCellValue('M' . $row, $value["amountsPerMonthList"]["June"]);
+                $sheet->setCellValue('N' . $row, $value["amountsPerMonthList"]["July"]);
+                $sheet->setCellValue('O' . $row, $value["amountsPerMonthList"]["August"]);
+                $sheet->setCellValue('P' . $row, $value["amountsPerMonthList"]["September"]);
+                $sheet->setCellValue('Q' . $row, $value["amountsPerMonthList"]["October"]);
+                $sheet->setCellValue('R' . $row, $value["amountsPerMonthList"]["November"]);
+                $sheet->setCellValue('S' . $row, $value["amountsPerMonthList"]["December"]);
+
+                foreach (range('A', 'S') as $column) {
+                    $sheet->getStyle($column . $row)->getAlignment()->setWrapText(true)->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
+                }
+
+                $sheet->getStyle('A' . $row . ':J' . $row)->getFont()->setName('Calibri')->setSize(9);
+
+                $row++;
+            }
+        }
+
+        // Aplicar bordes a toda la tabla desde los encabezados hasta el contenido
+        $styleArray = [
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => '000000'],
+                ],
+            ],
+        ];
+
+        $sheet->getStyle('A8:S' . ($row - 1))->applyFromArray($styleArray);
+
+        // Guardar el archivo como XLSX
+        $writer = new Xlsx($spreadsheet);
+
+        // Establecer el nombre del archivo
+        $current_date = Carbon::now()->format('d_m_Y');
+        $filename = 'texto_excel_' . $current_date . '.xlsx';
+
+        // Establecer las cabeceras para descargar el archivo
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        // Guardar el archivo en la salida PHP
+        $writer->save('php://output');
     }
 }
