@@ -251,21 +251,6 @@ export default {
             filterAllYearsInDeals();
             data.value.labels = [];
             data.value.datasets[0].data = [];
-            yearsArray.value = uniqueYearsArray;
-            year.value = yearsArray.value[yearsArray.value.length - 1];
-            newFilteredDataSet(year.value);
-        })
-
-
-
-        onMounted(() => {
-            filterAllYearsInDeals();
-        });
-
-        watch(userData, () => {
-            filterAllYearsInDeals();
-            data.value.labels = [];
-            data.value.datasets[0].data = [];
 
             if (userData.value !== '') {
                 userData.value.evaluaciones_personal.forEach(element => {

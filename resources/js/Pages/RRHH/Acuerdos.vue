@@ -210,7 +210,7 @@ export default {
             perPage: ["10", "20", "30"],
             tableData: {
                 draw: 0,
-                length: 5,
+                length: 10,
                 column: 0,
                 dir: "desc",
                 search: {},
