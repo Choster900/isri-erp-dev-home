@@ -34,10 +34,10 @@
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center ">{{ persona.dui_persona }}</div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                            <td class="px-2 first:pl-5 last:pr-5 ">
                                 <div class="font-medium text-slate-800 text-center ">{{ persona.profesion.nombre_profesion }}</div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                            <td class="px-2 first:pl-5 last:pr-5 ">
                                 <div class="font-medium text-slate-800 text-center">
                                     {{ `${persona.pnombre_persona ? persona.pnombre_persona : ''}
                                                                         ${persona.snombre_persona ? persona.snombre_persona : ''}

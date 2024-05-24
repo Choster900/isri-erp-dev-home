@@ -17,32 +17,27 @@
         <div class="text-center" v-if="originalDataExpedientePersona == ''">
             <img src="../../../../img/emptyAnexos.svg" alt="" class="h-[350px] mx-auto">
             <h1 class="font-medium mt-6 text-lg">No hay documentos en esta sección de anexos</h1>
-            <p class="mt-2 text-sm">Para visualizar documentos en esta área, primero agrega un documento aquí o modifica uno
+            <p class="mt-2 text-sm">Para visualizar documentos en esta área, primero agrega un documento aquí o modifica
+                uno
                 existente y muévelo a esta sección.</p>
         </div>
-        <!--     <pre>
-            {{ originalDataExpedientePersona }}
-        </pre> -->
-        <div id="mainSection" class="mb-4 h-[500px]  px-5 overflow-y-auto  grid " v-if="originalDataExpedientePersona != ''"
+
+        <div id="mainSection" class="mb-4 h-[500px] px-5 overflow-y-auto grid"
+            v-if="originalDataExpedientePersona && originalDataExpedientePersona.length > 0"
             :class="{ 'grid-cols-1': viewList, 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3': !viewList, 'gap-5': !viewList, 'gap-2': viewList }">
-            <div class="relative border border-gray-200 bg-white rounded-md shadow-lg cursor-pointer hover:bg-slate-100 text-center"
+            <div  class="relative border border-gray-200 bg-white rounded-md shadow-lg cursor-pointer hover:bg-slate-100 text-center"
                 :class="{ 'flex': viewList }" v-for="(anexo, i) in originalDataExpedientePersona" :key="i"
                 @click="$emit('sent-preview-information', anexo)">
-                <div class="flex justify-center" :class="viewList ? 'px-1 ' : ' py-2 px-5'">
-                    <img  src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/PDF_file_icon.svg/1200px-PDF_file_icon.svg.png"
-                        v-if="anexo.id_tipo_mime == 1" alt="" class="h-20 m-2">
-                    <img src="https://icons-for-free.com/iconfiles/png/512/gallery+image+landscape+mobile+museum+open+line+icon-1320183049020185924.png"
-                        v-else alt="" class="h-20">
+                <div class="flex justify-center" :class="viewList ? 'px-1' : 'py-2 px-5'">
+                    <img v-if="anexo.id_tipo_mime == 1"
+                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/PDF_file_icon.svg/1200px-PDF_file_icon.svg.png"
+                        alt="" class="h-20 m-2">
+                    <img v-else src="https://cdn-icons-png.flaticon.com/512/3342/3342177.png" alt="" class="h-20">
                 </div>
                 <div class="px-5 py-4">
-                    <h1 class="font-semibold text-sm " :class="{ 'pb-2': !viewList, 'text-start': viewList }">
-                    <!--     {{ anexo.nombre_archivo_anexo }} -->
+                    <h1 class="font-semibold text-sm" :class="{ 'text-start': viewList }">
                         {{ $options.filters.truncate(anexo.nombre_archivo_anexo, 25, '...') }}
-
                     </h1>
-                    <span class="text-xs block text-slate-500 " :class="{ 'text-start': viewList }">
-                        Agregado: hace 1 dia
-                    </span>
                 </div>
                 <div class="absolute top-0 right-0 py-1 px-2">
                     <DropdownHelp>
@@ -53,13 +48,14 @@
                                     <path
                                         d="M10.5 0h-9A1.5 1.5 0 000 1.5v9A1.5 1.5 0 001.5 12h9a1.5 1.5 0 001.5-1.5v-9A1.5 1.5 0 0010.5 0zM10 7L8.207 5.207l-3 3-1.414-1.414 3-3L5 2h5v5z" />
                                 </svg>
-                                <span>Modificar</span>
+                                <span class="text-xs">Ver para modificar</span>
                             </div>
                         </li>
                     </DropdownHelp>
                 </div>
             </div>
         </div>
+
 
 
     </div>
