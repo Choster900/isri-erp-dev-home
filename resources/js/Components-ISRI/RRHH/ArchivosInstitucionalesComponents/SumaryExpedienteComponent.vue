@@ -1,7 +1,6 @@
 <template>
     <div class="container mx-auto ">
-        <h1 class="text-center font-bold text-gray-800 text-xl pb-2">Listado de Expedientes por Fecha de Agregación</h1>
-        <div class="border-l-4 border-gray-200">
+       <div class="border-l-4 border-gray-200">
             <!-- Card 1 -->
             <div v-for="(item, i) in userData" :key="i"
                 class="transform transition duration-300 hover:-translate-y-1 hover:border ml-8 relative flex items-center px-6 py-4 bg-white shadow-md rounded-lg mb-6">
