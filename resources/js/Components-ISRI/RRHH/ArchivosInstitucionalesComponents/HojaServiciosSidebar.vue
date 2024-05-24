@@ -35,7 +35,7 @@
                         <li class="-mx-2"
                             :class="{ ' bg-slate-300 rounded-md': isProfileSelected.id_empleado == user.id_empleado }"
                             v-for="user in userMatches" :key="user">
-                            <button class="w-full p-2 rounded " @click="$emit('sendUserDataWhenIsClick', user)"
+                            <button class="w-full px-2 py-1 rounded " @click="$emit('sendUserDataWhenIsClick', user)"
                                 :title="`${user.empleado.codigo_empleado} -${user.pnombre_persona ? user.pnombre_persona : ''} ${user.snombre_persona ? user.snombre_persona : ''} ${user.tnombre_persona ? user.snombre_persona : ''} ${user.papellido_persona ? user.papellido_persona : ''} ${user.sapellido_persona ? user.sapellido_persona : ''} ${user.tapellido_persona ? user.tapellido_persona : ''} `">
                                 <div class="flex items-center">
                                     <div class="flex flex-col items-center sm:flex-row sm:justify-between sm:items-end">
@@ -46,7 +46,7 @@
                                         </div>
                                     </div>
                                     <div class="truncate">
-                                        <span class="text-sm font-medium text-slate-800">
+                                        <span class="text-[9pt] font-medium text-slate-800">
                                             {{ `${user.empleado.codigo_empleado} - ${user.pnombre_persona ?
                                                 user.pnombre_persona : ''} ${user.snombre_persona ? user.snombre_persona
                                                     : ''} ${user.tnombre_persona ? user.snombre_persona : ''}
