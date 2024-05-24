@@ -157,16 +157,16 @@ import moment from 'moment';
                                         </div>
                                         <!-- Tipo Contrato - Fecha Asignacion -->
                                         <div class="flex flex-col space-y-1 md:flex-row md:space-x-2">
-                                            <div class="w-full md:w-[50%]">
+                                            <div class="w-full md:w-[40%]">
                                                 <p class="text-sm text-gray-600">Tipo Contratación</p>
                                                 <p class="text-base font-medium text-navy-700 ">
                                                     {{ jobPosition.detalle_plaza.tipo_contrato.nombre_tipo_contrato }}
                                                 </p>
                                             </div>
-                                            <div class="w-full md:w-[35%]">
-                                                <p class="text-sm text-gray-600">Fecha Nombramiento</p>
+                                            <div class="w-full md:w-[45%]">
+                                                <p class="text-sm text-gray-600">{{jobPosition.fecha_renuncia_plaza_asignada ? 'Período' : 'Fecha Nombramiento'}}</p>
                                                 <p class="text-base font-medium text-navy-700 ">
-                                                    {{ moment(jobPosition.fecha_plaza_asignada).format('DD/MM/YYYY') }}
+                                                    {{ jobPosition.fecha_renuncia_plaza_asignada ? '('+moment(jobPosition.fecha_plaza_asignada).format('DD/MM/YYYY')+' - '+moment(jobPosition.fecha_renuncia_plaza_asignada).format('DD/MM/YYYY')+')' : moment(jobPosition.fecha_plaza_asignada).format('DD/MM/YYYY') }}
                                                 </p>
                                             </div>
                                             <div class="w-full md:w-[15%]">
@@ -507,7 +507,7 @@ export default {
             this.showJobPositions = true
             this.loadingCount = 0 //Conteo para el loader
             this.errors = []
-            this.activeSelected = true
+            this.activeSelected = this.modalData.id_estado_empleado === 1 ? true : false
             this.edit = false
             this.deleting = false
             this.indexToDelete = ''

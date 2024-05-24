@@ -248,34 +248,17 @@ export default {
         });
 
         watch(userData, () => {
-            filterAllYearsInDeals();
-            data.value.labels = [];
-            data.value.datasets[0].data = [];
-            yearsArray.value = uniqueYearsArray;
-            year.value = yearsArray.value[yearsArray.value.length - 1];
-            newFilteredDataSet(year.value);
-        })
+    filterAllYearsInDeals();
+    data.value.labels = [];
+    data.value.datasets[0].data = [];
 
-
-
-        onMounted(() => {
-            filterAllYearsInDeals();
+    if (userData.value && userData.value.length > 0) { // Verificar si userData está definido y tiene elementos
+        userData.value.evaluaciones_personal.forEach(element => {
+            data.value.labels.push(`${element.periodo_evaluacion.nombre_periodo_evaluacion} - ${moment(element.fecha_inicio_evaluacion_personal).year()}`);
+            data.value.datasets[0].data.push(element.puntaje_evaluacion_personal);
         });
-
-        watch(userData, () => {
-            filterAllYearsInDeals();
-            data.value.labels = [];
-            data.value.datasets[0].data = [];
-
-            if (userData.value !== '') {
-                userData.value.evaluaciones_personal.forEach(element => {
-                    data.value.labels.push(`${element.periodo_evaluacion.nombre_periodo_evaluacion} - ${moment(element.fecha_inicio_evaluacion_personal).year()}`);
-                    data.value.datasets[0].data.push(element.puntaje_evaluacion_personal);
-
-                });
-            }
-
-        });
+    }
+});
 
         // Aquí puedes definir otras funciones computadas si es necesario
 

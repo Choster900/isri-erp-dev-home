@@ -42,11 +42,12 @@ import html2pdf from 'html2pdf.js'
             <header class="text-center sm:text-left mb-6">
                 <!-- Name -->
                 <div class="inline-flex items-start mb-2" v-if="userData != ''">
-                    <h1 class="text-2xl text-slate-800 font-bold"> {{ userData != '' ? `${userData.empleado.codigo_empleado}
-                                            - ${userData.pnombre_persona ? userData.pnombre_persona : ''} ${userData.snombre_persona ?
-                            userData.snombre_persona : ''} ${userData.tnombre_persona ? userData.snombre_persona : ''}
-                                            ${userData.papellido_persona ? userData.papellido_persona : ''} ${userData.sapellido_persona ?
-                            userData.sapellido_persona : ''} ${userData.tapellido_persona ? userData.tapellido_persona : ''}
+                    <h1 class="text-2xl text-slate-800 font-bold"> {{ userData != '' ?
+            `${userData.empleado.codigo_empleado}
+                        - ${userData.pnombre_persona ? userData.pnombre_persona : ''} ${userData.snombre_persona ?
+                userData.snombre_persona : ''} ${userData.tnombre_persona ? userData.snombre_persona : ''}
+                        ${userData.papellido_persona ? userData.papellido_persona : ''} ${userData.sapellido_persona ?
+                userData.sapellido_persona : ''} ${userData.tapellido_persona ? userData.tapellido_persona : ''}
                         `: '' }}</h1>
                     <div class="flex space-x-2 sm:mb-2 " title="Descargar hoja de servicios">
                         <svg class="ml-2 h-7 w-7 cursor-pointer" @click="printPdf" viewBox="0 0 24 24" fill="none"
@@ -83,11 +84,12 @@ import html2pdf from 'html2pdf.js'
                                 stroke="#64748b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                             </path>
                         </svg>
-                        <span v-if="userData" class="text-sm font-medium uppercase whitespace-nowrap text-slate-500 ml-2">
+                        <span v-if="userData"
+                            class="text-sm font-medium uppercase whitespace-nowrap text-slate-500 ml-2">
                             {{ userData !== undefined && userData.municipio !== undefined ? `
                             ${userData.municipio.departamento.pais.id_pais}-${userData.municipio.departamento.pais.nombre_pais}
-                                                        ${userData.municipio.departamento.id_departamento}-${userData.municipio.departamento.nombre_departamento}
-                                                        ${userData.municipio.id_municipio}-${userData.municipio.nombre_municipio}
+                            ${userData.municipio.departamento.id_departamento}-${userData.municipio.departamento.nombre_departamento}
+                            ${userData.municipio.id_municipio}-${userData.municipio.nombre_municipio}
                             ` : '' }}
                         </span>
                         <div class="animate-pulse" v-if="userData == ''">
@@ -119,9 +121,9 @@ import html2pdf from 'html2pdf.js'
 
                         </svg>
                         <a class="text-sm font-medium whitespace-nowrap text-slate-500 ml-2">Fecha de ingreso: {{
-                            userData !== '' && userData.empleado !== undefined ?
-                            moment(userData.empleado.fecha_contratacion_empleado).format('dddd, MMMM D, YYYY')
-                            : '' }}</a>
+            userData !== '' && userData.empleado !== undefined ?
+                moment(userData.empleado.fecha_contratacion_empleado).format('dddd, MMMM D, YYYY')
+                : '' }}</a>
 
                         <div class="animate-pulse pl-1" v-if="userData == ''">
                             <div class="h-3 bg-slate-400 rounded w-[200px]"></div>
@@ -142,9 +144,9 @@ import html2pdf from 'html2pdf.js'
 
                         </svg>
                         <a class="text-sm font-medium whitespace-nowrap text-slate-500 ml-2">Fecha de nacimiento: {{
-                            userData !== '' && userData.empleado !== undefined ?
-                            moment(userData.fecha_nac_persona).format('dddd, MMMM D, YYYY')
-                            : '' }}</a>
+            userData !== '' && userData.empleado !== undefined ?
+                moment(userData.fecha_nac_persona).format('dddd, MMMM D, YYYY')
+                : '' }}</a>
 
                         <div class="animate-pulse pl-1" v-if="userData == ''">
                             <div class="h-3 bg-slate-400 rounded w-[200px]"></div>
@@ -156,23 +158,33 @@ import html2pdf from 'html2pdf.js'
             <div class="relative mb-6">
                 <div class="absolute bottom-0 w-full h-px bg-slate-200" aria-hidden="true"></div>
                 <ul class="relative text-sm font-medium flex flex-nowrap -mx-4 sm:-mx-6 lg:-mx-8">
-                    <li class="mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8">
+                    <li
+                        class="mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8">
                         <a class="block pb-3 cursor-pointer  whitespace-nowrap "
                             @click="showingSections = 'GeneralInformationVue';"
                             :class="showingSections == 'GeneralInformationVue' ? 'border-b-2 text-indigo-500 border-indigo-500' : 'text-slate-500'">General</a>
                     </li>
-                    <li class="mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8">
+                    <li
+                        class="mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8">
                         <a class="block pb-3 cursor-pointer hover:text-slate-600 whitespace-nowrap"
                             @click="showingSections = 'FooterServiciosBodyVue';"
                             :class="showingSections == 'FooterServiciosBodyVue' ? 'border-b-2 text-indigo-500 border-indigo-500' : 'text-slate-500'">Acuerdos</a>
                     </li>
-                    <li class="mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8">
+                    <li
+                        class="mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8">
                         <a class="block pb-3 cursor-pointer hover:text-slate-600 whitespace-nowrap"
                             @click="showingSections = 'FooterEvaluationsVue';"
                             :class="showingSections == 'FooterEvaluationsVue' ? 'border-b-2 text-indigo-500 border-indigo-500' : 'text-slate-500'">Evaluaciones</a>
                     </li>
+                    <li
+                        class="mr-6 last:mr-0 first:pl-4 sm:first:pl-6 lg:first:pl-8 last:pr-4 sm:last:pr-6 lg:last:pr-8">
+                        <a class="block pb-3 cursor-pointer hover:text-slate-600 whitespace-nowrap"
+                            @click="showingSections = 'SumaryExpedienteComponent';"
+                            :class="showingSections == 'SumaryExpedienteComponent' ? 'border-b-2 text-indigo-500 border-indigo-500' : 'text-slate-500'">Expedientes</a>
+                    </li>
                 </ul>
             </div>
+          <!--   {{ showingSections }} -->
             <!-- GENERAL -->
             <GeneralInformationVue :class="showingSections == 'GeneralInformationVue' ? '' : 'hidden'"
                 :moreInformacionEmployee="userData != '' ? userData : ''" />
@@ -182,6 +194,10 @@ import html2pdf from 'html2pdf.js'
 
             <FooterEvaluationsVue :class="showingSections == 'FooterEvaluationsVue' ? '' : 'hidden'"
                 :userData="userData != '' ? userData.empleado : []" />
+
+            <SumaryExpedienteComponent  :class="showingSections == 'SumaryExpedienteComponent' ? '' : 'hidden'"
+                 :userData="userData != '' ? userData.archivo_anexo : []"
+              />
         </div>
     </div>
 </template>
@@ -192,7 +208,7 @@ import { createApp, h } from 'vue'
 import HojaServiciosPdfVue from '@/pdf/RRHH/HojaServiciosPdfCopy.vue';
 import ListEvaluationsVue from './ListEvaluations.vue';
 import FooterEvaluationsVue from './FooterEvaluations.vue';
-
+import SumaryExpedienteComponent from './SumaryExpedienteComponent.vue'
 export default {
     props: {
         userData: {
@@ -204,7 +220,7 @@ export default {
     data() {
         return {
 
-            showingSections: 'FooterEvaluationsVue',
+            showingSections: 'FooterServiciosBodyVue',
 
         }
     },

@@ -50,6 +50,9 @@ class HojaServicioController extends Controller
                     ->orderBy("fecha_reg_evaluacion_personal", "asc");
                 return $query;
             },
+            // ! nueva relacion con archivo anexo
+            'archivo_anexo.tipo_archivo_anexo',
+            'archivo_anexo.tipo_mine',
         ]);
         if (!empty($request["data"])) {
             $query->orWhere(function ($query) use ($request) {
@@ -67,7 +70,7 @@ class HojaServicioController extends Controller
         $query->whereHas('empleado');
 
         if (!$request["data"]) {
-            $query->take(10); // Limitar a los últimos 5 registros
+            $query->take(20); // Limitar a los últimos 5 registros
         }
 
         $result = $query->get();
@@ -75,6 +78,8 @@ class HojaServicioController extends Controller
         return $result;
     }
 
+
+    // TODO: Aplicar los cambios hechos en la funcion principal aqui tambien para obtener la informacion personal
     function getMyOwnInformation(Request $request)
     {
         $query = Persona::with([

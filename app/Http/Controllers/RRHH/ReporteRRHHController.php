@@ -309,26 +309,58 @@ class ReporteRRHHController extends Controller
 
     public function createPdfEmployees(Request $request)
     {
+        $queryResult = $request->input('queryResult');
+
+        // Contar el número total de empleados
+        $totalEmployees = count($queryResult);
+
+        // Contar el número de empleados pensionados
+        $totalPensionados = count(array_filter($queryResult, function ($employee) {
+            return $employee['pensionado_empleado'] == 1;
+        }));
+
+        // Fecha y hora de generación
+        $generatedAt = \Carbon\Carbon::now()->format('Ymd_His');  // Formato para el nombre del archivo
+
         // Datos que deseas pasar a la vista
         $data = [
-            'title'         => $request->input('title'),
-            'depInfo'       => $request->input('depInfo'),
-            'date'          => $request->input('date'),
-            'queryResult'   => $request->input('queryResult'),
-            'totalPages'    => null  // Inicialmente nulo, se actualizará después
+            'title'                 => $request->input('title'),
+            'depInfo'               => $request->input('depInfo'),
+            'date'                  => $request->input('date'),
+            'queryResult'           => $queryResult,
+            'totalPages'            => 0,  // Inicialmente cero, se actualizará después
+            'generatedAt'           => \Carbon\Carbon::now()->format('d/m/Y H:i:s'),  // Fecha y hora de generación para el contenido del PDF
+            'totalEmployees'        => $totalEmployees,
+            'totalPensionados'      => $totalPensionados
         ];
 
         // Crear el PDF inicialmente para contar las páginas
         $pdf = PDF::loadView('RRHH/PDF/empleados-report', $data)->setPaper('letter', 'landscape');
-        $pageCount = $pdf->getDomPDF()->get_canvas()->get_page_count();
 
-        // Actualizar los datos con el total de páginas
-        $data['totalPages'] = $pageCount;
+        // Renderizar el PDF inicialmente
+        $pdf->render();
+
+        // Obtener el número total de páginas desde el contenido renderizado
+        $dompdf = $pdf->getDomPDF();
+        $canvas = $dompdf->getCanvas();
+        $totalPages = $canvas->get_page_count();
+
+        // Actualizar los datos con el número total de páginas
+        $data['totalPages'] = $totalPages;
 
         // Crear el PDF nuevamente con el total de páginas actualizado
         $pdf = PDF::loadView('RRHH/PDF/empleados-report', $data)->setPaper('letter', 'landscape');
 
-        // Descargar el PDF
-        return $pdf->download('reporte-empleados.pdf');
+        // Preparar la respuesta con el encabezado adicional
+        $response = response()->streamDownload(function () use ($pdf) {
+            echo $pdf->output();
+        }, "reporte-empleados_{$generatedAt}.pdf", [
+            'Content-Type' => 'application/pdf',
+        ]);
+
+        // Agregar encabezado adicional
+        $response->headers->set('X-Generated-At', $generatedAt);
+
+        return $response;
     }
 }
