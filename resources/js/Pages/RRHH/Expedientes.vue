@@ -147,7 +147,7 @@
             </div>
         </div>
 
-        <ModalExpedientes :showModal="showModal" @cerrar-modal="showModal = false"
+        <NewModalExpediente :showModal="showModal" @cerrar-modal="showModal = false"
             @actualizar-data="getPeople(lastUrl); showModal = false" :persona="dataPersona" />
 
     </AppLayoutVue>
@@ -157,11 +157,11 @@
 import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";;
-import ModalExpedientes from '@/Components-ISRI/RRHH/ExpedientesComponents/ModalExpedientes.vue';
+import NewModalExpediente from '@/Components-ISRI/RRHH/ExpedientesComponents/NewModalExpediente.vue';
 import { useDatatable } from '@/Composables/RRHH/Expediente/useDatatable'
 import { ref, watch } from 'vue';
 export default {
-    components: { Head, AppLayoutVue, Datatable, ModalExpedientes },
+    components: { Head, AppLayoutVue, Datatable, NewModalExpediente },
     setup() {
         const dataPersona = ref(null)
 
