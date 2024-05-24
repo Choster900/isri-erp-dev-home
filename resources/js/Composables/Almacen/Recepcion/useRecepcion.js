@@ -193,7 +193,6 @@ export const useRecepcion = (context) => {
                         perishable: element.producto.perecedero_producto,
                         fractionated: element.producto.fraccionado_producto,
                         avails: "",
-                        //Aca quiero hacer la conversion
                         qty: element.producto.fraccionado_producto == 0 ? floatToInt(element.cant_det_recepcion_pedido) : element.cant_det_recepcion_pedido,
                         cost: element.producto_adquisicion.costo_prod_adquisicion,
                         total: recDocument.value.isGas ? (element.cant_det_recepcion_pedido * element.costo_det_recepcion_pedido).toFixed(2) : '',
