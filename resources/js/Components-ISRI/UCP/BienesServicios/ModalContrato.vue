@@ -41,6 +41,14 @@
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z" />
                                         </svg>
+
+                                        <svg class="w-5 h-5 ml-2 stroke-slate-400 hover:stroke-slate-500 cursor-pointer"
+                                            viewBox="0 0 24 24" @click="exportDocumentToExcel" fill="none" xmlns="http://www.w3.org/2000/svg"
+                                            stroke="currentColor" stroke-width="0.6">
+                                            <path
+                                                d="M9.29289 1.29289C9.48043 1.10536 9.73478 1 10 1H18C19.6569 1 21 2.34315 21 4V9C21 9.55228 20.5523 10 20 10C19.4477 10 19 9.55228 19 9V4C19 3.44772 18.5523 3 18 3H11V8C11 8.55228 10.5523 9 10 9H5V20C5 20.5523 5.44772 21 6 21H7C7.55228 21 8 21.4477 8 22C8 22.5523 7.55228 23 7 23H6C4.34315 23 3 21.6569 3 20V8C3 7.73478 3.10536 7.48043 3.29289 7.29289L9.29289 1.29289ZM6.41421 7H9V4.41421L6.41421 7ZM19 12C19.5523 12 20 12.4477 20 13V19H23C23.5523 19 24 19.4477 24 20C24 20.5523 23.5523 21 23 21H19C18.4477 21 18 20.5523 18 20V13C18 12.4477 18.4477 12 19 12ZM11.8137 12.4188C11.4927 11.9693 10.8682 11.8653 10.4188 12.1863C9.96935 12.5073 9.86526 13.1318 10.1863 13.5812L12.2711 16.5L10.1863 19.4188C9.86526 19.8682 9.96935 20.4927 10.4188 20.8137C10.8682 21.1347 11.4927 21.0307 11.8137 20.5812L13.5 18.2205L15.1863 20.5812C15.5073 21.0307 16.1318 21.1347 16.5812 20.8137C17.0307 20.4927 17.1347 19.8682 16.8137 19.4188L14.7289 16.5L16.8137 13.5812C17.1347 13.1318 17.0307 12.5073 16.5812 12.1863C16.1318 11.8653 15.5073 11.9693 15.1863 12.4188L13.5 14.7795L11.8137 12.4188Z"
+                                                fill="#94a3b8"></path>
+                                        </svg>
                                     </div>
                                 </td>
                             </tr>
@@ -80,7 +88,7 @@
                         </tbody>
                     </table>
                     <div id="especificaciones" class="mb-4">
-                        <div class="flex items-center justify-between pt-4 ">
+                        <div class="flex items-center justify-start gap-4 pt-4 ">
                             <div class="flex items-center" v-if="propProdAdquisicion == ''">
                                 <label for="" class="text-[7pt] font-semibold mr-2">LUGAR Y FECHA: </label>
                                 <input type="text" :value="`SAN SALVADOR ${moment().format('D [de] MMMM [de] YYYY')}`"
@@ -226,13 +234,9 @@
 
                                     <td class=" w-12 relative bg-slate-200 cursor-not-allowed"
                                         :class="{ 'bg-red-500': errorsValidation[`productAdq.${i}.detalleDoc.${j}.cantProdAdquisicion`] }">
-                                        <input type="text" v-model="detalle.cantProdAdquisicion"
-                                            :disabled="estadoDocAdq !== 1"
-                                            @input="handleInput(i, j); detalle.cantProdAdquisicion = detalle.cantProdAdquisicion.replace(/\D/g, '')"
-                                            inputmode="numeric"
-                                            :class="estadoDocAdq !== 1 ? 'cursor-not-allowed' : 'cursor-not-allowed '"
-                                            class="absolute  top-0 left-0 w-full bg-transparent border-none pl-2 text-center text-[8pt] p-0 outline-none focus:outline-none focus:ring focus:ring-transparent"
-                                            placeholder="0" min="0" max="1000" />
+                                        <span class="absolute top-1 left-0 w-full flex flex-col items-center ">
+                                            {{ detalle.cantProdAdquisicion }}
+                                        </span>
                                     </td>
                                     <td class=" relative text-center "
                                         :class="{ 'bg-red-500': errorsValidation[`productAdq.${i}.detalleDoc.${j}.costoProdAdquisicion`] }">
@@ -246,20 +250,21 @@
                                         </div>
 
                                     </td>
-                                    <td class="relative text-center w-20 bg-slate-200">
+                                    <td class="relative text-center w-20 bg-slate-200 cursor-not-allowed">
                                         <span class="absolute top-1 left-0 w-full flex flex-col items-center ">
                                             {{ detalle.valorTotalProduct !== undefined ?
-                                            detalle.valorTotalProduct.toLocaleString('en-US', {
-                                                minimumFractionDigits: 2,
-                                                maximumFractionDigits: 2
-                                            }) : '00.00' }}
+                detalle.valorTotalProduct.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }) : '00.00' }}
                                         </span>
                                     </td>
                                     <!-- //!NUEVO -->
                                     <td class="relative p-0 bg-white"
                                         style="padding-left: 0 !important; padding-right: 0 !important; ">
-                                        <CalendarAcuerdoComponent v-if="showModal":dataInserted="detalle.amountsPerMonthList"
-                                            @update:dataCalendar="handleDataCalendarUpdate($event, i, j)"  />
+                                        <CalendarAcuerdoComponent v-if="showModal"
+                                            :dataInserted="detalle.amountsPerMonthList"
+                                            @update:dataCalendar="handleDataCalendarUpdate($event, i, j)" />
                                     </td>
                                 </tr>
                             </template>
@@ -289,22 +294,15 @@
                                             <span class="text-xs pt-0.5 text-slate-600">
                                                 NUEVO PRODUCTO ADQUISICION EN:
                                                 <br>
-                                                {{ arrayLineaTrabajo.find(index => index.value ==
-                docAdq.idLt)?.label ||
+                                                {{ arrayLineaTrabajo.find(index => index.value == docAdq.idLt)?.label ||
                 '' }}
                                             </span>
                                         </div>
                                     </button>
                                 </td>
                             </tr>
-
-
-
                         </template>
-
-
                     </table>
-
                     <div v-if="estadoDocAdq == 1">
                         <button style="outline: none;" @click="addinDocAdquisicion"
                             class="w-full  border-4 border-dashed border-slate-500 hover:border-slate-800  my-3 py-10 ">
@@ -553,7 +551,7 @@ export default {
             }
         }
 
-        const { printPdf } = useConfigPdf(
+        const { printPdf,exportDocumentToExcel } = useConfigPdf(
             arrayDocAdquisicion,
             idDetDocAdquisicion,
             objectGetFromProp,
@@ -575,6 +573,7 @@ export default {
             handleInput,
             moment,
             printPdf,
+            exportDocumentToExcel,
             disableLt,
             getBrandName,
             arrayMarca,

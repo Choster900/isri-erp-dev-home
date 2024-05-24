@@ -2,7 +2,16 @@ import { ref, onMounted, watch, computed, reactive } from "vue";
 import axios from "axios";
 import { executeRequest } from "@/plugins/requestHelpers";
 import Swal from "sweetalert2";
-export const useBienesServicios = (propProdAdquisicion, showModal,typeDoc) => {
+/**
+ * Hook personalizado para la gestión de bienes y servicios.
+ * Este hook se encarga de realizar operaciones relacionadas con la gestión de bienes y servicios,
+ * como la carga de datos, envío de solicitudes y manejo de eventos.
+ * @param {Object} propProdAdquisicion - Propiedad que contiene los datos de adquisición de productos.
+ * @param {Boolean} showModal - Indica si se muestra el modal de bienes y servicios.
+ * @param {String} typeDoc - Tipo de documento relacionado con la adquisición.
+ * @returns {Object} - Retorna un objeto con los datos y funciones relacionadas con la gestión de bienes y servicios.
+ */
+export const useBienesServicios = (propProdAdquisicion, showModal, typeDoc) => {
     const arrayProductoAdquisicion = ref([])
     const idDetDocAdquisicion = ref(null)
     const observacionDetDocAdquisicion = ref(null)
@@ -22,7 +31,6 @@ export const useBienesServicios = (propProdAdquisicion, showModal,typeDoc) => {
     const arrayProductsWhenIsEditable = ref(null)
 
     const estadoDocAdq = ref(1)
-    const tipoProcesoCompra = ref(null)
 
     const ArrayProductFiltered = ref([])
 
@@ -102,7 +110,7 @@ export const useBienesServicios = (propProdAdquisicion, showModal,typeDoc) => {
      */
     const getArrayObject = async () => {
         try {
-            const resp = await axios.post("/get-array-objects-for-multiselect", {tipoDoc: typeDoc});
+            const resp = await axios.post("/get-array-objects-for-multiselect", { tipoDoc: typeDoc });
             arrayLineaTrabajo.value = resp.data.lineaTrabajo.map(index => {
                 return { value: index.id_lt, label: `${index.codigo_up_lt} - ${index.nombre_lt}`, disabled: false };
             })
@@ -203,7 +211,7 @@ export const useBienesServicios = (propProdAdquisicion, showModal,typeDoc) => {
             // Realiza el cálculo del valor total y asigna al producto
             const valorTotal = cantProdAdquisicion * costoProdAdquisicion;
             arrayProductoAdquisicion.value[docAdq].detalleDoc[detalleDocAdq].valorTotalProduct = valorTotal;
-            sumatorioTotalProduct()
+            calculateTotalProductValue()
         } catch (error) {
             // Maneja los errores imprimiéndolos en la consola.
             console.error("Error al calcular el valor total del producto:", error);
@@ -211,18 +219,35 @@ export const useBienesServicios = (propProdAdquisicion, showModal,typeDoc) => {
     };
 
 
-    const sumatorioTotalProduct = () => {
-        let suma = []
+    /**
+     * Calculates the total sum of all product values within the acquisition document.
+     * Iterates through each product in `arrayProductoAdquisicion` and their respective details,
+     * sums up the total value of all products, and updates `totProductos` with the total.
+     * Additionally, it formats the total to two decimal places and calls `getTextForNumber` with the total sum.
+     */
+    const calculateTotalProductValue = () => {
+        // Array to store all product details
+        let suma = [];
+
+        // Iterate through each product in the acquisition array
         arrayProductoAdquisicion.value.forEach(element => {
+            // Iterate through each detail of the current product
             element.detalleDoc.forEach(element2 => {
-                suma.push(element2)
+                // Add the detail to the suma array
+                suma.push(element2);
             });
         });
 
+        // Calculate the total sum of all product values
         let sumaTotal = suma.reduce((acumulador, producto) => acumulador + producto.valorTotalProduct, 0);
-        totProductos.value = sumaTotal.toFixed(2)
-        getTextForNumber(sumaTotal)
-    }
+
+        // Update the total products value, formatted to two decimal places
+        totProductos.value = sumaTotal.toFixed(2);
+
+        // Call the function to get the text representation of the total sum
+        getTextForNumber(sumaTotal);
+    };
+
 
     const loadingNumberLetter = ref(false)
     /**
@@ -536,7 +561,8 @@ export const useBienesServicios = (propProdAdquisicion, showModal,typeDoc) => {
                 }
             }).filter(Boolean)  // Filtra los elementos nulos o indefinidos
 
-
+            // si se cuenta mas de 10 producto adquisiciones oculatar tuplas por linea de trabajo para mas ergonomia
+            let show = productosAdquisiciones.length > 9 ? false : true
             // Utiliza map y filter para mejorar la legibilidad y reducir código duplicado
             arrayProductoAdquisicion.value = productosAdquisiciones
                 .map(producto => {
@@ -546,7 +572,7 @@ export const useBienesServicios = (propProdAdquisicion, showModal,typeDoc) => {
                         return {
                             idProdAdquisicion: producto.id_prod_adquisicion,
                             idLt: idLt,
-                            vShowLt: true,
+                            vShowLt: show,
                             hoverToDelete: false,
                             estadoLt: 2, // [Comment: Estado manejado en 0 => deleted,1 => created,2 =>edited]
                             detalleDoc: []
@@ -595,7 +621,7 @@ export const useBienesServicios = (propProdAdquisicion, showModal,typeDoc) => {
                 });
             });
             onSelectDocAdquisicion(idDetDocAdquisicion.value)
-            sumatorioTotalProduct()
+            calculateTotalProductValue()
             disableLt()
         } else {
             objectGetFromProp.value = [];
@@ -752,7 +778,7 @@ export const useBienesServicios = (propProdAdquisicion, showModal,typeDoc) => {
         productDataSearched,
         addingRows,
         arrayWhenIsEditingDocAdq,
-        sumatorioTotalProduct,
+        calculateTotalProductValue,
         brandsUsedInDoc,
         loadingNumberLetter,
         setInformacionProduct,
