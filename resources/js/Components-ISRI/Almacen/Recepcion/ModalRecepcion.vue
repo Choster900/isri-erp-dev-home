@@ -67,21 +67,31 @@
                     <div class="relative font-semibold flex h-[35px] w-full md:w-[60%]">
                         <Multiselect id="doc" v-model="infoToShow.docId" :options="filteredDoc" :searchable="true"
                             :noOptionsText="'Lista vacía.'" placeholder="Seleccione documento"
-                            @clear="infoToShow.detDocId = ''" />
+                            @clear="infoToShow.detDocId = ''" @change="infoToShow.detDocId = ''"/>
                     </div>
                 </div>
-                <div class="flex flex-col md:flex-row items-center mb-[50px] h-10 mx-8 max-w-full">
+                <div class="flex flex-col md:flex-row items-center mb-4 h-10 mx-8 max-w-full">
                     <div class="w-full md:w-[40%] mb-2 md:mb-0 md:mr-2">
                         <label for="det-doc" class="font-[Roboto]">Item:</label>
                     </div>
                     <div class="relative font-semibold flex h-[35px] w-full md:w-[60%]">
                         <Multiselect id="det-doc" v-model="infoToShow.detDocId" :options="filteredItems"
-                            :searchable="true" @clear="infoToShow.detDocId = ''" :noOptionsText="'Lista vacía.'"
+                            :searchable="true" :noOptionsText="'Lista vacía.'"
                             placeholder="Seleccione item" />
                     </div>
                 </div>
+                <div v-if="docSelected === 1" class="flex flex-col md:flex-row items-center mb-4 h-10 mx-8 max-w-full">
+                    <div class="w-full md:w-[40%] mb-2 md:mb-0 md:mr-2">
+                        <label for="det-doc" class="font-[Roboto]">Mes:</label>
+                    </div>
+                    <div class="relative font-semibold flex h-[35px] w-full md:w-[60%]">
+                        <Multiselect id="det-doc" v-model="infoToShow.monthId" :options="months"
+                            :searchable="true" :noOptionsText="'Lista vacía.'"
+                            placeholder="Seleccione mes" />
+                    </div>
+                </div>
 
-                <div class="md:flex my-6 flex-row justify-end mx-8">
+                <div class="md:flex mb-6 mt-[60px] flex-row justify-end mx-8">
                     <button type="button" :disabled="infoToShow.docId == '' || infoToShow.detDocId == ''"
                         :class="(infoToShow.docId == '' || infoToShow.detDocId == '') ? 'cursor-not-allowed opacity-50' : ''"
                         :title="(infoToShow.docId == '' || infoToShow.detDocId == '') ? 'Información incompleta' : 'Iniciar proceso de recepción'"
@@ -437,7 +447,7 @@ export default {
 
         const {
             isLoadingRequest, recDocument, errors, activeDetails,
-            documents, ordenC, contrato, docSelected, products, brands,
+            documents, ordenC, contrato, docSelected, products, brands, months,
             filteredDoc, filteredItems, startRec, filteredProds, totalRec, infoToShow,
             getInfoForModalRecep, startReception, setProdItem, calculateLtTotal, checkBlinkingClass,
             deleteRow, handleValidation, storeReception, updateReception, showAvails, returnToTop, 
@@ -451,7 +461,7 @@ export default {
         )
 
         return {
-            isLoadingRequest, recDocument, errors, activeDetails,
+            isLoadingRequest, recDocument, errors, activeDetails, months,
             documents, ordenC, contrato, docSelected, totalRec, products, brands,
             filteredDoc, filteredItems, startRec, filteredProds, infoToShow,
             handleValidation, startReception, setProdItem, calculateLtTotal, checkBlinkingClass,

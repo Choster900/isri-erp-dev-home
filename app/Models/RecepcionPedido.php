@@ -32,6 +32,7 @@ class RecepcionPedido extends Model
         'fecha_mod_recepcion_pedido',
         'usuario_recepcion_pedido',
         'ip_recepcion_pedido',
+        'id_mes'
     ];
 
     public function detalle_recepcion()
