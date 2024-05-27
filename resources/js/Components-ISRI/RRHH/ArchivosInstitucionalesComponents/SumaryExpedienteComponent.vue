@@ -1,6 +1,6 @@
 <template>
-    <div class="container mx-auto ">
-       <div class="border-l-4 border-gray-200">
+    <div class="container mx-auto">
+        <div class="border-l-4 border-gray-200">
             <!-- Card 1 -->
             <div v-for="(item, i) in userData" :key="i"
                 class="transform transition duration-300 hover:-translate-y-1 hover:border ml-8 relative flex items-center px-6 py-4 bg-white shadow-md rounded-lg mb-6">
@@ -17,17 +17,15 @@
                             :src="item.url_archivo_anexo" alt="" />
                         <iframe v-else-if="item.id_tipo_mime == 1" class="w-full rounded-lg"
                             :src="item.url_archivo_anexo" alt=""></iframe>
-                        <!--  <button @click="openInNewTab(item.url_archivo_anexo)"
-                            class="block w-full mt-2 bg-blue-500 hover:bg-blue-700 text-white text-xs font-bold py-2 px-4 rounded">Abrir
-                            archivo en nueva pestaña</button> -->
                     </div>
 
 
                     <div>
                         <h2 class="text-sm font-semibold text-gray-900">
-                            {{ item . tipo_archivo_anexo . nombre_tipo_archivo_anexo }}</h2>
-                        <p class="text-xs text-gray-600">{{ item . nombre_archivo_anexo }}</p>
-                        <p class="text-xs text-gray-500">Peso: {{ fetchFileSize(item.url_archivo_anexo) }} KB</p>
+                            {{ item.tipo_archivo_anexo.nombre_tipo_archivo_anexo }}</h2>
+                        <p class="text-xs text-gray-600">{{ item.nombre_archivo_anexo }}</p>
+                        <p class="text-xs text-gray-500" v-if="fileSizes[i] !== undefined">Peso: {{ fileSizes[i] }} KB
+                        </p>
                         <p class="text-xs text-gray-500">Fecha de Subida: 23/05/2024</p>
                     </div>
                 </div>
@@ -53,47 +51,47 @@
 </template>
 
 <script>
-    import ModalToShowFiles from '@/Components-ISRI/AllModal/ModalToShowFiles.vue'
-    export default {
-        props: ["userData"],
-        components: {
-            ModalToShowFiles
+import ModalToShowFiles from '@/Components-ISRI/AllModal/ModalToShowFiles.vue'
+export default {
+    props: ["userData"],
+    components: {
+        ModalToShowFiles
+    },
+    data() {
+        return {
+            fileSizes: []
+        };
+    },
+    created() {
+        this.userData.forEach(async (item) => {
+            try {
+                const response = await axios.head(item.url_archivo_anexo);
+                const contentLength = response.headers['content-length'];
+                if (contentLength) {
+                    this.fileSizes.push((parseInt(contentLength) / 1024).toFixed(2));
+                } else {
+                    this.fileSizes.push('Desconocido');
+                }
+            } catch (error) {
+                console.error('Error al obtener el tamaño del archivo:', error);
+                this.fileSizes.push('Desconocido');
+            }
+        });
+    },
+    methods: {
+        downloadFile(fileUrl) {
+            const link = document.createElement('a');
+            link.href = fileUrl;
+            link.download = fileUrl.split('/').pop(); // Extrae el nombre del archivo de la URL
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         },
-        setup() {
-
-            const downloadFile = (fileUrl) => {
-                const link = document.createElement('a');
-                link.href = fileUrl;
-                link.download = fileUrl.split('/').pop(); // Extrae el nombre del archivo de la URL
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            };
-
-            const openInNewTab = (fileUrl) => {
-                window.open(fileUrl, '_blank');
-            };
-
-            const fetchFileSize = async (fileUrl) => {
-      try {
-        const response = await axios.head(fileUrl);
-        const contentLength = response.headers['content-length'];
-        if (contentLength) {
-          return (parseInt(contentLength) / 1024).toFixed(2); // Convertir bytes a kilobytes y redondear a 2 decimales
-        }
-      } catch (error) {
-        console.error('Error al obtener el tamaño del archivo:', error);
-        return 'Desconocido';
-      }
-    };
-
-            return {
-                fetchFileSize,
-                downloadFile,
-                openInNewTab
-            };
+        openInNewTab(fileUrl) {
+            window.open(fileUrl, '_blank');
         }
     }
+}
 </script>
 
 <style lang="scss" scoped></style>
