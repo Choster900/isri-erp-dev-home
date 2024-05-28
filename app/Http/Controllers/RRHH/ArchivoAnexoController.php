@@ -144,7 +144,7 @@ class ArchivoAnexoController extends Controller
             //$idTipoMime = TipoMine::where('extension_tipo_mime', $request->idTipoMine)->value('id_tipo_mime');
 
             // Create a new ArchivoAnexo record in the database
-            $response = ArchivoAnexo::create([
+            $archivoAnexo  = ArchivoAnexo::create([
                 'estado_archivo_anexo'      => 1,
                 'nombre_archivo_anexo'      => $name,
                 'url_archivo_anexo'         => $imageUrl,
@@ -162,8 +162,12 @@ class ArchivoAnexoController extends Controller
 
             DB::commit();
 
-            // Return the created ArchivoAnexo
-            return $response;
+            // Cargar la relación tipoArchivoAnexo y devolver el registro creado
+            $archivoAnexoConRelaciones = ArchivoAnexo::with(['tipo_archivo_anexo','persona'])->find($archivoAnexo->id_archivo_anexo);
+
+            // Return the created ArchivoAnexo with its relationship
+            return response()->json($archivoAnexoConRelaciones, 201);
+
         } catch (\Throwable $th) {
             // An error occurred, rollback the transaction
             DB::rollback();
@@ -229,7 +233,7 @@ class ArchivoAnexoController extends Controller
             DB::commit();
 
             // Return the updated ArchivoAnexo
-            return $response;
+            return ArchivoAnexo::find($request->idArchivoAnexo);
         } catch (\Throwable $th) {
             // An error occurred, rollback the transaction
             DB::rollback();

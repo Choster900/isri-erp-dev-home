@@ -26,6 +26,7 @@
                         </div>
 
                         <div class="flex flex-col md:flex-row gap-3">
+                            <!-- File Upload Section -->
                             <div v-if="!nameArchivoAnexo" @dragover.prevent="handleDragOver" @drop="handleDrop"
                                 @click="openFileInput"
                                 class="h-56 md:w-2/3 border-[3px] cursor-pointer border-dashed border-slate-400 rounded-lg flex items-center justify-center text-center bg-slate-200 hover:bg-slate-300">
@@ -35,42 +36,45 @@
                                     accept=".pdf,.jpeg,.jpg,.png" style="display: none;">
                             </div>
 
+                            <!-- File Display Section -->
                             <div class="relative h-56 md:w-2/3" v-else>
-                                <img v-if="/.(jpg|jpeg|png)$/.test(nameArchivoAnexo)" :src="urlArchivoAnexo" alt=""
-                                    class="rounded-lg border shadow-md shadow-black max-h-full w-full">
-                                <embed v-else :src="urlArchivoAnexo" type="application/pdf" height="220"
-                                    class="rounded-lg w-full border border-gray-300 shadow-md shadow-black">
-
+                                <template v-if="/\.(jpg|jpeg|png)$/.test(nameArchivoAnexo)">
+                                    <!-- Image Display -->
+                                    <div class="flex items-center justify-center h-full">
+                                        <img :src="urlArchivoAnexo" alt="Archivo Anexo"
+                                            class="max-h-full max-w-full object-contain rounded-lg border shadow-md shadow-black">
+                                    </div>
+                                </template>
+                                <template v-else>
+                                    <!-- PDF Display -->
+                                    <embed :src="urlArchivoAnexo" type="application/pdf" height="100%"
+                                        class="rounded-lg w-full border border-gray-300 shadow-md shadow-black">
+                                </template>
                             </div>
-
                             <div class="w-full md:w-1/2 flex flex-col">
-                                <div class="mb-4 md:mb-0 ">
-                                    <label for="searchUser"
-                                        class="block mb-1 text-[13px] font-medium text-gray-600">Busqueda de usuario
-                                        <span class="text-red-600 font-extrabold">*</span></label>
-                                    <div v-if="persona != ''" class="relative flex h-8 w-full flex-row-reverse">
-                                        <Multiselect v-model="idPersona" :filter-results="false" :disabled="true"
-                                            :resolve-on-load="false" :delay="1000" :searchable="true"
-                                            :clear-on-search="true" :min-chars="5" placeholder="buscar por nombre..."
-                                            :options="personaWhoWasSelected" :classes="{
-                                                containerDisabled: 'cursor-not-allowed bg-gray-300',
-                                                wrapper: 'cursor-not-allowed text-xs relative mx-auto w-full flex items-center justify-end box-border  outline-none',
-                                                placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                            }" noOptionsText="<p class='text-xs'>Sin Resultado de personas<p>"
-                                            noResultsText="<p class='text-xs'>Sin resultados de personas <p>" />
-                                    </div>
-                                    <div v-else class="relative flex h-8 w-full flex-row-reverse">
-                                        <Multiselect v-model="idPersona" :filter-results="false"
-                                            :resolve-on-load="false" :delay="1000" :searchable="true"
-                                            :clear-on-search="true" :min-chars="5" placeholder="buscar por nombre..."
-                                            :options="async function (query) {
-                                                return await getPeopleByName(query)
-                                            }" :classes="{
-                                                placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                            }" noOptionsText="<p class='text-xs'>Sin Resultado de personas<p>"
-                                            noResultsText="<p class='text-xs'>Sin resultados de personas <p>" />
-                                    </div>
+                                <div v-if="(persona !== null && persona !== '') || (Array.isArray(personaWhoWasSelected) && personaWhoWasSelected.length > 0)"
+                                    class="relative flex h-8 w-full flex-row-reverse">
+                                    <Multiselect v-model="idPersona" :filter-results="false" :disabled="true"
+                                        :resolve-on-load="false" :delay="1000" :searchable="true"
+                                        :clear-on-search="true" :min-chars="5" placeholder="buscar por nombre..."
+                                        :options="personaWhoWasSelected" :classes="{
+            containerDisabled: 'cursor-not-allowed bg-gray-300',
+            wrapper: 'cursor-not-allowed text-xs relative mx-auto w-full flex items-center justify-end box-border  outline-none',
+            placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+        }" noOptionsText="<p class='text-xs'>Sin Resultado de personas<p>"
+                                        noResultsText="<p class='text-xs'>Sin resultados de personas <p>" />
                                 </div>
+                                <div v-else class="relative flex h-8 w-full flex-row-reverse">
+                                    <Multiselect v-model="idPersona" :filter-results="false" :resolve-on-load="false"
+                                        :delay="1000" :searchable="true" :clear-on-search="true" :min-chars="5"
+                                        placeholder="buscar por nombre..." :options="async function (query) {
+            return await getPeopleByName(query)
+        }" :classes="{
+            placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+        }" noOptionsText="<p class='text-xs'>Sin Resultado de personas<p>"
+                                        noResultsText="<p class='text-xs'>Sin resultados de personas <p>" />
+                                </div>
+
 
                                 <div class="mb-4">
                                     <label for="selectAnexo"
@@ -80,18 +84,16 @@
                                         <Multiselect v-model="idTipoArchivoAnexo" :filter-results="true"
                                             :searchable="true" :clear-on-search="true" :options="annexTypeData"
                                             placeholder="tipos de anexos..." :classes="{
-                                                placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
-                                            }" noOptionsText="<p class='text-xs'><p>"
+            placeholder: 'flex items-center text-center h-full absolute left-0 top-0 pointer-events-none bg-transparent leading-snug pl-3.5 text-gray-400 rtl:left-auto rtl:right-0 rtl:pl-0 rtl:pr-3.5',
+        }" noOptionsText="<p class='text-xs'><p>"
                                             noResultsText="<p class='text-xs'>no hay resultado en tu busqueda <p>" />
                                     </div>
                                 </div>
-
                                 <button v-if="nameArchivoAnexo" @click="deleteFile"
                                     class="w-full text-sm bg-gray-200 text-gray-700 rounded-lg px-4 py-2 hover:bg-gray-300">Remover
                                     archivo <span class="font-bold text-red-600">-</span></button>
                             </div>
                         </div>
-
                         <div class="mt-4 bg-gray-50 rounded-lg">
                             <textarea id="description" rows="4" v-model="descripcionArchivoAnexo"
                                 class="block p-2.5 w-full text-xs text-gray-900 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
@@ -99,12 +101,46 @@
                         </div>
 
                         <div class="mt-4 flex justify-between items-center space-x-2">
+                            <button @click="updateArchivoAnexo()" v-if="actionOption == 2"
+                                class="w-full text-sm flex items-center justify-center bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 transition-colors duration-300 shadow-md">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor" class="h-5 w-5 mr-1">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7" />
+                                </svg>
+                                Modificar y salir
+                            </button>
+                            <button @click="createArchivoAnexo()" v-else-if="actionOption == 1"
+                                class="w-full text-sm flex items-center justify-center bg-green-500 text-white rounded-lg px-4 py-2 hover:bg-green-600 transition-colors duration-300 shadow-md">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor" class="h-5 w-5 mr-1">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7" />
+                                </svg>
+                                Guardar y salir
+                            </button>
                             <button @click="stateView = 0"
-                                class="w-full text-sm bg-gray-200 text-gray-700 rounded-lg px-4 py-2 hover:bg-gray-300">Cancel</button>
-                            <button @click="createArchivoAnexo()"
-                                class="w-full text-sm bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600">Guardar
-                                y salir</button>
+                                class="w-full text-sm flex items-center justify-center bg-gray-500 text-white rounded-lg px-4 py-2 hover:bg-gray-600 transition-colors duration-300 shadow-md">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor" class="h-5 w-5 mr-1">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                                Cancelar
+                            </button>
                         </div>
+                        <div class="mt-4" v-if="actionOption == 2">
+                            <button @click="delteArchivoAnexo()"
+                                class="w-full text-sm flex items-center justify-center bg-red-500 text-white rounded-lg px-4 py-2 hover:bg-red-600 transition-colors duration-300 shadow-md">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor" class="h-5 w-5 mr-1">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                                Eliminar
+                            </button>
+                        </div>
+
                     </div>
 
 
@@ -141,30 +177,75 @@
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mt-4">
 
-                            <div @click="stateView = 1"
-                                class="bg-slate-700 border rounded-lg shadow-md p-4 h-60 flex flex-col justify-center items-center cursor-pointer">
+                            <div @click="cleanData(), stateView = 1"
+                                class="bg-slate-700 border rounded-lg shadow-md p-4 flex flex-col justify-center items-center cursor-pointer hover:bg-slate-800 transition-colors duration-300">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                    stroke-width="1.5" stroke="currentColor" class="size-10 text-white">
+                                    stroke="currentColor" class="h-12 w-12 text-white mb-2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                                 </svg>
-
-                                <span class="text-white  text-center">Agregar Archivo Anexo</span>
+                                <span class="text-white text-lg font-semibold text-center">Agregar anexo al
+                                    empleado</span>
                             </div>
 
 
-                            <div class="bg-white rounded-lg shadow cursor-pointer flex flex-col justify-between hover:shadow-lg hover:-translate-y-1 transition-transform duration-300"
-                                v-for="(item, index) in objectPersona?.archivo_anexo" :key="index">
+                            <div class="bg-white border rounded-lg shadow cursor-pointer flex flex-col justify-between hover:shadow-lg hover:-translate-y-1 transition-transform duration-300"
+                                v-for="(item, index) in objectPersona" :key="index"
+                                @click.self="onClickForEditFile(item)">
                                 <div class="flex justify-between items-start">
                                     <div class="text-red-500 text-2xl w-full">
-                                        <iframe v-if="item.id_tipo_mime == 1" class="w-full rounded-lg"
-                                            :src="item.url_archivo_anexo" alt=""></iframe>
-                                        <img v-else class="w-full rounded-lg " :src="item.url_archivo_anexo" alt="" />
+                                        <template v-if="item.id_tipo_mime == 1">
+                                            <!-- PDF Display -->
+                                            <iframe class="w-full h-64 rounded-lg border  shadow-black"
+                                                :src="item.url_archivo_anexo" frameborder="0"></iframe>
+                                        </template>
+                                        <template v-else>
+                                            <!-- Image Display -->
+                                            <img @click.self="onClickForEditFile(item)"
+                                                class="w-full h-64 object-contain rounded-lg border shadow-black"
+                                                :src="item.url_archivo_anexo" alt="Archivo Anexo" />
+                                        </template>
                                     </div>
                                 </div>
                                 <div class="mt-4 px-2 pb-3">
-                                    <h2 class="font-semibold text-sm normal-case">{{ item.nombre_archivo_anexo }}</h2>
-                                    <p class="text-gray-500 text-xs mt-2">{{ item.descripcion_archivo_anexo }}</p>
+                                    <!-- Contenedor del archivo -->
+                                    <div class="flex items-center justify-between gap-1">
+                                        <!-- Título del archivo -->
+                                        <h2 @click.self="onClickForEditFile(item)"
+                                            class="font-semibold text-sm normal-case mr-1">
+                                            {{ $options.filters.truncate(item.nombre_archivo_anexo, 14, '...') }}
+                                        </h2>
+                                        <!-- Iconos de acciones -->
+                                        <div class="flex items-center space-x-2">
+                                            <!-- Abrir en nueva pestaña -->
+                                            <svg @click="openInNewTab(item.url_archivo_anexo)"
+                                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                                fill="currentColor"
+                                                class="w-5 h-5 hover:shadow-lg hover:-translate-y-1 transition-transform duration-300">
+                                                <path fill-rule="evenodd"
+                                                    d="M4.25 5.5a.75.75 0 0 0-.75.75v8.5c0 .414.336.75.75.75h8.5a.75.75 0 0 0 .75-.75v-4a.75.75 0 0 1 1.5 0v4A2.25 2.25 0 0 1 12.75 17h-8.5A2.25 2.25 0 0 1 2 14.75v-8.5A2.25 2.25 0 0 1 4.25 4h5a.75.75 0 0 1 0 1.5h-5Z"
+                                                    clip-rule="evenodd" />
+                                                <path fill-rule="evenodd"
+                                                    d="M6.194 12.753a.75.75 0 0 0 1.06.053L16.5 4.44v2.81a.75.75 0 0 0 1.5 0v-4.5a.75.75 0 0 0-.75-.75h-4.5a.75.75 0 0 0 0 1.5h2.553l-9.056 8.194a.75.75 0 0 0-.053 1.06Z"
+                                                    clip-rule="evenodd" />
+                                            </svg>
+                                            <!-- Descargar archivo -->
+                                            <svg @click="downloadFile(item.url_archivo_anexo)"
+                                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                                fill="currentColor"
+                                                class="w-5 h-5 hover:shadow-lg hover:-translate-y-1 transition-transform duration-300">
+                                                <path
+                                                    d="M10.75 2.75a.75.75 0 0 0-1.5 0v8.614L6.295 8.235a.75.75 0 1 0-1.09 1.03l4.25 4.5a.75.75 0 0 0 1.09 0l4.25-4.5a.75.75 0 0 0-1.09-1.03l-2.955 3.129V2.75Z" />
+                                                <path
+                                                    d="M3.5 12.75a.75.75 0 0 0-1.5 0v2.5A2.75 2.75 0 0 0 4.75 18h10.5A2.75 2.75 0 0 0 18 15.25v-2.5a.75.75 0 0 0-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5Z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <!-- Descripción del archivo -->
+                                    <p @click.self="onClickForEditFile(item)" class="text-gray-500 text-xs mt-2">
+                                        {{ $options.filters.truncate(item.descripcion_archivo_anexo, 55, '...') }}
+                                    </p>
                                 </div>
+
                             </div>
 
 
@@ -214,15 +295,23 @@ export default {
 
         const { persona, showModal } = toRefs(props);
 
-
         const { getPeopleByName } = usePersona();
 
-        const { file, fileInput, handleDrop, deleteFile, openFileInput, urlArchivoAnexo, handleDragOver, handleFileChange, nameArchivoAnexo, sizeArchivo, tipoMine } = useFileHandling();
+        const { file,
+            fileInput,
+            handleDrop,
+            deleteFile,
+            openFileInput,
+            handleDragOver,
+            urlArchivoAnexo,
+            tipoMine, objectPersona,
+            sizeArchivo,
+            handleFileChange,
+            downloadFile, actionOption,
+            openInNewTab, personaWhoWasSelected,
+            nameArchivoAnexo, idPersona, idTipoMine, sizeArchivoAnexo, idArchivoAnexo, idTipoArchivoAnexo, fileArchivoAnexo, nombreArchivoAnexo, descripcionArchivoAnexo, stateView, errorsData, updateArchivoAnexoRequest, delteArchivoAnexoRequest, getPersonasById, dataArrayPersona, isLoadingRequestPersona, createArchivoAnexoRequest } = useArchivoAnexo();
 
-        const { idPersona, idTipoMine, sizeArchivoAnexo, idArchivoAnexo, idTipoArchivoAnexo, fileArchivoAnexo, nombreArchivoAnexo, descripcionArchivoAnexo, updateArchivoAnexo, errorsData, delteArchivoAnexoRequest, delteArchivoAnexo, getPersonasById, dataArrayPersona, isLoadingRequestPersona, createArchivoAnexoRequest } = useArchivoAnexo();
 
-
-        const stateView = ref(0) // Valida que este agregando o viendo los archivos del usuario
         const annexType = ref(0) // variable que maneja el index del tipo de anexo que se selecciono
         const annexTypeData = ref([ // Objeto con todos los tipos de anexos
             { "value": 0, "label": "TODOS LOS ANEXOS" },
@@ -242,14 +331,12 @@ export default {
             { "value": 14, "label": "TITULO" }
         ])
 
-        const objectPersona = ref(null)
-        const personaWhoWasSelected = ref([])// Contiene el array de la persona a quien se esta editando
 
         // Observa los cambios en la variable 'persona'
         watch(persona, (newValue, oldValue) => {
             // Verifica que 'persona' no sea nulo, indefinido y no esté vacío
             if (newValue !== null && newValue !== undefined && (Array.isArray(newValue) ? newValue.length > 0 : newValue !== '')) {
-                objectPersona.value = newValue; // Actualiza 'objectPersona' con el nuevo valor de 'persona'
+                objectPersona.value = newValue.archivo_anexo; // Actualiza 'objectPersona' con el nuevo valor de 'persona'
                 console.log(objectPersona.value);
                 console.log("Inserting persona");
                 // Agrega un objeto con los datos del usuario seleccionado a 'personaWhoWasSelected'
@@ -267,6 +354,16 @@ export default {
                 personaWhoWasSelected.value = [];
                 // Limpia el array que contiene los archivos anexos del usuario editado
                 objectPersona.value = {};
+
+                stateView.value = 0
+                idArchivoAnexo.value = null
+                urlArchivoAnexo.value = null
+                idTipoArchivoAnexo.value = null
+                nombreArchivoAnexo.value = null
+                nameArchivoAnexo.value = null
+                descripcionArchivoAnexo.value = null
+
+
             }
         });
 
@@ -275,6 +372,26 @@ export default {
             fileArchivoAnexo.value = file.value
             sizeArchivoAnexo.value = sizeArchivo.value
         }) // Verficia que se seleccione una archivo para asignarlo a fileArchivoAnexo
+
+
+        const delteArchivoAnexo = async () => {
+            const confirmed = await Swal.fire({
+                title: '<p class="text-[17pt] text-center">¿Esta seguro de eliminar el anexo?. los cambios no podran revertirse y perdera el archivo</p>',
+                icon: "question",
+                iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
+                confirmButtonText: "Si, Editar",
+                confirmButtonColor: "#F34541",
+                cancelButtonText: "Cancelar",
+                showCancelButton: true,
+                showCloseButton: true,
+            });
+            if (confirmed.isConfirmed) {
+                executeRequest(
+                    delteArchivoAnexoRequest(),
+                    "¡El anexo se ha eliminado correctamente! Espere mientras se redirecciona al inicio"
+                );
+            }
+        }
 
         const createArchivoAnexo = async (thereIsIdPersona) => {
             const confirmed = await Swal.fire({
@@ -295,13 +412,59 @@ export default {
             }
         };
 
+        const updateArchivoAnexo = async () => {
+            const confirmed = await Swal.fire({
+                title: '<p class="text-[18pt] text-center">¿Esta seguro de editar el anexo?</p>',
+                icon: "question",
+                iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
+                confirmButtonText: "Si, Editar",
+                confirmButtonColor: "#001b47",
+                cancelButtonText: "Cancelar",
+                showCancelButton: true,
+                showCloseButton: true,
+            });
+            if (confirmed.isConfirmed) {
+                executeRequest(
+                    updateArchivoAnexoRequest(),
+                    "¡El anexo se ha acutalizado correctamente! Espere mientras se redirecciona al inicio"
+                );
+            }
+        };
 
+        const onClickForEditFile = (idFile) => {
+
+            console.log(idFile);
+            stateView.value = 1
+            actionOption.value = 2
+            idArchivoAnexo.value = idFile.id_archivo_anexo
+            urlArchivoAnexo.value = idFile.url_archivo_anexo
+            idTipoArchivoAnexo.value = idFile.id_tipo_archivo_anexo
+            nombreArchivoAnexo.value = idFile.nombre_archivo_anexo
+            nameArchivoAnexo.value = idFile.nombre_archivo_anexo
+            descripcionArchivoAnexo.value = idFile.descripcion_archivo_anexo
+        }
+
+
+        const cleanData = () => {
+
+            idArchivoAnexo.value = ''
+            urlArchivoAnexo.value = ''
+            idTipoArchivoAnexo.value = ''
+            nombreArchivoAnexo.value = ''
+            nameArchivoAnexo.value = ''
+            descripcionArchivoAnexo.value = ''
+
+            actionOption.value = 1
+        }
 
 
         return {
+            downloadFile, actionOption,
+            openInNewTab,
+            onClickForEditFile, cleanData, updateArchivoAnexo,
             createArchivoAnexoRequest, objectPersona, personaWhoWasSelected,
             annexTypeData, stateView, annexType, getPeopleByName, file, fileInput, handleDrop, deleteFile, openFileInput, urlArchivoAnexo, handleDragOver, handleFileChange, nameArchivoAnexo, sizeArchivo, tipoMine,
-            idPersona, idTipoMine, sizeArchivoAnexo, idArchivoAnexo, idTipoArchivoAnexo, fileArchivoAnexo, nombreArchivoAnexo, descripcionArchivoAnexo, createArchivoAnexo, updateArchivoAnexo, errorsData, delteArchivoAnexoRequest, delteArchivoAnexo, getPersonasById, dataArrayPersona, isLoadingRequestPersona
+            idPersona, idTipoMine, sizeArchivoAnexo, idArchivoAnexo, idTipoArchivoAnexo, fileArchivoAnexo, nombreArchivoAnexo, descripcionArchivoAnexo, createArchivoAnexo, errorsData, delteArchivoAnexoRequest, delteArchivoAnexo, getPersonasById, dataArrayPersona, isLoadingRequestPersona
         }
     }
 }
