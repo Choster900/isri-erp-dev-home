@@ -3,7 +3,7 @@ import Swal from "sweetalert2";
 import { executeRequest } from "@/plugins/requestHelpers.js";
 import { useFileHandling } from "@/Composables/RRHH/Expediente/useFileHandling";
 
-export const useArchivoAnexo = (context) => {
+export const useArchivoAnexo = () => {
     const errorsData = ref([]);
     const idPersona = ref("");
     const idTipoMine = ref(null);
@@ -63,9 +63,9 @@ export const useArchivoAnexo = (context) => {
                 );
 
                 if (thereIsIdPersona) {
-                    context.emit("refresh-information");
+                    //   context.emit("refresh-information");
                 } else {
-                    context.emit("cerrar-modal");
+                    // context.emit("cerrar-modal");
                 }
                 crealFormVar();
                 fileHandling.deleteFile();
@@ -88,24 +88,7 @@ export const useArchivoAnexo = (context) => {
         });
     };
 
-    const createArchivoAnexo = async (thereIsIdPersona) => {
-        const confirmed = await Swal.fire({
-            title: '<p class="text-[18pt] text-center">¿Esta seguro de agregar un nuevo Anexo?</p>',
-            icon: "question",
-            iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
-            confirmButtonText: "Si, Agregar",
-            confirmButtonColor: "#001b47",
-            cancelButtonText: "Cancelar",
-            showCancelButton: true,
-            showCloseButton: true,
-        });
-        if (confirmed.isConfirmed) {
-            executeRequest(
-                createArchivoAnexoRequest(thereIsIdPersona),
-                "¡El anexo se ha agregado correctamente! Espere mientras se redirecciona al inicio"
-            );
-        }
-    };
+   
 
     /**
      *
@@ -131,7 +114,7 @@ export const useArchivoAnexo = (context) => {
                         },
                     }
                 );
-                context.emit("refresh-information");
+                //    context.emit("refresh-information");
                 crealFormVar();
                 resolve(resp);
             } catch (error) {
@@ -196,7 +179,7 @@ export const useArchivoAnexo = (context) => {
                 const resp = await axios.post("/deleteArchivoAnexoById", {
                     idArchivoAnexo: idArchivoAnexoForDelete,
                 });
-                context.emit("refresh-information");
+                //  context.emit("refresh-information");
                 resolve(resp);
             } catch (error) {
                 console.log(error.message);
@@ -217,7 +200,6 @@ export const useArchivoAnexo = (context) => {
         idTipoArchivoAnexo,
         nombreArchivoAnexo,
         getPersonasById,
-        createArchivoAnexo,
         updateArchivoAnexo,
         descripcionArchivoAnexo,
         delteArchivoAnexoRequest,
