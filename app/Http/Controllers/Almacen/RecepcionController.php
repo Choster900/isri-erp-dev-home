@@ -257,7 +257,8 @@ class RecepcionController extends Controller
                 'detalle_recepcion.producto_adquisicion.centro_atencion',
                 'detalle_recepcion.marca',
                 'det_doc_adquisicion.documento_adquisicion.tipo_documento_adquisicion',
-                'estado_recepcion'
+                'estado_recepcion',
+                'mes_recepcion'
             ])->find($idRec);
             $item = DetDocumentoAdquisicion::with(['documento_adquisicion.proveedor', 'fuente_financiamiento', 'documento_adquisicion.tipo_documento_adquisicion', 'documento_adquisicion.proceso_compra'])->find($recep->det_doc_adquisicion->id_det_doc_adquisicion);
             if (!$recep || !$item) {

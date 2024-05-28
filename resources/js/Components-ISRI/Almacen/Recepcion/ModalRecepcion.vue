@@ -172,11 +172,18 @@
                         </div>
                     </div>
                     <div class="min-w-[970px]">
-                        <div class="grid grid-cols-[100%] max-w-[96%] bg-white border-b border-gray-500">
-                            <div class="w-full justify-start flex items-center border-x border-gray-500 bg-white">
+                        <div class="grid grid-cols-[75%_25%] max-w-[96%] bg-white border-b border-gray-500">
+                            <div class="w-full justify-start flex items-center border-l border-gray-500 bg-white">
                                 <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2">Fecha referencia documento de compra:
                                     <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
                                         infoToShow.acqDocDate }}</span>
+                                </p>
+                            </div>
+                            <div class="w-full justify-start flex items-center border-r border-gray-500 bg-white">
+                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1"> Mes:
+                                    <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
+                                        infoToShow.monthName
+                                    }}</span>
                                 </p>
                             </div>
                         </div>

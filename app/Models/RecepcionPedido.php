@@ -69,4 +69,9 @@ class RecepcionPedido extends Model
     {
         return $this->belongsTo('App\Models\ProyectoFinanciado','id_proy_financiado','id_proy_financiado');
     }
+
+    public function mes_recepcion()
+    {
+        return $this->belongsTo('App\Models\MesRecepcion','id_mes_recepcion','id_mes_recepcion');
+    }
 }
