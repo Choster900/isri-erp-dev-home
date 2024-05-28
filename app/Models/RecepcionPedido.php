@@ -18,6 +18,7 @@ class RecepcionPedido extends Model
         'id_proy_financiado',
         'id_estado_recepcion_pedido',
         'id_proveedor',
+        'id_mes_recepcion',
         'id_empleado', //Administrador de contrato
         'emp_id_empleado', //Guardaalmacen
         'factura_recepcion_pedido',
@@ -32,7 +33,6 @@ class RecepcionPedido extends Model
         'fecha_mod_recepcion_pedido',
         'usuario_recepcion_pedido',
         'ip_recepcion_pedido',
-        'id_mes'
     ];
 
     public function detalle_recepcion()

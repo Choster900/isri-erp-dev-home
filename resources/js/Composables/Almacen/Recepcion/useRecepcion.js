@@ -22,21 +22,8 @@ export const useRecepcion = (context) => {
     const documents = ref([])
     const items = ref([])
     const brands = ref([])
-
-    const months = ref([
-        { value: 1, label: 'ENERO' },
-        { value: 2, label: 'FEBRERO' },
-        { value: 3, label: 'MARZO' },
-        { value: 4, label: 'ABRIL' },
-        { value: 5, label: 'MAYO' },
-        { value: 6, label: 'JUNIO' },
-        { value: 7, label: 'JULIO' },
-        { value: 8, label: 'AGOSTO' },
-        { value: 9, label: 'SEPTIEMBRE' },
-        { value: 10, label: 'OCTUBRE' },
-        { value: 11, label: 'NOVIEMBRE' },
-        { value: 12, label: 'DICIEMBRE' }
-    ])
+    const isLoadingItem = ref(false);
+    const months = ref([])
 
     const startRec = ref(false)
     const infoToShow = ref({ //This is an object used to show general information related to the acquisition document
@@ -243,6 +230,31 @@ export const useRecepcion = (context) => {
         }
 
         startRec.value = true
+    }
+
+    const selectItem = async (detDocId) => {
+        if (detDocId && docSelected.value === 1) {
+            try {
+                isLoadingItem.value = true;
+                const response = await axios.post(
+                    `/check-available-months`, {
+                    detDocId: detDocId
+                }
+                );
+                months.value = response.data.monthsAvail
+            } catch (err) {
+                if (err.response.data.logical_error) {
+                    useShowToast(toast.error, err.response.data.logical_error);
+                    context.emit("get-table");
+                } else {
+                    showErrorMessage(err);
+                }
+            } finally {
+                isLoadingItem.value = false;
+            }
+        } else {
+            months.value = []
+        }
     }
 
     const setProdItem = (paId) => {
@@ -588,10 +600,10 @@ export const useRecepcion = (context) => {
 
     return {
         errors, isLoadingRequest, reception, infoToShow, activeDetails,
-        documents, ordenC, contrato, docSelected, totalRec, products,
+        documents, ordenC, contrato, docSelected, totalRec, products, isLoadingItem,
         filteredDoc, filteredItems, recDocument, startRec, filteredProds, brands, months,
         getInfoForModalRecep, startReception, setProdItem, calculateLtTotal, checkBlinkingClass,
         deleteRow, handleValidation, storeReception, updateReception, showAvails, returnToTop,
-        hasActiveProds
+        hasActiveProds, selectItem
     }
 }

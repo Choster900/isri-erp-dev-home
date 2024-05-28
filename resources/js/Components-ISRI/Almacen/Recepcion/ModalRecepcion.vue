@@ -25,7 +25,7 @@
                     </path>
                 </svg>
             </div>
-            <div v-if="recepId <= 0 && !startRec" class="w-full">
+            <div v-if="recepId <= 0 && !startRec" class="w-full overflow-y-auto">
                 <div>
                     <p class="text-center mt-4 font-[Roboto] text-slate-800 font-semibold">SELECCIONE TIPO DOCUMENTO</p>
                     <div class="w-full flex justify-center">
@@ -76,7 +76,7 @@
                     </div>
                     <div class="relative font-semibold flex h-[35px] w-full md:w-[60%]">
                         <Multiselect id="det-doc" v-model="infoToShow.detDocId" :options="filteredItems"
-                            :searchable="true" :noOptionsText="'Lista vacía.'"
+                            :searchable="true" :noOptionsText="'Lista vacía.'" @change="selectItem($event)"
                             placeholder="Seleccione item" />
                     </div>
                 </div>
@@ -85,13 +85,14 @@
                         <label for="det-doc" class="font-[Roboto]">Mes:</label>
                     </div>
                     <div class="relative font-semibold flex h-[35px] w-full md:w-[60%]">
-                        <Multiselect id="det-doc" v-model="infoToShow.monthId" :options="months"
-                            :searchable="true" :noOptionsText="'Lista vacía.'"
-                            placeholder="Seleccione mes" />
+                        <Multiselect id="det-doc" v-model="infoToShow.monthId" :options="months" 
+                            :disabled="months.length <= 0" :loading="isLoadingItem"
+                            :searchable="true" :noOptionsText="'Lista vacía.'"  
+                            :placeholder="months.length <= 0 ? 'Sin meses disponibles' : 'Seleccione mes'" />
                     </div>
                 </div>
 
-                <div class="md:flex mb-6 mt-[60px] flex-row justify-end mx-8">
+                <div class="md:flex pb-[30px] mt-[60px] flex-row justify-end mx-8">
                     <button type="button" :disabled="infoToShow.docId == '' || infoToShow.detDocId == ''"
                         :class="(infoToShow.docId == '' || infoToShow.detDocId == '') ? 'cursor-not-allowed opacity-50' : ''"
                         :title="(infoToShow.docId == '' || infoToShow.detDocId == '') ? 'Información incompleta' : 'Iniciar proceso de recepción'"
@@ -446,12 +447,12 @@ export default {
         const { recepId } = toRefs(props)
 
         const {
-            isLoadingRequest, recDocument, errors, activeDetails,
+            isLoadingRequest, recDocument, errors, activeDetails, isLoadingItem,
             documents, ordenC, contrato, docSelected, products, brands, months,
             filteredDoc, filteredItems, startRec, filteredProds, totalRec, infoToShow,
             getInfoForModalRecep, startReception, setProdItem, calculateLtTotal, checkBlinkingClass,
             deleteRow, handleValidation, storeReception, updateReception, showAvails, returnToTop, 
-            hasActiveProds
+            hasActiveProds, selectItem
         } = useRecepcion(context);
 
         onMounted(
@@ -463,10 +464,10 @@ export default {
         return {
             isLoadingRequest, recDocument, errors, activeDetails, months,
             documents, ordenC, contrato, docSelected, totalRec, products, brands,
-            filteredDoc, filteredItems, startRec, filteredProds, infoToShow,
+            filteredDoc, filteredItems, startRec, filteredProds, infoToShow, isLoadingItem,
             handleValidation, startReception, setProdItem, calculateLtTotal, checkBlinkingClass,
             deleteRow, storeReception, updateReception, showAvails, returnToTop, 
-            hasActiveProds
+            hasActiveProds, selectItem
         }
     }
 }
