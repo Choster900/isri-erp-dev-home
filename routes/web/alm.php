@@ -32,6 +32,9 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     )->name('alm.recepciones');
     Route::post('recepciones', [RecepcionController::class, 'getRecepciones'])->name('recepcion.getRecepciones');
     Route::post('get-info-modal-recep', [RecepcionController::class, 'getInfoModalRecep'])->name('recepcion.getInfoModalRecep');
+
+    Route::post('check-available-months', [RecepcionController::class, 'checkAvailableMonths'])->name('recepcion.checkAvailableMonths');
+    
     Route::get('get-initial-doc-info', [RecepcionController::class, 'getInitialInfoDoc'])->name('recepcion.getInitialInfoDoc');
     Route::post('save-goods-reception', [RecepcionController::class, 'storeReception'])->name('recepcion.storeReception');
     Route::post('update-goods-reception', [RecepcionController::class, 'updateReception'])->name('recepcion.updateReception');
@@ -106,6 +109,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
             ];
         });
     })->name('reporte.get-cuenta'); */
+
     //Surplus adjustment
     Route::get(
         '/alm/ajuste-entrada',

@@ -174,6 +174,79 @@ class RecepcionController extends Controller
         ]);
     }
 
+    public function checkAvailableMonths(Request $request)
+    {
+        $idDetDoc = $request->input('detDocId');
+
+        $mesesConFaltantes = DB::select(
+            '
+            WITH Interno AS (
+                SELECT
+                    drp.id_prod_adquisicion,
+                    rp.id_mes_recepcion,
+                    SUM(drp.cant_det_recepcion_pedido) AS contador,
+                    SUM(drp.cant_det_recepcion_pedido * drp.costo_det_recepcion_pedido) AS contador_monto
+                FROM
+                    recepcion_pedido rp
+                INNER JOIN detalle_recepcion_pedido drp 
+                    ON rp.id_recepcion_pedido = drp.id_recepcion_pedido
+                WHERE
+                    rp.id_det_doc_adquisicion = ?
+                    AND rp.id_estado_recepcion_pedido != 3
+                    AND drp.estado_det_recepcion_pedido = 1
+                GROUP BY
+                    drp.id_prod_adquisicion, rp.id_mes_recepcion
+            ),
+            MesesConFaltantes AS (
+                SELECT DISTINCT
+                    mr.id_mes_recepcion
+                FROM producto_adquisicion pa
+                JOIN mes_recepcion mr ON mr.id_mes_recepcion BETWEEN 1 AND 12
+                LEFT JOIN Interno i 
+                    ON pa.id_prod_adquisicion = i.id_prod_adquisicion 
+                    AND mr.id_mes_recepcion = i.id_mes_recepcion
+                WHERE
+                    pa.id_det_doc_adquisicion = ?
+                    AND CASE mr.id_mes_recepcion
+                        WHEN 1 THEN pa.cant_ene_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 2 THEN pa.cant_feb_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 3 THEN pa.cant_mar_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 4 THEN pa.cant_abr_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 5 THEN pa.cant_may_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 6 THEN pa.cant_jun_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 7 THEN pa.cant_jul_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 8 THEN pa.cant_ago_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 9 THEN pa.cant_sept_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 10 THEN pa.cant_oct_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 11 THEN pa.cant_nov_prod_adquisicion * pa.costo_prod_adquisicion
+                        WHEN 12 THEN pa.cant_dic_prod_adquisicion * pa.costo_prod_adquisicion
+                    END > IFNULL(i.contador_monto, 0)
+            )
+            SELECT id_mes_recepcion FROM MesesConFaltantes;
+        ',
+            [$idDetDoc, $idDetDoc]
+        );
+
+        // Extraer los IDs de los meses
+        $mesIds = array_map(function ($row) {
+            return $row->id_mes_recepcion;
+        }, $mesesConFaltantes);
+
+        if (empty($mesIds)) {
+            return response()->json(['logical_error' => 'No se encontraron meses disponibles.'], 500);
+        }
+
+        // Consultar la tabla mes_recepcion con los IDs obtenidos
+        $mesesSeleccionables = DB::table('mes_recepcion')
+            ->select('id_mes_recepcion as value', 'nombre_mes_recepcion as label')
+            ->whereIn('id_mes_recepcion', $mesIds)
+            ->get();
+
+        return response()->json([
+            'monthsAvail'      => $mesesSeleccionables
+        ]);
+    }
+
     public function getInfoModalRecep(Request $request)
     {
         $idRec = $request->id; //Reception id from the view, if it's 0 that means we are creating a new reception
@@ -184,7 +257,8 @@ class RecepcionController extends Controller
                 'detalle_recepcion.producto_adquisicion.centro_atencion',
                 'detalle_recepcion.marca',
                 'det_doc_adquisicion.documento_adquisicion.tipo_documento_adquisicion',
-                'estado_recepcion'
+                'estado_recepcion',
+                'mes_recepcion'
             ])->find($idRec);
             $item = DetDocumentoAdquisicion::with(['documento_adquisicion.proveedor', 'fuente_financiamiento', 'documento_adquisicion.tipo_documento_adquisicion', 'documento_adquisicion.proceso_compra'])->find($recep->det_doc_adquisicion->id_det_doc_adquisicion);
             if (!$recep || !$item) {
