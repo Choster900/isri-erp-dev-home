@@ -110,7 +110,7 @@
 
             <div v-else>
                 <div class="pl-8 mr-0 pb-1 max-w-full overflow-x-auto mt-4 max-h-[450px] overflow-y-auto">
-                    <div class="min-w-[970px] bg-white" id="headerFormat">
+                    <div class="min-w-[970px]" id="headerFormat">
                         <div class="grid grid-cols-[23%_77%] max-w-[96%] border border-gray-500">
                             <!-- Columna 1 -->
                             <div class="w-full bg-white border-r border-gray-500 p-2 flex items-center justify-center">
@@ -132,15 +132,15 @@
                             </div>
                         </div>
                     </div>
-                    <div class="min-w-[970px] bg-white">
-                        <div class="grid grid-cols-[40%_35%_25%] max-w-[96%]">
+                    <div class="min-w-[970px]">
+                        <div class="grid grid-cols-[40%_35%_25%] max-w-[96%] bg-white">
                             <div class="w-full justify-start flex items-center border-l border-gray-500 bg-white">
                                 <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2">Fecha y hora de recepción:
                                     <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
                                         infoToShow.dateTime }}</span>
                                 </p>
                             </div>
-                            <div class=" w-full justify-start flex items-center bg-white">
+                            <div class=" w-full justify-start flex items-center">
                                 <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1">Financiamiento:
                                     <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
                                         infoToShow.financingSource }}</span>
@@ -172,14 +172,14 @@
                         </div>
                     </div>
                     <div class="min-w-[970px]">
-                        <div class="grid grid-cols-[75%_25%] max-w-[96%] bg-white border-b border-gray-500">
-                            <div class="w-full justify-start flex items-center border-l border-gray-500 bg-white">
+                        <div class="grid grid-cols-[75%_25%] max-w-[96%] bg-white border-b border-x border-gray-500">
+                            <div class="w-full justify-start flex items-center bg-white">
                                 <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2">Fecha referencia documento de compra:
                                     <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
                                         infoToShow.acqDocDate }}</span>
                                 </p>
                             </div>
-                            <div class="w-full justify-start flex items-center border-r border-gray-500 bg-white">
+                            <div v-if="docSelected === 1" class="w-full justify-start flex items-center bg-white">
                                 <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1"> Mes:
                                     <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
                                         infoToShow.monthName
@@ -372,8 +372,8 @@
                                 SELECCIONADOS</p>
                         </div>
                     </div>
-                    <div id="total" class="w-full max-w-full grid grid-cols-[96%_4%] min-w-[970px] bg-white">
-                        <div class="grid grid-cols-[88%_12%] w-full max-w-full border-b border-x border-gray-500">
+                    <div id="total" class="w-full max-w-full grid grid-cols-[96%_4%] min-w-[970px]">
+                        <div class="grid grid-cols-[88%_12%] w-full max-w-full border-b border-x border-gray-500 bg-white">
                             <div class="flex items-center justify-end border-r h-[30px]  border-gray-500">
                                 <p class="font-[MuseoSans] text-[12px] py-2 mr-2 font-bold">TOTAL ACTA</p>
                             </div>

@@ -94,11 +94,13 @@ export const useRecepcion = (context) => {
                 const response = await axios.post(
                     `/get-info-modal-recep`, {
                     id: id,
-                    detId: infoToShow.value.detDocId
+                    detId: infoToShow.value.detDocId,
+                    monthId: infoToShow.value.monthId
                 });
-                console.log(response.data);
+                console.log(response);
                 setModalValues(response.data, id)
             } catch (err) {
+                console.log(err);
                 if (err.response && err.response.data.logical_error) {
                     useShowToast(toast.error, err.response.data.logical_error);
                     context.emit("get-table");
@@ -125,6 +127,7 @@ export const useRecepcion = (context) => {
         infoToShow.value.dateTime = recepData ? moment(recepData.fecha_reg_recepcion_pedido).format('DD/MM/YYYY, HH:mm:ss') : ''
         infoToShow.value.status = id > 0 ? recepData.id_estado_recepcion_pedido : 1
         infoToShow.value.monthName = id > 0 ? recepData.mes_recepcion.nombre_mes_recepcion : ''
+        docSelected.value = id > 0 ? data.itemInfo.documento_adquisicion.id_tipo_doc_adquisicion : ''
         infoToShow.value.acqDocDate = moment(data.itemInfo.documento_adquisicion.fecha_adjudicacion_doc_adquisicion).format('DD/MM/YYYY')
 
         brands.value = data.brands
@@ -143,7 +146,7 @@ export const useRecepcion = (context) => {
             // Filter products based on conditions
             const newOptions = data.products.filter(element => {
                 const rightOpt = recepData.detalle_recepcion.some(e => e.id_prod_adquisicion === element.value && e.estado_prod_adquisicion === 1);
-                return rightOpt || element.total_menos_acumulado > 0 || element.total_menos_acumulado_monto > 0 ;
+                return rightOpt || element.total_menos_acumulado > 0 || element.total_menos_acumulado_monto > 0;
             });
 
             // Set products to newOptions
@@ -222,11 +225,13 @@ export const useRecepcion = (context) => {
                 }
             });
 
-            //We set month label
-            const selectedMonth = months.value.find((element) => {
-                return element.value === infoToShow.value.monthId; 
-            });
-            infoToShow.value.monthName = selectedMonth.label
+            if (docSelected.value === 1) {
+                //We set month label
+                const selectedMonth = months.value.find((element) => {
+                    return element.value === infoToShow.value.monthId;
+                });
+                infoToShow.value.monthName = selectedMonth.label
+            }
 
             // Set products and filteredProds to newOptions
             products.value = newOptions;

@@ -285,15 +285,29 @@ class RecepcionController extends Controller
         } else {
             if ($item->productos_adquisiciones()->where('estado_prod_adquisicion', 1)->exists()) {
                 if ($idRec > 0) {
-                    $procedure = DB::select(
-                        'CALL PR_GET_PRODUCT_ACQUISITION_MINUS_CURRENT_RECEIPT(?, ?)',
-                        array($item->id_det_doc_adquisicion, $recep->id_recepcion_pedido)
-                    );
+                    if ($item->documento_adquisicion->id_tipo_doc_adquisicion == 1) { //If it's a contract
+                        $procedure = DB::select(
+                            'CALL PR_GET_PA_CONTRACT_EDIT(?, ?, ?)',
+                            array($item->id_det_doc_adquisicion, $recep->id_mes_recepcion, $recep->id_recepcion_pedido)
+                        );
+                    } else {
+                        $procedure = DB::select(
+                            'CALL PR_GET_PRODUCT_ACQUISITION_MINUS_CURRENT_RECEIPT(?, ?)',
+                            array($item->id_det_doc_adquisicion, $recep->id_recepcion_pedido)
+                        );
+                    }
                 } else {
-                    $procedure = DB::select(
-                        'CALL PR_GET_PRODUCT_ACQUISITION(?)',
-                        array($item->id_det_doc_adquisicion)
-                    );
+                    if ($item->documento_adquisicion->id_tipo_doc_adquisicion == 1) { //If it's a contract
+                        $procedure = DB::select(
+                            'CALL PR_GET_PA_CONTRACT_CREATE(?, ?)',
+                            array($item->id_det_doc_adquisicion, $request->monthId)
+                        );
+                    } else {
+                        $procedure = DB::select(
+                            'CALL PR_GET_PRODUCT_ACQUISITION(?)',
+                            array($item->id_det_doc_adquisicion)
+                        );
+                    }
                 }
                 $brands = Marca::select('id_marca as value', 'nombre_marca as label')->get();
 
