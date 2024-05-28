@@ -25,7 +25,7 @@
                     </path>
                 </svg>
             </div>
-            <div v-if="recepId <= 0 && !startRec" class="w-full">
+            <div v-if="recepId <= 0 && !startRec" class="w-full overflow-y-auto">
                 <div>
                     <p class="text-center mt-4 font-[Roboto] text-slate-800 font-semibold">SELECCIONE TIPO DOCUMENTO</p>
                     <div class="w-full flex justify-center">
@@ -67,21 +67,32 @@
                     <div class="relative font-semibold flex h-[35px] w-full md:w-[60%]">
                         <Multiselect id="doc" v-model="infoToShow.docId" :options="filteredDoc" :searchable="true"
                             :noOptionsText="'Lista vacía.'" placeholder="Seleccione documento"
-                            @clear="infoToShow.detDocId = ''" />
+                            @clear="infoToShow.detDocId = ''" @change="infoToShow.detDocId = ''"/>
                     </div>
                 </div>
-                <div class="flex flex-col md:flex-row items-center mb-[50px] h-10 mx-8 max-w-full">
+                <div class="flex flex-col md:flex-row items-center mb-4 h-10 mx-8 max-w-full">
                     <div class="w-full md:w-[40%] mb-2 md:mb-0 md:mr-2">
                         <label for="det-doc" class="font-[Roboto]">Item:</label>
                     </div>
                     <div class="relative font-semibold flex h-[35px] w-full md:w-[60%]">
                         <Multiselect id="det-doc" v-model="infoToShow.detDocId" :options="filteredItems"
-                            :searchable="true" @clear="infoToShow.detDocId = ''" :noOptionsText="'Lista vacía.'"
+                            :searchable="true" :noOptionsText="'Lista vacía.'" @change="selectItem($event)"
                             placeholder="Seleccione item" />
                     </div>
                 </div>
+                <div v-if="docSelected === 1" class="flex flex-col md:flex-row items-center mb-4 h-10 mx-8 max-w-full">
+                    <div class="w-full md:w-[40%] mb-2 md:mb-0 md:mr-2">
+                        <label for="det-doc" class="font-[Roboto]">Mes:</label>
+                    </div>
+                    <div class="relative font-semibold flex h-[35px] w-full md:w-[60%]">
+                        <Multiselect id="det-doc" v-model="infoToShow.monthId" :options="months" 
+                            :disabled="months.length <= 0" :loading="isLoadingItem"
+                            :searchable="true" :noOptionsText="'Lista vacía.'"  
+                            :placeholder="months.length <= 0 ? 'Sin meses disponibles' : 'Seleccione mes'" />
+                    </div>
+                </div>
 
-                <div class="md:flex my-6 flex-row justify-end mx-8">
+                <div class="md:flex pb-[30px] mt-[60px] flex-row justify-end mx-8">
                     <button type="button" :disabled="infoToShow.docId == '' || infoToShow.detDocId == ''"
                         :class="(infoToShow.docId == '' || infoToShow.detDocId == '') ? 'cursor-not-allowed opacity-50' : ''"
                         :title="(infoToShow.docId == '' || infoToShow.detDocId == '') ? 'Información incompleta' : 'Iniciar proceso de recepción'"
@@ -161,11 +172,18 @@
                         </div>
                     </div>
                     <div class="min-w-[970px]">
-                        <div class="grid grid-cols-[100%] max-w-[96%] bg-white border-b border-gray-500">
-                            <div class="w-full justify-start flex items-center border-x border-gray-500 bg-white">
+                        <div class="grid grid-cols-[75%_25%] max-w-[96%] bg-white border-b border-gray-500">
+                            <div class="w-full justify-start flex items-center border-l border-gray-500 bg-white">
                                 <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2">Fecha referencia documento de compra:
                                     <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
                                         infoToShow.acqDocDate }}</span>
+                                </p>
+                            </div>
+                            <div class="w-full justify-start flex items-center border-r border-gray-500 bg-white">
+                                <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1"> Mes:
+                                    <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
+                                        infoToShow.monthName
+                                    }}</span>
                                 </p>
                             </div>
                         </div>
@@ -436,12 +454,12 @@ export default {
         const { recepId } = toRefs(props)
 
         const {
-            isLoadingRequest, recDocument, errors, activeDetails,
-            documents, ordenC, contrato, docSelected, products, brands,
+            isLoadingRequest, recDocument, errors, activeDetails, isLoadingItem,
+            documents, ordenC, contrato, docSelected, products, brands, months,
             filteredDoc, filteredItems, startRec, filteredProds, totalRec, infoToShow,
             getInfoForModalRecep, startReception, setProdItem, calculateLtTotal, checkBlinkingClass,
             deleteRow, handleValidation, storeReception, updateReception, showAvails, returnToTop, 
-            hasActiveProds
+            hasActiveProds, selectItem
         } = useRecepcion(context);
 
         onMounted(
@@ -451,12 +469,12 @@ export default {
         )
 
         return {
-            isLoadingRequest, recDocument, errors, activeDetails,
+            isLoadingRequest, recDocument, errors, activeDetails, months,
             documents, ordenC, contrato, docSelected, totalRec, products, brands,
-            filteredDoc, filteredItems, startRec, filteredProds, infoToShow,
+            filteredDoc, filteredItems, startRec, filteredProds, infoToShow, isLoadingItem,
             handleValidation, startReception, setProdItem, calculateLtTotal, checkBlinkingClass,
             deleteRow, storeReception, updateReception, showAvails, returnToTop, 
-            hasActiveProds
+            hasActiveProds, selectItem
         }
     }
 }

@@ -18,6 +18,7 @@ class RecepcionPedido extends Model
         'id_proy_financiado',
         'id_estado_recepcion_pedido',
         'id_proveedor',
+        'id_mes_recepcion',
         'id_empleado', //Administrador de contrato
         'emp_id_empleado', //Guardaalmacen
         'factura_recepcion_pedido',
@@ -67,5 +68,10 @@ class RecepcionPedido extends Model
     public function fuente_financiamiento()
     {
         return $this->belongsTo('App\Models\ProyectoFinanciado','id_proy_financiado','id_proy_financiado');
+    }
+
+    public function mes_recepcion()
+    {
+        return $this->belongsTo('App\Models\MesRecepcion','id_mes_recepcion','id_mes_recepcion');
     }
 }

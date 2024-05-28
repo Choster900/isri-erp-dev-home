@@ -22,6 +22,8 @@ export const useRecepcion = (context) => {
     const documents = ref([])
     const items = ref([])
     const brands = ref([])
+    const isLoadingItem = ref(false);
+    const months = ref([])
 
     const startRec = ref(false)
     const infoToShow = ref({ //This is an object used to show general information related to the acquisition document
@@ -35,7 +37,9 @@ export const useRecepcion = (context) => {
         nit: '', //nit_proveedor
         dui: '', //dui_proveedor
         dateTime: '', //fecha_reg_recepcion_pedido
-        acqDocDate: '' //acquisition document reference date
+        acqDocDate: '', //acquisition document reference date
+        monthId: '',
+        monthName: ''
     })
 
     const recDocument = ref({
@@ -43,7 +47,6 @@ export const useRecepcion = (context) => {
         acta: '', //Acta number
         detStockId: '',
         isGas: '',
-        invoice: '', //Invoice number
         financingSourceId: '',
         observation: '', //Reception observation
         detDocId: '', //Identifier of the document detail related to the reception
@@ -93,6 +96,7 @@ export const useRecepcion = (context) => {
                     id: id,
                     detId: infoToShow.value.detDocId
                 });
+                console.log(response.data);
                 setModalValues(response.data, id)
             } catch (err) {
                 if (err.response && err.response.data.logical_error) {
@@ -120,13 +124,10 @@ export const useRecepcion = (context) => {
         infoToShow.value.dui = data.itemInfo.documento_adquisicion.proveedor.dui_proveedor
         infoToShow.value.dateTime = recepData ? moment(recepData.fecha_reg_recepcion_pedido).format('DD/MM/YYYY, HH:mm:ss') : ''
         infoToShow.value.status = id > 0 ? recepData.id_estado_recepcion_pedido : 1
+        infoToShow.value.monthName = id > 0 ? recepData.mes_recepcion.nombre_mes_recepcion : ''
         infoToShow.value.acqDocDate = moment(data.itemInfo.documento_adquisicion.fecha_adjudicacion_doc_adquisicion).format('DD/MM/YYYY')
 
         brands.value = data.brands
-        recDocument.value.procedure = data.products
-
-        brands.value = data.brands
-
         recDocument.value.procedure = data.products
 
         recDocument.value.financingSourceId = data.itemInfo.id_proy_financiado
@@ -137,18 +138,16 @@ export const useRecepcion = (context) => {
         if (id > 0) {
             recDocument.value.id = recepData.id_recepcion_pedido //Set reception id
             recDocument.value.acta = recepData.acta_recepcion_pedido //Set acta number
-            recDocument.value.invoice = recepData.factura_recepcion_pedido //Set invoice number
             recDocument.value.observation = recepData.observacion_recepcion_pedido ?? '' //Set observation
 
             // Filter products based on conditions
             const newOptions = data.products.filter(element => {
                 const rightOpt = recepData.detalle_recepcion.some(e => e.id_prod_adquisicion === element.value && e.estado_prod_adquisicion === 1);
-                return rightOpt || element.total_menos_acumulado != 0;
+                return rightOpt || element.total_menos_acumulado > 0 || element.total_menos_acumulado_monto > 0 ;
             });
 
             // Set products to newOptions
             products.value = newOptions;
-
 
             // Arreglo para almacenar los grupos de productos
             const groupedProducts = [];
@@ -223,11 +222,42 @@ export const useRecepcion = (context) => {
                 }
             });
 
+            //We set month label
+            const selectedMonth = months.value.find((element) => {
+                return element.value === infoToShow.value.monthId; 
+            });
+            infoToShow.value.monthName = selectedMonth.label
+
             // Set products and filteredProds to newOptions
             products.value = newOptions;
         }
 
         startRec.value = true
+    }
+
+    const selectItem = async (detDocId) => {
+        if (detDocId && docSelected.value === 1) {
+            try {
+                isLoadingItem.value = true;
+                const response = await axios.post(
+                    `/check-available-months`, {
+                    detDocId: detDocId
+                }
+                );
+                months.value = response.data.monthsAvail
+            } catch (err) {
+                if (err.response.data.logical_error) {
+                    useShowToast(toast.error, err.response.data.logical_error);
+                    context.emit("get-table");
+                } else {
+                    showErrorMessage(err);
+                }
+            } finally {
+                isLoadingItem.value = false;
+            }
+        } else {
+            months.value = []
+        }
     }
 
     const setProdItem = (paId) => {
@@ -311,7 +341,7 @@ export const useRecepcion = (context) => {
         }
     }
 
-    const checkBlinkingClass = (indexLt,index) => {
+    const checkBlinkingClass = (indexLt, index) => {
         const newRowId = `lt-${indexLt}prod-${index}`;
         const newRowElement = document.getElementById(newRowId);
         return newRowElement && newRowElement.classList.contains('blinking');
@@ -573,10 +603,10 @@ export const useRecepcion = (context) => {
 
     return {
         errors, isLoadingRequest, reception, infoToShow, activeDetails,
-        documents, ordenC, contrato, docSelected, totalRec, products,
-        filteredDoc, filteredItems, recDocument, startRec, filteredProds, brands,
+        documents, ordenC, contrato, docSelected, totalRec, products, isLoadingItem,
+        filteredDoc, filteredItems, recDocument, startRec, filteredProds, brands, months,
         getInfoForModalRecep, startReception, setProdItem, calculateLtTotal, checkBlinkingClass,
         deleteRow, handleValidation, storeReception, updateReception, showAvails, returnToTop,
-        hasActiveProds
+        hasActiveProds, selectItem
     }
 }
