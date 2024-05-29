@@ -96,7 +96,6 @@ export const useRecepcion = (context) => {
             });
             setModalValues(response.data, id)
         } catch (err) {
-            console.log(err);
             if (err.response && err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
                 context.emit("get-table");
@@ -138,6 +137,9 @@ export const useRecepcion = (context) => {
 
     const setRecDocumentData = (data, id) => {
         const itemInfo = data.itemInfo;
+        const recepData = data.recep;
+
+        brands.value = data.brands
 
         recDocument.value.financingSourceId = itemInfo.id_proy_financiado
         recDocument.value.detDocId = itemInfo.id_det_doc_adquisicion
@@ -610,7 +612,6 @@ export const useRecepcion = (context) => {
     };
 
     const handleSuccessResponse = (response) => {
-        console.log(response);
         useShowToast(toast.success, response.data.message);
         context.emit("cerrar-modal")
         context.emit("get-table")
