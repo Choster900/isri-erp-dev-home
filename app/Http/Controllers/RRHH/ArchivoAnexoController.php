@@ -59,8 +59,7 @@ class ArchivoAnexoController extends Controller
 
 
         // Construir la consulta base con las relaciones
-        $query = Persona::select('*')->with([
-
+        $query = Persona::with([
             "archivo_anexo.tipo_archivo_anexo",
             "empleado",
             "profesion",
@@ -70,7 +69,8 @@ class ArchivoAnexoController extends Controller
             "familiar.parentesco",
             "municipio.departamento.pais",
             "archivo_anexo" => function ($query) {
-                $query->where('estado_archivo_anexo', 1);
+                $query->where('estado_archivo_anexo', 1)
+                      ->orderBy('fecha_reg_archivo_anexo', 'desc'); // Ordenar por fecha_reg_archivo_anexo en orden descendente
             },
             "empleado.plazas_asignadas.detalle_plaza.plaza",
         ])->whereHas("archivo_anexo")
@@ -144,7 +144,7 @@ class ArchivoAnexoController extends Controller
             //$idTipoMime = TipoMine::where('extension_tipo_mime', $request->idTipoMine)->value('id_tipo_mime');
 
             // Create a new ArchivoAnexo record in the database
-            $response = ArchivoAnexo::create([
+            $archivoAnexo  = ArchivoAnexo::create([
                 'estado_archivo_anexo'      => 1,
                 'nombre_archivo_anexo'      => $name,
                 'url_archivo_anexo'         => $imageUrl,
@@ -162,8 +162,12 @@ class ArchivoAnexoController extends Controller
 
             DB::commit();
 
-            // Return the created ArchivoAnexo
-            return $response;
+            // Cargar la relación tipoArchivoAnexo y devolver el registro creado
+            $archivoAnexoConRelaciones = ArchivoAnexo::with(['tipo_archivo_anexo','persona'])->find($archivoAnexo->id_archivo_anexo);
+
+            // Return the created ArchivoAnexo with its relationship
+            return response()->json($archivoAnexoConRelaciones, 201);
+
         } catch (\Throwable $th) {
             // An error occurred, rollback the transaction
             DB::rollback();
@@ -229,7 +233,7 @@ class ArchivoAnexoController extends Controller
             DB::commit();
 
             // Return the updated ArchivoAnexo
-            return $response;
+            return ArchivoAnexo::find($request->idArchivoAnexo);
         } catch (\Throwable $th) {
             // An error occurred, rollback the transaction
             DB::rollback();

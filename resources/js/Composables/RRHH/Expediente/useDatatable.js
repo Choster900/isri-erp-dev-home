@@ -6,9 +6,10 @@ export const useDatatable = () => {
     const columns = [
         { width: "10%", label: "ID", name: "id_persona", type: "text" },
         { width: "10%", label: "Dui", name: "dui_persona", type: "text" },
-        { width: "10%", label: "Profesion", name: "nombre_profesion", type: "text" },
+        { width: "20%", label: "Profesion", name: "nombre_profesion", type: "text" },
         { width: "20%", label: "Nombres", name: "collecNombre", type: "text" },
         {width: "20%",label: "Apellidos",name: "collecApellido",type: "text",},
+        {width: "10%",label: "Fecha",name: "fecha_reg_archivo_anexo",type: "date",},
         { width: "1%", label: "", name: "Acciones" },
     ];
     const isLoadinRequest = ref(false);
@@ -29,7 +30,7 @@ export const useDatatable = () => {
     const perPage = ref(["10", "20", "30"]);
     const tableData = ref({
         draw: 0,
-        length: 5,
+        length: 10,
         column: 0,
         dir: "desc",
         search: {},

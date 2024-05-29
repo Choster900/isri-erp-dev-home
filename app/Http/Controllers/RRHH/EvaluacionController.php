@@ -248,7 +248,7 @@ class EvaluacionController extends Controller
      */
     function getPlazaAsignadaByUserAndDependencia(Request $request)
     {
-        try {
+        try { 
 
             // Obtener parámetros de la solicitud
             $employeeId = $request->employeeId;
