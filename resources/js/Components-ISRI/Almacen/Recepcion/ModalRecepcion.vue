@@ -62,17 +62,17 @@
                 </p>
                 <div class="flex flex-col md:flex-row items-center mb-4 h-10 mx-8 max-w-full">
                     <div class="w-full md:w-[40%] mb-2 md:mb-0 md:mr-2">
-                        <label for="doc" class="font-[Roboto]">Numero documento:</label>
+                        <label for="doc" class="font-[Roboto]">Numero documento: <span class="text-red-600 font-bold font-[Roboto]">*</span></label>
                     </div>
                     <div class="relative font-semibold flex h-[35px] w-full md:w-[60%]">
                         <Multiselect id="doc" v-model="infoToShow.docId" :options="filteredDoc" :searchable="true"
                             :noOptionsText="'Lista vacía.'" placeholder="Seleccione documento"
-                            @clear="infoToShow.detDocId = ''" @change="infoToShow.detDocId = ''"/>
+                            @change="infoToShow.detDocId = ''; recDocument.monthId = '';"/>
                     </div>
                 </div>
                 <div class="flex flex-col md:flex-row items-center mb-4 h-10 mx-8 max-w-full">
                     <div class="w-full md:w-[40%] mb-2 md:mb-0 md:mr-2">
-                        <label for="det-doc" class="font-[Roboto]">Item:</label>
+                        <label for="det-doc" class="font-[Roboto]">Item: <span class="text-red-600 font-bold font-[Roboto]">*</span></label>
                     </div>
                     <div class="relative font-semibold flex h-[35px] w-full md:w-[60%]">
                         <Multiselect id="det-doc" v-model="infoToShow.detDocId" :options="filteredItems"
@@ -82,22 +82,20 @@
                 </div>
                 <div v-if="docSelected === 1" class="flex flex-col md:flex-row items-center mb-4 h-10 mx-8 max-w-full">
                     <div class="w-full md:w-[40%] mb-2 md:mb-0 md:mr-2">
-                        <label for="det-doc" class="font-[Roboto]">Mes:</label>
+                        <label for="det-doc" class="font-[Roboto]">Mes: <span class="text-red-600 font-bold font-[Roboto]">*</span></label>
                     </div>
                     <div class="relative font-semibold flex h-[35px] w-full md:w-[60%]">
                         <Multiselect id="det-doc" v-model="recDocument.monthId" :options="months" 
                             :disabled="months.length <= 0" :loading="isLoadingItem"
-                            :searchable="true" :noOptionsText="'Lista vacía.'"  
+                            :searchable="true" :noOptionsText="'Lista vacía.'" @change="changeMonth($event)"
                             :placeholder="months.length <= 0 ? 'Sin meses disponibles' : 'Seleccione mes'" />
                     </div>
                 </div>
 
                 <div class="md:flex pb-[30px] mt-[60px] flex-row justify-end mx-8">
-                    <button type="button" :disabled="infoToShow.docId == '' || infoToShow.detDocId == ''"
-                        :class="(infoToShow.docId == '' || infoToShow.detDocId == '') ? 'cursor-not-allowed opacity-50' : ''"
-                        :title="(infoToShow.docId == '' || infoToShow.detDocId == '') ? 'Información incompleta' : 'Iniciar proceso de recepción'"
-                        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                        @click="startReception(recepId)">
+                    <button type="button" :title="'Iniciar proceso de recepción'"
+                        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center"
+                        @click="handleReceptionStart(recepId)">
                         Iniciar recepcion
                         <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true"
                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
@@ -457,9 +455,9 @@ export default {
             isLoadingRequest, recDocument, errors, activeDetails, isLoadingItem,
             documents, ordenC, contrato, docSelected, products, brands, months,
             filteredDoc, filteredItems, startRec, filteredProds, totalRec, infoToShow,
-            getInfoForModalRecep, startReception, setProdItem, calculateLtTotal, checkBlinkingClass,
+            getInfoForModalRecep, handleReceptionStart, setProdItem, calculateLtTotal, checkBlinkingClass,
             deleteRow, handleValidation, storeReception, updateReception, showAvails, returnToTop, 
-            hasActiveProds, selectItem
+            hasActiveProds, selectItem, changeMonth
         } = useRecepcion(context);
 
         onMounted(
@@ -472,9 +470,9 @@ export default {
             isLoadingRequest, recDocument, errors, activeDetails, months,
             documents, ordenC, contrato, docSelected, totalRec, products, brands,
             filteredDoc, filteredItems, startRec, filteredProds, infoToShow, isLoadingItem,
-            handleValidation, startReception, setProdItem, calculateLtTotal, checkBlinkingClass,
+            handleValidation, handleReceptionStart, setProdItem, calculateLtTotal, checkBlinkingClass,
             deleteRow, storeReception, updateReception, showAvails, returnToTop, 
-            hasActiveProds, selectItem
+            hasActiveProds, selectItem, changeMonth
         }
     }
 }

@@ -86,160 +86,145 @@ export const useRecepcion = (context) => {
     };
 
     const startReception = async (id) => {
-        if (infoToShow.value.detDocId === '' && id <= 0) {
-            useShowToast(toast.error, "Error, no se puede procesar la petición por información incompleta.");
-        } else {
-            try {
-                isLoadingRequest.value = true;
-                const response = await axios.post(
-                    `/get-info-modal-recep`, {
-                    id: id,
-                    detId: infoToShow.value.detDocId,
-                    monthId: recDocument.value.monthId
-                });
-                console.log(response);
-                setModalValues(response.data, id)
-            } catch (err) {
-                console.log(err);
-                if (err.response && err.response.data.logical_error) {
-                    useShowToast(toast.error, err.response.data.logical_error);
-                    context.emit("get-table");
-                } else {
-                    showErrorMessage(err);
-                    context.emit("cerrar-modal");
-                }
-            } finally {
-                isLoadingRequest.value = false;
+        try {
+            isLoadingRequest.value = true;
+            const response = await axios.post(
+                `/get-info-modal-recep`, {
+                id: id,
+                detId: infoToShow.value.detDocId,
+                monthId: recDocument.value.monthId
+            });
+            setModalValues(response.data, id)
+        } catch (err) {
+            if (err.response && err.response.data.logical_error) {
+                useShowToast(toast.error, err.response.data.logical_error);
+                context.emit("get-table");
+            } else {
+                showErrorMessage(err);
+                context.emit("cerrar-modal");
             }
+        } finally {
+            isLoadingRequest.value = false;
         }
     }
 
     const setModalValues = (data, id) => {
-        const recepData = data.recep
-        //Set the general information to show in the view
-        infoToShow.value.docName = data.itemInfo.documento_adquisicion.tipo_documento_adquisicion.nombre_tipo_doc_adquisicion + ' "' + data.itemInfo.documento_adquisicion.numero_doc_adquisicion + '"'
-        infoToShow.value.itemName = upperCase(data.itemInfo.nombre_det_doc_adquisicion)
-        infoToShow.value.financingSource = data.itemInfo.fuente_financiamiento.nombre_proy_financiado
-        infoToShow.value.commitment = data.itemInfo.compromiso_ppto_det_doc_adquisicion
-        infoToShow.value.supplier = data.itemInfo.documento_adquisicion.proveedor.razon_social_proveedor
-        infoToShow.value.nit = data.itemInfo.documento_adquisicion.proveedor.nit_proveedor
-        infoToShow.value.dui = data.itemInfo.documento_adquisicion.proveedor.dui_proveedor
+        setGeneralInfo(data, id);
+        setRecDocumentData(data, id);
+        if (id > 0) {
+            setExistingReceptionData(data.products, data.recep);
+        } else {
+            filterProducts(data.products);
+        }
+        startRec.value = true;
+    };
+
+    const setGeneralInfo = (data, id) => {
+        const itemInfo = data.itemInfo;
+        const recepData = data.recep;
+
+        infoToShow.value.docName = itemInfo.documento_adquisicion.tipo_documento_adquisicion.nombre_tipo_doc_adquisicion + ' "' + itemInfo.documento_adquisicion.numero_doc_adquisicion + '"'
+        infoToShow.value.itemName = upperCase(itemInfo.nombre_det_doc_adquisicion)
+        infoToShow.value.financingSource = itemInfo.fuente_financiamiento.nombre_proy_financiado
+        infoToShow.value.commitment = itemInfo.compromiso_ppto_det_doc_adquisicion
+        infoToShow.value.supplier = itemInfo.documento_adquisicion.proveedor.razon_social_proveedor
+        infoToShow.value.nit = itemInfo.documento_adquisicion.proveedor.nit_proveedor
+        infoToShow.value.dui = itemInfo.documento_adquisicion.proveedor.dui_proveedor
         infoToShow.value.dateTime = recepData ? moment(recepData.fecha_reg_recepcion_pedido).format('DD/MM/YYYY, HH:mm:ss') : ''
         infoToShow.value.status = id > 0 ? recepData.id_estado_recepcion_pedido : 1
-        infoToShow.value.acqDocDate = moment(data.itemInfo.documento_adquisicion.fecha_adjudicacion_doc_adquisicion).format('DD/MM/YYYY')
-        id > 0 ? docSelected.value = data.itemInfo.documento_adquisicion.id_tipo_doc_adquisicion : ''
-        id > 0 && docSelected.value === 1 ? infoToShow.value.monthName = recepData.mes_recepcion.nombre_mes_recepcion : ''
-        id > 0 && docSelected.value === 1 ? recDocument.value.monthId = recepData.id_mes_recepcion : ''
+        infoToShow.value.acqDocDate = moment(itemInfo.documento_adquisicion.fecha_adjudicacion_doc_adquisicion).format('DD/MM/YYYY')
+    };
+
+    const setRecDocumentData = (data, id) => {
+        const itemInfo = data.itemInfo;
+        const recepData = data.recep;
 
         brands.value = data.brands
+
+        recDocument.value.financingSourceId = itemInfo.id_proy_financiado
+        recDocument.value.detDocId = itemInfo.id_det_doc_adquisicion
+        recDocument.value.isGas = itemInfo.documento_adquisicion.proceso_compra.nombre_proceso_compra === 'GAS LICUADO DE PETROLEO' ? true : false
         recDocument.value.procedure = data.products
 
-        recDocument.value.financingSourceId = data.itemInfo.id_proy_financiado
-        recDocument.value.detDocId = data.itemInfo.id_det_doc_adquisicion
-        recDocument.value.isGas = data.itemInfo.documento_adquisicion.proceso_compra.nombre_proceso_compra === 'GAS LICUADO DE PETROLEO' ? true : false
-
-        // Check if id > 0
         if (id > 0) {
             recDocument.value.id = recepData.id_recepcion_pedido //Set reception id
             recDocument.value.acta = recepData.acta_recepcion_pedido //Set acta number
             recDocument.value.observation = recepData.observacion_recepcion_pedido ?? '' //Set observation
-
-            // Filter products based on conditions
-            const newOptions = data.products.filter(element => {
-                const rightOpt = recepData.detalle_recepcion.some(e => e.id_prod_adquisicion === element.value && e.estado_prod_adquisicion === 1);
-                return rightOpt || element.total_menos_acumulado > 0 || element.total_menos_acumulado_monto > 0;
-            });
-
-            // Set products to newOptions
-            products.value = newOptions;
-
-            // Arreglo para almacenar los grupos de productos
-            const groupedProducts = [];
-
-            // Iterar sobre los detalles de recepción
-            recepData.detalle_recepcion.forEach(element => {
-                if (element.estado_det_recepcion_pedido == 1) {
-                    // Obtener el código_up_lt y el id_lt del producto
-                    const codigo_up_lt = element.producto_adquisicion.linea_trabajo.codigo_up_lt;
-                    const id_lt = element.producto_adquisicion.id_lt;
-
-                    // Buscar si ya existe un grupo para este código_up_lt
-                    let groupIndex = groupedProducts.findIndex(group => group.codigo_up_lt === codigo_up_lt);
-
-                    // Si no existe un grupo, crear uno nuevo
-                    if (groupIndex === -1) {
-                        groupedProducts.push({
-                            id_lt: id_lt,
-                            codigo_up_lt: codigo_up_lt,
-                            hover: false,
-                            isOpen: false,
-                            productos: []
-                        });
-                        // Ordenar el arreglo de grupos por id_lt
-                        groupedProducts.sort((a, b) => a.id_lt - b.id_lt);
-                        groupIndex = groupedProducts.findIndex(group => group.codigo_up_lt === codigo_up_lt);
-                    }
-
-                    // Agregar el producto al arreglo de productos del grupo correspondiente
-                    groupedProducts[groupIndex].productos.push({
-                        detRecId: element.id_det_recepcion_pedido,
-                        prodId: element.producto_adquisicion.id_prod_adquisicion,
-                        desc: element.producto_adquisicion.linea_trabajo.codigo_up_lt + ' — ' +
-                            element.producto_adquisicion.centro_atencion.codigo_centro_atencion + ' — ' +
-                            element.producto.codigo_producto + ' — ' + element.producto.nombre_completo_producto + ' — ' +
-                            element.producto.unidad_medida.nombre_unidad_medida + ' — ' + element.producto_adquisicion.descripcion_prod_adquisicion,
-                        brandId: element.id_marca,
-                        brandLabel: element.marca ? element.marca.nombre_marca : 'N/A',
-                        prodLabel: element.producto_adquisicion.linea_trabajo.codigo_up_lt + ' — ' +
-                            element.producto_adquisicion.centro_atencion.codigo_centro_atencion + ' — ' + element.producto.codigo_producto,
-                        expiryDate: formatDateVue3DP(element.fecha_vcto_det_recepcion_pedido),
-                        perishable: element.producto.perecedero_producto,
-                        fractionated: element.producto.fraccionado_producto,
-                        avails: "",
-                        qty: element.producto.fraccionado_producto == 0 ? floatToInt(element.cant_det_recepcion_pedido) : element.cant_det_recepcion_pedido,
-                        cost: element.producto_adquisicion.costo_prod_adquisicion,
-                        total: recDocument.value.isGas ? (element.cant_det_recepcion_pedido * element.costo_det_recepcion_pedido).toFixed(2) : '',
-                        deleted: false,
-                        initial: "",
-                        initialAmount: "",
-                    });
-                }
-            });
-
-            // Ahora groupedProducts contiene los grupos de productos como arreglos
-            recDocument.value.prods = groupedProducts;
-
-            // Desplazar la pantalla hasta la última fila agregada
-            nextTick(() => {
-                const newRowElement = document.getElementById(`observ`);
-                if (newRowElement) {
-                    newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
-                }
-            });
-        } else {
-            // Filter products based on condition
-            const newOptions = data.products.filter((element) => {
-                if (recDocument.value.isGas) {
-                    return element.total_menos_acumulado_monto > 0
-                } else {
-                    return element.total_menos_acumulado > 0
-                }
-            });
-
+            docSelected.value = itemInfo.documento_adquisicion.id_tipo_doc_adquisicion;
             if (docSelected.value === 1) {
-                //We set month label
-                const selectedMonth = months.value.find((element) => {
-                    return element.value === recDocument.value.monthId;
-                });
-                infoToShow.value.monthName = selectedMonth.label
+                infoToShow.value.monthName = data.recep.mes_recepcion.nombre_mes_recepcion;
+                recDocument.value.monthId = data.recep.id_mes_recepcion;
             }
-
-            // Set products and filteredProds to newOptions
-            products.value = newOptions;
         }
+    };
 
-        startRec.value = true
-    }
+    const setExistingReceptionData = (prodcs, recepData) => {
+        products.value = filterExistingProducts(prodcs, recepData);
+        recDocument.value.prods = groupProducts(recepData.detalle_recepcion);
+        scrollToLastRow();
+    };
+
+    const filterExistingProducts = (prods, recepData) => {
+        return prods.filter(element => {
+            const isRightOpt = recepData.detalle_recepcion.some(e => e.id_prod_adquisicion === element.value && e.estado_prod_adquisicion === 1);
+            return isRightOpt || element.total_menos_acumulado > 0 || element.total_menos_acumulado_monto > 0;
+        });
+    };
+
+    const groupProducts = (detalleRecepcion) => {
+        const groupedProducts = [];
+        detalleRecepcion.forEach(element => {
+            if (element.estado_det_recepcion_pedido === 1) {
+                const codigo_up_lt = element.producto_adquisicion.linea_trabajo.codigo_up_lt;
+                const id_lt = element.producto_adquisicion.id_lt;
+                let groupIndex = groupedProducts.findIndex(group => group.codigo_up_lt === codigo_up_lt);
+                if (groupIndex === -1) {
+                    groupedProducts.push({ id_lt, codigo_up_lt, hover: false, isOpen: false, productos: [] });
+                    groupedProducts.sort((a, b) => a.id_lt - b.id_lt);
+                    groupIndex = groupedProducts.findIndex(group => group.codigo_up_lt === codigo_up_lt);
+                }
+                groupedProducts[groupIndex].productos.push(createProductObject(element));
+            }
+        });
+        return groupedProducts;
+    };
+
+    const createProductObject = (element) => {
+        return {
+            detRecId: element.id_det_recepcion_pedido,
+            prodId: element.producto_adquisicion.id_prod_adquisicion,
+            desc: `${element.producto_adquisicion.linea_trabajo.codigo_up_lt} — ${element.producto_adquisicion.centro_atencion.codigo_centro_atencion} — ${element.producto.codigo_producto} — ${element.producto.nombre_completo_producto} — ${element.producto.unidad_medida.nombre_unidad_medida} — ${element.producto_adquisicion.descripcion_prod_adquisicion}`,
+            brandId: element.id_marca,
+            brandLabel: element.marca ? element.marca.nombre_marca : 'N/A',
+            prodLabel: `${element.producto_adquisicion.linea_trabajo.codigo_up_lt} — ${element.producto_adquisicion.centro_atencion.codigo_centro_atencion} — ${element.producto.codigo_producto}`,
+            expiryDate: formatDateVue3DP(element.fecha_vcto_det_recepcion_pedido),
+            perishable: element.producto.perecedero_producto,
+            fractionated: element.producto.fraccionado_producto,
+            avails: "",
+            qty: element.producto.fraccionado_producto === 0 ? floatToInt(element.cant_det_recepcion_pedido) : element.cant_det_recepcion_pedido,
+            cost: element.producto_adquisicion.costo_prod_adquisicion,
+            total: recDocument.value.isGas ? (element.cant_det_recepcion_pedido * element.costo_det_recepcion_pedido).toFixed(2) : '',
+            deleted: false,
+            initial: "",
+            initialAmount: "",
+        };
+    };
+
+    const filterProducts = (prodcs) => {
+        const newOptions = prodcs.filter(element => {
+            return recDocument.value.isGas ? element.total_menos_acumulado_monto > 0 : element.total_menos_acumulado > 0;
+        });
+        products.value = newOptions;
+    };
+
+    const scrollToLastRow = () => {
+        nextTick(() => {
+            const newRowElement = document.getElementById(`observ`);
+            if (newRowElement) {
+                newRowElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
+        });
+    };
 
     const selectItem = async (detDocId) => {
         if (detDocId && docSelected.value === 1) {
@@ -263,6 +248,18 @@ export const useRecepcion = (context) => {
             }
         } else {
             months.value = []
+            recDocument.value.monthId = ''
+        }
+    }
+
+    const changeMonth = (id) => {
+        if (id) {
+            const selectedMonth = months.value.find((element) => {
+                return element.value === id;
+            });
+            infoToShow.value.monthName = selectedMonth.label
+        } else {
+            infoToShow.value.monthName = ''
         }
     }
 
@@ -429,6 +426,25 @@ export const useRecepcion = (context) => {
         }
     }
 
+    const handleReceptionStart = async (id) => {
+        if (docSelected.value === 1) {
+            if ((infoToShow.value.docId && infoToShow.value.docId != '')
+                && (infoToShow.value.detDocId && infoToShow.value.detDocId != '')
+                && (recDocument.value.monthId && recDocument.value.monthId != '')) {
+                await startReception(id)
+            } else {
+                useShowToast(toast.warning, "No es posible iniciar la recepción, debes completar toda la información requerida.");
+            }
+        } else {
+            if ((infoToShow.value.docId && infoToShow.value.docId != '')
+                && (infoToShow.value.detDocId && infoToShow.value.detDocId != '')) {
+                await startReception(id)
+            } else {
+                useShowToast(toast.warning, "No es posible iniciar la recepción, debes completar toda la información requerida.");
+            }
+        }
+    }
+
     const activeDetails = computed(() => {
         // Filtrar los productos no eliminados dentro de todos los grupos
         const activeProducts = recDocument.value.prods.flatMap(group => group.productos.filter(producto => !producto.deleted));
@@ -579,8 +595,8 @@ export const useRecepcion = (context) => {
     };
 
     const handleErrorResponse = (err) => {
-        if (err.response.status === 422) {
-            if (err.response && err.response.data.logical_error) {
+        if (err.response && err.response.status === 422) {
+            if (err.response.data.logical_error) {
                 useShowToast(toast.error, err.response.data.logical_error);
                 if (err.response.data.refresh) {
                     products.value = err.response.data.prods
@@ -596,7 +612,6 @@ export const useRecepcion = (context) => {
     };
 
     const handleSuccessResponse = (response) => {
-        console.log(response);
         useShowToast(toast.success, response.data.message);
         context.emit("cerrar-modal")
         context.emit("get-table")
@@ -611,8 +626,8 @@ export const useRecepcion = (context) => {
         errors, isLoadingRequest, reception, infoToShow, activeDetails,
         documents, ordenC, contrato, docSelected, totalRec, products, isLoadingItem,
         filteredDoc, filteredItems, recDocument, startRec, filteredProds, brands, months,
-        getInfoForModalRecep, startReception, setProdItem, calculateLtTotal, checkBlinkingClass,
+        getInfoForModalRecep, handleReceptionStart, setProdItem, calculateLtTotal, checkBlinkingClass,
         deleteRow, handleValidation, storeReception, updateReception, showAvails, returnToTop,
-        hasActiveProds, selectItem
+        hasActiveProds, selectItem, changeMonth
     }
 }
