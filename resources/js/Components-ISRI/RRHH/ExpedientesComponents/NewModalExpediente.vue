@@ -1,17 +1,28 @@
 <template>
     <div class="m-1.5">
         <ProcessModal addClases=" bg-[#F9F9F9]" :show="showModal" @close="$emit('cerrar-modal')" maxWidth="5xl">
-            <div class="p-10">
+            <div class="py-5 px-5">
+                <svg class="h-7 w-7 absolute top-0 right-0 mt-2 cursor-pointer" viewBox="0 0 25 25"
+                            @click="$emit('cerrar-modal')">
+                            <path fill="currentColor"
+                                d="M7.95 6.536l4.242-4.243a1 1 0 111.415 1.414L9.364 7.95l4.243 4.242a1 1 0 11-1.415 1.415L7.95 9.364l-4.243 4.243a1 1 0 01-1.414-1.415L6.536 7.95 2.293 3.707a1 1 0 011.414-1.414L7.95 6.536z" />
+                        </svg>
                 <div class="flex flex-col md:flex-row">
                     <div
                         class="bg-white rounded-md shadow-sm border w-full md:w-1/4 md:h-[600px] h-auto max-h-[600px] overflow-y-auto">
                         <ul class="pt-10">
-                            <li class="font-light px-6 py-2 text-gray-600">MANAGER</li>
+                            <li class="font-light px-6 py-2 text-gray-600">MENU </li>
                             <li class=" font-light flex items-center px-6 py-4 relative cursor-pointer "
                                 v-for="(item, index) in annexTypeData" :key="index"
                                 @click="filterAnexosBy(index), annexType = index"
                                 :class="{ 'bg-[#E8E8E8]': annexType == index, 'hover:bg-[#8E9CB7]/10': annexType != index }">
-                                <div class="text-sm  font-medium">{{ item.label }}</div>
+                                <div class="text-xs  font-medium">{{ item.label }}</div>
+                                <div class="absolute right-0  bottom-0 text-xs px-2" v-if="index > 0">
+                                    {{ objectPersonaAnexosFiltered.filter(i => i.id_tipo_archivo_anexo == index).length }}
+                                </div>
+                                <div class="absolute right-0  bottom-0 text-xs px-2" v-else>
+                                    {{ objectPersonaAnexosFiltered.length }}
+                                </div>
                                 <div class="absolute left-0 top-0 bottom-0 w-1 bg-[#8E9CB7]" v-if="annexType == index">
                                 </div>
                             </li>
@@ -162,7 +173,7 @@
 
 
                     <div class="w-full md:w-3/4 mt-4 md:mt-0 px-4" v-if="!stateView">
-                        <h1 class="font-medium text-lg">File Manager</h1>
+                        <h1 class="font- text-lg">Administrador de anexos</h1>
 
                         <div class="flex justify-between border-b pb-2">
                             <div class="flex">
@@ -501,7 +512,7 @@ export default {
         return {
             downloadFile, actionOption,
             openInNewTab, filterAnexosBy,
-            onClickForEditFile, cleanData, updateArchivoAnexo,
+            onClickForEditFile, cleanData, updateArchivoAnexo,objectPersonaAnexosFiltered,
             createArchivoAnexoRequest, objectPersona, personaWhoWasSelected,
             annexTypeData, stateView, annexType, getPeopleByName, file, fileInput, handleDrop, deleteFile, openFileInput, urlArchivoAnexo, handleDragOver, handleFileChange, nameArchivoAnexo, sizeArchivo, tipoMine,
             idPersona, idTipoMine, sizeArchivoAnexo, idArchivoAnexo, idTipoArchivoAnexo, fileArchivoAnexo, nombreArchivoAnexo, descripcionArchivoAnexo, createArchivoAnexo, errorsData, delteArchivoAnexoRequest, delteArchivoAnexo, getPersonasById, dataArrayPersona, isLoadingRequestPersona
