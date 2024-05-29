@@ -59,8 +59,7 @@ class ArchivoAnexoController extends Controller
 
 
         // Construir la consulta base con las relaciones
-        $query = Persona::select('*')->with([
-
+        $query = Persona::with([
             "archivo_anexo.tipo_archivo_anexo",
             "empleado",
             "profesion",
@@ -70,7 +69,8 @@ class ArchivoAnexoController extends Controller
             "familiar.parentesco",
             "municipio.departamento.pais",
             "archivo_anexo" => function ($query) {
-                $query->where('estado_archivo_anexo', 1);
+                $query->where('estado_archivo_anexo', 1)
+                      ->orderBy('fecha_reg_archivo_anexo', 'desc'); // Ordenar por fecha_reg_archivo_anexo en orden descendente
             },
             "empleado.plazas_asignadas.detalle_plaza.plaza",
         ])->whereHas("archivo_anexo")

@@ -51,6 +51,11 @@
                                                                         ${persona.tapellido_persona ? persona.tapellido_persona : ''}` }}
                                 </div>
                             </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{ persona.archivo_anexo[persona.archivo_anexo.length - 1].fecha_reg_archivo_anexo  }}
+                                </div>
+                            </td>
                             <td class="first:pl-5 last:pr-5">
                                 <div class="space-x-1">
                                     <DropDownOptions>
@@ -147,7 +152,7 @@
             </div>
         </div>
 
-        <NewModalExpediente :showModal="showModal" @cerrar-modal="showModal = false"
+        <NewModalExpediente :showModal="showModal" @cerrar-modal="showModal = false" @actualizar-datatable="getPeople(lastUrl);"
             @actualizar-data="getPeople(lastUrl); showModal = false" :persona="dataPersona" />
 
     </AppLayoutVue>

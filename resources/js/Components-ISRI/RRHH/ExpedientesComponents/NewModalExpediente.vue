@@ -8,7 +8,8 @@
                         <ul class="pt-10">
                             <li class="font-light px-6 py-2 text-gray-600">MANAGER</li>
                             <li class=" font-light flex items-center px-6 py-4 relative cursor-pointer "
-                                v-for="(item, index) in annexTypeData" :key="index" @click="annexType = index"
+                                v-for="(item, index) in annexTypeData" :key="index"
+                                @click="filterAnexosBy(index), annexType = index"
                                 :class="{ 'bg-[#E8E8E8]': annexType == index, 'hover:bg-[#8E9CB7]/10': annexType != index }">
                                 <div class="text-sm  font-medium">{{ item.label }}</div>
                                 <div class="absolute left-0 top-0 bottom-0 w-1 bg-[#8E9CB7]" v-if="annexType == index">
@@ -27,6 +28,7 @@
 
                         <div class="flex flex-col md:flex-row gap-3">
                             <!-- File Upload Section -->
+
                             <div v-if="!nameArchivoAnexo" @dragover.prevent="handleDragOver" @drop="handleDrop"
                                 @click="openFileInput"
                                 class="h-56 md:w-2/3 border-[3px] cursor-pointer border-dashed border-slate-400 rounded-lg flex items-center justify-center text-center bg-slate-200 hover:bg-slate-300">
@@ -34,6 +36,7 @@
                                     alt="Icono de cargar archivo">
                                 <input @change="handleFileChange" type="file" ref="fileInput"
                                     accept=".pdf,.jpeg,.jpg,.png" style="display: none;">
+
                             </div>
 
                             <!-- File Display Section -->
@@ -51,9 +54,15 @@
                                         class="rounded-lg w-full border border-gray-300 shadow-md shadow-black">
                                 </template>
                             </div>
-                            <div class="w-full md:w-1/2 flex flex-col">
+
+                            <div class="w-full md:w-1/2 flex flex-col space-y-1">
+                                <label for="selectAnexo"
+                                    class="block mb-1 text-[13px] font-medium text-gray-600">Busqueda de persona por
+                                    nombre
+                                    <span class="text-red-600 font-extrabold">*</span></label>
                                 <div v-if="(persona !== null && persona !== '') || (Array.isArray(personaWhoWasSelected) && personaWhoWasSelected.length > 0)"
                                     class="relative flex h-8 w-full flex-row-reverse">
+
                                     <Multiselect v-model="idPersona" :filter-results="false" :disabled="true"
                                         :resolve-on-load="false" :delay="1000" :searchable="true"
                                         :clear-on-search="true" :min-chars="5" placeholder="buscar por nombre..."
@@ -74,6 +83,7 @@
         }" noOptionsText="<p class='text-xs'>Sin Resultado de personas<p>"
                                         noResultsText="<p class='text-xs'>Sin resultados de personas <p>" />
                                 </div>
+                                <InputError class="mt-2" :message="errorsData[`idPersona`]" />
 
 
                                 <div class="mb-4">
@@ -88,10 +98,16 @@
         }" noOptionsText="<p class='text-xs'><p>"
                                             noResultsText="<p class='text-xs'>no hay resultado en tu busqueda <p>" />
                                     </div>
+                                    <InputError class="mt-2" :message="errorsData[`idTipoArchivoAnexo`]" />
+
                                 </div>
                                 <button v-if="nameArchivoAnexo" @click="deleteFile"
                                     class="w-full text-sm bg-gray-200 text-gray-700 rounded-lg px-4 py-2 hover:bg-gray-300">Remover
                                     archivo <span class="font-bold text-red-600">-</span></button>
+
+
+                                <InputError class="mt-2" :message="errorsData[`fileArchivoAnexo`]" />
+
                             </div>
                         </div>
                         <div class="mt-4 bg-gray-50 rounded-lg">
@@ -140,7 +156,6 @@
                                 Eliminar
                             </button>
                         </div>
-
                     </div>
 
 
@@ -178,7 +193,7 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mt-4">
 
                             <div @click="cleanData(), stateView = 1"
-                                class="bg-slate-700 border rounded-lg shadow-md p-4 flex flex-col justify-center items-center cursor-pointer hover:bg-slate-800 transition-colors duration-300">
+                                class="bg-slate-700 border rounded-lg shadow-md p-4 h-64 flex flex-col justify-center items-center cursor-pointer hover:bg-slate-800 transition-colors duration-300">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke="currentColor" class="h-12 w-12 text-white mb-2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -279,7 +294,7 @@ import { executeRequest } from '@/plugins/requestHelpers';
 export default {
     mixins: [truncateString],
     name: 'ModalExpedientes',
-    emits: ['cerrar-modal'],
+    emits: ['cerrar-modal', 'actualizar-datatable'],
     components: { Modal, SearchIcon, ProcessModal, OrderSquareIcon, OrderListIcon, AddExpediente, ListExpedientes, SideInfoFile },
     props: {
         showModal: {
@@ -298,7 +313,7 @@ export default {
         const { getPeopleByName } = usePersona();
 
         const { file,
-            fileInput,
+            fileInput,objectPersonaAnexosFiltered,
             handleDrop,
             deleteFile,
             openFileInput,
@@ -309,7 +324,10 @@ export default {
             handleFileChange,
             downloadFile, actionOption,
             openInNewTab, personaWhoWasSelected,
-            nameArchivoAnexo, idPersona, idTipoMine, sizeArchivoAnexo, idArchivoAnexo, idTipoArchivoAnexo, fileArchivoAnexo, nombreArchivoAnexo, descripcionArchivoAnexo, stateView, errorsData, updateArchivoAnexoRequest, delteArchivoAnexoRequest, getPersonasById, dataArrayPersona, isLoadingRequestPersona, createArchivoAnexoRequest } = useArchivoAnexo();
+            nameArchivoAnexo, idPersona, idTipoMine,
+            sizeArchivoAnexo, idArchivoAnexo, idTipoArchivoAnexo, fileArchivoAnexo, nombreArchivoAnexo,
+            descripcionArchivoAnexo, stateView, errorsData, updateArchivoAnexoRequest, delteArchivoAnexoRequest,
+            getPersonasById, dataArrayPersona, isLoadingRequestPersona, createArchivoAnexoRequest } = useArchivoAnexo();
 
 
         const annexType = ref(0) // variable que maneja el index del tipo de anexo que se selecciono
@@ -332,11 +350,27 @@ export default {
         ])
 
 
+
+        const filterAnexosBy = (idTipoAnexo) => {
+
+            console.log(idTipoAnexo);
+
+            console.log(objectPersonaAnexosFiltered.value.filter(index => index.id_tipo_archivo_anexo == idTipoAnexo));
+
+
+            if (idTipoAnexo == 0) {
+                objectPersona.value =  objectPersonaAnexosFiltered.value
+            }else{
+                objectPersona.value =  objectPersonaAnexosFiltered.value.filter(index => index.id_tipo_archivo_anexo == idTipoAnexo)
+
+            }
+        }
         // Observa los cambios en la variable 'persona'
         watch(persona, (newValue, oldValue) => {
             // Verifica que 'persona' no sea nulo, indefinido y no esté vacío
             if (newValue !== null && newValue !== undefined && (Array.isArray(newValue) ? newValue.length > 0 : newValue !== '')) {
                 objectPersona.value = newValue.archivo_anexo; // Actualiza 'objectPersona' con el nuevo valor de 'persona'
+                objectPersonaAnexosFiltered.value = newValue.archivo_anexo; // haciendo una copia identica para no perder la informacion
                 console.log(objectPersona.value);
                 console.log("Inserting persona");
                 // Agrega un objeto con los datos del usuario seleccionado a 'personaWhoWasSelected'
@@ -354,7 +388,7 @@ export default {
                 personaWhoWasSelected.value = [];
                 // Limpia el array que contiene los archivos anexos del usuario editado
                 objectPersona.value = {};
-
+                objectPersonaAnexosFiltered.value = []
                 stateView.value = 0
                 idArchivoAnexo.value = null
                 urlArchivoAnexo.value = null
@@ -386,10 +420,12 @@ export default {
                 showCloseButton: true,
             });
             if (confirmed.isConfirmed) {
-                executeRequest(
+                await executeRequest(
                     delteArchivoAnexoRequest(),
-                    "¡El anexo se ha eliminado correctamente! Espere mientras se redirecciona al inicio"
+                    "¡El archivo ha sido eliminado satisfactoriamente!"
                 );
+                emit("actualizar-datatable")
+                stateView.value = 0
             }
         }
 
@@ -405,10 +441,12 @@ export default {
                 showCloseButton: true,
             });
             if (confirmed.isConfirmed) {
-                executeRequest(
+                await executeRequest(
                     createArchivoAnexoRequest(thereIsIdPersona),
-                    "¡El anexo se ha agregado correctamente! Espere mientras se redirecciona al inicio"
+                    "¡El anexo se ha agregado correctamente!",
                 );
+                emit("actualizar-datatable")
+                stateView.value = 0
             }
         };
 
@@ -424,10 +462,12 @@ export default {
                 showCloseButton: true,
             });
             if (confirmed.isConfirmed) {
-                executeRequest(
+                await executeRequest(
                     updateArchivoAnexoRequest(),
-                    "¡El anexo se ha acutalizado correctamente! Espere mientras se redirecciona al inicio"
+                    "¡El anexo se ha acutalizado correctamente!"
                 );
+                emit("actualizar-datatable")
+                stateView.value = 0
             }
         };
 
@@ -460,7 +500,7 @@ export default {
 
         return {
             downloadFile, actionOption,
-            openInNewTab,
+            openInNewTab, filterAnexosBy,
             onClickForEditFile, cleanData, updateArchivoAnexo,
             createArchivoAnexoRequest, objectPersona, personaWhoWasSelected,
             annexTypeData, stateView, annexType, getPeopleByName, file, fileInput, handleDrop, deleteFile, openFileInput, urlArchivoAnexo, handleDragOver, handleFileChange, nameArchivoAnexo, sizeArchivo, tipoMine,

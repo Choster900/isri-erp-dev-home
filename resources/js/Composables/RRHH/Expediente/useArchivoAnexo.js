@@ -19,6 +19,7 @@ export const useArchivoAnexo = () => {
     const objectPersona = ref([])
     const stateView = ref(0) // Valida que este agregando o viendo los archivos del usuario
     const personaWhoWasSelected = ref([])// Contiene el array de la persona a quien se esta editando
+    const objectPersonaAnexosFiltered = ref([])
 
     const actionOption = ref(1); // Optio 1 es igual a agregar 2 es igual a editar
     const fileInput = ref('');
@@ -151,19 +152,33 @@ export const useArchivoAnexo = () => {
                 // Verifica si `objectPersona.value` es un array, si no, conviértelo en uno
                 if (!Array.isArray(objectPersona.value)) {
                     objectPersona.value = [];
+
                 }
+
+                if (!Array.isArray(objectPersonaAnexosFiltered.value)) {
+                    objectPersonaAnexosFiltered.value = [];
+                }
+
 
                 // Comprueba si `dataFromBack` es un array
                 if (Array.isArray(dataFromBack)) {
                     // Si es un array, usa spread operator para agregar los elementos individualmente
-                    objectPersona.value.push(...dataFromBack);
+
+                    objectPersonaAnexosFiltered.value.push(...dataFromBack);
+                    objectPersona.value = objectPersonaAnexosFiltered.value
+
+                    //objectPersona.value.push(...dataFromBack);
+                    //objectPersonaAnexosFiltered.value = objectPersona.value
                 } else {
                     // Si no es un array, simplemente agrega `dataFromBack` a `objectPersona.value`
-                    objectPersona.value.push(dataFromBack);
+
+                    objectPersonaAnexosFiltered.value.push(dataFromBack);
+                    objectPersona.value = objectPersonaAnexosFiltered.value
+                    //objectPersona.value.push(dataFromBack);
+                    //objectPersonaAnexosFiltered.value = objectPersona.value
                 }
-                
+
                 crealFormVar();
-                fileHandling.deleteFile();
                 resolve(resp);
             } catch (error) {
                 console.log(error);
@@ -211,23 +226,18 @@ export const useArchivoAnexo = () => {
                     }
                 );
                 //    context.emit("refresh-information");
-                console.log(resp.data);
-                console.log(objectPersona.value.find(index => index.id_archivo_anexo == resp.data.id_archivo_anexo));
-                objectPersona.value.find(index => index.id_archivo_anexo == resp.data.id_archivo_anexo).url_archivo_anexo = resp.data.url_archivo_anexo
-                objectPersona.value.find(index => index.id_archivo_anexo == resp.data.id_archivo_anexo).nombre_archivo_anexo = resp.data.nombre_archivo_anexo
-                objectPersona.value.find(index => index.id_archivo_anexo == resp.data.id_archivo_anexo).descripcion_archivo_anexo = resp.data.descripcion_archivo_anexo
-                objectPersona.value.find(index => index.id_archivo_anexo == resp.data.id_archivo_anexo).id_tipo_archivo_anexo = resp.data.id_tipo_archivo_anexo
-                objectPersona.value.find(index => index.id_archivo_anexo == resp.data.id_archivo_anexo).id_tipo_mime = resp.data.id_tipo_mime
+
+                objectPersonaAnexosFiltered.value.find(index => index.id_archivo_anexo == resp.data.id_archivo_anexo).url_archivo_anexo = resp.data.url_archivo_anexo
+                objectPersonaAnexosFiltered.value.find(index => index.id_archivo_anexo == resp.data.id_archivo_anexo).nombre_archivo_anexo = resp.data.nombre_archivo_anexo
+                objectPersonaAnexosFiltered.value.find(index => index.id_archivo_anexo == resp.data.id_archivo_anexo).descripcion_archivo_anexo = resp.data.descripcion_archivo_anexo
+                objectPersonaAnexosFiltered.value.find(index => index.id_archivo_anexo == resp.data.id_archivo_anexo).id_tipo_archivo_anexo = resp.data.id_tipo_archivo_anexo
+                objectPersonaAnexosFiltered.value.find(index => index.id_archivo_anexo == resp.data.id_archivo_anexo).id_tipo_mime = resp.data.id_tipo_mime
 
 
-                /*
-                urlArchivoAnexo.value = idFile.url_archivo_anexo
-                 idArchivoAnexo.value = idFile.id_archivo_anexo
-            idTipoArchivoAnexo.value = idFile.id_tipo_archivo_anexo
-            nombreArchivoAnexo.value = idFile.nombre_archivo_anexo
-            nameArchivoAnexo.value = idFile.nombre_archivo_anexo
-            descripcionArchivoAnexo.value = idFile.descripcion_archivo_anexo
-             */
+
+                objectPersona.value = objectPersonaAnexosFiltered.value
+
+
                 crealFormVar();
                 resolve(resp);
             } catch (error) {
@@ -250,24 +260,6 @@ export const useArchivoAnexo = () => {
 
 
 
-    /* const delteArchivoAnexo = async () => {
-        const confirmed = await Swal.fire({
-            title: '<p class="text-[17pt] text-center">¿Esta seguro de eliminar el anexo?. los cambios no podran revertirse y perdera el archivo</p>',
-            icon: "question",
-            iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
-            confirmButtonText: "Si, Editar",
-            confirmButtonColor: "#F34541",
-            cancelButtonText: "Cancelar",
-            showCancelButton: true,
-            showCloseButton: true,
-        });
-        if (confirmed.isConfirmed) {
-            executeRequest(
-                delteArchivoAnexoRequest(),
-                "¡El anexo se ha eliminado correctamente! Espere mientras se redirecciona al inicio"
-            );
-        }
-    }; */
 
     const delteArchivoAnexoRequest = () => {
         return new Promise(async (resolve, reject) => {
@@ -305,9 +297,39 @@ export const useArchivoAnexo = () => {
         window.open(fileUrl, '_blank');
     }
 
+
+    const onClickForEditFile = (idFile) => {
+
+        console.log(idFile);
+        stateView.value = 1
+        actionOption.value = 2
+        idArchivoAnexo.value = idFile.id_archivo_anexo
+        urlArchivoAnexo.value = idFile.url_archivo_anexo
+        idTipoArchivoAnexo.value = idFile.id_tipo_archivo_anexo
+        nombreArchivoAnexo.value = idFile.nombre_archivo_anexo
+        nameArchivoAnexo.value = idFile.nombre_archivo_anexo
+        descripcionArchivoAnexo.value = idFile.descripcion_archivo_anexo
+    }
+
+
+    const cleanData = () => {
+
+        idArchivoAnexo.value = ''
+        urlArchivoAnexo.value = ''
+        idTipoArchivoAnexo.value = ''
+        nombreArchivoAnexo.value = ''
+        nameArchivoAnexo.value = ''
+        descripcionArchivoAnexo.value = ''
+
+        actionOption.value = 1
+    }
+
+
     return {
         downloadFile,
         openInNewTab,
+        onClickForEditFile,
+        cleanData,
         isLoadingRequestPersona,
         objectPersona,
         idPersona,
@@ -316,7 +338,7 @@ export const useArchivoAnexo = () => {
         idArchivoAnexo,
         fileArchivoAnexo,
         sizeArchivoAnexo,
-
+        objectPersonaAnexosFiltered,
         idTipoArchivoAnexo,
         nombreArchivoAnexo,
         stateView,
