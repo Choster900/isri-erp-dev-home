@@ -263,31 +263,6 @@ export const useRecepcion = (context) => {
         }
     }
 
-    const selectItem = async (detDocId) => {
-        if (detDocId && docSelected.value === 1) {
-            try {
-                isLoadingItem.value = true;
-                const response = await axios.post(
-                    `/check-available-months`, {
-                    detDocId: detDocId
-                }
-                );
-                months.value = response.data.monthsAvail
-            } catch (err) {
-                if (err.response.data.logical_error) {
-                    useShowToast(toast.error, err.response.data.logical_error);
-                    context.emit("get-table");
-                } else {
-                    showErrorMessage(err);
-                }
-            } finally {
-                isLoadingItem.value = false;
-            }
-        } else {
-            months.value = []
-        }
-    }
-
     const setProdItem = (paId) => {
         if (!paId) {
             useShowToast(toast.info, "Debes elegir un producto de la lista.");
