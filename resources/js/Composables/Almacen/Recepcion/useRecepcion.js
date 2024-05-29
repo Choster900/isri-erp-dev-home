@@ -38,13 +38,13 @@ export const useRecepcion = (context) => {
         dui: '', //dui_proveedor
         dateTime: '', //fecha_reg_recepcion_pedido
         acqDocDate: '', //acquisition document reference date
-        monthId: '',
         monthName: ''
     })
 
     const recDocument = ref({
         id: '', //reception id
         acta: '', //Acta number
+        monthId: '',
         detStockId: '',
         isGas: '',
         financingSourceId: '',
@@ -95,7 +95,7 @@ export const useRecepcion = (context) => {
                     `/get-info-modal-recep`, {
                     id: id,
                     detId: infoToShow.value.detDocId,
-                    monthId: infoToShow.value.monthId
+                    monthId: recDocument.value.monthId
                 });
                 console.log(response);
                 setModalValues(response.data, id)
@@ -126,9 +126,10 @@ export const useRecepcion = (context) => {
         infoToShow.value.dui = data.itemInfo.documento_adquisicion.proveedor.dui_proveedor
         infoToShow.value.dateTime = recepData ? moment(recepData.fecha_reg_recepcion_pedido).format('DD/MM/YYYY, HH:mm:ss') : ''
         infoToShow.value.status = id > 0 ? recepData.id_estado_recepcion_pedido : 1
-        infoToShow.value.monthName = id > 0 ? recepData.mes_recepcion.nombre_mes_recepcion : ''
-        docSelected.value = id > 0 ? data.itemInfo.documento_adquisicion.id_tipo_doc_adquisicion : ''
         infoToShow.value.acqDocDate = moment(data.itemInfo.documento_adquisicion.fecha_adjudicacion_doc_adquisicion).format('DD/MM/YYYY')
+        id > 0 ? docSelected.value = data.itemInfo.documento_adquisicion.id_tipo_doc_adquisicion : ''
+        id > 0 && docSelected.value === 1 ? infoToShow.value.monthName = recepData.mes_recepcion.nombre_mes_recepcion : ''
+        id > 0 && docSelected.value === 1 ? recDocument.value.monthId = recepData.id_mes_recepcion : ''
 
         brands.value = data.brands
         recDocument.value.procedure = data.products
@@ -228,7 +229,7 @@ export const useRecepcion = (context) => {
             if (docSelected.value === 1) {
                 //We set month label
                 const selectedMonth = months.value.find((element) => {
-                    return element.value === infoToShow.value.monthId;
+                    return element.value === recDocument.value.monthId;
                 });
                 infoToShow.value.monthName = selectedMonth.label
             }

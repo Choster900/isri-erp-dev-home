@@ -85,7 +85,7 @@
                         <label for="det-doc" class="font-[Roboto]">Mes:</label>
                     </div>
                     <div class="relative font-semibold flex h-[35px] w-full md:w-[60%]">
-                        <Multiselect id="det-doc" v-model="infoToShow.monthId" :options="months" 
+                        <Multiselect id="det-doc" v-model="recDocument.monthId" :options="months" 
                             :disabled="months.length <= 0" :loading="isLoadingItem"
                             :searchable="true" :noOptionsText="'Lista vacía.'"  
                             :placeholder="months.length <= 0 ? 'Sin meses disponibles' : 'Seleccione mes'" />
