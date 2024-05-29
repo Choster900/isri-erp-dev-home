@@ -110,7 +110,7 @@
 
     </div>
 </template>
-  
+
 
 <script>
 import SideInfo from './SideInfoPersona.vue';
@@ -142,7 +142,7 @@ export default {
         const { file, fileInput, handleDrop, deleteFile, openFileInput, urlArchivoAnexo, handleDragOver, handleFileChange, nameArchivoAnexo, sizeArchivo, tipoMine } = useFileHandling();
         // Composable usePersona => getPeopleByName() retorna el objeto con las personas buscada en multiselect
         const { getPeopleByName } = usePersona();
-        // Composable useArchivoAnexo 
+        // Composable useArchivoAnexo
         const { idPersona, idTipoMine, sizeArchivoAnexo, idArchivoAnexo, idTipoArchivoAnexo, fileArchivoAnexo, nombreArchivoAnexo, descripcionArchivoAnexo, createArchivoAnexo, updateArchivoAnexo, errorsData, delteArchivoAnexoRequest, delteArchivoAnexo, getPersonasById, dataArrayPersona, isLoadingRequestPersona } = useArchivoAnexo(context);
 
         const objectPersona = ref(null)
@@ -156,7 +156,7 @@ export default {
         })
 
         /**
-         * Propiedad computada que genera un objeto con un array para obtener el id y el nombre de la persona seleccionada 
+         * Propiedad computada que genera un objeto con un array para obtener el id y el nombre de la persona seleccionada
          * Esto se usa cuando estamos editando y queremos setear el id de la persona actual
          */
         const selectedValue = computed(() => {
@@ -232,7 +232,7 @@ export default {
         });
 
         /**
-         * 
+         *
          * @param {Object} obj1 Objeto de comparacion1
          * @param {Object} obj2 Objeto de comparacion2
          */

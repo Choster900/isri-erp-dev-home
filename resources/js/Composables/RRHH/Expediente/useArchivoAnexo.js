@@ -3,7 +3,7 @@ import Swal from "sweetalert2";
 import { executeRequest } from "@/plugins/requestHelpers.js";
 import { useFileHandling } from "@/Composables/RRHH/Expediente/useFileHandling";
 
-export const useArchivoAnexo = (context) => {
+export const useArchivoAnexo = () => {
     const errorsData = ref([]);
     const idPersona = ref("");
     const idTipoMine = ref(null);
@@ -16,6 +16,80 @@ export const useArchivoAnexo = (context) => {
     const dataArrayPersona = ref(null);
     const isLoadingRequestPersona = ref(false);
     const fileHandling = useFileHandling();
+    const objectPersona = ref([])
+    const stateView = ref(0) // Valida que este agregando o viendo los archivos del usuario
+    const personaWhoWasSelected = ref([])// Contiene el array de la persona a quien se esta editando
+    const objectPersonaAnexosFiltered = ref([])
+
+    const actionOption = ref(1); // Optio 1 es igual a agregar 2 es igual a editar
+    const fileInput = ref('');
+    const urlArchivoAnexo = ref(null);
+    const nameArchivoAnexo = ref(null);
+    const file = ref(null);
+    const tipoMine = ref(null);
+    const sizeArchivo = ref(null);
+    const openFileInput = () => {
+        fileInput.value.click();
+    };
+
+    const handleFileChange = () => {
+        const selectedFile = fileInput.value.files[0];
+        tipoMine.value = selectedFile.type
+        sizeArchivo.value = selectedFile.size
+        nameArchivoAnexo.value = selectedFile.name;
+        if (selectedFile) {
+            const fileType = selectedFile.type;
+            if (fileType.includes("image")) {
+                setImageData(selectedFile);
+            } else if (fileType === "application/pdf") {
+                setPdfData(selectedFile);
+            } else {
+                console.error("Tipo de archivo no compatible.");
+            }
+        }
+    };
+
+    const handleDragOver = (event) => {
+        event.preventDefault();
+    };
+
+    const handleDrop = (event) => {
+        event.preventDefault();
+        const selectedFile = event.dataTransfer.files[0];
+        nameArchivoAnexo.value = selectedFile.name;
+        if (selectedFile) {
+            const fileType = selectedFile.type;
+            if (fileType.includes("image")) {
+                setImageData(selectedFile);
+            } else if (fileType === "application/pdf") {
+                setPdfData(selectedFile);
+            } else {
+                console.error("Tipo de archivo no compatible.");
+            }
+        }
+        fileInput.value = null;
+    };
+
+    const setImageData = (selectedFile) => {
+        urlArchivoAnexo.value = URL.createObjectURL(selectedFile);
+        file.value = selectedFile;
+        console.log("Imagen seleccionada:", selectedFile.name);
+    };
+
+    const setPdfData = (selectedFile) => {
+        urlArchivoAnexo.value = URL.createObjectURL(selectedFile);
+        file.value = selectedFile;
+        console.log("PDF seleccionado:", selectedFile.name);
+    };
+
+    const deleteFile = () => {
+        console.log(file);
+        file.value = '';
+        fileInput.value = '';
+        urlArchivoAnexo.value = '';
+        nameArchivoAnexo.value = '';
+        console.log("Archivo eliminado.");
+    };
 
     function crealFormVar() {
         descripcionArchivoAnexo.value = "";
@@ -23,6 +97,7 @@ export const useArchivoAnexo = (context) => {
         sizeArchivoAnexo.value = "";
         fileArchivoAnexo.value = "";
         idTipoArchivoAnexo.value = "";
+        stateView.value = 0
     }
 
     const getPersonasById = async (idPer) => {
@@ -63,14 +138,50 @@ export const useArchivoAnexo = (context) => {
                 );
 
                 if (thereIsIdPersona) {
-                    context.emit("refresh-information");
+                    //   context.emit("refresh-information");
                 } else {
-                    context.emit("cerrar-modal");
+                    // context.emit("cerrar-modal");
                 }
+                console.log(resp.data.persona);
+                const dataFromBack = resp.data;
+
+
+                personaWhoWasSelected.value.push({ value: resp.data.persona.id_persona, label: resp.data.persona.nombre_apellido });
+                idPersona.value = resp.data.persona.id_persona
+
+                // Verifica si `objectPersona.value` es un array, si no, conviértelo en uno
+                if (!Array.isArray(objectPersona.value)) {
+                    objectPersona.value = [];
+
+                }
+
+                if (!Array.isArray(objectPersonaAnexosFiltered.value)) {
+                    objectPersonaAnexosFiltered.value = [];
+                }
+
+
+                // Comprueba si `dataFromBack` es un array
+                if (Array.isArray(dataFromBack)) {
+                    // Si es un array, usa spread operator para agregar los elementos individualmente
+
+                    objectPersonaAnexosFiltered.value.push(...dataFromBack);
+                    objectPersona.value = objectPersonaAnexosFiltered.value
+
+                    //objectPersona.value.push(...dataFromBack);
+                    //objectPersonaAnexosFiltered.value = objectPersona.value
+                } else {
+                    // Si no es un array, simplemente agrega `dataFromBack` a `objectPersona.value`
+
+                    objectPersonaAnexosFiltered.value.push(dataFromBack);
+                    objectPersona.value = objectPersonaAnexosFiltered.value
+                    //objectPersona.value.push(dataFromBack);
+                    //objectPersonaAnexosFiltered.value = objectPersona.value
+                }
+
                 crealFormVar();
-                fileHandling.deleteFile();
                 resolve(resp);
             } catch (error) {
+                console.log(error);
                 if (error.response.status === 422) {
                     let data = error.response.data.errors;
                     var myData = new Object();
@@ -88,24 +199,7 @@ export const useArchivoAnexo = (context) => {
         });
     };
 
-    const createArchivoAnexo = async (thereIsIdPersona) => {
-        const confirmed = await Swal.fire({
-            title: '<p class="text-[18pt] text-center">¿Esta seguro de agregar un nuevo Anexo?</p>',
-            icon: "question",
-            iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
-            confirmButtonText: "Si, Agregar",
-            confirmButtonColor: "#001b47",
-            cancelButtonText: "Cancelar",
-            showCancelButton: true,
-            showCloseButton: true,
-        });
-        if (confirmed.isConfirmed) {
-            executeRequest(
-                createArchivoAnexoRequest(thereIsIdPersona),
-                "¡El anexo se ha agregado correctamente! Espere mientras se redirecciona al inicio"
-            );
-        }
-    };
+
 
     /**
      *
@@ -131,7 +225,19 @@ export const useArchivoAnexo = (context) => {
                         },
                     }
                 );
-                context.emit("refresh-information");
+                //    context.emit("refresh-information");
+
+                objectPersonaAnexosFiltered.value.find(index => index.id_archivo_anexo == resp.data.id_archivo_anexo).url_archivo_anexo = resp.data.url_archivo_anexo
+                objectPersonaAnexosFiltered.value.find(index => index.id_archivo_anexo == resp.data.id_archivo_anexo).nombre_archivo_anexo = resp.data.nombre_archivo_anexo
+                objectPersonaAnexosFiltered.value.find(index => index.id_archivo_anexo == resp.data.id_archivo_anexo).descripcion_archivo_anexo = resp.data.descripcion_archivo_anexo
+                objectPersonaAnexosFiltered.value.find(index => index.id_archivo_anexo == resp.data.id_archivo_anexo).id_tipo_archivo_anexo = resp.data.id_tipo_archivo_anexo
+                objectPersonaAnexosFiltered.value.find(index => index.id_archivo_anexo == resp.data.id_archivo_anexo).id_tipo_mime = resp.data.id_tipo_mime
+
+
+
+                objectPersona.value = objectPersonaAnexosFiltered.value
+
+
                 crealFormVar();
                 resolve(resp);
             } catch (error) {
@@ -152,51 +258,24 @@ export const useArchivoAnexo = (context) => {
         });
     };
 
-    const updateArchivoAnexo = async () => {
-        const confirmed = await Swal.fire({
-            title: '<p class="text-[18pt] text-center">¿Esta seguro de editar el anexo?</p>',
-            icon: "question",
-            iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
-            confirmButtonText: "Si, Editar",
-            confirmButtonColor: "#001b47",
-            cancelButtonText: "Cancelar",
-            showCancelButton: true,
-            showCloseButton: true,
-        });
-        if (confirmed.isConfirmed) {
-            executeRequest(
-                updateArchivoAnexoRequest(),
-                "¡El anexo se ha acutalizado correctamente! Espere mientras se redirecciona al inicio"
-            );
-        }
-    };
 
-    const delteArchivoAnexo = async () => {
-        const confirmed = await Swal.fire({
-            title: '<p class="text-[17pt] text-center">¿Esta seguro de eliminar el anexo?. los cambios no podran revertirse y perdera el archivo</p>',
-            icon: "question",
-            iconHtml: `<lord-icon src="https://cdn.lordicon.com/enzmygww.json" trigger="loop" delay="500" colors="primary:#121331" style="width:100px;height:100px"></lord-icon>`,
-            confirmButtonText: "Si, Editar",
-            confirmButtonColor: "#F34541",
-            cancelButtonText: "Cancelar",
-            showCancelButton: true,
-            showCloseButton: true,
-        });
-        if (confirmed.isConfirmed) {
-            executeRequest(
-                delteArchivoAnexoRequest(),
-                "¡El anexo se ha eliminado correctamente! Espere mientras se redirecciona al inicio"
-            );
-        }
-    };
 
-    const delteArchivoAnexoRequest = (idArchivoAnexoForDelete) => {
+
+    const delteArchivoAnexoRequest = () => {
         return new Promise(async (resolve, reject) => {
             try {
                 const resp = await axios.post("/deleteArchivoAnexoById", {
-                    idArchivoAnexo: idArchivoAnexoForDelete,
+                    idArchivoAnexo: idArchivoAnexo.value,
                 });
-                context.emit("refresh-information");
+                //  context.emit("refresh-information");
+
+
+                const index = objectPersona.value.findIndex(item => item.id_archivo_anexo === idArchivoAnexo.value);
+                if (index !== -1) {
+                    objectPersona.value.splice(index, 1);
+                }
+
+
                 resolve(resp);
             } catch (error) {
                 console.log(error.message);
@@ -205,24 +284,82 @@ export const useArchivoAnexo = (context) => {
         });
     };
 
+    const downloadFile = (fileUrl) => {
+        const link = document.createElement('a');
+        link.href = fileUrl;
+        link.download = fileUrl.split('/').pop(); // Extrae el nombre del archivo de la URL
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    const openInNewTab = (fileUrl) => {
+        window.open(fileUrl, '_blank');
+    }
+
+
+    const onClickForEditFile = (idFile) => {
+
+        console.log(idFile);
+        stateView.value = 1
+        actionOption.value = 2
+        idArchivoAnexo.value = idFile.id_archivo_anexo
+        urlArchivoAnexo.value = idFile.url_archivo_anexo
+        idTipoArchivoAnexo.value = idFile.id_tipo_archivo_anexo
+        nombreArchivoAnexo.value = idFile.nombre_archivo_anexo
+        nameArchivoAnexo.value = idFile.nombre_archivo_anexo
+        descripcionArchivoAnexo.value = idFile.descripcion_archivo_anexo
+    }
+
+
+    const cleanData = () => {
+
+        idArchivoAnexo.value = ''
+        urlArchivoAnexo.value = ''
+        idTipoArchivoAnexo.value = ''
+        nombreArchivoAnexo.value = ''
+        nameArchivoAnexo.value = ''
+        descripcionArchivoAnexo.value = ''
+
+        actionOption.value = 1
+    }
+
+
     return {
+        downloadFile,
+        openInNewTab,
+        onClickForEditFile,
+        cleanData,
         isLoadingRequestPersona,
+        objectPersona,
         idPersona,
         idTipoMine,
         errorsData,
         idArchivoAnexo,
         fileArchivoAnexo,
         sizeArchivoAnexo,
-        delteArchivoAnexo,
+        objectPersonaAnexosFiltered,
         idTipoArchivoAnexo,
         nombreArchivoAnexo,
+        stateView,
         getPersonasById,
-        createArchivoAnexo,
-        updateArchivoAnexo,
         descripcionArchivoAnexo,
         delteArchivoAnexoRequest,
         createArchivoAnexoRequest,
         dataArrayPersona,
         updateArchivoAnexoRequest,
+        file,
+        fileInput,
+        handleDrop,
+        deleteFile,
+        openFileInput,
+        handleDragOver,
+        urlArchivoAnexo,
+        personaWhoWasSelected,
+        tipoMine,
+        sizeArchivo,
+        handleFileChange,
+        actionOption,
+        nameArchivoAnexo,
     };
 };

@@ -34,10 +34,10 @@
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center ">{{ persona.dui_persona }}</div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                            <td class="px-2 first:pl-5 last:pr-5 ">
                                 <div class="font-medium text-slate-800 text-center ">{{ persona.profesion.nombre_profesion }}</div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                            <td class="px-2 first:pl-5 last:pr-5 ">
                                 <div class="font-medium text-slate-800 text-center">
                                     {{ `${persona.pnombre_persona ? persona.pnombre_persona : ''}
                                                                         ${persona.snombre_persona ? persona.snombre_persona : ''}
@@ -49,6 +49,11 @@
                                     {{ `${persona.papellido_persona ? persona.papellido_persona : ''}
                                                                         ${persona.sapellido_persona ? persona.sapellido_persona : ''}
                                                                         ${persona.tapellido_persona ? persona.tapellido_persona : ''}` }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{ persona.archivo_anexo[persona.archivo_anexo.length - 1].fecha_reg_archivo_anexo  }}
                                 </div>
                             </td>
                             <td class="first:pl-5 last:pr-5">
@@ -147,7 +152,7 @@
             </div>
         </div>
 
-        <ModalExpedientes :showModal="showModal" @cerrar-modal="showModal = false"
+        <NewModalExpediente :showModal="showModal" @cerrar-modal="showModal = false" @actualizar-datatable="getPeople(lastUrl);"
             @actualizar-data="getPeople(lastUrl); showModal = false" :persona="dataPersona" />
 
     </AppLayoutVue>
@@ -157,11 +162,11 @@
 import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";;
-import ModalExpedientes from '@/Components-ISRI/RRHH/ExpedientesComponents/ModalExpedientes.vue';
+import NewModalExpediente from '@/Components-ISRI/RRHH/ExpedientesComponents/NewModalExpediente.vue';
 import { useDatatable } from '@/Composables/RRHH/Expediente/useDatatable'
 import { ref, watch } from 'vue';
 export default {
-    components: { Head, AppLayoutVue, Datatable, ModalExpedientes },
+    components: { Head, AppLayoutVue, Datatable, NewModalExpediente },
     setup() {
         const dataPersona = ref(null)
 
