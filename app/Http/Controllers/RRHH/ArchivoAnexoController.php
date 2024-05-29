@@ -69,8 +69,7 @@ class ArchivoAnexoController extends Controller
             "familiar.parentesco",
             "municipio.departamento.pais",
             "archivo_anexo" => function ($query) {
-                $query->where('estado_archivo_anexo', 1)
-                      ->orderBy('fecha_reg_archivo_anexo', 'desc'); // Ordenar por fecha_reg_archivo_anexo en orden descendente
+                $query->where('estado_archivo_anexo', 1);
             },
             "empleado.plazas_asignadas.detalle_plaza.plaza",
         ])->whereHas("archivo_anexo")
@@ -163,11 +162,10 @@ class ArchivoAnexoController extends Controller
             DB::commit();
 
             // Cargar la relación tipoArchivoAnexo y devolver el registro creado
-            $archivoAnexoConRelaciones = ArchivoAnexo::with(['tipo_archivo_anexo','persona'])->find($archivoAnexo->id_archivo_anexo);
+            $archivoAnexoConRelaciones = ArchivoAnexo::with(['tipo_archivo_anexo', 'persona'])->find($archivoAnexo->id_archivo_anexo);
 
             // Return the created ArchivoAnexo with its relationship
             return response()->json($archivoAnexoConRelaciones, 201);
-
         } catch (\Throwable $th) {
             // An error occurred, rollback the transaction
             DB::rollback();
