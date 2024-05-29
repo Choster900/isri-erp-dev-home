@@ -62,17 +62,17 @@
                 </p>
                 <div class="flex flex-col md:flex-row items-center mb-4 h-10 mx-8 max-w-full">
                     <div class="w-full md:w-[40%] mb-2 md:mb-0 md:mr-2">
-                        <label for="doc" class="font-[Roboto]">Numero documento:</label>
+                        <label for="doc" class="font-[Roboto]">Numero documento: <span class="text-red-600 font-bold font-[Roboto]">*</span></label>
                     </div>
                     <div class="relative font-semibold flex h-[35px] w-full md:w-[60%]">
                         <Multiselect id="doc" v-model="infoToShow.docId" :options="filteredDoc" :searchable="true"
                             :noOptionsText="'Lista vacía.'" placeholder="Seleccione documento"
-                            @clear="infoToShow.detDocId = ''" @change="infoToShow.detDocId = ''"/>
+                            @change="infoToShow.detDocId = ''; recDocument.monthId = '';"/>
                     </div>
                 </div>
                 <div class="flex flex-col md:flex-row items-center mb-4 h-10 mx-8 max-w-full">
                     <div class="w-full md:w-[40%] mb-2 md:mb-0 md:mr-2">
-                        <label for="det-doc" class="font-[Roboto]">Item:</label>
+                        <label for="det-doc" class="font-[Roboto]">Item: <span class="text-red-600 font-bold font-[Roboto]">*</span></label>
                     </div>
                     <div class="relative font-semibold flex h-[35px] w-full md:w-[60%]">
                         <Multiselect id="det-doc" v-model="infoToShow.detDocId" :options="filteredItems"
@@ -82,22 +82,20 @@
                 </div>
                 <div v-if="docSelected === 1" class="flex flex-col md:flex-row items-center mb-4 h-10 mx-8 max-w-full">
                     <div class="w-full md:w-[40%] mb-2 md:mb-0 md:mr-2">
-                        <label for="det-doc" class="font-[Roboto]">Mes:</label>
+                        <label for="det-doc" class="font-[Roboto]">Mes: <span class="text-red-600 font-bold font-[Roboto]">*</span></label>
                     </div>
                     <div class="relative font-semibold flex h-[35px] w-full md:w-[60%]">
-                        <Multiselect id="det-doc" v-model="infoToShow.monthId" :options="months" 
+                        <Multiselect id="det-doc" v-model="recDocument.monthId" :options="months" 
                             :disabled="months.length <= 0" :loading="isLoadingItem"
-                            :searchable="true" :noOptionsText="'Lista vacía.'"  
+                            :searchable="true" :noOptionsText="'Lista vacía.'" @change="changeMonth($event)"
                             :placeholder="months.length <= 0 ? 'Sin meses disponibles' : 'Seleccione mes'" />
                     </div>
                 </div>
 
                 <div class="md:flex pb-[30px] mt-[60px] flex-row justify-end mx-8">
-                    <button type="button" :disabled="infoToShow.docId == '' || infoToShow.detDocId == ''"
-                        :class="(infoToShow.docId == '' || infoToShow.detDocId == '') ? 'cursor-not-allowed opacity-50' : ''"
-                        :title="(infoToShow.docId == '' || infoToShow.detDocId == '') ? 'Información incompleta' : 'Iniciar proceso de recepción'"
-                        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                        @click="startReception(recepId)">
+                    <button type="button" :title="'Iniciar proceso de recepción'"
+                        class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center"
+                        @click="handleReceptionStart(recepId)">
                         Iniciar recepcion
                         <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true"
                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
@@ -110,7 +108,7 @@
 
             <div v-else>
                 <div class="pl-8 mr-0 pb-1 max-w-full overflow-x-auto mt-4 max-h-[450px] overflow-y-auto">
-                    <div class="min-w-[970px] bg-white" id="headerFormat">
+                    <div class="min-w-[970px]" id="headerFormat">
                         <div class="grid grid-cols-[23%_77%] max-w-[96%] border border-gray-500">
                             <!-- Columna 1 -->
                             <div class="w-full bg-white border-r border-gray-500 p-2 flex items-center justify-center">
@@ -132,15 +130,15 @@
                             </div>
                         </div>
                     </div>
-                    <div class="min-w-[970px] bg-white">
-                        <div class="grid grid-cols-[40%_35%_25%] max-w-[96%]">
+                    <div class="min-w-[970px]">
+                        <div class="grid grid-cols-[40%_35%_25%] max-w-[96%] bg-white">
                             <div class="w-full justify-start flex items-center border-l border-gray-500 bg-white">
                                 <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2">Fecha y hora de recepción:
                                     <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
                                         infoToShow.dateTime }}</span>
                                 </p>
                             </div>
-                            <div class=" w-full justify-start flex items-center bg-white">
+                            <div class=" w-full justify-start flex items-center">
                                 <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1">Financiamiento:
                                     <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
                                         infoToShow.financingSource }}</span>
@@ -172,14 +170,14 @@
                         </div>
                     </div>
                     <div class="min-w-[970px]">
-                        <div class="grid grid-cols-[75%_25%] max-w-[96%] bg-white border-b border-gray-500">
-                            <div class="w-full justify-start flex items-center border-l border-gray-500 bg-white">
+                        <div class="grid grid-cols-[75%_25%] max-w-[96%] bg-white border-b border-x border-gray-500">
+                            <div class="w-full justify-start flex items-center bg-white">
                                 <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1 ml-2">Fecha referencia documento de compra:
                                     <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
                                         infoToShow.acqDocDate }}</span>
                                 </p>
                             </div>
-                            <div class="w-full justify-start flex items-center border-r border-gray-500 bg-white">
+                            <div v-if="docSelected === 1" class="w-full justify-start flex items-center bg-white">
                                 <p class="font-[MuseoSans] text-gray-700 text-[12px] py-1"> Mes:
                                     <span class="ml-1 underline font-bold font-[MuseoSans] text-[12px]">{{
                                         infoToShow.monthName
@@ -372,8 +370,8 @@
                                 SELECCIONADOS</p>
                         </div>
                     </div>
-                    <div id="total" class="w-full max-w-full grid grid-cols-[96%_4%] min-w-[970px] bg-white">
-                        <div class="grid grid-cols-[88%_12%] w-full max-w-full border-b border-x border-gray-500">
+                    <div id="total" class="w-full max-w-full grid grid-cols-[96%_4%] min-w-[970px]">
+                        <div class="grid grid-cols-[88%_12%] w-full max-w-full border-b border-x border-gray-500 bg-white">
                             <div class="flex items-center justify-end border-r h-[30px]  border-gray-500">
                                 <p class="font-[MuseoSans] text-[12px] py-2 mr-2 font-bold">TOTAL ACTA</p>
                             </div>
@@ -457,9 +455,9 @@ export default {
             isLoadingRequest, recDocument, errors, activeDetails, isLoadingItem,
             documents, ordenC, contrato, docSelected, products, brands, months,
             filteredDoc, filteredItems, startRec, filteredProds, totalRec, infoToShow,
-            getInfoForModalRecep, startReception, setProdItem, calculateLtTotal, checkBlinkingClass,
+            getInfoForModalRecep, handleReceptionStart, setProdItem, calculateLtTotal, checkBlinkingClass,
             deleteRow, handleValidation, storeReception, updateReception, showAvails, returnToTop, 
-            hasActiveProds, selectItem
+            hasActiveProds, selectItem, changeMonth
         } = useRecepcion(context);
 
         onMounted(
@@ -472,9 +470,9 @@ export default {
             isLoadingRequest, recDocument, errors, activeDetails, months,
             documents, ordenC, contrato, docSelected, totalRec, products, brands,
             filteredDoc, filteredItems, startRec, filteredProds, infoToShow, isLoadingItem,
-            handleValidation, startReception, setProdItem, calculateLtTotal, checkBlinkingClass,
+            handleValidation, handleReceptionStart, setProdItem, calculateLtTotal, checkBlinkingClass,
             deleteRow, storeReception, updateReception, showAvails, returnToTop, 
-            hasActiveProds, selectItem
+            hasActiveProds, selectItem, changeMonth
         }
     }
 }

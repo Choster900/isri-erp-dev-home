@@ -285,15 +285,29 @@ class RecepcionController extends Controller
         } else {
             if ($item->productos_adquisiciones()->where('estado_prod_adquisicion', 1)->exists()) {
                 if ($idRec > 0) {
-                    $procedure = DB::select(
-                        'CALL PR_GET_PRODUCT_ACQUISITION_MINUS_CURRENT_RECEIPT(?, ?)',
-                        array($item->id_det_doc_adquisicion, $recep->id_recepcion_pedido)
-                    );
+                    if ($item->documento_adquisicion->id_tipo_doc_adquisicion == 1) { //If it's a contract
+                        $procedure = DB::select(
+                            'CALL PR_GET_PA_CONTRACT_EDIT(?, ?, ?)',
+                            array($item->id_det_doc_adquisicion, $recep->id_mes_recepcion, $recep->id_recepcion_pedido)
+                        );
+                    } else {
+                        $procedure = DB::select(
+                            'CALL PR_GET_PRODUCT_ACQUISITION_MINUS_CURRENT_RECEIPT(?, ?)',
+                            array($item->id_det_doc_adquisicion, $recep->id_recepcion_pedido)
+                        );
+                    }
                 } else {
-                    $procedure = DB::select(
-                        'CALL PR_GET_PRODUCT_ACQUISITION(?)',
-                        array($item->id_det_doc_adquisicion)
-                    );
+                    if ($item->documento_adquisicion->id_tipo_doc_adquisicion == 1) { //If it's a contract
+                        $procedure = DB::select(
+                            'CALL PR_GET_PA_CONTRACT_CREATE(?, ?)',
+                            array($item->id_det_doc_adquisicion, $request->monthId)
+                        );
+                    } else {
+                        $procedure = DB::select(
+                            'CALL PR_GET_PRODUCT_ACQUISITION(?)',
+                            array($item->id_det_doc_adquisicion)
+                        );
+                    }
                 }
                 $brands = Marca::select('id_marca as value', 'nombre_marca as label')->get();
 
@@ -313,10 +327,19 @@ class RecepcionController extends Controller
 
     public function storeReception(RecepcionRequest $request)
     {
-        $procedure = DB::select(
-            'CALL PR_GET_PRODUCT_ACQUISITION(?)',
-            array($request->detDocId)
-        );
+        $detDoc = DetDocumentoAdquisicion::with('documento_adquisicion.proveedor')->find($request->detDocId);
+
+        if ($detDoc->documento_adquisicion->id_tipo_doc_adquisicion == 1) { //If it's a contract
+            $procedure = DB::select(
+                'CALL PR_GET_PA_CONTRACT_CREATE(?, ?)',
+                array($request->detDocId, $request->monthId)
+            );
+        } else {
+            $procedure = DB::select(
+                'CALL PR_GET_PRODUCT_ACQUISITION(?)',
+                array($request->detDocId)
+            );
+        }
 
         // Obtener el valor de total_menos_acumulado de todos los elementos de $procedure
         $totalMenosAcumuladoProcedure = array_column($procedure, $request->isGas ? 'total_menos_acumulado_monto' : 'total_menos_acumulado');
@@ -332,8 +355,6 @@ class RecepcionController extends Controller
                 'prods'         => $procedure
             ], 422);
         }
-
-        $detDoc = DetDocumentoAdquisicion::with('documento_adquisicion.proveedor')->find($request->detDocId);
 
         DB::beginTransaction();
         try {
@@ -353,6 +374,7 @@ class RecepcionController extends Controller
                 'id_det_doc_adquisicion'                => $request->detDocId,
                 'id_proy_financiado'                    => $request->financingSourceId,
                 'monto_recepcion_pedido'                => $request->total,
+                'id_mes_recepcion'                      => $detDoc->documento_adquisicion->id_tipo_doc_adquisicion == 1 ? $request->monthId : null,
                 'id_proveedor'                          => $detDoc->documento_adquisicion->proveedor->id_proveedor,
                 'id_estado_recepcion_pedido'            => 1,
                 'factura_recepcion_pedido'              => $request->invoice,
@@ -422,15 +444,19 @@ class RecepcionController extends Controller
 
     public function updateReception(RecepcionRequest $request)
     {
-        $procedure = DB::select(
-            'CALL PR_GET_PRODUCT_ACQUISITION(?)',
-            array($request->detDocId)
-        );
+        $detDoc = DetDocumentoAdquisicion::with('documento_adquisicion')->find($request->detDocId);
 
-        $procedure = DB::select(
-            'CALL PR_GET_PRODUCT_ACQUISITION_MINUS_CURRENT_RECEIPT(?, ?)',
-            array($request->detDocId, $request->id)
-        );
+        if ($detDoc->documento_adquisicion->id_tipo_doc_adquisicion == 1) { //If it's a contract
+            $procedure = DB::select(
+                'CALL PR_GET_PA_CONTRACT_EDIT(?, ?, ?)',
+                array($request->detDocId, $request->monthId, $request->id)
+            );
+        } else {
+            $procedure = DB::select(
+                'CALL PR_GET_PRODUCT_ACQUISITION_MINUS_CURRENT_RECEIPT(?, ?)',
+                array($request->detDocId, $request->id)
+            );
+        }
 
         // Obtener el valor de total_menos_acumulado de todos los elementos de $procedure
         $totalMenosAcumuladoProcedure = array_column($procedure, $request->isGas ? 'total_menos_acumulado_monto' : 'total_menos_acumulado');
@@ -441,7 +467,7 @@ class RecepcionController extends Controller
         // Comparar los valores
         if ($totalMenosAcumuladoProcedure !== $totalMenosAcumuladoRequest) {
             return response()->json([
-                'logical_error' => 'Error, la disponibilidad de recepcion de bienes ha cambiado, intente nuevamente xxx.',
+                'logical_error' => 'Error, la disponibilidad de recepcion de bienes ha cambiado, intente nuevamente.',
                 'refresh'       => true,
                 'prods'            => $procedure,
             ], 422);

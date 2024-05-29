@@ -1,5 +1,5 @@
-
 <template>
+
     <Head title="RRHH - Gestion Empleados" />
     <AppLayoutVue nameSubModule="RRHH - Empleados">
         <div class="sm:flex sm:justify-end sm:items-center mb-2">
@@ -13,14 +13,15 @@
                 <div class="mb-4 md:flex flex-row justify-items-start">
                     <div class="mb-4 md:mr-2 md:mb-0 basis-1/4">
                         <div class="relative flex h-8 w-full flex-row-reverse div-multiselect">
-                            <Multiselect v-model="tableData.length" @select="getPeople()"
-                                @deselect=" tableData.length = 5; getPeople()" @clear="tableData.length = 5; getPeople()"
-                                :options="perPage" :searchable="true" placeholder="Cantidad a mostrar" />
+                            <Multiselect v-model="tableData.length" @select="getPeople(lastUrl)"
+                                @deselect=" tableData.length = 5; getPeople(lastUrl)"
+                                @clear="tableData.length = 5; getPeople(lastUrl)" :options="perPage" :searchable="true"
+                                placeholder="Cantidad a mostrar" />
                             <LabelToInput icon="list2" />
                         </div>
                     </div>
                     <h2 class="font-semibold text-slate-800 pt-1">Empleados: <span class="text-slate-400 font-medium">{{
-                        persona ? pagination.total : '' }}</span></h2>
+                    persona ? pagination.total : '' }}</span></h2>
                 </div>
             </header>
             <div class="overflow-x-auto">
@@ -34,21 +35,30 @@
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center ">{{ persona.dui_persona }}</div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
-                                <div class="font-medium text-slate-800 text-center ">{{ persona.profesion.nombre_profesion }}</div>
+                            <td class="px-2 first:pl-5 last:pr-5 ">
+                                <div class="font-medium text-slate-800 text-center ">{{
+                    persona.profesion.nombre_profesion }}</div>
                             </td>
-                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                            <td class="px-2 first:pl-5 last:pr-5 ">
                                 <div class="font-medium text-slate-800 text-center">
                                     {{ `${persona.pnombre_persona ? persona.pnombre_persona : ''}
-                                                                        ${persona.snombre_persona ? persona.snombre_persona : ''}
-                                                                        ${persona.tapellido_persona ? persona.tapellido_persona : ''}` }}
+                                    ${persona.snombre_persona ? persona.snombre_persona : ''}
+                                    ${persona.tapellido_persona ? persona.tapellido_persona : ''}` }}
                                 </div>
                             </td>
                             <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
                                 <div class="font-medium text-slate-800 text-center">
                                     {{ `${persona.papellido_persona ? persona.papellido_persona : ''}
-                                                                        ${persona.sapellido_persona ? persona.sapellido_persona : ''}
-                                                                        ${persona.tapellido_persona ? persona.tapellido_persona : ''}` }}
+                                    ${persona.sapellido_persona ? persona.sapellido_persona : ''}
+                                    ${persona.tapellido_persona ? persona.tapellido_persona : ''}` }}
+                                </div>
+                            </td>
+                            <td class="px-2 first:pl-5 last:pr-5  whitespace-nowrap w-px">
+                                <div class="font-medium text-slate-800 text-center">
+                                    {{
+
+                                        moment(persona.archivo_anexo[persona.archivo_anexo.length - 1]?.fecha_reg_archivo_anexo).format('D MMM YYYY')
+                                    }}
                                 </div>
                             </td>
                             <td class="first:pl-5 last:pr-5">
@@ -58,8 +68,9 @@
                                             @click.stop="dataPersona = persona; showModal = !showModal">
                                             <div class="w-8 text-blue-900">
                                                 <span class="text-xs">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                        stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                                        class="w-6 h-6">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
                                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -79,7 +90,8 @@
                             <td colspan="5" class="text-center">
                                 <img src="../../../img/IsSearching.gif" alt="" class="w-60 h-60 mx-auto">
                                 <h1 class="font-medium text-xl mt-4">Cargando!!!</h1>
-                                <p class="text-sm text-gray-600 mt-2 pb-10">Por favor espera un momento mientras se carga la
+                                <p class="text-sm text-gray-600 mt-2 pb-10">Por favor espera un momento mientras se
+                                    carga la
                                     información.</p>
                             </td>
                         </tr>
@@ -89,7 +101,8 @@
                             <td colspan="5" class="text-center">
                                 <img src="../../../img/NoData.gif" alt="" class="w-60 h-60 mx-auto">
                                 <h1 class="font-medium text-xl mt-4">No se encontraron resultados!</h1>
-                                <p class="text-sm text-gray-600 mt-2 pb-10">Parece que no hay registros disponibles en este
+                                <p class="text-sm text-gray-600 mt-2 pb-10">Parece que no hay registros disponibles en
+                                    este
                                     momento.</p>
                             </td>
                         </tr>
@@ -147,8 +160,9 @@
             </div>
         </div>
 
-        <ModalExpedientes :showModal="showModal" @cerrar-modal="showModal = false"
-            @actualizar-data="getPeople(lastUrl); showModal = false" :persona="dataPersona" />
+        <NewModalExpediente :showModal="showModal" @cerrar-modal="showModal = false"
+            @actualizar-datatable="getPeople(lastUrl);" @actualizar-data="getPeople(lastUrl); showModal = false"
+            :persona="dataPersona" />
 
     </AppLayoutVue>
 </template>
@@ -157,11 +171,12 @@
 import { Head } from "@inertiajs/vue3";
 import AppLayoutVue from "@/Layouts/AppLayout.vue";
 import Datatable from "@/Components-ISRI/Datatable.vue";;
-import ModalExpedientes from '@/Components-ISRI/RRHH/ExpedientesComponents/ModalExpedientes.vue';
+import NewModalExpediente from '@/Components-ISRI/RRHH/ExpedientesComponents/NewModalExpediente.vue';
 import { useDatatable } from '@/Composables/RRHH/Expediente/useDatatable'
 import { ref, watch } from 'vue';
+import moment from "moment";
 export default {
-    components: { Head, AppLayoutVue, Datatable, ModalExpedientes },
+    components: { Head, AppLayoutVue, Datatable, NewModalExpediente },
     setup() {
         const dataPersona = ref(null)
 
@@ -182,6 +197,7 @@ export default {
         })
 
         return {
+            moment,
             emptyObject,
             dataPersona,
             pagination,
@@ -196,4 +212,3 @@ export default {
     }
 }
 </script>
-
