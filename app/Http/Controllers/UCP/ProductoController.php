@@ -123,7 +123,7 @@ class ProductoController extends Controller
                 'nombre_producto'           => $request->name,
                 'descripcion_producto'      => $request->description,
                 'nombre_completo_producto'  => $request->name . " " . $request->description,
-                'precio_producto'           => substr($request->price, 1),
+                'precio_producto'           => substr($request->price, 1), //we remove the dollar sign
                 'basico_producto'           => $request->gAndS == -1 ? null : $request->gAndS,
                 'perecedero_producto'       => $request->perishable == -1 ? null : $request->perishable,
                 'fraccionado_producto'      => 0,
