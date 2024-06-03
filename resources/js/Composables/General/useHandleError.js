@@ -24,22 +24,10 @@ export const useHandleError = (errors) => {
             const code_error = errors.response.status;
 
             switch (code_error) {
-                case 419:
-                    console.log(errors.response.data.message || "Página expirada.");
-                    title = "Sesión expirada";
-                    text = "Página expirada, por favor recargue la página.";
-                    icon = "warning";
-                    break;
-                case 500:
-                    console.log(errors.response.data.message || "Error del servidor.");
-                    title = "Operación cancelada";
-                    text = "Error al conectarse con el servidor.";
-                    icon = "error";
-                    break;
                 case 401:
                     console.log(errors.response.data.message || "Unauthorized");
                     title = "Autenticación requerida.";
-                    text = "Necesita estar autenticado para acceder al recurso solicitado, consulte con el administrador.";
+                    text = "Necesita estar autenticado para acceder al recurso solicitado, por favor recargue la página e inicie sesión.";
                     icon = "warning";
                     break;
                 case 403:
@@ -54,11 +42,23 @@ export const useHandleError = (errors) => {
                     text = "El recurso al que intentas acceder no esta disponible, consulte con el administrador.";
                     icon = "warning";
                     break;
+                case 419:
+                    console.log(errors.response.data.message || "Página expirada.");
+                    title = "Sesión expirada";
+                    text = "Página expirada, por favor recargue la página.";
+                    icon = "warning";
+                    break;
                 case 429:
                     console.log(errors.response.data.message || "Demasiadas solicitudes.");
                     title = "Demasiadas solicitudes";
                     text = "Has realizado demasiadas solicitudes en un corto período de tiempo. Por favor, inténtalo de nuevo más tarde.";
                     icon = "warning";
+                    break;
+                case 500:
+                    console.log(errors.response.data.message || "Error del servidor.");
+                    title = "Operación cancelada";
+                    text = "Error al conectarse con el servidor.";
+                    icon = "error";
                     break;
                 case 503:
                     console.log(errors.response.data.message || "Servicio no disponible.");
