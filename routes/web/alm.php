@@ -190,6 +190,12 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('get-reporte-recepcion-almacen', [ReporteAlmacenController::class, 'getReporteRecepcion'])->name('reporte.AlmacenRecepcion');
     Route::post('get-reporte-recepcion-excel', [ReporteAlmacenController::class, 'getExcelRecepcion'])->name('reporte.AlmacenRecepcion');
 
-
-
+    //Contract tracking report
+    Route::get(
+        '/alm/reporte-seguimiento',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/reporte-seguimiento', 'Almacen/ReporteSeguimientoContrato');
+        }
+    )->name('alm.reporteSeguimiento');
+    Route::get('get-contracts-info', [ReporteAlmacenController::class, 'getContractsInfo'])->name('reporteAlm.getContractsInfo');
 });

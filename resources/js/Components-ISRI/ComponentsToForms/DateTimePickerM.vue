@@ -2,7 +2,7 @@
     <label v-if="label" :for="id" class="block mb-2 text-[13px] font-medium text-gray-600">{{ label }}
         <span v-if="required" class="text-red-600 font-extrabold">*</span></label>
     <vue-date-picker v-model="modelValue" :enable-time-picker="enableTimePicker" :format="format" :no-today="noToday" :hide-input-icon="!showIcon"
-        :placeholder="placeholder" :disabled="disabled" :teleport="teleport" auto-apply :locale="localeConfig" :day-names="dayNames"
+        :placeholder="placeholder" :disabled="disabled" :teleport="teleport" auto-apply :locale="localeConfig" :day-names="dayNames" :required="required"
         @update:model-value="$emit('update:modelValue', $event)" :style="hasError ? '--dp-border-color: #F87171;' : ''"
         class="py-0">
         <template #input-icon>
@@ -86,6 +86,10 @@ export default {
             type: Boolean,
             default: false
         },
+        required: {
+            type: Boolean,
+            default: false
+        },
         dayNames: {
             type: Array,
             default: () => ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa', 'Do'],
@@ -125,7 +129,7 @@ export default {
 
 .dp__theme_light {
     /* I've edited this */
-    --dp-primary-color: #059669;
+    /* --dp-primary-color: #059669; */
     --dp-cell-size: 25px;
     --dp-font-size: 0.8rem;
 }
