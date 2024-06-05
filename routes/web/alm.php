@@ -198,6 +198,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
         }
     )->name('alm.reporteSeguimiento');
     Route::get('get-contracts-info', [ReporteAlmacenController::class, 'getContractsInfo'])->name('reporteAlm.getContractsInfo');
+    Route::post('get-contract-tracking-report', [ReporteAlmacenController::class, 'getContractTrackingReport'])->name('reporteAlm.getContractTrackingReport');
 
     Route::get(
         '/alm/reporte-kardex',
