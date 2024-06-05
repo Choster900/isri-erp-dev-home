@@ -53,6 +53,7 @@ export const useToDataTable = (columns, requestUrl, columnToSort, dir, col = 0) 
                         toast.success,
                         response.data.message
                     );
+                    getDataToShow(tableData.value.currentPage)
                 } catch (err) {
                     if (err.response.status === 422) {
                         if (err.response.data.logical_error) {
@@ -61,12 +62,12 @@ export const useToDataTable = (columns, requestUrl, columnToSort, dir, col = 0) 
                                 err.response.data.logical_error
                             );
                         }
+                        getDataToShow(tableData.value.currentPage)
                     } else {
                         showErrorMessage(err);
                     }
                 } finally {
                     isLoadingTop.value = false;
-                    getDataToShow(tableData.value.currentPage)
                 }
             }
         });

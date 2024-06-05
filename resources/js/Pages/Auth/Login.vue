@@ -3,7 +3,7 @@
 import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import { Head, Link, useForm } from "@inertiajs/vue3";
-
+import moment from 'moment';
 const form = useForm({
     nick_usuario: "",
     password: "",
@@ -34,7 +34,8 @@ const submit = () => {
                     </h1>
                 </div>
                 <p class="font-medium text-gray-400 flex justify-center">
-                    © 2023 ISRI - Gobierno de El Salvador
+
+                    ©  {{ moment().year() }} ISRI - Gobierno de El Salvador
                 </p>
             </div>
 

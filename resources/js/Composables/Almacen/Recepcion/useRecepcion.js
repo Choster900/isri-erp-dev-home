@@ -18,7 +18,6 @@ export const useRecepcion = (context) => {
     const docSelected = ref('')
     const reception = ref([])
     const products = ref([])
-    const filteredProds = ref([])
     const documents = ref([])
     const items = ref([])
     const brands = ref([])
@@ -445,105 +444,44 @@ export const useRecepcion = (context) => {
         }
     }
 
-    const activeDetails = computed(() => {
-        // Filtrar los productos no eliminados dentro de todos los grupos
-        const activeProducts = recDocument.value.prods.flatMap(group => group.productos.filter(producto => !producto.deleted));
-
-        return activeProducts;
-    });
-
-
-    const totalRec = computed(() => {
-        let sum = 0;
-        for (let i = 0; i < recDocument.value.prods.length; i++) {
-            for (let j = 0; j < recDocument.value.prods[i].productos.length; j++) { // <- Corregido aquí
-                if (recDocument.value.prods[i].productos[j].deleted == false) {
-                    let amount = parseFloat(recDocument.value.prods[i].productos[j].total);
-                    if (!isNaN(amount)) {
-                        sum += amount;
-                    }
-                }
-            }
-        }
-        recDocument.value.total = sum.toFixed(2);
-        return sum.toFixed(2);
-    });
-
-
-    const ordenC = computed(() => {
-        const result = documents.value.filter((element) => {
-            return element.id_tipo_doc_adquisicion == 2
-        });
-        return result ?? [];
-    });
-
-    const contrato = computed(() => {
-        const result = documents.value.filter((element) => {
-            return element.id_tipo_doc_adquisicion == 1
-        });
-        return result ?? [];
-    });
-
-    const filteredDoc = computed(() => {
-        const result = documents.value.filter((element) => {
-            return element.id_tipo_doc_adquisicion == docSelected.value
-        });
-        return result ?? [];
-    });
-
-    const filteredItems = computed(() => {
-        const result = items.value.filter((element) => {
-            return element.id_doc_adquisicion == infoToShow.value.docId
-        });
-        return result ?? [];
-    });
-
-    // Observa cambios en las propiedades qty y cost de cada producto
-    watch(recDocument, (newValue) => {
-        newValue.prods.forEach((lts) => {
-            lts.productos.forEach((prod) => {
-                if (recDocument.value.isGas) {
-                    if (prod.total && prod.qty) {
-                        if (prod.total > 0 && prod.qty > 0) {
-                            prod.cost = (prod.total / prod.qty).toFixed(6)
-                        } else {
-                            prod.cost = '0.00'
-                        }
-                    } else {
-                        prod.cost = '0.00'
-                    }
-                } else {
-                    prod.total = (prod.qty * prod.cost).toFixed(2)
-                }
-            })
-        });
-    }, { deep: true });
-
     const showAvails = (prodId, indexLt, index, isGas) => {
-        if (prodId) {
-            const matchProds = recDocument.value.prods[indexLt].productos.filter((e) => e.prodId == prodId)
-            const prodProcedure = products.value.find((e) => e.value == prodId)
-
-            let acumulado = 0
-            acumulado += parseFloat(isGas ? prodProcedure.acumulado_monto : prodProcedure.acumulado)
-            matchProds.forEach((e) => {
-                if (!e.deleted) {
-                    let amount = parseFloat(isGas ? e.total : e.qty);
-                    if (!isNaN(amount)) {
-                        acumulado += amount;
-                    }
-                }
-            })
-            acumulado.toFixed(2)
-
-            const qtyTotal = isGas ? parseFloat((prodProcedure.cant_prod_adquisicion * prodProcedure.costo_prod_adquisicion) - acumulado) : parseFloat(prodProcedure.cant_prod_adquisicion - acumulado)
-            recDocument.value.prods[indexLt].productos[index].avails = isGas ? qtyTotal.toFixed(2) : qtyTotal
-            return isGas ? qtyTotal.toFixed(2) : qtyTotal
-        } else {
-            recDocument.value.prods[indexLt].productos[index].avails = -1
-            return ""
+        if (!prodId) {
+            recDocument.value.prods[indexLt].productos[index].avails = -1;
+            return "";
         }
-    }
+
+        const { productos } = recDocument.value.prods[indexLt];
+        const prodProcedure = products.value.find(e => e.value === prodId);
+
+        if (!prodProcedure) return "";
+
+        const initialAmount = parseFloat(isGas ? prodProcedure.acumulado_monto : prodProcedure.acumulado) || 0;
+
+        const acumulado = productos
+            .filter(e => e.prodId === prodId && !e.deleted)
+            .reduce((sum, e) => {
+                const amount = parseFloat(isGas ? e.total : e.qty);
+                return sum + (isNaN(amount) ? 0 : amount);
+            }, initialAmount);
+
+        const qtyTotal = isGas
+            ? (prodProcedure.cant_prod_adquisicion * prodProcedure.costo_prod_adquisicion) - acumulado
+            : prodProcedure.cant_prod_adquisicion - acumulado;
+
+        const formattedQtyTotal = isGas ? qtyTotal.toFixed(2) : qtyTotal;
+
+        recDocument.value.prods[indexLt].productos[index].avails = formattedQtyTotal;
+
+        // Agregar o actualizar la propiedad 'existencia' en 'products'
+        const productIndex = products.value.findIndex(product => product.value === prodId);
+        if (productIndex !== -1) {
+            const existencia = qtyTotal > 0 ? qtyTotal : 0;
+            products.value[productIndex].existencia = existencia;
+        }
+
+        return formattedQtyTotal;
+    };
+
 
     const storeReception = async (obj) => {
         swal({
@@ -621,6 +559,85 @@ export const useRecepcion = (context) => {
         const { title, text, icon } = useHandleError(err);
         swal({ title: title, text: text, icon: icon, timer: 5000 });
     };
+
+    const activeDetails = computed(() => {
+        // Filtrar los productos no eliminados dentro de todos los grupos
+        const activeProducts = recDocument.value.prods.flatMap(group => group.productos.filter(producto => !producto.deleted));
+
+        return activeProducts;
+    });
+
+    const totalRec = computed(() => {
+        let sum = 0;
+        for (let i = 0; i < recDocument.value.prods.length; i++) {
+            for (let j = 0; j < recDocument.value.prods[i].productos.length; j++) { // <- Corregido aquí
+                if (recDocument.value.prods[i].productos[j].deleted == false) {
+                    let amount = parseFloat(recDocument.value.prods[i].productos[j].total);
+                    if (!isNaN(amount)) {
+                        sum += amount;
+                    }
+                }
+            }
+        }
+        recDocument.value.total = sum.toFixed(2);
+        return sum.toFixed(2);
+    });
+
+    const ordenC = computed(() => {
+        const result = documents.value.filter((element) => {
+            return element.id_tipo_doc_adquisicion == 2
+        });
+        return result ?? [];
+    });
+
+    const contrato = computed(() => {
+        const result = documents.value.filter((element) => {
+            return element.id_tipo_doc_adquisicion == 1
+        });
+        return result ?? [];
+    });
+
+    const filteredDoc = computed(() => {
+        const result = documents.value.filter((element) => {
+            return element.id_tipo_doc_adquisicion == docSelected.value
+        });
+        return result ?? [];
+    });
+
+    const filteredItems = computed(() => {
+        const result = items.value.filter((element) => {
+            return element.id_doc_adquisicion == infoToShow.value.docId
+        });
+        return result ?? [];
+    });
+
+    const filteredProds = computed(() => {
+        return products.value.filter(product => {
+            // Si la propiedad 'existencia' no está definida o es mayor que 0, incluir el producto
+            return !('existencia' in product) || product.existencia > 0;
+        });
+    });
+    
+    // Observa cambios en las propiedades qty y cost de cada producto
+    watch(recDocument, (newValue) => {
+        newValue.prods.forEach((lts) => {
+            lts.productos.forEach((prod) => {
+                if (recDocument.value.isGas) {
+                    if (prod.total && prod.qty) {
+                        if (prod.total > 0 && prod.qty > 0) {
+                            prod.cost = (prod.total / prod.qty).toFixed(6)
+                        } else {
+                            prod.cost = '0.00'
+                        }
+                    } else {
+                        prod.cost = '0.00'
+                    }
+                } else {
+                    prod.total = (prod.qty * prod.cost).toFixed(2)
+                }
+            })
+        });
+    }, { deep: true });
 
     return {
         errors, isLoadingRequest, reception, infoToShow, activeDetails,
