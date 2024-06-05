@@ -189,6 +189,16 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     )->name('alm.reporteRecepcion');
     Route::post('get-reporte-recepcion-almacen', [ReporteAlmacenController::class, 'getReporteRecepcion'])->name('reporte.AlmacenRecepcion');
     Route::post('get-reporte-recepcion-excel', [ReporteAlmacenController::class, 'getExcelRecepcion'])->name('reporte.AlmacenRecepcion');
+
+    //Contract tracking report
+    Route::get(
+        '/alm/reporte-seguimiento',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/reporte-seguimiento', 'Almacen/ReporteSeguimientoContrato');
+        }
+    )->name('alm.reporteSeguimiento');
+    Route::get('get-contracts-info', [ReporteAlmacenController::class, 'getContractsInfo'])->name('reporteAlm.getContractsInfo');
+
     Route::get(
         '/alm/reporte-kardex',
         function (Request $request) {
@@ -198,6 +208,4 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('get-producto-for-reporte', [ReporteAlmacenController::class, 'getProductos'])->name('reporte.get-producto-for-reporte');
     Route::post('get-reporte-kardex', [ReporteAlmacenController::class, 'getReporteKardex'])->name('reporte.get-reporte-kardex');
     Route::post('get-reporte-excel-kardex', [ReporteAlmacenController::class, 'getKardexExcelReport'])->name('reporte.get-reporte-kardex');
-
-
 });
