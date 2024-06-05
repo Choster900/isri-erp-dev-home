@@ -34,7 +34,7 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     Route::post('get-info-modal-recep', [RecepcionController::class, 'getInfoModalRecep'])->name('recepcion.getInfoModalRecep');
 
     Route::post('check-available-months', [RecepcionController::class, 'checkAvailableMonths'])->name('recepcion.checkAvailableMonths');
-    
+
     Route::get('get-initial-doc-info', [RecepcionController::class, 'getInitialInfoDoc'])->name('recepcion.getInitialInfoDoc');
     Route::post('save-goods-reception', [RecepcionController::class, 'storeReception'])->name('recepcion.storeReception');
     Route::post('update-goods-reception', [RecepcionController::class, 'updateReception'])->name('recepcion.updateReception');
@@ -189,7 +189,15 @@ Route::group(['middleware' => ['auth', 'access']], function () {
     )->name('alm.reporteRecepcion');
     Route::post('get-reporte-recepcion-almacen', [ReporteAlmacenController::class, 'getReporteRecepcion'])->name('reporte.AlmacenRecepcion');
     Route::post('get-reporte-recepcion-excel', [ReporteAlmacenController::class, 'getExcelRecepcion'])->name('reporte.AlmacenRecepcion');
-
+    Route::get(
+        '/alm/reporte-kardex',
+        function (Request $request) {
+            return checkModuleAccessAndRedirect($request->user()->id_usuario, '/alm/reporte-kardex', 'Almacen/ReporteKardex');
+        }
+    )->name('alm.reporteKardex');
+    Route::post('get-producto-for-reporte', [ReporteAlmacenController::class, 'getProductos'])->name('reporte.get-producto-for-reporte');
+    Route::post('get-reporte-kardex', [ReporteAlmacenController::class, 'getReporteKardex'])->name('reporte.get-reporte-kardex');
+    Route::post('get-reporte-excel-kardex', [ReporteAlmacenController::class, 'getKardexExcelReport'])->name('reporte.get-reporte-kardex');
 
 
 });
