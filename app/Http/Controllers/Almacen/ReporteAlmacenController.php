@@ -1364,18 +1364,18 @@ class ReporteAlmacenController extends Controller
     function getReporteKardex(Request $request)
     {
 
-        /* $rules = [
+        $rules = [
             "idProy"       => "required",
-            "idEstado"     => "required",
+            "inProd"     => "required",
             "fechaInicial" => "required",
             "fechaFinal"   => "required",
         ];
 
         $customMessages = [
             "idProy.required"       => "El campo Centro es obligatorio.",
-            "idEstado.required"     => "El campo Estado es obligatorio.",
-            "fechaInicial.required" => "El campo Fecha Inicial es obligatorio.",
-            "fechaFinal.required"   => "El campo Fecha Final es obligatorio.",
+            "inProd.required"     => "El campo Estado es obligatorio.",
+            "fechaInicial.required" => "El campo Fecha es obligatorio.",
+            "fechaFinal.required"   => "El campo Fecha es obligatorio.",
         ];
 
         $validator = Validator::make($request->all(), $rules, $customMessages);
@@ -1384,28 +1384,19 @@ class ReporteAlmacenController extends Controller
             $message = 'The given data was invalid.';
             return response()->json(['message' => $message, 'errors' => $errors], 422);
         }
- */
+
 
         $fechaInicial = $request->fechaInicial != '' ? date('Y-m-d', strtotime($request->fechaInicial)) : null;
         $fechaFinal = $request->fechaFinal != '' ? date('Y-m-d', strtotime($request->fechaFinal)) : null;
 
 
-        /* $params = [
+        $params = [
             'idproy'    => $request->idProy,
-            'idproducto'    => $request->idEstado,
-            'idcentro'    => $request->idEstado,
+            'idproducto'    => $request->inProd,
+            'idcentro'    => $request->idCentro,
             'fecha_inicial'  => $fechaInicial,
             'fecha_final' =>  $fechaFinal
-        ]; */
-
-        $params = [
-            'idproy'    => 1,
-            'idproducto'    => 3218,
-            'idcentro'    => null,
-            'fecha_inicial'  => '2024-04-01',
-            'fecha_final' =>  '2024-06-30'
         ];
-
 
         return DB::select("CALL PR_RPT_KARDEX(:idproy, :idproducto, :idcentro, :fecha_inicial, :fecha_final)", $params);
     }
@@ -1413,16 +1404,16 @@ class ReporteAlmacenController extends Controller
     public function getKardexExcelReport(Request $request)
     {
 
-        /*   $fechaInicial = $request->fechaInicial != '' ? date('Y-m-d', strtotime($request->fechaInicial)) : null;
+        $fechaInicial = $request->fechaInicial != '' ? date('Y-m-d', strtotime($request->fechaInicial)) : null;
         $fechaFinal = $request->fechaFinal != '' ? date('Y-m-d', strtotime($request->fechaFinal)) : null;
- */
+
 
         $params = [
-            'idproy'    => 1,
-            'idproducto'    => 3218,
-            'idcentro'    => null,
-            'fecha_inicial'  => '2024-04-01',
-            'fecha_final' =>  '2024-06-30'
+            'idproy'    => $request->idProy,
+            'idproducto'    => $request->inProd,
+            'idcentro'    => $request->idCentro,
+            'fecha_inicial'  => $fechaInicial,
+            'fecha_final' =>  $fechaFinal
         ];
 
 
@@ -1440,16 +1431,16 @@ class ReporteAlmacenController extends Controller
 
 
         $sheet->mergeCells('B2:F2');
-        $sheet->setCellValue('B2', 'KARDEX');
+        $sheet->setCellValue('B2', 'TARJETA KARDEX');
         $sheet->getStyle('B2')->getFont()->setBold(true)->setSize(18);
         $sheet->getStyle('B2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
 
-        $sheet->mergeCells('H3:I3');
-        #$sheet->setCellValue('H3', 'DEL ' . date_format(date_create($fechaInicial), 'd, F, Y'));
-        $sheet->setCellValue('H3', 'DEL 12 , ABRIL, 2023');
-        $sheet->getStyle('H3')->getFont()->setSize(9);
-        $sheet->getStyle('H3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+        $sheet->mergeCells('L3:M3');
+        $sheet->setCellValue('L3', 'DEL ' . date_format(date_create($fechaInicial), 'd, F, Y'));
+        #$sheet->setCellValue('H3', 'DEL 12 , ABRIL, 2023');
+        $sheet->getStyle('L3')->getFont()->setSize(9);
+        $sheet->getStyle('L3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
 
         $sheet->mergeCells('A4:B4');
         #$sheet->setCellValue('H4', 'DEL ' . date_format(date_create($fechaFinal), 'd, F, Y'));
@@ -1458,11 +1449,11 @@ class ReporteAlmacenController extends Controller
         $sheet->getStyle('B4')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
 
 
-        $sheet->mergeCells('H4:I4');
-        #$sheet->setCellValue('H4', 'DEL ' . date_format(date_create($fechaFinal), 'd, F, Y'));
-        $sheet->setCellValue('H4', 'AL 16. ABRIL, 2024');
-        $sheet->getStyle('H4')->getFont()->setSize(9);
-        $sheet->getStyle('H4')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+        $sheet->mergeCells('L4:M4');
+        $sheet->setCellValue('L4', 'DEL ' . date_format(date_create($fechaFinal), 'd, F, Y'));
+        #$sheet->setCellValue('H4', 'AL 16. ABRIL, 2024');
+        $sheet->getStyle('L4')->getFont()->setSize(9);
+        $sheet->getStyle('L4')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
 
 
         $encabezados = [
@@ -1533,12 +1524,12 @@ class ReporteAlmacenController extends Controller
             $sheet->setCellValue('L' . $row, $data->costo_final_rpt_kardex);
             $sheet->setCellValue('M' . $row, $data->monto_final_rpt_kardex);
 
-         /*    foreach (range('C', 'I') as $column) {
-                if ($column != 'C') {
+            foreach (range('C', 'M') as $column) {
+
                     $sheet->getStyle($column . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                }
+
             }
- */
+
             // Establecer la alineación centrada para todas las celdas excepto en la columna C
 
             $sheet->getStyle('A' . $row . ':J' . $row)->getFont()->setName('Calibri')->setSize(9);

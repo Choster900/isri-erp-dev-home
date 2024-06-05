@@ -10,16 +10,18 @@
                 <div class="pl-4">
                     <DateTimePickerM :showIcon="false" v-model="fechaInicial" :label="'Fecha inicio'"
                         :placeholder="'Seleccione'" :required="true" />
+                        <InputError class="mt-2" :message="errors[`fechaInicial`]" />
 
                 </div>
 
                 <div class="">
                     <date-time-picker-m :showIcon="false" v-model="fechaFinal" :label="'Fecha fin'"
                         :placeholder="'Seleccione'" :required="true" />
+                        <InputError class="mt-2" :message="errors[`fechaFinal`]" />
 
                 </div>
 
-                <div class="mb-4 md:mr-0 md:mb-0 basis-[25%]">
+                <div class="md:mr-0 md:mb-0 basis-[25%]">
                     <label class="block mb-2 text-[13px] font-medium text-gray-600">Proyecto financiado <span
                             class="text-red-600 font-extrabold">*</span></label>
                     <div class="relative flex h-[30px] w-full">
@@ -29,14 +31,16 @@
                             { value: 3, label: 'RECURSOS PROPIOS' },
                             { value: 4, label: 'DONACION' },
                         ]" :searchable="true" :noOptionsText="'Lista vacía.'" placeholder="Seleccione" />
+
                     </div>
+                        <InputError class="mt-2" :message="errors[`idProy`]" />
                 </div>
 
-                <div class="mb-4 md:mr-0 md:mb-0 basis-[25%]">
+                <div class="md:mr-0 md:mb-0 basis-[25%]">
                     <label class="block mb-2 text-[13px] font-medium text-gray-600">Centro de atencion
                         <span class="text-red-600 font-extrabold">*</span></label>
                     <div class="relative flex h-[30px] w-full">
-                        <Multiselect v-model="idEstado" :options="[
+                        <Multiselect v-model="idCentro" :options="[
                                 { value: 0, label: 'TODOS' },
                                 { value: 1, label: 'ADMINISTRACION SUPERIOR' },
                                 { value: 2, label: 'CENTRO DE ATENCION A ANCIANOS SARA ZALDIVAR' },
@@ -52,11 +56,11 @@
                     </div>
 
                 </div>
-                <div class="mb-4 md:mr-0 md:mb-0 basis-[25%]">
+                <div class="md:mr-0 md:mb-0 basis-[25%]">
                     <label class="block mb-2 text-[13px] font-medium text-gray-600">Producto
                         <span class="text-red-600 font-extrabold">*</span></label>
                     <div class="relative flex h-[30px] w-full">
-                        <Multiselect v-model="idEstado" :classes="{
+                        <Multiselect v-model="inProd" :classes="{
                                 containerDisabled: ' bg-gray-200 text-text-slate-400',
                                 optionSelectedDisabled: 'text-white bg-[#001c48] bg-opacity-50 cursor-not-allowed',
                                 optionPointed: 'text-gray-800 bg-gray-100 cursor-pointer',
@@ -75,7 +79,9 @@
                             }" :filter-results="false" :resolve-on-load="false" :delay="1000" :searchable="true" :clear-on-search="true"
                             :min-chars="1" :noOptionsText="'Lista vacía.'"
                             placeholder="Buscar por (Nombre,codigo,especifico)" />
+
                     </div>
+                        <InputError class="mt-2" :message="errors[`inProd`]" />
 
                 </div>
 
@@ -92,7 +98,7 @@
             </div>
 
             <div class="flex justify-end px-4 gap-3" v-if="dataReporteKardex != ''">
-                <h1 class="font-medium">Reporte de requisición:</h1>
+                <h1 class="font-medium">Reporte de kardex:</h1>
                 <div class="flex" style="display: non">
                     <div @click="exportExcel"
                         class="flex items-center cursor-pointer text-slate-700 hover:text-green-600">
@@ -176,6 +182,7 @@ export default {
             idProy,
             isLoadinRequest,
             dataReporteKardex,
+            errors,
             getInformacionReport,
             handleProducto,
         } = useReporteKardex();
@@ -192,6 +199,7 @@ export default {
             idProy,
             dataReporteKardex,
             isLoadinRequest,
+            errors,
 
             handleProducto,
             getInformacionReport,

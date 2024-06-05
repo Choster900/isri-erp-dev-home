@@ -50,7 +50,7 @@
                         </tr>
                     </thead>
                     <!-- id_rpt_requisicion -->
-                    <tbody>
+                    <tbody v-if="!isLoadinRequest">
                         <template v-for="(item, index) in dataGetKardex" :key="index">
 
 
@@ -126,11 +126,6 @@
             </div>
         </div>
     </div>
-
-
-<!-- <pre>
-{{dataGetKardex}}
-</pre> -->
 </template>
 
 <script>

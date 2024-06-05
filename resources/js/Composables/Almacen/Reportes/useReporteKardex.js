@@ -26,7 +26,13 @@ export const useReporteKardex = () => {
             isLoadinRequest.value = true;
 
             const resp = await axios.post(
-                "/get-reporte-kardex", {}
+                "/get-reporte-kardex", {
+                idProy: idProy.value,
+                inProd: inProd.value,
+                idCentro: idCentro.value,
+                fechaInicial: fechaInicial.value,
+                fechaFinal: fechaFinal.value,
+            }
             );
             const { data } = resp;
             console.log(data);
@@ -166,7 +172,11 @@ export const useReporteKardex = () => {
                 const response = await axios.post(
                     "/get-reporte-excel-kardex",
                     {
-                      
+                        idProy: idProy.value,
+                        inProd: inProd.value,
+                        idCentro: idCentro.value,
+                        fechaInicial: fechaInicial.value,
+                        fechaFinal: fechaFinal.value,
                     },
                     { responseType: "blob" }
                 );
@@ -177,7 +187,7 @@ export const useReporteKardex = () => {
                 // Crear un enlace temporal y simular un clic para descargar el archivo
                 const link = document.createElement("a");
                 link.href = url;
-                link.setAttribute("download", "REPORTE_CONSUMO_" + moment().format('L') + ".xlsx"); // Nombre del archivo deseado
+                link.setAttribute("download", "TARJETA_KARDEX" + moment().format('L') + ".xlsx"); // Nombre del archivo deseado
                 document.body.appendChild(link);
                 link.click();
 
